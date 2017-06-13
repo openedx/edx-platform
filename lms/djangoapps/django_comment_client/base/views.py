@@ -28,6 +28,8 @@ from django_comment_client.utils import (
     get_annotated_content_info,
     get_cached_discussion_id_map,
     get_group_id_for_comments_service,
+    get_group_id_for_user,
+    get_user_group_ids,
     is_comment_too_deep,
     prepare_content
 )
@@ -169,6 +171,8 @@ def permitted(func):
             """
             Extract the forum object from the keyword arguments to the view.
             """
+            user_group_id = None
+            content_user_group_id = None
             if "thread_id" in kwargs:
                 content = cc.Thread.find(kwargs["thread_id"]).to_dict()
             elif "comment_id" in kwargs:
@@ -177,9 +181,16 @@ def permitted(func):
                 content = cc.Commentable.find(kwargs["commentable_id"]).to_dict()
             else:
                 content = None
-            return content
+
+            if 'username' in content:
+                (user_group_id, content_user_group_id) = get_user_group_ids(course_key, content, request.user)
+            return content, user_group_id, content_user_group_id
+
         course_key = CourseKey.from_string(kwargs['course_id'])
-        if check_permissions_by_view(request.user, course_key, fetch_content(), request.view_name):
+        content, user_group_id, content_user_group_id = fetch_content()
+
+        if check_permissions_by_view(request.user, course_key, content,
+                                     request.view_name, user_group_id, content_user_group_id):
             return func(request, *args, **kwargs)
         else:
             return JsonError("unauthorized", status=401)
@@ -203,7 +214,7 @@ def ajax_content_response(request, course_key, content):
 @permitted
 def create_thread(request, course_id, commentable_id):
     """
-    Given a course and commentble ID, create the thread
+    Given a course and commentable ID, create the thread
     """
 
     log.debug("Creating new thread in %r, id %r", course_id, commentable_id)

@@ -249,6 +249,20 @@ from django.utils.translation import ugettext as _
     ></div>
 
     <div class="auth-list-container"
+      data-rolename="Group Moderator"
+      data-display-name="${_("Discussion Group Moderators")}"
+      data-info-text="
+        ${_("Discussion Group Moderators can edit or delete any post, clear misuse flags, close "
+         "and re-open threads, endorse responses, and see posts from all groups. "
+         "Their posts are marked as 'staff'. They cannot manage course team membership by "
+         "adding or removing discussion moderation roles. Only enrolled users can be "
+         "added as Discussion Moderators.")}"
+      data-list-endpoint="${ section_data['list_forum_members_url'] }"
+      data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
+      data-add-button-label="${_("Add Group Moderator")}"
+    ></div>
+
+    <div class="auth-list-container"
       data-rolename="Community TA"
       data-display-name="${_("Discussion Community TAs")}"
       data-info-text="
