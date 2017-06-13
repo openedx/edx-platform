@@ -1,5 +1,6 @@
 """
 Test the Studio help links.
+Finding commit that worked.
 """
 
 from unittest import skip
