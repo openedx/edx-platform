@@ -799,7 +799,6 @@ class SettingsHelpTest(StudioCourseTest):
 
         self.settings_page.visit()
 
-    @skip("Fix studio help links in DOC-3686")
     def test_settings_page_nav_help(self):
         """
         Scenario: Help link in navigation bar is working on Settings page.
@@ -872,7 +871,6 @@ class CourseTeamSettingsHelpTest(StudioCourseTest):
 
         self.course_team_settings_page.visit()
 
-    @skip("Fix studio help links in DOC-3686")
     def test_course_course_team_nav_help(self):
         """
         Scenario: Help link in navigation bar is working on Course Team settings page
@@ -1002,7 +1000,6 @@ class CertificatePageHelpTest(StudioCourseTest):
 
         self.certificates_page.visit()
 
-    @skip("Fix studio help links in DOC-3686")
     def test_certificate_page_nav_help(self):
         """
         Scenario: Help link in navigation bar is working on Certificate settings page
@@ -1021,7 +1018,6 @@ class CertificatePageHelpTest(StudioCourseTest):
             href=expected_url,
         )
 
-    @skip("Fix studio help links in DOC-3686")
     def test_certificate_page_side_bar_help(self):
         """
         Scenario: Help link in side bar is working Certificate settings page
