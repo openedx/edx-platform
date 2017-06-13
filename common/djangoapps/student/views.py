@@ -1298,9 +1298,6 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     backend_name = None
     email = None
     password = None
-    redirect_url = None
-    response = None
-    running_pipeline = None
     third_party_auth_requested = third_party_auth.is_enabled() and pipeline.running(request)
     third_party_auth_successful = False
     trumped_by_first_party_auth = bool(request.POST.get('email')) or bool(request.POST.get('password'))
