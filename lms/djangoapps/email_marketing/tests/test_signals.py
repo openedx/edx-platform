@@ -25,7 +25,8 @@ from email_marketing.tasks import (
     _get_list_from_email_marketing_provider,
     _get_or_create_user_list,
     update_user,
-    update_user_email
+    update_user_email,
+    get_email_cookies_via_sailthru
 )
 from student.tests.factories import UserFactory, UserProfileFactory
 from util.json_request import JsonResponse
@@ -98,13 +99,10 @@ class EmailMarketingTests(TestCase):
         self.request.COOKIES['anonymous_interest'] = 'cookie_content'
         mock_get_current_request.return_value = self.request
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'keys': {'cookie': 'test_cookie'}}))
-        cookie_log = "Sending to Sailthru the user interest cookie [{'anonymous_interest': 'cookie_content'}]" \
-                     ' for user [test@edx.org]'
 
         with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:
             add_email_marketing_cookies(None, response=response, user=self.user)
             logger.check(
-                (LOGGER_NAME, 'INFO', cookie_log),
                 (LOGGER_NAME, 'INFO',
                     'Started at {start} and ended at {end}, time spent:{delta} milliseconds'.format(
                         start=datetime.datetime.now().isoformat(' '),
@@ -119,6 +117,28 @@ class EmailMarketingTests(TestCase):
                                           'vars': {'last_login_date': ANY}})
         self.assertTrue('sailthru_hid' in response.cookies)
         self.assertEquals(response.cookies['sailthru_hid'].value, "test_cookie")
+
+    @patch('email_marketing.signals.SailthruClient.api_post')
+    def test_get_cookies_via_sailthu(self, mock_sailthru):
+
+        cookies = {'cookie': 'test_cookie'}
+        mock_sailthru.return_value = SailthruResponse(JsonResponse({'keys': cookies}))
+
+        post_parms = {
+            'id': self.user.email,
+            'fields': {'keys': 1},
+            'vars': {'last_login_date': datetime.datetime.now().strftime("%Y-%m-%d")},
+            'cookies': {'anonymous_interest': 'cookie_content'}
+        }
+        expected_cookie = get_email_cookies_via_sailthru.delay(self.user.email, post_parms)
+
+        mock_sailthru.assert_called_with('user',
+                                         {'fields': {'keys': 1},
+                                          'cookies': {'anonymous_interest': 'cookie_content'},
+                                          'id': TEST_EMAIL,
+                                          'vars': {'last_login_date': ANY}})
+
+        self.assertEqual(cookies['cookie'], expected_cookie.result)
 
     @patch('email_marketing.signals.SailthruClient.api_post')
     def test_drop_cookie_error_path(self, mock_sailthru):
