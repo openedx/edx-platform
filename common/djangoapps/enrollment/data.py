@@ -13,6 +13,7 @@ from enrollment.errors import (
 )
 from enrollment.serializers import CourseEnrollmentSerializer, CourseSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.exceptions import CourseNotFoundError
 from student.models import (
     CourseEnrollment, NonExistentCourseError, EnrollmentClosedError,
