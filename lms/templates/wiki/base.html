@@ -59,7 +59,11 @@
 <div class="container">
   <div class="wiki-wrapper">
     <main id="main" aria-label="Content" tabindex="-1">
-      <section class="wiki {{ selected_tab }}" id="wiki-content">
+          <section class="wiki {{ selected_tab }}" id="wiki-content"
+            {% if request.course.language %}
+              lang="{{ request.course.language }}"
+            {% endif %}
+          >
         {% block wiki_body %}
 
           {% block wiki_breadcrumbs %}{% endblock %}

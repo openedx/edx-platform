@@ -30,7 +30,7 @@ class MemoryUserPartitionScheme(object):
         """
         self.current_group.setdefault(user.id, {})[user_partition.id] = group
 
-    def get_group_for_user(self, course_id, user, user_partition, track_function=None):  # pylint: disable=unused-argument
+    def get_group_for_user(self, course_id, user, user_partition):  # pylint: disable=unused-argument
         """
         Fetch the group to which this user is linked in this partition, or None.
         """
