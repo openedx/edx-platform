@@ -299,11 +299,6 @@ class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
     """
     @ddt.data([], ['fake_program_type'])
     def test_get_programs_with_type_called(self, program_types):
-        self.site_configuration.values.update({
-            'ENABLED_PROGRAM_TYPES': program_types
-        })
-        self.site_configuration.save()
-
         views = [
             (reverse('root'), 'student.views.get_programs_with_type'),
             (reverse('branding.views.courses'), 'courseware.views.views.get_programs_with_type'),

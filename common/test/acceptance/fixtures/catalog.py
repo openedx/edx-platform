@@ -29,7 +29,6 @@ class CatalogFixture(object):
             uuids.append(uuid)
 
             program_key = '{base}.{uuid}'.format(base=key, uuid=uuid)
-
             requests.put(
                 '{}/set_config'.format(CATALOG_STUB_URL),
                 data={program_key: json.dumps(program)},
@@ -39,6 +38,18 @@ class CatalogFixture(object):
         requests.put(
             '{}/set_config'.format(CATALOG_STUB_URL),
             data={key: json.dumps(uuids)},
+        )
+
+    def install_program_types(self, program_types):
+        """
+        Stub the discovery service's program type list API endpoints.
+
+        Arguments:
+            program_types (list): A list of program types. List endpoint will be stubbed using data from this list.
+        """
+        requests.put(
+            '{}/set_config'.format(CATALOG_STUB_URL),
+            data={'catalog.programs_types': json.dumps(program_types)},
         )
 
 
