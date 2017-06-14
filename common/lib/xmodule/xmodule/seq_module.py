@@ -523,7 +523,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
 class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor, XmlDescriptor):
     """
-    A Sequences Descriptor object
+    A Sequence's Descriptor object
     """
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
