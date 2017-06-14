@@ -155,15 +155,7 @@ def courses(request):
         else:
             courses_list = sort_by_announcement(courses_list)
 
-    # Get the active programs of the type configured for the current site from the catalog service. The programs_list
-    # is being added to the context but it's not being used currently in courseware/courses.html. To use this list,
-    # you need to create a custom theme that overrides courses.html. The modifications to courses.html to display the
-    # programs will be done after the support for edx-pattern-library is added.
-    program_types = configuration_helpers.get_value('ENABLED_PROGRAM_TYPES')
-
-    # Do not add programs to the context if there are no program types enabled for the site.
-    if program_types:
-        programs_list = get_programs_with_type(program_types, include_hidden=False)
+    programs_list = get_programs_with_type(include_hidden=False)
 
     return render_to_response(
         "courseware/courses.html",
