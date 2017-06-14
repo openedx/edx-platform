@@ -2,26 +2,37 @@
 import copy
 import logging
 
+import waffle
 from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from edx_rest_api_client.client import EdxRestApiClient
 
-from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, PROGRAM_UUIDS_CACHE_KEY
+from openedx.core.djangoapps.catalog.cache import (
+    PROGRAM_CACHE_KEY_TPL,
+    PROGRAM_UUIDS_CACHE_KEY,
+    SITE_PROGRAM_UUIDS_CACHE_KEY
+)
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
+from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
 
 logger = logging.getLogger(__name__)
 
 
-def create_catalog_api_client(user):
+def create_catalog_api_client(user, site=None):
     """Returns an API client which can be used to make Catalog API requests."""
     scopes = ['email', 'profile']
     expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
     jwt = JwtBuilder(user).build_token(scopes, expires_in)
 
-    url = CatalogIntegration.current().get_internal_api_url()
+    if not site:
+        url = CatalogIntegration.current().get_internal_api_url()
+    else:
+        # management command explicitly defining the site.
+        url = site.configuration.get_value("COURSE_CATALOG_API_URL")
+
     return EdxRestApiClient(url, jwt=jwt)
 
 
@@ -45,8 +56,15 @@ def get_programs(uuid=None):
             logger.warning(missing_details_msg_tpl.format(uuid=uuid))
 
         return program
-
-    uuids = cache.get(PROGRAM_UUIDS_CACHE_KEY, [])
+    if waffle.switch_is_active("get-multitenant-programs"):
+        logger.info('Fetching programs from cache for site {site_name}, key = {cache_key}'.format(
+            site_name=get_current_site().domain,
+            cache_key=SITE_PROGRAM_UUIDS_CACHE_KEY.format(site_name=get_current_site().domain)
+        ))
+        uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY.format(site_name=get_current_site().domain), [])
+        logger.info(uuids)
+    else:
+        uuids = cache.get(PROGRAM_UUIDS_CACHE_KEY, [])
     if not uuids:
         logger.warning('Failed to get program UUIDs from the cache.')
 
@@ -109,16 +127,14 @@ def get_program_types(name=None):
         return []
 
 
-def get_programs_with_type(types=None, include_hidden=True):
+def get_programs_with_type(include_hidden=True):
     """
-    Return the list of programs. You can filter the types of programs returned using the optional
-    types parameter. If no filter is provided, all programs of all types will be returned. In addition,
-    you can specify whether to include hidden programs using the optional include_hidden parameter.
+    Return the list of programs. You can filter the types of programs returned by using the optional
+    include_hidden parameter. By default hidden programs will be included.
 
     The program dict is updated with the fully serialized program type.
 
     Keyword Arguments:
-        types (list): List of program type slugs to filter by.
         include_hidden (bool): whether to include hidden programs
 
     Return:
@@ -130,13 +146,6 @@ def get_programs_with_type(types=None, include_hidden=True):
     if programs:
         program_types = {program_type['name']: program_type for program_type in get_program_types()}
         for program in programs:
-            # This limited type filtering is sufficient for current needs and
-            # helps us avoid additional complexity when caching program data.
-            # However, if the need for additional filtering of programs should
-            # arise, consider using the cache_programs management command to
-            # cache the filtered lists of UUIDs.
-            if types and program['type'] not in types:
-                continue
 
             if program['hidden'] and not include_hidden:
                 continue
@@ -144,7 +153,7 @@ def get_programs_with_type(types=None, include_hidden=True):
             # deepcopy the program dict here so we are not adding
             # the type to the cached object
             program_with_type = copy.deepcopy(program)
-            program_with_type['type'] = program_types[program['type']]
+            program_with_type['type'] = program_types.get(program['type'])
             programs_with_type.append(program_with_type)
 
     return programs_with_type
