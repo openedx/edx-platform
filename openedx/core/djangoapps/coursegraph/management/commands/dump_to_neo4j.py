@@ -19,10 +19,10 @@ from openedx.core.djangoapps.content.course_structures.models import CourseStruc
 
 log = logging.getLogger(__name__)
 
-# When testing locally, neo4j's bolt logger was noisy, so we'll only have it
+# When testing locally, neo4j's loggers are noisy, so we'll only have it
 # emit logs if there's an error.
-bolt_log = logging.getLogger('neo4j.bolt')  # pylint: disable=invalid-name
-bolt_log.setLevel(logging.ERROR)
+logging.getLogger('neo4j.bolt').setLevel(logging.ERROR)
+logging.getLogger('httpstream').setLevel(logging.ERROR)
 
 PRIMITIVE_NEO4J_TYPES = (integer, string, neo4j_unicode, float, bool)
 
@@ -364,6 +364,7 @@ class Command(BaseCommand):
         parser.add_argument('--secure', action='store_true')
         parser.add_argument('--user', type=six.text_type)
         parser.add_argument('--password', type=six.text_type)
+        parser.add_argument('--no_bolt', action='store_true', default=False)
         parser.add_argument('--courses', type=six.text_type, nargs='*')
         parser.add_argument('--skip', type=six.text_type, nargs='*')
         parser.add_argument(
@@ -383,6 +384,7 @@ class Command(BaseCommand):
         secure = options['secure']
         neo4j_user = options['user']
         neo4j_password = options['password']
+        use_bolt = not options['no_bolt']
 
         authenticate(
             "{host}:{port}".format(host=host, port=https_port if secure else http_port),
@@ -391,7 +393,7 @@ class Command(BaseCommand):
         )
 
         graph = Graph(
-            bolt=True,
+            bolt=use_bolt,
             password=neo4j_password,
             user=neo4j_user,
             https_port=https_port,
