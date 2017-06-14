@@ -239,6 +239,12 @@ class CoursewareSearchCohortTest(ContainerBase, CohortTestMixin):
     def test_cohorted_search_user_staff_masquerade_student_content(self):
         """
         Test staff user can search just student public content if selected from preview menu.
+
+        NOTE: Although it would be wise to combine these masquerading tests into
+        a single test due to expensive setup, doing so revealed a very low
+        priority bug where searching seems to stick/cache the access of the
+        first user who searches for future searches.
+
         """
         self._auto_auth(self.staff_user["username"], self.staff_user["email"], False)
         self._goto_staff_page().set_staff_view_mode('Learner')
