@@ -18,7 +18,8 @@ from common.test.acceptance.pages.lms.progress import ProgressPage
 from common.test.acceptance.pages.studio.overview import ContainerPage, CourseOutlinePage, ExpandCollapseLinkState
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
 from common.test.acceptance.pages.studio.utils import add_discussion, drag, verify_ordering
-from common.test.acceptance.tests.helpers import disable_animations, load_data_str
+from common.test.acceptance.tests.helpers import create_user_partition_json, disable_animations, load_data_str
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID, Group
 
 SECTION_NAME = 'Test Section'
 SUBSECTION_NAME = 'Test Subsection'
@@ -139,6 +140,7 @@ class WarningMessagesTest(CourseOutlineTest):
     LIVE_UNPUBLISHED_WARNING = 'Unpublished changes to live content'
     FUTURE_UNPUBLISHED_WARNING = 'Unpublished changes to content that will release in the future'
     NEVER_PUBLISHED_WARNING = 'Unpublished units will not be released'
+    GROUP_RESTRICTION_WARNING = 'Access to this unit is restricted to Audit'
 
     class PublishState(object):
         """
@@ -152,11 +154,12 @@ class WarningMessagesTest(CourseOutlineTest):
     class UnitState(object):
         """ Represents the state of a unit """
 
-        def __init__(self, is_released, publish_state, is_locked):
+        def __init__(self, is_released, publish_state, is_locked, is_restricted):
             """ Creates a new UnitState with the given properties """
             self.is_released = is_released
             self.publish_state = publish_state
             self.is_locked = is_locked
+            self.is_restricted = is_restricted
 
         @property
         def name(self):
@@ -169,6 +172,7 @@ class WarningMessagesTest(CourseOutlineTest):
             else:
                 result += "Published "
             result += "Locked" if self.is_locked else "Unlocked"
+            result += "Restricted" if self.is_restricted else "Unrestricted"
             return result
 
     def populate_course_fixture(self, course_fixture):
@@ -178,7 +182,8 @@ class WarningMessagesTest(CourseOutlineTest):
         features = [
             [True, False],             # Possible values for is_released
             self.PublishState.VALUES,  # Possible values for publish_state
-            [True, False]              # Possible values for is_locked
+            [True, False],             # Possible values for is_locked
+            [True, False],             # Possible values for is_restricted
         ]
 
         # Add a fixture for every state in the product of features
@@ -190,6 +195,7 @@ class WarningMessagesTest(CourseOutlineTest):
         """ Returns an XBlockFixtureDesc with a section, subsection, and possibly unit that has the given state. """
         name = unit_state.name
         start = (datetime(1984, 3, 4) if unit_state.is_released else datetime.now(UTC) + timedelta(1)).isoformat()
+        id_base = MINIMUM_STATIC_PARTITION_ID
 
         subsection = XBlockFixtureDesc('sequential', name, metadata={'start': start})
 
@@ -198,7 +204,19 @@ class WarningMessagesTest(CourseOutlineTest):
             subsection if unit_state.publish_state == self.PublishState.NEVER_PUBLISHED
             else subsection.add_children(
                 XBlockFixtureDesc('vertical', name, metadata={
-                    'visible_to_staff_only': True if unit_state.is_locked else None
+                    'visible_to_staff_only': True if unit_state.is_locked else None,
+                    'group_access': {50: [1]} if unit_state.is_restricted else {},
+                    'user_partitions': [
+                        create_user_partition_json(
+                            50,
+                            'Name of Enrollment Track Partition',
+                            'Enrollment Track Partition',
+                            [
+                                Group(1, 'Audit')
+                            ],
+                            scheme="cohort"
+                        )
+                    ],
                 })
             )
         )
@@ -206,63 +224,108 @@ class WarningMessagesTest(CourseOutlineTest):
     def test_released_never_published_locked(self):
         """ Tests that released never published locked units display staff only warnings """
         self._verify_unit_warning(
-            self.UnitState(is_released=True, publish_state=self.PublishState.NEVER_PUBLISHED, is_locked=True),
+            self.UnitState(
+                is_released=True,
+                publish_state=self.PublishState.NEVER_PUBLISHED,
+                is_locked=True,
+                is_restricted=False
+            ),
             self.STAFF_ONLY_WARNING
         )
 
     def test_released_never_published_unlocked(self):
         """ Tests that released never published unlocked units display 'Unpublished units will not be released' """
         self._verify_unit_warning(
-            self.UnitState(is_released=True, publish_state=self.PublishState.NEVER_PUBLISHED, is_locked=False),
+            self.UnitState(
+                is_released=True,
+                publish_state=self.PublishState.NEVER_PUBLISHED,
+                is_locked=False,
+                is_restricted=False
+            ),
             self.NEVER_PUBLISHED_WARNING
         )
 
     def test_released_unpublished_changes_locked(self):
         """ Tests that released unpublished changes locked units display staff only warnings """
         self._verify_unit_warning(
-            self.UnitState(is_released=True, publish_state=self.PublishState.UNPUBLISHED_CHANGES, is_locked=True),
+            self.UnitState(
+                is_released=True,
+                publish_state=self.PublishState.UNPUBLISHED_CHANGES,
+                is_locked=True,
+                is_restricted=False
+            ),
             self.STAFF_ONLY_WARNING
         )
 
     def test_released_unpublished_changes_unlocked(self):
         """ Tests that released unpublished changes unlocked units display 'Unpublished changes to live content' """
         self._verify_unit_warning(
-            self.UnitState(is_released=True, publish_state=self.PublishState.UNPUBLISHED_CHANGES, is_locked=False),
+            self.UnitState(
+                is_released=True,
+                publish_state=self.PublishState.UNPUBLISHED_CHANGES,
+                is_locked=False,
+                is_restricted=False
+            ),
             self.LIVE_UNPUBLISHED_WARNING
         )
 
     def test_released_published_locked(self):
         """ Tests that released published locked units display staff only warnings """
         self._verify_unit_warning(
-            self.UnitState(is_released=True, publish_state=self.PublishState.PUBLISHED, is_locked=True),
+            self.UnitState(
+                is_released=True,
+                publish_state=self.PublishState.PUBLISHED,
+                is_locked=True,
+                is_restricted=False
+            ),
             self.STAFF_ONLY_WARNING
         )
 
     def test_released_published_unlocked(self):
         """ Tests that released published unlocked units display no warnings """
         self._verify_unit_warning(
-            self.UnitState(is_released=True, publish_state=self.PublishState.PUBLISHED, is_locked=False),
+            self.UnitState(
+                is_released=True,
+                publish_state=self.PublishState.PUBLISHED,
+                is_locked=False,
+                is_restricted=False
+            ),
             None
         )
 
     def test_unreleased_never_published_locked(self):
         """ Tests that unreleased never published locked units display staff only warnings """
         self._verify_unit_warning(
-            self.UnitState(is_released=False, publish_state=self.PublishState.NEVER_PUBLISHED, is_locked=True),
+            self.UnitState(
+                is_released=False,
+                publish_state=self.PublishState.NEVER_PUBLISHED,
+                is_locked=True,
+                is_restricted=False
+            ),
             self.STAFF_ONLY_WARNING
         )
 
     def test_unreleased_never_published_unlocked(self):
         """ Tests that unreleased never published unlocked units display 'Unpublished units will not be released' """
         self._verify_unit_warning(
-            self.UnitState(is_released=False, publish_state=self.PublishState.NEVER_PUBLISHED, is_locked=False),
+            self.UnitState(
+                is_released=False,
+                publish_state=self.PublishState.NEVER_PUBLISHED,
+                is_locked=False,
+                is_restricted=False
+            ),
             self.NEVER_PUBLISHED_WARNING
         )
 
     def test_unreleased_unpublished_changes_locked(self):
         """ Tests that unreleased unpublished changes locked units display staff only warnings """
         self._verify_unit_warning(
-            self.UnitState(is_released=False, publish_state=self.PublishState.UNPUBLISHED_CHANGES, is_locked=True),
+            self.UnitState(
+                is_released=False,
+                publish_state=self.PublishState.UNPUBLISHED_CHANGES,
+                is_locked=True,
+                is_restricted=False
+            ),
             self.STAFF_ONLY_WARNING
         )
 
@@ -272,22 +335,85 @@ class WarningMessagesTest(CourseOutlineTest):
         release in the future'
         """
         self._verify_unit_warning(
-            self.UnitState(is_released=False, publish_state=self.PublishState.UNPUBLISHED_CHANGES, is_locked=False),
+            self.UnitState(
+                is_released=False,
+                publish_state=self.PublishState.UNPUBLISHED_CHANGES,
+                is_locked=False,
+                is_restricted=False
+            ),
             self.FUTURE_UNPUBLISHED_WARNING
         )
 
     def test_unreleased_published_locked(self):
         """ Tests that unreleased published locked units display staff only warnings """
         self._verify_unit_warning(
-            self.UnitState(is_released=False, publish_state=self.PublishState.PUBLISHED, is_locked=True),
+            self.UnitState(
+                is_released=False,
+                publish_state=self.PublishState.PUBLISHED,
+                is_locked=True,
+                is_restricted=False
+            ),
             self.STAFF_ONLY_WARNING
         )
 
     def test_unreleased_published_unlocked(self):
         """ Tests that unreleased published unlocked units display no warnings """
         self._verify_unit_warning(
-            self.UnitState(is_released=False, publish_state=self.PublishState.PUBLISHED, is_locked=False),
+            self.UnitState(
+                is_released=False,
+                publish_state=self.PublishState.PUBLISHED,
+                is_locked=False,
+                is_restricted=False
+            ),
             None
+        )
+
+    def test_unreleased_unpublished_unlocked_restricted(self):
+        """ Tests that unreleased unpublished unlocked units that are restricted display the restricted message"""
+        self._verify_unit_warning(
+            self.UnitState(
+                is_released=False,
+                publish_state=self.PublishState.PUBLISHED,
+                is_locked=False,
+                is_restricted=True
+            ),
+            self.GROUP_RESTRICTION_WARNING
+        )
+
+    def test_released_unpublished_unlocked_restricted(self):
+        """ Tests that released unpublished unlocked units that are restricted display the restricted message"""
+        self._verify_unit_warning(
+            self.UnitState(
+                is_released=True,
+                publish_state=self.PublishState.PUBLISHED,
+                is_locked=False,
+                is_restricted=True
+            ),
+            self.GROUP_RESTRICTION_WARNING
+        )
+
+    def test_released_published_unlocked_restricted(self):
+        """ Tests that released published unlocked units that are restricted display the restricted message"""
+        self._verify_unit_warning(
+            self.UnitState(
+                is_released=True,
+                publish_state=self.PublishState.PUBLISHED,
+                is_locked=False,
+                is_restricted=True
+            ),
+            self.GROUP_RESTRICTION_WARNING
+        )
+
+    def test_unreleased_unpublished_locked_restricted(self):
+        """ Tests that unreleased unpublished locked units that are restricted display the staff warning"""
+        self._verify_unit_warning(
+            self.UnitState(
+                is_released=False,
+                publish_state=self.PublishState.PUBLISHED,
+                is_locked=True,
+                is_restricted=True
+            ),
+            self.STAFF_ONLY_WARNING
         )
 
     def _verify_unit_warning(self, unit_state, expected_status_message):
@@ -307,7 +433,8 @@ class WarningMessagesTest(CourseOutlineTest):
             self.assertEqual(unit.status_message, self.STAFF_ONLY_WARNING)
         else:
             self.assertFalse(section.has_status_message)
-            self.assertFalse(subsection.has_status_message)
+            if not self.GROUP_RESTRICTION_WARNING:
+                self.assertFalse(subsection.has_status_message)
             if expected_status_message:
                 self.assertEqual(unit.status_message, expected_status_message)
             else:
