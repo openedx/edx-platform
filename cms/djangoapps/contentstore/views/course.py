@@ -17,6 +17,7 @@ import django.utils
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods, require_GET
 from django.views.decorators.csrf import ensure_csrf_cookie
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview, CourseOverviewTab
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -1249,6 +1250,19 @@ def advanced_settings_handler(request, course_key_string):
 
                         # now update mongo
                         modulestore().update_item(course_module, request.user.id)
+                        # Throw away old versions of CourseOverview and CourseOverviewTab - added by labster
+                        # as they might contain stale data then create new one.
+                        try:
+                            # Delete old data of CourseOverview and CourseOverviewTab if exist.
+                            course_overview = CourseOverview.objects.get(id=course_key)
+                            CourseOverviewTab.objects.filter(course_overview=course_overview).delete()
+                            course_overview.delete()
+                        except CourseOverview.DoesNotExist:
+                            pass
+                        # Create new one CourseOverview and CourseOverviewTab from data course module that
+                        # has been updated so the data always up to date. It fixes the issue when `invitation_value` has
+                        # changed and user can't enroll a course through voucher feature.
+                        CourseOverview.load_from_module_store(course_key)  # added by labster
 
                         return JsonResponse(updated_data)
                     else:
