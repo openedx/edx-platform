@@ -98,6 +98,11 @@ class CourseMetadata(object):
             filtered_list.append('enable_ccx')
             filtered_list.append('ccx_connector')
 
+        # Do not show "Issue Open Badges" in Studio Advanced Settings
+        # if the feature is disabled.
+        if not settings.FEATURES.get('ENABLE_OPENBADGES'):
+            filtered_list.append('issue_badges')
+
         # If the XBlockStudioConfiguration table is not being used, there is no need to
         # display the "Allow Unsupported XBlocks" setting.
         if not XBlockStudioConfigurationFlag.is_enabled():
