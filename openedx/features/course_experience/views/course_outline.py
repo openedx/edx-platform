@@ -1,14 +1,12 @@
 """
 Views to show a course outline.
 """
-
 from django.core.context_processors import csrf
 from django.template.loader import render_to_string
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
 from courseware.courses import get_course_overview_with_access
-from lms.djangoapps.courseware.views.views import check_and_get_upgrade_link, get_cosmetic_verified_display_price
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 
 from ..utils import get_course_outline_block_tree
@@ -32,10 +30,6 @@ class CourseOutlineFragmentView(EdxFragmentView):
             'csrf': csrf(request)['csrf_token'],
             'course': course_overview,
             'blocks': course_block_tree,
-            # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
-            'upgrade_link': check_and_get_upgrade_link(request, request.user, course_key),
-            'upgrade_price': get_cosmetic_verified_display_price(course_overview),
-            # ENDTODO
         }
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)
