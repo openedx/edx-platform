@@ -9,9 +9,10 @@ from django.conf import settings
 from django.dispatch import receiver
 from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError
+from celery.exceptions import TimeoutError
 
 from email_marketing.models import EmailMarketingConfiguration
-from lms.djangoapps.email_marketing.tasks import update_user, update_user_email
+from lms.djangoapps.email_marketing.tasks import update_user, update_user_email, get_email_cookies_via_sailthru
 from student.cookies import CREATE_LOGON_COOKIE
 from student.views import REGISTER_USER
 from util.model_utils import USER_FIELD_CHANGED
@@ -54,41 +55,34 @@ def add_email_marketing_cookies(sender, response=None, user=None,
         if sailthru_content:
             post_parms['cookies'] = {'anonymous_interest': sailthru_content}
 
+    time_before_call = datetime.datetime.now()
+    sailthru_response = get_email_cookies_via_sailthru.delay(user.email, post_parms)
+
     try:
-        sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
-        log.info(
-            'Sending to Sailthru the user interest cookie [%s] for user [%s]',
-            post_parms.get('cookies', ''),
-            user.email
-        )
-        time_before_call = datetime.datetime.now()
+        # synchronous call to get result of an asynchronous celery task, with timeout
+        sailthru_response.get(timeout=email_config.user_registration_cookie_timeout_delay,
+                              propagate=True)
+        cookie = sailthru_response.result
 
-        sailthru_response = \
-            sailthru_client.api_post("user", post_parms)
-
+    except TimeoutError as exc:
+        log.error("Timeout error while attempting to obtain cookie from Sailthru: %s", unicode(exc))
+        return response
     except SailthruClientError as exc:
         log.error("Exception attempting to obtain cookie from Sailthru: %s", unicode(exc))
-
         return response
 
-    if sailthru_response.is_ok():
-        if 'keys' in sailthru_response.json and 'cookie' in sailthru_response.json['keys']:
-            cookie = sailthru_response.json['keys']['cookie']
-
-            response.set_cookie(
-                'sailthru_hid',
-                cookie,
-                max_age=365 * 24 * 60 * 60,  # set for 1 year
-                domain=settings.SESSION_COOKIE_DOMAIN,
-                path='/',
-            )
-            _log_sailthru_api_call_time(time_before_call)
-        else:
-            log.error("No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
+    if not cookie:
+        log.error("No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
+        return response
     else:
-        error = sailthru_response.get_error()
-        # generally invalid email address
-        log.info("Error attempting to obtain cookie from Sailthru: %s", error.get_message())
+        response.set_cookie(
+            'sailthru_hid',
+            cookie,
+            max_age=365 * 24 * 60 * 60,  # set for 1 year
+            domain=settings.SESSION_COOKIE_DOMAIN,
+            path='/',
+        )
+        _log_sailthru_api_call_time(time_before_call)
 
     return response
 
