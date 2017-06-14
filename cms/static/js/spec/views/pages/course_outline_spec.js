@@ -52,7 +52,8 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                         display_name: 'Subsection',
                         children: []
                     },
-                    user_partitions: []
+                    user_partitions: [],
+                    group_access: {}
                 }, options, {child_info: {children: children}});
             };
 
@@ -621,8 +622,10 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     selectBasicSettings();
                     $('.wrapper-modal-window .action-save').click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-section', {
+                        'publish': 'republish',
                         'metadata': {
-                            'start': '2015-01-02T00:00:00.000Z'
+                            'start': '2015-01-02T00:00:00.000Z',
+                            'visible_to_staff_only': null
                         }
                     });
                     expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
@@ -1606,7 +1609,8 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                 });
 
                 it('shows partition group information', function() {
-                    var messages = getUnitStatus({has_partition_group_components: true});
+                    var messages = getUnitStatus({has_partition_group_components: true, group_access: {1: [2, 3]}});
+                    console.dir(messages);
                     expect(messages.length).toBe(1);
                     expect(messages).toContainText(
                         'Access to some content in this unit is restricted to specific groups of learners'
