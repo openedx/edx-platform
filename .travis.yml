@@ -35,7 +35,6 @@ before_install:
 install:   
   - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install 6.9.4
   - npm install
-  - npm install -g karma@0.13.22
 
   - pip install setuptools
   - pip install --exists-action w -r requirements/edx/paver.txt
@@ -58,6 +57,9 @@ install:
   - sudo apt-get install libxmlsec1-dev
   - sudo apt-get install swig
   - if [ -e requirements/edx/post.txt ]; then pip install --exists-action w -r requirements/edx/post.txt ; fi
+
+before_script:
+  - export PATH=$PATH:$PWD/node_modules/.bin
 
 # command to run tests
 script: ./scripts/travis-tests.sh
