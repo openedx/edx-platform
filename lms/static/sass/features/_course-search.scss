@@ -1,0 +1,70 @@
+// Styles for course search results
+
+.search-results {
+  .search-result-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    clear: both;
+  }
+
+  .search-results-title {
+    display: inline-block;
+    color: black;
+    font-size: 1.5rem;
+    line-height: 1.5;
+  }
+
+  .search-count {
+    @include float(right);
+    color: $lms-gray;
+  }
+
+  .search-results-item {
+    @include padding-right(140px);
+    position: relative;
+    border-top: 1px solid $border-color;
+    padding: $baseline ($baseline/2);
+    list-style-type: none;
+    cursor: pointer;
+
+    &:last-child {
+      border-bottom: 1px solid $border-color;
+    }
+
+    &:hover {
+      background: $lms-background-color;
+    }
+  }
+
+  .result-excerpt {
+    display: inline-block;
+  }
+
+  .result-location {
+    display: block;
+    color: $lms-gray;
+    font-size: 14px;
+    padding-top: ($baseline/2);
+  }
+
+  .result-link {
+    @include right($baseline/2);
+    position: absolute;
+    top: $baseline;
+    line-height: 1.6em;
+  }
+
+  .result-type {
+    @include right($baseline/2);
+    position: absolute;
+    color: $lms-gray;
+    font-size: 14px;
+    bottom: $baseline;
+  }
+
+  .search-load-next {
+    display: block;
+    margin-top: $baseline;
+  }
+}

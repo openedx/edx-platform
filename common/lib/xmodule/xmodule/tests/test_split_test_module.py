@@ -96,7 +96,6 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
         partitions_service = MockPartitionService(
             self.course,
             course_id=self.course.id,
-            track_function=Mock(name='track_function'),
         )
         self.module_system._services['partitions'] = partitions_service  # pylint: disable=protected-access
 
