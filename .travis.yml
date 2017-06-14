@@ -64,4 +64,7 @@ before_script:
 # command to run tests
 script: ./scripts/travis-tests.sh
 
+addons:
+  firefox: "45.0"
+
 dist: trusty
