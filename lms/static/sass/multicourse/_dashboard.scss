@@ -1221,6 +1221,7 @@
 
   // CASE: is pending
   &.is-pending {
+    border-top: 3px solid $active-color !important;
 
     .status-data-message {
       color: $m-gray-d3;
