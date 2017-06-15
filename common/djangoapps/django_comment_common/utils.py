@@ -71,7 +71,7 @@ def seed_permissions_roles(course_key):
         administrator_role.add_permission(per)
 
     moderator_role.inherit_permissions(student_role)
-    group_moderator_role
+    group_moderator_role.inherit_permissions(student_role)
     # For now, Community TA == Moderator, except for the styling.
     community_ta_role.inherit_permissions(moderator_role)
 
@@ -100,7 +100,7 @@ def are_permissions_roles_seeded(course_id):
             return False
 
     for per in GROUP_MODERATOR_ROLE_PERMISSIONS + STUDENT_ROLE_PERMISSIONS:
-        if not moderator_role.has_permission(per):
+        if not group_moderator_role.has_permission(per):
             return False
 
     for per in ADMINISTRATOR_ROLE_PERMISSIONS + MODERATOR_ROLE_PERMISSIONS + GROUP_MODERATOR_ROLE_PERMISSIONS + STUDENT_ROLE_PERMISSIONS:
