@@ -127,7 +127,12 @@ var wpconfig = {
     },
 
     externals: {
-        gettext: 'gettext'
+        backbone: 'Backbone',
+        gettext: 'gettext',
+        jquery: 'jQuery',
+        logger: 'Logger',
+        underscore: '_',
+        URI: 'URI'
     },
 
     watchOptions: {
