@@ -35,32 +35,31 @@
 
 <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
-        <h1 class="page-header">
+        <h3 class="page-header">
             <small class="subtitle">${_("Content")}</small>
-            <span class="sr">&gt; </span>${_("Files & Uploads")}
-        </h1>
+            <span class="sr">- </span>${_("Files & Uploads")}
+        </h3>
 
-        <nav class="nav-actions" aria-label="${_('Page Actions')}">
-            <h3 class="sr">${_("Page Actions")}</h3>
+        <div class="nav-actions">
             <ul>
                 <li class="nav-item">
                     <a href="#" class="button upload-button new-button"><span class="icon fa fa-plus" aria-hidden="true"></span> ${_("Upload New File")}</a>
                 </li>
             </ul>
-        </nav>
+        </div>
     </header>
 </div>
 
 <div class="wrapper-content wrapper">
-    <section class="content">
-        <article class="content-primary" role="main">
-            <div class="wrapper-assets" />
+    <div class="content">
+        <div class="content-primary">
+            <div class="wrapper-assets"> </div>
             <div class="ui-loading">
                 <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
             </div>
-        </article>
+        </div>
 
-        <aside class="content-supplementary" role="complementary">
+        <aside class="content-supplementary" role="complementary" aria-label="${_("Help adding Files and Uploads")}">
             <div class="bit">
                 <h3 class="title-3">${_("Adding Files for Your Course")}</h3>
 
@@ -84,14 +83,14 @@
             </div>
 
         </aside>
-    </section>
+    </div>
 </div>
 
 <div class="upload-modal modal">
     <a href="#" class="close-button"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <span class="sr">${_('close')}</span></a>
     <div class="modal-body">
-        <h1 class="title">${_("Upload New File")}</h1>
-        <h2>${_("Max per-file size: {max_filesize}MB").format(max_filesize=max_file_size_in_mbs)}</h2>
+        <h2 class="title">${_("Upload New File")}</h2>
+        <p>${_("Max per-file size: {max_filesize}MB").format(max_filesize=max_file_size_in_mbs)}</p>
         <p class="file-name">
         <div class="progress-bar">
             <div class="progress-fill"></div>
