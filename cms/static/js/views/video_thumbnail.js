@@ -246,12 +246,7 @@ define(
                 } else if (this.action === 'edit') {
                     this.setActionInfo(this.action, true);
                 }
-
-                // When we had error, focused effect was not wearing off after hover out.
-                // Add focused class to all rows except rows having error.
-                if (!$(this.$el.parent()).hasClass('has-thumbnail-error')) {
-                    this.$('.thumbnail-wrapper').addClass('focused');
-                }
+                this.$('.thumbnail-wrapper').addClass('focused');
             },
 
             hideHoverState: function() {
@@ -260,6 +255,7 @@ define(
                 } else if (this.action === 'edit') {
                     this.setActionInfo(this.action, false);
                 }
+                this.$('.thumbnail-wrapper').removeClass('focused');
             },
 
             setActionInfo: function(action, showText, additionalSRText) {
@@ -334,86 +330,12 @@ define(
                 this.setActionInfo(this.action, true);
                 this.readMessages([gettext('Could not upload the video image file'), errorText]);
 
-                // Add css classes so as to distinguish.
-                $parentRowEl.addClass('has-thumbnail-error thumbnail-error');
-
-                // We need to update data attr in DOM too so as to find our element on hover.
-                $parentRowEl.attr('data-video-id', videoId);
-
-                // Add error wrapper html before current video element row.
+                // Add error wrapper html to current video element row.
                 $parentRowEl.before(    // safe-lint: disable=javascript-jquery-insertion
                    HtmlUtils.ensureHtml(
                        this.thumbnailErrorTemplate({videoId: videoId, errorText: errorText})
                    ).toString()
                 );
-
-                // We need to treat error and error throwing row as one.
-                // Refresh table rows to reflect error row.
-                this.refreshVideoTableRowClasses();
-
-                // To treat current row and it's error row as one on hover,
-                // we add hover effect to both rows, even if it is hovered on only one row, thus, giving us
-                // the combined one row feel.
-                $('.thumbnail-error[data-video-id="' + videoId + '"]').hover(function() {
-                    $('.thumbnail-error[data-video-id="' + videoId + '"]').toggleClass('blue-l5');
-                });
-            },
-
-            /*
-            Refresh video table classes.
-
-            This method treats row and their corresponsing error rows as one, for that to achieve we need to reset
-            table row even odd colors.
-            */
-            refreshVideoTableRowClasses: function() {
-                var savedClass, // this class will be applied to the row corresponding to error row.
-                    oddRowClass = 'white',
-                    evenRowClass = 'gray-l6';
-
-                $('.view-video-uploads .assets-table .js-table-body tr').each(function(index) {
-                    var currentRowClass;
-
-                    // Decide current iterated row is even or odd.
-                    if (index % 2 === 0) {
-                        currentRowClass = evenRowClass;
-                    } else {
-                        currentRowClass = oddRowClass;
-                    }
-
-                    // If the row is error row, save it's class so that it can be applied to it's corresponding row.
-                    if ($(this).hasClass('thumbnail-error-wrapper')) {
-                        savedClass = currentRowClass;
-                    }
-
-                    // If current iterated row is the row which generated error
-                    // Apply the class same as it's corresponding error row. The class was saved.
-                    if ($(this).hasClass('has-thumbnail-error')) {
-                        // First remove previously added classes.
-                        $(this).removeClass(evenRowClass);
-                        $(this).removeClass(oddRowClass);
-
-                        // Apply new class now.
-                        $(this).addClass(savedClass);
-
-                        // Now after the saved class, swap even odd row classes.
-                        if (currentRowClass === oddRowClass) {
-                            oddRowClass = evenRowClass;
-                            evenRowClass = currentRowClass;
-                        } else {
-                            evenRowClass = oddRowClass;
-                            oddRowClass = currentRowClass;
-                        }
-                        // Reset the saved class after it has been applied.
-                        savedClass = '';
-                    } else {
-                        // For all simple rows, first remove classes if added
-                        $(this).removeClass(evenRowClass);
-                        $(this).removeClass(oddRowClass);
-
-                        // then add the class based on it's rows.
-                        $(this).addClass(currentRowClass);
-                    }
-                });
             },
 
             readMessages: function(messages) {
