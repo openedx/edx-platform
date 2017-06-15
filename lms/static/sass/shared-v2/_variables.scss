@@ -9,27 +9,38 @@
 // ----------------------------
 // #GRID
 // ----------------------------
-$lms-max-width: 1180px;
+$lms-max-width: 1180px !default;
 
 // ----------------------------
 // #COLORS
 // ----------------------------
-$lms-gray: palette(grayscale, base);
-$lms-background-color: palette(grayscale, x-back);
-$lms-container-background-color: $white;
-$lms-border-color: palette(grayscale, back);
-$lms-label-color: palette(grayscale, black);
-$lms-active-color: palette(primary, base);
-$lms-preview-menu-color: #c8c8c8;
 
-$white-transparent: rgba(255, 255, 255, 0);
-$white-opacity-40: rgba(255, 255, 255, 0.4);
-$white-opacity-60: rgba(255, 255, 255, 0.6);
-$white-opacity-70: rgba(255, 255, 255, 0.7);
-$white-opacity-80: rgba(255, 255, 255, 0.8);
+$lms-gray: palette(grayscale, base) !default;
+$lms-background-color: palette(grayscale, x-back) !default;
+$lms-container-background-color: $white !default;
+$lms-border-color: palette(grayscale, back) !default;
+$lms-label-color: palette(grayscale, black) !default;
+$lms-active-color: palette(primary, base) !default;
+$lms-preview-menu-color: #c8c8c8 !default;
+$success-color: palette(success, accent) !default;
+$success-color-hover: palette(success, text) !default;
 
-$light-grey-transparent: rgba(200,200,200, 0);
-$light-grey-solid: rgba(200,200,200, 1);
+$button-bg-hover-color: $white !default;
+
+$white-transparent: rgba(255, 255, 255, 0) !default;
+$white-opacity-40: rgba(255, 255, 255, 0.4) !default;
+$white-opacity-60: rgba(255, 255, 255, 0.6) !default;
+$white-opacity-70: rgba(255, 255, 255, 0.7) !default;
+$white-opacity-80: rgba(255, 255, 255, 0.8) !default;
+
+$black:     rgb(0,0,0) !default;
+$black-t0:  rgba($black, 0.125) !default;
+$black-t1:  rgba($black, 0.25) !default;
+$black-t2:  rgba($black, 0.5) !default;
+$black-t3:  rgba($black, 0.75) !default;
+
+$light-grey-transparent: rgba(200,200,200, 0) !default;
+$light-grey-solid: rgba(200,200,200, 1) !default;
 
 // ----------------------------
 // #TYPOGRAPHY
@@ -42,9 +53,10 @@ $font-bold: 700 !default;
 // ----------------------------
 // #ICONS
 // ----------------------------
-$lms-dark-icon-color: $white;
-$lms-dark-icon-background-color: palette(grayscale, black);
+// Icons
+$lms-dark-icon-color: $white !default;
+$lms-dark-icon-background-color: palette(grayscale, black) !default;
 
-$site-status-color: rgb(182,37,103);
+$site-status-color: rgb(182,37,103) !default;
 
 $shadow-l1: rgba(0,0,0,0.1) !default;
