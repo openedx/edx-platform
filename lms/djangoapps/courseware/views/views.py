@@ -289,7 +289,8 @@ def course_info(request, course_id):
         masquerade, user = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
 
         # if user is not enrolled in a course then app will show enroll/get register link inside course info page.
-        show_enroll_banner = request.user.is_authenticated() and not CourseEnrollment.is_enrolled(user, course.id)
+        user_is_enrolled = CourseEnrollment.is_enrolled(user, course.id)
+        show_enroll_banner = request.user.is_authenticated() and not user_is_enrolled
         if show_enroll_banner and hasattr(course_key, 'ccx'):
             # if course is CCX and user is not enrolled/registered then do not let him open course direct via link for
             # self registration. Because only CCX coach can register/enroll a student. If un-enrolled user try
@@ -334,6 +335,7 @@ def course_info(request, course_id):
             'supports_preview_menu': True,
             'studio_url': get_studio_url(course, 'course_info'),
             'show_enroll_banner': show_enroll_banner,
+            'user_is_enrolled': user_is_enrolled,
             'dates_fragment': dates_fragment,
             'url_to_enroll': url_to_enroll,
             # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
@@ -343,9 +345,9 @@ def course_info(request, course_id):
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message
-        context['last_accessed_courseware_url'] = None
+        context['resume_course_url'] = None
         if SelfPacedConfiguration.current().enable_course_home_improvements:
-            context['last_accessed_courseware_url'] = get_last_accessed_courseware(course, request, user)
+            context['resume_course_url'] = get_last_accessed_courseware(course, request, user)
 
         if not is_course_open_for_learner(user, course):
             # Disable student view button if user is staff and

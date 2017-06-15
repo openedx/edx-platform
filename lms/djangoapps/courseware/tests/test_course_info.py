@@ -172,7 +172,16 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
         content = pq(response.content)
         self.assertEqual(content('.page-header-secondary a').length, 0)
 
-    def test_last_accessed_shown(self):
+    def get_resume_course_url(self, course_info_url):
+        """
+        Retrieves course info page and returns the resume course url
+        or None if the button doesn't exist.
+        """
+        info_page_response = self.client.get(course_info_url)
+        content = pq(info_page_response.content)
+        return content('.page-header-secondary .last-accessed-link').attr('href')
+
+    def test_resume_course_visibility(self):
         SelfPacedConfiguration(enable_course_home_improvements=True).save()
         chapter = ItemFactory.create(
             category="chapter", parent_location=self.course.location
@@ -190,9 +199,20 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
         )
         self.client.get(section_url)
         info_url = reverse('info', args=(unicode(self.course.id),))
-        info_page_response = self.client.get(info_url)
-        content = pq(info_page_response.content)
-        self.assertEqual(content('.page-header-secondary .last-accessed-link').attr('href'), section_url)
+
+        # Assuring a non-authenticated user cannot see the resume course button.
+        resume_course_url = self.get_resume_course_url(info_url)
+        self.assertEqual(resume_course_url, None)
+
+        # Assuring an unenrolled user cannot see the resume course button.
+        self.setup_user()
+        resume_course_url = self.get_resume_course_url(info_url)
+        self.assertEqual(resume_course_url, None)
+
+        # Assuring an enrolled user can see the resume course button.
+        self.enroll(self.course)
+        resume_course_url = self.get_resume_course_url(info_url)
+        self.assertEqual(resume_course_url, section_url)
 
 
 @attr(shard=1)
