@@ -8,7 +8,9 @@ define(
         'use strict';
 
         var PreviousVideoUploadView = BaseView.extend({
-            tagName: 'tr',
+            tagName: 'div',
+
+            className: 'video-row',
 
             events: {
                 'click .remove-video-button.action-button': 'removeVideo'
@@ -41,10 +43,7 @@ define(
             },
 
             removeVideo: function(event) {
-                var $thumbnailEl,
-                    videoView = this,
-                    videoId = videoView.model.get('edx_video_id');
-
+                var videoView = this;
                 event.preventDefault();
 
                 ViewUtils.confirmThenRunOperation(
@@ -60,11 +59,6 @@ define(
                                     type: 'DELETE'
                                 }).done(function() {
                                     videoView.remove();
-                                    // TODO: Remove this when cleaning up - EDUCATOR-562
-                                    $thumbnailEl = $('.thumbnail-error-wrapper[data-video-id="' + videoId + '"]');
-                                    if ($thumbnailEl.length) {
-                                        $thumbnailEl.remove();
-                                    }
                                 });
                             }
                         );

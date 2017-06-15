@@ -169,32 +169,55 @@
     }
   }
 
-  .gray-l6 {
-    background: $gray-l6 !important;
-  }
+  .video-table {
+    .video-row {
+      display: table;
+      table-layout: fixed;
+      width: 100%;
 
-  .white {
-    background: white !important;
-  }
+      .video-col {
+        display: table-cell;
+      }
 
-  .blue-l5 {
-    background: $blue-l5 !important;
+      .thumbnail-col {
+        width: 15%;
+      }
+
+      .name-col {
+        width: 25%;
+      }
+
+      .date-col {
+        width: 10%;
+      }
+
+      .video-id-col {
+        width: 15%;
+      }
+
+      .status-col {
+        width: 10%;
+      }
+
+      .actions-col {
+        width: 5%;
+      }
+
+
+    }
   }
 
   .thumbnail-error-wrapper {
-    padding: 0 !important;
-    border: none !important;
+    display: table-row;
+    white-space: nowrap;
 
     .thumbnail-error-text {
       color: $red;
+      padding: 10px 10px 0;
       .action-text {
         margin-left: 5px;
       }
     }
-  }
-
-  tr.has-thumbnail-error {
-    border: none !important;
   }
 
   $thumbnail-width: ($baseline*7.5);
