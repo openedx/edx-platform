@@ -1,7 +1,8 @@
-<tr class="thumbnail-error-wrapper thumbnail-error" data-video-id="<%- videoId %>">
-    <td colspan="6" class="thumbnail-error-text" colspan="6">
-    <span class="action-icon" aria-hidden="true">
-        <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
-    </span>
-    <span class="action-text"><%- errorText %></span></td>
-</tr>
+<div class="thumbnail-error-wrapper thumbnail-error" data-video-id="<%- videoId %>">
+    <div class="thumbnail-error-text">
+        <span class="action-icon" aria-hidden="true">
+            <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
+        </span>
+        <span class="action-text"><%- errorText %></span>
+    </div>
+</div>
