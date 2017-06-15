@@ -20,6 +20,7 @@ from ..utils import get_course_outline_block_tree
 from .course_dates import CourseDatesFragmentView
 from .course_outline import CourseOutlineFragmentView
 from .welcome_message import WelcomeMessageFragmentView
+from .course_sock import CourseSockFragmentView
 
 
 class CourseHomeView(CourseTabView):
@@ -105,6 +106,9 @@ class CourseHomeFragmentView(EdxFragmentView):
         # TODO: Use get_course_overview_with_access and blocks api
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
 
+        # Render the verification sock as a fragment
+        course_sock_fragment = CourseSockFragmentView().render_to_fragment(request, course=course, **kwargs)
+
         # Get the handouts
         handouts_html = get_course_info_section(request, request.user, course, 'handouts')
 
@@ -119,6 +123,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             'resume_course_url': resume_course_url,
             'dates_fragment': dates_fragment,
             'welcome_message_fragment': welcome_message_fragment,
+            'course_sock_fragment': course_sock_fragment,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
         }

@@ -107,6 +107,10 @@
             border: 1px solid $lms-active-color;
           }
         }
+
+        &:last-child {
+          border-bottom: none;
+        }
       }
     }
   }
@@ -186,4 +190,3 @@
     }
   }
 }
-
