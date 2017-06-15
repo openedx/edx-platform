@@ -14,11 +14,17 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j import (
-    ModuleStoreSerializer,
+    ModuleStoreSerializer
 )
 from openedx.core.djangoapps.coursegraph.management.commands.tests.utils import (
     MockGraph,
     MockNodeSelector,
+)
+from openedx.core.djangoapps.coursegraph.tasks import (
+    serialize_item,
+    serialize_course,
+    coerce_types,
+    should_dump_course,
 )
 from openedx.core.djangoapps.content.course_structures.signals import (
     listen_for_course_publish
@@ -109,8 +115,8 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
     Tests for the dump to neo4j management command
     """
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.NodeSelector')
-    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.Graph')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.Graph')
     @ddt.data(1, 2)
     def test_dump_specific_courses(self, number_of_courses, mock_graph_class, mock_selector_class):
         """
@@ -134,8 +140,8 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
             number_rollbacks=0
         )
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.NodeSelector')
-    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.Graph')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.Graph')
     def test_dump_skip_course(self, mock_graph_class, mock_selector_class):
         """
         Test that you can skip courses.
@@ -160,8 +166,8 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
             number_rollbacks=0,
         )
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.NodeSelector')
-    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.Graph')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.Graph')
     def test_dump_skip_beats_specifying(self, mock_graph_class, mock_selector_class):
         """
         Test that if you skip and specify the same course, you'll skip it.
@@ -187,8 +193,8 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
             number_rollbacks=0,
         )
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.NodeSelector')
-    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.Graph')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.Graph')
     def test_dump_all_courses(self, mock_graph_class, mock_selector_class):
         """
         Test if you don't specify which courses to dump, then you'll dump
@@ -229,7 +235,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         Tests the serialize_item method.
         """
-        fields, label = self.mss.serialize_item(self.course)
+        fields, label = serialize_item(self.course)
         self.assertEqual(label, "course")
         self.assertIn("edited_on", fields.keys())
         self.assertIn("display_name", fields.keys())
@@ -246,7 +252,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         Tests the serialize_course method.
         """
-        nodes, relationships = self.mss.serialize_course(self.course.id)
+        nodes, relationships = serialize_course(self.course.id)
         self.assertEqual(len(nodes), 9)
         # the course has 7 "PARENT_OF" relationships and 3 "PRECEDES"
         self.assertEqual(len(relationships), 10)
@@ -282,7 +288,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         Returns:
             A tuple of the string representations of those XBlocks' locations.
         """
-        return (unicode(xblock1.location), unicode(xblock2.location))
+        return (six.text_type(xblock1.location), six.text_type(xblock2.location))
 
     def assertBlockPairIsRelationship(self, xblock1, xblock2, relationships, relationship_type):
         """
@@ -306,7 +312,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         Tests that two nodes that should have a precedes relationship have it.
         """
-        __, relationships = self.mss.serialize_course(self.course.id)
+        __, relationships = serialize_course(self.course.id)
         self.assertBlockPairIsRelationship(self.video, self.video2, relationships, "PRECEDES")
         self.assertBlockPairIsNotRelationship(self.video2, self.video, relationships, "PRECEDES")
         self.assertBlockPairIsNotRelationship(self.vertical, self.video, relationships, "PRECEDES")
@@ -316,7 +322,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         Test that two nodes that should have a parent_of relationship have it.
         """
-        __, relationships = self.mss.serialize_course(self.course.id)
+        __, relationships = serialize_course(self.course.id)
         self.assertBlockPairIsRelationship(self.vertical, self.video, relationships, "PARENT_OF")
         self.assertBlockPairIsRelationship(self.vertical, self.html, relationships, "PARENT_OF")
         self.assertBlockPairIsRelationship(self.course, self.chapter, relationships, "PARENT_OF")
@@ -328,7 +334,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         Test that we add index values on nodes
         """
-        nodes, relationships = self.mss.serialize_course(self.course.id)
+        nodes, relationships = serialize_course(self.course.id)
 
         # the html node should have 0 index, and the problem should have 1
         html_nodes = [node for node in nodes if node['block_type'] == 'html']
@@ -359,19 +365,22 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         Tests the coerce_types helper
         """
-        coerced_value = self.mss.coerce_types(original_value)
+        coerced_value = coerce_types(original_value)
         self.assertEqual(coerced_value, coerced_expected)
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.NodeSelector')
-    def test_dump_to_neo4j(self, mock_selector_class):
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
+    def test_dump_to_neo4j(self, mock_graph_constructor, mock_selector_class):
         """
         Tests the dump_to_neo4j method works against a mock
         py2neo Graph
         """
         mock_graph = MockGraph()
+        mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
+        mock_credentials = mock.Mock()
 
-        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_graph)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_credentials)
 
         self.assertCourseDump(
             mock_graph,
@@ -386,16 +395,19 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         self.assertEqual(len(mock_graph.nodes), 11)
         self.assertItemsEqual(submitted, self.course_strings)
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.NodeSelector')
-    def test_dump_to_neo4j_rollback(self, mock_selector_class):
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
+    def test_dump_to_neo4j_rollback(self, mock_graph_constructor, mock_selector_class):
         """
         Tests that the the dump_to_neo4j method handles the case where there's
         an exception trying to write to the neo4j database.
         """
         mock_graph = MockGraph(transaction_errors=True)
+        mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
+        mock_credentials = mock.Mock()
 
-        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_graph)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_credentials)
 
         self.assertCourseDump(
             mock_graph,
@@ -406,50 +418,64 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
 
         self.assertItemsEqual(submitted, self.course_strings)
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
     @ddt.data((True, 2), (False, 0))
     @ddt.unpack
-    def test_dump_to_neo4j_cache(self, override_cache, expected_number_courses, mock_selector_class):
+    def test_dump_to_neo4j_cache(
+        self,
+        override_cache,
+        expected_number_courses,
+        mock_graph_constructor,
+        mock_selector_class,
+    ):
         """
         Tests the caching mechanism and override to make sure we only publish
         recently updated courses.
         """
         mock_graph = MockGraph()
+        mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
+        mock_credentials = mock.Mock()
 
         # run once to warm the cache
         self.mss.dump_courses_to_neo4j(
-            mock_graph, override_cache=override_cache
+            mock_credentials, override_cache=override_cache
         )
 
         # when run the second time, only dump courses if the cache override
         # is enabled
         submitted, __ = self.mss.dump_courses_to_neo4j(
-            mock_graph, override_cache=override_cache
+            mock_credentials, override_cache=override_cache
         )
         self.assertEqual(len(submitted), expected_number_courses)
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.NodeSelector')
-    def test_dump_to_neo4j_published(self, mock_selector_class):
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
+    def test_dump_to_neo4j_published(self, mock_graph_constructor, mock_selector_class):
         """
         Tests that we only dump those courses that have been published after
         the last time the command was been run.
         """
         mock_graph = MockGraph()
+        mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
+        mock_credentials = mock.Mock()
 
         # run once to warm the cache
-        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_graph)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_credentials)
         self.assertEqual(len(submitted), len(self.course_strings))
 
         # simulate one of the courses being published
         listen_for_course_publish(None, self.course.id)
 
         # make sure only the published course was dumped
-        submitted, __ = self.mss.dump_courses_to_neo4j(mock_graph)
+        submitted, __ = self.mss.dump_courses_to_neo4j(mock_credentials)
         self.assertEqual(len(submitted), 1)
-        self.assertEqual(submitted[0], unicode(self.course.id))
+        self.assertEqual(submitted[0], six.text_type(self.course.id))
 
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.get_course_last_published')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.get_command_last_run')
     @ddt.data(
         (six.text_type(datetime(2016, 3, 30)), six.text_type(datetime(2016, 3, 31)), True),
         (six.text_type(datetime(2016, 3, 31)), six.text_type(datetime(2016, 3, 30)), False),
@@ -458,17 +484,23 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         (None, None, True),
     )
     @ddt.unpack
-    def test_should_dump_course(self, last_command_run, last_course_published, should_dump):
+    def test_should_dump_course(
+        self,
+        last_command_run,
+        last_course_published,
+        should_dump,
+        mock_get_command_last_run,
+        mock_get_course_last_published,
+    ):
         """
         Tests whether a course should be dumped given the last time it was
         dumped and the last time it was published.
         """
-        mss = ModuleStoreSerializer.create()
-        mss.get_command_last_run = lambda course_key, graph: last_command_run
-        mss.get_course_last_published = lambda course_key: last_course_published
+        mock_get_command_last_run.return_value = last_command_run
+        mock_get_course_last_published.return_value = last_course_published
         mock_course_key = mock.Mock
         mock_graph = mock.Mock()
         self.assertEqual(
-            mss.should_dump_course(mock_course_key, mock_graph),
+            should_dump_course(mock_course_key, mock_graph),
             should_dump,
         )
