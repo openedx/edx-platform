@@ -1,26 +1,11 @@
 (function() {
     'use strict';
-    var commonLibrariesPath = 'common/js/common_libraries';
-
-    var getModule = function(moduleName, excludeCommonDeps) {
-        var module = {
-            name: moduleName
-        };
-
-        if (excludeCommonDeps) {
-            module.exclude = [commonLibrariesPath];
-        }
-
-        return module;
-    };
 
     var getModulesList = function(modules) {
-        var result = [getModule(commonLibrariesPath)];
-        return result.concat(modules.map(function(moduleName) {
-            return getModule(moduleName, true);
-        }));
+        return modules.map(function(moduleName) {
+            return {name: moduleName};
+        });
     };
-
 
     var jsOptimize = process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE !== undefined ?
         process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE : 'uglify2';
@@ -77,10 +62,23 @@
          * file should be skipped because it has no dependencies.
          */
         paths: {
-            'gettext': 'empty:',
-            'xmodule': 'empty:',
-            'mathjax': 'empty:',
-            'youtube': 'empty:'
+            backbone: 'empty:',
+            gettext: 'empty:',
+            jquery: 'empty:',
+            'jquery.cookie': 'empty:',
+            'jquery-migrate': 'empty:',
+            logger: 'empty:',
+            mathjax: 'empty:',
+            underscore: 'empty:',
+            'underscore.string': 'empty:',
+            URI: 'empty:',
+            utility: 'empty:',
+            xmodule: 'empty:',
+            youtube: 'empty:',
+
+            // Don't bundle UI Toolkit helpers as they are loaded into the "edx" namespace
+            'edx-ui-toolkit/js/utils/html-utils': 'empty:',
+            'edx-ui-toolkit/js/utils/string-utils': 'empty:'
         },
 
         /**
