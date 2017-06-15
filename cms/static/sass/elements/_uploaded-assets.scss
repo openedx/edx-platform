@@ -36,7 +36,7 @@
       font-size: 80%;
       word-wrap: break-word;
 
-      th {
+      th, .video-head-col {
         @extend %t-copy-sub2;
         background-color: $gray-l5;
         padding: 0 ($baseline/2) ($baseline*0.75) ($baseline/2);
@@ -60,18 +60,18 @@
         }
       }
 
-      td {
+      td, .video-col {
         padding: ($baseline/2);
         vertical-align: middle;
         text-align: left;
       }
 
-      tbody {
+      tbody, .js-table-body {
         box-shadow: 0 2px 2px $shadow-l1;
         border: 1px solid $gray-l4;
         background: $white;
 
-        tr {
+        tr, .video-row {
           @include transition(all $tmg-f2 ease-in-out 0s);
           border-top: 1px solid $gray-l4;
 
