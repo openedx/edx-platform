@@ -15,7 +15,15 @@ from django.utils.translation import ugettext as _
         <span class="title status-title">${_("Current Verification Status: Pending")}</span>
         <p class="status-note">${_("Your edX ID verification is pending. Your verification information has been submitted and will be reviewed shortly.")}</p>
     </li>
-%elif verification_status in ['must_reverify', 'expired']:
+%elif verification_status in ['denied','must_reverify', 'must_retry']:
+    <li class="status status-verification is-denied">
+        <span class="title status-title">${_("Current Verification Status: Denied")}</span>
+        <p class="status-note">${_("Your verification submission was not accepted. To receive a verified certificate, you must submit a new photo of yourself and your government-issued photo ID before the verification deadline for your course.")}</p>
+      <div class="btn-reverify">
+        <a href="${reverse('verify_student_reverify')}" class="action action-reverify">${_("Resubmit Verification")}</a>
+      </div>
+    </li>
+%elif verification_status == 'expired':
     <li class="status status-verification is-denied">
         <span class="title status-title">${_("Current Verification Status: Expired")}</span>
         <p class="status-note">${_("Your verification has expired. To receive a verified certificate, you must submit a new photo of yourself and your government-issued photo ID before the verification deadline for your course.")}</p>
