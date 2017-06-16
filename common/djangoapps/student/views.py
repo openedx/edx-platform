@@ -788,7 +788,8 @@ def dashboard(request):
 
     # Verification Attempts
     # Used to generate the "you must reverify for course x" banner
-    verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
+    verification_status, verification_error_codes = SoftwareSecurePhotoVerification.user_status(user)
+    verification_errors = get_verification_error_reasons_for_display(verification_error_codes)
 
     # Gets data for midcourse reverifications, if any are necessary or have failed
     statuses = ["approved", "denied", "pending", "must_reverify"]
@@ -866,7 +867,7 @@ def dashboard(request):
         'reverifications': reverifications,
         'verification_status': verification_status,
         'verification_status_by_course': verify_status_by_course,
-        'verification_msg': verification_msg,
+        'verification_errors': verification_errors,
         'show_refund_option_for': show_refund_option_for,
         'block_courses': block_courses,
         'denied_banner': denied_banner,
@@ -896,6 +897,27 @@ def dashboard(request):
     response = render_to_response('dashboard.html', context)
     set_user_info_cookie(response, request)
     return response
+
+
+def get_verification_error_reasons_for_display(verification_error_codes):
+    verification_errors = []
+    verification_error_map = {
+        'photos_mismatched': _('Photos are mismatched'),
+        'id_image_missing_name': _('Name missing from ID photo'),
+        'id_image_missing': _('ID photo not provided'),
+        'id_invalid': _('ID is invalid'),
+        'user_image_not_clear': _('Learner photo is blurry'),
+        'name_mismatch': _('Name on ID does not match name on account'),
+        'user_image_missing': _('Learner photo not provided'),
+        'id_image_not_clear': _('ID photo is blurry'),
+    }
+
+    for error in verification_error_codes:
+        error_text = verification_error_map.get(error)
+        if error_text:
+            verification_errors.append(error_text)
+
+    return verification_errors
 
 
 def _create_recent_enrollment_message(course_enrollments, course_modes):  # pylint: disable=invalid-name

@@ -1179,7 +1179,7 @@ class ReverifyView(View):
         Most of the work is done client-side by composing the same
         Backbone views used in the initial verification flow.
         """
-        status, _ = SoftwareSecurePhotoVerification.user_status(request.user)
+        status, __ = SoftwareSecurePhotoVerification.user_status(request.user)
 
         expiration_datetime = SoftwareSecurePhotoVerification.get_expiration_datetime(request.user)
         can_reverify = False
