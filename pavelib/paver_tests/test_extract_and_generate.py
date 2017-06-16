@@ -72,8 +72,6 @@ class TestGenerate(TestCase):
         self.assertTrue(os.path.exists(filename))
         os.remove(filename)
 
-    # Patch dummy_locales to not have esperanto present
-    @patch.object(self.configuration, 'dummy_locales', ['fake2'])
     def test_main(self):
         """
         Runs generate.main() which should merge source files,
