@@ -8,7 +8,7 @@ from celery_utils.logged_task import LoggedTask
 
 
 @task(base=LoggedTask)
-def clear_subsection_score(user_id_to_clear, course_key, subsection_id):
+def clear_subsection_score(user_id_to_clear, course_id, subsection_id):
     """
     A thing Eric wrote
 
@@ -19,8 +19,10 @@ def clear_subsection_score(user_id_to_clear, course_key, subsection_id):
     from lms.djangoapps.grades.new.subsection_grade import ZeroSubsectionGrade
     from lms.djangoapps.grades.new.course_data import CourseData
     from lms.djangoapps.grades.signals.signals import SUBSECTION_SCORE_CHANGED
+    from opaque_keys.edx.keys import CourseKey
     from xmodule.modulestore.django import modulestore
 
+    course_key = CourseKey.from_string(course_id)
     student = User.objects.get(id=user_id_to_clear)
     store = modulestore()
     course = store.get_course(course_key, depth=0),
