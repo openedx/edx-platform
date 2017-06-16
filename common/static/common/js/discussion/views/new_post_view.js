@@ -54,7 +54,7 @@
                 _.extend(context, {
                     group_options: this.getGroupOptions(),
                     is_commentable_divided: this.is_commentable_divided,
-                    is_cohorted: this.course_settings.get('is_cohorted'),
+                    is_discussion_division_enabled: this.course_settings.get('is_discussion_division_enabled'),
                     mode: this.mode,
                     startHeader: this.startHeader,
                     form_id: this.mode + (this.topicId ? '-' + this.topicId : '')
@@ -74,7 +74,7 @@
                         group_name: this.getGroupName()
                     });
                     this.topicView.on('thread:topic_change', this.toggleGroupDropDown);
-                    if (this.course_settings.get('is_cohorted')) {
+                    if (this.course_settings.get('is_discussion_division_enabled')) {
                         this.topicView.on('thread:topic_change', this.updateVisibilityMessage);
                     }
                     this.addField(this.topicView.render());
@@ -111,18 +111,18 @@
 
             NewPostView.prototype.getGroupName = function() {
                 var userGroupId;
-                var cohort;
+                var group;
                 var group_name = null;
-                if (this.course_settings.get('is_cohorted')) {
+                if (this.course_settings.get('is_discussion_division_enabled')) {
                     userGroupId = $('#discussion-container').data('user-group-id');
                     if (!userGroupId) {
                         userGroupId = this.user_group_id;
                     }
-                    cohort = this.course_settings.get('cohorts').find(function(cohort) {
-                        return cohort.id == userGroupId;
+                    group = this.course_settings.get('groups').find(function(group) {
+                        return group.id == userGroupId;
                     });
-                    if (cohort) {
-                        group_name = cohort.name;
+                    if (group) {
+                        group_name = group.name;
                     }
                 }
 
@@ -150,11 +150,11 @@
                 }
             };
 
-            NewPostView.prototype.updateVisibilityMessage = function($target, force_cohorted) {
+            NewPostView.prototype.updateVisibilityMessage = function($target, force_divided) {
                 var visEl = $('.group-visibility .field-label-text');
                 var visTemplate = edx.HtmlUtils.template($('#new-post-visibility-template').html());
                 var group_name = null;
-                if (($target && $target.data('cohorted')) || force_cohorted) {
+                if (($target && $target.data('divided')) || force_divided) {
                     group_name = this.group_name;
                 }
 

@@ -29,7 +29,7 @@
             </div>
         </label>
     </div>
-    <% } else if (is_cohorted) { %>
+    <% } else if (is_discussion_division_enabled) { %>
     <div class="post-field group-visibility">
         <label class="field-label">
             <span class="field-label-text"></span>
