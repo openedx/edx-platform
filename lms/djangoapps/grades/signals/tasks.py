@@ -28,6 +28,7 @@ def clear_subsection_score(user_id_to_clear, course_key, subsection_id):
     course_data = CourseData(student, course=course, structure=course_structure)
     subsection = course_structure[subsection_id]
     grade = ZeroSubsectionGrade(subsection, course_data)
+    grade.all_total.first_attempted = True  # this is dumb and should not be merged, testing something
     grade.update_or_create_model(student)
 
     SUBSECTION_SCORE_CHANGED.send(
