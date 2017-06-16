@@ -15,6 +15,7 @@ class TestAnalyticsDistributions(TestCase):
     def setUp(self):
         super(TestAnalyticsDistributions, self).setUp()
         self.course_id = SlashSeparatedCourseKey('robot', 'course', 'id')
+        self.users = [UserFactory(
             profile__gender=['m', 'f', 'o'][i % 3],
             profile__level_of_education=['m', 'b', 'a'][i % 3],
             profile__year_of_birth=i + 1930
@@ -72,7 +73,6 @@ class TestAnalyticsDistributions(TestCase):
 
 class TestAnalyticsDistributionsNoData(TestCase):
     '''Test analytics distribution gathering.'''
-
     def setUp(self):
         super(TestAnalyticsDistributionsNoData, self).setUp()
         self.course_id = SlashSeparatedCourseKey('robot', 'course', 'id')
