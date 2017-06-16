@@ -106,7 +106,7 @@ def _check_condition(user, condition, content):
     return handlers[condition](user, content)
 
 
-def _check_conditions_permissions(user, permissions, course_id, content, user_group_id = None, content_user_group=None):
+def _check_conditions_permissions(user, permissions, course_id, content, user_group_id=None, content_user_group=None):
     """
     Accepts a list of permissions and proceed if any of the permission is valid.
     Note that ["can_view", "can_edit"] will proceed if the user has either
@@ -118,8 +118,11 @@ def _check_conditions_permissions(user, permissions, course_id, content, user_gr
         if isinstance(per, basestring):
             if per in CONDITIONS:
                 return _check_condition(user, per, content)
-            if 'group_' in per and user_group_id and content_user_group:
-                if user_group_id != content_user_group:
+            # TODO: Consider changing this to something a little more clear
+            if 'group_' in per:
+                if (content_user_group is None or
+                        user_group_id is None or
+                        user_group_id != content_user_group):
                     return False
             return has_permission(user, per, course_id=course_id)
         elif isinstance(per, list) and operator in ["and", "or"]:
@@ -166,16 +169,7 @@ VIEW_PERMISSIONS = {
 }
 
 
-def check_permissions_by_view(user, course_id, content, name):
-    assert isinstance(course_id, CourseKey)
-    try:
-        p = VIEW_PERMISSIONS[name]
-    except KeyError:
-        logging.warning("Permission for view named %s does not exist in permissions.py", name)
-    return _check_conditions_permissions(user, p, course_id, content)
-
-
-def check_permissions_by_view_group(user, course_id, content, name, group_id, content_user_group):
+def check_permissions_by_view(user, course_id, content, name, group_id=None, content_user_group=None):
     assert isinstance(course_id, CourseKey)
     try:
         p = VIEW_PERMISSIONS[name]
