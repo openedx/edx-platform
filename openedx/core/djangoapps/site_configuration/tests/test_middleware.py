@@ -128,6 +128,7 @@ class SessionCookieDomainSiteConfigurationOverrideTests(TestCase):
         response = self.client.get('/', HTTP_HOST=self.site.domain)
         self.assertIn(self.site.domain, str(response.cookies['sessionid']))
 
+
 class LoginRequiredMiddlewareTests(TestCase):
 
     def setUp(self):
@@ -176,4 +177,3 @@ class LoginRequiredMiddlewareTests(TestCase):
     def test_anonymous_user_can_access_login_exempt_urls_for_restricted_site(self):
         response = self.client.get('/about', HTTP_HOST=self.restricted_site.domain)
         self.assertEqual(response.status_code, 200)
-
