@@ -8,7 +8,9 @@ import urllib
 from bok_choy.page_object import XSS_INJECTION, PageObject, unguarded
 
 # The URL used for user auth in testing
-AUTH_BASE_URL = os.environ.get('test_url', 'http://localhost:8031')
+HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', 'localhost')
+CMS_PORT = os.environ.get('BOK_CHOY_CMS_PORT', 8031)
+AUTH_BASE_URL = os.environ.get('test_url', 'http://{}:{}'.format(HOSTNAME, CMS_PORT))
 
 
 class AutoAuthPage(PageObject):
