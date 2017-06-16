@@ -28,7 +28,7 @@ from openedx.core.djangolib.markup import HTML, Text
       <h2 class="title">${_("You are not enrolled yet")}</h2>
       <div class="copy">
         <p class='enroll-message'>
-          ${Text(_("You are not currently enrolled in this course. {link_start}Sign up now!{link_end}")).format(
+          ${Text(_("You are not currently enrolled in this course. {link_start}Enroll now!{link_end}")).format(
                 link_start=HTML("<a href={}>").format(url_to_enroll),
                 link_end=HTML("</a>")
           )}
@@ -69,9 +69,9 @@ from openedx.core.djangolib.markup import HTML, Text
               <div class="page-subtitle">${course.display_name_with_default}</div>
             </h2>
         </div>
-        % if last_accessed_courseware_url:
+        % if resume_course_url and user_is_enrolled:
           <div class="page-header-secondary">
-              <a href="${last_accessed_courseware_url}" class="last-accessed-link">${_("Resume Course")}</a>
+              <a href="${resume_course_url}" class="last-accessed-link">${_("Resume Course")}</a>
           </div>
         % endif
       </div>
