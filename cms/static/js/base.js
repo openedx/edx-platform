@@ -99,7 +99,7 @@ require([
                 dropdownMenuView.postRender();
             }
             // Change link based on selected site
-            $('.view-button').bind('click', selectSite);
+            $('.view-button').on('click', selectSite);
 			
         });
 
