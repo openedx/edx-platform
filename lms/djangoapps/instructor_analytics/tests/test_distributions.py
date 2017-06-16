@@ -15,10 +15,8 @@ class TestAnalyticsDistributions(TestCase):
     def setUp(self):
         super(TestAnalyticsDistributions, self).setUp()
         self.course_id = SlashSeparatedCourseKey('robot', 'course', 'id')
-
-        self.users = [UserFactory(
             profile__gender=['m', 'f', 'o'][i % 3],
-            profile__level_of_education=['a', 'hs', 'el'][i % 3],
+            profile__level_of_education=['m', 'b', 'a'][i % 3],
             profile__year_of_birth=i + 1930
         ) for i in xrange(30)]
 
@@ -63,13 +61,13 @@ class TestAnalyticsDistributions(TestCase):
 
     def test_level_of_education_count(self):
         course_enrollments = CourseEnrollment.objects.filter(
-            course_id=self.course_id, user__profile__level_of_education='hs'
+            course_id=self.course_id, user__profile__level_of_education='a'
         )
         distribution = profile_distribution(self.course_id, "level_of_education")
-        self.assertEqual(distribution.data['hs'], len(course_enrollments))
+        self.assertEqual(distribution.data['a'], len(course_enrollments))
         course_enrollments[0].deactivate()
         distribution = profile_distribution(self.course_id, "level_of_education")
-        self.assertEqual(distribution.data['hs'], len(course_enrollments) - 1)
+        self.assertEqual(distribution.data['a'], len(course_enrollments) - 1)
 
 
 class TestAnalyticsDistributionsNoData(TestCase):
