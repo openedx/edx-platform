@@ -138,9 +138,7 @@ require([
         }
         function selectSite() {
             var selectedSite = $(this).parent().parent().find('.site_name');
-            console.log(selectedSite);
             var site_name = selectedSite.find("option:selected").val();
-            console.log(site_name);
             var site = $(this).attr('href');
             var href = site.replace(site.split('/')[2], site_name);
             $(this).attr('href',href);
