@@ -18,6 +18,7 @@ from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLP
 
 log = logging.getLogger(__name__)
 
+
 SAML_XML_NS = 'urn:oasis:names:tc:SAML:2.0:metadata'  # The SAML Metadata XML namespace
 
 

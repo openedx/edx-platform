@@ -53,7 +53,12 @@ class SamlIntegrationTestUtilities(object):
             """ Return a cached copy of TestShib's metadata by reading it from disk """
             return (200, headers, self.read_data_file('testshib_metadata.xml'))
 
-        httpretty.register_uri(httpretty.GET, TESTSHIB_METADATA_URL, content_type='text/xml', body=metadata_callback)
+        httpretty.register_uri(
+            httpretty.GET,
+            TESTSHIB_METADATA_URL,
+            content_type='text/xml',
+            body=metadata_callback
+        )
 
         def cache_duration_metadata_callback(_request, _uri, headers):
             """Return a cached copy of TestShib's metadata with a cacheDuration attribute"""
@@ -92,7 +97,7 @@ class SamlIntegrationTestUtilities(object):
         kwargs.setdefault('entity_id', TESTSHIB_ENTITY_ID)
         kwargs.setdefault('metadata_source', TESTSHIB_METADATA_URL)
         kwargs.setdefault('icon_class', 'fa-university')
-        kwargs.setdefault('attr_email', 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6')  # eduPersonPrincipalName
+        kwargs.setdefault('attributes', '{"attr_email": "urn:oid:1.3.6.1.4.1.5923.1.1.1.6"}')
         kwargs.setdefault('max_session_length', None)
         self.configure_saml_provider(**kwargs)
 
@@ -163,7 +168,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         )
         self.assertEqual(attributes.get("urn:oid:2.5.4.3"), ["Me Myself And I"])
         self.assertEqual(attributes.get("urn:oid:0.9.2342.19200300.100.1.1"), ["myself"])
-        self.assertEqual(attributes.get("urn:oid:2.5.4.20"), ["555-5555"])  # Phone number
+        self.assertEqual(attributes.get("urn:oid:2.5.4.20"), ["555-5555"])
 
     @ddt.data(True, False)
     def test_debug_mode_login(self, debug_mode_enabled):
@@ -200,7 +205,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         kwargs.setdefault('entity_id', TESTSHIB_ENTITY_ID)
         kwargs.setdefault('metadata_source', TESTSHIB_METADATA_URL_WITH_CACHE_DURATION)
         kwargs.setdefault('icon_class', 'fa-university')
-        kwargs.setdefault('attr_email', 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6')  # eduPersonPrincipalName
+        kwargs.setdefault('attributes', '{"attr_email": "urn:oid:1.3.6.1.4.1.5923.1.1.1.6"}')
         self.configure_saml_provider(**kwargs)
         self.assertTrue(httpretty.is_enabled())
         num_total, num_skipped, num_attempted, num_updated, num_failed, failure_messages = fetch_saml_metadata()

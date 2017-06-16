@@ -396,7 +396,6 @@ def _local_server_get(url, session):
     view, args, kwargs = resolve(url)
     response = view(request, *args, **kwargs)
 
-    # Return the content of the response
     return response.content
 
 
