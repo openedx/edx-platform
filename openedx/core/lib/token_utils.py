@@ -2,6 +2,7 @@
 import json
 from time import time
 
+import logging
 from Cryptodome.PublicKey import RSA
 from django.conf import settings
 from django.utils.functional import cached_property
@@ -9,7 +10,10 @@ from jwkest.jwk import KEYS, RSAKey
 from jwkest.jws import JWS
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.models import UserPreference
 from student.models import UserProfile, anonymous_id_for_user
+
+log = logging.getLogger(__name__)
 
 
 class JwtBuilder(object):
@@ -94,8 +98,17 @@ class JwtBuilder(object):
         except UserProfile.DoesNotExist:
             name = None
 
+        language = None
+        try:
+            user_preference = UserPreference.objects.get(user=self.user)
+            language = user_preference.get_all_preferences(self.user).get('pref-lang')
+        except UserPreference.DoesNotExist:
+            log.debug("UserPreference for User: '{}' does not exist.".format(self.user))
+            pass
+
         payload.update({
             'name': name,
+            'locale': language,
             'family_name': self.user.last_name,
             'given_name': self.user.first_name,
             'administrator': self.user.is_staff,
