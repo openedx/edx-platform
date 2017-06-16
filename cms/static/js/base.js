@@ -137,10 +137,10 @@ require([
             $(this).closest('.wrapper-alert').removeClass('is-shown');
         }
         function selectSite() {
-            var selectedSite = $(this).parent().parent().find('.site_name');
-            var site_name = selectedSite.find("option:selected").val();
+            var selectedSite = $(this).parent().parent().find('.site-name');
+            var siteName = selectedSite.find("option:selected").val();
             var site = $(this).attr('href');
-            var href = site.replace(site.split('/')[2], site_name);
+            var href = site.replace(site.split('/')[2], siteName);
             $(this).attr('href',href);
         }
 
