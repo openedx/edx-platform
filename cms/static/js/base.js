@@ -99,8 +99,7 @@ require([
                 dropdownMenuView.postRender();
             }
             // Change link based on selected site
-            $('.view-button').on('click', selectSite);
-			
+            $('.site-name').on('change', selectSite);
         });
 
         function smoothScrollLink(e) {
@@ -137,11 +136,16 @@ require([
             $(this).closest('.wrapper-alert').removeClass('is-shown');
         }
         function selectSite() {
-            var selectedSite = $(this).parent().parent().find('.site-name');
+            // Get selected hostname
+            var selectedSite = $(this);
             var siteName = selectedSite.find("option:selected").val();
-            var site = $(this).attr('href');
-            var href = site.replace(site.split('/')[2], siteName);
-            $(this).attr('href',href);
+    
+            // Update button target
+            var buttonElement = selectedSite.parent().parent().find('.view-button');
+            var currentUrl = buttonElement.attr('href');
+            //todo: replace with a URL builder (ideally following examples in edx or using a libary we already include).
+            var newUrl = currentUrl.replace(currentUrl.split('/')[2], currentUrl);
+            buttonElement.attr('href', newUrl);
         }
 
     }); // end require()
