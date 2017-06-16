@@ -325,20 +325,15 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
         self.assertEquals(status, ('none', ''))
 
         # test for when one has been created
-        attempt = SoftwareSecurePhotoVerification(user=user)
-        attempt.status = 'approved'
-        attempt.save()
-
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=user, status='approved')
         status = SoftwareSecurePhotoVerification.user_status(user)
         self.assertEquals(status, ('approved', ''))
 
         # create another one for the same user, make sure the right one is
         # returned
-        attempt2 = SoftwareSecurePhotoVerification(user=user)
-        attempt2.status = 'denied'
-        attempt2.error_msg = '[{"photoIdReasons": ["Not provided"]}]'
-        attempt2.save()
-
+        SoftwareSecurePhotoVerification.objects.create(
+            user=user, status='denied', error_msg='[{"photoIdReasons": ["Not provided"]}]'
+        )
         status = SoftwareSecurePhotoVerification.user_status(user)
         self.assertEquals(status, ('approved', ''))
 
@@ -346,31 +341,26 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
         # properly
         attempt.delete()
         status = SoftwareSecurePhotoVerification.user_status(user)
-        self.assertEquals(status, ('must_reverify', "No photo ID was provided."))
+        self.assertEquals(status, ('must_reverify', ['id_image_missing']))
 
+    # pylint: disable=line-too-long
     def test_parse_error_msg_success(self):
         user = UserFactory.create()
         attempt = SoftwareSecurePhotoVerification(user=user)
         attempt.status = 'denied'
-        attempt.error_msg = '[{"photoIdReasons": ["Not provided"]}]'
+        attempt.error_msg = '[{"userPhotoReasons": ["Face out of view"]}, {"photoIdReasons": ["Photo hidden/No photo", "ID name not provided"]}]'
         parsed_error_msg = attempt.parsed_error_msg()
-        self.assertEquals("No photo ID was provided.", parsed_error_msg)
+        self.assertEquals(parsed_error_msg, ['id_image_missing_name', 'user_image_not_clear', 'id_image_not_clear'])
 
-    def test_parse_error_msg_failure(self):
+    @ddt.data(
+        'Not Provided',
+        '{"IdReasons": ["Not provided"]}',
+        u'[{"ïḋṚëäṡöṅṡ": ["Ⓝⓞⓣ ⓟⓡⓞⓥⓘⓓⓔⓓ "]}]',
+    )
+    def test_parse_error_msg_failure(self, msg):
         user = UserFactory.create()
-        attempt = SoftwareSecurePhotoVerification(user=user)
-        attempt.status = 'denied'
-        # when we can't parse into json
-        bad_messages = {
-            'Not Provided',
-            '[{"IdReasons": ["Not provided"]}]',
-            '{"IdReasons": ["Not provided"]}',
-            u'[{"ïḋṚëäṡöṅṡ": ["Ⓝⓞⓣ ⓟⓡⓞⓥⓘⓓⓔⓓ "]}]',
-        }
-        for msg in bad_messages:
-            attempt.error_msg = msg
-            parsed_error_msg = attempt.parsed_error_msg()
-            self.assertEquals(parsed_error_msg, "There was an error verifying your ID photos.")
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=user, status='denied', error_msg=msg)
+        self.assertEqual(attempt.parsed_error_msg(), [])
 
     def test_active_at_datetime(self):
         user = UserFactory.create()
