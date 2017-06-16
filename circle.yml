@@ -71,5 +71,5 @@ test:
     # - if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
 
     - pip install codecov==2.0.5
-    - codecov --token=$CODE_COV_TOKEN --branch=$CI_BRANCH
+    - codecov --token=$CODE_COV_TOKEN
     

@@ -68,7 +68,7 @@ class TestGenerate(TestCase):
         Tests merge script on English source files.
         """
         filename = os.path.join(self.configuration.source_messages_dir, random_name())
-        generate.merge(self.configuration.source_locale, target=filename)
+        generate.merge(self.configuration, self.configuration.source_locale, target=filename)
         self.assertTrue(os.path.exists(filename))
         os.remove(filename)
 
