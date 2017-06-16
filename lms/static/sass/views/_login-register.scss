@@ -681,7 +681,11 @@
         height: 100px;
     }
 
-    h2 {
+    p {
+        &:first-of-type {
+            margin-top: 20px;
+        }
+        
         font-size: 16px;
         line-height: 1.5;
         color: $gray-d2;
