@@ -179,19 +179,19 @@ class LoginRequiredMiddlewareTests(TestCase):
 
     def test_anonymous_user_can_access_open_site(self):
         response = self.client.get('/courses', HTTP_HOST=self.open_site.domain)
-        self.assertEqual(response.status_code, 404, 'Response: ' + str(response.status_code))
+        self.assertEqual(response.status_code, 200, 'Response: ' + str(response.status_code))
 
     def test_anonymous_user_cannot_access_restricted_site(self):
         response = self.client.get('/courses', HTTP_HOST=self.restricted_site.domain)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 302)
 
     def test_logged_in_user_can_access_both_sites(self):
         self.client.login(username=self.user.username, password="password")
         o_response = self.client.get('/courses', HTTP_HOST=self.open_site.domain)
         r_response = self.client.get('/courses', HTTP_HOST=self.restricted_site.domain)
-        self.assertEqual(o_response.status_code, 404)
-        self.assertEqual(r_response.status_code, 404)
+        self.assertEqual(o_response.status_code, 200)
+        self.assertEqual(r_response.status_code, 200)
 
     def test_anonymous_user_can_access_login_exempt_urls_for_restricted_site(self):
         response = self.client.get('/about', HTTP_HOST=self.restricted_site.domain)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)

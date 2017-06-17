@@ -9,7 +9,7 @@ services:
   
 env:
   - TEST_SUITE="lms-unit"
-  # - TEST_SUITE="cms-unit"
+  - TEST_SUITE="cms-unit"
   # - TEST_SUITE="lib"
   # - TEST_SUITE="quality"
   # - TEST_SUITE="js-unit"

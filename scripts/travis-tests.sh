@@ -48,9 +48,10 @@ case "$TEST_SUITE" in
         paver test_system -t openedx/core/djangoapps/site_configuration/tests/test_middleware.py
         ;;
 
-    # "cms-unit")
-    #     paver test_system -s cms $PAVER_ARGS
-    #     ;;
+    "cms-unit")
+        # paver test_system -s cms $PAVER_ARGS
+        paver test_system -t openedx/core/djangoapps/site_configuration/tests/test_middleware.py
+        ;;
 
     # "lib")
     #     paver test_lib --with-flaky --cov-args="-p" -v --with-xunit
