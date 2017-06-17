@@ -9,13 +9,13 @@ services:
   
 env:
   - TEST_SUITE="lms-unit"
-  - TEST_SUITE="cms-unit"
-  - TEST_SUITE="lib"
-  - TEST_SUITE="quality"
-  - TEST_SUITE="js-unit"
-  - TEST_SUITE="lms-acceptance"
-  - TEST_SUITE="cms-acceptance"
-  - TEST_SUITE="commonlib-js-unit"
+  # - TEST_SUITE="cms-unit"
+  # - TEST_SUITE="lib"
+  # - TEST_SUITE="quality"
+  # - TEST_SUITE="js-unit"
+  # - TEST_SUITE="lms-acceptance"
+  # - TEST_SUITE="cms-acceptance"
+  # - TEST_SUITE="commonlib-js-unit"
   
 cache:
   pip: true

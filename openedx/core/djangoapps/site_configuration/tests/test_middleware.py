@@ -128,7 +128,7 @@ class SessionCookieDomainSiteConfigurationOverrideTests(TestCase):
         response = self.client.get('/', HTTP_HOST=self.site.domain)
         self.assertIn(self.site.domain, str(response.cookies['sessionid']))
 
-
+# @unittest.skipUnless(settings.RESTRICT_SITE_TO_LOGGED_IN_USERS == True, 'Test only if feature enabled')
 class LoginRequiredMiddlewareTests(TestCase):
 
     def setUp(self):
@@ -157,12 +157,29 @@ class LoginRequiredMiddlewareTests(TestCase):
                 "LOGIN_EXEMPT_URLS": r'^about'
             }
         )
+
+        self.site = SiteFactory.create(
+            domain='testserver.fake',
+            name='testserver.fake'
+        )
+        self.site_configuration = SiteConfigurationFactory.create(
+            site=self.site,
+            values={
+                "SESSION_COOKIE_DOMAIN": self.site.domain,
+            }
+        )
+        self.test_client = Client()
+        self.test_client.login(username=self.user.username, password="password")
+
         self.client = Client()
 
+    def test_working_client_site_configuration(self):
+        response = self.client.get('/', HTTP_HOST=self.site.domain)
+        self.assertEqual(response.status_code, 200)
+
     def test_anonymous_user_can_access_open_site(self):
-        print str(self.open_site.domain)
         response = self.client.get('/courses', HTTP_HOST=self.open_site.domain)
-        self.assertEqual(response.status_code, 404, 'Response: ' + str(response.status_code) + ' ' + str(response))
+        self.assertEqual(response.status_code, 404, 'Response: ' + str(response.status_code))
 
     def test_anonymous_user_cannot_access_restricted_site(self):
         response = self.client.get('/courses', HTTP_HOST=self.restricted_site.domain)
