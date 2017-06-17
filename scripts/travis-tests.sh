@@ -15,76 +15,74 @@ EXIT=0
 
 case "$TEST_SUITE" in
 
-    # "quality")
-    #     echo "Finding fixme's and storing report..."
-    #     paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
-    #     echo "Finding pep8 violations and storing report..."
-    #     paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
-    #     echo "Finding pylint violations and storing in report..."
-    #     paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { cat pylint.log; EXIT=1; }
+    "quality")
+        echo "Finding fixme's and storing report..."
+        paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
+        echo "Finding pep8 violations and storing report..."
+        paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
+        echo "Finding pylint violations and storing in report..."
+        paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { cat pylint.log; EXIT=1; }
 
-    #     mkdir -p reports
+        mkdir -p reports
 
-    #     echo "Finding ESLint violations and storing report..."
-    #     paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
-    #     echo "Running code complexity report (python)."
-    #     paver run_complexity || echo "Unable to calculate code complexity. Ignoring error."
-    #     echo "Running safe template linter report."
-    #     paver run_safelint -t $SAFELINT_THRESHOLDS > safelint.log || { cat safelint.log; EXIT=1; }
-    #     echo "Running safe commit linter report."
-    #     paver run_safecommit_report > safecommit.log || { cat safecommit.log; EXIT=1; }
-    #     # Run quality task. Pass in the 'fail-under' percentage to diff-quality
-    #     echo "Running diff quality."
-    #     paver run_quality -p 100 || EXIT=1
+        echo "Finding ESLint violations and storing report..."
+        paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
+        echo "Running code complexity report (python)."
+        paver run_complexity || echo "Unable to calculate code complexity. Ignoring error."
+        echo "Running safe template linter report."
+        paver run_safelint -t $SAFELINT_THRESHOLDS > safelint.log || { cat safelint.log; EXIT=1; }
+        echo "Running safe commit linter report."
+        paver run_safecommit_report > safecommit.log || { cat safecommit.log; EXIT=1; }
+        # Run quality task. Pass in the 'fail-under' percentage to diff-quality
+        echo "Running diff quality."
+        paver run_quality -p 100 || EXIT=1
 
-    #     # Need to create an empty test result so the post-build
-    #     # action doesn't fail the build.
-    #     emptyxunit "quality"
-    #     exit $EXIT
-    #     ;;
+        # Need to create an empty test result so the post-build
+        # action doesn't fail the build.
+        emptyxunit "quality"
+        exit $EXIT
+        ;;
 
     "lms-unit")
-        # paver test_system -s lms $PAVER_ARGS   
-        paver test_system -t openedx/core/djangoapps/site_configuration/tests/test_middleware.py
+        paver test_system -s lms $PAVER_ARGS        
         ;;
 
     "cms-unit")
-        # paver test_system -s cms $PAVER_ARGS
-        paver test_system -t openedx/core/djangoapps/site_configuration/tests/test_middleware.py
+        paver test_system -s cms $PAVER_ARGS
         ;;
 
-    # "lib")
-    #     paver test_lib --with-flaky --cov-args="-p" -v --with-xunit
-    #     ;;
+    "lib")
+        paver test_lib --with-flaky --cov-args="-p" -v --with-xunit
+        ;;
 
-    # "js-unit")
-    #     paver test_js --coverage
-    #     paver diff_coverage
-    #     ;;
+    "js-unit")
+        paver test_js --coverage
+        paver diff_coverage
+        ;;
 
-    # "commonlib-js-unit")
-    #     paver test_js --coverage --skip-clean || { EXIT=1; }
-    #     paver test_lib --skip-clean --with-flaky --cov-args="-p" --with-xunitmp || { EXIT=1; }
+    "commonlib-js-unit")
+        paver test_js --coverage --skip-clean || { EXIT=1; }
+        paver test_lib --skip-clean --with-flaky --cov-args="-p" --with-xunitmp || { EXIT=1; }
 
-    #     # This is to ensure that the build status of the shard is properly set.
-    #     # Because we are running two paver commands in a row, we need to capture
-    #     # their return codes in order to exit with a non-zero code if either of
-    #     # them fail. We put the || clause there because otherwise, when a paver
-    #     # command fails, this entire script will exit, and not run the second
-    #     # paver command in this case statement. So instead of exiting, the value
-    #     # of a variable named EXIT will be set to 1 if either of the paver
-    #     # commands fail. We then use this variable's value as our exit code.
-    #     # Note that by default the value of this variable EXIT is not set, so if
-    #     # neither command fails then the exit command resolves to simply exit
-    #     # which is considered successful.
-    #     exit $EXIT
-    #     ;;
+        # This is to ensure that the build status of the shard is properly set.
+        # Because we are running two paver commands in a row, we need to capture
+        # their return codes in order to exit with a non-zero code if either of
+        # them fail. We put the || clause there because otherwise, when a paver
+        # command fails, this entire script will exit, and not run the second
+        # paver command in this case statement. So instead of exiting, the value
+        # of a variable named EXIT will be set to 1 if either of the paver
+        # commands fail. We then use this variable's value as our exit code.
+        # Note that by default the value of this variable EXIT is not set, so if
+        # neither command fails then the exit command resolves to simply exit
+        # which is considered successful.
+        exit $EXIT
+        ;;
 
-    # "lms-acceptance")
-    #     paver test_acceptance -s lms -vvv --with-xunit
-    #     ;;
+    "lms-acceptance")
+        paver test_acceptance -s lms -vvv --with-xunit
+        ;;
 
-    # "cms-acceptance")
-    #     paver test_acceptance -s cms -vvv --with-xunit
-    #     ;;
+    "cms-acceptance")
+        paver test_acceptance -s cms -vvv --with-xunit
+        ;;
 esac
