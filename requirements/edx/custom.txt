@@ -11,16 +11,10 @@
 -e git+https://github.com/open-craft/xblock-poll.git@copy-change-patch#egg=xblock-poll
 -e git+https://github.com/edx/edx-notifications.git@0.6.0#egg=edx-notifications==0.6.0
 -e git+https://github.com/open-craft/problem-builder.git@6cc9169342d40d809a8c9de45608e0f40e896687#egg=problem-builder
-
-# TODO: django-upload-validator is a transitive dependency of group-project-v2, so it shouldn't be here,
-# but it doesn't have pupi version and pip does not use dependency_links by default, so paver install_prereqs fails
--e git+https://github.com/mckinseyacademy/django-upload-validator@90c0e31da525336635eb56da98c1355e3f68aba8#egg=django-upload-validator
--e git+https://github.com/open-craft/xblock-group-project-v2.git@4133b842447a13ca81ca6e60ff5cb7521aa5ff7e#egg=xblock-group-project-v2
-
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/open-craft/xblock-chat.git@d737c910455a7a206bbe81336fac57bc6b945577#egg=xblock-chat
+git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.2#egg=xblock-group-project-v2
 git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.1#egg=xblock-diagnostic-feedback==0.2.1
-
 git+https://github.com/edx-solutions/api-integration.git@v1.1.8#egg=api-integration==1.1.8
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.1.4#egg=organizations-edx-platform-extensions==1.1.4
 git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.0.7#egg=gradebook-edx-platform-extensions==1.0.7
