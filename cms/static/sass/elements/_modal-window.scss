@@ -151,6 +151,9 @@
     }
 
     .modal-section-content {
+      .user-partition-group-checkboxes {
+        min-height: 75px;
+      }
 
       .list-fields, .list-actions {
         display: inline-block;
@@ -700,7 +703,7 @@
       }
     }
 
-    .edit-staff-lock, .edit-content-visibility {
+    .edit-staff-lock, .edit-content-visibility, .edit-unit-access {
       margin-bottom: $baseline;
 
       .tip {
@@ -710,7 +713,7 @@
     }
 
     // UI: staff lock section
-    .edit-staff-lock, .edit-settings-timed-examination {
+    .edit-staff-lock, .edit-settings-timed-examination, .edit-unit-access {
 
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;
