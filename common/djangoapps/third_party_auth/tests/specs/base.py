@@ -17,13 +17,8 @@ from django.conf import settings as django_settings
 from social import actions, exceptions
 from social.apps.django_app import utils as social_utils
 from social.apps.django_app import views as social_views
-
-<<<<<<< HEAD
 from lms.djangoapps.commerce.tests import TEST_API_URL, TEST_API_SIGNING_KEY
-=======
-from lms.djangoapps.commerce.tests import TEST_API_URL
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
->>>>>>> 2f1d405... Set 'created_on_site' UserAttribute on account creation.
 from student import models as student_models
 from student import views as student_views
 from student.tests.factories import UserFactory
