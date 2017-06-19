@@ -50,6 +50,7 @@ from util.file import store_uploaded_file
 log = logging.getLogger(__name__)
 
 TRACKING_MAX_FORUM_BODY = 2000
+TRACKING_MAX_FORUM_TITLE = 1000
 _EVENT_NAME_TEMPLATE = 'edx.forum.{obj_type}.{action_name}'
 
 
@@ -94,6 +95,11 @@ def track_created_event(request, event_name, course, obj, data):
     track_forum_event(request, event_name, course, obj, data)
 
 
+def add_truncated_title_to_event_data(event_data, full_title):
+    event_data['title_truncated'] = (len(full_title) > TRACKING_MAX_FORUM_TITLE)
+    event_data['title'] = full_title[:TRACKING_MAX_FORUM_TITLE]
+
+
 def track_thread_created_event(request, course, thread, followed):
     """
     Send analytics event for a newly created thread.
@@ -103,7 +109,6 @@ def track_thread_created_event(request, course, thread, followed):
         'commentable_id': thread.commentable_id,
         'group_id': thread.get("group_id"),
         'thread_type': thread.thread_type,
-        'title': thread.title,
         'anonymous': thread.anonymous,
         'anonymous_to_peers': thread.anonymous_to_peers,
         'options': {'followed': followed},
@@ -112,6 +117,7 @@ def track_thread_created_event(request, course, thread, followed):
         # However, the view does not contain that data, and including it will
         # likely require changes elsewhere.
     }
+    add_truncated_title_to_event_data(event_data, thread.title)
     track_created_event(request, event_name, course, thread, event_data)
 
 
