@@ -39,7 +39,7 @@ class CourseUpdatesView(CourseTabView):
 
 class CourseUpdatesFragmentView(EdxFragmentView):
     """
-    A fragment to render the home page for a course.
+    A fragment to render the updates page for a course.
     """
     STATUS_VISIBLE = 'visible'
     STATUS_DELETED = 'deleted'

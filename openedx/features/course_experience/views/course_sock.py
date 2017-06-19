@@ -1,9 +1,6 @@
 """
 Fragment for rendering the course's sock and associated toggle button.
 """
-from datetime import datetime
-
-from django.conf import settings
 from django.template.loader import render_to_string
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
@@ -11,7 +8,6 @@ from web_fragments.fragment import Fragment
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from courseware.date_summary import VerifiedUpgradeDeadlineDate
-from courseware.courses import get_course_with_access
 from courseware.views.views import get_course_prices
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 

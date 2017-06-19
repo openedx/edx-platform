@@ -7,7 +7,7 @@ from nose.plugins.attrib import attr
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.bookmarks import BookmarksPage
-from ...pages.lms.course_home import CourseHomePage, CourseSearchResultsPage
+from ...pages.lms.course_home import CourseHomePage
 from ...pages.lms.courseware import CoursewarePage
 from ..helpers import UniqueCourseTest, auto_auth, load_data_str
 
@@ -124,7 +124,7 @@ class CourseHomeTest(CourseHomeBaseTest):
 @attr('a11y')
 class CourseHomeA11yTest(CourseHomeBaseTest):
     """
-    Tests the accessibility of the course home page with course outline.
+    Tests the accessibility of the course home page
     """
 
     def test_course_home_a11y(self):

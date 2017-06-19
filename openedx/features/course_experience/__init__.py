@@ -20,7 +20,10 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
 UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'unified_course_tab')
 
 # Waffle flag to enable the sock on the footer of the home and courseware pages
-DISPLAY_COURSE_SOCK = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'display_course_sock')
+DISPLAY_COURSE_SOCK_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'display_course_sock')
+
+# Waffle flag to enable a review page link from the unified home page
+SHOW_REVIEWS_TOOL_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_reviews_tool')
 
 
 def course_home_page_title(course):  # pylint: disable=unused-argument

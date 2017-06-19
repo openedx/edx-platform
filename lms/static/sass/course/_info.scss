@@ -295,6 +295,17 @@ div.info-wrapper {
 
     a {
       color: $link-color;
+      display: block;
+      font-size: 16px;
+
+      span {
+        width: 20px;
+        text-align: center;
+      }
+
+      &:not(:first-child) {
+        margin-top: 10px;
+      }
     }
 
     &:after {
@@ -307,7 +318,7 @@ div.info-wrapper {
       @extend %t-strong;
       @extend %t-title6;
       margin-bottom: 0;
-      padding: 12px 26px 20px 0;
+      padding: 12px 26px 10px 0;
     }
 
     ul {
