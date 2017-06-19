@@ -128,7 +128,7 @@ class SessionCookieDomainSiteConfigurationOverrideTests(TestCase):
         response = self.client.get('/', HTTP_HOST=self.site.domain)
         self.assertIn(self.site.domain, str(response.cookies['sessionid']))
 
-# @unittest.skipUnless(settings.RESTRICT_SITE_TO_LOGGED_IN_USERS == True, 'Test only if feature enabled')
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class LoginRequiredMiddlewareTests(TestCase):
 
     def setUp(self):
