@@ -406,21 +406,10 @@ class TestCreateAccount(SiteMixin, TestCase):
                 UserAttribute.get_user_attribute(user, REGISTRATION_UTM_CREATED_AT)
             )
 
-<<<<<<< HEAD
-=======
-    @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", mock.Mock(return_value=False))
-    def test_create_account_not_allowed(self):
-        """
-        Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
-        """
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
 
     def test_created_on_site_user_attribute_set(self):
         profile = self.create_account_and_fetch_profile(host=self.site.domain)
         self.assertEqual(UserAttribute.get_user_attribute(profile.user, 'created_on_site'), self.site.domain)
-
->>>>>>> 2f1d405... Set 'created_on_site' UserAttribute on account creation.
 
 @ddt.ddt
 class TestCreateAccountValidation(TestCase):
