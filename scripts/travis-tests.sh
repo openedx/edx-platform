@@ -9,7 +9,7 @@ set -o pipefail
 # There is no need to install the prereqs, as this was already
 # just done via the dependencies override section of circle.yml.
 export NO_PREREQ_INSTALL='true'
-PAVER_ARGS="--with-flaky --processes=-1 --cov-args='-p' --with-xunitmp --fastest"
+PAVER_ARGS="--with-flaky --processes=-1 --cov-args='-p' --with-xunitmp --fasttest"
 
 EXIT=0
 

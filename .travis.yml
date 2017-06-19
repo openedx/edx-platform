@@ -64,8 +64,10 @@ install:
   - if [ -e requirements/edx/post.txt ]; then pip install --exists-action w -r requirements/edx/post.txt ; fi
 
 before_script:
-  - export PATH=$PATH:$PWD/node_modules/.bin
-  - ./scripts/travis-start-browsers.sh
+  - "export PATH=$PATH:$PWD/node_modules/.bin"
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3
 
 # command to run tests
 script: ./scripts/travis-tests.sh
