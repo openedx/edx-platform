@@ -1,0 +1,130 @@
+<%
+var groupAccess = xblockInfo.get('group_access');
+var selectablePartitions = [];
+var groupIdToName = {};
+
+contentGroups.forEach(function (partition) {
+    if (partition['scheme'] != 'cohort' && partition['scheme'] != 'enrollment_track') {
+        return;
+    }
+    if (partition['scheme'] == 'enrollment_track') {
+        var tracks = [];
+        var trackSelected = false;
+        partition['groups'].forEach(function (group) {
+            if (group['selected'] === true) {
+                trackSelected = true;
+            }
+        })
+        if (partition['groups'].length <= 1 && trackSelected === false) {
+            return;
+        }
+    }
+    selectablePartitions.push(partition);
+})
+
+selectablePartitions.forEach(function (partition) {
+    var schemeId = partition['id'];
+    var groups = partition['groups'];
+    groups.forEach(function (group) {
+        var groupId = group['id'];
+        var groupName = group['name'];
+        var fullId = schemeId.toString() + '-' + groupId.toString();
+        groupIdToName[fullId] = groupName;
+    })
+})
+
+var deletedGroups = [];
+
+for (var schemeId in groupAccess) {
+    groupAccess[schemeId].forEach(function (groupId) {
+        var fullId = schemeId.toString() + '-' + groupId.toString();
+        if (!groupIdToName[fullId]) {
+            deletedGroups.push(fullId);
+        }
+    })
+}
+
+// Need to include deleted groups logic to not change is_active boolean in contentstore/utils.py get_user_partition_info
+deletedGroups.forEach(function (fullId) {
+    var schemeId = fullId.split('-')[0];
+    var groupId = fullId.split('-')[1];
+    var partitionExists = false;
+    selectablePartitions.forEach(function (partition) {
+        if (partition['id'] === schemeId) {
+            partitionExists = true;
+            partition['groups'].push(
+                {
+                    "deleted": true,
+                    "selected": true,
+                    "id": groupId,
+                    "name": ""
+                }
+            );
+        }
+    })
+
+    if (!partitionExists) {
+        selectablePartitions.push(
+            {
+                "scheme": "cohort",
+                "id": schemeId,
+                "groups": [
+                    {
+                        "deleted": true,
+                        "selected": true,
+                        "id": groupId,
+                        "name": "Deleted Group"
+                    }
+                ],
+                "name": "Content Group Configuration"
+            }
+        )
+    }
+})
+%>
+<form>
+<h3 class="modal-section-title">
+    <%- gettext('Unit Access') %>
+</h3>
+<div class="modal-section-content access-change">
+    <label for="partition-select" class="group-select-title"><%- gettext('Restrict access to:') %>
+        <select class="user-partition-select" id="partition-select">
+            <option value="-1" selected ="selected"><%- gettext('Select a group type') %></option>
+            <% for (var i=0; i < selectablePartitions.length; i++) { %>
+                <option id="<%- selectablePartitions[i].id %>-option" value="<%- selectablePartitions[i].id %>"><%- selectablePartitions[i].name %></option>
+            <% } %>
+        </select>
+    </label>
+    <br>
+    <% if (selectablePartitions.length > 0) { %>
+        <div class="user-partition-group-checkboxes">
+            <% for (var i=0; i < selectablePartitions.length; i++) { %>
+                <div id="<%- selectablePartitions[i].id %>-checkboxes">
+                    <div class="partition-group-directions">
+                        <%- gettext('Select one or more groups:') %>
+                        <% for (var j = 0; j < selectablePartitions[i].groups.length; j++) { %>
+                            <div class="field partition-group-control">
+                                <input type="checkbox" id="content-group-<%- selectablePartitions[i].groups[j].id %>" value="<%- selectablePartitions[i].groups[j].id %>" class="input input-checkbox"
+                                    <% if ((groupAccess[selectablePartitions[i].id]
+                                        && groupAccess[selectablePartitions[i].id].indexOf(selectablePartitions[i].groups[j].id) !== -1)
+                                        || selectablePartitions[i].groups[j].deleted) { %> checked="checked" <% } %> />
+                                <% if (selectablePartitions[i].groups[j].deleted) { %>
+                                    <label for="content-group-<%- selectablePartitions[i].groups[j].id %>" class="label deleted">
+                                        <%- gettext('Deleted Group') %>
+                                        <span class="deleted-group-message"><%- gettext('This group no longer exists. Choose another group or do not restrict access to this unit.') %></span>
+                                <% } else { %>
+                                    <label for="content-group-<%- selectablePartitions[i].groups[j].id %>" class="label">
+                                        <%- selectablePartitions[i].groups[j].name %>
+                                    </label>
+                                <% } %>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    <% } else { %>
+        <%- gettext('You have not set up any content groups yet.') %>
+    <% } %>
+</div>
+ </form>

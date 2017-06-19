@@ -15,8 +15,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     'use strict';
     var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
-        AbstractVisibilityAndAccessEditor, StaffLockEditor, VisibilityAndAccessEditor, ContentVisibilityEditor,
-        TimedExaminationPreferenceEditor, AccessEditor, ShowCorrectnessEditor;
+        StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
+        AccessEditor, ShowCorrectnessEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
@@ -581,20 +581,6 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return this.model.get('ancestor_has_staff_lock');
         },
 
-        getContext: function() {
-            return {
-                hasExplicitStaffLock: this.isModelLocked(),
-                ancestorLocked: this.isAncestorLocked()
-            };
-        }
-    });
-
-    AbstractVisibilityAndAccessEditor = AbstractEditor.extend({
-
-        afterRender: function() {
-            AbstractEditor.prototype.afterRender.call(this);
-        },
-
         getContentGroups: function() {
             return this.model.get('user_partitions');
         },
@@ -605,6 +591,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         getContext: function() {
             return {
+                hasExplicitStaffLock: this.isModelLocked(),
+                ancestorLocked: this.isAncestorLocked(),
                 contentGroups: this.getContentGroups(),
                 groupAccess: this.getGroupAccess()
             };
@@ -645,9 +633,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         }
     });
 
-    VisibilityAndAccessEditor = AbstractVisibilityAndAccessEditor.extend({
-        templateName: 'visibility-and-access-editor',
-        className: 'edit-staff-lock',
+    UnitAccessEditor = AbstractVisibilityEditor.extend({
+        templateName: 'unit-access-editor',
+        className: 'edit-unit-access',
         events: {
             'change .user-partition-select': function() {
                 this.hideCheckboxDivs();
@@ -659,7 +647,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         afterRender: function() {
             var groupAccess,
                 keys;
-            AbstractVisibilityAndAccessEditor.prototype.afterRender.call(this);
+            AbstractVisibilityEditor.prototype.afterRender.call(this);
             this.hideCheckboxDivs();
             if (this.model.attributes.group_access) {
                 groupAccess = this.model.attributes.group_access;
@@ -669,6 +657,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                         // Select the option that has group access, provided there is a specific group within the scheme
                         this.$('.user-partition-select option[value=' + keys[0] + ']').prop('selected', true);
                         this.showSelectedDiv(keys[0]);
+                        this.$('#partition-select option:contains("Select a group type")').text('All Learners and Staff');
                     }
                 }
             }
@@ -724,6 +713,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         getRequestData: function() {
             var metadata = {},
                 groupAccessData = this.getGroupAccessData();
+
             if (this.hasChanges()) {
                 if (groupAccessData) {
                     metadata.group_access = groupAccessData;
@@ -887,7 +877,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 editors: []
             };
             if (xblockInfo.isVertical()) {
-                editors = [StaffLockEditor, VisibilityAndAccessEditor];
+                editors = [StaffLockEditor, UnitAccessEditor];
             } else {
                 tabs = [
                     {
@@ -903,7 +893,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 ];
                 if (xblockInfo.isChapter()) {
                     tabs[0].editors = [ReleaseDateEditor];
-                    tabs[1].editors = [StaffLockEditor, VisibilityAndAccessEditor];
+                    tabs[1].editors = [StaffLockEditor];
                 } else if (xblockInfo.isSequential()) {
                     tabs[0].editors = [ReleaseDateEditor, GradingEditor, DueDateEditor];
                     tabs[1].editors = [ContentVisibilityEditor, ShowCorrectnessEditor];
