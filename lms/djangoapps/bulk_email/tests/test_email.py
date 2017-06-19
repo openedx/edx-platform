@@ -444,7 +444,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
 
 @attr(shard=1)
-@skipIf(os.environ.get("TRAVIS") == 'true', "Skip this test in Travis CI.")
+@skipIf(os.environ.get("TRAVIS") == 'true' or os.environ.get("CIRCLECI") == 'true', "Skip this test in Travis or Circle CI.")
 class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
     """
     Tests email sending without mocked html_to_text.
