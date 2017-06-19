@@ -31,6 +31,7 @@ from third_party_auth.tests.utils import (
 from .test_helpers import TestCaseForm
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from ..helpers import FormDescription
 from ..accounts import (
     NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
@@ -873,8 +874,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 u"restrictions": {
                     'min_length': PASSWORD_MIN_LENGTH,
                     'max_length': PASSWORD_MAX_LENGTH
-                    # 'min_length': account_api.PASSWORD_MIN_LENGTH,
-                    # 'max_length': account_api.PASSWORD_MAX_LENGTH
                 },
             }
         )
@@ -936,35 +935,35 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             }
         )
 
-    def test_register_form_third_party_auth_running(self):
+    def test_register_form_third_party_auth_running_google(self):
         no_extra_fields_setting = {}
+        country_options = (
+            [
+                {
+                    "name": "--",
+                    "value": "",
+                    "default": False
+                }
+            ] + [
+                {
+                    "value": country_code,
+                    "name": unicode(country_name),
+                    "default": True if country_code == "PK" else False
+                }
+                for country_code, country_name in SORTED_COUNTRIES
+            ]
+        )
 
-        self.configure_google_provider(enabled=True)
+        provider = self.configure_google_provider(enabled=True)
         with simulate_running_pipeline(
-            "openedx.core.djangoapps.user_api.views.third_party_auth.pipeline",
-            "google-oauth2", email="bob@example.com",
-            fullname="Bob", username="Bob123"
+            "openedx.core.djangoapps.user_api.views.third_party_auth.pipeline", "google-oauth2",
+            email="bob@example.com",
+            fullname="Bob",
+            username="Bob123",
+            country="PK"
         ):
-            # Password field should be hidden
-            self._assert_reg_field(
-                no_extra_fields_setting,
-                {
-                    "name": "password",
-                    "type": "hidden",
-                    "required": False,
-                }
-            )
-            # social_auth_provider should be present
-            # with value `Google`(we are setting up google provider for this test).
-            self._assert_reg_field(
-                no_extra_fields_setting,
-                {
-                    "name": "social_auth_provider",
-                    "type": "hidden",
-                    "required": False,
-                    "defaultValue": "Google"
-                }
-            )
+            self._assert_password_field_hidden(no_extra_fields_setting)
+            self._assert_social_auth_provider_present(no_extra_fields_setting, provider)
 
             # Email should be filled in
             self._assert_reg_field(
@@ -1020,6 +1019,22 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 }
             )
 
+            # Country should be filled in.
+            self._assert_reg_field(
+                {u"country": u"required"},
+                {
+                    u"label": u"Country",
+                    u"name": u"country",
+                    u"defaultValue": u"PK",
+                    u"type": u"select",
+                    u"required": True,
+                    u"options": country_options,
+                    u"errorMessages": {
+                        u"required": u"Please select your Country."
+                    },
+                }
+            )
+
     def test_register_form_level_of_education(self):
         self._assert_reg_field(
             {"level_of_education": "optional"},
@@ -1030,15 +1045,15 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "label": "Highest level of education completed",
                 "options": [
                     {"value": "", "name": "--", "default": True},
-                    {"value": "p", "name": "Doctorate"},
-                    {"value": "m", "name": "Master's or professional degree"},
-                    {"value": "b", "name": "Bachelor's degree"},
-                    {"value": "a", "name": "Associate degree"},
-                    {"value": "hs", "name": "Secondary/high school"},
-                    {"value": "jhs", "name": "Junior secondary/junior high/middle school"},
-                    {"value": "el", "name": "Elementary/primary school"},
-                    {"value": "none", "name": "No formal education"},
-                    {"value": "other", "name": "Other education"},
+                    {"value": "p", "name": "Doctorate", "default": False},
+                    {"value": "m", "name": "Master's or professional degree", "default": False},
+                    {"value": "b", "name": "Bachelor's degree", "default": False},
+                    {"value": "a", "name": "Associate degree", "default": False},
+                    {"value": "hs", "name": "Secondary/high school", "default": False},
+                    {"value": "jhs", "name": "Junior secondary/junior high/middle school", "default": False},
+                    {"value": "el", "name": "Elementary/primary school", "default": False},
+                    {"value": "none", "name": "No formal education", "default": False},
+                    {"value": "other", "name": "Other education", "default": False},
                 ],
             }
         )
@@ -1056,15 +1071,15 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "label": "Highest level of education completed TRANSLATED",
                 "options": [
                     {"value": "", "name": "--", "default": True},
-                    {"value": "p", "name": "Doctorate TRANSLATED"},
-                    {"value": "m", "name": "Master's or professional degree TRANSLATED"},
-                    {"value": "b", "name": "Bachelor's degree TRANSLATED"},
-                    {"value": "a", "name": "Associate degree TRANSLATED"},
-                    {"value": "hs", "name": "Secondary/high school TRANSLATED"},
-                    {"value": "jhs", "name": "Junior secondary/junior high/middle school TRANSLATED"},
-                    {"value": "el", "name": "Elementary/primary school TRANSLATED"},
-                    {"value": "none", "name": "No formal education TRANSLATED"},
-                    {"value": "other", "name": "Other education TRANSLATED"},
+                    {"value": "p", "name": "Doctorate TRANSLATED", "default": False},
+                    {"value": "m", "name": "Master's or professional degree TRANSLATED", "default": False},
+                    {"value": "b", "name": "Bachelor's degree TRANSLATED", "default": False},
+                    {"value": "a", "name": "Associate degree TRANSLATED", "default": False},
+                    {"value": "hs", "name": "Secondary/high school TRANSLATED", "default": False},
+                    {"value": "jhs", "name": "Junior secondary/junior high/middle school TRANSLATED", "default": False},
+                    {"value": "el", "name": "Elementary/primary school TRANSLATED", "default": False},
+                    {"value": "none", "name": "No formal education TRANSLATED", "default": False},
+                    {"value": "other", "name": "Other education TRANSLATED", "default": False},
                 ],
             }
         )
@@ -1079,9 +1094,9 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "label": "Gender",
                 "options": [
                     {"value": "", "name": "--", "default": True},
-                    {"value": "m", "name": "Male"},
-                    {"value": "f", "name": "Female"},
-                    {"value": "o", "name": "Other/Prefer Not to Say"},
+                    {"value": "m", "name": "Male", "default": False},
+                    {"value": "f", "name": "Female", "default": False},
+                    {"value": "o", "name": "Other/Prefer Not to Say", "default": False},
                 ],
             }
         )
@@ -1099,9 +1114,9 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "label": "Gender TRANSLATED",
                 "options": [
                     {"value": "", "name": "--", "default": True},
-                    {"value": "m", "name": "Male TRANSLATED"},
-                    {"value": "f", "name": "Female TRANSLATED"},
-                    {"value": "o", "name": "Other/Prefer Not to Say TRANSLATED"},
+                    {"value": "m", "name": "Male TRANSLATED", "default": False},
+                    {"value": "f", "name": "Female TRANSLATED", "default": False},
+                    {"value": "o", "name": "Other/Prefer Not to Say TRANSLATED", "default": False},
                 ],
             }
         )
@@ -1109,8 +1124,18 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     def test_register_form_year_of_birth(self):
         this_year = datetime.datetime.now(UTC).year
         year_options = (
-            [{"value": "", "name": "--", "default": True}] + [
-                {"value": unicode(year), "name": unicode(year)}
+            [
+                {
+                    "value": "",
+                    "name": "--",
+                    "default": True
+                }
+            ] + [
+                {
+                    "value": unicode(year),
+                    "name": unicode(year),
+                    "default": False
+                }
                 for year in range(this_year, this_year - 120, -1)
             ]
         )
@@ -1173,9 +1198,18 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
     def test_registration_form_country(self):
         country_options = (
-            [{"name": "--", "value": "", "default": True}] +
             [
-                {"value": country_code, "name": unicode(country_name)}
+                {
+                    "name": "--",
+                    "value": "",
+                    "default": True
+                }
+            ] + [
+                {
+                    "value": country_code,
+                    "name": unicode(country_name),
+                    "default": False
+                }
                 for country_code, country_name in SORTED_COUNTRIES
             ]
         )
@@ -1820,63 +1854,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             }
         )
 
-    def _assert_reg_field(self, extra_fields_setting, expected_field):
-        """Retrieve the registration form description from the server and
-        verify that it contains the expected field.
-
-        Args:
-            extra_fields_setting (dict): Override the Django setting controlling
-                which extra fields are displayed in the form.
-
-            expected_field (dict): The field definition we expect to find in the form.
-
-        Raises:
-            AssertionError
-
-        """
-        # Add in fields that are always present
-        defaults = [
-            ("label", ""),
-            ("instructions", ""),
-            ("placeholder", ""),
-            ("defaultValue", ""),
-            ("restrictions", {}),
-            ("errorMessages", {}),
-        ]
-        for key, value in defaults:
-            if key not in expected_field:
-                expected_field[key] = value
-
-        # Retrieve the registration form description
-        with override_settings(REGISTRATION_EXTRA_FIELDS=extra_fields_setting):
-            response = self.client.get(self.url)
-            self.assertHttpOK(response)
-
-        # Verify that the form description matches what we'd expect
-        form_desc = json.loads(response.content)
-
-        # Search the form for this field
-        actual_field = None
-        for field in form_desc["fields"]:
-            if field["name"] == expected_field["name"]:
-                actual_field = field
-                break
-
-        self.assertIsNot(
-            actual_field, None,
-            msg="Could not find field {name}".format(name=expected_field["name"])
-        )
-
-        for key, value in expected_field.iteritems():
-            self.assertEqual(
-                expected_field[key], actual_field[key],
-                msg=u"Expected {expected} for {key} but got {actual} instead".format(
-                    key=key,
-                    expected=expected_field[key],
-                    actual=actual_field[key]
-                )
-            )
-
     def test_country_overrides(self):
         """Test that overridden countries are available in country list."""
         # Retrieve the registration form description
@@ -1903,6 +1880,84 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             mock_get_value.side_effect = _side_effect_for_get_value
             response = self.client.post(self.url, {"email": self.EMAIL, "username": self.USERNAME})
             self.assertEqual(response.status_code, 403)
+
+    def _assert_fields_match(self, actual_field, expected_field):
+        self.assertIsNot(
+            actual_field, None,
+            msg="Could not find field {name}".format(name=expected_field["name"])
+        )
+
+        for key, value in expected_field.iteritems():
+            self.assertEqual(
+                actual_field[key], expected_field[key],
+                msg=u"Expected {expected} for {key} but got {actual} instead".format(
+                    key=key,
+                    actual=actual_field[key],
+                    expected=expected_field[key]
+                )
+            )
+
+    def _populate_always_present_fields(self, field):
+        defaults = [
+            ("label", ""),
+            ("instructions", ""),
+            ("placeholder", ""),
+            ("defaultValue", ""),
+            ("restrictions", {}),
+            ("errorMessages", {}),
+        ]
+        field.update({
+            key: value
+            for key, value in defaults if key not in field
+        })
+
+    def _assert_reg_field(self, extra_fields_setting, expected_field):
+        """Retrieve the registration form description from the server and
+        verify that it contains the expected field.
+
+        Args:
+            extra_fields_setting (dict): Override the Django setting controlling
+                which extra fields are displayed in the form.
+
+            expected_field (dict): The field definition we expect to find in the form.
+
+        Raises:
+            AssertionError
+
+        """
+        # Add in fields that are always present
+        self._populate_always_present_fields(expected_field)
+
+        # Retrieve the registration form description
+        with override_settings(REGISTRATION_EXTRA_FIELDS=extra_fields_setting):
+            response = self.client.get(self.url)
+            self.assertHttpOK(response)
+
+        # Verify that the form description matches what we'd expect
+        form_desc = json.loads(response.content)
+
+        actual_field = None
+        for field in form_desc["fields"]:
+            if field["name"] == expected_field["name"]:
+                actual_field = field
+                break
+
+        self._assert_fields_match(actual_field, expected_field)
+
+    def _assert_password_field_hidden(self, field_settings):
+        self._assert_reg_field(field_settings, {
+            "name": "password",
+            "type": "hidden",
+            "required": False
+        })
+
+    def _assert_social_auth_provider_present(self, field_settings, backend):
+        self._assert_reg_field(field_settings, {
+            "name": "social_auth_provider",
+            "type": "hidden",
+            "required": False,
+            "defaultValue": backend.name
+        })
 
 
 @httpretty.activate
@@ -1931,8 +1986,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
             "country": "US",
             "username": user.username if user else "test_username",
             "name": user.first_name if user else "test name",
-            "email": user.email if user else "test@test.com",
-
+            "email": user.email if user else "test@test.com"
         }
 
     def _assert_existing_user_error(self, response):

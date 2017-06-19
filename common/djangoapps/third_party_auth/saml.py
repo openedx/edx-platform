@@ -100,9 +100,29 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         return SAMLConfiguration.current(Site.objects.get_current(get_current_request()))
 
 
-class SapSuccessFactorsIdentityProvider(SAMLIdentityProvider):
+class EdXSAMLIdentityProvider(SAMLIdentityProvider):
     """
-    Customized version of SAMLIdentityProvider that knows how to retrieve user details
+    Customized version of SAMLIdentityProvider that can retrieve details beyond the standard
+    details supported by the canonical upstream version.
+    """
+
+    def get_user_details(self, attributes):
+        """
+        Overrides `get_user_details` from the base class; retrieves those details,
+        then updates the dict with values from whatever additional fields are desired.
+        """
+        details = super(EdXSAMLIdentityProvider, self).get_user_details(attributes)
+        extra_field_definitions = self.conf.get('extra_field_definitions', [])
+        details.update({
+            field['name']: attributes[field['urn']][0] if field['urn'] in attributes else None
+            for field in extra_field_definitions
+        })
+        return details
+
+
+class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
+    """
+    Customized version of EdXSAMLIdentityProvider that knows how to retrieve user details
     from the SAPSuccessFactors OData API, rather than parse them directly off the
     SAML assertion that we get in response to a login attempt.
     """
@@ -244,12 +264,12 @@ def get_saml_idp_class(idp_identifier_string):
     the SAMLIdentityProvider subclass able to handle requests for that type of identity provider.
     """
     choices = {
-        STANDARD_SAML_PROVIDER_KEY: SAMLIdentityProvider,
+        STANDARD_SAML_PROVIDER_KEY: EdXSAMLIdentityProvider,
         SAP_SUCCESSFACTORS_SAML_KEY: SapSuccessFactorsIdentityProvider,
     }
     if idp_identifier_string not in choices:
         log.error(
-            '%s is not a valid SAMLIdentityProvider subclass; using SAMLIdentityProvider base class.',
+            '%s is not a valid EdXSAMLIdentityProvider subclass; using EdXSAMLIdentityProvider base class.',
             idp_identifier_string
         )
-    return choices.get(idp_identifier_string, SAMLIdentityProvider)
+    return choices.get(idp_identifier_string, EdXSAMLIdentityProvider)
