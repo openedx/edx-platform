@@ -194,10 +194,10 @@
       }
 
       a {
-        color: $blue;
+        color: $blue-d2;
 
         &:hover {
-          color: $blue-s2;
+          color: $blue-d4;
         }
       }
     }
@@ -780,4 +780,43 @@
       }
     }
   }
+
+  .modal-section-content {
+    @include font-size(16);
+
+    .group-select-title {
+      font-weight: font-weight(semi-bold);
+      font-size: inherit;
+      margin-bottom: ($baseline/4);
+
+      .user-partition-select {
+        font-size: inherit;
+      }
+    }
+
+    .partition-group-directions {
+      padding-top: ($baseline/2);
+    }
+
+    .label {
+
+      &.deleted {
+        color: $red;
+      }
+
+      font-size: inherit;
+      margin-left: ($baseline/4);
+    }
+
+    .deleted-group-message {
+      display: block;
+      color: $red;
+      @include font-size(14);
+    }
+
+    .field {
+      margin-top: ($baseline/4);
+    }
+  }
+
 }
