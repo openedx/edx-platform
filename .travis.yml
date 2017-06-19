@@ -10,12 +10,12 @@ services:
 env:
   - TEST_SUITE="lms-unit"
   - TEST_SUITE="cms-unit"
-  # - TEST_SUITE="lib"
-  # - TEST_SUITE="quality"
-  # - TEST_SUITE="js-unit"
-  # - TEST_SUITE="lms-acceptance"
-  # - TEST_SUITE="cms-acceptance"
-  # - TEST_SUITE="commonlib-js-unit"
+  - TEST_SUITE="lib"
+  - TEST_SUITE="quality"
+  - TEST_SUITE="js-unit"
+  - TEST_SUITE="lms-acceptance"
+  - TEST_SUITE="cms-acceptance"
+  - TEST_SUITE="commonlib-js-unit"
   
 cache:
   pip: true
@@ -59,12 +59,16 @@ install:
   - if [ -e requirements/edx/post.txt ]; then pip install --exists-action w -r requirements/edx/post.txt ; fi
 
 before_script:
-  - export PATH=$PATH:$PWD/node_modules/.bin
+  - xport PATH=$PATH:$PWD/node_modules/.bin
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+  - sleep 3 # give xvfb some time to start
 
 # command to run tests
 script: ./scripts/travis-tests.sh
 
 addons:
   firefox: "45.0"
-
+  chrome: stable
+  
 dist: trusty
