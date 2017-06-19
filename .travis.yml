@@ -9,6 +9,9 @@ services:
   
 env:
   - TEST_SUITE="lms-unit"
+    SHARD=1
+    SHARD=2
+    SHARD=3
   - TEST_SUITE="cms-unit"
   - TEST_SUITE="lib"
   - TEST_SUITE="quality"
@@ -62,6 +65,7 @@ before_script:
   - export PATH=$PATH:$PWD/node_modules/.bin
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
+  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=8003 http://localhost
   - sleep 3 # give xvfb some time to start
 
 # command to run tests

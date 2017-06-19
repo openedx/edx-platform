@@ -45,6 +45,25 @@ case "$TEST_SUITE" in
 
     "lms-unit")
         paver test_system -s lms $PAVER_ARGS        
+        case "$SHARD" in
+            "all")
+                paver test_system -s lms $PAVER_ARGS
+                ;;
+            [1-3])
+                paver test_system -s lms --attr="shard=$SHARD" $PAVER_ARGS
+                ;;
+            4|"noshard")
+                paver test_system -s lms --attr='!shard' $PAVER_ARGS
+                ;;
+            *)
+                # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
+                # backwards compatibility feature. If a new shard (e.g., shard n) is introduced in the build
+                # system, but the tests are called with the old code, then builds will not fail because the
+                # code is out of date. Instead, there will be an instantly-passing shard.
+                mkdir -p reports/lms
+                emptyxunit "lms/nosetests"
+                ;;
+        esac
         ;;
 
     "cms-unit")
