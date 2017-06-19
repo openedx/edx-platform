@@ -887,8 +887,10 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             "Content-Type": "application/json",
             "Date": formatdate(timeval=None, localtime=False, usegmt=True)
         }
+
+        body_for_signature = {"EdX-ID": str(self.receipt_id)}
         _message, _sig, authorization = generate_signed_message(
-            "POST", headers, body, access_key, secret_key
+            "POST", headers, body_for_signature, access_key, secret_key
         )
         headers['Authorization'] = authorization
 
