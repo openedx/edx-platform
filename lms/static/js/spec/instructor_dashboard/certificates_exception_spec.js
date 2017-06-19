@@ -1,14 +1,14 @@
-/* global define, sinon */
 define([
     'jquery',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'js/certificates/models/certificate_exception',
     'js/certificates/views/certificate_whitelist',
     'js/certificates/views/certificate_whitelist_editor',
-    'js/certificates/collections/certificate_whitelist'
+    'js/certificates/collections/certificate_whitelist',
+    'sinon'
 ],
     function($, AjaxHelpers, CertificateExceptionModel, CertificateWhiteListView, CertificateWhiteListEditorView,
-             CertificateWhiteListCollection) {
+             CertificateWhiteListCollection, sinon) {
         'use strict';
         describe('edx.certificates.models.certificates_exception.CertificateExceptionModel', function() {
             var certificate_exception = null;
