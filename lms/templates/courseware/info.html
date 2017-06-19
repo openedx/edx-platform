@@ -12,6 +12,7 @@ from django.utils.translation import ugettext as _
 from courseware.courses import get_course_info_section, get_course_date_blocks
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.course_experience import SHOW_REVIEWS_TOOL_FLAG
 %>
 
 <%block name="pagetitle">${_("{course_number} Course Info").format(course_number=course.display_number_with_default)}</%block>
@@ -48,13 +49,6 @@ from openedx.core.djangolib.markup import HTML, Text
         CourseHomeEvents();
 </%static:require_module_async>
 
-<%block name="js_extra">
-  ## CourseTalk widget js script
-  % if show_coursetalk_widget:
-      <script src="//d3q6qq2zt8nhwv.cloudfront.net/s/js/widgets/coursetalk-write-reviews.js"></script>
-  % endif
-</%block>
-
 <%block name="bodyclass">view-in-course view-course-info ${course.css_class or ''}</%block>
 
 <main id="main" aria-label="Content" tabindex="-1">
@@ -89,14 +83,7 @@ from openedx.core.djangolib.markup import HTML, Text
           <h3 class="hd hd-3">${_("Course Updates and News")}</h3>
           ${HTML(get_course_info_section(request, masquerade_user, course, 'updates'))}
 
-          ## CourseTalk widget
-          % if show_coursetalk_widget:
-            <div class="coursetalk-write-reviews">
-              <div id="ct-custom-read-review-widget" data-provider="${platform_key}" data-course="${course_review_key}"></div>
-            </div>
-          % endif
         </section>
-
         <section aria-label="${_('Handout Navigation')}" class="handouts">
           <h3 class="hd hd-3 handouts-header">${_("Course Tools")}</h3>
             <div>
@@ -104,6 +91,12 @@ from openedx.core.djangolib.markup import HTML, Text
                     <span class="icon fa fa-bookmark" aria-hidden="true"></span>
                     ${_("Bookmarks")}
                 </a>
+                % if SHOW_REVIEWS_TOOL_FLAG.is_enabled(course.id) and show_reviews_link:
+                    <a href="${reverse('openedx.course_experience.course_reviews', args=[course.id])}">
+                        <span class="icon fa fa-star" aria-hidden="true"></span>
+                        ${_("Reviews")}
+                    </a>
+                % endif
             </div>
 
           % if SelfPacedConfiguration.current().enable_course_home_improvements:
