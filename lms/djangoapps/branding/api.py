@@ -35,7 +35,7 @@ def is_enabled():
 def get_footer(is_secure=True):
     """Retrieve information used to render the footer.
 
-    This will handle both the OpenEdX and EdX.org versions
+    This will handle both the Open edX and edX.org versions
     of the footer.  All user-facing text is internationalized.
 
     Currently, this does NOT support theming.
@@ -101,6 +101,10 @@ def get_footer(is_secure=True):
         "mobile_links": _footer_mobile_links(is_secure),
         "legal_links": _footer_legal_links(),
         "openedx_link": _footer_openedx_link(),
+        "edx_org_link": {
+            "url": "https://www.edx.org/?utm_medium=affiliate_partner&utm_source=opensource-partner&utm_content=open-edx-partner-footer-link&utm_campaign=open-edx-footer",
+            "text": _("Take free online courses at edX.org"),
+        },
     }
 
 
@@ -120,7 +124,7 @@ def _footer_copyright():
 
 
 def _footer_openedx_link():
-    """Return the image link for "powered by OpenEdX".
+    """Return the image link for "Powered by Open edX".
 
     Args:
         is_secure (bool): Whether the request is using TLS.

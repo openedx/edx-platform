@@ -90,6 +90,10 @@ class TestFooter(TestCase):
                 'url': 'http://open.edx.org',
                 'image': 'https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png',
                 'title': 'Powered by Open edX'
-            }
+            },
+            'edx_org_link': {
+                'url': 'https://www.edx.org/?utm_medium=affiliate_partner&utm_source=opensource-partner&utm_content=open-edx-partner-footer-link&utm_campaign=open-edx-footer',
+                'text': 'Take free online courses at edX.org',
+            },
         }
         self.assertEqual(actual_footer, expected_footer)
