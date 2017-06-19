@@ -147,6 +147,44 @@ class FormDescriptionTest(TestCase):
         with self.assertRaises(InvalidFieldError):
             desc.add_field("name", field_type="text", restrictions={"invalid": 0})
 
+    def test_option_overrides(self):
+        desc = FormDescription("post", "/submit")
+        field = {
+            "name": "country",
+            "label": "Country",
+            "field_type": "select",
+            "default": "PK",
+            "required": True,
+            "error_messages": {
+                "required": "You must provide a value!"
+            },
+            "options": [
+                ("US", "United States of America"),
+                ("PK", "Pakistan")
+            ]
+        }
+        desc.override_field_properties(
+            field["name"],
+            default="PK"
+        )
+        desc.add_field(**field)
+        self.assertEqual(
+            desc.fields[0]["options"],
+            [
+                {
+                    'default': False,
+                    'name': 'United States of America',
+                    'value': 'US'
+                },
+                {
+                    'default': True,
+                    'name': 'Pakistan',
+                    'value': 'PK'
+                }
+
+            ]
+        )
+
 
 @ddt.ddt
 class StudentViewShimTest(TestCase):
