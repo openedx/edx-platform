@@ -84,6 +84,15 @@ class GradeTestBase(SharedModuleStoreTestCase):
                 display_name="Test Problem",
                 data=problem_xml
             )
+            # AED 2017-06-19: make cls.sequence belong to multiple parents,
+            # so we can test that DAGs with this shape are handled correctly.
+            cls.chapter_2 = ItemFactory.create(
+                parent=cls.course,
+                category='chapter',
+                display_name='Test Chapter 2'
+            )
+            cls.chapter_2.children.append(cls.sequence.location)
+            cls.store.update_item(cls.chapter_2, UserFactory().id)
 
     def setUp(self):
         super(GradeTestBase, self).setUp()
