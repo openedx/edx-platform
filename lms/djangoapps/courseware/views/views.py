@@ -83,7 +83,6 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, UNIFIED_COURSE_VIEW_FLAG, course_home_url_name
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
@@ -321,8 +320,7 @@ def course_info(request, course_id):
         dates_fragment = None
 
         if request.user.is_authenticated():
-            if SelfPacedConfiguration.current().enable_course_home_improvements:
-                dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id)
+            dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id)
 
         context = {
             'request': request,
@@ -345,9 +343,7 @@ def course_info(request, course_id):
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message
-        context['resume_course_url'] = None
-        if SelfPacedConfiguration.current().enable_course_home_improvements:
-            context['resume_course_url'] = get_last_accessed_courseware(course, request, user)
+        context['resume_course_url'] = get_last_accessed_courseware(course, request, user)
 
         if not is_course_open_for_learner(user, course):
             # Disable student view button if user is staff and

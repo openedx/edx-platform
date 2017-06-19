@@ -10,7 +10,6 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from courseware.courses import get_course_info_section, get_course_date_blocks
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
@@ -106,11 +105,9 @@ from openedx.core.djangolib.markup import HTML, Text
                 </a>
             </div>
 
-          % if SelfPacedConfiguration.current().enable_course_home_improvements:
-            ${HTML(dates_fragment.body_html())}
-          % endif
-            <h3 class="hd hd-3  handouts-header">${_(course.info_sidebar_name)}</h3>
-            ${HTML(get_course_info_section(request, masquerade_user, course, 'handouts'))}
+          ${HTML(dates_fragment.body_html())}
+          <h3 class="hd hd-3  handouts-header">${_(course.info_sidebar_name)}</h3>
+          ${HTML(get_course_info_section(request, masquerade_user, course, 'handouts'))}
         </section>
       % else:
         <section class="updates">

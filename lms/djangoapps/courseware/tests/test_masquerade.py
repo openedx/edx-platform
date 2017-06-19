@@ -314,8 +314,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_masquerade_as_specific_user_on_self_paced(self):
         """
-        Test masquerading as a specific user for course info page when self paced configuration
-        "enable_course_home_improvements" flag is set
+        Test masquerading as a specific user for course info page
 
         Login as a staff user and visit course info page.
         set masquerade to view same page as a specific student and revisit the course info page.
@@ -328,7 +327,6 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.assertIn("OOGIE BLOOGIE", content)
 
         # Masquerade as the student,enable the self paced configuration, and check we can see the info page.
-        SelfPacedConfiguration(enable_course_home_improvements=True).save()
         self.update_masquerade(role='student', user_name=self.student_user.username)
         response = self.get_course_info_page()
         self.assertEqual(response.status_code, 200)

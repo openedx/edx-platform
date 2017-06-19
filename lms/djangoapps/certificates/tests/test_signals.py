@@ -5,7 +5,6 @@ and disabling for instructor-paced courses.
 from certificates import api as certs_api
 from certificates.models import CertificateGenerationConfiguration
 from certificates.signals import _listen_for_course_pacing_changed
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -17,7 +16,6 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
 
     def setUp(self):
         super(SelfGeneratedCertsSignalTest, self).setUp()
-        SelfPacedConfiguration(enabled=True).save()
         self.course = CourseFactory.create(self_paced=True)
         # Enable the feature
         CertificateGenerationConfiguration.objects.create(enabled=True)

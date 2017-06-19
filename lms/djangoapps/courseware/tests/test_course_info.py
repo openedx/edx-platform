@@ -12,7 +12,6 @@ from nose.plugins.attrib import attr
 from pyquery import PyQuery as pq
 
 from lms.djangoapps.ccx.tests.factories import CcxFactory
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
 from util.date_utils import strftime_localized
@@ -166,7 +165,6 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
         Test that the last accessed courseware link is not shown if there
         is no course content.
         """
-        SelfPacedConfiguration(enable_course_home_improvements=True).save()
         url = reverse('info', args=(unicode(self.course.id),))
         response = self.client.get(url)
         content = pq(response.content)
@@ -182,7 +180,6 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
         return content('.page-header-secondary .last-accessed-link').attr('href')
 
     def test_resume_course_visibility(self):
-        SelfPacedConfiguration(enable_course_home_improvements=True).save()
         chapter = ItemFactory.create(
             category="chapter", parent_location=self.course.location
         )
@@ -368,7 +365,6 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         cls.self_paced_course = CourseFactory.create(self_paced=True)
 
     def setUp(self):
-        SelfPacedConfiguration(enabled=True).save()
         super(SelfPacedCourseInfoTestCase, self).setUp()
         self.setup_user()
 
