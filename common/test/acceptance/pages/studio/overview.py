@@ -14,7 +14,7 @@ from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 from common.test.acceptance.pages.studio.container import ContainerPage
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.utils import set_input_value, set_input_value_and_save
-from common.test.acceptance.tests.helpers import disable_animations, enable_animations
+from common.test.acceptance.tests.helpers import disable_animations, enable_animations, select_option_by_text
 
 
 @js_defined('jQuery')
@@ -89,6 +89,11 @@ class CourseOutlineItem(object):
         return self.status_message == 'Contains staff only content' if self.has_status_message else False
 
     @property
+    def has_restricted_warning(self):
+        """ Returns True if the 'Access to this unit is restricted to' message is visible """
+        return 'Access to this unit is restricted to' in self.status_message if self.has_status_message else False
+
+    @property
     def is_staff_only(self):
         """ Returns True if the visiblity state of this item is staff only (has a black sidebar) """
         return "is-staff-only" in self.q(css=self._bounded_selector(''))[0].get_attribute("class")  # pylint: disable=no-member
@@ -128,6 +133,20 @@ class CourseOutlineItem(object):
         modal = self.edit()
         modal.is_explicitly_locked = is_locked
         modal.save()
+
+    def set_unit_access(self, partition_name, group_ids):
+        """
+        Checks unit access to the group group_name if group_name != None
+        """
+        if group_ids:
+            modal = self.edit()
+            groups_select = self.q(css='.group-select-title select')
+            select_option_by_text(groups_select, partition_name)
+
+            for group_id in group_ids:
+                checkbox = self.q(css='#content-group-{group_id}'.format(group_id=group_id))
+                checkbox.click()
+            modal.save()
 
     def in_editable_form(self):
         """

@@ -83,7 +83,7 @@ if (staffOnlyMessage) {
         addStatusMessage(messageType, messageText);
     }
 
-    if (hasPartitionGroups && allowedGroups.length === 0) {
+    if (hasPartitionGroups && allowedGroups.length === 0 && xblockInfo.isVertical()) {
         addStatusMessage(
             'partition-groups',
             gettext('Access to some content in this unit is restricted to specific groups of learners')
