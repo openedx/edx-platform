@@ -11,7 +11,7 @@ set -o pipefail
 # - contains "10 11 12" "12": 0
 # - contains "10 11 12" "13": 1
 contains() {
-    [[ $1 =~ (^|[[:space:]])$2($|[[:space:]]) ]] && exit(0) || exit(1)
+    [[ $1 =~ (^|[[:space:]])$2($|[[:space:]]) ]] && exit 0 || exit 1
 }
 
 # start chrome
