@@ -95,3 +95,11 @@ class UsernameAvailabilityView(APIView):
             return Response(None, status=status.HTTP_404_NOT_FOUND)
 
 
+class DomainAvailabilityView(APIView):
+    def get(self, request, subdomain, format=None):
+        try:
+            Site.objects.get(name=subdomain)
+            return Response(None, status=status.HTTP_200_OK)
+        except Site.DoesNotExist:
+            return Response(None, status=status.HTTP_404_NOT_FOUND)
+

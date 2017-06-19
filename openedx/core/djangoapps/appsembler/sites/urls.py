@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter
-from .api import SiteConfigurationViewSet, SiteViewSet, FileUploadView, SiteCreateView, UsernameAvailabilityView
+from .api import SiteConfigurationViewSet, SiteViewSet, FileUploadView, SiteCreateView,\
+    UsernameAvailabilityView, DomainAvailabilityView
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
@@ -13,6 +14,7 @@ router.register(r'sites', SiteViewSet)
 urlpatterns = [
     url(r'^upload_file/', FileUploadView.as_view()),
     url(r'^username/{}/'.format(settings.USERNAME_PATTERN), UsernameAvailabilityView.as_view()),
+    url(r'^domain/(?P<subdomain>[\w.@+-]+)/', DomainAvailabilityView.as_view()),
     url(r'^register/', SiteCreateView.as_view()),
     url(r'^', include(router.urls)),
 ]
