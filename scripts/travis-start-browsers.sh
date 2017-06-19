@@ -15,14 +15,43 @@ contains() {
 }
 
 # start chrome
-if [ contains "lms-acceptance cms-acceptance" "$TEST_SUITE" ]; then
-    google-chrome-stable --headless --disable-gpu --remote-debugging-port=8003 http://localhost
-    sleep 3
-fi
+# if [ "contains 'lms-acceptance cms-acceptance' '$TEST_SUITE'" ]; then
+#     echo 'HERE CHROME'
+#     # google-chrome-stable --headless --disable-gpu --remote-debugging-port=8003 http://localhost
+#     sleep 3
+# fi
 
 # start svfb display for firefox usage
-if [ contains "js-unit lms-acceptance cms-acceptance commonlib-js-unit" "$TEST_SUITE" ]; then
+# if [ "contains 'js-unit lms-acceptance cms-acceptance commonlib-js-unit' '$TEST_SUITE'" ]; then
+#     export DISPLAY=:99.0
+#     sh -e /etc/init.d/xvfb start
+#     sleep 3
+# fi
+
+start_xvfb() {
+    echo 'Starting xvfb display required for FireFox'
     export DISPLAY=:99.0
     sh -e /etc/init.d/xvfb start
     sleep 3
-fi
+}
+
+
+case "$TEST_SUITE" in
+
+    "js-unit"|"lms-acceptance"|"cms-acceptance"|"commonlib-js-unit")
+        case "$TEST_SUITE" in
+            "lms-acceptance"|"cms-acceptance")
+                echo 'Starting Chrome'
+                start_xvfb
+                google-chrome-stable --headless --disable-gpu --remote-debugging-port=8003 http://localhost
+            ;;
+
+            *)
+                start_xvfb    
+        esac
+    ;;
+
+    *)
+        echo 'Not starting browsers'
+
+esac
