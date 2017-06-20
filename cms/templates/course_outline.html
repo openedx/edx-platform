@@ -145,9 +145,9 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
                        title="${_('Click to open the courseware in the LMS in a new tab')}">${_("View Live")}</a>
                 </li>
 		<%
-	            Sites = configuration_helpers.get_lms_base_values(course_info['org'],settings.SITE_NAME)
+	            Sites = configuration_helpers.get_lms_base_values(context_course.display_org_with_default,settings.SITE_NAME)
 	        %>
-		<li class="action">
+		<li class="nav-item">
 		    <select name="site_name" class="form-control site_name">
 		    % if Sites != settings.SITE_NAME:
 		        % for name,site in Sites.items():
