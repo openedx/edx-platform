@@ -6,17 +6,20 @@ import itertools
 import json
 from datetime import datetime, timedelta
 
+from bok_choy.page_object import XSS_INJECTION
 from nose.plugins.attrib import attr
 from pytz import UTC
 
 from base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.config import ConfigModelFixture
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.common.utils import add_enrollment_course_modes, enroll_user_track
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.progress import ProgressPage
 from common.test.acceptance.pages.studio.overview import ContainerPage, CourseOutlinePage, ExpandCollapseLinkState
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
+from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
 from common.test.acceptance.pages.studio.utils import add_discussion, drag, verify_ordering
 from common.test.acceptance.tests.helpers import create_user_partition_json, disable_animations, load_data_str
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID, Group
@@ -625,19 +628,36 @@ class UnitAccessTest(CourseOutlineTest):
 
     __test__ = True
 
+    def setUp(self):
+        super(UnitAccessTest, self).setUp()
+        self.group_configurations_page = GroupConfigurationsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        self.content_group_a = "CG"
+        self.content_group_b = "Blocked Group"
+
+        add_enrollment_course_modes(self.browser, self.course_id, ["audit", "verified"])
+
     def populate_course_fixture(self, course_fixture):
         """
-        Create a course with one section, two subsections, and four units
+        Create a course with one section, one subsection, and one unit
         """
+        # with collapsed outline
+        self.chap_1_handle = 0
+        self.chap_1_seq_1_handle = 1
+
+        # with first sequential expanded
+        self.seq_1_vert_1_handle = 2
+        self.seq_1_vert_2_handle = 3
+        self.chap_1_seq_2_handle = 4
+
         course_fixture.add_children(
-            XBlockFixtureDesc('chapter', '1').add_children(
+            XBlockFixtureDesc('chapter', "1").add_children(
                 XBlockFixtureDesc('sequential', '1.1').add_children(
-                    XBlockFixtureDesc('vertical', '1.1.1'),
-                    XBlockFixtureDesc('vertical', '1.1.2')
-                ),
-                XBlockFixtureDesc('sequential', '1.2').add_children(
-                    XBlockFixtureDesc('vertical', '1.2.1'),
-                    XBlockFixtureDesc('vertical', '1.2.2')
+                    XBlockFixtureDesc('vertical', '1.1.1')
                 )
             )
         )
@@ -673,7 +693,6 @@ class UnitAccessTest(CourseOutlineTest):
         """
         self.course_outline_page.visit()
         self.course_outline_page.expand_all_subsections()
-        #TODO: configure set_group_access to take content group names
         unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0)
         unit.set_unit_access('Blocked Group')
         self.course_outline_page.view_live()
