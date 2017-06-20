@@ -75,7 +75,7 @@ case "$TEST_SUITE" in
 
     "js-unit")
         paver test_js --coverage
-        paver diff_coverage
+#         paver diff_coverage
         ;;
 
     "commonlib-js-unit")
