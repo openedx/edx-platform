@@ -299,7 +299,11 @@
       }
     }
 
-    &.edit .thumbnail-action {
+    &.action-icon.edit {
+      display: none;
+    }
+
+    &.edit .thumbnail-action .edit-container {
       background-color: white;
       padding: ($baseline/4);
       border-radius: ($baseline/5);

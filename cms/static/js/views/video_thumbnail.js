@@ -26,22 +26,38 @@ define(
                 this.videoImageSettings = options.videoImageSettings;
                 this.actionsInfo = {
                     upload: {
+                        name: 'upload',
                         icon: '',
                         text: gettext('Add Thumbnail')
                     },
                     edit: {
+                        name: 'edit',
+                        actionText: gettext('Edit Thumbnail'),
                         icon: '<span class="icon fa fa-pencil" aria-hidden="true"></span>',
-                        text: gettext('Edit Thumbnail')
+                        text: HtmlUtils.interpolateHtml(
+                            // Translators: This is a 3 part text which tells the image requirements.
+                            gettext('{InstructionsSpanStart}{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}'),   // eslint-disable-line max-len
+                            {
+                                videoImageResoultion: this.getVideoImageResolution(),
+                                videoImageSupportedFileFormats: this.getVideoImageSupportedFileFormats().humanize,
+                                lineBreak: HtmlUtils.HTML('<br>'),
+                                InstructionsSpanStart: HtmlUtils.HTML('<span class="requirements-instructions">'),
+                                spanEnd: HtmlUtils.HTML('</span>')
+                            }
+                        ).toString()
                     },
                     error: {
+                        name: 'error',
                         icon: '',
                         text: gettext('Image upload failed')
                     },
                     progress: {
+                        name: 'progress-action',
                         icon: '<span class="icon fa fa-spinner fa-pulse fa-spin" aria-hidden="true"></span>',
                         text: gettext('Uploading')
                     },
                     requirements: {
+                        name: 'requirements',
                         icon: '',
                         text: HtmlUtils.interpolateHtml(
                             // Translators: This is a 3 part text which tells the image requirements.
@@ -260,19 +276,11 @@ define(
 
             setActionInfo: function(action, showText, additionalSRText) {
                 this.$('.thumbnail-action').toggle(showText);
-
-                // In case of error, we don't want to show any icon on the image.
-                if (action === 'error') {
-                    HtmlUtils.setHtml(
-                        this.$('.thumbnail-action .action-icon'),
-                        HtmlUtils.HTML('')
-                    );
-                } else {
-                    HtmlUtils.setHtml(
-                        this.$('.thumbnail-action .action-icon'),
-                        HtmlUtils.HTML(this.actionsInfo[action].icon)
-                    );
-                }
+                this.$('.action-icon').addClass(action);
+                HtmlUtils.setHtml(
+                    this.$('.thumbnail-action .action-icon'),
+                    HtmlUtils.HTML(this.actionsInfo[action].icon)
+                );
                 HtmlUtils.setHtml(
                     this.$('.thumbnail-action .action-text'),
                     HtmlUtils.HTML(this.actionsInfo[action].text)
@@ -323,11 +331,13 @@ define(
             },
 
             showErrorMessage: function(errorText) {
-                var videoId = this.model.get('edx_video_id'),
+                var showText = false,
+                    videoId = this.model.get('edx_video_id'),
                     $parentRowEl = $(this.$el.parent());
 
-                this.action = 'error';
-                this.setActionInfo(this.action, true);
+                showText = this.model.get('course_video_image_url') ? false : true;
+                this.action = showText ? 'upload' : 'edit';
+                this.setActionInfo(this.action, showText);
                 this.readMessages([gettext('Could not upload the video image file'), errorText]);
 
                 // Add error wrapper html to current video element row.
