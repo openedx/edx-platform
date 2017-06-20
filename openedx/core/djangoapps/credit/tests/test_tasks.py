@@ -3,6 +3,7 @@ Tests for credit course tasks.
 """
 
 import mock
+import unittest
 from nose.plugins.attrib import attr
 from datetime import datetime, timedelta
 
@@ -86,6 +87,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 1)
 
+    unittest.skip("Skipping ICRV - deprecated")
     def test_task_adding_icrv_requirements(self):
         """Make sure that the receiver correctly fires off the task when
         invoked by signal.
@@ -288,6 +290,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 0)
 
+    @unittest.skip("Skipping Credit Requirement Blocks ordering - deprecated")
     def test_credit_requirement_blocks_ordering(self):
         """
         Test ordering of the proctoring and ICRV blocks are in proper order.
