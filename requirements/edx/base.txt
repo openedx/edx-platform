@@ -43,7 +43,7 @@ django-waffle==0.11.1
 djangorestframework-jwt==1.8.0
 djangorestframework-oauth==1.1.0
 edx-ccx-keys==0.2.1
-edx-celeryutils==0.2.2
+edx-celeryutils==0.2.4
 edx-drf-extensions==1.2.2
 edx-i18n-tools==0.3.7
 edx-lint==0.4.3
