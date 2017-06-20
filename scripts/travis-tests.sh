@@ -49,7 +49,7 @@ case "$TEST_SUITE" in
                 paver test_system -s lms $PAVER_ARGS
                 ;;
             [1-3])
-                paver test_system -s lms --attr="shard_$SHARD" $PAVER_ARGS -v
+                paver test_system -s lms --attr="shard=$SHARD" $PAVER_ARGS -v
                 ;;
             4|"noshard")
                 paver test_system -s lms --attr='!shard' $PAVER_ARGS
