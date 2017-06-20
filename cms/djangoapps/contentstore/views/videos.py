@@ -187,7 +187,10 @@ def validate_video_image(image_file):
             return _('This image file is corrupted.')
         image_file_aspect_ratio = abs(image_file_width / float(image_file_height) - settings.VIDEO_IMAGE_ASPECT_RATIO)
         if image_file_width < settings.VIDEO_IMAGE_MIN_WIDTH or image_file_height < settings.VIDEO_IMAGE_MIN_HEIGHT:
-            error = _('The minimum allowed image resolution is {image_file_min_width}x{image_file_min_height}.').format(
+            error = _('Recommended image resolution is {image_file_max_width}x{image_file_max_height}. '
+                      'The minimum resolution is {image_file_min_width}x{image_file_min_height}.').format(
+                image_file_max_width=settings.VIDEO_IMAGE_MAX_WIDTH,
+                image_file_max_height=settings.VIDEO_IMAGE_MAX_HEIGHT,
                 image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
                 image_file_min_height=settings.VIDEO_IMAGE_MIN_HEIGHT
             )

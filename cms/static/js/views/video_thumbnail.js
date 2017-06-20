@@ -26,26 +26,42 @@ define(
                 this.videoImageSettings = options.videoImageSettings;
                 this.actionsInfo = {
                     upload: {
+                        name: 'upload',
                         icon: '',
                         text: gettext('Add Thumbnail')
                     },
                     edit: {
+                        name: 'edit',
+                        actionText: gettext('Edit Thumbnail'),
                         icon: '<span class="icon fa fa-pencil" aria-hidden="true"></span>',
-                        text: gettext('Edit Thumbnail')
+                        text: HtmlUtils.interpolateHtml(
+                            // Translators: This is a 2 part text which tells the image requirements.
+                            gettext('{InstructionsSpanStart}{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}'),   // eslint-disable-line max-len
+                            {
+                                videoImageResoultion: this.getVideoImageResolution(),
+                                videoImageSupportedFileFormats: this.getVideoImageSupportedFileFormats().humanize,
+                                lineBreak: HtmlUtils.HTML('<br>'),
+                                InstructionsSpanStart: HtmlUtils.HTML('<span class="requirements-instructions">'),
+                                spanEnd: HtmlUtils.HTML('</span>')
+                            }
+                        ).toString()
                     },
                     error: {
+                        name: 'error',
                         icon: '',
                         text: gettext('Image upload failed')
                     },
                     progress: {
+                        name: 'progress-action',
                         icon: '<span class="icon fa fa-spinner fa-pulse fa-spin" aria-hidden="true"></span>',
                         text: gettext('Uploading')
                     },
                     requirements: {
+                        name: 'requirements',
                         icon: '',
                         text: HtmlUtils.interpolateHtml(
                             // Translators: This is a 3 part text which tells the image requirements.
-                            gettext('{ReqTextSpanStart}Image requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}'),   // eslint-disable-line max-len
+                            gettext('{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}'),   // eslint-disable-line max-len
                             {
                                 videoImageResoultion: this.getVideoImageResolution(),
                                 videoImageSupportedFileFormats: this.getVideoImageSupportedFileFormats().humanize,
@@ -259,26 +275,40 @@ define(
             },
 
             setActionInfo: function(action, showText, additionalSRText) {
+                var hasError = this.$('.thumbnail-wrapper').hasClass('error');
                 this.$('.thumbnail-action').toggle(showText);
-
-                // In case of error, we don't want to show any icon on the image.
-                if (action === 'error') {
-                    HtmlUtils.setHtml(
-                        this.$('.thumbnail-action .action-icon'),
-                        HtmlUtils.HTML('')
-                    );
-                } else {
-                    HtmlUtils.setHtml(
-                        this.$('.thumbnail-action .action-icon'),
-                        HtmlUtils.HTML(this.actionsInfo[action].icon)
-                    );
-                }
+                HtmlUtils.setHtml(
+                    this.$('.thumbnail-action .action-icon'),
+                    HtmlUtils.HTML(this.actionsInfo[action].icon)
+                );
                 HtmlUtils.setHtml(
                     this.$('.thumbnail-action .action-text'),
                     HtmlUtils.HTML(this.actionsInfo[action].text)
                 );
                 this.$('.thumbnail-action .action-text-sr').text(additionalSRText || '');
                 this.$('.thumbnail-wrapper').attr('class', 'thumbnail-wrapper {action}'.replace('{action}', action));
+                this.$('.thumbnail-action .action-icon')
+                    .attr('class', 'action-icon {action}'.replace('{action}', action));
+
+                // Add error class if it was already present.
+                if (hasError) {
+                    this.$('.thumbnail-wrapper').addClass('error');
+                }
+
+                // Don't show edit-container layout on progress action.
+                if (action === 'progress') {
+                    this.$('.thumbnail-action .edit-container').toggle(false);
+                } else if (action === 'edit') {
+                    this.$('.thumbnail-action .edit-container').toggle(true);
+                    HtmlUtils.setHtml(
+                    this.$('.thumbnail-action .edit-container .action-icon'),
+                        HtmlUtils.HTML(this.actionsInfo[action].icon)
+                    );
+                    HtmlUtils.setHtml(
+                        this.$('.thumbnail-action .edit-container .edit-action-text'),
+                        HtmlUtils.HTML(this.actionsInfo[action].actionText)
+                    );
+                }
             },
 
             validateImageFile: function(imageFile) {
@@ -320,22 +350,29 @@ define(
                 if ($thumbnailWrapperEl.length) {
                     $thumbnailWrapperEl.remove();
                 }
+                // Remove error class from thumbnail wrapper as well.
+                $('.thumbnail-wrapper').removeClass('error');
             },
 
             showErrorMessage: function(errorText) {
                 var videoId = this.model.get('edx_video_id'),
                     $parentRowEl = $(this.$el.parent());
 
-                this.action = 'error';
+                // If image url is not this.defaultVideoImageURL then it means image is uploaded
+                // so we should treat it as edit action otherwise default upload action.
+                this.action = this.$('.thumbnail-wrapper img').attr('src') !== this.defaultVideoImageURL
+                                ? 'edit' : 'upload';
                 this.setActionInfo(this.action, true);
                 this.readMessages([gettext('Could not upload the video image file'), errorText]);
 
+                errorText = gettext('Image upload failed. ') + errorText;   // eslint-disable-line no-param-reassign
                 // Add error wrapper html to current video element row.
-                $parentRowEl.before(    // safe-lint: disable=javascript-jquery-insertion
+                $parentRowEl.before(    // xss-lint: disable=javascript-jquery-insertion
                    HtmlUtils.ensureHtml(
                        this.thumbnailErrorTemplate({videoId: videoId, errorText: errorText})
                    ).toString()
                 );
+                this.$el.find('.thumbnail-wrapper').addClass('error');
             },
 
             readMessages: function(messages) {

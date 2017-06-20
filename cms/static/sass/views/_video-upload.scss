@@ -179,23 +179,15 @@
         display: table-cell;
       }
 
-      .thumbnail-col {
-        width: 15%;
-      }
-
       .name-col {
         width: 25%;
       }
 
-      .date-col {
-        width: 10%;
-      }
-
-      .video-id-col {
+      .thumbnail-col, .video-id-col {
         width: 15%;
       }
 
-      .status-col {
+      .date-col, .status-col {
         width: 10%;
       }
 
@@ -203,20 +195,18 @@
         width: 5%;
       }
 
-
+      .video-head-col.thumbnail-col {
+          width: 17% !important;
+      }
     }
   }
 
   .thumbnail-error-wrapper {
     display: table-row;
     white-space: nowrap;
-
-    .thumbnail-error-text {
-      color: $red;
-      padding: 10px 10px 0;
-      .action-text {
-        margin-left: 5px;
-      }
+    color: $red;
+    .icon {
+      margin: ($baseline*0.75) ($baseline/4) 0 ($baseline/2);
     }
   }
 
@@ -250,7 +240,7 @@
         font-size: 15px;
         font-family: "Open Sans";
         text-align: left;
-        color: #4c4c4c;
+        color: $gray-d2;
         line-height: 1.5;
       }
       .video-duration {
@@ -271,7 +261,6 @@
       }
     }
 
-    &.error,
     &.progress {
       background: white;
 
@@ -285,10 +274,6 @@
       }
     }
 
-    &.error .thumbnail-action {
-      color: $red;
-    }
-
     &.upload .thumbnail-action {
         color: $blue;
     }
@@ -299,10 +284,24 @@
       }
     }
 
-    &.edit .thumbnail-action {
-      background-color: white;
+    &.edit {
+      background-color: #4e4e4e;
+    }
+
+    &.edit .thumbnail-action .action-icon.edit {
+      display: none;
+    }
+
+    &.edit .thumbnail-action .edit-container {
+      background-color: $white;
       padding: ($baseline/4);
       border-radius: ($baseline/5);
+      margin-top: ($baseline/2);
+      display: none;
+    }
+
+    &.edit .action-text {
+      color: $white;
     }
 
     .thumbnail-action {
@@ -316,6 +315,7 @@
       left: 5px;;
       right: 5px;
       @include transform(translateY(-50%));
+      z-index: 1;
     }
 
     .upload-image-input {
@@ -343,6 +343,10 @@
 
     &.focused {
         box-shadow: 0 0 ($baseline/5) 1px $blue;
+    }
+
+    &.error {
+        box-shadow: 0 0 ($baseline/5) 1px $red;
     }
   }
 }
