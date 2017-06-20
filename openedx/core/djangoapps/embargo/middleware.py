@@ -98,7 +98,7 @@ class EmbargoMiddleware(object):
             # If the IP is blacklisted, reject.
             # This applies to any request, not just courseware URLs.
             ip_blacklist_url = reverse(
-                'embargo_blocked_message',
+                'embargo:blocked_message',
                 kwargs={
                     'access_point': 'courseware',
                     'message_key': 'embargo'
