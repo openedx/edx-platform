@@ -10,7 +10,6 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from util.db import outer_atomic
 
@@ -236,3 +235,13 @@ class CourseCohort(models.Model):
         )
 
         return course_cohort
+
+
+class UnregisteredLearnerCohortAssignments(models.Model):
+
+    class Meta(object):
+        unique_together = (('course_id', 'email'), )
+
+    course_user_group = models.ForeignKey(CourseUserGroup)
+    email = models.CharField(blank=True, max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255)

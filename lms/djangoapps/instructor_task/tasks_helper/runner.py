@@ -26,6 +26,7 @@ class TaskProgress(object):
         self.succeeded = 0
         self.skipped = 0
         self.failed = 0
+        self.preassigned = 0
 
     def update_task_state(self, extra_meta=None):
         """
@@ -47,6 +48,7 @@ class TaskProgress(object):
             'skipped': self.skipped,
             'failed': self.failed,
             'total': self.total,
+            'preassigned': self.preassigned,
             'duration_ms': int((time() - self.start_time) * 1000),
         }
         if extra_meta is not None:
