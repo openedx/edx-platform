@@ -130,7 +130,7 @@ $(document).ready(function() {
 
     if (page < maxPages) {
         $('#pagination-next').addClass('active');
-        $('#pagination-next > span.sr').attr("aria-hidden", "false");
+        $('#pagination-next > span.sr').attr('aria-hidden', "false");
     }
 
     $('#pagination-next').click(function() {
@@ -139,12 +139,12 @@ $(document).ready(function() {
         }
         if (page + 1 === maxPages) {
             $(this).removeClass('active');
-            $(this).children('span.sr').attr("aria-hidden", "true");
+            $(this).children('span.sr').attr('aria-hidden', "true");
         }
         page = page + 1;
         paginate(page, size, total);
         $('#pagination-previous').addClass('active');
-        $('#pagination-previous > span.sr').attr("aria-hidden", "false");
+        $('#pagination-previous > span.sr').attr('aria-hidden', "false");
         return false;
     });
 
@@ -154,12 +154,12 @@ $(document).ready(function() {
         }
         if (page - 1 === 0) {
             $(this).removeClass('active');
-            $(this).children('span.sr').attr("aria-hidden", "true");
+            $(this).children('span.sr').attr('aria-hidden', "true");
         }
         page = page - 1;
         paginate(page, size, total);
         $('#pagination-next').addClass('active');
-        $('#pagination-next > span.sr').attr("aria-hidden", "false");
+        $('#pagination-next > span.sr').attr('aria-hidden', "false");
         return false;
     });
 
