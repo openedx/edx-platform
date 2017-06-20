@@ -275,8 +275,9 @@ define(
             },
 
             setActionInfo: function(action, showText, additionalSRText) {
+                // Don't show edit-container layout on progress action.
+                var toggleShowEditContainer = action === 'progress' ? false : true;
                 this.$('.thumbnail-action').toggle(showText);
-                this.$('.action-icon').addClass(action);
                 HtmlUtils.setHtml(
                     this.$('.thumbnail-action .action-icon'),
                     HtmlUtils.HTML(this.actionsInfo[action].icon)
@@ -287,6 +288,7 @@ define(
                 );
                 this.$('.thumbnail-action .action-text-sr').text(additionalSRText || '');
                 this.$('.thumbnail-wrapper').attr('class', 'thumbnail-wrapper {action}'.replace('{action}', action));
+                this.$('.thumbnail-action .edit-container').toggle(toggleShowEditContainer);
             },
 
             validateImageFile: function(imageFile) {
