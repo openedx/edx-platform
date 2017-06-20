@@ -1,15 +1,14 @@
 """
 Extra views required for SSO
 """
-import social
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseServerError
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
-from social.apps.django_app.utils import load_backend, load_strategy
-from social.apps.django_app.views import complete
-from social.utils import setting_name
+from social_django.utils import load_strategy, load_backend, psa
+from social_django.views import complete
+from social_core.utils import setting_name
 
 from student.models import UserProfile
 from student.views import compose_and_send_activation_email
@@ -56,7 +55,7 @@ def saml_metadata_view(request):
 
 
 @csrf_exempt
-@social.apps.django_app.utils.psa('{0}:complete'.format(URL_NAMESPACE))
+@psa('{0}:complete'.format(URL_NAMESPACE))
 def lti_login_and_complete_view(request, backend, *args, **kwargs):
     """This is a combination login/complete due to LTI being a one step login"""
 

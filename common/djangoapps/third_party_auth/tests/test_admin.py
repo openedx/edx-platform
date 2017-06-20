@@ -16,7 +16,7 @@ from third_party_auth.tests import testutil
 
 
 # This is necessary because cms does not implement third party auth
-@unittest.skipUnless(settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'), 'third party auth not enabled')
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class Oauth2ProviderConfigAdminTest(testutil.TestCase):
     """
     Tests for oauth2 provider config admin

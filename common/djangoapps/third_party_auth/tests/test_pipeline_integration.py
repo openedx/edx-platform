@@ -6,7 +6,7 @@ import mock
 from django import test
 from django.conf import settings
 from django.contrib.auth import models
-from social.apps.django_app.default import models as social_models
+from social_django import models as social_models
 
 from third_party_auth import pipeline, provider
 from third_party_auth.tests import testutil
@@ -24,8 +24,7 @@ class TestCase(testutil.TestCase, test.TestCase):
         self.enabled_provider = self.configure_google_provider(enabled=True)
 
 
-@unittest.skipUnless(
-    testutil.AUTH_FEATURES_KEY in settings.FEATURES, testutil.AUTH_FEATURES_KEY + ' not in settings.FEATURES')
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class GetAuthenticatedUserTestCase(TestCase):
     """Tests for get_authenticated_user."""
 
@@ -66,8 +65,7 @@ class GetAuthenticatedUserTestCase(TestCase):
         self.assertEqual(self.enabled_provider.get_authentication_backend(), user.backend)
 
 
-@unittest.skipUnless(
-    testutil.AUTH_FEATURES_KEY in settings.FEATURES, testutil.AUTH_FEATURES_KEY + ' not in settings.FEATURES')
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class GetProviderUserStatesTestCase(testutil.TestCase, test.TestCase):
     """Tests generation of ProviderUserStates."""
 
@@ -143,8 +141,7 @@ class GetProviderUserStatesTestCase(testutil.TestCase, test.TestCase):
         self.assertEqual(self.user, linkedin_state.user)
 
 
-@unittest.skipUnless(
-    testutil.AUTH_FEATURES_KEY in settings.FEATURES, testutil.AUTH_FEATURES_KEY + ' not in settings.FEATURES')
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class UrlFormationTestCase(TestCase):
     """Tests formation of URLs for pipeline hook points."""
 
@@ -210,8 +207,7 @@ class UrlFormationTestCase(TestCase):
             pipeline.get_complete_url(provider_id)
 
 
-@unittest.skipUnless(
-    testutil.AUTH_FEATURES_KEY in settings.FEATURES, testutil.AUTH_FEATURES_KEY + ' not in settings.FEATURES')
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class TestPipelineUtilityFunctions(TestCase, test.TestCase):
     """
     Test some of the isolated utility functions in the pipeline
@@ -230,36 +226,36 @@ class TestPipelineUtilityFunctions(TestCase, test.TestCase):
         Test that we can use a dictionary with a UID entry to retrieve a
         database-backed UserSocialAuth object.
         """
-        request = mock.MagicMock(
-            session={
-                'partial_pipeline': {
-                    'kwargs': {
-                        'social': {
-                            'uid': 'fake uid'
-                        }
-                    }
+        request = mock.MagicMock()
+        pipeline_partial = {
+            'kwargs': {
+                'social': {
+                    'uid': 'fake uid'
                 }
             }
-        )
-        real_social = pipeline.get_real_social_auth_object(request)
-        self.assertEqual(real_social, self.social_auth)
+        }
+
+        with mock.patch('third_party_auth.pipeline.get') as get_pipeline:
+            get_pipeline.return_value = pipeline_partial
+            real_social = pipeline.get_real_social_auth_object(request)
+            self.assertEqual(real_social, self.social_auth)
 
     def test_get_real_social_auth(self):
         """
         Test that trying to get a database-backed UserSocialAuth from an existing
         instance returns correctly.
         """
-        request = mock.MagicMock(
-            session={
-                'partial_pipeline': {
-                    'kwargs': {
-                        'social': self.social_auth
-                    }
-                }
+        request = mock.MagicMock()
+        pipeline_partial = {
+            'kwargs': {
+                'social': self.social_auth
             }
-        )
-        real_social = pipeline.get_real_social_auth_object(request)
-        self.assertEqual(real_social, self.social_auth)
+        }
+
+        with mock.patch('third_party_auth.pipeline.get') as get_pipeline:
+            get_pipeline.return_value = pipeline_partial
+            real_social = pipeline.get_real_social_auth_object(request)
+            self.assertEqual(real_social, self.social_auth)
 
     def test_get_real_social_auth_no_pipeline(self):
         """

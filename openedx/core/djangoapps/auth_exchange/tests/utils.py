@@ -2,8 +2,14 @@
 Test utilities for OAuth access token exchange
 """
 
-from social.apps.django_app.default.models import UserSocialAuth
+from django.conf import settings
+from social_django.models import UserSocialAuth, Partial
+
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin
+
+
+TPA_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
+TPA_FEATURE_ENABLED = TPA_FEATURES_KEY in settings.FEATURES
 
 
 class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
@@ -86,16 +92,19 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
 
     def test_no_linked_user(self):
         UserSocialAuth.objects.all().delete()
+        Partial.objects.all().delete()
         self._setup_provider_response(success=True)
         self._assert_error(self.data, "invalid_grant", "access_token is not valid")
 
     def test_user_automatically_linked_by_email(self):
         UserSocialAuth.objects.all().delete()
+        Partial.objects.all().delete()
         self._setup_provider_response(success=True, email=self.user.email)
         self._assert_success(self.data, expected_scopes=[])
 
     def test_inactive_user_not_automatically_linked(self):
         UserSocialAuth.objects.all().delete()
+        Partial.objects.all().delete()
         self._setup_provider_response(success=True, email=self.user.email)
         self.user.is_active = False
         self.user.save()  # pylint: disable=no-member
