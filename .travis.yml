@@ -9,11 +9,14 @@ services:
   
 env:
   - TEST_SUITE="lms-unit"
-    SHARD=1
-  - TEST_SUITE="lms-unit"
-    SHARD=2
-  - TEST_SUITE="lms-unit"
-    SHARD=3
+    - SHARD=1
+      SHARD=2
+      SHARD=3
+      SHARD=4
+  #- TEST_SUITE="lms-unit"
+  #  SHARD=2
+  #- TEST_SUITE="lms-unit"
+  #  SHARD=3
   - TEST_SUITE="cms-unit"
   - TEST_SUITE="lib"
   - TEST_SUITE="quality"
