@@ -43,14 +43,13 @@ case "$TEST_SUITE" in
         exit $EXIT
         ;;
 
-    "lms-unit")
-        paver test_system -s lms $PAVER_ARGS        
+    "lms-unit")             
         case "$SHARD" in
             "all")
                 paver test_system -s lms $PAVER_ARGS
                 ;;
             [1-3])
-                paver test_system -s lms --attr="shard_$SHARD" $PAVER_ARGS
+                paver test_system -s lms --attr="shard_$SHARD" $PAVER_ARGS -v
                 ;;
             4|"noshard")
                 paver test_system -s lms --attr='!shard' $PAVER_ARGS
