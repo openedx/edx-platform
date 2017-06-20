@@ -9,6 +9,8 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from contentstore.utils import reverse_usage_url
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
 %>
 <%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course view-outline</%block>
@@ -142,6 +144,20 @@ from openedx.core.djangolib.markup import HTML, Text
                     <a href="${lms_link}" rel="external" class="button view-button view-live-button"
                        title="${_('Click to open the courseware in the LMS in a new tab')}">${_("View Live")}</a>
                 </li>
+		<%
+	            Sites = configuration_helpers.get_lms_base_values(context_course.display_org_with_default,settings.SITE_NAME)
+	        %>
+		<li class="nav-item">
+		    <select name="site_name" class="form-control site_name">
+		    % if Sites != settings.SITE_NAME:
+		        % for name,site in Sites.items():
+			    <option value="${site}" ${'selected' if loop.first else ''}>${name}</option>
+		        % endfor
+		    % else:
+		            <option value="${settings.SITE_NAME}" ${'selected' if loop.first else ''}>${settings.SITE_NAME}</option>
+		    % endif
+                    </select>
+		</li>
             </ul>
         </nav>
     </header>
