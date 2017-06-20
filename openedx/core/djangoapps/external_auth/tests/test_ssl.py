@@ -20,7 +20,6 @@ from mock import Mock, patch
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 import openedx.core.djangoapps.external_auth.views as external_auth_views
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import UserFactory
