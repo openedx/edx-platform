@@ -747,7 +747,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
             return json.loads(response.content)
 
     def verify_added_users_to_cohort(self, response_dict, cohort, course, expected_added, expected_changed,
-                                     expected_present, expected_unknown):
+                                     expected_present, expected_unknown, expected_preassigned, expected_invalid):
         """
         Check that add_users_to_cohort returned the expected response and has
         the expected side effects.
@@ -757,6 +757,8 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         `expected_present` is a list of (user, email/username) tuples where
             email/username corresponds to the input
         `expected_unknown` is a list of strings corresponding to the input
+        'expected_preassigned' is a list of email addresses
+        'expected_invalid' is a list of email addresses
         """
         self.assertTrue(response_dict.get("success"))
         self.assertEqual(
@@ -782,6 +784,8 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
             [username_or_email for (_, username_or_email) in expected_present]
         )
         self.assertEqual(response_dict.get("unknown"), expected_unknown)
+        self.assertEqual(response_dict.get("invalid"), expected_invalid)
+        self.assertEqual(response_dict.get("preassigned"), expected_preassigned)
         for user in expected_added + [user for (user, _) in expected_changed + expected_present]:
             self.assertEqual(
                 CourseUserGroup.objects.get(
@@ -815,7 +819,9 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
             expected_added=[],
             expected_changed=[],
             expected_present=[],
-            expected_unknown=[]
+            expected_preassigned=[],
+            expected_unknown=[],
+            expected_invalid=[]
         )
 
     def test_only_added(self):
@@ -834,7 +840,9 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
             expected_added=self.cohortless_users,
             expected_changed=[],
             expected_present=[],
-            expected_unknown=[]
+            expected_preassigned=[],
+            expected_unknown=[],
+            expected_invalid=[]
         )
 
     def test_only_changed(self):
@@ -856,7 +864,9 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
                 [(user, self.cohort3.name) for user in self.cohort3_users]
             ),
             expected_present=[],
-            expected_unknown=[]
+            expected_preassigned=[],
+            expected_unknown=[],
+            expected_invalid=[]
         )
 
     def test_only_present(self):
@@ -876,7 +886,9 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
             expected_added=[],
             expected_changed=[],
             expected_present=[(user, user.username) for user in self.cohort1_users],
-            expected_unknown=[]
+            expected_preassigned=[],
+            expected_unknown=[],
+            expected_invalid=[]
         )
 
     def test_only_unknown(self):
@@ -896,7 +908,54 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
             expected_added=[],
             expected_changed=[],
             expected_present=[],
-            expected_unknown=usernames
+            expected_preassigned=[],
+            expected_unknown=usernames,
+            expected_invalid=[]
+        )
+
+    def test_preassigned_users(self):
+        """
+        Verify that email addresses can be preassigned for a cohort if the user associated with that email
+        address does not yet exist.
+        """
+        email_addresses = ["email@example.com", "email2@example.com", "email3@example.com"]
+        response_dict = self.request_add_users_to_cohort(
+            ",".join(email_addresses),
+            self.cohort1,
+            self.course
+        )
+        self.verify_added_users_to_cohort(
+            response_dict,
+            self.cohort1,
+            self.course,
+            expected_added=[],
+            expected_changed=[],
+            expected_present=[],
+            expected_preassigned=email_addresses,
+            expected_unknown=[],
+            expected_invalid=[]
+        )
+
+    def test_invalid_email_addresses(self):
+        """
+        Verify that invalid email addresses return an error.
+        """
+        email_addresses = ["email@", "@email", "invalid@email."]
+        response_dict = self.request_add_users_to_cohort(
+            ",".join(email_addresses),
+            self.cohort1,
+            self.course
+        )
+        self.verify_added_users_to_cohort(
+            response_dict,
+            self.cohort1,
+            self.course,
+            expected_added=[],
+            expected_changed=[],
+            expected_present=[],
+            expected_preassigned=[],
+            expected_unknown=[],
+            expected_invalid=email_addresses
         )
 
     def check_user_count(self, expected_count, cohort):
@@ -915,10 +974,12 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         Test all adding conditions together.
         """
         unknowns = ["unknown_user{}".format(i) for i in range(3)]
+        valid_emails = ["email@example.com", "email2@example.com", "email3@example.com"]
         new_users = self.cohortless_users + self.cohort1_users + self.cohort2_users + self.cohort3_users
         response_dict = self.request_add_users_to_cohort(
             ",".join(
                 unknowns +
+                valid_emails +
                 [
                     user.username
                     for user in new_users
@@ -940,20 +1001,26 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
                 [(user, self.cohort3.name) for user in self.cohort3_users]
             ),
             expected_present=[(user, user.username) for user in self.cohort1_users],
-            expected_unknown=unknowns
+            expected_preassigned=valid_emails,
+            expected_unknown=unknowns,
+            expected_invalid=[]
         )
 
     def test_emails(self):
         """
         Verify that we can use emails to identify users.
+        Expect unknown email address not associated with an account to be preassigned.
+        Expect unknown user (neither an email address nor a username) to not be added.
         """
-        unknown = "unknown_user@example.com"
+        valid_email_no_account = "unknown_user@example.com"
+        unknown_user = "unknown"
         response_dict = self.request_add_users_to_cohort(
             ",".join([
                 self.cohort1_users[0].email,
                 self.cohort2_users[0].email,
                 self.cohortless_users[0].email,
-                unknown
+                valid_email_no_account,
+                unknown_user
             ]),
             self.cohort1,
             self.course
@@ -965,7 +1032,9 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
             expected_added=[self.cohortless_users[0]],
             expected_changed=[(self.cohort2_users[0], self.cohort2.name)],
             expected_present=[(self.cohort1_users[0], self.cohort1_users[0].email)],
-            expected_unknown=[unknown]
+            expected_preassigned=[valid_email_no_account],
+            expected_unknown=[unknown_user],
+            expected_invalid=[]
         )
 
     def test_delimiters(self):
@@ -991,7 +1060,9 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
             expected_added=[self.cohortless_users[0]],
             expected_changed=[(self.cohort2_users[0], self.cohort2.name)],
             expected_present=[(self.cohort1_users[0], self.cohort1_users[0].username)],
-            expected_unknown=[unknown]
+            expected_preassigned=[],
+            expected_unknown=[unknown],
+            expected_invalid=[]
         )
 
     def test_can_cohort_unenrolled_users(self):
@@ -1018,7 +1089,9 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
             expected_added=self.unenrolled_users,
             expected_changed=[],
             expected_present=[],
-            expected_unknown=[]
+            expected_preassigned=[],
+            expected_unknown=[],
+            expected_invalid=[]
         )
 
     def test_non_existent_cohort(self):

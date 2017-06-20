@@ -149,8 +149,8 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         confirmation_messages = self.cohort_management_page.get_cohort_confirmation_messages()
         self.assertEqual(
             [
-                "2 students have been added to this cohort",
-                "1 student was removed from " + self.manual_cohort_name
+                "2 learners have been added to this cohort.",
+                "1 learner was moved from " + self.manual_cohort_name
             ],
             confirmation_messages
         )
@@ -217,16 +217,16 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
 
         self.assertEqual(
             [
-                "0 students have been added to this cohort",
-                "1 student was already in the cohort"
+                "0 learners have been added to this cohort.",
+                "1 learner was already in the cohort"
             ],
             self.cohort_management_page.get_cohort_confirmation_messages()
         )
 
         self.assertEqual(
             [
-                "There was an error when trying to add students:",
-                "Unknown user: unknown_user"
+                "There was an error when trying to add learners:",
+                "Unknown username: unknown_user"
             ],
             self.cohort_management_page.get_cohort_error_messages()
         )

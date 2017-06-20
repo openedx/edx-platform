@@ -10,6 +10,7 @@ from time import time
 
 import unicodecsv
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.core.files.storage import DefaultStorage
 from openassessment.data import OraAggregateData
 from pytz import UTC
@@ -137,9 +138,9 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
 
     # cohorts_status is a mapping from cohort_name to metadata about
     # that cohort.  The metadata will include information about users
-    # successfully added to the cohort, users not found, and a cached
-    # reference to the corresponding cohort object to prevent
-    # redundant cohort queries.
+    # successfully added to the cohort, users not found, Preassigned
+    # users, and a cached reference to the corresponding cohort object
+    # to prevent redundant cohort queries.
     cohorts_status = {}
 
     with DefaultStorage().open(task_input['file_name']) as f:
@@ -152,8 +153,10 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
             if not cohorts_status.get(cohort_name):
                 cohorts_status[cohort_name] = {
                     'Cohort Name': cohort_name,
-                    'Students Added': 0,
-                    'Students Not Found': set()
+                    'Learners Added': 0,
+                    'Learners Not Found': set(),
+                    'Invalid Email Addresses': set(),
+                    'Preassigned Learners': set()
                 }
                 try:
                     cohorts_status[cohort_name]['cohort'] = CourseUserGroup.objects.get(
@@ -170,11 +173,25 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
                 continue
 
             try:
-                add_user_to_cohort(cohorts_status[cohort_name]['cohort'], username_or_email)
-                cohorts_status[cohort_name]['Students Added'] += 1
-                task_progress.succeeded += 1
+                # If add_user_to_cohort successfully adds a user, a user object is returned.
+                # If a user is preassigned to a cohort, no user object is returned (we already have the email address).
+                (user, previous_cohort, preassigned) = add_user_to_cohort(cohorts_status[cohort_name]['cohort'], username_or_email)
+                if preassigned:
+                    cohorts_status[cohort_name]['Preassigned Learners'].add(username_or_email)
+                    task_progress.preassigned += 1
+                else:
+                    cohorts_status[cohort_name]['Learners Added'] += 1
+                    task_progress.succeeded += 1
             except User.DoesNotExist:
-                cohorts_status[cohort_name]['Students Not Found'].add(username_or_email)
+                # Raised when a user with the username could not be found, and the email is not valid
+                cohorts_status[cohort_name]['Learners Not Found'].add(username_or_email)
+                task_progress.failed += 1
+            except ValidationError:
+                # Raised when a user with the username could not be found, and the email is not valid,
+                # but the entered string contains an "@"
+                # Since there is no way to know if the entered string is an invalid username or an invalid email,
+                # assume that a string with the "@" symbol in it is an attempt at entering an email
+                cohorts_status[cohort_name]['Invalid Email Addresses'].add(username_or_email)
                 task_progress.failed += 1
             except ValueError:
                 # Raised when the user is already in the given cohort
@@ -186,10 +203,12 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     task_progress.update_task_state(extra_meta=current_step)
 
     # Filter the output of `add_users_to_cohorts` in order to upload the result.
-    output_header = ['Cohort Name', 'Exists', 'Students Added', 'Students Not Found']
+    output_header = ['Cohort Name', 'Exists', 'Learners Added', 'Learners Not Found', 'Invalid Email Addresses', 'Preassigned Learners']
     output_rows = [
         [
-            ','.join(status_dict.get(column_name, '')) if column_name == 'Students Not Found'
+            ','.join(status_dict.get(column_name, '')) if (column_name == 'Learners Not Found'
+                                                           or column_name == 'Invalid Email Addresses'
+                                                           or column_name == 'Preassigned Learners')
             else status_dict[column_name]
             for column_name in output_header
         ]
