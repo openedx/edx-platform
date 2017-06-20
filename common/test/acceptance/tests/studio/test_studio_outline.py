@@ -197,7 +197,6 @@ class WarningMessagesTest(CourseOutlineTest):
         """ Returns an XBlockFixtureDesc with a section, subsection, and possibly unit that has the given state. """
         name = unit_state.name
         start = (datetime(1984, 3, 4) if unit_state.is_released else datetime.now(UTC) + timedelta(1)).isoformat()
-        id_base = MINIMUM_STATIC_PARTITION_ID
 
         subsection = XBlockFixtureDesc('sequential', name, metadata={'start': start})
 
