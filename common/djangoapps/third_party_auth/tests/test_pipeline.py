@@ -35,7 +35,7 @@ class MakeRandomPasswordTest(testutil.TestCase):
         self.assertEqual(expected, pipeline.make_random_password(choice_fn=random_instance.choice))
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class ProviderUserStateTestCase(testutil.TestCase):
     """Tests ProviderUserState behavior."""
 
