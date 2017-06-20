@@ -41,7 +41,7 @@
                             expect(state.videoPlayer.player.video.play).toHaveBeenCalled();
                         });
 
-                        it('player state was changed', function(done) {
+                        xit('player state was changed', function(done) {
                             jasmine.waitUntil(function() {
                                 return state.videoPlayer.player.getPlayerState() === STATUS.PLAYING;
                             }).always(done);
@@ -100,7 +100,7 @@
                     });
 
 
-                    it('player state was changed', function(done) {
+                    xit('player state was changed', function(done) {
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
                         }).then(function() {
@@ -136,7 +136,7 @@
                         expect(state.videoPlayer.player.video.pause).toHaveBeenCalled();
                     });
 
-                    it('player state was changed', function(done) {
+                    xit('player state was changed', function(done) {
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.PLAYING;
                         }).then(function() {
@@ -181,7 +181,7 @@
                         }).done(done);
                     });
 
-                    it('player state was changed', function() {
+                    xit('player state was changed', function() {
                         jasmine.fireEvent(state.videoPlayer.player.video, 'ended');
                         expect(state.videoPlayer.player.getPlayerState()).toBe(STATUS.ENDED);
                     });
