@@ -6,17 +6,15 @@ from setuptools import setup
 
 setup(
     name="Open edX",
-    version="0.6",
+    version="0.7",
     install_requires=["setuptools"],
     requires=[],
     # NOTE: These are not the names we should be installing.  This tree should
     # be reorganized to be a more conventional Python tree.
     packages=[
-        "openedx.core.djangoapps.course_groups",
-        "openedx.core.djangoapps.credit",
-        "openedx.core.djangoapps.user_api",
-        "lms",
         "cms",
+        "lms",
+        "openedx",
     ],
     entry_points={
         "openedx.course_tab": [
@@ -37,6 +35,11 @@ setup(
             "teams = lms.djangoapps.teams.plugins:TeamsTab",
             "textbooks = lms.djangoapps.courseware.tabs:TextbookTabs",
             "wiki = lms.djangoapps.course_wiki.tab:WikiTab",
+        ],
+        "openedx.course_tool": [
+            "course_bookmarks = openedx.features.course_bookmarks.plugins:CourseBookmarksTool",
+            "course_updates = openedx.features.course_experience.plugins:CourseUpdatesTool",
+            "course_reviews = openedx.features.course_experience.plugins:CourseReviewsTool",
         ],
         "openedx.user_partition_scheme": [
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",
