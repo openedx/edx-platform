@@ -248,7 +248,7 @@ def enterprise_customer_for_request(request, tpa_hint=None):
         except EnterpriseCustomer.DoesNotExist:
             pass
 
-    ec_uuid = request.GET.get('enterprise_customer')
+    ec_uuid = request.GET.get('enterprise_customer') or request.COOKIES.get(settings.ENTERPRISE_CUSTOMER_COOKIE_NAME)
     if not ec and ec_uuid:
         try:
             ec = EnterpriseCustomer.objects.get(uuid=ec_uuid)
