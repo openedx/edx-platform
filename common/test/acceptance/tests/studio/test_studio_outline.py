@@ -617,6 +617,91 @@ class EditingSectionsTest(CourseOutlineTest):
         self.assertIn(release_text, self.course_outline_page.section_at(0).release_date)
         self.assertIn(release_text, self.course_outline_page.section_at(0).subsection_at(0).release_date)
 
+@attr(shard=3)
+class UnitAccessTest(CourseOutlineTest):
+    """
+    Feature: Units can be restricted and unrestricted to certain groups from the course outline.
+    """
+
+    __test__ = True
+
+    def populate_course_fixture(self, course_fixture):
+        """
+        Create a course with one section, two subsections, and four units
+        """
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', '1').add_children(
+                XBlockFixtureDesc('sequential', '1.1').add_children(
+                    XBlockFixtureDesc('vertical', '1.1.1'),
+                    XBlockFixtureDesc('vertical', '1.1.2')
+                ),
+                XBlockFixtureDesc('sequential', '1.2').add_children(
+                    XBlockFixtureDesc('vertical', '1.2.1'),
+                    XBlockFixtureDesc('vertical', '1.2.2')
+                )
+            )
+        )
+
+    def _set_restriction_on_unrestricted_unit(self, unit):
+        """
+        Restrict unit access to a certain group and confirm that a
+        warning is displayed.  Then, remove the access restriction
+        and verify that the warning no longer appears.
+        """
+        self.assertFalse(unit.has_restricted_warning())
+        unit.set_group_access("CG")
+        self.assertTrue(unit.has_restricted_warning())
+        unit.set_group_access("CG")
+        self.assertFalse(unit.has_restricted_warning())
+
+    def test_units_can_be_restricted(self):
+        """
+        Visit the course outline page, restrict access to a unit.
+        Verify that there is a restricted group warning.
+        Remove the group access restriction and verify that there
+        is no longer a warning.
+        """
+        self.course_outline_page.visit()
+        self.course_outline_page.expand_all_subsections()
+        unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0)
+        self._set_restriction_on_unrestricted_unit(unit)
+
+    def test_restricted_sections_do_not_appear_to_blocked_users_in_lms(self):
+        """
+        Test that a section restricted to one content group does not
+        appear to users outside of that content group.
+        """
+        self.course_outline_page.visit()
+        self.course_outline_page.add_section_from_top_button()
+        #TODO: configure set_group_access to take content group names
+        unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0)
+        unit.set_group_access('Blocked Group')
+        self.course_outline_page.view_live()
+
+        course_home_page = CourseHomePage(self.browser, self.course_id)
+        course_home_page.visit()
+        self.assertEqual(course_home_page.outline.num_sections, 2)
+        course_home_page.preview.set_staff_view_mode('Blocked Group')
+        self.assertEqual(course_home_page.outline.num_sections, 1)
+
+    def test_restricted_sections_do_appear_to_restricted_users_in_lms(self):
+        """
+        Verify that those who are in a content group with access to
+        a restricted unit are able to see that unit in lms.
+        """
+        self.course_outline_page.visit()
+        self.course_outline_page.add_section_from_top_button()
+        unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0)
+        unit.set_group_access("CG")
+        self.course_outline_page.view_live()
+
+        course_home_page = CourseHomePage(self.browser, self.course_id)
+        course_home_page.visit()
+        # TODO: Write num_units method and visit inner pages
+        self.assertEqual(course_home_page.outline.num_sections, 2)
+        course_home_page.preview.set_staff_view_mode('CG')
+        self.assertEqual(course_home_page.outline.num_sections, 2)
+
 
 @attr(shard=3)
 class StaffLockTest(CourseOutlineTest):

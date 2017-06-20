@@ -89,6 +89,11 @@ class CourseOutlineItem(object):
         return self.status_message == 'Contains staff only content' if self.has_status_message else False
 
     @property
+    def has_restricted_warning(self):
+        """ Returns True if the 'Access to this unit is restricted to' message is visible """
+        return 'Access to this unit is restricted to' in self.status_message if self.has_status_message else False
+
+    @property
     def is_staff_only(self):
         """ Returns True if the visiblity state of this item is staff only (has a black sidebar) """
         return "is-staff-only" in self.q(css=self._bounded_selector(''))[0].get_attribute("class")  # pylint: disable=no-member
@@ -128,6 +133,19 @@ class CourseOutlineItem(object):
         modal = self.edit()
         modal.is_explicitly_locked = is_locked
         modal.save()
+
+    def set_unit_access(self, group_name):
+        """
+        Checks unit access to the group group_name if group_name != None
+        """
+        if group_name:
+            modal = self.edit()
+            groups_select = Select(self.q(css=self._bounded_selector(".group-select-title")))
+            groups_select.select_by_visible_text('Content Groups')
+            checkbox_div = self.q(css=self._bounded_selector(".field partition-group-control"))
+            checkbox = checkbox_div.find_element_by_xpath("//*[contains(text(), " + group_name + ")]")
+            checkbox.click()
+            modal.save()
 
     def in_editable_form(self):
         """
