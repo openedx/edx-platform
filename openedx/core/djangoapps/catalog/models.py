@@ -1,4 +1,5 @@
 """Models governing integration with the catalog service."""
+import waffle
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -54,7 +55,10 @@ class CatalogIntegration(ConfigurationModel):
 
     def get_internal_api_url(self):
         """ Returns the internal Catalog API URL associated with the request's site. """
-        return helpers.get_value('COURSE_CATALOG_API_URL', settings.COURSE_CATALOG_API_URL)
+        if waffle.switch_is_active("populate-multitenant-programs"):
+            return helpers.get_value('COURSE_CATALOG_API_URL', settings.COURSE_CATALOG_API_URL)
+        else:
+            return self.internal_api_url
 
     def get_service_user(self):
         # NOTE: We load the user model here to avoid issues at startup time that result from the hacks
