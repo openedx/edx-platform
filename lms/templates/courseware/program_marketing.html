@@ -319,8 +319,14 @@ description_max_length = 250
               )}
             </div>
             <div class="controls">
-              <a href="#" id="pagination-previous"><span class="fa fa-chevron-up"></span></a>
-              <a href="#" id="pagination-next"><span class="fa fa-chevron-down"></span></a>
+              <a href="#" id="pagination-previous">
+                <span class="fa fa-chevron-up" aria-hidden="true"></span>
+                <span class="sr" aria-hidden="true">${_("Previous page")}</span>
+              </a>
+              <a href="#" id="pagination-next">
+                <span class="fa fa-chevron-down" aria-hidden="true"></span>
+                <span class="sr" aria-hidden="true">${_("Next page")}</span>
+              </a>
             </div>
           </div>
         </div>

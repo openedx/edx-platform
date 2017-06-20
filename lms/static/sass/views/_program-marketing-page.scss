@@ -38,12 +38,8 @@
           margin-left: -moz-calc((100% - 74px) / 2);
           margin-left: -webkit-calc((100% - 74px) / 2);
           margin-left: calc((100% - 74px) / 2);
-          margin-top: -moz-calc(250px/ 2);
-          margin-top: -webkit-calc(250px/ 2);
-          margin-top: calc(250px/ 2);
-          margin-bottom: -moz-calc(186px/ 2);
-          margin-bottom: -webkit-calc(186px/ 2);
-          margin-bottom: calc(186px/ 2);
+          margin-top: 125px;
+          margin-bottom: 94px;
           height: 74px;
           width: 74px;
           color: #fff;
@@ -101,7 +97,7 @@
 
       .banner-title,
       .banner-description {
-          color: white;
+          color: $white;
       }
 
       .banner-title {
@@ -126,7 +122,7 @@
           min-height: 60px;
           font-size: 1.06em;
           font-weight: 600;
-          line-height: 1.35;
+          line-height: 1.35em;
           @media (max-width: 767px) {
               margin-bottom: 14px;
               font-weight: normal;
@@ -199,7 +195,7 @@
     }
 
     .courses-in-program .course-card {
-        background: white;
+        background: $white;
         padding: 10px;
         margin-bottom: 30px;
         border: 1px solid palette(grayscale, back);
@@ -260,7 +256,7 @@
         margin-top: 15px;
         @media (min-width: 768px) {
             margin-top: 0;
-            background: white;
+            background: $white;
             padding: 20px;
         }
 
@@ -348,7 +344,7 @@
 
     .copy-meta-mobile{
       font-size: 0.875rem;
-      line-height: 1.6;
+      line-height: 1.6em;
     }
 
     //Helper Classes
@@ -527,7 +523,7 @@
 
     #course-trailer {
       .trailer-link {
-        color: white;
+        color: $white;
         font-weight: bold;
 
         span {
@@ -548,7 +544,7 @@
           .accordion-head {
               background: #004165;
               padding: 18px 18px 18px 84px;
-              color: white;
+              color: $white;
               border-radius: 0;
               border: none;
               margin: 0;
@@ -590,7 +586,7 @@
               ul {
                   color: #4a4a4a;
                   font-size: .85em;
-                  line-height: 1.5;
+                  line-height: 1.5em;
                   margin-bottom: 15px;
 
                   &:last-child {
@@ -640,7 +636,7 @@
               @extend .visible-sm;
 
               .accordion-content {
-                  background: white;
+                  background: $white;
                   padding: 0;
 
                   .instructor-profiles {
@@ -715,7 +711,7 @@
         border: none;
         display: block;
         margin: 0 auto 40px;
-        background: white;
+        background: $white;
         border-radius: 0;
 
         .program-image {
@@ -767,7 +763,7 @@
 
         .banner {
           background: #065784;
-          color: white;
+          color: $white;
           padding-right: 15px;
           line-height: 18px;
           font-weight: bold;
@@ -792,7 +788,7 @@
             overflow: hidden;
             color: #222;
             font-size: 1.25em;
-            line-height: 1.333;
+            line-height: 1.333em;
             margin-bottom: 5px;
           }
 
@@ -950,7 +946,7 @@
                 }
                 .dept {
                     font-size: 1em;
-                    line-height: 1.5;
+                    line-height: 1.5em;
                 }
             }
 
@@ -1004,12 +1000,6 @@
             }
         }
     }
-    .grid-container,
-    .grid-manual {
-
-        [class*='col-'] {
-        }
-    }
 
     .program-desc-tbl {
         margin-bottom: 20px;
@@ -1053,7 +1043,7 @@
                 display: block;
                 width: 100%;
                 color: palette(primary, dark);
-                line-height: 1.4;
+                line-height: 1.4em;
 
                 @media (min-width: 768px) {
                     display: inline-block;
@@ -1135,7 +1125,7 @@
                 padding-left: 30px;
 
                 &:before {
-                    font-family: FontAwesome;
+                    font-family: "FontAwesome";
                     content: "\f105";
                     position: absolute;
                     left: 5px;
@@ -1172,7 +1162,7 @@
     }
     .modal-custom {
       width: 320px;
-      background-color: white;
+      background-color: $white;
       padding: 30px 30px;
       position: fixed !important;
       overflow: auto;
@@ -1639,7 +1629,7 @@
         display: inline-block;
         margin: 0 calc(0.5 * 2.6rem) 30px calc(0.5 * 1rem) !important;
         width: calc(50% - 22px);
-        verticle-align: top;
+        vertical-align: top;
         position: absolute;
         height: 283px;
         max-height: 283px;
