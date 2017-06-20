@@ -717,7 +717,9 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 'width': 16,  # 16x9
                 'height': 9
             },
-            'The minimum allowed image resolution is {image_file_min_width}x{image_file_min_height}.'.format(
+            'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. The minimum resolution is {image_file_min_width}x{image_file_min_height}.'.format(
+                image_file_max_width=settings.VIDEO_IMAGE_MAX_WIDTH,
+                image_file_max_height=settings.VIDEO_IMAGE_MAX_HEIGHT,
                 image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
                 image_file_min_height=settings.VIDEO_IMAGE_MIN_HEIGHT
             )
@@ -727,7 +729,9 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 'width': settings.VIDEO_IMAGE_MIN_WIDTH - 10,
                 'height': settings.VIDEO_IMAGE_MIN_HEIGHT
             },
-            'The minimum allowed image resolution is {image_file_min_width}x{image_file_min_height}.'.format(
+            'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. The minimum resolution is {image_file_min_width}x{image_file_min_height}.'.format(
+                image_file_max_width=settings.VIDEO_IMAGE_MAX_WIDTH,
+                image_file_max_height=settings.VIDEO_IMAGE_MAX_HEIGHT,
                 image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
                 image_file_min_height=settings.VIDEO_IMAGE_MIN_HEIGHT
             )
@@ -737,7 +741,9 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 'width': settings.VIDEO_IMAGE_MIN_WIDTH,
                 'height': settings.VIDEO_IMAGE_MIN_HEIGHT - 10
             },
-            'The minimum allowed image resolution is {image_file_min_width}x{image_file_min_height}.'.format(
+            'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. The minimum resolution is {image_file_min_width}x{image_file_min_height}.'.format(
+                image_file_max_width=settings.VIDEO_IMAGE_MAX_WIDTH,
+                image_file_max_height=settings.VIDEO_IMAGE_MAX_HEIGHT,
                 image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
                 image_file_min_height=settings.VIDEO_IMAGE_MIN_HEIGHT
             )
@@ -747,7 +753,9 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 'width': 1200,  # not 16:9, but width/height check first.
                 'height': 100
             },
-            'The minimum allowed image resolution is {image_file_min_width}x{image_file_min_height}.'.format(
+            'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. The minimum resolution is {image_file_min_width}x{image_file_min_height}.'.format(
+                image_file_max_width=settings.VIDEO_IMAGE_MAX_WIDTH,
+                image_file_max_height=settings.VIDEO_IMAGE_MAX_HEIGHT,
                 image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
                 image_file_min_height=settings.VIDEO_IMAGE_MIN_HEIGHT
             )
