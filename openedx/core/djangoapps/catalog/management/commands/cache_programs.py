@@ -9,7 +9,6 @@ from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, PROGRAM
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.utils import create_catalog_api_client
 
-
 logger = logging.getLogger(__name__)
 User = get_user_model()  # pylint: disable=invalid-name
 
