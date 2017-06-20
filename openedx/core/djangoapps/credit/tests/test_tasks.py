@@ -87,7 +87,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 1)
 
-    unittest.skip("Skipping ICRV - deprecated")
+    @unittest.skip("Skipping ICRV - deprecated")
     def test_task_adding_icrv_requirements(self):
         """Make sure that the receiver correctly fires off the task when
         invoked by signal.
