@@ -3,6 +3,7 @@
 Unit tests for behavior that is specific to the api methods (vs. the view methods).
 Most of the functionality is covered in test_views.py.
 """
+
 import re
 import ddt
 from dateutil.parser import parse as parse_datetime
@@ -17,17 +18,29 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from django.test.client import RequestFactory
+from openedx.core.djangoapps.user_api.accounts import (
+    USERNAME_MAX_LENGTH,
+    PRIVATE_VISIBILITY
+)
+from openedx.core.djangoapps.user_api.accounts.api import (
+    get_account_settings,
+    update_account_settings,
+    create_account,
+    activate_account,
+    request_password_change
+)
+from openedx.core.djangoapps.user_api.errors import (
+    UserNotFound, UserNotAuthorized,
+    AccountUpdateError, AccountValidationError, AccountUserAlreadyExists,
+    AccountUsernameInvalid, AccountEmailInvalid, AccountPasswordInvalid,
+    AccountRequestError
+)
+from openedx.core.djangoapps.user_api.accounts.tests.testutils import (
+    INVALID_EMAILS, INVALID_PASSWORDS, INVALID_USERNAMES
+)
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import PendingEmailChange
 from student.tests.tests import UserSettingsEventTestMixin
-from ...errors import (
-    UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError,
-    AccountUserAlreadyExists, AccountUsernameInvalid, AccountEmailInvalid, AccountPasswordInvalid, AccountRequestError
-)
-from ..api import (
-    get_account_settings, update_account_settings, create_account, activate_account, request_password_change
-)
-from .. import USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH, PRIVATE_VISIBILITY
 
 
 def mock_render_to_string(template_name, context):
@@ -309,40 +322,6 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
 
     ORIG_HOST = 'example.com'
     IS_SECURE = False
-
-    INVALID_USERNAMES = [
-        None,
-        u'',
-        u'a',
-        u'a' * (USERNAME_MAX_LENGTH + 1),
-        u'invalid_symbol_@',
-        u'invalid-unicode_fŕáńḱ',
-    ]
-
-    INVALID_EMAILS = [
-        None,
-        u'',
-        u'a',
-        'no_domain',
-        'no+domain',
-        '@',
-        '@domain.com',
-        'test@no_extension',
-        u'fŕáńḱ@example.com',
-
-        # Long email -- subtract the length of the @domain
-        # except for one character (so we exceed the max length limit)
-        u'{user}@example.com'.format(
-            user=(u'e' * (EMAIL_MAX_LENGTH - 11))
-        )
-    ]
-
-    INVALID_PASSWORDS = [
-        None,
-        u'',
-        u'a',
-        u'a' * (PASSWORD_MAX_LENGTH + 1)
-    ]
 
     @skip_unless_lms
     def test_activate_account(self):

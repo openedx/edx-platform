@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Programmatic integration point for User API Accounts sub-application
 """
@@ -20,16 +21,23 @@ from util.model_utils import emit_setting_changed_event
 from openedx.core.lib.api.view_utils import add_serializer_errors
 
 from ..errors import (
-    AccountUpdateError, AccountValidationError, AccountUsernameInvalid, AccountPasswordInvalid,
-    AccountEmailInvalid, AccountUserAlreadyExists,
+    AccountUpdateError, AccountValidationError,
+    AccountDataBadLength, AccountDataBadType,
+    AccountUsernameInvalid, AccountPasswordInvalid, AccountEmailInvalid,
+    AccountUserAlreadyExists, AccountUsernameAlreadyExists, AccountEmailAlreadyExists,
     UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized
 )
 from ..forms import PasswordResetFormNoActive
 from ..helpers import intercept_errors
 
 from . import (
-    EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
-    USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
+    EMAIL_BAD_LENGTH_MSG, PASSWORD_BAD_LENGTH_MSG, USERNAME_BAD_LENGTH_MSG,
+    EMAIL_BAD_TYPE_MSG, PASSWORD_BAD_TYPE_MSG, USERNAME_BAD_TYPE_MSG,
+    EMAIL_CONFLICT_MSG, USERNAME_CONFLICT_MSG,
+    EMAIL_INVALID_MSG, USERNAME_INVALID_MSG,
+    EMAIL_MIN_LENGTH, PASSWORD_MIN_LENGTH, USERNAME_MIN_LENGTH,
+    EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH, USERNAME_MAX_LENGTH,
+    PASSWORD_CANT_EQUAL_USERNAME_MSG
 )
 from .serializers import (
     AccountLegacyProfileSerializer, AccountUserSerializer,
@@ -70,6 +78,7 @@ def get_account_settings(request, usernames=None, configuration=None, view=None)
          UserNotFound: no user with username `username` exists (or `request.user.username` if
             `username` is not specified)
          UserAPIInternalError: the operation failed due to an unexpected error.
+
     """
     requesting_user = request.user
     usernames = usernames or [requesting_user.username]
@@ -122,6 +131,7 @@ def update_account_settings(requesting_user, update, username=None):
             in particular, the user account (not including e-mail address) may have successfully been updated,
             but then the e-mail change request, which is processed last, may throw an error.
         UserAPIInternalError: the operation failed due to an unexpected error.
+
     """
     if username is None:
         username = requesting_user.username
@@ -243,20 +253,6 @@ def update_account_settings(requesting_user, update, username=None):
             )
 
 
-def _get_user_and_profile(username):
-    """
-    Helper method to return the legacy user and profile objects based on username.
-    """
-    try:
-        existing_user = User.objects.get(username=username)
-    except ObjectDoesNotExist:
-        raise UserNotFound()
-
-    existing_user_profile, _ = UserProfile.objects.get_or_create(user=existing_user)
-
-    return existing_user, existing_user_profile
-
-
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
 @transaction.atomic
 def create_account(username, password, email):
@@ -296,6 +292,7 @@ def create_account(username, password, email):
         AccountEmailInvalid
         AccountPasswordInvalid
         UserAPIInternalError: the operation failed due to an unexpected error.
+
     """
     # Check if ALLOW_PUBLIC_ACCOUNT_CREATION flag turned off to restrict user account creation
     if not configuration_helpers.get_value(
@@ -350,10 +347,13 @@ def check_account_exists(username=None, email=None):
     """
     conflicts = []
 
-    if email is not None and User.objects.filter(email=email).exists():
+    try:
+        _validate_email_doesnt_exist(email)
+    except AccountEmailAlreadyExists:
         conflicts.append("email")
-
-    if username is not None and User.objects.filter(username=username).exists():
+    try:
+        _validate_username_doesnt_exist(username)
+    except AccountUsernameAlreadyExists:
         conflicts.append("username")
 
     return conflicts
@@ -372,6 +372,7 @@ def activate_account(activation_key):
     Raises:
         UserNotAuthorized
         UserAPIInternalError: the operation failed due to an unexpected error.
+
     """
     try:
         registration = Registration.objects.get(activation_key=activation_key)
@@ -400,6 +401,7 @@ def request_password_change(email, orig_host, is_secure):
         UserNotFound
         AccountRequestError
         UserAPIInternalError: the operation failed due to an unexpected error.
+
     """
     # Binding data to a form requires that the data be passed as a dictionary
     # to the Form class constructor.
@@ -419,6 +421,101 @@ def request_password_change(email, orig_host, is_secure):
         raise UserNotFound
 
 
+def get_username_validation_error(username, default=''):
+    """Get the built-in validation error message for when
+    the username is invalid in some way.
+
+    :param username: The proposed username (unicode).
+    :param default: The message to default to in case of no error.
+    :return: Validation error message.
+
+    """
+    try:
+        _validate_username(username)
+    except AccountUsernameInvalid as invalid_username_err:
+        return invalid_username_err.message
+    return default
+
+
+def get_email_validation_error(email, default=''):
+    """Get the built-in validation error message for when
+    the email is invalid in some way.
+
+    :param email: The proposed email (unicode).
+    :param default: The message to default to in case of no error.
+    :return: Validation error message.
+
+    """
+    try:
+        _validate_email(email)
+    except AccountEmailInvalid as invalid_email_err:
+        return invalid_email_err.message
+    return default
+
+
+def get_password_validation_error(password, username=None, default=''):
+    """Get the built-in validation error message for when
+    the password is invalid in some way.
+
+    :param password: The proposed password (unicode).
+    :param username: The username associated with the user's account (unicode).
+    :param default: The message to default to in case of no error.
+    :return: Validation error message.
+
+    """
+    try:
+        _validate_password(password, username)
+    except AccountPasswordInvalid as invalid_password_err:
+        return invalid_password_err.message
+    return default
+
+
+def get_username_existence_validation_error(username, default=''):
+    """Get the built-in validation error message for when
+    the username has an existence conflict.
+
+    :param username: The proposed username (unicode).
+    :param default: The message to default to in case of no error.
+    :return: Validation error message.
+
+    """
+    try:
+        _validate_username_doesnt_exist(username)
+    except AccountUsernameAlreadyExists as username_exists_err:
+        return username_exists_err.message
+    return default
+
+
+def get_email_existence_validation_error(email, default=''):
+    """Get the built-in validation error message for when
+    the email has an existence conflict.
+
+    :param email: The proposed email (unicode).
+    :param default: The message to default to in case of no error.
+    :return: Validation error message.
+
+    """
+    try:
+        _validate_email_doesnt_exist(email)
+    except AccountEmailAlreadyExists as email_exists_err:
+        return email_exists_err.message
+    return default
+
+
+def _get_user_and_profile(username):
+    """
+    Helper method to return the legacy user and profile objects based on username.
+    """
+    try:
+        existing_user = User.objects.get(username=username)
+    except ObjectDoesNotExist:
+        raise UserNotFound()
+
+    existing_user_profile, _ = UserProfile.objects.get_or_create(user=existing_user)
+
+    return existing_user, existing_user_profile
+
+
 def _validate_username(username):
     """Validate the username.
 
@@ -432,33 +529,54 @@ def _validate_username(username):
         AccountUsernameInvalid
 
     """
-    if not isinstance(username, basestring):
-        raise AccountUsernameInvalid(u"Username must be a string")
-
-    if len(username) < USERNAME_MIN_LENGTH:
-        raise AccountUsernameInvalid(
-            u"Username '{username}' must be at least {min} characters long".format(
+    try:
+        _validate_unicode(username)
+        _validate_type(username, basestring, USERNAME_BAD_TYPE_MSG)
+        _validate_length(
+            username, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, USERNAME_BAD_LENGTH_MSG.format(
                 username=username,
-                min=USERNAME_MIN_LENGTH
-            )
-        )
-    if len(username) > USERNAME_MAX_LENGTH:
-        raise AccountUsernameInvalid(
-            u"Username '{username}' must be at most {max} characters long".format(
-                username=username,
+                min=USERNAME_MIN_LENGTH,
                 max=USERNAME_MAX_LENGTH
             )
         )
-    try:
         with override_language('en'):
             # `validate_username` provides a proper localized message, however the API needs only the English
             # message by convention.
             student_forms.validate_username(username)
-    except ValidationError as error:
-        raise AccountUsernameInvalid(error.message)
+    except (UnicodeError, AccountDataBadType, AccountDataBadLength, ValidationError) as invalid_username_err:
+        raise AccountUsernameInvalid(invalid_username_err.message)
 
 
-def _validate_password(password, username):
+def _validate_email(email):
+    """Validate the format of the email address.
+
+    Arguments:
+        email (unicode): The proposed email.
+
+    Returns:
+        None
+
+    Raises:
+        AccountEmailInvalid
+
+    """
+    try:
+        _validate_unicode(email)
+        _validate_type(email, basestring, EMAIL_BAD_TYPE_MSG)
+        _validate_length(
+            email, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, EMAIL_BAD_LENGTH_MSG.format(
+                email=email,
+                min=EMAIL_MIN_LENGTH,
+                max=EMAIL_MAX_LENGTH
+            )
+        )
+        validate_email.message = EMAIL_INVALID_MSG.format(email=email)
+        validate_email(email)
+    except (UnicodeError, AccountDataBadType, AccountDataBadLength, ValidationError) as invalid_email_err:
+        raise AccountEmailInvalid(invalid_email_err.message)
+
+
+def _validate_password(password, username=None):
     """Validate the format of the user's password.
 
     Passwords cannot be the same as the username of the account,
@@ -475,62 +593,99 @@ def _validate_password(password, username):
         AccountPasswordInvalid
 
     """
-    if not isinstance(password, basestring):
-        raise AccountPasswordInvalid(u"Password must be a string")
-
-    if len(password) < PASSWORD_MIN_LENGTH:
-        raise AccountPasswordInvalid(
-            u"Password must be at least {min} characters long".format(
-                min=PASSWORD_MIN_LENGTH
-            )
-        )
-
-    if len(password) > PASSWORD_MAX_LENGTH:
-        raise AccountPasswordInvalid(
-            u"Password must be at most {max} characters long".format(
+    try:
+        _validate_type(password, basestring, PASSWORD_BAD_TYPE_MSG)
+        _validate_length(
+            password, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH, PASSWORD_BAD_LENGTH_MSG.format(
+                min=PASSWORD_MIN_LENGTH,
                 max=PASSWORD_MAX_LENGTH
             )
         )
+        _validate_password_works_with_username(password, username)
+    except (AccountDataBadType, AccountDataBadLength) as invalid_password_err:
+        raise AccountPasswordInvalid(invalid_password_err.message)
 
+
+def _validate_username_doesnt_exist(username):
+    """Validate that the username is not associated with an existing user.
+
+    :param username: The proposed username (unicode).
+    :return: None
+    :raises: AccountUsernameAlreadyExists
+    """
+    if username is not None and User.objects.filter(username=username).exists():
+        raise AccountUsernameAlreadyExists(_(USERNAME_CONFLICT_MSG).format(username=username))
+
+
+def _validate_email_doesnt_exist(email):
+    """Validate that the email is not associated with an existing user.
+
+    :param email: The proposed email (unicode).
+    :return: None
+    :raises: AccountEmailAlreadyExists
+    """
+    if email is not None and User.objects.filter(email=email).exists():
+        raise AccountEmailAlreadyExists(_(EMAIL_CONFLICT_MSG).format(email_address=email))
+
+
+def _validate_password_works_with_username(password, username=None):
+    """Run validation checks on whether the password and username
+    go well together.
+
+    An example check is to see whether they are the same.
+
+    :param password: The proposed password (unicode).
+    :param username: The username associated with the user's account (unicode).
+    :return: None
+    :raises: AccountPasswordInvalid
+    """
     if password == username:
-        raise AccountPasswordInvalid(u"Password cannot be the same as the username")
+        raise AccountPasswordInvalid(PASSWORD_CANT_EQUAL_USERNAME_MSG)
 
 
-def _validate_email(email):
-    """Validate the format of the email address.
+def _validate_type(data, type, err):
+    """Checks whether the input data is of type. If not,
+    throws a generic error message.
 
-    Arguments:
-        email (unicode): The proposed email.
-
-    Returns:
-        None
-
-    Raises:
-        AccountEmailInvalid
+    :param data: The data to check.
+    :param type: The type to check against.
+    :param err: The error message to throw back if data is not of type.
+    :return: None
+    :raises: AccountDataBadType
 
     """
-    if not isinstance(email, basestring):
-        raise AccountEmailInvalid(u"Email must be a string")
+    if not isinstance(data, type):
+        raise AccountDataBadType(err)
 
-    if len(email) < EMAIL_MIN_LENGTH:
-        raise AccountEmailInvalid(
-            u"Email '{email}' must be at least {min} characters long".format(
-                email=email,
-                min=EMAIL_MIN_LENGTH
-            )
-        )
 
-    if len(email) > EMAIL_MAX_LENGTH:
-        raise AccountEmailInvalid(
-            u"Email '{email}' must be at most {max} characters long".format(
-                email=email,
-                max=EMAIL_MAX_LENGTH
-            )
-        )
+def _validate_length(data, min, max, err):
+    """Validate that the data's length is less than or equal to max,
+    and greater than or equal to min.
 
+    :param data: The data to do the test on.
+    :param min: The minimum allowed length.
+    :param max: The maximum allowed length.
+    :return: None
+    :raises: AccountDataBadLength
+
+    """
+    if len(data) < min or len(data) > max:
+        raise AccountDataBadLength(err)
+
+
+def _validate_unicode(data, err=u"Input not valid unicode"):
+    """Checks whether the input data is valid unicode or not.
+
+    :param data: The data to check for unicode validity.
+    :param err: The error message to throw back if unicode is invalid.
+    :return: None
+    :raises: UnicodeError
+
+    """
     try:
-        validate_email(email)
-    except ValidationError:
-        raise AccountEmailInvalid(
-            u"Email '{email}' format is not valid".format(email=email)
-        )
+        if not isinstance(data, str) and not isinstance(data, unicode):
+            raise UnicodeError
+        # In some cases we pass the above, but it's still inappropriate utf-8.
+        str(data)
+    except UnicodeError:
+        raise UnicodeError(err)
