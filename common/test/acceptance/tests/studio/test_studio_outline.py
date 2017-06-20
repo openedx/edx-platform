@@ -649,9 +649,9 @@ class UnitAccessTest(CourseOutlineTest):
         and verify that the warning no longer appears.
         """
         self.assertFalse(unit.has_restricted_warning())
-        unit.set_group_access("CG")
+        unit.set_unit_access("CG")
         self.assertTrue(unit.has_restricted_warning())
-        unit.set_group_access("CG")
+        unit.set_unit_access("CG")
         self.assertFalse(unit.has_restricted_warning())
 
     def test_units_can_be_restricted(self):
@@ -672,17 +672,17 @@ class UnitAccessTest(CourseOutlineTest):
         appear to users outside of that content group.
         """
         self.course_outline_page.visit()
-        self.course_outline_page.add_section_from_top_button()
+        self.course_outline_page.expand_all_subsections()
         #TODO: configure set_group_access to take content group names
         unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0)
-        unit.set_group_access('Blocked Group')
+        unit.set_unit_access('Blocked Group')
         self.course_outline_page.view_live()
 
         course_home_page = CourseHomePage(self.browser, self.course_id)
         course_home_page.visit()
-        self.assertEqual(course_home_page.outline.num_sections, 2)
+        self.assertEqual(course_home_page.outline.num_units, 2)
         course_home_page.preview.set_staff_view_mode('Blocked Group')
-        self.assertEqual(course_home_page.outline.num_sections, 1)
+        self.assertEqual(course_home_page.outline.num_units, 1)
 
     def test_restricted_sections_do_appear_to_restricted_users_in_lms(self):
         """
@@ -690,17 +690,17 @@ class UnitAccessTest(CourseOutlineTest):
         a restricted unit are able to see that unit in lms.
         """
         self.course_outline_page.visit()
-        self.course_outline_page.add_section_from_top_button()
+        self.course_outline_page.expand_all_subsections()
         unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0)
-        unit.set_group_access("CG")
+        unit.set_unit_access("CG")
         self.course_outline_page.view_live()
 
         course_home_page = CourseHomePage(self.browser, self.course_id)
         course_home_page.visit()
         # TODO: Write num_units method and visit inner pages
-        self.assertEqual(course_home_page.outline.num_sections, 2)
+        self.assertEqual(course_home_page.outline.num_units, 2)
         course_home_page.preview.set_staff_view_mode('CG')
-        self.assertEqual(course_home_page.outline.num_sections, 2)
+        self.assertEqual(course_home_page.outline.num_units, 2)
 
 
 @attr(shard=3)
