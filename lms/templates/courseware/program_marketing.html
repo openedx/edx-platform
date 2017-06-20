@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from mako import exceptions
 
 from openedx.core.djangolib.markup import HTML, Text
 %>
@@ -14,6 +15,7 @@ from openedx.core.djangolib.markup import HTML, Text
 <%
 faq = program['faq']
 program_type = program['type']
+program_type_slug = program['type_slug']
 title = program['title']
 status = program['status']
 courses = program['courses']
@@ -223,7 +225,13 @@ description_max_length = 250
               </div>
             </div>
           </div>
-          <%include file="_program_type_faq.html" args="program_type=program_type" />
+
+          % try:
+            <%include file="_${program_type_slug}_faq.html" args="program_type=program_type" />
+          % except exceptions.TemplateLookupException:
+            ## pass
+          % endtry
+
           <div class="accordion-item">
             <div class="accordion-head">${_("FAQ")}</div>
             <div class="accordion-content">
