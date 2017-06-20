@@ -1133,7 +1133,7 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
         self.user.profile.country = restricted_country.country
         self.user.profile.save()
 
-        path = reverse('embargo_blocked_message', kwargs={'access_point': 'enrollment', 'message_key': 'default'})
+        path = reverse('embargo:blocked_message', kwargs={'access_point': 'enrollment', 'message_key': 'default'})
         self.assert_access_denied(path)
 
     @override_settings(EDX_API_KEY=EnrollmentTestMixin.API_KEY)
