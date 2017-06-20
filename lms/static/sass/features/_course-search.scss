@@ -16,7 +16,8 @@
   }
 
   .search-count {
-    @include float(right);
+    @include text-align(right);
+    display: block;
     color: $lms-gray;
   }
 
