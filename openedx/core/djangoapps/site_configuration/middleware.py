@@ -95,7 +95,7 @@ class LoginRequiredMiddleware:
         if RESTRICT_SITE_TO_LOGGED_IN_USERS:
             LOGIN_EXEMPT_URLS = configuration_helpers.get_value(
                 'LOGIN_EXEMPT_URLS',
-                getattr(settings, 'LOGIN_EXEMPT_URLS', None)
+                settings.FEATURES.get('LOGIN_EXEMPT_URLS', None)
             )
 
             EXEMPT_URLS = [compile(self.LOGIN_URL.lstrip('/'))]
