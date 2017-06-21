@@ -161,11 +161,12 @@ class LoginRequiredMiddlewareTests(TestCase):
 
     def test_anonymous_user_can_access_open_site(self):
         response = self.client.get('/courses', HTTP_HOST=self.open_site.domain)
-        self.assertEqual(response.status_code, 200, 'Response: ' + str(response.status_code))
+        self.assertEqual(response.status_code, 200)
 
     def test_anonymous_user_cannot_access_restricted_site(self):
         response = self.client.get('/courses', HTTP_HOST=self.restricted_site.domain)
         self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.redirect_chain[-1][0] == 'http://testserver.fake.restricted/login/')
 
     def test_logged_in_user_can_access_both_sites(self):
         self.client.login(username=self.user.username, password="password")
