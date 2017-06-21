@@ -33,20 +33,20 @@ branches:
   - oxa/ci
   - oxa/ci-merge2
 
-before_install:
-  - eval "$(curl -sL https://raw.github.com/kabirkhan/travis-remote-shell/master/run.sh)"
-
 # command to install dependencies
 install: 
   - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install 6.9.4
   - npm install
+
+  # Hack for testing purposes
+  - pip install --exists-action w boto==2.39.0
 
   - pip install setuptools
   - pip install --exists-action w -r requirements/edx/paver.txt
 
   # Mirror what paver install_prereqs does.
   # After a successful build, Travis will
-  # cache the virtualenv at that state, so that
+  # cache the virtualenv at that state, so that  
   # the next build will not need to install them
   # from scratch again.
   - pip install --exists-action w -r requirements/edx/pre.txt
@@ -79,4 +79,4 @@ addons:
 
 dist: trusty
 
-group: deprecated-2017Q2
+# group: deprecated-2017Q2
