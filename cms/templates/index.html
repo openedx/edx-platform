@@ -34,7 +34,7 @@ from openedx.core.djangolib.markup import HTML, Text
           <a href="mailto:${settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("Email staff to create course")}</a>
           % endif
 
-          % if show_new_library_button:
+          % if show_new_library_button and user.is_staff:
             <a href="#" class="button new-button new-library-button"><span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>
             ${_("New Library")}</a>
           % endif
@@ -511,7 +511,7 @@ from openedx.core.djangolib.markup import HTML, Text
               </div>
           </div>
         </div>
-        % if show_new_library_button:
+        % if show_new_library_button and user.is_staff:
         <div class="notice-item has-actions">
           <div class="msg">
               <h3 class="title">${_('Create Your First Library')}</h3>
