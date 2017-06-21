@@ -9,6 +9,7 @@ from datetime import datetime
 import ddt
 import freezegun
 import httpretty
+import waffle
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import patch
@@ -157,6 +158,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.assertEquals(response.status_code, 200)
 
     @httpretty.activate
+    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_enterprise_learner_context(self):
         """
         Test: Track selection page should show the enterprise context message if user belongs to the Enterprise.
@@ -177,6 +179,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         )
 
     @httpretty.activate
+    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_enterprise_learner_context_with_multiple_organizations(self):
         """
         Test: Track selection page should show the enterprise context message with multiple organization names
@@ -209,6 +212,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         )
 
     @httpretty.activate
+    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_enterprise_learner_context_audit_disabled(self):
         """
         Track selection page should hide the audit choice by default in an Enterprise Customer/Learner context
