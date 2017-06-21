@@ -2248,6 +2248,9 @@ INSTALLED_APPS = (
     'openedx.features.enterprise_support',
 
     'experiments',
+
+    # DRF filters
+    'django_filters',
 )
 
 ######################### CSRF #########################################

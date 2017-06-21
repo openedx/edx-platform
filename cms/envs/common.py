@@ -1045,6 +1045,9 @@ INSTALLED_APPS = (
 
     # Waffle related utilities
     'openedx.core.djangoapps.waffle_utils',
+
+    # DRF filters
+    'django_filters',
 )
 
 

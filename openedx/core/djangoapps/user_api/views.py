@@ -10,10 +10,11 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from django_countries import countries
+from django_filters.rest_framework import DjangoFilterBackend
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx import locator
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from rest_framework import authentication, filters, generics, status, viewsets
+from rest_framework import authentication, generics, status, viewsets
 from rest_framework.exceptions import ParseError
 from rest_framework.views import APIView
 
@@ -1054,7 +1055,7 @@ class UserPreferenceViewSet(viewsets.ReadOnlyModelViewSet):
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (ApiKeyHeaderPermission,)
     queryset = UserPreference.objects.all()
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend,)
     filter_fields = ("key", "user")
     serializer_class = UserPreferenceSerializer
     paginate_by = 10

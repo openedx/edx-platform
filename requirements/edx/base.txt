@@ -20,7 +20,7 @@ django-celery==3.2.1
 django-config-models==0.1.5
 django-countries==4.0
 django-extensions==1.5.9
-django-filter==0.11.0
+django-filter==1.0.4
 django-ipware==1.1.0
 django-model-utils==2.3.1
 django-mptt==0.7.4
@@ -35,9 +35,7 @@ django-statici18n==1.4.0
 django-storages==1.4.1
 django-method-override==0.1.0
 django-user-tasks==0.1.4
-# We need a fix to DRF 3.2.x, for now use it from our own cherry-picked repo
-#djangorestframework>=3.1,<3.2
-git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
+git+https://github.com/edx/django-rest-framework.git@1ceda7c086fddffd1c440cc86856441bbf0bd9cb#egg=djangorestframework==3.6.3
 django==1.8.18
 django-waffle==0.12.0
 djangorestframework-jwt==1.8.0
