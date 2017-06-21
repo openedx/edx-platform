@@ -359,7 +359,7 @@ class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
         self.assertHttpMethodNotAllowed(self.request_with_auth("put", self.LIST_URI))
 
     def test_patch_list_not_allowed(self):
-        raise SkipTest("Django 1.4's test client does not support patch")
+        self.assertHttpMethodNotAllowed(self.request_with_auth("patch", self.LIST_URI))
 
     def test_delete_list_not_allowed(self):
         self.assertHttpMethodNotAllowed(self.request_with_auth("delete", self.LIST_URI))
@@ -450,7 +450,7 @@ class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
         self.assertHttpMethodNotAllowed(self.request_with_auth("put", self.detail_uri))
 
     def test_patch_detail_not_allowed(self):
-        raise SkipTest("Django 1.4's test client does not support patch")
+        self.assertHttpMethodNotAllowed(self.request_with_auth("patch", self.detail_uri))
 
     def test_delete_detail_not_allowed(self):
         self.assertHttpMethodNotAllowed(self.request_with_auth("delete", self.detail_uri))
