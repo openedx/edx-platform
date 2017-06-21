@@ -52,7 +52,7 @@ case "$TEST_SUITE" in
                 paver test_system -s lms --attr="shard=$SHARD" $PAVER_ARGS -v
                 ;;
             4|"noshard")
-                paver test_system -s lms --attr='!shard' $PAVER_ARGS
+                paver test_system -s lms --attr='!shard' $PAVER_ARGS -v
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
