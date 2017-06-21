@@ -45,7 +45,7 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "Your Platform Name Here"
+PLATFORM_NAME = _('Your Platform Name Here')
 CC_MERCHANT_NAME = PLATFORM_NAME
 
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
@@ -2852,7 +2852,7 @@ OPENID_DOMAIN_PREFIX = 'openid:'
 
 ### Analytics Dashboard (Insights) settings
 ANALYTICS_DASHBOARD_URL = ""
-ANALYTICS_DASHBOARD_NAME = PLATFORM_NAME + " Insights"
+ANALYTICS_DASHBOARD_NAME = _('Your Platform Insights')
 
 # REGISTRATION CODES DISPLAY INFORMATION SUBTITUTIONS IN THE INVOICE ATTACHMENT
 INVOICE_CORP_ADDRESS = "Please place your corporate address\nin this configuration"

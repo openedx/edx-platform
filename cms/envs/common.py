@@ -65,6 +65,9 @@ from lms.envs.common import (
     MEDIA_ROOT,
     MEDIA_URL,
 
+    # Lazy Gettext
+    _,
+
     # Django REST framework configuration
     REST_FRAMEWORK,
 
@@ -125,8 +128,8 @@ from openedx.core.lib.license import LicenseMixin
 # Dummy secret key for dev/test
 SECRET_KEY = 'dev key'
 
-STUDIO_NAME = "Studio"
-STUDIO_SHORT_NAME = "Studio"
+STUDIO_NAME = _("Your Platform Studio")
+STUDIO_SHORT_NAME = _("Studio")
 FEATURES = {
     'GITHUB_PUSH': False,
 
