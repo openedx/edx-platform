@@ -40,6 +40,7 @@ install:
 
   # Hack for testing purposes
   - pip install --exists-action w boto==2.39.0
+  - pip install --exists-action w google-compute-engine
 
   - pip install setuptools
   - pip install --exists-action w -r requirements/edx/paver.txt
