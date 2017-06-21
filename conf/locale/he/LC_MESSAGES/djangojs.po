@@ -63,8 +63,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-05-11 15:05+0000\n"
-"PO-Revision-Date: 2017-05-11 15:11+0000\n"
+"POT-Creation-Date: 2017-06-08 14:58+0000\n"
+"PO-Revision-Date: 2017-06-08 15:04+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
@@ -73,6 +73,17 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Language: he\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: common/static/bundles/Import.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
+
+#: cms/static/cms/js/main.js common/static/bundles/Import.js
+msgid "Studio's having trouble saving your work"
+msgstr ""
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -171,6 +182,7 @@ msgstr "מעלה"
 #: cms/static/js/views/active_video_upload.js
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/static/js/student_account/tos_modal.js
 #: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/alert-popup.underscore
 #: common/static/common/templates/discussion/forum-action-close.underscore
@@ -258,9 +270,9 @@ msgstr "העלה קובץ"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-course-wide.underscore
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -282,8 +294,8 @@ msgid "Removing"
 msgstr "מסיר"
 
 #: cms/static/js/views/validation.js
-#: lms/static/js/groups/views/cohort_discussions_course_wide.js
-#: lms/static/js/groups/views/cohort_discussions_inline.js
+#: lms/static/js/discussions_management/views/divided_discussions_course_wide.js
+#: lms/static/js/discussions_management/views/divided_discussions_inline.js
 #: lms/static/js/views/fields.js
 msgid "Your changes have been saved."
 msgstr "השינויים נשמרו"
@@ -2000,6 +2012,51 @@ msgstr "הפעל תמלילים"
 msgid "Turn off transcripts"
 msgstr "כבה תמלילים"
 
+#: common/static/bundles/Import.js
+msgid "There was an error during the upload process."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "There was an error while unpacking the file."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "There was an error while verifying the file you submitted."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "Choose new file"
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid ""
+"File format not supported. Please upload a file with a {ext} extension."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "There was an error while importing the new library to our database."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "There was an error while importing the new course to our database."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "Your import has failed."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "Your import is in progress; navigating away will abort it."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "Error importing course"
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "There was an error with the upload"
+msgstr ""
+
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
 msgstr "שדה חובה"
@@ -3251,6 +3308,67 @@ msgstr "לא נמצאה אף תוצאה עבור \"%s\"."
 msgid "There was an error, try searching again."
 msgstr "אירעה שגיאה, נסה לחפש שוב."
 
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Not divided"
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid ""
+"Discussions are unified; all learners interact with posts from other "
+"learners, regardless of the group they are in."
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Enrollment Tracks"
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid ""
+"Use enrollment tracks as the basis for dividing discussions. All learners, "
+"regardless of their enrollment track, see the same discussion topics, but "
+"within divided topics, only learners who are in the same enrollment track "
+"see and respond to each others’ posts."
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Cohorts"
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid ""
+"Use cohorts as the basis for dividing discussions. All learners, regardless "
+"of cohort, see the same discussion topics, but within divided topics, only "
+"members of the same cohort see and respond to each others’ posts. "
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Discussion topics in the course are not divided."
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Any divided discussion topics are divided based on enrollment track."
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Any divided discussion topics are divided based on cohort."
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Your changes have been saved. {details}"
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "We have encountered an error. Refresh your browser and then try again."
+msgstr ""
+
+#: lms/static/js/discussions_management/views/divided_discussions.js
+#: lms/static/js/discussions_management/views/divided_discussions_course_wide.js
+#: lms/static/js/discussions_management/views/divided_discussions_inline.js
+#: lms/static/js/groups/views/cohort_form.js
+#: lms/static/js/groups/views/cohorts.js
+msgid "We've encountered an error. Refresh your browser and then try again."
+msgstr "אירעה שגיאה. רענן את הדפדפן שלך ואז נסה שוב."
+
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
 msgid ""
@@ -3322,14 +3440,6 @@ msgstr "אירעה שגיאה. בדוק את חיבור האינטרנט ונס�
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 msgid "Choose one"
 msgstr "בחר אחד"
-
-#: lms/static/js/groups/views/cohort_discussions.js
-#: lms/static/js/groups/views/cohort_discussions_course_wide.js
-#: lms/static/js/groups/views/cohort_discussions_inline.js
-#: lms/static/js/groups/views/cohort_form.js
-#: lms/static/js/groups/views/cohorts.js
-msgid "We've encountered an error. Refresh your browser and then try again."
-msgstr "אירעה שגיאה. רענן את הדפדפן שלך ואז נסה שוב."
 
 #: lms/static/js/groups/views/cohort_editor.js
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
@@ -4158,7 +4268,7 @@ msgstr ""
 msgid "Earned Certificates"
 msgstr ""
 
-#: lms/static/js/learner_dashboard/views/program_details_view_2017.js
+#: lms/static/js/learner_dashboard/views/program_details_view.js
 msgid "Enrolled"
 msgstr ""
 
@@ -4233,6 +4343,10 @@ msgstr "לא הצלחנו לשלוח לך דואר אלקטרוני לאיפוס
 msgid "Please check your email to confirm the change"
 msgstr "בדוק את הדואר האלקטרוני שלך כדי לאשר את השינוי"
 
+#: lms/static/js/student_account/tos_modal.js
+msgid "Terms of Service and Honor Code"
+msgstr ""
+
 #: lms/static/js/student_account/views/FinishAuthView.js
 msgid "Saving your email preference"
 msgstr "שמירת העדפת הדואר האלקטרוני שלך"
@@ -4253,6 +4367,13 @@ msgstr "טוען את הקורסים שלך"
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "An error occurred."
 msgstr "אירעה שגיאה."
+
+#. Translators: This string is appended to optional field labels on the
+#. student login, registration, and
+#. profile forms.
+#: lms/static/js/student_account/views/FormView.js
+msgid "(optional)"
+msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid "We couldn't sign you in."
@@ -4476,10 +4597,10 @@ msgstr "עליך לצאת מהחשבון ולהכנס חזרה על מנת שש�
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
-"We've sent a message to {email_address}. Click the link in the message to "
-"reset your password."
+"We've sent a message to {email}. Click the link in the message to reset your"
+" password. Didn't receive the message? Contact {anchorStart}technical "
+"support{anchorEnd}."
 msgstr ""
-"שלחנו הודעה אל {email_address}. לחץ על הקישור שבהודעה כדי לאפס את סיסמתך."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link your {accountName} account"
@@ -4830,18 +4951,6 @@ msgstr "מספר לומדים"
 msgid "Overall Score"
 msgstr "ניקוד כללי"
 
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
-"ייתכן ודבר זה מתרחש בשל טעות בשרת שלנו או בחיבור האינטרנט. נסה לרענן את "
-"העמוד או ודא שאתה מקוון."
-
-#: cms/static/cms/js/main.js
-msgid "Studio's having trouble saving your work"
-msgstr "סטודיו מתקשה לשמור את עבודתך"
-
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
 msgstr "שגיאת שמירה של OpenAssessment"
@@ -4937,40 +5046,6 @@ msgstr "אבגדהוזחטיכלמנסעפצקרשת"
 #: cms/static/js/factories/export.js
 msgid "Your export has failed."
 msgstr ""
-
-#: cms/static/js/factories/import.js
-msgid "There was an error while importing the new library to our database."
-msgstr "אירעה שגיאה במהלך יבוא הספרייה החדשה לבסיס הנתונים שלנו."
-
-#: cms/static/js/factories/import.js
-msgid "There was an error while importing the new course to our database."
-msgstr "אירעה שגיאה במהלך יבוא הקורס החדש לבסיס הנתונים שלנו."
-
-#: cms/static/js/factories/import.js
-msgid "There was an error during the upload process."
-msgstr "אירעה שגיאה במהלך תהליך העלאת הנתונים."
-
-#: cms/static/js/factories/import.js
-msgid "There was an error while unpacking the file."
-msgstr "אירעה שגיאה בחילוץ הקובץ."
-
-#: cms/static/js/factories/import.js
-msgid "There was an error while verifying the file you submitted."
-msgstr "אירעה שגיאה בזמן אימות הקובץ שהגשת."
-
-#: cms/static/js/factories/import.js
-msgid "Choose new file"
-msgstr "בחר קובץ חדש"
-
-#: cms/static/js/factories/import.js
-msgid "Your import has failed."
-msgstr "היבוא נכשל."
-
-#: cms/static/js/factories/import.js
-msgid ""
-"File format not supported. Please upload a file with a {file_extension} "
-"extension."
-msgstr "תבנית הקובץ אינה נתמכת. אנא העלה קובץ עם תוספת {file_extension}."
 
 #: cms/static/js/factories/manage_users.js
 msgid "Already a course team member"
@@ -5382,18 +5457,6 @@ msgstr "הוסף את הגדרת תצורת קבוצתך הראשונה "
 msgid "You have not created any group configurations yet."
 msgstr "לא יצרת עדיין הגדרות קבוצה."
 
-#: cms/static/js/views/import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr "היבוא שלך נמצא בתהליך; ניווט החוצה יבטל זאת."
-
-#: cms/static/js/views/import.js
-msgid "Error importing course"
-msgstr "שגיאה בייבוא קורס."
-
-#: cms/static/js/views/import.js
-msgid "There was an error with the upload"
-msgstr "אירעה שגיאה בהעלאה"
-
 #: cms/static/js/views/instructor_info.js
 msgid "Upload instructor image."
 msgstr "העלה תמונת מדריך."
@@ -5629,8 +5692,8 @@ msgstr "הוסף תאריך"
 
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/pages/container.js
-msgid "Editing visibility for: %(title)s"
-msgstr "עורך הצגה/הסתרה: %(title)s"
+msgid "Editing access for: %(title)s"
+msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -6112,18 +6175,6 @@ msgstr "התקרב"
 msgid "Zoom Out"
 msgstr "התרחק"
 
-#: common/static/common/templates/sequence-breadcrumbs.underscore
-#: test_root/staticfiles/common/templates/sequence-breadcrumbs.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/sequence-breadcrumbs.underscore
-msgid "Return to course outline"
-msgstr ""
-
-#: common/static/common/templates/sequence-breadcrumbs.underscore
-#: test_root/staticfiles/common/templates/sequence-breadcrumbs.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/sequence-breadcrumbs.underscore
-msgid "Outline"
-msgstr ""
-
 #: common/static/common/templates/components/paging-footer.underscore
 #: test_root/staticfiles/common/templates/components/paging-footer.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-footer.underscore
@@ -6252,14 +6303,10 @@ msgid "Visible to"
 msgstr "גלוי עבור:"
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid ""
 "Discussion admins, moderators, and TAs can make their posts visible to all "
-"students or specify a single cohort."
+"students or specify a single group."
 msgstr ""
-"מנהלי דיון, מנחים ועוזרי הוראה יכולים להפוך את הפוסטים שלהם לגלויים לכל "
-"הסטודנטים או להגבילם לקבוצה ספציפית של סטודנטים. "
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
@@ -7198,7 +7245,6 @@ msgid "LEARN MORE"
 msgstr "למידע נוסף"
 
 #: lms/templates/discovery/course_card.underscore
-#: lms/templates/discovery/course_card_2017.underscore
 #: test_root/staticfiles/templates/discovery/course_card.underscore
 #: test_root/staticfiles/templates/discovery/course_card_2017.underscore
 #, python-format
@@ -7206,7 +7252,6 @@ msgid "Starts: %(start_date)s"
 msgstr "מתחיל: %(start_date)s"
 
 #: lms/templates/discovery/course_card.underscore
-#: lms/templates/discovery/course_card_2017.underscore
 #: test_root/staticfiles/templates/discovery/course_card.underscore
 #: test_root/staticfiles/templates/discovery/course_card_2017.underscore
 msgid "Starts"
@@ -7475,54 +7520,9 @@ msgstr "התעודה נוצרה"
 msgid "Remove from List"
 msgstr "הסר מהרשימה"
 
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid "Specify whether discussion topics are divided by cohort"
-msgstr "ציין אם נושאי הדיון מחולקים על פי קבוצות הלימוד"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-msgid "Course-Wide Discussion Topics"
-msgstr "נושאי דיון כלל קורסיים"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-msgid ""
-"Select the course-wide discussion topics that you want to divide by cohort."
-msgstr "בחר נושאי דיון כלל קורסיים שאתה מעוניין לחלק על פי קבוצת לימוד."
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-msgid "Content-Specific Discussion Topics"
-msgstr "נושאי דיון לתוכן מסוים"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-msgid ""
-"Specify whether content-specific discussion topics are divided by cohort."
-msgstr "ציין אם נושאי דיון לתוכן מסוים מחולקים על פי קבוצות לימוד."
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-msgid "Always cohort content-specific discussion topics"
-msgstr "תמיד נושאי דיון לתוכן מסוים על פי קבוצת לימוד"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-msgid "Cohort selected content-specific discussion topics"
-msgstr "נושאי דיון בנושא ספציפי שנבחרו בידי קבוצת לימוד"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-msgid "No content-specific discussion topics exist."
-msgstr "לא קיימים נושאי דיון ספציפיים לקבוצת הלימוד"
-
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
-msgid "Cohorted"
-msgstr "קבוצת לימוד"
+msgid "Divided"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
@@ -7738,6 +7738,41 @@ msgstr ""
 " עליך להוריד את מידע פרופיל הקורס או תוצאות קבוצת הלמידה בעמוד "
 "{link_start}Data Download{link_end}."
 
+#: lms/templates/instructor/instructor_dashboard_2/discussions.underscore
+msgid "Specify whether discussion topics are divided"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-course-wide.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
+msgid "Course-Wide Discussion Topics"
+msgstr "נושאי דיון כלל קורסיים"
+
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-course-wide.underscore
+msgid "Select the course-wide discussion topics that you want to divide."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+msgid "Content-Specific Discussion Topics"
+msgstr "נושאי דיון לתוכן מסוים"
+
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
+msgid "Specify whether content-specific discussion topics are divided."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
+msgid "Always divide content-specific discussion topics"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
+msgid "Divide the selected content-specific discussion topics"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+msgid "No content-specific discussion topics exist."
+msgstr "לא קיימים נושאי דיון ספציפיים לקבוצת הלימוד"
+
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Used"
@@ -7748,53 +7783,19 @@ msgstr "נעשה שימוש"
 msgid "Valid"
 msgstr "חוקי"
 
-#: lms/templates/learner_dashboard/certificate.underscore
-#: test_root/staticfiles/templates/learner_dashboard/certificate.underscore
-msgid "Program Certificates"
-msgstr "תעודות התכנית"
-
 #: lms/templates/learner_dashboard/certificate_status.underscore
-#: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
-msgid "Congratulations! You have earned a certificate for this course."
-msgstr "ברכות! הרווחת תעודה עבור קורס זה."
-
-#: lms/templates/learner_dashboard/certificate_status.underscore
-#: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
-msgid "View Certificate"
-msgstr "הצג תעודה"
-
-#: lms/templates/learner_dashboard/certificate_status_2017.underscore
-#: lms/templates/learner_dashboard/upgrade_message_2017.underscore
+#: lms/templates/learner_dashboard/upgrade_message.underscore
 #: test_root/staticfiles/templates/learner_dashboard/certificate_status_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/upgrade_message_2017.underscore
 msgid "Certificate Status:"
 msgstr ""
 
-#: lms/templates/learner_dashboard/certificate_status_2017.underscore
+#: lms/templates/learner_dashboard/certificate_status.underscore
 #: test_root/staticfiles/templates/learner_dashboard/certificate_status_2017.underscore
 msgid "Certificate Purchased"
 msgstr ""
 
-#: lms/templates/learner_dashboard/course_card.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_card.underscore
-#, python-format
-msgid "%(courseName)s Home Page."
-msgstr "עמוד הבית של %(courseName)s"
-
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-msgid "enrolled"
-msgstr "רשומים"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-#: lms/templates/learner_dashboard/course_enroll_2017.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
-msgid "View Course"
-msgstr "הצג קורס"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "View Archived Course"
@@ -7802,62 +7803,38 @@ msgstr "צפה בארכיון הקורס"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-msgid "Not Enrolled"
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
+msgid "View Course"
+msgstr "הצג קורס"
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
+msgid "Choose a course run:"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-msgid "Please select a course date"
-msgstr "בחר תאריך קורס"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-msgid "Select Course Run"
-msgstr "בחר מחזור לימודים של קורס"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-msgid "Choose Course Date"
-msgstr "בחר תאריך קורס"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-#, python-format
-msgid "Starts %(start)s"
-msgstr "מתחיל ב-%(start)s"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Enroll Now"
 msgstr "להרשמה"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Coming Soon"
 msgstr "בקרוב"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Enrollment Opens on"
 msgstr "הרישום נפתח ב"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Not Currently Available"
 msgstr "לא זמין כרגע"
-
-#: lms/templates/learner_dashboard/course_enroll_2017.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
-msgid "Choose a course run:"
-msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 #: test_root/staticfiles/templates/learner_dashboard/empty_programs_list.underscore
@@ -7917,89 +7894,61 @@ msgstr ""
 msgid "Open the certificate you earned for the %(title)s program."
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid "Congratulations!"
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid "Your Program Journey"
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid ""
 "To complete the program, you must earn a verified certificate for each "
 "course."
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid "COURSES IN PROGRESS"
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid "REMAINING COURSES"
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid "COMPLETED COURSES"
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid "As you complete courses, you will see them listed here."
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid ""
 "Complete courses on your schedule to ensure you stand out in your field!"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
-#: lms/templates/learner_dashboard/program_header_view_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_header_view_2017.underscore
 msgid "{organization}\\'s logo"
 msgstr "הסמל של {organization}"
 
-#: lms/templates/learner_dashboard/program_header_view.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
-msgid "You are here"
-msgstr "אתה נמצא כאן"
-
-#: lms/templates/learner_dashboard/program_header_view.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
-msgid "Dashboard"
-msgstr "לוח בקרה"
-
-#: lms/templates/learner_dashboard/program_header_view.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
-msgid "Programs"
-msgstr "תוכניות"
-
 #: lms/templates/learner_dashboard/upgrade_message.underscore
-#: test_root/staticfiles/templates/learner_dashboard/upgrade_message.underscore
-msgid ""
-"You need a certificate in this course to be eligible for a program "
-"certificate."
-msgstr "אתה צריך תעודה בקורס זה כדי לקבל תעודת תכנית."
-
-#: lms/templates/learner_dashboard/upgrade_message.underscore
-#: test_root/staticfiles/templates/learner_dashboard/upgrade_message.underscore
-msgid "Upgrade Now"
-msgstr "שדרג עכשיו"
-
-#: lms/templates/learner_dashboard/upgrade_message_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/upgrade_message_2017.underscore
 msgid "Needs verified certificate "
 msgstr ""
 
-#: lms/templates/learner_dashboard/upgrade_message_2017.underscore
+#: lms/templates/learner_dashboard/upgrade_message.underscore
 #: test_root/staticfiles/templates/learner_dashboard/upgrade_message_2017.underscore
 msgid "Buy Certificate"
 msgstr ""
@@ -8058,7 +8007,6 @@ msgstr "שכחת סיסמה?"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/register.underscore
 #: test_root/staticfiles/templates/student_account/hinted_login.underscore
 #: test_root/staticfiles/templates/student_account/login.underscore
 #: test_root/staticfiles/templates/student_account/register.underscore
@@ -8110,6 +8058,18 @@ msgid "Register through edX"
 msgstr "הירשם דרך edX"
 
 #: lms/templates/student_account/login.underscore
+msgid "First time here?"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "Create an Account."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "Sign In"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
 #: test_root/staticfiles/templates/student_account/login.underscore
 msgid ""
 "Sign in here using your email address and password, or use one of the "
@@ -8146,17 +8106,6 @@ msgstr "היכנס לחשבון באמצעות %(providerName)s"
 msgid "Use my institution/campus credentials"
 msgstr "השתמש בהרשאות מוסד/קמפוס"
 
-#: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
-#, python-format
-msgid "New to %(platformName)s?"
-msgstr "חדש ב- %(platformName)s?"
-
-#: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
-msgid "Create an account"
-msgstr "צור חשבון"
-
 #: lms/templates/student_account/password_reset.underscore
 #: test_root/staticfiles/templates/student_account/password_reset.underscore
 msgid "Password assistance"
@@ -8178,6 +8127,19 @@ msgstr "שחזר את הסיסמה שלי"
 
 #: lms/templates/student_account/register.underscore
 #: test_root/staticfiles/templates/student_account/register.underscore
+msgid "Already have an account?"
+msgstr "האם יש לך כבר חשבון?"
+
+#: lms/templates/student_account/register.underscore
+msgid "Sign in."
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "Create an Account"
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Create an account using"
 msgstr "צור חשבון בעזרת"
 
@@ -8193,24 +8155,8 @@ msgid "or create a new one here"
 msgstr "או צור אחד חדש כאן"
 
 #: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
-msgid "Create a new account"
-msgstr "צור חשבון חדש"
-
-#: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
-msgid "Create your account"
-msgstr "צור את חשבונך"
-
-#: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
-msgid "Required field"
-msgstr "שדות חובה"
-
-#: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
-msgid "Already have an account?"
-msgstr "האם יש לך כבר חשבון?"
+msgid "Create account"
+msgstr ""
 
 #: lms/templates/student_profile/badge.underscore
 #: test_root/staticfiles/templates/student_profile/badge.underscore
@@ -8974,6 +8920,25 @@ msgid ""
 "page, click \"Bookmark this page\" under the page title."
 msgstr ""
 
+#: test_root/staticfiles/common/templates/sequence-breadcrumbs.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/sequence-breadcrumbs.underscore
+msgid "Return to course outline"
+msgstr ""
+
+#: test_root/staticfiles/common/templates/sequence-breadcrumbs.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/sequence-breadcrumbs.underscore
+msgid "Outline"
+msgstr ""
+
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+msgid ""
+"Discussion admins, moderators, and TAs can make their posts visible to all "
+"students or specify a single cohort."
+msgstr ""
+"מנהלי דיון, מנחים ועוזרי הוראה יכולים להפוך את הפוסטים שלהם לגלויים לכל "
+"הסטודנטים או להגבילם לקבוצה ספציפית של סטודנטים. "
+
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Add a New Allowance"
 msgstr ""
@@ -9046,6 +9011,118 @@ msgstr ""
 #, python-format
 msgid " %(username)s "
 msgstr ""
+
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid "Specify whether discussion topics are divided by cohort"
+msgstr "ציין אם נושאי הדיון מחולקים על פי קבוצות הלימוד"
+
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
+msgid ""
+"Select the course-wide discussion topics that you want to divide by cohort."
+msgstr "בחר נושאי דיון כלל קורסיים שאתה מעוניין לחלק על פי קבוצת לימוד."
+
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+msgid ""
+"Specify whether content-specific discussion topics are divided by cohort."
+msgstr "ציין אם נושאי דיון לתוכן מסוים מחולקים על פי קבוצות לימוד."
+
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+msgid "Always cohort content-specific discussion topics"
+msgstr "תמיד נושאי דיון לתוכן מסוים על פי קבוצת לימוד"
+
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+msgid "Cohort selected content-specific discussion topics"
+msgstr "נושאי דיון בנושא ספציפי שנבחרו בידי קבוצת לימוד"
+
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
+msgid "Cohorted"
+msgstr "קבוצת לימוד"
+
+#: test_root/staticfiles/templates/learner_dashboard/certificate.underscore
+msgid "Program Certificates"
+msgstr "תעודות התכנית"
+
+#: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
+msgid "Congratulations! You have earned a certificate for this course."
+msgstr "ברכות! הרווחת תעודה עבור קורס זה."
+
+#: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
+msgid "View Certificate"
+msgstr "הצג תעודה"
+
+#: test_root/staticfiles/templates/learner_dashboard/course_card.underscore
+#, python-format
+msgid "%(courseName)s Home Page."
+msgstr "עמוד הבית של %(courseName)s"
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+msgid "enrolled"
+msgstr "רשומים"
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+msgid "Not Enrolled"
+msgstr ""
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+msgid "Please select a course date"
+msgstr "בחר תאריך קורס"
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+msgid "Select Course Run"
+msgstr "בחר מחזור לימודים של קורס"
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+msgid "Choose Course Date"
+msgstr "בחר תאריך קורס"
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+#, python-format
+msgid "Starts %(start)s"
+msgstr "מתחיל ב-%(start)s"
+
+#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
+msgid "You are here"
+msgstr "אתה נמצא כאן"
+
+#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
+msgid "Dashboard"
+msgstr "לוח בקרה"
+
+#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
+msgid "Programs"
+msgstr "תוכניות"
+
+#: test_root/staticfiles/templates/learner_dashboard/upgrade_message.underscore
+msgid ""
+"You need a certificate in this course to be eligible for a program "
+"certificate."
+msgstr "אתה צריך תעודה בקורס זה כדי לקבל תעודת תכנית."
+
+#: test_root/staticfiles/templates/learner_dashboard/upgrade_message.underscore
+msgid "Upgrade Now"
+msgstr "שדרג עכשיו"
+
+#: test_root/staticfiles/templates/student_account/login.underscore
+#, python-format
+msgid "New to %(platformName)s?"
+msgstr "חדש ב- %(platformName)s?"
+
+#: test_root/staticfiles/templates/student_account/login.underscore
+msgid "Create an account"
+msgstr "צור חשבון"
+
+#: test_root/staticfiles/templates/student_account/register.underscore
+msgid "Create a new account"
+msgstr "צור חשבון חדש"
+
+#: test_root/staticfiles/templates/student_account/register.underscore
+msgid "Create your account"
+msgstr "צור את חשבונך"
+
+#: test_root/staticfiles/templates/student_account/register.underscore
+msgid "Required field"
+msgstr "שדות חובה"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
@@ -9463,7 +9540,8 @@ msgstr "שינויים שלא פורסמו לתוכן שישוחרר בעתיד"
 
 #: cms/templates/js/course-outline.underscore
 msgid ""
-"Some content in this unit is visible only to specific groups of learners"
+"Access to some content in this unit is restricted to specific groups of "
+"learners"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
@@ -9882,13 +9960,13 @@ msgid "Add your first textbook"
 msgstr "הוסף את ספר הלימוד הראשון שלך"
 
 #: cms/templates/js/partition-group-details.underscore
-msgid "This group controls visibility of:"
+msgid "This group controls access to:"
 msgstr ""
 
 #: cms/templates/js/partition-group-details.underscore
 msgid ""
-"Use this group to control a component's visibility in the {linkStart}Course "
-"Outline{linkEnd}."
+"In the {linkStart}Course Outline{linkEnd}, use this group to control access "
+"to a component."
 msgstr ""
 
 #: cms/templates/js/previous-video-upload-list.underscore
@@ -9997,7 +10075,8 @@ msgstr "צוות ולומדים"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid ""
-"Some content in this unit is visible only to specific groups of learners."
+"Access to some content in this unit is restricted to specific groups of "
+"learners."
 msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore

@@ -153,9 +153,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-05-11 15:05+0000\n"
-"PO-Revision-Date: 2017-05-25 12:37+0000\n"
-"Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
+"POT-Creation-Date: 2017-06-08 14:58+0000\n"
+"PO-Revision-Date: 2017-06-08 15:04+0000\n"
+"Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -163,6 +163,17 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: common/static/bundles/Import.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
+
+#: cms/static/cms/js/main.js common/static/bundles/Import.js
+msgid "Studio's having trouble saving your work"
+msgstr ""
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -261,6 +272,7 @@ msgstr "Загрузка"
 #: cms/static/js/views/active_video_upload.js
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/static/js/student_account/tos_modal.js
 #: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/alert-popup.underscore
 #: common/static/common/templates/discussion/forum-action-close.underscore
@@ -348,9 +360,9 @@ msgstr "Загрузить файл"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-course-wide.underscore
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -372,8 +384,8 @@ msgid "Removing"
 msgstr "Удаление"
 
 #: cms/static/js/views/validation.js
-#: lms/static/js/groups/views/cohort_discussions_course_wide.js
-#: lms/static/js/groups/views/cohort_discussions_inline.js
+#: lms/static/js/discussions_management/views/divided_discussions_course_wide.js
+#: lms/static/js/discussions_management/views/divided_discussions_inline.js
 #: lms/static/js/views/fields.js
 msgid "Your changes have been saved."
 msgstr "Изменения сохранены."
@@ -2105,6 +2117,51 @@ msgstr "Включить встроенные субтитры"
 msgid "Turn off transcripts"
 msgstr "Отключить встроенные субтитры"
 
+#: common/static/bundles/Import.js
+msgid "There was an error during the upload process."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "There was an error while unpacking the file."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "There was an error while verifying the file you submitted."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "Choose new file"
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid ""
+"File format not supported. Please upload a file with a {ext} extension."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "There was an error while importing the new library to our database."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "There was an error while importing the new course to our database."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "Your import has failed."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "Your import is in progress; navigating away will abort it."
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "Error importing course"
+msgstr ""
+
+#: common/static/bundles/Import.js
+msgid "There was an error with the upload"
+msgstr ""
+
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
 msgstr "Обязательное поле."
@@ -3410,6 +3467,67 @@ msgstr "Нет результатов для «%s»."
 msgid "There was an error, try searching again."
 msgstr "Произошла ошибка.  Попробуйте повторить поиск."
 
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Not divided"
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid ""
+"Discussions are unified; all learners interact with posts from other "
+"learners, regardless of the group they are in."
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Enrollment Tracks"
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid ""
+"Use enrollment tracks as the basis for dividing discussions. All learners, "
+"regardless of their enrollment track, see the same discussion topics, but "
+"within divided topics, only learners who are in the same enrollment track "
+"see and respond to each others’ posts."
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Cohorts"
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid ""
+"Use cohorts as the basis for dividing discussions. All learners, regardless "
+"of cohort, see the same discussion topics, but within divided topics, only "
+"members of the same cohort see and respond to each others’ posts. "
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Discussion topics in the course are not divided."
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Any divided discussion topics are divided based on enrollment track."
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Any divided discussion topics are divided based on cohort."
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Your changes have been saved. {details}"
+msgstr ""
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "We have encountered an error. Refresh your browser and then try again."
+msgstr ""
+
+#: lms/static/js/discussions_management/views/divided_discussions.js
+#: lms/static/js/discussions_management/views/divided_discussions_course_wide.js
+#: lms/static/js/discussions_management/views/divided_discussions_inline.js
+#: lms/static/js/groups/views/cohort_form.js
+#: lms/static/js/groups/views/cohorts.js
+msgid "We've encountered an error. Refresh your browser and then try again."
+msgstr "Возникла ошибка.  Перезагрузите свой браузер и попробуйте ещё раз."
+
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
 msgid ""
@@ -3487,14 +3605,6 @@ msgstr ""
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 msgid "Choose one"
 msgstr "Выберите один"
-
-#: lms/static/js/groups/views/cohort_discussions.js
-#: lms/static/js/groups/views/cohort_discussions_course_wide.js
-#: lms/static/js/groups/views/cohort_discussions_inline.js
-#: lms/static/js/groups/views/cohort_form.js
-#: lms/static/js/groups/views/cohorts.js
-msgid "We've encountered an error. Refresh your browser and then try again."
-msgstr "Возникла ошибка.  Перезагрузите свой браузер и попробуйте ещё раз."
 
 #: lms/static/js/groups/views/cohort_editor.js
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
@@ -4342,7 +4452,7 @@ msgstr ""
 msgid "Earned Certificates"
 msgstr ""
 
-#: lms/static/js/learner_dashboard/views/program_details_view_2017.js
+#: lms/static/js/learner_dashboard/views/program_details_view.js
 msgid "Enrolled"
 msgstr ""
 
@@ -4419,6 +4529,10 @@ msgstr "Нам не удалось отправить вам электронн�
 msgid "Please check your email to confirm the change"
 msgstr "Проверьте электронную почту для подтверждения изменений"
 
+#: lms/static/js/student_account/tos_modal.js
+msgid "Terms of Service and Honor Code"
+msgstr ""
+
 #: lms/static/js/student_account/views/FinishAuthView.js
 msgid "Saving your email preference"
 msgstr "Сохранение ваших настроек электронной почты"
@@ -4438,6 +4552,13 @@ msgstr "Идёт загрузка ваших курсов"
 #: lms/static/js/student_account/views/FormView.js
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "An error occurred."
+msgstr ""
+
+#. Translators: This string is appended to optional field labels on the
+#. student login, registration, and
+#. profile forms.
+#: lms/static/js/student_account/views/FormView.js
+msgid "(optional)"
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
@@ -4672,11 +4793,10 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
-"We've sent a message to {email_address}. Click the link in the message to "
-"reset your password."
+"We've sent a message to {email}. Click the link in the message to reset your"
+" password. Didn't receive the message? Contact {anchorStart}technical "
+"support{anchorEnd}."
 msgstr ""
-"Мы выслали сообщение на {email_address}. Перейдите по ссылке в письме, чтобы"
-" сбросить пароль."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link your {accountName} account"
@@ -5048,18 +5168,6 @@ msgstr "Количество слушателей"
 msgid "Overall Score"
 msgstr ""
 
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
-"Такое может случаться из-за проблем с нашим сервером или вашим подключением "
-"к сети. Попробуйте обновить страницу или проверьте подключение."
-
-#: cms/static/cms/js/main.js
-msgid "Studio's having trouble saving your work"
-msgstr "При сохранении результатов вашей работы в Studio возникли проблемы"
-
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
 msgstr "Ошибка сохранения OpenAssessment"
@@ -5156,42 +5264,6 @@ msgstr "АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЩЭЮЯ"
 #: cms/static/js/factories/export.js
 msgid "Your export has failed."
 msgstr ""
-
-#: cms/static/js/factories/import.js
-msgid "There was an error while importing the new library to our database."
-msgstr "Произошла ошибка при импорте новой библиотеки в нашу базу данных."
-
-#: cms/static/js/factories/import.js
-msgid "There was an error while importing the new course to our database."
-msgstr "Возникла ошибка при импорте нового курса в нашу базу данных."
-
-#: cms/static/js/factories/import.js
-msgid "There was an error during the upload process."
-msgstr "Возникла ошибка в процессе загрузки."
-
-#: cms/static/js/factories/import.js
-msgid "There was an error while unpacking the file."
-msgstr "Возникла ошибка при распаковке файла."
-
-#: cms/static/js/factories/import.js
-msgid "There was an error while verifying the file you submitted."
-msgstr "Возникла ошибка при подтверждении отправленного вами файла."
-
-#: cms/static/js/factories/import.js
-msgid "Choose new file"
-msgstr "Выберите новый файл"
-
-#: cms/static/js/factories/import.js
-msgid "Your import has failed."
-msgstr "Ошибка при импорте."
-
-#: cms/static/js/factories/import.js
-msgid ""
-"File format not supported. Please upload a file with a {file_extension} "
-"extension."
-msgstr ""
-"Формат файла не поддерживается Пожалуйста, загрузите файл с расширением "
-"{file_extension}."
 
 #: cms/static/js/factories/manage_users.js
 msgid "Already a course team member"
@@ -5615,18 +5687,6 @@ msgstr "Добавьте первую конфигурацию групп"
 msgid "You have not created any group configurations yet."
 msgstr "Вы ещё не создали ни одной конфигурации групп."
 
-#: cms/static/js/views/import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr "Ваш импорт в процессе, покинув страницу, вы его отмените."
-
-#: cms/static/js/views/import.js
-msgid "Error importing course"
-msgstr "Ошибка при импорте курса"
-
-#: cms/static/js/views/import.js
-msgid "There was an error with the upload"
-msgstr "Ошибка загрузки"
-
 #: cms/static/js/views/instructor_info.js
 msgid "Upload instructor image."
 msgstr "Загрузка изображения инструктора"
@@ -5871,8 +5931,8 @@ msgstr "Дата добавления"
 
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/pages/container.js
-msgid "Editing visibility for: %(title)s"
-msgstr "Настройки видимости для: %(title)s"
+msgid "Editing access for: %(title)s"
+msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -6362,18 +6422,6 @@ msgstr "Приблизить"
 msgid "Zoom Out"
 msgstr "Отдалить"
 
-#: common/static/common/templates/sequence-breadcrumbs.underscore
-#: test_root/staticfiles/common/templates/sequence-breadcrumbs.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/sequence-breadcrumbs.underscore
-msgid "Return to course outline"
-msgstr ""
-
-#: common/static/common/templates/sequence-breadcrumbs.underscore
-#: test_root/staticfiles/common/templates/sequence-breadcrumbs.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/sequence-breadcrumbs.underscore
-msgid "Outline"
-msgstr ""
-
 #: common/static/common/templates/components/paging-footer.underscore
 #: test_root/staticfiles/common/templates/components/paging-footer.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-footer.underscore
@@ -6502,15 +6550,10 @@ msgid "Visible to"
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid ""
 "Discussion admins, moderators, and TAs can make their posts visible to all "
-"students or specify a single cohort."
+"students or specify a single group."
 msgstr ""
-"Администраторы обсуждения, модераторы и ассистенты преподавателя могут "
-"настраивать видимость своих сообщений для всех слушателей или для "
-"определённой группы."
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
@@ -7445,7 +7488,6 @@ msgid "LEARN MORE"
 msgstr "ПОДРОБНЕЕ"
 
 #: lms/templates/discovery/course_card.underscore
-#: lms/templates/discovery/course_card_2017.underscore
 #: test_root/staticfiles/templates/discovery/course_card.underscore
 #: test_root/staticfiles/templates/discovery/course_card_2017.underscore
 #, python-format
@@ -7453,7 +7495,6 @@ msgid "Starts: %(start_date)s"
 msgstr "Начало: %(start_date)s"
 
 #: lms/templates/discovery/course_card.underscore
-#: lms/templates/discovery/course_card_2017.underscore
 #: test_root/staticfiles/templates/discovery/course_card.underscore
 #: test_root/staticfiles/templates/discovery/course_card_2017.underscore
 msgid "Starts"
@@ -7724,60 +7765,9 @@ msgstr "Сертификат создан"
 msgid "Remove from List"
 msgstr "Исключить из списка"
 
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid "Specify whether discussion topics are divided by cohort"
-msgstr "Укажите, нужно ли обсуждать темы по отдельным группам"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-msgid "Course-Wide Discussion Topics"
-msgstr "Общие темы для обсуждения в рамках курса"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-msgid ""
-"Select the course-wide discussion topics that you want to divide by cohort."
-msgstr "Выберите темы курса, которые нужно обсуждать по отдельным группам."
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-msgid "Content-Specific Discussion Topics"
-msgstr "Темы для обсуждения, связанные с конкретными материалами курса"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-msgid ""
-"Specify whether content-specific discussion topics are divided by cohort."
-msgstr ""
-"Укажите, разделять ли обсуждения конкретных материалов курса по отдельным "
-"группам."
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-msgid "Always cohort content-specific discussion topics"
-msgstr ""
-"Всегда обсуждать темы, связанные с конкретными материалами курса, по "
-"отдельным группам"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-msgid "Cohort selected content-specific discussion topics"
-msgstr ""
-"Обсуждать темы, связанные с конкретными материалами курса, по отдельным "
-"группам"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-msgid "No content-specific discussion topics exist."
-msgstr "В курсе нет тем для обсуждения, связанных с конкретными материалами."
-
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
-msgid "Cohorted"
-msgstr "распределено по группам"
+msgid "Divided"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
@@ -7997,6 +7987,41 @@ msgid ""
 "{link_start}Data Download{link_end} page."
 msgstr ""
 
+#: lms/templates/instructor/instructor_dashboard_2/discussions.underscore
+msgid "Specify whether discussion topics are divided"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-course-wide.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
+msgid "Course-Wide Discussion Topics"
+msgstr "Общие темы для обсуждения в рамках курса"
+
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-course-wide.underscore
+msgid "Select the course-wide discussion topics that you want to divide."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+msgid "Content-Specific Discussion Topics"
+msgstr "Темы для обсуждения, связанные с конкретными материалами курса"
+
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
+msgid "Specify whether content-specific discussion topics are divided."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
+msgid "Always divide content-specific discussion topics"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
+msgid "Divide the selected content-specific discussion topics"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+msgid "No content-specific discussion topics exist."
+msgstr "В курсе нет тем для обсуждения, связанных с конкретными материалами."
+
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Used"
@@ -8007,53 +8032,19 @@ msgstr "Использовано"
 msgid "Valid"
 msgstr "Данные действительны"
 
-#: lms/templates/learner_dashboard/certificate.underscore
-#: test_root/staticfiles/templates/learner_dashboard/certificate.underscore
-msgid "Program Certificates"
-msgstr "Сертификаты программ"
-
 #: lms/templates/learner_dashboard/certificate_status.underscore
-#: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
-msgid "Congratulations! You have earned a certificate for this course."
-msgstr "Поздравляем! Вы получите сертификат об окончании курса."
-
-#: lms/templates/learner_dashboard/certificate_status.underscore
-#: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
-msgid "View Certificate"
-msgstr "Просмотреть сертификат"
-
-#: lms/templates/learner_dashboard/certificate_status_2017.underscore
-#: lms/templates/learner_dashboard/upgrade_message_2017.underscore
+#: lms/templates/learner_dashboard/upgrade_message.underscore
 #: test_root/staticfiles/templates/learner_dashboard/certificate_status_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/upgrade_message_2017.underscore
 msgid "Certificate Status:"
 msgstr ""
 
-#: lms/templates/learner_dashboard/certificate_status_2017.underscore
+#: lms/templates/learner_dashboard/certificate_status.underscore
 #: test_root/staticfiles/templates/learner_dashboard/certificate_status_2017.underscore
 msgid "Certificate Purchased"
 msgstr ""
 
-#: lms/templates/learner_dashboard/course_card.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_card.underscore
-#, python-format
-msgid "%(courseName)s Home Page."
-msgstr ""
-
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-msgid "enrolled"
-msgstr "зачислено"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-#: lms/templates/learner_dashboard/course_enroll_2017.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
-msgid "View Course"
-msgstr "Посмотреть курс"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "View Archived Course"
@@ -8061,62 +8052,38 @@ msgstr "Посмотреть курс из архива"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-msgid "Not Enrolled"
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
+msgid "View Course"
+msgstr "Посмотреть курс"
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
+msgid "Choose a course run:"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-msgid "Please select a course date"
-msgstr "Пожалуйста, выберите дату"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-msgid "Select Course Run"
-msgstr "Выберите запуск курса"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-msgid "Choose Course Date"
-msgstr "Выбор даты курса"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-#, python-format
-msgid "Starts %(start)s"
-msgstr "Начало %(start)s"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Enroll Now"
 msgstr "Записаться"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Coming Soon"
 msgstr "Скоро"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Enrollment Opens on"
 msgstr "Дата начала записи"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Not Currently Available"
 msgstr "Запись пока недоступна"
-
-#: lms/templates/learner_dashboard/course_enroll_2017.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll_2017.underscore
-msgid "Choose a course run:"
-msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 #: test_root/staticfiles/templates/learner_dashboard/empty_programs_list.underscore
@@ -8180,91 +8147,61 @@ msgstr ""
 msgid "Open the certificate you earned for the %(title)s program."
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid "Congratulations!"
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid "Your Program Journey"
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid ""
 "To complete the program, you must earn a verified certificate for each "
 "course."
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid "COURSES IN PROGRESS"
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid "REMAINING COURSES"
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid "COMPLETED COURSES"
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid "As you complete courses, you will see them listed here."
 msgstr ""
 
-#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_details_view_2017.underscore
 msgid ""
 "Complete courses on your schedule to ensure you stand out in your field!"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
-#: lms/templates/learner_dashboard/program_header_view_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_header_view_2017.underscore
 msgid "{organization}\\'s logo"
 msgstr "логотип {organization}"
 
-#: lms/templates/learner_dashboard/program_header_view.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
-msgid "You are here"
-msgstr "Вы здесь"
-
-#: lms/templates/learner_dashboard/program_header_view.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
-msgid "Dashboard"
-msgstr "Панель управления"
-
-#: lms/templates/learner_dashboard/program_header_view.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
-msgid "Programs"
-msgstr "Программы"
-
 #: lms/templates/learner_dashboard/upgrade_message.underscore
-#: test_root/staticfiles/templates/learner_dashboard/upgrade_message.underscore
-msgid ""
-"You need a certificate in this course to be eligible for a program "
-"certificate."
-msgstr ""
-"Для получения сертификата об успешном освоении программы необходим "
-"сертификат об окончании этого курса"
-
-#: lms/templates/learner_dashboard/upgrade_message.underscore
-#: test_root/staticfiles/templates/learner_dashboard/upgrade_message.underscore
-msgid "Upgrade Now"
-msgstr "Изменить статус слушателя"
-
-#: lms/templates/learner_dashboard/upgrade_message_2017.underscore
 #: test_root/staticfiles/templates/learner_dashboard/upgrade_message_2017.underscore
 msgid "Needs verified certificate "
 msgstr ""
 
-#: lms/templates/learner_dashboard/upgrade_message_2017.underscore
+#: lms/templates/learner_dashboard/upgrade_message.underscore
 #: test_root/staticfiles/templates/learner_dashboard/upgrade_message_2017.underscore
 msgid "Buy Certificate"
 msgstr ""
@@ -8325,7 +8262,6 @@ msgstr "Забыли пароль?"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/register.underscore
 #: test_root/staticfiles/templates/student_account/hinted_login.underscore
 #: test_root/staticfiles/templates/student_account/login.underscore
 #: test_root/staticfiles/templates/student_account/register.underscore
@@ -8378,6 +8314,18 @@ msgid "Register through edX"
 msgstr "Зарегистрироваться через edX"
 
 #: lms/templates/student_account/login.underscore
+msgid "First time here?"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "Create an Account."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "Sign In"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
 #: test_root/staticfiles/templates/student_account/login.underscore
 msgid ""
 "Sign in here using your email address and password, or use one of the "
@@ -8414,17 +8362,6 @@ msgstr "Войти через %(providerName)s"
 msgid "Use my institution/campus credentials"
 msgstr "Использовать мой логин и пароль"
 
-#: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
-#, python-format
-msgid "New to %(platformName)s?"
-msgstr "Впервые в %(platformName)s?"
-
-#: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
-msgid "Create an account"
-msgstr "Создать учётную запись"
-
 #: lms/templates/student_account/password_reset.underscore
 #: test_root/staticfiles/templates/student_account/password_reset.underscore
 msgid "Password assistance"
@@ -8446,6 +8383,19 @@ msgstr "Сбросить пароль"
 
 #: lms/templates/student_account/register.underscore
 #: test_root/staticfiles/templates/student_account/register.underscore
+msgid "Already have an account?"
+msgstr "Уже есть учётная запись?"
+
+#: lms/templates/student_account/register.underscore
+msgid "Sign in."
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "Create an Account"
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Create an account using"
 msgstr "Создать учётную запись, используя"
 
@@ -8461,24 +8411,8 @@ msgid "or create a new one here"
 msgstr "или создать новую в этом сервисе"
 
 #: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
-msgid "Create a new account"
-msgstr "Создать новую учётную запись"
-
-#: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
-msgid "Create your account"
-msgstr "Создать учётную запись"
-
-#: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
-msgid "Required field"
-msgstr "Обязательное поле"
-
-#: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
-msgid "Already have an account?"
-msgstr "Уже есть учётная запись?"
+msgid "Create account"
+msgstr ""
 
 #: lms/templates/student_profile/badge.underscore
 #: test_root/staticfiles/templates/student_profile/badge.underscore
@@ -9276,6 +9210,26 @@ msgid ""
 "page, click \"Bookmark this page\" under the page title."
 msgstr ""
 
+#: test_root/staticfiles/common/templates/sequence-breadcrumbs.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/sequence-breadcrumbs.underscore
+msgid "Return to course outline"
+msgstr ""
+
+#: test_root/staticfiles/common/templates/sequence-breadcrumbs.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/sequence-breadcrumbs.underscore
+msgid "Outline"
+msgstr ""
+
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+msgid ""
+"Discussion admins, moderators, and TAs can make their posts visible to all "
+"students or specify a single cohort."
+msgstr ""
+"Администраторы обсуждения, модераторы и ассистенты преподавателя могут "
+"настраивать видимость своих сообщений для всех слушателей или для "
+"определённой группы."
+
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Add a New Allowance"
 msgstr ""
@@ -9348,6 +9302,126 @@ msgstr ""
 #, python-format
 msgid " %(username)s "
 msgstr ""
+
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid "Specify whether discussion topics are divided by cohort"
+msgstr "Укажите, нужно ли обсуждать темы по отдельным группам"
+
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
+msgid ""
+"Select the course-wide discussion topics that you want to divide by cohort."
+msgstr "Выберите темы курса, которые нужно обсуждать по отдельным группам."
+
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+msgid ""
+"Specify whether content-specific discussion topics are divided by cohort."
+msgstr ""
+"Укажите, разделять ли обсуждения конкретных материалов курса по отдельным "
+"группам."
+
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+msgid "Always cohort content-specific discussion topics"
+msgstr ""
+"Всегда обсуждать темы, связанные с конкретными материалами курса, по "
+"отдельным группам"
+
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
+msgid "Cohort selected content-specific discussion topics"
+msgstr ""
+"Обсуждать темы, связанные с конкретными материалами курса, по отдельным "
+"группам"
+
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
+msgid "Cohorted"
+msgstr "распределено по группам"
+
+#: test_root/staticfiles/templates/learner_dashboard/certificate.underscore
+msgid "Program Certificates"
+msgstr "Сертификаты программ"
+
+#: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
+msgid "Congratulations! You have earned a certificate for this course."
+msgstr "Поздравляем! Вы получите сертификат об окончании курса."
+
+#: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
+msgid "View Certificate"
+msgstr "Просмотреть сертификат"
+
+#: test_root/staticfiles/templates/learner_dashboard/course_card.underscore
+#, python-format
+msgid "%(courseName)s Home Page."
+msgstr ""
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+msgid "enrolled"
+msgstr "зачислено"
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+msgid "Not Enrolled"
+msgstr ""
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+msgid "Please select a course date"
+msgstr "Пожалуйста, выберите дату"
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+msgid "Select Course Run"
+msgstr "Выберите запуск курса"
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+msgid "Choose Course Date"
+msgstr "Выбор даты курса"
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+#, python-format
+msgid "Starts %(start)s"
+msgstr "Начало %(start)s"
+
+#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
+msgid "You are here"
+msgstr "Вы здесь"
+
+#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
+msgid "Dashboard"
+msgstr "Панель управления"
+
+#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
+msgid "Programs"
+msgstr "Программы"
+
+#: test_root/staticfiles/templates/learner_dashboard/upgrade_message.underscore
+msgid ""
+"You need a certificate in this course to be eligible for a program "
+"certificate."
+msgstr ""
+"Для получения сертификата об успешном освоении программы необходим "
+"сертификат об окончании этого курса"
+
+#: test_root/staticfiles/templates/learner_dashboard/upgrade_message.underscore
+msgid "Upgrade Now"
+msgstr "Изменить статус слушателя"
+
+#: test_root/staticfiles/templates/student_account/login.underscore
+#, python-format
+msgid "New to %(platformName)s?"
+msgstr "Впервые в %(platformName)s?"
+
+#: test_root/staticfiles/templates/student_account/login.underscore
+msgid "Create an account"
+msgstr "Создать учётную запись"
+
+#: test_root/staticfiles/templates/student_account/register.underscore
+msgid "Create a new account"
+msgstr "Создать новую учётную запись"
+
+#: test_root/staticfiles/templates/student_account/register.underscore
+msgid "Create your account"
+msgstr "Создать учётную запись"
+
+#: test_root/staticfiles/templates/student_account/register.underscore
+msgid "Required field"
+msgstr "Обязательное поле"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
@@ -9778,7 +9852,8 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid ""
-"Some content in this unit is visible only to specific groups of learners"
+"Access to some content in this unit is restricted to specific groups of "
+"learners"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
@@ -10200,13 +10275,13 @@ msgid "Add your first textbook"
 msgstr "Добавить первый учебник"
 
 #: cms/templates/js/partition-group-details.underscore
-msgid "This group controls visibility of:"
+msgid "This group controls access to:"
 msgstr ""
 
 #: cms/templates/js/partition-group-details.underscore
 msgid ""
-"Use this group to control a component's visibility in the {linkStart}Course "
-"Outline{linkEnd}."
+"In the {linkStart}Course Outline{linkEnd}, use this group to control access "
+"to a component."
 msgstr ""
 
 #: cms/templates/js/previous-video-upload-list.underscore
@@ -10317,7 +10392,8 @@ msgstr "Сотрудникам и слушателям"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid ""
-"Some content in this unit is visible only to specific groups of learners."
+"Access to some content in this unit is restricted to specific groups of "
+"learners."
 msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore

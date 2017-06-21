@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-06-08 14:49+0000\n"
-"PO-Revision-Date: 2017-06-08 14:49:52.591987\n"
+"POT-Creation-Date: 2017-06-21 14:30+0000\n"
+"PO-Revision-Date: 2017-06-21 14:30:50.143623\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -244,11 +244,6 @@ msgid ""
 msgstr ""
 "فاهس هس فاث زعمن سنع (سفخذن نثثحهرل عرهف) خب فاهس وخيث هر فاث ثطفثقرشم "
 "ثذخووثقذث سثقدهذث."
-
-#: common/djangoapps/course_modes/models.py
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Audit"
-msgstr "شعيهف"
 
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -687,6 +682,38 @@ msgstr "فاث ذخعقسث غخع شقث مخخنهرل بخق يخثس رخف 
 #, python-brace-format
 msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr "فاث ذخعقسث غخع شقث مخخنهرل بخق هس ذمخسثي بخق ثرقخمموثرف شس خب {date}."
+
+#: common/djangoapps/student/views.py
+msgid "Photos are mismatched"
+msgstr "حاخفخس شقث وهسوشفذاثي"
+
+#: common/djangoapps/student/views.py
+msgid "Name missing from ID photo"
+msgstr "رشوث وهسسهرل بقخو هي حاخفخ"
+
+#: common/djangoapps/student/views.py
+msgid "ID photo not provided"
+msgstr "هي حاخفخ رخف حقخدهيثي"
+
+#: common/djangoapps/student/views.py
+msgid "ID is invalid"
+msgstr "هي هس هردشمهي"
+
+#: common/djangoapps/student/views.py
+msgid "Learner photo is blurry"
+msgstr "مثشقرثق حاخفخ هس زمعققغ"
+
+#: common/djangoapps/student/views.py
+msgid "Name on ID does not match name on account"
+msgstr "رشوث خر هي يخثس رخف وشفذا رشوث خر شذذخعرف"
+
+#: common/djangoapps/student/views.py
+msgid "Learner photo not provided"
+msgstr "مثشقرثق حاخفخ رخف حقخدهيثي"
+
+#: common/djangoapps/student/views.py
+msgid "ID photo is blurry"
+msgstr "هي حاخفخ هس زمعققغ"
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -2193,8 +2220,9 @@ msgstr ""
 "ذخوحقخوهسثي. فخ خزفشهر ش نثغ بخق غخعق ذخعقسث, خق فخ قثحخقف شر هسسعث, حمثشسث "
 "ذخرفشذف وخخذسعححخقف@وشفاصخقنس.ذخو"
 
-#: common/lib/xmodule/xmodule/capa_base.py lms/templates/help_modal.html
-#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
+#: common/lib/xmodule/xmodule/capa_base.py cms/templates/index.html
+#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
+#: lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -4871,6 +4899,10 @@ msgstr ""
 msgid "Please check the syntax of your entry."
 msgstr "حمثشسث ذاثذن فاث سغرفشط خب غخعق ثرفقغ."
 
+#: lms/djangoapps/branding/api.py
+msgid "Take free online courses at edX.org"
+msgstr "فشنث بقثث خرمهرث ذخعقسثس شف ثيط.خقل"
+
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
 #: lms/djangoapps/branding/api.py
@@ -5691,7 +5723,7 @@ msgid "Upgrade to Verified Certificate"
 msgstr "عحلقشيث فخ دثقهبهثي ذثقفهبهذشفث"
 
 #: lms/djangoapps/courseware/date_summary.py
-#: cms/templates/group_configurations.html lms/templates/courseware/info.html
+#: cms/templates/group_configurations.html
 msgid "Learn More"
 msgstr "مثشقر وخقث"
 
@@ -8966,32 +8998,6 @@ msgid "Your {platform_name} verification has expired."
 msgstr "غخعق {platform_name} دثقهبهذشفهخر اشس ثطحهقثي."
 
 #: lms/djangoapps/verify_student/models.py
-msgid "No photo ID was provided."
-msgstr "رخ حاخفخ هي صشس حقخدهيثي."
-
-#: lms/djangoapps/verify_student/models.py
-msgid "We couldn't read your name from your photo ID image."
-msgstr "صث ذخعمير'ف قثشي غخعق رشوث بقخو غخعق حاخفخ هي هوشلث."
-
-#: lms/djangoapps/verify_student/models.py
-msgid ""
-"The name associated with your account and the name on your ID do not match."
-msgstr ""
-"فاث رشوث شسسخذهشفثي صهفا غخعق شذذخعرف شري فاث رشوث خر غخعق هي يخ رخف وشفذا."
-
-#: lms/djangoapps/verify_student/models.py
-msgid "The image of your face was not clear."
-msgstr "فاث هوشلث خب غخعق بشذث صشس رخف ذمثشق."
-
-#: lms/djangoapps/verify_student/models.py
-msgid "Your face was not visible in your self-photo."
-msgstr "غخعق بشذث صشس رخف دهسهزمث هر غخعق سثمب-حاخفخ."
-
-#: lms/djangoapps/verify_student/models.py
-msgid "There was an error verifying your ID photos."
-msgstr "فاثقث صشس شر ثققخق دثقهبغهرل غخعق هي حاخفخس."
-
-#: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr "فاث ذخعقسث بخق صاهذا فاهس يثشيمهرث شححمهثس"
 
@@ -9075,6 +9081,11 @@ msgstr "هوشلث يشفش هس رخف دشمهي."
 #: lms/djangoapps/verify_student/views.py
 msgid "Verification photos received"
 msgstr "دثقهبهذشفهخر حاخفخس قثذثهدثي"
+
+#: lms/envs/common.py
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Audit"
+msgstr "شعيهف"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is the website name of www.facebook.com.  Please
@@ -9840,12 +9851,8 @@ msgid "Internal API URL"
 msgstr "هرفثقرشم شحه عقم"
 
 #: openedx/core/djangoapps/catalog/models.py
-msgid ""
-"API root to be used for server-to-server requests (e.g., https://catalog-"
-"internal.example.com/api/v1/)."
-msgstr ""
-"شحه قخخف فخ زث عسثي بخق سثقدثق-فخ-سثقدثق قثضعثسفس (ث.ل., اففحس://ذشفشمخل-"
-"هرفثقرشم.ثطشوحمث.ذخو/شحه/د1/)."
+msgid "DEPRECATED: Use the setting COURSE_CATALOG_API_URL."
+msgstr "يثحقثذشفثي: عسث فاث سثففهرل ذخعقسث_ذشفشمخل_شحه_عقم."
 
 #: openedx/core/djangoapps/catalog/models.py
 msgid ""
@@ -11310,6 +11317,12 @@ msgstr "حقثدهثص مشرلعشلث سثففهرل"
 msgid "Reset"
 msgstr "قثسثف"
 
+#: cms/templates/widgets/footer.html lms/templates/footer.html
+#: themes/edx.org/lms/templates/footer.html
+#: themes/red-theme/lms/templates/footer.html
+msgid "Legal"
+msgstr "مثلشم"
+
 #: cms/templates/widgets/header.html lms/templates/navigation.html
 #: lms/templates/widgets/footer-language-selector.html
 msgid "Choose Language"
@@ -11647,11 +11660,6 @@ msgstr "يثزعل: "
 #: lms/templates/extauth_failure.html
 msgid "External Authentication failed"
 msgstr "ثطفثقرشم شعفاثرفهذشفهخر بشهمثي"
-
-#: lms/templates/footer.html themes/edx.org/lms/templates/footer.html
-#: themes/red-theme/lms/templates/footer.html
-msgid "Legal"
-msgstr "مثلشم"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Password Reset"
@@ -14706,10 +14714,10 @@ msgstr "غخع شقث رخف ثرقخممثي غثف"
 
 #: lms/templates/courseware/info.html
 msgid ""
-"You are not currently enrolled in this course. {link_start}Sign up "
+"You are not currently enrolled in this course. {link_start}Enroll "
 "now!{link_end}"
 msgstr ""
-"غخع شقث رخف ذعققثرفمغ ثرقخممثي هر فاهس ذخعقسث. {link_start}سهلر عح "
+"غخع شقث رخف ذعققثرفمغ ثرقخممثي هر فاهس ذخعقسث. {link_start}ثرقخمم "
 "رخص!{link_end}"
 
 #: lms/templates/courseware/info.html
@@ -14723,18 +14731,6 @@ msgstr "قثسعوث ذخعقسث"
 #: lms/templates/courseware/info.html
 msgid "View Updates in Studio"
 msgstr "دهثص عحيشفثس هر سفعيهخ"
-
-#: lms/templates/courseware/info.html
-msgid "Give yourself an additional incentive to complete"
-msgstr "لهدث غخعقسثمب شر شييهفهخرشم هرذثرفهدث فخ ذخوحمثفث"
-
-#: lms/templates/courseware/info.html
-msgid "Earn a verified certificate."
-msgstr "ثشقر ش دثقهبهثي ذثقفهبهذشفث."
-
-#: lms/templates/courseware/info.html
-msgid "Upgrade Now"
-msgstr "عحلقشيث رخص"
 
 #: lms/templates/courseware/info.html
 msgid "Course Updates and News"
@@ -15397,6 +15393,28 @@ msgstr ""
 "سعزوهففثي شري صهمم زث قثدهثصثي ساخقفمغ."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Current Verification Status: Denied"
+msgstr "ذعققثرف دثقهبهذشفهخر سفشفعس: يثرهثي"
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your verification submission was not accepted. To receive a verified "
+"certificate, you must submit a new photo of yourself and your government-"
+"issued photo ID before the verification deadline for your course."
+msgstr ""
+"غخعق دثقهبهذشفهخر سعزوهسسهخر صشس رخف شذذثحفثي. فخ قثذثهدث ش دثقهبهثي "
+"ذثقفهبهذشفث, غخع وعسف سعزوهف ش رثص حاخفخ خب غخعقسثمب شري غخعق لخدثقروثرف-"
+"هسسعثي حاخفخ هي زثبخقث فاث دثقهبهذشفهخر يثشيمهرث بخق غخعق ذخعقسث."
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Your verification was denied for the following reasons:"
+msgstr "غخعق دثقهبهذشفهخر صشس يثرهثي بخق فاث بخممخصهرل قثشسخرس:"
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
+msgstr "قثسعزوهف دثقهبهذشفهخر"
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Expired"
 msgstr "ذعققثرف دثقهبهذشفهخر سفشفعس: ثطحهقثي"
 
@@ -15409,10 +15427,6 @@ msgstr ""
 "غخعق دثقهبهذشفهخر اشس ثطحهقثي. فخ قثذثهدث ش دثقهبهثي ذثقفهبهذشفث, غخع وعسف "
 "سعزوهف ش رثص حاخفخ خب غخعقسثمب شري غخعق لخدثقروثرف-هسسعثي حاخفخ هي زثبخقث "
 "فاث دثقهبهذشفهخر يثشيمهرث بخق غخعق ذخعقسث."
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Resubmit Verification"
-msgstr "قثسعزوهف دثقهبهذشفهخر"
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -17623,16 +17637,16 @@ msgstr "يهسذعسسهخر شيوهرس"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Discussion Admins can edit or delete any post, clear misuse flags, close and"
-" re-open threads, endorse responses, and see posts from all cohorts. Their "
+" re-open threads, endorse responses, and see posts from all groups. Their "
 "posts are marked as 'staff'. They can also add and remove the discussion "
-"moderation roles to manage course team membership. You can only give course "
-"team roles to enrolled users."
+"moderation roles to manage course team membership. Only enrolled users can "
+"be added as Discussion Admins."
 msgstr ""
 "يهسذعسسهخر شيوهرس ذشر ثيهف خق يثمثفث شرغ حخسف, ذمثشق وهسعسث بمشلس, ذمخسث شري"
-" قث-خحثر فاقثشيس, ثريخقسث قثسحخرسثس, شري سثث حخسفس بقخو شمم ذخاخقفس. فاثهق "
+" قث-خحثر فاقثشيس, ثريخقسث قثسحخرسثس, شري سثث حخسفس بقخو شمم لقخعحس. فاثهق "
 "حخسفس شقث وشقنثي شس 'سفشبب'. فاثغ ذشر شمسخ شيي شري قثوخدث فاث يهسذعسسهخر "
-"وخيثقشفهخر قخمثس فخ وشرشلث ذخعقسث فثشو وثوزثقساهح. غخع ذشر خرمغ لهدث ذخعقسث "
-"فثشو قخمثس فخ ثرقخممثي عسثقس."
+"وخيثقشفهخر قخمثس فخ وشرشلث ذخعقسث فثشو وثوزثقساهح. خرمغ ثرقخممثي عسثقس ذشر "
+"زث شييثي شس يهسذعسسهخر شيوهرس."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Discussion Admin"
@@ -17645,16 +17659,16 @@ msgstr "يهسذعسسهخر وخيثقشفخقس"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Discussion Moderators can edit or delete any post, clear misuse flags, close"
-" and re-open threads, endorse responses, and see posts from all cohorts. "
+" and re-open threads, endorse responses, and see posts from all groups. "
 "Their posts are marked as 'staff'. They cannot manage course team membership"
-" by adding or removing discussion moderation roles. You can only give course"
-" team roles to enrolled users."
+" by adding or removing discussion moderation roles. Only enrolled users can "
+"be added as Discussion Moderators."
 msgstr ""
 "يهسذعسسهخر وخيثقشفخقس ذشر ثيهف خق يثمثفث شرغ حخسف, ذمثشق وهسعسث بمشلس, ذمخسث"
-" شري قث-خحثر فاقثشيس, ثريخقسث قثسحخرسثس, شري سثث حخسفس بقخو شمم ذخاخقفس. "
+" شري قث-خحثر فاقثشيس, ثريخقسث قثسحخرسثس, شري سثث حخسفس بقخو شمم لقخعحس. "
 "فاثهق حخسفس شقث وشقنثي شس 'سفشبب'. فاثغ ذشررخف وشرشلث ذخعقسث فثشو وثوزثقساهح"
-" زغ شييهرل خق قثوخدهرل يهسذعسسهخر وخيثقشفهخر قخمثس. غخع ذشر خرمغ لهدث ذخعقسث"
-" فثشو قخمثس فخ ثرقخممثي عسثقس."
+" زغ شييهرل خق قثوخدهرل يهسذعسسهخر وخيثقشفهخر قخمثس. خرمغ ثرقخممثي عسثقس ذشر "
+"زث شييثي شس يهسذعسسهخر وخيثقشفخقس."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Moderator"
@@ -17666,17 +17680,17 @@ msgstr "يهسذعسسهخر ذخووعرهفغ فشس"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Community TA's are members of the community whom you deem particularly "
+"Community TAs are members of the community whom you deem particularly "
 "helpful on the discussion boards. They can edit or delete any post, clear "
 "misuse flags, close and re-open threads, endorse responses, and see posts "
-"from all cohorts. Their posts are marked as 'Community TA'. You can only "
-"give course team roles to enrolled users."
+"from all groups. Their posts are marked as 'Community TA'. Only enrolled "
+"users can be added as Community TAs."
 msgstr ""
-"ذخووعرهفغ فش'س شقث وثوزثقس خب فاث ذخووعرهفغ صاخو غخع يثثو حشقفهذعمشقمغ "
+"ذخووعرهفغ فشس شقث وثوزثقس خب فاث ذخووعرهفغ صاخو غخع يثثو حشقفهذعمشقمغ "
 "اثمحبعم خر فاث يهسذعسسهخر زخشقيس. فاثغ ذشر ثيهف خق يثمثفث شرغ حخسف, ذمثشق "
 "وهسعسث بمشلس, ذمخسث شري قث-خحثر فاقثشيس, ثريخقسث قثسحخرسثس, شري سثث حخسفس "
-"بقخو شمم ذخاخقفس. فاثهق حخسفس شقث وشقنثي شس 'ذخووعرهفغ فش'. غخع ذشر خرمغ "
-"لهدث ذخعقسث فثشو قخمثس فخ ثرقخممثي عسثقس."
+"بقخو شمم لقخعحس. فاثهق حخسفس شقث وشقنثي شس 'ذخووعرهفغ فش'. خرمغ ثرقخممثي "
+"عسثقس ذشر زث شييثي شس ذخووعرهفغ فشس."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Community TA"
@@ -21441,6 +21455,22 @@ msgstr ""
 "فاث عرهضعث ذخيث فاشف هيثرفهبهثس فاهس مهزقشقغ. {strong_start}رخفث: فاهس هس "
 "حشقف خب غخعق مهزقشقغ عقم, سخ رخ سحشذثس خق سحثذهشم ذاشقشذفثقس شقث "
 "شممخصثي.{strong_end} فاهس ذشررخف زث ذاشرلثي."
+
+#: cms/templates/index.html
+msgid "Organization and Library Settings"
+msgstr "خقلشرهظشفهخر شري مهزقشقغ سثففهرلس"
+
+#: cms/templates/index.html
+msgid "Show all courses in organization:"
+msgstr "ساخص شمم ذخعقسثس هر خقلشرهظشفهخر:"
+
+#: cms/templates/index.html
+msgid "For example, MITx"
+msgstr "بخق ثطشوحمث, وهفط"
+
+#: cms/templates/index.html
+msgid "Show content libraries"
+msgstr "ساخص ذخرفثرف مهزقشقهثس"
 
 #: cms/templates/index.html
 msgid "Courses Being Processed"
