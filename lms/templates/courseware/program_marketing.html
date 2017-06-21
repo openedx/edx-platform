@@ -250,7 +250,7 @@ description_max_length = 250
           <div class="quote">
             % if endorsement:
               <span>"${endorsement_quote}"</span>
-                % if endorser:
+                % if endorser and endorsement_image:
                   <img class="visible-sm pull-left" src="${endorsement_image}" width="40" height="40" alt="${_('Endorser Image')}"/>
                   <span class="writer">
                     ${endorsement_name},
@@ -342,7 +342,7 @@ description_max_length = 250
           <div class="quote">
             % if endorsement:
               <span class="pull-right hidden-sm">
-                % if endorser:
+                % if endorser and endorsement_image:
                   <img src="${endorsement_image}" width="90" height="90" alt="${_('Endorser Image')}"/>
                 % endif
               </span>
