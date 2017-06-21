@@ -265,9 +265,9 @@ BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = ENV_TOKENS.get(
 # We have to reset the value here, since we have changed the value of the queue name.
 BULK_EMAIL_ROUTING_KEY = ENV_TOKENS.get('BULK_EMAIL_ROUTING_KEY', HIGH_PRIORITY_QUEUE)
 
-# We can run smaller jobs on the low priority queue. See note above for why
+# We can run smaller jobs on the default priority queue. See note above for why
 # we have to reset the value here.
-BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = ENV_TOKENS.get('BULK_EMAIL_ROUTING_KEY_SMALL_JOBS', LOW_PRIORITY_QUEUE)
+BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = ENV_TOKENS.get('BULK_EMAIL_ROUTING_KEY_SMALL_JOBS', DEFAULT_PRIORITY_QUEUE)
 
 # Queue to use for updating persistent grades
 RECALCULATE_GRADES_ROUTING_KEY = ENV_TOKENS.get('RECALCULATE_GRADES_ROUTING_KEY', LOW_PRIORITY_QUEUE)
