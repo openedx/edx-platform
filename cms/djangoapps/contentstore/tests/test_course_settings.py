@@ -455,11 +455,11 @@ class CourseGradingTest(CourseTestCase):
 
         # one for each of the calls to update_from_json()
         send_signal.assert_has_calls([
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
         ])
 
         # one for each of the calls to update_from_json(); the last update doesn't actually change the parts of the
@@ -505,9 +505,9 @@ class CourseGradingTest(CourseTestCase):
 
         # one for each of the calls to update_grader_from_json()
         send_signal.assert_has_calls([
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
         ])
 
         # one for each of the calls to update_grader_from_json()
@@ -620,8 +620,8 @@ class CourseGradingTest(CourseTestCase):
 
         # one for each call to update_section_grader_type()
         send_signal.assert_has_calls([
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
         ])
 
         tracker.emit.assert_has_calls([
@@ -698,9 +698,9 @@ class CourseGradingTest(CourseTestCase):
         self.assertNotIn(original_model['graders'][1], updated_model['graders'])
         send_signal.assert_has_calls([
             # once for the POST
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
             # once for the DELETE
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
         ])
 
     def setup_test_set_get_section_grader_ajax(self):

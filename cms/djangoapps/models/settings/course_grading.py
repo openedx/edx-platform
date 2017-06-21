@@ -265,7 +265,7 @@ def _grading_event_and_signal(course_key, user_id):
         "event_transaction_type": GRADING_POLICY_CHANGED_EVENT_TYPE,
     }
     tracker.emit(name, data)
-    GRADING_POLICY_CHANGED.send(sender=CourseGradingModel, user_id=user_id, course_id=course_key)
+    GRADING_POLICY_CHANGED.send(sender=CourseGradingModel, user_id=user_id, course_key=course_key)
 
 
 def hash_grading_policy(grading_policy):

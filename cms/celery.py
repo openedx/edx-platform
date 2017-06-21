@@ -34,8 +34,18 @@ class Router(AlternateEnvironmentRouter):
         """
         Defines alternate environment tasks, as a dict of form { task_name: alternate_queue }
         """
+        # The tasks below will be routed to the default lms queue.
         return {
             'openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache': 'lms',
             'openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache_v2': 'lms',
-            'lms.djangoapps.grades.tasks.compute_all_grades_for_course': 'lms',
+        }
+
+    @property
+    def explicit_queues(self):
+        """
+        Defines specific queues for tasks to run in (typically outside of the cms environment),
+        as a dict of form { task_name: queue_name }.
+        """
+        return {
+            'lms.djangoapps.grades.tasks.compute_all_grades_for_course': settings.POLICY_CHANGE_GRADES_ROUTING_KEY,
         }
