@@ -179,7 +179,7 @@ class HomeHelpTest(StudioCourseTest):
         Scenario: Help link in sidebar links is working on 'Home'(Courses tab) page.
         Given that I am on the 'Home'(Courses tab) page.
         And I want help about the courses
-        And I click the 'Getting Started with edX Studio' in the sidebar links
+        And I click the 'Getting Started with Your Platform Studio' in the sidebar links
         Then Help link should open.
         And help url should be correct
         """
@@ -190,7 +190,7 @@ class HomeHelpTest(StudioCourseTest):
             test=self,
             page=self.home_page,
             href=expected_url,
-            help_text='Getting Started with edX Studio',
+            help_text='Getting Started with Your Platform Studio',
             as_list_item=True
         )
 
@@ -232,7 +232,7 @@ class NewCourseHelpTest(AcceptanceTest):
         Scenario: Help link in sidebar links is working on 'Create a New Course' page in the dashboard.
         Given that I am on the 'Create a New Course' page in the dashboard.
         And I want help about the process
-        And I click the 'Getting Started with edX Studio' in the sidebar links
+        And I click the 'Getting Started with Your Platform Studio' in the sidebar links
         Then Help link should open.
         And help url should be correct
         """
@@ -243,7 +243,7 @@ class NewCourseHelpTest(AcceptanceTest):
             test=self,
             page=self.dashboard_page,
             href=expected_url,
-            help_text='Getting Started with edX Studio',
+            help_text='Getting Started with Your Platform Studio',
             as_list_item=True
         )
 
@@ -285,7 +285,7 @@ class NewLibraryHelpTest(AcceptanceTest):
         Scenario: Help link in sidebar links is working on 'Create a New Library' page in the dashboard.
         Given that I am on the 'Create a New Library' page in the dashboard.
         And I want help about the process
-        And I click the 'Getting Started with edX Studio' in the sidebar links
+        And I click the 'Getting Started with Your Platform Studio' in the sidebar links
         Then Help link should open.
         And help url should be correct
         """
@@ -296,7 +296,7 @@ class NewLibraryHelpTest(AcceptanceTest):
             test=self,
             page=self.dashboard_page,
             href=expected_url,
-            help_text='Getting Started with edX Studio',
+            help_text='Getting Started with Your Platform Studio',
             as_list_item=True
         )
 
