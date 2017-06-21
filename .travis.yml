@@ -19,10 +19,6 @@ env:
   - TEST_SUITE="cms-unit"
   - TEST_SUITE="lib"  
   - TEST_SUITE="js-unit"
-  # - TEST_SUITE="quality"
-  # - TEST_SUITE="lms-acceptance"
-  # - TEST_SUITE="cms-acceptance"
-  # - TEST_SUITE="commonlib-js-unit"
   
 cache:
   pip: true
@@ -35,7 +31,7 @@ branches:
   - oxa/devfic
   - oxa/dev.fic
   - oxa/ci
-  - oxa/ci-merge
+  - oxa/ci-merge2
 
 before_install:
   - eval "$(curl -sL https://raw.github.com/kabirkhan/travis-remote-shell/master/run.sh)"
