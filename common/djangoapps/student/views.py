@@ -2224,10 +2224,10 @@ def password_reset(request):
         # bad user? tick the rate limiter counter
         AUDIT_LOG.info("Bad password_reset user passed in.")
         limiter.tick_bad_request_counter(request)
-
+    from_email = request.POST.get('email')
     return JsonResponse({
         'success': True,
-        'value': render_to_string('registration/password_reset_done.html', {}),
+        'value': render_to_string('registration/password_reset_done.html', {'email':  from_email}),
     })
 
 
