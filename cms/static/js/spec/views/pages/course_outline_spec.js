@@ -1616,7 +1616,32 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                 });
 
                 it('shows partition group information with group_access set', function() {
-                    var messages = getUnitStatus({has_partition_group_components: true, group_access: {1: [2, 3]}});
+                    var partitions = [
+                        {
+                            "scheme": "cohort",
+                            "id": 1,
+                            "groups": [
+                                {
+                                    "deleted": false,
+                                    "selected": true,
+                                    "id": 2,
+                                    "name": "Group 2"
+                                },
+                                {
+                                    "deleted": false,
+                                    "selected": true,
+                                    "id": 3,
+                                    "name": "Group 3"
+                                }
+                            ],
+                            "name": "Content Group Configuration"
+                        }
+                    ];
+                    var messages = getUnitStatus({
+                        has_partition_group_components: true,
+                        user_partitions: partitions,
+                        group_access: {1: [2, 3]}
+                    });
                     expect(messages.length).toBe(1);
                     expect(messages).toContainText(
                         'Access to this unit is restricted to'

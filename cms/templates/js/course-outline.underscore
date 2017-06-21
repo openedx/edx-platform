@@ -6,30 +6,38 @@ var prereq = xblockInfo.get('prereq');
 var hasPartitionGroups = xblockInfo.get('has_partition_group_components');
 var userPartitions = xblockInfo.get('user_partitions');
 var groupAccess = xblockInfo.get('group_access');
-var allowedGroups = [];
-var groupIdToName = {};
+var groupAccessMap = {};
+var idToName = {};
 
-for (var schemeId in groupAccess) {
-    var schemeAllowedGroups = groupAccess[schemeId];
-
-    schemeAllowedGroups.forEach(function (groupId) {
-        var fullId = schemeId + groupId;
-        allowedGroups.push(fullId);
+for (schemeId in groupAccess) {
+    var groupIds = [];
+    groupAccess[schemeId].forEach(function (groupId) {
+        groupIds.push(groupId);
     });
+    groupAccessMap[schemeId] = groupIds;
 }
 
 userPartitions.forEach(function (partition) {
-    var schemeId = null;
-    var groupId = null;
-    schemeId = partition['id'];
+    var schemeId = partition['id'];
     var groups = partition['groups'];
+    var groupIds = [];
+    idToName[schemeId] = {};
     groups.forEach(function (group) {
+        var groupIdToName = {};
         var groupId = group['id'];
         var groupName = group['name'];
-        var fullId = schemeId.toString() + groupId.toString();
-        groupIdToName[fullId] = groupName;
+        groupIdToName[groupId] = groupName;
+        idToName[schemeId][groupId] = groupName;
     })
-})
+});
+
+var numAllowedGroups = 0;
+for (var schemeId in groupAccessMap) {
+    var groups = groupAccessMap[schemeId];
+    groups.forEach(function (groups) {
+        numAllowedGroups++;
+    })
+}
 
 var statusMessages = [];
 var messageType;
@@ -83,22 +91,39 @@ if (staffOnlyMessage) {
         addStatusMessage(messageType, messageText);
     }
 
-    if (hasPartitionGroups && allowedGroups.length === 0 && xblockInfo.isVertical()) {
+    if (hasPartitionGroups && numAllowedGroups === 0 && xblockInfo.isVertical()) {
         addStatusMessage(
             'partition-groups',
             gettext('Access to some content in this unit is restricted to specific groups of learners')
         );
-    } else if (allowedGroups.length >= 1 && xblockInfo.isVertical()) {
-        var groupNames = [];
-        for (var i = 0; i < allowedGroups.length; i++) {
-            var groupName = groupIdToName[allowedGroups[i]];
-            groupNames.push(groupName);
+    } else if (numAllowedGroups >= 1 && xblockInfo.isVertical()) {
+        var selectedGroupsLabel = '';
+
+        for (var schemeId in groupAccessMap) {
+            var groups = groupAccessMap[schemeId];
+            for (var i = 0; i < groups.length; i++) {
+                var currentGroup = idToName[schemeId][groups[i]];
+
+                if (selectedGroupsLabel.length === 0) {
+                    selectedGroupsLabel = currentGroup;
+                } else {
+                    // Translators: This is building up a list of groups. It is marked for translation because of the
+                    // comma, which is used as a separator between each group.
+                    selectedGroupsLabel = edx.StringUtils.interpolate(
+                        gettext('{previousGroups}, {currentGroup}'),
+                        {
+                            previousGroups: selectedGroupsLabel,
+                            currentGroup: currentGroup
+                        }
+                    )
+                }
+            }
         }
         messageType = 'partition-groups';
         messageText = edx.StringUtils.interpolate(
-                gettext('Access to this unit is restricted to {groupNames}'),
+                gettext('Access to this unit is restricted to {selectedGroupsLabel}'),
                 {
-                    groupNames: groupNames.join(', ')
+                    selectedGroupsLabel: selectedGroupsLabel
                 }
         )
         addStatusMessage(messageType, messageText);

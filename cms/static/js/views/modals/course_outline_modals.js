@@ -581,20 +581,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return this.model.get('ancestor_has_staff_lock');
         },
 
-        getContentGroups: function() {
-            return this.model.get('user_partitions');
-        },
-
-        getGroupAccess: function() {
-            return this.model.get('group_access');
-        },
-
         getContext: function() {
             return {
                 hasExplicitStaffLock: this.isModelLocked(),
-                ancestorLocked: this.isAncestorLocked(),
-                contentGroups: this.getContentGroups(),
-                groupAccess: this.getGroupAccess()
+                ancestorLocked: this.isAncestorLocked()
             };
         }
     });
@@ -657,11 +647,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                         // Select the option that has group access, provided there is a specific group within the scheme
                         this.$('.user-partition-select option[value=' + keys[0] + ']').prop('selected', true);
                         this.showSelectedDiv(keys[0]);
-                        this.$('#partition-select option:contains("Select a group type")').text(
-                            'All Learners and Staff'
-                        );
+                        // Change default option to 'All Learners and Staff' if unit is currently restricted
+                        this.$('#partition-select option:first').text(gettext('All Learners and Staff'));
                     }
                 }
+            } else {
+                this.hideAccessSelect();
             }
         },
 
@@ -689,6 +680,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         hideCheckboxDivs: function() {
             this.getCheckboxDivs().hide();
+        },
+
+        hideAccessSelect: function() {
+            $('.access-change').hide();
         },
 
         hasChanges: function() {

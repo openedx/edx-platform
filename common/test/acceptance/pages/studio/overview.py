@@ -1101,7 +1101,7 @@ class CourseOutlineModal(object):
         """
         self.ensure_staff_lock_visible()
         if value != self.is_explicitly_locked:
-            self.find_css('label[for="staff_lock"]').click()
+            self.find_css('#staff_lock').click()
         EmptyPromise(lambda: value == self.is_explicitly_locked, "Explicit staff lock is updated").fulfill()
 
     def shows_staff_lock_warning(self):
