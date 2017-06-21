@@ -110,7 +110,7 @@
 # Андрей Сандлер <inactive+asandler@transifex.com>, 2013
 # berseneva, 2013
 # Danil Moskovoy <tenrius@gmail.com>, 2013
-# daznix <daznix@gmail.com>, 2014
+# Rad <daznix@gmail.com>, 2014
 # Dmitriy <polevaiabrest@gmail.com>, 2014
 # Dmitry Ganchev <dima.ganchev@gmail.com>, 2014
 # Dmitry Oshkalo <dmitry.oshkalo@gmail.com>, 2015
@@ -246,7 +246,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-05-11 15:06+0000\n"
+"POT-Creation-Date: 2017-06-08 14:59+0000\n"
 "PO-Revision-Date: 2017-05-25 12:05+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -1060,10 +1060,30 @@ msgid "Account creation not allowed."
 msgstr ""
 
 #: common/djangoapps/student/views.py
-msgid "Unknown error. Please e-mail us to let us know how it happened."
+#, python-brace-format
+msgid ""
+"{html_start}Your account could not be activated{html_end}Something went "
+"wrong, please <a href=\"{support_url}\">contact support</a> to resolve this "
+"issue."
 msgstr ""
-"Неизвестная ошибка. Пожалуйста, сообщите нам о её возникновении по "
-"электронной почте."
+
+#: common/djangoapps/student/views.py
+#, python-brace-format
+msgid "{html_start}Success{html_end} You have activated your account."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+#, python-brace-format
+msgid ""
+"{html_start}Success! You have activated your account.{html_end}You will now "
+"receive email updates and alerts from us related to the courses you are "
+"enrolled in. Sign In to continue."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+#, python-brace-format
+msgid "{html_start}This account has already been activated.{html_end}"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 #, python-brace-format
@@ -4071,17 +4091,6 @@ msgid ""
 msgstr ""
 "Не удалось распознать регистрационные данные LTI: {lti_passport}. Требуется "
 "строка вида \"id:key:secret\"."
-
-#: common/lib/xmodule/xmodule/mixin.py
-msgid "License"
-msgstr "Лицензия"
-
-#: common/lib/xmodule/xmodule/mixin.py
-msgid ""
-"A license defines how the contents of this block can be shared and reused."
-msgstr ""
-"Лицензия определяет условия распространения и использования содержимого "
-"этого блока."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 #: common/lib/xmodule/xmodule/seq_module.py lms/templates/ccx/schedule.html
@@ -7377,6 +7386,11 @@ msgid "Cohorts"
 msgstr "Группы"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
+msgid "Discussions"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Student Admin"
 msgstr "Оценки"
@@ -7484,11 +7498,14 @@ msgstr ""
 msgid "No due date extension is set for that student and unit."
 msgstr "Срок сдачи задания для этого обучающегося не был продлён."
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
+#: openedx/core/djangoapps/user_api/views.py cms/templates/register.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -7507,6 +7524,10 @@ msgstr "Пользователи с продлёнными сроками сда
 #, python-brace-format
 msgid "Due date extensions for {0} {1} ({2})"
 msgstr "Продление сроков сдачи {0} {1} ({2})"
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "This component cannot be rescored."
+msgstr ""
 
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "Not all problems in entrance exam support re-scoring."
@@ -7809,13 +7830,12 @@ msgstr " (из {total})"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"This component's visibility settings refer to deleted or invalid group "
+"This component's access settings refer to deleted or invalid group "
 "configurations."
 msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
-msgid ""
-"This component's visibility settings refer to deleted or invalid groups."
+msgid "This component's access settings refer to deleted or invalid groups."
 msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
@@ -9421,6 +9441,19 @@ msgstr "Подпишитесь на канал {platform_name} на YouTube"
 msgid "Kosovo"
 msgstr "Косово"
 
+#: lms/envs/common.py
+#, python-brace-format
+msgid "Welcome to {platform_name}."
+msgstr ""
+
+#: lms/envs/common.py
+#, python-brace-format
+msgid ""
+"{start_bold}{enterprise_name}{end_bold} has partnered with "
+"{start_bold}{platform_name}{end_bold} to offer you high-quality learning "
+"opportunities from the world's best universities."
+msgstr ""
+
 #: lms/templates/logout.html
 msgid "Signed Out"
 msgstr "Выход выполнен"
@@ -10553,6 +10586,13 @@ msgstr ""
 "Кажется {username} уже используется. Попробуйте ещё раз с другим именем "
 "пользователя."
 
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "This is what you will use to login."
+msgstr ""
+
 #. Translators: This label appears above a field on the registration form
 #. meant to confirm the user's email address.
 #: openedx/core/djangoapps/user_api/views.py
@@ -10560,53 +10600,42 @@ msgid "Confirm Email"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
-msgid "Please confirm your email."
+msgid "The email addresses do not match."
 msgstr ""
-
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's full name.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Full name"
-msgstr "Полное имя"
 
 #. Translators: This example name is used as a placeholder in
 #. a field on the registration form meant to hold the user's name.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "Jane Doe"
-msgstr "Мария Иванова"
+msgid "Jane Q. Learner"
+msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's full name.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Your legal name, used for any certificates you earn."
-msgstr "Ваше полное имя для официальных сертификатов."
-
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's public username.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "Public username"
+msgid "This name will be used on any certificates that you earn."
+msgstr ""
+
+#: cms/templates/register.html lms/templates/register-form.html
+#: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Public Username"
 msgstr "Имя пользователя"
 
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's public username.
 #: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
 msgid ""
-"The name that will identify you in your courses - {bold_start}(cannot be "
-"changed later){bold_end}"
+"The name that will identify you in your courses. It cannot be changed later."
 msgstr ""
-"Ваше имя, под которым вы будете проходить курсы – {bold_start}(не может быть"
-" впоследствии изменено){bold_end}"
 
 #. Translators: This example username is used as a placeholder in
 #. a field on the registration form meant to hold the user's username.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "JaneDoe"
-msgstr "maria_ivanova"
+msgid "Jane_Q_Learner"
+msgstr ""
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's highest completed level of education.
@@ -10692,6 +10721,14 @@ msgstr ""
 msgid "The course key for the course we would like to be auto-cohorted."
 msgstr ""
 
+#: openedx/core/djangoapps/waffle_utils/models.py
+msgid "Force On"
+msgstr ""
+
+#: openedx/core/djangoapps/waffle_utils/models.py
+msgid "Force Off"
+msgstr ""
+
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
 msgstr "Это недопустимое значение."
@@ -10709,6 +10746,17 @@ msgstr "%(min_score)s неверное значение в процентах"
 #, python-brace-format
 msgid "Gating milestone for {usage_key}"
 msgstr "Этап открытия шлюза для {usage_key}"
+
+#: openedx/core/lib/license/mixin.py
+msgid "License"
+msgstr "Лицензия"
+
+#: openedx/core/lib/license/mixin.py
+msgid ""
+"A license defines how the contents of this block can be shared and reused."
+msgstr ""
+"Лицензия определяет условия распространения и использования содержимого "
+"этого блока."
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "Category"
@@ -11144,7 +11192,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/preview.py
 #, python-brace-format
-msgid "Visible to: {list_of_groups}"
+msgid "Access restricted to: {list_of_groups}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
@@ -11474,13 +11522,6 @@ msgstr "Забыли пароль?"
 msgid "example: Jane Doe"
 msgstr "образец: Мария Иванова"
 
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Public Username"
-msgstr "Имя пользователя"
-
 #. Translators: This is the placeholder text for a field that asks the user to
 #. pick a username
 #: cms/templates/register.html lms/templates/register-form.html
@@ -11521,33 +11562,13 @@ msgstr "Предварительный просмотр выбранного я�
 msgid "Reset"
 msgstr "Сбросить"
 
-#: cms/templates/registration/activation_complete.html
-#: lms/templates/registration/activation_complete.html
-msgid "Thanks for activating your account."
-msgstr "Спасибо за активацию учётной записи."
-
-#: cms/templates/registration/activation_complete.html
-#: lms/templates/registration/activation_complete.html
-msgid "This account has already been activated."
-msgstr "Эта учётная запись уже активирована."
-
-#: cms/templates/registration/activation_complete.html
-#: lms/templates/registration/activation_complete.html
-msgid "Visit your {link_start}dashboard{link_end} to see your courses."
-msgstr ""
-"Перейдите к {link_start}панели управления{link_end}, чтобы просмотреть свои "
-"курсы."
-
-#: cms/templates/registration/activation_complete.html
-#: lms/templates/registration/activation_complete.html
-msgid "You can now {link_start}sign in{link_end}."
-msgstr "Теперь вы можете {link_start}войти{link_end}."
-
 #: cms/templates/widgets/header.html lms/templates/navigation.html
+#: lms/templates/widgets/footer-language-selector.html
 msgid "Choose Language"
 msgstr "Выберите язык"
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
+#: themes/edx.org/lms/templates/header.html
 msgid "Account"
 msgstr "Учётная запись"
 
@@ -11630,34 +11651,6 @@ msgstr "Выйти"
 msgid "Code Editor"
 msgstr ""
 
-#: common/templates/license.html
-msgid "All Rights Reserved"
-msgstr "Все права защищены"
-
-#: common/templates/license.html
-msgid "Attribution"
-msgstr "Атрибуция"
-
-#: common/templates/license.html
-msgid "Noncommercial"
-msgstr "Некоммерческое использование"
-
-#: common/templates/license.html
-msgid "No Derivatives"
-msgstr "Без производных произведений"
-
-#: common/templates/license.html
-msgid "Share Alike"
-msgstr "Распространение на тех же условиях"
-
-#: common/templates/license.html
-msgid "Creative Commons licensed content, with terms as follow:"
-msgstr "Содержимое защищено лицензией Creative Commons на следующих условиях:"
-
-#: common/templates/license.html
-msgid "Some Rights Reserved"
-msgstr "Некоторые права защищены"
-
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
 msgstr ""
@@ -11688,10 +11681,6 @@ msgstr ""
 
 #: common/templates/emails/contact_us_feedback_email_subject.txt
 msgid "Feedback from user"
-msgstr ""
-
-#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
-msgid "Discussions"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
@@ -12620,6 +12609,11 @@ msgstr ""
 msgid "Please complete the following fields to register for an account. "
 msgstr ""
 "Пожалуйста, заполните следующие поля для регистрации нового пользователя."
+
+#: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Your legal name, used for any certificates you earn."
+msgstr "Ваше полное имя для официальных сертификатов."
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -15036,6 +15030,22 @@ msgid "Practice Scores: "
 msgstr "Баллы за практику:"
 
 #: lms/templates/courseware/progress.html
+msgid "Problem scores are hidden until the due date."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Practice scores are hidden until the due date."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Problem scores are hidden."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Practice scores are hidden."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
 msgid "No problem scores in this section"
 msgstr "Нет баллов за выполненные в этом разделе задания"
 
@@ -15664,14 +15674,14 @@ msgstr ""
 msgid "Flagged"
 msgstr "Помеченные"
 
-#. Translators: This labels a cohort menu in forum navigation
+#. Translators: This labels a group menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Cohort:"
-msgstr "Группа:"
+msgid "Group:"
+msgstr ""
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "in all cohorts"
-msgstr "во всех группах"
+msgid "in all groups"
+msgstr ""
 
 #. Translators: This labels a sort menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -15784,8 +15794,8 @@ msgstr "С уважением, команда курса {course_name}"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"You're almost there!  Use the link to activate your account to access "
-"engaging, high-quality {platform_name} courses.  Note that you will not be "
+"You're almost there! Use the link to activate your account to access "
+"engaging, high-quality {platform_name} courses. Note that you will not be "
 "able to log back into your account until you have activated it."
 msgstr ""
 
@@ -18289,7 +18299,6 @@ msgid "My Courses"
 msgstr "Мои курсы"
 
 #: lms/templates/learner_dashboard/program_details.html
-#: lms/templates/learner_dashboard/program_details_2017.html
 msgid "Program Details"
 msgstr "Информация о программе"
 
@@ -18558,7 +18567,8 @@ msgstr ""
 #: lms/templates/registration/account_activation_sidebar_notice.html
 msgid ""
 "Check your {email_start}{email}{email_end} inbox for an account activation "
-"link from edX. If you need help, contact {link_start}edX Support{link_end}."
+"link from {platform_name}. If you need help, contact "
+"{link_start}{platform_name} Support{link_end}."
 msgstr ""
 
 #: lms/templates/registration/activate_account_notice.html
@@ -18576,33 +18586,6 @@ msgstr ""
 "активировать свою учётную запись. Мы отправили сообщение с указаниями по "
 "активации учётной записи на адрес {email_start}{email}{email_end}. Если вы "
 "не получили сообщение, проверьте папку «Спам»."
-
-#: lms/templates/registration/activation_complete.html
-msgid "Account Activated"
-msgstr "Учётная запись активирована"
-
-#: lms/templates/registration/activation_complete.html
-msgid "Account already active"
-msgstr "Учётная запись уже активирована"
-
-#: lms/templates/registration/activation_invalid.html
-msgid "Activation Invalid"
-msgstr "Активация недействительна"
-
-#: lms/templates/registration/activation_invalid.html
-msgid ""
-"Something went wrong. Email programs sometimes split URLs into two lines, so"
-" make sure the URL you're using is formatted correctly. If you still have "
-"issues, send us an email message at {email_start}{email}{email_end}."
-msgstr ""
-"Что-то пошло не так. Иногда почтовые программы переносят часть URL на "
-"следующую строку, поэтому проверьте правильность URL-адреса, который вы "
-"используете. Если это не решит проблему, напишите нам по адресу "
-"{email_start}{email}{email_end}."
-
-#: lms/templates/registration/activation_invalid.html
-msgid "Return to the {link_start}home page{link_end}."
-msgstr "Вернуться на {link_start}главную страницу{link_end}."
 
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
@@ -19498,10 +19481,18 @@ msgid "About edX"
 msgstr "Об edX"
 
 #: themes/edx.org/lms/templates/footer.html
+msgid "edX Home Page"
+msgstr ""
+
+#: themes/edx.org/lms/templates/footer.html
 msgid ""
 "© 2012-{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
 "edX and the edX and Open EdX logos are registered trademarks or trademarks "
 "of edX Inc."
+msgstr ""
+
+#: themes/edx.org/lms/templates/header.html
+msgid "Main"
 msgstr ""
 
 #: themes/edx.org/lms/templates/header.html
@@ -20918,8 +20909,8 @@ msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
-"On unit pages in the course outline, you can designate components as visible"
-" only to learners in a specific enrollment track."
+"On unit pages in the course outline, you can restrict access to components "
+"to learners based on their enrollment track."
 msgstr ""
 
 #: cms/templates/group_configurations.html
@@ -20941,10 +20932,10 @@ msgstr ""
 #: cms/templates/group_configurations.html
 msgid ""
 "Each content group that you create can be associated with one or more "
-"cohorts. In addition to course content that is intended for all learners, "
-"you can designate some content as visible only to specified content groups. "
-"Only learners in the cohorts that are associated with the specified content "
-"groups see the additional content."
+"cohorts. In addition to making course content available to all learners, you"
+" can restrict access to some content to learners in specific content groups."
+" Only learners in the cohorts that are associated with the specified content"
+" groups see the additional content."
 msgstr ""
 
 #: cms/templates/group_configurations.html
@@ -22884,12 +22875,12 @@ msgid "Expand or Collapse"
 msgstr "Развернуть/свернуть"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Visibility Settings"
-msgstr "Настройки видимости"
+msgid "Access Settings"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Visibility"
-msgstr "Видимость"
+msgid "Set Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
@@ -23016,26 +23007,25 @@ msgid ""
 msgstr ""
 
 #: cms/templates/visibility_editor.html
-msgid "No visibility settings"
+msgid "Access is not restricted"
 msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"No visibility settings are defined for this component, but visibility might "
-"be affected by inherited settings."
+"Access to this component is not restricted, but visibility might be affected"
+" by inherited settings."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"You can make this component visible only to specific groups of learners "
-"based either on their enrollment track, or by content groups that you "
-"create."
+"You can restrict access to this component to learners in specific enrollment"
+" tracks or content groups."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"You can make this component visible only to specific groups of learners "
-"based on content groups that you create."
+"You can restrict access to this component to learners in specific content "
+"groups."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
@@ -23048,23 +23038,23 @@ msgstr "Управление группами по изучаемому мате
 msgid ""
 "{screen_reader_start}Warning:{screen_reader_end} The unit that contains this"
 " component is hidden from learners. The unit setting overrides the component"
-" visibility settings defined here."
+" access settings defined here."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
-msgid "Currently visible to:"
+msgid "Access is restricted to:"
 msgstr ""
 
 #: cms/templates/visibility_editor.html
-msgid "All Learners and Staff"
-msgstr ""
-
-#: cms/templates/visibility_editor.html
-msgid "Change visibility to:"
+msgid "Restrict access to:"
 msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid "Select a group type"
+msgstr ""
+
+#: cms/templates/visibility_editor.html
+msgid "All Learners and Staff"
 msgstr ""
 
 #: cms/templates/visibility_editor.html
@@ -23073,8 +23063,8 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"This group no longer exists. Choose another group or make this component "
-"visible to All Learners and Staff."
+"This group no longer exists. Choose another group or do not restrict access "
+"to this component."
 msgstr ""
 
 #: cms/templates/emails/activation_email.txt
@@ -23180,6 +23170,37 @@ msgstr "Сброс значений"
 #: cms/templates/maintenance/base.html cms/templates/maintenance/index.html
 msgid "Maintenance Dashboard"
 msgstr "Панель технического обслуживания"
+
+#: cms/templates/registration/activation_complete.html
+msgid "Thanks for activating your account."
+msgstr ""
+
+#: cms/templates/registration/activation_complete.html
+msgid "This account has already been activated."
+msgstr ""
+
+#: cms/templates/registration/activation_complete.html
+msgid "Visit your {link_start}dashboard{link_end} to see your courses."
+msgstr ""
+
+#: cms/templates/registration/activation_complete.html
+msgid "You can now {link_start}sign in{link_end}."
+msgstr ""
+
+#: cms/templates/registration/activation_invalid.html
+msgid "Activation Invalid"
+msgstr ""
+
+#: cms/templates/registration/activation_invalid.html
+msgid ""
+"Something went wrong. Email programs sometimes split URLs into two lines, so"
+" make sure the URL you're using is formatted correctly. If you still have "
+"issues, send us an email message at {email_start}{email}{email_end}."
+msgstr ""
+
+#: cms/templates/registration/activation_invalid.html
+msgid "Return to the {link_start}home page{link_end}."
+msgstr ""
 
 #: cms/templates/registration/reg_complete.html
 msgid ""
