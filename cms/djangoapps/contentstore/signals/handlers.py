@@ -95,12 +95,12 @@ def handle_grading_policy_changed(sender, **kwargs):
     """
     Receives signal and kicks off celery task to recalculate grades
     """
-    course_key = kwargs.get('course_key')
-    result = compute_all_grades_for_course.apply_async(
-        course_key=course_key,
-        event_transaction_id=get_event_transaction_id(),
-        event_transaction_type=get_event_transaction_type(),
-    )
+    kwargs = {
+        'course_key': unicode(kwargs.get('course_key')),
+        'event_transaction_id': unicode(get_event_transaction_id()),
+        'event_transaction_type': unicode(get_event_transaction_type()),
+    }
+    result = compute_all_grades_for_course.apply_async(kwargs=kwargs)
     log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
         task_name=compute_all_grades_for_course.name,
         task_id=result.task_id,
