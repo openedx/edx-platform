@@ -781,7 +781,8 @@
     }
   }
 
-  .modal-section-content {
+  .edit-unit-access, .edit-staff-lock {
+    .modal-section-content {
     @include font-size(16);
 
     .group-select-title {
@@ -818,5 +819,5 @@
       margin-top: ($baseline/4);
     }
   }
-
+  }
 }

@@ -7,11 +7,10 @@
     <% } %>
 </h3>
 <div class="modal-section-content staff-lock">
-    <input type="checkbox" id="staff_lock" name="staff_lock" class="input input-checkbox" />
-    <label for="staff_lock" class="label">
+    <label class="label">
+      <input type="checkbox" id="staff_lock" class="input input-checkbox" />
       <%- gettext('Hide from learners') %>
     </label>
-
     <% if (hasExplicitStaffLock && !ancestorLocked) { %>
         <p class="tip tip-warning">
           <% if (xblockInfo.isVertical()) { %>
