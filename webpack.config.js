@@ -27,7 +27,7 @@ var wpconfig = {
         Enrollment: './openedx/features/course_experience/static/course_experience/js/Enrollment.js',
         Import: './cms/static/js/features/import/factories/import.js',
         StudioIndex: './cms/static/js/features_jsx/studio/index.jsx',
-        DropdownRenderer: './common/static/js/components/DropdownRenderer.js',
+        DropdownRenderer: './common/static/js/components/DropdownRenderer.js'
     },
 
     output: {
