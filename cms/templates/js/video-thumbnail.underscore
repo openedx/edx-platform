@@ -3,15 +3,13 @@
     <div class="thumbnail-overlay">
         <input id="thumb-<%- videoId %>" class="upload-image-input" type="file" name="file" accept=".bmp, .jpg, .jpeg, .png, .gif"/>
         <label for="thumb-<%- videoId %>" class="thumbnail-action">
-            <span class="action-icon <%- actionInfo.name %>" aria-hidden="true"><%- actionInfo.icon %></span>
+            <span class="main-icon action-icon <%- actionInfo.name %>" aria-hidden="true"><%- actionInfo.icon %></span>
             <span class="action-text-sr sr"></span>
             <span class="action-text"><%- actionInfo.text %></span>
-            <% if(actionInfo.name == 'edit') { %>
-                <div class="edit-container">
-                    <span class="action-icon" aria-hidden="true"><%- actionInfo.icon %></span>
-                    <span class="edit-action-text"><%- actionInfo.actionText %></span>
-                </div>
-            <% } %>
+            <div class="edit-container">
+                <span class="action-icon" aria-hidden="true"><%- actionInfo.icon %></span>
+                <span class="edit-action-text"><%- actionInfo.actionText %></span>
+            </div>
         </label>
 
         <span class="requirements-text-sr sr">

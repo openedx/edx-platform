@@ -35,7 +35,7 @@ define(
                         actionText: gettext('Edit Thumbnail'),
                         icon: '<span class="icon fa fa-pencil" aria-hidden="true"></span>',
                         text: HtmlUtils.interpolateHtml(
-                            // Translators: This is a 3 part text which tells the image requirements.
+                            // Translators: This is a 2 part text which tells the image requirements.
                             gettext('{InstructionsSpanStart}{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}'),   // eslint-disable-line max-len
                             {
                                 videoImageResoultion: this.getVideoImageResolution(),
@@ -61,7 +61,7 @@ define(
                         icon: '',
                         text: HtmlUtils.interpolateHtml(
                             // Translators: This is a 3 part text which tells the image requirements.
-                            gettext('{ReqTextSpanStart}Image requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}'),   // eslint-disable-line max-len
+                            gettext('{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}'),   // eslint-disable-line max-len
                             {
                                 videoImageResoultion: this.getVideoImageResolution(),
                                 videoImageSupportedFileFormats: this.getVideoImageSupportedFileFormats().humanize,
@@ -275,11 +275,10 @@ define(
             },
 
             setActionInfo: function(action, showText, additionalSRText) {
-                // Don't show edit-container layout on progress action.
-                var toggleShowEditContainer = action === 'progress' ? false : true;
+                var hasError = this.$('.thumbnail-wrapper').hasClass('error');
                 this.$('.thumbnail-action').toggle(showText);
                 HtmlUtils.setHtml(
-                    this.$('.thumbnail-action .action-icon'),
+                    this.$('.thumbnail-action .main-icon.action-icon'),
                     HtmlUtils.HTML(this.actionsInfo[action].icon)
                 );
                 HtmlUtils.setHtml(
@@ -288,7 +287,27 @@ define(
                 );
                 this.$('.thumbnail-action .action-text-sr').text(additionalSRText || '');
                 this.$('.thumbnail-wrapper').attr('class', 'thumbnail-wrapper {action}'.replace('{action}', action));
-                this.$('.thumbnail-action .edit-container').toggle(toggleShowEditContainer);
+                this.$('.thumbnail-action .main-icon.action-icon').attr('class', 'action-icon {action}'.replace('{action}', action));
+
+                // Add error class if it was already present.
+                if (hasError) {
+                    this.$('.thumbnail-wrapper').addClass('error');
+                }
+
+                // Don't show edit-container layout on progress action.
+                if (action === 'progress') {
+                    this.$('.thumbnail-action .edit-container').toggle(false);
+                } else if (action == 'edit') {
+                    this.$('.thumbnail-action .edit-container').toggle(true);
+                    HtmlUtils.setHtml(
+                    this.$('.thumbnail-action .edit-container .action-icon'),
+                        HtmlUtils.HTML(this.actionsInfo[action].icon)
+                    );
+                    HtmlUtils.setHtml(
+                        this.$('.thumbnail-action .edit-container .edit-action-text'),
+                        HtmlUtils.HTML(this.actionsInfo[action].actionText)
+                    );
+                }
             },
 
             validateImageFile: function(imageFile) {
@@ -330,16 +349,18 @@ define(
                 if ($thumbnailWrapperEl.length) {
                     $thumbnailWrapperEl.remove();
                 }
+                // Remove error class from thumbnail wrapper as well.
+                $('.thumbnail-wrapper').removeClass('error');
             },
 
             showErrorMessage: function(errorText) {
-                var showText = false,
-                    videoId = this.model.get('edx_video_id'),
+                var videoId = this.model.get('edx_video_id'),
                     $parentRowEl = $(this.$el.parent());
 
-                showText = this.model.get('course_video_image_url') ? false : true;
-                this.action = showText ? 'upload' : 'edit';
-                this.setActionInfo(this.action, showText);
+                // If image url is not this.defaultVideoImageURL then it means image is uploaded
+                // so we should treat it as edit action otherwise default upload action.
+                this.action = this.$('.thumbnail-wrapper img').attr('src') !== this.defaultVideoImageURL ? 'edit' : 'upload';
+                this.setActionInfo(this.action, true);
                 this.readMessages([gettext('Could not upload the video image file'), errorText]);
 
                 // Add error wrapper html to current video element row.
@@ -348,6 +369,7 @@ define(
                        this.thumbnailErrorTemplate({videoId: videoId, errorText: errorText})
                    ).toString()
                 );
+                this.$el.find('.thumbnail-wrapper').addClass('error');
             },
 
             readMessages: function(messages) {

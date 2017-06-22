@@ -179,44 +179,30 @@
         display: table-cell;
       }
 
-      .thumbnail-col {
-        width: 15%;
-      }
-
       .name-col {
         width: 25%;
       }
 
-      .date-col {
-        width: 10%;
-      }
-
-      .video-id-col {
+      .thumbnail-col, .video-id-col {
         width: 15%;
       }
 
-      .status-col {
+      .date-col, .status-col {
         width: 10%;
       }
 
       .actions-col {
         width: 5%;
       }
-
-
     }
   }
 
   .thumbnail-error-wrapper {
     display: table-row;
     white-space: nowrap;
-
-    .thumbnail-error-text {
-      color: $red;
-      padding: 10px 10px 0;
-      .action-text {
-        margin-left: 5px;
-      }
+    color: $red;
+    .icon {
+      margin: 15px 5px 0px 10px;
     }
   }
 
@@ -271,7 +257,6 @@
       }
     }
 
-    &.error,
     &.progress {
       background: white;
 
@@ -285,10 +270,6 @@
       }
     }
 
-    &.error .thumbnail-action {
-      color: $red;
-    }
-
     &.upload .thumbnail-action {
         color: $blue;
     }
@@ -299,14 +280,24 @@
       }
     }
 
+    &.edit {
+      background-color: #4e4e4e;
+    }
+
     &.edit .thumbnail-action .action-icon.edit {
       display: none;
     }
 
     &.edit .thumbnail-action .edit-container {
-      background-color: white;
+      background-color: $white;
       padding: ($baseline/4);
       border-radius: ($baseline/5);
+      margin-top: 10px;
+      display: none;
+    }
+
+    &.edit .action-text {
+      color: $white;
     }
 
     .thumbnail-action {
@@ -347,6 +338,10 @@
 
     &.focused {
         box-shadow: 0 0 ($baseline/5) 1px $blue;
+    }
+
+    &.error {
+        box-shadow: 0 0 ($baseline/5) 1px $red;
     }
   }
 }
