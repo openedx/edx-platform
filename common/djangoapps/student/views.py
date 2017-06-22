@@ -174,7 +174,6 @@ def index(request, extra_context=None, user=AnonymousUser()):
     if extra_context is None:
         extra_context = {}
 
-    programs_list = []
     courses = get_courses(user)
 
     if configuration_helpers.get_value(
@@ -208,13 +207,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
     # Insert additional context for use in the template
     context.update(extra_context)
 
-    # Get the active programs of the type configured for the current site from the catalog service. The programs_list
-    # is being added to the context but it's not being used currently in courseware/courses.html. To use this list,
-    # you need to create a custom theme that overrides courses.html. The modifications to courses.html to display the
-    # programs will be done after the support for edx-pattern-library is added.
-    programs_list = get_programs_with_type(include_hidden=False)
-
-    context["programs_list"] = programs_list
+    context["programs_list"] = get_programs_with_type(include_hidden=False)
 
     return render_to_response('index.html', context)
 

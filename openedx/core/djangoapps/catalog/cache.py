@@ -6,4 +6,4 @@ PROGRAM_CACHE_KEY_TPL = 'program-{uuid}'
 PROGRAM_UUIDS_CACHE_KEY = 'program-uuids'
 
 # Cache key used to locate an item containing a list of all program UUIDs for a site.
-SITE_PROGRAM_UUIDS_CACHE_KEY = 'program-uuids-{site_name}'
+SITE_PROGRAM_UUIDS_CACHE_KEY_TPL = 'program-uuids-{domain}'

@@ -22,14 +22,16 @@ class CatalogFixture(object):
                 will be stubbed using data from this list.
         """
         key = 'catalog.programs'
+        program_types_key = 'catalog.programs_types'
 
         uuids = []
+        program_types = []
         for program in programs:
             uuid = program['uuid']
             uuids.append(uuid)
 
             program_key = '{base}.{uuid}'.format(base=key, uuid=uuid)
-
+            program_types.append(program['type'])
             requests.put(
                 '{}/set_config'.format(CATALOG_STUB_URL),
                 data={program_key: json.dumps(program)},
@@ -39,6 +41,12 @@ class CatalogFixture(object):
         requests.put(
             '{}/set_config'.format(CATALOG_STUB_URL),
             data={key: json.dumps(uuids)},
+        )
+
+        # Stub the program_type endpoint.
+        requests.put(
+            '{}/set_config'.format(CATALOG_STUB_URL),
+            data={program_types_key: json.dumps(program_types)},
         )
 
 

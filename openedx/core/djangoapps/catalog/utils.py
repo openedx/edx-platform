@@ -11,7 +11,7 @@ from edx_rest_api_client.client import EdxRestApiClient
 from openedx.core.djangoapps.catalog.cache import (
     PROGRAM_CACHE_KEY_TPL,
     PROGRAM_UUIDS_CACHE_KEY,
-    SITE_PROGRAM_UUIDS_CACHE_KEY
+    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.theming.helpers import get_current_site
@@ -57,12 +57,7 @@ def get_programs(uuid=None):
 
         return program
     if waffle.switch_is_active("get-multitenant-programs"):
-        logger.info('Fetching programs from cache for site {site_name}, key = {cache_key}'.format(
-            site_name=get_current_site().domain,
-            cache_key=SITE_PROGRAM_UUIDS_CACHE_KEY.format(site_name=get_current_site().domain)
-        ))
-        uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY.format(site_name=get_current_site().domain), [])
-        logger.info(uuids)
+        uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=get_current_site().domain), [])
     else:
         uuids = cache.get(PROGRAM_UUIDS_CACHE_KEY, [])
     if not uuids:
@@ -122,6 +117,7 @@ def get_program_types(name=None):
         if name:
             data = next(program_type for program_type in data if program_type['name'] == name)
 
+        logger.info("program types: " + str(data))
         return data
     else:
         return []
@@ -153,7 +149,7 @@ def get_programs_with_type(include_hidden=True):
             # deepcopy the program dict here so we are not adding
             # the type to the cached object
             program_with_type = copy.deepcopy(program)
-            program_with_type['type'] = program_types.get(program['type'])
+            program_with_type['type'] = program_types[program['type']]
             programs_with_type.append(program_with_type)
 
     return programs_with_type
