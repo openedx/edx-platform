@@ -44,13 +44,7 @@ require([
             $('.action-alert-close, .alert.has-actions .nav-actions a').bind('click', hideAlert);
             $('.action-notification-close').bind('click', hideNotification);
 
-            // nav - dropdown related
-            $body.click(function(e) {
-                $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
-                $('.nav-dd .nav-item .title').removeClass('is-selected');
-            });
-
-            $('.nav-dd .nav-item, .filterable-column .nav-item').click(function(e) {
+            $('.filterable-column .nav-item').click(function(e) {
                 $subnav = $(this).find('.wrapper-nav-sub');
                 $title = $(this).find('.title');
 
@@ -58,8 +52,6 @@ require([
                     $subnav.removeClass('is-shown');
                     $title.removeClass('is-selected');
                 } else {
-                    $('.nav-dd .nav-item .title').removeClass('is-selected');
-                    $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
                     $title.addClass('is-selected');
                     $subnav.addClass('is-shown');
             // if propagation is not stopped, the event will bubble up to the

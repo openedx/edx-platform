@@ -5,6 +5,7 @@
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
   from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
+  from openedx.core.djangolib.js_utils import dump_js_escaped_json
 %>
 <div class="wrapper-header wrapper" id="view-top">
   <header class="primary" role="banner">
@@ -20,20 +21,30 @@
       <%
             course_key = context_course.id
             index_url = reverse('contentstore.views.course_handler', kwargs={'course_key_string': unicode(course_key)})
-            course_team_url = reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(course_key)})
-            assets_url = reverse('contentstore.views.assets_handler', kwargs={'course_key_string': unicode(course_key)})
-            textbooks_url = reverse('contentstore.views.textbooks_list_handler', kwargs={'course_key_string': unicode(course_key)})
-            videos_url = reverse('contentstore.views.videos_handler', kwargs={'course_key_string': unicode(course_key)})
-            import_url = reverse('contentstore.views.import_handler', kwargs={'course_key_string': unicode(course_key)})
-            course_info_url = reverse('contentstore.views.course_info_handler', kwargs={'course_key_string': unicode(course_key)})
-            export_url = reverse('contentstore.views.export_handler', kwargs={'course_key_string': unicode(course_key)})
-            settings_url = reverse('contentstore.views.settings_handler', kwargs={'course_key_string': unicode(course_key)})
-            grading_url = reverse('contentstore.views.grading_handler', kwargs={'course_key_string': unicode(course_key)})
-            advanced_settings_url = reverse('contentstore.views.advanced_settings_handler', kwargs={'course_key_string': unicode(course_key)})
-            tabs_url = reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': unicode(course_key)})
-            certificates_url = ''
+
+            menu_context = {
+              'course_key': context_course.id,
+              'index_url': index_url,
+              'course_team_url': reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(course_key)}),
+              'assets_url': reverse('contentstore.views.assets_handler', kwargs={'course_key_string': unicode(course_key)}),
+              'textbooks_url': reverse('contentstore.views.textbooks_list_handler', kwargs={'course_key_string': unicode(course_key)}),
+              'videos_url': reverse('contentstore.views.videos_handler', kwargs={'course_key_string': unicode(course_key)}),
+              'import_url': reverse('contentstore.views.import_handler', kwargs={'course_key_string': unicode(course_key)}),
+              'course_info_url': reverse('contentstore.views.course_info_handler', kwargs={'course_key_string': unicode(course_key)}),
+              'export_url': reverse('contentstore.views.export_handler', kwargs={'course_key_string': unicode(course_key)}),
+              'settings_url': reverse('contentstore.views.settings_handler', kwargs={'course_key_string': unicode(course_key)}),
+              'grading_url': reverse('contentstore.views.grading_handler', kwargs={'course_key_string': unicode(course_key)}),
+              'advanced_settings_url': reverse('contentstore.views.advanced_settings_handler', kwargs={'course_key_string': unicode(course_key)}),
+              'tabs_url': reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': unicode(course_key)}),
+              'group_config_url': reverse('contentstore.views.group_configurations_list_handler', kwargs={'course_key_string': unicode(course_key)}),
+              'video_pipeline_configured': context_course.video_pipeline_configured
+            }
+
             if settings.FEATURES.get("CERTIFICATES_HTML_VIEW") and context_course.cert_html_view_enabled:
-                certificates_url = reverse('contentstore.views.certificates.certificates_list_handler', kwargs={'course_key_string': unicode(course_key)})
+              menu_context['certificates_url'] = reverse('contentstore.views.certificates.certificates_list_handler', kwargs={'course_key_string': unicode(course_key)})
+
+            if settings.FEATURES.get('ENABLE_EXPORT_GIT') and context_course.giturl:
+              menu_context['export_git_url'] = reverse('export_git', kwargs=dict(course_key_string=unicode(course_key)))
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
@@ -45,112 +56,13 @@
 
       <nav class="nav-course nav-dd ui-left" aria-label="${_('Course')}">
         <h2 class="sr">${_("Course Navigation")}</h2>
-        <ol>
-          <li class="nav-item nav-course-courseware">
-            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Content")}</span> <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span></h3>
-
-            <div class="wrapper wrapper-nav-sub">
-              <div class="nav-sub">
-                <ul>
-                  <li class="nav-item nav-course-courseware-outline">
-                    <a href="${index_url}">${_("Outline")}</a>
-                  </li>
-                  <li class="nav-item nav-course-courseware-updates">
-                    <a href="${course_info_url}">${_("Updates")}</a>
-                  </li>
-                  <li class="nav-item nav-course-courseware-pages">
-                    <a href="${tabs_url}">${_("Pages")}</a>
-                  </li>
-                  <li class="nav-item nav-course-courseware-uploads">
-                    <a href="${assets_url}">${_("Files & Uploads")}</a>
-                  </li>
-                  <li class="nav-item nav-course-courseware-textbooks">
-                    <a href="${textbooks_url}">${_("Textbooks")}</a>
-                  </li>
-                  % if context_course.video_pipeline_configured:
-                  <li class="nav-item nav-course-courseware-videos">
-                    <a href="${videos_url}">${_("Video Uploads")}</a>
-                  </li>
-                  % endif
-                </ul>
-              </div>
-            </div>
-          </li>
-
-          <li>
-            <div id="test-container"></div>
-            <%static:webpack entry="DropdownRenderer">
-              new DropdownRenderer({
-                selector: '#test-container',
-                context: {
-                  title: 'Course',
-                  menuItems: [
-                    {
-                      label: 'Outline',
-                      href: '/'
-                    },
-                    {
-                      label: 'Outline',
-                      href: '/'
-                    }
-                  ]
-                }
-              });
-            </%static:webpack>
-          </li>
-
-          <li class="nav-item nav-course-settings">
-            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Settings")}</span> <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span></h3>
-
-            <div class="wrapper wrapper-nav-sub">
-              <div class="nav-sub">
-                <ul>
-                  <li class="nav-item nav-course-settings-schedule">
-                    <a href="${settings_url}">${_("Schedule & Details")}</a>
-                  </li>
-                  <li class="nav-item nav-course-settings-grading">
-                    <a href="${grading_url}">${_("Grading")}</a>
-                  </li>
-                  <li class="nav-item nav-course-settings-team">
-                    <a href="${course_team_url}">${_("Course Team")}</a>
-                  </li>
-                  <li class="nav-item nav-course-settings-group-configurations">
-                    <a href="${reverse('contentstore.views.group_configurations_list_handler', kwargs={'course_key_string': unicode(course_key)})}">${_("Group Configurations")}</a>
-                  </li>
-                  <li class="nav-item nav-course-settings-advanced">
-                    <a href="${advanced_settings_url}">${_("Advanced Settings")}</a>
-                  </li>
-                  % if certificates_url:
-                  <li class="nav-item nav-course-settings-certificates">
-                    <a href="${certificates_url}">${_("Certificates")}</a>
-                  </li>
-                  % endif
-                </ul>
-              </div>
-            </div>
-          </li>
-
-          <li class="nav-item nav-course-tools">
-            <h3 class="title"><span class="label">${_("Tools")}</span> <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span></h3>
-            <div class="wrapper wrapper-nav-sub">
-              <div class="nav-sub">
-                <ul>
-                  <li class="nav-item nav-course-tools-import">
-                    <a href="${import_url}">${_("Import")}</a>
-                  </li>
-                  <li class="nav-item nav-course-tools-export">
-                    <a href="${export_url}">${_("Export")}</a>
-                  </li>
-                  % if settings.FEATURES.get('ENABLE_EXPORT_GIT') and context_course.giturl:
-                  <li class="nav-item nav-course-tools-export-git">
-                    <a href="${reverse('export_git', kwargs=dict(course_key_string=unicode(course_key)))}">${_("Export to Git")}</a>
-                  </li>
-                  % endif
-                </ul>
-              </div>
-            </div>
-          </li>
-        </ol>
+        <div id="menu-container"></div>
+        <%static:webpack entry="DropdownRenderer">
+          new DropdownRenderer({
+            selector: '#menu-container',
+            context: ${menu_context | n, dump_js_escaped_json}
+          });
+        </%static:webpack>
       </nav>
       % elif context_library:
        <%

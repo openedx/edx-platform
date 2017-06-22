@@ -61,7 +61,7 @@
   // basic layout - nav items
   nav {
 
-    > ol > .nav-item {
+    ol > .nav-item {
       @extend %t-action3;
       @extend %t-strong;
       display: inline-block;

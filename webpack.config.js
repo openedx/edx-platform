@@ -21,7 +21,7 @@ var wpconfig = {
         CourseOutline: './openedx/features/course_experience/static/course_experience/js/CourseOutline.js',
         CourseSock: './openedx/features/course_experience/static/course_experience/js/CourseSock.js',
         WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js',
-        DropdownRenderer: './common/static/js/components/DropdownRenderer.js',
+        DropdownRenderer: './cms/static/js/features/menubar/DropdownRenderer.js',
         Import: './cms/static/js/features/import/factories/import.js'
     },
 
