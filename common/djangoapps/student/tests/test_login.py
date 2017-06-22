@@ -208,7 +208,7 @@ class LoginTest(CacheIsolationTestCase):
         self._assert_response(response, success=True)
 
         response = self.client.post(reverse('logout'))
-        self.assertRedirects(response, "/")
+        self.assertRedirects(response, "/login")
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_logout_logging_no_pii(self):

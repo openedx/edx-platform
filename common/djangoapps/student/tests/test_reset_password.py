@@ -68,7 +68,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         obj = json.loads(bad_pwd_resp.content)
         self.assertEquals(obj, {
             'success': True,
-            'value': "('registration/password_reset_done.html', [])",
+            'value': "('registration/password_reset_done.html', [{ 'email': {} }])".format(self.user_bad_passwd.email),
         })
         self.assert_no_events_were_emitted()
 
@@ -76,7 +76,8 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     def test_nonexist_email_password_reset(self):
         """Now test the exception cases with of reset_password called with invalid email."""
 
-        bad_email_req = self.request_factory.post('/password_reset/', {'email': self.user.email + "makeItFail"})
+        bad_email = self.user.email + "makeItFail"
+        bad_email_req = self.request_factory.post('/password_reset/', {'email': bad_email })
         bad_email_resp = password_reset(bad_email_req)
         # Note: even if the email is bad, we return a successful response code
         # This prevents someone potentially trying to "brute-force" find out which
@@ -85,7 +86,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         obj = json.loads(bad_email_resp.content)
         self.assertEquals(obj, {
             'success': True,
-            'value': "('registration/password_reset_done.html', [])",
+            'value': "('registration/password_reset_done.html', [{ 'email': {} }])".format(bad_email),
         })
         self.assert_no_events_were_emitted()
 
@@ -132,7 +133,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         obj = json.loads(good_resp.content)
         self.assertEquals(obj, {
             'success': True,
-            'value': "('registration/password_reset_done.html', [])",
+            'value': "('registration/password_reset_done.html', [{ 'email': {} }])".format(self.user.email),
         })
 
         (subject, msg, from_addr, to_addrs) = send_email.call_args[0]
