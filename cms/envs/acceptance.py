@@ -106,6 +106,10 @@ FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 # We do not yet understand why this occurs. Setting this to true is a stopgap measure
 USE_I18N = True
 
+# Override the test stub webpack_loader that is installed in test.py.
+INSTALLED_APPS = tuple(app for app in INSTALLED_APPS if app != 'openedx.tests.util.webpack_loader')
+INSTALLED_APPS += ('webpack_loader',)
+
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 # django.contrib.staticfiles used to be loaded by lettuce, now we must add it ourselves
 # django.contrib.staticfiles is not added to lms as there is a ^/static$ route built in to the app

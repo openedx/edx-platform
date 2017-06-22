@@ -445,26 +445,6 @@
     // STATE: hover/focus
     &:hover {
       background: $paleYellow;
-
-      .course-actions {
-        opacity: 1.0;
-        pointer-events: auto;
-      }
-
-      .view-live-button {
-        @extend %ui-depth3;
-        @extend %btn-primary-blue;
-        @extend %sizing;
-        @include transition(opacity $tmg-f2 ease-in-out 0);
-        @include box-sizing(border-box);
-        padding: ($baseline/2);
-        opacity: 0.0;
-        pointer-events: none;
-      }
-
-      .course-metadata {
-        opacity: 1.0;
-      }
     }
 
     .course-link, .course-actions {
@@ -498,8 +478,8 @@
 
         & + .metadata-item:before {
           content: "/";
-          margin-left: ($baseline/10);
-          margin-right: ($baseline/10);
+          margin-left: ($baseline/4);
+          margin-right: ($baseline/4);
           color: $gray-l4;
         }
 
@@ -509,18 +489,15 @@
       }
 
       .extra-metadata {
-        margin-left: ($baseline/10);
+        margin-left: ($baseline/4);
       }
     }
 
     .course-actions {
-      @include transition(opacity $tmg-f2 ease-in-out 0);
       @extend %ui-depth3;
       position: static;
       width: flex-grid(3, 9);
       @include text-align(right);
-      opacity: 0;
-      pointer-events: none;
 
       .action {
         display: inline-block;
@@ -545,11 +522,6 @@
       // course re-run button
       .action-rerun {
         margin-right: $baseline;
-      }
-
-      .rerun-button {
-        font-weight: 600;
-        // TODO: sync up button styling and add secondary style here
       }
     }
 

@@ -97,6 +97,9 @@ class CreateCourseTest(AcceptanceTest):
         self.assertTrue(self.dashboard_page.has_course(
             org=self.course_org, number=self.course_number, run=self.course_run
         ))
+        # Click on the course listing and verify that the Studio course outline page opens.
+        self.dashboard_page.click_course_run(self.course_run)
+        course_outline_page.wait_for_page()
 
     def test_create_course_with_existing_org_via_autocomplete(self):
         """
