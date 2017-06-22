@@ -1,44 +1,53 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 
-class CourseListing extends React.Component {
+class CourseOrLibraryListing extends React.Component {
 
     render() {
-        let allowReruns = this.props.allowReruns;
+        let allowReruns = this.props.allowReruns,
+            linkClass = this.props.linkClass;
 
         return (
             <ul className="list-courses">
                 {
-                    this.props.courses.map((course_info, i) =>
-                        <li key={i} className="course-item" data-course-key={course_info.course_key}>
-                            <a className="course-link" href={course_info.url}>
-                                <h3 className="course-title">{course_info.display_name}</h3>
+                    this.props.items.map((item, i) =>
+                        <li key={i} className="course-item" data-course-key={item.course_key}>
+                            <a className={linkClass} href={item.url}>
+                                <h3 className="course-title">{item.display_name}</h3>
                                 <div className="course-metadata">
                                     <span className="course-org metadata-item">
-                                        <span className="label">Organization:</span> <span
-                                        className="value">{course_info.org}</span>
+                                        <span className="label">{gettext("Organization:")}</span> <span
+                                        className="value">{item.org}</span>
                                     </span>
                                     <span className="course-num metadata-item">
-                                        <span className="label">Course Number:</span>
-                                        <span className="value">{course_info.number}</span>
+                                        <span className="label">{gettext("Course Number:")}</span>
+                                        <span className="value">{item.number}</span>
                                     </span>
-                                    <span className="course-run metadata-item">
-                                        <span className="label">Course Run:</span> <span
-                                        className="value">{course_info.run}</span>
-                                    </span>
+                                    { item.run &&
+                                        <span className="course-run metadata-item">
+                                            <span className="label">{gettext("Course Run:")}</span>
+                                            <span className="value">{item.run}</span>
+                                        </span>
+                                    }
+                                    { item.can_edit === false &&
+                                        <span className="extra-metadata">{gettext("(Read-only)")}</span>
+                                    }
                                 </div>
                             </a>
-
-                            <ul className="item-actions course-actions">
-                                { allowReruns &&
-                                <li className="action action-rerun">
-                                    <a href={course_info.rerun_link} className="button rerun-button">Re-run Course</a>
-                                </li>
-                                }
-                                <li className="action action-view">
-                                    <a href={course_info.lms_link} rel="external" className="button view-button">View Live</a>
-                                </li>
-                            </ul>
+                            { item.lms_link && item.rerun_link &&
+                                <ul className="item-actions course-actions">
+                                    { allowReruns &&
+                                    <li className="action action-rerun">
+                                        <a href={item.rerun_link}
+                                           className="button rerun-button">{gettext("Re-run Course")}</a>
+                                    </li>
+                                    }
+                                    <li className="action action-view">
+                                        <a href={item.lms_link} rel="external"
+                                           className="button view-button">{gettext("View Live")}</a>
+                                    </li>
+                                </ul>
+                            }
                         </li>
                     )
                 }
@@ -48,10 +57,19 @@ class CourseListing extends React.Component {
 }
 
 
-export class StudioIndex {
+export class StudioCourseIndex {
     constructor(selector, context, allowReruns) {
         ReactDOM.render(
-            <CourseListing courses={context} allowReruns={allowReruns}/>,
+            <CourseOrLibraryListing items={context} linkClass="course-link" allowReruns={allowReruns}/>,
+            document.querySelector(selector)
+        );
+    }
+}
+
+export class StudioLibraryIndex {
+    constructor(selector, context) {
+        ReactDOM.render(
+            <CourseOrLibraryListing items={context} linkClass="library-link" allowReruns={false}/>,
             document.querySelector(selector)
         );
     }

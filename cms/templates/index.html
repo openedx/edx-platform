@@ -442,30 +442,7 @@ from openedx.core.djangolib.js_utils import (
       % endif
 
       %if len(libraries) > 0:
-      <div class="libraries libraries-tab">
-        <ul class="list-courses">
-          %for library_info in sorted(libraries, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
-          <li class="course-item">
-            <a class="library-link" href="${library_info['url']}">
-              <h3 class="course-title">${library_info['display_name']}</h3>
-
-              <div class="course-metadata">
-                <span class="course-org metadata-item">
-                  <span class="label">${_("Organization:")}</span> <span class="value">${library_info['org']}</span>
-                </span>
-                <span class="course-num metadata-item">
-                  <span class="label">${_("Course Number:")}</span>
-                  <span class="value">${library_info['number']}</span>
-                </span>
-                % if not library_info["can_edit"]:
-                  <span class="extra-metadata">${_("(Read-only)")}</span>
-                % endif
-              </div>
-            </a>
-          </li>
-          %endfor
-        </ul>
-      </div>
+      <div class="libraries react-library-listing libraries-tab"></div>
 
       %else:
       <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices libraries-tab">
@@ -572,10 +549,14 @@ from openedx.core.djangolib.js_utils import (
   %endif
 </div>
 <%static:webpack entry="StudioIndex">
-  new StudioIndex(
-      ".react-course-listing",
-      ${sorted(courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else '') | n, dump_js_escaped_json},
-      ${allow_course_reruns and rerun_creator_status and course_creator_status=='granted' | n, dump_js_escaped_json}
-);
+    new StudioCourseIndex(
+        ".react-course-listing",
+        ${sorted(courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else '') | n, dump_js_escaped_json},
+        ${allow_course_reruns and rerun_creator_status and course_creator_status=='granted' | n, dump_js_escaped_json}
+    );
+    new StudioLibraryIndex(
+        ".react-library-listing",
+        ${sorted(libraries, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else '') | n, dump_js_escaped_json}
+    );
 </%static:webpack>
 </%block>

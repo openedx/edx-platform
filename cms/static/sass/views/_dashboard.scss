@@ -498,8 +498,8 @@
 
         & + .metadata-item:before {
           content: "/";
-          margin-left: ($baseline/10);
-          margin-right: ($baseline/10);
+          margin-left: ($baseline/4);
+          margin-right: ($baseline/4);
           color: $gray-l4;
         }
 
@@ -509,7 +509,7 @@
       }
 
       .extra-metadata {
-        margin-left: ($baseline/10);
+        margin-left: ($baseline/4);
       }
     }
 
