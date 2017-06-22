@@ -151,16 +151,18 @@ description_max_length = 250
               <p>${HTML(overview)}</p>
             </div>
           </div>
-          <div class="accordion-item">
-            <div class="accordion-head">${_('Job Outlook')}</div>
-            <div class="accordion-content">
-              <ul class="list-bulleted list-disc no-indent">
-                % for item in job_outlook_items:
-                  <li>${item}</li>
-                % endfor
-              </ul>
-            </div>
-          </div>
+          % if job_outlook_items:
+              <div class="accordion-item">
+                <div class="accordion-head">${_('Job Outlook')}</div>
+                <div class="accordion-content">
+                  <ul class="list-bulleted list-disc no-indent">
+                    % for item in job_outlook_items:
+                      <li>${item}</li>
+                    % endfor
+                  </ul>
+                </div>
+              </div>
+          % endif
           <div class="accordion-item">
             <div class="accordion-head">${_("What You'll Learn")}</div>
             <div class="accordion-content">
