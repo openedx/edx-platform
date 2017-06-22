@@ -214,9 +214,10 @@ class WarningMessagesTest(CourseOutlineTest):
                             'Name of Enrollment Track Partition',
                             'Enrollment Track Partition',
                             [
-                                Group(1, 'Audit')
+                                Group(1, 'Audit'),
+                                Group(2, 'Verified')
                             ],
-                            scheme="cohort"
+                            scheme="enrollment_track"
                         )
                     ],
                 })
@@ -683,9 +684,9 @@ class UnitAccessTest(CourseOutlineTest):
         and verify that the warning no longer appears.
         """
         self.assertFalse(unit.has_restricted_warning)
-        unit.set_unit_access('Content Groups', [self.content_group_a_id])
+        unit.toggle_unit_access('Content Groups', [self.content_group_a_id])
         self.assertTrue(unit.has_restricted_warning)
-        unit.set_unit_access('Content Groups', [self.content_group_a_id])
+        unit.toggle_unit_access('Content Groups', [self.content_group_a_id])
         self.assertFalse(unit.has_restricted_warning)
 
     def test_units_can_be_restricted(self):
@@ -700,85 +701,63 @@ class UnitAccessTest(CourseOutlineTest):
         unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0)
         self._set_restriction_on_unrestricted_unit(unit)
 
-    def test_restricted_sections_do_not_appear_to_blocked_users_in_lms(self):
+    def test_restricted_sections_for_content_group_users_in_lms(self):
         """
-        Test that a section restricted to one content group does not
-        appear to users outside of that content group.
+        Verify that those who are in an content track with access to a restricted unit are able
+        to see that unit in lms, and those who are in an enrollment track without access to a restricted
+        unit are not able to see that unit in lms
         """
         self.course_outline_page.visit()
         self.course_outline_page.expand_all_subsections()
         unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0)
-        unit.set_unit_access('Content Groups', [self.content_group_a_id])
+        unit.toggle_unit_access('Content Groups', [self.content_group_a_id])
         self.course_outline_page.view_live()
 
         course_home_page = CourseHomePage(self.browser, self.course_id)
         course_home_page.visit()
         course_home_page.resume_course_from_header()
         self.assertEqual(course_home_page.outline.num_units, 2)
+
+        # Test for a user without additional content available
         course_home_page.visit()
         course_home_page.preview.set_staff_view_mode("Learner in Test Group B")
         course_home_page.resume_course_from_header()
         self.assertEqual(course_home_page.outline.num_units, 1)
 
-    def test_restricted_sections_do_appear_to_restricted_users_in_lms(self):
-        """
-        Verify that those who are in a content group with access to
-        a restricted unit are able to see that unit in lms.
-        """
-        self.course_outline_page.visit()
-        self.course_outline_page.expand_all_subsections()
-        unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0)
-        unit.set_unit_access('Content Groups', [self.content_group_a_id])
-        self.course_outline_page.view_live()
-
-        course_home_page = CourseHomePage(self.browser, self.course_id)
-        course_home_page.visit()
-        course_home_page.resume_course_from_header()
-        self.assertEqual(course_home_page.outline.num_units, 2)
+        # Test for a user with additional content available
         course_home_page.visit()
         course_home_page.preview.set_staff_view_mode("Learner in Test Group A")
         course_home_page.resume_course_from_header()
         self.assertEqual(course_home_page.outline.num_units, 2)
 
-    def test_restricted_sections_do_appear_to_enrollment_track_users_in_lms(self):
+    def test_restricted_sections_for_enrollment_track_users_in_lms(self):
         """
-        Verify that those who are in an enrollment track with access to
-        a restricted unit are able to see that unit in lms.
+        Verify that those who are in an enrollment track with access to a restricted unit are able
+        to see that unit in lms, and those who are in an enrollment track without access to a restricted
+        unit are not able to see that unit in lms
         """
         self.course_outline_page.visit()
         self.course_outline_page.expand_all_subsections()
         unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0)
-        unit.set_unit_access('Enrollment Track Groups', [1])  # Hard coded 1 for audit ID
+        unit.toggle_unit_access('Enrollment Track Groups', [1])  # Hard coded 1 for audit ID
         self.course_outline_page.view_live()
 
         course_home_page = CourseHomePage(self.browser, self.course_id)
         course_home_page.visit()
         course_home_page.resume_course_from_header()
         self.assertEqual(course_home_page.outline.num_units, 2)
-        course_home_page.visit()
-        course_home_page.preview.set_staff_view_mode("Learner in Audit")
-        course_home_page.resume_course_from_header()
-        self.assertEqual(course_home_page.outline.num_units, 2)
 
-    def test_restricted_sections_do_not_appear_to_enrollment_track_users_in_lms(self):
-        """
-        Verify that those who are in an enrollment track with access to
-        a restricted unit are able to see that unit in lms.
-        """
-        self.course_outline_page.visit()
-        self.course_outline_page.expand_all_subsections()
-        unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0)
-        unit.set_unit_access('Enrollment Track Groups', [1])  # Hard coded 1 for audit ID
-        self.course_outline_page.view_live()
-
-        course_home_page = CourseHomePage(self.browser, self.course_id)
-        course_home_page.visit()
-        course_home_page.resume_course_from_header()
-        self.assertEqual(course_home_page.outline.num_units, 2)
+        # Test for a user without additional content available
         course_home_page.visit()
         course_home_page.preview.set_staff_view_mode("Learner in Verified")
         course_home_page.resume_course_from_header()
         self.assertEqual(course_home_page.outline.num_units, 1)
+
+        # Test for a user with additional content available
+        course_home_page.visit()
+        course_home_page.preview.set_staff_view_mode("Learner in Audit")
+        course_home_page.resume_course_from_header()
+        self.assertEqual(course_home_page.outline.num_units, 2)
 
 
 @attr(shard=3)

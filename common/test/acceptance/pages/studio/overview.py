@@ -134,7 +134,7 @@ class CourseOutlineItem(object):
         modal.is_explicitly_locked = is_locked
         modal.save()
 
-    def set_unit_access(self, partition_name, group_ids):
+    def toggle_unit_access(self, partition_name, group_ids):
         """
         Checks unit access to the group group_name if group_name != None
         """
