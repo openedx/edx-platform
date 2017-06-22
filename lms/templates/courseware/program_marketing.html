@@ -148,7 +148,7 @@ description_max_length = 250
           <div class="accordion-item">
             <div class="accordion-head">${_('Overview')}</div>
             <div class="accordion-content">
-              <p>${overview}</p>
+              <p>${HTML(overview)}</p>
             </div>
           </div>
           <div class="accordion-item">
@@ -216,7 +216,7 @@ description_max_length = 250
                             </h3>
                           </div>
                         </div>
-                        <div class="instructor-bio">${instructor['bio']}</div>
+                        <div class="instructor-bio">${HTML(instructor['bio'])}</div>
                       </div>
                       <a href="#" class="focusKeeper"></a>
                     </div>
@@ -310,7 +310,7 @@ description_max_length = 250
                       </h3>
                     </div>
                   </div>
-                  <div class="instructor-bio">${instructor['bio']}</div>
+                  <div class="instructor-bio">${HTML(instructor['bio'])}</div>
                 </div>
                 <a href="#" class="focusKeeper"></a>
               </div>
