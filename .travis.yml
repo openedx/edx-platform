@@ -31,7 +31,6 @@ branches:
   - oxa/devfic
   - oxa/dev.fic
   - oxa/ci
-  - oxa/ci-merge2
 
 # command to install dependencies
 install: 
