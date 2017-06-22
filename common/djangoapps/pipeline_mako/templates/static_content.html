@@ -96,6 +96,7 @@ source, template_path = Loader(engine).load_template_source(path)
         try:
             return Template("""
                 {% load render_bundle from webpack_loader %}
+                {% render_bundle "commons" %}
                 {% render_bundle entry %}
                 <script type="text/javascript">
                     {% autoescape off %}{{ body }}{% endautoescape %}
