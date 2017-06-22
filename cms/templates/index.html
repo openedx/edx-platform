@@ -333,15 +333,15 @@ from openedx.core.djangolib.markup import HTML, Text
 
             <ul  class="item-actions course-actions">
 	      <%
-	          Sites = configuration_helpers.get_lms_base_values(course_info['org'],settings.SITE_NAME)
+	          sites = configuration_helpers.get_lms_base_values(course_info['org'],settings.SITE_NAME)
 	      %>
 	      <li class="action">
 	        <select name="site_name" class="form-control site_name">
-	        % if Sites != settings.SITE_NAME:
-                   %for name,site in Sites.items():
-		     <option value="${site}" ${'selected' if loop.first else ''}>${name}</option>
-		   % endfor
-		% else:
+	        % if sites != settings.SITE_NAME:
+            %for name,site in Sites.items():
+              <option value="${site}" ${'selected' if loop.first else ''}>${name}</option>
+            % endfor
+		      % else:
 	          <option value="${settings.SITE_NAME}" ${'selected' if loop.first else ''}>${settings.SITE_NAME}</option>
 	        % endif
                 </select>
