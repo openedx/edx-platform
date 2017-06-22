@@ -164,7 +164,7 @@ class LoginRequiredMiddlewareTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_anonymous_user_cannot_access_restricted_site(self):
-        response = self.client.get('/courses', HTTP_HOST=self.restricted_site.domain)
+        response = self.client.get('/courses', HTTP_HOST=self.restricted_site.domain, follow=True)
         self.assertEqual(response.redirect_chain[-1][0], 'http://{}/login?next=/courses'.format(self.restricted_site.domain))
 
     def test_logged_in_user_can_access_both_sites(self):
