@@ -44,11 +44,12 @@ def start_servers(options):
         cmd = (
             "DEFAULT_STORE={default_store} "
             "coverage run --rcfile={coveragerc} -m "
-            "manage {service} --settings bok_choy runserver "
+            "manage {service} --settings {settings} runserver "
             "{address} --traceback --noreload".format(
                 default_store=options.default_store,
                 coveragerc=coveragerc,
                 service=service,
+                settings=Env.SETTINGS,
                 address=address,
             )
         )
@@ -83,7 +84,7 @@ def wait_for_server(server, port):
     attempts = 0
     server_ok = False
 
-    while attempts < 30:
+    while attempts < 120:
         try:
             connection = httplib.HTTPConnection(server, port, timeout=10)
             connection.request('GET', '/')
@@ -107,7 +108,7 @@ def wait_for_test_servers():
     """
 
     for service, info in Env.BOK_CHOY_SERVERS.iteritems():
-        ready = wait_for_server("0.0.0.0", info['port'])
+        ready = wait_for_server(info['host'], info['port'])
         if not ready:
             msg = colorize(
                 "red",
@@ -123,7 +124,7 @@ def is_mongo_running():
     """
     # The mongo command will connect to the service,
     # failing with a non-zero exit code if it cannot connect.
-    output = os.popen('mongo --eval "print(\'running\')"').read()
+    output = os.popen('mongo --host {} --eval "print(\'running\')"'.format(Env.BOK_CHOY_MONGO_HOST)).read()
     return output and "running" in output
 
 
@@ -155,7 +156,8 @@ def clear_mongo():
     Clears mongo database.
     """
     sh(
-        "mongo {} --eval 'db.dropDatabase()' > /dev/null".format(
+        "mongo --host {} {} --eval 'db.dropDatabase()' > /dev/null".format(
+            Env.BOK_CHOY_MONGO_HOST,
             Env.BOK_CHOY_MONGO_DATABASE,
         )
     )
@@ -191,6 +193,9 @@ def check_mysql():
     """
     Check that mysql is running
     """
+    if 'BOK_CHOY_HOSTNAME' in os.environ:
+        # mysql should be running in a separate Docker container
+        return
     if not is_mysql_running():
         msg = colorize('red', "MySQL is not running locally.")
         print msg
