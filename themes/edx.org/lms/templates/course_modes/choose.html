@@ -72,8 +72,12 @@ from openedx.core.djangolib.markup import HTML, Text
             <div class="wrapper-register-choose wrapper-content-main">
                 <article class="register-choose content-main">
                     <header class="page-header content-main">
-                        <h3 class="title">
-                        ${title_content}
+                        <h3 class="title v1">
+                            ${title_content}
+                        </h3>
+                        <!-- This div was added as part of the LEARNER-1312 experiment. The v2 class should be removed if the experiment is implemented-->
+                        <h3 class="title v2 hidden">
+                            Next, Select Your Learning Path
                         </h3>
                     </header>
 
@@ -82,7 +86,28 @@ from openedx.core.djangolib.markup import HTML, Text
                         b_tag_kwargs = {'b_start': HTML('<b>'), 'b_end': HTML('</b>')}
                         %>
                         % if "verified" in modes:
-                            <div class="register-choice register-choice-certificate">
+                            <!-- This div was added as part of the LEARNER-1312 experiment. The v2 class should be removed if the experiment is implemented-->
+                            <div class="register-choice register-choice-certificate v2 hidden">
+                                <h4 class="title">Pursue a Verified Certificate</h4>
+                                <div class="wrapper-copy-inline">
+                                  <div class="wrapper-copy-inline">
+                                    <div class="wrapper-copy">
+                                        Get premium level support throughout the course and commit to completion up front.
+                                    </div>
+                                        <img src="/static/images/cert-verified-thumb.png" class="visual-reference img-certificate" alt="Visual representation of a Certificate"/>
+                                  </div>
+                                </div>
+                                <div class="copy-inline">
+                                  <ul class="list-actions">
+                                    <li class="action action-select">
+                                      <input type="hidden" name="contribution" value="${min_price}" />
+                                      <!-- The class verified_mode should be added to this selector if the experiment is implemented-->
+                                      <input type="submit" name="verified_mode" value="Upgrade to a Certificate ($${min_price} USD)" />
+                                    </li>
+                                  </ul>
+                                </div>
+                            </div>
+                            <div class="register-choice register-choice-certificate v1">
                                 <div class="wrapper-copy">
                                     <span class="deco-ribbon"></span>
                                     % if has_credit_upsell:
@@ -164,11 +189,50 @@ from openedx.core.djangolib.markup import HTML, Text
                                 </ul>
                             </div>
                         % elif "audit" in modes:
-                            <span class="deco-divider">
+                            <span class="deco-divider v1">
+                                <span class="copy">${_("or")}</span>
+                            </span>
+                            <!-- This div was added as part of the LEARNER-1312 experiment. The v2 class should be removed if the experiment is implemented-->
+                            <span class="deco-divider v2 hidden">
                                 <span class="copy">${_("or")}</span>
                             </span>
 
-                            <div class="register-choice register-choice-audit">
+                            <!-- This div was added as part of the LEARNER-1312 experiment. The v2 class should be removed if the experiment is implemented-->
+                            <div class="register-choice register-choice-donate v2 hidden">
+                                <h4 class="title">
+                                    Donate to Support our Non-Profit Mission
+                                </h4>
+                                <div class="wrapper-copy-inline">
+                                    <div class="wrapper-copy">
+                                        Any amount will support our mission to make the world's best education more accessible.
+                                    </div>
+                                    <img src="/static/images/edx-home-graphic.png" class="visual-reference img-donate" alt="Visual of two hands forming a heart shape" >
+                                </div>
+                                <div class="copy-inline">
+                                    <ul class="list-actions">
+                                      <li class="action action-select">
+                                        <a class="donation-link" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=MJUBGL54QTCTA">Donate and Continue to Course</a>
+                                      </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- This div was added as part of the LEARNER-1312 experiment. The v2 class should be removed if the experiment is implemented-->
+                            <div class="register-choice register-choice-v2-audit register-choice-view v2 hidden">
+                              <h4 class="title">I Don't Want to Upgrade or Donate Today</h4>
+                              <div class="wrapper-copy-inline">
+                                <div class="wrapper-copy">
+                                    If you do not want to buy a certificate or donate to edX's mission today, you can skip this step for now and continue to the course.
+                                </div>
+                                <div class="copy-inline">
+                                <ul class="list-actions">
+                                    <input type="submit" name="audit_mode" value="Continue to Course">
+                                </ul>
+                              </div>
+                              </div>
+                            </div>
+
+                            <div class="register-choice register-choice-audit v1">
                                 <div class="wrapper-copy">
                                     <span class="deco-ribbon"></span>
                                     <h4 class="title">${_("Audit This Course (No Certificate)")}</h4>
