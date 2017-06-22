@@ -953,7 +953,6 @@ ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ENV_TOKENS.get(
     ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES
 )
 
-
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class
 # The below environmental settings are utilized by the LMS when interacting with
@@ -991,6 +990,10 @@ ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = set(
         'ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS',
         ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS
     )
+)
+BASE_COOKIE_DOMAIN = ENV_TOKENS.get(
+    'BASE_COOKIE_DOMAIN',
+    BASE_COOKIE_DOMAIN
 )
 
 ############## CATALOG/DISCOVERY SERVICE API CLIENT CONFIGURATION ######################
