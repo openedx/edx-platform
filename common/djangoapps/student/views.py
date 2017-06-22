@@ -1963,7 +1963,7 @@ def activate_account(request, key):
                         )
 
         if settings.FEATURES.get('ENABLE_MKTG_SITE') and 'WELCOME' in settings.MKTG_URLS and not already_active:
-            return redirect('welcome')
+            return redirect('welcome-activate')
 
         resp = render_to_response(
             "registration/activation_complete.html",

@@ -1006,19 +1006,17 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
     )
 
 if settings.FEATURES.get('ENABLE_MKTG_SITE'):
-    if 'WELCOME' in settings.MKTG_URLS:
-        urlpatterns += (
-            url(
-                r'^welcome$',
-                RedirectView.as_view(url=settings.MKTG_URLS['ROOT'] + settings.MKTG_URLS['WELCOME'], permanent=True),
-                name='welcome'
-            ),
-        )
-    if 'WELCOME_UNACTIVATED' in settings.MKTG_URLS:
-        urlpatterns += (
-            url(
-                r'^welcome-unactivated$',
-                RedirectView.as_view(url=settings.MKTG_URLS['ROOT'] + settings.MKTG_URLS['WELCOME_UNACTIVATED'], permanent=True),
-                name='welcome-unactivated'
-            ),
-        )
+    welcome_keys = {
+        'WELCOME': 'welcome',
+        'WELCOME_ACTIVATE': 'welcome-activate'
+    }
+    
+    for key, value in welcome_keys.iteritems():
+        if key in settings.MKTG_URLS:
+            urlpatterns += (
+                url(
+                    r'^{pattern}$'.format(pattern=value),
+                    RedirectView.as_view(url=settings.MKTG_URLS['ROOT'] + settings.MKTG_URLS[key], permanent=True),
+                    name=value
+                ),
+            )
