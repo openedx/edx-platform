@@ -31,7 +31,7 @@ from commerce.models import CommerceConfiguration
 from commerce.tests import factories
 from commerce.tests.mocks import mock_get_orders
 from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response
+from http.cookies import SimpleCookie
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
@@ -541,6 +541,23 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             self.assertContains(response, expected_message)
             if logo_url:
                 self.assertContains(response, logo_url)
+
+    def test_enterprise_cookie_delete(self):
+        """
+        Test that enterprise cookies are deleted in login/registration views.
+
+        Cookies must be deleted in login/registration views so that *default* login/registration branding
+        is displayed to subsequent requests from non-enterprise customers.
+        """
+        cookies = SimpleCookie()
+        cookies[settings.ENTERPRISE_CUSTOMER_COOKIE_NAME] = 'test-enterprise-customer'
+        response = self.client.get(reverse('signin_user'), HTTP_ACCEPT="text/html", cookies=cookies)
+
+        self.assertIn(settings.ENTERPRISE_CUSTOMER_COOKIE_NAME, response.cookies)  # pylint:disable=no-member
+        enterprise_cookie = response.cookies[settings.ENTERPRISE_CUSTOMER_COOKIE_NAME]  # pylint:disable=no-member
+
+        self.assertEqual(enterprise_cookie['domain'], settings.BASE_COOKIE_DOMAIN)
+        self.assertEqual(enterprise_cookie.value, '')
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
     def test_microsite_uses_old_login_page(self):

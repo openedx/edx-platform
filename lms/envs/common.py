@@ -3177,6 +3177,7 @@ ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = {
     'mailing_address',
 }
 ENTERPRISE_CUSTOMER_COOKIE_NAME = 'enterprise_customer_uuid'
+BASE_COOKIE_DOMAIN = 'localhost'
 
 ############## Settings for Course Enrollment Modes ######################
 COURSE_ENROLLMENT_MODES = {

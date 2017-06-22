@@ -150,7 +150,15 @@ def login_and_registration_form(request, initial_mode="login"):
 
     context = update_context_for_enterprise(request, context)
 
-    return render_to_response('student_account/login_and_register.html', context)
+    response = render_to_response('student_account/login_and_register.html', context)
+
+    # Remove enterprise cookie so that subsequent requests show default login page.
+    response.delete_cookie(
+        configuration_helpers.get_value("ENTERPRISE_CUSTOMER_COOKIE_NAME", settings.ENTERPRISE_CUSTOMER_COOKIE_NAME),
+        domain=configuration_helpers.get_value("BASE_COOKIE_DOMAIN", settings.BASE_COOKIE_DOMAIN),
+    )
+
+    return response
 
 
 @require_http_methods(['POST'])
