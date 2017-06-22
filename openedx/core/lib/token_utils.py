@@ -100,7 +100,7 @@ class JwtBuilder(object):
 
         language = None
         try:
-            user_preference = UserPreference.objects.get(user=self.user)
+            user_preference = UserPreference.objects.get(user=self.user, key='pref-lang')
             language = user_preference.get_all_preferences(self.user).get('pref-lang')
         except UserPreference.DoesNotExist:
             log.debug("UserPreference for User: '{}' does not exist.".format(self.user))
