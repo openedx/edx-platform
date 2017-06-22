@@ -9,8 +9,12 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 %>
 
 <%block name="content">
-    % if show_course_sock and DISPLAY_COURSE_SOCK_FLAG.is_enabled(course_id):
-    <div class="verification-sock">
+    % if show_course_sock:
+    <div class="verification-sock"
+        % if not DISPLAY_COURSE_SOCK_FLAG.is_enabled(course_id):
+        style="display: none"
+        %endif
+    >
         <button type="button" class="btn btn-brand focusable action-toggle-verification-sock">
             Learn About Verified Certificate
         </button>
@@ -46,7 +50,7 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
                     <div class="story-quote">
                         I wanted to include a verified certificate on my resume and my profile to
                         illustrate that I am working towards this goal I have and that I have
-                        achieved something while I was unemployed.</br>
+                        achieved something while I was unemployed.<br/>
                         <span class="author">- Cheryl Troell, edX Learner</span>
                     </div>
                 </div>
@@ -59,7 +63,7 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
             </div>
         </div>
     </div>
-    % endif
+    %endif
 </%block>
 
 <%static:webpack entry="CourseSock">
