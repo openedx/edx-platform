@@ -518,9 +518,7 @@ def get_ability(course_id, content, user):
     """
     Return a dictionary of forums-oriented actions and the user's permission to perform them
     """
-    content_user = get_user_by_username_or_email(content.get('username'))
-    user_group_id = get_group_id_for_user(user, get_course_discussion_settings(course_id))
-    content_user_group_id = get_group_id_for_user(content_user, get_course_discussion_settings(course_id))
+    (user_group_id, content_user_group_id) = get_user_group_ids(user, course_id, content)
     return {
         'editable': check_permissions_by_view(
             user,
@@ -562,6 +560,13 @@ def get_ability(course_id, content, user):
     }
 
 # TODO: RENAME
+
+
+def get_user_group_ids(user, course_id, content):
+    content_user = get_user_by_username_or_email(content.get('username'))
+    user_group_id = get_group_id_for_user(user, get_course_discussion_settings(course_id))
+    content_user_group_id = get_group_id_for_user(content_user, get_course_discussion_settings(course_id))
+    return user_group_id, content_user_group_id
 
 
 def get_annotated_content_info(course_id, content, user, user_info):

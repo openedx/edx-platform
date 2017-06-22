@@ -78,6 +78,7 @@ class FakeTarget(object):
 class FakeTargetGroup(object):
     """ Mocks out the M2M relationship between FakeEmail and FakeTarget """
     def all(self):
+        # type: () -> object
         """ Mocks out a django method """
         return [FakeTarget()]
 

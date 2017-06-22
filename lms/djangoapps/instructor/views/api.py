@@ -2617,7 +2617,8 @@ def update_forum_role_membership(request, course_id):
 
     Query parameters:
     - `email` is the target users email
-    - `rolename` is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
+    - `rolename` is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_GROUP_MODERATOR,
+        FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
     - `action` is one of ['allow', 'revoke']
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)

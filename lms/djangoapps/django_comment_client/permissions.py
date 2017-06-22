@@ -119,10 +119,11 @@ def _check_conditions_permissions(user, permissions, course_id, content, user_gr
             if per in CONDITIONS:
                 return _check_condition(user, per, content)
             # TODO: Consider changing this to something a little more clear
+                # TODO: Doesn't work because content_user_group and user_group_id is never set
+                # in views.py > update_thread() in the permitted decorator
+                # Commented out for now, not sure how it works on the sandbox?
             if 'group_' in per:
-                if (content_user_group is None or
-                        user_group_id is None or
-                        user_group_id != content_user_group):
+                if (user_group_id != content_user_group):
                     return False
             return has_permission(user, per, course_id=course_id)
         elif isinstance(per, list) and operator in ["and", "or"]:
@@ -171,6 +172,7 @@ VIEW_PERMISSIONS = {
 
 def check_permissions_by_view(user, course_id, content, name, group_id=None, content_user_group=None):
     assert isinstance(course_id, CourseKey)
+    p = None
     try:
         p = VIEW_PERMISSIONS[name]
     except KeyError:
