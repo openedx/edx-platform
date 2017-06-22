@@ -8,6 +8,7 @@ from types import NoneType
 from opaque_keys.edx.keys import CourseKey
 
 from django_comment_common.models import all_permissions_for_user_in_course
+from django_comment_common.utils import get_course_discussion_settings
 from lms.djangoapps.teams.models import CourseTeam
 from lms.lib.comment_client import Thread
 from request_cache.middleware import RequestCache, request_cached
@@ -119,11 +120,14 @@ def _check_conditions_permissions(user, permissions, course_id, content, user_gr
             if per in CONDITIONS:
                 return _check_condition(user, per, content)
             # TODO: Consider changing this to something a little more clear
-                # TODO: Doesn't work because content_user_group and user_group_id is never set
-                # in views.py > update_thread() in the permitted decorator
-                # Commented out for now, not sure how it works on the sandbox?
             if 'group_' in per:
-                if (user_group_id != content_user_group):
+                # If a course does not have divided discussions
+                # or a course has divided discussions, but the current user's content group does not equal
+                # the content group of the commenter/poster,
+                # then the current user does not have group edit permissions.
+                division_scheme = get_course_discussion_settings(course_id).division_scheme
+                if division_scheme is 'none' or user_group_id is None or content_user_group is None\
+                        or user_group_id != content_user_group:
                     return False
             return has_permission(user, per, course_id=course_id)
         elif isinstance(per, list) and operator in ["and", "or"]:

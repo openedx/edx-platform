@@ -177,14 +177,13 @@ def permitted(func):
                 content = cc.Comment.find(kwargs["comment_id"]).to_dict()
             elif "commentable_id" in kwargs:
                 content = cc.Commentable.find(kwargs["commentable_id"]).to_dict()
+                user_group_id = None
+                content_user_group_id = None
             else:
                 content = None
 
             if 'username' in content:
-                (user_group_id, content_user_group_id) = get_user_group_ids(request.user, course_key, content)
-            else:
-                user_group_id = None
-                content_user_group_id = None
+                (user_group_id, content_user_group_id) = get_user_group_ids(course_key, content, request.user)
             return content, user_group_id, content_user_group_id
 
         course_key = CourseKey.from_string(kwargs['course_id'])

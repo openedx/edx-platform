@@ -518,7 +518,7 @@ def get_ability(course_id, content, user):
     """
     Return a dictionary of forums-oriented actions and the user's permission to perform them
     """
-    (user_group_id, content_user_group_id) = get_user_group_ids(user, course_id, content)
+    (user_group_id, content_user_group_id) = get_user_group_ids(course_id, content, user)
     return {
         'editable': check_permissions_by_view(
             user,
@@ -562,10 +562,19 @@ def get_ability(course_id, content, user):
 # TODO: RENAME
 
 
-def get_user_group_ids(user, course_id, content):
-    content_user = get_user_by_username_or_email(content.get('username'))
-    user_group_id = get_group_id_for_user(user, get_course_discussion_settings(course_id))
-    content_user_group_id = get_group_id_for_user(content_user, get_course_discussion_settings(course_id))
+def get_user_group_ids(course_id, content, user=None):
+    """
+    Given a user, course ID, and the content of the thread or comment, returns the group ID for the current user
+    and the user that posted the thread/comment.
+    """
+    if content.get('username'):
+        content_user = get_user_by_username_or_email(content.get('username'))
+        content_user_group_id = get_group_id_for_user(content_user, get_course_discussion_settings(course_id))
+    else:
+        content_user_group_id = None
+
+    user_group_id = get_group_id_for_user(user, get_course_discussion_settings(course_id)) if user else None
+
     return user_group_id, content_user_group_id
 
 
