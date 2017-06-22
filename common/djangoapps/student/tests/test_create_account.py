@@ -16,6 +16,7 @@ import pytz
 
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from notification_prefs import NOTIFICATION_PREF_KEY
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 import student
@@ -42,7 +43,7 @@ TEST_CS_URL = 'https://comments.service.test:123/'
         ]
     }
 )
-class TestCreateAccount(TestCase):
+class TestCreateAccount(SiteMixin, TestCase):
     """Tests for account creation"""
 
     def setUp(self):
@@ -74,12 +75,12 @@ class TestCreateAccount(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(get_user_preference(user, LANGUAGE_KEY), lang)
 
-    def create_account_and_fetch_profile(self):
+    def create_account_and_fetch_profile(self, host='microsite.example.com'):
         """
         Create an account with self.params, assert that the response indicates
         success, and return the UserProfile object for the newly created user
         """
-        response = self.client.post(self.url, self.params, HTTP_HOST="microsite.example.com")
+        response = self.client.post(self.url, self.params, HTTP_HOST=host)
         self.assertEqual(response.status_code, 200)
         user = User.objects.get(username=self.username)
         return user.profile
@@ -223,6 +224,7 @@ class TestCreateAccount(TestCase):
         """
 
         request = self.request_factory.post(self.url, self.params)
+        request.site = self.site
         # now indicate we are doing ext_auth by setting 'ExternalAuthMap' in the session.
         request.session = import_module(settings.SESSION_ENGINE).SessionStore()  # empty session
         extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
@@ -404,6 +406,10 @@ class TestCreateAccount(TestCase):
                 UserAttribute.get_user_attribute(user, REGISTRATION_UTM_CREATED_AT)
             )
 
+
+    def test_created_on_site_user_attribute_set(self):
+        profile = self.create_account_and_fetch_profile(host=self.site.domain)
+        self.assertEqual(UserAttribute.get_user_attribute(profile.user, 'created_on_site'), self.site.domain)
 
 @ddt.ddt
 class TestCreateAccountValidation(TestCase):

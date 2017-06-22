@@ -1,7 +1,7 @@
 <%page expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
-
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
@@ -34,7 +34,7 @@ from openedx.core.djangolib.markup import HTML, Text
           <a href="mailto:${settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("Email staff to create course")}</a>
           % endif
 
-          % if show_new_library_button:
+          % if show_new_library_button and user.is_staff:
             <a href="#" class="button new-button new-library-button"><span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>
             ${_("New Library")}</a>
           % endif
@@ -332,6 +332,20 @@ from openedx.core.djangolib.markup import HTML, Text
             </a>
 
             <ul  class="item-actions course-actions">
+	      <%
+	          Sites = configuration_helpers.get_lms_base_values(course_info['org'],settings.SITE_NAME)
+	      %>
+	      <li class="action">
+	        <select name="site_name" class="form-control site_name">
+	        % if Sites != settings.SITE_NAME:
+                   %for name,site in Sites.items():
+		     <option value="${site}" ${'selected' if loop.first else ''}>${name}</option>
+		   % endfor
+		% else:
+	          <option value="${settings.SITE_NAME}" ${'selected' if loop.first else ''}>${settings.SITE_NAME}</option>
+	        % endif
+                </select>
+              </li>
               % if allow_course_reruns and rerun_creator_status and course_creator_status=='granted':
               <li class="action action-rerun">
                 <a href="${course_info['rerun_link']}" class="button rerun-button">${_("Re-run Course")}</a>
@@ -497,7 +511,7 @@ from openedx.core.djangolib.markup import HTML, Text
               </div>
           </div>
         </div>
-        % if show_new_library_button:
+        % if show_new_library_button and user.is_staff:
         <div class="notice-item has-actions">
           <div class="msg">
               <h3 class="title">${_('Create Your First Library')}</h3>
