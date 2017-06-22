@@ -9,11 +9,9 @@ from ccx_keys.locator import CCXLocator
 from chrono import Timer
 from django.conf import settings
 from django.test import RequestFactory
-from django.test.client import Client
 from mock import Mock, patch
 from opaque_keys.edx.locations import CourseLocator
 
-from common.test.utils import XssTestMixin
 from contentstore.tests.utils import AjaxEnabledTestClient
 from contentstore.utils import delete_course
 from contentstore.views.course import (
@@ -44,7 +42,7 @@ USER_COURSES_COUNT = 1
 
 
 @ddt.ddt
-class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
+class TestCourseListing(ModuleStoreTestCase):
     """
     Unit tests for getting the list of courses for a logged in user
     """
@@ -87,30 +85,6 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
         """
         self.client.logout()
         ModuleStoreTestCase.tearDown(self)
-
-    def test_course_listing_is_escaped(self):
-        """
-        Tests course listing returns escaped data.
-        """
-        escaping_content = "<script>alert('ESCAPE')</script>"
-
-        # Make user staff to access course listing
-        self.user.is_staff = True
-        self.user.save()  # pylint: disable=no-member
-
-        self.client = Client()
-        self.client.login(username=self.user.username, password='test')
-
-        # Change 'display_coursenumber' field and update the course.
-        course = CourseFactory.create()
-        course.display_coursenumber = escaping_content
-        course = self.store.update_item(course, self.user.id)  # pylint: disable=no-member
-        self.assertEqual(course.display_coursenumber, escaping_content)
-
-        # Check if response is escaped
-        response = self.client.get('/home')
-        self.assertEqual(response.status_code, 200)
-        self.assert_no_xss(response, escaping_content)
 
     def test_empty_course_listing(self):
         """

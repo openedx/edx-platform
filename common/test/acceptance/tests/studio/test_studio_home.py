@@ -1,15 +1,18 @@
 """
 Acceptance tests for Home Page (My Courses / My Libraries).
 """
+import datetime
 from uuid import uuid4
 
 from flaky import flaky
 from opaque_keys.edx.locator import LibraryLocator
 
+from base_studio_test import StudioCourseTest
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.studio.index import DashboardPage
 from common.test.acceptance.pages.studio.library import LibraryEditPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.tests.helpers import AcceptanceTest, get_selected_option_text, select_option_by_text
 
 
@@ -60,6 +63,9 @@ class CreateLibraryTest(AcceptanceTest):
         # Then go back to the home page and make sure the new library is listed there:
         self.dashboard_page.visit()
         self.assertTrue(self.dashboard_page.has_library(name=name, org=org, number=number))
+        # Click on the library listing and verify that the library edit view loads.
+        self.dashboard_page.click_library(name)
+        lib_page.wait_for_page()
 
 
 class StudioLanguageTest(AcceptanceTest):
@@ -95,3 +101,44 @@ class StudioLanguageTest(AcceptanceTest):
             get_selected_option_text(language_selector),
             u'Dummy Language (Esperanto)'
         )
+
+
+class ArchivedCourseTest(StudioCourseTest):
+    """ Tests that archived courses appear in their own list. """
+
+    def setUp(self, is_staff=True, test_xss=False):
+        """
+        Load the helper for the home page (dashboard page)
+        """
+        super(ArchivedCourseTest, self).setUp(is_staff=is_staff, test_xss=test_xss)
+        self.dashboard_page = DashboardPage(self.browser)
+
+    def populate_course_fixture(self, course_fixture):
+        current_time = datetime.datetime.now()
+        course_start_date = current_time - datetime.timedelta(days=60)
+        course_end_date = current_time - datetime.timedelta(days=90)
+
+        course_fixture.add_course_details({
+            'start_date': course_start_date,
+            'end_date': course_end_date
+        })
+
+    def test_archived_course(self):
+        """
+        Scenario: Ensure that an archived course displays in its own list and can be clicked on.
+        """
+        self.dashboard_page.visit()
+        self.assertTrue(self.dashboard_page.has_course(
+            org=self.course_info['org'], number=self.course_info['number'], run=self.course_info['run'],
+            archived=True
+        ))
+
+        # Click on the archived course and make sure that the Studio course outline appears.
+        self.dashboard_page.click_course_run(self.course_info['run'])
+        course_outline_page = CourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        course_outline_page.wait_for_page()

@@ -288,7 +288,7 @@ def run_eslint(options):
     violations_limit = int(getattr(options, 'limit', -1))
 
     sh(
-        "eslint --format=compact . | tee {eslint_report}".format(
+        "eslint --ext .js --ext .jsx --format=compact . | tee {eslint_report}".format(
             eslint_report=eslint_report
         ),
         ignore_error=True

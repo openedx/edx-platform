@@ -252,6 +252,10 @@ FEATURES = {
 
     # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
     'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True,
+
+    # Whether archived courses (courses with end dates in the past) should be
+    # shown in Studio in a separate list.
+    'ENABLE_SEPARATE_ARCHIVED_COURSES': True
 }
 
 ENABLE_JASMINE = False

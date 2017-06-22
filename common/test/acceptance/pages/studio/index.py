@@ -205,12 +205,13 @@ class DashboardPage(PageObject, HelpMixin):
         )
         self.q(css='.ui-autocomplete .ui-menu-item a').filter(lambda el: el.text == item_text)[0].click()
 
-    def list_courses(self):
+    def list_courses(self, archived=False):
         """
-        List all the courses found on the page's list of libraries.
+        List all the courses found on the page's list of courses.
         """
         # Workaround Selenium/Firefox bug: `.text` property is broken on invisible elements
-        course_tab_link = self.q(css='#course-index-tabs .courses-tab a')
+        tab_selector = '#course-index-tabs .{} a'.format('archived-courses-tab' if archived else 'courses-tab')
+        course_tab_link = self.q(css=tab_selector)
         if course_tab_link:
             course_tab_link.click()
         div2info = lambda element: {
@@ -220,13 +221,14 @@ class DashboardPage(PageObject, HelpMixin):
             'run': element.find_element_by_css_selector('.course-run .value').text,
             'url': element.find_element_by_css_selector('a.course-link').get_attribute('href'),
         }
-        return self.q(css='.courses li.course-item').map(div2info).results
+        course_list_selector = '.{} li.course-item'.format('archived-courses' if archived else 'courses')
+        return self.q(css=course_list_selector).map(div2info).results
 
-    def has_course(self, org, number, run):
+    def has_course(self, org, number, run, archived=False):
         """
         Returns `True` if course for given org, number and run exists on the page otherwise `False`
         """
-        for course in self.list_courses():
+        for course in self.list_courses(archived):
             if course['org'] == org and course['number'] == number and course['run'] == run:
                 return True
         return False
@@ -245,6 +247,7 @@ class DashboardPage(PageObject, HelpMixin):
             'name': element.find_element_by_css_selector('.course-title').text,
             'org': element.find_element_by_css_selector('.course-org .value').text,
             'number': element.find_element_by_css_selector('.course-num .value').text,
+            'link_element': element.find_element_by_css_selector('a.library-link'),
             'url': element.find_element_by_css_selector('a.library-link').get_attribute('href'),
         }
         self.wait_for_element_visibility('.libraries li.course-item', "Switch to library tab")
@@ -258,6 +261,14 @@ class DashboardPage(PageObject, HelpMixin):
             if all([lib[key] == kwargs[key] for key in kwargs]):
                 return True
         return False
+
+    def click_library(self, name):
+        """
+        Click on the library with the given name.
+        """
+        for lib in self.list_libraries():
+            if lib['name'] == name:
+                lib['link_element'].click()
 
     @property
     def language_selector(self):
