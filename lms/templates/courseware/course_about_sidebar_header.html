@@ -26,8 +26,8 @@ from django.conf import settings
                 domain=site_domain,
                 path=reverse('about_course', args=[course.id.to_deprecated_string()])
             )
-        ).replace(u" ", u"+")
-        tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text)
+        )
+        tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text.replace(u"+", u"%2b"))
 
         facebook_link = static.get_value('course_about_facebook_link', settings.PLATFORM_FACEBOOK_ACCOUNT)
 
