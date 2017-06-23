@@ -380,22 +380,18 @@ function(VideoPlayer, HLS) {
             });
 
             describe('when the video is playing', function() {
-                beforeEach(function(done) {
+                it('call runTimer in seekTo on player', function(done) {
                     state.videoPlayer.play();
-
                     jasmine.waitUntil(function() {
                         return state.videoPlayer.isPlaying();
-                    }).done(done);
-                });
-
-
-                it('call runTimer in seekTo on player', function() {
-                    spyOn(state.videoPlayer, 'stopTimer').and.callThrough();
-                    spyOn(state.videoPlayer, 'runTimer').and.callThrough();
-                    state.videoPlayer.seekTo(10);
-                    expect(state.videoPlayer.currentTime).toBe(10);
-                    expect(state.videoPlayer.stopTimer).toHaveBeenCalled();
-                    expect(state.videoPlayer.runTimer).toHaveBeenCalled();
+                    }).then(function() {
+                        spyOn(state.videoPlayer, 'stopTimer').and.callThrough();
+                        spyOn(state.videoPlayer, 'runTimer').and.callThrough();
+                        state.videoPlayer.seekTo(10);
+                        expect(state.videoPlayer.currentTime).toBe(10);
+                        expect(state.videoPlayer.stopTimer).toHaveBeenCalled();
+                        expect(state.videoPlayer.runTimer).toHaveBeenCalled();
+                    }).always(done);
                 });
 
                 it('seek the player', function() {
