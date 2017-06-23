@@ -138,6 +138,9 @@ class Env(object):
     # Test Ids Directory
     TEST_DIR = REPO_ROOT / ".testids"
 
+    # Configured browser to use for the js test suites
+    KARMA_BROWSER = 'FirefoxDocker' if USING_DOCKER else 'FirefoxNoUpdates'
+
     # Files used to run each of the js test suites
     # TODO:  Store this as a dict. Order seems to matter for some
     # reason. See issue TE-415.
