@@ -5,6 +5,7 @@ from django.test import TestCase
 from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.oauth_dispatch.tests import mixins
+from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
 from openedx.core.lib.token_utils import JwtBuilder
 from student.tests.factories import UserFactory, UserProfileFactory
 
@@ -58,3 +59,22 @@ class TestJwtBuilder(mixins.AccessTokenMixin, TestCase):
         token = JwtBuilder(self.user, secret=secret).build_token(scopes, self.expires_in, aud=audience)
 
         jwt.decode(token, secret, audience=audience)
+
+    def test_attach_profile_claims(self):
+        """
+        Verify that attach_profile_claim updates the payload with the correct data.
+        """
+        self.user_preference = UserPreferenceFactory(user=self.user, key='pref-lang', value='en')
+        self.user.first_name = 'first name'
+        self.user.last_name = 'last name'
+        self.user.is_staff = False
+        expected_payload = {
+            'name': self.profile.name,
+            'locale': 'en',
+            'family_name': self.user.last_name,
+            'given_name': self.user.first_name,
+            'administrator': self.user.is_staff,
+        }
+        payload = {}
+        JwtBuilder(self.user).attach_profile_claim(payload)
+        self.assertEqual(payload, expected_payload)
