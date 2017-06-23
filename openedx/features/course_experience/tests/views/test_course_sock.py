@@ -4,8 +4,10 @@ Tests for course verification sock
 
 import datetime
 import ddt
+from django.template.loader import render_to_string
 
 from course_modes.models import CourseMode
+from courseware.views.views import get_course_prices
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -14,7 +16,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from .test_course_home import course_home_url
 
 TEST_PASSWORD = 'test'
-TEST_VERIFICATION_SOCK_LOCATOR = '<div class="verification-sock">'
+TEST_VERIFICATION_SOCK_LOCATOR = '<div class="verification-sock"'
 TEST_COURSE_PRICE = 50
 
 
@@ -58,8 +60,7 @@ class TestCourseSockView(SharedModuleStoreTestCase):
         not have a visible verification sock.
         """
         response = self.client.get(course_home_url(self.standard_course))
-        self.assertEqual(self.is_verified_sock_visible(response), False,
-                         'Student should not be able to see sock in a unverifiable course.')
+        self.assert_verified_sock_is_not_visible(self.standard_course, response)
 
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_verified_course(self):
@@ -68,8 +69,7 @@ class TestCourseSockView(SharedModuleStoreTestCase):
         visible verification sock.
         """
         response = self.client.get(course_home_url(self.verified_course))
-        self.assertEqual(self.is_verified_sock_visible(response), True,
-                         'Student should be able to see sock in a verifiable course.')
+        self.assert_verified_sock_is_visible(self.verified_course, response)
 
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_verified_course_updated_expired(self):
@@ -78,8 +78,7 @@ class TestCourseSockView(SharedModuleStoreTestCase):
         date does not display the verification sock.
         """
         response = self.client.get(course_home_url(self.verified_course_update_expired))
-        self.assertEqual(self.is_verified_sock_visible(response), False,
-                         'Student should be able to see sock in a verifiable course if the update expiration date has passed.')
+        self.assert_verified_sock_is_not_visible(self.verified_course_update_expired, response)
 
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_verified_course_user_already_upgraded(self):
@@ -88,12 +87,21 @@ class TestCourseSockView(SharedModuleStoreTestCase):
         verified status cannot see the verification sock.
         """
         response = self.client.get(course_home_url(self.verified_course_already_enrolled))
-        self.assertEqual(self.is_verified_sock_visible(response), False,
-                         'Student should be able to see sock if they have already upgraded to verified mode.')
+        self.assert_verified_sock_is_not_visible(self.verified_course_already_enrolled, response)
 
-    @classmethod
-    def is_verified_sock_visible(cls, response):
-        return TEST_VERIFICATION_SOCK_LOCATOR in response.content
+    def assert_verified_sock_is_visible(self, course, response):
+        return self.assertIn(
+            TEST_VERIFICATION_SOCK_LOCATOR,
+            response.content,
+            msg='Student should be able to see sock if they have already upgraded to verified mode.',
+        )
+
+    def assert_verified_sock_is_not_visible(self, course, response):
+        return self.assertNotIn(
+            TEST_VERIFICATION_SOCK_LOCATOR,
+            response.content,
+            msg='Student should not be able to see sock in a unverifiable course.',
+        )
 
     @classmethod
     def _add_course_mode(cls, course, upgrade_deadline_expired=False):
