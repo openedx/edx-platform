@@ -278,7 +278,7 @@ define(
                 var hasError = this.$('.thumbnail-wrapper').hasClass('error');
                 this.$('.thumbnail-action').toggle(showText);
                 HtmlUtils.setHtml(
-                    this.$('.thumbnail-action .main-icon.action-icon'),
+                    this.$('.thumbnail-action .action-icon'),
                     HtmlUtils.HTML(this.actionsInfo[action].icon)
                 );
                 HtmlUtils.setHtml(
@@ -287,7 +287,7 @@ define(
                 );
                 this.$('.thumbnail-action .action-text-sr').text(additionalSRText || '');
                 this.$('.thumbnail-wrapper').attr('class', 'thumbnail-wrapper {action}'.replace('{action}', action));
-                this.$('.thumbnail-action .main-icon.action-icon').attr('class', 'action-icon {action}'.replace('{action}', action));
+                this.$('.thumbnail-action .action-icon').attr('class', 'action-icon {action}'.replace('{action}', action));
 
                 // Add error class if it was already present.
                 if (hasError) {
