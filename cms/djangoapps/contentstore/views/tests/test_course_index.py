@@ -93,7 +93,7 @@ class TestCourseIndex(CourseTestCase):
         """
         Test that people with is_staff see the courses and can navigate into them
         """
-        self.check_index_and_outline(self.client)
+        self.check_courses_on_index(self.client)
 
     def test_negative_conditions(self):
         """
@@ -121,7 +121,7 @@ class TestCourseIndex(CourseTestCase):
             )
 
         # test access
-        self.check_index_and_outline(course_staff_client)
+        self.check_courses_on_index(course_staff_client)
 
     def test_json_responses(self):
         outline_url = reverse_course_url('course_handler', self.course.id)
