@@ -56,7 +56,7 @@ git+https://github.com/edx/nltk.git@2.0.6#egg=nltk==2.0.6
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 git+https://github.com/edx/django-pyfs.git@1.0.3#egg=django-pyfs==1.0.3
 git+https://github.com/mitodl/django-cas.git@v2.1.1#egg=django-cas==2.1.1
--e git+https://github.com/dgrtwo/ParsePy.git@bbeggs/3.6-test#egg=parse_rest
+-e git+https://github.com/dgrtwo/ParsePy.git@7949b9f754d1445eff8e8f20d0e967b9a6420639#egg=parse_rest
 # Master pyfs has a bug working with VPC auth. This is a fix. We should switch
 # back to master when and if this fix is merged back.
 # fs==0.4.0
