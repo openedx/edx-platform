@@ -31,7 +31,7 @@ django-pipeline-forgiving==1.0.0
 django-sekizai==0.8.2
 django-ses==0.7.1
 django-simple-history==1.6.3
-django-statici18n==1.1.5
+django-statici18n==1.4.0
 django-storages==1.4.1
 django-method-override==0.1.0
 django-user-tasks==0.1.4
