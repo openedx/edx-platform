@@ -12,7 +12,7 @@ class CourseBookmarksTool(CourseTool):
     The course bookmarks tool.
     """
     @classmethod
-    def is_enabled(cls, course_key):
+    def is_enabled(cls, request, course_key):
         """
         Always show the bookmarks tool.
         """

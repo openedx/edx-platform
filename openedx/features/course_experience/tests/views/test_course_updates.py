@@ -61,7 +61,7 @@ def create_course_updates_block(course, user):
     return course_updates
 
 
-def remove_course_updates(course):
+def remove_course_updates(user, course):
     """
     Remove any course updates in the specified course.
     """
@@ -69,6 +69,7 @@ def remove_course_updates(course):
     try:
         course_updates = modulestore().get_item(updates_usage_key)
         course_updates.items = []
+        modulestore().update_item(course_updates, user.id)
     except ItemNotFoundError:
         pass
 
@@ -105,7 +106,7 @@ class TestCourseUpdatesPage(SharedModuleStoreTestCase):
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
     def tearDown(self):
-        remove_course_updates(self.course)
+        remove_course_updates(self.user, self.course)
         super(TestCourseUpdatesPage, self).tearDown()
 
     def test_view(self):
