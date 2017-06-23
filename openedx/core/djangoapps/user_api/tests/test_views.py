@@ -935,7 +935,15 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             }
         )
 
-    def test_register_form_third_party_auth_running_google(self):
+    @ddt.data(
+        ('pk', 'PK'),
+        ('Pk', 'PK'),
+        ('pK', 'PK'),
+        ('PK', 'PK'),
+        ('us', 'US'),
+    )
+    @ddt.unpack
+    def test_register_form_third_party_auth_running_google(self, input_country_code, expected_country_code):
         no_extra_fields_setting = {}
         country_options = (
             [
@@ -948,7 +956,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 {
                     "value": country_code,
                     "name": unicode(country_name),
-                    "default": True if country_code == "PK" else False
+                    "default": True if country_code == expected_country_code else False
                 }
                 for country_code, country_name in SORTED_COUNTRIES
             ]
@@ -960,7 +968,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             email="bob@example.com",
             fullname="Bob",
             username="Bob123",
-            country="PK"
+            country=input_country_code
         ):
             self._assert_password_field_hidden(no_extra_fields_setting)
             self._assert_social_auth_provider_present(no_extra_fields_setting, provider)
@@ -1025,7 +1033,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 {
                     u"label": u"Country",
                     u"name": u"country",
-                    u"defaultValue": u"PK",
+                    u"defaultValue": expected_country_code,
                     u"type": u"select",
                     u"required": True,
                     u"options": country_options,
