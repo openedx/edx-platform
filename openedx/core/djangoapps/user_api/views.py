@@ -787,6 +787,14 @@ class RegistrationView(APIView):
         country_label = _(u"Country")
         error_msg = _(u"Please select your Country.")
 
+        # If we set a country code, make sure it's uppercase for the sake of the form.
+        default_country = form_desc._field_overrides.get('country', {}).get('defaultValue')
+        if default_country:
+            form_desc.override_field_properties(
+                'country',
+                default=default_country.upper()
+            )
+
         form_desc.add_field(
             "country",
             label=country_label,
