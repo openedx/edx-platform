@@ -287,7 +287,8 @@ define(
                 );
                 this.$('.thumbnail-action .action-text-sr').text(additionalSRText || '');
                 this.$('.thumbnail-wrapper').attr('class', 'thumbnail-wrapper {action}'.replace('{action}', action));
-                this.$('.thumbnail-action .action-icon').attr('class', 'action-icon {action}'.replace('{action}', action));
+                this.$('.thumbnail-action .action-icon')
+                    .attr('class', 'action-icon {action}'.replace('{action}', action));
 
                 // Add error class if it was already present.
                 if (hasError) {
@@ -297,7 +298,7 @@ define(
                 // Don't show edit-container layout on progress action.
                 if (action === 'progress') {
                     this.$('.thumbnail-action .edit-container').toggle(false);
-                } else if (action == 'edit') {
+                } else if (action === 'edit') {
                     this.$('.thumbnail-action .edit-container').toggle(true);
                     HtmlUtils.setHtml(
                     this.$('.thumbnail-action .edit-container .action-icon'),
@@ -359,7 +360,8 @@ define(
 
                 // If image url is not this.defaultVideoImageURL then it means image is uploaded
                 // so we should treat it as edit action otherwise default upload action.
-                this.action = this.$('.thumbnail-wrapper img').attr('src') !== this.defaultVideoImageURL ? 'edit' : 'upload';
+                this.action = this.$('.thumbnail-wrapper img').attr('src') !== this.defaultVideoImageURL
+                                ? 'edit' : 'upload';
                 this.setActionInfo(this.action, true);
                 this.readMessages([gettext('Could not upload the video image file'), errorText]);
 

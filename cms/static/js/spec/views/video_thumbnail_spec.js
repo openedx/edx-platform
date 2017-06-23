@@ -201,7 +201,7 @@ define(
 
                 AjaxHelpers.respondWithError(requests, 400);
 
-                verifyStateInfo($thumbnail, 'error');
+                verifyStateInfo($thumbnail, 'edit');
             });
 
             it('calls readMessage with correct message', function() {
