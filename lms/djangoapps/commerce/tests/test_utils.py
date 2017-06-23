@@ -97,7 +97,9 @@ class EcommerceServiceTests(TestCase):
     def test_get_checkout_page_url(self, skus):
         """ Verify the checkout page URL is properly constructed and returned. """
         url = EcommerceService().get_checkout_page_url(*skus)
-        expected_url = '{root}/test_basket/?{skus}'.format(
+        config = CommerceConfiguration.current()
+        expected_url = '{root}{basket_url}?{skus}'.format(
+            basket_url=config.MULTIPLE_ITEMS_BASKET_PAGE_URL,
             root=settings.ECOMMERCE_PUBLIC_URL_ROOT,
             skus=urlencode({'sku': skus}, doseq=True),
         )

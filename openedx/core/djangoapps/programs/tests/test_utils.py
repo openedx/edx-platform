@@ -872,6 +872,19 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         self.program['applicable_seat_types'] = [seat['type']]
         return seat
 
+    def _update_discount_data(self, mock_discount_data):
+        """
+        Helper method that updates mocked discount data with
+            - a flag indicating whether the program price is discounted
+            - the amount of the discount (0 in case there's no discount)
+        """
+        program_discounted_price = mock_discount_data['total_incl_tax']
+        program_full_price = mock_discount_data['total_incl_tax_excl_discounts']
+        mock_discount_data.update({
+            'is_discounted': program_discounted_price < program_full_price,
+            'discount_value': program_full_price - program_discounted_price
+        })
+
     def test_instructors(self):
         data = ProgramMarketingDataExtender(self.program, self.user).extend()
 
@@ -887,10 +900,13 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         self.assertEqual(data['avg_price_per_course'], program_full_price / self.number_of_courses)
 
     def test_course_pricing_when_all_course_runs_have_no_seats(self):
-        course = ModuleStoreCourseFactory()
-        course = self.update_course(course, self.user.id)
-        course_run = CourseRunFactory(key=unicode(course.id), seats=[])
-        program = ProgramFactory(courses=[CourseFactory(course_runs=[course_run])])
+        # Create three seatless course runs and add them to the program
+        course_runs = []
+        for __ in range(3):
+            course = ModuleStoreCourseFactory()
+            course = self.update_course(course, self.user.id)
+            course_runs.append(CourseRunFactory(key=unicode(course.id), seats=[]))
+        program = ProgramFactory(courses=[CourseFactory(course_runs=course_runs)])
 
         data = ProgramMarketingDataExtender(program, self.user).extend()
 
@@ -988,7 +1004,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         self._prepare_program_for_discounted_price_calculation_endpoint()
         mock_discount_data = {
             'total_incl_tax_excl_discounts': 200.0,
-            'currency': "USD",
+            'currency': 'USD',
             'total_incl_tax': 50.0
         }
         httpretty.register_uri(
@@ -999,6 +1015,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         )
 
         data = ProgramMarketingDataExtender(self.program, self.user).extend()
+        self._update_discount_data(mock_discount_data)
 
         self.assertEqual(
             data['skus'],
@@ -1015,7 +1032,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         self._prepare_program_for_discounted_price_calculation_endpoint()
         mock_discount_data = {
             'total_incl_tax_excl_discounts': 200.0,
-            'currency': "USD",
+            'currency': 'USD',
             'total_incl_tax': 50.0
         }
         httpretty.register_uri(
@@ -1026,6 +1043,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         )
 
         data = ProgramMarketingDataExtender(self.program, AnonymousUserFactory()).extend()
+        self._update_discount_data(mock_discount_data)
 
         self.assertEqual(
             data['skus'],
