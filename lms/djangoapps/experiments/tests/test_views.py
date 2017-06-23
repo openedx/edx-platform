@@ -96,8 +96,32 @@ class ExperimentDataViewSetTests(APITestCase):
         response = self.client.post(url, {})
         self.assertEqual(response.status_code, 401)
 
-        self.assert_data_created_for_user(UserFactory())
-        self.assert_data_created_for_user(UserFactory())
+        user = UserFactory()
+        data = {
+            'experiment_id': 1,
+            'key': 'foo',
+            'value': 'bar',
+        }
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
+
+        # Users can create data for themselves
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 201)
+        ExperimentData.objects.get(user=user)
+
+        # A non-staff user cannot create data for another user
+        other_user = UserFactory()
+        data['user'] = other_user.username
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(ExperimentData.objects.filter(user=other_user).exists())
+
+        # A staff user can create data for other users
+        user.is_staff = True
+        user.save()
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 201)
+        ExperimentData.objects.get(user=other_user)
 
     def test_put_as_create(self):
         """ Users should be able to use PUT to create new data. """
