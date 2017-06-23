@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'gettext', 'jquery', 'underscore', 'backbone', 'logger', 'moment', 'edx-ui-toolkit/js/utils/html-utils',
         'common/js/components/views/paging_header', 'common/js/components/views/paging_footer',
