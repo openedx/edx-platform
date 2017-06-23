@@ -1001,7 +1001,11 @@ class TestProgramMarketingView(SharedModuleStoreTestCase):
         course_run = CourseRunFactory(key=unicode(modulestore_course.id))  # pylint: disable=no-member
         course = CatalogCourseFactory(course_runs=[course_run])
 
-        cls.data = ProgramFactory(uuid=cls.program_uuid, courses=[course])
+        cls.data = ProgramFactory(
+            courses=[course],
+            is_program_eligible_for_one_click_purchase=False,
+            uuid=cls.program_uuid,
+        )
 
     def test_404_if_no_data(self, mock_cache):
         """
