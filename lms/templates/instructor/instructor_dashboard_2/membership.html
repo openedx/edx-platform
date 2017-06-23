@@ -64,7 +64,8 @@ from django.utils.translation import ugettext as _
     </div>
     <div class="enroll-option">
         <label class="has-hint">
-            <input type="checkbox" name="email-students" id="email-students" value="Notify-students-by-email" checked="yes" aria-describedby="heading-batch-enrollment">
+          <input type="checkbox" name="email-students" id="email-students" value="Notify-students-by-email" aria-describedby="heading-batch-enrollment"
+                 ${'checked="yes"' if settings.FEATURES.get('BATCH_ENROLLMENT_NOTIFY_USERS_DEFAULT') else ''}>
             <span class="label-text">${_("Notify users by email")}</span>
             <div class="hint email-students-hint">
                 <span class="hint-caret"></span>
