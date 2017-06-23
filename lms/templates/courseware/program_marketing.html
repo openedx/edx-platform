@@ -66,14 +66,11 @@ description_max_length = 250
           <h1 class="banner-title">${title}</h1>
           <p class="banner-description">${subtitle}</p>
           % if program.get('is_learner_eligible_for_one_click_purchase'):
-            <a href="${buy_button_href}" class="btn-brand btn-large hidden-sm btn-start">
-              ${Text(_('Buy the {program_name} (${price} USD)')).format(
-                program_name=title,
-                price=program['price_ranges'][0]['total']
-              )}
+            <a href="${buy_button_href}" class="btn-brand btn-large btn-start">
+              ${_('Purchase the Program')}
             </a>
           % else:
-            <a href="#courses" class="btn-brand btn-large hidden-sm btn-start">
+            <a href="#courses" class="btn-brand btn-large btn-start">
               ${_('Start Learning')}
             </a>
           % endif
@@ -81,7 +78,7 @@ description_max_length = 250
         <div class="col col-12 md-col-4 lg-col-3" id="course-trailer">
           <a href="#video-modal" class="media trailer-link visible-sm" rel="leanModal">
             <i class="fa fa-play-circle-o" aria-hidden="true"></i>
-            <span>${_('View Course Trailer')}</span>
+            <span>${_('View Program Trailer')}</span>
           </a>
           <div class="hidden-sm">
             <button href="#video-modal" class="media btn-play" rel="leanModal">
@@ -148,19 +145,21 @@ description_max_length = 250
           <div class="accordion-item">
             <div class="accordion-head">${_('Overview')}</div>
             <div class="accordion-content">
-              <p>${overview}</p>
+              <p>${HTML(overview)}</p>
             </div>
           </div>
-          <div class="accordion-item">
-            <div class="accordion-head">${_('Job Outlook')}</div>
-            <div class="accordion-content">
-              <ul class="list-bulleted list-disc no-indent">
-                % for item in job_outlook_items:
-                  <li>${item}</li>
-                % endfor
-              </ul>
-            </div>
-          </div>
+          % if job_outlook_items:
+              <div class="accordion-item">
+                <div class="accordion-head">${_('Job Outlook')}</div>
+                <div class="accordion-content">
+                  <ul class="list-bulleted list-disc no-indent">
+                    % for item in job_outlook_items:
+                      <li>${item}</li>
+                    % endfor
+                  </ul>
+                </div>
+              </div>
+          % endif
           <div class="accordion-item">
             <div class="accordion-head">${_("What You'll Learn")}</div>
             <div class="accordion-content">
@@ -216,7 +215,7 @@ description_max_length = 250
                             </h3>
                           </div>
                         </div>
-                        <div class="instructor-bio">${instructor['bio']}</div>
+                        <div class="instructor-bio">${HTML(instructor['bio'])}</div>
                       </div>
                       <a href="#" class="focusKeeper"></a>
                     </div>
@@ -250,8 +249,10 @@ description_max_length = 250
           <div class="quote">
             % if endorsement:
               <span>"${endorsement_quote}"</span>
-                % if endorser and endorsement_image:
-                  <img class="visible-sm pull-left" src="${endorsement_image}" width="40" height="40" alt="${_('Endorser Image')}"/>
+                % if endorser:
+                  % if endorsement_image:
+                    <img class="visible-sm pull-left" src="${endorsement_image}" width="40" height="40" alt="${_('Endorser Image')}"/>
+                  % endif
                   <span class="writer">
                     ${endorsement_name},
                     ${endorsement_position},
@@ -308,7 +309,7 @@ description_max_length = 250
                       </h3>
                     </div>
                   </div>
-                  <div class="instructor-bio">${instructor['bio']}</div>
+                  <div class="instructor-bio">${HTML(instructor['bio'])}</div>
                 </div>
                 <a href="#" class="focusKeeper"></a>
               </div>
