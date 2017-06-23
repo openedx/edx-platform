@@ -5,7 +5,7 @@ from rest_framework.filters import DjangoFilterBackend
 from experiments import filters
 from experiments.models import ExperimentData
 from experiments.permissions import IsStaffOrOwner
-from experiments.serializers import ExperimentDataSerializer
+from experiments.serializers import ExperimentDataCreateSerializer, ExperimentDataSerializer
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 
 
@@ -20,6 +20,11 @@ class ExperimentDataViewSet(viewsets.ModelViewSet):
     def filter_queryset(self, queryset):
         queryset = queryset.filter(user=self.request.user)
         return super(ExperimentDataViewSet, self).filter_queryset(queryset)
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return ExperimentDataCreateSerializer
+        return ExperimentDataSerializer
 
     def create_or_update(self, request, *args, **kwargs):
         # If we have a primary key, treat this as a regular update request
@@ -40,4 +45,5 @@ class ExperimentDataViewSet(viewsets.ModelViewSet):
             except ExperimentData.DoesNotExist:
                 pass
 
+        self.action = 'create'
         return self.create(request, *args, **kwargs)

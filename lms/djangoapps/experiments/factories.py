@@ -10,5 +10,5 @@ class ExperimentDataFactory(factory.DjangoModelFactory):
 
     user = factory.SubFactory(UserFactory)
     experiment_id = factory.fuzzy.FuzzyInteger(0)
-    key = factory.Faker('word')
+    key = factory.Sequence(lambda n: n)
     value = factory.Faker('word')
