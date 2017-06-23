@@ -196,7 +196,7 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
 
     def test_default(self):
         suite = Pa11yCrawler(
-            'pa11ycrawler', course_key="course-v1:edX+Test101+course",
+            'pa11ycrawler', course_key="course-v1:edX+TC102+course",
         )
         ignore = (
             "pa11y_ignore_rules_url="
@@ -210,7 +210,7 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
             "-a",
             "port=8003",
             "-a",
-            "course_key=course-v1:edX+Test101+course",
+            "course_key=course-v1:edX+TC102+course",
             "-a",
             ignore,
             "-a",

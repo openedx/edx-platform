@@ -126,7 +126,7 @@ def pa11ycrawler(options, passthrough_options):
         'should_fetch_course',
         not options.get('fasttest')
     )
-    options.pa11ycrawler.course_key = getattr(options, 'course-key', "course-v1:edX+Test101+course")
+    options.pa11ycrawler.course_key = getattr(options, 'course-key', "course-v1:edX+TC102+course")
     test_suite = Pa11yCrawler('pa11ycrawler', passthrough_options=passthrough_options, **options.pa11ycrawler)
     test_suite.run()
 
