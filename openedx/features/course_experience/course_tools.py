@@ -35,7 +35,7 @@ class CourseTool(object):
     def icon_classes(cls, course_key):
         """
         Returns the icon classes needed to represent this tool.
-        
+
         For example, return an icon from font-awasome.css, like 'fa fa-star'.
         """
         raise NotImplementedError("Must specify an icon for a course tool.")
