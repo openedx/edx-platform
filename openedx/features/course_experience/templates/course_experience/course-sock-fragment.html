@@ -5,11 +5,11 @@
 
 <%!
 from openedx.core.djangolib.markup import HTML
-from openedx.features.course_experience import DISPLAY_COURSE_SOCK
+from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 %>
 
 <%block name="content">
-    % if show_course_sock and DISPLAY_COURSE_SOCK.is_enabled(course_id):
+    % if show_course_sock and DISPLAY_COURSE_SOCK_FLAG.is_enabled(course_id):
     <div class="verification-sock">
         <button type="button" class="btn btn-brand focusable action-toggle-verification-sock">
             Learn About Verified Certificate

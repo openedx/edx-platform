@@ -389,6 +389,10 @@ FEATURES = {
     'DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR': False,
 }
 
+# Settings for the course reviews tool template and identification key, set either to None to disable course reviews
+COURSE_REVIEWS_TOOL_PROVIDER_FRAGMENT_NAME = 'coursetalk-reviews-fragment.html'
+COURSE_REVIEWS_TOOL_PROVIDER_PLATFORM_KEY = 'edx'
+
 # Ignore static asset files on import which match this pattern
 ASSET_IGNORE_REGEX = r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)"
 
@@ -2171,9 +2175,6 @@ INSTALLED_APPS = (
 
     # Static i18n support
     'statici18n',
-
-    # Review widgets
-    'openedx.core.djangoapps.coursetalk',
 
     # API access administration
     'openedx.core.djangoapps.api_admin',

@@ -6,7 +6,6 @@ import logging
 import urllib
 from collections import OrderedDict, namedtuple
 from datetime import datetime, timedelta
-from pytz import utc
 
 import analytics
 from django.conf import settings
@@ -31,6 +30,7 @@ from ipware.ip import get_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from pytz import utc
 from rest_framework import status
 from web_fragments.fragment import Fragment
 
@@ -74,7 +74,6 @@ from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.coursetalk.helpers import inject_coursetalk_keys_into_context
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
     is_credit_course,
@@ -86,7 +85,7 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, UNIFIED_COURSE_VIEW_FLAG, course_home_url_name
+from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.utils import is_shopping_cart_enabled
@@ -325,6 +324,14 @@ def course_info(request, course_id):
             if SelfPacedConfiguration.current().enable_course_home_improvements:
                 dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id)
 
+        # This local import is due to the circularity of lms and openedx references.
+        # This may be resolved by using stevedore to allow web fragments to be used
+        # as plugins, and to avoid the direct import.
+        from openedx.features.course_experience.views.course_reviews import CourseReviewsModuleFragmentView
+
+        # Decide whether or not to show the reviews link in the course tools bar
+        show_reviews_link = CourseReviewsModuleFragmentView.is_configured()
+
         context = {
             'request': request,
             'masquerade_user': user,
@@ -339,6 +346,7 @@ def course_info(request, course_id):
             'user_is_enrolled': user_is_enrolled,
             'dates_fragment': dates_fragment,
             'url_to_enroll': url_to_enroll,
+            'show_reviews_link': show_reviews_link,
             # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
             'upgrade_link': check_and_get_upgrade_link(request, user, course.id),
             'upgrade_price': get_cosmetic_verified_display_price(course),
@@ -355,9 +363,6 @@ def course_info(request, course_id):
             # course is not yet visible to students.
             context['disable_student_access'] = True
             context['supports_preview_menu'] = False
-
-        if CourseEnrollment.is_enrolled(request.user, course.id):
-            inject_coursetalk_keys_into_context(context, course_key)
 
         return render_to_response('courseware/info.html', context)
 
@@ -695,7 +700,6 @@ def course_about(request, course_id):
     """
     Display the course's about page.
     """
-
     course_key = CourseKey.from_string(course_id)
 
     if hasattr(course_key, 'ccx'):
@@ -777,7 +781,7 @@ def course_about(request, course_id):
         # - Student is already registered for course
         # - Course is already full
         # - Student cannot enroll in course
-        active_reg_button = not(registered or is_course_full or not can_enroll)
+        active_reg_button = not (registered or is_course_full or not can_enroll)
 
         is_shib_course = uses_shib(course)
 
@@ -786,6 +790,14 @@ def course_about(request, course_id):
 
         # Overview
         overview = CourseOverview.get_from_id(course.id)
+
+        # This local import is due to the circularity of lms and openedx references.
+        # This may be resolved by using stevedore to allow web fragments to be used
+        # as plugins, and to avoid the direct import.
+        from openedx.features.course_experience.views.course_reviews import CourseReviewsModuleFragmentView
+
+        # Embed the course reviews tool
+        reviews_fragment_view = CourseReviewsModuleFragmentView().render_to_fragment(request, course=course)
 
         context = {
             'course': course,
@@ -815,8 +827,8 @@ def course_about(request, course_id):
             'cart_link': reverse('shoppingcart.views.show_cart'),
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
+            'reviews_fragment_view': reviews_fragment_view,
         }
-        inject_coursetalk_keys_into_context(context, course_key)
 
         return render_to_response('courseware/course_about.html', context)
 
