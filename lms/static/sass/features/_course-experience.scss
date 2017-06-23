@@ -10,6 +10,10 @@
     font-weight: $font-bold;
     color: $black;
   }
+
+  .dismiss-message {
+      @include float(right);
+  }
 }
 
 // Course sidebar
