@@ -313,14 +313,10 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_ecommerce_checkout_redirect(self):
         """Verify the block link redirects to ecommerce checkout if it's enabled."""
         sku = 'TESTSKU'
-        checkout_page = '/test_basket/'
-        CommerceConfiguration.objects.create(
-            checkout_on_ecommerce_service=True,
-            single_course_checkout_page=checkout_page
-        )
+        configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
         self.setup_course_and_user(sku=sku)
         block = VerifiedUpgradeDeadlineDate(self.course, self.user)
-        self.assertEqual(block.link, '{}?sku={}'.format(checkout_page, sku))
+        self.assertEqual(block.link, '{}?sku={}'.format(configuration.MULTIPLE_ITEMS_BASKET_PAGE_URL, sku))
 
     ## VerificationDeadlineDate
     def test_no_verification_deadline(self):

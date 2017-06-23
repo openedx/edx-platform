@@ -469,12 +469,8 @@ class ViewsTestCase(ModuleStoreTestCase):
             _id(bool): Tell the method to either expect an id in the href or not.
 
         """
-        checkout_page = '/test_basket/'
         sku = 'TEST123'
-        CommerceConfiguration.objects.create(
-            checkout_on_ecommerce_service=True,
-            single_course_checkout_page=checkout_page
-        )
+        configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
         course = CourseFactory.create()
         CourseModeFactory(mode_slug=CourseMode.PROFESSIONAL, course_id=course.id, sku=sku, min_price=1)
 
@@ -486,7 +482,10 @@ class ViewsTestCase(ModuleStoreTestCase):
         # Construct the link according the following scenarios and verify its presence in the response:
         #      (1) shopping cart is enabled and the user is not logged in
         #      (2) shopping cart is enabled and the user is logged in
-        href = '<a href="{uri_stem}?sku={sku}" class="add-to-cart">'.format(uri_stem=checkout_page, sku=sku)
+        href = '<a href="{uri_stem}?sku={sku}" class="add-to-cart">'.format(
+            uri_stem=configuration.MULTIPLE_ITEMS_BASKET_PAGE_URL,
+            sku=sku,
+        )
 
         # Generate the course about page content
         response = self.client.get(reverse('about_course', args=[unicode(course.id)]))

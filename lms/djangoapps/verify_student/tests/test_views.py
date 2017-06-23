@@ -131,7 +131,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     )
     def test_start_flow_with_ecommerce(self):
         """Verify user gets redirected to ecommerce checkout when ecommerce checkout is enabled."""
-        checkout_page = '/test_basket/'
         sku = 'TESTSKU'
         # When passing a SKU ecommerce api gets called.
         httpretty.register_uri(
@@ -140,11 +139,10 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             body=json.dumps(['foo', 'bar']),
             content_type="application/json",
         )
+        configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
+        checkout_page = configuration.MULTIPLE_ITEMS_BASKET_PAGE_URL
         httpretty.register_uri(httpretty.GET, "{}{}".format(TEST_PUBLIC_URL_ROOT, checkout_page))
-        CommerceConfiguration.objects.create(
-            checkout_on_ecommerce_service=True,
-            single_course_checkout_page=checkout_page
-        )
+
         course = self._create_course('verified', sku=sku)
         self._enroll(course.id)
         response = self._get_page('verify_student_start_flow', course.id, expected_status_code=302)
