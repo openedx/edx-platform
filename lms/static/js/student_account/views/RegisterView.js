@@ -37,6 +37,7 @@
                     this.errorMessage = data.thirdPartyAuth.errorMessage || '';
                     this.platformName = data.platformName;
                     this.autoSubmit = data.thirdPartyAuth.autoSubmitRegForm;
+                    this.hideAuthWarnings = data.hideAuthWarnings;
 
                     this.listenTo(this.model, 'sync', this.saveSuccess);
                 },
@@ -63,7 +64,7 @@
                     // Must be called after postRender, since postRender sets up $formFeedback.
                     if (this.errorMessage) {
                         this.renderErrors(formErrorsTitle, [this.errorMessage]);
-                    } else if (this.currentProvider) {
+                    } else if (this.currentProvider && !this.hideAuthWarnings) {
                         this.renderAuthWarning();
                     }
 

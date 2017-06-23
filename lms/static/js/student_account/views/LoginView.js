@@ -48,6 +48,7 @@
                 this.passwordResetSupportUrl = data.passwordResetSupportUrl;
                 this.createAccountOption = data.createAccountOption;
                 this.accountActivationMessages = data.accountActivationMessages;
+                this.hideAuthWarnings = data.hideAuthWarnings;
 
                 this.listenTo(this.model, 'sync', this.saveSuccess);
                 this.listenTo(this.resetModel, 'sync', this.resetEmail);
@@ -193,8 +194,10 @@
                 if (error.status === 403 &&
                  error.responseText === 'third-party-auth' &&
                  this.currentProvider) {
-                    this.clearFormErrors();
-                    this.renderAuthWarning();
+                    if (!this.hideAuthWarnings) {
+                        this.clearFormErrors();
+                        this.renderAuthWarning();
+                    }
                 } else {
                     this.renderErrors(this.defaultFormErrorsTitle, this.errors);
                 }
