@@ -75,7 +75,7 @@ from openedx.features.course_experience.course_tools import CourseToolsPluginMan
                         <h3 class="hd-6">${_("Course Tools")}</h3>
                         <ul class="list-unstyled">
                             % for course_tool in course_tools:
-                                % if course_tool.is_enabled(course_key):
+                                % if course_tool.is_enabled(request, course_key):
                                     <li>
                                         <a href="${course_tool.url(course_key)}">
                                             <span class="icon ${course_tool.icon_classes()}" aria-hidden="true"></span>

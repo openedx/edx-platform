@@ -3,13 +3,15 @@ Platform plugins to support the course experience.
 
 This includes any locally defined CourseTools.
 """
-
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from . import UNIFIED_COURSE_TAB_FLAG, SHOW_REVIEWS_TOOL_FLAG
-from views.course_reviews import CourseReviewsModuleFragmentView
 from course_tools import CourseTool
+from courseware.courses import get_course_by_id
+from views.course_reviews import CourseReviewsModuleFragmentView
+from views.course_updates import CourseUpdatesFragmentView
+
+from . import SHOW_REVIEWS_TOOL_FLAG, UNIFIED_COURSE_TAB_FLAG
 
 
 class CourseUpdatesTool(CourseTool):
@@ -31,11 +33,13 @@ class CourseUpdatesTool(CourseTool):
         return 'fa fa-newspaper-o'
 
     @classmethod
-    def is_enabled(cls, course_key):
+    def is_enabled(cls, request, course_key):
         """
         Returns True if this tool is enabled for the specified course key.
         """
-        return UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key)
+        course = get_course_by_id(course_key)
+        has_updates = CourseUpdatesFragmentView.has_updates(request, course)
+        return UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key) and has_updates
 
     @classmethod
     def url(cls, course_key):
@@ -64,7 +68,7 @@ class CourseReviewsTool(CourseTool):
         return 'fa fa-star'
 
     @classmethod
-    def is_enabled(cls, course_key):
+    def is_enabled(cls, request, course_key):
         """
         Returns True if this tool is enabled for the specified course key.
         """
