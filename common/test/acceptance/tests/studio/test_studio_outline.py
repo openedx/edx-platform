@@ -21,7 +21,7 @@ from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettin
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
 from common.test.acceptance.pages.studio.utils import add_discussion, drag, verify_ordering
 from common.test.acceptance.tests.helpers import create_user_partition_json, disable_animations, load_data_str
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID, Group
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group
 
 SECTION_NAME = 'Test Section'
 SUBSECTION_NAME = 'Test Subsection'
@@ -207,17 +207,17 @@ class WarningMessagesTest(CourseOutlineTest):
                 XBlockFixtureDesc('vertical', name, metadata={
                     'visible_to_staff_only': True if unit_state.is_locked else None,
                     # Below 1 is the hardcoded group ID for Audit
-                    'group_access': {ENROLLMENT_TRACK_PARTITION_ID: [1]} if unit_state.is_restricted else {},
+                    'group_access': {MINIMUM_STATIC_PARTITION_ID: [MINIMUM_STATIC_PARTITION_ID + 1]} if unit_state.is_restricted else {},
                     'user_partitions': [
                         create_user_partition_json(
-                            ENROLLMENT_TRACK_PARTITION_ID,
+                            MINIMUM_STATIC_PARTITION_ID,
                             'Name of Enrollment Track Partition',
                             'Enrollment Track Partition',
                             [
-                                Group(1, 'Audit'),
-                                Group(2, 'Verified')
+                                Group(MINIMUM_STATIC_PARTITION_ID + 1, 'Group A'),
+                                Group(MINIMUM_STATIC_PARTITION_ID + 2, 'Group B')
                             ],
-                            scheme="enrollment_track"
+                            scheme="cohort"
                         )
                     ],
                 })
@@ -380,8 +380,7 @@ class WarningMessagesTest(CourseOutlineTest):
             self.assertEqual(unit.status_message, self.STAFF_ONLY_WARNING)
         else:
             self.assertFalse(section.has_status_message)
-            if not self.GROUP_RESTRICTION_WARNING:
-                self.assertFalse(subsection.has_status_message)
+            self.assertFalse(subsection.has_status_message)
             if expected_status_message:
                 self.assertEqual(unit.status_message, expected_status_message)
             else:

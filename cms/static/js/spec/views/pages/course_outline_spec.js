@@ -1618,23 +1618,23 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                 it('shows partition group information with group_access set', function() {
                     var partitions = [
                         {
-                            "scheme": "cohort",
-                            "id": 1,
-                            "groups": [
+                            scheme: 'cohort',
+                            id: 1,
+                            groups: [
                                 {
-                                    "deleted": false,
-                                    "selected": true,
-                                    "id": 2,
-                                    "name": "Group 2"
+                                    deleted: false,
+                                    selected: true,
+                                    id: 2,
+                                    name: 'Group 2'
                                 },
                                 {
-                                    "deleted": false,
-                                    "selected": true,
-                                    "id": 3,
-                                    "name": "Group 3"
+                                    deleted: false,
+                                    selected: true,
+                                    id: 3,
+                                    name: 'Group 3'
                                 }
                             ],
-                            "name": "Content Group Configuration"
+                            name: 'Content Group Configuration'
                         }
                     ];
                     var messages = getUnitStatus({
