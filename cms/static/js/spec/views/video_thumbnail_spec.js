@@ -205,8 +205,8 @@ define(
             });
 
             it('calls readMessage with correct message', function() {
-                var errorMessage = 'This image file type is not supported. Supported file types are ' +
-                                    videoThumbnailView.getVideoImageSupportedFileFormats().humanize + '.',
+                var errorMessage = 'Image upload failed. This image file type is not supported. Supported file ' +
+                    'types are ' + videoThumbnailView.getVideoImageSupportedFileFormats().humanize + '.',
                     successData = {
                         files: [createFakeImageFile()],
                         submit: function() {}
@@ -255,7 +255,7 @@ define(
                 // Verify error message
                 expect($videoListEl.find('.thumbnail-error-wrapper').find('.action-text').html()
                 .trim()).toEqual(
-                    'The selected image must be larger than ' +
+                    'Image upload failed. The selected image must be larger than ' +
                     videoThumbnailView.getVideoImageMinSize().humanize + '.'
                 );
             });
@@ -270,7 +270,7 @@ define(
                 // Verify error message
                 expect($videoListEl.find('.thumbnail-error-wrapper').find('.action-text').html()
                 .trim()).toEqual(
-                    'The selected image must be smaller than ' +
+                    'Image upload failed. The selected image must be smaller than ' +
                     videoThumbnailView.getVideoImageMaxSize().humanize + '.'
                 );
             });
@@ -307,7 +307,7 @@ define(
                 // Verify error message
                 expect($videoListEl.find('.thumbnail-error-wrapper').find('.action-text').html()
                 .trim()).toEqual(
-                    'This image file type is not supported. Supported file types are ' +
+                    'Image upload failed. This image file type is not supported. Supported file types are ' +
                     videoThumbnailView.getVideoImageSupportedFileFormats().humanize + '.'
                 );
             });

@@ -365,6 +365,7 @@ define(
                 this.setActionInfo(this.action, true);
                 this.readMessages([gettext('Could not upload the video image file'), errorText]);
 
+                errorText = gettext('Image upload failed. ') + errorText;   // eslint-disable-line no-param-reassign
                 // Add error wrapper html to current video element row.
                 $parentRowEl.before(    // safe-lint: disable=javascript-jquery-insertion
                    HtmlUtils.ensureHtml(
