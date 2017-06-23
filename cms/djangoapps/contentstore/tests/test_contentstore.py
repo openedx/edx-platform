@@ -24,7 +24,6 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import AssetLocation, CourseLocator
 from path import Path as path
 
-from common.test.utils import XssTestMixin
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
 from contentstore.utils import delete_course, reverse_course_url, reverse_url
 from contentstore.views.component import ADVANCED_COMPONENT_TYPES
@@ -1138,7 +1137,7 @@ class MiscCourseTests(ContentStoreTestCase):
 
 
 @ddt.ddt
-class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
+class ContentStoreTest(ContentStoreTestCase):
     """
     Tests for the CMS ContentStore application.
     """
@@ -1472,33 +1471,6 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         course = CourseFactory.create()
         item = ItemFactory.create(parent_location=course.location)
         self.assertIsInstance(item, SequenceDescriptor)
-
-    def test_course_index_view_with_course(self):
-        """Test viewing the index page with an existing course"""
-        CourseFactory.create(display_name='Robot Super Educational Course')
-        resp = self.client.get_html('/home/')
-        self.assertContains(
-            resp,
-            '<h3 class="course-title">Robot Super Educational Course</h3>',
-            status_code=200,
-            html=True
-        )
-
-    def test_course_index_view_xss(self):
-        """Test that the index page correctly escapes course names with script
-        tags."""
-        CourseFactory.create(
-            display_name='<script>alert("course XSS")</script>'
-        )
-
-        LibraryFactory.create(display_name='<script>alert("library XSS")</script>')
-
-        resp = self.client.get_html('/home/')
-        for xss in ('course', 'library'):
-            html = '<script>alert("{name} XSS")</script>'.format(
-                name=xss
-            )
-            self.assert_no_xss(resp, html)
 
     def test_course_overview_view_with_course(self):
         """Test viewing the course overview page with an existing course"""
@@ -1911,30 +1883,22 @@ class RerunCourseTest(ContentStoreTestCase):
             destination_course_key = CourseKey.from_string(json_resp['destination_course_key'])
         return destination_course_key
 
-    def get_course_listing_elements(self, html, course_key):
-        """Returns the elements in the course listing section of html that have the given course_key"""
-        return html.cssselect('.course-item[data-course-key="{}"]'.format(unicode(course_key)))
-
     def get_unsucceeded_course_action_elements(self, html, course_key):
         """Returns the elements in the unsucceeded course action section that have the given course_key"""
         return html.cssselect('.courses-processing li[data-course-key="{}"]'.format(unicode(course_key)))
 
     def assertInCourseListing(self, course_key):
         """
-        Asserts that the given course key is in the accessible course listing section of the html
-        and NOT in the unsucceeded course action section of the html.
+        Asserts that the given course key is NOT in the unsucceeded course action section of the html.
         """
         course_listing = lxml.html.fromstring(self.client.get_html('/home/').content)
-        self.assertEqual(len(self.get_course_listing_elements(course_listing, course_key)), 1)
         self.assertEqual(len(self.get_unsucceeded_course_action_elements(course_listing, course_key)), 0)
 
     def assertInUnsucceededCourseActions(self, course_key):
         """
-        Asserts that the given course key is in the unsucceeded course action section of the html
-        and NOT in the accessible course listing section of the html.
+        Asserts that the given course key is in the unsucceeded course action section of the html.
         """
         course_listing = lxml.html.fromstring(self.client.get_html('/home/').content)
-        self.assertEqual(len(self.get_course_listing_elements(course_listing, course_key)), 0)
         self.assertEqual(len(self.get_unsucceeded_course_action_elements(course_listing, course_key)), 1)
 
     def verify_rerun_course(self, source_course_key, destination_course_key, destination_display_name):
