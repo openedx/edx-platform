@@ -1,9 +1,10 @@
 """
 Tests for celery tasks defined in tasks module
 """
+import contextlib
 
+import mock
 from ccx_keys.locator import CCXLocator
-from mock_django import mock_signal_receiver
 
 from lms.djangoapps.ccx.tasks import send_ccx_course_published
 from lms.djangoapps.ccx.tests.factories import CcxFactory
@@ -16,8 +17,17 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@contextlib.contextmanager
+def mock_signal_receiver(signal):
+    receiver = mock.Mock()
+    signal.connect(receiver)
+    yield receiver
+    signal.disconnect(receiver)
+
+
 class TestSendCCXCoursePublished(ModuleStoreTestCase):
-    """unit tests for the send ccx course published task
+    """
+    Unit tests for the send ccx course published task
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
@@ -39,12 +49,14 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
         self.ccx4 = CcxFactory(course_id=course2.id, coach=coach)
 
     def call_fut(self, course_key):
-        """Call the function under test
+        """
+        Call the function under test
         """
         send_ccx_course_published(unicode(course_key))
 
     def test_signal_not_sent_for_ccx(self):
-        """Check that course published signal is not sent when course key is for a ccx
+        """
+        Check that course published signal is not sent when course key is for a ccx
         """
         course_key = CCXLocator.from_course_locator(self.course.id, self.ccx.id)
         with mock_signal_receiver(SignalHandler.course_published) as receiver:
@@ -52,7 +64,8 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
             self.assertEqual(receiver.call_count, 0)
 
     def test_signal_sent_for_ccx(self):
-        """Check that course published signal is sent when course key is not for a ccx.
+        """
+        Check that course published signal is sent when course key is not for a ccx.
         We have 4 ccx's, but only 3 are derived from the course id used here, so call
         count must be 3 to confirm that all derived courses and no more got the signal.
         """
@@ -61,7 +74,8 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
             self.assertEqual(receiver.call_count, 3)
 
     def test_course_structure_generated(self):
-        """Check that course structure is generated after course published signal is sent
+        """
+        Check that course structure is generated after course published signal is sent
         """
         ccx_structure = {
             u"blocks": {
@@ -88,7 +102,8 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
             self.assertEqual(structure.structure, ccx_structure)
 
     def test_course_overview_cached(self):
-        """Check that course overview is cached after course published signal is sent
+        """
+        Check that course overview is cached after course published signal is sent
         """
         course_key = CCXLocator.from_course_locator(self.course.id, self.ccx.id)
         overview = CourseOverview.objects.filter(id=course_key)

@@ -162,7 +162,6 @@ django_nose==1.4.1
 factory_boy==2.8.1
 flaky==3.3.0
 freezegun==0.3.8
-mock-django==0.6.9
 mock==1.0.1
 moto==0.3.1
 needle==0.5.0
