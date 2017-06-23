@@ -20,6 +20,10 @@
 .course-sidebar {
   @include margin-left(0);
   @include padding-left($baseline);
+
+  .section-tools li:not(:first-child) {
+    margin-top: ($baseline / 5);
+  }
 }
 
 // Course outline
@@ -193,4 +197,9 @@
       }
     }
   }
+}
+
+// Course Reviews Page
+.course-reviews-tool {
+  margin: ($baseline * 2) ($baseline * 3);
 }

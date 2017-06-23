@@ -19,6 +19,7 @@ from util.views import ensure_valid_course_key
 from ..utils import get_course_outline_block_tree
 from .course_dates import CourseDatesFragmentView
 from .course_outline import CourseOutlineFragmentView
+from .course_reviews import CourseReviewsModuleFragmentView
 from .welcome_message import WelcomeMessageFragmentView
 from .course_sock import CourseSockFragmentView
 
@@ -112,6 +113,9 @@ class CourseHomeFragmentView(EdxFragmentView):
         # Get the handouts
         handouts_html = get_course_info_section(request, request.user, course, 'handouts')
 
+        # Only show the reviews button if configured
+        show_reviews_link = CourseReviewsModuleFragmentView.is_configured()
+
         # Render the course home fragment
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -126,6 +130,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             'course_sock_fragment': course_sock_fragment,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
+            'show_reviews_link': show_reviews_link,
         }
         html = render_to_string('course_experience/course-home-fragment.html', context)
         return Fragment(html)

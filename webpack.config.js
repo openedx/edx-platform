@@ -130,6 +130,7 @@ var wpconfig = {
 
     externals: {
         backbone: 'Backbone',
+        coursetalk: 'CourseTalk',
         gettext: 'gettext',
         jquery: 'jQuery',
         logger: 'Logger',

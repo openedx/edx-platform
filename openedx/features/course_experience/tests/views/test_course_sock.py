@@ -7,7 +7,7 @@ import ddt
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.features.course_experience import DISPLAY_COURSE_SOCK
+from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -51,7 +51,7 @@ class TestCourseSockView(SharedModuleStoreTestCase):
         # Log the user in
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
-    @override_waffle_flag(DISPLAY_COURSE_SOCK, active=True)
+    @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_standard_course(self):
         """
         Assure that a course that cannot be verified does
@@ -61,7 +61,7 @@ class TestCourseSockView(SharedModuleStoreTestCase):
         self.assertEqual(self.is_verified_sock_visible(response), False,
                          'Student should not be able to see sock in a unverifiable course.')
 
-    @override_waffle_flag(DISPLAY_COURSE_SOCK, active=True)
+    @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_verified_course(self):
         """
         Assure that a course that can be verified has a
@@ -71,7 +71,7 @@ class TestCourseSockView(SharedModuleStoreTestCase):
         self.assertEqual(self.is_verified_sock_visible(response), True,
                          'Student should be able to see sock in a verifiable course.')
 
-    @override_waffle_flag(DISPLAY_COURSE_SOCK, active=True)
+    @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_verified_course_updated_expired(self):
         """
         Assure that a course that has an expired upgrade
@@ -81,7 +81,7 @@ class TestCourseSockView(SharedModuleStoreTestCase):
         self.assertEqual(self.is_verified_sock_visible(response), False,
                          'Student should be able to see sock in a verifiable course if the update expiration date has passed.')
 
-    @override_waffle_flag(DISPLAY_COURSE_SOCK, active=True)
+    @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_verified_course_user_already_upgraded(self):
         """
         Assure that a user that has already upgraded to a
