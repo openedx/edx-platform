@@ -61,7 +61,11 @@ from pipeline_mako import render_require_js_path_overrides
   <link rel="icon" type="image/x-icon" href="${static.url(static.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
   <%static:css group='style-vendor'/>
-  <%static:css group='${self.attr.main_css}'/>
+  % if uses_bootstrap:
+    <link rel="stylesheet" href="${static.url(self.attr.main_css)}" type="text/css" media="all" />
+  % else:
+    <%static:css group='${self.attr.main_css}'/>
+  % endif
 
   % if not uses_pattern_library:
     % if disable_courseware_js:
@@ -76,6 +80,11 @@ from pipeline_mako import render_require_js_path_overrides
     ## https://openedx.atlassian.net/browse/FEDX-140
     <%static:js group='base_vendor'/>
     <%static:js group='base_application'/>
+  % endif
+
+  % if uses_bootstrap:
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
   % endif
 
   <script>
@@ -131,14 +140,14 @@ from pipeline_mako import render_require_js_path_overrides
 % if not disable_window_wrap:
   <div class="window-wrap" dir="${static.dir_rtl()}">
 % endif
-    <a class="nav-skip" href="#main">${_("Skip to main content")}</a>
+    <a class="nav-skip sr-only sr-only-focusable" href="#main">${_("Skip to main content")}</a>
 
     % if not disable_header:
         <%include file="${static.get_template_path('header.html')}" args="online_help_token=online_help_token" />
         <%include file="/preview_menu.html" />
     % endif
 
-    <div class="content-wrapper" id="content">
+    <div class="content-wrapper container main-container" id="content">
       ${self.body()}
       <%block name="bodyextra"/>
     </div>
