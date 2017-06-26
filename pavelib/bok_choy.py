@@ -110,8 +110,8 @@ def perf_report_bokchoy(options, passthrough_options):
 @timed
 def pa11ycrawler(options, passthrough_options):
     """
-    Runs pa11ycrawler against the demo-test-course to generates accessibility
-    reports. (See https://github.com/edx/demo-test-course)
+    Runs pa11ycrawler against the supported-components course to generate accessibility
+    reports. (See https://github.com/edx/supported-components)
 
     Note: Like the bok-choy tests, this can be used with the `serversonly`
     flag to get an environment running. The setup for this is the same as
