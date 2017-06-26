@@ -58,7 +58,7 @@ class TestWelcomeMessageView(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
     def tearDown(self):
-        remove_course_updates(self.course)
+        remove_course_updates(self.user, self.course)
         super(TestWelcomeMessageView, self).tearDown()
 
     def test_welcome_message(self):
