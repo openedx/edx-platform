@@ -8,7 +8,7 @@ from web_fragments.fragment import Fragment
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from courseware.date_summary import VerifiedUpgradeDeadlineDate
-from courseware.views.views import get_course_prices
+from courseware.views.views import get_cosmetic_verified_display_price
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 
 
@@ -41,11 +41,11 @@ class CourseSockFragmentView(EdxFragmentView):
         show_course_sock = has_verified_mode and not is_already_verified and not deadline_has_passed
 
         # Get the price of the course and format correctly
-        course_prices = get_course_prices(course)
+        course_price = get_cosmetic_verified_display_price(course)
 
         context = {
             'show_course_sock': show_course_sock,
-            'course_price': course_prices[1],
+            'course_price': course_price,
             'course_id': course.id
         }
 
