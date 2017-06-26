@@ -61,6 +61,10 @@ from lms.envs.common import (
     ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY,
     COURSE_MODE_DEFAULTS, DEFAULT_COURSE_ABOUT_IMAGE_URL,
 
+    # User-uploaded content
+    MEDIA_ROOT,
+    MEDIA_URL,
+
     # Django REST framework configuration
     REST_FRAMEWORK,
 
