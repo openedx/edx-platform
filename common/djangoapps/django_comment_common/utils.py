@@ -103,7 +103,7 @@ def are_permissions_roles_seeded(course_id):
         if not group_moderator_role.has_permission(per):
             return False
 
-    for per in ADMINISTRATOR_ROLE_PERMISSIONS + MODERATOR_ROLE_PERMISSIONS + GROUP_MODERATOR_ROLE_PERMISSIONS + STUDENT_ROLE_PERMISSIONS:
+    for per in ADMINISTRATOR_ROLE_PERMISSIONS + MODERATOR_ROLE_PERMISSIONS + STUDENT_ROLE_PERMISSIONS:
         if not administrator_role.has_permission(per):
             return False
 
