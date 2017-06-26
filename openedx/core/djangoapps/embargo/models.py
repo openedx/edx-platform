@@ -317,7 +317,7 @@ class RestrictedCourse(models.Model):
         # We use generic messaging unless we find something more specific,
         # but *always* return a valid URL path.
         default_path = reverse(
-            'embargo_blocked_message',
+            'embargo:blocked_message',
             kwargs={
                 'access_point': 'courseware',
                 'message_key': 'default'
@@ -336,7 +336,7 @@ class RestrictedCourse(models.Model):
             course = cls.objects.get(course_key=course_key)
             msg_key = course.message_key_for_access_point(access_point)
             return reverse(
-                'embargo_blocked_message',
+                'embargo:blocked_message',
                 kwargs={
                     'access_point': access_point,
                     'message_key': msg_key

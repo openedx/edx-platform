@@ -115,7 +115,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
             self.assertEqual(response.status_code, 200)
         else:
             redirect_url = reverse(
-                'embargo_blocked_message',
+                'embargo:blocked_message',
                 kwargs={
                     'access_point': 'courseware',
                     'message_key': 'embargo'
@@ -139,7 +139,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
         )
 
         url = reverse(
-            'embargo_blocked_message',
+            'embargo:blocked_message',
             kwargs={
                 'access_point': access_point,
                 'message_key': msg_key
