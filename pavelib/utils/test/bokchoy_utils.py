@@ -124,7 +124,7 @@ def is_mongo_running():
     """
     # The mongo command will connect to the service,
     # failing with a non-zero exit code if it cannot connect.
-    output = os.popen('mongo --host {} --eval "print(\'running\')"'.format(Env.BOK_CHOY_MONGO_HOST)).read()
+    output = os.popen('mongo --host {} --eval "print(\'running\')"'.format(Env.MONGO_HOST)).read()
     return output and "running" in output
 
 
@@ -157,7 +157,7 @@ def clear_mongo():
     """
     sh(
         "mongo --host {} {} --eval 'db.dropDatabase()' > /dev/null".format(
-            Env.BOK_CHOY_MONGO_HOST,
+            Env.MONGO_HOST,
             Env.BOK_CHOY_MONGO_DATABASE,
         )
     )
