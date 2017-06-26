@@ -144,20 +144,22 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
                     <a href="${lms_link}" rel="external" class="button view-button view-live-button"
                        title="${_('Click to open the courseware in the LMS in a new tab')}">${_("View Live")}</a>
                 </li>
-		    <%
-	            sites = configuration_helpers.get_lms_base_values(context_course.display_org_with_default,settings.SITE_NAME)
-	        %>
-		<li class="nav-item">
-		    <select name="site_name" class="form-control site_name">
-		    % if sites != settings.SITE_NAME:
-		        % for name, site in sites.items():
-			    <option value="${site}" ${'selected' if loop.first else ''}>${name}</option>
-		        % endfor
-		    % else:
-		            <option value="${settings.SITE_NAME}" ${'selected' if loop.first else ''}>${settings.SITE_NAME}</option>
-		    % endif
+                <%
+                    sites = configuration_helpers.get_lms_base_values(
+                        context_course.display_org_with_default,settings.SITE_NAME
+                    )
+                %>
+                <li class="nav-item">
+                    <select name="site_name" class="form-control site_name">
+                        % if sites != settings.SITE_NAME:
+                            % for name, site in sites.items():
+                                <option value="${site}" ${'selected' if loop and loop.first else ''}>${name}</option>
+                            % endfor
+                        % else:
+                                <option value="${settings.SITE_NAME}" selected>${settings.SITE_NAME}</option>
+                        % endif
                     </select>
-		</li>
+                </li>
             </ul>
         </nav>
     </header>
