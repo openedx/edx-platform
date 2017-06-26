@@ -1,10 +1,8 @@
 """
 Tests for the course home page.
 """
-
 from django.core.urlresolvers import reverse
-
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -18,6 +16,8 @@ TEST_PASSWORD = 'test'
 TEST_WELCOME_MESSAGE = '<h2>Welcome!</h2>'
 TEST_UPDATE_MESSAGE = '<h2>Test Update!</h2>'
 TEST_COURSE_UPDATES_TOOL = '/course/updates">'
+
+QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 
 def course_home_url(course):
@@ -105,7 +105,7 @@ class TestCourseHomePage(SharedModuleStoreTestCase):
         course_home_url(self.course)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(46):
+        with self.assertNumQueries(39, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)

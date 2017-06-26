@@ -10,8 +10,10 @@ namespace.  For example:
 
    WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
 
-   HIDE_SEARCH_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'hide_search')
+   # Use CourseWaffleFlag when you are in the context of a course.
    UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'unified_course_tab')
+   # Use WaffleFlag when outside the context of a course.
+   HIDE_SEARCH_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'hide_search')
 
 You can check these flags in code using the following:
 
@@ -43,14 +45,14 @@ To test WaffleSwitchNamespace, use the provided context managers.  For example:
         ...
 
 """
+import logging
 from abc import ABCMeta
 from contextlib import contextmanager
-import logging
-from waffle.testutils import override_switch as waffle_override_switch
-from waffle import flag_is_active, switch_is_active
-
 from opaque_keys.edx.keys import CourseKey
-from request_cache import get_request, get_cache as get_request_cache
+from request_cache import get_cache as get_request_cache, get_request
+from waffle import flag_is_active, switch_is_active
+from waffle.models import Flag
+from waffle.testutils import override_switch as waffle_override_switch
 
 from .models import WaffleFlagCourseOverrideModel
 
@@ -64,7 +66,6 @@ class WaffleNamespace(object):
     An instance of this class represents a single namespace
     (e.g. "course_experience"), and can be used to work with a set of
     flags or switches that will all share this namespace.
-
     """
     __metaclass__ = ABCMeta
 
@@ -92,7 +93,6 @@ class WaffleNamespace(object):
 
         Arguments:
             setting_name (String): The name of the flag or switch.
-
         """
         return u'{}.{}'.format(self.name, setting_name)
 
@@ -110,7 +110,6 @@ class WaffleSwitchNamespace(WaffleNamespace):
 
     All namespaced switch values are stored in a single request cache containing
     all switches for all namespaces.
-
     """
     def is_enabled(self, switch_name):
         """
@@ -174,7 +173,6 @@ class WaffleFlagNamespace(WaffleNamespace):
 
     All namespaced flag values are stored in a single request cache containing
     all flags for all namespaces.
-
     """
     __metaclass__ = ABCMeta
 
@@ -185,7 +183,7 @@ class WaffleFlagNamespace(WaffleNamespace):
         """
         return self._get_request_cache().setdefault('flags', {})
 
-    def is_flag_active(self, flag_name, check_before_waffle_callback=None):
+    def is_flag_active(self, flag_name, check_before_waffle_callback=None, flag_undefined_default=None):
         """
         Returns and caches whether the provided flag is active.
 
@@ -202,7 +200,8 @@ class WaffleFlagNamespace(WaffleNamespace):
                 check_before_waffle_callback(namespaced_flag_name) returns True
                 or False, it is cached and returned.  If it returns None, then
                 waffle is used.
-
+            flag_undefined_default (Boolean): A default value to be returned if
+                the waffle flag is to be checked, but doesn't exist.
         """
         # validate arguments
         namespaced_flag_name = self._namespaced_name(flag_name)
@@ -213,7 +212,16 @@ class WaffleFlagNamespace(WaffleNamespace):
                 value = check_before_waffle_callback(namespaced_flag_name)
 
             if value is None:
-                value = flag_is_active(get_request(), namespaced_flag_name)
+
+                if flag_undefined_default is not None:
+                    # determine if the flag is undefined in waffle
+                    try:
+                        Flag.objects.get(name=namespaced_flag_name)
+                    except Flag.DoesNotExist:
+                        value = flag_undefined_default
+
+                if value is None:
+                    value = flag_is_active(get_request(), namespaced_flag_name)
 
             self._cached_flags[namespaced_flag_name] = value
         return value
@@ -224,7 +232,7 @@ class WaffleFlag(object):
     Represents a single waffle flag, using a cached waffle namespace.
     """
 
-    def __init__(self, waffle_namespace, flag_name):
+    def __init__(self, waffle_namespace, flag_name, flag_undefined_default=None):
         """
         Initializes the waffle flag instance.
 
@@ -232,16 +240,21 @@ class WaffleFlag(object):
             waffle_namespace (WaffleFlagNamespace): Provides a cached namespace
                 for this flag.
             flag_name (String): The name of the flag (without namespacing).
-
+            flag_undefined_default (Boolean): A default value to be returned if
+                the waffle flag is to be checked, but doesn't exist.
         """
         self.waffle_namespace = waffle_namespace
         self.flag_name = flag_name
+        self.flag_undefined_default = flag_undefined_default
 
     def is_enabled(self):
         """
         Returns whether or not the flag is enabled.
         """
-        return self.waffle_namespace.is_flag_active(self.flag_name)
+        return self.waffle_namespace.is_flag_active(
+            self.flag_name,
+            flag_undefined_default=self.flag_undefined_default
+        )
 
 
 class CourseWaffleFlag(WaffleFlag):
@@ -249,7 +262,6 @@ class CourseWaffleFlag(WaffleFlag):
     Represents a single waffle flag that can be forced on/off for a course.
 
     Uses a cached waffle namespace.
-
     """
 
     def _get_course_override_callback(self, course_id):
@@ -259,7 +271,6 @@ class CourseWaffleFlag(WaffleFlag):
         Arguments:
             course_id (CourseKey): The course to check for override before
             checking waffle.
-
         """
         def course_override_callback(namespaced_flag_name):
             """
@@ -269,7 +280,6 @@ class CourseWaffleFlag(WaffleFlag):
             Arguments:
                 namespaced_flag_name (String): A namespaced version of the flag
                     to check.
-
             """
             force_override = WaffleFlagCourseOverrideModel.override_value(namespaced_flag_name, course_id)
 
@@ -287,12 +297,12 @@ class CourseWaffleFlag(WaffleFlag):
         Arguments:
             course_id (CourseKey): The course to check for override before
             checking waffle.
-
         """
         # validate arguments
         assert issubclass(type(course_id), CourseKey), "The course_id '{}' must be a CourseKey.".format(str(course_id))
 
         return self.waffle_namespace.is_flag_active(
             self.flag_name,
-            check_before_waffle_callback=self._get_course_override_callback(course_id)
+            check_before_waffle_callback=self._get_course_override_callback(course_id),
+            flag_undefined_default=self.flag_undefined_default
         )

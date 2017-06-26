@@ -1,20 +1,16 @@
 """
 Unified course experience settings and helper methods.
 """
-import waffle
-
 from django.utils.translation import ugettext as _
 
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
-from request_cache.middleware import RequestCache
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlag, WaffleFlagNamespace
 
-# Waffle flag to enable the full screen course content view along with a unified
-# course home page.
-# NOTE: This is the only legacy flag that does not use the namespace.
-UNIFIED_COURSE_VIEW_FLAG = 'unified_course_view'
 
 # Namespace for course experience waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
+
+# Waffle flag to enable the separate course outline page and full width content.
+COURSE_OUTLINE_PAGE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'course_outline_page', flag_undefined_default=True)
 
 # Waffle flag to enable a single unified "Course" tab.
 UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'unified_course_tab')
@@ -33,11 +29,14 @@ def course_home_page_title(course):  # pylint: disable=unused-argument
     return _('Course')
 
 
-def default_course_url_name(request=None):
+def default_course_url_name(course_id):
     """
     Returns the default course URL name for the current user.
+
+    Arguments:
+        course_id (CourseKey): The course id of the current course.
     """
-    if waffle.flag_is_active(request or RequestCache.get_current_request(), UNIFIED_COURSE_VIEW_FLAG):
+    if COURSE_OUTLINE_PAGE_FLAG.is_enabled(course_id):
         return 'openedx.course_experience.course_home'
     else:
         return 'courseware'

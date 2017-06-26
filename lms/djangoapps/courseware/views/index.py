@@ -31,10 +31,9 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
-from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG, default_course_url_name
+from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, default_course_url_name
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from request_cache.middleware import RequestCache
 from shoppingcart.models import CourseRegistrationCode
 from student.views import is_course_blocked
 from util.views import ensure_valid_course_key
@@ -328,7 +327,7 @@ class CoursewareIndex(View):
         Returns and creates the rendering context for the courseware.
         Also returns the table of contents for the courseware.
         """
-        course_url_name = default_course_url_name(request)
+        course_url_name = default_course_url_name(self.course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(self.course.id)})
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
@@ -348,7 +347,7 @@ class CoursewareIndex(View):
             'disable_optimizely': not WaffleSwitchNamespace('RET').is_enabled('enable_optimizely_in_courseware'),
             'section_title': None,
             'sequence_title': None,
-            'disable_accordion': waffle.flag_is_active(request, UNIFIED_COURSE_VIEW_FLAG),
+            'disable_accordion': COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
             # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
             'upgrade_link': check_and_get_upgrade_link(request, self.effective_user, self.course.id),
             'upgrade_price': get_cosmetic_verified_display_price(self.course),
