@@ -53,14 +53,11 @@ class WelcomeMessageFragmentView(EdxFragmentView):
         """
         Returns the course's welcome message or None if it doesn't have one.
         """
-        info_module = get_course_info_section_module(request, request.user, course, 'updates')
-        if not info_module:
-            return None
-
         # Return the course update with the most recent publish date
-        ordered_updates = CourseUpdatesFragmentView.order_updates(info_module.items)
+        ordered_updates = CourseUpdatesFragmentView.get_ordered_updates(request, course)
         content = None
         if ordered_updates:
+            info_module = get_course_info_section_module(request, request.user, course, 'updates')
             info_block = getattr(info_module, '_xmodule', info_module)
             content = info_block.system.replace_urls(ordered_updates[0]['content'])
 

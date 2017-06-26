@@ -18,7 +18,7 @@ class CourseTool(object):
     """
 
     @classmethod
-    def is_enabled(cls, course_key):
+    def is_enabled(cls, request, course_key):
         """
         Returns true if this tool is enabled for the specified course key.
         """
