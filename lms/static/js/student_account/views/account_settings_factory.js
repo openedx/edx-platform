@@ -17,11 +17,14 @@
             userAccountsApiUrl,
             userPreferencesApiUrl,
             accountUserId,
-            platformName
+            platformName,
+            contactEmail,
+            allowEmailChange
         ) {
             var accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
-                showLoadingError, orderNumber, getUserField, userFields, timeZoneDropdownField, countryDropdownField;
+                showLoadingError, orderNumber, getUserField, userFields, timeZoneDropdownField, countryDropdownField,
+                emailFieldView;
 
             accountSettingsElement = $('.wrapper-account-settings');
 
@@ -30,6 +33,33 @@
 
             userPreferencesModel = new UserPreferencesModel();
             userPreferencesModel.url = userPreferencesApiUrl;
+
+            if (allowEmailChange) {
+                emailFieldView = {
+                    view: new AccountSettingsFieldViews.EmailFieldView({
+                        model: userAccountModel,
+                        title: gettext('Email Address'),
+                        valueAttribute: 'email',
+                        helpMessage: StringUtils.interpolate(
+                            gettext('The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address.'),  // eslint-disable-line max-len
+                            {platform_name: platformName}
+                        ),
+                        persistChanges: true
+                    })
+                };
+            } else {
+                emailFieldView = {
+                    view: new AccountSettingsFieldViews.ReadonlyFieldView({
+                        model: userAccountModel,
+                        title: gettext('Email Address'),
+                        valueAttribute: 'email',
+                        helpMessage: StringUtils.interpolate(
+                            gettext('The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address.  To change the email address, please contact {contact_email}.'),  // eslint-disable-line max-len
+                            {platform_name: platformName, contact_email: contactEmail}
+                        )
+                    })
+                };
+            }
 
             aboutSectionsData = [
                 {
@@ -58,18 +88,7 @@
                                 persistChanges: true
                             })
                         },
-                        {
-                            view: new AccountSettingsFieldViews.EmailFieldView({
-                                model: userAccountModel,
-                                title: gettext('Email Address'),
-                                valueAttribute: 'email',
-                                helpMessage: StringUtils.interpolate(
-                                    gettext('The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address.'),  // eslint-disable-line max-len
-                                    {platform_name: platformName}
-                                ),
-                                persistChanges: true
-                            })
-                        },
+                        emailFieldView,
                         {
                             view: new AccountSettingsFieldViews.PasswordFieldView({
                                 model: userAccountModel,

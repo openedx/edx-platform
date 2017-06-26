@@ -183,10 +183,6 @@
                         padding: 11px 14px;
                         line-height: normal;
                     }
-
-                    #u-field-value-username {
-                        padding-top: ($baseline/2);
-                    }
                 }
 
                 .u-field-order {
@@ -321,6 +317,10 @@
                     border-bottom: none;
                     margin-bottom: ($baseline*2);
                 }
+            }
+
+            .u-field-readonly .u-field-value {
+                padding-top: ($baseline/2);
             }
 
             .u-field-orderHistory {
