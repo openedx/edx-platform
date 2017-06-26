@@ -5,9 +5,8 @@ import ddt
 from django.test import TestCase
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
-from waffle.testutils import override_flag
-
 from request_cache.middleware import RequestCache
+from waffle.testutils import override_flag
 
 from .. import CourseWaffleFlag, WaffleFlagNamespace
 from ..models import WaffleFlagCourseOverrideModel
@@ -50,3 +49,34 @@ class TestCourseWaffleFlag(TestCase):
                     self.NAMESPACED_FLAG_NAME,
                     self.TEST_COURSE_KEY
                 )
+
+    @ddt.data(
+        {'flag_undefined_default': None, 'result': False},
+        {'flag_undefined_default': False, 'result': False},
+        {'flag_undefined_default': True, 'result': True},
+    )
+    def test_undefined_waffle_flag(self, data):
+        """
+        Test flag with various defaults provided for undefined waffle flags.
+        """
+        RequestCache.clear_request_cache()
+
+        test_course_flag = CourseWaffleFlag(
+            self.TEST_NAMESPACE,
+            self.FLAG_NAME,
+            flag_undefined_default=data['flag_undefined_default']
+        )
+
+        with patch.object(
+            WaffleFlagCourseOverrideModel,
+            'override_value',
+            return_value=WaffleFlagCourseOverrideModel.ALL_CHOICES.unset
+        ):
+            # check twice to test that the result is properly cached
+            self.assertEqual(test_course_flag.is_enabled(self.TEST_COURSE_KEY), data['result'])
+            self.assertEqual(test_course_flag.is_enabled(self.TEST_COURSE_KEY), data['result'])
+            # result is cached, so override check should happen once
+            WaffleFlagCourseOverrideModel.override_value.assert_called_once_with(
+                self.NAMESPACED_FLAG_NAME,
+                self.TEST_COURSE_KEY
+            )

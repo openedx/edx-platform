@@ -8,24 +8,24 @@ from datetime import datetime
 import ddt
 import mock
 from ccx_keys.locator import CCXLocator
+from courseware.field_overrides import OverrideFieldData
+from courseware.testutils import FieldOverrideTestMixin
+from courseware.views.views import progress
 from django.conf import settings
 from django.core.cache import caches
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from lms.djangoapps.ccx.tests.factories import CcxFactory
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
-from xblock.core import XBlock
-
-from courseware.field_overrides import OverrideFieldData
-from courseware.testutils import FieldOverrideTestMixin
-from courseware.views.views import progress
-from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from pytz import UTC
 from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
+from xblock.core import XBlock
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MONGO_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
@@ -33,6 +33,8 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_sum_of_calls
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
+
+QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 
 @attr(shard=3)
@@ -181,7 +183,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
             # can actually take affect.
             OverrideFieldData.provider_classes = None
 
-            with self.assertNumQueries(sql_queries, using='default'):
+            with self.assertNumQueries(sql_queries, using='default', table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
                 with self.assertNumQueries(0, using='student_module_history'):
                     with self.assertMongoCallCount(mongo_reads):
                         with self.assertXBlockInstantiations(1):
@@ -235,18 +237,18 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
         #     # of sql queries to default,
         #     # of mongo queries,
         # )
-        ('no_overrides', 1, True, False): (27, 1),
-        ('no_overrides', 2, True, False): (27, 1),
-        ('no_overrides', 3, True, False): (27, 1),
-        ('ccx', 1, True, False): (27, 1),
-        ('ccx', 2, True, False): (27, 1),
-        ('ccx', 3, True, False): (27, 1),
-        ('no_overrides', 1, False, False): (27, 1),
-        ('no_overrides', 2, False, False): (27, 1),
-        ('no_overrides', 3, False, False): (27, 1),
-        ('ccx', 1, False, False): (27, 1),
-        ('ccx', 2, False, False): (27, 1),
-        ('ccx', 3, False, False): (27, 1),
+        ('no_overrides', 1, True, False): (23, 1),
+        ('no_overrides', 2, True, False): (23, 1),
+        ('no_overrides', 3, True, False): (23, 1),
+        ('ccx', 1, True, False): (23, 1),
+        ('ccx', 2, True, False): (23, 1),
+        ('ccx', 3, True, False): (23, 1),
+        ('no_overrides', 1, False, False): (23, 1),
+        ('no_overrides', 2, False, False): (23, 1),
+        ('no_overrides', 3, False, False): (23, 1),
+        ('ccx', 1, False, False): (23, 1),
+        ('ccx', 2, False, False): (23, 1),
+        ('ccx', 3, False, False): (23, 1),
     }
 
 
@@ -258,19 +260,19 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     TEST_DATA = {
-        ('no_overrides', 1, True, False): (27, 3),
-        ('no_overrides', 2, True, False): (27, 3),
-        ('no_overrides', 3, True, False): (27, 3),
-        ('ccx', 1, True, False): (27, 3),
-        ('ccx', 2, True, False): (27, 3),
-        ('ccx', 3, True, False): (27, 3),
-        ('ccx', 1, True, True): (28, 3),
-        ('ccx', 2, True, True): (28, 3),
-        ('ccx', 3, True, True): (28, 3),
-        ('no_overrides', 1, False, False): (27, 3),
-        ('no_overrides', 2, False, False): (27, 3),
-        ('no_overrides', 3, False, False): (27, 3),
-        ('ccx', 1, False, False): (27, 3),
-        ('ccx', 2, False, False): (27, 3),
-        ('ccx', 3, False, False): (27, 3),
+        ('no_overrides', 1, True, False): (23, 3),
+        ('no_overrides', 2, True, False): (23, 3),
+        ('no_overrides', 3, True, False): (23, 3),
+        ('ccx', 1, True, False): (23, 3),
+        ('ccx', 2, True, False): (23, 3),
+        ('ccx', 3, True, False): (23, 3),
+        ('ccx', 1, True, True): (24, 3),
+        ('ccx', 2, True, True): (24, 3),
+        ('ccx', 3, True, True): (24, 3),
+        ('no_overrides', 1, False, False): (23, 3),
+        ('no_overrides', 2, False, False): (23, 3),
+        ('no_overrides', 3, False, False): (23, 3),
+        ('ccx', 1, False, False): (23, 3),
+        ('ccx', 2, False, False): (23, 3),
+        ('ccx', 3, False, False): (23, 3),
     }

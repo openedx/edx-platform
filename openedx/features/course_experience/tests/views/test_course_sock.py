@@ -4,15 +4,14 @@ Tests for course verification sock
 
 import datetime
 import ddt
-from django.template.loader import render_to_string
 
 from course_modes.models import CourseMode
-from courseware.views.views import get_course_prices
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
 from .test_course_home import course_home_url
 
 TEST_PASSWORD = 'test'

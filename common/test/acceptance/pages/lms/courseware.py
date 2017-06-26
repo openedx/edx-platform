@@ -355,7 +355,7 @@ class CourseNavPage(PageObject):
         super(CourseNavPage, self).__init__(browser)
         self.parent_page = parent_page
         # TODO: TNL-6546: Remove the following
-        self.unified_course_view = False
+        self.course_outline_page = False
 
     def is_browser_on_page(self):
         return self.parent_page.is_browser_on_page
@@ -579,11 +579,11 @@ class CourseNavPage(PageObject):
         """
         return self.q(css='.chapter-content-container .menu-item.active a').attrs('href')[0]
 
-    # TODO: TNL-6546: Remove all references to self.unified_course_view
+    # TODO: TNL-6546: Remove all references to self.course_outline_page
     # TODO: TNL-6546: Remove the following function
-    def visit_unified_course_view(self):
-        # use unified_course_view version of the nav
-        self.unified_course_view = True
-        # reload the same page with the unified course view
-        self.browser.get(self.browser.current_url + "&unified_course_view=1")
+    def visit_course_outline_page(self):
+        # use course_outline_page version of the nav
+        self.course_outline_page = True
+        # reload the same page with the course_outline_page flag
+        self.browser.get(self.browser.current_url + "&course_experience.course_outline_page=1")
         self.wait_for_page()

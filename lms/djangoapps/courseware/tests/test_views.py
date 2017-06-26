@@ -10,26 +10,8 @@ from HTMLParser import HTMLParser
 from urllib import quote, urlencode
 from uuid import uuid4
 
-import ddt
-from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
-from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseBadRequest
-from django.test import TestCase
-from django.test.client import Client, RequestFactory
-from django.test.utils import override_settings
-from freezegun import freeze_time
-from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import MagicMock, PropertyMock, create_autospec, patch
-from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
-from pytz import UTC
-from waffle.testutils import override_flag
-from xblock.core import XBlock
-from xblock.fields import Scope, String
-from xblock.fragment import Fragment
-
 import courseware.views.views as views
+import ddt
 import shoppingcart
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from certificates import api as certs_api
@@ -45,9 +27,21 @@ from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponseBadRequest
+from django.test import TestCase
+from django.test.client import Client, RequestFactory
+from django.test.utils import override_settings
+from freezegun import freeze_time
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
+from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import MagicMock, PropertyMock, create_autospec, patch
+from nose.plugins.attrib import attr
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -55,14 +49,20 @@ from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
+from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
+from pytz import UTC
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.tests.test_date_utils import fake_pgettext, fake_ugettext
 from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
+from xblock.core import XBlock
+from xblock.fields import Scope, String
+from xblock.fragment import Fragment
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -72,6 +72,8 @@ from xmodule.modulestore.tests.django_utils import (
     SharedModuleStoreTestCase
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+
+QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 
 @attr(shard=1)
@@ -209,8 +211,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 150),
-        (ModuleStoreEnum.Type.split, 4, 150),
+        (ModuleStoreEnum.Type.mongo, 10, 143),
+        (ModuleStoreEnum.Type.split, 4, 143),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -228,7 +230,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=password)
         CourseEnrollment.enroll(self.user, course.id)
 
-        with self.assertNumQueries(expected_mysql_query_count):
+        with self.assertNumQueries(expected_mysql_query_count, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(expected_mongo_query_count):
                 url = reverse(
                     'courseware_section',
@@ -519,8 +521,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         mock_user.is_authenticated.return_value = False
         self.assertEqual(views.user_groups(mock_user), [])
 
-    # TODO: TNL-6546: Remove decorator for unified_course_view
-    @override_flag('unified_course_view', active=True)
     def test_get_redirect_url(self):
         # test the course location
         self.assertEqual(
@@ -964,6 +964,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
     # TODO: TNL-6387: Remove test
+    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
     def test_accordion(self):
         """
         This needs a response_context, which is not included in the render_accordion's main method
@@ -1068,7 +1069,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
 
         self.time_with_tz = "2013-09-18 11:30:00+00:00"
 
-    def test_backwards_compatability(self):
+    def test_backwards_compatibility(self):
         # The test course being used has show_timezone = False in the policy file
         # (and no due_date_display_format set). This is to test our backwards compatibility--
         # in course_module's init method, the date_display_format will be set accordingly to
@@ -1116,6 +1117,7 @@ class TestProgressDueDate(BaseDueDateTests):
         return self.client.get(reverse('progress', args=[unicode(course.id)]))
 
 
+# TODO: LEARNER-71: Delete entire TestAccordionDueDate class
 class TestAccordionDueDate(BaseDueDateTests):
     """
     Test that the accordion page displays due dates correctly
@@ -1128,6 +1130,31 @@ class TestAccordionDueDate(BaseDueDateTests):
             reverse('courseware', args=[unicode(course.id)]),
             follow=True
         )
+
+    # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
+    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    def test_backwards_compatibility(self):
+        super(TestAccordionDueDate, self).test_backwards_compatibility()
+
+    # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
+    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    def test_defaults(self):
+        super(TestAccordionDueDate, self).test_defaults()
+
+    # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
+    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    def test_format_date(self):
+        super(TestAccordionDueDate, self).test_format_date()
+
+    # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
+    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    def test_format_invalid(self):
+        super(TestAccordionDueDate, self).test_format_invalid()
+
+    # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
+    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    def test_format_none(self):
+        super(TestAccordionDueDate, self).test_format_none()
 
 
 @attr(shard=1)
@@ -1248,7 +1275,6 @@ class ProgressPageTests(ProgressPageBaseTests):
     """
     Tests that verify that the progress page works correctly.
     """
-
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
     def test_progress_page_xss_prevent(self, malicious_code):
         """
@@ -1438,23 +1464,27 @@ class ProgressPageTests(ProgressPageBaseTests):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(44), check_mongo_calls(1):
+        with self.assertNumQueries(40, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
             self._get_progress_page()
 
     @ddt.data(
-        (False, 44, 30),
-        (True, 37, 26)
+        (False, 40, 26),
+        (True, 33, 22)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
         self.setup_course()
         with grades_waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
-            with self.assertNumQueries(initial), check_mongo_calls(1):
+            with self.assertNumQueries(
+                initial, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST
+            ), check_mongo_calls(1):
                 self._get_progress_page()
 
             # subsequent accesses to the progress page require fewer queries.
             for _ in range(2):
-                with self.assertNumQueries(subsequent), check_mongo_calls(1):
+                with self.assertNumQueries(
+                    subsequent, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST
+                ), check_mongo_calls(1):
                     self._get_progress_page()
 
     @patch(
