@@ -76,7 +76,7 @@ from openedx.core.djangolib.js_utils import (
                   <span class="tip" id="tip-new-course-name">${_("The public display name for your course. This cannot be changed, but you can set a different display name in Advanced Settings later.")}</span>
                   <span class="tip tip-error is-hiding" id="tip-error-new-course-name"></span>
                 </li>
-                <li class="field text required" id="field-organization">
+                <li class="field text required">
                   <label for="new-course-org">${_("Organization")}</label>
                   ## Translators: This is an example for the name of the organization sponsoring a course, seen when filling out the form to create a new course. The organization name cannot contain spaces.
                   ## Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed when user put no data into this field.
@@ -152,7 +152,7 @@ from openedx.core.djangolib.js_utils import (
                   <span class="tip" id="tip-new-library-name">${_("The public display name for your library.")}</span>
                   <span class="tip tip-error is-hiding" id="tip-error-new-library-name"></span>
                 </li>
-                <li class="field text required" id="field-organization">
+                <li class="field text required">
                   <label for="new-library-org">${_("Organization")}</label>
                   <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-library-org tip-error-new-library-org" />
                   <span class="tip" id="tip-new-library-org">${_("The public organization name for your library.")} ${_("This cannot be changed.")}</span>

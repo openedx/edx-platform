@@ -42,7 +42,7 @@
                   <span class="tip">The public display name for your course. This cannot be changed, but you can set a different display name in Advanced Settings later.</span>
                   <span class="tip tip-error is-hiding"></span>
                 </li>
-                <li class="field text required" id="field-organization">
+                <li class="field text required">
                   <label for="new-course-org">Organization</label>
                   <input class="new-course-org" id="new-course-org" type="text" name="new-course-org" aria-required="true" placeholder="e.g. UniversityX or OrganizationX" />
                   <span class="tip">The name of the organization sponsoring the course.  <strong>Note: This is part of your course URL, so no spaces or special characters are allowed.</strong> This cannot be changed, but you can set a different display name in Advanced Settings later.</span>
@@ -96,7 +96,7 @@
                   <span class="tip">The public display name for your library.</span>
                   <span class="tip tip-error is-hiding"></span>
                 </li>
-                <li class="field text required" id="field-organization">
+                <li class="field text required">
                   <label for="new-library-org">Organization</label>
                   <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" aria-required="true" placeholder="e.g. UniversityX or OrganizationX" />
                   <span class="tip">The public organization name for your library. This cannot be changed.</span>
