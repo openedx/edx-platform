@@ -169,7 +169,8 @@ nose-exclude
 nose-ignore-docstring
 nose-randomly==1.2.0
 nosexcover==1.0.7
-pa11ycrawler==1.6.2
+# pa11ycrawler==1.6.2
+-e git+https://github.com/edx/pa11ycrawler.git@set-default-supported-components#egg=pa11ycrawler
 pep8==1.5.7
 PyContracts==1.7.1
 python-subunit==0.0.16
