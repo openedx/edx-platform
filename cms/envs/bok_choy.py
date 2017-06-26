@@ -64,6 +64,9 @@ STATICFILES_DIRS = [
     (TEST_ROOT / "staticfiles" / "cms").abspath(),
 ]
 
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+MEDIA_ROOT = TEST_ROOT / "uploads"
+
 WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = TEST_ROOT / "staticfiles" / "cms" / "webpack-stats.json"
 
 # Silence noisy logs
