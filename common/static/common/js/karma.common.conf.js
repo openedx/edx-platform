@@ -34,6 +34,7 @@
 //
 
 /* eslint-env node */
+/* globals process */
 
 'use strict';
 
@@ -267,6 +268,11 @@ function getBaseConfig(config, useRequireJs) {
         });
     };
 
+    var hostname = 'localhost';
+    if (process.env.hasOwnProperty('BOK_CHOY_HOSTNAME')) {
+        hostname = process.env.BOK_CHOY_HOSTNAME;
+    }
+
     initFrameworks.$inject = ['config.files'];
 
     var customPlugin = {
@@ -290,6 +296,7 @@ function getBaseConfig(config, useRequireJs) {
             'karma-chrome-launcher',
             'karma-firefox-launcher',
             'karma-spec-reporter',
+            'karma-webdriver-launcher',
             'karma-webpack',
             'karma-sourcemap-loader',
             customPlugin
@@ -315,7 +322,8 @@ function getBaseConfig(config, useRequireJs) {
         junitReporter: junitSettings(config),
 
 
-        // web server port
+        // web server hostname and port
+        hostname: hostname,
         port: 9876,
 
 
@@ -344,6 +352,14 @@ function getBaseConfig(config, useRequireJs) {
                 prefs: {
                     'app.update.auto': false,
                     'app.update.enabled': false
+                }
+            },
+            FirefoxDocker: {
+                base: 'WebDriver',
+                browserName: 'firefox',
+                config: {
+                    hostname: 'edx.devstack.firefox',
+                    port: 4444
                 }
             }
         },
