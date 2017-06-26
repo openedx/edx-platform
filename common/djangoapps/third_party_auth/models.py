@@ -176,6 +176,13 @@ class ProviderConfig(ConfigurationModel):
             "Django platform session default length will be used."
         )
     )
+    send_to_registration_first = models.BooleanField(
+        default=False,
+        help_text=_(
+            "If this option is selected, users will be directed to the registration page "
+            "immediately after authenticating with the third party instead of the login page."
+        ),
+    )
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass
     accepts_logins = True  # Whether to display a sign-in button when the provider is enabled
