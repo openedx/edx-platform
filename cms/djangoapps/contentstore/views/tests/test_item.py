@@ -16,7 +16,6 @@ from django.core.urlresolvers import reverse
 from contentstore.utils import reverse_usage_url, reverse_course_url
 
 from opaque_keys import InvalidKeyError
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from contentstore.views.component import (
     component_handler, get_component_templates
 )
@@ -3065,7 +3064,6 @@ class TestXBlockPublishingInfo(ItemTest):
         Test that when item was initially in `scheduled` state in instructor mode, change course pacing to self-paced,
         now in self-paced course, item should have `live` visibility state.
         """
-        SelfPacedConfiguration(enabled=True).save()
 
         # Create course, chapter and setup future release date to make chapter in scheduled state
         course = CourseFactory.create(default_store=store_type)

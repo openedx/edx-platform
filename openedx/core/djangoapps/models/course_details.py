@@ -9,7 +9,6 @@ from django.dispatch import Signal
 
 from xmodule.fields import Date
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.lib.courses import course_image_url
 from xmodule.modulestore.django import modulestore
 
@@ -269,8 +268,7 @@ class CourseDetails(object):
             descriptor.language = jsondict['language']
             dirty = True
 
-        if (SelfPacedConfiguration.current().enabled
-                and descriptor.can_toggle_course_pacing
+        if (descriptor.can_toggle_course_pacing
                 and 'self_paced' in jsondict
                 and jsondict['self_paced'] != descriptor.self_paced):
             descriptor.self_paced = jsondict['self_paced']

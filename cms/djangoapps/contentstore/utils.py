@@ -13,7 +13,6 @@ from pytz import UTC
 
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from student import auth
 from student.models import CourseEnrollment
@@ -503,4 +502,4 @@ def is_self_paced(course):
     """
     Returns True if course is self-paced, False otherwise.
     """
-    return course and course.self_paced and SelfPacedConfiguration.current().enabled
+    return course and course.self_paced

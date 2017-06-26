@@ -54,7 +54,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
@@ -1430,13 +1429,9 @@ class ProgressPageTests(ProgressPageBaseTests):
         resp = self._get_progress_page()
         self.assertContains(resp, u"Download Your Certificate")
 
-    @ddt.data(
-        *itertools.product((True, False), (True, False))
-    )
-    @ddt.unpack
-    def test_progress_queries_paced_courses(self, self_paced, self_paced_enabled):
+    @ddt.data(True, False)
+    def test_progress_queries_paced_courses(self, self_paced):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
-        SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
         with self.assertNumQueries(44), check_mongo_calls(1):
             self._get_progress_page()
@@ -2414,7 +2409,6 @@ class TestRenderXBlockSelfPaced(TestRenderXBlock):
     """
     def setUp(self):
         super(TestRenderXBlockSelfPaced, self).setUp()
-        SelfPacedConfiguration(enabled=True).save()
 
     def course_options(self):
         options = super(TestRenderXBlockSelfPaced, self).course_options()

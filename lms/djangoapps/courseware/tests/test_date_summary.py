@@ -15,14 +15,12 @@ from courseware.courses import get_course_date_blocks
 from courseware.date_summary import (
     CourseEndDate,
     CourseStartDate,
-    DateSummary,
     TodaysDate,
     VerificationDeadlineDate,
     VerifiedUpgradeDeadlineDate
 )
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
@@ -37,7 +35,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""
 
     def setUp(self):
-        SelfPacedConfiguration(enable_course_home_improvements=True).save()
         super(CourseDateSummaryTest, self).setUp()
 
     def setup_course_and_user(
@@ -92,14 +89,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
         if verification_status is not None:
             SoftwareSecurePhotoVerificationFactory.create(user=self.user, status=verification_status)
-
-    def test_course_info_feature_flag(self):
-        SelfPacedConfiguration(enable_course_home_improvements=False).save()
-        self.setup_course_and_user()
-        self.client.login(username='mrrobot', password='test')
-        url = reverse('info', args=(self.course.id,))
-        response = self.client.get(url)
-        self.assertNotIn('date-summary', response.content)
 
     def test_course_info_logged_out(self):
         self.setup_course_and_user()
