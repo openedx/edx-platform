@@ -2,7 +2,7 @@
 This module creates a sysadmin dashboard for managing and viewing
 courses.
 """
-import csv
+import unicodecsv as csv
 import json
 import logging
 import os
