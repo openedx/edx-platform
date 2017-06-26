@@ -53,7 +53,7 @@ def course_delete(course_key_string):
     return "succeeded"
 
 
-@CELERY_APP.task
+@CELERY_APP.task(name=u'openedx.core.djangoapps.labster.course.tasks.update_course_access')
 def update_course_access(course_id):
     """
     Updates master course access structure.
