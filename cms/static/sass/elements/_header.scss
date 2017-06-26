@@ -66,13 +66,14 @@
       @extend %t-strong;
       display: inline-block;
       vertical-align: middle;
+      margin-right: 4px;
 
       &:last-child {
         margin-right: 0;
       }
     }
 
-    .nav-item a {
+    .nav-item button {
       color: $gray-d1;
 
       &:hover {
@@ -82,42 +83,42 @@
   }
 
   // basic layout - dropdowns
-  .nav-dd {
+  // .nav-dd {
 
-    .title {
-      @extend %t-action2;
-      @extend %ui-btn-dd-nav-primary;
-      @include transition(all $tmg-f2 ease-in-out 0s);
+  //   .title {
+  //     @extend %t-action2;
+  //     @extend %ui-btn-dd-nav-primary;
+  //     @include transition(all $tmg-f2 ease-in-out 0s);
 
-      .label, .fa-caret-down {
+  //     .label, .fa-caret-down {
 
-      }
+  //     }
 
-      .label {
+  //     .label {
 
-      }
+  //     }
 
-      .fa-caret-down {
-        opacity: 0.25;
-      }
+  //     .fa-caret-down {
+  //       opacity: 0.25;
+  //     }
 
-      &:hover {
+  //     &:hover {
 
-        .fa-caret-down {
-          opacity: 1.0;
-        }
-      }
+  //       .fa-caret-down {
+  //         opacity: 1.0;
+  //       }
+  //     }
 
-      .nav-sub .nav-item {
+  //     .nav-sub .nav-item {
 
-        .icon {
-          display: inline-block;
-          vertical-align: middle;
-          margin-right: ($baseline/4);
-        }
-      }
-    }
-  }
+  //       .icon {
+  //         display: inline-block;
+  //         vertical-align: middle;
+  //         margin-right: ($baseline/4);
+  //       }
+  //     }
+  //   }
+  // }
 
   // ====================
 
