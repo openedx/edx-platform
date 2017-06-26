@@ -26,6 +26,11 @@ class ExperimentDataViewSet(viewsets.ModelViewSet):
             return ExperimentDataCreateSerializer
         return ExperimentDataSerializer
 
+    def get_serializer(self, *args, **kwargs):
+        # If we have a list of items, assume we are performing a bulk operation.
+        kwargs['many'] = kwargs.get('many', isinstance(self.request.data, list))
+        return super(ExperimentDataViewSet, self).get_serializer(*args, **kwargs)
+
     def create_or_update(self, request, *args, **kwargs):
         # If we have a primary key, treat this as a regular update request
         if self.kwargs.get('pk'):
