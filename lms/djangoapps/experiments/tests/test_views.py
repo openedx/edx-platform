@@ -96,8 +96,32 @@ class ExperimentDataViewSetTests(APITestCase):
         response = self.client.post(url, {})
         self.assertEqual(response.status_code, 401)
 
-        self.assert_data_created_for_user(UserFactory())
-        self.assert_data_created_for_user(UserFactory())
+        user = UserFactory()
+        data = {
+            'experiment_id': 1,
+            'key': 'foo',
+            'value': 'bar',
+        }
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
+
+        # Users can create data for themselves
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 201)
+        ExperimentData.objects.get(user=user)
+
+        # A non-staff user cannot create data for another user
+        other_user = UserFactory()
+        data['user'] = other_user.username
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(ExperimentData.objects.filter(user=other_user).exists())
+
+        # A staff user can create data for other users
+        user.is_staff = True
+        user.save()
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 201)
+        ExperimentData.objects.get(user=other_user)
 
     def test_put_as_create(self):
         """ Users should be able to use PUT to create new data. """
@@ -125,3 +149,61 @@ class ExperimentDataViewSetTests(APITestCase):
         self.client.login(username=other_user.username, password=UserFactory._DEFAULT_PASSWORD)
         response = self.client.patch(url, data)
         self.assertEqual(response.status_code, 404)
+
+    def test_bulk_create(self):
+        """ Staff users should be able to insert multiple items in a single call. """
+        url = reverse('api_experiments:v0:data-list')
+        data = []
+        experiment_id = 1
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 401)
+
+        user = UserFactory()
+        other_user = UserFactory()
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
+
+        # The user field is required for bulk insertions
+        data = [
+            {
+                'experiment_id': experiment_id,
+                'key': 'foo',
+                'value': 'bar',
+            },
+        ]
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        # Non-staff users CANNOT use the bulk insert functionality
+        data = [
+            {
+                'experiment_id': experiment_id,
+                'key': 'foo',
+                'value': 'bar',
+                'user': user.username,
+            },
+        ]
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(ExperimentData.objects.filter(user=user).exists())
+
+        # Staff users can create data for any user
+        user.is_staff = True
+        user.save()
+        data = [
+            {
+                'experiment_id': experiment_id,
+                'key': 'foo',
+                'value': 'bar',
+                'user': user.username,
+            },
+            {
+                'experiment_id': experiment_id,
+                'key': 'foo',
+                'value': 'bar',
+                'user': other_user.username,
+            },
+        ]
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+        ExperimentData.objects.get(user=other_user, experiment_id=experiment_id, key='foo', value='bar')
+        ExperimentData.objects.get(user=user, experiment_id=experiment_id, key='foo', value='bar')

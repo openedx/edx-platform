@@ -8,5 +8,16 @@ class IsStaffOrOwner(permissions.IsStaffOrOwner):
     """
 
     def has_permission(self, request, view):
+        # Only staff users can make bulk changes
+        if isinstance(request.data, list):
+            return request.user.is_staff
+
+        # Staff users can create data for anyone.
+        # Non-staff users can only create data for themselves.
+        if view.action == 'create':
+            username = request.user.username
+            return super(IsStaffOrOwner, self).has_permission(request, view) or (
+                username == request.data.get('user', username))
+
         # The view will handle filtering for the current user
         return True
