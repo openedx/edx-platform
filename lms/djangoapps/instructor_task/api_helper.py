@@ -272,7 +272,7 @@ def check_arguments_for_overriding(usage_key, score):
     """
     descriptor = modulestore().get_item(usage_key)
     score = int(score)
-    
+
     # some weirdness around initializing the descriptor requires this
     if not hasattr(descriptor.__class__, 'set_score'):
         msg = _("This component does not support score override.")

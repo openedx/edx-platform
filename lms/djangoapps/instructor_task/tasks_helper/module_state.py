@@ -172,8 +172,8 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
         if instance is None:
             # Either permissions just changed, or someone is trying to be clever
             # and load something they shouldn't have access to.
-            msg = "No module {loc} for student {student}--access denied?".format(
-                loc=usage_key,
+            msg = "No module {location} for student {student}--access denied?".format(
+                location=usage_key,
                 student=student
             )
             TASK_LOG.warning(msg)
@@ -227,6 +227,17 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
 @outer_atomic
 def override_problem_score_module_state(xmodule_instance_args, module_descriptor, student_module, task_input):
     '''
+    Takes an XModule descriptor and a corresponding StudentModule object, and
+    performs an override on the student's problem score.
+
+    Throws exceptions if the override is fatal and should be aborted if in a loop.
+    In particular, raises UpdateProblemModuleStateError if module fails to instantiate,
+    or if the module doesn't support overriding, or if the score used for override
+    is outside the acceptable range of scores (between 0 and the max score for the
+    problem).
+
+    Returns True if problem was successfully overriden for the given student, and False
+    if problem encountered some kind of error in overriding.
     '''
     # unpack the StudentModule:
     course_id = student_module.course_id
@@ -235,9 +246,6 @@ def override_problem_score_module_state(xmodule_instance_args, module_descriptor
 
     with modulestore().bulk_operations(course_id):
         course = get_course_by_id(course_id)
-        # TODO: Here is a call site where we could pass in a loaded course.  I
-        # think we certainly need it since grading is happening here, and field
-        # overrides would be important in handling that correctly
         instance = _get_module_instance_for_task(
             course_id,
             student,
@@ -250,8 +258,8 @@ def override_problem_score_module_state(xmodule_instance_args, module_descriptor
         if instance is None:
             # Either permissions just changed, or someone is trying to be clever
             # and load something they shouldn't have access to.
-            msg = "No module {loc} for student {student}--access denied?".format(
-                loc=usage_key,
+            msg = "No module {location} for student {student}--access denied?".format(
+                location=usage_key,
                 student=student
             )
             TASK_LOG.warning(msg)
@@ -272,7 +280,6 @@ def override_problem_score_module_state(xmodule_instance_args, module_descriptor
         create_new_event_transaction_id()
         set_event_transaction_type(GRADES_OVERRIDE_EVENT_TYPE)
 
-        # specific events from CAPA are not propagated up the stack. Do we want this?
         problem_weight = instance.weight if instance.weight is not None else 1
         instance.set_score(Score(
             raw_earned=weighted_override_score / problem_weight,
