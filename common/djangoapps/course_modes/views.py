@@ -107,6 +107,16 @@ class ChooseModeView(View):
         # If there isn't a verified mode available, then there's nothing
         # to do on this page.  Send the user to the dashboard.
         if not CourseMode.has_verified_mode(modes):
+            # If the learner has arrived at this screen via the traditional enrollment workflow,
+            # then they should already be enrolled in an audit mode for the course, assuming one has
+            # been configured.  However, alternative enrollment workflows have been introduced into the
+            # system, such as third-party discovery.  These workflows result in learners arriving
+            # directly at this screen, and they will not necessarily be pre-enrolled in the audit mode.
+            # In this particular case, Audit is the ONLY option available, and thus we need to ensure
+            # that the learner is truly enrolled before we redirect them away to the dashboard.
+            if len(modes) == 1 and modes.get(CourseMode.AUDIT):
+                CourseEnrollment.enroll(request.user, course_key, CourseMode.AUDIT)
+
             return redirect(reverse('dashboard'))
 
         # If a user has already paid, redirect them to the dashboard.
