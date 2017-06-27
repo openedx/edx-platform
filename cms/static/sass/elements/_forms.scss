@@ -404,7 +404,7 @@ form {
     max-width: 80%;
   }
 
-  .incontext-editor-open-action {
+  .incontext-editor-open-action, .visibility-button {
     @extend %ui-btn-non-blue;
     @extend %t-copy-base;
     padding-top: ($baseline/10);

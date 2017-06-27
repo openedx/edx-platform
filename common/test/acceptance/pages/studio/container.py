@@ -284,6 +284,12 @@ class ContainerPage(PageObject, HelpMixin):
         """
         return _click_edit(self, '.edit-button', '.xblock-studio_view')
 
+    def edit_visibility(self):
+        """
+        Clicks the edit visibility button for this container.
+        """
+        return _click_edit(self, '.visibility-button', '.xblock-visibility_view')
+
     def verify_confirmation_message(self, message, verify_hidden=False):
         """
         Verify for confirmation message is present or hidden.
