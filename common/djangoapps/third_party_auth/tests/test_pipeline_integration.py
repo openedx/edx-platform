@@ -3,6 +3,7 @@
 import unittest
 
 import mock
+import ddt
 from django import test
 from django.conf import settings
 from django.contrib.auth import models
@@ -296,3 +297,42 @@ class TestPipelineUtilityFunctions(TestCase, test.TestCase):
         )
         pipeline.lift_quarantine(request)
         self.assertNotIn('third_party_auth_quarantined_modules', request.session)
+
+
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+@ddt.ddt
+class EnsureUserInformationTestCase(testutil.TestCase, test.TestCase):
+    """Tests ensuring that we have the necessary user information to proceed with the pipeline."""
+
+    def setUp(self):
+        super(EnsureUserInformationTestCase, self).setUp()
+
+    @ddt.data(
+        (True, '/register'),
+        (False, '/login')
+    )
+    @ddt.unpack
+    def test_provider_settings_redirect_to_registration(self, send_to_registration_first, expected_redirect_url):
+        """
+        Test if user is not authenticated, that they get redirected to the appropriate page
+        based on the provider's setting for send_to_registration_first.
+        """
+
+        provider = mock.MagicMock(
+            send_to_registration_first=send_to_registration_first,
+            skip_email_verification=False
+        )
+
+        with mock.patch('third_party_auth.pipeline.provider.Registry.get_from_pipeline') as get_from_pipeline:
+            get_from_pipeline.return_value = provider
+            with mock.patch('social_core.pipeline.partial.partial_prepare') as partial_prepare:
+                partial_prepare.return_value = mock.MagicMock(token='')
+                strategy = mock.MagicMock()
+                response = pipeline.ensure_user_information(
+                    strategy=strategy,
+                    backend=None,
+                    auth_entry=pipeline.AUTH_ENTRY_LOGIN,
+                    pipeline_index=0
+                )
+                assert response.status_code == 302
+                assert response.url == expected_redirect_url
