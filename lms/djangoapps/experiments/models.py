@@ -20,3 +20,18 @@ class ExperimentData(TimeStampedModel):
         unique_together = (
             ('user', 'experiment_id', 'key'),
         )
+
+
+class ExperimentKeyValue(TimeStampedModel):
+    experiment_id = models.PositiveSmallIntegerField(
+        null=False, blank=False, db_index=True, verbose_name='Experiment ID'
+    )
+    key = models.CharField(null=False, blank=False, max_length=255)
+    value = models.TextField()
+
+    class Meta(object):
+        verbose_name = 'Experiment Data'
+        verbose_name_plural = 'Experiment Data'
+        unique_together = (
+            ('experiment_id', 'key'),
+        )
