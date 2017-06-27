@@ -68,7 +68,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         obj = json.loads(bad_pwd_resp.content)
         self.assertEquals(obj, {
             'success': True,
-            'value': "('registration/password_reset_done.html', [{ 'email': {} }])".format(self.user_bad_passwd.email),
+            u'value': u"('registration/password_reset_done.html', [('email', u'{}')])".format(self.user_bad_passwd.email),
         })
         self.assert_no_events_were_emitted()
 
@@ -86,7 +86,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         obj = json.loads(bad_email_resp.content)
         self.assertEquals(obj, {
             'success': True,
-            'value': "('registration/password_reset_done.html', [{ 'email': {} }])".format(bad_email),
+            u'value': u"('registration/password_reset_done.html', [('email', u'{}')])".format(bad_email),
         })
         self.assert_no_events_were_emitted()
 
@@ -133,7 +133,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         obj = json.loads(good_resp.content)
         self.assertEquals(obj, {
             'success': True,
-            'value': "('registration/password_reset_done.html', [{ 'email': {} }])".format(self.user.email),
+            u'value': u"('registration/password_reset_done.html', [('email', u'{}')])".format(self.user.email),
         })
 
         (subject, msg, from_addr, to_addrs) = send_email.call_args[0]
