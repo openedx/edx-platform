@@ -1,18 +1,19 @@
 """
 Programmatic integration point for User API Accounts sub-application
 """
-from django.utils.translation import ugettext as _
+from django.utils.translation import override as override_language, ugettext as _
 from django.db import transaction, IntegrityError
 import datetime
 from pytz import UTC
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
-from django.core.validators import validate_email, validate_slug, ValidationError
+from django.core.validators import validate_email, ValidationError
 from django.http import HttpResponseForbidden
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.djangoapps.user_api.errors import PreferenceValidationError
 
 from student.models import User, UserProfile, Registration
+from student import forms as student_forms
 from student import views as student_views
 from util.model_utils import emit_setting_changed_event
 
@@ -449,11 +450,12 @@ def _validate_username(username):
             )
         )
     try:
-        validate_slug(username)
-    except ValidationError:
-        raise AccountUsernameInvalid(
-            u"Username '{username}' must contain only A-Z, a-z, 0-9, -, or _ characters"
-        )
+        with override_language('en'):
+            # `validate_username` provides a proper localized message, however the API needs only the English
+            # message by convention.
+            student_forms.validate_username(username)
+    except ValidationError as error:
+        raise AccountUsernameInvalid(error.message)
 
 
 def _validate_password(password, username):
