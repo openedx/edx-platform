@@ -175,6 +175,15 @@ class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
     inlines = (UserProfileInline,)
 
+    def get_readonly_fields(self, *args, **kwargs):
+        """
+        Allows editing the users while skipping the username check, so we can have Unicode username with no problems.
+        The username is marked read-only regardless of `ENABLE_UNICODE_USERNAME`, to simplify the bokchoy tests.
+        """
+
+        django_readonly = super(UserAdmin, self).get_readonly_fields(*args, **kwargs)
+        return django_readonly + ('username',)
+
 
 @admin.register(UserAttribute)
 class UserAttributeAdmin(admin.ModelAdmin):
