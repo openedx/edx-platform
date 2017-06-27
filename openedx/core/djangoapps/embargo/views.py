@@ -4,8 +4,10 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from django.views.generic.base import View
 from edx_rest_framework_extensions.authentication import JwtAuthentication
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -42,11 +44,14 @@ class CheckCourseAccessView(APIView):
 
         if course_ids and user and user_ip_address:
             for course_id in course_ids:
-                if not check_course_access(CourseKey.from_string(course_id), user, user_ip_address):
-                    response['access'] = False
-                    break
+                try:
+                    if not check_course_access(CourseKey.from_string(course_id), user, user_ip_address):
+                        response['access'] = False
+                        break
+                except InvalidKeyError:
+                    raise ValidationError('Invalid course_ids')
         else:
-            return Response(data=None, status=status.HTTP_400_BAD_REQUEST)
+            raise ValidationError('Missing parameters')
 
         return Response(response)
 
