@@ -87,6 +87,7 @@ DEBUG_TOOLBAR_CONFIG = {
         'debug_toolbar.panels.profiling.ProfilingPanel',
     ),
     'SHOW_TOOLBAR_CALLBACK': 'cms.envs.devstack.should_show_debug_toolbar',
+    'JQUERY_URL': None,
 }
 
 
