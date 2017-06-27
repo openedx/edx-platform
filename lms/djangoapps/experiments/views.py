@@ -6,10 +6,9 @@ from rest_framework.decorators import list_route
 from rest_framework.filters import DjangoFilterBackend
 from rest_framework.response import Response
 
-from experiments import filters
-from experiments.models import ExperimentData
-from experiments.permissions import IsStaffOrOwner
-from experiments.serializers import ExperimentDataCreateSerializer, ExperimentDataSerializer
+from experiments import filters, serializers
+from experiments.models import ExperimentData, ExperimentKeyValue
+from experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 
 User = get_user_model()  # pylint: disable=invalid-name
@@ -21,7 +20,7 @@ class ExperimentDataViewSet(viewsets.ModelViewSet):
     filter_class = filters.ExperimentDataFilter
     permission_classes = (permissions.IsAuthenticated, IsStaffOrOwner,)
     queryset = ExperimentData.objects.all()
-    serializer_class = ExperimentDataSerializer
+    serializer_class = serializers.ExperimentDataSerializer
     _cached_users = {}
 
     def filter_queryset(self, queryset):
@@ -30,8 +29,8 @@ class ExperimentDataViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'create':
-            return ExperimentDataCreateSerializer
-        return ExperimentDataSerializer
+            return serializers.ExperimentDataCreateSerializer
+        return serializers.ExperimentDataSerializer
 
     def create_or_update(self, request, *args, **kwargs):
         # If we have a primary key, treat this as a regular update request
@@ -78,6 +77,28 @@ class ExperimentDataViewSet(viewsets.ModelViewSet):
                 user = self._get_user(username=item['user'])
                 datum, __ = ExperimentData.objects.update_or_create(
                     user=user, experiment_id=item['experiment_id'], key=item['key'], defaults={'value': item['value']})
+                upserted.append(datum)
+
+            serializer = self.get_serializer(upserted, many=True)
+            return Response(serializer.data)
+
+
+class ExperimentKeyValueViewSet(viewsets.ModelViewSet):
+    authentication_classes = (JwtAuthentication, SessionAuthenticationAllowInactiveUser,)
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = filters.ExperimentKeyValueFilter
+    permission_classes = (IsStaffOrReadOnly,)
+    queryset = ExperimentKeyValue.objects.all()
+    serializer_class = serializers.ExperimentKeyValueSerializer
+
+    @list_route(methods=['put'], permission_classes=[permissions.IsAdminUser])
+    def bulk_upsert(self, request):
+        upserted = []
+
+        with transaction.atomic():
+            for item in request.data:
+                datum, __ = ExperimentKeyValue.objects.update_or_create(
+                    experiment_id=item['experiment_id'], key=item['key'], defaults={'value': item['value']})
                 upserted.append(datum)
 
             serializer = self.get_serializer(upserted, many=True)
