@@ -130,7 +130,7 @@ def submit_override_problem_score_for_student(request, usage_key, student, score
     if this task is already running for this student, or NotImplementedError if
     the problem is not a ScorableXBlock.
     """
-    check_argument_for_overriding(usage_key, score)
+    check_arguments_for_overriding(usage_key, score)
     task_type = 'override_problem_score'
     task_class = override_problem_score
     task_input, task_key = encode_problem_and_student_input(usage_key, student)

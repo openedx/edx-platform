@@ -125,19 +125,17 @@ def common_exceptions_400(func):
     (decorator without arguments)
     """
     def wrapped(request, *args, **kwargs):  # pylint: disable=missing-docstring
-        use_json = (request.is_ajax() or
-                    request.META.get("HTTP_ACCEPT", "").startswith("application/json"))
         try:
             return func(request, *args, **kwargs)
         except User.DoesNotExist:
             message = _("User does not exist.")
-            if use_json:
+            if _use_json(request):
                 return JsonResponse({"error": message}, 400)
             else:
                 return HttpResponseBadRequest(message)
         except AlreadyRunningError:
             message = _("Task is already running.")
-            if use_json:
+            if _use_json(request):
                 return JsonResponse({"error": message}, 400)
             else:
                 return HttpResponseBadRequest(message)
@@ -2166,12 +2164,12 @@ def override_problem_score(request, course_id):
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
     else:
-        return HttpResponseBadRequest("Invalid student ID.")
+        return _create_error_response(request, "Invalid student ID.")
 
     try:
         module_state_key = course_id.make_usage_key_from_deprecated_string(problem_to_reset)
     except InvalidKeyError:
-        return HttpResponseBadRequest("Unable to parse problem id")
+        return _create_error_response(request, "Unable to parse problem id.")
 
     response_payload = {'problem_to_reset': problem_to_reset}
     response_payload['student'] = student_identifier
@@ -2183,7 +2181,10 @@ def override_problem_score(request, course_id):
             score,
         )
     except NotImplementedError as exc:
-        return HttpResponseBadRequest(exc.message)
+        return _create_error_response(request, exc.message)
+
+    except ValueError as exc:
+        return _create_error_response(request, exc.message)
 
     response_payload['task'] = 'created'
     return JsonResponse(response_payload)
@@ -3422,3 +3423,25 @@ def _get_boolean_param(request, param_name):
     values to boolean values.
     """
     return request.POST.get(param_name, False) in ['true', 'True', True]
+
+
+def _use_json(request):
+    """
+    Returns whether the current request expects a response in JSON form.
+    """
+    return request.is_ajax() or request.META.get("HTTP_ACCEPT", "").startswith("application/json")
+
+
+def _create_error_response(request, msg):
+    """
+    Creates the appropriate error response for the current request,
+    either raw text or JSON.
+    For use when raising errors with a message intended
+    to be surfaced to the end user.
+    """
+    if _use_json(request):
+        response = JsonResponse({"error": _(msg)}, 400)
+    else:
+        response = HttpResponseBadRequest(_(msg))
+
+    return response
