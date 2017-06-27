@@ -147,3 +147,8 @@ class CheckCourseAccessViewTest(CourseApiFactoryMixin, ModuleStoreTestCase):
     def test_course_access_endpoint_with_invalid_data(self):
         response = self.client.get(self.url, data=None)
         self.assertEqual(response.status_code, 400)
+
+    def test_invalid_course_id(self):
+        self.request_data['course_ids'] = ['foo']
+        response = self.client.get(self.url, data=self.request_data)
+        self.assertEqual(response.status_code, 400)
