@@ -3,8 +3,8 @@ import urllib
 from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase
 
-from experiments.factories import ExperimentDataFactory
-from experiments.models import ExperimentData
+from experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
+from experiments.models import ExperimentData, ExperimentKeyValue
 from experiments.serializers import ExperimentDataSerializer
 from student.tests.factories import UserFactory
 
@@ -208,3 +208,84 @@ class ExperimentDataViewSetTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         ExperimentData.objects.get(user=user, **kwargs)
         ExperimentData.objects.get(user=other_user, **kwargs)
+
+
+class ExperimentKeyValueViewSetTests(APITestCase):
+    def test_permissions(self):
+        """ Staff access is required for write operations. """
+        url = reverse('api_experiments:v0:key_value-list')
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(url, {})
+        self.assertEqual(response.status_code, 401)
+
+        instance = ExperimentKeyValueFactory()
+        url = reverse('api_experiments:v0:key_value-detail', kwargs={'pk': instance.id})
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        user = UserFactory(is_staff=False)
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
+
+        response = self.client.put(url, {})
+        self.assertEqual(response.status_code, 403)
+
+        response = self.client.patch(url, {})
+        self.assertEqual(response.status_code, 403)
+
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_bulk_upsert_permissions(self):
+        """ Non-staff users should not be allowed to access the endpoint.  """
+        data = []
+        url = reverse('api_experiments:v0:key_value-bulk-upsert')
+        user = UserFactory(is_staff=False)
+
+        # Authentication required
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 401)
+
+        # Staff permission required
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+    def test_bulk_upsert(self):
+        """ The endpoint should support creating/updating multiple ExperimentData objects with a single call. """
+        url = reverse('api_experiments:v0:key_value-bulk-upsert')
+        experiment_id = 1
+        user = UserFactory(is_staff=True)
+        data = [
+            {
+                'experiment_id': experiment_id,
+                'key': 'foo',
+                'value': 'bar',
+            },
+            {
+                'experiment_id': experiment_id,
+                'key': 'foo1',
+                'value': 'bar',
+            },
+        ]
+
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
+
+        # New data should be created
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+        kwargs = {
+            'experiment_id': experiment_id,
+            'value': 'bar',
+        }
+        ExperimentKeyValue.objects.get(key='foo', **kwargs)
+        ExperimentKeyValue.objects.get(key='foo1', **kwargs)
+
+        # Subsequent calls should update the existing data rather than create more
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+        ExperimentKeyValue.objects.get(key='foo', **kwargs)
+        ExperimentKeyValue.objects.get(key='foo1', **kwargs)

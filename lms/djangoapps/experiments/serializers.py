@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from .models import ExperimentData
+from .models import ExperimentData, ExperimentKeyValue
 
 User = get_user_model()  # pylint:disable=invalid-name
 
@@ -20,3 +20,9 @@ class ExperimentDataSerializer(serializers.ModelSerializer):
 
     class Meta(ExperimentDataCreateSerializer.Meta):
         read_only_fields = ('user',)
+
+
+class ExperimentKeyValueSerializer(serializers.ModelSerializer):
+    class Meta(object):
+        model = ExperimentKeyValue
+        fields = ('id', 'experiment_id', 'key', 'value', 'created', 'modified',)

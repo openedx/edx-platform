@@ -1,3 +1,5 @@
+from rest_framework.permissions import SAFE_METHODS, BasePermission
+
 from openedx.core.lib.api import permissions
 
 
@@ -17,3 +19,8 @@ class IsStaffOrOwner(permissions.IsStaffOrOwner):
 
         # The view will handle filtering for the current user
         return True
+
+
+class IsStaffOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_staff or request.method in SAFE_METHODS
