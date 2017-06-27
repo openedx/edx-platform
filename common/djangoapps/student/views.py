@@ -45,9 +45,9 @@ from provider.oauth2.models import Client
 from pytz import UTC
 from ratelimitbackend.exceptions import RateLimitException
 from requests import HTTPError
-from social_django import utils as social_utils
 from social_core.backends import oauth as social_oauth
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
+from social_django import utils as social_utils
 
 import dogstats_wrapper as dog_stats_api
 import openedx.core.djangoapps.external_auth.views
