@@ -263,6 +263,22 @@ def check_arguments_for_rescoring(usage_key):
         raise NotImplementedError(msg)
 
 
+def check_arguments_for_overriding(usage_key, score):
+    """
+    Do simple checks on the descriptor to confirm that it supports overriding
+    the problem score and the score passed in is not greater than the value of
+    the problem or less than 0.
+    """
+    descriptor = modulestore().get_item(usage_key)
+    if not hasattr(descriptor, 'set_score'):
+        msg = _("This component does not support score override.")
+        raise NotImplementedError(msg)
+
+    if score < 0 or score > descriptor.max_score():
+        msg = _("Scores must be between 0 and the value of the problem.")
+        raise NotImplementedError(msg)
+
+
 def check_entrance_exam_problems_for_rescoring(exam_key):  # pylint: disable=invalid-name
     """
     Grabs all problem descriptors in exam and checks each descriptor to
