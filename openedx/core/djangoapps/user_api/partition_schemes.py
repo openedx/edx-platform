@@ -5,6 +5,8 @@ import logging
 import random
 import course_tag.api as course_tag_api
 
+from eventtracking import tracker
+
 from xmodule.partitions.partitions import UserPartitionError, NoSuchUserPartitionGroupError
 
 log = logging.getLogger(__name__)
@@ -17,7 +19,7 @@ class NotImplementedPartitionScheme(object):
     """
 
     @classmethod
-    def get_group_for_user(cls, course_key, user, user_partition, assign=True, track_function=None):  # pylint: disable=unused-argument
+    def get_group_for_user(cls, course_key, user, user_partition, assign=True):  # pylint: disable=unused-argument
         """
         Returning None is equivalent to saying "This user is not in any groups
         using this partition scheme", be sure the scheme you're removing is
@@ -31,7 +33,7 @@ class ReturnGroup1PartitionScheme(object):
     This scheme is needed to allow verification partitions to be killed, see EDUCATOR-199
     """
     @classmethod
-    def get_group_for_user(cls, course_key, user, user_partition, assign=True, track_function=None):  # pylint: disable=unused-argument
+    def get_group_for_user(cls, course_key, user, user_partition, assign=True):  # pylint: disable=unused-argument
         """
         The previous "allow" definition for verification was defined as 1, so return that.
         Details at https://github.com/edx/edx-platform/pull/14913/files#diff-feff1466ec4d1b8c38894310d8342a80
@@ -46,7 +48,7 @@ class RandomUserPartitionScheme(object):
     RANDOM = random.Random()
 
     @classmethod
-    def get_group_for_user(cls, course_key, user, user_partition, assign=True, track_function=None):
+    def get_group_for_user(cls, course_key, user, user_partition, assign=True):
         """
         Returns the group from the specified user position to which the user is assigned.
         If the user has not yet been assigned, a group will be randomly chosen for them if assign flag is True.
@@ -83,20 +85,24 @@ class RandomUserPartitionScheme(object):
             # persist the value as a course tag
             course_tag_api.set_course_tag(user, course_key, partition_key, group.id)
 
-            if track_function:
-                # emit event for analytics
-                # FYI - context is always user ID that is logged in, NOT the user id that is
-                # being operated on. If instructor can move user explicitly, then we should
-                # put in event_info the user id that is being operated on.
-                event_info = {
-                    'group_id': group.id,
-                    'group_name': group.name,
-                    'partition_id': user_partition.id,
-                    'partition_name': user_partition.name
-                }
-                # pylint: disable=fixme
-                # TODO: Use the XBlock publish api instead
-                track_function('xmodule.partitions.assigned_user_to_partition', event_info)
+            # emit event for analytics
+            # FYI - context is always user ID that is logged in, NOT the user id that is
+            # being operated on. If instructor can move user explicitly, then we should
+            # put in event_info the user id that is being operated on.
+            event_name = 'xmodule.partitions.assigned_user_to_partition'
+            event_info = {
+                'group_id': group.id,
+                'group_name': group.name,
+                'partition_id': user_partition.id,
+                'partition_name': user_partition.name
+            }
+            # pylint: disable=fixme
+            # TODO: Use the XBlock publish api instead
+            with tracker.get_tracker().context(event_name, {}):
+                tracker.emit(
+                    event_name,
+                    event_info,
+                )
 
         return group
 

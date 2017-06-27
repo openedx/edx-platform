@@ -3,23 +3,23 @@ Provides a function for importing a git repository into the lms
 instance when using a mongo modulestore
 """
 
+import logging
 import os
 import re
 import StringIO
 import subprocess
-import logging
 
+import mongoengine
 from django.conf import settings
 from django.core import management
 from django.core.management.base import CommandError
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-import mongoengine
-
-from dashboard.models import CourseImportLog
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from dashboard.models import CourseImportLog
 
 log = logging.getLogger(__name__)
 

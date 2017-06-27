@@ -2,6 +2,7 @@
 Common utilities for use along with the course blocks.
 """
 import json
+
 from courseware.models import StudentModule
 
 

@@ -1,9 +1,14 @@
 import base64
+
 from nose.tools import assert_equals
 
 from lms.djangoapps.verify_student.ssencrypt import (
-    aes_decrypt, aes_encrypt, encrypt_and_encode, decode_and_decrypt,
-    rsa_decrypt, rsa_encrypt
+    aes_decrypt,
+    aes_encrypt,
+    decode_and_decrypt,
+    encrypt_and_encode,
+    rsa_decrypt,
+    rsa_encrypt
 )
 
 

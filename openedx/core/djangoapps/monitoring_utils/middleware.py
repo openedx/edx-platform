@@ -10,16 +10,19 @@ request handlers which do not record custom metrics.
 
 """
 import logging
+from uuid import uuid4
+
+import psutil
+
+import request_cache
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
+
 log = logging.getLogger(__name__)
 try:
     import newrelic.agent
 except ImportError:
     log.warning("Unable to load NewRelic agent module")
     newrelic = None  # pylint: disable=invalid-name
-
-import psutil
-import request_cache
-from openedx.core.djangolib.waffle_utils import WaffleSwitchPlus
 
 
 REQUEST_CACHE_KEY = 'monitoring_custom_metrics'
@@ -83,9 +86,11 @@ class MonitoringMemoryMiddleware(object):
     Middleware for monitoring memory usage.
     """
     memory_data_key = u'memory_data'
+    guid_key = u'guid_key'
 
     def process_request(self, request):
         if self._is_enabled():
+            self._cache[self.guid_key] = unicode(uuid4())
             log_prefix = self._log_prefix(u"Before", request)
             self._cache[self.memory_data_key] = self._memory_data(log_prefix)
 
@@ -109,7 +114,11 @@ class MonitoringMemoryMiddleware(object):
         """
         Returns a formatted prefix for logging for the given request.
         """
-        return u"{} request '{} {}'".format(prefix, request.method, request.path)
+        # After a celery task runs, the request cache is cleared. So if celery
+        # tasks are running synchronously (CELERY_ALWAYS _EAGER), "guid_key"
+        # will no longer be in the request cache when process_response executes.
+        cached_guid = self._cache.get(self.guid_key) or u"without_guid"
+        return u"{} request '{} {} {}'".format(prefix, request.method, request.path, cached_guid)
 
     def _memory_data(self, log_prefix):
         """
@@ -163,4 +172,4 @@ class MonitoringMemoryMiddleware(object):
         """
         Returns whether this middleware is enabled.
         """
-        return WaffleSwitchPlus(namespace=WAFFLE_NAMESPACE).is_enabled(u'enable_memory_middleware')
+        return WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_memory_middleware')

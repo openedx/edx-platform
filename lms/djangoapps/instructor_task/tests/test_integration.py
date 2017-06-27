@@ -5,45 +5,41 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
-from collections import namedtuple
-import ddt
 import json
 import logging
-from mock import patch
-from nose.plugins.attrib import attr
 import textwrap
+from collections import namedtuple
 
-from celery.states import SUCCESS, FAILURE
+import ddt
+from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from mock import patch
+from nose.plugins.attrib import attr
 
-from openedx.core.djangoapps.util.testing import TestConditionalContent
-from openedx.core.djangolib.testing.utils import get_mock_request
-from capa.tests.response_xml_factory import (CodeResponseXMLFactory,
-                                             CustomResponseXMLFactory)
-from xmodule.modulestore.tests.factories import ItemFactory
-from xmodule.modulestore import ModuleStoreEnum
-
+from capa.responsetypes import StudentInputError
+from capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory
 from courseware.model_data import StudentModule
-
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor_task.api import (
+    submit_delete_problem_state_for_all_students,
     submit_rescore_problem_for_all_students,
     submit_rescore_problem_for_student,
-    submit_reset_problem_attempts_for_all_students,
-    submit_delete_problem_state_for_all_students
+    submit_reset_problem_attempts_for_all_students
 )
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.tasks_helper.grades import CourseGradeReport
 from lms.djangoapps.instructor_task.tests.test_base import (
-    InstructorTaskModuleTestCase,
-    TestReportMixin,
     OPTION_1,
     OPTION_2,
+    InstructorTaskModuleTestCase,
+    TestReportMixin
 )
-from capa.responsetypes import StudentInputError
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from openedx.core.djangoapps.util.testing import TestConditionalContent
+from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.url_utils import quote_slashes
-
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.factories import ItemFactory
 
 log = logging.getLogger(__name__)
 
@@ -604,7 +600,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
             group_config_hdr_tpl = 'Experiment Group ({})'
             return {
                 group_config_hdr_tpl.format(self.partition.name): self.partition.scheme.get_group_for_user(
-                    self.course.id, user, self.partition, track_function=None
+                    self.course.id, user, self.partition
                 ).name
             }
 

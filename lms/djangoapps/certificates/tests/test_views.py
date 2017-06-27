@@ -11,15 +11,15 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 from certificates.api import get_certificate_url
 from certificates.models import (
-    ExampleCertificateSet,
-    ExampleCertificate,
-    GeneratedCertificate,
     CertificateHtmlViewConfiguration,
+    ExampleCertificate,
+    ExampleCertificateSet,
+    GeneratedCertificate
 )
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

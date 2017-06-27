@@ -6,11 +6,10 @@ import mock
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
-from xmodule.modulestore.tests.factories import CourseFactory
-
 from openedx.core.djangoapps.credit.api import get_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.signals import on_course_publish
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class CreditEligibilityTest(CourseTestCase):

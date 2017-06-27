@@ -2,10 +2,9 @@
 Course API URLs
 """
 from django.conf import settings
-from django.conf.urls import patterns, url, include
+from django.conf.urls import include, patterns, url
 
 from .views import CourseDetailView, CourseListView
-
 
 urlpatterns = patterns(
     '',

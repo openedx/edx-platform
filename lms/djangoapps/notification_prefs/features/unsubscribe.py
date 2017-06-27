@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User
 from lettuce import step, world
-from notification_prefs import NOTIFICATION_PREF_KEY
-from openedx.core.djangoapps.user_api.preferences.api import set_user_preference, get_user_preference
 
+from notification_prefs import NOTIFICATION_PREF_KEY
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 
 USERNAME = "robot"
 UNSUB_TOKEN = "av9E-14sAP1bVBRCPbrTHQ=="

@@ -1,15 +1,10 @@
 import codecs
-from fractions import Fraction
 import unittest
-
-from .chemcalc import (
-    compare_chemical_expression,
-    divide_chemical_expression,
-    render_to_html,
-    chemical_equations_equal,
-)
+from fractions import Fraction
 
 import chem.miller
+
+from .chemcalc import chemical_equations_equal, compare_chemical_expression, divide_chemical_expression, render_to_html
 
 LOCAL_DEBUG = None
 

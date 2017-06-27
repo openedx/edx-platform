@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
 """ Tests for transcripts_utils. """
-import unittest
-from uuid import uuid4
 import copy
 import textwrap
-from mock import patch, Mock
+import unittest
+from uuid import uuid4
 
-from django.test.utils import override_settings
 from django.conf import settings
+from django.test.utils import override_settings
 from django.utils import translation
-
+from mock import Mock, patch
 from nose.plugins.skip import SkipTest
 
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.contentstore.content import StaticContent
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.exceptions import NotFoundError
-from xmodule.contentstore.django import contentstore
-from xmodule.video_module import transcripts_utils
 from contentstore.tests.utils import mock_requests_get
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.video_module import transcripts_utils
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex

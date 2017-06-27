@@ -96,7 +96,7 @@ class MockUserPartitionScheme(object):
         self.name = name
         self.current_group = current_group
 
-    def get_group_for_user(self, course_id, user, user_partition, assign=True, track_function=None):  # pylint: disable=unused-argument
+    def get_group_for_user(self, course_id, user, user_partition, assign=True):  # pylint: disable=unused-argument
         """
         Returns the current group if set, else the first group from the specified user partition.
         """
@@ -446,7 +446,6 @@ class PartitionServiceBaseClass(PartitionTestCase):
         return MockPartitionService(
             self.course,
             course_id=self.course.id,
-            track_function=Mock(),
             cache=cache
         )
 

@@ -8,6 +8,7 @@ from django.utils.translation import ugettext as _
 from django.template import RequestContext
 import third_party_auth
 from third_party_auth import pipeline
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
 %>
@@ -27,12 +28,6 @@ from openedx.core.djangolib.markup import HTML, Text
   <%static:include path="dashboard/${template_name}.underscore" />
 </script>
 % endfor
-
-% for template_name in ["dashboard_search_item", "dashboard_search_results", "search_loading", "search_error"]:
-<script type="text/template" id="${template_name}-tpl">
-    <%static:include path="search/${template_name}.underscore" />
-</script>
-% endfor
 </%block>
 
 <%block name="js_extra">
@@ -48,7 +43,7 @@ from openedx.core.djangolib.markup import HTML, Text
     });
   </script>
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
-    <%static:require_module module_name="js/search/dashboard/dashboard_search_factory" class_name="DashboardSearchFactory">
+    <%static:require_module module_name="course_search/js/dashboard_search_factory" class_name="DashboardSearchFactory">
         DashboardSearchFactory();
     </%static:require_module>
   % endif
@@ -102,7 +97,12 @@ from openedx.core.djangolib.markup import HTML, Text
 
         % if len(course_enrollments) > 0:
           <ul class="listing-courses">
-          <% share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}) %>
+          <%
+              share_settings = configuration_helpers.get_value(
+                  'SOCIAL_SHARING_SETTINGS',
+                  getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
+              )
+          %>
           % for dashboard_index, enrollment in enumerate(course_enrollments):
             <% show_courseware_link = (enrollment.course_id in show_courseware_links_for) %>
             <% cert_status = cert_statuses.get(enrollment.course_id) %>
@@ -159,7 +159,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
       % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
         <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
-          <form>
+          <form class="search-form">
             <label for="dashboard-search-input">${_('Search Your Courses')}</label>
             <div class="search-field-wrapper">
               <input id="dashboard-search-input" type="text" class="search-field"/>

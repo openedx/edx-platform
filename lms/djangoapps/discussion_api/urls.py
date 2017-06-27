@@ -3,11 +3,9 @@ Discussion API URLs
 """
 from django.conf import settings
 from django.conf.urls import include, patterns, url
-
 from rest_framework.routers import SimpleRouter
 
 from discussion_api.views import CommentViewSet, CourseTopicsView, CourseView, ThreadViewSet
-
 
 ROUTER = SimpleRouter()
 ROUTER.register("threads", ThreadViewSet, base_name="thread")

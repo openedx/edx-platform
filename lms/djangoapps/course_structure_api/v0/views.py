@@ -4,14 +4,15 @@ import logging
 
 from django.conf import settings
 from django.http import Http404
+from edx_rest_framework_extensions.authentication import JwtAuthentication
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.authentication import SessionAuthentication
-from rest_framework_oauth.authentication import OAuth2Authentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_oauth.authentication import OAuth2Authentication
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.keys import CourseKey
 
 from course_structure_api.v0 import serializers
 from courseware import courses
@@ -19,7 +20,6 @@ from courseware.access import has_access
 from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
 from openedx.core.lib.exceptions import CourseNotFoundError
 from student.roles import CourseInstructorRole, CourseStaffRole
-
 
 log = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class CourseViewMixin(object):
     Mixin for views dealing with course content. Also handles authorization and authentication.
     """
     lookup_field = 'course_id'
-    authentication_classes = (OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     def get_course_or_404(self):
@@ -55,6 +55,7 @@ class CourseViewMixin(object):
         :param func: function to be wrapped
         :returns: the wrapped function
         """
+
         def func_wrapper(self, *args, **kwargs):
             """Wrapper function for this decorator.
 

@@ -2,9 +2,8 @@
 This module handles the detection of crawlers, so that we can handle them
 appropriately in other parts of the code.
 """
-from django.db import models
-
 from config_models.models import ConfigurationModel
+from django.db import models
 
 
 class CrawlersConfig(ConfigurationModel):

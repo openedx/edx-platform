@@ -4,15 +4,16 @@
 Acceptance tests for CMS Video Module.
 """
 import os
+from unittest import skipIf
 
 from mock import patch
 from nose.plugins.attrib import attr
-from unittest import skipIf
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.pages.studio.video.video import VideoComponentPage
-from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
-from common.test.acceptance.tests.helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
+from common.test.acceptance.tests.helpers import UniqueCourseTest, YouTubeStubConfig, is_youtube_available
 
 
 @skipIf(is_youtube_available() is False, 'YouTube is not available!')

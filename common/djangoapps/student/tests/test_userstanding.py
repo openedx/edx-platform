@@ -4,11 +4,12 @@ that students with disabled accounts are unable to access the courseware.
 """
 import unittest
 
-from student.tests.factories import UserFactory, UserStandingFactory
-from student.models import UserStanding
 from django.conf import settings
-from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
+from django.test import Client, TestCase
+
+from student.models import UserStanding
+from student.tests.factories import UserFactory, UserStandingFactory
 
 
 class UserStandingTest(TestCase):

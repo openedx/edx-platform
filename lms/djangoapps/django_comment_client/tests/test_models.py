@@ -6,9 +6,7 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 
 import django_comment_common.models as models
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
-)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 

@@ -45,8 +45,8 @@ CSRF cookie.
 import logging
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
 from django.middleware.csrf import CsrfViewMiddleware
-from django.core.exceptions import MiddlewareNotUsed, ImproperlyConfigured
 
 from .helpers import is_cross_domain_request_allowed, skip_cross_domain_referer_check
 

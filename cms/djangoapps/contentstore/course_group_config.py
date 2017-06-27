@@ -4,12 +4,12 @@ Class for manipulating groups configuration on a course object.
 import json
 import logging
 
-from util.db import generate_int_id, MYSQL_MAX_INT
-
 from django.utils.translation import ugettext as _
+
 from contentstore.utils import reverse_usage_url
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
-from xmodule.partitions.partitions import UserPartition, MINIMUM_STATIC_PARTITION_ID
+from util.db import MYSQL_MAX_INT, generate_int_id
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, UserPartition
 from xmodule.partitions.partitions_service import get_all_partitions_for_course
 from xmodule.split_test_module import get_split_user_partitions
 

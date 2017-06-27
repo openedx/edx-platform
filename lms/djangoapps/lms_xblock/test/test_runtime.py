@@ -2,24 +2,23 @@
 Tests of the LMS XBlock Runtime and associated utilities
 """
 
-from django.conf import settings
-from ddt import ddt, data
-from django.test import TestCase
-from mock import Mock, patch
 from urlparse import urlparse
 
+from ddt import data, ddt
+from django.conf import settings
+from django.test import TestCase
+from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import BlockUsageLocator, CourseLocator, SlashSeparatedCourseKey
+from xblock.exceptions import NoSuchServiceError
+from xblock.fields import ScopeIds
 
 from badges.tests.factories import BadgeClassFactory
 from badges.tests.test_models import get_image
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
-from xblock.fields import ScopeIds
+from student.tests.factories import UserFactory
 from xmodule.modulestore.django import ModuleI18nService
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xblock.exceptions import NoSuchServiceError
-
-from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 
 

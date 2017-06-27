@@ -3,13 +3,15 @@
 A linting tool to check if templates are safe
 """
 from __future__ import print_function
+
 import argparse
 import ast
-from enum import Enum
 import os
 import re
 import sys
 import textwrap
+
+from enum import Enum
 
 
 class StringLines(object):

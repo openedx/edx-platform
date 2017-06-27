@@ -7,10 +7,9 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
-
 from opaque_keys.edx.keys import CourseKey
 
-from student.models import User, CourseEnrollment
+from student.models import CourseEnrollment, User
 
 from .models import SoftwareSecurePhotoVerification
 

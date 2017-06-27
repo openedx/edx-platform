@@ -1,33 +1,30 @@
 """Interface for adding certificate generation tasks to the XQueue. """
 import json
-import random
 import logging
-import lxml.html
-from lxml.etree import XMLSyntaxError, ParserError
+import random
 from uuid import uuid4
 
-from django.test.client import RequestFactory
+import lxml.html
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
+from lxml.etree import ParserError, XMLSyntaxError
 from requests.auth import HTTPBasicAuth
 
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
-from xmodule.modulestore.django import modulestore
-from capa.xqueue_interface import XQueueInterface
-from capa.xqueue_interface import make_xheader, make_hashkey
-from course_modes.models import CourseMode
-from student.models import UserProfile, CourseEnrollment
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-
+from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
+from certificates.models import CertificateStatuses as status
 from certificates.models import (
     CertificateStatuses,
-    GeneratedCertificate,
-    certificate_status_for_student,
-    CertificateStatuses as status,
     CertificateWhitelist,
-    ExampleCertificate
+    ExampleCertificate,
+    GeneratedCertificate,
+    certificate_status_for_student
 )
-
+from course_modes.models import CourseMode
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from student.models import CourseEnrollment, UserProfile
+from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)
 

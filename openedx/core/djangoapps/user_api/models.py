@@ -4,20 +4,19 @@ Django ORM model specifications for the User API application
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
-from django.db.models.signals import post_delete, pre_save, post_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
 
-from util.model_utils import get_changed_fields_dict, emit_setting_changed_event
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-
 # Currently, the "student" app is responsible for
 # accounts, profiles, enrollments, and the student dashboard.
 # We are trying to move some of this functionality into separate apps,
 # but currently the rest of the system assumes that "student" defines
 # certain models.  For now we will leave the models in "student" and
 # create an alias in "user_api".
-from student.models import UserProfile, Registration, PendingEmailChange  # pylint: disable=unused-import
+from student.models import PendingEmailChange, Registration, UserProfile  # pylint: disable=unused-import
+from util.model_utils import emit_setting_changed_event, get_changed_fields_dict
 
 
 class UserPreference(models.Model):
@@ -29,6 +28,15 @@ class UserPreference(models.Model):
 
     class Meta(object):
         unique_together = ("user", "key")
+
+    @staticmethod
+    def get_all_preferences(user):
+        """
+        Gets all preferences for a given user
+
+        Returns: Set of (preference type, value) pairs for each of the user's preferences
+        """
+        return dict([(pref.key, pref.value) for pref in user.preferences.all()])
 
     @classmethod
     def get_value(cls, user, preference_key, default=None):

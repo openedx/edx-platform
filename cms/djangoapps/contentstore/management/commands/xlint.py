@@ -2,6 +2,7 @@
 Verify the structure of courseware as to it's suitability for import
 """
 from django.core.management.base import BaseCommand, CommandError
+
 from xmodule.modulestore.xml_importer import perform_xlint
 
 

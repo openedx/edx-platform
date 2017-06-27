@@ -1,13 +1,13 @@
 """
 Tests for the lms_filter_generator
 """
-from mock import patch, Mock
+from mock import Mock, patch
 
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
 from lms.lib.courseware_search.lms_filter_generator import LmsSearchFilterGenerator
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):

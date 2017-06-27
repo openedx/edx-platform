@@ -44,7 +44,7 @@
   <div class="collection-references wrapper-group-configuration-usages">
     <% if (!_.isEmpty(usage)) { %>
       <h4 class="intro group-configuration-usage-text">
-        <%- gettext('This group controls visibility of:') %>
+        <%- gettext('This group controls access to:') %>
       </h4>
       <ol class="usage group-configuration-usage">
         <% _.each(usage, function(unit) { %>
@@ -56,7 +56,7 @@
     <% } else { %>
         <p class="group-configuration-usage-text">
             <%= HtmlUtils.interpolateHtml(
-                    gettext("Use this group to control a component's visibility in the {linkStart}Course Outline{linkEnd}."),
+                    gettext("In the {linkStart}Course Outline{linkEnd}, use this group to control access to a component."),
                     {
                         linkStart: HtmlUtils.interpolateHtml(
                             HtmlUtils.HTML('<a href="{courseOutlineUrl}" title="{courseOutlineTitle}">'),

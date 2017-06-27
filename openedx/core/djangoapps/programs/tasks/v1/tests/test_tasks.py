@@ -3,15 +3,15 @@ Tests for programs celery tasks.
 """
 import json
 
-from celery.exceptions import MaxRetriesExceededError
 import ddt
-from django.conf import settings
-from django.test import override_settings, TestCase
-from edx_rest_api_client import exceptions
-from edx_rest_api_client.client import EdxRestApiClient
-from edx_oauth2_provider.tests.factories import ClientFactory
 import httpretty
 import mock
+from celery.exceptions import MaxRetriesExceededError
+from django.conf import settings
+from django.test import override_settings, TestCase
+from edx_oauth2_provider.tests.factories import ClientFactory
+from edx_rest_api_client import exceptions
+from edx_rest_api_client.client import EdxRestApiClient
 
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
@@ -19,7 +19,7 @@ from openedx.core.djangoapps.programs.tasks.v1 import tasks
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 
-
+CREDENTIALS_INTERNAL_SERVICE_URL = 'https://credentials.example.com'
 TASKS_MODULE = 'openedx.core.djangoapps.programs.tasks.v1.tasks'
 
 
@@ -29,6 +29,7 @@ class GetApiClientTestCase(CredentialsApiConfigMixin, TestCase):
     Test the get_api_client function
     """
 
+    @override_settings(CREDENTIALS_INTERNAL_SERVICE_URL=CREDENTIALS_INTERNAL_SERVICE_URL)
     @mock.patch(TASKS_MODULE + '.JwtBuilder.build_token')
     def test_get_api_client(self, mock_build_token):
         """
@@ -36,13 +37,12 @@ class GetApiClientTestCase(CredentialsApiConfigMixin, TestCase):
         """
         student = UserFactory()
         ClientFactory.create(name='credentials')
-        api_config = self.create_credentials_config(
-            internal_service_url='http://foo'
-        )
+        api_config = self.create_credentials_config()
         mock_build_token.return_value = 'test-token'
 
         api_client = tasks.get_api_client(api_config, student)
-        self.assertEqual(api_client._store['base_url'], 'http://foo/api/v2/')  # pylint: disable=protected-access
+        expected = CREDENTIALS_INTERNAL_SERVICE_URL.strip('/') + '/api/v2/'
+        self.assertEqual(api_client._store['base_url'], expected)  # pylint: disable=protected-access
         self.assertEqual(api_client._store['session'].auth.token, 'test-token')  # pylint: disable=protected-access
 
 
@@ -82,7 +82,7 @@ class GetAwardedCertificateProgramsTestCase(TestCase):
         ]
 
         result = tasks.get_certified_programs(student)
-        self.assertEqual(mock_get_credentials.call_args[0], (student, ))
+        self.assertEqual(mock_get_credentials.call_args[0], (student,))
         self.assertEqual(result, [1])
 
 
@@ -136,10 +136,10 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)  # pylint: disable=no-member
 
     def test_completion_check(
-            self,
-            mock_get_completed_programs,
-            mock_get_certified_programs,  # pylint: disable=unused-argument
-            mock_award_program_certificate,  # pylint: disable=unused-argument
+        self,
+        mock_get_completed_programs,
+        mock_get_certified_programs,  # pylint: disable=unused-argument
+        mock_award_program_certificate,  # pylint: disable=unused-argument
     ):
         """
         Checks that the Programs API is used correctly to determine completed
@@ -155,12 +155,12 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
     )
     @ddt.unpack
     def test_awarding_certs(
-            self,
-            already_awarded_program_uuids,
-            expected_awarded_program_uuids,
-            mock_get_completed_programs,
-            mock_get_certified_programs,
-            mock_award_program_certificate,
+        self,
+        already_awarded_program_uuids,
+        expected_awarded_program_uuids,
+        mock_get_completed_programs,
+        mock_get_certified_programs,
+        mock_award_program_certificate,
     ):
         """
         Checks that the Credentials API is used to award certificates for
@@ -179,10 +179,10 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
     )
     @ddt.unpack
     def test_retry_if_config_disabled(
-            self,
-            disabled_config_type,
-            disabled_config_attribute,
-            *mock_helpers
+        self,
+        disabled_config_type,
+        disabled_config_attribute,
+        *mock_helpers
     ):
         """
         Checks that the task is aborted if any relevant api configs are
@@ -208,10 +208,10 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
             self.assertFalse(mock_helper.called)
 
     def test_abort_if_no_completed_programs(
-            self,
-            mock_get_completed_programs,
-            mock_get_certified_programs,
-            mock_award_program_certificate,
+        self,
+        mock_get_completed_programs,
+        mock_get_certified_programs,
+        mock_award_program_certificate,
     ):
         """
         Checks that the task will be aborted without further action if there
@@ -234,19 +234,21 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
             http://www.voidspace.org.uk/python/mock/mock.html#mock.Mock.side_effect
 
         """
+
         def side_effect(*_a):  # pylint: disable=missing-docstring
             if side_effects:
                 exc = side_effects.pop(0)
                 if exc:
                     raise exc
             return mock.DEFAULT
+
         return side_effect
 
     def test_continue_awarding_certs_if_error(
-            self,
-            mock_get_completed_programs,
-            mock_get_certified_programs,
-            mock_award_program_certificate,
+        self,
+        mock_get_completed_programs,
+        mock_get_certified_programs,
+        mock_award_program_certificate,
     ):
         """
         Checks that a single failure to award one of several certificates
@@ -268,9 +270,9 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         mock_info.assert_any_call(mock.ANY, 2, self.student.username)
 
     def test_retry_on_programs_api_errors(
-            self,
-            mock_get_completed_programs,
-            *_mock_helpers  # pylint: disable=unused-argument
+        self,
+        mock_get_completed_programs,
+        *_mock_helpers  # pylint: disable=unused-argument
     ):
         """
         Ensures that any otherwise-unhandled errors that arise while trying
@@ -283,10 +285,10 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         self.assertEqual(mock_get_completed_programs.call_count, 2)
 
     def test_retry_on_credentials_api_errors(
-            self,
-            mock_get_completed_programs,
-            mock_get_certified_programs,
-            mock_award_program_certificate,
+        self,
+        mock_get_completed_programs,
+        mock_get_certified_programs,
+        mock_award_program_certificate,
     ):
         """
         Ensures that any otherwise-unhandled errors that arise while trying
@@ -302,10 +304,10 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         self.assertEqual(mock_award_program_certificate.call_count, 1)
 
     def test_no_retry_on_credentials_api_not_found_errors(
-            self,
-            mock_get_completed_programs,
-            mock_get_certified_programs,
-            mock_award_program_certificate,
+        self,
+        mock_get_completed_programs,
+        mock_get_certified_programs,
+        mock_award_program_certificate,
     ):
         mock_get_completed_programs.return_value = [1, 2]
         mock_get_certified_programs.side_effect = [[], [2]]

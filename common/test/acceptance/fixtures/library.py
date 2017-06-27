@@ -5,7 +5,7 @@ Fixture to create a Content Library
 from opaque_keys.edx.keys import CourseKey
 
 from common.test.acceptance.fixtures import STUDIO_BASE_URL
-from common.test.acceptance.fixtures.base import XBlockContainerFixture, FixtureError
+from common.test.acceptance.fixtures.base import FixtureError, XBlockContainerFixture
 
 
 class LibraryFixture(XBlockContainerFixture):

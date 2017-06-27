@@ -1,11 +1,11 @@
 """
 Tests Draft import order.
 """
-from xmodule.modulestore.xml_importer import import_course_from_xml
-
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.django import modulestore
 from django.conf import settings
+
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 

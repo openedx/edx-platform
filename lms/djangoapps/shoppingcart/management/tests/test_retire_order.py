@@ -1,13 +1,14 @@
 """Tests for the retire_order command"""
 
 from tempfile import NamedTemporaryFile
+
 from django.core.management import call_command
 
 from course_modes.models import CourseMode
+from shoppingcart.models import CertificateItem, Order
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from shoppingcart.models import Order, CertificateItem
-from student.tests.factories import UserFactory
 
 
 class TestRetireOrder(ModuleStoreTestCase):

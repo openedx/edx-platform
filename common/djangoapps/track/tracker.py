@@ -21,12 +21,10 @@ below::
 import inspect
 from importlib import import_module
 
+from django.conf import settings
 from dogapi import dog_stats_api
 
-from django.conf import settings
-
 from track.backends import BaseBackend
-
 
 __all__ = ['send']
 

@@ -10,20 +10,20 @@ import ddt
 from flaky import flaky
 from nose.plugins.attrib import attr
 
-from ..helpers import UniqueCourseTest, EventsTestMixin, auto_auth, create_multiple_choice_problem
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from ...pages.common.auto_auth import AutoAuthPage
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.course_home import CourseHomePage
 from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
 from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.lms.dashboard import DashboardPage
-from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage, FakeSoftwareSecureVerificationPage
+from ...pages.lms.pay_and_verify import FakePaymentPage, FakeSoftwareSecureVerificationPage, PaymentAndVerificationFlow
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
 from ...pages.lms.staff_view import StaffCoursewarePage
 from ...pages.lms.track_selection import TrackSelectionPage
-from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
+from ..helpers import EventsTestMixin, UniqueCourseTest, auto_auth, create_multiple_choice_problem
 
 
 @attr(shard=9)
@@ -77,10 +77,6 @@ class CoursewareTest(UniqueCourseTest):
         self.problem_page = ProblemPage(self.browser)  # pylint: disable=attribute-defined-outside-init
         self.assertEqual(self.problem_page.problem_name, 'Test Problem 1')
 
-    def _create_breadcrumb(self, index):
-        """ Create breadcrumb """
-        return ['Test Section {}'.format(index), 'Test Subsection {}'.format(index), 'Test Problem {}'.format(index)]
-
     def test_courseware(self):
         """
         Test courseware if recent visited subsection become unpublished.
@@ -118,11 +114,15 @@ class CoursewareTest(UniqueCourseTest):
         """
         xblocks = self.course_fix.get_nested_xblocks(category="problem")
         for index in range(1, len(xblocks) + 1):
+            test_section_title = 'Test Section {}'.format(index)
+            test_subsection_title = 'Test Subsection {}'.format(index)
+            test_unit_title = 'Test Problem {}'.format(index)
             self.course_home_page.visit()
-            self.course_home_page.outline.go_to_section('Test Section {}'.format(index), 'Test Subsection {}'.format(index))
-            courseware_page_breadcrumb = self.courseware_page.breadcrumb
-            expected_breadcrumb = self._create_breadcrumb(index)  # pylint: disable=no-member
-            self.assertEqual(courseware_page_breadcrumb, expected_breadcrumb)
+            self.course_home_page.outline.go_to_section(test_section_title, test_subsection_title)
+            course_nav = self.courseware_page.nav
+            self.assertEqual(course_nav.breadcrumb_section_title, test_section_title)
+            self.assertEqual(course_nav.breadcrumb_subsection_title, test_subsection_title)
+            self.assertEqual(course_nav.breadcrumb_unit_title, test_unit_title)
 
 
 @attr(shard=9)

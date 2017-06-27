@@ -1,5 +1,6 @@
 """Track selection page"""
 from bok_choy.page_object import PageObject
+
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow

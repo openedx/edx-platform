@@ -1,13 +1,12 @@
 """
 Utility methods useful for Studio page tests.
 """
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.keys import Keys
 from bok_choy.javascript import js_defined
 from bok_choy.promise import EmptyPromise
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 
 from common.test.acceptance.pages.common.utils import click_css, sync_on_notification
-
 
 NAV_HELP_NOT_SIGNED_IN_CSS = '.nav-item.nav-not-signedin-help a'
 NAV_HELP_CSS = '.nav-item.nav-account-help a'

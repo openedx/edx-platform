@@ -4,16 +4,16 @@ Library edit page in Studio
 from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
+
+from common.test.acceptance.pages.common.utils import confirm_prompt, sync_on_notification
+from common.test.acceptance.pages.studio import BASE_URL
 from common.test.acceptance.pages.studio.component_editor import ComponentEditorView
 from common.test.acceptance.pages.studio.container import XBlockWrapper
-from common.test.acceptance.pages.studio.users import UsersPageMixin
 from common.test.acceptance.pages.studio.pagination import PaginatedMixin
-from selenium.webdriver.common.keys import Keys
+from common.test.acceptance.pages.studio.users import UsersPageMixin
 from common.test.acceptance.pages.studio.utils import HelpMixin
-from common.test.acceptance.pages.common.utils import confirm_prompt, sync_on_notification
-
-from common.test.acceptance.pages.studio import BASE_URL
 
 
 class LibraryPage(PageObject, HelpMixin):

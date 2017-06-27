@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations, models
 import django.db.models.deletion
-import openedx.core.djangoapps.xmodule_django.models
 from django.conf import settings
+from django.db import migrations, models
+
+import openedx.core.djangoapps.xmodule_django.models
 
 
 class Migration(migrations.Migration):

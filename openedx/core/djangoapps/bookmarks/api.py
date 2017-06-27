@@ -1,11 +1,13 @@
 """
 Bookmarks Python API.
 """
-from eventtracking import tracker
-from . import DEFAULT_FIELDS, OPTIONAL_FIELDS
-from xmodule.modulestore.django import modulestore
 from django.conf import settings
+
+from eventtracking import tracker
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from . import DEFAULT_FIELDS, OPTIONAL_FIELDS
 from .models import Bookmark
 from .serializers import BookmarkSerializer
 

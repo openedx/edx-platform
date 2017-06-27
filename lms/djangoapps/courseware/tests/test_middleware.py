@@ -2,15 +2,14 @@
 Tests for courseware middleware
 """
 
-from django.test.client import RequestFactory
 from django.http import Http404
+from django.test.client import RequestFactory
 from nose.plugins.attrib import attr
-
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from lms.djangoapps.courseware.exceptions import Redirect
 from lms.djangoapps.courseware.middleware import RedirectMiddleware
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=1)

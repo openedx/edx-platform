@@ -1,7 +1,7 @@
 """
 Forum urls for the django_comment_client.
 """
-from django.conf.urls import url, patterns
+from django.conf.urls import patterns, url
 
 from .views import DiscussionBoardFragmentView
 

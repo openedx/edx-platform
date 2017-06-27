@@ -40,6 +40,7 @@ SUPPORTED_FIELDS = [
     SupportedFieldType('graded'),
     SupportedFieldType('format'),
     SupportedFieldType('due'),
+    SupportedFieldType('show_correctness'),
     # 'student_view_data'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_DATA, StudentViewTransformer),
     # 'student_view_multi_device'

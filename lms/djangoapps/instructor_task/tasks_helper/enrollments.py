@@ -1,30 +1,35 @@
 """
 Instructor tasks related to enrollments.
 """
-from datetime import datetime
-from django.conf import settings
-from django.utils.translation import ugettext as _
 import logging
-from pytz import UTC
+from datetime import datetime
 from StringIO import StringIO
 from time import time
 
-from edxmako.shortcuts import render_to_string
+from django.conf import settings
+from django.utils.translation import ugettext as _
+from pytz import UTC
+
 from courseware.courses import get_course_by_id
-from lms.djangoapps.instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
-from lms.djangoapps.instructor_task.models import ReportStore
+from edxmako.shortcuts import render_to_string
 from instructor_analytics.basic import enrolled_students_features, list_may_enroll
 from instructor_analytics.csvs import format_dictlist
+from lms.djangoapps.instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
+from lms.djangoapps.instructor_task.models import ReportStore
 from shoppingcart.models import (
-    PaidCourseRegistration, CourseRegCodeItem, InvoiceTransaction,
-    Invoice, CouponRedemption, RegistrationCodeRedemption, CourseRegistrationCode
+    CouponRedemption,
+    CourseRegCodeItem,
+    CourseRegistrationCode,
+    Invoice,
+    InvoiceTransaction,
+    PaidCourseRegistration,
+    RegistrationCodeRedemption
 )
-from student.models import CourseEnrollment, CourseAccessRole
+from student.models import CourseAccessRole, CourseEnrollment
 from util.file import course_filename_prefix_generator
 
 from .runner import TaskProgress
 from .utils import tracker_emit, upload_csv_to_report_store
-
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 FILTERED_OUT_ROLES = ['staff', 'instructor', 'finance_admin', 'sales_admin']

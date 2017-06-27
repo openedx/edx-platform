@@ -2,8 +2,8 @@
 Models for contentserver
 """
 
-from django.db.models.fields import PositiveIntegerField, TextField
 from config_models.models import ConfigurationModel
+from django.db.models.fields import PositiveIntegerField, TextField
 
 
 class CourseAssetCacheTtlConfig(ConfigurationModel):

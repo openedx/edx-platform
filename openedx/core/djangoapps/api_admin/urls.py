@@ -6,8 +6,13 @@ from django.contrib.auth.decorators import login_required
 
 from openedx.core.djangoapps.api_admin.decorators import api_access_enabled_or_404
 from openedx.core.djangoapps.api_admin.views import (
-    ApiRequestView, ApiRequestStatusView, ApiTosView, CatalogListView, CatalogEditView,
-    CatalogPreviewView, CatalogSearchView
+    ApiRequestStatusView,
+    ApiRequestView,
+    ApiTosView,
+    CatalogEditView,
+    CatalogListView,
+    CatalogPreviewView,
+    CatalogSearchView
 )
 
 urlpatterns = (

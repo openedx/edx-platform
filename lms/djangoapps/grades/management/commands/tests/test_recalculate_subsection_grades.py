@@ -2,14 +2,15 @@
 Tests for reset_grades management command.
 """
 
-import ddt
 from datetime import datetime
+
+import ddt
 from django.conf import settings
-from mock import patch, MagicMock
+from mock import MagicMock, patch
 from pytz import utc
 
-from lms.djangoapps.grades.management.commands import recalculate_subsection_grades
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
+from lms.djangoapps.grades.management.commands import recalculate_subsection_grades
 from lms.djangoapps.grades.tests.test_tasks import HasCourseWithProblemsMixin
 from track.event_transaction_utils import get_event_transaction_id
 from util.date_utils import to_timestamp

@@ -1,19 +1,20 @@
 """
 Add and create new modes for running courses on this particular LMS
 """
+from collections import defaultdict, namedtuple
 from datetime import datetime, timedelta
-import pytz
 
-from collections import namedtuple, defaultdict
+import pytz
 from config_models.models import ConfigurationModel
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-from request_cache.middleware import ns_request_cached, RequestCache
 
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from request_cache.middleware import RequestCache, ns_request_cached
 
 Mode = namedtuple('Mode',
                   [
@@ -119,8 +120,21 @@ class CourseMode(models.Model):
     NO_ID_PROFESSIONAL_MODE = "no-id-professional"
     CREDIT_MODE = "credit"
 
-    DEFAULT_MODE = Mode(AUDIT, _('Audit'), 0, '', 'usd', None, None, None, None)
-    DEFAULT_MODE_SLUG = AUDIT
+    DEFAULT_MODE = Mode(
+        settings.COURSE_MODE_DEFAULTS['slug'],
+        settings.COURSE_MODE_DEFAULTS['name'],
+        settings.COURSE_MODE_DEFAULTS['min_price'],
+        settings.COURSE_MODE_DEFAULTS['suggested_prices'],
+        settings.COURSE_MODE_DEFAULTS['currency'],
+        settings.COURSE_MODE_DEFAULTS['expiration_datetime'],
+        settings.COURSE_MODE_DEFAULTS['description'],
+        settings.COURSE_MODE_DEFAULTS['sku'],
+        settings.COURSE_MODE_DEFAULTS['bulk_sku'],
+    )
+    DEFAULT_MODE_SLUG = settings.COURSE_MODE_DEFAULTS['slug']
+
+    # Modes utilized for audit/free enrollments
+    AUDIT_MODES = [AUDIT, HONOR]
 
     # Modes that allow a student to pursue a verified certificate
     VERIFIED_MODES = [VERIFIED, PROFESSIONAL]

@@ -5,31 +5,29 @@ import json
 import re
 import unittest
 
+import ddt
+from django.conf import settings
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.test.client import RequestFactory
-from django.contrib.auth.models import User
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
-from django.contrib.auth.tokens import default_token_generator
-from edx_oauth2_provider.tests.factories import ClientFactory, AccessTokenFactory, RefreshTokenFactory
+from django.utils.http import int_to_base36
+from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
+from mock import Mock, patch
 from oauth2_provider import models as dot_models
 from provider.oauth2 import models as dop_models
 
-from django.utils.http import int_to_base36
-
-from mock import Mock, patch
-import ddt
-
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.views import password_reset, password_reset_confirm_wrapper, SETTING_CHANGE_INITIATED
 from student.tests.factories import UserFactory
 from student.tests.test_email import mock_render_to_string
+from student.views import SETTING_CHANGE_INITIATED, password_reset, password_reset_confirm_wrapper
 from util.testing import EventTestMixin
 
 from .test_configuration_overrides import fake_get_value
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 @unittest.skipUnless(

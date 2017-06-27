@@ -6,40 +6,38 @@ Module do not support rollback (pressing "Cancel" button in Studio)
 All user changes are saved immediately.
 """
 import copy
-import os
-import logging
 import json
+import logging
+import os
+
 import requests
-
-from django.http import HttpResponse, Http404
-from django.core.exceptions import PermissionDenied
-from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.http import Http404, HttpResponse
 from django.utils.translation import ugettext as _
-
 from opaque_keys import InvalidKeyError
-
-from xmodule.contentstore.content import StaticContent
-from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import UsageKey
-from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-
-from util.json_request import JsonResponse
-
-from xmodule.video_module.transcripts_utils import (
-    generate_subs_from_source,
-    generate_srt_from_sjson, remove_subs_from_store,
-    download_youtube_subs, get_transcripts_from_youtube,
-    copy_or_rename_transcript,
-    manage_video_subtitles_save,
-    GetTranscriptsFromYouTubeException,
-    TranscriptsRequestValidationException,
-    youtube_video_transcript_name,
-)
 
 from student.auth import has_course_author_access
+from util.json_request import JsonResponse
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.video_module.transcripts_utils import (
+    GetTranscriptsFromYouTubeException,
+    TranscriptsRequestValidationException,
+    copy_or_rename_transcript,
+    download_youtube_subs,
+    generate_srt_from_sjson,
+    generate_subs_from_source,
+    get_transcripts_from_youtube,
+    manage_video_subtitles_save,
+    remove_subs_from_store,
+    youtube_video_transcript_name
+)
 
 __all__ = [
     'upload_transcripts',

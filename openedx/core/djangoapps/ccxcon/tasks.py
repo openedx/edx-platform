@@ -4,17 +4,10 @@ This file contains celery tasks for ccxcon
 
 from celery.task import task  # pylint: disable=no-name-in-module, import-error
 from celery.utils.log import get_task_logger  # pylint: disable=no-name-in-module, import-error
-from requests.exceptions import (
-    ConnectionError,
-    HTTPError,
-    RequestException,
-    TooManyRedirects
-)
-
 from opaque_keys.edx.keys import CourseKey
+from requests.exceptions import ConnectionError, HTTPError, RequestException, TooManyRedirects
 
 from openedx.core.djangoapps.ccxcon import api
-
 
 log = get_task_logger(__name__)
 

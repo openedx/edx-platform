@@ -1,17 +1,17 @@
 """
 Module for Image annotations using annotator.
 """
+import textwrap
+
 from lxml import etree
 from pkg_resources import resource_string
-
-from xmodule.x_module import XModule
-from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
-from xmodule.annotator_mixin import get_instructions, html_to_text
-from xmodule.annotator_token import retrieve_token
 from xblock.fragment import Fragment
 
-import textwrap
+from xmodule.annotator_mixin import get_instructions, html_to_text
+from xmodule.annotator_token import retrieve_token
+from xmodule.raw_module import RawDescriptor
+from xmodule.x_module import XModule
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file

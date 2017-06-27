@@ -4,12 +4,12 @@ This file contains implementation override of SearchResultProcessor which will a
     * Confirms user access to object
 """
 from django.core.urlresolvers import reverse
-
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from search.result_processor import SearchResultProcessor
-from xmodule.modulestore.django import modulestore
+
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.access import has_access
+from xmodule.modulestore.django import modulestore
 
 
 class LmsSearchResultProcessor(SearchResultProcessor):

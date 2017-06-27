@@ -1,11 +1,11 @@
 """
 APIs providing support for enterprise functionality.
 """
-from functools import wraps
 import hashlib
 import logging
-import six
+from functools import wraps
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -14,9 +14,15 @@ from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
-from slumber.exceptions import HttpClientError, HttpServerError
-
 from edx_rest_api_client.client import EdxRestApiClient
+from requests.exceptions import ConnectionError, Timeout
+from slumber.exceptions import HttpClientError, HttpServerError, SlumberBaseException
+
+from openedx.core.djangoapps.catalog.models import CatalogIntegration
+from openedx.core.djangoapps.catalog.utils import create_catalog_api_client
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.token_utils import JwtBuilder
+
 try:
     from enterprise import utils as enterprise_utils
     from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer
@@ -24,17 +30,8 @@ try:
     from enterprise.utils import consent_necessary_for_course
 except ImportError:
     pass
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from slumber.exceptions import SlumberBaseException
-from requests.exceptions import ConnectionError, Timeout
-from openedx.core.djangoapps.api_admin.utils import course_discovery_api_client
-
-from openedx.core.lib.token_utils import JwtBuilder
-from openedx.core.djangoapps.catalog.models import CatalogIntegration
-
 
 CONSENT_FAILED_PARAMETER = 'consent_failed'
-ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS = 'enterprise_customer_branding_override_details'
 LOGGER = logging.getLogger("edx.enterprise_helpers")
 
 
@@ -203,6 +200,7 @@ def data_sharing_consent_required(view_func):
     After granting consent, the user will be redirected back to the original request.path.
 
     """
+
     @wraps(view_func)
     def inner(request, course_id, *args, **kwargs):
         """
@@ -250,7 +248,7 @@ def enterprise_customer_for_request(request, tpa_hint=None):
         except EnterpriseCustomer.DoesNotExist:
             pass
 
-    ec_uuid = request.GET.get('enterprise_customer')
+    ec_uuid = request.GET.get('enterprise_customer') or request.COOKIES.get(settings.ENTERPRISE_CUSTOMER_COOKIE_NAME)
     if not ec and ec_uuid:
         try:
             ec = EnterpriseCustomer.objects.get(uuid=ec_uuid)
@@ -322,67 +320,10 @@ def insert_enterprise_pipeline_elements(pipeline):
         'enterprise.tpa_pipeline.handle_enterprise_logistration',
     )
     # Find the item we need to insert the data sharing consent elements before
-    insert_point = pipeline.index('social.pipeline.social_auth.load_extra_data')
+    insert_point = pipeline.index('social_core.pipeline.social_auth.load_extra_data')
 
     for index, element in enumerate(additional_elements):
         pipeline.insert(insert_point + index, element)
-
-
-def get_enterprise_customer_logo_url(request):
-    """
-    Client API operation adapter/wrapper.
-    """
-
-    if not enterprise_enabled():
-        return None
-
-    parameter = get_enterprise_branding_filter_param(request)
-    if not parameter:
-        return None
-
-    provider_id = parameter.get('provider_id', None)
-    ec_uuid = parameter.get('ec_uuid', None)
-
-    if provider_id:
-        branding_info = enterprise_utils.get_enterprise_branding_info_by_provider_id(identity_provider_id=provider_id)
-    elif ec_uuid:
-        branding_info = enterprise_utils.get_enterprise_branding_info_by_ec_uuid(ec_uuid=ec_uuid)
-
-    logo_url = None
-    if branding_info and branding_info.logo:
-        logo_url = branding_info.logo.url
-
-    return logo_url
-
-
-def set_enterprise_branding_filter_param(request, provider_id):
-    """
-    Setting 'ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS' in session. 'ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS'
-    either be provider_id or ec_uuid. e.g. {provider_id: 'xyz'} or {ec_src: enterprise_customer_uuid}
-    """
-    ec_uuid = request.GET.get('ec_src', None)
-    if provider_id:
-        LOGGER.info(
-            "Session key 'ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS' has been set with provider_id '%s'",
-            provider_id
-        )
-        request.session[ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS] = {'provider_id': provider_id}
-
-    elif ec_uuid:
-        # we are assuming that none sso based enterprise will return Enterprise Customer uuid as 'ec_src' in query
-        # param e.g. edx.org/foo/bar?ec_src=6185ed46-68a4-45d6-8367-96c0bf70d1a6
-        LOGGER.info(
-            "Session key 'ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS' has been set with ec_uuid '%s'", ec_uuid
-        )
-        request.session[ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS] = {'ec_uuid': ec_uuid}
-
-
-def get_enterprise_branding_filter_param(request):
-    """
-    :return Filter parameter from session for enterprise customer branding information.
-
-    """
-    return request.session.get(ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS, None)
 
 
 def get_cache_key(**kwargs):
@@ -521,7 +462,7 @@ def is_course_in_enterprise_catalog(site, course_id, enterprise_catalog_id):
 
         try:
             # GET: /api/v1/catalogs/{catalog_id}/contains?course_run_id={course_run_ids}
-            response = course_discovery_api_client(user=user).catalogs(enterprise_catalog_id).contains.get(
+            response = create_catalog_api_client(user=user).catalogs(enterprise_catalog_id).contains.get(
                 course_run_id=course_id
             )
             cache.set(cache_key, response, settings.COURSES_API_CACHE_TIMEOUT)

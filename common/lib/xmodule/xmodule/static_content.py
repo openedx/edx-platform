@@ -4,17 +4,17 @@ This module has utility functions for gathering up the static content
 that is defined by XModules and XModuleDescriptors (javascript and css)
 """
 
-import logging
-import hashlib
-import os
 import errno
+import hashlib
+import logging
+import os
 import sys
 from collections import defaultdict
+
 from docopt import docopt
 from path import Path as path
 
 from xmodule.x_module import XModuleDescriptor
-
 
 LOG = logging.getLogger(__name__)
 

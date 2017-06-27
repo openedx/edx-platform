@@ -1,19 +1,15 @@
 """
 Django storage backends for Open edX.
 """
-from django_pipeline_forgiving.storages import PipelineForgivingStorage
 from django.contrib.staticfiles.storage import StaticFilesStorage
 from django.core.files.storage import get_storage_class
 from django.utils.lru_cache import lru_cache
-
+from django_pipeline_forgiving.storages import PipelineForgivingStorage
 from pipeline.storage import NonPackagingMixin
 from require.storage import OptimizedFilesMixin
-from openedx.core.djangoapps.theming.storage import (
-    ThemeStorage,
-    ThemeCachedFilesMixin,
-    ThemePipelineMixin
-)
 from storages.backends.s3boto import S3BotoStorage
+
+from openedx.core.djangoapps.theming.storage import ThemeCachedFilesMixin, ThemePipelineMixin, ThemeStorage
 
 
 class ProductionStorage(

@@ -2,14 +2,14 @@
 """
 End-to-end tests for the LMS that utilize the course home page and course outline.
 """
-from contextlib import contextmanager
+
 from nose.plugins.attrib import attr
 
-from ..helpers import auto_auth, load_data_str, UniqueCourseTest
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.bookmarks import BookmarksPage
 from ...pages.lms.course_home import CourseHomePage
 from ...pages.lms.courseware import CoursewarePage
+from ..helpers import UniqueCourseTest, auto_auth, load_data_str
 
 
 class CourseHomeBaseTest(UniqueCourseTest):
@@ -124,7 +124,7 @@ class CourseHomeTest(CourseHomeBaseTest):
 @attr('a11y')
 class CourseHomeA11yTest(CourseHomeBaseTest):
     """
-    Tests the accessibility of the course home page with course outline.
+    Tests the accessibility of the course home page
     """
 
     def test_course_home_a11y(self):
@@ -134,3 +134,12 @@ class CourseHomeA11yTest(CourseHomeBaseTest):
         course_home_page = CourseHomePage(self.browser, self.course_id)
         course_home_page.visit()
         course_home_page.a11y_audit.check_for_accessibility_errors()
+
+    def test_course_search_a11y(self):
+        """
+        Test the accessibility of the search results page.
+        """
+        course_home_page = CourseHomePage(self.browser, self.course_id)
+        course_home_page.visit()
+        course_search_results_page = course_home_page.search_for_term("Test Search")
+        course_search_results_page.a11y_audit.check_for_accessibility_errors()

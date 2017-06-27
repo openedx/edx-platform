@@ -1,20 +1,27 @@
 """Provides factories for student models."""
 import random
+from datetime import datetime
+from uuid import uuid4
 
-from student.models import (User, UserProfile, Registration,
-                            CourseEnrollmentAllowed, CourseEnrollment,
-                            PendingEmailChange, UserStanding,
-                            CourseAccessRole)
-from course_modes.models import CourseMode
+import factory
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from datetime import datetime
-import factory
 from factory import lazy_attribute
 from factory.django import DjangoModelFactory
-from uuid import uuid4
-from pytz import UTC
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from pytz import UTC
+
+from course_modes.models import CourseMode
+from student.models import (
+    CourseAccessRole,
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    PendingEmailChange,
+    Registration,
+    User,
+    UserProfile,
+    UserStanding
+)
 
 # Factories are self documenting
 # pylint: disable=missing-docstring

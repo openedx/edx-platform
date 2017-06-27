@@ -4,36 +4,31 @@ Acceptance tests for the teams feature.
 import json
 import random
 import time
-
-from dateutil.parser import parse
-import ddt
-from nose.plugins.attrib import attr
-from selenium.common.exceptions import TimeoutException
 from uuid import uuid4
 
-from common.test.acceptance.tests.helpers import get_modal_alert, EventsTestMixin, UniqueCourseTest
+import ddt
+from dateutil.parser import parse
+from nose.plugins.attrib import attr
+from selenium.common.exceptions import TimeoutException
+
 from common.test.acceptance.fixtures import LMS_BASE_URL
 from common.test.acceptance.fixtures.course import CourseFixture
-from common.test.acceptance.fixtures.discussion import (
-    Thread,
-    MultipleThreadFixture,
-    ForumsConfigMixin,
-)
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.fixtures.discussion import ForumsConfigMixin, MultipleThreadFixture, Thread
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.utils import confirm_prompt
 from common.test.acceptance.pages.lms.course_info import CourseInfoPage
 from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 from common.test.acceptance.pages.lms.teams import (
-    TeamsPage,
-    MyTeamsPage,
-    BrowseTopicsPage,
     BrowseTeamsPage,
-    TeamManagementPage,
+    BrowseTopicsPage,
     EditMembershipPage,
-    TeamPage
+    MyTeamsPage,
+    TeamManagementPage,
+    TeamPage,
+    TeamsPage
 )
-from common.test.acceptance.pages.common.utils import confirm_prompt
-
+from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest, get_modal_alert
 
 TOPICS_PER_PAGE = 12
 

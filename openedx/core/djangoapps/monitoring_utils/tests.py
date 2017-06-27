@@ -2,7 +2,7 @@
 Tests for monitoring custom metrics.
 """
 from django.test import TestCase
-from mock import patch, call
+from mock import call, patch
 
 from openedx.core.djangoapps import monitoring_utils
 from openedx.core.djangoapps.monitoring_utils.middleware import MonitoringCustomMetrics

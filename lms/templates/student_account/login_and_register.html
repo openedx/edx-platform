@@ -1,6 +1,8 @@
+<%page expression_filter="h"/>
 <%!
     import json
     from django.utils.translation import ugettext as _
+    from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
     from openedx.core.djangolib.js_utils import dump_js_escaped_json
 %>
 <%namespace name='static' file='/static_content.html'/>
@@ -22,6 +24,9 @@
             newrelic.addPageAction('xfinished');
         }
     </%static:require_module>
+    % if configuration_helpers.get_value('DISPLAY_TOS_IN_MODAL_ON_REGISTRATION_PAGE', False):
+    <script type="text/javascript" src="${static.url('js/student_account/tos_modal.js')}"></script>
+    % endif
 </%block>
 
 <%block name="header_extras">

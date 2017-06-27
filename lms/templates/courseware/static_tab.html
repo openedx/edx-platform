@@ -25,6 +25,11 @@ ${HTML(fragment.foot_html())}
 <%include file="/courseware/course_navigation.html" args="active_page=active_page" />
 
 <main id="main" aria-label="Content" tabindex="-1">
+    <section class="container"
+    % if getattr(course, 'language'):
+      lang=${course.language}
+    % endif
+    >
     <section class="container">
       <div class="static_tab_wrapper">
         ${HTML(fragment.body_html())}

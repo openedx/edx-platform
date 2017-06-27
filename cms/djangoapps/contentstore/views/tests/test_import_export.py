@@ -2,41 +2,37 @@
 Unit tests for course import and export
 """
 import copy
-import ddt
 import json
 import logging
-import lxml
 import os
 import shutil
 import tarfile
 import tempfile
-from path import Path as path
 from uuid import uuid4
 
-from django.test.utils import override_settings
+import ddt
+import lxml
 from django.conf import settings
+from django.test.utils import override_settings
+from milestones.tests.utils import MilestonesTestCaseMixin
+from opaque_keys.edx.locator import LibraryLocator
+from path import Path as path
 
 from contentstore.tests.test_libraries import LibraryTestCase
-from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.xml_exporter import export_library_to_xml, export_course_to_xml
-from xmodule.modulestore.xml_importer import import_library_from_xml, import_course_from_xml
-from xmodule.modulestore import LIBRARY_ROOT, ModuleStoreEnum
-from contentstore.utils import reverse_course_url
 from contentstore.tests.utils import CourseTestCase
-
-from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, CourseFactory
-from xmodule.modulestore.tests.utils import (
-    MongoContentstoreBuilder, SPLIT_MODULESTORE_SETUP, TEST_DATA_DIR
-)
-from opaque_keys.edx.locator import LibraryLocator
-
+from contentstore.utils import reverse_course_url
+from models.settings.course_metadata import CourseMetadata
 from openedx.core.lib.extract_tar import safetar_extractall
 from student import auth
 from student.roles import CourseInstructorRole, CourseStaffRole
-from models.settings.course_metadata import CourseMetadata
 from util import milestones_helpers
-from milestones.tests.utils import MilestonesTestCaseMixin
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import LIBRARY_ROOT, ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
+from xmodule.modulestore.tests.utils import SPLIT_MODULESTORE_SETUP, TEST_DATA_DIR, MongoContentstoreBuilder
+from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex

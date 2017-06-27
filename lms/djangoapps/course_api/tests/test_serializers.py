@@ -3,21 +3,22 @@ Test data created by CourseSerializer and CourseDetailSerializer
 """
 
 from __future__ import unicode_literals
+
 from datetime import datetime
 
 import ddt
 from nose.plugins.attrib import attr
-from openedx.core.djangoapps.models.course_details import CourseDetails
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from rest_framework.test import APIRequestFactory
 from rest_framework.request import Request
-
+from rest_framework.test import APIRequestFactory
 from xblock.core import XBlock
+
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
-from ..serializers import CourseSerializer, CourseDetailSerializer
+from ..serializers import CourseDetailSerializer, CourseSerializer
 from .mixins import CourseApiFactoryMixin
 
 

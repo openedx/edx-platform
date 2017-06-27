@@ -1,8 +1,9 @@
 """Script for deleting orphans"""
 from django.core.management.base import BaseCommand, CommandError
-from contentstore.views.item import _delete_orphans
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
+from contentstore.views.item import _delete_orphans
 from xmodule.modulestore import ModuleStoreEnum
 
 

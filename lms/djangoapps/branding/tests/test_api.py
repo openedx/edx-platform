@@ -2,11 +2,11 @@
 """Tests of Branding API """
 from __future__ import unicode_literals
 
-from django.test import TestCase
-
 import mock
-from branding.api import get_logo_url, get_footer
+from django.test import TestCase
 from django.test.utils import override_settings
+
+from branding.api import get_footer, get_logo_url
 
 
 class TestHeader(TestCase):
@@ -90,6 +90,10 @@ class TestFooter(TestCase):
                 'url': 'http://open.edx.org',
                 'image': 'https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png',
                 'title': 'Powered by Open edX'
-            }
+            },
+            'edx_org_link': {
+                'url': 'https://www.edx.org/?utm_medium=affiliate_partner&utm_source=opensource-partner&utm_content=open-edx-partner-footer-link&utm_campaign=open-edx-footer',
+                'text': 'Take free online courses at edX.org',
+            },
         }
         self.assertEqual(actual_footer, expected_footer)

@@ -3,25 +3,26 @@ Asset compilation and collection.
 """
 
 from __future__ import print_function
-from datetime import datetime
-from functools import wraps
-from threading import Timer
+
 import argparse
 import glob
 import os
 import traceback
+from datetime import datetime
+from functools import wraps
+from threading import Timer
 
 from paver import tasks
-from paver.easy import sh, path, task, cmdopts, needs, consume_args, call_task, no_help
-from watchdog.observers.polling import PollingObserver
+from paver.easy import call_task, cmdopts, consume_args, needs, no_help, path, sh, task
 from watchdog.events import PatternMatchingEventHandler
-
-from .utils.envs import Env
-from .utils.cmd import cmd, django_cmd
-from .utils.timer import timed
-from .utils.process import run_background_process
+from watchdog.observers.polling import PollingObserver
 
 from openedx.core.djangoapps.theming.paver_helpers import get_theme_paths
+
+from .utils.cmd import cmd, django_cmd
+from .utils.envs import Env
+from .utils.process import run_background_process
+from .utils.timer import timed
 
 # setup baseline paths
 

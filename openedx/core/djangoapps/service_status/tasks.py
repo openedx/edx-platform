@@ -4,9 +4,8 @@ Django Celery tasks for service status app
 
 import time
 
-from dogapi import dog_stats_api
-
 from djcelery import celery
+from dogapi import dog_stats_api
 
 
 @celery.task

@@ -1,8 +1,8 @@
 """ Test Student helpers """
 
 import logging
-import ddt
 
+import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -10,7 +10,6 @@ from django.test.client import RequestFactory
 from testfixtures import LogCapture
 
 from student.helpers import get_next_url_for_login_page
-
 
 LOGGER_NAME = "student.helpers"
 

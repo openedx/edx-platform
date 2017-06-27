@@ -89,6 +89,10 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
             Feedback.prototype.outFocus.apply(this);
         },
 
+        resize: function() {
+            // Do Nothing. Overridden to use our own styling instead of one provided by base modal
+        },
+
         focusModal: function() {
             Feedback.prototype.inFocus.apply(this, [this.options.modalWindowClass]);
             $(this.options.modalWindowClass).focus();

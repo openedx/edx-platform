@@ -1,6 +1,5 @@
 from django.conf.urls import patterns, url
 
-
 id_regex = r"(?P<note_id>[0-9A-Fa-f]+)"
 urlpatterns = patterns('notes.api',
                        url(r'^api$', 'api_request', {'resource': 'root'}, name='notes_api_root'),

@@ -3,16 +3,18 @@ Tests for the InstructorService
 """
 
 import json
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+
+import mock
+from nose.plugins.attrib import attr
+
 from courseware.models import StudentModule
 from lms.djangoapps.instructor.access import allow_access
 from lms.djangoapps.instructor.services import InstructorService
 from lms.djangoapps.instructor.tests.test_tools import msk_from_problem_urlname
-from nose.plugins.attrib import attr
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-import mock
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=1)

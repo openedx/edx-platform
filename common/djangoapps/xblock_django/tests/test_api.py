@@ -1,9 +1,9 @@
 """
 Tests related to XBlock support API.
 """
-from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
-from xblock_django.api import deprecated_xblocks, disabled_xblocks, authorable_xblocks
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from xblock_django.api import authorable_xblocks, deprecated_xblocks, disabled_xblocks
+from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
 
 
 class XBlockSupportTestCase(CacheIsolationTestCase):

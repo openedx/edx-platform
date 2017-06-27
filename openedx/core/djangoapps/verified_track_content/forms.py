@@ -2,14 +2,12 @@
 Forms for configuring courses for verified track cohorting
 """
 from django import forms
-
 from django.utils.translation import ugettext as _
-
-from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
+from xmodule.modulestore.django import modulestore
 
 
 class VerifiedTrackCourseForm(forms.ModelForm):

@@ -5,6 +5,9 @@ Models used to implement SAML SSO support in third_party_auth
 """
 from __future__ import absolute_import
 
+import json
+import logging
+
 from config_models.models import ConfigurationModel, cache
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -12,21 +15,26 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-import json
-import logging
-from provider.utils import long_token
 from provider.oauth2.models import Client
-from social.backends.base import BaseAuth
-from social.backends.oauth import OAuthAuth
-from social.backends.saml import SAMLAuth, SAMLIdentityProvider
-from .lti import LTIAuthBackend, LTI_PARAMS_KEY
-from .saml import STANDARD_SAML_PROVIDER_KEY, get_saml_idp_choices, get_saml_idp_class
-from social.exceptions import SocialAuthBaseException
-from social.utils import module_member
+from provider.utils import long_token
+from social_core.backends.base import BaseAuth
+from social_core.backends.oauth import OAuthAuth
+from social_core.backends.saml import SAMLAuth, SAMLIdentityProvider
+from social_core.exceptions import SocialAuthBaseException
+from social_core.utils import module_member
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
+from .lti import LTI_PARAMS_KEY, LTIAuthBackend
+from .saml import STANDARD_SAML_PROVIDER_KEY, get_saml_idp_choices, get_saml_idp_class
+
 log = logging.getLogger(__name__)
+
+REGISTRATION_FORM_FIELD_BLACKLIST = [
+    'name',
+    'username'
+]
 
 
 # A dictionary of {name: class} entries for each python-social-auth backend available.
@@ -238,8 +246,13 @@ class ProviderConfig(ConfigurationModel):
             values for that field. Where there is no value, the empty string
             must be used.
         """
+        registration_form_data = {}
+
         # Details about the user sent back from the provider.
-        details = pipeline_kwargs.get('details')
+        details = pipeline_kwargs.get('details').copy()
+
+        # Set the registration form to use the `fullname` detail for the `name` field.
+        registration_form_data['name'] = details.get('fullname', '')
 
         # Get the username separately to take advantage of the de-duping logic
         # built into the pipeline. The provider cannot de-dupe because it can't
@@ -247,13 +260,19 @@ class ProviderConfig(ConfigurationModel):
         # technically a data race between the creation of this value and the
         # creation of the user object, so it is still possible for users to get
         # an error on submit.
-        suggested_username = pipeline_kwargs.get('username')
+        registration_form_data['username'] = pipeline_kwargs.get('username')
 
-        return {
-            'email': details.get('email', ''),
-            'name': details.get('fullname', ''),
-            'username': suggested_username,
-        }
+        # Any other values that are present in the details dict should be copied
+        # into the registration form details. This may include details that do
+        # not map to a value that exists in the registration form. However,
+        # because the fields that are actually rendered are not based on this
+        # list, only those values that map to a valid registration form field
+        # will actually be sent to the form as default values.
+        for blacklisted_field in REGISTRATION_FORM_FIELD_BLACKLIST:
+            details.pop(blacklisted_field, None)
+        registration_form_data.update(details)
+
+        return registration_form_data
 
     def get_authentication_backend(self):
         """Gets associated Django settings.AUTHENTICATION_BACKEND string."""
@@ -398,10 +417,13 @@ class SAMLProviderConfig(ProviderConfig):
         verbose_name="Advanced settings", blank=True,
         help_text=(
             'For advanced use cases, enter a JSON object with addtional configuration. '
-            'The tpa-saml backend supports only {"requiredEntitlements": ["urn:..."]} '
-            'which can be used to require the presence of a specific eduPersonEntitlement. '
-            'Custom provider types, as selected in the "Identity Provider Type" field, may make '
-            'use of the information stored in this field for configuration.'
+            'The tpa-saml backend supports {"requiredEntitlements": ["urn:..."]}, '
+            'which can be used to require the presence of a specific eduPersonEntitlement, '
+            'and {"extra_field_definitions": [{"name": "...", "urn": "..."},...]}, which can be '
+            'used to define registration form fields and the URNs that can be used to retrieve '
+            'the relevant values from the SAML response. Custom provider types, as selected '
+            'in the "Identity Provider Type" field, may make use of the information stored '
+            'in this field for additional configuration.'
         ))
 
     def clean(self):
@@ -559,7 +581,7 @@ class SAMLConfiguration(ConfigurationModel):
             return getattr(settings, 'SOCIAL_AUTH_SAML_SP_PRIVATE_KEY', '')
         other_config = {
             # These defaults can be overriden by self.other_config_str
-            "EXTRA_DATA": ["attributes"],  # Save all attribute values the IdP sends into the UserSocialAuth table
+            "GET_ALL_EXTRA_DATA": True,  # Save all attribute values the IdP sends into the UserSocialAuth table
             "TECHNICAL_CONTACT": DEFAULT_SAML_CONTACT,
             "SUPPORT_CONTACT": DEFAULT_SAML_CONTACT,
         }

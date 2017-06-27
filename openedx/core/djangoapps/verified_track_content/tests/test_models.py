@@ -4,23 +4,26 @@ Tests for Verified Track Cohorting models
 # pylint: disable=attribute-defined-outside-init
 # pylint: disable=no-member
 
-from django.test import TestCase
 import mock
 from mock import patch
 
+from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
-
-from openedx.core.djangoapps.course_groups.cohorts import get_cohort
-from student.models import CourseMode
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from ..models import VerifiedTrackCohortedCourse, DEFAULT_VERIFIED_COHORT_NAME
-from ..tasks import sync_cohort_with_mode
 from openedx.core.djangoapps.course_groups.cohorts import (
-    set_course_cohort_settings, add_cohort, CourseCohort, DEFAULT_COHORT_NAME
+    DEFAULT_COHORT_NAME,
+    CourseCohort,
+    add_cohort,
+    get_cohort,
+    set_course_cohorted
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.models import CourseMode
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
+from ..models import DEFAULT_VERIFIED_COHORT_NAME, VerifiedTrackCohortedCourse
+from ..tasks import sync_cohort_with_mode
 
 
 class TestVerifiedTrackCohortedCourse(TestCase):
@@ -88,7 +91,7 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
 
     def _enable_cohorting(self):
         """ Turn on cohorting in the course. """
-        set_course_cohort_settings(self.course.id, is_cohorted=True)
+        set_course_cohorted(self.course.id, True)
 
     def _create_verified_cohort(self, name=DEFAULT_VERIFIED_COHORT_NAME):
         """ Create a verified cohort. """

@@ -2,23 +2,20 @@
 View endpoints for Survey
 """
 
-import logging
 import json
+import logging
 
-from django.contrib.auth.decorators import login_required
-from django.http import (
-    HttpResponse, HttpResponseRedirect, HttpResponseNotFound
-)
-from django.core.urlresolvers import reverse
-from django.views.decorators.http import require_POST
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.utils.html import escape
-
+from django.views.decorators.http import require_POST
 from opaque_keys.edx.keys import CourseKey
 
 from edxmako.shortcuts import render_to_response
-from survey.models import SurveyForm
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from survey.models import SurveyForm
 
 log = logging.getLogger("edx.survey")
 

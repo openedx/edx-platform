@@ -5,16 +5,30 @@ Uses pyparsing to parse. Main function as of now is evaluator().
 """
 
 import math
-import operator
 import numbers
+import operator
+
 import numpy
 import scipy.constants
-import functions
-
 from pyparsing import (
-    Word, Literal, CaselessLiteral, ZeroOrMore, MatchFirst, Optional, Forward,
-    Group, ParseResults, stringEnd, Suppress, Combine, alphas, nums, alphanums
+    CaselessLiteral,
+    Combine,
+    Forward,
+    Group,
+    Literal,
+    MatchFirst,
+    Optional,
+    ParseResults,
+    Suppress,
+    Word,
+    ZeroOrMore,
+    alphanums,
+    alphas,
+    nums,
+    stringEnd
 )
+
+import functions
 
 DEFAULT_FUNCTIONS = {
     'sin': numpy.sin,

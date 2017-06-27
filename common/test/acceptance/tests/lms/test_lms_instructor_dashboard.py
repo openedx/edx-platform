@@ -4,43 +4,57 @@ End-to-end tests for the LMS Instructor Dashboard.
 """
 
 import ddt
-
-from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
 from flaky import flaky
+from nose.plugins.attrib import attr
 
-from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
-from common.test.acceptance.pages.common.logout import LogoutPage
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
-from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.instructor_dashboard import (
-    InstructorDashboardPage,
-    EntranceExamAdmin,
-    StudentSpecificAdmin,
-)
-from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
-from common.test.acceptance.pages.lms.dashboard import DashboardPage
-from common.test.acceptance.pages.lms.problem import ProblemPage
-from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow
-from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
-from common.test.acceptance.pages.common.utils import enroll_user_track
-from common.test.acceptance.tests.helpers import disable_animations, create_multiple_choice_problem
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.common.utils import enroll_user_track
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
+from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.lms.instructor_dashboard import (
+    EntranceExamAdmin,
+    InstructorDashboardPage,
+    StudentSpecificAdmin
+)
+from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
+from common.test.acceptance.tests.helpers import (
+    EventsTestMixin,
+    UniqueCourseTest,
+    create_multiple_choice_problem,
+    disable_animations,
+    get_modal_alert
+)
 
 
 class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
     """
     Mixin class for testing the instructor dashboard.
     """
-    def log_in_as_instructor(self):
+    def log_in_as_instructor(self, course_access_roles=None):
         """
-        Logs in as an instructor and returns the id.
+        Login with an instructor account.
+
+        Args:
+            course_access_roles (str[]): List of course access roles that should be assigned to the user.
+
+        Returns
+            username (str)
+            user_id (int)
         """
-        username = "test_instructor_{uuid}".format(uuid=self.unique_id[0:6])
-        auto_auth_page = AutoAuthPage(self.browser, username=username, course_id=self.course_id, staff=True)
-        return username, auto_auth_page.visit().get_user_id()
+        course_access_roles = course_access_roles or []
+        auto_auth_page = AutoAuthPage(
+            self.browser, course_id=self.course_id, staff=True, course_access_roles=course_access_roles
+        )
+        auto_auth_page.visit()
+        user_info = auto_auth_page.user_info
+        return user_info['username'], user_info['user_id']
 
     def visit_instructor_dashboard(self):
         """
@@ -411,6 +425,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Then, the added record should be visible
         self.assertTrue(allowance_section.is_allowance_record_visible)
 
+    @flaky  # See EDUCATOR-551
     def test_can_reset_attempts(self):
         """
         Make sure that Exam attempts are visible and can be reset.
@@ -1255,23 +1270,11 @@ class EcommerceTest(BaseInstructorDashboardTest):
         )
         course_fixture.install()
 
-    def log_in_as_unique_user(self):
-        """
-        Log in as a valid lms user.
-        """
-        AutoAuthPage(
-            self.browser,
-            username="test_instructor",
-            email="test_instructor@example.com",
-            password="password",
-            course_id=self.course_id
-        ).visit()
-
     def visit_ecommerce_section(self):
         """
         Log in to visit Instructor dashboard and click E-commerce tab
         """
-        self.log_in_as_unique_user()
+        self.log_in_as_instructor(course_access_roles=['finance_admin'])
         instructor_dashboard_page = self.visit_instructor_dashboard()
         return instructor_dashboard_page.select_ecommerce_tab()
 
@@ -1371,6 +1374,7 @@ class StudentAdminTest(BaseInstructorDashboardTest):
         self.username, _ = self.log_in_as_instructor()
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
 
+    @flaky  # See EDUCATOR-552
     def test_rescore_nonrescorable(self):
         student_admin_section = self.instructor_dashboard_page.select_student_admin(StudentSpecificAdmin)
         student_admin_section.set_student_email_or_username(self.username)

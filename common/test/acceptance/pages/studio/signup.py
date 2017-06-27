@@ -3,9 +3,9 @@ Signup page for studio
 """
 from bok_choy.page_object import PageObject
 
-from common.test.acceptance.pages.studio import BASE_URL
-from common.test.acceptance.pages.studio.utils import set_input_value, HelpMixin
 from common.test.acceptance.pages.common.utils import click_css
+from common.test.acceptance.pages.studio import BASE_URL
+from common.test.acceptance.pages.studio.utils import HelpMixin, set_input_value
 
 
 class SignupPage(PageObject, HelpMixin):

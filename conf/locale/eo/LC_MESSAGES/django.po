@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-05-11 14:55+0000\n"
-"PO-Revision-Date: 2017-05-11 14:55:07.422808\n"
+"POT-Creation-Date: 2017-06-21 14:30+0000\n"
+"PO-Revision-Date: 2017-06-21 14:30:50.143623\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -265,11 +265,6 @@ msgid ""
 msgstr ""
 "Thïs ïs thé ßülk SKÛ (stöçk kéépïng ünït) öf thïs mödé ïn thé éxtérnäl "
 "éçömmérçé sérvïçé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/djangoapps/course_modes/models.py
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Audit"
-msgstr "Àüdït Ⱡ'σяєм ιρѕ#"
 
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -782,6 +777,40 @@ msgstr ""
 " ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: common/djangoapps/student/views.py
+msgid "Photos are mismatched"
+msgstr "Phötös äré mïsmätçhéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/djangoapps/student/views.py
+msgid "Name missing from ID photo"
+msgstr "Nämé mïssïng fröm ÌD phötö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/djangoapps/student/views.py
+msgid "ID photo not provided"
+msgstr "ÌD phötö nöt prövïdéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/djangoapps/student/views.py
+msgid "ID is invalid"
+msgstr "ÌD ïs ïnvälïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/djangoapps/student/views.py
+msgid "Learner photo is blurry"
+msgstr "Léärnér phötö ïs ßlürrý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: common/djangoapps/student/views.py
+msgid "Name on ID does not match name on account"
+msgstr ""
+"Nämé ön ÌD döés nöt mätçh nämé ön äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: common/djangoapps/student/views.py
+msgid "Learner photo not provided"
+msgstr "Léärnér phötö nöt prövïdéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/djangoapps/student/views.py
+msgid "ID photo is blurry"
+msgstr "ÌD phötö ïs ßlürrý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: common/djangoapps/student/views.py
 msgid "Course id not specified"
 msgstr "Çöürsé ïd nöt spéçïfïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
@@ -974,10 +1003,46 @@ msgid "Account creation not allowed."
 msgstr "Àççöünt çréätïön nöt ällöwéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: common/djangoapps/student/views.py
-msgid "Unknown error. Please e-mail us to let us know how it happened."
+#, python-brace-format
+msgid ""
+"{html_start}Your account could not be activated{html_end}Something went "
+"wrong, please <a href=\"{support_url}\">contact support</a> to resolve this "
+"issue."
 msgstr ""
-"Ûnknöwn érrör. Pléäsé é-mäïl üs tö lét üs knöw höw ït häppénéd. Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"{html_start}Ýöür äççöünt çöüld nöt ßé äçtïvätéd{html_end}Söméthïng wént "
+"wröng, pléäsé <a href=\"{support_url}\">çöntäçt süppört</a> tö résölvé thïs "
+"ïssüé. Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: common/djangoapps/student/views.py
+#, python-brace-format
+msgid "{html_start}Success{html_end} You have activated your account."
+msgstr ""
+"{html_start}Süççéss{html_end} Ýöü hävé äçtïvätéd ýöür äççöünt. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/djangoapps/student/views.py
+#, python-brace-format
+msgid ""
+"{html_start}Success! You have activated your account.{html_end}You will now "
+"receive email updates and alerts from us related to the courses you are "
+"enrolled in. Sign In to continue."
+msgstr ""
+"{html_start}Süççéss! Ýöü hävé äçtïvätéd ýöür äççöünt.{html_end}Ýöü wïll nöw "
+"réçéïvé émäïl üpdätés änd älérts fröm üs rélätéd tö thé çöürsés ýöü äré "
+"énrölléd ïn. Sïgn Ìn tö çöntïnüé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
+"σƒƒι¢ια#"
+
+#: common/djangoapps/student/views.py
+#, python-brace-format
+msgid "{html_start}This account has already been activated.{html_end}"
+msgstr ""
+"{html_start}Thïs äççöünt häs älréädý ßéén äçtïvätéd.{html_end} Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/djangoapps/student/views.py
 #, python-brace-format
@@ -2464,8 +2529,9 @@ msgstr ""
 "çömprömïséd. Tö ößtäïn ä kéý för ýöür çöürsé, ör tö répört än ïssüé, pléäsé "
 "çöntäçt mööçsüppört@mäthwörks.çöm#"
 
-#: common/lib/xmodule/xmodule/capa_base.py lms/templates/help_modal.html
-#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
+#: common/lib/xmodule/xmodule/capa_base.py cms/templates/index.html
+#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
+#: lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -4443,17 +4509,6 @@ msgstr ""
 "Çöüld nöt pärsé LTÌ pässpört: {lti_passport}. Shöüld ßé \"ïd:kéý:séçrét\" "
 "strïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
-#: common/lib/xmodule/xmodule/mixin.py
-msgid "License"
-msgstr "Lïçénsé Ⱡ'σяєм ιρѕυм #"
-
-#: common/lib/xmodule/xmodule/mixin.py
-msgid ""
-"A license defines how the contents of this block can be shared and reused."
-msgstr ""
-"À lïçénsé défïnés höw thé çönténts öf thïs ßlöçk çän ßé shäréd änd réüséd. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 #: common/lib/xmodule/xmodule/seq_module.py lms/templates/ccx/schedule.html
 msgid "Due Date"
@@ -5658,6 +5713,11 @@ msgstr ""
 "Pléäsé çhéçk thé sýntäx öf ýöür éntrý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
+#: lms/djangoapps/branding/api.py
+msgid "Take free online courses at edX.org"
+msgstr ""
+"Täké fréé önlïné çöürsés ät édX.örg Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
 #: lms/djangoapps/branding/api.py
@@ -6606,7 +6666,7 @@ msgid "Upgrade to Verified Certificate"
 msgstr "Ûpgrädé tö Vérïfïéd Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/djangoapps/courseware/date_summary.py
-#: cms/templates/group_configurations.html lms/templates/courseware/info.html
+#: cms/templates/group_configurations.html
 msgid "Learn More"
 msgstr "Léärn Möré Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -8283,6 +8343,11 @@ msgid "Cohorts"
 msgstr "Çöhörts Ⱡ'σяєм ιρѕυм #"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
+msgid "Discussions"
+msgstr "Dïsçüssïöns Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Student Admin"
 msgstr "Stüdént Àdmïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -8402,11 +8467,14 @@ msgstr ""
 "Nö düé däté éxténsïön ïs sét för thät stüdént änd ünït. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
+#: openedx/core/djangoapps/user_api/views.py cms/templates/register.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -8429,6 +8497,11 @@ msgid "Due date extensions for {0} {1} ({2})"
 msgstr ""
 "Düé däté éxténsïöns för {0} {1} ({2}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "This component cannot be rescored."
+msgstr ""
+"Thïs çömpönént çännöt ßé résçöréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "Not all problems in entrance exam support re-scoring."
@@ -8770,18 +8843,17 @@ msgstr " (öüt öf {total}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"This component's visibility settings refer to deleted or invalid group "
+"This component's access settings refer to deleted or invalid group "
 "configurations."
 msgstr ""
-"Thïs çömpönént's vïsïßïlïtý séttïngs référ tö délétéd ör ïnvälïd gröüp "
-"çönfïgürätïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+"Thïs çömpönént's äççéss séttïngs référ tö délétéd ör ïnvälïd gröüp "
+"çönfïgürätïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/djangoapps/lms_xblock/mixin.py
-msgid ""
-"This component's visibility settings refer to deleted or invalid groups."
+msgid "This component's access settings refer to deleted or invalid groups."
 msgstr ""
-"Thïs çömpönént's vïsïßïlïtý séttïngs référ tö délétéd ör ïnvälïd gröüps. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+"Thïs çömpönént's äççéss séttïngs référ tö délétéd ör ïnvälïd gröüps. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Whether to display this module in the table of contents"
@@ -10348,41 +10420,6 @@ msgstr ""
 "¢σηѕє¢тєт#"
 
 #: lms/djangoapps/verify_student/models.py
-msgid "No photo ID was provided."
-msgstr "Nö phötö ÌD wäs prövïdéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/djangoapps/verify_student/models.py
-msgid "We couldn't read your name from your photo ID image."
-msgstr ""
-"Wé çöüldn't réäd ýöür nämé fröm ýöür phötö ÌD ïmägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/verify_student/models.py
-msgid ""
-"The name associated with your account and the name on your ID do not match."
-msgstr ""
-"Thé nämé ässöçïätéd wïth ýöür äççöünt änd thé nämé ön ýöür ÌD dö nöt mätçh. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/djangoapps/verify_student/models.py
-msgid "The image of your face was not clear."
-msgstr ""
-"Thé ïmägé öf ýöür fäçé wäs nöt çléär. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: lms/djangoapps/verify_student/models.py
-msgid "Your face was not visible in your self-photo."
-msgstr ""
-"Ýöür fäçé wäs nöt vïsïßlé ïn ýöür sélf-phötö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/djangoapps/verify_student/models.py
-msgid "There was an error verifying your ID photos."
-msgstr ""
-"Théré wäs än érrör vérïfýïng ýöür ÌD phötös. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr ""
 "Thé çöürsé för whïçh thïs déädlïné äpplïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -10477,6 +10514,11 @@ msgstr "Ìmägé dätä ïs nöt välïd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ
 #: lms/djangoapps/verify_student/views.py
 msgid "Verification photos received"
 msgstr "Vérïfïçätïön phötös réçéïvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/envs/common.py
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Audit"
+msgstr "Àüdït Ⱡ'σяєм ιρѕ#"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is the website name of www.facebook.com.  Please
@@ -10577,6 +10619,22 @@ msgstr ""
 #: lms/envs/common.py
 msgid "Kosovo"
 msgstr "Kösövö Ⱡ'σяєм ιρѕυ#"
+
+#: lms/envs/common.py
+#, python-brace-format
+msgid "Welcome to {platform_name}."
+msgstr "Wélçömé tö {platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/envs/common.py
+#, python-brace-format
+msgid ""
+"{start_bold}{enterprise_name}{end_bold} has partnered with "
+"{start_bold}{platform_name}{end_bold} to offer you high-quality learning "
+"opportunities from the world's best universities."
+msgstr ""
+"{start_bold}{enterprise_name}{end_bold} häs pärtnéréd wïth "
+"{start_bold}{platform_name}{end_bold} tö öffér ýöü hïgh-qüälïtý léärnïng "
+"öppörtünïtïés fröm thé wörld's ßést ünïvérsïtïés. Ⱡ'σяєм ιρ#"
 
 #: lms/templates/logout.html
 msgid "Signed Out"
@@ -11295,12 +11353,10 @@ msgid "Internal API URL"
 msgstr "Ìntérnäl ÀPÌ ÛRL Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: openedx/core/djangoapps/catalog/models.py
-msgid ""
-"API root to be used for server-to-server requests (e.g., https://catalog-"
-"internal.example.com/api/v1/)."
+msgid "DEPRECATED: Use the setting COURSE_CATALOG_API_URL."
 msgstr ""
-"ÀPÌ rööt tö ßé üséd för sérvér-tö-sérvér réqüésts (é.g., https://çätälög-"
-"ïntérnäl.éxämplé.çöm/äpï/v1/). Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+"DÉPRÉÇÀTÉD: Ûsé thé séttïng ÇÖÛRSÉ_ÇÀTÀLÖG_ÀPÌ_ÛRL. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: openedx/core/djangoapps/catalog/models.py
 msgid ""
@@ -11902,6 +11958,14 @@ msgstr ""
 "Ìt lööks lïké {username} ßélöngs tö än éxïstïng äççöünt. Trý ägäïn wïth ä "
 "dïfférént üsérnämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "This is what you will use to login."
+msgstr ""
+"Thïs ïs whät ýöü wïll üsé tö lögïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
 #. Translators: This label appears above a field on the registration form
 #. meant to confirm the user's email address.
 #: openedx/core/djangoapps/user_api/views.py
@@ -11909,55 +11973,51 @@ msgid "Confirm Email"
 msgstr "Çönfïrm Émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: openedx/core/djangoapps/user_api/views.py
-msgid "Please confirm your email."
-msgstr "Pléäsé çönfïrm ýöür émäïl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's full name.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Full name"
-msgstr "Füll nämé Ⱡ'σяєм ιρѕυм ∂σł#"
+msgid "The email addresses do not match."
+msgstr ""
+"Thé émäïl äddréssés dö nöt mätçh. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #. Translators: This example name is used as a placeholder in
 #. a field on the registration form meant to hold the user's name.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "Jane Doe"
-msgstr "Jäné Döé Ⱡ'σяєм ιρѕυм ∂#"
+msgid "Jane Q. Learner"
+msgstr "Jäné Q. Léärnér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's full name.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Your legal name, used for any certificates you earn."
+#: openedx/core/djangoapps/user_api/views.py
+msgid "This name will be used on any certificates that you earn."
 msgstr ""
-"Ýöür légäl nämé, üséd för äný çértïfïçätés ýöü éärn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
+"Thïs nämé wïll ßé üséd ön äný çértïfïçätés thät ýöü éärn. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Public username"
-msgstr "Püßlïç üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+#: openedx/core/djangoapps/user_api/views.py cms/templates/register.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Public Username"
+msgstr "Püßlïç Ûsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's public username.
 #: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
 msgid ""
-"The name that will identify you in your courses - {bold_start}(cannot be "
-"changed later){bold_end}"
+"The name that will identify you in your courses. It cannot be changed later."
 msgstr ""
-"Thé nämé thät wïll ïdéntïfý ýöü ïn ýöür çöürsés - {bold_start}(çännöt ßé "
-"çhängéd lätér){bold_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+"Thé nämé thät wïll ïdéntïfý ýöü ïn ýöür çöürsés. Ìt çännöt ßé çhängéd lätér."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #. Translators: This example username is used as a placeholder in
 #. a field on the registration form meant to hold the user's username.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "JaneDoe"
-msgstr "JänéDöé Ⱡ'σяєм ιρѕυм #"
+msgid "Jane_Q_Learner"
+msgstr "Jäné_Q_Léärnér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's highest completed level of education.
@@ -12055,6 +12115,14 @@ msgstr ""
 "Thé çöürsé kéý för thé çöürsé wé wöüld lïké tö ßé äütö-çöhörtéd. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#: openedx/core/djangoapps/waffle_utils/models.py
+msgid "Force On"
+msgstr "Förçé Ön Ⱡ'σяєм ιρѕυм ∂#"
+
+#: openedx/core/djangoapps/waffle_utils/models.py
+msgid "Force Off"
+msgstr "Förçé Öff Ⱡ'σяєм ιρѕυм ∂σł#"
+
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
 msgstr "Thïs välüé ïs ïnvälïd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
@@ -12074,6 +12142,17 @@ msgstr ""
 #, python-brace-format
 msgid "Gating milestone for {usage_key}"
 msgstr "Gätïng mïléstöné för {usage_key} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: openedx/core/lib/license/mixin.py
+msgid "License"
+msgstr "Lïçénsé Ⱡ'σяєм ιρѕυм #"
+
+#: openedx/core/lib/license/mixin.py
+msgid ""
+"A license defines how the contents of this block can be shared and reused."
+msgstr ""
+"À lïçénsé défïnés höw thé çönténts öf thïs ßlöçk çän ßé shäréd änd réüséd. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "Category"
@@ -12572,8 +12651,9 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/preview.py
 #, python-brace-format
-msgid "Visible to: {list_of_groups}"
-msgstr "Vïsïßlé tö: {list_of_groups} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+msgid "Access restricted to: {list_of_groups}"
+msgstr ""
+"Àççéss réstrïçtéd tö: {list_of_groups} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -12927,13 +13007,6 @@ msgstr "Förgöt pässwörd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 msgid "example: Jane Doe"
 msgstr "éxämplé: Jäné Döé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Public Username"
-msgstr "Püßlïç Ûsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
 #. Translators: This is the placeholder text for a field that asks the user to
 #. pick a username
 #: cms/templates/register.html lms/templates/register-form.html
@@ -12974,38 +13047,19 @@ msgstr "Prévïéw Längüägé Séttïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕ
 msgid "Reset"
 msgstr "Rését Ⱡ'σяєм ιρѕ#"
 
-#: cms/templates/registration/activation_complete.html
-#: lms/templates/registration/activation_complete.html
-msgid "Thanks for activating your account."
-msgstr ""
-"Thänks för äçtïvätïng ýöür äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: cms/templates/registration/activation_complete.html
-#: lms/templates/registration/activation_complete.html
-msgid "This account has already been activated."
-msgstr ""
-"Thïs äççöünt häs älréädý ßéén äçtïvätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: cms/templates/registration/activation_complete.html
-#: lms/templates/registration/activation_complete.html
-msgid "Visit your {link_start}dashboard{link_end} to see your courses."
-msgstr ""
-"Vïsït ýöür {link_start}däshßöärd{link_end} tö séé ýöür çöürsés. Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/templates/registration/activation_complete.html
-#: lms/templates/registration/activation_complete.html
-msgid "You can now {link_start}sign in{link_end}."
-msgstr ""
-"Ýöü çän nöw {link_start}sïgn ïn{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕ#"
+#: cms/templates/widgets/footer.html lms/templates/footer.html
+#: themes/edx.org/lms/templates/footer.html
+#: themes/red-theme/lms/templates/footer.html
+msgid "Legal"
+msgstr "Légäl Ⱡ'σяєм ιρѕ#"
 
 #: cms/templates/widgets/header.html lms/templates/navigation.html
+#: lms/templates/widgets/footer-language-selector.html
 msgid "Choose Language"
 msgstr "Çhöösé Längüägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
+#: themes/edx.org/lms/templates/header.html
 msgid "Account"
 msgstr "Àççöünt Ⱡ'σяєм ιρѕυм #"
 
@@ -13095,36 +13149,6 @@ msgstr "Sïgn Öüt Ⱡ'σяєм ιρѕυм ∂#"
 msgid "Code Editor"
 msgstr "Çödé Édïtör Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
-#: common/templates/license.html
-msgid "All Rights Reserved"
-msgstr "Àll Rïghts Résérvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: common/templates/license.html
-msgid "Attribution"
-msgstr "Àttrïßütïön Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: common/templates/license.html
-msgid "Noncommercial"
-msgstr "Nönçömmérçïäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: common/templates/license.html
-msgid "No Derivatives"
-msgstr "Nö Dérïvätïvés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: common/templates/license.html
-msgid "Share Alike"
-msgstr "Shäré Àlïké Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: common/templates/license.html
-msgid "Creative Commons licensed content, with terms as follow:"
-msgstr ""
-"Çréätïvé Çömmöns lïçénséd çöntént, wïth térms äs föllöw: Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/templates/license.html
-msgid "Some Rights Reserved"
-msgstr "Sömé Rïghts Résérvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
 msgstr "Féédßäçk Förm Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -13156,10 +13180,6 @@ msgstr "Àddïtïönäl Ìnfö: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#
 #: common/templates/emails/contact_us_feedback_email_subject.txt
 msgid "Feedback from user"
 msgstr "Féédßäçk fröm üsér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
-msgid "Discussions"
-msgstr "Dïsçüssïöns Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Add a Post"
@@ -13390,11 +13410,6 @@ msgstr "Déßüg:  Ⱡ'σяєм ιρѕυм #"
 #: lms/templates/extauth_failure.html
 msgid "External Authentication failed"
 msgstr "Éxtérnäl Àüthéntïçätïön fäïléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/footer.html themes/edx.org/lms/templates/footer.html
-#: themes/red-theme/lms/templates/footer.html
-msgid "Legal"
-msgstr "Légäl Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Password Reset"
@@ -14212,6 +14227,13 @@ msgid "Please complete the following fields to register for an account. "
 msgstr ""
 "Pléäsé çömplété thé föllöwïng fïélds tö régïstér för än äççöünt.  Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Your legal name, used for any certificates you earn."
+msgstr ""
+"Ýöür légäl nämé, üséd för äný çértïfïçätés ýöü éärn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -16808,10 +16830,10 @@ msgstr "Ýöü äré nöt énrölléd ýét Ⱡ'σяєм ιρѕυм ∂σłσя 
 
 #: lms/templates/courseware/info.html
 msgid ""
-"You are not currently enrolled in this course. {link_start}Sign up "
+"You are not currently enrolled in this course. {link_start}Enroll "
 "now!{link_end}"
 msgstr ""
-"Ýöü äré nöt çürréntlý énrölléd ïn thïs çöürsé. {link_start}Sïgn üp "
+"Ýöü äré nöt çürréntlý énrölléd ïn thïs çöürsé. {link_start}Énröll "
 "nöw!{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/courseware/info.html
@@ -16825,20 +16847,6 @@ msgstr "Résümé Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: lms/templates/courseware/info.html
 msgid "View Updates in Studio"
 msgstr "Vïéw Ûpdätés ïn Stüdïö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/templates/courseware/info.html
-msgid "Give yourself an additional incentive to complete"
-msgstr ""
-"Gïvé ýöürsélf än äddïtïönäl ïnçéntïvé tö çömplété Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/courseware/info.html
-msgid "Earn a verified certificate."
-msgstr "Éärn ä vérïfïéd çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/templates/courseware/info.html
-msgid "Upgrade Now"
-msgstr "Ûpgrädé Nöw Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/courseware/info.html
 msgid "Course Updates and News"
@@ -16967,6 +16975,26 @@ msgstr "Prößlém Sçörés:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 #: lms/templates/courseware/progress.html
 msgid "Practice Scores: "
 msgstr "Präçtïçé Sçörés:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/templates/courseware/progress.html
+msgid "Problem scores are hidden until the due date."
+msgstr ""
+"Prößlém sçörés äré hïddén üntïl thé düé däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/courseware/progress.html
+msgid "Practice scores are hidden until the due date."
+msgstr ""
+"Präçtïçé sçörés äré hïddén üntïl thé düé däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α#"
+
+#: lms/templates/courseware/progress.html
+msgid "Problem scores are hidden."
+msgstr "Prößlém sçörés äré hïddén. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/courseware/progress.html
+msgid "Practice scores are hidden."
+msgstr "Präçtïçé sçörés äré hïddén. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: lms/templates/courseware/progress.html
 msgid "No problem scores in this section"
@@ -17586,6 +17614,36 @@ msgstr ""
 "süßmïttéd änd wïll ßé révïéwéd shörtlý. Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Current Verification Status: Denied"
+msgstr ""
+"Çürrént Vérïfïçätïön Stätüs: Dénïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your verification submission was not accepted. To receive a verified "
+"certificate, you must submit a new photo of yourself and your government-"
+"issued photo ID before the verification deadline for your course."
+msgstr ""
+"Ýöür vérïfïçätïön süßmïssïön wäs nöt äççéptéd. Tö réçéïvé ä vérïfïéd "
+"çértïfïçäté, ýöü müst süßmït ä néw phötö öf ýöürsélf änd ýöür gövérnmént-"
+"ïssüéd phötö ÌD ßéföré thé vérïfïçätïön déädlïné för ýöür çöürsé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕι#"
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Your verification was denied for the following reasons:"
+msgstr ""
+"Ýöür vérïfïçätïön wäs dénïéd för thé föllöwïng réäsöns: Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
+msgstr "Résüßmït Vérïfïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Expired"
 msgstr ""
 "Çürrént Vérïfïçätïön Stätüs: Éxpïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -17605,10 +17663,6 @@ msgstr ""
 "υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
 "∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
 " ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση#"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Resubmit Verification"
-msgstr "Résüßmït Vérïfïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -17698,14 +17752,14 @@ msgstr "Ûnänswéréd pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 msgid "Flagged"
 msgstr "Fläggéd Ⱡ'σяєм ιρѕυм #"
 
-#. Translators: This labels a cohort menu in forum navigation
+#. Translators: This labels a group menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Cohort:"
-msgstr "Çöhört: Ⱡ'σяєм ιρѕυм #"
+msgid "Group:"
+msgstr "Gröüp: Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "in all cohorts"
-msgstr "ïn äll çöhörts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+msgid "in all groups"
+msgstr "ïn äll gröüps Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #. Translators: This labels a sort menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -17826,18 +17880,18 @@ msgstr ""
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"You're almost there!  Use the link to activate your account to access "
-"engaging, high-quality {platform_name} courses.  Note that you will not be "
+"You're almost there! Use the link to activate your account to access "
+"engaging, high-quality {platform_name} courses. Note that you will not be "
 "able to log back into your account until you have activated it."
 msgstr ""
-"Ýöü'ré älmöst théré!  Ûsé thé lïnk tö äçtïväté ýöür äççöünt tö äççéss "
-"éngägïng, hïgh-qüälïtý {platform_name} çöürsés.  Nöté thät ýöü wïll nöt ßé "
+"Ýöü'ré älmöst théré! Ûsé thé lïnk tö äçtïväté ýöür äççöünt tö äççéss "
+"éngägïng, hïgh-qüälïtý {platform_name} çöürsés. Nöté thät ýöü wïll nöt ßé "
 "äßlé tö lög ßäçk ïntö ýöür äççöünt üntïl ýöü hävé äçtïvätéd ït. Ⱡ'σяєм ιρѕυм"
 " ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
 "ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
 "ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂#"
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт#"
 
 #: lms/templates/emails/activation_email.txt
 msgid "Enjoy learning with {platform_name}."
@@ -20215,17 +20269,17 @@ msgstr "Dïsçüssïön Àdmïns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Discussion Admins can edit or delete any post, clear misuse flags, close and"
-" re-open threads, endorse responses, and see posts from all cohorts. Their "
+" re-open threads, endorse responses, and see posts from all groups. Their "
 "posts are marked as 'staff'. They can also add and remove the discussion "
-"moderation roles to manage course team membership. You can only give course "
-"team roles to enrolled users."
+"moderation roles to manage course team membership. Only enrolled users can "
+"be added as Discussion Admins."
 msgstr ""
 "Dïsçüssïön Àdmïns çän édït ör délété äný pöst, çléär mïsüsé flägs, çlösé änd"
-" ré-öpén thréäds, éndörsé réspönsés, änd séé pösts fröm äll çöhörts. Théïr "
+" ré-öpén thréäds, éndörsé réspönsés, änd séé pösts fröm äll gröüps. Théïr "
 "pösts äré märkéd äs 'stäff'. Théý çän älsö ädd änd rémövé thé dïsçüssïön "
-"mödérätïön rölés tö mänägé çöürsé téäm mémßérshïp. Ýöü çän önlý gïvé çöürsé "
-"téäm rölés tö énrölléd üsérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σł#"
+"mödérätïön rölés tö mänägé çöürsé téäm mémßérshïp. Önlý énrölléd üsérs çän "
+"ßé äddéd äs Dïsçüssïön Àdmïns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσя#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Discussion Admin"
@@ -20238,17 +20292,17 @@ msgstr "Dïsçüssïön Mödérätörs Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Discussion Moderators can edit or delete any post, clear misuse flags, close"
-" and re-open threads, endorse responses, and see posts from all cohorts. "
+" and re-open threads, endorse responses, and see posts from all groups. "
 "Their posts are marked as 'staff'. They cannot manage course team membership"
-" by adding or removing discussion moderation roles. You can only give course"
-" team roles to enrolled users."
+" by adding or removing discussion moderation roles. Only enrolled users can "
+"be added as Discussion Moderators."
 msgstr ""
 "Dïsçüssïön Mödérätörs çän édït ör délété äný pöst, çléär mïsüsé flägs, çlösé"
-" änd ré-öpén thréäds, éndörsé réspönsés, änd séé pösts fröm äll çöhörts. "
+" änd ré-öpén thréäds, éndörsé réspönsés, änd séé pösts fröm äll gröüps. "
 "Théïr pösts äré märkéd äs 'stäff'. Théý çännöt mänägé çöürsé téäm mémßérshïp"
-" ßý äddïng ör rémövïng dïsçüssïön mödérätïön rölés. Ýöü çän önlý gïvé çöürsé"
-" téäm rölés tö énrölléd üsérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє є#"
+" ßý äddïng ör rémövïng dïsçüssïön mödérätïön rölés. Önlý énrölléd üsérs çän "
+"ßé äddéd äs Dïsçüssïön Mödérätörs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт ł#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Moderator"
@@ -20260,18 +20314,19 @@ msgstr "Dïsçüssïön Çömmünïtý TÀs Ⱡ'σяєм ιρѕυм ∂σłσя 
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Community TA's are members of the community whom you deem particularly "
+"Community TAs are members of the community whom you deem particularly "
 "helpful on the discussion boards. They can edit or delete any post, clear "
 "misuse flags, close and re-open threads, endorse responses, and see posts "
-"from all cohorts. Their posts are marked as 'Community TA'. You can only "
-"give course team roles to enrolled users."
+"from all groups. Their posts are marked as 'Community TA'. Only enrolled "
+"users can be added as Community TAs."
 msgstr ""
-"Çömmünïtý TÀ's äré mémßérs öf thé çömmünïtý whöm ýöü déém pärtïçülärlý "
+"Çömmünïtý TÀs äré mémßérs öf thé çömmünïtý whöm ýöü déém pärtïçülärlý "
 "hélpfül ön thé dïsçüssïön ßöärds. Théý çän édït ör délété äný pöst, çléär "
 "mïsüsé flägs, çlösé änd ré-öpén thréäds, éndörsé réspönsés, änd séé pösts "
-"fröm äll çöhörts. Théïr pösts äré märkéd äs 'Çömmünïtý TÀ'. Ýöü çän önlý "
-"gïvé çöürsé téäm rölés tö énrölléd üsérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσ#"
+"fröm äll gröüps. Théïr pösts äré märkéd äs 'Çömmünïtý TÀ'. Önlý énrölléd "
+"üsérs çän ßé äddéd äs Çömmünïtý TÀs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє #"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Community TA"
@@ -20769,7 +20824,6 @@ msgid "My Courses"
 msgstr "Mý Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/learner_dashboard/program_details.html
-#: lms/templates/learner_dashboard/program_details_2017.html
 msgid "Program Details"
 msgstr "Prögräm Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
@@ -21058,11 +21112,12 @@ msgstr "Àçtïväté ýöür äççöünt! Ⱡ'σяєм ιρѕυм ∂σłσя 
 #: lms/templates/registration/account_activation_sidebar_notice.html
 msgid ""
 "Check your {email_start}{email}{email_end} inbox for an account activation "
-"link from edX. If you need help, contact {link_start}edX Support{link_end}."
+"link from {platform_name}. If you need help, contact "
+"{link_start}{platform_name} Support{link_end}."
 msgstr ""
 "Çhéçk ýöür {email_start}{email}{email_end} ïnßöx för än äççöünt äçtïvätïön "
-"lïnk fröm édX. Ìf ýöü nééd hélp, çöntäçt {link_start}édX Süppört{link_end}. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя#"
+"lïnk fröm {platform_name}. Ìf ýöü nééd hélp, çöntäçt "
+"{link_start}{platform_name} Süppört{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя#"
 
 #: lms/templates/registration/activate_account_notice.html
 msgid "You're almost there!"
@@ -21083,39 +21138,6 @@ msgstr ""
 "ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
 "ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт #"
-
-#: lms/templates/registration/activation_complete.html
-msgid "Account Activated"
-msgstr "Àççöünt Àçtïvätéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/registration/activation_complete.html
-msgid "Account already active"
-msgstr "Àççöünt älréädý äçtïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/templates/registration/activation_invalid.html
-msgid "Activation Invalid"
-msgstr "Àçtïvätïön Ìnvälïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: lms/templates/registration/activation_invalid.html
-msgid ""
-"Something went wrong. Email programs sometimes split URLs into two lines, so"
-" make sure the URL you're using is formatted correctly. If you still have "
-"issues, send us an email message at {email_start}{email}{email_end}."
-msgstr ""
-"Söméthïng wént wröng. Émäïl prögräms sömétïmés splït ÛRLs ïntö twö lïnés, sö"
-" mäké süré thé ÛRL ýöü'ré üsïng ïs förmättéd çörréçtlý. Ìf ýöü stïll hävé "
-"ïssüés, sénd üs än émäïl méssägé ät {email_start}{email}{email_end}. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂#"
-
-#: lms/templates/registration/activation_invalid.html
-msgid "Return to the {link_start}home page{link_end}."
-msgstr ""
-"Rétürn tö thé {link_start}hömé pägé{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢т#"
 
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
@@ -22117,6 +22139,10 @@ msgid "About edX"
 msgstr "Àßöüt édX Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: themes/edx.org/lms/templates/footer.html
+msgid "edX Home Page"
+msgstr "édX Hömé Pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: themes/edx.org/lms/templates/footer.html
 msgid ""
 "© 2012-{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
 "edX and the edX and Open EdX logos are registered trademarks or trademarks "
@@ -22130,6 +22156,10 @@ msgstr ""
 "єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
 "νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт#"
+
+#: themes/edx.org/lms/templates/header.html
+msgid "Main"
+msgstr "Mäïn Ⱡ'σяєм ι#"
 
 #: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
@@ -23810,11 +23840,11 @@ msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
-"On unit pages in the course outline, you can designate components as visible"
-" only to learners in a specific enrollment track."
+"On unit pages in the course outline, you can restrict access to components "
+"to learners based on their enrollment track."
 msgstr ""
-"Ön ünït pägés ïn thé çöürsé öütlïné, ýöü çän désïgnäté çömpönénts äs vïsïßlé"
-" önlý tö léärnérs ïn ä spéçïfïç énröllmént träçk. Ⱡ'σяєм #"
+"Ön ünït pägés ïn thé çöürsé öütlïné, ýöü çän réstrïçt äççéss tö çömpönénts "
+"tö léärnérs ßäséd ön théïr énröllmént träçk. Ⱡ'σяєм ιρѕυм#"
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -23849,17 +23879,17 @@ msgstr ""
 #: cms/templates/group_configurations.html
 msgid ""
 "Each content group that you create can be associated with one or more "
-"cohorts. In addition to course content that is intended for all learners, "
-"you can designate some content as visible only to specified content groups. "
-"Only learners in the cohorts that are associated with the specified content "
-"groups see the additional content."
+"cohorts. In addition to making course content available to all learners, you"
+" can restrict access to some content to learners in specific content groups."
+" Only learners in the cohorts that are associated with the specified content"
+" groups see the additional content."
 msgstr ""
 "Éäçh çöntént gröüp thät ýöü çréäté çän ßé ässöçïätéd wïth öné ör möré "
-"çöhörts. Ìn äddïtïön tö çöürsé çöntént thät ïs ïnténdéd för äll léärnérs, "
-"ýöü çän désïgnäté sömé çöntént äs vïsïßlé önlý tö spéçïfïéd çöntént gröüps. "
-"Önlý léärnérs ïn thé çöhörts thät äré ässöçïätéd wïth thé spéçïfïéd çöntént "
-"gröüps séé thé äddïtïönäl çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂#"
+"çöhörts. Ìn äddïtïön tö mäkïng çöürsé çöntént äväïläßlé tö äll léärnérs, ýöü"
+" çän réstrïçt äççéss tö sömé çöntént tö léärnérs ïn spéçïfïç çöntént gröüps."
+" Önlý léärnérs ïn thé çöhörts thät äré ässöçïätéd wïth thé spéçïfïéd çöntént"
+" gröüps séé thé äddïtïönäl çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя"
+" α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσ#"
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -24689,6 +24719,24 @@ msgstr ""
 "∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
 " ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι"
 " σƒƒι¢ια ∂є#"
+
+#: cms/templates/index.html
+msgid "Organization and Library Settings"
+msgstr ""
+"Örgänïzätïön änd Lïßrärý Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: cms/templates/index.html
+msgid "Show all courses in organization:"
+msgstr ""
+"Shöw äll çöürsés ïn örgänïzätïön: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: cms/templates/index.html
+msgid "For example, MITx"
+msgstr "För éxämplé, MÌTx Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: cms/templates/index.html
+msgid "Show content libraries"
+msgstr "Shöw çöntént lïßrärïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: cms/templates/index.html
 msgid "Courses Being Processed"
@@ -26176,12 +26224,12 @@ msgid "Expand or Collapse"
 msgstr "Éxpänd ör Çölläpsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Visibility Settings"
-msgstr "Vïsïßïlïtý Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+msgid "Access Settings"
+msgstr "Àççéss Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Visibility"
-msgstr "Vïsïßïlïtý Ⱡ'σяєм ιρѕυм ∂σłσ#"
+msgid "Set Access"
+msgstr "Sét Àççéss Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
@@ -26349,39 +26397,32 @@ msgstr ""
 "nöt ßé çömplété för äll énçödïngs änd äll vïdéö höstïng sïtés.#"
 
 #: cms/templates/visibility_editor.html
-msgid "No visibility settings"
-msgstr "Nö vïsïßïlïtý séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+msgid "Access is not restricted"
+msgstr "Àççéss ïs nöt réstrïçtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"No visibility settings are defined for this component, but visibility might "
-"be affected by inherited settings."
+"Access to this component is not restricted, but visibility might be affected"
+" by inherited settings."
 msgstr ""
-"Nö vïsïßïlïtý séttïngs äré défïnéd för thïs çömpönént, ßüt vïsïßïlïtý mïght "
-"ßé äfféçtéd ßý ïnhérïtéd séttïngs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+"Àççéss tö thïs çömpönént ïs nöt réstrïçtéd, ßüt vïsïßïlïtý mïght ßé äfféçtéd"
+" ßý ïnhérïtéd séttïngs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"You can make this component visible only to specific groups of learners "
-"based either on their enrollment track, or by content groups that you "
-"create."
+"You can restrict access to this component to learners in specific enrollment"
+" tracks or content groups."
 msgstr ""
-"Ýöü çän mäké thïs çömpönént vïsïßlé önlý tö spéçïfïç gröüps öf léärnérs "
-"ßäséd éïthér ön théïr énröllmént träçk, ör ßý çöntént gröüps thät ýöü "
-"çréäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
-"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
-" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
-"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
-" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηι#"
+"Ýöü çän réstrïçt äççéss tö thïs çömpönént tö léärnérs ïn spéçïfïç énröllmént"
+" träçks ör çöntént gröüps. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"You can make this component visible only to specific groups of learners "
-"based on content groups that you create."
+"You can restrict access to this component to learners in specific content "
+"groups."
 msgstr ""
-"Ýöü çän mäké thïs çömpönént vïsïßlé önlý tö spéçïfïç gröüps öf léärnérs "
-"ßäséd ön çöntént gröüps thät ýöü çréäté. Ⱡ'σяєм ιρѕυм ∂σłσя#"
+"Ýöü çän réstrïçt äççéss tö thïs çömpönént tö léärnérs ïn spéçïfïç çöntént "
+"gröüps. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: cms/templates/visibility_editor.html
 msgid "Manage content groups"
@@ -26393,33 +26434,33 @@ msgstr "Mänägé çöntént gröüps Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 msgid ""
 "{screen_reader_start}Warning:{screen_reader_end} The unit that contains this"
 " component is hidden from learners. The unit setting overrides the component"
-" visibility settings defined here."
+" access settings defined here."
 msgstr ""
 "{screen_reader_start}Wärnïng:{screen_reader_end} Thé ünït thät çöntäïns thïs"
 " çömpönént ïs hïddén fröm léärnérs. Thé ünït séttïng övérrïdés thé çömpönént"
-" vïsïßïlïtý séttïngs défïnéd héré. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+" äççéss séttïngs défïnéd héré. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
 "α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
 " αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
 "ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
 "яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
 "ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
-"σƒƒι¢ια ∂єѕєяυηт мσłłιт#"
+"σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм#"
 
 #: cms/templates/visibility_editor.html
-msgid "Currently visible to:"
-msgstr "Çürréntlý vïsïßlé tö: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgid "Access is restricted to:"
+msgstr "Àççéss ïs réstrïçtéd tö: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: cms/templates/visibility_editor.html
-msgid "All Learners and Staff"
-msgstr "Àll Léärnérs änd Stäff Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: cms/templates/visibility_editor.html
-msgid "Change visibility to:"
-msgstr "Çhängé vïsïßïlïtý tö: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgid "Restrict access to:"
+msgstr "Réstrïçt äççéss tö: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: cms/templates/visibility_editor.html
 msgid "Select a group type"
 msgstr "Séléçt ä gröüp týpé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: cms/templates/visibility_editor.html
+msgid "All Learners and Staff"
+msgstr "Àll Léärnérs änd Stäff Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: cms/templates/visibility_editor.html
 msgid "Select one or more groups:"
@@ -26427,11 +26468,11 @@ msgstr "Séléçt öné ör möré gröüps: Ⱡ'σяєм ιρѕυм ∂σłσя
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"This group no longer exists. Choose another group or make this component "
-"visible to All Learners and Staff."
+"This group no longer exists. Choose another group or do not restrict access "
+"to this component."
 msgstr ""
-"Thïs gröüp nö löngér éxïsts. Çhöösé änöthér gröüp ör mäké thïs çömpönént "
-"vïsïßlé tö Àll Léärnérs änd Stäff. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+"Thïs gröüp nö löngér éxïsts. Çhöösé änöthér gröüp ör dö nöt réstrïçt äççéss "
+"tö thïs çömpönént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
@@ -26552,6 +26593,54 @@ msgstr "Rését välüés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: cms/templates/maintenance/base.html cms/templates/maintenance/index.html
 msgid "Maintenance Dashboard"
 msgstr "Mäïnténänçé Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/templates/registration/activation_complete.html
+msgid "Thanks for activating your account."
+msgstr ""
+"Thänks för äçtïvätïng ýöür äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: cms/templates/registration/activation_complete.html
+msgid "This account has already been activated."
+msgstr ""
+"Thïs äççöünt häs älréädý ßéén äçtïvätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: cms/templates/registration/activation_complete.html
+msgid "Visit your {link_start}dashboard{link_end} to see your courses."
+msgstr ""
+"Vïsït ýöür {link_start}däshßöärd{link_end} tö séé ýöür çöürsés. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/templates/registration/activation_complete.html
+msgid "You can now {link_start}sign in{link_end}."
+msgstr ""
+"Ýöü çän nöw {link_start}sïgn ïn{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕ#"
+
+#: cms/templates/registration/activation_invalid.html
+msgid "Activation Invalid"
+msgstr "Àçtïvätïön Ìnvälïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: cms/templates/registration/activation_invalid.html
+msgid ""
+"Something went wrong. Email programs sometimes split URLs into two lines, so"
+" make sure the URL you're using is formatted correctly. If you still have "
+"issues, send us an email message at {email_start}{email}{email_end}."
+msgstr ""
+"Söméthïng wént wröng. Émäïl prögräms sömétïmés splït ÛRLs ïntö twö lïnés, sö"
+" mäké süré thé ÛRL ýöü'ré üsïng ïs förmättéd çörréçtlý. Ìf ýöü stïll hävé "
+"ïssüés, sénd üs än émäïl méssägé ät {email_start}{email}{email_end}. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂#"
+
+#: cms/templates/registration/activation_invalid.html
+msgid "Return to the {link_start}home page{link_end}."
+msgstr ""
+"Rétürn tö thé {link_start}hömé pägé{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
 
 #: cms/templates/registration/reg_complete.html
 msgid ""

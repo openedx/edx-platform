@@ -1,15 +1,15 @@
 """
 API for the gating djangoapp
 """
-from collections import defaultdict
 import json
 import logging
+from collections import defaultdict
+
+from opaque_keys.edx.keys import UsageKey
 
 from lms.djangoapps.courseware.entrance_exams import get_entrance_exam_content
 from openedx.core.lib.gating import api as gating_api
-from opaque_keys.edx.keys import UsageKey
 from util import milestones_helpers
-
 
 log = logging.getLogger(__name__)
 

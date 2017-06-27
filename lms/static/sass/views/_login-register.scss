@@ -62,7 +62,7 @@
         margin: 0;
         letter-spacing: normal;
         font-family: $sans-serif;
-        color: $gray-d4;
+        color: $uxpl-gray-dark;
     }
 
     a, label {
@@ -354,7 +354,7 @@
             }
 
             &.error {
-                border-color: tint($red,50%);
+                border-color: $error-color;
             }
         }
 
@@ -373,11 +373,15 @@
             &:active, &:focus {
                 outline: auto;
             }
+
+            &.error {
+                outline-color: $error-color;
+            }
         }
 
         .tip, .label-optional {
             @extend %t-copy-sub1;
-            color: $gray-d2;
+            color: $uxpl-gray-base;
         }
         .tip {
             display: block;
@@ -677,9 +681,101 @@
         height: 100px;
     }
 
-    h2 {
+    p {
+        &:first-of-type {
+            margin-top: 20px;
+        }
+        
         font-size: 16px;
         line-height: 1.5;
         color: $gray-d2;
     }
 }
+
+.tos-modal {
+    background-color: $black-t1;
+    display: none;
+    height: 120%;
+    left: -10%;
+    overflow: auto;
+    position: fixed;
+    top: -10%;
+    width: 120%;
+    z-index: 1;
+
+    .modal-content {
+        background-color: $white;
+        bottom: auto;
+        left: 50%;
+        margin: auto;
+        max-width: 650px;
+        min-height: 540px;
+        min-width: 300px;
+        position: fixed;
+        right: auto;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+
+        .header {
+            height: 50px;
+            position: relative;
+
+            h1#modal-header-text {
+                float: left;
+                font-family: $sans-serif;
+                font-size: font-size(large);
+                font-weight: bold;
+                margin-bottom: 0;
+                padding-left: 20px;
+                position: absolute;
+                text-align: left;
+                top: 50%;
+                transform: translate(0, -50%);
+                width: 75%;
+            }
+
+            .modal-close-button {
+                background: $white;
+                border: none;
+                border-radius: 0;
+                box-shadow: none;
+                box-sizing: border-box;
+                color: $uxpl-blue-base;
+                float: right;
+                font-size: font-size(large);
+                height: 48px;
+                letter-spacing: normal;
+                padding: 0;
+                position: absolute;
+                right: 0;
+                text-shadow: none;
+                text-transform: lowercase;
+                top: 50%;
+                transform: translate(0, -50%);
+                width: 80px;
+            }
+
+            .modal-close-button:hover {
+                background: $white;
+                color: $uxpl-blue-hover-active;
+                text-decoration: underline;
+            }
+
+            .modal-close-button:focus {
+                color: $uxpl-blue-hover-active;
+                text-decoration: underline;
+            }
+        }
+
+        iframe {
+            border: 0;
+            width: 100%;
+        }
+    }
+}
+
+body.open-modal {
+    overflow: hidden;
+}
+

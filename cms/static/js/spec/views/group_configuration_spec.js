@@ -901,7 +901,7 @@ define([
 
         it('should show empty usage appropriately', function() {
             this.view.$('.show-groups').click();
-            assertShowEmptyUsages(this.view, "Use this group to control a component's visibility in the ");
+            assertShowEmptyUsages(this.view, 'use this group to control access to a component');
         });
 
         it('should hide empty usage appropriately', function() {
@@ -915,7 +915,7 @@ define([
 
             assertShowNonEmptyUsages(
                 this.view,
-                'This group controls visibility of:',
+                'This group controls access to:',
                 'Cannot delete when in use by a unit'
             );
         });

@@ -3,18 +3,18 @@
 Unit tests for student optouts from course email
 """
 import json
-from mock import patch, Mock
-from nose.plugins.attrib import attr
 
 from django.core import mail
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
+from mock import Mock, patch
+from nose.plugins.attrib import attr
 
-from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
+from bulk_email.models import BulkEmailFlag
 from student.models import CourseEnrollment
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from bulk_email.models import BulkEmailFlag
 
 
 @attr(shard=1)

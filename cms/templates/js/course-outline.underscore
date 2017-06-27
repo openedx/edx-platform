@@ -60,7 +60,7 @@ if (staffOnlyMessage) {
     if (hasPartitionGroups) {
         addStatusMessage(
             'partition-groups',
-            gettext('Some content in this unit is visible only to specific groups of learners')
+            gettext('Access to some content in this unit is restricted to specific groups of learners')
         );
     }
 }

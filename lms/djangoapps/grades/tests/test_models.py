@@ -1,31 +1,31 @@
 """
 Unit tests for grades models.
 """
+import json
 from base64 import b64encode
 from collections import OrderedDict
 from datetime import datetime
-import ddt
 from hashlib import sha1
-import json
-from mock import patch
 
+import ddt
+import pytz
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils.timezone import now
 from freezegun import freeze_time
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
-import pytz
-from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
+from mock import patch
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from lms.djangoapps.grades.config import waffle
 from lms.djangoapps.grades.models import (
+    BLOCK_RECORD_LIST_VERSION,
     BlockRecord,
     BlockRecordList,
-    BLOCK_RECORD_LIST_VERSION,
     PersistentCourseGrade,
     PersistentSubsectionGrade,
     VisibleBlocks
 )
+from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 
 
 class BlockRecordListTestCase(TestCase):

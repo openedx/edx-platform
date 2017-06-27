@@ -7,13 +7,12 @@ import ddt
 from nose.plugins.attrib import attr
 from stevedore.extension import Extension, ExtensionManager
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import Group, UserPartition, USER_PARTITION_SCHEME_NAMESPACE
-from xmodule.modulestore.django import modulestore
-
 import courseware.access as access
 from courseware.tests.factories import StaffFactory, UserFactory
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import USER_PARTITION_SCHEME_NAMESPACE, Group, UserPartition
 
 
 class MemoryUserPartitionScheme(object):
@@ -31,7 +30,7 @@ class MemoryUserPartitionScheme(object):
         """
         self.current_group.setdefault(user.id, {})[user_partition.id] = group
 
-    def get_group_for_user(self, course_id, user, user_partition, track_function=None):  # pylint: disable=unused-argument
+    def get_group_for_user(self, course_id, user, user_partition):  # pylint: disable=unused-argument
         """
         Fetch the group to which this user is linked in this partition, or None.
         """

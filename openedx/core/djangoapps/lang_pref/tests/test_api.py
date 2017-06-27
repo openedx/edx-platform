@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """ Tests for the language API. """
 
+from mock import patch
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import translation
@@ -8,8 +9,8 @@ from django.contrib.auth.models import User
 import ddt
 
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
-
 from openedx.core.djangoapps.lang_pref import api as language_api
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
 EN = language_api.Language('en', 'English')
 ES_419 = language_api.Language('es-419', u'Español (Latinoamérica)')
@@ -20,6 +21,45 @@ class LanguageApiTest(TestCase):
     """
     Tests of the language APIs.
     """
+
+    @ddt.data(
+        # Should return the base config value
+        ({'SHOW_HEADER_LANGUAGE_SELECTOR': True}, {}, True),
+
+        # Should return the site config value
+        ({'SHOW_HEADER_LANGUAGE_SELECTOR': False}, {'SHOW_HEADER_LANGUAGE_SELECTOR': True}, True),
+        ({'SHOW_HEADER_LANGUAGE_SELECTOR': True}, {'SHOW_HEADER_LANGUAGE_SELECTOR': False}, False),
+
+        # SHOW_LANGUAGE_SELECTOR should supercede SHOW_HEADER_LANGUAGE_SELECTOR when true
+        ({'SHOW_HEADER_LANGUAGE_SELECTOR': False, 'SHOW_LANGUAGE_SELECTOR': True}, {}, True),
+        ({'SHOW_HEADER_LANGUAGE_SELECTOR': False}, {'SHOW_LANGUAGE_SELECTOR': True}, True)
+    )
+    @ddt.unpack
+    def test_header_language_selector_is_enabled(self, base_config, site_config, expected):
+        """
+        Verify that the header language selector config is correct.
+        """
+        with patch.dict('django.conf.settings.FEATURES', base_config):
+            with with_site_configuration_context(configuration=site_config):
+                self.assertEqual(language_api.header_language_selector_is_enabled(), expected)
+
+    @ddt.data(
+        # Should return the base config value
+        ({'SHOW_FOOTER_LANGUAGE_SELECTOR': True}, {}, True),
+
+        # Should return the site config value
+        ({'SHOW_FOOTER_LANGUAGE_SELECTOR': False}, {'SHOW_FOOTER_LANGUAGE_SELECTOR': True}, True),
+        ({'SHOW_FOOTER_LANGUAGE_SELECTOR': True}, {'SHOW_FOOTER_LANGUAGE_SELECTOR': False}, False)
+    )
+    @ddt.unpack
+    def test_footer_language_selector_is_enabled(self, base_config, site_config, expected):
+        """
+        Verify that the footer language selector config is correct.
+        """
+        with patch.dict('django.conf.settings.FEATURES', base_config):
+            with with_site_configuration_context(configuration=site_config):
+                self.assertEqual(language_api.footer_language_selector_is_enabled(), expected)
+
     @ddt.data(*[
         ('en', [], [], []),
         ('en', [EN], [], [EN]),

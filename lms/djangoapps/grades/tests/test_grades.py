@@ -13,16 +13,16 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from openedx.core.djangolib.testing.utils import get_mock_request
-from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 from xmodule.graders import ProblemScore
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from .utils import answer_problem
 from ..new.course_grade_factory import CourseGradeFactory
 from ..new.subsection_grade_factory import SubsectionGradeFactory
+from .utils import answer_problem
 
 
 @attr(shard=1)

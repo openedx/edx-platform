@@ -4,12 +4,12 @@ Tests for the LTI outcome service handlers, both in outcomes.py and in tasks.py
 
 import ddt
 from django.test import TestCase
-from mock import patch, MagicMock
-from student.tests.factories import UserFactory
+from mock import MagicMock, patch
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
-from lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
 import lti_provider.tasks as tasks
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+from lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
+from student.tests.factories import UserFactory
 
 
 class BaseOutcomeTest(TestCase):

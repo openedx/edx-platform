@@ -10,6 +10,8 @@
 // ----------------------------
 %btn-shims {
   display: inline-block;
+  background-color: transparent;
+  background-image: none;
   border-style: $btn-border-style;
   border-radius: $btn-border-radius;
   border-width: $btn-border-size;

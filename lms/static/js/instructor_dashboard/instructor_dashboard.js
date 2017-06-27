@@ -188,6 +188,9 @@ such that the value can be defined later than this assignment (file load order).
                 constructor: window.InstructorDashboard.sections.CohortManagement,
                 $element: idashContent.find('.' + CSS_IDASH_SECTION + '#cohort_management')
             }, {
+                constructor: window.InstructorDashboard.sections.DiscussionsManagement,
+                $element: idashContent.find('.' + CSS_IDASH_SECTION + '#discussions_management')
+            }, {
                 constructor: window.InstructorDashboard.sections.Certificates,
                 $element: idashContent.find('.' + CSS_IDASH_SECTION + '#certificates')
             }, {

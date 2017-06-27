@@ -25,7 +25,7 @@ TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 # Unlike in prod, we use the JSON files stored in this repo.
 # This is a convenience for ensuring (a) that we can consistently find the files
 # and (b) that the files are the same in Jenkins as in local dev.
-os.environ['SERVICE_VARIANT'] = 'bok_choy'
+os.environ['SERVICE_VARIANT'] = 'bok_choy_docker' if 'BOK_CHOY_HOSTNAME' in os.environ else 'bok_choy'
 os.environ['CONFIG_ROOT'] = CONFIG_ROOT
 
 from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
@@ -232,15 +232,7 @@ if RELEASE_LINE == "master":
         'course_author': 'http://edx.readthedocs.io/projects/edx-partner-course-staff',
     }
 
-# TODO: TNL-6546: Remove this waffle and flag code.
-from django.db.utils import ProgrammingError
-from waffle.models import Flag
-try:
-    flag, created = Flag.objects.get_or_create(name='unified_course_view')
-    WAFFLE_OVERRIDE = True
-except ProgrammingError:
-    # during initial reset_db, the table for the flag doesn't yet exist.
-    pass
+WAFFLE_OVERRIDE = True
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

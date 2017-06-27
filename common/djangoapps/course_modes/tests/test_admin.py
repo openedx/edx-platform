@@ -5,24 +5,22 @@ import unittest
 from datetime import datetime, timedelta
 
 import ddt
-from pytz import timezone, UTC
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from pytz import UTC, timezone
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from util.date_utils import get_time_display
-from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory
-from course_modes.models import CourseMode
 from course_modes.admin import CourseModeForm
+from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-
 # Technically, we shouldn't be importing verify_student, since it's
 # defined in the LMS and course_modes is in common.  However, the benefits
 # of putting all this configuration in one place outweigh the downsides.
 # Once the course admin tool is deployed, we can remove this dependency.
 from lms.djangoapps.verify_student.models import VerificationDeadline
+from student.tests.factories import UserFactory
+from util.date_utils import get_time_display
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 # We can only test this in the LMS because the course modes admin relies

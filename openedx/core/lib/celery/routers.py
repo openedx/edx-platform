@@ -3,9 +3,10 @@ Custom routers used by both lms and cms when routing tasks to worker queues.
 
 For more, see http://celery.readthedocs.io/en/latest/userguide/routing.html#routers
 """
-from abc import ABCMeta, abstractproperty
-from django.conf import settings
 import logging
+from abc import ABCMeta, abstractproperty
+
+from django.conf import settings
 
 log = logging.getLogger(__name__)
 

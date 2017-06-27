@@ -3,12 +3,13 @@
 Tests for openedx.core.djangolib.markup
 """
 
-from nose.plugins.attrib import attr
 import unittest
 
 import ddt
-from django.utils.translation import ugettext as _, ungettext
+from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext
 from mako.template import Template
+from nose.plugins.attrib import attr
 
 from openedx.core.djangolib.markup import HTML, Text
 

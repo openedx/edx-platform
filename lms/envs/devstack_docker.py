@@ -15,7 +15,12 @@ LMS_ROOT_URL = 'http://{}'.format(HOST)
 
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
 ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
+
 ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_ROOT_URL)
+ENABLE_ENTERPRISE_INTEGRATION = False
+
+CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
+CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
 OAUTH_OIDC_ISSUER = '{}/oauth2'.format(LMS_ROOT_URL)
 
@@ -30,8 +35,8 @@ FEATURES.update({
     'ENABLE_COURSEWARE_SEARCH': False,
     'ENABLE_COURSE_DISCOVERY': False,
     'ENABLE_DASHBOARD_SEARCH': False,
-    'SHOW_LANGUAGE_SELECTOR': True,
     'ENABLE_DISCUSSION_SERVICE': False,
+    'SHOW_HEADER_LANGUAGE_SELECTOR': True
 })
 
 ENABLE_MKTG_SITE = os.environ.get('ENABLE_MARKETING_SITE', False)

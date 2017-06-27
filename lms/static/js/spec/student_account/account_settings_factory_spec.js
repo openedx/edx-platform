@@ -14,50 +14,18 @@ define(['backbone',
         'use strict';
 
         describe('edx.user.AccountSettingsFactory', function() {
-            var FIELDS_DATA = {
-                'country': {
-                    'options': Helpers.FIELD_OPTIONS
-                }, 'gender': {
-                    'options': Helpers.FIELD_OPTIONS
-                }, 'language': {
-                    'options': Helpers.FIELD_OPTIONS
-                }, 'level_of_education': {
-                    'options': Helpers.FIELD_OPTIONS
-                }, 'password': {
-                    'url': '/password_reset'
-                }, 'year_of_birth': {
-                    'options': Helpers.FIELD_OPTIONS
-                }, 'preferred_language': {
-                    'options': Helpers.FIELD_OPTIONS
-                }, 'time_zone': {
-                    'options': Helpers.FIELD_OPTIONS
-                }
-            };
-
-            var AUTH_DATA = {
-                'providers': [
-                    {
-                        'id': 'oa2-network1',
-                        'name': 'Network1',
-                        'connected': true,
-                        'accepts_logins': 'true',
-                        'connect_url': 'yetanother1.com/auth/connect',
-                        'disconnect_url': 'yetanother1.com/auth/disconnect'
-                    },
-                    {
-                        'id': 'oa2-network2',
-                        'name': 'Network2',
-                        'connected': true,
-                        'accepts_logins': 'true',
-                        'connect_url': 'yetanother2.com/auth/connect',
-                        'disconnect_url': 'yetanother2.com/auth/disconnect'
-                    }
-                ]
-            };
-
             var createAccountSettingsPage = function() {
                 var context = AccountSettingsPage(
-                    FIELDS_DATA, [], AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL, 'edX'
+                    Helpers.FIELDS_DATA,
+                    [],
+                    Helpers.AUTH_DATA,
+                    Helpers.PASSWORD_RESET_SUPPORT_LINK,
+                    Helpers.USER_ACCOUNTS_API_URL,
+                    Helpers.USER_PREFERENCES_API_URL,
+                    1,
+                    Helpers.PLATFORM_NAME,
+                    Helpers.CONTACT_EMAIL,
+                    true
                 );
                 return context.accountSettingsView;
             };

@@ -1,38 +1,33 @@
 # -*- coding: utf-8 -*-
 """Video xmodule tests in mongo."""
 
-import ddt
 import json
 from collections import OrderedDict
-from path import Path as path
-
-from lxml import etree
-from mock import patch, MagicMock, Mock
-from nose.plugins.attrib import attr
 from uuid import uuid4
 
+import ddt
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
+from edxval.api import ValCannotCreateError, ValVideoNotFoundError, create_profile, create_video, get_video_info
+from lxml import etree
+from mock import MagicMock, Mock, patch
+from nose.plugins.attrib import attr
+from path import Path as path
 
-from xmodule.video_module import VideoDescriptor, bumper_utils, video_utils, rewrite_video_url
-from xmodule.x_module import STUDENT_VIEW
-from xmodule.tests.test_video import VideoDescriptorTestBase, instantiate_descriptor
-from xmodule.tests.test_import import DummySystem
-from xmodule.video_module.transcripts_utils import save_to_store, Transcript
-from xmodule.modulestore.inheritance import own_metadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE
-)
-from edxval.api import (
-    create_profile, create_video, get_video_info, ValCannotCreateError, ValVideoNotFoundError
-)
+from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE
+from xmodule.tests.test_import import DummySystem
+from xmodule.tests.test_video import VideoDescriptorTestBase, instantiate_descriptor
+from xmodule.video_module import VideoDescriptor, bumper_utils, rewrite_video_url, video_utils
+from xmodule.video_module.transcripts_utils import Transcript, save_to_store
+from xmodule.x_module import STUDENT_VIEW
 
 from . import BaseTestXmodule
-from .test_video_xml import SOURCE_XML
 from .test_video_handlers import TestVideo
+from .test_video_xml import SOURCE_XML
 
 
 @attr(shard=1)
@@ -982,6 +977,7 @@ class TestVideoCDNRewriting(BaseTestXmodule):
 
 
 @attr(shard=1)
+@ddt.ddt
 class TestVideoDescriptorInitialization(BaseTestXmodule):
     """
     Make sure that module initialization works correctly.
@@ -1050,6 +1046,68 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
 
         self.assertNotIn('source', fields)
         self.assertFalse(self.item_descriptor.download_video)
+
+    @ddt.data(
+        (
+            {
+                'desktop_webm': 'https://webm.com/dw.webm',
+                'hls': 'https://hls.com/hls.m3u8',
+                'youtube': 'v0TFmdO4ZP0',
+                'desktop_mp4': 'https://mp4.com/dm.mp4'
+            },
+            ['https://www.youtube.com/watch?v=v0TFmdO4ZP0']
+        ),
+        (
+            {
+                'desktop_webm': 'https://webm.com/dw.webm',
+                'hls': 'https://hls.com/hls.m3u8',
+                'youtube': None,
+                'desktop_mp4': 'https://mp4.com/dm.mp4'
+            },
+            ['https://hls.com/hls.m3u8']
+        ),
+        (
+            {
+                'desktop_webm': 'https://webm.com/dw.webm',
+                'hls': None,
+                'youtube': None,
+                'desktop_mp4': 'https://mp4.com/dm.mp4'
+            },
+            ['https://mp4.com/dm.mp4']
+        ),
+        (
+            {
+                'desktop_webm': 'https://webm.com/dw.webm',
+                'hls': None,
+                'youtube': None,
+                'desktop_mp4': None
+            },
+            ['https://webm.com/dw.webm']
+        ),
+        (
+            {
+                'desktop_webm': None,
+                'hls': None,
+                'youtube': None,
+                'desktop_mp4': None
+            },
+            ['https://www.youtube.com/watch?v=3_yD_cEKoCk']
+        ),
+    )
+    @ddt.unpack
+    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    def test_val_encoding_in_context(self, val_video_encodings, video_url):
+        """
+        Tests that the val encodings correctly override the video url when the edx video id is set and
+        one or more encodings are present.
+        """
+        with patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
+            get_urls_for_profiles.return_value = val_video_encodings
+            self.initialize_module(
+                data='<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
+            )
+            context = self.item_descriptor.get_context()
+            self.assertEqual(context['transcripts_basic_tab_metadata']['video_url']['value'], video_url)
 
 
 @attr(shard=1)

@@ -5,17 +5,16 @@ Unit tests for Ecommerce feature flag in new instructor dashboard.
 import datetime
 
 import pytz
-
 from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
-from student.roles import CourseFinanceAdminRole
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from shoppingcart.models import Coupon, CourseRegistrationCode
+from student.roles import CourseFinanceAdminRole
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 
 
 @attr(shard=1)
@@ -30,7 +29,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
 
         # URL for instructor dash
         cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course.id.to_deprecated_string()})
-        cls.ecommerce_link = '<button type="button" class="btn-link" data-section="e-commerce">E-Commerce</button>'
+        cls.ecommerce_link = '<button type="button" class="btn-link e-commerce" data-section="e-commerce">E-Commerce</button>'
 
     def setUp(self):
         super(TestECommerceDashboardViews, self).setUp()

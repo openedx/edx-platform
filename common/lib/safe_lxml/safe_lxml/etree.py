@@ -7,12 +7,11 @@ It also includes a safer XMLParser.
 For processing xml always prefer this over using lxml.etree directly.
 """
 
-from lxml.etree import *  # pylint: disable=wildcard-import, unused-wildcard-import
-from lxml.etree import XMLParser as _XMLParser
-from lxml.etree import _Element, _ElementTree  # pylint: disable=unused-import
-
 # This should be imported after lxml.etree so that it overrides the following attributes.
-from defusedxml.lxml import parse, fromstring, XML
+from defusedxml.lxml import XML, fromstring, parse
+from lxml.etree import XMLParser as _XMLParser
+from lxml.etree import *  # pylint: disable=wildcard-import, unused-wildcard-import; pylint: disable=unused-import
+from lxml.etree import _Element, _ElementTree
 
 
 class XMLParser(_XMLParser):  # pylint: disable=function-redefined

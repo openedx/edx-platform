@@ -6,53 +6,48 @@ import datetime
 import decimal
 import json
 import logging
-from pytz import UTC
-from ipware.ip import get_ip
 
+import analytics
+import waffle
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.http import HttpResponse, HttpResponseBadRequest, Http404
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _, ugettext_lazy
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import View
-
-import analytics
-from eventtracking import tracker
+from edx_rest_api_client.exceptions import SlumberBaseException
+from ipware.ip import get_ip
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-import waffle
+from pytz import UTC
 
 from commerce.utils import EcommerceService, is_account_activation_requirement_disabled
 from course_modes.models import CourseMode
-from edx_rest_api_client.exceptions import SlumberBaseException
 from edxmako.shortcuts import render_to_response, render_to_string
-from openedx.core.djangoapps.embargo import api as embargo_api
+from eventtracking import tracker
+from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
+from lms.djangoapps.verify_student.ssencrypt import has_valid_signature
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import update_account_settings
-from openedx.core.djangoapps.user_api.errors import UserNotFound, AccountValidationError
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.errors import AccountValidationError, UserNotFound
 from openedx.core.lib.log_utils import audit_log
+from shoppingcart.models import CertificateItem, Order
+from shoppingcart.processors import get_purchase_endpoint, get_signed_purchase_params
 from student.models import CourseEnrollment
-from shoppingcart.models import Order, CertificateItem
-from shoppingcart.processors import (
-    get_signed_purchase_params, get_purchase_endpoint
-)
-from lms.djangoapps.verify_student.ssencrypt import has_valid_signature
-from lms.djangoapps.verify_student.models import (
-    VerificationDeadline,
-    SoftwareSecurePhotoVerification,
-)
-from lms.djangoapps.verify_student.image import decode_image_data, InvalidImageData
-from util.json_request import JsonResponse
 from util.db import outer_atomic
+from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -505,7 +500,7 @@ class PayAndVerifyView(View):
             # is enabled redirect him to the ecommerce checkout page.
             ecommerce_service = EcommerceService()
             if ecommerce_service.is_enabled(user):
-                url = ecommerce_service.checkout_page_url(sku)
+                url = ecommerce_service.get_checkout_page_url(sku)
 
         # Redirect if necessary, otherwise implicitly return None
         if url is not None:
@@ -1184,7 +1179,7 @@ class ReverifyView(View):
         Most of the work is done client-side by composing the same
         Backbone views used in the initial verification flow.
         """
-        status, _ = SoftwareSecurePhotoVerification.user_status(request.user)
+        status, __ = SoftwareSecurePhotoVerification.user_status(request.user)
 
         expiration_datetime = SoftwareSecurePhotoVerification.get_expiration_datetime(request.user)
         can_reverify = False

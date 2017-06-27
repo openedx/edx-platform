@@ -2,8 +2,8 @@
 Django admin dashboard configuration for Video XModule.
 """
 
-from django.contrib import admin
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
+from django.contrib import admin
 
 from openedx.core.djangoapps.video_config.forms import CourseHLSPlaybackFlagAdminForm
 from openedx.core.djangoapps.video_config.models import CourseHLSPlaybackEnabledFlag, HLSPlaybackEnabledFlag

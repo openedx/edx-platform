@@ -3,52 +3,51 @@
 This module contains celery task functions for handling the sending of bulk email
 to a course.
 """
-from collections import Counter
 import json
 import logging
 import random
 import re
+from collections import Counter
+from smtplib import SMTPConnectError, SMTPDataError, SMTPException, SMTPServerDisconnected
 from time import sleep
 
-import dogstats_wrapper as dog_stats_api
-from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPException
-from boto.ses.exceptions import (
-    SESAddressNotVerifiedError,
-    SESIdentityNotVerifiedError,
-    SESDomainNotConfirmedError,
-    SESAddressBlacklistedError,
-    SESDailyQuotaExceededError,
-    SESMaxSendingRateExceededError,
-    SESDomainEndsWithDotError,
-    SESLocalAddressCharacterError,
-    SESIllegalAddressError,
-)
 from boto.exception import AWSConnectionError
-from markupsafe import escape
-
-from celery import task, current_task  # pylint: disable=no-name-in-module
-from celery.states import SUCCESS, FAILURE, RETRY  # pylint: disable=no-name-in-module, import-error
+from boto.ses.exceptions import (
+    SESAddressBlacklistedError,
+    SESAddressNotVerifiedError,
+    SESDailyQuotaExceededError,
+    SESDomainEndsWithDotError,
+    SESDomainNotConfirmedError,
+    SESIdentityNotVerifiedError,
+    SESIllegalAddressError,
+    SESLocalAddressCharacterError,
+    SESMaxSendingRateExceededError
+)
+from celery import current_task, task  # pylint: disable=no-name-in-module
 from celery.exceptions import RetryTaskError  # pylint: disable=no-name-in-module, import-error
-
+from celery.states import FAILURE, RETRY, SUCCESS  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.message import forbid_multi_line_headers
 from django.core.urlresolvers import reverse
-from django.utils.translation import override as override_language, ugettext as _
+from django.utils.translation import override as override_language
+from django.utils.translation import ugettext as _
+from markupsafe import escape
 
+import dogstats_wrapper as dog_stats_api
 from bulk_email.models import CourseEmail, Optout
 from courseware.courses import get_course
-from openedx.core.lib.courses import course_image_url
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (
     SubtaskStatus,
-    queue_subtasks_for_query,
     check_subtask_is_valid,
-    update_subtask_status,
+    queue_subtasks_for_query,
+    update_subtask_status
 )
-from util.date_utils import get_default_time_display
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.courses import course_image_url
+from util.date_utils import get_default_time_display
 
 log = logging.getLogger('edx.celery.task')
 

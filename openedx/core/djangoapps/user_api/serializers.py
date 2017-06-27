@@ -28,7 +28,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         """
         Returns the set of preferences as a dict for the specified user
         """
-        return dict([(pref.key, pref.value) for pref in user.preferences.all()])
+        return UserPreference.get_all_preferences(user)
 
     class Meta(object):
         model = User

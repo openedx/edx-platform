@@ -1,6 +1,6 @@
 # pylint: disable=missing-docstring
 
-from lettuce import world, step
+from lettuce import step, world
 
 SELECTORS = {
     'spinner': '.video-wrapper .spinner',

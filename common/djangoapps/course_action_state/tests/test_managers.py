@@ -2,13 +2,14 @@
 """
 Tests for basic common operations related to Course Action State managers
 """
-from ddt import ddt, data
-from django.test import TestCase
 from collections import namedtuple
-from opaque_keys.edx.locations import CourseLocator
-from course_action_state.models import CourseRerunState
-from course_action_state.managers import CourseActionStateItemNotFoundError
 
+from ddt import data, ddt
+from django.test import TestCase
+from opaque_keys.edx.locations import CourseLocator
+
+from course_action_state.managers import CourseActionStateItemNotFoundError
+from course_action_state.models import CourseRerunState
 
 # Sequence of Action models to be tested with ddt.
 COURSE_ACTION_STATES = (CourseRerunState, )

@@ -132,11 +132,7 @@
         display: inline-block;
         font-size: em(11);
 
-      }
-
-      .nav-legal-02 a {
-
-        &:before {
+        &:not(:first-child) a:before {
           margin-right: ($baseline/4);
           content: "-";
         }

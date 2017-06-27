@@ -3,6 +3,7 @@ Tests for Platform against Mobile App Request
 """
 import ddt
 from django.test import TestCase
+
 from mobile_api.mobile_platform import MobilePlatform
 
 

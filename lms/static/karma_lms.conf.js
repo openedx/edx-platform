@@ -28,6 +28,7 @@ var options = {
     sourceFiles: [
         {pattern: 'coffee/src/**/!(*spec).js'},
         {pattern: 'course_bookmarks/**/!(*spec).js'},
+        {pattern: 'course_search/**/!(*spec).js'},
         {pattern: 'discussion/js/**/!(*spec).js'},
         {pattern: 'js/**/!(*spec|djangojs).js'},
         {pattern: 'lms/js/**/!(*spec).js'},

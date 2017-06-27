@@ -1,6 +1,7 @@
 """
 Discussion API internal interface
 """
+import itertools
 from collections import defaultdict
 from urllib import urlencode
 from urlparse import urlunparse
@@ -8,47 +9,41 @@ from urlparse import urlunparse
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import Http404
-import itertools
 from enum import Enum
-from openedx.core.djangoapps.user_api.accounts.views import AccountViewSet
-
-from rest_framework.exceptions import PermissionDenied
-
-from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
-from courseware.courses import get_course_with_access
+from rest_framework.exceptions import PermissionDenied
 
-from discussion_api.exceptions import ThreadNotFoundError, CommentNotFoundError, DiscussionDisabledError
+from courseware.courses import get_course_with_access
+from discussion_api.exceptions import CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError
 from discussion_api.forms import CommentActionsForm, ThreadActionsForm
 from discussion_api.permissions import (
     can_delete,
     get_editable_fields,
     get_initializable_comment_fields,
-    get_initializable_thread_fields,
+    get_initializable_thread_fields
 )
-from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context, DiscussionTopicSerializer
-from django_comment_client.base.views import (
-    track_comment_created_event,
-    track_thread_created_event,
-    track_voted_event,
-)
+from discussion_api.serializers import CommentSerializer, DiscussionTopicSerializer, ThreadSerializer, get_context
+from django_comment_client.base.views import track_comment_created_event, track_thread_created_event, track_voted_event
+from django_comment_client.utils import get_accessible_discussion_xblocks, get_group_id_for_user, is_commentable_divided
 from django_comment_common.signals import (
-    thread_created,
-    thread_edited,
-    thread_deleted,
-    thread_voted,
     comment_created,
+    comment_deleted,
     comment_edited,
     comment_voted,
-    comment_deleted,
+    thread_created,
+    thread_deleted,
+    thread_edited,
+    thread_voted
 )
-from django_comment_client.utils import get_accessible_discussion_xblocks, is_commentable_divided, get_group_id_for_user
+from django_comment_common.utils import get_course_discussion_settings
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion_api.pagination import DiscussionAPIPagination
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.utils import CommentClientRequestError
-from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError, DiscussionNotFoundError
+from openedx.core.djangoapps.user_api.accounts.views import AccountViewSet
+from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
 
 
 class DiscussionTopic(object):
@@ -109,12 +104,13 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
         course_key = CourseKey.from_string(cc_thread["course_id"])
         course = _get_course(course_key, request.user)
         context = get_context(course, request, cc_thread)
+        course_discussion_settings = get_course_discussion_settings(course_key)
         if (
                 not context["is_requester_privileged"] and
                 cc_thread["group_id"] and
-                is_commentable_divided(course.id, cc_thread["commentable_id"])
+                is_commentable_divided(course.id, cc_thread["commentable_id"], course_discussion_settings)
         ):
-            requester_group_id = get_group_id_for_user(request.user, course.id)
+            requester_group_id = get_group_id_for_user(request.user, course_discussion_settings)
             if requester_group_id is not None and cc_thread["group_id"] != requester_group_id:
                 raise ThreadNotFoundError("Thread not found.")
         return cc_thread, context
@@ -546,7 +542,7 @@ def get_thread_list(
         "user_id": unicode(request.user.id),
         "group_id": (
             None if context["is_requester_privileged"] else
-            get_group_id_for_user(request.user, course.id)
+            get_group_id_for_user(request.user, get_course_discussion_settings(course.id))
         ),
         "page": page,
         "per_page": page_size,
@@ -828,12 +824,13 @@ def create_thread(request, thread_data):
 
     context = get_context(course, request)
     _check_initializable_thread_fields(thread_data, context)
+    discussion_settings = get_course_discussion_settings(course_key)
     if (
             "group_id" not in thread_data and
-            is_commentable_divided(course_key, thread_data.get("topic_id"))
+            is_commentable_divided(course_key, thread_data.get("topic_id"), discussion_settings)
     ):
         thread_data = thread_data.copy()
-        thread_data["group_id"] = get_group_id_for_user(user, course_key)
+        thread_data["group_id"] = get_group_id_for_user(user, discussion_settings)
     serializer = ThreadSerializer(data=thread_data, context=context)
     actions_form = ThreadActionsForm(thread_data)
     if not (serializer.is_valid() and actions_form.is_valid()):

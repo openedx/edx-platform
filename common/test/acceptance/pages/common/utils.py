@@ -2,11 +2,12 @@
 Utility methods common to Studio and the LMS.
 """
 from bok_choy.promise import BrokenPromise
-from common.test.acceptance.tests.helpers import disable_animations
 from selenium.webdriver.common.action_chains import ActionChains
-from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
-from common.test.acceptance.pages.lms.track_selection import TrackSelectionPage
+
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
+from common.test.acceptance.pages.lms.pay_and_verify import FakePaymentPage, PaymentAndVerificationFlow
+from common.test.acceptance.pages.lms.track_selection import TrackSelectionPage
+from common.test.acceptance.tests.helpers import disable_animations
 
 
 def sync_on_notification(page, style='default', wait_for_hide=False):

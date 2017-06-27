@@ -2,13 +2,10 @@
 Django admin dashboard configuration for LMS XBlock infrastructure.
 """
 
-from django.contrib import admin
 from config_models.admin import ConfigurationModelAdmin
-from .models import (
-    AppVersionConfig,
-    MobileApiConfig,
-    IgnoreMobileAvailableFlagConfig
-)
+from django.contrib import admin
+
+from .models import AppVersionConfig, IgnoreMobileAvailableFlagConfig, MobileApiConfig
 
 admin.site.register(MobileApiConfig, ConfigurationModelAdmin)
 admin.site.register(IgnoreMobileAvailableFlagConfig, ConfigurationModelAdmin)

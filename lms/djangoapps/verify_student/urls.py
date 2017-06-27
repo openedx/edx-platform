@@ -5,7 +5,6 @@ from django.conf.urls import patterns, url
 
 from lms.djangoapps.verify_student import views
 
-
 urlpatterns = patterns(
     '',
 

@@ -2,26 +2,23 @@
 """
 Acceptance tests for studio related to the outline page.
 """
+import itertools
 import json
 from datetime import datetime, timedelta
-import itertools
-from pytz import UTC
-from bok_choy.promise import EmptyPromise
-from nose.plugins.attrib import attr
 
-from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
-from common.test.acceptance.pages.studio.utils import add_discussion, drag, verify_ordering
-from common.test.acceptance.pages.lms.course_home import CourseHomePage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
-from common.test.acceptance.fixtures.config import ConfigModelFixture
-from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from nose.plugins.attrib import attr
+from pytz import UTC
 
 from base_studio_test import StudioCourseTest
-from common.test.acceptance.tests.helpers import load_data_str, disable_animations
+from common.test.acceptance.fixtures.config import ConfigModelFixture
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.progress import ProgressPage
-
+from common.test.acceptance.pages.studio.overview import ContainerPage, CourseOutlinePage, ExpandCollapseLinkState
+from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
+from common.test.acceptance.pages.studio.utils import add_discussion, drag, verify_ordering
+from common.test.acceptance.tests.helpers import disable_animations, load_data_str
 
 SECTION_NAME = 'Test Section'
 SUBSECTION_NAME = 'Test Subsection'
@@ -1442,8 +1439,6 @@ class DefaultStatesContentTest(CourseOutlineTest):
 
     __test__ = True
 
-    # TODO: TNL-6546: Removing unified_course_view_flag
-    # This test will need to be rewritten to point to the new course home page.
     def test_view_live(self):
         """
         Scenario: View Live version from course outline

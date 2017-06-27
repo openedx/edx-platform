@@ -1,14 +1,13 @@
 """Tests of comprehensive theming."""
 
 from django.conf import settings
-from django.test import TestCase
-
-from path import path           # pylint: disable=no-name-in-module
 from django.contrib import staticfiles
+from django.test import TestCase
+from path import path  # pylint: disable=no-name-in-module
 
 import edxmako
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from openedx.core.lib.tempdir import mkdtemp_clean, create_symlink, delete_symlink
+from openedx.core.lib.tempdir import create_symlink, delete_symlink, mkdtemp_clean
 
 
 class TestComprehensiveTheming(TestCase):

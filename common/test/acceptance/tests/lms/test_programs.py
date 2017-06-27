@@ -2,15 +2,13 @@
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.catalog import CatalogFixture, CatalogIntegrationMixin
-from common.test.acceptance.fixtures.programs import ProgramsConfigMixin
 from common.test.acceptance.fixtures.course import CourseFixture
-from common.test.acceptance.tests.helpers import UniqueCourseTest
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.fixtures.programs import ProgramsConfigMixin
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.catalog import CacheProgramsPage
-from common.test.acceptance.pages.lms.programs import ProgramListingPage, ProgramDetailsPage
-from openedx.core.djangoapps.catalog.tests.factories import (
-    ProgramFactory, CourseFactory, CourseRunFactory
-)
+from common.test.acceptance.pages.lms.programs import ProgramDetailsPage, ProgramListingPage
+from common.test.acceptance.tests.helpers import UniqueCourseTest
+from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
 
 
 class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourseTest):

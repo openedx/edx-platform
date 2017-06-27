@@ -137,6 +137,9 @@ if STATIC_URL_BASE:
 # DEFAULT_COURSE_ABOUT_IMAGE_URL specifies the default image to show for courses that don't provide one
 DEFAULT_COURSE_ABOUT_IMAGE_URL = ENV_TOKENS.get('DEFAULT_COURSE_ABOUT_IMAGE_URL', DEFAULT_COURSE_ABOUT_IMAGE_URL)
 
+# COURSE_MODE_DEFAULTS specifies the course mode to use for courses that do not set one
+COURSE_MODE_DEFAULTS = ENV_TOKENS.get('COURSE_MODE_DEFAULTS', COURSE_MODE_DEFAULTS)
+
 # MEDIA_ROOT specifies the directory where user-uploaded files are stored.
 MEDIA_ROOT = ENV_TOKENS.get('MEDIA_ROOT', MEDIA_ROOT)
 MEDIA_URL = ENV_TOKENS.get('MEDIA_URL', MEDIA_URL)
@@ -309,7 +312,12 @@ ENABLE_COMPREHENSIVE_THEMING = ENV_TOKENS.get('ENABLE_COMPREHENSIVE_THEMING', EN
 # Marketing link overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 
+# Intentional defaults.
 SUPPORT_SITE_LINK = ENV_TOKENS.get('SUPPORT_SITE_LINK', SUPPORT_SITE_LINK)
+PASSWORD_RESET_SUPPORT_LINK = ENV_TOKENS.get('PASSWORD_RESET_SUPPORT_LINK', SUPPORT_SITE_LINK)
+ACTIVATION_EMAIL_SUPPORT_LINK = ENV_TOKENS.get(
+    'ACTIVATION_EMAIL_SUPPORT_LINK', SUPPORT_SITE_LINK
+)
 
 # Mobile store URL overrides
 MOBILE_STORE_URLS = ENV_TOKENS.get('MOBILE_STORE_URLS', MOBILE_STORE_URLS)
@@ -673,10 +681,10 @@ X_FRAME_OPTIONS = ENV_TOKENS.get('X_FRAME_OPTIONS', X_FRAME_OPTIONS)
 if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     AUTHENTICATION_BACKENDS = (
         ENV_TOKENS.get('THIRD_PARTY_AUTH_BACKENDS', [
-            'social.backends.google.GoogleOAuth2',
-            'social.backends.linkedin.LinkedinOAuth2',
-            'social.backends.facebook.FacebookOAuth2',
-            'social.backends.azuread.AzureADOAuth2',
+            'social_core.backends.google.GoogleOAuth2',
+            'social_core.backends.linkedin.LinkedinOAuth2',
+            'social_core.backends.facebook.FacebookOAuth2',
+            'social_core.backends.azuread.AzureADOAuth2',
             'third_party_auth.saml.SAMLAuthBackend',
             'third_party_auth.lti.LTIAuthBackend',
         ]) + list(AUTHENTICATION_BACKENDS)
@@ -798,6 +806,9 @@ ECOMMERCE_API_URL = ENV_TOKENS.get('ECOMMERCE_API_URL', ECOMMERCE_API_URL)
 ECOMMERCE_API_TIMEOUT = ENV_TOKENS.get('ECOMMERCE_API_TIMEOUT', ECOMMERCE_API_TIMEOUT)
 
 COURSE_CATALOG_API_URL = ENV_TOKENS.get('COURSE_CATALOG_API_URL', COURSE_CATALOG_API_URL)
+
+CREDENTIALS_INTERNAL_SERVICE_URL = ENV_TOKENS.get('CREDENTIALS_INTERNAL_SERVICE_URL', CREDENTIALS_INTERNAL_SERVICE_URL)
+CREDENTIALS_PUBLIC_SERVICE_URL = ENV_TOKENS.get('CREDENTIALS_PUBLIC_SERVICE_URL', CREDENTIALS_PUBLIC_SERVICE_URL)
 
 ##### Custom Courses for EdX #####
 if FEATURES.get('CUSTOM_COURSES_EDX'):
@@ -935,6 +946,13 @@ ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = ENV_TOKENS.get(
     ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE
 )
 
+# Course enrollment modes to be hidden in the Enterprise enrollment page
+# if the "Hide audit track" flag is enabled for an EnterpriseCustomer
+ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ENV_TOKENS.get(
+    'ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES',
+    ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES
+)
+
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class
@@ -984,3 +1002,6 @@ COURSES_API_CACHE_TIMEOUT = ENV_TOKENS.get('COURSES_API_CACHE_TIMEOUT', COURSES_
 
 # Add an ICP license for serving content in China if your organization is registered to do so
 ICP_LICENSE = ENV_TOKENS.get('ICP_LICENSE', None)
+
+############## Settings for CourseGraph ############################
+COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', LOW_PRIORITY_QUEUE)

@@ -6,11 +6,10 @@ NOTE: These views are deprecated.  These routes are superseded by
 ``openedx.core.djangoapps.user_api.urls``.
 """
 
+from django.conf import settings
 from django.conf.urls import patterns, url
 
-from .views import ProfileImageUploadView, ProfileImageRemoveView
-from django.conf import settings
-
+from .views import ProfileImageRemoveView, ProfileImageUploadView
 
 urlpatterns = patterns(
     '',

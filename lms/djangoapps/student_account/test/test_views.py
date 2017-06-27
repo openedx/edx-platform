@@ -6,29 +6,25 @@ import re
 from unittest import skipUnless
 from urllib import urlencode
 
-import mock
 import ddt
+import mock
 from django.conf import settings
-from django.core import mail
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.messages.middleware import MessageMiddleware
+from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.urlresolvers import reverse
+from django.http import HttpRequest
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.http import HttpRequest
-from edx_oauth2_provider.tests.factories import ClientFactory, AccessTokenFactory, RefreshTokenFactory
+from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from edx_rest_api_client import exceptions
 from nose.plugins.attrib import attr
-from oauth2_provider.models import (
-    AccessToken as dot_access_token,
-    RefreshToken as dot_refresh_token
-)
-from provider.oauth2.models import (
-    AccessToken as dop_access_token,
-    RefreshToken as dop_refresh_token
-)
+from oauth2_provider.models import AccessToken as dot_access_token
+from oauth2_provider.models import RefreshToken as dot_refresh_token
+from provider.oauth2.models import AccessToken as dop_access_token
+from provider.oauth2.models import RefreshToken as dop_refresh_token
 from testfixtures import LogCapture
 
 from commerce.models import CommerceConfiguration
@@ -38,18 +34,17 @@ from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
-from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
-from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
-from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
+from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
+from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student_account.views import account_settings_context, get_user_orders
-from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
+from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
-
 
 LOGGER_NAME = 'audit'
 User = get_user_model()  # pylint:disable=invalid-name
@@ -333,19 +328,19 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         ("edx.org", "register_user"),
     )
     @ddt.unpack
-    def test_login_and_registration_form_signin_preserves_params(self, theme, url_name):
+    def test_login_and_registration_form_signin_not_preserves_params(self, theme, url_name):
         params = [
             ('course_id', 'edX/DemoX/Demo_Course'),
             ('enrollment_action', 'enroll'),
         ]
 
-        # The response should have a "Sign In" button with the URL
+        # The response should not have a "Sign In" button with the URL
         # that preserves the querystring params
         with with_comprehensive_theme_context(theme):
             response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         expected_url = '/login?{}'.format(self._finish_auth_url_param(params + [('next', '/dashboard')]))
-        self.assertContains(response, expected_url)
+        self.assertNotContains(response, expected_url)
 
         # Add additional parameters:
         params = [
@@ -361,7 +356,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         expected_url = '/login?{}'.format(self._finish_auth_url_param(params))
-        self.assertContains(response, expected_url)
+        self.assertNotContains(response, expected_url)
 
     @mock.patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
     @ddt.data("signin_user", "register_user")

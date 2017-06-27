@@ -4,12 +4,11 @@ Defines a form for providing validation of subsection grade templates.
 import logging
 
 from django import forms
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.locator import CourseLocator
 
 from lms.djangoapps.grades.config.models import CoursePersistentGradesFlag
-
-from opaque_keys import InvalidKeyError
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locator import CourseLocator
 
 log = logging.getLogger(__name__)
 

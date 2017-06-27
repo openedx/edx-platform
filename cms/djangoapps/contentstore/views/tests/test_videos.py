@@ -2,25 +2,24 @@
 """
 Unit tests for video-related REST APIs.
 """
-from datetime import datetime
 import csv
-import ddt
 import json
-import dateutil.parser
 import re
+from datetime import datetime
 from StringIO import StringIO
-import pytz
 
+import dateutil.parser
+import ddt
+import pytz
 from django.conf import settings
 from django.test.utils import override_settings
+from edxval.api import create_profile, create_video, get_video_info
 from mock import Mock, patch
 
-from edxval.api import create_profile, create_video, get_video_info
-
 from contentstore.models import VideoUploadConfig
-from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
+from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
 from xmodule.modulestore.tests.factories import CourseFactory
 
 

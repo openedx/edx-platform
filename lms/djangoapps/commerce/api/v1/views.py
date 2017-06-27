@@ -1,14 +1,13 @@
-""" API v1 views. """
 import logging
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import Http404
 from edx_rest_api_client import exceptions
+from edx_rest_framework_extensions.authentication import JwtAuthentication
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.views import APIView
-from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 from rest_framework_oauth.authentication import OAuth2Authentication
 
 from commerce.api.v1.models import Course
@@ -17,7 +16,6 @@ from commerce.api.v1.serializers import CourseSerializer
 from commerce.utils import is_account_activation_requirement_disabled
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.mixins import PutAsCreateMixin
 from util.json_request import JsonResponse
 
@@ -26,7 +24,7 @@ log = logging.getLogger(__name__)
 
 class CourseListView(ListAPIView):
     """ List courses and modes. """
-    authentication_classes = (OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
     permission_classes = (IsAuthenticated,)
     serializer_class = CourseSerializer
     pagination_class = None
@@ -40,7 +38,7 @@ class CourseRetrieveUpdateView(PutAsCreateMixin, RetrieveUpdateAPIView):
     lookup_field = 'id'
     lookup_url_kwarg = 'course_id'
     model = CourseMode
-    authentication_classes = (OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
     permission_classes = (ApiKeyOrModelPermission,)
     serializer_class = CourseSerializer
 
@@ -67,7 +65,7 @@ class CourseRetrieveUpdateView(PutAsCreateMixin, RetrieveUpdateAPIView):
 class OrderView(APIView):
     """ Retrieve order details. """
 
-    authentication_classes = (SessionAuthentication,)
+    authentication_classes = (JwtAuthentication, SessionAuthentication,)
     permission_classes = (IsAuthenticatedOrActivationOverridden,)
 
     def get(self, request, number):
@@ -77,7 +75,7 @@ class OrderView(APIView):
         if not request.user.is_authenticated() and is_account_activation_requirement_disabled():
             try:
                 request.user = User.objects.get(id=request.session._session_cache['_auth_user_id'])
-            except DoesNotExist:
+            except User.DoesNotExist:
                 return JsonResponse(status=403)
         try:
             order = ecommerce_api_client(request.user).orders(number).get()

@@ -18,7 +18,6 @@ from openedx.core.djangoapps.theming.helpers import (
   is_request_in_themed_site,
 )
 from certificates.api import get_asset_url_by_slug
-from openedx.core.djangoapps.lang_pref.api import released_languages
 logger = logging.getLogger(__name__)
 %>
 
@@ -97,6 +96,7 @@ source, template_path = Loader(engine).load_template_source(path)
         try:
             return Template("""
                 {% load render_bundle from webpack_loader %}
+                {% render_bundle "commons" %}
                 {% render_bundle entry %}
                 <script type="text/javascript">
                     {% autoescape off %}{{ body }}{% endautoescape %}
@@ -195,10 +195,6 @@ else:
     return get_value('email_from_address', settings.TECH_SUPPORT_EMAIL)
 %></%def>
 
-<%def name="show_language_selector()"><%
-    return get_value('SHOW_LANGUAGE_SELECTOR', settings.FEATURES.get('SHOW_LANGUAGE_SELECTOR', False))
-%></%def>
-
-<%def name="get_released_languages()"><%
-    return released_languages()
+<%def name="get_contact_email_address()"><%
+    return get_value('email_from_address', settings.CONTACT_EMAIL)
 %></%def>

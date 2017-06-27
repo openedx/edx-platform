@@ -5,13 +5,12 @@ Utility Mixins for unit tests
 import json
 import sys
 
-from mock import patch
-
 from django.conf import settings
 from django.core.urlresolvers import clear_url_caches, resolve
 from django.test import TestCase
+from mock import patch
 
-from util.db import OuterAtomic, CommitOnSuccessManager
+from util.db import CommitOnSuccessManager, OuterAtomic
 
 
 class UrlResetMixin(object):

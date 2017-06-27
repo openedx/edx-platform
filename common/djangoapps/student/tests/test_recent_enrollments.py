@@ -2,23 +2,24 @@
 Tests for the recently enrolled messaging within the Dashboard.
 """
 import datetime
+import unittest
+
+import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from nose.plugins.attrib import attr
 from opaque_keys.edx import locator
 from pytz import UTC
-from nose.plugins.attrib import attr
-import unittest
-import ddt
-from shoppingcart.models import DonationConfiguration
 
+from common.test.utils import XssTestMixin
+from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from shoppingcart.models import DonationConfiguration
+from student.models import CourseEnrollment, DashboardConfiguration
 from student.tests.factories import UserFactory
+from student.views import _get_recently_enrolled_courses, get_course_enrollments
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from course_modes.tests.factories import CourseModeFactory
-from student.models import CourseEnrollment, DashboardConfiguration
-from student.views import get_course_enrollments, _get_recently_enrolled_courses
-from common.test.utils import XssTestMixin
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
 
 @attr(shard=3)

@@ -1,11 +1,12 @@
 """
 Template module
 """
-from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
-from xmodule.raw_module import RawDescriptor
 from lxml import etree
 from mako.template import Template
+
 import dogstats_wrapper as dog_stats_api
+from xmodule.raw_module import RawDescriptor
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule
 
 
 class CustomTagModule(XModule):

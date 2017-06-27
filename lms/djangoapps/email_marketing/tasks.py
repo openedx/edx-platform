@@ -6,12 +6,12 @@ import time
 from datetime import datetime, timedelta
 
 from celery import task
-from django.core.cache import cache
 from django.conf import settings
-
-from email_marketing.models import EmailMarketingConfiguration
+from django.core.cache import cache
 from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError
+
+from email_marketing.models import EmailMarketingConfiguration
 
 log = logging.getLogger(__name__)
 SAILTHRU_LIST_CACHE_KEY = "email.marketing.cache"

@@ -167,7 +167,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-04-27 14:25+0000\n"
+"POT-Creation-Date: 2017-06-08 14:59+0000\n"
 "PO-Revision-Date: 2017-03-16 12:39+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -848,6 +848,15 @@ msgstr "عملية التسجيل غير صحيحة"
 #: common/djangoapps/student/views.py
 #, python-brace-format
 msgid ""
+"In order to sign in, you need to activate your account.<br /><br />We just "
+"sent an activation link to <strong>{email}</strong>.  If you do not receive "
+"an email, check your spam folders or <a href=\"{support_url}\">contact "
+"{platform} Support</a>."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+#, python-brace-format
+msgid ""
 "You've successfully logged into your {provider_name} account, but this "
 "account isn't linked with an {platform_name} account yet."
 msgstr ""
@@ -908,14 +917,6 @@ msgid "Email or password is incorrect."
 msgstr "عنوان البريد الإلكتروني أو كلمة المرور خاطئين."
 
 #: common/djangoapps/student/views.py
-msgid ""
-"Before you sign in, you need to activate your account. We have sent you an "
-"email message with instructions for activating your account."
-msgstr ""
-"قبل أن تدخل إلى حسابك عليك أن تُفعّله. لقد أرسلنا لك بريداً الكترونياً مع "
-"تعليمات التفعيل."
-
-#: common/djangoapps/student/views.py
 msgid "Please enter a username"
 msgstr "يُرجى إدخال اسم المستخدم"
 
@@ -973,10 +974,30 @@ msgid "Account creation not allowed."
 msgstr ""
 
 #: common/djangoapps/student/views.py
-msgid "Unknown error. Please e-mail us to let us know how it happened."
+#, python-brace-format
+msgid ""
+"{html_start}Your account could not be activated{html_end}Something went "
+"wrong, please <a href=\"{support_url}\">contact support</a> to resolve this "
+"issue."
 msgstr ""
-"نعتذر لحدوث خطأ غير معروف. يُرجى التواصل معنا بإرسال رسالة إلى عنوان بريدنا "
-"الإلكتروني لإعلامنا بكيفية حدوث ذلك. "
+
+#: common/djangoapps/student/views.py
+#, python-brace-format
+msgid "{html_start}Success{html_end} You have activated your account."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+#, python-brace-format
+msgid ""
+"{html_start}Success! You have activated your account.{html_end}You will now "
+"receive email updates and alerts from us related to the courses you are "
+"enrolled in. Sign In to continue."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+#, python-brace-format
+msgid "{html_start}This account has already been activated.{html_end}"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 #, python-brace-format
@@ -1081,6 +1102,14 @@ msgstr ""
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this provider configuration belongs to."
 msgstr "الموقع الذي ينتمي إليه ضبط إعدادات مقدم الخدمة."
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is enabled, users that visit a \"TPA hinted\" URL for this "
+"provider (e.g. a URL ending with `?tpa_hint=[provider_name]`) will be "
+"forwarded directly to the login URL of the provider instead of being first "
+"prompted with a login dialog."
+msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -1872,15 +1901,15 @@ msgid "Could not interpret '{student_answer}' as a number."
 msgstr "تعذّر تفسير ’{student_answer}‘ كرقم."
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "You may not use variables ({bad_variables}) in numerical problems."
-msgstr "لا يمكنك استخدام متغيّرات ({bad_variables}) في المسائل العددية."
+msgid ""
+"Answers can include numerals, operation signs, and a few specific "
+"characters, such as the constants e and i."
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
-msgid "factorial function evaluated outside its domain:'{student_answer}'"
+msgid "Factorial function evaluated outside its domain:'{student_answer}'"
 msgstr ""
-"جرى تقييم وظيفة التحليل إلى العوامل خارج نطاق مجالها: ’{student_answer}‘"
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
@@ -1997,17 +2026,10 @@ msgstr "إدخال تعبير رياضي"
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
-msgid "Invalid input: {bad_input} not permitted in answer."
-msgstr "مُدخلات غير صحيحة: {bad_input} غير مسموح بها في الإجابة."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid ""
-"factorial function not permitted in answer for this problem. Provided answer"
+"Factorial function not permitted in answer for this problem. Provided answer"
 " was: {bad_input}"
 msgstr ""
-"لا يُسمح باستخدام وظيفة التحليل إلى عوامل في الإجابة عن هذه المسألة. الإجابة"
-" المقدَّمة: {bad_input}"
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
@@ -2431,12 +2453,6 @@ msgstr ""
 "يجب أن تنتظر ما لا يقلّ عن {wait_secs} ثوان بين كل تقديمين متتاليين. بقِيَت "
 "{remaining_secs} ثوان."
 
-#. Translators: {msg} will be replaced with a problem's error message.
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "Error: {msg}"
-msgstr "خطأ: {msg}"
-
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
 msgid "{num_hour} hour"
@@ -2470,16 +2486,6 @@ msgstr[3] "{num_second} ثوانٍ"
 msgstr[4] "{num_second} ثوانٍ"
 msgstr[5] "{num_second} ثوانٍ"
 
-#. Translators: 'rescoring' refers to the act of re-submitting a student's
-#. solution so it can get a new score.
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem's definition does not support rescoring."
-msgstr "لا يدعم تعريف المسألة عملية إعادة التقييم."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem must be answered before it can be graded again."
-msgstr "يجب الإجابة على المسألة قبل أن يٌسمح بتقييمها من جديد. "
-
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem needs to be reset prior to save."
 msgstr "يجب إعادة ضبط المسألة قبل حفظها."
@@ -2506,6 +2512,16 @@ msgstr "لا يمكنك تحديد إعادة ضبط مسألة مغلقة."
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "You must submit an answer before you can select Reset."
 msgstr "يجب تقديم إجابة قبل أن تتمكن من تحديد إعادة الضبط."
+
+#. Translators: 'rescoring' refers to the act of re-submitting a student's
+#. solution so it can get a new score.
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Problem's definition does not support rescoring."
+msgstr "لا يدعم تعريف المسألة عملية إعادة التقييم."
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Problem must be answered before it can be graded again."
+msgstr "يجب الإجابة على المسألة قبل أن يٌسمح بتقييمها من جديد. "
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
@@ -4013,15 +4029,6 @@ msgid ""
 msgstr ""
 "لا يمكن إعراب تصاريح LTI: {lti_passport}. يجب أن يكون النص على شكل "
 "\"id:key:secret\"."
-
-#: common/lib/xmodule/xmodule/mixin.py
-msgid "License"
-msgstr "الإجازة"
-
-#: common/lib/xmodule/xmodule/mixin.py
-msgid ""
-"A license defines how the contents of this block can be shared and reused."
-msgstr "تحدِّد الإجازة كيف يمكن مشاركة محتويات هذه الكتلة وإعادة استخدامها."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 #: common/lib/xmodule/xmodule/seq_module.py lms/templates/ccx/schedule.html
@@ -7272,6 +7279,10 @@ msgstr "العضوية"
 msgid "Cohorts"
 msgstr "الشُعب"
 
+#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
+msgid "Discussions"
+msgstr "نقاشات"
+
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Student Admin"
@@ -7384,11 +7395,14 @@ msgstr ""
 msgid "No due date extension is set for that student and unit."
 msgstr "لم يجرِ تمديد تاريخ الاستحقاق لذلك الطالب وتلك الوحدة."
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
+#: openedx/core/djangoapps/user_api/views.py cms/templates/register.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -7407,6 +7421,10 @@ msgstr "مستخدمون ممن لديهم عمليات تمديد تاريخ ا
 #, python-brace-format
 msgid "Due date extensions for {0} {1} ({2})"
 msgstr "عمليات تمديد تاريخ الاستحقاق لـ {0} {1} ({2})"
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "This component cannot be rescored."
+msgstr ""
 
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "Not all problems in entrance exam support re-scoring."
@@ -7718,13 +7736,12 @@ msgstr "(من أصل {total})"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"This component's visibility settings refer to deleted or invalid group "
+"This component's access settings refer to deleted or invalid group "
 "configurations."
 msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
-msgid ""
-"This component's visibility settings refer to deleted or invalid groups."
+msgid "This component's access settings refer to deleted or invalid groups."
 msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
@@ -9302,6 +9319,19 @@ msgstr "اشترك في قناة منصّة {platform_name} على موقع يو
 msgid "Kosovo"
 msgstr "كوسوفو"
 
+#: lms/envs/common.py
+#, python-brace-format
+msgid "Welcome to {platform_name}."
+msgstr ""
+
+#: lms/envs/common.py
+#, python-brace-format
+msgid ""
+"{start_bold}{enterprise_name}{end_bold} has partnered with "
+"{start_bold}{platform_name}{end_bold} to offer you high-quality learning "
+"opportunities from the world's best universities."
+msgstr ""
+
 #: lms/templates/logout.html
 msgid "Signed Out"
 msgstr "سُجِّل خروجك"
@@ -10438,6 +10468,13 @@ msgstr ""
 "يبدو أنّ اسم المستخدم {username} يخصّ حسابًا موجودًا. يُرجى إعادة المحاولة "
 "باستخدام اسم مستخدم مختلف."
 
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "This is what you will use to login."
+msgstr ""
+
 #. Translators: This label appears above a field on the registration form
 #. meant to confirm the user's email address.
 #: openedx/core/djangoapps/user_api/views.py
@@ -10445,53 +10482,42 @@ msgid "Confirm Email"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
-msgid "Please confirm your email."
+msgid "The email addresses do not match."
 msgstr ""
-
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's full name.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Full name"
-msgstr "الاسم الكامل"
 
 #. Translators: This example name is used as a placeholder in
 #. a field on the registration form meant to hold the user's name.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "Jane Doe"
-msgstr "فاطمة الفهري"
+msgid "Jane Q. Learner"
+msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's full name.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Your legal name, used for any certificates you earn."
-msgstr "اسمك القانوني، المستخدم في أيّ شهادة تحصل عليها."
-
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's public username.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "Public username"
-msgstr "اسم المستخدم العلنيّ"
+msgid "This name will be used on any certificates that you earn."
+msgstr ""
+
+#: cms/templates/register.html lms/templates/register-form.html
+#: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Public Username"
+msgstr "اسم المستخدم"
 
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's public username.
 #: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
 msgid ""
-"The name that will identify you in your courses - {bold_start}(cannot be "
-"changed later){bold_end}"
+"The name that will identify you in your courses. It cannot be changed later."
 msgstr ""
-"الاسم الذي سيعرّف عنك في مساقاتك - {bold_start}(لا يمكن تغييره "
-"لاحقًا){bold_end}"
 
 #. Translators: This example username is used as a placeholder in
 #. a field on the registration form meant to hold the user's username.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "JaneDoe"
-msgstr "فاطمة_الفهري"
+msgid "Jane_Q_Learner"
+msgstr ""
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's highest completed level of education.
@@ -10577,6 +10603,14 @@ msgstr "استعراض شروط الخدمة"
 msgid "The course key for the course we would like to be auto-cohorted."
 msgstr "مفتاح الدورة للدورة التدريبية التي تود جعلها تشعبية بشكل تلقائي. "
 
+#: openedx/core/djangoapps/waffle_utils/models.py
+msgid "Force On"
+msgstr ""
+
+#: openedx/core/djangoapps/waffle_utils/models.py
+msgid "Force Off"
+msgstr ""
+
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
 msgstr "هذة القيمة غير صحيحة"
@@ -10594,6 +10628,15 @@ msgstr "%(min_score)s ليست نسبة درجة صحيحة"
 #, python-brace-format
 msgid "Gating milestone for {usage_key}"
 msgstr "تقييد الإنجاز الهام من أجل {usage_key}"
+
+#: openedx/core/lib/license/mixin.py
+msgid "License"
+msgstr "الإجازة"
+
+#: openedx/core/lib/license/mixin.py
+msgid ""
+"A license defines how the contents of this block can be shared and reused."
+msgstr "تحدِّد الإجازة كيف يمكن مشاركة محتويات هذه الكتلة وإعادة استخدامها."
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "Category"
@@ -11020,7 +11063,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/preview.py
 #, python-brace-format
-msgid "Visible to: {list_of_groups}"
+msgid "Access restricted to: {list_of_groups}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
@@ -11349,13 +11392,6 @@ msgstr "هل نسيت كلمة المرور؟"
 msgid "example: Jane Doe"
 msgstr "مثال: عبد الحليم حافظ"
 
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Public Username"
-msgstr "اسم المستخدم"
-
 #. Translators: This is the placeholder text for a field that asks the user to
 #. pick a username
 #: cms/templates/register.html lms/templates/register-form.html
@@ -11396,33 +11432,13 @@ msgstr "معاينة إعداد اللغة"
 msgid "Reset"
 msgstr "إعادة الضبط"
 
-#: cms/templates/registration/activation_complete.html
-#: lms/templates/registration/activation_complete.html
-msgid "Thanks for activating your account."
-msgstr "نشكرك على تفعيل حسابك."
-
-#: cms/templates/registration/activation_complete.html
-#: lms/templates/registration/activation_complete.html
-msgid "This account has already been activated."
-msgstr "سبق أن جرى تفعيل هذا الحساب."
-
-#: cms/templates/registration/activation_complete.html
-#: lms/templates/registration/activation_complete.html
-msgid "Visit your {link_start}dashboard{link_end} to see your courses."
-msgstr ""
-"تفضّل بزيارة {link_start}لوحة المعلومات{link_end} الخاصة بحسابك لرؤية "
-"مساقاتك."
-
-#: cms/templates/registration/activation_complete.html
-#: lms/templates/registration/activation_complete.html
-msgid "You can now {link_start}sign in{link_end}."
-msgstr "بإمكانك الآن {link_start}تسجيل الدخول{link_end}. "
-
 #: cms/templates/widgets/header.html lms/templates/navigation.html
+#: lms/templates/widgets/footer-language-selector.html
 msgid "Choose Language"
 msgstr "اختر لغة"
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
+#: themes/edx.org/lms/templates/header.html
 msgid "Account"
 msgstr "الحساب"
 
@@ -11505,34 +11521,6 @@ msgstr "تسجيل الخروج"
 msgid "Code Editor"
 msgstr "محرر الرمز"
 
-#: common/templates/license.html
-msgid "All Rights Reserved"
-msgstr "جميع الحقوق محفوظة"
-
-#: common/templates/license.html
-msgid "Attribution"
-msgstr "الإسناد"
-
-#: common/templates/license.html
-msgid "Noncommercial"
-msgstr "استخدام غير تجاري"
-
-#: common/templates/license.html
-msgid "No Derivatives"
-msgstr "عدم الاقتباس"
-
-#: common/templates/license.html
-msgid "Share Alike"
-msgstr "مشاركة بالتساوي"
-
-#: common/templates/license.html
-msgid "Creative Commons licensed content, with terms as follow:"
-msgstr "محتوى مُجاز مشترك ومبتكر، شروطه كالتالي:"
-
-#: common/templates/license.html
-msgid "Some Rights Reserved"
-msgstr "بعض الحقوق محفوظة"
-
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
 msgstr "استمارة الآراء والملاحظات"
@@ -11564,10 +11552,6 @@ msgstr "معلومات إضافية:"
 #: common/templates/emails/contact_us_feedback_email_subject.txt
 msgid "Feedback from user"
 msgstr "الآراء والملاحظات من المستخدم"
-
-#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
-msgid "Discussions"
-msgstr "نقاشات"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Add a Post"
@@ -12501,6 +12485,11 @@ msgstr ""
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Please complete the following fields to register for an account. "
 msgstr "يُرجى إكمال الحقول التالية للتسجيل وإنشاء حساب."
+
+#: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Your legal name, used for any certificates you earn."
+msgstr "اسمك القانوني، مستخدم في جميع الشهادات التي ستحصل عليها."
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -14777,7 +14766,7 @@ msgstr "خدمات المساق"
 msgid "Courseware"
 msgstr "محتويات المساق"
 
-#: lms/templates/courseware/courseware.html
+#: lms/templates/courseware/courseware.html lms/templates/courseware/info.html
 msgid "Bookmarks"
 msgstr "العلامات"
 
@@ -14869,12 +14858,8 @@ msgid "Handout Navigation"
 msgstr "تصفّح النشرات "
 
 #: lms/templates/courseware/info.html
-msgid "Important Course Dates"
-msgstr "تواريخ مهمّة بالنسبة للمساق"
-
-#: lms/templates/courseware/info.html
-msgid "Today is {date}"
-msgstr "تاريخ اليوم {date}"
+msgid "Course Tools"
+msgstr ""
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -14981,6 +14966,22 @@ msgid "Practice Scores: "
 msgstr "درجات التدريب:"
 
 #: lms/templates/courseware/progress.html
+msgid "Problem scores are hidden until the due date."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Practice scores are hidden until the due date."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Problem scores are hidden."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Practice scores are hidden."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
 msgid "No problem scores in this section"
 msgstr "لا توجد درجات للمسائل في هذا القسم"
 
@@ -15059,8 +15060,8 @@ msgstr ""
 "مستقبلية مع {platform_name}!"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
+#: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
-#: themes/edx.org/lms/templates/emails/activation_email.txt
 msgid "The {platform_name} Team"
 msgstr "فريق {platform_name}"
 
@@ -15611,14 +15612,14 @@ msgstr ""
 msgid "Flagged"
 msgstr "المُشار إليها"
 
-#. Translators: This labels a cohort menu in forum navigation
+#. Translators: This labels a group menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Cohort:"
-msgstr "الشعبة:"
+msgid "Group:"
+msgstr ""
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "in all cohorts"
-msgstr "في كافة الشعب"
+msgid "in all groups"
+msgstr ""
 
 #. Translators: This labels a sort menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -15728,35 +15729,31 @@ msgid "Sincerely yours,The {course_name} Team"
 msgstr "مع خالص التقدير، فريق {course_name} "
 
 #: lms/templates/emails/activation_email.txt
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid "Thank you for creating an account with {platform_name}!"
-msgstr "شكراً على تسجيلك في {platform_name}!"
+msgid ""
+"You're almost there! Use the link to activate your account to access "
+"engaging, high-quality {platform_name} courses. Note that you will not be "
+"able to log back into your account until you have activated it."
+msgstr ""
+
+#: lms/templates/emails/activation_email.txt
+msgid "Enjoy learning with {platform_name}."
+msgstr ""
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"There's just one more step before you can enroll in a course: you need to "
-"activate your {platform_name} account. To activate your account, click the "
-"following link. If that doesn't work, copy and paste the link into your "
-"browser's address bar."
+"If you need help, please use our web form at {support_url} or email "
+"{support_email}."
 msgstr ""
-"بقيت خطوة واحدة قبل تمكنك من التسجيل في المساقات:عليك أن تفعل حسابك على "
-"{platform_name}. لتفعيل حسابك، اضغط على الرابط التالي. إن لم يعمل، انسخ "
-"والصق الرابط في شريط العنوان في متصفحك."
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"If you didn't create an account, you don't need to do anything; you won't "
-"receive any more email from us. If you need assistance, please do not reply "
-"to this email message. Check the help section of the {platform_name} "
-"website."
+"This email message was automatically sent by {lms_url} because someone "
+"attempted to create an account on {platform_name} using this email address."
 msgstr ""
-"إن لم تكن قد سجلت حساباً، ليس عليك فعل أي شيء. ولن تصلك أي رسائل أخرى منّا. "
-"إن احتجت مساعدة، لا ترد على هذه الرسالة، بل اذهب لقسم المساعدة في موقع "
-"{platform_name}."
 
 #: lms/templates/emails/activation_email_subject.txt
-msgid "Activate Your {platform_name} Account"
-msgstr "تفعيل حسابك في {platform_name}"
+msgid "Action Required: Activate your {platform_name} account"
+msgstr ""
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
@@ -18190,7 +18187,6 @@ msgid "My Courses"
 msgstr "مساقاتي"
 
 #: lms/templates/learner_dashboard/program_details.html
-#: lms/templates/learner_dashboard/program_details_2017.html
 msgid "Program Details"
 msgstr "تفاصيل البرنامج"
 
@@ -18453,7 +18449,8 @@ msgstr ""
 #: lms/templates/registration/account_activation_sidebar_notice.html
 msgid ""
 "Check your {email_start}{email}{email_end} inbox for an account activation "
-"link from edX. If you need help, contact {link_start}edX Support{link_end}."
+"link from {platform_name}. If you need help, contact "
+"{link_start}{platform_name} Support{link_end}."
 msgstr ""
 
 #: lms/templates/registration/activate_account_notice.html
@@ -18470,33 +18467,6 @@ msgstr ""
 "بقيت خطوة واحدة: قبل أن تنضم لدورة تدريبية ما، تحتاج لتفعيل حسابك. قد قمنا "
 "بإرسال رسالة إلى {email_start}{email}{email_end} مع تعليمات بكيفية التفعيل. "
 "إن لم تصلك الرسالة، انظر في صندوق الرسائل المهملة أو البريد غير الهام."
-
-#: lms/templates/registration/activation_complete.html
-msgid "Account Activated"
-msgstr "تم تفعيل حسابك"
-
-#: lms/templates/registration/activation_complete.html
-msgid "Account already active"
-msgstr "تم تفعيل هذا الحساب مسبقاً"
-
-#: lms/templates/registration/activation_invalid.html
-msgid "Activation Invalid"
-msgstr "عملية التفعيل غير صحيحة"
-
-#: lms/templates/registration/activation_invalid.html
-msgid ""
-"Something went wrong. Email programs sometimes split URLs into two lines, so"
-" make sure the URL you're using is formatted correctly. If you still have "
-"issues, send us an email message at {email_start}{email}{email_end}."
-msgstr ""
-"حدث خطأ ما. بعض برامج البريد الإلكتروني قد تقسِم الروابط في الرسائل إلى "
-"سطرين. تأكد من أن الروابط في رسالة التفعيل منسّقة بصورة سليمة. إذا استمر "
-"وجود المشكلات لديك، فأرسل إلينا رسالة بالبريد الإلكتروني واشرح لنا ما حدث "
-"على: {email_start}{email}{email_end}."
-
-#: lms/templates/registration/activation_invalid.html
-msgid "Return to the {link_start}home page{link_end}."
-msgstr "عُد إلى {link_start}الصفحة الرئيسية{link_end}."
 
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
@@ -19389,10 +19359,18 @@ msgid "About edX"
 msgstr "لمحة عن edX"
 
 #: themes/edx.org/lms/templates/footer.html
+msgid "edX Home Page"
+msgstr ""
+
+#: themes/edx.org/lms/templates/footer.html
 msgid ""
 "© 2012-{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
 "edX and the edX and Open EdX logos are registered trademarks or trademarks "
 "of edX Inc."
+msgstr ""
+
+#: themes/edx.org/lms/templates/header.html
+msgid "Main"
 msgstr ""
 
 #: themes/edx.org/lms/templates/header.html
@@ -19411,37 +19389,6 @@ msgid ""
 msgstr ""
 "{b_start} ادعم مهمتنا: {b_end} EdX مشروع غير ربحي، يعتمد على مجموعة من "
 "الشهادات الموثّقة بهدف دعم تمويل التعليم المجاني للجميع، حول العالم."
-
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid ""
-"There's just one more step before you can enroll in a course: You need to "
-"activate your {platform_name} account. To activate your account, click the "
-"following link. If that doesn't work, copy and paste the link into your "
-"browser's address bar."
-msgstr ""
-
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid ""
-"After you activate your account, you can take any of the hundreds of courses"
-" {platform_name} offers. You will receive occasional email messages from "
-"{platform_name} about new courses or other information."
-msgstr ""
-
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid ""
-"If you need help, please use our web form at {contact_us_url}, email "
-"{info_email_address}, or write to {info_postal_address}."
-msgstr ""
-
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid "We hope you enjoy learning with {platform_name}!"
-msgstr ""
-
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid ""
-"This email message was automatically sent by {site_name} because someone "
-"attempted to create an account on {platform_name} using this email address."
-msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
@@ -20817,8 +20764,8 @@ msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
-"On unit pages in the course outline, you can designate components as visible"
-" only to learners in a specific enrollment track."
+"On unit pages in the course outline, you can restrict access to components "
+"to learners based on their enrollment track."
 msgstr ""
 
 #: cms/templates/group_configurations.html
@@ -20841,10 +20788,10 @@ msgstr ""
 #: cms/templates/group_configurations.html
 msgid ""
 "Each content group that you create can be associated with one or more "
-"cohorts. In addition to course content that is intended for all learners, "
-"you can designate some content as visible only to specified content groups. "
-"Only learners in the cohorts that are associated with the specified content "
-"groups see the additional content."
+"cohorts. In addition to making course content available to all learners, you"
+" can restrict access to some content to learners in specific content groups."
+" Only learners in the cohorts that are associated with the specified content"
+" groups see the additional content."
 msgstr ""
 
 #: cms/templates/group_configurations.html
@@ -22752,12 +22699,12 @@ msgid "Expand or Collapse"
 msgstr "تكبير أو تصغير"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Visibility Settings"
-msgstr "إعدادات قابلية الرؤية"
+msgid "Access Settings"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Visibility"
-msgstr "قابلية الرؤية"
+msgid "Set Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
@@ -22893,26 +22840,25 @@ msgstr ""
 "تكون كاملة لجميع ترميزات وجميع مواقع استضافة الفيديو."
 
 #: cms/templates/visibility_editor.html
-msgid "No visibility settings"
+msgid "Access is not restricted"
 msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"No visibility settings are defined for this component, but visibility might "
-"be affected by inherited settings."
+"Access to this component is not restricted, but visibility might be affected"
+" by inherited settings."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"You can make this component visible only to specific groups of learners "
-"based either on their enrollment track, or by content groups that you "
-"create."
+"You can restrict access to this component to learners in specific enrollment"
+" tracks or content groups."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"You can make this component visible only to specific groups of learners "
-"based on content groups that you create."
+"You can restrict access to this component to learners in specific content "
+"groups."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
@@ -22925,23 +22871,23 @@ msgstr "إدارة مجموعات المحتوى"
 msgid ""
 "{screen_reader_start}Warning:{screen_reader_end} The unit that contains this"
 " component is hidden from learners. The unit setting overrides the component"
-" visibility settings defined here."
+" access settings defined here."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
-msgid "Currently visible to:"
+msgid "Access is restricted to:"
 msgstr ""
 
 #: cms/templates/visibility_editor.html
-msgid "All Learners and Staff"
-msgstr ""
-
-#: cms/templates/visibility_editor.html
-msgid "Change visibility to:"
+msgid "Restrict access to:"
 msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid "Select a group type"
+msgstr ""
+
+#: cms/templates/visibility_editor.html
+msgid "All Learners and Staff"
 msgstr ""
 
 #: cms/templates/visibility_editor.html
@@ -22950,8 +22896,8 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"This group no longer exists. Choose another group or make this component "
-"visible to All Learners and Staff."
+"This group no longer exists. Choose another group or do not restrict access "
+"to this component."
 msgstr ""
 
 #: cms/templates/emails/activation_email.txt
@@ -23057,6 +23003,37 @@ msgstr "إعادة ضبط القيم"
 #: cms/templates/maintenance/base.html cms/templates/maintenance/index.html
 msgid "Maintenance Dashboard"
 msgstr "لوحة الصيانة"
+
+#: cms/templates/registration/activation_complete.html
+msgid "Thanks for activating your account."
+msgstr ""
+
+#: cms/templates/registration/activation_complete.html
+msgid "This account has already been activated."
+msgstr ""
+
+#: cms/templates/registration/activation_complete.html
+msgid "Visit your {link_start}dashboard{link_end} to see your courses."
+msgstr ""
+
+#: cms/templates/registration/activation_complete.html
+msgid "You can now {link_start}sign in{link_end}."
+msgstr ""
+
+#: cms/templates/registration/activation_invalid.html
+msgid "Activation Invalid"
+msgstr ""
+
+#: cms/templates/registration/activation_invalid.html
+msgid ""
+"Something went wrong. Email programs sometimes split URLs into two lines, so"
+" make sure the URL you're using is formatted correctly. If you still have "
+"issues, send us an email message at {email_start}{email}{email_end}."
+msgstr ""
+
+#: cms/templates/registration/activation_invalid.html
+msgid "Return to the {link_start}home page{link_end}."
+msgstr ""
 
 #: cms/templates/registration/reg_complete.html
 msgid ""

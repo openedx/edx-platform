@@ -3,8 +3,8 @@ import copy
 import logging
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from edx_rest_api_client.client import EdxRestApiClient
 
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, PROGRAM_UUIDS_CACHE_KEY
@@ -12,18 +12,17 @@ from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
 
-
 logger = logging.getLogger(__name__)
-User = get_user_model()  # pylint: disable=invalid-name
 
 
-def create_catalog_api_client(user, catalog_integration):
-    """Returns an API client which can be used to make catalog API requests."""
+def create_catalog_api_client(user):
+    """Returns an API client which can be used to make Catalog API requests."""
     scopes = ['email', 'profile']
     expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
     jwt = JwtBuilder(user).build_token(scopes, expires_in)
 
-    return EdxRestApiClient(catalog_integration.internal_api_url, jwt=jwt)
+    url = CatalogIntegration.current().get_internal_api_url()
+    return EdxRestApiClient(url, jwt=jwt)
 
 
 def get_programs(uuid=None):
@@ -38,7 +37,7 @@ def get_programs(uuid=None):
         list of dict, representing programs.
         dict, if a specific program is requested.
     """
-    missing_details_msg_tpl = 'Details for program {uuid} are not cached.'
+    missing_details_msg_tpl = 'Failed to get details for program {uuid} from the cache.'
 
     if uuid:
         program = cache.get(PROGRAM_CACHE_KEY_TPL.format(uuid=uuid))
@@ -49,14 +48,31 @@ def get_programs(uuid=None):
 
     uuids = cache.get(PROGRAM_UUIDS_CACHE_KEY, [])
     if not uuids:
-        logger.warning('Program UUIDs are not cached.')
+        logger.warning('Failed to get program UUIDs from the cache.')
 
     programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in uuids])
     programs = list(programs.values())
 
+    # The get_many above sometimes fails to bring back details cached on one or
+    # more Memcached nodes. It doesn't look like these keys are being evicted.
+    # 99% of the time all keys come back, but 1% of the time all the keys stored
+    # on one or more nodes are missing from the result of the get_many. One
+    # get_many may fail to bring these keys back, but a get_many occurring
+    # immediately afterwards will succeed in bringing back all the keys. This
+    # behavior can be mitigated by trying again for the missing keys, which is
+    # what we do here. Splitting the get_many into smaller chunks may also help.
     missing_uuids = set(uuids) - set(program['uuid'] for program in programs)
-    for uuid in missing_uuids:
-        logger.warning(missing_details_msg_tpl.format(uuid=uuid))
+    if missing_uuids:
+        logger.info(
+            'Failed to get details for {count} programs. Retrying.'.format(count=len(missing_uuids))
+        )
+
+        retried_programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in missing_uuids])
+        programs += list(retried_programs.values())
+
+        still_missing_uuids = set(uuids) - set(program['uuid'] for program in programs)
+        for uuid in still_missing_uuids:
+            logger.warning(missing_details_msg_tpl.format(uuid=uuid))
 
     return programs
 
@@ -74,11 +90,11 @@ def get_program_types(name=None):
     catalog_integration = CatalogIntegration.current()
     if catalog_integration.enabled:
         try:
-            user = User.objects.get(username=catalog_integration.service_username)
-        except User.DoesNotExist:
+            user = catalog_integration.get_service_user()
+        except ObjectDoesNotExist:
             return []
 
-        api = create_catalog_api_client(user, catalog_integration)
+        api = create_catalog_api_client(user)
         cache_key = '{base}.program_types'.format(base=catalog_integration.CACHE_KEY)
 
         data = get_edx_api_data(catalog_integration, 'program_types', api=api,
@@ -93,15 +109,17 @@ def get_program_types(name=None):
         return []
 
 
-def get_programs_with_type(types=None):
+def get_programs_with_type(types=None, include_hidden=True):
     """
     Return the list of programs. You can filter the types of programs returned using the optional
-    types parameter. If no filter is provided, all programs of all types will be returned.
+    types parameter. If no filter is provided, all programs of all types will be returned. In addition,
+    you can specify whether to include hidden programs using the optional include_hidden parameter.
 
     The program dict is updated with the fully serialized program type.
 
     Keyword Arguments:
         types (list): List of program type slugs to filter by.
+        include_hidden (bool): whether to include hidden programs
 
     Return:
         list of dict, representing the active programs.
@@ -118,6 +136,9 @@ def get_programs_with_type(types=None):
             # arise, consider using the cache_programs management command to
             # cache the filtered lists of UUIDs.
             if types and program['type'] not in types:
+                continue
+
+            if program['hidden'] and not include_hidden:
                 continue
 
             # deepcopy the program dict here so we are not adding
@@ -140,15 +161,15 @@ def get_course_runs():
     course_runs = []
     if catalog_integration.enabled:
         try:
-            user = User.objects.get(username=catalog_integration.service_username)
-        except User.DoesNotExist:
+            user = catalog_integration.get_service_user()
+        except ObjectDoesNotExist:
             logger.error(
                 'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
                 catalog_integration.service_username,
             )
             return course_runs
 
-        api = create_catalog_api_client(user, catalog_integration)
+        api = create_catalog_api_client(user)
 
         querystring = {
             'page_size': catalog_integration.page_size,

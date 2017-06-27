@@ -11,27 +11,23 @@ Test utilities for mobile API tests:
 """
 # pylint: disable=no-member
 from datetime import timedelta
-from django.conf import settings
 
-from django.utils import timezone
 import ddt
-from mock import patch
+from django.conf import settings
 from django.core.urlresolvers import reverse
-from rest_framework.test import APITestCase
+from django.utils import timezone
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from rest_framework.test import APITestCase
 
-from courseware.access_response import (
-    MobileAvailabilityError,
-    StartDateError,
-    VisibilityError
-)
+from courseware.access_response import MobileAvailabilityError, StartDateError, VisibilityError
 from courseware.tests.factories import UserFactory
-from student import auth
-from student.models import CourseEnrollment
 from mobile_api.models import IgnoreMobileAvailableFlagConfig
 from mobile_api.tests.test_milestones import MobileAPIMilestonesMixin
+from student import auth
+from student.models import CourseEnrollment
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class MobileAPITestCase(ModuleStoreTestCase, APITestCase):

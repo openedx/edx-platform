@@ -3,7 +3,6 @@ URLs for the CCX Feature.
 """
 from django.conf.urls import patterns, url
 
-
 urlpatterns = patterns(
     '',
     url(r'^ccx_coach$',

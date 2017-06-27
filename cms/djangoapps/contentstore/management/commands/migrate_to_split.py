@@ -2,14 +2,15 @@
 Django management command to migrate a course from the old Mongo modulestore
 to the new split-Mongo modulestore.
 """
-from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand, CommandError
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
+from contentstore.management.commands.utils import user_from_str
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.split_migrator import SplitMigrator
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys import InvalidKeyError
-from xmodule.modulestore import ModuleStoreEnum
-from contentstore.management.commands.utils import user_from_str
 
 
 class Command(BaseCommand):

@@ -5,15 +5,9 @@ some additional coverage
 import ddt
 from mock import patch
 
-from microsite_configuration.microsite import (
-    get_value_for_org,
-    get_backend,
-)
 from microsite_configuration.backends.base import BaseMicrositeBackend
-from microsite_configuration.tests.tests import (
-    DatabaseMicrositeTestCase,
-    MICROSITE_BACKENDS,
-)
+from microsite_configuration.microsite import get_backend, get_value_for_org
+from microsite_configuration.tests.tests import MICROSITE_BACKENDS, DatabaseMicrositeTestCase
 
 
 @ddt.ddt

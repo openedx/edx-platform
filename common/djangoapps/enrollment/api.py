@@ -5,6 +5,7 @@ course level, such as available course modes.
 """
 import importlib
 import logging
+
 from django.conf import settings
 from django.core.cache import cache
 from opaque_keys.edx.keys import CourseKey
@@ -141,7 +142,7 @@ def get_enrollment(user_id, course_id):
     return _data_api().get_course_enrollment(user_id, course_id)
 
 
-def add_enrollment(user_id, course_id, mode=None, is_active=True):
+def add_enrollment(user_id, course_id, mode=None, is_active=True, enrollment_attributes=None):
     """Enrolls a user in a course.
 
     Enrolls a user in a course. If the mode is not specified, this will default to `CourseMode.DEFAULT_MODE_SLUG`.
@@ -149,12 +150,11 @@ def add_enrollment(user_id, course_id, mode=None, is_active=True):
     Arguments:
         user_id (str): The user to enroll.
         course_id (str): The course to enroll the user in.
-
-    Keyword Arguments:
         mode (str): Optional argument for the type of enrollment to create. Ex. 'audit', 'honor', 'verified',
             'professional'. If not specified, this defaults to the default course mode.
         is_active (boolean): Optional argument for making the new enrollment inactive. If not specified, is_active
             defaults to True.
+        enrollment_attributes (list): Attributes to be set the enrollment.
 
     Returns:
         A serializable dictionary of the new course enrollment.
@@ -193,7 +193,12 @@ def add_enrollment(user_id, course_id, mode=None, is_active=True):
     if mode is None:
         mode = _default_course_mode(course_id)
     validate_course_mode(course_id, mode, is_active=is_active)
-    return _data_api().create_course_enrollment(user_id, course_id, mode, is_active)
+    enrollment = _data_api().create_course_enrollment(user_id, course_id, mode, is_active)
+
+    if enrollment_attributes is not None:
+        set_enrollment_attributes(user_id, course_id, enrollment_attributes)
+
+    return enrollment
 
 
 def update_enrollment(user_id, course_id, mode=None, is_active=None, enrollment_attributes=None, include_expired=False):

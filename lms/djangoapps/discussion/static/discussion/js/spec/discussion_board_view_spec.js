@@ -57,7 +57,7 @@
                         discussionBoardView.render();
                         threadListView = discussionBoardView.discussionThreadListView;
                         spyOn(threadListView, 'performSearch');
-                        discussionBoardView.$el.find('.search-btn').click();
+                        discussionBoardView.$el.find('.search-button').click();
                         expect(threadListView.performSearch).toHaveBeenCalled();
                     });
                 });

@@ -2,32 +2,32 @@
 """
 Unit tests for handling email sending errors
 """
+import json
 from itertools import cycle
+from smtplib import SMTPConnectError, SMTPDataError, SMTPServerDisconnected
 
-from celery.states import SUCCESS, RETRY  # pylint: disable=no-name-in-module, import-error
 import ddt
+from celery.states import RETRY, SUCCESS  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.db import DatabaseError
-import json
-from mock import patch, Mock
+from mock import Mock, patch
 from nose.plugins.attrib import attr
-from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from bulk_email.models import CourseEmail, SEND_TO_MYSELF, BulkEmailFlag
+from bulk_email.models import SEND_TO_MYSELF, BulkEmailFlag, CourseEmail
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email
 from lms.djangoapps.instructor_task.exceptions import DuplicateTaskException
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (
-    initialize_subtask_info,
+    MAX_DATABASE_LOCK_RETRIES,
     SubtaskStatus,
     check_subtask_is_valid,
-    update_subtask_status,
-    MAX_DATABASE_LOCK_RETRIES,
+    initialize_subtask_info,
+    update_subtask_status
 )
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

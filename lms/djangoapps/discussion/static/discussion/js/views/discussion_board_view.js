@@ -26,7 +26,7 @@
                 'keydown .forum-nav-browse-filter-input': 'keyboardBinding',
                 'click .forum-nav-browse-menu-wrapper': 'ignoreClick',
                 'keydown .search-input': 'performSearch',
-                'click .search-btn': 'performSearch',
+                'click .search-button': 'performSearch',
                 'topic:selected': 'clearSearch'
             },
 

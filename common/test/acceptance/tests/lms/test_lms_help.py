@@ -2,22 +2,15 @@
 Test Help links in LMS
 """
 
-import json
-
-from common.test.acceptance.tests.lms.test_lms_instructor_dashboard import BaseInstructorDashboardTest
-from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
-from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
-from common.test.acceptance.fixtures import LMS_BASE_URL
 from common.test.acceptance.fixtures.course import CourseFixture
+from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
+from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
+from common.test.acceptance.tests.helpers import assert_opened_help_link_is_correct, url_for_help
+from common.test.acceptance.tests.lms.test_lms_instructor_dashboard import BaseInstructorDashboardTest
+from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 
-from common.test.acceptance.tests.helpers import (
-    assert_link,
-    assert_opened_help_link_is_correct,
-    url_for_help,
-)
 
-
-class TestCohortHelp(ContainerBase):
+class TestCohortHelp(ContainerBase, CohortTestMixin):
     """
     Tests help links in Cohort page
     """
@@ -78,15 +71,6 @@ class TestCohortHelp(ContainerBase):
             '/course_features/cohorts/cohorts_overview.html#all-automated-assignment',
         )
         self.verify_help_link(href)
-
-    def enable_cohorting(self, course_fixture):
-        """
-        Enables cohorting for the current course.
-        """
-        url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/settings'  # pylint: disable=protected-access
-        data = json.dumps({'is_cohorted': True})
-        response = course_fixture.session.patch(url, data=data, headers=course_fixture.headers)
-        self.assertTrue(response.ok, "Failed to enable cohorts")
 
 
 class InstructorDashboardHelp(BaseInstructorDashboardTest):

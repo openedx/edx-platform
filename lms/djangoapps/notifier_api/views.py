@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
-from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework.response import Response
 from rest_framework import pagination
+from rest_framework.response import Response
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from notification_prefs import NOTIFICATION_PREF_KEY
 from notifier_api.serializers import NotifierUserSerializer

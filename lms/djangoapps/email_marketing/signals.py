@@ -1,23 +1,20 @@
 """
 This module contains signals needed for email integration
 """
-import crum
 import datetime
 import logging
 
+import crum
 from django.conf import settings
 from django.dispatch import receiver
-
-from student.cookies import CREATE_LOGON_COOKIE
-from student.views import REGISTER_USER
-from email_marketing.models import EmailMarketingConfiguration
-from util.model_utils import USER_FIELD_CHANGED
-from lms.djangoapps.email_marketing.tasks import (
-    update_user, update_user_email
-)
-
 from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError
+
+from email_marketing.models import EmailMarketingConfiguration
+from lms.djangoapps.email_marketing.tasks import update_user, update_user_email
+from student.cookies import CREATE_LOGON_COOKIE
+from student.views import REGISTER_USER
+from util.model_utils import USER_FIELD_CHANGED
 
 log = logging.getLogger(__name__)
 

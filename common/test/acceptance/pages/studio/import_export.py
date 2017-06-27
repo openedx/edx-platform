@@ -1,19 +1,18 @@
 """
 Import/Export pages.
 """
+import os
+import re
 import time
 from datetime import datetime
 
-from bok_choy.promise import EmptyPromise
-import os
-import re
 import requests
+from bok_choy.promise import EmptyPromise
 
 from common.test.acceptance.pages.common.utils import click_css
-
-from common.test.acceptance.pages.studio.library import LibraryPage
-from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio import BASE_URL
+from common.test.acceptance.pages.studio.course_page import CoursePage
+from common.test.acceptance.pages.studio.library import LibraryPage
 
 
 class TemplateCheckMixin(object):

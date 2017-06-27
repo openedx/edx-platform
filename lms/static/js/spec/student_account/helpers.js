@@ -7,12 +7,64 @@ define(['underscore'], function(_) {
     var IMAGE_UPLOAD_API_URL = '/api/profile_images/v0/staff/upload';
     var IMAGE_REMOVE_API_URL = '/api/profile_images/v0/staff/remove';
     var FIND_COURSES_URL = '/courses';
-
+    var PASSWORD_RESET_SUPPORT_LINK = 'https://support.edx.org/hc/en-us/articles/206212088-What-if-I-did-not-receive-a-password-reset-message-'; // eslint-disable-line max-len
+    var PLATFORM_NAME = 'edX';
+    var CONTACT_EMAIL = 'info@example.com';
     var PROFILE_IMAGE = {
         image_url_large: '/media/profile-images/image.jpg',
         has_image: true
     };
-
+    var FIELD_OPTIONS = [
+        ['0', 'Option 0'],
+        ['1', 'Option 1'],
+        ['2', 'Option 2'],
+        ['3', 'Option 3']
+    ];
+    var TIME_ZONE_RESPONSE = [{
+        time_zone: 'America/Guyana',
+        description: 'America/Guyana (ECT, UTC-0500)'
+    }];
+    var FIELDS_DATA = {
+        country: {
+            options: FIELD_OPTIONS
+        }, gender: {
+            options: FIELD_OPTIONS
+        }, language: {
+            options: FIELD_OPTIONS
+        }, level_of_education: {
+            options: FIELD_OPTIONS
+        }, password: {
+            url: '/password_reset'
+        }, year_of_birth: {
+            options: FIELD_OPTIONS
+        }, preferred_language: {
+            options: FIELD_OPTIONS
+        }, time_zone: {
+            options: FIELD_OPTIONS
+        }
+    };
+    var AUTH_DATA = {
+        providers: [
+            {
+                id: 'oa2-network1',
+                name: 'Network1',
+                connected: true,
+                accepts_logins: 'true',
+                connect_url: 'yetanother1.com/auth/connect',
+                disconnect_url: 'yetanother1.com/auth/disconnect'
+            },
+            {
+                id: 'oa2-network2',
+                name: 'Network2',
+                connected: true,
+                accepts_logins: 'true',
+                connect_url: 'yetanother2.com/auth/connect',
+                disconnect_url: 'yetanother2.com/auth/disconnect'
+            }
+        ]
+    };
+    var IMAGE_MAX_BYTES = 1024 * 1024;
+    var IMAGE_MIN_BYTES = 100;
     var DEFAULT_ACCOUNT_SETTINGS_DATA = {
         username: 'student',
         name: 'Student',
@@ -28,34 +80,18 @@ define(['underscore'], function(_) {
         profile_image: PROFILE_IMAGE,
         accomplishments_shared: false
     };
-
-    var createAccountSettingsData = function(options) {
-        return _.extend(_.extend({}, DEFAULT_ACCOUNT_SETTINGS_DATA), options);
-    };
-
     var DEFAULT_USER_PREFERENCES_DATA = {
         'pref-lang': '2',
         'time_zone': null
     };
 
+    var createAccountSettingsData = function(options) {
+        return _.extend(_.extend({}, DEFAULT_ACCOUNT_SETTINGS_DATA), options);
+    };
+
     var createUserPreferencesData = function(options) {
         return _.extend(_.extend({}, DEFAULT_USER_PREFERENCES_DATA), options);
     };
-
-    var FIELD_OPTIONS = [
-        ['0', 'Option 0'],
-        ['1', 'Option 1'],
-        ['2', 'Option 2'],
-        ['3', 'Option 3']
-    ];
-
-    var TIME_ZONE_RESPONSE = [{
-        time_zone: 'America/Guyana',
-        description: 'America/Guyana (ECT, UTC-0500)'
-    }];
-
-    var IMAGE_MAX_BYTES = 1024 * 1024;
-    var IMAGE_MIN_BYTES = 100;
 
     var expectLoadingIndicatorIsVisible = function(view, visible) {
         if (visible) {
@@ -88,10 +124,6 @@ define(['underscore'], function(_) {
         }
     };
 
-    var expectSettingsSectionsButNotFieldsToBeRendered = function(accountSettingsView) {
-        expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView, false);
-    };
-
     var expectSettingsSectionsAndFieldsToBeRendered = function(accountSettingsView, fieldsAreRendered) {
         var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
 
@@ -99,7 +131,8 @@ define(['underscore'], function(_) {
         expect(sectionElements.length).toBe(sectionsData.length);
 
         _.each(sectionElements, function(sectionElement, sectionIndex) {
-            expect($(sectionElement).find('.section-header').text().trim()).toBe(sectionsData[sectionIndex].title);
+            expect($(sectionElement).find('.section-header').text()
+                .trim()).toBe(sectionsData[sectionIndex].title);
 
             var sectionFieldElements = $(sectionElement).find('.u-field');
 
@@ -115,6 +148,10 @@ define(['underscore'], function(_) {
         });
     };
 
+    var expectSettingsSectionsButNotFieldsToBeRendered = function(accountSettingsView) {
+        expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView, false);
+    };
+
     return {
         USER_ACCOUNTS_API_URL: USER_ACCOUNTS_API_URL,
         USER_PREFERENCES_API_URL: USER_PREFERENCES_API_URL,
@@ -122,13 +159,18 @@ define(['underscore'], function(_) {
         FIND_COURSES_URL: FIND_COURSES_URL,
         IMAGE_UPLOAD_API_URL: IMAGE_UPLOAD_API_URL,
         IMAGE_REMOVE_API_URL: IMAGE_REMOVE_API_URL,
-        IMAGE_MAX_BYTES: IMAGE_MAX_BYTES,
-        IMAGE_MIN_BYTES: IMAGE_MIN_BYTES,
+        PASSWORD_RESET_SUPPORT_LINK: PASSWORD_RESET_SUPPORT_LINK,
+        PLATFORM_NAME: PLATFORM_NAME,
+        CONTACT_EMAIL: CONTACT_EMAIL,
         PROFILE_IMAGE: PROFILE_IMAGE,
-        createAccountSettingsData: createAccountSettingsData,
-        createUserPreferencesData: createUserPreferencesData,
         FIELD_OPTIONS: FIELD_OPTIONS,
         TIME_ZONE_RESPONSE: TIME_ZONE_RESPONSE,
+        FIELDS_DATA: FIELDS_DATA,
+        AUTH_DATA: AUTH_DATA,
+        IMAGE_MAX_BYTES: IMAGE_MAX_BYTES,
+        IMAGE_MIN_BYTES: IMAGE_MIN_BYTES,
+        createAccountSettingsData: createAccountSettingsData,
+        createUserPreferencesData: createUserPreferencesData,
         expectLoadingIndicatorIsVisible: expectLoadingIndicatorIsVisible,
         expectLoadingErrorIsVisible: expectLoadingErrorIsVisible,
         expectElementContainsField: expectElementContainsField,

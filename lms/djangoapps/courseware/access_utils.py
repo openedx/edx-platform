@@ -4,14 +4,15 @@ It allows us to share code between access.py and block transformers.
 """
 
 from datetime import datetime, timedelta
+from logging import getLogger
+
 from django.conf import settings
 from django.utils.timezone import UTC
-from logging import getLogger
-from student.roles import CourseBetaTesterRole
-from courseware.masquerade import is_masquerading_as_student
-from courseware.access_response import AccessResponse, StartDateError
-from xmodule.util.django import get_current_request_hostname
 
+from courseware.access_response import AccessResponse, StartDateError
+from courseware.masquerade import is_masquerading_as_student
+from student.roles import CourseBetaTesterRole
+from xmodule.util.django import get_current_request_hostname
 
 DEBUG_ACCESS = False
 log = getLogger(__name__)

@@ -7,8 +7,8 @@ from collections import namedtuple
 
 from django.core.management.base import BaseCommand
 
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 
 Result = namedtuple("Result", ["course_key", "cert_name_short", "cert_name_long", "should_clean"])
 

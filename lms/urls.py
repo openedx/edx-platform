@@ -2,15 +2,15 @@
 URLs for LMS
 """
 
+from config_models.views import ConfigurationModelCurrentAPIView
 from django.conf import settings
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, patterns, url
+from django.conf.urls.static import static
 from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
-from django.conf.urls.static import static
 
-from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
-from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.views.index import CoursewareIndex
+from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -108,10 +108,9 @@ urlpatterns = (
 
     # URLs for API access management
     url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
-)
 
-urlpatterns += (
     url(r'^dashboard/', include('learner_dashboard.urls')),
+    url(r'^api/experiments/', include('experiments.urls', namespace='api_experiments')),
 )
 
 # TODO: This needs to move to a separate urls.py once the student_account and
@@ -504,6 +503,15 @@ urlpatterns += (
         include(COURSE_URLS)
     ),
 
+    # Discussions Management
+    url(
+        r'^courses/{}/discussions/settings$'.format(
+            settings.COURSE_KEY_PATTERN,
+        ),
+        'lms.djangoapps.discussion.views.course_discussions_settings_handler',
+        name='course_discussions_settings',
+    ),
+
     # Cohorts management
     url(
         r'^courses/{}/cohorts/settings$'.format(
@@ -548,11 +556,11 @@ urlpatterns += (
         name='debug_cohort_mgmt',
     ),
     url(
-        r'^courses/{}/cohorts/topics$'.format(
+        r'^courses/{}/discussion/topics$'.format(
             settings.COURSE_KEY_PATTERN,
         ),
-        'openedx.core.djangoapps.course_groups.views.cohort_discussion_topics',
-        name='cohort_discussion_topics',
+        'lms.djangoapps.discussion.views.discussion_topics',
+        name='discussion_topics',
     ),
     url(
         r'^courses/{}/verified_track_content/settings'.format(
@@ -592,7 +600,9 @@ urlpatterns += (
 
     # Student profile
     url(
-        r'^u/(?P<username>[\w.@+-]+)$',
+        r'^u/{username_pattern}$'.format(
+            username_pattern=settings.USERNAME_PATTERN,
+        ),
         'student_profile.views.learner_profile',
         name='learner_profile',
     ),
@@ -626,6 +636,14 @@ urlpatterns += (
             settings.COURSE_ID_PATTERN,
         ),
         include('openedx.features.course_bookmarks.urls'),
+    ),
+
+    # Course search
+    url(
+        r'^courses/{}/search/'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        include('openedx.features.course_search.urls'),
     ),
 )
 
@@ -797,7 +815,8 @@ urlpatterns += (
 # Embargo
 if settings.FEATURES.get('EMBARGO'):
     urlpatterns += (
-        url(r'^embargo/', include('openedx.core.djangoapps.embargo.urls')),
+        url(r'^embargo/', include('openedx.core.djangoapps.embargo.urls', namespace='embargo')),
+        url(r'^api/embargo/', include('openedx.core.djangoapps.embargo.urls', namespace='api_embargo')),
     )
 
 # Survey Djangoapp

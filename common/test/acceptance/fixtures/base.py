@@ -1,9 +1,9 @@
 """
 Common code shared by course and library fixtures.
 """
-import re
-import requests
 import json
+
+import requests
 from lazy import lazy
 
 from common.test.acceptance.fixtures import STUDIO_BASE_URL
@@ -32,22 +32,20 @@ class StudioApiFixture(object):
         """
         # Use auto-auth to retrieve the session for a logged in user
         session = requests.Session()
-        response = session.get(STUDIO_BASE_URL + "/auto_auth?staff=true")
+        response = session.get(STUDIO_BASE_URL + '/auto_auth?staff=true')
 
         # Return the session from the request
         if response.ok:
-            # auto_auth returns information about the newly created user
-            # capture this so it can be used by by the testcases.
-            user_pattern = re.compile(r'Logged in user {0} \({1}\) with password {2} and user_id {3}'.format(
-                r'(?P<username>\S+)', r'(?P<email>[^\)]+)', r'(?P<password>\S+)', r'(?P<user_id>\d+)'))
-            user_matches = re.match(user_pattern, response.text)
-            if user_matches:
-                self.user = user_matches.groupdict()
+            # Capture the details of the authenticated user
+            self.user = response.json()
+
+            if not self.user:
+                raise StudioApiLoginError('Auto-auth failed. Response was: {}'.format(self.user))
 
             return session
 
         else:
-            msg = "Could not log in to use Studio restful API.  Status code: {0}".format(response.status_code)
+            msg = 'Could not log in to use Studio restful API.  Status code: {0}'.format(response.status_code)
             raise StudioApiLoginError(msg)
 
     @lazy

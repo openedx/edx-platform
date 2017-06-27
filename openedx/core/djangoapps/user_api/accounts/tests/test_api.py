@@ -193,6 +193,16 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         account_settings = get_account_settings(self.default_request)[0]
         self.assertEqual("Mickey Mouse", account_settings["name"])
 
+    @patch.dict(settings.FEATURES, dict(ALLOW_EMAIL_ADDRESS_CHANGE=False))
+    def test_email_changes_disabled(self):
+        """
+        Test that email address changes are rejected when ALLOW_EMAIL_ADDRESS_CHANGE is not set.
+        """
+        disabled_update = {"email": "valid@example.com"}
+        with self.assertRaises(AccountUpdateError) as context_manager:
+            update_account_settings(self.user, disabled_update)
+        self.assertIn("Email address changes have been disabled", context_manager.exception.developer_message)
+
     @patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')
     def test_serializer_save_fails(self, serializer_save):
         """
@@ -450,3 +460,34 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         """
         response = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         self.assertEqual(response.status_code, 403)
+
+
+@attr(shard=2)
+@ddt.ddt
+class AccountCreationUnicodeUsernameTest(TestCase):
+    """
+    Test cases to cover the account initialization workflow
+    """
+    PASSWORD = u'unicode-user-password'
+    EMAIL = u'unicode-user-username@example.com'
+
+    UNICODE_USERNAMES = [
+        u'Enchanté',
+        u'username_with_@',
+        u'username with spaces',
+        u'eastern_arabic_numbers_١٢٣',
+    ]
+
+    @ddt.data(*UNICODE_USERNAMES)
+    def test_unicode_usernames(self, unicode_username):
+        with patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': False}):
+            with self.assertRaises(AccountUsernameInvalid):
+                create_account(unicode_username, self.PASSWORD, self.EMAIL)  # Feature is disabled, therefore invalid.
+
+        with patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': True}):
+            try:
+                create_account(unicode_username, self.PASSWORD, self.EMAIL)
+            except AccountUsernameInvalid:
+                self.fail(u'The API should accept Unicode username `{unicode_username}`.'.format(
+                    unicode_username=unicode_username,
+                ))

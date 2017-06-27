@@ -1,19 +1,18 @@
 """
 Helpers for accessing comprehensive theming related variables.
 """
-import re
 import os
-from path import Path
+import re
+from logging import getLogger
 
-from django.conf import settings, ImproperlyConfigured
+from django.conf import ImproperlyConfigured, settings
 from django.contrib.staticfiles.storage import staticfiles_storage
-
-from request_cache.middleware import RequestCache
+from path import Path
 
 from microsite_configuration import microsite
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from request_cache.middleware import RequestCache
 
-from logging import getLogger
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 

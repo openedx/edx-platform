@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 import json
 from mock import patch
-from social.exceptions import AuthException
+from social_core.exceptions import AuthException
 from student.tests.factories import UserFactory
 from third_party_auth import pipeline
 from third_party_auth.tests.specs import base

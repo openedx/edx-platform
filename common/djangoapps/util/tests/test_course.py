@@ -3,15 +3,13 @@ Tests for course utils.
 """
 import ddt
 import mock
-
 from django.conf import settings
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from util.course import get_link_for_about_page
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from util.course import get_link_for_about_page
 
 
 @ddt.ddt

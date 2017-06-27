@@ -3,6 +3,7 @@
 from functools import partial
 
 import factory
+import uuid
 from faker import Faker
 
 
@@ -32,6 +33,19 @@ def generate_zulu_datetime():
     https://en.wikipedia.org/wiki/ISO_8601#UTC.
     """
     return fake.date_time().isoformat() + 'Z'
+
+
+def generate_price_ranges():
+    return [{
+        'currency': 'USD',
+        'max': 1000,
+        'min': 100,
+        'total': 500
+    }]
+
+
+def generate_seat_sku():
+    return uuid.uuid4().hex[:7].upper()
 
 
 class DictFactoryBase(factory.Factory):
@@ -77,12 +91,15 @@ class OrganizationFactory(DictFactoryBase):
     key = factory.Faker('word')
     name = factory.Faker('company')
     uuid = factory.Faker('uuid4')
+    logo_image_url = factory.Faker('image_url')
 
 
 class SeatFactory(DictFactoryBase):
-    type = factory.Faker('word')
-    price = factory.Faker('random_int')
     currency = 'USD'
+    price = factory.Faker('random_int')
+    sku = factory.LazyFunction(generate_seat_sku)
+    type = 'verified'
+    upgrade_deadline = factory.LazyFunction(generate_zulu_datetime)
 
 
 class CourseRunFactory(DictFactoryBase):
@@ -91,13 +108,13 @@ class CourseRunFactory(DictFactoryBase):
     enrollment_end = factory.LazyFunction(generate_zulu_datetime)
     enrollment_start = factory.LazyFunction(generate_zulu_datetime)
     image = ImageFactory()
-    is_enrolled = False
     key = factory.LazyFunction(generate_course_run_key)
     marketing_url = factory.Faker('url')
     pacing_type = 'self_paced'
     seats = factory.LazyFunction(partial(generate_instances, SeatFactory))
     short_description = factory.Faker('sentence')
     start = factory.LazyFunction(generate_zulu_datetime)
+    status = 'published'
     title = factory.Faker('catch_phrase')
     type = 'verified'
     uuid = factory.Faker('uuid4')
@@ -112,19 +129,57 @@ class CourseFactory(DictFactoryBase):
     uuid = factory.Faker('uuid4')
 
 
+class JobOutlookItemFactory(DictFactoryBase):
+    value = factory.Faker('sentence')
+
+
+class PersonFactory(DictFactoryBase):
+    bio = factory.Faker('paragraphs')
+    given_name = factory.Faker('first_name')
+    family_name = factory.Faker('last_name')
+    profile_image_url = factory.Faker('image_url')
+    uuid = factory.Faker('uuid4')
+
+
+class EndorserFactory(DictFactoryBase):
+    person = PersonFactory()
+    quote = factory.Faker('sentence')
+
+
+class ExpectedLearningItemFactory(DictFactoryBase):
+    value = factory.Faker('sentence')
+
+
+class FAQFactory(DictFactoryBase):
+    answer = factory.Faker('sentence')
+    question = factory.Faker('sentence')
+
+
 class ProgramFactory(DictFactoryBase):
     authoring_organizations = factory.LazyFunction(partial(generate_instances, OrganizationFactory, count=1))
+    applicable_seat_types = []
     banner_image = factory.LazyFunction(generate_sized_stdimage)
     card_image_url = factory.Faker('image_url')
     courses = factory.LazyFunction(partial(generate_instances, CourseFactory))
+    expected_learning_items = factory.LazyFunction(partial(generate_instances, CourseFactory))
+    faq = factory.LazyFunction(partial(generate_instances, FAQFactory))
+    hidden = False
+    individual_endorsements = factory.LazyFunction(partial(generate_instances, EndorserFactory))
     is_program_eligible_for_one_click_purchase = True
+    job_outlook_items = factory.LazyFunction(partial(generate_instances, JobOutlookItemFactory))
     marketing_slug = factory.Faker('slug')
     marketing_url = factory.Faker('url')
+    max_hours_effort_per_week = fake.random_int(21, 28)
+    min_hours_effort_per_week = fake.random_int(7, 14)
+    overview = factory.Faker('sentence')
+    price_ranges = factory.LazyFunction(generate_price_ranges)
+    staff = factory.LazyFunction(partial(generate_instances, PersonFactory))
     status = 'active'
     subtitle = factory.Faker('sentence')
     title = factory.Faker('catch_phrase')
     type = factory.Faker('word')
     uuid = factory.Faker('uuid4')
+    weeks_to_complete = fake.random_int(1, 45)
 
 
 class ProgramTypeFactory(DictFactoryBase):

@@ -3,15 +3,16 @@
 a release-master multitool
 """
 from __future__ import print_function, unicode_literals
-import sys
+
 import argparse
-from datetime import date, timedelta
-import re
 import collections
 import functools
-import textwrap
-import json
 import getpass
+import json
+import re
+import sys
+import textwrap
+from datetime import date, timedelta
 
 try:
     from path import Path as path

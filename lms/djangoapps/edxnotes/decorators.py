@@ -6,14 +6,8 @@ import json
 
 from django.conf import settings
 
-from edxnotes.helpers import (
-    get_edxnotes_id_token,
-    get_public_endpoint,
-    get_token_url,
-    generate_uid,
-    is_feature_enabled,
-)
 from edxmako.shortcuts import render_to_string
+from edxnotes.helpers import generate_uid, get_edxnotes_id_token, get_public_endpoint, get_token_url, is_feature_enabled
 
 
 def edxnotes(cls):

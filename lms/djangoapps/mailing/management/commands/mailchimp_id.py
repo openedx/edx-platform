@@ -6,7 +6,6 @@ import sys
 from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
-
 from mailsnake import MailSnake
 
 

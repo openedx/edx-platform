@@ -5,12 +5,12 @@ import six
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from student.cookies import get_user_info_cookie_data
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class CookieTests(SharedModuleStoreTestCase):

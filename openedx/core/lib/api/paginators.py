@@ -1,10 +1,9 @@
 """ Paginatator methods for edX API implementations."""
 
+from django.core.paginator import InvalidPage, Paginator
 from django.http import Http404
-from django.core.paginator import Paginator, InvalidPage
-
-from rest_framework.response import Response
 from rest_framework import pagination
+from rest_framework.response import Response
 
 
 class DefaultPagination(pagination.PageNumberPagination):

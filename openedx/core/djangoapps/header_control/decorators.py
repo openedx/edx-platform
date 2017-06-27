@@ -3,7 +3,8 @@ Middleware decorator for removing headers.
 """
 
 from functools import wraps
-from openedx.core.djangoapps.header_control import remove_headers_from_response, force_header_for_response
+
+from openedx.core.djangoapps.header_control import force_header_for_response, remove_headers_from_response
 
 
 def remove_headers(*headers):

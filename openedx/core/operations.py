@@ -1,12 +1,12 @@
 """
 Workflows useful for reporting on runtime characteristics of the system
 """
+import gc
 import os
 import signal
 import tempfile
-import gc
-
 from datetime import datetime
+
 from meliae import scanner
 
 

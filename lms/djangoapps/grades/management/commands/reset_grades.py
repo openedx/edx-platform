@@ -1,17 +1,16 @@
 """
 Reset persistent grades for learners.
 """
-from datetime import datetime
 import logging
-from pytz import utc
+from datetime import datetime
 from textwrap import dedent
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
+from pytz import utc
 
+from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
 from openedx.core.lib.command_utils import get_mutually_exclusive_required_option, parse_course_keys
-from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentCourseGrade
-
 
 log = logging.getLogger(__name__)
 

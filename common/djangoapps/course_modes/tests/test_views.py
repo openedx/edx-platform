@@ -2,34 +2,34 @@
 Tests for course_modes views.
 """
 
-from datetime import datetime
-import unittest
 import decimal
+import unittest
+from datetime import datetime
+
 import ddt
-import httpretty
 import freezegun
+import httpretty
+import waffle
+from django.conf import settings
+from django.core.urlresolvers import reverse
 from mock import patch
 from nose.plugins.attrib import attr
 
-from django.conf import settings
-from django.core.urlresolvers import reverse
-
-from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory
-
 from course_modes.models import CourseMode, Mode
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
+from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
-from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from util.tests.mixins.discovery import CourseCatalogServiceMockMixin
 from util import organizations_helpers as organizations_api
-from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
+from util.testing import UrlResetMixin
+from util.tests.mixins.discovery import CourseCatalogServiceMockMixin
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=3)
@@ -130,27 +130,12 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # Configure whether we're upgrading or not
         url = reverse('course_modes_choose', args=[unicode(prof_course.id)])
         response = self.client.get(url)
-        self.assertRedirects(response, 'http://testserver/test_basket/?sku=TEST', fetch_redirect_response=False)
+        self.assertRedirects(response, 'http://testserver/basket/add/?sku=TEST', fetch_redirect_response=False)
         ecomm_test_utils.update_commerce_config(enabled=False)
 
-    @httpretty.activate
-    def test_no_enrollment(self):
-        # Create the course modes
-        for mode in ('audit', 'honor', 'verified'):
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
-
-        self.mock_enterprise_learner_api()
-
-        # User visits the track selection page directly without ever enrolling
-        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
-        response = self.client.get(url)
-
-        self.assertEquals(response.status_code, 200)
-
-    @httpretty.activate
-    def test_enterprise_learner_context(self):
+    def _generate_enterprise_learner_context(self, enable_audit_enrollment=False):
         """
-        Test: Track selection page should show the enterprise context message if user belongs to the Enterprise.
+        Internal helper to support common pieces of test case variations
         """
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
@@ -159,14 +144,28 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         catalog_integration = self.create_catalog_integration()
         UserFactory(username=catalog_integration.service_username)
 
-        self.mock_enterprise_learner_api()
-
         self.mock_course_discovery_api_for_catalog_contains(
             catalog_id=1, course_run_ids=[str(self.course.id)]
         )
+        self.mock_enterprise_learner_api(enable_audit_enrollment=enable_audit_enrollment)
+
+        return reverse('course_modes_choose', args=[unicode(self.course.id)])
+
+    @httpretty.activate
+    def test_no_enrollment(self):
+        url = self._generate_enterprise_learner_context()
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+
+    @httpretty.activate
+    @waffle.testutils.override_switch("populate-multitenant-programs", True)
+    def test_enterprise_learner_context(self):
+        """
+        Test: Track selection page should show the enterprise context message if user belongs to the Enterprise.
+        """
+        url = self._generate_enterprise_learner_context()
 
         # User visits the track selection page directly without ever enrolling
-        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         self.assertContains(
@@ -180,21 +179,13 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         )
 
     @httpretty.activate
+    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_enterprise_learner_context_with_multiple_organizations(self):
         """
         Test: Track selection page should show the enterprise context message with multiple organization names
         if user belongs to the Enterprise.
         """
-        # Create the course modes
-        for mode in ('audit', 'honor', 'verified'):
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
-
-        catalog_integration = self.create_catalog_integration()
-        UserFactory(username=catalog_integration.service_username)
-        self.mock_enterprise_learner_api()
-        self.mock_course_discovery_api_for_catalog_contains(
-            catalog_id=1, course_run_ids=[str(self.course.id)]
-        )
+        url = self._generate_enterprise_learner_context()
 
         # Creating organization
         for i in xrange(2):
@@ -209,7 +200,6 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             organizations_api.add_organization_course(organization_data=test_org, course_id=unicode(self.course.id))
 
         # User visits the track selection page directly without ever enrolling
-        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         self.assertContains(
@@ -220,6 +210,31 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
                 course_name=self.course.display_name_with_default_escaped
             )
         )
+
+    @httpretty.activate
+    @waffle.testutils.override_switch("populate-multitenant-programs", True)
+    def test_enterprise_learner_context_audit_disabled(self):
+        """
+        Track selection page should hide the audit choice by default in an Enterprise Customer/Learner context
+        """
+
+        # User visits the track selection page directly without ever enrolling, sees only Verified track choice
+        url = self._generate_enterprise_learner_context()
+        response = self.client.get(url)
+        self.assertContains(response, 'Pursue a Verified Certificate')
+        self.assertNotContains(response, 'Audit This Course')
+
+    @httpretty.activate
+    def test_enterprise_learner_context_audit_enabled(self):
+        """
+        Track selection page should display Audit choice when specified for an Enterprise Customer
+        """
+
+        # User visits the track selection page directly without ever enrolling, sees both Verified and Audit choices
+        url = self._generate_enterprise_learner_context(enable_audit_enrollment=True)
+        response = self.client.get(url)
+        self.assertContains(response, 'Pursue a Verified Certificate')
+        self.assertContains(response, 'Audit This Course')
 
     @httpretty.activate
     @ddt.data(

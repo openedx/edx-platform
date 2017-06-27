@@ -3,13 +3,13 @@ Course Advanced Settings page
 """
 
 from bok_choy.promise import EmptyPromise
+
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.utils import (
-    press_the_notification_button,
-    type_in_codemirror,
     get_codemirror_value,
+    press_the_notification_button,
+    type_in_codemirror
 )
-
 
 KEY_CSS = '.key h3.title'
 UNDO_BUTTON_SELECTOR = ".action-item .action-undo"

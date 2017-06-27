@@ -1,17 +1,18 @@
-from lazy import lazy
+from collections import OrderedDict
 from logging import getLogger
 
+from lazy import lazy
+
 from courseware.model_data import ScoresClient
+from lms.djangoapps.grades.config import assume_zero_if_absent, should_persist_grades
+from lms.djangoapps.grades.models import PersistentSubsectionGrade
+from lms.djangoapps.grades.scores import possibly_scored
 from openedx.core.lib.grade_utils import is_score_higher_or_equal
 from student.models import anonymous_id_for_user
 from submissions import api as submissions_api
 
-from lms.djangoapps.grades.config import should_persist_grades, assume_zero_if_absent
-from lms.djangoapps.grades.models import PersistentSubsectionGrade
-from lms.djangoapps.grades.scores import possibly_scored
 from .course_data import CourseData
 from .subsection_grade import SubsectionGrade, ZeroSubsectionGrade
-
 
 log = getLogger(__name__)
 
@@ -25,7 +26,7 @@ class SubsectionGradeFactory(object):
         self.course_data = course_data or CourseData(student, course=course, structure=course_structure)
 
         self._cached_subsection_grades = None
-        self._unsaved_subsection_grades = []
+        self._unsaved_subsection_grades = OrderedDict()
 
     def create(self, subsection, read_only=False):
         """
@@ -47,7 +48,7 @@ class SubsectionGradeFactory(object):
                 )
                 if should_persist_grades(self.course_data.course_key):
                     if read_only:
-                        self._unsaved_subsection_grades.append(subsection_grade)
+                        self._unsaved_subsection_grades[subsection_grade.location] = subsection_grade
                     else:
                         grade_model = subsection_grade.create_model(self.student)
                         self._update_saved_subsection_grade(subsection.location, grade_model)
@@ -57,8 +58,10 @@ class SubsectionGradeFactory(object):
         """
         Bulk creates all the unsaved subsection_grades to this point.
         """
-        SubsectionGrade.bulk_create_models(self.student, self._unsaved_subsection_grades, self.course_data.course_key)
-        self._unsaved_subsection_grades = []
+        SubsectionGrade.bulk_create_models(
+            self.student, self._unsaved_subsection_grades.values(), self.course_data.course_key
+        )
+        self._unsaved_subsection_grades.clear()
 
     def update(self, subsection, only_if_higher=None):
         """

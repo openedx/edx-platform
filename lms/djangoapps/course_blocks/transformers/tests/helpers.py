@@ -2,15 +2,16 @@
 Test helpers for testing course block transformers.
 """
 from mock import patch
+
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access import has_access
-from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.core.djangoapps.content.block_structure.tests.helpers import clear_registered_transformers_cache
+from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ...api import get_course_blocks
 

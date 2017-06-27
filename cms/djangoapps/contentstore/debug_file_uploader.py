@@ -1,5 +1,6 @@
-from django.core.files.uploadhandler import FileUploadHandler
 import time
+
+from django.core.files.uploadhandler import FileUploadHandler
 
 
 class DebugFileUploader(FileUploadHandler):

@@ -1,14 +1,14 @@
 """
 Useful django models for implementing XBlock infrastructure in django.
 """
-import warnings
 import logging
+import warnings
 
-from django.db import models
 from django.core.exceptions import ValidationError
-from opaque_keys.edx.keys import CourseKey, UsageKey, BlockTypeKey
-from xmodule.modulestore.django import modulestore
+from django.db import models
+from opaque_keys.edx.keys import BlockTypeKey, CourseKey, UsageKey
 
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 

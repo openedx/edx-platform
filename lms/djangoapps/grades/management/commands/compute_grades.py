@@ -7,19 +7,15 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import hashlib
 import logging
 
-from django.core.management.base import BaseCommand
 import six
+from django.core.management.base import BaseCommand
 
-from openedx.core.lib.command_utils import (
-    get_mutually_exclusive_required_option,
-    parse_course_keys,
-)
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
+from openedx.core.lib.command_utils import get_mutually_exclusive_required_option, parse_course_keys
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
 from ... import tasks
-
 
 log = logging.getLogger(__name__)
 
@@ -108,15 +104,11 @@ class Command(BaseCommand):
         all_args = []
         estimate_first_attempted = options['estimate_first_attempted']
         for course_key in self._get_course_keys(options):
-            enrollment_count = CourseEnrollment.objects.filter(course_id=course_key).count()
-            if enrollment_count == 0:
-                log.warning("No enrollments found for {}".format(course_key))
-            batch_size = self._latest_settings().batch_size if options.get('from_settings') else options['batch_size']
-            for offset in six.moves.range(options['start_index'], enrollment_count, batch_size):
-                # This is a tuple to reduce memory consumption.
-                # The dictionaries with their extra overhead will be created
-                # and consumed one at a time.
-                all_args.append((six.text_type(course_key), offset, batch_size))
+            # This is a tuple to reduce memory consumption.
+            # The dictionaries with their extra overhead will be created
+            # and consumed one at a time.
+            for task_arg_tuple in tasks._course_task_args(course_key, **options):
+                all_args.append(task_arg_tuple)
         all_args.sort(key=lambda x: hashlib.md5(b'{!r}'.format(x)))
         for args in all_args:
             yield {

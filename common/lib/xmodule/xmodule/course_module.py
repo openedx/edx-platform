@@ -4,11 +4,12 @@ Django module container for classes and operations related to the "Course Module
 import json
 import logging
 from cStringIO import StringIO
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 from lazy import lazy
 from lxml import etree
+from openedx.core.lib.license import LicenseMixin
 from path import Path as path
 from pytz import utc
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
@@ -16,7 +17,6 @@ from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.graders import grader_from_conf
-from xmodule.mixin import LicenseMixin
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.tabs import CourseTabList, InvalidTabsException
 from .fields import Date
@@ -187,6 +187,10 @@ class CourseFields(object):
         scope=Scope.settings
     )
     end = Date(help=_("Date that this class ends"), scope=Scope.settings)
+    certificate_available_date = Date(
+        help=_("Date that certificates become available to learners"),
+        scope=Scope.content
+    )
     cosmetic_display_price = Integer(
         display_name=_("Cosmetic Course Display Price"),
         help=_(
@@ -530,7 +534,7 @@ class CourseFields(object):
         default=False,
     )
     cert_html_view_overrides = Dict(
-        # Translators: This field is the container for course-specific certifcate configuration values
+        # Translators: This field is the container for course-specific certificate configuration values
         display_name=_("Certificate Web/HTML View Overrides"),
         # Translators: These overrides allow for an alternative configuration of the certificate web view
         help=_("Enter course-specific overrides for the Web/HTML template parameters here (JSON format)"),
@@ -539,7 +543,7 @@ class CourseFields(object):
 
     # Specific certificate information managed via Studio (should eventually fold other cert settings into this)
     certificates = Dict(
-        # Translators: This field is the container for course-specific certifcate configuration values
+        # Translators: This field is the container for course-specific certificate configuration values
         display_name=_("Certificate Configuration"),
         # Translators: These overrides allow for an alternative configuration of the certificate web view
         help=_("Enter course-specific configuration information here (JSON format)"),
@@ -915,6 +919,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         except InvalidTabsException as err:
             raise type(err)('{msg} For course: {course_id}'.format(msg=err.message, course_id=unicode(self.id)))
 
+        self.set_default_certificate_available_date()
+
     def set_grading_policy(self, course_policy):
         """
         The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is
@@ -939,6 +945,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         # Use setters so that side effecting to .definitions works
         self.raw_grader = grading_policy['GRADER']  # used for cms access
         self.grade_cutoffs = grading_policy['GRADE_CUTOFFS']
+
+    def set_default_certificate_available_date(self):
+        if (not self.certificate_available_date) and self.end:
+            self.certificate_available_date = self.end + timedelta(days=2)
 
     @classmethod
     def read_grading_policy(cls, paths, system):

@@ -2,14 +2,15 @@
 """Tests of Branding API views. """
 import json
 import urllib
-from django.test import TestCase
+
+import ddt
+import mock
+from config_models.models import cache
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.conf import settings
+from django.test import TestCase
 
-import mock
-import ddt
-from config_models.models import cache
 from branding.models import BrandingApiConfig
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.api import released_languages

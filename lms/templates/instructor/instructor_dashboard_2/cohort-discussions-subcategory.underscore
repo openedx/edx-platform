@@ -3,7 +3,7 @@
         <label>
             <input data-id="<%- id %>" class="check-discussion-subcategory-<%- type %>" type="checkbox" <%- is_divided ? 'checked="checked"' : '' %> />
             <span class="topic-name"><%- name %></span>
-            <span class="cohorted-text <%- is_divided ? '' : 'hidden'%>">- <%- gettext('Cohorted') %></span>
+            <span class="divided-discussion-text <%- is_divided ? '' : 'hidden'%>">- <%- gettext('Divided') %></span>
         </label>
     </div>
 </li>

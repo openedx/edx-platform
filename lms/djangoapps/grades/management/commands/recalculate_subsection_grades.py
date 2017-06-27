@@ -5,15 +5,16 @@ in the specified time range.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from datetime import datetime
 import logging
-from pytz import utc
+from datetime import datetime
 
 from django.core.management.base import BaseCommand, CommandError
+from pytz import utc
+
+from courseware.models import StudentModule
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.signals.handlers import PROBLEM_SUBMITTED_EVENT_TYPE
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
-from courseware.models import StudentModule
 from student.models import user_by_anonymous_id
 from submissions.models import Submission
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type

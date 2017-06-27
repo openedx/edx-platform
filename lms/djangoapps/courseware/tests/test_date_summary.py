@@ -7,12 +7,10 @@ from django.core.urlresolvers import reverse
 from freezegun import freeze_time
 from nose.plugins.attrib import attr
 from pytz import utc
-from waffle.testutils import override_flag
-from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
 
 from commerce.models import CommerceConfiguration
-from course_modes.tests.factories import CourseModeFactory
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from courseware.courses import get_course_date_blocks
 from courseware.date_summary import (
     CourseEndDate,
@@ -20,13 +18,15 @@ from courseware.date_summary import (
     DateSummary,
     TodaysDate,
     VerificationDeadlineDate,
-    VerifiedUpgradeDeadlineDate,
+    VerifiedUpgradeDeadlineDate
 )
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -194,7 +194,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         'info',
         'openedx.course_experience.course_home',
     )
-    @override_flag(UNIFIED_COURSE_EXPERIENCE_FLAG, active=True)
+    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_todays_date_no_timezone(self, url_name):
         with freeze_time('2015-01-02'):
             self.setup_course_and_user()
@@ -218,7 +218,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         'info',
         'openedx.course_experience.course_home',
     )
-    @override_flag(UNIFIED_COURSE_EXPERIENCE_FLAG, active=True)
+    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_todays_date_timezone(self, url_name):
         with freeze_time('2015-01-02'):
             self.setup_course_and_user()
@@ -249,7 +249,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         'info',
         'openedx.course_experience.course_home',
     )
-    @override_flag(UNIFIED_COURSE_EXPERIENCE_FLAG, active=True)
+    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_start_date_render(self, url_name):
         with freeze_time('2015-01-02'):
             self.setup_course_and_user()
@@ -267,7 +267,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         'info',
         'openedx.course_experience.course_home',
     )
-    @override_flag(UNIFIED_COURSE_EXPERIENCE_FLAG, active=True)
+    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_start_date_render_time_zone(self, url_name):
         with freeze_time('2015-01-02'):
             self.setup_course_and_user()
@@ -310,100 +310,13 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         )
         self.assertEqual(block.title, 'Course End')
 
-    # Tests Verified Upgrade Deadline Date Block
-
-    def check_upgrade_banner(
-            self,
-            banner_expected=True,
-            include_url_parameter=True,
-            expected_cookie_value=None
-    ):
-        """
-        Helper method to check for the presence of the Upgrade Banner
-        """
-        url = reverse('info', args=[self.course.id.to_deprecated_string()])
-        if include_url_parameter:
-            url += '?upgrade=true'
-        resp = self.client.get(url)
-        upgrade_cookie_name = 'show_upgrade_notification'
-        expected_banner_text = "Give yourself an additional incentive to complete"
-        if banner_expected:
-            self.assertIn(expected_banner_text, resp.content)
-            self.assertIn(str(self.course.id), self.client.cookies[upgrade_cookie_name].value)
-        else:
-            self.assertNotIn(expected_banner_text, resp.content)
-            if upgrade_cookie_name in self.client.cookies:
-                self.assertNotIn(str(self.course.id), self.client.cookies[upgrade_cookie_name].value)
-            if expected_cookie_value is not None:
-                self.assertIn(str(expected_cookie_value), self.client.cookies[upgrade_cookie_name].value)
-
-    def test_verified_upgrade_deadline_date(self):
-        with freeze_time('2015-01-02'):
-            self.setup_course_and_user(days_till_upgrade_deadline=1, user_enrollment_mode=CourseMode.AUDIT)
-            self.client.login(username='mrrobot', password='test')
-            block = VerifiedUpgradeDeadlineDate(self.course, self.user)
-            self.assertEqual(block.date, datetime.now(utc) + timedelta(days=1))
-            self.assertTrue(block.is_enabled)
-            self.assertEqual(block.link, reverse('verify_student_upgrade_and_verify', args=(self.course.id,)))
-            self.check_upgrade_banner()
-
-    def test_without_upgrade_deadline(self):
-        self.setup_course_and_user(enrollment_mode=None)
-        self.client.login(username='mrrobot', password='test')
-        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
-        self.assertFalse(block.is_enabled)
-        self.assertIsNone(block.date)
-        self.check_upgrade_banner(banner_expected=False)
-
-    def test_verified_upgrade_banner_not_present_past_deadline(self):
-        with freeze_time('2015-01-02'):
-            self.setup_course_and_user(days_till_upgrade_deadline=-1, user_enrollment_mode=CourseMode.AUDIT)
-            self.client.login(username='mrrobot', password='test')
-            block = VerifiedUpgradeDeadlineDate(self.course, self.user)
-            self.assertFalse(block.is_enabled)
-            self.check_upgrade_banner(banner_expected=False)
-
-    def test_verified_upgrade_banner_cookie(self):
-        with freeze_time('2015-01-02'):
-            self.setup_course_and_user(days_till_upgrade_deadline=1, user_enrollment_mode=CourseMode.AUDIT)
-            self.client.login(username='mrrobot', password='test')
-
-            # No URL parameter or cookie present, notification should not be shown.
-            self.check_upgrade_banner(include_url_parameter=False, banner_expected=False)
-
-            # Now pass URL parameter-- notification should be shown.
-            self.check_upgrade_banner(include_url_parameter=True)
-
-            # A cookie should be set in the previous call, so it is no longer necessary to pass
-            # the URL parameter in order to see the notification.
-            self.check_upgrade_banner(include_url_parameter=False)
-
-            # Store the current course_id for testing
-            old_course_id = self.course.id
-
-            # Change to another course
-            self.setup_course_and_user(days_till_upgrade_deadline=1,
-                                       user_enrollment_mode=CourseMode.AUDIT,
-                                       create_user=False)
-
-            # Banner should not be present in the newly created course
-            self.check_upgrade_banner(include_url_parameter=False,
-                                      banner_expected=False,
-                                      expected_cookie_value=old_course_id)
-
-            # Unfortunately (according to django doc), it is not possible to test expiration of the cookie.
-
     def test_ecommerce_checkout_redirect(self):
         """Verify the block link redirects to ecommerce checkout if it's enabled."""
         sku = 'TESTSKU'
-        checkout_page = '/test_basket/'
-        CommerceConfiguration.objects.create(
-            checkout_on_ecommerce_service=True,
-            single_course_checkout_page=checkout_page
-        )
+        configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
         self.setup_course_and_user(sku=sku)
         block = VerifiedUpgradeDeadlineDate(self.course, self.user)
-        self.assertEqual(block.link, '{}?sku={}'.format(checkout_page, sku))
+        self.assertEqual(block.link, '{}?sku={}'.format(configuration.MULTIPLE_ITEMS_BASKET_PAGE_URL, sku))
 
     ## VerificationDeadlineDate
     def test_no_verification_deadline(self):

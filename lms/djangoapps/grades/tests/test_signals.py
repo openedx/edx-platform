@@ -3,22 +3,23 @@ Tests for the score change signals defined in the courseware models module.
 """
 
 import re
-
 from datetime import datetime
+
 import ddt
-from django.test import TestCase
-from mock import patch, MagicMock
 import pytz
-from submissions.models import score_set, score_reset
+from django.test import TestCase
+from mock import MagicMock, patch
+
+from submissions.models import score_reset, score_set
 from util.date_utils import to_timestamp
 
 from ..constants import ScoreDatabaseTableEnum
 from ..signals.handlers import (
-    enqueue_subsection_update,
-    submissions_score_set_handler,
-    submissions_score_reset_handler,
     disconnect_submissions_signal_receiver,
+    enqueue_subsection_update,
     problem_raw_score_changed_handler,
+    submissions_score_reset_handler,
+    submissions_score_set_handler
 )
 from ..signals.signals import PROBLEM_RAW_SCORE_CHANGED
 

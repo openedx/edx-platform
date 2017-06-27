@@ -1,24 +1,24 @@
 import datetime
-import pytz
 
+import pytz
 from django.core.urlresolvers import reverse
 from mock import patch
 from nose.plugins.attrib import attr
 
 from courseware.access import has_access
-from courseware.tests.helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
 from courseware.tests.factories import (
     BetaTesterFactory,
-    StaffFactory,
     GlobalStaffFactory,
     InstructorFactory,
-    OrgStaffFactory,
     OrgInstructorFactory,
+    OrgStaffFactory,
+    StaffFactory
 )
+from courseware.tests.helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 
 @attr(shard=1)

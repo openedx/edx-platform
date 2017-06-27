@@ -1,24 +1,22 @@
 """
 Tests for student enrollment.
 """
-import ddt
 import unittest
+
+import ddt
+from django.conf import settings
+from django.core.urlresolvers import reverse
 from mock import patch
 from nose.plugins.attrib import attr
 
-from django.conf import settings
-from django.core.urlresolvers import reverse
 from course_modes.models import CourseMode
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from student.models import CourseEnrollment, CourseFullError
+from student.roles import CourseInstructorRole, CourseStaffRole
+from student.tests.factories import CourseModeFactory, UserFactory
+from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from util.testing import UrlResetMixin
-from openedx.core.djangoapps.embargo.test_utils import restrict_course
-from student.tests.factories import UserFactory, CourseModeFactory
-from student.models import CourseEnrollment, CourseFullError
-from student.roles import (
-    CourseInstructorRole,
-    CourseStaffRole,
-)
 
 
 @attr(shard=3)

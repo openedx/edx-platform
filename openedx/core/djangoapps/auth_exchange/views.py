@@ -9,9 +9,10 @@ The following are currently implemented:
 
 # pylint: disable=abstract-method
 
+import django.contrib.auth as auth
+import social_django.utils as social_utils
 from django.conf import settings
 from django.contrib.auth import login
-import django.contrib.auth as auth
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -24,7 +25,6 @@ from provider.oauth2.views import AccessTokenView as DOPAccessTokenView
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-import social.apps.django_app.utils as social_utils
 
 from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters
@@ -37,7 +37,7 @@ class AccessTokenExchangeBase(APIView):
     OAuth access token.
     """
     @method_decorator(csrf_exempt)
-    @method_decorator(social_utils.strategy("social:complete"))
+    @method_decorator(social_utils.psa("social:complete"))
     def dispatch(self, *args, **kwargs):
         return super(AccessTokenExchangeBase, self).dispatch(*args, **kwargs)
 
@@ -137,11 +137,11 @@ class DOTAccessTokenExchangeView(AccessTokenExchangeBase, DOTAccessTokenView):
         request.extra_credentials = None
         request.grant_type = client.authorization_grant_type
 
-    def error_response(self, form_errors):
+    def error_response(self, form_errors, **kwargs):
         """
         Return an error response consisting of the errors in the form
         """
-        return Response(status=400, data=form_errors)
+        return Response(status=400, data=form_errors, **kwargs)
 
 
 class LoginWithAccessTokenView(APIView):

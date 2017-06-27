@@ -1,20 +1,17 @@
 """
 Test the CCXModulestoreWrapper
 """
-from collections import deque
-from ccx_keys.locator import CCXLocator
 import datetime
-from itertools import izip_longest, chain
+from collections import deque
+from itertools import chain, izip_longest
+
 import pytz
-from student.tests.factories import AdminFactory
-from xmodule.modulestore.tests.django_utils import (
-    SharedModuleStoreTestCase,
-    TEST_DATA_SPLIT_MODULESTORE
-)
-from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from ccx_keys.locator import CCXLocator
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
+from student.tests.factories import AdminFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):

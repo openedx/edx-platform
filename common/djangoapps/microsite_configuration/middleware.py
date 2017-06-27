@@ -8,6 +8,7 @@ A microsite enables the following features:
 """
 
 from django.conf import settings
+
 from microsite_configuration import microsite
 
 

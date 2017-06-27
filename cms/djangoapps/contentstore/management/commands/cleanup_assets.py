@@ -5,8 +5,8 @@ or with filename which starts with "._") for all courses
 import logging
 
 from django.core.management.base import BaseCommand
-from xmodule.contentstore.django import contentstore
 
+from xmodule.contentstore.django import contentstore
 
 log = logging.getLogger(__name__)
 

@@ -6,10 +6,8 @@ Includes:
         rendered in the LMS.
 """
 
-from django.db.models import TextField
-
 from config_models.models import ConfigurationModel
-
+from django.db.models import TextField
 from xblock.core import XBlockAside
 
 

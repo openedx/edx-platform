@@ -2,12 +2,13 @@
 This file contains utility functions which will responsible for sending emails.
 """
 
-import os
-
+import HTMLParser
 import logging
+import os
 import urlparse
 import uuid
-import HTMLParser
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -17,16 +18,13 @@ from django.core.mail import EmailMessage, SafeMIMEText
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from email.mime.image import MIMEImage
-from email.mime.multipart import MIMEMultipart
-from eventtracking import tracker
 from edxmako.shortcuts import render_to_string
 from edxmako.template import Template
+from eventtracking import tracker
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.credit.models import CreditConfig, CreditProvider
-from xmodule.modulestore.django import modulestore
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 

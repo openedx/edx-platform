@@ -1,31 +1,34 @@
 """Tests of email marketing signal handlers."""
-import ddt
-import logging
 import datetime
+import logging
 
-from django.test import TestCase
+import ddt
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
-from mock import patch, ANY
-from util.json_request import JsonResponse
-from testfixtures import LogCapture
+from django.test import TestCase
+from django.test.client import RequestFactory
 from freezegun import freeze_time
-
-from email_marketing.signals import email_marketing_register_user, \
-    email_marketing_user_field_changed, \
-    add_email_marketing_cookies
-from email_marketing.tasks import (
-    update_user, update_user_email, _get_or_create_user_list,
-    _get_list_from_email_marketing_provider, _create_user_list
-)
+from mock import ANY, patch
+from opaque_keys.edx.keys import CourseKey
+from sailthru.sailthru_error import SailthruClientError
+from sailthru.sailthru_response import SailthruResponse
+from testfixtures import LogCapture
 
 from email_marketing.models import EmailMarketingConfiguration
-from django.test.client import RequestFactory
+from email_marketing.signals import (
+    add_email_marketing_cookies,
+    email_marketing_register_user,
+    email_marketing_user_field_changed
+)
+from email_marketing.tasks import (
+    _create_user_list,
+    _get_list_from_email_marketing_provider,
+    _get_or_create_user_list,
+    update_user,
+    update_user_email
+)
 from student.tests.factories import UserFactory, UserProfileFactory
-from opaque_keys.edx.keys import CourseKey
-
-from sailthru.sailthru_response import SailthruResponse
-from sailthru.sailthru_error import SailthruClientError
+from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 

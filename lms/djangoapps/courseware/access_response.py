@@ -3,6 +3,7 @@ This file contains all the classes used by has_access for error handling
 """
 
 from django.utils.translation import ugettext as _
+
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 

@@ -1,13 +1,13 @@
-from django.db import reset_queries
-from celery import Task, current_task
-import dogstats_wrapper as dog_stats_api
 import json
 import logging
-from util.db import outer_atomic
 from time import time
 
-from lms.djangoapps.instructor_task.models import InstructorTask, PROGRESS
+from celery import Task, current_task
+from django.db import reset_queries
 
+import dogstats_wrapper as dog_stats_api
+from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
+from util.db import outer_atomic
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 
@@ -26,6 +26,7 @@ class TaskProgress(object):
         self.succeeded = 0
         self.skipped = 0
         self.failed = 0
+        self.preassigned = 0
 
     def update_task_state(self, extra_meta=None):
         """
@@ -47,6 +48,7 @@ class TaskProgress(object):
             'skipped': self.skipped,
             'failed': self.failed,
             'total': self.total,
+            'preassigned': self.preassigned,
             'duration_ms': int((time() - self.start_time) * 1000),
         }
         if extra_meta is not None:

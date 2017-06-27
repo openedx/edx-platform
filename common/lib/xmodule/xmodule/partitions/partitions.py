@@ -1,6 +1,7 @@
 """Defines ``Group`` and ``UserPartition`` models for partitioning"""
 
 from collections import namedtuple
+
 from stevedore.extension import ExtensionManager
 
 # We use ``id`` in this file as the IDs of our Groups and UserPartitions,

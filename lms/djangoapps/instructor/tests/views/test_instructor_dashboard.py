@@ -1,32 +1,31 @@
 """
 Unit tests for instructor_dashboard.py.
 """
-import ddt
 import datetime
-from mock import patch
-from nose.plugins.attrib import attr
-from pytz import UTC
 
+import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from edxmako.shortcuts import render_to_response
-
-from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import UserFactory, StudentModuleFactory, StaffFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
-from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
+from mock import patch
+from nose.plugins.attrib import attr
+from pytz import UTC
 
 from common.test.utils import XssTestMixin
+from course_modes.models import CourseMode
+from courseware.tabs import get_course_tab_list
+from courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from edxmako.shortcuts import render_to_response
+from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
+from shoppingcart.models import CourseRegCodeItem, Order, PaidCourseRegistration
+from student.models import CourseEnrollment
+from student.roles import CourseFinanceAdminRole
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from shoppingcart.models import PaidCourseRegistration, Order, CourseRegCodeItem
-from course_modes.models import CourseMode
-from student.roles import CourseFinanceAdminRole
-from student.models import CourseEnrollment
 
 
 def intercept_renderer(path, context):
@@ -228,7 +227,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         Test analytics dashboard message is shown
         """
         response = self.client.get(self.url)
-        analytics_section = '<li class="nav-item"><button type="button" class="btn-link" data-section="instructor_analytics">Analytics</button></li>'  # pylint: disable=line-too-long
+        analytics_section = '<li class="nav-item"><button type="button" class="btn-link instructor_analytics" data-section="instructor_analytics">Analytics</button></li>'  # pylint: disable=line-too-long
         self.assertIn(analytics_section, response.content)
 
         # link to dashboard shown
@@ -327,7 +326,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         ora_section = (
             '<li class="nav-item">'
-            '<button type="button" class="btn-link" data-section="open_response_assessment">'
+            '<button type="button" class="btn-link open_response_assessment" data-section="open_response_assessment">'
             'Open Responses'
             '</button>'
             '</li>'

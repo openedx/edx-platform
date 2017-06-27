@@ -4,8 +4,9 @@ import json
 import httpretty
 from provider.constants import PUBLIC
 from provider.oauth2.models import Client
-from social.apps.django_app.default.models import UserSocialAuth
-from social.backends.facebook import FacebookOAuth2
+from social_core.backends.facebook import FacebookOAuth2, API_VERSION as FACEBOOK_API_VERSION
+from social_django.models import UserSocialAuth, Partial
+
 from student.tests.factories import UserFactory
 
 from .testutil import ThirdPartyAuthTestMixin
@@ -37,6 +38,10 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
             self.configure_google_provider(enabled=True, visible=True)
         elif self.BACKEND == 'facebook':
             self.configure_facebook_provider(enabled=True, visible=True)
+
+    def tearDown(self):
+        super(ThirdPartyOAuthTestMixin, self).tearDown()
+        Partial.objects.all().delete()
 
     def _create_client(self):
         """
@@ -80,7 +85,7 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
 class ThirdPartyOAuthTestMixinFacebook(object):
     """Tests oauth with the Facebook backend"""
     BACKEND = "facebook"
-    USER_URL = FacebookOAuth2.USER_DATA_URL
+    USER_URL = FacebookOAuth2.USER_DATA_URL.format(version=FACEBOOK_API_VERSION)
     # In facebook responses, the "id" field is used as the user's identifier
     UID_FIELD = "id"
 

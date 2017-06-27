@@ -2,33 +2,37 @@
 """
 Performance tests for field overrides.
 """
-import ddt
 import itertools
-import mock
-from nose.plugins.skip import SkipTest
-
-from courseware.views.views import progress
-from courseware.field_overrides import OverrideFieldData
-from courseware.testutils import FieldOverrideTestMixin
 from datetime import datetime
+
+import ddt
+import mock
+from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.core.cache import caches
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
+from nose.plugins.skip import SkipTest
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
+from xblock.core import XBlock
+
+from courseware.field_overrides import OverrideFieldData
+from courseware.testutils import FieldOverrideTestMixin
+from courseware.views.views import progress
+from lms.djangoapps.ccx.tests.factories import CcxFactory
+from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from xblock.core import XBlock
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, \
-    TEST_DATA_SPLIT_MODULESTORE, TEST_DATA_MONGO_MODULESTORE
-from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, check_sum_of_calls
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_MODULESTORE,
+    TEST_DATA_SPLIT_MODULESTORE,
+    ModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_sum_of_calls
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
-from ccx_keys.locator import CCXLocator
-from lms.djangoapps.ccx.tests.factories import CcxFactory
-from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 
 
 @attr(shard=3)
@@ -231,18 +235,18 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
         #     # of sql queries to default,
         #     # of mongo queries,
         # )
-        ('no_overrides', 1, True, False): (24, 1),
-        ('no_overrides', 2, True, False): (24, 1),
-        ('no_overrides', 3, True, False): (24, 1),
-        ('ccx', 1, True, False): (24, 1),
-        ('ccx', 2, True, False): (24, 1),
-        ('ccx', 3, True, False): (24, 1),
-        ('no_overrides', 1, False, False): (24, 1),
-        ('no_overrides', 2, False, False): (24, 1),
-        ('no_overrides', 3, False, False): (24, 1),
-        ('ccx', 1, False, False): (24, 1),
-        ('ccx', 2, False, False): (24, 1),
-        ('ccx', 3, False, False): (24, 1),
+        ('no_overrides', 1, True, False): (27, 1),
+        ('no_overrides', 2, True, False): (27, 1),
+        ('no_overrides', 3, True, False): (27, 1),
+        ('ccx', 1, True, False): (27, 1),
+        ('ccx', 2, True, False): (27, 1),
+        ('ccx', 3, True, False): (27, 1),
+        ('no_overrides', 1, False, False): (27, 1),
+        ('no_overrides', 2, False, False): (27, 1),
+        ('no_overrides', 3, False, False): (27, 1),
+        ('ccx', 1, False, False): (27, 1),
+        ('ccx', 2, False, False): (27, 1),
+        ('ccx', 3, False, False): (27, 1),
     }
 
 
@@ -254,19 +258,19 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     TEST_DATA = {
-        ('no_overrides', 1, True, False): (24, 3),
-        ('no_overrides', 2, True, False): (24, 3),
-        ('no_overrides', 3, True, False): (24, 3),
-        ('ccx', 1, True, False): (24, 3),
-        ('ccx', 2, True, False): (24, 3),
-        ('ccx', 3, True, False): (24, 3),
-        ('ccx', 1, True, True): (25, 3),
-        ('ccx', 2, True, True): (25, 3),
-        ('ccx', 3, True, True): (25, 3),
-        ('no_overrides', 1, False, False): (24, 3),
-        ('no_overrides', 2, False, False): (24, 3),
-        ('no_overrides', 3, False, False): (24, 3),
-        ('ccx', 1, False, False): (24, 3),
-        ('ccx', 2, False, False): (24, 3),
-        ('ccx', 3, False, False): (24, 3),
+        ('no_overrides', 1, True, False): (27, 3),
+        ('no_overrides', 2, True, False): (27, 3),
+        ('no_overrides', 3, True, False): (27, 3),
+        ('ccx', 1, True, False): (27, 3),
+        ('ccx', 2, True, False): (27, 3),
+        ('ccx', 3, True, False): (27, 3),
+        ('ccx', 1, True, True): (28, 3),
+        ('ccx', 2, True, True): (28, 3),
+        ('ccx', 3, True, True): (28, 3),
+        ('no_overrides', 1, False, False): (27, 3),
+        ('no_overrides', 2, False, False): (27, 3),
+        ('no_overrides', 3, False, False): (27, 3),
+        ('ccx', 1, False, False): (27, 3),
+        ('ccx', 2, False, False): (27, 3),
+        ('ccx', 3, False, False): (27, 3),
     }

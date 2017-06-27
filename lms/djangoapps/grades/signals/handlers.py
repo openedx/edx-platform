@@ -2,34 +2,35 @@
 Grades related signals.
 """
 from contextlib import contextmanager
-from crum import get_current_user
 from logging import getLogger
 
+from crum import get_current_user
 from django.dispatch import receiver
-from submissions.models import score_set, score_reset
 from xblock.scorable import ScorableXBlockMixin, Score
 
 from courseware.model_data import get_score, set_score
 from eventtracking import tracker
 from openedx.core.lib.grade_utils import is_score_higher_or_equal
 from student.models import user_by_anonymous_id
-from util.date_utils import to_timestamp
+from submissions.models import score_reset, score_set
 from track.event_transaction_utils import (
-    get_event_transaction_type,
+    create_new_event_transaction_id,
     get_event_transaction_id,
-    set_event_transaction_type,
-    create_new_event_transaction_id
+    get_event_transaction_type,
+    set_event_transaction_type
 )
-from .signals import (
-    PROBLEM_RAW_SCORE_CHANGED,
-    PROBLEM_WEIGHTED_SCORE_CHANGED,
-    SUBSECTION_SCORE_CHANGED,
-    SCORE_PUBLISHED,
-)
+from util.date_utils import to_timestamp
+
 from ..constants import ScoreDatabaseTableEnum
 from ..new.course_grade_factory import CourseGradeFactory
 from ..scores import weighted_score
-from ..tasks import recalculate_subsection_grade_v3, RECALCULATE_GRADE_DELAY
+from ..tasks import RECALCULATE_GRADE_DELAY, recalculate_subsection_grade_v3
+from .signals import (
+    PROBLEM_RAW_SCORE_CHANGED,
+    PROBLEM_WEIGHTED_SCORE_CHANGED,
+    SCORE_PUBLISHED,
+    SUBSECTION_SCORE_CHANGED
+)
 
 log = getLogger(__name__)
 

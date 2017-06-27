@@ -3,24 +3,24 @@
 Acceptance tests for Studio's Setting pages
 """
 from __future__ import unicode_literals
-import os
 
+import os
+from textwrap import dedent
+
+from bok_choy.promise import EmptyPromise
 from mock import patch
 from nose.plugins.attrib import attr
 
 from base_studio_test import StudioCourseTest
-from bok_choy.promise import EmptyPromise
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
-from common.test.acceptance.tests.helpers import create_user_partition_json, element_has_text
+from common.test.acceptance.pages.common.utils import add_enrollment_course_modes
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.studio.utils import get_input_value
-from common.test.acceptance.pages.common.utils import add_enrollment_course_modes
-
-from textwrap import dedent
+from common.test.acceptance.tests.helpers import create_user_partition_json, element_has_text
 from xmodule.partitions.partitions import Group
 
 

@@ -3,8 +3,8 @@ Decorators used by the support app.
 """
 from functools import wraps
 
-from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
 
 from courseware.access import has_access
 

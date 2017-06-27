@@ -2,21 +2,52 @@
 Views handling read (GET) requests for the Discussion tab and inline discussions.
 """
 
-from functools import wraps
 import logging
+from contextlib import contextmanager
+from functools import wraps
 from sets import Set
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.context_processors import csrf
-from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.context_processors import csrf
+from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseServerError
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.utils.translation import get_language_bidi
-from django.views.decorators.http import require_GET
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_GET, require_http_methods
+from opaque_keys.edx.keys import CourseKey
+from rest_framework import status
+from web_fragments.fragment import Fragment
+
+import django_comment_client.utils as utils
+import lms.lib.comment_client as cc
+from courseware.access import has_access
+from courseware.courses import get_course_with_access
+from courseware.views.views import CourseTabView
+from django_comment_client.constants import TYPE_ENTRY
+from django_comment_client.permissions import get_team, has_permission
+from django_comment_client.utils import (
+    add_courseware_context,
+    available_division_schemes,
+    course_discussion_division_enabled,
+    extract,
+    get_group_id_for_comments_service,
+    get_group_id_for_user,
+    get_group_names_by_id,
+    is_commentable_divided,
+    merge_dict,
+    strip_none
+)
+from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
+from lms.djangoapps.courseware.views.views import check_and_get_upgrade_link, get_cosmetic_verified_display_price
+from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from student.models import CourseEnrollment
+from util.json_request import JsonResponse, expect_json
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.discussions")
 try:
@@ -24,40 +55,6 @@ try:
 except ImportError:
     newrelic = None  # pylint: disable=invalid-name
 
-from rest_framework import status
-
-from web_fragments.fragment import Fragment
-
-from courseware.courses import get_course_with_access
-from courseware.views.views import CourseTabView
-from openedx.core.djangoapps.course_groups.cohorts import (
-    is_course_cohorted,
-    get_course_cohorts,
-)
-from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-
-from courseware.access import has_access
-from student.models import CourseEnrollment
-from xmodule.modulestore.django import modulestore
-
-from django_comment_common.utils import ThreadContext
-from django_comment_client.permissions import has_permission, get_team
-from django_comment_client.utils import (
-    merge_dict,
-    extract,
-    strip_none,
-    add_courseware_context,
-    get_group_id_for_comments_service,
-    is_commentable_divided,
-    get_group_id_for_user,
-)
-
-import django_comment_client.utils as utils
-import lms.lib.comment_client as cc
-
-from opaque_keys.edx.keys import CourseKey
-
-from contextlib import contextmanager
 
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
@@ -83,11 +80,15 @@ def make_course_settings(course, user):
     Generate a JSON-serializable model for course settings, which will be used to initialize a
     DiscussionCourseSettings object on the client.
     """
+    course_discussion_settings = get_course_discussion_settings(course.id)
+    group_names_by_id = get_group_names_by_id(course_discussion_settings)
     return {
-        'is_cohorted': is_course_cohorted(course.id),
+        'is_discussion_division_enabled': course_discussion_division_enabled(course_discussion_settings),
         'allow_anonymous': course.allow_anonymous,
         'allow_anonymous_to_peers': course.allow_anonymous_to_peers,
-        'cohorts': [{"id": str(g.id), "name": g.name} for g in get_course_cohorts(course)],
+        'groups': [
+            {"id": str(group_id), "name": group_name} for group_id, group_name in group_names_by_id.iteritems()
+        ],
         'category_map': utils.get_discussion_category_map(course, user)
     }
 
@@ -346,10 +347,11 @@ def _find_thread(request, course, discussion_id, thread_id):
     if thread_context == "course" and not utils.discussion_category_id_access(course, request.user, discussion_id):
         return None
 
-    # verify that the thread belongs to the requesting student's cohort
+    # verify that the thread belongs to the requesting student's group
     is_moderator = has_permission(request.user, "see_all_cohorts", course.id)
-    if is_commentable_divided(course.id, discussion_id) and not is_moderator:
-        user_group_id = get_group_id_for_user(request.user, course.id)
+    course_discussion_settings = get_course_discussion_settings(course.id)
+    if is_commentable_divided(course.id, discussion_id, course_discussion_settings) and not is_moderator:
+        user_group_id = get_group_id_for_user(request.user, course_discussion_settings)
         if getattr(thread, "group_id", None) is not None and user_group_id != thread.group_id:
             return None
 
@@ -424,7 +426,8 @@ def _create_discussion_board_context(request, course_key, discussion_id=None, th
         add_courseware_context(threads, course, user)
 
     with newrelic_function_trace("get_cohort_info"):
-        user_group_id = get_group_id_for_user(user, course_key)
+        course_discussion_settings = get_course_discussion_settings(course_key)
+        user_group_id = get_group_id_for_user(user, course_discussion_settings)
 
     context.update({
         'root_url': root_url,
@@ -434,12 +437,16 @@ def _create_discussion_board_context(request, course_key, discussion_id=None, th
         'thread_pages': thread_pages,
         'annotated_content_info': annotated_content_info,
         'is_moderator': has_permission(user, "see_all_cohorts", course_key),
-        'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
+        'groups': course_settings["groups"],  # still needed to render _thread_list_template
         'user_group_id': user_group_id,  # read from container in NewPostView
         'sort_preference': cc_user.default_sort_key,
         'category_map': course_settings["category_map"],
         'course_settings': course_settings,
-        'is_commentable_divided': is_commentable_divided(course_key, discussion_id)
+        'is_commentable_divided': is_commentable_divided(course_key, discussion_id, course_discussion_settings),
+        # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
+        'upgrade_link': check_and_get_upgrade_link(request, user, course.id),
+        'upgrade_price': get_cosmetic_verified_display_price(course),
+        # ENDTODO
     })
     return context
 
@@ -501,7 +508,8 @@ def user_profile(request, course_key, user_id):
             ).order_by("name").values_list("name", flat=True).distinct()
 
             with newrelic_function_trace("get_cohort_info"):
-                user_group_id = get_group_id_for_user(request.user, course_key)
+                course_discussion_settings = get_course_discussion_settings(course_key)
+                user_group_id = get_group_id_for_user(request.user, course_discussion_settings)
 
             context = _create_base_discussion_view_context(request, course_key)
             context.update({
@@ -678,3 +686,167 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             return self.get_css_dependencies('style-discussion-main-rtl')
         else:
             return self.get_css_dependencies('style-discussion-main')
+
+
+@expect_json
+@login_required
+def discussion_topics(request, course_key_string):
+    """
+    The handler for divided discussion categories requests.
+    This will raise 404 if user is not staff.
+
+    Returns the JSON representation of discussion topics w.r.t categories for the course.
+
+    Example:
+        >>> example = {
+        >>>               "course_wide_discussions": {
+        >>>                   "entries": {
+        >>>                       "General": {
+        >>>                           "sort_key": "General",
+        >>>                           "is_divided": True,
+        >>>                           "id": "i4x-edx-eiorguegnru-course-foobarbaz"
+        >>>                       }
+        >>>                   }
+        >>>                   "children": ["General", "entry"]
+        >>>               },
+        >>>               "inline_discussions" : {
+        >>>                   "subcategories": {
+        >>>                       "Getting Started": {
+        >>>                           "subcategories": {},
+        >>>                           "children": [
+        >>>                               ["Working with Videos", "entry"],
+        >>>                               ["Videos on edX", "entry"]
+        >>>                           ],
+        >>>                           "entries": {
+        >>>                               "Working with Videos": {
+        >>>                                   "sort_key": None,
+        >>>                                   "is_divided": False,
+        >>>                                   "id": "d9f970a42067413cbb633f81cfb12604"
+        >>>                               },
+        >>>                               "Videos on edX": {
+        >>>                                   "sort_key": None,
+        >>>                                   "is_divided": False,
+        >>>                                   "id": "98d8feb5971041a085512ae22b398613"
+        >>>                               }
+        >>>                           }
+        >>>                       },
+        >>>                       "children": ["Getting Started", "subcategory"]
+        >>>                   },
+        >>>               }
+        >>>          }
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    course = get_course_with_access(request.user, 'staff', course_key)
+
+    discussion_topics = {}
+    discussion_category_map = utils.get_discussion_category_map(
+        course, request.user, divided_only_if_explicit=True, exclude_unstarted=False
+    )
+
+    # We extract the data for the course wide discussions from the category map.
+    course_wide_entries = discussion_category_map.pop('entries')
+
+    course_wide_children = []
+    inline_children = []
+
+    for name, c_type in discussion_category_map['children']:
+        if name in course_wide_entries and c_type == TYPE_ENTRY:
+            course_wide_children.append([name, c_type])
+        else:
+            inline_children.append([name, c_type])
+
+    discussion_topics['course_wide_discussions'] = {
+        'entries': course_wide_entries,
+        'children': course_wide_children
+    }
+
+    discussion_category_map['children'] = inline_children
+    discussion_topics['inline_discussions'] = discussion_category_map
+
+    return JsonResponse(discussion_topics)
+
+
+@require_http_methods(("GET", "PATCH"))
+@ensure_csrf_cookie
+@expect_json
+@login_required
+def course_discussions_settings_handler(request, course_key_string):
+    """
+    The restful handler for divided discussion setting requests. Requires JSON.
+    This will raise 404 if user is not staff.
+    GET
+        Returns the JSON representation of divided discussion settings for the course.
+    PATCH
+        Updates the divided discussion settings for the course. Returns the JSON representation of updated settings.
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    course = get_course_with_access(request.user, 'staff', course_key)
+    discussion_settings = get_course_discussion_settings(course_key)
+
+    if request.method == 'PATCH':
+        divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
+            course, discussion_settings
+        )
+
+        settings_to_change = {}
+
+        if 'divided_course_wide_discussions' in request.json or 'divided_inline_discussions' in request.json:
+            divided_course_wide_discussions = request.json.get(
+                'divided_course_wide_discussions', divided_course_wide_discussions
+            )
+            divided_inline_discussions = request.json.get(
+                'divided_inline_discussions', divided_inline_discussions
+            )
+            settings_to_change['divided_discussions'] = divided_course_wide_discussions + divided_inline_discussions
+
+        if 'always_divide_inline_discussions' in request.json:
+            settings_to_change['always_divide_inline_discussions'] = request.json.get(
+                'always_divide_inline_discussions'
+            )
+        if 'division_scheme' in request.json:
+            settings_to_change['division_scheme'] = request.json.get(
+                'division_scheme'
+            )
+
+        if not settings_to_change:
+            return JsonResponse({"error": unicode("Bad Request")}, 400)
+
+        try:
+            if settings_to_change:
+                discussion_settings = set_course_discussion_settings(course_key, **settings_to_change)
+
+        except ValueError as err:
+            # Note: error message not translated because it is not exposed to the user (UI prevents this state).
+            return JsonResponse({"error": unicode(err)}, 400)
+
+    divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
+        course, discussion_settings
+    )
+
+    return JsonResponse({
+        'id': discussion_settings.id,
+        'divided_inline_discussions': divided_inline_discussions,
+        'divided_course_wide_discussions': divided_course_wide_discussions,
+        'always_divide_inline_discussions': discussion_settings.always_divide_inline_discussions,
+        'division_scheme': discussion_settings.division_scheme,
+        'available_division_schemes': available_division_schemes(course_key)
+    })
+
+
+def get_divided_discussions(course, discussion_settings):
+    """
+    Returns the course-wide and inline divided discussion ids separately.
+    """
+    divided_course_wide_discussions = []
+    divided_inline_discussions = []
+
+    course_wide_discussions = [topic['id'] for __, topic in course.discussion_topics.items()]
+    all_discussions = utils.get_discussion_categories_ids(course, None, include_all=True)
+
+    for divided_discussion_id in discussion_settings.divided_discussions:
+        if divided_discussion_id in course_wide_discussions:
+            divided_course_wide_discussions.append(divided_discussion_id)
+        elif divided_discussion_id in all_discussions:
+            divided_inline_discussions.append(divided_discussion_id)
+
+    return divided_course_wide_discussions, divided_inline_discussions

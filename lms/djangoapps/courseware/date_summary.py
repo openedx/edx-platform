@@ -4,18 +4,17 @@ page. Each block gives information about a particular
 course-run-specific date which will be displayed to the user.
 """
 from datetime import datetime
-from pytz import timezone, utc
 
 from babel.dates import format_timedelta
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_lazy
-from django.utils.translation import to_locale, get_language
+from django.utils.translation import get_language, to_locale, ugettext_lazy
 from lazy import lazy
+from pytz import timezone, utc
 
 from course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from student.models import CourseEnrollment
 
 
@@ -72,9 +71,10 @@ class DateSummary(object):
             self.user.preferences.model.get_value(self.user, "time_zone", "UTC")
         )
 
-    def __init__(self, course, user):
+    def __init__(self, course, user, course_id=None):
         self.course = course
         self.user = user
+        self.course_id = course_id or self.course.id
 
     @property
     def relative_datestring(self):
@@ -117,6 +117,14 @@ class DateSummary(object):
         if self.date is not None:
             return datetime.now(utc) <= self.date
         return False
+
+    def deadline_has_passed(self):
+        """
+        Return True if a deadline (the date) exists, and has already passed.
+        Returns False otherwise.
+        """
+        deadline = self.date
+        return deadline is not None and deadline <= datetime.now(utc)
 
     def __repr__(self):
         return u'DateSummary: "{title}" {date} is_enabled={is_enabled}'.format(
@@ -174,7 +182,7 @@ class CourseEndDate(DateSummary):
     @property
     def description(self):
         if datetime.now(utc) <= self.date:
-            mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+            mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_id)
             if is_active and CourseMode.is_eligible_for_certificate(mode):
                 return _('To earn a certificate, you must complete all requirements before this date.')
             else:
@@ -204,10 +212,10 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
         ecommerce_service = EcommerceService()
         if ecommerce_service.is_enabled(self.user):
             course_mode = CourseMode.objects.get(
-                course_id=self.course.id, mode_slug=CourseMode.VERIFIED
+                course_id=self.course_id, mode_slug=CourseMode.VERIFIED
             )
-            return ecommerce_service.checkout_page_url(course_mode.sku)
-        return reverse('verify_student_upgrade_and_verify', args=(self.course.id,))
+            return ecommerce_service.get_checkout_page_url(course_mode.sku)
+        return reverse('verify_student_upgrade_and_verify', args=(self.course_id,))
 
     @property
     def is_enabled(self):
@@ -221,7 +229,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
         if not is_enabled:
             return False
 
-        enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_id)
 
         # Return `true` if user is not enrolled in course
         if enrollment_mode is None and is_active is None:
@@ -234,7 +242,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
     def date(self):
         try:
             verified_mode = CourseMode.objects.get(
-                course_id=self.course.id, mode_slug=CourseMode.VERIFIED
+                course_id=self.course_id, mode_slug=CourseMode.VERIFIED
             )
             return verified_mode.expiration_datetime
         except CourseMode.DoesNotExist:
@@ -273,7 +281,7 @@ class VerificationDeadlineDate(DateSummary):
             'verification-deadline-retry': (_('Retry Verification'), reverse('verify_student_reverify')),
             'verification-deadline-upcoming': (
                 _('Verify My Identity'),
-                reverse('verify_student_verify_now', args=(self.course.id,))
+                reverse('verify_student_verify_now', args=(self.course_id,))
             )
         }
 
@@ -297,13 +305,13 @@ class VerificationDeadlineDate(DateSummary):
 
     @lazy
     def date(self):
-        return VerificationDeadline.deadline_for_course(self.course.id)
+        return VerificationDeadline.deadline_for_course(self.course_id)
 
     @lazy
     def is_enabled(self):
         if self.date is None:
             return False
-        (mode, is_active) = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        (mode, is_active) = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_id)
         if is_active and mode == 'verified':
             return self.verification_status in ('expired', 'none', 'must_reverify')
         return False
@@ -312,13 +320,6 @@ class VerificationDeadlineDate(DateSummary):
     def verification_status(self):
         """Return the verification status for this user."""
         return SoftwareSecurePhotoVerification.user_status(self.user)[0]
-
-    def deadline_has_passed(self):
-        """
-        Return True if a verification deadline exists, and has already passed.
-        """
-        deadline = self.date
-        return deadline is not None and deadline <= datetime.now(utc)
 
     def must_retry(self):
         """Return True if the user must re-submit verification, False otherwise."""

@@ -8,8 +8,8 @@ from django.core.urlresolvers import reverse
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 
-from badges.models import CourseCompleteImageConfiguration, BadgeClass, BadgeAssertion
-from badges.utils import site_prefix, requires_badges_enabled
+from badges.models import BadgeAssertion, BadgeClass, CourseCompleteImageConfiguration
+from badges.utils import requires_badges_enabled, site_prefix
 from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)

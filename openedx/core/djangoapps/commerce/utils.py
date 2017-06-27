@@ -1,8 +1,8 @@
 """ Commerce API Service. """
 from django.conf import settings
 from edx_rest_api_client.client import EdxRestApiClient
-from eventtracking import tracker
 
+from eventtracking import tracker
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.token_utils import JwtBuilder
 

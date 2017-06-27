@@ -3,11 +3,11 @@ Internationalization tasks
 """
 
 import re
-import sys
 import subprocess
+import sys
 
 from path import Path as path
-from paver.easy import task, cmdopts, needs, sh
+from paver.easy import cmdopts, needs, sh, task
 
 from .utils.cmd import django_cmd
 from .utils.timer import timed

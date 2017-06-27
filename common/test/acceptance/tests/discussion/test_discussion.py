@@ -5,40 +5,34 @@ Tests for discussion pages
 import datetime
 from uuid import uuid4
 
+from flaky import flaky
 from nose.plugins.attrib import attr
 from nose.tools import nottest
 from pytz import UTC
-from flaky import flaky
-
-from common.test.acceptance.tests.discussion.helpers import BaseDiscussionTestCase
-from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.discussion import (
-    DiscussionTabSingleThreadPage,
-    InlineDiscussionPage,
-    InlineDiscussionThreadPage,
-    DiscussionUserProfilePage,
-    DiscussionTabHomePage,
-    DiscussionSortPreferencePage,
-)
-from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
-from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.discussion import (
-    SingleThreadViewFixture,
-    UserProfileViewFixture,
-    SearchResultFixture,
-    Thread,
-    Response,
     Comment,
+    Response,
     SearchResult,
-    MultipleThreadFixture,
+    SearchResultFixture,
+    SingleThreadViewFixture,
+    Thread,
+    UserProfileViewFixture
 )
-
-from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin
-from common.test.acceptance.tests.helpers import skip_if_browser
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.discussion import (
+    DiscussionSortPreferencePage,
+    DiscussionTabHomePage,
+    DiscussionTabSingleThreadPage,
+    DiscussionUserProfilePage,
+    InlineDiscussionPage
+)
+from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
+from common.test.acceptance.pages.lms.tab_nav import TabNavPage
+from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, BaseDiscussionTestCase
+from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, skip_if_browser
 
 
 THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
@@ -291,7 +285,7 @@ class DiscussionNavigationTest(BaseDiscussionTestCase):
 
     def test_breadcrumbs_clear_search(self):
         self.thread_page.q(css=".search-input").fill("search text")
-        self.thread_page.q(css=".search-btn").click()
+        self.thread_page.q(css=".search-button").click()
 
         # Verify that clicking the first breadcrumb clears your search
         self.thread_page.q(css=".breadcrumbs .nav-item")[0].click()

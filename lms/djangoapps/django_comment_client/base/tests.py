@@ -1,37 +1,38 @@
 # -*- coding: utf-8 -*-
 """Tests for django comment client views."""
-from contextlib import contextmanager
-import logging
 import json
-import ddt
+import logging
+from contextlib import contextmanager
 
-from django.test.client import RequestFactory
+import ddt
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
-from mock import patch, ANY, Mock
-from nose.tools import assert_true, assert_equal
+from django.test.client import RequestFactory
+from mock import ANY, Mock, patch
 from nose.plugins.attrib import attr
+from nose.tools import assert_equal, assert_true
 from opaque_keys.edx.keys import CourseKey
-from lms.lib.comment_client import Thread
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from django_comment_client.base import views
-from django_comment_client.tests.group_id import CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
-from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
+from django_comment_client.tests.group_id import (
+    CohortedTopicGroupIdTestMixin,
+    GroupIdAssertionMixin,
+    NonCohortedTopicGroupIdTestMixin
+)
 from django_comment_client.tests.unicode import UnicodeTestMixin
+from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
 from django_comment_common.models import Role
-from django_comment_common.utils import seed_permissions_roles, ThreadContext
-
+from django_comment_common.utils import ThreadContext, seed_permissions_roles
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseAccessRoleFactory
+from lms.lib.comment_client import Thread
+from student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import check_mongo_calls
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
-
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 log = logging.getLogger(__name__)
 
@@ -378,8 +379,8 @@ class ViewsQueryCountTestCase(
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 4, 30),
-        (ModuleStoreEnum.Type.split, 3, 13, 30),
+        (ModuleStoreEnum.Type.mongo, 3, 4, 31),
+        (ModuleStoreEnum.Type.split, 3, 13, 31),
     )
     @ddt.unpack
     @count_queries
@@ -387,8 +388,8 @@ class ViewsQueryCountTestCase(
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 3, 26),
-        (ModuleStoreEnum.Type.split, 3, 10, 26),
+        (ModuleStoreEnum.Type.mongo, 3, 3, 27),
+        (ModuleStoreEnum.Type.split, 3, 10, 27),
     )
     @ddt.unpack
     @count_queries

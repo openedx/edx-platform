@@ -7,8 +7,12 @@
 
   h1, h2, h3 {
     font-size: font-size(large);
-    font-weight: bold;
+    font-weight: $font-bold;
     color: $black;
+  }
+
+  .dismiss-message {
+      @include float(right);
   }
 }
 
@@ -16,6 +20,10 @@
 .course-sidebar {
   @include margin-left(0);
   @include padding-left($baseline);
+
+  .section-tools li:not(:first-child) {
+    margin-top: ($baseline / 5);
+  }
 }
 
 // Course outline
@@ -42,7 +50,7 @@
         padding: 0;
 
         h3 {
-          font-weight: bold;
+          font-weight: $font-bold;
           font-size: 1.1rem;
           margin: 0;
         }
@@ -107,6 +115,10 @@
             border: 1px solid $lms-active-color;
           }
         }
+
+        &:last-child {
+          border-bottom: none;
+        }
       }
     }
   }
@@ -120,8 +132,10 @@
     @include border-left(3px solid $gray-l3);
 
     .heading {
-      @extend %t-title7;
-      color: $gray-d2;
+      font-size: 1.1rem;
+      line-height: 1;
+      font-weight: $font-bold;
+      color: $lms-gray;
     }
 
     .description {
@@ -129,29 +143,22 @@
       margin-bottom: $baseline/2;
       display: inline-block;
       color: $gray-d1;
-      @extend %t-title8;
     }
 
     .date-summary-link {
-      @extend %t-title8;
       font-weight: $font-semibold;
       a {
         color: $link-color;
-        font-weight: normal;
+        font-weight: $font-regular;
       }
     }
 
     .date {
       color: $gray-d1;
-      @extend %t-title9;
     }
 
     &-todays-date {
       @include border-left(3px solid $blue);
-
-      .heading {
-        @extend %t-title8;
-      }
     }
 
     &-verified-upgrade-deadline {
@@ -170,4 +177,29 @@
       @include border-left(3px solid $orange);
     }
   }
+}
+
+// Course Updates Page
+.course-updates {
+  .all-updates {
+    .updates-article {
+      margin: ($baseline*6/5) 0;
+      padding-bottom: ($baseline*6/5);
+      border-bottom: 1px solid $lms-border-color;
+      .date {
+        font-size: font-size(small);
+        font-weight: 300;
+        float: none;
+        padding-bottom: ($baseline/4);
+      }
+      &:last-child {
+        border-bottom: 0;
+      }
+    }
+  }
+}
+
+// Course Reviews Page
+.course-reviews-tool {
+  margin: ($baseline * 2) ($baseline * 3);
 }

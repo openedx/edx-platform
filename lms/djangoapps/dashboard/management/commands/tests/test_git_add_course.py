@@ -8,28 +8,27 @@ import StringIO
 import subprocess
 import unittest
 from uuid import uuid4
-from nose.plugins.attrib import attr
 
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
+from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 import dashboard.git_import as git_import
 from dashboard.git_import import (
     GitImportError,
-    GitImportErrorNoDir,
-    GitImportErrorUrlBad,
-    GitImportErrorCannotPull,
     GitImportErrorBadRepo,
+    GitImportErrorCannotPull,
+    GitImportErrorNoDir,
     GitImportErrorRemoteBranchMissing,
+    GitImportErrorUrlBad
 )
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 
 TEST_MONGODB_LOG = {
     'host': MONGO_HOST,

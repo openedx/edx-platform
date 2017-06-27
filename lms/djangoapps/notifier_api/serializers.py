@@ -2,10 +2,9 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from rest_framework import serializers
 
+from lms.djangoapps.notification_prefs import NOTIFICATION_PREF_KEY
 from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-
-from lms.djangoapps.notification_prefs import NOTIFICATION_PREF_KEY
 
 
 class NotifierUserSerializer(serializers.ModelSerializer):

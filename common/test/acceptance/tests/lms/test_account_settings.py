@@ -9,8 +9,8 @@ from bok_choy.page_object import XSS_INJECTION
 from nose.plugins.attrib import attr
 from pytz import timezone, utc
 
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
 

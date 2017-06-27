@@ -7,20 +7,19 @@ import re
 from urlparse import urljoin
 from uuid import uuid4
 
+import mock
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import override_settings
-import mock
 
-from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, CourseFactory, CourseRunFactory
+from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
-
 
 PROGRAMS_UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 

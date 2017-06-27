@@ -1,15 +1,14 @@
 """
 Grades Transformer
 """
+import json
 from base64 import b64encode
 from functools import reduce as functools_reduce
 from hashlib import sha1
 from logging import getLogger
-import json
 
 from lms.djangoapps.course_blocks.transformers.utils import collect_unioned_set_field, get_field_on_block
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
-
 
 log = getLogger(__name__)
 
@@ -29,6 +28,7 @@ class GradesTransformer(BlockStructureTransformer):
         graded: (boolean)
         has_score: (boolean)
         weight: (numeric)
+        show_correctness: (string) when to show grades (one of 'always', 'past_due', 'never')
 
     Additionally, the following value is calculated and stored as a
     transformer_block_field for each block:
@@ -37,7 +37,16 @@ class GradesTransformer(BlockStructureTransformer):
     """
     WRITE_VERSION = 4
     READ_VERSION = 4
-    FIELDS_TO_COLLECT = [u'due', u'format', u'graded', u'has_score', u'weight', u'course_version', u'subtree_edited_on']
+    FIELDS_TO_COLLECT = [
+        u'due',
+        u'format',
+        u'graded',
+        u'has_score',
+        u'weight',
+        u'course_version',
+        u'subtree_edited_on',
+        u'show_correctness',
+    ]
 
     EXPLICIT_GRADED_FIELD_NAME = 'explicit_graded'
 

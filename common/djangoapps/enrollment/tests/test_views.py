@@ -1,42 +1,42 @@
 """
 Tests for user enrollment.
 """
-import json
-import itertools
-import unittest
 import datetime
+import itertools
+import json
+import unittest
 
 import ddt
+import httpretty
+import pytz
+from django.conf import settings
 from django.core.cache import cache
-from mock import patch
-from nose.plugins.attrib import attr
-from django.test import Client
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.urlresolvers import reverse
-from rest_framework.test import APITestCase
+from django.test import Client
+from django.test.utils import override_settings
+from mock import patch
+from nose.plugins.attrib import attr
 from rest_framework import status
-from django.conf import settings
+from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
-from django.test.utils import override_settings
-import pytz
-import httpretty
 
 from course_modes.models import CourseMode
-from enrollment.views import EnrollmentUserThrottle
-from util.models import RateLimitConfiguration
-from util.testing import UrlResetMixin
-from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError
+from enrollment.views import EnrollmentUserThrottle
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.user_api.models import UserOrgTag
 from openedx.core.lib.django_test_client_utils import get_absolute_url
+from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, CourseModeFactory, UserFactory
-from openedx.core.djangoapps.embargo.models import CountryAccessRule, Country, RestrictedCourse
-from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from util.models import RateLimitConfiguration
+from util.testing import UrlResetMixin
 
 
 class EnrollmentTestMixin(object):
@@ -997,6 +997,55 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             'No request was made to the mocked enterprise-course-enrollment API'
         )
 
+    def test_enrollment_attributes_always_written(self):
+        """ Enrollment attributes should always be written, regardless of whether
+        the enrollment is being created or updated.
+        """
+        course_key = self.course.id
+        for mode in [CourseMode.DEFAULT_MODE_SLUG, CourseMode.VERIFIED]:
+            CourseModeFactory.create(
+                course_id=course_key,
+                mode_slug=mode,
+                mode_display_name=mode,
+            )
+
+        # Creating a new enrollment should write attributes
+        order_number = 'EDX-1000'
+        enrollment_attributes = [{
+            'namespace': 'order',
+            'name': 'order_number',
+            'value': order_number,
+        }]
+        mode = CourseMode.VERIFIED
+        self.assert_enrollment_status(
+            as_server=True,
+            is_active=True,
+            mode=mode,
+            enrollment_attributes=enrollment_attributes
+        )
+        enrollment = CourseEnrollment.objects.get(user=self.user, course_id=course_key)
+        self.assertTrue(enrollment.is_active)
+        self.assertEqual(enrollment.mode, CourseMode.VERIFIED)
+        self.assertEqual(enrollment.attributes.get(namespace='order', name='order_number').value, order_number)
+
+        # Updating an enrollment should update attributes
+        order_number = 'EDX-2000'
+        enrollment_attributes = [{
+            'namespace': 'order',
+            'name': 'order_number',
+            'value': order_number,
+        }]
+        mode = CourseMode.DEFAULT_MODE_SLUG
+        self.assert_enrollment_status(
+            as_server=True,
+            mode=mode,
+            enrollment_attributes=enrollment_attributes
+        )
+        enrollment.refresh_from_db()
+        self.assertTrue(enrollment.is_active)
+        self.assertEqual(enrollment.mode, mode)
+        self.assertEqual(enrollment.attributes.get(namespace='order', name='order_number').value, order_number)
+
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestCase):
@@ -1084,7 +1133,7 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
         self.user.profile.country = restricted_country.country
         self.user.profile.save()
 
-        path = reverse('embargo_blocked_message', kwargs={'access_point': 'enrollment', 'message_key': 'default'})
+        path = reverse('embargo:blocked_message', kwargs={'access_point': 'enrollment', 'message_key': 'default'})
         self.assert_access_denied(path)
 
     @override_settings(EDX_API_KEY=EnrollmentTestMixin.API_KEY)

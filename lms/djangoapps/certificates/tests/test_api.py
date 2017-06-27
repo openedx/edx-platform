@@ -1,20 +1,30 @@
 """Tests for the certificates Python API. """
-from contextlib import contextmanager
-import ddt
-from functools import wraps
 import uuid
+from contextlib import contextmanager
+from functools import wraps
 
-from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings
+import ddt
+from config_models.models import cache
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test import RequestFactory, TestCase
+from django.test.utils import override_settings
 from django.utils import timezone
 from freezegun import freeze_time
 from mock import patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
-from config_models.models import cache
+from certificates import api as certs_api
+from certificates.models import (
+    CertificateGenerationConfiguration,
+    CertificateStatuses,
+    ExampleCertificate,
+    GeneratedCertificate,
+    certificate_status_for_student
+)
+from certificates.queue import XQueueAddToQueueError, XQueueCertInterface
+from certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import GlobalStaffFactory
@@ -23,26 +33,8 @@ from microsite_configuration import microsite
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.testing import EventTestMixin
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase,
-)
-
-from certificates import api as certs_api
-from certificates.models import (
-    CertificateStatuses,
-    CertificateGenerationConfiguration,
-    ExampleCertificate,
-    GeneratedCertificate,
-    certificate_status_for_student,
-)
-from certificates.queue import XQueueCertInterface, XQueueAddToQueueError
-from certificates.tests.factories import (
-    CertificateInvalidationFactory,
-    GeneratedCertificateFactory
-)
-
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True

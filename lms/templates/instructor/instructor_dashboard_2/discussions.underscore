@@ -1,0 +1,26 @@
+<!-- Discussion Topics. -->
+<div class="discussions-nav" id="discussions-management" tabindex="-1">
+    <div class="hd hd-3 subsection-title" id="division-scheme-title"><%- gettext('Specify whether discussion topics are divided') %></div>
+    <div class="division-scheme-container">
+        <div class="division-scheme-items" role="group" aria-labelledby="division-scheme-title">
+            <% for (var i = 0; i < availableSchemes.length; i++) { %>
+                <div class="division-scheme-item <%- availableSchemes[i].key %> <%- layoutClass %> <% if (!availableSchemes[i].enabled) { %>hidden<% } %>">
+                    <label class="division-scheme-label">
+                        <input class="division-scheme <%- availableSchemes[i].key %>" type="radio" name="division-scheme"
+                               value="<%- availableSchemes[i].key %>" aria-describedby="<%- availableSchemes[i].key %>-description"
+                        <% if (availableSchemes[i].selected) { %>
+                        checked
+                        <% } %>
+                        >
+                        <%- availableSchemes[i].displayName %>
+                    </label>
+                    <p class='field-message' id="<%- availableSchemes[i].key %>-description"><%- availableSchemes[i].descriptiveText %></p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+    <div class="topic-division-nav">
+        <div class="course-wide-discussions-nav"></div>
+        <div class="inline-discussions-nav"></div>
+    </div>
+</div>

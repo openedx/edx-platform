@@ -1603,7 +1603,7 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     var messages = getUnitStatus({has_partition_group_components: true});
                     expect(messages.length).toBe(1);
                     expect(messages).toContainText(
-                        'Some content in this unit is visible only to specific groups of learners'
+                        'Access to some content in this unit is restricted to specific groups of learners'
                     );
                 });
 

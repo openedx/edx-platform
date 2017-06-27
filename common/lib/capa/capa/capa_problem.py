@@ -13,27 +13,26 @@ Main module which shows problems (of "capa" type).
 This is used by capa_module.
 """
 
-from collections import OrderedDict
-from copy import deepcopy
-from datetime import datetime
 import logging
 import os.path
 import re
+from collections import OrderedDict
+from copy import deepcopy
+from datetime import datetime
+from xml.sax.saxutils import unescape
 
 from lxml import etree
 from pytz import UTC
-from xml.sax.saxutils import unescape
 
-from capa.correctmap import CorrectMap
-import capa.inputtypes as inputtypes
 import capa.customrender as customrender
+import capa.inputtypes as inputtypes
 import capa.responsetypes as responsetypes
-from capa.util import contextualize_text, convert_files_to_filenames
 import capa.xqueue_interface as xqueue_interface
+from capa.correctmap import CorrectMap
 from capa.safe_exec import safe_exec
+from capa.util import contextualize_text, convert_files_to_filenames
 from openedx.core.djangolib.markup import HTML
 from xmodule.stringify import stringify_children
-
 
 # extra things displayed after "show answers" is pressed
 solution_tags = ['solution']

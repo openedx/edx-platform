@@ -1,20 +1,15 @@
 """
 Public views
 """
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.clickjacking import xframe_options_deny
+from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
-from django.conf import settings
+from django.views.decorators.clickjacking import xframe_options_deny
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from edxmako.shortcuts import render_to_response
-
-from openedx.core.djangoapps.external_auth.views import (
-    ssl_login_shortcut,
-    ssl_get_cert_from_request,
-    redirect_with_get,
-)
+from openedx.core.djangoapps.external_auth.views import redirect_with_get, ssl_get_cert_from_request, ssl_login_shortcut
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 __all__ = ['signup', 'login_page', 'howitworks']

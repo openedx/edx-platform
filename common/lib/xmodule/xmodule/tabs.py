@@ -1,13 +1,13 @@
 """
 Implement CourseTab
 """
-from abc import ABCMeta
 import logging
-
-from xblock.fields import List
-from openedx.core.lib.api.plugins import PluginError
+from abc import ABCMeta
 
 from django.core.files.storage import get_storage_class
+from xblock.fields import List
+
+from openedx.core.lib.api.plugins import PluginError
 
 log = logging.getLogger("edx.courseware")
 

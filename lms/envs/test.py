@@ -260,11 +260,11 @@ PASSWORD_COMPLEXITY = {}
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
 
 AUTHENTICATION_BACKENDS = (
-    'social.backends.google.GoogleOAuth2',
-    'social.backends.linkedin.LinkedinOAuth2',
-    'social.backends.facebook.FacebookOAuth2',
-    'social.backends.azuread.AzureADOAuth2',
-    'social.backends.twitter.TwitterOAuth',
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.linkedin.LinkedinOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'social_core.backends.azuread.AzureADOAuth2',
+    'social_core.backends.twitter.TwitterOAuth',
     'third_party_auth.dummy.DummyBackend',
     'third_party_auth.saml.SAMLAuthBackend',
     'third_party_auth.lti.LTIAuthBackend',
@@ -361,6 +361,8 @@ MKTG_URL_LINK_MAP = {
 }
 
 SUPPORT_SITE_LINK = 'https://support.example.com'
+PASSWORD_RESET_SUPPORT_LINK = 'https://support.example.com/password-reset-help.html'
+ACTIVATION_EMAIL_SUPPORT_LINK = 'https://support.example.com/activation-email-help.html'
 
 ############################ STATIC FILES #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
@@ -552,7 +554,7 @@ SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 
 FACEBOOK_APP_SECRET = "Test"
 FACEBOOK_APP_ID = "Test"
-FACEBOOK_API_VERSION = "v2.2"
+FACEBOOK_API_VERSION = "v2.8"
 
 ######### custom courses #########
 INSTALLED_APPS += ('lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon')
@@ -590,6 +592,9 @@ JWT_AUTH.update({
 })
 
 COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
+
+CREDENTIALS_INTERNAL_SERVICE_URL = 'https://credentials-internal.example.com'
+CREDENTIALS_PUBLIC_SERVICE_URL = 'https://credentials.example.com'
 
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]
 COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]

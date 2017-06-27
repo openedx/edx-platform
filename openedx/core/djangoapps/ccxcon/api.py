@@ -5,20 +5,18 @@ Module containing API functions for the CCXCon
 import logging
 import urlparse
 
-from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.http import Http404
 from oauthlib.oauth2 import BackendApplicationClient
 from requests_oauthlib import OAuth2Session
-from rest_framework.status import (
-    HTTP_200_OK,
-    HTTP_201_CREATED,
-)
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
 
 from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from student.models import anonymous_id_for_user
 from student.roles import CourseInstructorRole
+
 from .models import CCXCon
 
 log = logging.getLogger(__name__)

@@ -5,12 +5,12 @@ This module contains legacy code originally from `student.views`.
 import re
 
 from django.conf import settings
-from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
-import openedx.core.djangoapps.external_auth.views
-
-from xmodule.modulestore.django import modulestore
+from django.shortcuts import redirect
 from opaque_keys.edx.keys import CourseKey
+
+import openedx.core.djangoapps.external_auth.views
+from xmodule.modulestore.django import modulestore
 
 
 # pylint: disable=fixme

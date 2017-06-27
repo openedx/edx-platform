@@ -7,74 +7,65 @@ import logging
 import random
 import string  # pylint: disable=deprecated-module
 
+import django.utils
+import six
+from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, Http404
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect
-import django.utils
 from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_http_methods, require_GET
 from django.views.decorators.csrf import ensure_csrf_cookie
-
+from django.views.decorators.http import require_GET, require_http_methods
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 
-from .component import (
-    ADVANCED_COMPONENT_TYPES,
-)
-from .item import create_xblock_info
-from .library import LIBRARIES_ENABLED, get_library_creator_status
-from ccx_keys.locator import CCXLocator
 from contentstore.course_group_config import (
     COHORT_SCHEME,
     ENROLLMENT_SCHEME,
-    GroupConfiguration,
-    GroupConfigurationsValidationError,
     RANDOM_SCHEME,
+    GroupConfiguration,
+    GroupConfigurationsValidationError
 )
-from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
+from contentstore.course_info_model import delete_course_update, get_course_updates, update_course_updates
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.push_notification import push_notification_enabled
 from contentstore.tasks import rerun_course
 from contentstore.utils import (
     add_instructor,
-    initialize_permissions,
     get_lms_link_for_item,
+    initialize_permissions,
     remove_all_instructors,
     reverse_course_url,
     reverse_library_url,
-    reverse_usage_url,
     reverse_url,
+    reverse_usage_url
 )
-from contentstore.views.entrance_exam import (
-    create_entrance_exam,
-    delete_entrance_exam,
-    update_entrance_exam,
-)
+from contentstore.views.entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
-from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
+from course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from edxmako.shortcuts import render_to_response
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
 from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
-from openedx.core.djangoapps.credit.api import is_credit_course, get_credit_requirements
+from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
-from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from student import auth
-from student.auth import has_course_author_access, has_studio_write_access, has_studio_read_access
-from student.roles import (
-    CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff, UserBasedRole
-)
+from student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
+from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole, GlobalStaff, UserBasedRole
 from util.course import get_link_for_about_page
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
@@ -82,23 +73,22 @@ from util.milestones_helpers import (
     is_entrance_exams_enabled,
     is_prerequisite_courses_enabled,
     is_valid_course_key,
-    set_prerequisite_courses,
+    set_prerequisite_courses
 )
-from util.organizations_helpers import (
-    add_organization_course,
-    get_organization_by_short_name,
-    organizations_enabled,
-)
+from util.organizations_helpers import add_organization_course, get_organization_by_short_name, organizations_enabled
 from util.string_utils import _has_non_ascii_characters
 from xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent
-from xmodule.course_module import CourseFields
-from xmodule.course_module import DEFAULT_START_DATE
+from xmodule.course_module import DEFAULT_START_DATE, CourseFields
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
+from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
+
+from .component import ADVANCED_COMPONENT_TYPES
+from .item import create_xblock_info
+from .library import LIBRARIES_ENABLED, get_library_creator_status
 
 log = logging.getLogger(__name__)
 
@@ -111,6 +101,8 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_notifications_handler',
            'textbooks_list_handler', 'textbooks_detail_handler',
            'group_configurations_list_handler', 'group_configurations_detail_handler']
+
+WAFFLE_NAMESPACE = 'studio_home'
 
 
 class AccessListFallback(Exception):
@@ -357,15 +349,22 @@ def get_in_process_course_actions(request):
     return [
         course for course in
         CourseRerunState.objects.find_all(
-            exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED}, should_display=True
+            exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED},
+            should_display=True,
         )
         if has_studio_read_access(request.user, course.course_key)
     ]
 
 
-def _accessible_courses_summary_list(request):
+def _accessible_courses_summary_iter(request, org=None):
     """
     List all courses available to the logged in user by iterating through all the courses
+
+    Arguments:
+        request: the request object
+        org (string): if not None, this value will limit the courses returned. An empty
+            string will result in no courses, and otherwise only courses with the
+            specified org will be returned. The default value is None.
     """
     def course_filter(course_summary):
         """
@@ -377,15 +376,19 @@ def _accessible_courses_summary_list(request):
             return False
 
         return has_studio_read_access(request.user, course_summary.id)
-
-    courses_summary = filter(course_filter, modulestore().get_course_summaries())
+    if org is not None:
+        courses_summary = [] if org == '' else CourseOverview.get_all_courses(orgs=[org])
+    else:
+        courses_summary = modulestore().get_course_summaries()
+    courses_summary = six.moves.filter(course_filter, courses_summary)
     in_process_course_actions = get_in_process_course_actions(request)
     return courses_summary, in_process_course_actions
 
 
-def _accessible_courses_list(request):
+def _accessible_courses_iter(request):
     """
-    List all courses available to the logged in user by iterating through all the courses
+    List all courses available to the logged in user by iterating through all the courses.
+    This method is only used by tests.
     """
     def course_filter(course):
         """
@@ -406,7 +409,7 @@ def _accessible_courses_list(request):
 
         return has_studio_read_access(request.user, course.id)
 
-    courses = filter(course_filter, modulestore().get_courses())
+    courses = six.moves.filter(course_filter, modulestore().get_courses())
 
     in_process_course_actions = get_in_process_course_actions(request)
     return courses, in_process_course_actions
@@ -455,12 +458,12 @@ def _accessible_courses_list_from_groups(request):
     return courses_list.values(), in_process_course_actions
 
 
-def _accessible_libraries_list(user):
+def _accessible_libraries_iter(user):
     """
     List all libraries available to the logged in user by iterating through all libraries
     """
     # No need to worry about ErrorDescriptors - split's get_libraries() never returns them.
-    return [lib for lib in modulestore().get_libraries() if has_studio_read_access(user, lib.location.library_key)]
+    return (lib for lib in modulestore().get_libraries() if has_studio_read_access(user, lib.location.library_key))
 
 
 @login_required
@@ -469,29 +472,38 @@ def course_listing(request):
     """
     List all courses available to the logged in user
     """
-    courses, in_process_course_actions = get_courses_accessible_to_user(request)
+    optimization_enabled = GlobalStaff().has_user(request.user) and \
+        WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
+
+    if optimization_enabled:
+        org = request.GET.get('org', '')
+        show_libraries = LIBRARIES_ENABLED and request.GET.get('libraries', 'false').lower() == 'true'
+    else:
+        org = None
+        show_libraries = LIBRARIES_ENABLED
+    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     user = request.user
-    libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED else []
+    libraries = _accessible_libraries_iter(request.user) if show_libraries else []
 
     def format_in_process_course_view(uca):
         """
         Return a dict of the data which the view requires for each unsucceeded course
         """
         return {
-            'display_name': uca.display_name,
-            'course_key': unicode(uca.course_key),
-            'org': uca.course_key.org,
-            'number': uca.course_key.course,
-            'run': uca.course_key.run,
-            'is_failed': True if uca.state == CourseRerunUIStateManager.State.FAILED else False,
-            'is_in_progress': True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,
-            'dismiss_link': reverse_course_url(
-                'course_notifications_handler',
+            u'display_name': uca.display_name,
+            u'course_key': unicode(uca.course_key),
+            u'org': uca.course_key.org,
+            u'number': uca.course_key.course,
+            u'run': uca.course_key.run,
+            u'is_failed': True if uca.state == CourseRerunUIStateManager.State.FAILED else False,
+            u'is_in_progress': True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,
+            u'dismiss_link': reverse_course_url(
+                u'course_notifications_handler',
                 uca.course_key,
                 kwargs={
-                    'action_state_id': uca.id,
+                    u'action_state_id': uca.id,
                 },
-            ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
+            ) if uca.state == CourseRerunUIStateManager.State.FAILED else u''
         }
 
     def format_library_for_view(library):
@@ -499,29 +511,30 @@ def course_listing(request):
         Return a dict of the data which the view requires for each library
         """
         return {
-            'display_name': library.display_name,
-            'library_key': unicode(library.location.library_key),
-            'url': reverse_library_url('library_handler', unicode(library.location.library_key)),
-            'org': library.display_org_with_default,
-            'number': library.display_number_with_default,
-            'can_edit': has_studio_write_access(request.user, library.location.library_key),
+            u'display_name': library.display_name,
+            u'library_key': unicode(library.location.library_key),
+            u'url': reverse_library_url(u'library_handler', unicode(library.location.library_key)),
+            u'org': library.display_org_with_default,
+            u'number': library.display_number_with_default,
+            u'can_edit': has_studio_write_access(request.user, library.location.library_key),
         }
 
-    courses = _remove_in_process_courses(courses, in_process_course_actions)
+    courses_iter = _remove_in_process_courses(courses_iter, in_process_course_actions)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
 
-    return render_to_response('index.html', {
-        'courses': courses,
-        'in_process_course_actions': in_process_course_actions,
-        'libraries_enabled': LIBRARIES_ENABLED,
-        'libraries': [format_library_for_view(lib) for lib in libraries],
-        'show_new_library_button': get_library_creator_status(user),
-        'user': user,
-        'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
-        'course_creator_status': _get_course_creator_status(user),
-        'rerun_creator_status': GlobalStaff().has_user(user),
-        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
-        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
+    return render_to_response(u'index.html', {
+        u'courses': list(courses_iter),
+        u'in_process_course_actions': in_process_course_actions,
+        u'libraries_enabled': show_libraries,
+        u'libraries': [format_library_for_view(lib) for lib in libraries],
+        u'show_new_library_button': show_libraries and get_library_creator_status(user),
+        u'user': user,
+        u'request_course_creator_url': reverse(u'contentstore.views.request_course_creator'),
+        u'course_creator_status': _get_course_creator_status(user),
+        u'rerun_creator_status': GlobalStaff().has_user(user),
+        u'allow_unicode_course_id': settings.FEATURES.get(u'ALLOW_UNICODE_COURSE_ID', False),
+        u'allow_course_reruns': settings.FEATURES.get(u'ALLOW_COURSE_RERUNS', True),
+        u'optimization_enabled': optimization_enabled
     })
 
 
@@ -616,25 +629,33 @@ def course_index(request, course_key):
         })
 
 
-def get_courses_accessible_to_user(request):
+def get_courses_accessible_to_user(request, org=None):
     """
     Try to get all courses by first reversing django groups and fallback to old method if it fails
     Note: overhead of pymongo reads will increase if getting courses from django groups fails
+
+    Arguments:
+        request: the request object
+        org (string): for global staff users ONLY, this value will be used to limit
+            the courses returned. A value of None will have no effect (all courses
+            returned), an empty string will result in no courses, and otherwise only courses with the
+            specified org will be returned. The default value is None.
+
     """
     if GlobalStaff().has_user(request.user):
         # user has global access so no need to get courses from django groups
-        courses, in_process_course_actions = _accessible_courses_summary_list(request)
+        courses, in_process_course_actions = _accessible_courses_summary_iter(request, org)
     else:
         try:
             courses, in_process_course_actions = _accessible_courses_list_from_groups(request)
         except AccessListFallback:
             # user have some old groups or there was some error getting courses from django groups
             # so fallback to iterating through all courses
-            courses, in_process_course_actions = _accessible_courses_summary_list(request)
+            courses, in_process_course_actions = _accessible_courses_summary_iter(request)
     return courses, in_process_course_actions
 
 
-def _remove_in_process_courses(courses, in_process_course_actions):
+def _remove_in_process_courses(courses_iter, in_process_course_actions):
     """
     removes any in-process courses in courses list. in-process actually refers to courses
     that are in the process of being generated for re-run
@@ -654,13 +675,12 @@ def _remove_in_process_courses(courses, in_process_course_actions):
             'run': course.location.run
         }
 
-    in_process_action_course_keys = [uca.course_key for uca in in_process_course_actions]
-    courses = [
+    in_process_action_course_keys = {uca.course_key for uca in in_process_course_actions}
+    return (
         format_course_for_view(course)
-        for course in courses
+        for course in courses_iter
         if not isinstance(course, ErrorDescriptor) and (course.id not in in_process_action_course_keys)
-    ]
-    return courses
+    )
 
 
 def course_outline_initial_state(locator_to_show, course_structure):
@@ -1014,10 +1034,10 @@ def settings_handler(request, course_key_string):
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
                 # exclude current course from the list of available courses
-                courses = [course for course in courses if course.id != course_key]
+                courses = (course for course in courses if course.id != course_key)
                 if courses:
                     courses = _remove_in_process_courses(courses, in_process_course_actions)
-                settings_context.update({'possible_pre_requisite_courses': courses})
+                settings_context.update({'possible_pre_requisite_courses': list(courses)})
 
             if credit_eligibility_enabled:
                 if is_credit_course(course_key):

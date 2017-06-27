@@ -8,9 +8,6 @@ import logging
 import os
 import re
 import shutil
-from path import Path as path
-
-from six import text_type
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -18,28 +15,26 @@ from django.core.exceptions import PermissionDenied
 from django.core.files import File
 from django.core.servers.basehttp import FileWrapper
 from django.db import transaction
-from django.http import HttpResponse, HttpResponseNotFound, Http404
+from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_http_methods, require_GET
-
-from edxmako.shortcuts import render_to_response
-from xmodule.exceptions import SerializationError
-from xmodule.modulestore.django import modulestore
+from django.views.decorators.http import require_GET, require_http_methods
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
+from path import Path as path
+from six import text_type
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
-from student.auth import has_course_author_access
-
-from util.json_request import JsonResponse
-from util.views import ensure_valid_course_key
 from contentstore.storage import course_import_export_storage
 from contentstore.tasks import CourseExportTask, CourseImportTask, create_export_tarball, export_olx, import_olx
-
 from contentstore.utils import reverse_course_url, reverse_library_url
-
+from edxmako.shortcuts import render_to_response
+from student.auth import has_course_author_access
+from util.json_request import JsonResponse
+from util.views import ensure_valid_course_key
+from xmodule.exceptions import SerializationError
+from xmodule.modulestore.django import modulestore
 
 __all__ = [
     'import_handler', 'import_status_handler',

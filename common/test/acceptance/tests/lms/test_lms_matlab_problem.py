@@ -2,14 +2,14 @@
 """
 Test for matlab problems
 """
-from textwrap import dedent
 import time
+from textwrap import dedent
 
 from flaky import flaky
 
-from common.test.acceptance.pages.lms.matlab_problem import MatlabProblemPage
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.fixtures.xqueue import XQueueResponseFixture
+from common.test.acceptance.pages.lms.matlab_problem import MatlabProblemPage
 from common.test.acceptance.tests.lms.test_lms_problems import ProblemsTest
 
 

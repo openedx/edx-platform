@@ -1,10 +1,10 @@
 """Unit tests for the Paver server tasks."""
 
 import os
-import paver.easy
-from paver import tasks
 from unittest import TestCase
 
+import paver.easy
+from paver import tasks
 from paver.easy import BuildFailure
 
 

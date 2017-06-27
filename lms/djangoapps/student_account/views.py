@@ -1,52 +1,43 @@
 """ Views for a student's account information. """
 
-import logging
 import json
+import logging
 import urlparse
 from datetime import datetime
 
+import pytz
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse, resolve
-from django.http import (
-    HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpRequest
-)
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import resolve, reverse
+from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
-from edxmako.shortcuts import render_to_response, render_to_string
-import pytz
 
+import third_party_auth
 from commerce.models import CommerceConfiguration
+from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.commerce.utils import EcommerceService
-from openedx.core.djangoapps.external_auth.login_and_register import (
-    login as external_auth_login,
-    register as external_auth_register
-)
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
-from openedx.core.djangoapps.lang_pref.api import released_languages, all_languages
+from openedx.core.djangoapps.external_auth.login_and_register import login as external_auth_login
+from openedx.core.djangoapps.external_auth.login_and_register import register as external_auth_register
+from openedx.core.djangoapps.lang_pref.api import all_languages, released_languages
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
-from openedx.features.enterprise_support.api import (
-    enterprise_customer_for_request,
-    set_enterprise_branding_filter_param
-)
-from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.core.lib.edx_api_utils import get_edx_api_data
+from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
+from openedx.features.enterprise_support.api import enterprise_customer_for_request
+from student.helpers import destroy_oauth_tokens, get_next_url_for_login_page
 from student.models import UserProfile
-from student.views import (
-    signin_user as old_login_view,
-    register_user as old_register_view
-)
-from student.helpers import get_next_url_for_login_page, destroy_oauth_tokens
-import third_party_auth
+from student.views import register_user as old_register_view
+from student.views import signin_user as old_login_view
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.bad_request_rate_limiter import BadRequestRateLimiter
@@ -99,8 +90,6 @@ def login_and_registration_form(request, initial_mode="login"):
         except (KeyError, ValueError, IndexError):
             pass
 
-    set_enterprise_branding_filter_param(request=request, provider_id=third_party_auth_hint)
-
     # If this is a themed site, revert to the old login/registration pages.
     # We need to do this for now to support existing themes.
     # Themed sites can use the new logistration page by setting
@@ -133,6 +122,9 @@ def login_and_registration_form(request, initial_mode="login"):
             'third_party_auth_hint': third_party_auth_hint or '',
             'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             'support_link': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
+            'password_reset_support_link': configuration_helpers.get_value(
+                'PASSWORD_RESET_SUPPORT_LINK', settings.PASSWORD_RESET_SUPPORT_LINK
+            ) or settings.SUPPORT_SITE_LINK,
             'account_activation_messages': account_activation_messages,
 
             # Include form descriptions retrieved from the user API.
@@ -149,6 +141,7 @@ def login_and_registration_form(request, initial_mode="login"):
         'responsive': True,
         'allow_iframing': True,
         'disable_courseware_js': True,
+        'combined_login_and_register': True,
         'disable_footer': not configuration_helpers.get_value(
             'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER',
             settings.FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER']
@@ -227,6 +220,7 @@ def update_context_for_enterprise(request, context):
         )
         context.update(sidebar_context)
         context['enable_enterprise_sidebar'] = True
+        context['data']['hide_auth_warnings'] = True
     else:
         context['enable_enterprise_sidebar'] = False
 
@@ -560,6 +554,9 @@ def account_settings_context(request):
             }
         },
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'password_reset_support_link': configuration_helpers.get_value(
+            'PASSWORD_RESET_SUPPORT_LINK', settings.PASSWORD_RESET_SUPPORT_LINK
+        ) or settings.SUPPORT_SITE_LINK,
         'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
         'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
         'disable_courseware_js': True,

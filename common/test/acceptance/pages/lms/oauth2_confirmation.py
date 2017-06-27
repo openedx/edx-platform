@@ -1,7 +1,7 @@
 """Pages relevant for OAuth2 confirmation."""
-from common.test.acceptance.pages.lms import BASE_URL
-
 from bok_choy.page_object import PageObject
+
+from common.test.acceptance.pages.lms import BASE_URL
 
 
 class OAuth2Confirmation(PageObject):

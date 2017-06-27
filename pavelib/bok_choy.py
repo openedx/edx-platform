@@ -2,21 +2,23 @@
 Run acceptance tests that use the bok-choy framework
 http://bok-choy.readthedocs.org/en/latest/
 """
-from paver.easy import task, needs, cmdopts, sh
-from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite, Pa11yCrawler
+import os
+from optparse import make_option
+
+from paver.easy import cmdopts, needs, sh, task
+
+from pavelib.utils.envs import Env
+from pavelib.utils.passthrough_opts import PassthroughTask
 from pavelib.utils.test.bokchoy_options import (
     BOKCHOY_OPTS,
-    PA11Y_HTML,
     PA11Y_COURSE_KEY,
     PA11Y_FETCH_COURSE,
+    PA11Y_HTML,
     PA11Y_SINGLE_URL
 )
-from pavelib.utils.envs import Env
+from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite, Pa11yCrawler
 from pavelib.utils.test.utils import check_firefox_version
-from pavelib.utils.passthrough_opts import PassthroughTask
 from pavelib.utils.timer import timed
-from optparse import make_option
-import os
 
 try:
     from pygments.console import colorize

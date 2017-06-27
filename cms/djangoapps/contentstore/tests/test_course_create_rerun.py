@@ -1,26 +1,23 @@
 """
 Test view handler for rerun (and eventually create)
 """
-import ddt
-from mock import patch
+from datetime import datetime
 
-from django.test.client import RequestFactory
+import ddt
 from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
+from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
-from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
-from datetime import datetime
+from util.organizations_helpers import add_organization, get_course_organizations
 from xmodule.course_module import CourseFields
-from util.organizations_helpers import (
-    add_organization,
-    get_course_organizations,
-)
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt

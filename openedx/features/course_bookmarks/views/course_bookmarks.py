@@ -11,13 +11,13 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
+from opaque_keys.edx.keys import CourseKey
+from web_fragments.fragment import Fragment
 
 from courseware.courses import get_course_with_access
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
 from util.views import ensure_valid_course_key
-from web_fragments.fragment import Fragment
 
 
 class CourseBookmarksView(View):

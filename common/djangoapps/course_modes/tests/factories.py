@@ -3,10 +3,11 @@ Factories for course mode models.
 """
 import random
 
-from course_modes.models import CourseMode
-from factory.django import DjangoModelFactory
 from factory import lazy_attribute
+from factory.django import DjangoModelFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from course_modes.models import CourseMode
 
 
 # Factories are self documenting

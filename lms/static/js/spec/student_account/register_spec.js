@@ -6,7 +6,8 @@
         'common/js/spec_helpers/template_helpers',
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/student_account/models/RegisterModel',
-        'js/student_account/views/RegisterView'
+        'js/student_account/views/RegisterView',
+        'js/student_account/tos_modal'
     ],
         function($, _, TemplateHelpers, AjaxHelpers, RegisterModel, RegisterView) {
             describe('edx.student.account.RegisterView', function() {
@@ -178,7 +179,9 @@
                                 type: 'checkbox',
                                 required: true,
                                 instructions: '',
-                                restrictions: {}
+                                restrictions: {},
+                                supplementalLink: '/honor',
+                                supplementalText: 'Review the Terms of Service and Honor Code'
                             }
                         ]
                     };
@@ -365,6 +368,50 @@
 
                 // Form button should be disabled on success.
                     expect(view.$submitButton).toHaveAttr('disabled');
+                });
+
+                it('displays a modal with the terms of service', function() {
+                    var $modal,
+                        $content;
+
+                    createRegisterView(this);
+
+                // Check there is no modal container initially
+                    expect($('.tos-modal').length).toEqual(0);
+
+                // And no modal is being displayed
+                    expect($('body').hasClass('open-modal')).toBe(false);
+
+                // Click TOS button
+                    $('.checkbox-honor_code .supplemental-link a').click();
+
+                // TOS modal container has been added and is visible
+                    $modal = $('.tos-modal');
+                    expect($modal.length).toEqual(1);
+                    expect($modal).toBeVisible();
+                    expect($('body').hasClass('open-modal')).toBe(true);
+
+                // The modal has a content area, a Close button and a title matching the TOS link
+                    $content = $modal.find('.modal-content');
+                    expect($content.length).toEqual(1);
+                    expect($content.find('.modal-close-button').text()).toEqual('Close');
+                    expect($content.find('#modal-header-text').text()).toEqual(
+                        'Terms of Service and Honor Code'
+                    );
+
+                // The content area has an iframe displaying the TOS link
+                    expect($content.find('iframe').length).toEqual(1);
+                    expect($content.find('iframe').attr('src').endsWith('/honor')).toBe(true);
+
+                // Click the close button
+                    $('.modal-close-button').click();
+
+                // The modal is now hidden
+                    expect($modal).toBeHidden();
+                    expect($('body').hasClass('open-modal')).toBe(false);
+
+                // The iframe has been deleted
+                    expect($content.find('iframe').length).toEqual(0);
                 });
             });
         });

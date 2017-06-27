@@ -1,11 +1,13 @@
 """
 Acceptance test tasks
 """
-from paver.easy import cmdopts, needs
-from pavelib.utils.test.suites import AcceptanceTestSuite
-from pavelib.utils.passthrough_opts import PassthroughTask
-from pavelib.utils.timer import timed
 from optparse import make_option
+
+from paver.easy import cmdopts, needs
+
+from pavelib.utils.passthrough_opts import PassthroughTask
+from pavelib.utils.test.suites import AcceptanceTestSuite
+from pavelib.utils.timer import timed
 
 try:
     from pygments.console import colorize

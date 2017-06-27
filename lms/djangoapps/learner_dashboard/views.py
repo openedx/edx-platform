@@ -5,14 +5,14 @@ from django.http import Http404
 from django.views.decorators.http import require_GET
 
 from edxmako.shortcuts import render_to_response
-from lms.djangoapps.learner_dashboard.utils import strip_course_id, FAKE_COURSE_KEY
+from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import (
-    get_program_marketing_url,
-    ProgramProgressMeter,
     ProgramDataExtender,
+    ProgramProgressMeter,
     get_certificates,
+    get_program_marketing_url
 )
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 

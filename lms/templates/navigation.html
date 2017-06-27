@@ -13,7 +13,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from branding import api as branding_api
 # app that handles site status messages
 from status.status import get_site_status_msg
-from openedx.features.enterprise_support.api import get_enterprise_customer_logo_url
+from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
 %>
 
 ## Provide a hook for themes to inject branding on top.
@@ -52,14 +52,7 @@ site_status_msg = get_site_status_msg(course_id)
         <div class="logo">
           <a href="${marketing_link('ROOT')}">
             <%block name="navigation_logo">
-            <%
-            logo_url = get_enterprise_customer_logo_url(request)
-            logo_size = 'ec-logo-size'
-            if logo_url is None:
-                logo_url = branding_api.get_logo_url(is_secure)
-                logo_size = ''
-            %>
-                <img class="${logo_size}" src="${logo_url}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
+            <img src="${branding_api.get_logo_url(is_secure)}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
             </%block>
           </a>
         </div>
@@ -143,7 +136,7 @@ site_status_msg = get_site_status_msg(course_id)
         </%block>
 
         <%block name="navigation_other_global_links">
-          % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+          % if not settings.FEATURES['DISABLE_LOGIN_BUTTON'] and not combined_login_and_register:
             % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
               <li class="item nav-global-05">
                 <a class="btn" href="/courses">${_("Explore Courses")}</a>
@@ -165,7 +158,7 @@ site_status_msg = get_site_status_msg(course_id)
       <ol class="right nav-courseware list-inline">
         <%block name="navigation_sign_in">
           <li class="item nav-courseware-01">
-            % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+            % if not settings.FEATURES['DISABLE_LOGIN_BUTTON'] and not combined_login_and_register:
               % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
                 <a class="btn btn-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
               % else:
@@ -176,8 +169,8 @@ site_status_msg = get_site_status_msg(course_id)
         </%block>
       </ol>
     % endif
-    % if static.show_language_selector():
-     <% languages = static.get_released_languages() %>
+    % if header_language_selector_is_enabled():
+     <% languages = released_languages() %>
       % if len(languages) > 1:
       <ol class="user">
         <li class="primary">

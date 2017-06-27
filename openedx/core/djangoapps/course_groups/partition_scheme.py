@@ -25,7 +25,7 @@ class CohortPartitionScheme(object):
 
     # pylint: disable=unused-argument
     @classmethod
-    def get_group_for_user(cls, course_key, user, user_partition, track_function=None, use_cached=True):
+    def get_group_for_user(cls, course_key, user, user_partition, use_cached=True):
         """
         Returns the Group from the specified user partition to which the user
         is assigned, via their cohort membership and any mappings from cohorts

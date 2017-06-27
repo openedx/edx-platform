@@ -19,14 +19,14 @@ Methods for creating RequestContext for using with Mako templates.
 """
 
 
+from crum import get_current_request
 from django.conf import settings
 from django.template import RequestContext
 from django.template.context import _builtin_context_processors
 from django.utils.module_loading import import_string
-from util.request import safe_get_host
-from crum import get_current_request
 
 import request_cache
+from util.request import safe_get_host
 
 
 def get_template_context_processors():

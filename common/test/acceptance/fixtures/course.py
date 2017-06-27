@@ -2,19 +2,17 @@
 Fixture to create a course and course components (XBlocks).
 """
 
-import mimetypes
-import json
-
 import datetime
-
-from textwrap import dedent
+import json
+import mimetypes
 from collections import namedtuple
-from path import Path as path
+from textwrap import dedent
 
 from opaque_keys.edx.keys import CourseKey
+from path import Path
 
 from common.test.acceptance.fixtures import STUDIO_BASE_URL
-from common.test.acceptance.fixtures.base import XBlockContainerFixture, FixtureError
+from common.test.acceptance.fixtures.base import FixtureError, XBlockContainerFixture
 
 
 class XBlockFixtureDesc(object):
@@ -392,7 +390,7 @@ class CourseFixture(XBlockContainerFixture):
         """
         url = STUDIO_BASE_URL + self._assets_url
 
-        test_dir = path(__file__).abspath().dirname().dirname().dirname()
+        test_dir = Path(__file__).abspath().dirname().dirname().dirname()
 
         for asset_name in self._assets:
             asset_file_path = test_dir + '/data/uploads/' + asset_name

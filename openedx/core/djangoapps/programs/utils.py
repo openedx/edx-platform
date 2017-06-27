@@ -1,33 +1,39 @@
 # -*- coding: utf-8 -*-
 """Helper functions for working with Programs."""
+import datetime
+import logging
 from collections import defaultdict
 from copy import deepcopy
-import datetime
+from itertools import chain
 from urlparse import urljoin
 
 from dateutil.parser import parse
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.utils.functional import cached_property
+from edx_rest_api_client.exceptions import SlumberBaseException
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
-from itertools import chain
+from requests.exceptions import ConnectionError, Timeout
 
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.catalog.utils import get_programs
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 
-
 # The datetime module's strftime() methods require a year >= 1900.
 DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
+
+log = logging.getLogger(__name__)
 
 
 def get_program_marketing_url(programs_config):
@@ -267,7 +273,12 @@ class ProgramProgressMeter(object):
                 # count towards completion of a course in a program). This may change
                 # in the future to make use of the more rigid set of "applicable seat
                 # types" associated with each program type in the catalog.
-                'type': course_run['type'],
+
+                # Runs of type 'credit' are counted as 'verified' since verified
+                # certificates are earned when credit runs are completed. LEARNER-1274
+                # tracks a cleaner way to do this using the discovery service's
+                # applicable_seat_types field.
+                'type': 'verified' if course_run['type'] == 'credit' else course_run['type'],
             }
 
         return any(reshape(course_run) in self.completed_course_runs for course_run in course['course_runs'])
@@ -428,7 +439,7 @@ class ProgramDataExtender(object):
             ecommerce = EcommerceService()
             sku = getattr(required_mode, 'sku', None)
             if ecommerce.is_enabled(self.user) and sku:
-                run_mode['upgrade_url'] = ecommerce.checkout_page_url(required_mode.sku)
+                run_mode['upgrade_url'] = ecommerce.get_checkout_page_url(required_mode.sku)
             else:
                 run_mode['upgrade_url'] = None
         else:
@@ -464,18 +475,13 @@ def get_certificates(user, extended_program):
                 # We only want one certificate per course to be returned.
                 break
 
-    # A user can only have earned a program certificate if they've earned certificates
-    # in associated course runs. If they haven't earned any course run certificates,
-    # they can't have earned a program certificate, and we can save a network call
-    # to the credentials service.
-    if certificates:
-        program_credentials = get_credentials(user, program_uuid=extended_program['uuid'])
-        if program_credentials:
-            certificates.append({
-                'type': 'program',
-                'title': extended_program['title'],
-                'url': program_credentials[0]['certificate_url'],
-            })
+    program_credentials = get_credentials(user, program_uuid=extended_program['uuid'])
+    if program_credentials:
+        certificates.append({
+            'type': 'program',
+            'title': extended_program['title'],
+            'url': program_credentials[0]['certificate_url'],
+        })
 
     return certificates
 
@@ -498,9 +504,9 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         self.instructors = {}
 
         # Values for programs' price calculation.
-        self.data['avg_price_per_course'] = 0
+        self.data['avg_price_per_course'] = 0.0
         self.data['number_of_courses'] = 0
-        self.data['full_program_price'] = 0
+        self.data['full_program_price'] = 0.0
 
     def _extend_program(self):
         """Aggregates data from the program data structure."""
@@ -508,27 +514,25 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             uuid=self.data['uuid']
         )
         program_instructors = cache.get(cache_key)
-        is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
 
         for course in self.data['courses']:
             self._execute('_collect_course', course)
             if not program_instructors:
                 for course_run in course['course_runs']:
                     self._execute('_collect_instructors', course_run)
-            if is_learner_eligible_for_one_click_purchase:
-                is_learner_eligible_for_one_click_purchase = not any(
-                    course_run['is_enrolled'] for course_run in course['course_runs']
-                )
 
         if not program_instructors:
             # We cache the program instructors list to avoid repeated modulestore queries
             program_instructors = self.instructors.values()
             cache.set(cache_key, program_instructors, 3600)
 
-        self.data.update({
-            'instructors': program_instructors,
-            'is_learner_eligible_for_one_click_purchase': is_learner_eligible_for_one_click_purchase,
-        })
+        self.data['instructors'] = program_instructors
+
+    def extend(self):
+        """Execute extension handlers, returning the extended data."""
+        self.data.update(super(ProgramMarketingDataExtender, self).extend())
+        self._collect_one_click_purchase_eligibility_data()
+        return self.data
 
     @classmethod
     def _handlers(cls, prefix):
@@ -583,3 +587,58 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             self.instructors.update(
                 {instructor.get('name'): instructor for instructor in course_instructors.get('instructors', [])}
             )
+
+    def _collect_one_click_purchase_eligibility_data(self):
+        """
+        Extend the program data with data about learner's eligibility for one click purchase,
+        discount data of the program and SKUs of seats that should be added to basket.
+        """
+        applicable_seat_types = self.data['applicable_seat_types']
+        is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
+        skus = []
+        if is_learner_eligible_for_one_click_purchase:
+            for course in self.data['courses']:
+                is_learner_eligible_for_one_click_purchase = not any(
+                    course_run['is_enrolled'] for course_run in course['course_runs']
+                )
+                if is_learner_eligible_for_one_click_purchase:
+                    published_course_runs = filter(lambda run: run['status'] == 'published', course['course_runs'])
+                    if len(published_course_runs) == 1:
+                        for seat in published_course_runs[0]['seats']:
+                            if seat['type'] in applicable_seat_types and seat['sku']:
+                                skus.append(seat['sku'])
+                    else:
+                        # If a course in the program has more than 1 published course run
+                        # learner won't be eligible for a one click purchase.
+                        is_learner_eligible_for_one_click_purchase = False
+                        skus = []
+                        break
+                else:
+                    skus = []
+                    break
+
+        if skus:
+            try:
+                User = get_user_model()
+                service_user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
+                api = ecommerce_api_client(service_user)
+
+                # Make an API call to calculate the discounted price
+                discount_data = api.baskets.calculate.get(sku=skus)
+
+                program_discounted_price = discount_data['total_incl_tax']
+                program_full_price = discount_data['total_incl_tax_excl_discounts']
+                discount_data['is_discounted'] = program_discounted_price < program_full_price
+                discount_data['discount_value'] = program_full_price - program_discounted_price
+
+                self.data.update({
+                    'discount_data': discount_data,
+                    'full_program_price': discount_data['total_incl_tax']
+                })
+            except (ConnectionError, SlumberBaseException, Timeout):
+                log.exception('Failed to get discount price for following product SKUs: %s ', ', '.join(skus))
+
+        self.data.update({
+            'is_learner_eligible_for_one_click_purchase': is_learner_eligible_for_one_click_purchase,
+            'skus': skus,
+        })

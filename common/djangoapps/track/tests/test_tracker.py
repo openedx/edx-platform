@@ -5,7 +5,6 @@ from django.test.utils import override_settings
 import track.tracker as tracker
 from track.backends import BaseBackend
 
-
 SIMPLE_SETTINGS = {
     'default': {
         'ENGINE': 'track.tests.test_tracker.DummyBackend',

@@ -8,14 +8,14 @@ If student have answered - words he entered and cloud.
 
 import json
 import logging
+
 from pkg_resources import resource_string
-
-from xmodule.raw_module import EmptyDataRawDescriptor
-from xmodule.editing_module import MetadataOnlyEditingDescriptor
-from xmodule.x_module import XModule
-
-from xblock.fields import Scope, Dict, Boolean, List, Integer, String
+from xblock.fields import Boolean, Dict, Integer, List, Scope, String
 from xblock.fragment import Fragment
+
+from xmodule.editing_module import MetadataOnlyEditingDescriptor
+from xmodule.raw_module import EmptyDataRawDescriptor
+from xmodule.x_module import XModule
 
 log = logging.getLogger(__name__)
 

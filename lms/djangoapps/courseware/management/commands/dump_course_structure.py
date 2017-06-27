@@ -21,14 +21,13 @@ from optparse import make_option
 from textwrap import dedent
 
 from django.core.management.base import BaseCommand, CommandError
-
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.inheritance import own_metadata, compute_inherited_metadata
-
-from xblock_discussion import DiscussionXBlock
-from xblock.fields import Scope
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from xblock.fields import Scope
+
+from xblock_discussion import DiscussionXBlock
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.inheritance import compute_inherited_metadata, own_metadata
 
 FILTER_LIST = ['xml_attributes']
 INHERITED_FILTER_LIST = ['children', 'xml_attributes']

@@ -828,6 +828,42 @@ class CapaModuleTest(unittest.TestCase):
             # Expect that the number of attempts is NOT incremented
             self.assertEqual(module.attempts, 1)
 
+    def test_submit_problem_error_with_codejail_exception(self):
+
+        # Try each exception that capa_module should handle
+        exception_classes = [StudentInputError,
+                             LoncapaProblemError,
+                             ResponseError]
+        for exception_class in exception_classes:
+
+            # Create the module
+            module = CapaFactory.create(attempts=1)
+
+            # Ensure that the user is NOT staff
+            module.system.user_is_staff = False
+
+            # Simulate a codejail exception 'Exception: test error'
+            with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+                try:
+                    raise ResponseError(
+                        'Couldn\'t execute jailed code: stdout: \'\', '
+                        'stderr: \'Traceback (most recent call last):\\n'
+                        '  File "jailed_code", line 15, in <module>\\n'
+                        '    exec code in g_dict\\n  File "<string>", line 67, in <module>\\n'
+                        '  File "<string>", line 65, in check_func\\n'
+                        'Exception: test error\\n\' with status code: 1',)
+                except ResponseError as err:
+                    mock_grade.side_effect = exception_class(err.message)
+                get_request_dict = {CapaFactory.input_key(): '3.14'}
+                result = module.submit_problem(get_request_dict)
+
+            # Expect an AJAX alert message in 'success' without the text of the stack trace
+            expected_msg = 'test error'
+            self.assertEqual(expected_msg, result['success'])
+
+            # Expect that the number of attempts is NOT incremented
+            self.assertEqual(module.attempts, 1)
+
     def test_submit_problem_other_errors(self):
         """
         Test that errors other than the expected kinds give an appropriate message.

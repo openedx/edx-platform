@@ -5,19 +5,16 @@ from urllib import urlencode
 
 from django.core.urlresolvers import reverse
 
-from xmodule.modulestore.search import path_to_location, navigation_index
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.search import navigation_index, path_to_location
 
 
-# TODO: TNL-6547: Remove unified_course_view parameter
-def get_redirect_url(course_key, usage_key, unified_course_view=False):
+def get_redirect_url(course_key, usage_key):
     """ Returns the redirect url back to courseware
 
     Args:
         course_id(str): Course Id string
         location(str): The location id of course component
-        unified_course_view (bool): temporary parameter while this feature is behind a waffle flag.
-            Is the unified_course_view waffle flag on?
 
     Raises:
         ItemNotFoundError if no data at the location or NoPathToItem if location not in any class
@@ -25,8 +22,6 @@ def get_redirect_url(course_key, usage_key, unified_course_view=False):
     Returns:
         Redirect url string
     """
-    if usage_key.block_type == 'course' and unified_course_view:
-        return reverse('openedx.course_experience.course_home', args=[unicode(course_key)])
 
     (
         course_key, chapter, section, vertical_unused,

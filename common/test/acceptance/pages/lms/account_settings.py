@@ -1,11 +1,10 @@
 """
 Base class for account settings page.
 """
-from common.test.acceptance.pages.lms import BASE_URL
-
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
 
+from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.fields import FieldsMixin
 
 

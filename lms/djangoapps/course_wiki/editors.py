@@ -1,11 +1,9 @@
 from django import forms
 from django.forms.utils import flatatt
+from django.template.loader import render_to_string
 from django.utils.encoding import force_unicode
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
-
-from django.template.loader import render_to_string
-
 from wiki.editors.base import BaseEditor
 from wiki.editors.markitup import MarkItUpAdminWidget
 

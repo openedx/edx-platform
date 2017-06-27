@@ -41,10 +41,10 @@ define(
                     thread_pages: [],
                     contentInfo: null,
                     courseSettings: {
-                        is_cohorted: false,
+                        is_discussion_division_enabled: false,
                         allow_anonymous: false,
                         allow_anonymous_to_peers: false,
-                        cohorts: [],
+                        groups: [],
                         category_map: {}
                     }
                 });

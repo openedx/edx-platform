@@ -2,11 +2,11 @@
 </div>
 
 <div class="toggle-form">
-    <span class="text"><%- gettext("Already have an account?") %></span>
+    <span class="text"><%- edx.StringUtils.interpolate(gettext('Already have an {platformName} account?'), {platformName: context.platformName }) %></span>
     <a href="#login" class="form-toggle" data-type="login"><%- gettext("Sign in.") %></a>
 </div>
 
-<h2><%- gettext("Create an Account") %></h2>
+<h2><%- gettext('Create an Account')%></h2>
 
 <form id="register" class="register-form" autocomplete="off" tabindex="-1" method="POST">
 

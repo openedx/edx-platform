@@ -1,19 +1,19 @@
 """
 Tests for ProctoredExamTransformer.
 """
-from mock import patch, Mock
+import ddt
+from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import Mock, patch
 from nose.plugins.attrib import attr
 
-import ddt
 from gating import api as lms_gating_api
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
-from milestones.tests.utils import MilestonesTestCaseMixin
-from openedx.core.lib.gating import api as gating_api
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
+from openedx.core.lib.gating import api as gating_api
 from student.tests.factories import CourseEnrollmentFactory
 
-from ..milestones import MilestonesAndSpecialExamsTransformer
 from ...api import get_course_blocks
+from ..milestones import MilestonesAndSpecialExamsTransformer
 
 
 @attr(shard=3)

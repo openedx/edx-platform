@@ -13,11 +13,11 @@ from unittest import skipUnless
 
 import crum
 from django import db
+from django.conf import settings
+from django.contrib import sites
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import caches
 from django.test import RequestFactory, TestCase, override_settings
-from django.conf import settings
-from django.contrib import sites
 from nose.plugins import Plugin
 
 from request_cache.middleware import RequestCache

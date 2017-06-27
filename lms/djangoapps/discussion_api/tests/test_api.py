@@ -1,23 +1,20 @@
 """
 Tests for Discussion API internal interface
 """
-from datetime import datetime, timedelta
 import itertools
-from urlparse import parse_qs, urlparse, urlunparse
+from datetime import datetime, timedelta
 from urllib import urlencode
+from urlparse import parse_qs, urlparse, urlunparse
 
 import ddt
 import httpretty
 import mock
-from nose.plugins.attrib import attr
-from pytz import UTC
-
 from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
-
-from rest_framework.exceptions import PermissionDenied
-
+from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
+from pytz import UTC
+from rest_framework.exceptions import PermissionDenied
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from courseware.tests.factories import BetaTesterFactory, StaffFactory
@@ -30,31 +27,32 @@ from discussion_api.api import (
     get_comment_list,
     get_course,
     get_course_topics,
+    get_thread,
     get_thread_list,
     update_comment,
-    update_thread,
-    get_thread,
+    update_thread
 )
-from discussion_api.exceptions import DiscussionDisabledError, ThreadNotFoundError, CommentNotFoundError
+from discussion_api.exceptions import CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError
 from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_comment,
     make_minimal_cs_thread,
-    make_paginated_api_response,
+    make_paginated_api_response
 )
+from django_comment_client.tests.utils import ForumsEnableMixin
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_STUDENT,
-    Role,
+    Role
 )
-from django_comment_client.tests.utils import ForumsEnableMixin
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -591,6 +589,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         self.request.user = self.user
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
         self.author = UserFactory.create()
+        self.course.cohort_config = {"cohorted": False}
+        modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
         self.cohort = CohortFactory.create(course_id=self.course.id)
 
     def get_thread_list(
@@ -662,6 +662,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         })
 
     def test_thread_content(self):
+        self.course.cohort_config = {"cohorted": True}
+        modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
         source_threads = [
             make_minimal_cs_thread({
                 "id": "test_thread_id_0",
@@ -1425,6 +1427,45 @@ class CreateThreadTest(
         SharedModuleStoreTestCase,
         MockSignalHandlerMixin
 ):
+    LONG_TITLE = (
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. '
+        'Aenean commodo ligula eget dolor. Aenean massa. Cum sociis '
+        'natoque penatibus et magnis dis parturient montes, nascetur '
+        'ridiculus mus. Donec quam felis, ultricies nec, '
+        'pellentesque eu, pretium quis, sem. Nulla consequat massa '
+        'quis enim. Donec pede justo, fringilla vel, aliquet nec, '
+        'vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet '
+        'a, venenatis vitae, justo. Nullam dictum felis eu pede '
+        'mollis pretium. Integer tincidunt. Cras dapibus. Vivamus '
+        'elementum semper nisi. Aenean vulputate eleifend tellus. '
+        'Aenean leo ligula, porttitor eu, consequat vitae, eleifend '
+        'ac, enim. Aliquam lorem ante, dapibus in, viverra quis, '
+        'feugiat a, tellus. Phasellus viverra nulla ut metus varius '
+        'laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies '
+        'nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam '
+        'eget dui. Etiam rhoncus. Maecenas tempus, tellus eget '
+        'condimentum rhoncus, sem quam semper libero, sit amet '
+        'adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, '
+        'luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et '
+        'ante tincidunt tempus. Donec vitae sapien ut libero '
+        'venenatis faucibus. Nullam quis ante. Etiam sit amet orci '
+        'eget eros faucibus tincidunt. Duis leo. Sed fringilla '
+        'mauris sit amet nibh. Donec sodales sagittis magna. Sed '
+        'consequat, leo eget bibendum sodales, augue velit cursus '
+        'nunc, quis gravida magna mi a libero. Fusce vulputate '
+        'eleifend sapien. Vestibulum purus quam, scelerisque ut, '
+        'mollis sed, nonummy id, metus. Nullam accumsan lorem in '
+        'dui. Cras ultricies mi eu turpis hendrerit fringilla. '
+        'Vestibulum ante ipsum primis in faucibus orci luctus et '
+        'ultrices posuere cubilia Curae; In ac dui quis mi '
+        'consectetuer lacinia. Nam pretium turpis et arcu. Duis arcu '
+        'tortor, suscipit eget, imperdiet nec, imperdiet iaculis, '
+        'ipsum. Sed aliquam ultrices mauris. Integer ante arcu, '
+        'accumsan a, consectetuer eget, posuere ut, mauris. Praesent '
+        'adipiscing. Phasellus ullamcorper ipsum rutrum nunc. Nunc '
+        'nonummy metus.'
+    )
+
     """Tests for create_thread"""
     @classmethod
     def setUpClass(cls):
@@ -1487,6 +1528,42 @@ class CreateThreadTest(
                 "group_id": None,
                 "thread_type": "discussion",
                 "title": "Test Title",
+                "title_truncated": False,
+                "anonymous": False,
+                "anonymous_to_peers": False,
+                "options": {"followed": False},
+                "id": "test_id",
+                "truncated": False,
+                "body": "Test body",
+                "url": "",
+                "user_forums_roles": [FORUM_ROLE_STUDENT],
+                "user_course_roles": [],
+            }
+        )
+
+    @mock.patch("eventtracking.tracker.emit")
+    def test_title_truncation(self, mock_emit):
+        data = self.minimal_data.copy()
+        data['title'] = self.LONG_TITLE
+
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_id",
+            "username": self.user.username,
+            "read": True,
+        })
+        self.register_post_thread_response(cs_thread)
+        with self.assert_signal_sent(api, 'thread_created', sender=None, user=self.user, exclude_args=('post',)):
+            actual = create_thread(self.request, data)
+        event_name, event_data = mock_emit.call_args[0]
+        self.assertEqual(event_name, "edx.forum.thread.created")
+        self.assertEqual(
+            event_data,
+            {
+                "commentable_id": "test_topic",
+                "group_id": None,
+                "thread_type": "discussion",
+                "title": self.LONG_TITLE[:1000],
+                "title_truncated": True,
                 "anonymous": False,
                 "anonymous_to_peers": False,
                 "options": {"followed": False},

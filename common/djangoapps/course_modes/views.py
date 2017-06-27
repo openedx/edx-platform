@@ -12,23 +12,24 @@ from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
-from django.utils.translation import get_language, to_locale, ugettext as _
+from django.utils.translation import ugettext as _
+from django.utils.translation import get_language, to_locale
 from django.views.generic.base import View
 from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.django import modulestore
 
-from lms.djangoapps.commerce.utils import EcommerceService
 from course_modes.models import CourseMode
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.features.enterprise_support import api as enterprise_api
 from student.models import CourseEnrollment
-from util.db import outer_atomic
-from util import organizations_helpers as organization_api
 from third_party_auth.decorators import tpa_hint_ends_existing_session
+from util import organizations_helpers as organization_api
+from util.db import outer_atomic
+from xmodule.modulestore.django import modulestore
 
 
 class ChooseModeView(View):
@@ -98,9 +99,9 @@ class ChooseModeView(View):
             if ecommerce_service.is_enabled(request.user):
                 professional_mode = modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE) or modes.get(CourseMode.PROFESSIONAL)
                 if purchase_workflow == "single" and professional_mode.sku:
-                    redirect_url = ecommerce_service.checkout_page_url(professional_mode.sku)
+                    redirect_url = ecommerce_service.get_checkout_page_url(professional_mode.sku)
                 if purchase_workflow == "bulk" and professional_mode.bulk_sku:
-                    redirect_url = ecommerce_service.checkout_page_url(professional_mode.bulk_sku)
+                    redirect_url = ecommerce_service.get_checkout_page_url(professional_mode.bulk_sku)
             return redirect(redirect_url)
 
         # If there isn't a verified mode available, then there's nothing
@@ -156,16 +157,17 @@ class ChooseModeView(View):
         )
         enterprise_learner_data = enterprise_api.get_enterprise_learner_data(site=request.site, user=request.user)
         if enterprise_learner_data:
+            enterprise_learner = enterprise_learner_data[0]
             is_course_in_enterprise_catalog = enterprise_api.is_course_in_enterprise_catalog(
                 site=request.site,
                 course_id=course_id,
-                enterprise_catalog_id=enterprise_learner_data[0]['enterprise_customer']['catalog']
+                enterprise_catalog_id=enterprise_learner['enterprise_customer']['catalog']
             )
 
             if is_course_in_enterprise_catalog:
                 partner_names = partner_name = course.display_organization \
                     if course.display_organization else course.org
-                enterprise_name = enterprise_learner_data[0]['enterprise_customer']['name']
+                enterprise_name = enterprise_learner['enterprise_customer']['name']
                 organizations = organization_api.get_course_organizations(course_id=course.id)
                 if organizations:
                     partner_names = ' and '.join([org.get('name', partner_name) for org in organizations])
@@ -178,6 +180,12 @@ class ChooseModeView(View):
                     partner_names=partner_names,
                     enterprise_name=enterprise_name
                 )
+
+                # Hide the audit modes for this enterprise customer, if necessary
+                if not enterprise_learner['enterprise_customer'].get('enable_audit_enrollment'):
+                    for audit_mode in CourseMode.AUDIT_MODES:
+                        modes.pop(audit_mode, None)
+
         context["title_content"] = title_content
 
         if "verified" in modes:

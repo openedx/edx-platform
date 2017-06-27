@@ -2,13 +2,15 @@
 Slightly customized python-social-auth backend for SAML 2.0 support
 """
 import logging
+
+import requests
 from django.contrib.sites.models import Site
 from django.http import Http404
 from django.utils.functional import cached_property
+from social_core.backends.saml import OID_EDU_PERSON_ENTITLEMENT, SAMLAuth, SAMLIdentityProvider
+from social_core.exceptions import AuthForbidden
+
 from openedx.core.djangoapps.theming.helpers import get_current_request
-import requests
-from social.backends.saml import SAMLAuth, SAMLIdentityProvider, OID_EDU_PERSON_ENTITLEMENT
-from social.exceptions import AuthForbidden, AuthMissingParameter
 
 STANDARD_SAML_PROVIDER_KEY = 'standard_saml_provider'
 SAP_SUCCESSFACTORS_SAML_KEY = 'sap_success_factors'
@@ -41,7 +43,6 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         authenticate the user.
 
         raise Http404 if SAML authentication is disabled.
-        raise AuthMissingParameter if the 'idp' parameter is missing.
         """
         if not self._config.enabled:
             log.error('SAML authentication is not enabled')
@@ -68,7 +69,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         """
         Get an instance of OneLogin_Saml2_Auth
 
-        idp: The Identity Provider - a social.backends.saml.SAMLIdentityProvider instance
+        idp: The Identity Provider - a social_core.backends.saml.SAMLIdentityProvider instance
         """
         # We only override this method so that we can add extra debugging when debug_mode is True
         # Note that auth_inst is instantiated just for the current HTTP request, then is destroyed
@@ -98,9 +99,29 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         return SAMLConfiguration.current(Site.objects.get_current(get_current_request()))
 
 
-class SapSuccessFactorsIdentityProvider(SAMLIdentityProvider):
+class EdXSAMLIdentityProvider(SAMLIdentityProvider):
     """
-    Customized version of SAMLIdentityProvider that knows how to retrieve user details
+    Customized version of SAMLIdentityProvider that can retrieve details beyond the standard
+    details supported by the canonical upstream version.
+    """
+
+    def get_user_details(self, attributes):
+        """
+        Overrides `get_user_details` from the base class; retrieves those details,
+        then updates the dict with values from whatever additional fields are desired.
+        """
+        details = super(EdXSAMLIdentityProvider, self).get_user_details(attributes)
+        extra_field_definitions = self.conf.get('extra_field_definitions', [])
+        details.update({
+            field['name']: attributes[field['urn']][0] if field['urn'] in attributes else None
+            for field in extra_field_definitions
+        })
+        return details
+
+
+class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
+    """
+    Customized version of EdXSAMLIdentityProvider that knows how to retrieve user details
     from the SAPSuccessFactors OData API, rather than parse them directly off the
     SAML assertion that we get in response to a login attempt.
     """
@@ -242,12 +263,12 @@ def get_saml_idp_class(idp_identifier_string):
     the SAMLIdentityProvider subclass able to handle requests for that type of identity provider.
     """
     choices = {
-        STANDARD_SAML_PROVIDER_KEY: SAMLIdentityProvider,
+        STANDARD_SAML_PROVIDER_KEY: EdXSAMLIdentityProvider,
         SAP_SUCCESSFACTORS_SAML_KEY: SapSuccessFactorsIdentityProvider,
     }
     if idp_identifier_string not in choices:
         log.error(
-            '%s is not a valid SAMLIdentityProvider subclass; using SAMLIdentityProvider base class.',
+            '%s is not a valid EdXSAMLIdentityProvider subclass; using EdXSAMLIdentityProvider base class.',
             idp_identifier_string
         )
-    return choices.get(idp_identifier_string, SAMLIdentityProvider)
+    return choices.get(idp_identifier_string, EdXSAMLIdentityProvider)

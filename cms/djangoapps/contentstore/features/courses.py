@@ -2,8 +2,10 @@
 # pylint: disable=redefined-outer-name
 # pylint: disable=unused-argument
 
-from lettuce import world, step
+from lettuce import step, world
+
 from common import *
+
 
 ############### ACTIONS ####################
 

@@ -19,6 +19,7 @@ front-end validation will not pass.
     t_not_exist - this file does not exist on YouTube; it exists locally
 """
 from nose.plugins.attrib import attr
+
 from common.test.acceptance.tests.video.test_studio_video_module import CMSVideoBaseTest
 
 

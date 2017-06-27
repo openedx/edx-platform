@@ -2,16 +2,25 @@
 """
 Tests for safe_template_linter.py
 """
-from ddt import ddt, data
-import mock
 import re
-from StringIO import StringIO
 import textwrap
+from StringIO import StringIO
 from unittest import TestCase
 
+import mock
+from ddt import data, ddt
+
 from scripts.safe_template_linter import (
-    _lint, FileResults, JavaScriptLinter, MakoTemplateLinter, ParseString,
-    StringLines, PythonLinter, SummaryResults, UnderscoreTemplateLinter, Rules
+    FileResults,
+    JavaScriptLinter,
+    MakoTemplateLinter,
+    ParseString,
+    PythonLinter,
+    Rules,
+    StringLines,
+    SummaryResults,
+    UnderscoreTemplateLinter,
+    _lint
 )
 
 

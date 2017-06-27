@@ -16,23 +16,20 @@ from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 
 from course_modes.models import CourseMode
+from enrollment import api
+from enrollment.errors import CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.features.enterprise_support.api import enterprise_enabled, EnterpriseApiClient, EnterpriseApiException
 from openedx.core.lib.api.authentication import (
-    SessionAuthenticationAllowInactiveUser, OAuth2AuthenticationAllowInactiveUser,
+    OAuth2AuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser
 )
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.exceptions import CourseNotFoundError
 from openedx.core.lib.log_utils import audit_log
-from enrollment import api
-from enrollment.errors import (
-    CourseEnrollmentError,
-    CourseModeNotFoundError,
-    CourseEnrollmentExistsError
-)
+from openedx.features.enterprise_support.api import EnterpriseApiClient, EnterpriseApiException, enterprise_enabled
 from student.auth import user_has_role
 from student.models import User
 from student.roles import CourseStaffRole, GlobalStaff
@@ -644,7 +641,13 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 )
             else:
                 # Will reactivate inactive enrollments.
-                response = api.add_enrollment(username, unicode(course_id), mode=mode, is_active=is_active)
+                response = api.add_enrollment(
+                    username,
+                    unicode(course_id),
+                    mode=mode,
+                    is_active=is_active,
+                    enrollment_attributes=enrollment_attributes
+                )
 
             email_opt_in = request.data.get('email_opt_in', None)
             if email_opt_in is not None:

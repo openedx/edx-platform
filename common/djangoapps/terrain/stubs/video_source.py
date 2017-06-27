@@ -1,12 +1,13 @@
 """
 Serve HTML5 video sources for acceptance tests
 """
-from SimpleHTTPServer import SimpleHTTPRequestHandler
-from .http import StubHttpService
-from contextlib import contextmanager
 import os
-
+from contextlib import contextmanager
 from logging import getLogger
+from SimpleHTTPServer import SimpleHTTPRequestHandler
+
+from .http import StubHttpService
+
 LOGGER = getLogger(__name__)
 
 

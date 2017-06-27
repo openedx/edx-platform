@@ -1,6 +1,6 @@
 {% extends "main_django.html" %}
 {% with online_help_token="wiki" %}
-{% load theme_pipeline %}{% load sekizai_tags i18n configuration %}{% load url from future %}{% load staticfiles %}
+{% load theme_pipeline %}{% load sekizai_tags i18n configuration %}{% load staticfiles %}
 
 {% block title %}
   {% block pagetitle %}{% endblock %} | {% trans "Wiki" %} | {% platform_name %}
@@ -59,7 +59,11 @@
 <div class="container">
   <div class="wiki-wrapper">
     <main id="main" aria-label="Content" tabindex="-1">
-      <section class="wiki {{ selected_tab }}" id="wiki-content">
+          <section class="wiki {{ selected_tab }}" id="wiki-content"
+            {% if request.course.language %}
+              lang="{{ request.course.language }}"
+            {% endif %}
+          >
         {% block wiki_body %}
 
           {% block wiki_breadcrumbs %}{% endblock %}

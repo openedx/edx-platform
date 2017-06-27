@@ -2,6 +2,7 @@
 Grading Context
 """
 from collections import OrderedDict
+
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 
 from .scores import possibly_scored

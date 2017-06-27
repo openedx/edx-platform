@@ -2,32 +2,33 @@
 Tests for the CyberSource processor handler
 """
 from collections import OrderedDict
+
+from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.conf import settings
-from student.tests.factories import UserFactory
+from mock import Mock, patch
+
 from shoppingcart.models import Order, OrderItem
-from shoppingcart.processors.helpers import get_processor_config
-from shoppingcart.processors.exceptions import (
-    CCProcessorException,
-    CCProcessorSignatureException,
-    CCProcessorDataException,
-    CCProcessorWrongAmountException
-)
 from shoppingcart.processors.CyberSource import (
-    render_purchase_form_html,
-    process_postpay_callback,
-    processor_hash,
-    verify_signatures,
-    sign,
     REASONCODE_MAP,
-    record_purchase,
     get_processor_decline_html,
     get_processor_exception_html,
     payment_accepted,
+    process_postpay_callback,
+    processor_hash,
+    record_purchase,
+    render_purchase_form_html,
+    sign,
+    verify_signatures
 )
-from mock import patch, Mock
-
+from shoppingcart.processors.exceptions import (
+    CCProcessorDataException,
+    CCProcessorException,
+    CCProcessorSignatureException,
+    CCProcessorWrongAmountException
+)
+from shoppingcart.processors.helpers import get_processor_config
+from student.tests.factories import UserFactory
 
 TEST_CC_PROCESSOR_NAME = "CyberSource"
 TEST_CC_PROCESSOR = {

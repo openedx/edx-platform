@@ -1,9 +1,9 @@
 """
 Utilities related to nose.
 """
+import django_nose
 from django.core.management import call_command
 from django.db import DEFAULT_DB_ALIAS, connections, transaction
-import django_nose
 
 
 class NoseTestSuiteRunner(django_nose.NoseTestSuiteRunner):

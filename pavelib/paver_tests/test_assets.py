@@ -1,12 +1,15 @@
 """Unit tests for the Paver asset tasks."""
 
-import ddt
 import os
 from unittest import TestCase
-from pavelib.assets import collect_assets, COLLECTSTATIC_LOG_DIR_ARG
-from paver.easy import call_task, path
+
+import ddt
 from mock import patch
+from paver.easy import call_task, path
 from watchdog.observers.polling import PollingObserver
+
+from pavelib.assets import COLLECTSTATIC_LOG_DIR_ARG, collect_assets
+
 from .utils import PaverTestCase
 
 ROOT_PATH = path(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))

@@ -3,18 +3,17 @@ Python tests for the Survey workflows
 """
 
 from collections import OrderedDict
-from nose.plugins.attrib import attr
 from copy import deepcopy
 
-from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-
-from survey.models import SurveyForm, SurveyAnswer
+from django.core.urlresolvers import reverse
+from nose.plugins.attrib import attr
 
 from common.test.utils import XssTestMixin
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
+from survey.models import SurveyAnswer, SurveyForm
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=1)

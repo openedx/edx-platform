@@ -3,10 +3,11 @@ General testing utilities.
 """
 import sys
 from contextlib import contextmanager
+
+import moto
 from django.dispatch import Signal
 from markupsafe import escape
 from mock import Mock, patch
-import moto
 
 
 @contextmanager

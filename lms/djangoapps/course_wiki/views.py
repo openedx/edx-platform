@@ -1,20 +1,19 @@
 """
 This file contains view functions for wrapping the django-wiki.
 """
+import cgi
 import logging
 import re
-import cgi
 
 from django.conf import settings
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
-
-from wiki.core.exceptions import NoRootURL
-from wiki.models import URLPath, Article
-
-from courseware.courses import get_course_by_id
-from course_wiki.utils import course_wiki_slug
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from wiki.core.exceptions import NoRootURL
+from wiki.models import Article, URLPath
+
+from course_wiki.utils import course_wiki_slug
+from courseware.courses import get_course_by_id
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 

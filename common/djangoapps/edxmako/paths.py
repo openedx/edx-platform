@@ -2,21 +2,19 @@
 Set up lookup paths for mako templates.
 """
 
-import hashlib
 import contextlib
+import hashlib
 import os
-import pkg_resources
 
+import pkg_resources
 from django.conf import settings
-from mako.lookup import TemplateLookup
 from mako.exceptions import TopLevelLookupException
+from mako.lookup import TemplateLookup
+
+from openedx.core.djangoapps.theming.helpers import get_template as themed_template
+from openedx.core.djangoapps.theming.helpers import get_template_path_with_theme, strip_site_theme_templates_path
 
 from . import LOOKUP
-from openedx.core.djangoapps.theming.helpers import (
-    get_template as themed_template,
-    get_template_path_with_theme,
-    strip_site_theme_templates_path,
-)
 
 
 class DynamicTemplateLookup(TemplateLookup):

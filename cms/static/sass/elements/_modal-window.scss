@@ -288,8 +288,11 @@
   // ------------------------
 
   // Move XBlock Modal
-  .modal-window.move-modal {
-    top: 10% !important;
+  .move-modal {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    @include transform(translate(-50%,-50%));
   }
 
   .move-xblock-modal {

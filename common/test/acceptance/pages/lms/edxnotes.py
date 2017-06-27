@@ -1,9 +1,10 @@
-from bok_choy.page_object import PageObject, PageLoadError, unguarded
+from bok_choy.page_object import PageLoadError, PageObject, unguarded
 from bok_choy.promise import BrokenPromise, EmptyPromise
-from common.test.acceptance.pages.lms.course_page import CoursePage
-from common.test.acceptance.pages.common.paging import PaginatedUIMixin
-from common.test.acceptance.tests.helpers import disable_animations
 from selenium.webdriver.common.action_chains import ActionChains
+
+from common.test.acceptance.pages.common.paging import PaginatedUIMixin
+from common.test.acceptance.pages.lms.course_page import CoursePage
+from common.test.acceptance.tests.helpers import disable_animations
 
 
 class NoteChild(PageObject):

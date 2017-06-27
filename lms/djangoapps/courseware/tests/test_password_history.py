@@ -2,24 +2,22 @@
 This file will test through the LMS some of the PasswordHistory features
 """
 import json
-import ddt
-from mock import patch
+from datetime import timedelta
 from uuid import uuid4
+
+import ddt
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
+from django.utils import timezone
+from django.utils.http import int_to_base36
+from freezegun import freeze_time
+from mock import patch
 from nose.plugins.attrib import attr
 
-from django.contrib.auth.models import User
-from django.utils import timezone
-from datetime import timedelta
-from django.test.utils import override_settings
-
-from django.core.urlresolvers import reverse
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import int_to_base36
-
-from freezegun import freeze_time
-
-from student.models import PasswordHistory
 from courseware.tests.helpers import LoginEnrollmentTestCase
+from student.models import PasswordHistory
 
 
 @attr(shard=1)

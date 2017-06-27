@@ -11,10 +11,11 @@ from uuid import uuid4
 from django.conf import settings
 from django.test.utils import override_settings
 
-from .utils import CourseTestCase
 import contentstore.git_export_utils as git_export_utils
-from xmodule.modulestore.django import modulestore
 from contentstore.utils import reverse_course_url
+from xmodule.modulestore.django import modulestore
+
+from .utils import CourseTestCase
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex

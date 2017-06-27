@@ -1,10 +1,12 @@
 """Tests covering the Organizations listing on the Studio home."""
 import json
-from mock import patch
+
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from util.organizations_helpers import add_organization
+from mock import patch
+
 from student.tests.factories import UserFactory
+from util.organizations_helpers import add_organization
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})

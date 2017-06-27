@@ -2,10 +2,12 @@
 # pylint: disable=missing-docstring
 
 import json
-from lettuce import world, step
+
+from lettuce import step, world
 from nose.tools import assert_equal, assert_true
-from common import type_in_codemirror, open_new_course
-from advanced_settings import change_value, ADVANCED_MODULES_KEY
+
+from advanced_settings import ADVANCED_MODULES_KEY, change_value
+from common import open_new_course, type_in_codemirror
 from course_import import import_file
 
 DISPLAY_NAME = "Display Name"

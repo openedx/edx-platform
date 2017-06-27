@@ -8,24 +8,24 @@ a student's score or the course grading policy changes. As they are
 persisted, course grades are also immune to changes in course content.
 """
 
+import json
+import logging
 from base64 import b64encode
 from collections import namedtuple
 from hashlib import sha1
-import json
-from lazy import lazy
-import logging
 
 from django.db import models
 from django.utils.timezone import now
-from eventtracking import tracker
+from lazy import lazy
 from model_utils.models import TimeStampedModel
-from track import contexts
-from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from eventtracking import tracker
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 from request_cache import get_cache
+from track import contexts
+from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 
 from .config import waffle
 

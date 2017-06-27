@@ -31,7 +31,7 @@
                 return expect(group_disabled).toEqual(true);
             }
         };
-        describe('cohort selector', function() {
+        describe('group selector', function() {
             beforeEach(function() {
                 this.course_settings = new DiscussionCourseSettings({
                     category_map: {
@@ -53,8 +53,8 @@
                     },
                     allow_anonymous: false,
                     allow_anonymous_to_peers: false,
-                    is_cohorted: true,
-                    cohorts: [
+                    is_discussion_division_enabled: true,
+                    groups: [
                         {
                             id: 1,
                             name: 'Cohort1'
@@ -75,15 +75,15 @@
             it('is not visible to students', function() {
                 return checkVisibility(this.view, false, false, true);
             });
-            it('allows TAs to see the cohort selector when the topic is cohorted', function() {
+            it('allows TAs to see the group selector when the topic is divided', function() {
                 DiscussionSpecHelper.makeTA();
                 return checkVisibility(this.view, true, false, true);
             });
-            it('allows moderators to see the cohort selector when the topic is cohorted', function() {
+            it('allows moderators to see the group selector when the topic is divided', function() {
                 DiscussionSpecHelper.makeModerator();
                 return checkVisibility(this.view, true, false, true);
             });
-            it('only enables the cohort selector when applicable', function() {
+            it('only enables the group selector when applicable', function() {
                 DiscussionSpecHelper.makeModerator();
                 checkVisibility(this.view, true, false, true);
 
@@ -95,7 +95,7 @@
                 $('.post-topic').trigger('change');
                 return checkVisibility(this.view, true, false, false);
             });
-            it('allows the user to make a cohort selection', function() {
+            it('allows the user to make a group selection', function() {
                 var expectedGroupId,
                     self = this;
                 DiscussionSpecHelper.makeModerator();
@@ -116,23 +116,23 @@
                 });
             });
         });
-        describe('always cohort inline discussions ', function() {
+        describe('always divide inline discussions ', function() {
             beforeEach(function() {
                 this.course_settings = new DiscussionCourseSettings({
-                    'category_map': {
-                        'children': [],
-                        'entries': {}
+                    category_map: {
+                        children: [],
+                        entries: {}
                     },
-                    'allow_anonymous': false,
-                    'allow_anonymous_to_peers': false,
-                    'is_cohorted': true,
-                    'cohorts': [
+                    allow_anonymous: false,
+                    allow_anonymous_to_peers: false,
+                    is_discussion_division_enabled: true,
+                    groups: [
                         {
-                            'id': 1,
-                            'name': 'Cohort1'
+                            id: 1,
+                            name: 'Cohort1'
                         }, {
-                            'id': 2,
-                            'name': 'Cohort2'
+                            id: 2,
+                            name: 'Cohort2'
                         }
                     ]
                 });
@@ -143,12 +143,12 @@
                     mode: 'tab'
                 });
             });
-            it('disables the cohort menu if it is set false', function() {
+            it('disables the group menu if it is set false', function() {
                 DiscussionSpecHelper.makeModerator();
                 this.view.is_commentable_divided = false;
                 return checkVisibility(this.view, true, true, true);
             });
-            it('enables the cohort menu if it is set true', function() {
+            it('enables the group menu if it is set true', function() {
                 DiscussionSpecHelper.makeModerator();
                 this.view.is_commentable_divided = true;
                 return checkVisibility(this.view, true, false, true);

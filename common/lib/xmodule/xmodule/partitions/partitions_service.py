@@ -87,9 +87,8 @@ class PartitionService(object):
     with a given course.
     """
 
-    def __init__(self, course_id, track_function=None, cache=None):
+    def __init__(self, course_id, cache=None):
         self._course_id = course_id
-        self._track_function = track_function
         self._cache = cache
 
     def get_course(self):
@@ -133,7 +132,7 @@ class PartitionService(object):
         if self._cache and (cache_key in self._cache):
             return self._cache[cache_key]
 
-        user_partition = self._get_user_partition(user_partition_id)
+        user_partition = self.get_user_partition(user_partition_id)
         if user_partition is None:
             raise ValueError(
                 "Configuration problem!  No user_partition with id {0} "
@@ -148,7 +147,7 @@ class PartitionService(object):
 
         return group_id
 
-    def _get_user_partition(self, user_partition_id):
+    def get_user_partition(self, user_partition_id):
         """
         Look for a user partition with a matching id in the course's partitions.
         Note that this method can return an inactive user partition.
@@ -165,7 +164,7 @@ class PartitionService(object):
         the partition's scheme.
         """
         return user_partition.scheme.get_group_for_user(
-            self._course_id, user, user_partition, assign=assign, track_function=self._track_function
+            self._course_id, user, user_partition, assign=assign,
         )
 
 

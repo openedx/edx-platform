@@ -4,12 +4,12 @@ Bok choy acceptance tests for Entrance exams in the LMS
 """
 from textwrap import dedent
 
-from common.test.acceptance.tests.helpers import UniqueCourseTest
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.problem import ProblemPage
-from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import UniqueCourseTest
 
 
 class EntranceExamTest(UniqueCourseTest):

@@ -3,14 +3,15 @@
 # This script requires that you have watchdog installed. You can install
 # watchdog via 'pip install watchdog'
 
-import sys
-import time
 import logging
 import os
-from subprocess import Popen
+import sys
+import time
 from signal import SIGTERM
+from subprocess import Popen
+
+from watchdog.events import FileSystemEventHandler, LoggingEventHandler
 from watchdog.observers import Observer
-from watchdog.events import LoggingEventHandler, FileSystemEventHandler
 
 # To watch more (or more specific) directories, change WATCH_DIRS to include the
 # directories you want to watch. Note that this is recursive. If you want to

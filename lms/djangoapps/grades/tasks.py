@@ -2,42 +2,39 @@
 This module contains tasks for asynchronous execution of grade updates.
 """
 
+from logging import getLogger
+
+import six
 from celery import task
+from celery_utils.logged_task import LoggedTask
+from celery_utils.persist_on_failure import PersistOnFailureTask
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
-from logging import getLogger
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import CourseLocator
 
-log = getLogger(__name__)
-
-from celery_utils.logged_task import LoggedTask
-from celery_utils.persist_on_failure import PersistOnFailureTask
 from courseware.model_data import get_score
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware import courses
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locator import CourseLocator
-from openedx.core.djangoapps.monitoring_utils import (
-    set_custom_metrics_for_course_key, set_custom_metric
-)
+from lms.djangoapps.grades.config.models import ComputeGradesSetting
+from openedx.core.djangoapps.monitoring_utils import set_custom_metric, set_custom_metrics_for_course_key
 from student.models import CourseEnrollment
 from submissions import api as sub_api
-from track.event_transaction_utils import (
-    set_event_transaction_type,
-    set_event_transaction_id,
-)
+from track.event_transaction_utils import set_event_transaction_id, set_event_transaction_type
 from util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
-from .config.waffle import waffle, ESTIMATE_FIRST_ATTEMPTED
+from .config.waffle import ESTIMATE_FIRST_ATTEMPTED, waffle
 from .constants import ScoreDatabaseTableEnum
 from .exceptions import DatabaseNotReadyError
-from .new.subsection_grade_factory import SubsectionGradeFactory
 from .new.course_grade_factory import CourseGradeFactory
+from .new.subsection_grade_factory import SubsectionGradeFactory
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .transformer import GradesTransformer
 
+log = getLogger(__name__)
 
 KNOWN_RETRY_ERRORS = (  # Errors we expect occasionally, should be resolved on retry
     DatabaseError,
@@ -52,6 +49,21 @@ class _BaseTask(PersistOnFailureTask, LoggedTask):  # pylint: disable=abstract-m
     Include persistence features, as well as logging of task invocation.
     """
     abstract = True
+
+
+@task(base=_BaseTask)
+def compute_all_grades_for_course(**kwargs):
+    """
+    Compute grades for all students in the specified course.
+    Kicks off a series of compute_grades_for_course_v2 tasks
+    to cover all of the students in the course.
+    """
+    for course_key, offset, batch_size in _course_task_args(
+        course_key=kwargs.pop('course_key'),
+        kwargs=kwargs
+    ):
+        task_options = {'course_key': course_key, 'offset': offset, 'batch_size': batch_size}
+        compute_grades_for_course_v2.apply_async(kwargs=kwargs, **task_options)
 
 
 @task(base=_BaseTask, bind=True, default_retry_delay=30, max_retries=1)
@@ -74,6 +86,12 @@ def compute_grades_for_course_v2(self, **kwargs):
         waffle switch.  If false or not provided, use the global value of
         the ESTIMATE_FIRST_ATTEMPTED waffle switch.
     """
+    if 'event_transaction_id' in kwargs:
+        set_event_transaction_id(kwargs['event_transaction_id'])
+
+    if 'event_transaction_type' in kwargs:
+        set_event_transaction_type(kwargs['event_transaction_type'])
+
     course_key = kwargs.pop('course_key')
     offset = kwargs.pop('offset')
     batch_size = kwargs.pop('batch_size')
@@ -250,3 +268,21 @@ def _update_subsection_grades(course_key, scored_block_usage_key, only_if_higher
                     user=student,
                     subsection_grade=subsection_grade,
                 )
+
+
+def _course_task_args(course_key, **kwargs):
+    """
+    Helper function to generate course-grade task args.
+    """
+    from_settings = kwargs.pop('from_settings', True)
+    enrollment_count = CourseEnrollment.objects.filter(course_id=course_key).count()
+    if enrollment_count == 0:
+        log.warning("No enrollments found for {}".format(course_key))
+
+    if from_settings is False:
+        batch_size = kwargs.pop('batch_size', 100)
+    else:
+        batch_size = ComputeGradesSetting.current().batch_size
+
+    for offset in six.moves.range(0, enrollment_count, batch_size):
+        yield (six.text_type(course_key), offset, batch_size)

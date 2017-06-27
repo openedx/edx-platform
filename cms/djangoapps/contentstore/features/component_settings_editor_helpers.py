@@ -3,9 +3,10 @@
 
 from lettuce import world
 from nose.tools import assert_equal, assert_in
-from terrain.steps import reload_the_page
-from common import type_in_codemirror
 from selenium.webdriver.common.keys import Keys
+
+from common import type_in_codemirror
+from terrain.steps import reload_the_page
 
 
 @world.absorb

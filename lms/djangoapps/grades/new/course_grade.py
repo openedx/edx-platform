@@ -2,13 +2,19 @@
 CourseGrade Class
 """
 from abc import abstractmethod
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
+
 from django.conf import settings
 from lazy import lazy
 
 from xmodule import block_metadata_utils
-from .subsection_grade_factory import SubsectionGradeFactory
+
 from .subsection_grade import ZeroSubsectionGrade
+from .subsection_grade_factory import SubsectionGradeFactory
+
+
+def uniqueify(iterable):
+    return OrderedDict([(item, None) for item in iterable]).keys()
 
 
 class CourseGradeBase(object):
@@ -166,7 +172,7 @@ class CourseGradeBase(object):
         """
         return [
             self._get_subsection_grade(course_structure[subsection_key])
-            for subsection_key in course_structure.get_children(chapter_key)
+            for subsection_key in uniqueify(course_structure.get_children(chapter_key))
         ]
 
     @abstractmethod

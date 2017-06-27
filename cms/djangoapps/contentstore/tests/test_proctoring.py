@@ -2,19 +2,16 @@
 Tests for the edx_proctoring integration into Studio
 """
 
-from mock import patch
-import ddt
 from datetime import datetime, timedelta
+
+import ddt
+from edx_proctoring.api import get_all_exams_for_course, get_review_policy_by_exam_id
+from mock import patch
 from pytz import UTC
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from contentstore.signals.handlers import listen_for_course_publish
-
-from edx_proctoring.api import (
-    get_all_exams_for_course,
-    get_review_policy_by_exam_id
-)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @ddt.ddt

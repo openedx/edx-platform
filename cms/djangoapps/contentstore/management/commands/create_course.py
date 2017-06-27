@@ -1,11 +1,12 @@
 """
 Django management command to create a course in a specific modulestore
 """
-from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
-from xmodule.modulestore import ModuleStoreEnum
-from contentstore.views.course import create_new_course_in_store
+from django.core.management.base import BaseCommand, CommandError
+
 from contentstore.management.commands.utils import user_from_str
+from contentstore.views.course import create_new_course_in_store
+from xmodule.modulestore import ModuleStoreEnum
 
 
 class Command(BaseCommand):

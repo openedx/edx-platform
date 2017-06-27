@@ -1,12 +1,14 @@
 """
 Test for user creation from sites with configuration overrides.
 """
-from django.test import TestCase
-from student.models import UserSignupSource
-import mock
 import json
-from django.core.urlresolvers import reverse
+
+import mock
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+from django.test import TestCase
+
+from student.models import UserSignupSource
 
 FAKE_SITE = {
     "SITE_NAME": "openedx.localhost",

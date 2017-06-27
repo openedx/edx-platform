@@ -1,19 +1,21 @@
 """
 Template for PDF Receipt/Invoice Generation
 """
-from PIL import Image
 import logging
-from reportlab.lib import colors
+
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from reportlab.pdfgen.canvas import Canvas
+from PIL import Image
+from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
-from reportlab.lib.units import mm
 from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import mm
+from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import Paragraph
 from reportlab.platypus.tables import Table, TableStyle
-from xmodule.modulestore.django import ModuleI18nService
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from xmodule.modulestore.django import ModuleI18nService
 
 log = logging.getLogger("PDF Generation")
 

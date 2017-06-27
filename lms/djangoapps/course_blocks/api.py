@@ -5,14 +5,8 @@ get_course_blocks function.
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 
-from .transformers import (
-    library_content,
-    start_date,
-    user_partitions,
-    visibility,
-)
+from .transformers import library_content, start_date, user_partitions, visibility
 from .usage_info import CourseUsageInfo
-
 
 # Default list of transformers for manipulating course block structures
 # based on the user's access to the course blocks.

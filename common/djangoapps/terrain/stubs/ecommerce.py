@@ -4,6 +4,7 @@ Stub implementation of ecommerce service for acceptance tests
 
 import re
 import urlparse
+
 from .http import StubHttpRequestHandler, StubHttpService
 
 

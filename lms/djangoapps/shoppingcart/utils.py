@@ -3,12 +3,13 @@ Utility methods for the Shopping Cart app
 """
 
 from django.conf import settings
-from pdfminer.pdfparser import PDFParser
-from pdfminer.pdfdocument import PDFDocument
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import PDFPageAggregator
+from pdfminer.layout import LAParams, LTFigure, LTTextBox, LTTextLine
+from pdfminer.pdfdocument import PDFDocument
+from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
 from pdfminer.pdfpage import PDFPage
-from pdfminer.layout import LAParams, LTTextBox, LTTextLine, LTFigure
+from pdfminer.pdfparser import PDFParser
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 

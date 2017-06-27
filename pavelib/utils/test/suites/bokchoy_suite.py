@@ -48,9 +48,10 @@ def load_bok_choy_data(options):
     print 'Loading data from json fixtures in db_fixtures directory'
     sh(
         "DEFAULT_STORE={default_store}"
-        " ./manage.py lms --settings bok_choy loaddata --traceback"
+        " ./manage.py lms --settings {settings} loaddata --traceback"
         " common/test/db_fixtures/*.json".format(
             default_store=options.default_store,
+            settings=Env.SETTINGS
         )
     )
 
@@ -76,9 +77,10 @@ def load_courses(options):
 
         sh(
             "DEFAULT_STORE={default_store}"
-            " ./manage.py cms --settings=bok_choy import {import_dir}".format(
+            " ./manage.py cms --settings={settings} import {import_dir}".format(
                 default_store=options.default_store,
-                import_dir=options.imports_dir
+                import_dir=options.imports_dir,
+                settings=Env.SETTINGS
             )
         )
     else:
@@ -261,7 +263,7 @@ class BokChoyTestSuite(TestSuite):
             # Clean up data we created in the databases
             msg = colorize('green', "Cleaning up databases...")
             print msg
-            sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
+            sh("./manage.py lms --settings {settings} flush --traceback --noinput".format(settings=Env.SETTINGS))
             clear_mongo()
 
     @property

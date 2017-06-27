@@ -2,20 +2,20 @@
 Unit tests for cloning a course between the same and different module stores.
 """
 import json
-from django.conf import settings
 
+from django.conf import settings
+from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
-from xmodule.modulestore import ModuleStoreEnum, EdxJSONEncoder
-from contentstore.tests.utils import CourseTestCase
+
 from contentstore.tasks import rerun_course
-from student.auth import has_course_author_access
-from course_action_state.models import CourseRerunState
+from contentstore.tests.utils import CourseTestCase
 from course_action_state.managers import CourseRerunUIStateManager
-from mock import patch, Mock
+from course_action_state.models import CourseRerunState
+from student.auth import has_course_author_access
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory
-
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 

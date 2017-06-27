@@ -4,7 +4,6 @@ URL mappings for the Survey feature
 
 from django.conf.urls import patterns, url
 
-
 urlpatterns = patterns(
     'survey.views',
 

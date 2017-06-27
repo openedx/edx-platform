@@ -1,9 +1,10 @@
 """Generates common contexts"""
 import logging
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
 from util.request import COURSE_REGEX
 
 log = logging.getLogger(__name__)

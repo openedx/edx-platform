@@ -2,6 +2,7 @@
 Tests for HiddenContentTransformer.
 """
 from datetime import timedelta
+
 import ddt
 from django.utils.timezone import now
 from nose.plugins.attrib import attr

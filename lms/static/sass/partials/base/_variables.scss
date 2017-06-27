@@ -36,7 +36,7 @@ $fg-gutter: $gw-gutter !default;
 $fg-max-columns: 12 !default;
 $fg-max-width: 1400px !default;
 $fg-min-width: 810px !default;
-
+$lms-max-width: 1180px !default;
 
 // ----------------------------
 // #COLORS
@@ -200,7 +200,7 @@ $ui-notification-height: ($baseline*10);
 $twitter-blue: #55ACEE;
 $facebook-blue: #3B5998;
 $linkedin-blue: #0077B5;
-$google-red: #DD4B39;
+$google-red: #D73924;
 $microsoft-blue: #00BCF2;
 
 // shadows
@@ -218,7 +218,7 @@ $active-color: $blue !default;
 $highlight-color: rgb(255,255,0) !default;
 $alert-color: rgb(212, 64, 64) !default;
 $success-color: rgb(0, 155, 0) !default;
-
+$success-color-hover: rgb(0, 129, 0) !default;
 
 // ----------------------------
 // #COLORS- EDX-SPECIFIC

@@ -3,6 +3,12 @@
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from django.conf import settings
+
+from datetime import datetime
+import pytz
+
+from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
 %>
 
 <div class="wrapper wrapper-footer">
@@ -43,8 +49,8 @@ from django.utils.translation import ugettext as _
       </ol>
       </nav>
 
-      % if include_language_selector:
-          <%include file='widgets/footer-language-selector.html'/>
+      % if context.get('include_language_selector', footer_language_selector_is_enabled()):
+          <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
       % endif
 
       <div class="wrapper-logo">
@@ -57,7 +63,7 @@ from django.utils.translation import ugettext as _
         </p>
       </div>
 
-      <p class="copyright">&copy; ${settings.COPYRIGHT_YEAR} ${static.get_platform_name()}.</p>
+      <p class="copyright">&copy; ${datetime.now(pytz.timezone(settings.TIME_ZONE)).year} ${static.get_platform_name()}.</p>
 
       ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
       <p class="copyright">

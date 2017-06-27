@@ -78,16 +78,17 @@ choice for most environments but you may be happy with the trade-offs of the
 
 """
 
-from django.conf import settings
-from django.contrib.auth import HASH_SESSION_KEY
-from django.contrib.auth.models import User, AnonymousUser
-from django.contrib.auth.middleware import AuthenticationMiddleware
-from django.utils.crypto import constant_time_compare
 from logging import getLogger
 
-from openedx.core.djangoapps.safe_sessions.middleware import SafeSessionMiddleware
-from .model import cache_model
+from django.conf import settings
+from django.contrib.auth import HASH_SESSION_KEY
+from django.contrib.auth.middleware import AuthenticationMiddleware
+from django.contrib.auth.models import AnonymousUser, User
+from django.utils.crypto import constant_time_compare
 
+from openedx.core.djangoapps.safe_sessions.middleware import SafeSessionMiddleware
+
+from .model import cache_model
 
 log = getLogger(__name__)
 

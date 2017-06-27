@@ -2,21 +2,21 @@
 # pylint: disable=redefined-outer-name
 
 import os
-from lettuce import world, step
-from nose.tools import assert_true, assert_in
+from logging import getLogger
+
 from django.conf import settings
-
-from student.roles import CourseStaffRole, CourseInstructorRole, GlobalStaff
-from student.models import get_user
-
+from lettuce import step, world
+from nose.tools import assert_in, assert_true
 from selenium.webdriver.common.keys import Keys
 
-from logging import getLogger
-from student.tests.factories import AdminFactory
 from student import auth
+from student.models import get_user
+from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
+from student.tests.factories import AdminFactory
+from terrain.browser import reset_data
+
 logger = getLogger(__name__)
 
-from terrain.browser import reset_data
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 

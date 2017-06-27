@@ -4,10 +4,10 @@ Namespace that defines fields common to all blocks used in the LMS
 
 #from django.utils.translation import ugettext_noop as _
 from lazy import lazy
-
 from xblock.core import XBlock
-from xblock.fields import Boolean, Scope, String, XBlockMixin, Dict
+from xblock.fields import Boolean, Dict, Scope, String, XBlockMixin
 from xblock.validation import ValidationMessage
+
 from xmodule.modulestore.inheritance import UserPartitionList
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 
@@ -15,8 +15,8 @@ from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPa
 # more information can be found here: https://openedx.atlassian.net/browse/PLAT-902
 _ = lambda text: text
 
-INVALID_USER_PARTITION_VALIDATION = _(u"This component's visibility settings refer to deleted or invalid group configurations.")
-INVALID_USER_PARTITION_GROUP_VALIDATION = _(u"This component's visibility settings refer to deleted or invalid groups.")
+INVALID_USER_PARTITION_VALIDATION = _(u"This component's access settings refer to deleted or invalid group configurations.")
+INVALID_USER_PARTITION_GROUP_VALIDATION = _(u"This component's access settings refer to deleted or invalid groups.")
 
 
 class GroupAccessDict(Dict):

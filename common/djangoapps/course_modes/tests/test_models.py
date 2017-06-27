@@ -5,15 +5,15 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
-from datetime import datetime, timedelta
 import itertools
+from datetime import datetime, timedelta
 
 import ddt
+import pytz
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
-import pytz
 
 from course_modes.helpers import enrollment_mode_display
 from course_modes.models import CourseMode, Mode, invalidate_course_mode_cache

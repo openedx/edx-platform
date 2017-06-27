@@ -1,6 +1,7 @@
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from xmodule.modulestore.django import modulestore
+
 from ..transformer import GradesTransformer
 
 

@@ -1,10 +1,19 @@
+from nose.plugins.attrib import attr
+
 from django.test import TestCase
-
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django_comment_common.models import Role
+from models import CourseDiscussionSettings
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from openedx.core.djangoapps.course_groups.cohorts import CourseCohortsSettings
 from student.models import CourseEnrollment, User
+from utils import get_course_discussion_settings, set_course_discussion_settings
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@attr(shard=1)
 class RoleAssignmentTest(TestCase):
     """
     Basic checks to make sure our Roles get assigned and unassigned as students
@@ -55,3 +64,73 @@ class RoleAssignmentTest(TestCase):
     #     )
     #     self.assertNotIn(student_role, self.student_user.roles.all())
     #     self.assertIn(student_role, another_student.roles.all())
+
+
+@attr(shard=1)
+class CourseDiscussionSettingsTest(ModuleStoreTestCase):
+
+    def setUp(self):
+        super(CourseDiscussionSettingsTest, self).setUp()
+        self.course = CourseFactory.create()
+
+    def test_get_course_discussion_settings(self):
+        discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual(CourseDiscussionSettings.NONE, discussion_settings.division_scheme)
+        self.assertEqual([], discussion_settings.divided_discussions)
+        self.assertFalse(discussion_settings.always_divide_inline_discussions)
+
+    def test_get_course_discussion_settings_legacy_settings(self):
+        self.course.cohort_config = {
+            'cohorted': True,
+            'always_cohort_inline_discussions': True,
+            'cohorted_discussions': ['foo']
+        }
+        modulestore().update_item(self.course, ModuleStoreEnum.UserID.system)
+        discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual(CourseDiscussionSettings.COHORT, discussion_settings.division_scheme)
+        self.assertEqual(['foo'], discussion_settings.divided_discussions)
+        self.assertTrue(discussion_settings.always_divide_inline_discussions)
+
+    def test_get_course_discussion_settings_cohort_settings(self):
+        CourseCohortsSettings.objects.get_or_create(
+            course_id=self.course.id,
+            defaults={
+                'is_cohorted': True,
+                'always_cohort_inline_discussions': True,
+                'cohorted_discussions': ['foo', 'bar']
+            }
+        )
+        discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual(CourseDiscussionSettings.COHORT, discussion_settings.division_scheme)
+        self.assertEqual(['foo', 'bar'], discussion_settings.divided_discussions)
+        self.assertTrue(discussion_settings.always_divide_inline_discussions)
+
+    def test_set_course_discussion_settings(self):
+        set_course_discussion_settings(
+            course_key=self.course.id,
+            divided_discussions=['cohorted_topic'],
+            division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK,
+            always_divide_inline_discussions=True,
+        )
+        discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual(CourseDiscussionSettings.ENROLLMENT_TRACK, discussion_settings.division_scheme)
+        self.assertEqual(['cohorted_topic'], discussion_settings.divided_discussions)
+        self.assertTrue(discussion_settings.always_divide_inline_discussions)
+
+    def test_invalid_data_types(self):
+        exception_msg_template = "Incorrect field type for `{}`. Type must be `{}`"
+        fields = [
+            {'name': 'division_scheme', 'type': basestring},
+            {'name': 'always_divide_inline_discussions', 'type': bool},
+            {'name': 'divided_discussions', 'type': list}
+        ]
+        invalid_value = 3.14
+
+        for field in fields:
+            with self.assertRaises(ValueError) as value_error:
+                set_course_discussion_settings(self.course.id, **{field['name']: invalid_value})
+
+            self.assertEqual(
+                value_error.exception.message,
+                exception_msg_template.format(field['name'], field['type'].__name__)
+            )

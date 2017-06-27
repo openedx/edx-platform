@@ -2,6 +2,7 @@
 Model Managers for Course Actions
 """
 import traceback
+
 from django.db import models, transaction
 
 

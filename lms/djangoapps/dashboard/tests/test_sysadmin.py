@@ -6,27 +6,26 @@ import os
 import re
 import shutil
 import unittest
+from datetime import datetime
 from uuid import uuid4
-from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
-from nose.plugins.attrib import attr
 
+import mongoengine
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.utils.timezone import utc as UTC
-import mongoengine
+from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from dashboard.models import CourseImportLog
 from dashboard.git_import import GitImportErrorNoDir
-from datetime import datetime
+from dashboard.models import CourseImportLog
 from student.roles import CourseStaffRole, GlobalStaff
 from student.tests.factories import UserFactory
+from util.date_utils import DEFAULT_DATE_TIME_FORMAT, get_time_display
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 
 TEST_MONGODB_LOG = {
     'host': MONGO_HOST,

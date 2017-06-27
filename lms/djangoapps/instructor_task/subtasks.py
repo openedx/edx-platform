@@ -1,24 +1,22 @@
 """
 This module contains celery task functions for handling the management of subtasks.
 """
-from time import time
 import json
-from uuid import uuid4
-import psutil
-from contextlib import contextmanager
 import logging
+from contextlib import contextmanager
+from time import time
+from uuid import uuid4
 
-from celery.states import SUCCESS, READY_STATES, RETRY
-import dogstats_wrapper as dog_stats_api
-
-from django.db import transaction, DatabaseError
+import psutil
+from celery.states import READY_STATES, RETRY, SUCCESS
 from django.core.cache import cache
+from django.db import DatabaseError, transaction
 
+import dogstats_wrapper as dog_stats_api
 from util.db import outer_atomic
 
 from .exceptions import DuplicateTaskException
-from .models import InstructorTask, PROGRESS, QUEUING
-
+from .models import PROGRESS, QUEUING, InstructorTask
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 

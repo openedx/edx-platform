@@ -4,13 +4,12 @@ Test saved subsection grade functionality.
 # pylint: disable=protected-access
 
 import datetime
-
-import ddt
-from django.conf import settings
 import itertools
 
-from mock import patch
+import ddt
 import pytz
+from django.conf import settings
+from mock import patch
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.access import has_access
@@ -25,13 +24,13 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
-from ..config.waffle import waffle, ASSUME_ZERO_GRADE_IF_ABSENT, WRITE_ONLY_IF_ENGAGED
+from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT, WRITE_ONLY_IF_ENGAGED, waffle
 from ..models import PersistentSubsectionGrade
 from ..new.course_data import CourseData
+from ..new.course_grade import CourseGrade, ZeroCourseGrade
 from ..new.course_grade_factory import CourseGradeFactory
-from ..new.course_grade import ZeroCourseGrade, CourseGrade
+from ..new.subsection_grade import SubsectionGrade, ZeroSubsectionGrade
 from ..new.subsection_grade_factory import SubsectionGradeFactory
-from ..new.subsection_grade import ZeroSubsectionGrade, SubsectionGrade
 from .utils import mock_get_score, mock_get_submissions_score
 
 
@@ -85,6 +84,15 @@ class GradeTestBase(SharedModuleStoreTestCase):
                 display_name="Test Problem",
                 data=problem_xml
             )
+            # AED 2017-06-19: make cls.sequence belong to multiple parents,
+            # so we can test that DAGs with this shape are handled correctly.
+            cls.chapter_2 = ItemFactory.create(
+                parent=cls.course,
+                category='chapter',
+                display_name='Test Chapter 2'
+            )
+            cls.chapter_2.children.append(cls.sequence.location)
+            cls.store.update_item(cls.chapter_2, UserFactory().id)
 
     def setUp(self):
         super(GradeTestBase, self).setUp()
