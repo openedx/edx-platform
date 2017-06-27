@@ -36,7 +36,7 @@ from openedx.core.djangoapps.user_api.errors import (
     AccountRequestError
 )
 from openedx.core.djangoapps.user_api.accounts.tests.testutils import (
-    INVALID_EMAILS, INVALID_PASSWORDS, INVALID_USERNAMES
+    INVALID_EMAILS, INVALID_PASSWORDS, INVALID_USERNAMES, VALID_USERNAMES_UNICODE
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import PendingEmailChange
@@ -450,14 +450,7 @@ class AccountCreationUnicodeUsernameTest(TestCase):
     PASSWORD = u'unicode-user-password'
     EMAIL = u'unicode-user-username@example.com'
 
-    UNICODE_USERNAMES = [
-        u'Enchanté',
-        u'username_with_@',
-        u'username with spaces',
-        u'eastern_arabic_numbers_١٢٣',
-    ]
-
-    @ddt.data(*UNICODE_USERNAMES)
+    @ddt.data(*VALID_USERNAMES_UNICODE)
     def test_unicode_usernames(self, unicode_username):
         with patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': False}):
             with self.assertRaises(AccountUsernameInvalid):

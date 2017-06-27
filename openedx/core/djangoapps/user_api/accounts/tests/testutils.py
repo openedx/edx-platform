@@ -10,6 +10,12 @@ from openedx.core.djangoapps.user_api.accounts import (
 )
 
 
+INVALID_NAMES = [
+    None,
+    '',
+    u''
+]
+
 INVALID_USERNAMES_ASCII = [
     '$invalid-ascii$',
     'invalid-fŕáńḱ',
@@ -52,6 +58,24 @@ INVALID_PASSWORDS = [
     u'a' * (PASSWORD_MAX_LENGTH + 1)
 ]
 
+INVALID_COUNTRIES = [
+    None,
+    "",
+    "--"
+]
+
+VALID_NAMES = [
+    'Validation Bot',
+    u'Validation Bot'
+]
+
+VALID_USERNAMES_UNICODE = [
+    u'Enchanté',
+    u'username_with_@',
+    u'username with spaces',
+    u'eastern_arabic_numbers_١٢٣',
+]
+
 VALID_USERNAMES = [
     u'username',
     u'a' * USERNAME_MIN_LENGTH,
@@ -71,4 +95,10 @@ VALID_PASSWORDS = [
     u'password',  # :)
     u'a' * PASSWORD_MIN_LENGTH,
     u'a' * PASSWORD_MAX_LENGTH
+]
+
+VALID_COUNTRIES = [
+    u'PK',
+    u'Pakistan',
+    u'US'
 ]

@@ -31,15 +31,7 @@ from student.forms import get_registration_extension_form
 from student.views import create_account_with_params, AccountValidationError
 from util.json_request import JsonResponse
 
-from .accounts import (
-    EMAIL_MAX_LENGTH, EMAIL_MIN_LENGTH,
-    NAME_MAX_LENGTH,
-    PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH,
-    USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH,
-    EMAIL_CONFLICT_MSG,
-    USERNAME_CONFLICT_MSG
-)
-from .accounts.api import check_account_exists
+import accounts
 from .helpers import FormDescription, require_post_params, shim_student_view
 from .models import UserPreference, UserProfile
 from .preferences.api import get_country_time_zones, update_email_opt_in
@@ -91,8 +83,8 @@ class LoginSessionView(APIView):
             placeholder=email_placeholder,
             instructions=email_instructions,
             restrictions={
-                "min_length": EMAIL_MIN_LENGTH,
-                "max_length": EMAIL_MAX_LENGTH,
+                "min_length": accounts.EMAIL_MIN_LENGTH,
+                "max_length": accounts.EMAIL_MAX_LENGTH,
             }
         )
 
@@ -105,8 +97,8 @@ class LoginSessionView(APIView):
             label=password_label,
             field_type="password",
             restrictions={
-                "min_length": PASSWORD_MIN_LENGTH,
-                "max_length": PASSWORD_MAX_LENGTH,
+                "min_length": accounts.PASSWORD_MIN_LENGTH,
+                "max_length": accounts.PASSWORD_MAX_LENGTH,
             }
         )
 
@@ -336,11 +328,11 @@ class RegistrationView(APIView):
         username = data.get('username')
 
         # Handle duplicate email/username
-        conflicts = check_account_exists(email=email, username=username)
+        conflicts = accounts.api.check_account_exists(email=email, username=username)
         if conflicts:
             conflict_messages = {
-                "email": EMAIL_CONFLICT_MSG.format(email_address=email),
-                "username": USERNAME_CONFLICT_MSG.format(username=username),
+                "email": accounts.EMAIL_CONFLICT_MSG.format(email_address=email),
+                "username": accounts.USERNAME_CONFLICT_MSG.format(username=username),
             }
             errors = {
                 field: [{"user_message": conflict_messages[field]}]
@@ -414,8 +406,8 @@ class RegistrationView(APIView):
             placeholder=email_placeholder,
             instructions=email_instructions,
             restrictions={
-                "min_length": EMAIL_MIN_LENGTH,
-                "max_length": EMAIL_MAX_LENGTH,
+                "min_length": accounts.EMAIL_MIN_LENGTH,
+                "max_length": accounts.EMAIL_MAX_LENGTH,
             },
             required=required
         )
@@ -433,7 +425,7 @@ class RegistrationView(APIView):
         # Translators: This label appears above a field on the registration form
         # meant to confirm the user's email address.
         email_label = _(u"Confirm Email")
-        error_msg = _(u"The email addresses do not match.")
+        error_msg = accounts.REQUIRED_FIELD_CONFIRM_EMAIL_MSG
 
         form_desc.add_field(
             "confirm_email",
@@ -472,7 +464,7 @@ class RegistrationView(APIView):
             placeholder=name_placeholder,
             instructions=name_instructions,
             restrictions={
-                "max_length": NAME_MAX_LENGTH,
+                "max_length": accounts.NAME_MAX_LENGTH,
             },
             required=required
         )
@@ -508,8 +500,8 @@ class RegistrationView(APIView):
             instructions=username_instructions,
             placeholder=username_placeholder,
             restrictions={
-                "min_length": USERNAME_MIN_LENGTH,
-                "max_length": USERNAME_MAX_LENGTH,
+                "min_length": accounts.USERNAME_MIN_LENGTH,
+                "max_length": accounts.USERNAME_MAX_LENGTH,
             },
             required=required
         )
@@ -533,8 +525,8 @@ class RegistrationView(APIView):
             label=password_label,
             field_type="password",
             restrictions={
-                "min_length": PASSWORD_MIN_LENGTH,
-                "max_length": PASSWORD_MAX_LENGTH,
+                "min_length": accounts.PASSWORD_MIN_LENGTH,
+                "max_length": accounts.PASSWORD_MAX_LENGTH,
             },
             required=required
         )
@@ -552,6 +544,7 @@ class RegistrationView(APIView):
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's highest completed level of education.
         education_level_label = _(u"Highest level of education completed")
+        error_msg = accounts.REQUIRED_FIELD_LEVEL_OF_EDUCATION_MSG
 
         # The labels are marked for translation in UserProfile model definition.
         options = [(name, _(label)) for name, label in UserProfile.LEVEL_OF_EDUCATION_CHOICES]  # pylint: disable=translation-of-non-string
@@ -561,7 +554,10 @@ class RegistrationView(APIView):
             field_type="select",
             options=options,
             include_default_option=True,
-            required=required
+            required=required,
+            error_messages={
+                "required": error_msg
+            }
         )
 
     def _add_gender_field(self, form_desc, required=True):
@@ -626,12 +622,16 @@ class RegistrationView(APIView):
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's mailing address.
         mailing_address_label = _(u"Mailing address")
+        error_msg = accounts.REQUIRED_FIELD_MAILING_ADDRESS_MSG
 
         form_desc.add_field(
             "mailing_address",
             label=mailing_address_label,
             field_type="textarea",
-            required=required
+            required=required,
+            error_messages={
+                "required": error_msg
+            }
         )
 
     def _add_goals_field(self, form_desc, required=True):
@@ -649,12 +649,16 @@ class RegistrationView(APIView):
         goals_label = _(u"Tell us why you're interested in {platform_name}").format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
         )
+        error_msg = accounts.REQUIRED_FIELD_GOALS_MSG
 
         form_desc.add_field(
             "goals",
             label=goals_label,
             field_type="textarea",
-            required=required
+            required=required,
+            error_messages={
+                "required": error_msg
+            }
         )
 
     def _add_city_field(self, form_desc, required=True):
@@ -670,11 +674,15 @@ class RegistrationView(APIView):
         # Translators: This label appears above a field on the registration form
         # which allows the user to input the city in which they live.
         city_label = _(u"City")
+        error_msg = accounts.REQUIRED_FIELD_CITY_MSG
 
         form_desc.add_field(
             "city",
             label=city_label,
-            required=required
+            required=required,
+            error_messages={
+                "required": error_msg
+            }
         )
 
     def _add_state_field(self, form_desc, required=False):
@@ -790,7 +798,7 @@ class RegistrationView(APIView):
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the country in which the user lives.
         country_label = _(u"Country")
-        error_msg = _(u"Please select your Country.")
+        error_msg = accounts.REQUIRED_FIELD_COUNTRY_MSG
 
         # If we set a country code, make sure it's uppercase for the sake of the form.
         default_country = form_desc._field_overrides.get('country', {}).get('defaultValue')
@@ -1025,8 +1033,8 @@ class PasswordResetView(APIView):
             placeholder=email_placeholder,
             instructions=email_instructions,
             restrictions={
-                "min_length": EMAIL_MIN_LENGTH,
-                "max_length": EMAIL_MAX_LENGTH,
+                "min_length": accounts.EMAIL_MIN_LENGTH,
+                "max_length": accounts.EMAIL_MAX_LENGTH,
             }
         )
 
@@ -1094,7 +1102,9 @@ class PreferenceUsersListView(generics.ListAPIView):
     paginate_by_param = "page_size"
 
     def get_queryset(self):
-        return User.objects.filter(preferences__key=self.kwargs["pref_key"]).prefetch_related("preferences").select_related("profile")
+        return User.objects.filter(
+            preferences__key=self.kwargs["pref_key"]
+        ).prefetch_related("preferences").select_related("profile")
 
 
 class UpdateEmailOptInPreference(APIView):

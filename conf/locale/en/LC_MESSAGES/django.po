@@ -331,31 +331,6 @@ msgid "User profile"
 msgstr ""
 
 #: common/djangoapps/student/forms.py
-msgid "Username must be minimum of two characters long"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-#, python-format
-msgid "Username cannot be more than %(limit_value)s characters long"
-msgstr ""
-
-#. Translators: This message is shown when the Unicode usernames are NOT
-#. allowed
-#: common/djangoapps/student/forms.py
-msgid ""
-"Usernames can only contain Roman letters, western numerals (0-9), "
-"underscores (_), and hyphens (-)."
-msgstr ""
-
-#. Translators: This message is shown only when the Unicode usernames are
-#. allowed
-#: common/djangoapps/student/forms.py
-msgid ""
-"Usernames can only contain letters, numerals, underscore (_), numbers and "
-"@/./+/-/_ characters."
-msgstr ""
-
-#: common/djangoapps/student/forms.py
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
@@ -9288,23 +9263,83 @@ msgstr ""
 msgid "Enable course home page improvements."
 msgstr ""
 
-#: openedx/core/djangoapps/theming/views.py
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid ""
+"Usernames can only contain letters (A-Z, a-z), numerals (0-9), underscores "
+"(_), and hyphens (-)."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid ""
+"Usernames can only contain letters, numerals, and @/./+/-/_ characters."
+msgstr ""
+
+#. Translators: This message is shown to users who attempt to create a new
+#. account using
+#. an invalid email format.
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
-msgid "Site theme changed to {site_theme}"
+msgid "\"{email}\" is not a valid email address."
 msgstr ""
 
-#: openedx/core/djangoapps/theming/views.py
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
-msgid "Theme {site_theme} does not exist"
+msgid ""
+"It looks like {email_address} belongs to an existing account. Try again with"
+" a different email address."
 msgstr ""
 
-#: openedx/core/djangoapps/theming/views.py
-msgid "Site theme reverted to the default"
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid ""
+"It looks like {username} belongs to an existing account. Try again with a "
+"different username."
 msgstr ""
 
-#: openedx/core/djangoapps/theming/views.py
-#: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
-msgid "Theming Administration"
+#. Translators: This message is shown to users who enter a
+#. username/email/password
+#. with an inappropriate length (too short or too long).
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid "Username must be between {min} and {max} characters long."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid "Enter a valid email address that contains at least {min} characters."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please enter a password."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Password is not long enough."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid "Password cannot be longer than {max} character."
+msgstr ""
+
+#. Translators: This message is shown to users who enter a password matching
+#. the username they enter(ed).
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Password cannot be the same as the username."
+msgstr ""
+
+#. Translators: These messages are shown to users who do not enter information
+#. into the required field or enter it incorrectly.
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please enter your Full Name."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "The email addresses do not match."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please select your Country."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
@@ -9392,24 +9427,6 @@ msgstr ""
 msgid "Remember me"
 msgstr ""
 
-#. Translators: This message is shown to users who attempt to create a new
-#. account using an email address associated with an existing account.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid ""
-"It looks like {email_address} belongs to an existing account. Try again with"
-" a different email address."
-msgstr ""
-
-#. Translators: This message is shown to users who attempt to create a new
-#. account using a username associated with an existing account.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid ""
-"It looks like {username} belongs to an existing account. Try again with a "
-"different username."
-msgstr ""
-
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -9421,10 +9438,6 @@ msgstr ""
 #. meant to confirm the user's email address.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Confirm Email"
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/views.py
-msgid "The email addresses do not match."
 msgstr ""
 
 #. Translators: This example name is used as a placeholder in
@@ -9503,10 +9516,6 @@ msgstr ""
 #. which allows the user to input the Company
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Company"
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Please select your Country."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py

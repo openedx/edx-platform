@@ -5,6 +5,8 @@ import json
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
+from openedx.core.djangoapps.user_api.accounts import USERNAME_BAD_LENGTH_MSG
+
 
 class TestLongUsernameEmail(TestCase):
 
@@ -34,7 +36,7 @@ class TestLongUsernameEmail(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Username cannot be more than 30 characters long",
+            USERNAME_BAD_LENGTH_MSG,
         )
 
     def test_long_email(self):

@@ -21,7 +21,7 @@
                 var _fn = {
                     validate: {
 
-                        template: _.template('<li><%= content %></li>'),
+                        template: _.template('<li id="<%- id %>-validation-error-container"><%- content %></li>'),
 
                         msg: {
                             email: gettext("The email address you've provided isn't formatted correctly."),
@@ -32,6 +32,7 @@
 
                         field: function(el) {
                             var $el = $(el),
+                                id = $el.attr('id'),
                                 required = true,
                                 min = true,
                                 max = true,
@@ -65,6 +66,8 @@
                                     email: email
                                 });
                             }
+
+                            response.id = id;
 
                             return response;
                         },
@@ -107,7 +110,7 @@
                             regex: new RegExp(
                             [
                                 '(^[-!#$%&\'*+/=?^_`{}|~0-9A-Z]+(\\.[-!#$%&\'*+/=?^_`{}|~0-9A-Z]+)*',
-                                '|^"([\\001-\\010\\013\\014\\016-\\037!#-\\[\\]-\\177]|\\\\[\\001-\\011\\013\\014\\016-\\177])*"',
+                                '|^"([\\001-\\010\\013\\014\\016-\\037!#-\\[\\]-\\177]|\\\\[\\001-\\011\\013\\014\\016-\\177])*"', // eslint-disable-line max-len
                                 ')@((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\\.)+[A-Z]{2,6}\\.?$)',
                                 '|\\[(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}\\]$'
                             ].join(''), 'i'
@@ -124,7 +127,7 @@
 
                         getLabel: function(id) {
                         // Extract the field label, remove the asterisk (if it appears) and any extra whitespace
-                            return $('label[for=' + id + ']').text().split('*')[0].trim();
+                            return $('label[for=' + id + '] > span.label-text').text().split('*')[0].trim();
                         },
 
                         getMessage: function($el, tests) {
@@ -154,7 +157,10 @@
                                         content = _.sprintf(_fn.validate.msg[key], context);
                                     }
 
-                                    txt.push(_fn.validate.template({content: content}));
+                                    txt.push(_fn.validate.template({
+                                        content: content,
+                                        id: $el.attr('id')
+                                    }));
                                 }
                             });
 
@@ -173,7 +179,7 @@
                 return {
                     validate: _fn.validate.field
                 };
-            })();
+            }());
 
             return utils;
         });
