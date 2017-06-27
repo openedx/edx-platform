@@ -9,6 +9,9 @@ from rest_framework.views import APIView
 from openedx.core.djangoapps.user_api.accounts.api import (
     get_email_validation_error,
     get_email_existence_validation_error,
+    get_confirm_email_validation_error,
+    get_country_validation_error,
+    get_name_validation_error,
     get_password_validation_error,
     get_username_validation_error,
     get_username_existence_validation_error
@@ -85,38 +88,66 @@ class RegistrationValidationView(APIView):
 
         **Available Handlers**
 
+            "name":
+                A handler to check the validity of the user's real name.
             "username":
                 A handler to check the validity of usernames.
             "email":
                 A handler to check the validity of emails.
+            "confirm_email":
+                A handler to check whether the confirmation email field matches
+                the email field.
             "password":
                 A handler to check the validity of passwords; a compatibility
                 decision with the username is made if it exists in the input.
+            "country":
+                A handler to check whether the validity of country fields.
     """
+
+    # This end-point is available to anonymous users, so no authentication is needed.
+    authentication_classes = []
+
+    def name_handler(self, request):
+        name = request.data.get('name')
+        return get_name_validation_error(name)
 
     def username_handler(self, request):
         username = request.data.get('username')
         invalid_username_error = get_username_validation_error(username)
         username_exists_error = get_username_existence_validation_error(username)
-        # Existing usernames are already valid, so we prefer that error.
-        return username_exists_error or invalid_username_error
+        # We prefer seeing for invalidity first.
+        # Some invalid usernames (like for superusers) may exist.
+        return invalid_username_error or username_exists_error
 
     def email_handler(self, request):
         email = request.data.get('email')
         invalid_email_error = get_email_validation_error(email)
         email_exists_error = get_email_existence_validation_error(email)
-        # Existing emails are already valid, so we prefer that error.
-        return email_exists_error or invalid_email_error
+        # We prefer seeing for invalidity first.
+        # Some invalid emails (like a blank one for superusers) may exist.
+        return invalid_email_error or email_exists_error
+
+    def confirm_email_handler(self, request):
+        email = request.data.get('email', None)
+        confirm_email = request.data.get('confirm_email')
+        return get_confirm_email_validation_error(confirm_email, email)
 
     def password_handler(self, request):
-        username = request.data.get('username') or None
+        username = request.data.get('username', None)
         password = request.data.get('password')
         return get_password_validation_error(password, username)
 
+    def country_handler(self, request):
+        country = request.data.get('country')
+        return get_country_validation_error(country)
+
     validation_handlers = {
+        "name": name_handler,
         "username": username_handler,
         "email": email_handler,
+        "confirm_email": confirm_email_handler,
         "password": password_handler,
+        "country": country_handler
     }
 
     def post(self, request):
@@ -125,9 +156,12 @@ class RegistrationValidationView(APIView):
 
         Expects request of the form
         >>> {
+        >>>     "name": "Dan the Validator",
         >>>     "username": "mslm",
         >>>     "email": "mslm@gmail.com",
-        >>>     "password": "password123"
+        >>>     "confirm_email": "mslm@gmail.com",
+        >>>     "password": "password123",
+        >>>     "country": "PK"
         >>> }
         where each key is the appropriate form field name and the value is
         user input. One may enter individual inputs if needed. Some inputs

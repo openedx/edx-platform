@@ -4,29 +4,45 @@
         'jquery',
         'underscore',
         'gettext',
+        'edx-ui-toolkit/js/utils/string-utils',
         'js/student_account/views/FormView',
         'text!templates/student_account/form_status.underscore'
     ],
-        function($, _, gettext, FormView, formStatusTpl) {
+        function(
+            $, _, gettext,
+            StringUtils,
+            FormView,
+            formStatusTpl
+        ) {
             return FormView.extend({
                 el: '#register-form',
-
                 tpl: '#register-tpl',
-
+                validationUrl: '/api/user/v1/validation/registration',
                 events: {
                     'click .js-register': 'submitForm',
-                    'click .login-provider': 'thirdPartyAuth'
+                    'click .login-provider': 'thirdPartyAuth',
+                    'click input[required][type="checkbox"]': 'liveValidateHandler',
+                    'blur input[required], textarea[required], select[required]': 'liveValidateHandler',
+                    'focus input[required], textarea[required], select[required]': 'handleRequiredInputFocus'
                 },
-
+                liveValidationFields: [
+                    'name',
+                    'username',
+                    'password',
+                    'email',
+                    'confirm_email',
+                    'country',
+                    'honor_code',
+                    'terms_of_service'
+                ],
                 formType: 'register',
-
                 formStatusTpl: formStatusTpl,
-
                 authWarningJsHook: 'js-auth-warning',
-
                 defaultFormErrorsTitle: gettext('We couldn\'t create your account.'),
-
                 submitButton: '.js-register',
+                positiveValidationIcon: 'fa-check',
+                negativeValidationIcon: 'fa-exclamation',
+                successfulValidationDisplaySeconds: 3,
 
                 preRender: function(data) {
                     this.providers = data.thirdPartyAuth.providers || [];
@@ -41,6 +57,7 @@
                     this.autoRegisterWelcomeMessage = data.thirdPartyAuth.autoRegisterWelcomeMessage || '';
 
                     this.listenTo(this.model, 'sync', this.saveSuccess);
+                    this.listenTo(this.model, 'validation', this.renderLiveValidations);
                 },
 
                 render: function(html) {
@@ -79,6 +96,144 @@
                     return this;
                 },
 
+                hideRequiredMessageExceptOnError: function($el) {
+                    // We only handle blur if not in an error state.
+                    if (!$el.hasClass('error')) {
+                        this.hideRequiredMessage($el);
+                    }
+                },
+
+                hideRequiredMessage: function($el) {
+                    this.doOnInputLabel($el, function($label) {
+                        $label.addClass('hidden');
+                    });
+                },
+
+                doOnInputLabel: function($el, action) {
+                    var $label = this.getRequiredTextLabel($el);
+                    action($label);
+                },
+
+                handleRequiredInputFocus: function(event) {
+                    var $el = $(event.currentTarget);
+                    // Avoid rendering for required checkboxes.
+                    if ($el.attr('type') !== 'checkbox') {
+                        this.renderRequiredMessage($el);
+                    }
+                    if ($el.hasClass('error')) {
+                        this.doOnInputLabel($el, function($label) {
+                            $label.addClass('error');
+                        });
+                    }
+                },
+
+                renderRequiredMessage: function($el) {
+                    this.doOnInputLabel($el, function($label) {
+                        $label.removeClass('hidden').text(gettext('(required)'));
+                    });
+                },
+
+                getRequiredTextLabel: function($el) {
+                    return $('#' + $el.attr('id') + '-required-label');
+                },
+
+                renderLiveValidations: function($el, decisions) {
+                    var $label = this.getLabel($el),
+                        $requiredTextLabel = this.getRequiredTextLabel($el),
+                        $icon = this.getIcon($el),
+                        $errorTip = this.getErrorTip($el),
+                        name = $el.attr('name'),
+                        type = $el.attr('type'),
+                        isCheckbox = type === 'checkbox',
+                        hasError = decisions.validation_decisions[name] !== '',
+                        error = isCheckbox ? '' : decisions.validation_decisions[name];
+
+                    if (hasError) {
+                        this.renderLiveValidationError($el, $label, $requiredTextLabel, $icon, $errorTip, error);
+                    } else {
+                        this.renderLiveValidationSuccess($el, $label, $requiredTextLabel, $icon, $errorTip);
+                    }
+                },
+
+                getLabel: function($el) {
+                    return this.$form.find('label[for=' + $el.attr('id') + ']');
+                },
+
+                getIcon: function($el) {
+                    return $('#' + $el.attr('id') + '-validation-icon');
+                },
+
+                getErrorTip: function($el) {
+                    return $('#' + $el.attr('id') + '-validation-error-msg');
+                },
+
+                getFieldTimeout: function($el) {
+                    return $('#' + $el.attr('id')).attr('timeout-id') || null;
+                },
+
+                setFieldTimeout: function($el, time, action) {
+                    $el.attr('timeout-id', setTimeout(action, time));
+                },
+
+                clearFieldTimeout: function($el) {
+                    var timeout = this.getFieldTimeout($el);
+                    if (timeout) {
+                        clearTimeout(this.getFieldTimeout($el));
+                        $el.removeAttr('timeout-id');
+                    }
+                },
+
+                renderLiveValidationError: function($el, $label, $req, $icon, $tip, error) {
+                    this.removeLiveValidationIndicators(
+                        $el, $label, $req, $icon,
+                        'success', this.positiveValidationIcon
+                    );
+                    this.addLiveValidationIndicators(
+                        $el, $label, $req, $icon, $tip,
+                        'error', this.negativeValidationIcon, error
+                    );
+                    this.renderRequiredMessage($el);
+                },
+
+                renderLiveValidationSuccess: function($el, $label, $req, $icon, $tip) {
+                    var self = this,
+                        validationFadeTime = this.successfulValidationDisplaySeconds * 1000;
+                    this.removeLiveValidationIndicators(
+                        $el, $label, $req, $icon,
+                        'error', this.negativeValidationIcon
+                    );
+                    this.addLiveValidationIndicators(
+                        $el, $label, $req, $icon, $tip,
+                        'success', this.positiveValidationIcon, ''
+                    );
+                    this.hideRequiredMessage($el);
+
+                    // Hide success indicators after some time.
+                    this.clearFieldTimeout($el);
+                    this.setFieldTimeout($el, validationFadeTime, function() {
+                        self.removeLiveValidationIndicators(
+                            $el, $label, $req, $icon,
+                            'success', self.positiveValidationIcon
+                        );
+                        self.clearFieldTimeout($el);
+                    });
+                },
+
+                addLiveValidationIndicators: function($el, $label, $req, $icon, $tip, indicator, icon, msg) {
+                    $el.addClass(indicator);
+                    $label.addClass(indicator);
+                    $req.addClass(indicator);
+                    $icon.addClass(indicator + ' ' + icon);
+                    $tip.text(msg);
+                },
+
+                removeLiveValidationIndicators: function($el, $label, $req, $icon, indicator, icon) {
+                    $el.removeClass(indicator);
+                    $label.removeClass(indicator);
+                    $req.removeClass(indicator);
+                    $icon.removeClass(indicator + ' ' + icon);
+                },
+
                 thirdPartyAuth: function(event) {
                     var providerUrl = $(event.currentTarget).data('provider-url') || '';
 
@@ -100,7 +255,11 @@
                             function(errorList) {
                                 return _.map(
                                     errorList,
-                                    function(errorItem) { return '<li>' + errorItem.user_message + '</li>'; }
+                                    function(errorItem) {
+                                        return StringUtils.interpolate('<li>{error}</li>', {
+                                            error: errorItem.user_message
+                                        });
+                                    }
                                 );
                             }
                         )
@@ -135,32 +294,103 @@
                 getFormData: function() {
                     var obj = FormView.prototype.getFormData.apply(this, arguments),
                         $form = this.$form,
-                        $label,
-                        $emailElement,
-                        $confirmEmailElement,
-                        email = '',
-                        confirmEmail = '';
+                        $emailElement = $form.find('input[name=email]'),
+                        $confirmEmail = $form.find('input[name=confirm_email]'),
+                        elements = $form[0].elements,
+                        $el,
+                        key = '',
+                        i;
 
-                    $emailElement = $form.find('input[name=email]');
-                    $confirmEmailElement = $form.find('input[name=confirm_email]');
+                    for (i = 0; i < elements.length; i++) {
+                        $el = $(elements[i]);
+                        key = $el.attr('name') || false;
 
-                    if ($confirmEmailElement.length) {
-                        email = $emailElement.val();
-                        confirmEmail = $confirmEmailElement.val();
-                        $label = $form.find('label[for=' + $confirmEmailElement.attr('id') + ']');
+                        // Due to a bug in firefox, whitespaces in email type field are not removed.
+                        // TODO: Remove this code once firefox bug is resolved.
+                        if (key === 'email') {
+                            $el.val($el.val().trim());
+                        }
 
-                        if (confirmEmail !== '' && email !== confirmEmail) {
-                            this.errors.push('<li>' + $confirmEmailElement.data('errormsg-required') + '</li>');
-                            $confirmEmailElement.addClass('error');
-                            $label.addClass('error');
-                        } else if (confirmEmail !== '') {
-                            obj.confirm_email = confirmEmail;
-                            $confirmEmailElement.removeClass('error');
-                            $label.removeClass('error');
+                        // Simulate live validation.
+                        if ($el.attr('required')) {
+                            $el.blur();
+
+                            // Special case: show required string for errors even if we're not focused.
+                            if ($el.hasClass('error')) {
+                                this.renderRequiredMessage($el);
+                            }
                         }
                     }
 
+                    if ($confirmEmail.length) {
+                        if (!$confirmEmail.val() || ($emailElement.val() !== $confirmEmail.val())) {
+                            this.errors.push(StringUtils.interpolate('<li>{error}</li>', {
+                                error: $confirmEmail.data('errormsg-required')
+                            }));
+                        }
+                        obj.confirm_email = $confirmEmail.val();
+                    }
+
                     return obj;
+                },
+
+                liveValidateHandler: function(event) {
+                    var $el = $(event.currentTarget);
+                    // Until we get a back-end that can handle all available
+                    // registration fields, we do some generic validation here.
+                    if (this.inLiveValidationFields($el)) {
+                        if ($el.attr('type') === 'checkbox') {
+                            this.liveValidateCheckbox($el);
+                        } else {
+                            this.liveValidate($el);
+                        }
+                    } else {
+                        this.genericLiveValidateHandler($el);
+                    }
+                    // On blur, we do exactly as the function name says, no matter which input.
+                    this.hideRequiredMessageExceptOnError($el);
+                },
+
+                liveValidate: function($el) {
+                    var data = {},
+                        field,
+                        i;
+                    for (i = 0; i < this.liveValidationFields.length; ++i) {
+                        field = this.liveValidationFields[i];
+                        data[field] = $('#register-' + field).val();
+                    }
+                    FormView.prototype.liveValidate(
+                        $el, this.validationUrl, 'json', data, 'POST', this.model
+                    );
+                },
+
+                liveValidateCheckbox: function($checkbox) {
+                    var validationDecisions = {validation_decisions: {}},
+                        decisions = validationDecisions.validation_decisions,
+                        name = $checkbox.attr('name'),
+                        checked = $checkbox.is(':checked'),
+                        error = $checkbox.data('errormsg-required');
+                    decisions[name] = checked ? '' : error;
+                    this.renderLiveValidations($checkbox, validationDecisions);
+                },
+
+                genericLiveValidateHandler: function($el) {
+                    var elementType = $el.attr('type');
+                    if (elementType === 'checkbox') {
+                    // We are already validating checkboxes in a generic way.
+                        this.liveValidateCheckbox($el);
+                    } else {
+                        this.genericLiveValidate($el);
+                    }
+                },
+
+                genericLiveValidate: function($el) {
+                    var validationDecisions = {validation_decisions: {}},
+                        decisions = validationDecisions.validation_decisions,
+                        name = $el.attr('name'),
+                        error = $el.data('errormsg-required');
+                    decisions[name] = $el.val() ? '' : error;
+                    this.renderLiveValidations($el, validationDecisions);
                 }
             });
         });
