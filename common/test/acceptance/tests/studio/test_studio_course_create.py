@@ -98,6 +98,8 @@ class CreateCourseTest(AcceptanceTest):
             org=self.course_org, number=self.course_number, run=self.course_run
         ))
 
+        # TODO: click on the course listing and make sure the course opens
+
     def test_create_course_with_existing_org_via_autocomplete(self):
         """
         Scenario: Ensure that the course creation with an existing org should be successful.

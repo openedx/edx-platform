@@ -61,6 +61,8 @@ class CreateLibraryTest(AcceptanceTest):
         self.dashboard_page.visit()
         self.assertTrue(self.dashboard_page.has_library(name=name, org=org, number=number))
 
+        # TODO: click on the library link and verify the lib_page loads
+
 
 class StudioLanguageTest(AcceptanceTest):
     """ Test suite for the Studio Language """
