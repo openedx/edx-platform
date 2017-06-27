@@ -1,0 +1,5 @@
+<div class="access-editor-action-wrapper">
+    <button class="unit-container access-button">
+        <span class="icon fa fa-gear" aria-hidden="true"></span><span class="sr"> <%- gettext('Set Access') %></span>
+    </button>
+</div>

@@ -119,7 +119,11 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'common
             getTitle: function() {
                 var displayName = this.xblockInfo.get('display_name');
                 if (!displayName) {
-                    displayName = gettext('Component');
+                    if (this.xblockInfo.isVertical()) {
+                        displayName = gettext('Unit');
+                    } else {
+                        displayName = gettext('Component');
+                    }
                 }
                 return interpolate(this.options.titleFormat, {title: displayName}, true);
             },

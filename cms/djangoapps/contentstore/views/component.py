@@ -46,8 +46,8 @@ CONTAINER_TEMPLATES = [
     "editor-mode-button", "upload-dialog",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
     "add-xblock-component-support-legend", "add-xblock-component-support-level", "add-xblock-component-menu-problem",
-    "xblock-string-field-editor", "publish-xblock", "publish-history",
-    "unit-outline", "container-message", "container-unit-access", "license-selector",
+    "xblock-string-field-editor", "xblock-access-editor", "publish-xblock", "publish-history",
+    "unit-outline", "container-message", "container-access", "license-selector",
 ]
 
 

@@ -284,6 +284,12 @@ class ContainerPage(PageObject, HelpMixin):
         """
         return _click_edit(self, '.edit-button', '.xblock-studio_view')
 
+    def edit_visibility(self):
+        """
+        Clicks the edit visibility button for this container.
+        """
+        return _click_edit(self, '.access-button', '.xblock-visibility_view')
+
     def verify_confirmation_message(self, message, verify_hidden=False):
         """
         Verify for confirmation message is present or hidden.
@@ -523,7 +529,7 @@ class XBlockWrapper(PageObject):
         Returns true if this xblock has an 'edit visibility' button
         :return:
         """
-        return self.q(css=self._bounded_selector('.visibility-button')).is_present()
+        return self.q(css=self._bounded_selector('.access-button')).is_present()
 
     @property
     def has_move_modal_button(self):
@@ -558,7 +564,7 @@ class XBlockWrapper(PageObject):
         """
         Clicks the edit visibility button for this xblock.
         """
-        return _click_edit(self, '.visibility-button', '.xblock-visibility_view', self._bounded_selector)
+        return _click_edit(self, '.access-button', '.xblock-visibility_view', self._bounded_selector)
 
     def open_advanced_tab(self):
         """

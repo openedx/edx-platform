@@ -14,7 +14,7 @@ from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage, StudentSpecificAdmin
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
-from ...pages.studio.component_editor import ComponentEditorView
+from ...pages.studio.xblock_editor import XBlockEditorView
 from ...pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from ...pages.studio.utils import type_in_codemirror
 from ..helpers import (
@@ -179,7 +179,7 @@ class PersistentGradesTest(ProgressPageBaseTest):
         """
         unit, component = self._get_problem_in_studio()
         component.edit()
-        component_editor = ComponentEditorView(self.browser, component.locator)
+        component_editor = XBlockEditorView(self.browser, component.locator)
         component_editor.set_field_value_and_save('Problem Weight', 5)
         unit.publish()
 

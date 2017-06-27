@@ -1232,11 +1232,10 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             else:
                 xblock_info['staff_only_message'] = False
 
-            xblock_info["has_partition_group_components"] = has_children_visible_to_specific_partition_groups(
+            xblock_info['has_partition_group_components'] = has_children_visible_to_specific_partition_groups(
                 xblock
             )
-        if course_outline or xblock.category == 'vertical':
-            xblock_info["user_partition_info"] = get_visibility_partition_info(xblock, course=course)
+        xblock_info['user_partition_info'] = get_visibility_partition_info(xblock, course=course)
 
     return xblock_info
 
