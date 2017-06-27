@@ -1,9 +1,15 @@
+/**
+ * Keyboard support for the user dropdown on legacy pages.
+ *
+ * Note: this is not used for Pattern Library or Bootstrap pages.
+ */
+
 $(document).ready(function() {
     'use strict';
 
     // define variables for code legibility
-    var $dropdownMenuToggle = $('.dropdown');
-    var $dropdownMenu = $('.dropdown-menu');
+    var $dropdownMenuToggle = $('.user-dropdown');
+    var $dropdownMenu = $('.user-dropdown-menu');
     var menuItems = $dropdownMenu.find('.dropdown-menuitem');
 
     var keyCodes = {

@@ -13,12 +13,14 @@
 <%namespace name='static' file='static_content.html'/>
 <% online_help_token = self.online_help_token() if hasattr(self, 'online_help_token') else None %>
 <%!
+from branding import api as branding_api
 from django.core.urlresolvers import reverse
 from django.utils.http import urlquote_plus
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language_bidi
-from branding import api as branding_api
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from pipeline_mako import render_require_js_path_overrides
+
 %>
 <!DOCTYPE html>
 <!--[if lte IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
@@ -67,28 +69,20 @@ from pipeline_mako import render_require_js_path_overrides
     <%static:css group='${self.attr.main_css}'/>
   % endif
 
-  % if not uses_pattern_library:
-    % if disable_courseware_js:
-      <%static:js group='base_vendor'/>
-      <%static:js group='base_application'/>
-    % else:
-      <%static:js group='main_vendor'/>
-      <%static:js group='application'/>
-    % endif
-  % else:
-    ## TODO: Update to only bring in RequireJS
-    ## https://openedx.atlassian.net/browse/FEDX-140
+  % if disable_courseware_js or uses_pattern_library:
     <%static:js group='base_vendor'/>
     <%static:js group='base_application'/>
+  % else:
+    <%static:js group='main_vendor'/>
+    <%static:js group='application'/>
   % endif
 
   % if uses_bootstrap:
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <%static:js group='lms_bootstrap'/>
   % endif
 
   <script>
-    window.baseUrl = "${settings.STATIC_URL}";
+    window.baseUrl = "${settings.STATIC_URL | n, js_escaped_string}";
     (function (require) {
       require.config({
           baseUrl: window.baseUrl
@@ -97,7 +91,7 @@ from pipeline_mako import render_require_js_path_overrides
   </script>
   <script type="text/javascript" src="${static.url("lms/js/require-config.js")}"></script>
   <%block name="js_overrides">
-    ${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES)}
+    ${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES) | n, decode.utf8}
   </%block>
 
   % if not disable_courseware_js:
@@ -120,7 +114,7 @@ from pipeline_mako import render_require_js_path_overrides
 % if ga_acct:
     <script type="text/javascript">
     var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', '${ga_acct}']);
+    _gaq.push(['_setAccount', '${ga_acct | n, js_escaped_string}']);
     _gaq.push(['_trackPageview']);
 
     (function() {
@@ -147,7 +141,7 @@ from pipeline_mako import render_require_js_path_overrides
         <%include file="/preview_menu.html" />
     % endif
 
-    <div class="content-wrapper container main-container" id="content">
+    <div class="content-wrapper ${"container-fluid" if uses_bootstrap else "container" } main-container" id="content">
       ${self.body()}
       <%block name="bodyextra"/>
     </div>
@@ -178,7 +172,7 @@ from pipeline_mako import render_require_js_path_overrides
 % if settings.FEATURES.get('ENABLE_ONLOAD_BEACON', False):
 <script>
   (function () {
-    var sample_rate = ${settings.ONLOAD_BEACON_SAMPLE_RATE};
+    var sample_rate = ${settings.ONLOAD_BEACON_SAMPLE_RATE | n, dump_js_escaped_json};
     var roll = Math.floor(Math.random() * 100)/100;
     var onloadBeaconSent = false;
 

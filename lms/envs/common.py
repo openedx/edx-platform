@@ -417,6 +417,7 @@ COMMON_ROOT = REPO_ROOT / "common"
 OPENEDX_ROOT = REPO_ROOT / "openedx"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
+NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
 
 DATA_DIR = COURSES_ROOT
 
@@ -427,7 +428,7 @@ sys.path.append(COMMON_ROOT / 'djangoapps')
 
 # For Node.js
 
-system_node_path = os.environ.get("NODE_PATH", REPO_ROOT / 'node_modules')
+system_node_path = os.environ.get("NODE_PATH", NODE_MODULES_ROOT)
 
 node_paths = [
     COMMON_ROOT / "static/js/vendor",
@@ -1340,7 +1341,7 @@ main_vendor_js = base_vendor_js + [
 base_application_js = [
     'js/src/utility.js',
     'js/src/logger.js',
-    'js/my_courses_dropdown.js',
+    'js/user_dropdown_v1.js',  # Custom dropdown keyboard handling for legacy pages
     'js/dialog_tab_controls.js',
     'js/src/string_utils.js',
     'js/form.ext.js',
@@ -1612,7 +1613,6 @@ PIPELINE_JS = {
         'source_filenames': base_application_js,
         'output_filename': 'js/lms-base-application.js',
     },
-
     'application': {
         'source_filenames': (
             common_js + xblock_runtime_js + base_application_js + lms_application_js +
@@ -1640,6 +1640,13 @@ PIPELINE_JS = {
     'main_vendor': {
         'source_filenames': main_vendor_js,
         'output_filename': 'js/lms-main_vendor.js',
+    },
+    'lms_bootstrap': {
+        'source_filenames': [
+            'common/js/vendor/tether.js',
+            'common/js/vendor/bootstrap.js',
+        ],
+        'output_filename': 'js/lms-bootstrap.js',
     },
     'module-descriptor-js': {
         'source_filenames': rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js'),
