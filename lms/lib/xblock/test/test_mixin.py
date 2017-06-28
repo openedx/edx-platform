@@ -4,7 +4,9 @@ Tests of the LMS XBlock Mixin
 import ddt
 from nose.plugins.attrib import attr
 
-from lms_xblock.mixin import INVALID_USER_PARTITION_VALIDATION, INVALID_USER_PARTITION_GROUP_VALIDATION
+from lms_xblock.mixin import (
+    INVALID_USER_PARTITION_VALIDATION, INVALID_USER_PARTITION_GROUP_VALIDATION, NONSENSICAL_ACCESS_RESTRICTION
+)
 from xblock.validation import ValidationMessage
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory, ItemFactory
@@ -127,6 +129,71 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.verify_validation_message(
             validation.messages[0],
             INVALID_USER_PARTITION_GROUP_VALIDATION,
+            ValidationMessage.ERROR,
+        )
+
+    def test_validate_nonsensical_access_restriction(self):
+        """
+        Test the validation messages produced for a component whose
+        access settings contradict the unit level access.
+        """
+        # Test that there is no validation message for non-contradicting access restrictions
+        self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
+        self.set_group_access(self.video_location, {self.user_partition.id: [self.group1.id]})
+        validation = self.store.get_item(self.video_location).validate()
+        self.assertEqual(len(validation.messages), 0)
+
+        # Now try again with opposing access restrictions
+        self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
+        self.set_group_access(self.video_location, {self.user_partition.id: [self.group2.id]})
+        validation = self.store.get_item(self.video_location).validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            NONSENSICAL_ACCESS_RESTRICTION,
+            ValidationMessage.ERROR,
+        )
+
+        # Now try again when the component restricts access to additional groups that the unit does not
+        self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
+        self.set_group_access(self.video_location, {self.user_partition.id: [self.group1.id, self.group2.id]})
+        validation = self.store.get_item(self.video_location).validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            NONSENSICAL_ACCESS_RESTRICTION,
+            ValidationMessage.ERROR,
+        )
+
+        # Now try again when the component tries to allow access to all learners and staff
+        self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
+        self.set_group_access(self.video_location, {})
+        validation = self.store.get_item(self.video_location).validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            NONSENSICAL_ACCESS_RESTRICTION,
+            ValidationMessage.ERROR,
+        )
+
+    def test_nonsensical_access_restriction_does_not_override(self):
+        """
+        Test that the validation message produced for a component
+        whose access settings contradict the unit level access don't
+        override other messages but add on to them.
+        """
+        self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
+        self.set_group_access(self.video_location, {self.user_partition.id: [self.group2.id, 999]})
+        validation = self.store.get_item(self.video_location).validate()
+        self.assertEqual(len(validation.messages), 2)
+        self.verify_validation_message(
+            validation.messages[0],
+            INVALID_USER_PARTITION_GROUP_VALIDATION,
+            ValidationMessage.ERROR,
+        )
+        self.verify_validation_message(
+            validation.messages[1],
+            NONSENSICAL_ACCESS_RESTRICTION,
             ValidationMessage.ERROR,
         )
 
