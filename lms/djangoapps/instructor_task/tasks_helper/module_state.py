@@ -266,12 +266,12 @@ def override_problem_score_module_state(xmodule_instance_args, module_descriptor
             return UPDATE_STATUS_FAILED
 
         if not hasattr(instance, 'set_score'):
-            msg = "Score override is only valid for scorable components."
+            msg = "Scores cannot be updated for this problem type."
             raise UpdateProblemModuleStateError(msg)
 
         weighted_override_score = int(task_input['score'])
         if weighted_override_score < 0 or weighted_override_score > instance.max_score():
-            msg = "Score must be between 0 and the max points available for the problem."
+            msg = "Score must be between 0 and the maximum points available for the problem."
             raise UpdateProblemModuleStateError(msg)
 
         # Set the tracking info before this call, because it makes downstream

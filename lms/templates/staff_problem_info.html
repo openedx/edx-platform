@@ -68,7 +68,7 @@ ${block_content}
       </div>
       % if can_override_problem_score:
       <div>
-        <label for="sd_fs_${location.name | h}">${_('Score (for override only)')}:</label>
+        <label for="sd_fs_${location.name | h}">${_('Score (for manual update only)')}:</label>
         <input type="text" tabindex="0" id="sd_fs_${location.name | h}" placeholder="0"/>
         <label for="sd_fs_${location.name | h}"> / ${max_problem_score}</label>
       </div>

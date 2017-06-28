@@ -517,12 +517,12 @@
                 problem_to_reset: problemToReset,
                 score: score
             };
-            successMessage = gettext("Started override problem score task for problem '<%- problem_id %>' and student '<%- student_id %>'. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
+            successMessage = gettext("Started task to manually update the score for problem '<%- problem_id %>' and student '<%- student_id %>'. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
             fullSuccessMessage = _.template(successMessage)({
                 student_id: uniqStudentIdentifier,
                 problem_id: problemToReset
             });
-            defaultErrorMessage = gettext("Error starting a task to override score for problem '<%- problem_id %>' for student '<%- student_id %>'. Make sure that the the score and the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
+            defaultErrorMessage = gettext("Error starting a task to manually update score for problem '<%- problem_id %>' for student '<%- student_id %>'. Make sure that the the score and the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
             fullDefaultErrorMessage = _.template(defaultErrorMessage)({
                 student_id: uniqStudentIdentifier,
                 problem_id: problemToReset

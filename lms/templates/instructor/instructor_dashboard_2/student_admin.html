@@ -72,8 +72,8 @@
     <br><br>
 
     %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
-        <h5 class="hd hd-5">${_("Override")}</h5>
-        <label for="override-problem-score-single">${_("For the specified problem, override the learner's score.")}</label>
+        <h5 class="hd hd-5">${_("Manual Score Update")}</h5>
+        <label for="override-problem-score-single">${_("For the specified problem, manually update the learner's score.")}</label>
         <br><br>
         <label for="score-select-single">
             ${_("New score for problem, out of the total points available for the problem *")}<br>
@@ -82,7 +82,7 @@
         <input type="text" name="score-select-single" placeholder="${_('Score')}">
         <br><br>
         <span name="override-actions-single">
-            <input type="button" name="override-problem-score-single" value="${_('Override Learner\'s Score')}" data-endpoint="${ section_data['override_problem_score_url'] }">
+            <input type="button" name="override-problem-score-single" value="${_('Update Learner\'s Score')}" data-endpoint="${ section_data['override_problem_score_url'] }">
         </span>
     %endif
 

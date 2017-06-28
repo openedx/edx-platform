@@ -87,7 +87,7 @@ def override_problem_score(entry_id, xmodule_instance_args):
     Overrides a specific learner's score on a problem.
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    action_name = ugettext_noop('overridden')
+    action_name = ugettext_noop('updated')
     update_fcn = partial(override_problem_score_module_state, xmodule_instance_args)
 
     visit_fcn = partial(perform_module_state_update, update_fcn, None)
