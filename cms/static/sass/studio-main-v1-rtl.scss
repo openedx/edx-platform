@@ -14,7 +14,6 @@
 
 // +Libs and Resets - *do not edit*
 // ====================
-$output-bourbon-deprecation-warnings: false;
 @import 'bourbon/bourbon'; // lib - bourbon
 @import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
 
