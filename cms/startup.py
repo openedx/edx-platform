@@ -51,6 +51,11 @@ def run():
     # validate configurations on startup
     validate_cms_config(settings)
 
+    import gc
+    import logging
+    log = logging.getLogger(__name__)
+    log.info(gc.get_threshold())
+
 
 def add_mimetypes():
     """

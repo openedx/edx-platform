@@ -203,6 +203,18 @@ class SignalHandler(object):
         signal = self._mapping[signal_name]
         responses = signal.send_robust(sender=self.modulestore_class, **kwargs)
 
+        # EXTREMELY DEBUG VOICE: let's see if course_published is the cause of our runaway memory issue
+        if signal_name == 'course_published':
+            signal.send_robust(sender=self.modulestore_class, **kwargs)
+            signal.send_robust(sender=self.modulestore_class, **kwargs)
+            signal.send_robust(sender=self.modulestore_class, **kwargs)
+            signal.send_robust(sender=self.modulestore_class, **kwargs)
+            signal.send_robust(sender=self.modulestore_class, **kwargs)
+            signal.send_robust(sender=self.modulestore_class, **kwargs)
+            signal.send_robust(sender=self.modulestore_class, **kwargs)
+            signal.send_robust(sender=self.modulestore_class, **kwargs)
+            signal.send_robust(sender=self.modulestore_class, **kwargs)
+
         for receiver, response in responses:
             log.info('Sent %s signal to %s with kwargs %s. Response was: %s', signal_name, receiver, kwargs, response)
 
