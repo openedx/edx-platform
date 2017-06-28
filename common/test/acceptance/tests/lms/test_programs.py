@@ -9,8 +9,8 @@ from common.test.acceptance.pages.lms.catalog import CacheProgramsPage
 from common.test.acceptance.pages.lms.programs import ProgramDetailsPage, ProgramListingPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 from openedx.core.djangoapps.catalog.tests.factories import (
-    CourseFactory,
-    CourseRunFactory,
+    CourseFactory, 
+    CourseRunFactory, 
     ProgramFactory,
     ProgramTypeFactory
 )
@@ -42,7 +42,7 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
         course = CourseFactory(course_runs=[course_run])
 
         program_type = ProgramTypeFactory()
-        return ProgramFactory(courses=[course], type=program_type)
+        return ProgramFactory(courses=[course], type=program_type['name'])
 
     def stub_catalog_api(self, programs):
         """
