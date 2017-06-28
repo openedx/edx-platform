@@ -29,6 +29,8 @@ from student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.partitions.partitions_service import PartitionService
+from student.models import get_user_by_username_or_email
+
 
 log = logging.getLogger(__name__)
 
@@ -516,11 +518,35 @@ def get_ability(course_id, content, user):
     """
     Return a dictionary of forums-oriented actions and the user's permission to perform them
     """
+    content_user = get_user_by_username_or_email(content.get('username'))
+    user_group_id = get_group_id_for_user(user, get_course_discussion_settings(course_id))
+    content_user_group_id = get_group_id_for_user(content_user, get_course_discussion_settings(course_id))
     return {
-        'editable': check_permissions_by_view(user, course_id, content, "update_thread" if content['type'] == 'thread' else "update_comment"),
+        'editable': check_permissions_by_view(
+            user,
+            course_id,
+            content,
+            "update_thread" if content['type'] == 'thread' else "update_comment",
+            user_group_id,
+            content_user_group_id
+        ),
         'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment"),
-        'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if content['type'] == 'thread' else "delete_comment"),
-        'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if content['type'] == 'thread' else False,
+        'can_delete': check_permissions_by_view(
+            user,
+            course_id,
+            content,
+            "delete_thread" if content['type'] == 'thread' else "delete_comment",
+            user_group_id,
+            content_user_group_id
+        ),
+        'can_openclose': check_permissions_by_view(
+            user,
+            course_id,
+            content,
+            "openclose_thread" if content['type'] == 'thread' else False,
+            user_group_id,
+            content_user_group_id
+        ),
         'can_vote': not is_content_authored_by(content, user) and check_permissions_by_view(
             user,
             course_id,

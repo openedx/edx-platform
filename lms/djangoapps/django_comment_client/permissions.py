@@ -106,7 +106,7 @@ def _check_condition(user, condition, content):
     return handlers[condition](user, content)
 
 
-def _check_conditions_permissions(user, permissions, course_id, content):
+def _check_conditions_permissions(user, permissions, course_id, content, user_group_id=None, content_user_group=None):
     """
     Accepts a list of permissions and proceed if any of the permission is valid.
     Note that ["can_view", "can_edit"] will proceed if the user has either
@@ -118,6 +118,12 @@ def _check_conditions_permissions(user, permissions, course_id, content):
         if isinstance(per, basestring):
             if per in CONDITIONS:
                 return _check_condition(user, per, content)
+            # TODO: Consider changing this to something a little more clear
+            if 'group_' in per:
+                if (content_user_group is None or
+                        user_group_id is None or
+                        user_group_id != content_user_group):
+                    return False
             return has_permission(user, per, course_id=course_id)
         elif isinstance(per, list) and operator in ["and", "or"]:
             results = [test(user, x, operator="and") for x in per]
@@ -131,36 +137,42 @@ def _check_conditions_permissions(user, permissions, course_id, content):
 # Note: 'edit_content' is being used as a generic way of telling if someone is a privileged user
 # (forum Moderator/Admin/TA), because there is a desire that team membership does not impact privileged users.
 VIEW_PERMISSIONS = {
-    'update_thread': ['edit_content', ['update_thread', 'is_open', 'is_author']],
-    'create_comment': ['edit_content', ["create_comment", "is_open", "is_team_member_if_applicable"]],
-    'delete_thread': ['delete_thread', ['update_thread', 'is_author']],
-    'update_comment': ['edit_content', ['update_comment', 'is_open', 'is_author']],
+    'update_thread': ['group_edit_content', 'edit_content', ['update_thread', 'is_open', 'is_author']],
+    'create_comment': ['group_edit_content', 'edit_content', ["create_comment", "is_open",
+                                                              "is_team_member_if_applicable"]],
+    'delete_thread': ['group_delete_thread', 'delete_thread', ['update_thread', 'is_author']],
+    'update_comment': ['group_edit_content', 'edit_content', ['update_comment', 'is_open', 'is_author']],
     'endorse_comment': ['endorse_comment', 'is_question_author'],
-    'openclose_thread': ['openclose_thread'],
-    'create_sub_comment': ['edit_content', ['create_sub_comment', 'is_open', 'is_team_member_if_applicable']],
-    'delete_comment': ['delete_comment', ['update_comment', 'is_open', 'is_author']],
-    'vote_for_comment': ['edit_content', ['vote', 'is_open', 'is_team_member_if_applicable']],
-    'undo_vote_for_comment': ['edit_content', ['unvote', 'is_open', 'is_team_member_if_applicable']],
-    'vote_for_thread': ['edit_content', ['vote', 'is_open', 'is_team_member_if_applicable']],
-    'flag_abuse_for_thread': ['edit_content', ['vote', 'is_team_member_if_applicable']],
-    'un_flag_abuse_for_thread': ['edit_content', ['vote', 'is_team_member_if_applicable']],
-    'flag_abuse_for_comment': ['edit_content', ['vote', 'is_team_member_if_applicable']],
-    'un_flag_abuse_for_comment': ['edit_content', ['vote', 'is_team_member_if_applicable']],
-    'undo_vote_for_thread': ['edit_content', ['unvote', 'is_open', 'is_team_member_if_applicable']],
-    'pin_thread': ['openclose_thread'],
-    'un_pin_thread': ['openclose_thread'],
-    'follow_thread': ['edit_content', ['follow_thread', 'is_team_member_if_applicable']],
-    'follow_commentable': ['edit_content', ['follow_commentable', 'is_team_member_if_applicable']],
-    'unfollow_thread': ['edit_content', ['unfollow_thread', 'is_team_member_if_applicable']],
-    'unfollow_commentable': ['edit_content', ['unfollow_commentable', 'is_team_member_if_applicable']],
-    'create_thread': ['edit_content', ['create_thread', 'is_team_member_if_applicable']],
+    'openclose_thread': ['group_openclose_thread', 'openclose_thread'],
+    'create_sub_comment': ['group_edit_content', 'edit_content', ['create_sub_comment', 'is_open',
+                                                                  'is_team_member_if_applicable']],
+    'delete_comment': ['group_delete_comment', 'delete_comment', ['update_comment', 'is_open', 'is_author']],
+    'vote_for_comment': ['group_edit_content', 'edit_content', ['vote', 'is_open', 'is_team_member_if_applicable']],
+    'undo_vote_for_comment': ['group_edit_content', 'edit_content', ['unvote', 'is_open',
+                                                                     'is_team_member_if_applicable']],
+    'vote_for_thread': ['group_edit_content', 'edit_content', ['vote', 'is_open', 'is_team_member_if_applicable']],
+    'flag_abuse_for_thread': ['group_edit_content', 'edit_content', ['vote', 'is_team_member_if_applicable']],
+    'un_flag_abuse_for_thread': ['group_edit_content', 'edit_content', ['vote', 'is_team_member_if_applicable']],
+    'flag_abuse_for_comment': ['group_edit_content', 'edit_content', ['vote', 'is_team_member_if_applicable']],
+    'un_flag_abuse_for_comment': ['group_edit_content', 'edit_content', ['vote', 'is_team_member_if_applicable']],
+    'undo_vote_for_thread': ['group_edit_content', 'edit_content', ['unvote', 'is_open',
+                                                                    'is_team_member_if_applicable']],
+    'pin_thread': ['group_openclose_thread', 'openclose_thread'],
+    'un_pin_thread': ['group_openclose_thread', 'openclose_thread'],
+    'follow_thread': ['group_edit_content', 'edit_content', ['follow_thread', 'is_team_member_if_applicable']],
+    'follow_commentable': ['group_edit_content', 'edit_content', ['follow_commentable',
+                                                                  'is_team_member_if_applicable']],
+    'unfollow_thread': ['group_edit_content', 'edit_content', ['unfollow_thread', 'is_team_member_if_applicable']],
+    'unfollow_commentable': ['group_edit_content', 'edit_content', ['unfollow_commentable',
+                                                                    'is_team_member_if_applicable']],
+    'create_thread': ['group_edit_content', 'edit_content', ['create_thread', 'is_team_member_if_applicable']],
 }
 
 
-def check_permissions_by_view(user, course_id, content, name):
+def check_permissions_by_view(user, course_id, content, name, group_id=None, content_user_group=None):
     assert isinstance(course_id, CourseKey)
     try:
         p = VIEW_PERMISSIONS[name]
     except KeyError:
         logging.warning("Permission for view named %s does not exist in permissions.py", name)
-    return _check_conditions_permissions(user, p, course_id, content)
+    return _check_conditions_permissions(user, p, course_id, content, group_id, content_user_group)
