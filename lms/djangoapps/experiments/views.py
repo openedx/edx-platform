@@ -1,12 +1,18 @@
+from django.contrib.auth import get_user_model
+from django.db import transaction
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from rest_framework import permissions, viewsets
+from rest_framework.decorators import list_route
 from rest_framework.filters import DjangoFilterBackend
+from rest_framework.response import Response
 
 from experiments import filters
 from experiments.models import ExperimentData
 from experiments.permissions import IsStaffOrOwner
 from experiments.serializers import ExperimentDataCreateSerializer, ExperimentDataSerializer
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
+
+User = get_user_model()  # pylint: disable=invalid-name
 
 
 class ExperimentDataViewSet(viewsets.ModelViewSet):
@@ -16,6 +22,7 @@ class ExperimentDataViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated, IsStaffOrOwner,)
     queryset = ExperimentData.objects.all()
     serializer_class = ExperimentDataSerializer
+    _cached_users = {}
 
     def filter_queryset(self, queryset):
         queryset = queryset.filter(user=self.request.user)
@@ -47,3 +54,31 @@ class ExperimentDataViewSet(viewsets.ModelViewSet):
 
         self.action = 'create'
         return self.create(request, *args, **kwargs)
+
+    def _cache_users(self, usernames):
+        users = User.objects.filter(username__in=usernames)
+        self._cached_users = {user.username: user for user in users}
+
+    def _get_user(self, username):
+        user = self._cached_users.get(username)
+
+        if not user:
+            user = User.objects.get(username=username)
+            self._cached_users[username] = user
+
+        return user
+
+    @list_route(methods=['put'], permission_classes=[permissions.IsAdminUser])
+    def bulk_upsert(self, request):
+        upserted = []
+        self._cache_users([datum['user'] for datum in request.data])
+
+        with transaction.atomic():
+            for item in request.data:
+                user = self._get_user(username=item['user'])
+                datum, __ = ExperimentData.objects.update_or_create(
+                    user=user, experiment_id=item['experiment_id'], key=item['key'], defaults={'value': item['value']})
+                upserted.append(datum)
+
+            serializer = self.get_serializer(upserted, many=True)
+            return Response(serializer.data)

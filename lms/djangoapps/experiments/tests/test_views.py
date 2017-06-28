@@ -149,3 +149,62 @@ class ExperimentDataViewSetTests(APITestCase):
         self.client.login(username=other_user.username, password=UserFactory._DEFAULT_PASSWORD)
         response = self.client.patch(url, data)
         self.assertEqual(response.status_code, 404)
+
+    def test_bulk_upsert_permissions(self):
+        """ Only staff users can access the bulk upsert endpoint. """
+        url = reverse('api_experiments:v0:data-bulk-upsert')
+        data = []
+
+        # Authentication is required
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 401)
+
+        user = UserFactory()
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
+
+        # No access to non-staff users
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        user.is_staff = True
+        user.save()
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+    def test_bulk_upsert(self):
+        """ The endpoint should support creating/updating multiple ExperimentData objects with a single call. """
+        url = reverse('api_experiments:v0:data-bulk-upsert')
+        experiment_id = 1
+        user = UserFactory(is_staff=True)
+        other_user = UserFactory()
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
+
+        data = [
+            {
+                'experiment_id': experiment_id,
+                'key': 'foo',
+                'value': 'bar',
+                'user': user.username,
+            },
+            {
+                'experiment_id': experiment_id,
+                'key': 'foo',
+                'value': 'bar',
+                'user': other_user.username,
+            },
+        ]
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+        kwargs = {
+            'experiment_id': experiment_id,
+            'key': 'foo',
+            'value': 'bar',
+        }
+        ExperimentData.objects.get(user=user, **kwargs)
+        ExperimentData.objects.get(user=other_user, **kwargs)
+
+        # Subsequent calls should update the existing data rather than create more
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+        ExperimentData.objects.get(user=user, **kwargs)
+        ExperimentData.objects.get(user=other_user, **kwargs)
