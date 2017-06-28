@@ -10,6 +10,7 @@ import mock
 import pytz
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.locator import CourseLocator
 from search.api import perform_search
@@ -26,13 +27,13 @@ from contentstore.views.item import VisibilityState, create_xblock_info
 from course_action_state.managers import CourseRerunUIStateManager
 from course_action_state.models import CourseRerunState
 from student.auth import has_course_author_access
-from student.roles import LibraryUserRole
+from student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole
 from student.tests.factories import UserFactory
 from util.date_utils import get_default_time_display
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
 
 
 class TestCourseIndex(CourseTestCase):
@@ -326,6 +327,136 @@ class TestCourseIndex(CourseTestCase):
 
         # Assert that 'display_course_number' is being set to "" (as display_coursenumber was None).
         self.assertIn('display_course_number: ""', response.content)
+
+
+@ddt.ddt
+class TestCourseIndexArchived(CourseTestCase):
+    """
+    Unit tests for testing the course index list when there are archived courses.
+    """
+    NOW = datetime.datetime.now(pytz.utc)
+    DAY = datetime.timedelta(days=1)
+    YESTERDAY = NOW - DAY
+    TOMORROW = NOW + DAY
+
+    ORG = 'MyOrg'
+
+    ENABLE_SEPARATE_ARCHIVED_COURSES = settings.FEATURES.copy()
+    ENABLE_SEPARATE_ARCHIVED_COURSES['ENABLE_SEPARATE_ARCHIVED_COURSES'] = True
+    DISABLE_SEPARATE_ARCHIVED_COURSES = settings.FEATURES.copy()
+    DISABLE_SEPARATE_ARCHIVED_COURSES['ENABLE_SEPARATE_ARCHIVED_COURSES'] = False
+
+    def setUp(self):
+        """
+        Add courses with the end date set to various values
+        """
+        super(TestCourseIndexArchived, self).setUp()
+
+        # Base course has no end date (so is active)
+        self.course.end = None
+        self.course.display_name = 'Active Course 1'
+        self.ORG = self.course.location.org
+        self.save_course()
+
+        # Active course has end date set to tomorrow
+        self.active_course = CourseFactory.create(
+            display_name='Active Course 2',
+            org=self.ORG,
+            end=self.TOMORROW,
+        )
+
+        # Archived course has end date set to yesterday
+        self.archived_course = CourseFactory.create(
+            display_name='Archived Course',
+            org=self.ORG,
+            end=self.YESTERDAY,
+        )
+
+        # Base user has global staff access
+        self.assertTrue(GlobalStaff().has_user(self.user))
+
+        # Staff user just has course staff access
+        self.staff, self.staff_password = self.create_non_staff_user()
+        for course in (self.course, self.active_course, self.archived_course):
+            CourseStaffRole(course.id).add_users(self.staff)
+
+    def check_index_page_with_query_count(self, separate_archived_courses, org, mongo_queries, sql_queries):
+        """
+        Checks the index page, and ensures the number of database queries is as expected.
+        """
+        with self.assertNumQueries(sql_queries):
+            with check_mongo_calls(mongo_queries):
+                self.check_index_page(separate_archived_courses=separate_archived_courses, org=org)
+
+    def check_index_page(self, separate_archived_courses, org):
+        """
+        Ensure that the index page displays the archived courses as expected.
+        """
+        index_url = '/home/'
+        index_params = {}
+        if org is not None:
+            index_params['org'] = org
+        index_response = self.client.get(index_url, index_params, HTTP_ACCEPT='text/html')
+        self.assertEquals(index_response.status_code, 200)
+
+        parsed_html = lxml.html.fromstring(index_response.content)
+        course_tab = parsed_html.find_class('courses')
+        self.assertEqual(len(course_tab), 1)
+        course_links = course_tab[0].find_class('course-link')
+        course_titles = course_tab[0].find_class('course-title')
+        archived_course_tab = parsed_html.find_class('archived-courses')
+
+        if separate_archived_courses:
+            # Archived courses should be separated from the main course list
+            self.assertEqual(len(archived_course_tab), 1)
+            archived_course_links = archived_course_tab[0].find_class('course-link')
+            archived_course_titles = archived_course_tab[0].find_class('course-title')
+            self.assertEqual(len(archived_course_links), 1)
+            self.assertEqual(len(archived_course_titles), 1)
+            self.assertEqual(archived_course_titles[0].text, 'Archived Course')
+
+            self.assertEqual(len(course_links), 2)
+            self.assertEqual(len(course_titles), 2)
+            self.assertEqual(course_titles[0].text, 'Active Course 1')
+            self.assertEqual(course_titles[1].text, 'Active Course 2')
+        else:
+            # Archived courses should be included in the main course list
+            self.assertEqual(len(archived_course_tab), 0)
+            self.assertEqual(len(course_links), 3)
+            self.assertEqual(len(course_titles), 3)
+            self.assertEqual(course_titles[0].text, 'Active Course 1')
+            self.assertEqual(course_titles[1].text, 'Active Course 2')
+            self.assertEqual(course_titles[2].text, 'Archived Course')
+
+    @ddt.data(
+        # Staff user has course staff access
+        (True, 'staff', None, 4, 20),
+        (False, 'staff', None, 4, 20),
+        # Base user has global staff access
+        (True, 'user', ORG, 3, 16),
+        (False, 'user', ORG, 3, 16),
+        (True, 'user', None, 3, 16),
+        (False, 'user', None, 3, 16),
+    )
+    @ddt.unpack
+    def test_separate_archived_courses(self, separate_archived_courses, username, org, mongo_queries, sql_queries):
+        """
+        Ensure that archived courses are shown as expected for all user types, when the feature is enabled/disabled.
+        Also ensure that enabling the feature does not adversely affect the database query count.
+        """
+        # Authenticate the requested user
+        user = getattr(self, username)
+        password = getattr(self, username + '_password')
+        self.client.login(username=user, password=password)
+
+        # Enable/disable the feature before viewing the index page.
+        features = settings.FEATURES.copy()
+        features['ENABLE_SEPARATE_ARCHIVED_COURSES'] = separate_archived_courses
+        with override_settings(FEATURES=features):
+            self.check_index_page_with_query_count(separate_archived_courses=separate_archived_courses,
+                                                   org=org,
+                                                   mongo_queries=mongo_queries,
+                                                   sql_queries=sql_queries)
 
 
 @ddt.ddt
