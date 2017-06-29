@@ -559,20 +559,6 @@ class ExportTestCase(CourseTestCase):
         resp = self.client.get(output_url)
         self._verify_export_succeeded(resp)
 
-    def test_export_targz(self):
-        """
-        Get tar.gz file, using HTTP_ACCEPT.
-        """
-        resp = self.client.get(self.url, HTTP_ACCEPT='application/x-tgz')
-        self._verify_export_succeeded(resp)
-
-    def test_export_targz_urlparam(self):
-        """
-        Get tar.gz file, using URL parameter.
-        """
-        resp = self.client.get(self.url + '?_accept=application/x-tgz')
-        self._verify_export_succeeded(resp)
-
     def _verify_export_succeeded(self, resp):
         """ Export success helper method. """
         self.assertEquals(resp.status_code, 200)

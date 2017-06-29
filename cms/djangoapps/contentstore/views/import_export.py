@@ -292,21 +292,12 @@ def export_handler(request, course_key_string):
 
     GET
         html: return html page for import page
-        application/x-tgz: return tar.gz file containing exported course
         json: not supported
     POST
         Start a Celery task to export the course
 
-    Note that there are 3 ways to request the tar.gz file.  The Studio UI uses
-    a POST request to start the export asynchronously, with a link appearing
-    on the page once it's ready.  Additionally, for backwards compatibility
-    reasons the request header can specify application/x-tgz via HTTP_ACCEPT,
-    or a query parameter can be used (?_accept=application/x-tgz); this will
-    export the course synchronously and return the resulting file (unless the
-    request times out for a large course).
-
-    If the tar.gz file has been requested but the export operation fails, the
-    import page will be returned including a description of the error.
+    The Studio UI uses a POST request to start the export asynchronously, with
+    a link appearing on the page once it's ready.
     """
     course_key = CourseKey.from_string(course_key_string)
     if not has_course_author_access(request.user, course_key):
@@ -336,16 +327,10 @@ def export_handler(request, course_key_string):
     if request.method == 'POST':
         export_olx.delay(request.user.id, course_key_string, request.LANGUAGE_CODE)
         return JsonResponse({'ExportStatus': 1})
-    elif 'application/x-tgz' in requested_format:
-        try:
-            tarball = create_export_tarball(courselike_module, course_key, context)
-            return send_tarball(tarball)
-        except SerializationError:
-            return render_to_response('export.html', context)
     elif 'text/html' in requested_format:
         return render_to_response('export.html', context)
     else:
-        # Only HTML or x-tgz request formats are supported (no JSON).
+        # Only HTML request format is supported (no JSON).
         return HttpResponse(status=406)
 
 
