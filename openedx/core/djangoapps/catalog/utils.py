@@ -142,6 +142,8 @@ def get_programs_with_type(include_hidden=True):
     if programs:
         program_types = {program_type['name']: program_type for program_type in get_program_types()}
         for program in programs:
+            if program['type'] not in program_types:
+                continue
 
             if program['hidden'] and not include_hidden:
                 continue
