@@ -9,8 +9,8 @@ from common.test.acceptance.pages.lms.catalog import CacheProgramsPage
 from common.test.acceptance.pages.lms.programs import ProgramDetailsPage, ProgramListingPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 from openedx.core.djangoapps.catalog.tests.factories import (
-    CourseFactory, 
-    CourseRunFactory, 
+    CourseFactory,
+    CourseRunFactory,
     ProgramFactory,
     ProgramTypeFactory
 )
