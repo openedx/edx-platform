@@ -49,7 +49,7 @@ class CourseSearchFragmentView(EdxFragmentView):
         """
         course_key = CourseKey.from_string(course_id)
         course = get_course_overview_with_access(request.user, 'load', course_key, check_if_enrolled=True)
-        course_url_name = default_course_url_name(request)
+        course_url_name = default_course_url_name(course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
 
         # Render the course home fragment

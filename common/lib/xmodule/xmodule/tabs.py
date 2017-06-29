@@ -93,13 +93,10 @@ class CourseTab(object):
     @property
     def link_func(self):
         """
-        Returns a function that will determine a course URL for this tab.
-
-        The returned function takes two arguments:
-            course (Course) - the course in question.
-            view_name (str) - the name of the view.
+        Returns a function that takes a course and reverse function and will
+        compute the course URL for this tab.
         """
-        return self.tab_dict.get('link_func', link_reverse_func(self.view_name))
+        return self.tab_dict.get('link_func', course_reverse_func(self.view_name))
 
     @classmethod
     def is_enabled(cls, course, user=None):
@@ -570,14 +567,46 @@ def key_checker(expected_keys):
     return check
 
 
-def link_reverse_func(reverse_name):
+def course_reverse_func(reverse_name):
     """
-    Returns a function that takes in a course and reverse_url_func,
-    and calls the reverse_url_func with the given reverse_name and course's ID.
+    Returns a function that will determine a course URL for the provided
+    reverse_name.
 
-    This is used to generate the url for a CourseTab without having access to Django's reverse function.
+    See documentation for course_reverse_func_from_name_func.  This function
+    simply calls course_reverse_func_from_name_func after wrapping reverse_name
+    in a function.
     """
-    return lambda course, reverse_url_func: reverse_url_func(reverse_name, args=[course.id.to_deprecated_string()])
+    return course_reverse_func_from_name_func(lambda course: reverse_name)
+
+
+def course_reverse_func_from_name_func(reverse_name_func):
+    """
+    Returns a function that will determine a course URL for the provided
+    reverse_name_func.
+
+    Use this when the calculation of the reverse_name is dependent on the
+    course. Otherwise, use the simpler course_reverse_func.
+
+    This can be used to generate the url for a CourseTab without having
+    immediate access to Django's reverse function.
+
+    Arguments:
+        reverse_name_func (function): A function that takes a single argument
+            (Course) and returns the name to be used with the reverse function.
+
+    Returns:
+        A function that takes in two arguments:
+            course (Course): the course in question.
+            reverse_url_func (function): a reverse function for a course URL
+                that uses the course ID in the url.
+        When called, the returned function will return the course URL as
+        determined by calling reverse_url_func with the reverse_name and the
+        course's ID.
+    """
+    return lambda course, reverse_url_func: reverse_url_func(
+        reverse_name_func(course),
+        args=[course.id.to_deprecated_string()]
+    )
 
 
 def need_name(dictionary, raise_error=True):
