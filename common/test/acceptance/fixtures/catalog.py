@@ -31,7 +31,7 @@ class CatalogFixture(object):
             uuids.append(uuid)
 
             program_key = '{base}.{uuid}'.format(base=key, uuid=uuid)
-            program_types.append(program['type'])
+            program_types.append({'name': program['type']})
             requests.put(
                 '{}/set_config'.format(CATALOG_STUB_URL),
                 data={program_key: json.dumps(program)},
