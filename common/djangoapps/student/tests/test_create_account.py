@@ -3,6 +3,7 @@
 import json
 import unittest
 from datetime import datetime
+from importlib import import_module
 
 import ddt
 import mock
@@ -13,7 +14,6 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.utils.importlib import import_module
 from mock import patch
 
 import student
