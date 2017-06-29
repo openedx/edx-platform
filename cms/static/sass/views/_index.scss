@@ -228,7 +228,7 @@
               min-height: ($baseline*8);
               margin-right: flex-gutter();
               padding: ($baseline*0.75) $baseline;
-              color: $gray-l1;
+              color: $gray-d1;
 
               .title {
                 @extend %t-copy-base;
@@ -244,7 +244,7 @@
                 top: -($baseline/5);
 
                 .title {
-                  color: $blue;
+                  color: $blue-d2;
                 }
               }
 

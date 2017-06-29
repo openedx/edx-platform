@@ -42,11 +42,11 @@
         padding: 0 ($baseline/2) ($baseline*0.75) ($baseline/2);
         vertical-align: middle;
         text-align: left;
-        color: $gray;
+        color: $gray-d2;
 
         .column-sort-link {
           cursor: pointer;
-          color: $blue;
+          color: $blue-d2;
         }
 
         .current-sort {
@@ -111,7 +111,7 @@
             .date-col,
             .embed-col,
             .embed-col .embeddable-xml-input {
-              color: $gray;
+              color: $gray-d1;
             }
           }
         }
@@ -141,13 +141,13 @@
         .date-col {
           @include transition(all $tmg-f2 ease-in-out 0s);
           @extend %t-copy-sub2;
-          color: $gray-l2;
+          color: $gray-d1;
         }
 
         .embed-col {
           @include transition(all $tmg-f2 ease-in-out 0s);
           padding-left: ($baseline*0.75);
-          color: $gray-l2;
+          color: $gray-d1;
 
           .embeddable-xml-input {
             @include transition(all $tmg-f2 ease-in-out 0s);
@@ -156,7 +156,7 @@
             border: 1px solid transparent;
             background: none;
             width: 100%;
-            color: $gray-l2;
+            color: $gray-d1;
 
             &:focus {
               background-color: $white;
