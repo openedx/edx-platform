@@ -14,8 +14,7 @@ paver a11y_coverage
 # The settings that we use are installed with the pa11ycrawler module
 export SCRAPY_SETTINGS_MODULE='pa11ycrawler.settings'
 
-echo "Running pa11ycrawler against test course..."
-paver update_db
+echo "Running pa11ycrawler against test course...
 pip install ubcpi-xblock
 paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html
 
