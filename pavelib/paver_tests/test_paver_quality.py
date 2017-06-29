@@ -63,7 +63,7 @@ class TestPaverQualityViolations(unittest.TestCase):
 class TestPaverReportViolationsCounts(unittest.TestCase):
     """
     For testing utility functions for getting counts from reports for
-    run_eslint, run_complexity, run_safelint, and run_safecommit_report.
+    run_eslint, run_complexity, run_xsslint, and run_xsscommitlint.
     """
 
     def setUp(self):
@@ -136,9 +136,9 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
         actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "foo")  # pylint: disable=protected-access
         self.assertEqual(actual_count, None)
 
-    def test_get_safelint_counts_happy(self):
+    def test_get_xsslint_counts_happy(self):
         """
-        Test happy path getting violation counts from safelint report.
+        Test happy path getting violation counts from xsslint report.
         """
         report = textwrap.dedent("""
             test.html: 30:53: javascript-jquery-append:  $('#test').append(print_tos);
@@ -150,7 +150,7 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
         """)
         with open(self.f.name, 'w') as f:
             f.write(report)
-        counts = pavelib.quality._get_safelint_counts(self.f.name)  # pylint: disable=protected-access
+        counts = pavelib.quality._get_xsslint_counts(self.f.name)  # pylint: disable=protected-access
         self.assertDictEqual(counts, {
             'rules': {
                 'javascript-concat-html': 310,
@@ -159,9 +159,9 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
             'total': 2608,
         })
 
-    def test_get_safelint_counts_bad_counts(self):
+    def test_get_xsslint_counts_bad_counts(self):
         """
-        Test getting violation counts from truncated and malformed safelint
+        Test getting violation counts from truncated and malformed xsslint
         report.
         """
         report = textwrap.dedent("""
@@ -169,15 +169,15 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
         """)
         with open(self.f.name, 'w') as f:
             f.write(report)
-        counts = pavelib.quality._get_safelint_counts(self.f.name)  # pylint: disable=protected-access
+        counts = pavelib.quality._get_xsslint_counts(self.f.name)  # pylint: disable=protected-access
         self.assertDictEqual(counts, {
             'rules': {},
             'total': None,
         })
 
-    def test_get_safecommit_count_happy(self):
+    def test_get_xsscommitlint_count_happy(self):
         """
-        Test happy path getting violation count from safecommit report.
+        Test happy path getting violation count from xsscommitlint report.
         """
         report = textwrap.dedent("""
             Linting lms/templates/navigation.html:
@@ -190,26 +190,26 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
         """)
         with open(self.f.name, 'w') as f:
             f.write(report)
-        count = pavelib.quality._get_safecommit_count(self.f.name)  # pylint: disable=protected-access
+        count = pavelib.quality._get_xsscommitlint_count(self.f.name)  # pylint: disable=protected-access
 
         self.assertEqual(count, 5)
 
-    def test_get_safecommit_count_bad_counts(self):
+    def test_get_xsscommitlint_count_bad_counts(self):
         """
-        Test getting violation count from truncated safecommit report.
+        Test getting violation count from truncated xsscommitlint report.
         """
         report = textwrap.dedent("""
             Linting lms/templates/navigation.html:
         """)
         with open(self.f.name, 'w') as f:
             f.write(report)
-        count = pavelib.quality._get_safecommit_count(self.f.name)  # pylint: disable=protected-access
+        count = pavelib.quality._get_xsscommitlint_count(self.f.name)  # pylint: disable=protected-access
 
         self.assertIsNone(count)
 
-    def test_get_safecommit_count_no_files(self):
+    def test_get_xsscommitlint_count_no_files(self):
         """
-        Test getting violation count from safecommit report where no files were
+        Test getting violation count from xsscommitlint report where no files were
         linted.
         """
         report = textwrap.dedent("""
@@ -217,7 +217,7 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
         """)
         with open(self.f.name, 'w') as f:
             f.write(report)
-        count = pavelib.quality._get_safecommit_count(self.f.name)  # pylint: disable=protected-access
+        count = pavelib.quality._get_xsscommitlint_count(self.f.name)  # pylint: disable=protected-access
 
         self.assertEqual(count, 0)
 

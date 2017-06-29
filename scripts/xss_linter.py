@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-A linting tool to check if templates are safe
+A linting tool to check for xss vulnerabilities.
 """
 from __future__ import print_function
 
@@ -192,7 +192,7 @@ class Rules(Enum):
     An Enum of each rule which the linter will check.
     """
     # IMPORTANT: Do not edit without also updating the docs:
-    # - http://edx.readthedocs.io/projects/edx-developer-guide/en/latest/conventions/safe_templates.html#safe-template-linter
+    # - http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/preventing_xss.html#xss-linter
     mako_missing_default = 'mako-missing-default'
     mako_multiple_page_tags = 'mako-multiple-page-tags'
     mako_unparseable_expression = 'mako-unparseable-expression'
@@ -300,7 +300,7 @@ class RuleViolation(object):
 
         Pragma format::
 
-            safe-lint: disable=violation-name,other-violation-name
+            xss-lint: disable=violation-name,other-violation-name
 
         Arguments:
             string: The string of code in which to search for the pragma.
@@ -314,7 +314,7 @@ class RuleViolation(object):
             found.
 
         """
-        pragma_match = re.search(r'safe-lint:\s*disable=([a-zA-Z,-]+)', string)
+        pragma_match = re.search(r'xss-lint:\s*disable=([a-zA-Z,-]+)', string)
         if pragma_match is None:
             return
         if scope_start_string:
@@ -398,14 +398,14 @@ class ExpressionRuleViolation(RuleViolation):
 
         Pragma format::
 
-            safe-lint: disable=violation-name,other-violation-name
+            xss-lint: disable=violation-name,other-violation-name
 
         Examples::
 
-            <% // safe-lint: disable=underscore-not-escaped %>
+            <% // xss-lint: disable=underscore-not-escaped %>
             <%= gettext('Single Line') %>
 
-            <%= gettext('Single Line') %><% // safe-lint: disable=underscore-not-escaped %>
+            <%= gettext('Single Line') %><% // xss-lint: disable=underscore-not-escaped %>
 
         Arguments:
             string_lines: A StringLines containing the contents of the file in
@@ -1421,7 +1421,7 @@ class JavaScriptLinter(BaseLinter):
 
 class BaseVisitor(ast.NodeVisitor):
     """
-    Base class for AST NodeVisitor used for Python safe linting.
+    Base class for AST NodeVisitor used for Python xss linting.
 
     Important: This base visitor skips all __repr__ function definitions.
     """
@@ -1787,7 +1787,7 @@ class PythonLinter(BaseLinter):
         if file_name.lower().endswith('tests.py'):
             return results
 
-        # skip this linter code (i.e. safe_template_linter.py)
+        # skip this linter code (i.e. xss_linter.py)
         if file_name == os.path.basename(__file__):
             return results
 
@@ -2493,6 +2493,7 @@ SKIP_DIRS = (
     '.git',
     '.pycharm_helpers',
     'common/static/xmodule/modules',
+    'common/static/bundles',
     'perf_tests',
     'node_modules',
     'reports/diff_quality',
@@ -2615,11 +2616,11 @@ def main():
 
     Prints all violations.
     """
-    epilog = "For more help using the safe template linter, including details on how\n"
-    epilog += "to understand and fix any violations, read the docs here:\n"
+    epilog = "For more help using the xss linter, including details on how to\n"
+    epilog += "understand and fix any violations, read the docs here:\n"
     epilog += "\n"
     # pylint: disable=line-too-long
-    epilog += "  http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/safe_templates.html#safe-template-linter\n"
+    epilog += "  http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/preventing_xss.html#xss-linter\n"
 
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,

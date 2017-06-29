@@ -344,7 +344,7 @@
                     for (i = 0; i < options.length; i += 1) {
                         inner = /\s*\|\|(.*?)\|\|/.exec(options[i]);
                         if (inner) {
-                            // safe-lint: disable=javascript-concat-html
+                            // xss-lint: disable=javascript-concat-html
                             demandhints += '  <hint>' + inner[1].trim() + '</hint>\n';
                         }
                     }
@@ -601,9 +601,9 @@
                             hintLine = '';
                             if (textHint.hint) {
                                 firstAnswer = textHint.nothint;
-                                // safe-lint: disable=javascript-concat-html
+                                // xss-lint: disable=javascript-concat-html
                                 hintLine = '  <correcthint' + textHint.labelassign + '>' +
-                                // safe-lint: disable=javascript-concat-html
+                                // xss-lint: disable=javascript-concat-html
                                     textHint.hint + '</correcthint>\n';
                             }
 
@@ -611,16 +611,16 @@
                             if (isRangeToleranceCase(firstAnswer)) {
                                 // [5, 7) or (5, 7), or (1.2345 * (2+3), 7*4 ]  - range tolerance case
                                 // = (5*2)*3 should not be used as range tolerance
-                                // safe-lint: disable=javascript-concat-html
+                                // xss-lint: disable=javascript-concat-html
                                 numericalResponseString = '<numericalresponse answer="' + firstAnswer + '">\n';
                             } else {
                                 answerData = getAnswerData(firstAnswer);
-                                // safe-lint: disable=javascript-concat-html
+                                // xss-lint: disable=javascript-concat-html
                                 numericalResponseString = '<numericalresponse answer="' + answerData.answer + '">\n';
                                 if (answerData.default) {
-                                    // safe-lint: disable=javascript-concat-html
+                                    // xss-lint: disable=javascript-concat-html
                                     numericalResponseString += '  <responseparam type="tolerance" default="' +
-                                    // safe-lint: disable=javascript-concat-html
+                                    // xss-lint: disable=javascript-concat-html
                                         answerData.default + '" />\n';
                                 }
                             }
@@ -644,15 +644,15 @@
                                     }
 
                                     if (additionalTextHint.hint) {
-                                        // safe-lint: disable=javascript-concat-html
+                                        // xss-lint: disable=javascript-concat-html
                                         additionalHintLine = '<correcthint' +
-                                            // safe-lint: disable=javascript-concat-html
+                                            // xss-lint: disable=javascript-concat-html
                                             additionalTextHint.labelassign + '>' +
-                                            // safe-lint: disable=javascript-concat-html
+                                            // xss-lint: disable=javascript-concat-html
                                             additionalTextHint.hint + '</correcthint>';
                                     }
 
-                                    // safe-lint: disable=javascript-concat-html
+                                    // xss-lint: disable=javascript-concat-html
                                     additionalAnswerString += '  <additional_answer answer="' + orMatch[1] + '">';
                                     additionalAnswerString += additionalHintLine;
                                     additionalAnswerString += '</additional_answer>\n';
@@ -765,7 +765,7 @@
                 responseTypesSelector = responseTypes.join(', ');
 
                 // make temporary xml
-                // safe-lint: disable=javascript-concat-html
+                // xss-lint: disable=javascript-concat-html
                 $xml = $($.parseXML('<prob>' + xml + '</prob>'));
                 responseType = $xml.find(responseTypesSelector);
 
@@ -783,7 +783,7 @@
                         }
 
                         if (beforeInputtype) {
-                            // safe-lint: disable=javascript-jquery-insert-into-target
+                            // xss-lint: disable=javascript-jquery-insert-into-target
                             responseType[0].insertBefore(child, inputtype);
                         } else {
                             responseType[0].appendChild(child);
@@ -814,11 +814,11 @@
             });
             finalDemandHints = '';
             if (demandHintTags.length) {
-                // safe-lint: disable=javascript-concat-html
+                // xss-lint: disable=javascript-concat-html
                 finalDemandHints = '\n<demandhint>\n' + demandHintTags.join('') + '</demandhint>';
             }
             // make all responsetypes descendants of a single problem element
-            // safe-lint: disable=javascript-concat-html
+            // xss-lint: disable=javascript-concat-html
             finalXml = '<problem>\n' + responseTypesXML.join('\n\n') + finalDemandHints + '\n</problem>';
             return finalXml;
         };
