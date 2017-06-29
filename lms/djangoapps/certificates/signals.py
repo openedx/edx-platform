@@ -9,10 +9,14 @@ from django.dispatch import receiver
 from opaque_keys.edx.keys import CourseKey
 
 from .config import waffle
-from certificates.models import CertificateGenerationCourseSetting, CertificateWhitelist
+from certificates.models import \
+    CertificateGenerationCourseSetting, \
+    CertificateWhitelist, \
+    GeneratedCertificate
 from certificates.tasks import generate_certificate
 from courseware import courses
 from openedx.core.djangoapps.models.course_details import COURSE_PACING_CHANGE
+from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED
 
 
 log = logging.getLogger(__name__)
@@ -64,3 +68,37 @@ def toggle_self_generated_certs(course_key, course_self_paced):
     """
     course_key = CourseKey.from_string(course_key)
     CertificateGenerationCourseSetting.set_enabled_for_course(course_key, course_self_paced)
+
+
+@receiver(COURSE_GRADE_NOW_PASSED, dispatch_uid="new_passing_learner")
+def _listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disable=unused-argument
+    """
+    Listen for a learner passing a course, send cert generation task,
+    downstream signal from COURSE_GRADE_CHANGED
+    """
+
+    # No flags enabled
+    if (
+        not waffle.waffle().is_enabled(waffle.SELF_PACED_ONLY) and
+        not waffle.waffle().is_enabled(waffle.INSTRUCTOR_PACED_ONLY)
+    ):
+        return
+
+    # Only SELF_PACED_ONLY flag enabled
+    if waffle.waffle().is_enabled(waffle.SELF_PACED_ONLY):
+        if not courses.get_course_by_id(course_key, depth=0).self_paced:
+            return
+
+    # Only INSTRUCTOR_PACED_ONLY flag enabled
+    elif waffle.waffle().is_enabled(waffle.INSTRUCTOR_PACED_ONLY):
+        if courses.get_course_by_id(course_key, depth=0).self_paced:
+            return
+    if GeneratedCertificate.certificate_for_student(self.user, self.course_id) is None:
+        generate_certificate.apply_async(
+            student=user,
+            course_key=course_id,
+        )
+        log.info(u'Certificate generation task initiated for {user} : {course} via passing grade'.format(
+            user=user.id,
+            course=course_id
+        ))

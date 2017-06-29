@@ -8,8 +8,10 @@ from certificates import api as certs_api
 from certificates.config import waffle
 from certificates.models import CertificateGenerationConfiguration, CertificateWhitelist
 from certificates.signals import _listen_for_course_pacing_changed
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.tests.utils import mock_get_score
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from student.tests.factories import UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -56,9 +58,10 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
         self.user = UserFactory.create()
         self.ip_course = CourseFactory.create(self_paced=False)
 
-    def test_cert_generation_on_whitelist_append(self):
+    def test_cert_generation_on_whitelist_append_self_paced(self):
         """
-        Verify that signal is sent, received, and fires task based on various flag configs
+        Verify that signal is sent, received, and fires task
+        based on 'SELF_PACED_ONLY' flag
         """
         with mock.patch(
             'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
@@ -82,6 +85,16 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                     student=self.user,
                     course_key=self.course.id,
                 )
+
+    def test_cert_generation_on_whitelist_append_instructor_paced(self):
+        """
+        Verify that signal is sent, received, and fires task
+        based on 'INSTRUCTOR_PACED_ONLY' flag
+        """
+        with mock.patch(
+                'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+                return_value=None
+        ) as mock_generate_certificate_apply_async:
             with waffle.waffle().override(waffle.INSTRUCTOR_PACED_ONLY, active=False):
                 CertificateWhitelist.objects.create(
                     user=self.user,
@@ -100,3 +113,74 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                     student=self.user,
                     course_key=self.ip_course.id
                 )
+
+
+class PassingGradeCertsTest(ModuleStoreTestCase):
+    """
+    Tests for certificate generation task firing on passing grade receipt
+    """
+    def setUp(self):
+        super(PassingGradeCertsTest, self).setUp()
+        self.course = CourseFactory.create(self_paced=True)
+        self.user = UserFactory.create()
+        self.enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course.id,
+            is_active=True,
+            mode="verified",
+        )
+        self.ip_course = CourseFactory.create(self_paced=False)
+
+    def test_cert_generation_on_passing_self_paced(self):
+        with mock.patch(
+            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+            return_value=None
+        ) as mock_generate_certificate_apply_async:
+            with waffle.waffle().override(waffle.SELF_PACED_ONLY, active=True):
+                grade_factory = CourseGradeFactory()
+                with mock_get_score(0, 2):
+                    grade_factory.update(self.user, self.course)
+                    mock_generate_certificate_apply_async.assert_not_called(
+                        student=self.user,
+                        course_key=self.course.id
+                    )
+                with mock_get_score(1, 2):
+                    grade_factory.update(self.user, self.course)
+                    mock_generate_certificate_apply_async.assert_called(
+                        student=self.user,
+                        course_key=self.course.id
+                    )
+                # Certs are not re-fired after passing
+                with mock_get_score(2, 2):
+                    grade_factory.update(self.user, self.course)
+                    mock_generate_certificate_apply_async.assert_not_called(
+                        student=self.user,
+                        course_key=self.course.id
+                    )
+
+    def test_cert_generation_on_passing_instructor_paced(self):
+        with mock.patch(
+            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+            return_value=None
+        ) as mock_generate_certificate_apply_async:
+            with waffle.waffle().override(waffle.INSTRUCTOR_PACED_ONLY, active=True):
+                grade_factory = CourseGradeFactory()
+                with mock_get_score(0, 2):
+                    grade_factory.update(self.user, self.ip_course)
+                    mock_generate_certificate_apply_async.assert_not_called(
+                        student=self.user,
+                        course_key=self.ip_course.id
+                    )
+                with mock_get_score(1, 2):
+                    grade_factory.update(self.user, self.ip_course)
+                    mock_generate_certificate_apply_async.assert_called(
+                        student=self.user,
+                        course_key=self.ip_course.id
+                    )
+                # Certs are not re-fired after passing
+                with mock_get_score(2, 2):
+                    grade_factory.update(self.user, self.ip_course)
+                    mock_generate_certificate_apply_async.assert_not_called(
+                        student=self.user,
+                        course_key=self.ip_course.id
+                    )
