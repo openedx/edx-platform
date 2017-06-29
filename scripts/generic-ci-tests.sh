@@ -84,10 +84,10 @@ case "$TEST_SUITE" in
         paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
         echo "Running code complexity report (python)."
         paver run_complexity || echo "Unable to calculate code complexity. Ignoring error."
-        echo "Running safe template linter report."
-        paver run_safelint -t $SAFELINT_THRESHOLDS > safelint.log || { cat safelint.log; EXIT=1; }
-        echo "Running safe commit linter report."
-        paver run_safecommit_report > safecommit.log || { cat safecommit.log; EXIT=1; }
+        echo "Running xss linter report."
+        paver run_xsslint -t $XSSLINT_THRESHOLDS > xsslint.log || { cat xsslint.log; EXIT=1; }
+        echo "Running xss commit linter report."
+        paver run_xsscommitlint > xsscommitlint.log || { cat xsscommitlint.log; EXIT=1; }
         # Run quality task. Pass in the 'fail-under' percentage to diff-quality
         echo "Running diff quality."
         paver run_quality -p 100 || EXIT=1
