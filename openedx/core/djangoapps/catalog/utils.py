@@ -120,6 +120,7 @@ def get_program_types(name=None):
         logger.info("program types: " + str(data))
         return data
     else:
+        logger.info("No program types. Catalog Integration not enabled." + str(data))
         return []
 
 
