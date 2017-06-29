@@ -90,17 +90,17 @@
   color: $white;
 
   &:hover, &:active {
-    background: $uxpl-green-hover-active;
-    border-color: $uxpl-green-hover-active;
+    background: $uxpl-green-dark-hover-active;
+    border-color: $uxpl-green-dark-hover-active;
   }
 
   &.current, &.active {
-    background: $uxpl-green-hover-active;
+    background: $uxpl-green-dark-hover-active;
     color: $white;
-    border-color: $uxpl-green-hover-active;
+    border-color: $uxpl-green-dark-hover-active;
 
     &:hover, &:active {
-      background: $uxpl-green-hover-active;
+      background: $uxpl-green-dark-hover-active;
     }
   }
 }
@@ -111,7 +111,7 @@
 %btn-secondary-gray {
   @extend %ui-btn-secondary;
   border-color: $gray-l3;
-  color: $gray-l1;
+  color: $gray-d1;
 
   &:hover, &:active {
     background: $gray-l3;
@@ -294,7 +294,7 @@
       display: block;
       border-radius: 3px;
       padding: 3px ($baseline/2);
-      color: $gray-l1;
+      color: $gray-d1;
 
       &:hover {
         background-color: $uxpl-blue-base;
