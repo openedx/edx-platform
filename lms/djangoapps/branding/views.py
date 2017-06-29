@@ -215,8 +215,7 @@ def footer(request):
                 "image": "http://example.com/openedx.png"
             },
             "logo_image": "http://example.com/static/images/logo.png",
-            "copyright": "EdX, Open edX, and the edX and Open edX logos are \
-                registered trademarks or trademarks of edX Inc."
+            "copyright": "EdX, Open edX and their respective logos are trademarks or registered trademarks of edX Inc."
         }
 
 
@@ -226,7 +225,7 @@ def footer(request):
         Accepts: text/html
 
 
-    Example: Including the footer with the "Powered by OpenEdX" logo
+    Example: Including the footer with the "Powered by Open edX" logo
 
         GET /api/branding/v1/footer?show-openedx-logo=1
         Accepts: text/html

@@ -50,17 +50,19 @@
               <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
           % endif
 
+          ## \u00A9 is the copyright symbol.
+          ## \u2013 is the en-dash. It looks like a year, but it isn't.
           <p class="copyright">${_(
-          u"\u00A9 2012-{year} edX Inc.  All rights reserved except where noted.  "
-          u"EdX, Open edX and the edX and Open EdX logos are registered trademarks "
+          u"\u00A9 2012\u2013{year} edX Inc.  All rights reserved except where noted.  "
+          u"EdX, Open edX and the edX and Open edX logos are registered trademarks "
           u"or trademarks of edX Inc."
           ).format(year=datetime.datetime.now().year)}
           ${u" | {icp}".format(icp=getattr(settings,'ICP_LICENSE')) if getattr(settings,'ICP_LICENSE',False) else ""}
 	  </p>
 
-          ## The OpenEdX link may be hidden when this view is served
+          ## The Open edX link may be hidden when this view is served
           ## through an API to partner sites (such as marketing sites or blogs),
-          ## which are not technically powered by OpenEdX.
+          ## which are not technically powered by Open edX.
           % if not hide_openedx_link:
           <div class="openedx-link">
             <a href="${footer['openedx_link']['url']}" title="${footer['openedx_link']['title']}">
