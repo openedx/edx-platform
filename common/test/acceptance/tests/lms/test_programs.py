@@ -18,6 +18,7 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
 
         self.set_programs_api_configuration(is_enabled=True)
 
+
         self.programs = ProgramFactory.create_batch(3)
         self.username = None
 
