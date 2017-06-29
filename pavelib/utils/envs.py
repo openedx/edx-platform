@@ -130,7 +130,7 @@ class Env(object):
     }
 
     # Mongo databases that will be dropped before/after the tests run
-    BOK_CHOY_MONGO_HOST = 'edx.devstack.mongo' if USING_DOCKER else 'localhost'
+    MONGO_HOST = 'edx.devstack.mongo' if USING_DOCKER else 'localhost'
     BOK_CHOY_MONGO_DATABASE = "test"
     BOK_CHOY_CACHE_HOST = 'edx.devstack.memcached' if USING_DOCKER else '0.0.0.0'
     BOK_CHOY_CACHE = memcache.Client(['{}:11211'.format(BOK_CHOY_CACHE_HOST)], debug=0)
