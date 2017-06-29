@@ -7,23 +7,19 @@ import functools
 import os
 from contextlib import contextmanager
 
-from mock import patch
-
+from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.utils import override_settings
-
-from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
+from mock import patch
+from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, FilteredQueryCountMixin
 from openedx.core.lib.tempdir import mkdtemp_clean
-
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores, SignalHandler
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.django import SignalHandler, clear_existing_modulestores, modulestore
 from xmodule.modulestore.tests.factories import XMODULE_FACTORY_LOCK
-
-from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 
 
 class StoreConstructors(object):
@@ -312,7 +308,7 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin, SignalIsolationMixin):
         cls.enable_all_signals()
 
 
-class SharedModuleStoreTestCase(ModuleStoreIsolationMixin, CacheIsolationTestCase):
+class SharedModuleStoreTestCase(FilteredQueryCountMixin, ModuleStoreIsolationMixin, CacheIsolationTestCase):
     """
     Subclass for any test case that uses a ModuleStore that can be shared
     between individual tests. This class ensures that the ModuleStore is cleaned
@@ -395,7 +391,7 @@ class SharedModuleStoreTestCase(ModuleStoreIsolationMixin, CacheIsolationTestCas
         super(SharedModuleStoreTestCase, self).setUp()
 
 
-class ModuleStoreTestCase(ModuleStoreIsolationMixin, TestCase):
+class ModuleStoreTestCase(FilteredQueryCountMixin, ModuleStoreIsolationMixin, TestCase):
     """
     Subclass for any test case that uses a ModuleStore.
     Ensures that the ModuleStore is cleaned before/after each test.
