@@ -34,7 +34,7 @@ __test__ = False  # do not collect
 DEFAULT_NUM_PROCESSES = 1
 DEFAULT_VERBOSITY = 2
 
-DEMO_COURSE_TAR_GZ = "https://github.com/edx/supported-components/archive/master.tar.gz"
+DEMO_COURSE_TAR_GZ = "http://api.github.com/repos/edx/supported-components/tarball/master"
 DEMO_COURSE_IMPORT_DIR = path('test_root/courses/')
 
 
