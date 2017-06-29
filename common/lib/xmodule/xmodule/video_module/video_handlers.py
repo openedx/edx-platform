@@ -239,7 +239,7 @@ class VideoStudentViewHandlers(object):
             try:
                 transcript = self.translation(request.GET.get('videoId', None), transcripts)
             except (TypeError, NotFoundError) as ex:
-                log.info(ex.message)
+                log.debug(ex.message)
                 # Try to return static URL redirection as last resort
                 # if no translation is required
                 return self.get_static_transcript(request, transcripts)
