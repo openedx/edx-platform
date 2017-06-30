@@ -57,6 +57,18 @@ class EnterpriseServiceMockMixin(object):
             status=500
         )
 
+    def mock_enterprise_course_enrollment_get_api(self, **kwargs):
+        result = {
+            'results': [kwargs] if kwargs else []
+        }
+        httpretty.register_uri(
+            method=httpretty.GET,
+            uri=self.get_enterprise_url('enterprise-course-enrollment'),
+            body=json.dumps(result),
+            content_type='application/json',
+            status=200
+        )
+
     def mock_enterprise_learner_api(
             self,
             catalog_id=1,
