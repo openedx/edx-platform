@@ -16,6 +16,7 @@ class SHOWANSWER(object):
     CORRECT_OR_PAST_DUE = "correct_or_past_due"
     PAST_DUE = "past_due"
     NEVER = "never"
+    AFTER_SOME_NUMBER_OF_ATTEMPTS = "after_attempts"
 
 
 class RANDOMIZATION(object):
