@@ -363,6 +363,31 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
         self.assertRedirects(response, redirect_url)
 
+    def test_choose_mode_audit_enroll_on_get(self):
+        """
+        Confirms that the learner will be enrolled in Audit track if it is the only possible option
+        """
+        # Create the course mode
+        audit_mode = 'audit'
+        CourseModeFactory.create(mode_slug=audit_mode, course_id=self.course.id, min_price=0)
+
+        # Assert learner is not enrolled in Audit track pre-POST
+        mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertIsNone(mode)
+        self.assertIsNone(is_active)
+
+        # Choose the audit mode (POST request)
+        choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        response = self.client.get(choose_track_url)
+
+        # Assert learner is enrolled in Audit track and sent to the dashboard
+        mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertEquals(mode, audit_mode)
+        self.assertTrue(is_active)
+
+        redirect_url = reverse('dashboard')
+        self.assertRedirects(response, redirect_url)
+
     def test_choose_mode_audit_enroll_on_post(self):
         audit_mode = 'audit'
         # Create the course modes
