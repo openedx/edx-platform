@@ -8,7 +8,9 @@
     <div class="assets-table video-table">
         <div class="js-table-head">
             <div class="video-row">
+                <% if (videoImageUploadEnabled) { %>
                 <div class="video-head-col video-col thumbnail-col"><%- gettext("Thumbnail") %></div>
+                <% } %>
                 <div class="video-head-col video-col name-col"><%- gettext("Name") %></div>
                 <div class="video-head-col video-col date-col"><%- gettext("Date Added") %></div>
                 <div class="video-head-col video-col video-id-col"><%- gettext("Video ID") %></div>
