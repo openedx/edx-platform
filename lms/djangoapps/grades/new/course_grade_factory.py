@@ -159,6 +159,7 @@ class CourseGradeFactory(object):
             persistent_grade.letter_grade,
             persistent_grade.passed_timestamp is not None,
         )
+
         log.info(u'Grades: Read, %s, User: %s, %s', unicode(course_data), user.id, persistent_grade)
 
         return course_grade, persistent_grade.grading_policy_hash
@@ -199,11 +200,11 @@ class CourseGradeFactory(object):
             course_key=course_data.course_key,
             deadline=course_data.course.end,
         )
-        if course_grade.passed is True:
-            COURSE_GRADE_NOW_PASSED.send_robust(
+        if course_grade.passed:
+            COURSE_GRADE_NOW_PASSED.send(
                 sender=CourseGradeFactory,
                 user=user,
-                course_key=course_data.course_key,
+                course_id=course_data.course_key,
             )
 
         log.info(
