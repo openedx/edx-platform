@@ -747,7 +747,7 @@
 
                     HtmlUtils.setHtml($($spanEl), HtmlUtils.HTML(text.toString()));
 
-                    return $spanEl.wrap('<li>').parent()[0]; // safe-lint: disable=javascript-jquery-insertion
+                    return $spanEl.wrap('<li>').parent()[0]; // xss-lint: disable=javascript-jquery-insertion
                 };
 
                 return AsyncProcess.array(captions, process).done(function(list) {

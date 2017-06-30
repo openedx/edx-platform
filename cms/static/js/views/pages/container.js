@@ -343,7 +343,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                     updateHtml: function(element, html) {
                         // Replace the element with the new HTML content, rather than adding
                         // it as child elements.
-                        this.$el = $(html).replaceAll(element); // safe-lint: disable=javascript-jquery-insertion
+                        this.$el = $(html).replaceAll(element); // xss-lint: disable=javascript-jquery-insertion
                     }
                 });
                 temporaryView = new TemporaryXBlockView({

@@ -20,7 +20,7 @@
                         <option value="flagged">${_("Flagged")}</option>
                     %endif
                 </select>
-            ## safe-lint: disable=python-parse-error,python-wrap-html
+            ## xss-lint: disable=python-parse-error,python-wrap-html
             </label>${"<% if (isDiscussionDivisionEnabled && isPrivilegedUser) { %>" | n, decode.utf8}<label class="forum-nav-filter-cohort">
                 ## Translators: This labels a group menu in forum navigation
                 <span class="sr">${_("Group:")}</span>
@@ -31,7 +31,7 @@
                             <option value="${group['id']}">${group['name']}</option>
                         %endfor
                 </select>
-            ## safe-lint: disable=python-parse-error,python-wrap-html
+            ## xss-lint: disable=python-parse-error,python-wrap-html
             </label>${"<% } %>" | n, decode.utf8}<label class="forum-nav-sort">
                 ## Translators: This labels a sort menu in forum navigation
                 <span class="sr">${_("Sort:")}</span>

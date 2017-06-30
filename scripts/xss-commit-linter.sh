@@ -3,16 +3,15 @@ set -e
 
 ###############################################################################
 #
-#   safe-commit-linter.sh
+#   xss-commit-linter.sh
 #
-#   Executes safe_template_linter.py on the set of files in a particular git
-#   commit.
+#   Executes xss_linter.py on the set of files in a particular git commit.
 #
 ###############################################################################
 
 show_help() {
-    echo "Usage: safe-commit-linter.sh [OPTION]"
-    echo "Runs the Safe Template Linter against all files in a git commit."
+    echo "Usage: xss-commit-linter.sh [OPTION]"
+    echo "Runs the XSS Linter against all files in a git commit."
     echo ""
     echo "Mandatory arguments to long options are mandatory for short options too."
     echo "  -h, --help                  Output this help."
@@ -24,10 +23,10 @@ show_help() {
     echo "This scripts does not give a grand total.  Be sure to check for"
     echo "0 violations on each file."
     echo ""
-    echo "For more help using the safe template linter, including details on how"
-    echo "to understand and fix any violations, read the docs here:"
+    echo "For more help using the xss linter, including details on how to"
+    echo "understand and fix any violations, read the docs here:"
     echo ""
-    echo "  http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/safe_templates.html#safe-template-linter"
+    echo "  http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/preventing_xss.html#xss-linter"
 
 }
 
@@ -83,6 +82,6 @@ else
     for f in $diff_files; do
         echo ""
         echo "Linting $f:"
-        ./scripts/safe_template_linter.py $f
+        ./scripts/xss_linter.py $f
     done
 fi
