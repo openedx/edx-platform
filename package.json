@@ -30,7 +30,7 @@
     "webpack-bundle-tracker": "^0.2.0"
   },
   "devDependencies": {
-    "edx-custom-a11y-rules": "0.1.3",
+    "edx-custom-a11y-rules": "1.0.0",
     "eslint-config-edx": "^2.0.1",
     "eslint-config-edx-es5": "^2.0.0",
     "eslint-import-resolver-webpack": "^0.8.1",

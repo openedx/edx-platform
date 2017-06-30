@@ -391,7 +391,7 @@ def inputfield(course, problem_type, choice=None, input_num=1):
     ptype = problem_type.replace(" ", "_")
     # this is necessary due to naming requirement for this problem type
     if problem_type in ("radio_text", "checkbox_text"):
-        selector_template = "input#{}_2_{input}"
+        selector_template = "input#ctinput_{}_2_{input}"
     else:
         selector_template = "input#input_{}_2_{input}"
 
@@ -405,7 +405,7 @@ def inputfield(course, problem_type, choice=None, input_num=1):
         sel = sel + base + str(choice)
 
     # If the input element doesn't exist, fail immediately
-    assert world.is_css_present(sel)
+    assert world.is_css_present(sel, wait_time=4)
 
     # Retrieve the input element
     return sel
@@ -447,7 +447,7 @@ def assert_choicetext_values(course, problem_type, choices, expected_values):
         "choiceinput_0_numtolerance_input_0",
         "choiceinput_1_numtolerance_input_0"
     ]
-    for this_choice in all_choices:
+    for this_choice in all_inputs:
         element = world.css_find(inputfield(course, problem_type, choice=this_choice))
 
         if this_choice in choices:
