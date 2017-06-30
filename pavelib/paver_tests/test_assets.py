@@ -10,6 +10,7 @@ from watchdog.observers.polling import PollingObserver
 
 from pavelib.assets import COLLECTSTATIC_LOG_DIR_ARG, collect_assets
 
+from ..utils.envs import Env
 from .utils import PaverTestCase
 
 ROOT_PATH = path(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -252,12 +253,12 @@ class TestCollectAssets(PaverTestCase):
         if specified_log_loc is None:
             collect_assets(
                 systems,
-                "devstack"
+                Env.DEVSTACK_SETTINGS
             )
         else:
             collect_assets(
                 systems,
-                "devstack",
+                Env.DEVSTACK_SETTINGS,
                 **specified_log_dict
             )
         self.assertEqual(self.task_messages, expected_messages)
@@ -271,7 +272,7 @@ class TestCollectAssets(PaverTestCase):
         systems = ["lms"]
         kwargs = {COLLECTSTATIC_LOG_DIR_ARG: None}
         expected_messages = self._set_expected_messages(log_location=expected_log_loc, systems=systems)
-        collect_assets(systems, "devstack", **kwargs)
+        collect_assets(systems, Env.DEVSTACK_SETTINGS, **kwargs)
         self.assertEqual(self.task_messages, expected_messages)
 
     def _set_expected_messages(self, log_location, systems):
@@ -284,8 +285,9 @@ class TestCollectAssets(PaverTestCase):
         expected_messages = []
         for sys in systems:
             expected_messages.append(
-                'python manage.py {system} --settings=devstack collectstatic --noinput {log_loc}'.format(
+                'python manage.py {system} --settings={settings} collectstatic --noinput {log_loc}'.format(
                     system=sys,
+                    settings=Env.DEVSTACK_SETTINGS,
                     log_loc=log_location
                 )
             )
