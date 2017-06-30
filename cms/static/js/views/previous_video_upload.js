@@ -19,16 +19,21 @@ define(
             initialize: function(options) {
                 this.template = HtmlUtils.template(previousVideoUploadTemplate);
                 this.videoHandlerUrl = options.videoHandlerUrl;
-                this.videoThumbnailView = new VideoThumbnailView({
-                    model: this.model,
-                    imageUploadURL: options.videoImageUploadURL,
-                    defaultVideoImageURL: options.defaultVideoImageURL,
-                    videoImageSettings: options.videoImageSettings
-                });
+                this.videoImageUploadEnabled = options.videoImageSettings.video_image_upload_enabled;
+
+                if (this.videoImageUploadEnabled) {
+                    this.videoThumbnailView = new VideoThumbnailView({
+                        model: this.model,
+                        imageUploadURL: options.videoImageUploadURL,
+                        defaultVideoImageURL: options.defaultVideoImageURL,
+                        videoImageSettings: options.videoImageSettings
+                    });
+                }
             },
 
             render: function() {
                 var renderedAttributes = {
+                    videoImageUploadEnabled: this.videoImageUploadEnabled,
                     created: DateUtils.renderDate(this.model.get('created')),
                     status: this.model.get('status')
                 };
@@ -38,7 +43,10 @@ define(
                         _.extend({}, this.model.attributes, renderedAttributes)
                     )
                 );
-                this.videoThumbnailView.setElement(this.$('.thumbnail-col')).render();
+
+                if (this.videoImageUploadEnabled) {
+                    this.videoThumbnailView.setElement(this.$('.thumbnail-col')).render();
+                }
                 return this;
             },
 
