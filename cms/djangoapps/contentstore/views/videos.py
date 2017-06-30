@@ -431,7 +431,11 @@ def storage_service_bucket():
         settings.AWS_ACCESS_KEY_ID,
         settings.AWS_SECRET_ACCESS_KEY
     )
-    return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE["BUCKET"])
+    # We don't need to validate our bucket, it requires a very permissive IAM permission
+    # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
+    # meaning it would need ListObjects on the whole bucket, not just the path used in each
+    # environment (since we share a single bucket for multiple deployments in some configurations)
+    return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE["BUCKET"], validate=False)
 
 
 def storage_service_key(bucket, file_name):
