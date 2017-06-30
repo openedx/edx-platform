@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Tests for safe_template_linter.py
+Tests for xss_linter.py
 """
 import re
 import textwrap
@@ -10,7 +10,7 @@ from unittest import TestCase
 import mock
 from ddt import data, ddt
 
-from scripts.safe_template_linter import (
+from scripts.xss_linter import (
     FileResults,
     JavaScriptLinter,
     MakoTemplateLinter,
@@ -93,7 +93,7 @@ class TestLinter(TestCase):
             self.assertEqual(violation.rule, rule)
 
 
-class TestSafeTemplateLinter(TestCase):
+class TestXSSLinter(TestCase):
     """
     Test some top-level linter functions
     """
@@ -107,7 +107,7 @@ class TestSafeTemplateLinter(TestCase):
         self.patch_is_valid_directory(UnderscoreTemplateLinter)
         self.patch_is_valid_directory(PythonLinter)
 
-        patcher = mock.patch('scripts.safe_template_linter.is_skip_dir', return_value=False)
+        patcher = mock.patch('scripts.xss_linter.is_skip_dir', return_value=False)
         patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -548,7 +548,7 @@ class TestMakoTemplateLinter(TestLinter):
             # This is anything but a Mako file.
 
             # pragma can appear anywhere in file
-            # safe-lint: disable=mako-missing-default
+            # xss-lint: disable=mako-missing-default
         """)
 
         linter._check_mako_file_is_safe(mako_template, results)
@@ -566,7 +566,7 @@ class TestMakoTemplateLinter(TestLinter):
 
         mako_template = textwrap.dedent("""
             <%page expression_filter="h"/>
-            ## safe-lint: disable=mako-unwanted-html-filter
+            ## xss-lint: disable=mako-unwanted-html-filter
             ${x | h}
         """)
 
@@ -982,25 +982,25 @@ class TestUnderscoreTemplateLinter(TestLinter):
     @data(
         {
             'template':
-                '<% // safe-lint:   disable=underscore-not-escaped   %>\n'
+                '<% // xss-lint:   disable=underscore-not-escaped   %>\n'
                 '<%= message %>',
             'is_disabled': [True],
         },
         {
             'template':
-                '<% // safe-lint: disable=another-rule,underscore-not-escaped %>\n'
+                '<% // xss-lint: disable=another-rule,underscore-not-escaped %>\n'
                 '<%= message %>',
             'is_disabled': [True],
         },
         {
             'template':
-                '<% // safe-lint: disable=another-rule %>\n'
+                '<% // xss-lint: disable=another-rule %>\n'
                 '<%= message %>',
             'is_disabled': [False],
         },
         {
             'template':
-                '<% // safe-lint: disable=underscore-not-escaped %>\n'
+                '<% // xss-lint: disable=underscore-not-escaped %>\n'
                 '<%= message %>\n'
                 '<%= message %>',
             'is_disabled': [True, False],
@@ -1010,22 +1010,22 @@ class TestUnderscoreTemplateLinter(TestLinter):
                 '// This test does not use proper Underscore.js Template syntax\n'
                 '// But, it is just testing that a maximum of 5 non-whitespace\n'
                 '// are used to designate start of line for disabling the next line.\n'
-                ' 1 2 3 4 5 safe-lint: disable=underscore-not-escaped %>\n'
+                ' 1 2 3 4 5 xss-lint: disable=underscore-not-escaped %>\n'
                 '<%= message %>\n'
-                ' 1 2 3 4 5 6 safe-lint: disable=underscore-not-escaped %>\n'
+                ' 1 2 3 4 5 6 xss-lint: disable=underscore-not-escaped %>\n'
                 '<%= message %>',
             'is_disabled': [True, False],
         },
         {
             'template':
-                '<%= message %><% // safe-lint: disable=underscore-not-escaped %>\n'
+                '<%= message %><% // xss-lint: disable=underscore-not-escaped %>\n'
                 '<%= message %>',
             'is_disabled': [True, False],
         },
         {
             'template':
                 '<%= message %>\n'
-                '<% // safe-lint: disable=underscore-not-escaped %>',
+                '<% // xss-lint: disable=underscore-not-escaped %>',
             'is_disabled': [False],
         },
     )
@@ -1052,7 +1052,7 @@ class TestUnderscoreTemplateLinter(TestLinter):
         results = FileResults('')
 
         template = textwrap.dedent("""
-            <% // safe-lint: disable=underscore-not-escaped %>
+            <% // xss-lint: disable=underscore-not-escaped %>
             <%= message %>
             <%= message %>
         """)
