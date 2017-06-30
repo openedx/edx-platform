@@ -6,6 +6,7 @@ import csv
 import json
 import re
 from datetime import datetime
+from functools import wraps
 from StringIO import StringIO
 
 import dateutil.parser
@@ -21,16 +22,33 @@ from contentstore.models import VideoUploadConfig
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from contentstore.views.videos import (
-    KEY_EXPIRATION_IN_SECONDS,
-    StatusDisplayStrings,
-    convert_video_status,
     _get_default_video_image_url,
-    validate_video_image
+    validate_video_image,
+    VIDEO_IMAGE_UPLOAD_ENABLED,
+    WAFFLE_SWITCHES,
 )
 from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+
+
+def override_switch(switch, active):
+    """
+    Overrides the given waffle switch to `active` boolean.
+
+    Arguments:
+        switch(str): switch name
+        active(bool): A boolean representing (to be overridden) value
+    """
+    def decorate(function):
+        @wraps(function)
+        def inner(*args, **kwargs):
+            with WAFFLE_SWITCHES.override(switch, active=active):
+                function(*args, **kwargs)
+        return inner
+
+    return decorate
 
 
 class VideoUploadTestBase(object):
@@ -576,6 +594,16 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         self.assertIn('error', response)
         self.assertEqual(response['error'], error_message)
 
+    @override_switch(VIDEO_IMAGE_UPLOAD_ENABLED, False)
+    def test_video_image_upload_disabled(self):
+        """
+        Tests the video image upload when the feature is disabled.
+        """
+        video_image_upload_url = self.get_url_for_course_key(self.course.id, {'edx_video_id': 'test_vid_id'})
+        response = self.client.post(video_image_upload_url, {'file': 'dummy_file'}, format='multipart')
+        self.assertEqual(response.status_code, 404)
+
+    @override_switch(VIDEO_IMAGE_UPLOAD_ENABLED, True)
     def test_video_image(self):
         """
         Test video image is saved.
@@ -597,6 +625,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
 
         self.assertNotEqual(image_url1, image_url2)
 
+    @override_switch(VIDEO_IMAGE_UPLOAD_ENABLED, True)
     def test_video_image_no_file(self):
         """
         Test that an error error message is returned if upload request is incorrect.
@@ -625,6 +654,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
             error = validate_video_image(image_file)
             self.assertEquals(error, 'This image file is corrupted.')
 
+    @override_switch(VIDEO_IMAGE_UPLOAD_ENABLED, True)
     def test_no_video_image(self):
         """
         Test image url is set to None if no video image.
@@ -800,6 +830,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         )
     )
     @ddt.unpack
+    @override_switch(VIDEO_IMAGE_UPLOAD_ENABLED, True)
     def test_video_image_validation_message(self, image_data, error_message):
         """
         Test video image validation gives proper error message.

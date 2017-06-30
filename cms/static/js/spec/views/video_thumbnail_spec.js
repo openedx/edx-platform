@@ -29,11 +29,12 @@ define(
             /**
              * Creates a list of video records.
              *
+             * @param {Boolean} videoImageUploadEnabled  Boolean indicating if the feature is enabled.
              * @param {Object} modelData        Model data for video records.
              * @param {Integer} numVideos       Number of video elements to create.
              * @param {Integer} videoViewIndex  Index of video on which videoThumbnailView would be based.
              */
-            createVideoListView = function(modelData, numVideos, videoViewIndex) {
+            createVideoListView = function(videoImageUploadEnabled, modelData, numVideos, videoViewIndex) {
                 var modelData = modelData || {},  // eslint-disable-line no-redeclare
                     numVideos = numVideos || 1,   // eslint-disable-line no-redeclare
                     videoViewIndex = videoViewIndex || 0,   // eslint-disable-line no-redeclare,
@@ -58,12 +59,17 @@ define(
                         min_size: VIDEO_IMAGE_MIN_BYTES,
                         max_width: VIDEO_IMAGE_MAX_WIDTH,
                         max_height: VIDEO_IMAGE_MAX_HEIGHT,
-                        supported_file_formats: VIDEO_IMAGE_SUPPORTED_FILE_FORMATS
+                        supported_file_formats: VIDEO_IMAGE_SUPPORTED_FILE_FORMATS,
+                        video_image_upload_enabled: videoImageUploadEnabled
                     }
                 });
                 $videoListEl = videoListView.render().$el;
-                videoThumbnailView = videoListView.itemViews[videoViewIndex].videoThumbnailView;
-                $videoThumbnailEl = videoThumbnailView.render().$el;
+
+                if (videoImageUploadEnabled) {
+                    videoThumbnailView = videoListView.itemViews[videoViewIndex].videoThumbnailView;
+                    $videoThumbnailEl = videoThumbnailView.render().$el;
+                }
+
                 return videoListView;
             };
 
@@ -113,7 +119,12 @@ define(
                 setFixtures('<div id="page-prompt"></div><div id="page-notification"></div>');
                 TemplateHelpers.installTemplate('video-thumbnail');
                 TemplateHelpers.installTemplate('previous-video-upload-list');
-                createVideoListView();
+                createVideoListView(true);
+            });
+
+            it('Verifies that the ThumbnailView is not initialized on disabling the feature', function() {
+                createVideoListView(false);
+                expect(videoListView.itemViews[0].videoThumbnailView).toEqual(undefined);
             });
 
             it('renders as expected', function() {
@@ -122,7 +133,7 @@ define(
             });
 
             it('does not show duration if not available', function() {
-                createVideoListView({duration: 0});
+                createVideoListView(true, {duration: 0});
                 expect($videoThumbnailEl.find('.thumbnail-wrapper .video-duration')).not.toExist();
             });
 
