@@ -415,6 +415,115 @@ class CapaModuleTest(unittest.TestCase):
                                             graceperiod=self.two_day_delta_str)
         self.assertFalse(still_in_grace.answer_available())
 
+    def test_showanswer_after_attempts_with_max(self):
+        """
+        Button should not be visible when attempts < required attempts.
+
+        Even with max attempts set, the show answer button should only
+        show up after the user has attempted answering the question for
+        the requisite number of times, i.e `attempts_before_showanswer_button`
+        """
+        problem = CapaFactory.create(
+            showanswer='after_attempts',
+            attempts='2',
+            attempts_before_showanswer_button='3',
+            max_attempts='5',
+        )
+        self.assertFalse(problem.answer_available())
+
+    def test_showanswer_after_attempts_no_max(self):
+        """
+        Button should not be visible when attempts < required attempts.
+
+        Even when max attempts is NOT set, the answer should still
+        only be available after the student has attempted the
+        problem at least `attempts_before_showanswer_button` times
+        """
+        problem = CapaFactory.create(
+            showanswer='after_attempts',
+            attempts='2',
+            attempts_before_showanswer_button='3',
+        )
+        self.assertFalse(problem.answer_available())
+
+    def test_showanswer_after_attempts_used_all_attempts(self):
+        """
+        Button should be visible even after all attempts are used up.
+
+        As long as the student has attempted  the question for
+        the requisite number of times, then the show ans. button is
+        visible even after they have exhausted their attempts.
+        """
+        problem = CapaFactory.create(
+            showanswer='after_attempts',
+            attempts_before_showanswer_button='2',
+            max_attempts='3',
+            attempts='3',
+            due=self.tomorrow_str,
+        )
+        self.assertTrue(problem.answer_available())
+
+    def test_showanswer_after_attempts_past_due_date(self):
+        """
+        Show Answer button should be visible even after the due date.
+
+        As long as the student has attempted the problem for the requisite
+        number of times, the answer should be available past the due date.
+        """
+        problem = CapaFactory.create(
+            showanswer='after_attempts',
+            attempts_before_showanswer_button='2',
+            attempts='2',
+            due=self.yesterday_str,
+        )
+        self.assertTrue(problem.answer_available())
+
+    def test_showanswer_after_attempts_still_in_grace(self):
+        """
+        If attempts > required attempts, ans. is available in grace period.
+
+        As long as the user has attempted for the requisite # of times,
+        the show answer button is visible throughout the grace period.
+        """
+        problem = CapaFactory.create(
+            showanswer='after_attempts',
+            after_attempts='3',
+            attempts='4',
+            due=self.yesterday_str,
+            graceperiod=self.two_day_delta_str,
+        )
+        self.assertTrue(problem.answer_available())
+
+    def test_showanswer_after_attempts_large(self):
+        """
+        If required attempts > max attempts then required attempts = max attempts.
+
+        Ensure that if attempts_before_showanswer_button > max_attempts,
+        the button should show up after all attempts are used up,
+        i.e after_attempts falls back to max_attempts
+        """
+        problem = CapaFactory.create(
+            showanswer='after_attempts',
+            attempts_before_showanswer_button='5',
+            max_attempts='3',
+            attempts='3',
+        )
+        self.assertTrue(problem.answer_available())
+
+    def test_showanswer_after_attempts_zero(self):
+        """
+        Button should always be visible if required min attempts = 0.
+
+        If attempts_before_showanswer_button = 0, then the show answer
+        button should be visible at all times.
+        """
+        problem = CapaFactory.create(
+            showanswer='after_attempts',
+            attempts_before_showanswer_button='0',
+            attempts='0',
+        )
+        self.assertTrue(problem.answer_available())
+
     def test_showanswer_finished(self):
         """
         With showanswer="finished" should show answer after the problem is closed,
