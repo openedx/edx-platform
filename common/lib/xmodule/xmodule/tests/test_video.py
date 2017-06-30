@@ -12,6 +12,7 @@ You can then use the CourseFactory and XModuleItemFactory as defined
 in common/lib/xmodule/xmodule/modulestore/tests/factories.py to create
 the course, section, subsection, unit, etc.
 """
+import os
 import unittest
 import datetime
 from uuid import uuid4
@@ -821,7 +822,7 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
         settings.CONTENTSTORE = {
             'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
             'DOC_STORE_CONFIG': {
-                'host': 'localhost',
+                'host': 'edx.devstack.mongo' if 'BOK_CHOY_HOSTNAME' in os.environ else 'localhost',
                 'db': 'test_xcontent_%s' % uuid4().hex,
             },
             # allow for additional options that can be keyed on a name, e.g. 'trashcan'

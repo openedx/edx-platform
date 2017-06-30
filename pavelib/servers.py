@@ -10,11 +10,12 @@ from paver.easy import call_task, cmdopts, consume_args, needs, sh, task
 
 from .assets import collect_assets
 from .utils.cmd import django_cmd
+from .utils.envs import Env
 from .utils.process import run_multi_processes, run_process
 from .utils.timer import timed
 
 DEFAULT_PORT = {"lms": 8000, "studio": 8001}
-DEFAULT_SETTINGS = 'devstack'
+DEFAULT_SETTINGS = Env.DEVSTACK_SETTINGS
 OPTIMIZED_SETTINGS = "devstack_optimized"
 OPTIMIZED_ASSETS_SETTINGS = "test_static_optimized"
 
