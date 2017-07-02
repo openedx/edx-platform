@@ -1,21 +1,19 @@
 (function(define) {
     'use strict';
     define([
-        'jquery',
-        'underscore',
-        'gettext',
+        'jquery', 'underscore', 'gettext',
         'edx-ui-toolkit/js/utils/html-utils',
         'edx-ui-toolkit/js/utils/string-utils',
         'js/student_account/views/FormView',
         'text!templates/student_account/form_success.underscore',
         'text!templates/student_account/form_status.underscore'
     ], function(
-            $, _, gettext,
-            HtmlUtils,
-            StringUtils,
-            FormView,
-            formSuccessTpl,
-            formStatusTpl
+        $, _, gettext,
+        HtmlUtils,
+        StringUtils,
+        FormView,
+        formSuccessTpl,
+        formStatusTpl
     ) {
         return FormView.extend({
             el: '#login-form',
