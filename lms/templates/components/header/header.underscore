@@ -4,7 +4,7 @@
         <% if (breadcrumbs !== null && breadcrumbs.length > 0) { %>
             <nav class="breadcrumbs" aria-label="<%- nav_aria_label %>">
             <% _.each(breadcrumbs, function (breadcrumb) { %>
-                <a class="nav-item" href="<%= breadcrumb.url %>"><%- breadcrumb.title %></a>
+                <a class="nav-item" href="<%- breadcrumb.url %>"><%- breadcrumb.title %></a>
                 <span class="icon fa-angle-right" aria-hidden="true"></span>
             <% }) %>
             </nav>

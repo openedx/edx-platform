@@ -47,7 +47,7 @@
         <% } %>
     <% } %>
 
-    <%= context.fields %>
+    <%- context.fields %>
 
     <button type="submit" class="action action-primary action-update js-register register-button"><%- gettext("Create account") %></button>
 </form>

@@ -46,8 +46,8 @@
         <td>
           <button
               class="change-enrollment-btn"
-              data-modes="<%= _.pluck(enrollment.get('course_modes'), 'slug')%>"
-              data-course_id="<%= enrollment.get('course_id') %>"
+              data-modes="<%- _.pluck(enrollment.get('course_modes'), 'slug')%>"
+              data-course_id="<%- enrollment.get('course_id') %>"
           >
             <%- gettext('Change Enrollment') %>
           </button>

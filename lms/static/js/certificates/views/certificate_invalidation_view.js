@@ -46,7 +46,7 @@
                     );
 
                     if (this.collection.findWhere({user: user})) {
-                        message = gettext('Certificate of <%= user %> has already been invalidated. Please check your spelling and retry.');  // eslint-disable-line max-len
+                        message = gettext('Certificate of <%- user %> has already been invalidated. Please check your spelling and retry.');  // eslint-disable-line max-len
                         this.escapeAndShowMessage(_.template(message)({user: user}));
                     }
                     else if (certificate_invalidation.isValid()) {
@@ -56,7 +56,7 @@
 
                             success: function(model) {
                                 self.collection.add(model);
-                                message = gettext('Certificate has been successfully invalidated for <%= user %>.');
+                                message = gettext('Certificate has been successfully invalidated for <%- user %>.');
                                 self.escapeAndShowMessage(_.template(message)({user: user}));
                             },
 

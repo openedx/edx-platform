@@ -4,10 +4,10 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
     function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, PagingFooter, XBlockView) {
         var htmlResponseTpl = _.template('' +
             '<div class="xblock-container-paging-parameters" ' +
-                'data-start="<%= start %>" ' +
-                'data-displayed="<%= displayed %>" ' +
-                'data-total="<%= total %>" ' +
-                'data-previews="<%= previews %>"></div>'
+                'data-start="<%- start %>" ' +
+                'data-displayed="<%- displayed %>" ' +
+                'data-total="<%- total %>" ' +
+                'data-previews="<%- previews %>"></div>'
         );
 
         function getResponseHtml(override_options) {

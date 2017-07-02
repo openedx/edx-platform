@@ -21,7 +21,7 @@
                 var _fn = {
                     validate: {
 
-                        template: _.template('<li><%= content %></li>'),
+                        template: _.template('<li><%- content %></li>'),
 
                         msg: {
                             email: gettext("The email address you've provided isn't formatted correctly."),

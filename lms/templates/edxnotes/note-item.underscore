@@ -32,7 +32,7 @@
     <div class="wrapper-reference-content">
         <p class="reference-title"><%- gettext("Noted in:") %></p>
         <% if (unit.url) { %>
-          <a class="reference-meta reference-unit-link" href="<%= unit.url %>#<%= id %>"><%- unit.display_name %></a>
+          <a class="reference-meta reference-unit-link" href="<%- unit.url %>#<%- id %>"><%- unit.display_name %></a>
         <% } else { %>
           <span class="reference-meta"><%- unit.display_name %></span>
         <% } %>
