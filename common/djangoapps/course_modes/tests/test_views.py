@@ -141,7 +141,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         for mode in ('audit', 'honor', 'verified'):
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
-        catalog_integration = self.create_catalog_integration()
+        catalog_integration = self.create_catalog_integration(internal_api_url=settings.COURSE_CATALOG_API_URL)
         UserFactory(username=catalog_integration.service_username)
 
         self.mock_course_discovery_api_for_catalog_contains(
@@ -254,7 +254,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         for mode in ('audit', 'honor', 'verified'):
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
-        catalog_integration = self.create_catalog_integration()
+        catalog_integration = self.create_catalog_integration(internal_api_url=settings.COURSE_CATALOG_API_URL)
         UserFactory(username=catalog_integration.service_username)
 
         courses_in_catalog = [str(self.course.id)] if course_in_catalog else []
