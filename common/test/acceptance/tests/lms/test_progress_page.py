@@ -326,6 +326,9 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
             self._answer_problem_correctly()
             self.progress_page.visit()
 
+            # Verify the basic a11y of the progress page
+            self.progress_page.a11y_audit.check_for_accessibility_errors()
+
             # Verify that y-Axis labels are aria-hidden
             self.assertEqual(['100%', 'true'], self.progress_page.y_tick_label(0))
             self.assertEqual(['0%', 'true'], self.progress_page.y_tick_label(1))
