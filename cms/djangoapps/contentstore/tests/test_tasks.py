@@ -16,7 +16,12 @@ from organizations.models import OrganizationCourse
 from organizations.tests.factories import OrganizationFactory
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
-from contentstore.tasks import export_olx, rerun_course
+from contentstore.git_export_utils import GitExportError
+from contentstore.tasks import (
+    async_export_to_git,
+    export_olx,
+    rerun_course
+)
 from contentstore.tests.test_libraries import LibraryTestCase
 from contentstore.tests.utils import CourseTestCase
 from course_action_state.models import CourseRerunState
@@ -160,4 +165,38 @@ class RerunCourseTaskTestCase(CourseTestCase):
             rule_type=CountryAccessRule.BLACKLIST_RULE,
             restricted_course=restricted_course,
             country=restricted_country
+        )
+
+
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+class ExportGITCourseTestCase(CourseTestCase):
+    """
+    Tests for export to git task
+    """
+
+    def test_export_to_git_called(self):
+        """
+        Verify that export_to_git called
+        """
+        key = str(self.course.location.course_key)
+        with mock.patch('contentstore.tasks.export_to_git') as mocked_export_to_git:
+            async_export_to_git.delay(key)
+
+        course_module = modulestore().get_course(self.course.location.course_key)
+        mocked_export_to_git.assert_called_with(course_module.id, course_module.giturl, user=None)
+
+    def test_task_log_git_error(self):
+        """
+        Verify that task logs git error
+        """
+        key = str(self.course.location.course_key)
+        ex = GitExportError("error")
+        with mock.patch('contentstore.tasks.export_to_git', side_effect=ex), mock.patch(
+                'contentstore.tasks.LOGGER.error'
+        ) as mocked_error_logger:
+            async_export_to_git.delay(key)
+
+        course_module = modulestore().get_course(self.course.location.course_key)
+        mocked_error_logger.assert_called_with(
+            'Failed async course content export to git (course id: %s): %s', course_module.id, ex
         )

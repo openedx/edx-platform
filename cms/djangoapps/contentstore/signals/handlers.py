@@ -4,10 +4,11 @@ from datetime import datetime
 from functools import wraps
 import logging
 
+from django.conf import settings
 from django.core.cache import cache
 from django.dispatch import receiver
 from pytz import UTC
-from django.conf import settings
+
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer
 from contentstore.proctoring import register_special_exams
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course
