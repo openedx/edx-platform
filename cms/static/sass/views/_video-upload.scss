@@ -194,6 +194,10 @@
       .actions-col {
         width: 5%;
       }
+
+      .video-head-col.thumbnail-col {
+          width: 17% !important;
+      }
     }
   }
 
@@ -202,7 +206,7 @@
     white-space: nowrap;
     color: $red;
     .icon {
-      margin: 15px 5px 0px 10px;
+      margin: ($baseline*0.75) ($baseline/4) 0 ($baseline/2);
     }
   }
 
@@ -236,7 +240,7 @@
         font-size: 15px;
         font-family: "Open Sans";
         text-align: left;
-        color: #4c4c4c;
+        color: $gray-d2;
         line-height: 1.5;
       }
       .video-duration {
@@ -292,7 +296,7 @@
       background-color: $white;
       padding: ($baseline/4);
       border-radius: ($baseline/5);
-      margin-top: 10px;
+      margin-top: ($baseline/2);
       display: none;
     }
 
