@@ -275,12 +275,9 @@ def _emit_event(kwargs):
             }
         )
 
-    if root_type == GRADES_RESCORE_EVENT_TYPE:
+    if root_type in [GRADES_RESCORE_EVENT_TYPE, GRADES_OVERRIDE_EVENT_TYPE]:
         current_user = get_current_user()
-        if current_user is not None and hasattr(current_user, 'id'):
-            instructor_id = unicode(current_user.id)
-        else:
-            instructor_id = None
+        instructor_id = getattr(current_user, 'id', None)
         tracker.emit(
             unicode(GRADES_RESCORE_EVENT_TYPE),
             {
@@ -292,27 +289,6 @@ def _emit_event(kwargs):
                 'only_if_higher': kwargs.get('only_if_higher'),
                 'instructor_id': instructor_id,
                 'event_transaction_id': unicode(get_event_transaction_id()),
-                'event_transaction_type': unicode(GRADES_RESCORE_EVENT_TYPE),
-            }
-        )
-
-    if root_type == GRADES_OVERRIDE_EVENT_TYPE:
-        current_user = get_current_user()
-        if current_user is not None and hasattr(current_user, 'id'):
-            instructor_id = unicode(current_user.id)
-        else:
-            instructor_id = None
-        tracker.emit(
-            unicode(GRADES_OVERRIDE_EVENT_TYPE),
-            {
-                'course_id': unicode(kwargs['course_id']),
-                'user_id': unicode(kwargs['user_id']),
-                'problem_id': unicode(kwargs['usage_id']),
-                'new_weighted_earned': kwargs.get('weighted_earned'),
-                'new_weighted_possible': kwargs.get('weighted_possible'),
-                'only_if_higher': kwargs.get('only_if_higher'),
-                'instructor_id': instructor_id,
-                'event_transaction_id': unicode(get_event_transaction_id()),
-                'event_transaction_type': unicode(GRADES_OVERRIDE_EVENT_TYPE),
+                'event_transaction_type': unicode(root_type),
             }
         )

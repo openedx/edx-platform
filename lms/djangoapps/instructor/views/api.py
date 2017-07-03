@@ -59,6 +59,7 @@ from lms.djangoapps.instructor.enrollment import (
 )
 from lms.djangoapps.instructor.views import INVOICE_KEY
 from lms.djangoapps.instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
+from lms.djangoapps.instructor_task.api import submit_override_problem_score_for_student
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
 from lms.djangoapps.instructor_task.models import ReportStore
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -118,6 +119,7 @@ from .tools import (
 
 log = logging.getLogger(__name__)
 
+TASK_SUBMISSION_OK = 'created'
 
 def common_exceptions_400(func):
     """
@@ -1991,7 +1993,7 @@ def reset_student_attempts(request, course_id):
         response_payload['student'] = student_identifier
     elif all_students:
         lms.djangoapps.instructor_task.api.submit_reset_problem_attempts_for_all_students(request, module_state_key)
-        response_payload['task'] = 'created'
+        response_payload['task'] = TASK_SUBMISSION_OK
         response_payload['student'] = 'All Students'
     else:
         return HttpResponseBadRequest()
@@ -2070,7 +2072,7 @@ def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: dis
     except InvalidKeyError:
         return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
 
-    response_payload = {'student': student_identifier or _('All Students'), 'task': 'created'}
+    response_payload = {'student': student_identifier or _('All Students'), 'task': TASK_SUBMISSION_OK}
     return JsonResponse(response_payload)
 
 
@@ -2141,7 +2143,7 @@ def rescore_problem(request, course_id):
     else:
         return HttpResponseBadRequest()
 
-    response_payload['task'] = 'created'
+    response_payload['task'] = TASK_SUBMISSION_OK
     return JsonResponse(response_payload)
 
 
@@ -2153,7 +2155,7 @@ def rescore_problem(request, course_id):
 @require_post_params(problem_to_reset="problem urlname to reset", score='overriding score')
 @common_exceptions_400
 def override_problem_score(request, course_id):
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     score = strip_if_string(request.POST.get('score'))
     problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
     student_identifier = request.POST.get('unique_student_identifier', None)
@@ -2167,26 +2169,28 @@ def override_problem_score(request, course_id):
         return _create_error_response(request, "Invalid student ID.")
 
     try:
-        module_state_key = course_id.make_usage_key_from_deprecated_string(problem_to_reset)
+        usage_key = UsageKey.from_string(problem_to_reset).map_into_course(course_key)
     except InvalidKeyError:
         return _create_error_response(request, "Unable to parse problem id.")
 
-    response_payload = {'problem_to_reset': problem_to_reset}
-    response_payload['student'] = student_identifier
+    response_payload = {
+        'problem_to_reset': problem_to_reset,
+        'student': student_identifier
+    }
     try:
-        lms.djangoapps.instructor_task.api.submit_override_problem_score_for_student(
+        submit_override_problem_score_for_student(
             request,
-            module_state_key,
+            usage_key,
             student,
             score,
         )
-    except NotImplementedError as exc:
+    except NotImplementedError as exc:  # if we try to override the score of a non-scorable block, catch it here
         return _create_error_response(request, exc.message)
 
     except ValueError as exc:
         return _create_error_response(request, exc.message)
 
-    response_payload['task'] = 'created'
+    response_payload['task'] = TASK_SUBMISSION_OK
     return JsonResponse(response_payload)
 
 
@@ -2244,7 +2248,7 @@ def rescore_entrance_exam(request, course_id):
     lms.djangoapps.instructor_task.api.submit_rescore_entrance_exam_for_student(
         request, entrance_exam_key, student, only_if_higher,
     )
-    response_payload['task'] = 'created'
+    response_payload['task'] = TASK_SUBMISSION_OK
     return JsonResponse(response_payload)
 
 

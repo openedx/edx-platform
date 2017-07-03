@@ -116,10 +116,10 @@ def submit_rescore_problem_for_student(request, usage_key, student, only_if_high
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 
-# Disabling invalid-name because this fn name is longer than 30 chars.
-def submit_override_problem_score_for_student(request, usage_key, student, score):  # pylint: disable=invalid-name
+def submit_override_score(request, usage_key, student, score):
     """
-    Request a problem score override as a background task.
+    Request a problem score override as a background task. Only
+    applicable to individual users.
 
     The problem score will be overridden for the specified student only.
     Parameters are the `course_id`, the `problem_url`, the `student` as
@@ -131,10 +131,10 @@ def submit_override_problem_score_for_student(request, usage_key, student, score
     the problem is not a ScorableXBlock.
     """
     check_arguments_for_overriding(usage_key, score)
-    task_type = 'override_problem_score'
+    task_type = override_problem_score.__name__
     task_class = override_problem_score
     task_input, task_key = encode_problem_and_student_input(usage_key, student)
-    task_input.update({'score': score})
+    task_input['score'] = score
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 
