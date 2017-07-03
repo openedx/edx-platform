@@ -315,6 +315,7 @@
       left: 5px;;
       right: 5px;
       @include transform(translateY(-50%));
+      z-index: 1;
     }
 
     .upload-image-input {

@@ -367,7 +367,7 @@ define(
 
                 errorText = gettext('Image upload failed. ') + errorText;   // eslint-disable-line no-param-reassign
                 // Add error wrapper html to current video element row.
-                $parentRowEl.before(    // safe-lint: disable=javascript-jquery-insertion
+                $parentRowEl.before(    // xss-lint: disable=javascript-jquery-insertion
                    HtmlUtils.ensureHtml(
                        this.thumbnailErrorTemplate({videoId: videoId, errorText: errorText})
                    ).toString()
