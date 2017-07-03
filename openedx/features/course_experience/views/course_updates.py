@@ -79,11 +79,14 @@ class CourseUpdatesFragmentView(EdxFragmentView):
         info_module = get_course_info_section_module(request, request.user, course, 'updates')
 
         updates = info_module.items if info_module else []
+        info_block = getattr(info_module, '_xmodule', info_module) if info_module else None
         ordered_updates = [update for update in updates if update.get('status') == self.STATUS_VISIBLE]
         ordered_updates.sort(
             key=lambda item: (self.safe_parse_date(item['date']), item['id']),
             reverse=True
         )
+        for update in ordered_updates:
+            update['content'] = info_block.system.replace_urls(update['content'])
         return ordered_updates
 
     @classmethod
@@ -98,7 +101,8 @@ class CourseUpdatesFragmentView(EdxFragmentView):
         a single html object representing all the updates.
         """
         info_module = get_course_info_section_module(request, request.user, course, 'updates')
-        return info_module.data if info_module else ''
+        info_block = getattr(info_module, '_xmodule', info_module)
+        return info_block.system.replace_urls(info_module.data) if info_module else ''
 
     @staticmethod
     def safe_parse_date(date):
