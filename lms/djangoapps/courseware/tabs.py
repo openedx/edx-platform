@@ -36,6 +36,16 @@ class CoursewareTab(EnrolledTab):
     is_default = False
     supports_preview_menu = True
 
+    @classmethod
+    def is_enabled(cls, course, user=None):
+        """
+        Returns true if this tab is enabled.
+        """
+        # If this is the unified course tab then it is always enabled
+        if UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id):
+            return True
+        return super(CoursewareTab, cls).is_enabled(course, user)
+
     @property
     def link_func(self):
         """

@@ -24,13 +24,17 @@ from django.utils.translation import ugettext as _
                 <p class="hd hd-6 date localized-datetime" data-format="shortDate" data-datetime="${course_date.date}" data-timezone="${user_timezone}" data-language="${user_language}" data-string="${_(course_date.relative_datestring)}"></p>
             % endif
             % if course_date.description:
-              <p class="description">${course_date.description}</p>
+                <p class="description">${course_date.description}</p>
             % endif
             % if course_date.link and course_date.link_text:
-              <span class="date-summary-link">
-                  <a href="${course_date.link}">${course_date.link_text}</a>
-              </span>
+                <span class="date-summary-link">
+                    <a href="${course_date.link}">${course_date.link_text}</a>
+                </span>
             % endif
         </div>
     </div>
 % endfor
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform('.localized-datetime');
+</%static:require_module_async>

@@ -5,7 +5,6 @@ import datetime
 import ddt
 import json
 from markupsafe import escape
-from unittest import skip
 
 from django.core.urlresolvers import reverse
 from pyquery import PyQuery as pq
