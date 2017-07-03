@@ -259,8 +259,8 @@ class ScoreField(JSONField):
     def from_json(self, value):
         if value is None:
             return value
-        if isinstance(value, Score):
-            return value
+        # if isinstance(value, Score):
+        #     return value
 
         keys = value.keys()
         if 'raw_earned' not in keys or 'raw_possible' not in keys:
