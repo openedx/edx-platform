@@ -38,6 +38,7 @@ import dogstats_wrapper as dog_stats_api
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
 from contentstore.storage import course_import_export_storage
 from contentstore.utils import initialize_permissions, reverse_usage_url
+from contentstore.git_export_utils import export_to_git, GitExportError
 from course_action_state.models import CourseRerunState
 from models.settings.course_metadata import CourseMetadata
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
@@ -431,6 +432,25 @@ def push_course_update_task(course_key_string, course_subscription_id, course_di
     # TODO Use edx-notifications library instead (MA-638).
     from .push_notification import send_push_course_update
     send_push_course_update(course_key_string, course_subscription_id, course_display_name)
+
+
+@task()
+def async_export_to_git(course_key_string, user=None):
+    """
+    Exports a course to Git.
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    course_module = modulestore().get_course(course_key)
+    try:
+        LOGGER.debug('Starting async course content export to git (course id: %s)', course_module.id)
+        export_to_git(course_module.id, course_module.giturl, user=user)
+    except GitExportError as ex:
+        LOGGER.error('Failed async course content export to git (course id: %s): %s', course_module.id, ex)
+    except Exception as ex:
+        LOGGER.error(
+            'Unknown error occured during async course content export to git (course id: %s): %s',
+            course_module.id, ex
+        )
 
 
 class CourseExportTask(UserTask):  # pylint: disable=abstract-method
