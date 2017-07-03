@@ -8,7 +8,7 @@ from nose.plugins.attrib import attr
 
 from xmodule.x_module import STUDENT_VIEW
 
-from . import BaseTestXmodule
+from .helpers import BaseTestXmodule
 
 
 @attr(shard=1)

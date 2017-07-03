@@ -113,21 +113,21 @@ def check_course_access(course, user, action, check_if_enrolled=False):
     Check that the user has the access to perform the specified action
     on the course (CourseDescriptor|CourseOverview).
 
-    check_if_enrolled: If true, additionally verifies that the user is either
-    enrolled in the course or has staff access.
+    check_if_enrolled: If true, additionally verifies that the user is enrolled.
     """
-    access_response = has_access(user, action, course, course.id)
+    # Allow staff full access to the course even if not enrolled
+    if has_access(user, 'staff', course.id):
+        return
 
+    access_response = has_access(user, action, course, course.id)
     if not access_response:
         # Deliberately return a non-specific error message to avoid
         # leaking info about access control settings
         raise CoursewareAccessException(access_response)
 
     if check_if_enrolled:
-        # Verify that the user is either enrolled in the course or a staff
-        # member.  If the user is not enrolled, raise a Redirect exception
-        # that will be handled by middleware.
-        if not ((user.id and CourseEnrollment.is_enrolled(user, course.id)) or has_access(user, 'staff', course)):
+        # If the user is not enrolled, redirect them to the about page
+        if not CourseEnrollment.is_enrolled(user, course.id):
             raise CourseAccessRedirect(reverse('about_course', args=[unicode(course.id)]))
 
 

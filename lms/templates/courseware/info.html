@@ -12,7 +12,6 @@ from django.utils.translation import ugettext as _
 from courseware.courses import get_course_info_section, get_course_date_blocks
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.course_experience import SHOW_REVIEWS_TOOL_FLAG
 %>
 
 <%block name="pagetitle">${_("{course_number} Course Info").format(course_number=course.display_number_with_default)}</%block>
@@ -85,25 +84,20 @@ from openedx.features.course_experience import SHOW_REVIEWS_TOOL_FLAG
 
         </section>
         <section aria-label="${_('Handout Navigation')}" class="handouts">
-          <h3 class="hd hd-3 handouts-header">${_("Course Tools")}</h3>
-            <div>
-                <a class="action-show-bookmarks" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
-                    <span class="icon fa fa-bookmark" aria-hidden="true"></span>
-                    ${_("Bookmarks")}
-                </a>
-                % if SHOW_REVIEWS_TOOL_FLAG.is_enabled(course.id) and show_reviews_link:
-                    <a href="${reverse('openedx.course_experience.course_reviews', args=[course.id])}">
-                        <span class="icon fa fa-star" aria-hidden="true"></span>
-                        ${_("Reviews")}
-                    </a>
-                % endif
-            </div>
-
+          % if course_tools:
+            <h3 class="hd hd-3 handouts-header">${_("Course Tools")}</h3>
+            % for course_tool in course_tools:
+              <a href="${course_tool.url(course.id)}">
+                <span class="icon ${course_tool.icon_classes()}" aria-hidden="true"></span>
+                ${course_tool.title()}
+              </a>
+            % endfor
+          % endif
           % if SelfPacedConfiguration.current().enable_course_home_improvements:
             ${HTML(dates_fragment.body_html())}
           % endif
-            <h3 class="hd hd-3  handouts-header">${_(course.info_sidebar_name)}</h3>
-            ${HTML(get_course_info_section(request, masquerade_user, course, 'handouts'))}
+          <h3 class="hd hd-3  handouts-header">${_(course.info_sidebar_name)}</h3>
+          ${HTML(get_course_info_section(request, masquerade_user, course, 'handouts'))}
         </section>
       % else:
         <section class="updates">

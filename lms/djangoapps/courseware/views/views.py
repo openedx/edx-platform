@@ -87,6 +87,7 @@ from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_home_url_name
+from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.utils import is_shopping_cart_enabled
@@ -327,6 +328,9 @@ def course_info(request, course_id):
         # Decide whether or not to show the reviews link in the course tools bar
         show_reviews_link = CourseReviewsModuleFragmentView.is_configured()
 
+        # Get the course tools enabled for this user and course
+        course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
+
         context = {
             'request': request,
             'masquerade_user': user,
@@ -342,6 +346,8 @@ def course_info(request, course_id):
             'dates_fragment': dates_fragment,
             'url_to_enroll': url_to_enroll,
             'show_reviews_link': show_reviews_link,
+            'course_tools': course_tools,
+
             # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
             'upgrade_link': check_and_get_upgrade_link(request, user, course.id),
             'upgrade_price': get_cosmetic_verified_display_price(course),

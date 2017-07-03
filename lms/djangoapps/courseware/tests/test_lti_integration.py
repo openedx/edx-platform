@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
 
-from courseware.tests import BaseTestXmodule
+from courseware.tests.helpers import BaseTestXmodule
 from courseware.views.views import get_course_lti_endpoints
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

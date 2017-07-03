@@ -32,7 +32,7 @@ class CourseSockFragmentView(EdxFragmentView):
         has_verified_mode = CourseMode.has_verified_mode(available_modes)
 
         # Establish whether the user is already enrolled
-        is_already_verified = CourseEnrollment.is_enrolled_as_verified(request.user.id, course_key)
+        is_already_verified = CourseEnrollment.is_enrolled_as_verified(request.user, course_key)
 
         # Establish whether the verification deadline has already passed
         verification_deadline = VerifiedUpgradeDeadlineDate(course, request.user)

@@ -10,7 +10,7 @@
     background: $header-bg;
 
     .logo-header {
-      display: inline;
+        display: inline;
     }
 
     .wrapper-header {
@@ -42,7 +42,7 @@
             @include margin(12px, 10px, 0px, 10px);
             color: $lms-label-color;
             .provider {
-              font-weight: bold;
+                font-weight: bold;
             }
         }
 
@@ -63,17 +63,25 @@
 
         .list-inline {
             &.nav-global {
-                margin-top: 12px;
-                margin-bottom: 0;
-            }
+                @include margin(0, 0, 0, $baseline/2);
 
-            &.nav-courseware {
-                margin-top: 5px;
+                .btn {
+                    text-transform: uppercase;
+                    border: none;
+                    padding: 0;
+                    color: $lms-active-color;
+                    background: transparent;
+
+                    &:hover {
+                        background: transparent;
+                        color: $link-hover;
+                        text-decoration: underline;
+                    }
+                }
             }
 
             .item {
                 font-weight: font-weight(semi-bold);
-                text-transform: uppercase;
 
                 &.active {
                     a {
@@ -143,6 +151,6 @@
     color: $base-font-color;
 
     &:visited {
-      color: $base-font-color;
+        color: $base-font-color;
     }
 }
