@@ -2,6 +2,7 @@
     Tests for enrollment refund capabilities.
 """
 import logging
+from slumber.exceptions import HttpClientError
 import unittest
 from datetime import datetime, timedelta
 
@@ -37,6 +38,8 @@ class RefundableTest(SharedModuleStoreTestCase):
     """
     Tests for dashboard utility functions
     """
+    USER_PASSWORD = 'test'
+    ORDER_NUMBER = 'EDX-100000'
 
     @classmethod
     def setUpClass(cls):
@@ -46,7 +49,7 @@ class RefundableTest(SharedModuleStoreTestCase):
     def setUp(self):
         """ Setup components used by each refund test."""
         super(RefundableTest, self).setUp()
-        self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
+        self.user = UserFactory.create(password=self.USER_PASSWORD)
         self.verified_mode = CourseModeFactory.create(
             course_id=self.course.id,
             mode_slug='verified',
@@ -75,7 +78,7 @@ class RefundableTest(SharedModuleStoreTestCase):
 
     def test_refundable_of_purchased_course(self):
         """ Assert that courses without a verified mode are not refundable"""
-        self.client.login(username="jack", password="test")
+        self.client.login(username=self.user.username, password=self.USER_PASSWORD)
         course = CourseFactory.create()
         CourseModeFactory.create(
             course_id=course.id,
@@ -154,12 +157,11 @@ class RefundableTest(SharedModuleStoreTestCase):
         course_start = now + course_start_delta
         expected_date = now + expected_date_delta
         refund_period = timedelta(days=days)
-        order_number = 'OSCR-1000'
         expected_content = '{{"date_placed": "{date}"}}'.format(date=order_date.strftime(ECOMMERCE_DATE_FORMAT))
 
         httpretty.register_uri(
             httpretty.GET,
-            '{url}/orders/{order}/'.format(url=TEST_API_URL, order=order_number),
+            '{url}/orders/{order}/'.format(url=TEST_API_URL, order=self.ORDER_NUMBER),
             status=200, body=expected_content,
             adding_headers={'Content-Type': JSON}
         )
@@ -169,7 +171,7 @@ class RefundableTest(SharedModuleStoreTestCase):
             enrollment=self.enrollment,
             namespace='order',
             name='order_number',
-            value=order_number
+            value=self.ORDER_NUMBER
         ))
 
         with patch('student.models.EnrollmentRefundConfiguration.current') as config:
@@ -190,12 +192,11 @@ class RefundableTest(SharedModuleStoreTestCase):
         """ Order with mutiple refunds will not throw 500 error when dashboard page will access."""
         now = datetime.now(pytz.UTC).replace(microsecond=0)
         order_date = now + timedelta(days=1)
-        order_number = 'OSCR-1000'
         expected_content = '{{"date_placed": "{date}"}}'.format(date=order_date.strftime(ECOMMERCE_DATE_FORMAT))
 
         httpretty.register_uri(
             httpretty.GET,
-            '{url}/orders/{order}/'.format(url=TEST_API_URL, order=order_number),
+            '{url}/orders/{order}/'.format(url=TEST_API_URL, order=self.ORDER_NUMBER),
             status=200, body=expected_content,
             adding_headers={'Content-Type': JSON}
         )
@@ -206,9 +207,22 @@ class RefundableTest(SharedModuleStoreTestCase):
                 enrollment=self.enrollment,
                 namespace='order',
                 name='order_number',
-                value=order_number
+                value=self.ORDER_NUMBER
             ))
 
-        self.client.login(username="jack", password="test")
+        self.client.login(username=self.user.username, password=self.USER_PASSWORD)
         resp = self.client.post(reverse('student.views.dashboard', args=[]))
         self.assertEqual(resp.status_code, 200)
+
+    @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
+    def test_refund_cutoff_date_with_client_error(self):
+        """ Verify that dashboard will not throw internal server error if HttpClientError
+         raised while getting order detail for ecommerce.
+         """
+        # importing this after overriding value of ECOMMERCE_API_URL
+        from commerce.tests.mocks import mock_order_endpoint
+
+        self.client.login(username=self.user.username, password=self.USER_PASSWORD)
+        with mock_order_endpoint(order_number=self.ORDER_NUMBER, exception=HttpClientError):
+            response = self.client.post(reverse('student.views.dashboard', args=[]))
+            self.assertEqual(response.status_code, 200)
