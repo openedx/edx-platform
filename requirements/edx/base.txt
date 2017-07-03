@@ -133,7 +133,7 @@ watchdog==0.8.3
 
 # Metrics gathering and monitoring
 dogapi==1.2.1
-newrelic==2.78.0.57
+newrelic==2.86.3.70
 
 # Used for documentation gathering
 sphinx==1.1.3
