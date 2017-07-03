@@ -10,7 +10,17 @@ INSTALLED_APPS += (
     'openedx.core.djangoapps.appsembler.sites',
 )
 
-DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('openedx.core.djangoapps.appsembler.intercom_integration.context_processors.intercom',)
+GOOGLE_ANALYTICS_APP_ID = AUTH_TOKENS.get('GOOGLE_ANALYTICS_APP_ID')
+HUBSPOT_API_KEY = AUTH_TOKENS.get('HUBSPOT_API_KEY')
+HUBSPOT_PORTAL_ID = AUTH_TOKENS.get('HUBSPOT_PORTAL_ID')
+MIXPANEL_APP_ID = AUTH_TOKENS.get('MIXPANEL_APP_ID')
+
+DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += (
+    'openedx.core.djangoapps.appsembler.intercom_integration.context_processors.intercom',
+    'openedx.core.djangoapps.appsembler.analytics.context_processors.google_analytics',
+    'openedx.core.djangoapps.appsembler.analytics.context_processors.hubspot',
+    'openedx.core.djangoapps.appsembler.analytics.context_processors.mixpanel',
+)
 
 MANDRILL_API_KEY = AUTH_TOKENS.get("MANDRILL_API_KEY")
 

@@ -17,7 +17,17 @@ for cache_key in CACHES.keys():
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('openedx.core.djangoapps.appsembler.intercom_integration.context_processors.intercom',)
+GOOGLE_ANALYTICS_APP_ID = AUTH_TOKENS.get('GOOGLE_ANALYTICS_APP_ID')
+HUBSPOT_API_KEY = AUTH_TOKENS.get('HUBSPOT_API_KEY')
+HUBSPOT_PORTAL_ID = AUTH_TOKENS.get('HUBSPOT_PORTAL_ID')
+MIXPANEL_APP_ID = AUTH_TOKENS.get('MIXPANEL_APP_ID')
+
+DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += (
+    'openedx.core.djangoapps.appsembler.intercom_integration.context_processors.intercom',
+    'openedx.core.djangoapps.appsembler.analytics.context_processors.google_analytics',
+    'openedx.core.djangoapps.appsembler.analytics.context_processors.hubspot',
+    'openedx.core.djangoapps.appsembler.analytics.context_processors.mixpanel',
+)
 
 INTERCOM_APP_ID = AUTH_TOKENS.get("INTERCOM_APP_ID")
 INTERCOM_APP_SECRET = AUTH_TOKENS.get("INTERCOM_APP_SECRET")
