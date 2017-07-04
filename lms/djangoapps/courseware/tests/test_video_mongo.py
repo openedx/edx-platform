@@ -1197,6 +1197,24 @@ class TestEditorSavedMethod(BaseTestXmodule):
         item.editor_saved(self.user, old_metadata, None)
         self.assertEqual(item.edx_video_id, stripped_video_id)
 
+    @ddt.data(TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE)
+    @patch('xmodule.video_module.video_module.edxval_api.get_url_for_profile', Mock(return_value='test_yt_id'))
+    def test_editor_saved_with_yt_val_profile(self, default_store):
+        """
+        Verify editor saved overrides `youtube_id_1_0` when a youtube val profile is there
+        for a given `edx_video_id`.
+        """
+        self.MODULESTORE = default_store
+        self.initialize_module(metadata=self.metadata)
+        item = self.store.get_item(self.item_descriptor.location)
+        self.assertEqual(item.youtube_id_1_0, '3_yD_cEKoCk')
+
+        # Now, modify `edx_video_id` and save should override `youtube_id_1_0`.
+        old_metadata = own_metadata(item)
+        item.edx_video_id = unicode(uuid4())
+        item.editor_saved(self.user, old_metadata, None)
+        self.assertEqual(item.youtube_id_1_0, 'test_yt_id')
+
 
 @ddt.ddt
 class TestVideoDescriptorStudentViewJson(TestCase):
