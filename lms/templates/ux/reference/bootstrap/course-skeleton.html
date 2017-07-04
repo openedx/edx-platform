@@ -1,0 +1,73 @@
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/lms-main-bootstrap.css" %>
+
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+
+<%block name="pagetitle">Course Skeleton</%block>
+
+<%block name="bodyclass">course-skeleton</%block>
+
+<%block name="content">
+<nav class="navbar course-tabs pb-0 navbar-toggleable-sm navbar-light">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+            <a class="nav-link" href="#">Course <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Discussion</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Wiki</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Progress</a>
+        </li>
+    </ul>
+</nav>
+
+<section class="main-container">
+    <div class="container-fluid">
+        <div class="row page-header">
+            <div class="col-md-7">
+                <h2 class="hd hd-2 page-title">Skeleton Page</h2>
+                <p class="page-description">This demonstrates the pieces available to a courseware page.</p>
+            </div>
+            <div class="col-md-5">
+                <div class="row">
+                    <div class="input-group col">
+                        <input type="text" class="form-control" placeholder="Search" aria-label="Search"/>
+                        <span class="input-group-addon" id="basic-addon2">Search</span>
+                    </div>
+                    <button class="btn btn-primary col-4">Click Me!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row page-content">
+            <main id="main" aria-label="Content" tabindex="-1" class="col-md-8">
+                <article tabindex="-1" aria-label="Main Content">
+                    <h3>Main content goes here.</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis molestie, orci at viverra ornare,
+                        augue urna fermentum ex, vitae dignissim magna est sit amet diam. Nunc sodales dolor finibus
+                        pulvinar placerat. Suspendisse vitae tellus auctor, sodales erat ac, venenatis quam. Etiam
+                        purus est, consequat nec erat vel, bibendum volutpat ex. Fusce vitae consectetur ante.
+                        Suspendisse elit mauris, iaculis sed diam eu, efficitur tempor dui. Praesent tristique nunc
+                        quam, in tincidunt ligula accumsan et. Etiam augue sem, commodo ac ipsum vel, fringilla dapibus
+                        lacus. Sed facilisis euismod felis, non malesuada massa scelerisque sed. Etiam et placerat
+                        lorem. Nullam quis tincidunt sapien.</p>
+                </article>
+            </main>
+            <div class="col-md-4">
+                <h3>Sidebar</h3>
+                <ul>
+                    <li>Item one</li>
+                    <li>Item two</li>
+                    <li>Item three</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+</%block>

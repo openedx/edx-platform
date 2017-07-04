@@ -49,18 +49,20 @@ COMMON_LOOKUP_PATHS = [
 # A list of NPM installed libraries that should be copied into the common
 # static directory.
 NPM_INSTALLED_LIBRARIES = [
-    'backbone/backbone.js',
     'backbone.paginator/lib/backbone.paginator.js',
-    'moment-timezone/builds/moment-timezone-with-data.js',
-    'moment/min/moment-with-locales.js',
+    'backbone/backbone.js',
+    'bootstrap/dist/js/bootstrap.js',
+    'hls.js/dist/hls.js',
     'jquery-migrate/dist/jquery-migrate.js',
     'jquery.scrollto/jquery.scrollTo.js',
     'jquery/dist/jquery.js',
+    'moment-timezone/builds/moment-timezone-with-data.js',
+    'moment/min/moment-with-locales.js',
     'picturefill/dist/picturefill.js',
     'requirejs/require.js',
+    'tether/dist/js/tether.js',
     'underscore.string/dist/underscore.string.js',
     'underscore/underscore.js',
-    'hls.js/dist/hls.js',
 ]
 
 # A list of NPM installed developer libraries that should be copied into the common

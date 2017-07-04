@@ -22,9 +22,12 @@ def show_reference_template(request, template):
     e.g. /template/ux/reference/index.html?name=Foo
     """
     try:
+        uses_bootstrap = u'/bootstrap/' in request.path
+        uses_pattern_library = not uses_bootstrap
         context = {
             "disable_courseware_js": True,
-            "uses_pattern_library": True
+            "uses_pattern_library": uses_pattern_library,
+            "uses_bootstrap": uses_bootstrap,
         }
         context.update(request.GET.dict())
         return render_to_response(template, context)
