@@ -256,7 +256,7 @@
       &.focused {
         img, .video-duration {
           @include transition(all 0.3s linear);
-          opacity: 0.5;
+          opacity: 0.1;
         }
       }
     }
