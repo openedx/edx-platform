@@ -632,7 +632,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         """
         video_image_upload_url = self.get_url_for_course_key(self.course.id, {'edx_video_id': 'test1'})
         response = self.client.post(video_image_upload_url, {})
-        self.verify_error_message(response, 'No file provided for video image')
+        self.verify_error_message(response, 'An image file is required.')
 
     def test_invalid_image_file_info(self):
         """
@@ -652,7 +652,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 size=settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES']
             )
             error = validate_video_image(image_file)
-            self.assertEquals(error, 'This image file is corrupted.')
+            self.assertEquals(error, 'There is a problem with this image file. Try to upload a different file.')
 
     @override_switch(VIDEO_IMAGE_UPLOAD_ENABLED, True)
     def test_no_video_image(self):

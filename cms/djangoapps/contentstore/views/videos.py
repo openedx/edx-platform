@@ -188,7 +188,7 @@ def validate_video_image(image_file):
         try:
             image_file_width, image_file_height = get_image_dimensions(image_file)
         except TypeError:
-            return _('This image file is corrupted.')
+            return _('There is a problem with this image file. Try to upload a different file.')
         image_file_aspect_ratio = abs(image_file_width / float(image_file_height) - settings.VIDEO_IMAGE_ASPECT_RATIO)
         if image_file_width < settings.VIDEO_IMAGE_MIN_WIDTH or image_file_height < settings.VIDEO_IMAGE_MIN_HEIGHT:
             error = _('Recommended image resolution is {image_file_max_width}x{image_file_max_height}. '
@@ -220,7 +220,7 @@ def video_images_handler(request, course_key_string, edx_video_id=None):
         return HttpResponseNotFound()
 
     if 'file' not in request.FILES:
-        return JsonResponse({'error': _(u'No file provided for video image')}, status=400)
+        return JsonResponse({'error': _(u'An image file is required.')}, status=400)
 
     image_file = request.FILES['file']
     error = validate_video_image(image_file)
