@@ -1043,6 +1043,23 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 }
             )
 
+    def test_enterprise_overrides(self):
+        """
+        Verify that enterprise overrides are applied on logistration pages
+        for enterprise SSO.
+        """
+        with simulate_running_pipeline(
+            'openedx.core.djangoapps.user_api.views.third_party_auth.pipeline', 'google-oauth2',
+            email='bob@example.com',
+            fullname='Bob',
+            username='Bob123',
+            country='pk'
+        ):
+            with mock.patch(
+                'openedx.features.enterprise_support.api.enterprise_customer_for_request', return_value=True,
+            ):
+                self._assert_password_field_visible({})
+
     def test_register_form_level_of_education(self):
         self._assert_reg_field(
             {"level_of_education": "optional"},
@@ -1957,6 +1974,28 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "name": "password",
             "type": "hidden",
             "required": False
+        })
+
+    def _assert_password_field_visible(self, field_settings):
+        """
+        Assert that given field settings have a password field and the
+        password field is visible, required and have expected attributes.
+        """
+        self._assert_reg_field(field_settings, {
+            'name': 'password',
+            'defaultValue': '',
+            'type': 'password',
+            'required': True,
+            'label': 'Password',
+            'placeholder': '',
+            'instructions': '',
+            'restrictions': {
+                'min_length': PASSWORD_MIN_LENGTH,
+                'max_length': PASSWORD_MAX_LENGTH
+            },
+            'errorMessages': {},
+            'supplementalText': '',
+            'supplementalLink': '',
         })
 
     def _assert_social_auth_provider_present(self, field_settings, backend):

@@ -23,6 +23,7 @@ from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+from openedx.features.enterprise_support import api as enterprise_api
 from student.cookies import set_logged_in_cookies
 from student.forms import get_registration_extension_form
 from student.views import create_account_with_params
@@ -248,6 +249,7 @@ class RegistrationView(APIView):
         """
         form_desc = FormDescription("post", reverse("user_api_registration"))
         self._apply_third_party_auth_overrides(request, form_desc)
+        self._apply_enterprise_overrides(request, form_desc)
 
         # Custom form fields can be added via the form set in settings.REGISTRATION_EXTENSION_FORM
         custom_form = get_registration_extension_form()
@@ -956,6 +958,37 @@ class RegistrationView(APIView):
                         default=current_provider.name if current_provider.name else "Third Party",
                         required=False,
                     )
+
+    def _apply_enterprise_overrides(self, request, form_desc):
+        """
+        Modify the registration form if the user is associated with an enterprise.
+
+        If a user has successfully authenticated with a enterprise SSO,
+        but does not yet have an account with edX, we want to apply enterprise specific overrides to
+        login and registration pages.
+
+        Arguments:
+            request (HttpRequest): The request for the registration form, used
+                to determine if the user has successfully authenticated
+                with a third-party provider.
+
+            form_desc (FormDescription): The registration form description
+
+        """
+        if enterprise_api.enterprise_customer_for_request(request):
+            # Always show the password field for enterprise learners
+            form_desc.override_field_properties(
+                'password',
+                default='',
+                field_type='password',
+                required=True,
+                label=_(u'Password'),
+                instructions='',
+                restrictions={
+                    'min_length': PASSWORD_MIN_LENGTH,
+                    'max_length': PASSWORD_MAX_LENGTH
+                },
+            )
 
 
 class PasswordResetView(APIView):
