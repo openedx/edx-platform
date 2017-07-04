@@ -36,7 +36,6 @@ from django.utils.translation import get_language, ungettext
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView
-from eventtracking import tracker
 from ipware.ip import get_ip
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -46,9 +45,9 @@ from provider.oauth2.models import Client
 from pytz import UTC
 from ratelimitbackend.exceptions import RateLimitException
 from requests import HTTPError
-from social_django import utils as social_utils
 from social_core.backends import oauth as social_oauth
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
+from social_django import utils as social_utils
 
 import dogstats_wrapper as dog_stats_api
 import openedx.core.djangoapps.external_auth.views
@@ -66,6 +65,7 @@ from courseware.access import has_access
 from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date  # pylint: disable=import-error
 from django_comment_common.models import assign_role
 from edxmako.shortcuts import render_to_response, render_to_string
+from eventtracking import tracker
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
@@ -174,7 +174,6 @@ def index(request, extra_context=None, user=AnonymousUser()):
     if extra_context is None:
         extra_context = {}
 
-    programs_list = []
     courses = get_courses(user)
 
     if configuration_helpers.get_value(
@@ -208,17 +207,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
     # Insert additional context for use in the template
     context.update(extra_context)
 
-    # Get the active programs of the type configured for the current site from the catalog service. The programs_list
-    # is being added to the context but it's not being used currently in courseware/courses.html. To use this list,
-    # you need to create a custom theme that overrides courses.html. The modifications to courses.html to display the
-    # programs will be done after the support for edx-pattern-library is added.
-    program_types = configuration_helpers.get_value('ENABLED_PROGRAM_TYPES')
-
-    # Do not add programs to the context if there are no program types enabled for the site.
-    if program_types:
-        programs_list = get_programs_with_type(program_types, include_hidden=False)
-
-    context["programs_list"] = programs_list
+    context['programs_list'] = get_programs_with_type(include_hidden=False)
 
     return render_to_response('index.html', context)
 
