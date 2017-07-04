@@ -183,7 +183,7 @@
       }
     }
 
-    .dropdown {
+    .user-dropdown {
       font-size: $body-font-size;
       padding: 0 ($baseline/2);
       color: $base-font-color;
@@ -193,7 +193,7 @@
       text-shadow: none;
     }
 
-    .dropdown-menu {
+    .user-dropdown-menu {
       background: $white;
       border-radius: 4px;
       box-shadow: 0 2px 2px 0 rgba(0,0,0, 0.3);
