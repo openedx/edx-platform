@@ -1320,3 +1320,12 @@ RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
 
 # How long until database records about the outcome of a task and its artifacts get deleted?
 USER_TASKS_MAX_AGE = timedelta(days=7)
+
+############## Settings for Profile Image Size ######################
+
+PROFILE_IMAGE_SIZES_MAP = {
+    'full': 500,
+    'large': 120,
+    'medium': 50,
+    'small': 30
+}

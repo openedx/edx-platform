@@ -3139,7 +3139,7 @@ DOC_LINK_BASE_URL = None
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
 
-############## Settings for the Image Size ######################
+############## Settings for Profile Image Size ######################
 
 PROFILE_IMAGE_SIZES_MAP = {
     'full': 500,
@@ -3147,5 +3147,3 @@ PROFILE_IMAGE_SIZES_MAP = {
     'medium': 50,
     'small': 30
 }
-
-
