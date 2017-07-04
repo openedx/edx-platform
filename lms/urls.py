@@ -18,7 +18,6 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.enterprise_support.api import enterprise_enabled
-from openassessment.fileupload.urls import urlpatterns as orafileuploadpatterns
 
 
 # Uncomment the next two lines to enable the admin:
@@ -149,10 +148,7 @@ js_info_dict = {
 }
 
 urlpatterns += (
-    url(
-        r'^openassessment/fileupload/',
-        include(orafileuploadpatterns)
-    ),
+    url(r'^openassessment/fileupload/', include('openassessment.fileupload.urls')),
 )
 
 
