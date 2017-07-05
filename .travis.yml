@@ -1,0 +1,32 @@
+language: python
+
+python:
+  - "3.5"
+
+sudo: required
+
+services:
+  - docker
+
+cache:
+  - pip
+
+before_install:
+  - docker --version
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-engine
+  - docker --version
+
+# Do NOT install Python requirements.
+# Doing so is a waste of time since they won't be used.
+install: true
+
+script:
+  - ./docker-build.sh
+
+after_success:
+  # TODO Add secure environment variables with Docker Hub credentials
+  - if [ "TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    docker push dxops/edxapp:devstack-slim;
+    fi

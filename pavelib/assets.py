@@ -861,7 +861,7 @@ def update_assets(args):
     process_xmodule_assets()
     process_npm_assets()
     compile_coffeescript()
-    execute_webpack(prod=(args.settings != "devstack"), settings=args.settings)
+    execute_webpack(prod=(not args.settings.startswith("devstack")), settings=args.settings)
 
     # Compile sass for themes and system
     execute_compile_sass(args)

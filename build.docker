@@ -1,0 +1,20 @@
+FROM clintonb/edx-base:python-2.7-slim
+
+ENV WHEELHOUSE=/wheelhouse
+ENV PIP_WHEEL_DIR=/wheelhouse
+ENV PIP_FIND_LINKS=/wheelhouse
+
+VOLUME /wheelhouse
+VOLUME /requirements
+VOLUME /node_modules
+
+ENTRYPOINT cd / && \
+           rm -rf /node_modules/.staging && \
+	       npm install && \
+	       cd /requirements && \
+	       pip wheel -r edx/pre.txt && \
+# NOTE (CCB): Git-based dependencies are not downloaded as wheels. See https://github.com/pypa/pip/issues/3355.
+#           pip wheel -r edx/github.txt && \
+           pip wheel -r edx/base.txt && \
+           pip wheel -r edx/paver.txt && \
+	       pip wheel -r edx/post.txt
