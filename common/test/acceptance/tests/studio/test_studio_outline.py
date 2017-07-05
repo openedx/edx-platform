@@ -16,6 +16,7 @@ from common.test.acceptance.pages.common.utils import add_enrollment_course_mode
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.progress import ProgressPage
+from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.pages.studio.overview import ContainerPage, CourseOutlinePage, ExpandCollapseLinkState
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
@@ -589,15 +590,14 @@ class UnitAccessTest(CourseOutlineTest):
         self.assertEqual(course_home_page.outline.num_units, 2)
 
         # Test for a user without additional content available
-        course_home_page.visit()
-        course_home_page.preview.set_staff_view_mode("Learner in Test Group B")
-        course_home_page.resume_course_from_header()
+        staff_page = StaffCoursewarePage(self.browser, self.course_id)
+        staff_page.set_staff_view_mode('Learner in Test Group B')
+        staff_page.wait_for_page()
         self.assertEqual(course_home_page.outline.num_units, 1)
 
         # Test for a user with additional content available
-        course_home_page.visit()
-        course_home_page.preview.set_staff_view_mode("Learner in Test Group A")
-        course_home_page.resume_course_from_header()
+        staff_page.set_staff_view_mode('Learner in Test Group A')
+        staff_page.wait_for_page()
         self.assertEqual(course_home_page.outline.num_units, 2)
 
     def test_restricted_sections_for_enrollment_track_users_in_lms(self):
@@ -628,15 +628,15 @@ class UnitAccessTest(CourseOutlineTest):
         self.assertEqual(course_home_page.outline.num_units, 2)
 
         # Test for a user without additional content available
-        course_home_page.visit()
-        course_home_page.preview.set_staff_view_mode("Learner in Verified")
-        course_home_page.resume_course_from_header()
+        staff_page = StaffCoursewarePage(self.browser, self.course_id)
+        staff_page.set_staff_view_mode('Learner in Verified')
+        staff_page.wait_for_page()
         self.assertEqual(course_home_page.outline.num_units, 1)
 
         # Test for a user with additional content available
-        course_home_page.visit()
-        course_home_page.preview.set_staff_view_mode("Learner in Audit")
-        course_home_page.resume_course_from_header()
+        staff_page = StaffCoursewarePage(self.browser, self.course_id)
+        staff_page.set_staff_view_mode('Learner in Audit')
+        staff_page.wait_for_page()
         self.assertEqual(course_home_page.outline.num_units, 2)
 
 

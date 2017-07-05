@@ -56,6 +56,12 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                 this.messageView.render();
                 this.isUnitPage = this.options.isUnitPage;
                 if (this.isUnitPage) {
+                    this.unitAccessView = new ContainerSubviews.UnitAccess({
+                        el: this.$('.container-unit-access'),
+                        model: this.model
+                    });
+                    this.unitAccessView.render();
+
                     this.xblockPublisher = new ContainerSubviews.Publisher({
                         el: this.$('#publish-unit'),
                         model: this.model,

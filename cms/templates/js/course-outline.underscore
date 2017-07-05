@@ -63,7 +63,7 @@ if (staffOnlyMessage) {
     if (selectedPartitionIndex !== -1 && !isNaN(selectedPartitionIndex) && xblockInfo.isVertical()) {
         messageType = 'partition-groups';
         messageText = edx.StringUtils.interpolate(
-                gettext('Access to this unit is restricted to {selectedGroupsLabel}'),
+                gettext('Access to this unit is restricted to: {selectedGroupsLabel}'),
                 {
                     selectedGroupsLabel: selectedGroupsLabel
                 }

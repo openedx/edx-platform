@@ -687,7 +687,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         getGroupAccessData: function() {
             var userPartitionId = this.getSelectedEnrollmentTrackId(),
                 groupAccess = {};
-            if (userPartitionId !== -1 && !isNaN(userPartitionId)) { // If the selected partition ID is not none
+            if (userPartitionId !== -1 && !isNaN(userPartitionId)) {
                 groupAccess[userPartitionId] = this.getSelectedCheckboxesByDivId(userPartitionId);
                 return groupAccess;
             } else {
