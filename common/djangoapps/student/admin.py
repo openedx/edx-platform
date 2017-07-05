@@ -1,6 +1,7 @@
 """ Django admin pages for student app """
 from config_models.admin import ConfigurationModelAdmin
 from django import forms
+from django.contrib.admin.sites import NotRegistered
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import ugettext_lazy as _
@@ -206,5 +207,9 @@ admin.site.register(RegistrationCookieConfiguration, ConfigurationModelAdmin)
 admin.site.register(UserAttribute, UserAttributeAdmin)
 
 # We must first un-register the User model since it may also be registered by the auth app.
-admin.site.unregister(User)
+try:
+    admin.site.unregister(User)
+except NotRegistered:
+    pass
+
 admin.site.register(User, UserAdmin)
