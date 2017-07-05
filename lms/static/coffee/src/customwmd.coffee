@@ -134,7 +134,10 @@ if Markdown?
       $wmdPanel = $("<div>").addClass("wmd-panel")
                  .append($("<div>").attr("id", "wmd-button-bar#{_append}"))
                  .append($("<label>").addClass("sr").attr("for", wmdInputId).text(gettext("Post body")))
-                 .append($("<textarea>").addClass("wmd-input").attr("id", wmdInputId).html(initialText))
+                 .append($("<textarea>").addClass("wmd-input").attr("id", wmdInputId)
+                 .attr("placeholder", "Enter your post here. To help protect your privacy, don't include personal information, like your name or email address.")
+                 .focus(-> $(this).data('placeholder',$(this).attr('placeholder')).attr('placeholder',''))
+                 .blur(-> $(this).attr('placeholder',$(this).data('placeholder'))).html(initialText))
                  .append($wmdPreviewContainer)
       $elem.append($wmdPanel)
 
