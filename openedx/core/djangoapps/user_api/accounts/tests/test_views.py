@@ -200,7 +200,7 @@ class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
 @skip_unless_lms
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
 @patch.dict(
-    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
+    'django.conf.settings.PROFILE_IMAGE_SIZES_MAP',
     {'full': 50, 'small': 10},
     clear=True
 )
@@ -608,7 +608,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         verify_change_info(name_change_info[1], "Mickey Mouse", self.user.username, "Donald Duck")
 
     @patch.dict(
-        'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
+        'django.conf.settings.PROFILE_IMAGE_SIZES_MAP',
         {'full': 50, 'medium': 30, 'small': 10},
         clear=True
     )
