@@ -266,7 +266,7 @@ def override_score_module_state(xmodule_instance_args, module_descriptor, studen
             return UPDATE_STATUS_FAILED
 
         if not hasattr(instance, 'set_score'):
-            msg = "Scores cannot be updated for this problem type."
+            msg = "Scores cannot be overridden for this problem type."
             raise UpdateProblemModuleStateError(msg)
 
         weighted_override_score = int(task_input['score'])

@@ -120,8 +120,8 @@ var StaffDebug = (function() {
             locationName: locname,
             location: location,
             method: 'override_problem_score',
-            success_msg: gettext('Successfully updated problem score for {user}'),
-            error_msg: gettext('Could not update the problem score for {user}.'),
+            success_msg: gettext('Successfully overrode problem score for {user}'),
+            error_msg: gettext('Could not override problem score for {user}.'),
             score: getScore(locname)
         });
     };

@@ -254,7 +254,7 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         self._test_undefined_problem(override_problem_score)
 
     def test_override_with_no_state(self):
-        self._test_run_with_no_state(override_problem_score, 'updated')
+        self._test_run_with_no_state(override_problem_score, 'override')
 
     def test_override_with_failure(self):
         self._test_run_with_failure(override_problem_score, 'We expected this to fail')
@@ -282,7 +282,7 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         entry = InstructorTask.objects.get(id=task_entry.id)
         output = json.loads(entry.task_output)
         self.assertEquals(output['exception'], "UpdateProblemModuleStateError")
-        self.assertEquals(output['message'], "Scores cannot be updated for this problem type.")
+        self.assertEquals(output['message'], "Scores cannot be overridden for this problem type.")
         self.assertGreater(len(output['traceback']), 0)
 
     def test_overriding_unaccessable(self):
@@ -305,7 +305,7 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
             succeeded=0,
             skipped=0,
             failed=num_students,
-            action_name='updated'
+            action_name='overridden'
         )
 
     def test_overriding_success(self):
@@ -331,7 +331,7 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
             succeeded=num_students,
             skipped=0,
             failed=0,
-            action_name='updated'
+            action_name='overridden'
         )
 
 
