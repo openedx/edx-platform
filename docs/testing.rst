@@ -61,14 +61,15 @@ UI Acceptance Tests
 
 -  Use these to test that major program features are working correctly.
 
--  We use `lettuce <http://lettuce.it/>`__ to write BDD-style tests.
-   Most of these tests simulate user interactions through the browser
-   using `splinter <http://splinter.cobrateam.info/>`__.
-
 -  We use `Bok
    Choy <http://bok-choy.readthedocs.org/en/latest/tutorial.html>`__ to
    write end-user acceptance tests directly in Python, using the
    framework to maximize reliability and maintainability.
+
+-  We used to use `lettuce <http://lettuce.it/>`__ to write BDD-style
+   tests but it's now deprecated in favor of Bok Choy for new tests.
+   Most of these tests simulate user interactions through the browser
+   using `splinter <http://splinter.cobrateam.info/>`__.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
@@ -570,7 +571,8 @@ properly clean up.
 Running Lettuce Acceptance Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We use `Lettuce <http://lettuce.it/>`__ for acceptance testing. Most of
+Although it's deprecated now `Lettuce <http://lettuce.it/>`__ acceptance tests
+still exists in the code base. Most of
 our tests use `Splinter <http://splinter.cobrateam.info/>`__ to simulate
 UI browser interactions. Splinter, in turn, uses
 `Selenium <http://docs.seleniumhq.org/>`__ to control the Chrome
