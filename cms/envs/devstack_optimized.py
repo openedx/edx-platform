@@ -18,9 +18,14 @@ as they are for non-optimized devstack. Instead, update_assets must be
 invoked each time that changes have been made.
 """
 
+import os
+
 ########################## Devstack settings ###################################
 
-from .devstack import *  # pylint: disable=wildcard-import, unused-wildcard-import
+if 'BOK_CHOY_HOSTNAME' in os.environ:
+    from .devstack_docker import *  # pylint: disable=wildcard-import, unused-wildcard-import
+else:
+    from .devstack import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 TEST_ROOT = REPO_ROOT / "test_root"
 
