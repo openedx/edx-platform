@@ -6,17 +6,17 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.reverse import reverse
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from util.json_request import JsonResponse, expect_json
-from contentstore.views.course import _create_or_rerun_course
-from contentstore.utils import delete_course_and_groups
+from cms.djangoapps.contentstore.views.course import _create_or_rerun_course
+from cms.djangoapps.contentstore.utils import delete_course_and_groups
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
+
 from cms.djangoapps.contentstore.utils import add_instructor, remove_all_instructors
 from student.roles import CourseCcxCoachRole
 
@@ -49,7 +49,7 @@ def setup_course(course_key, staff=None):
 @csrf_exempt
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @authentication_classes((SessionAuthentication, TokenAuthentication))
-@permission_classes((IsAuthenticated,))
+@permission_classes((IsAdminUser,))
 @expect_json
 def course_handler(request, course_key_string=None):
     """
@@ -147,8 +147,8 @@ def course_handler(request, course_key_string=None):
 
 @api_view(['GET'])
 @authentication_classes((SessionAuthentication, TokenAuthentication))
-@permission_classes((IsAuthenticated,))
-def coach_list_handler(reuqest):
+@permission_classes((IsAdminUser,))
+def coach_list_handler(request):
     """
     Returns a list of dicts with information about CCX coaches (full name, email).
     """

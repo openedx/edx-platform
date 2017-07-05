@@ -6,10 +6,12 @@ from datetime import datetime, timedelta
 import mock
 from django.test.utils import override_settings
 from django.utils.timezone import UTC
+from django.conf import settings
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 from ccx.tests.factories import CcxFactory
+from ccx.overrides import override_field_for_ccx
 from ccx_keys.locator import CCXLocator
 from student.roles import CourseCcxCoachRole
 from student.tests.factories import UserFactory, AdminFactory
@@ -57,7 +59,6 @@ class CCXCourseTestBase(ModuleStoreTestCase):
         self.addCleanup(patch.stop)
 
         self.addCleanup(RequestCache.clear_request_cache)
-
 
     def inject_field_overrides(self):
         """

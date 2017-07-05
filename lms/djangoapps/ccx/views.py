@@ -466,7 +466,10 @@ def ccx_invite(request, course, ccx=None):
     email_params = get_email_params(course, auto_enroll=True, course_key=course_key, display_name=ccx.display_name)
 
     ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params, ccx.coach)
-
+    log.info(
+        "User: %s;\nCoach: %s;\nAction: %s;\nIdentifiers: %s;\nSend email: %s;\nCourse: %s;\nEmail parameters: %s.",
+        request.user, ccx.coach, action, identifiers, email_students, course_key, email_params
+    )
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': course_key})
     return redirect(url)
 
@@ -489,6 +492,10 @@ def ccx_student_management(request, course, ccx=None):
     email_params = get_email_params(course, auto_enroll=True, course_key=course_key, display_name=ccx.display_name)
 
     errors = ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params, ccx.coach)
+    log.info(
+        "User: %s;\nCoach: %s;\nAction: %s;\nIdentifiers: %s;\nSend email: %s;\nCourse: %s;\nEmail parameters: %s.",
+        request.user, ccx.coach, action, identifiers, email_students, course_key, email_params
+    )
 
     for error_message in errors:
         messages.error(request, error_message)

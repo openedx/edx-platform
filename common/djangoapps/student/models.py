@@ -1061,6 +1061,8 @@ class CourseEnrollment(models.Model):
             }
         )
 
+        log.info("User %s enrolled to course %s", user.email, course_key)
+
         return enrollment
 
     @classmethod
