@@ -270,7 +270,7 @@ def override_score_module_state(xmodule_instance_args, module_descriptor, studen
             raise UpdateProblemModuleStateError(msg)
 
         weighted_override_score = int(task_input['score'])
-        if not (0 <= weighted_score <= instance.max_score()):
+        if not (0 <= weighted_override_score <= instance.max_score()):
             msg = "Score must be between 0 and the maximum points available for the problem."
             raise UpdateProblemModuleStateError(msg)
 

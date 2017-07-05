@@ -59,7 +59,7 @@ from lms.djangoapps.instructor.enrollment import (
 )
 from lms.djangoapps.instructor.views import INVOICE_KEY
 from lms.djangoapps.instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
-from lms.djangoapps.instructor_task.api import submit_override_problem_score_for_student
+from lms.djangoapps.instructor_task.api import submit_override_score
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
 from lms.djangoapps.instructor_task.models import ReportStore
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -120,6 +120,7 @@ from .tools import (
 log = logging.getLogger(__name__)
 
 TASK_SUBMISSION_OK = 'created'
+
 
 def common_exceptions_400(func):
     """
@@ -2178,7 +2179,7 @@ def override_problem_score(request, course_id):
         'student': student_identifier
     }
     try:
-        submit_override_problem_score_for_student(
+        submit_override_score(
             request,
             usage_key,
             student,

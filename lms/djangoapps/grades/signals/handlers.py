@@ -287,7 +287,7 @@ def _emit_event(kwargs):
                 'new_weighted_earned': kwargs.get('weighted_earned'),
                 'new_weighted_possible': kwargs.get('weighted_possible'),
                 'only_if_higher': kwargs.get('only_if_higher'),
-                'instructor_id': instructor_id,
+                'instructor_id': unicode(instructor_id),
                 'event_transaction_id': unicode(get_event_transaction_id()),
                 'event_transaction_type': unicode(root_type),
             }

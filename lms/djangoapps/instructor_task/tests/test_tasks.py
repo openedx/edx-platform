@@ -254,7 +254,7 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         self._test_undefined_problem(override_problem_score)
 
     def test_override_with_no_state(self):
-        self._test_run_with_no_state(override_problem_score, 'override')
+        self._test_run_with_no_state(override_problem_score, 'overridden')
 
     def test_override_with_failure(self):
         self._test_run_with_failure(override_problem_score, 'We expected this to fail')
