@@ -98,4 +98,4 @@ git+https://github.com/edx/edx-proctoring.git@0.12.21#egg=edx-proctoring==0.12.2
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.7#egg=xblock-drag-and-drop-v2==2.0.7
 
 # Labster
--e git+https://github.com/Livit/Livit.Learn.EdxCourseLicenses.git#egg=labster_course_license
+-e git+git@github.com:Livit/Livit.Learn.EdxCourseLicenses.git@eucalyptus#egg=labster_course_license
