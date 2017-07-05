@@ -1,9 +1,8 @@
-from django.contrib import admin
+from ratelimitbackend import admin
 
 from .models import ExperimentData
 
 
-@admin.register(ExperimentData)
 class ExperimentDataAdmin(admin.ModelAdmin):
     list_display = ('user', 'experiment_id', 'key',)
     list_filter = ('experiment_id',)
@@ -11,3 +10,6 @@ class ExperimentDataAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     readonly_fields = ('created', 'modified',)
     search_fields = ('experiment_id', 'user', 'key',)
+
+
+admin.site.register(ExperimentData, ExperimentDataAdmin)
