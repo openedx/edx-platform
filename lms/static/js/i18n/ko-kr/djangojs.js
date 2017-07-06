@@ -55,18 +55,13 @@
     ], 
     "%s ago": "%s \uc804", 
     "%s from now": "\uc9c0\uae08\uc73c\ub85c \ubd80\ud130 %s \uc774\ud6c4", 
-    "%s result": [
-      "%s \uacb0\uacfc"
-    ], 
     "About me": "\uc790\uae30\uc18c\uac1c", 
     "Account Settings": "\uacc4\uc815 \uc124\uc815", 
     "Account Settings page.": "\uacc4\uc815 \uc124\uc815 \ud398\uc774\uc9c0", 
     "Add Cohort": "\ud559\uc2b5\uc9d1\ub2e8 \ucd94\uac00\ud558\uae30", 
     "Add Country": "\uad6d\uac00 \ucd94\uac00", 
-    "Add Students": "\ud559\uc2b5\uc790 \ucd94\uac00", 
     "Add a New Cohort": "\uc2e0\uaddc \ud559\uc2b5 \uc9d1\ub2e8 \ucd94\uac00", 
     "Add language": "\uc5b8\uc5b4 \ucd94\uac00", 
-    "Add students to this cohort": "\ud559\uc2b5\uc9d1\ub2e8\uc5d0 \ud559\uc2b5\uc790 \ucd94\uac00\ud558\uae30", 
     "Add to Dictionary": "\ubaa8\uc74c\uc5d0 \ucd94\uac00\ud558\uae30", 
     "Adding the selected course to your cart": "\uc7a5\ubc14\uad6c\ub2c8\uc5d0 \uc120\ud0dd\ub41c \uac15\uc88c\ub97c \ucd94\uac00\ud558\uace0 \uc788\uc2b5\ub2c8\ub2e4.", 
     "Advanced": "\uace0\uae09", 
@@ -165,10 +160,7 @@
     "Could not submit photos": "\uc0ac\uc9c4\uc744 \uc81c\ucd9c \ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.", 
     "Country": "\uad6d\uac00", 
     "Country or Region": "\uad6d\uac00", 
-    "Create a new account": "\uac00\uc785\ud558\uae30", 
-    "Create an account": "\uac00\uc785\ud558\uae30", 
     "Create an account using": "\uacc4\uc815 \uc5f0\ub3d9\ud558\uae30", 
-    "Create your account": "\uac00\uc785\ud558\uae30", 
     "Creating missing groups": "\ube60\uc9c4 \uadf8\ub8f9 \ub9cc\ub4e4\uae30", 
     "Current conversation": "\ud604\uc7ac \ub300\ud654", 
     "Current tab": "\ud604\uc7ac \ud0ed", 
@@ -217,7 +209,6 @@
     "Entrance exam attempts is being reset for student '{student_id}'.": "'{student_id}' \ud559\uc2b5\uc790\uac00 \uc2dc\ub3c4\ud55c \uc0ac\uc804 \ud3c9\uac00 \ud69f\uc218\ub294 \ucd08\uae30\ud654\ub429\ub2c8\ub2e4.", 
     "Entrance exam state is being deleted for student '{student_id}'.": "\ud559\uc2b5\uc790 '{student_id}'\uc758 \uc0ac\uc804 \ud3c9\uac00 \uc0c1\ud0dc\ub294 \uc0ad\uc81c\ub429\ub2c8\ub2e4.", 
     "Error": "\uc624\ub958", 
-    "Error adding students.": "\ud559\uc2b5\uc790 \ucd94\uac00 \uc624\ub958", 
     "Error adding/removing users as beta testers.": "\ubca0\ud0c0\ud14c\uc2a4\ud130 \ucd94\uac00/\uc0ad\uc81c \uc911 \uc624\ub958 \ubc1c\uc0dd", 
     "Error changing user's permissions.": "\uc774\uc6a9\uc790\uc758 \uad8c\ud55c \ubcc0\uacbd \uc5d0\ub7ec", 
     "Error deleting entrance exam state for student '{student_id}'. Make sure student identifier is correct.": "\ud559\uc2b5\uc790 '{student_id}'\uc758 \uc0ac\uc804 \ud3c9\uac00 \uc0c1\ud0dc\ub97c \uc0ad\uc81c\ud558\ub294 \ub3c4\uc911 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4.  \ud559\uc2b5\uc790\uc758 \uace0\uc720\ubc88\ud638\uac00 \uc62c\ubc14\ub978\uc9c0 \ud655\uc778\ud558\uc138\uc694.", 
@@ -363,7 +354,6 @@
     "No tasks currently running.": "\uc791\uc5c5\uc774 \uc5c6\uc2b5\ub2c8\ub2e4.", 
     "Nonbreaking space": "\ub2e8\uc5b4 \uc798\ub9bc \ubc29\uc9c0 \uacf5\ubc31", 
     "None": "\uc5c6\uc74c", 
-    "Note: Students can be in only one cohort. Adding students to this group overrides any previous group assignment.": "\ud559\uc2b5\uc790\ub294 \ud558\ub098\uc758 \ud559\uc2b5 \uc9d1\ub2e8\uc5d0\ub9cc \uc18d\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4. \ud559\uc2b5\uc790\ub97c \ud559\uc2b5 \uc9d1\ub2e8\uc5d0 \ucd94\uac00\ud558\uba74,  \uc774\uc804\uc758 \ud559\uc2b5\uc9d1\ub2e8 \uc18c\uc18d\uc774 \ubb34\ud6a8\uac00 \ub429\ub2c8\ub2e4.", 
     "Notes hidden": "\uac10\ucdb0\uc9c4 \ub178\ud2b8", 
     "Notes visible": "\ubcfc \uc218 \uc788\ub294 \ub178\ud2b8", 
     "Number Sent": "\ubcf4\ub0b8 \ud69f\uc218", 
@@ -431,7 +421,6 @@
     "Reply to Annotation": "\uc8fc\uc11d\uc5d0 \ub313\uae00\ub2ec\uae30", 
     "Report annotation as inappropriate or offensive.": "\ubd80\uc801\uc808\ud55c \uc8fc\uc11d\uc73c\ub85c \uc2e0\uace0\ud569\ub2c8\ub2e4.", 
     "Requester": "\uc694\uccad\uc790", 
-    "Required field": "\ud544\uc218 \ud56d\ubaa9", 
     "Reset Password": "\ube44\ubc00\ubc88\ud638 \uc7ac\uc124\uc815", 
     "Reset my password": "\ube44\ubc00\ubc88\ud638 \uc7ac\uc124\uc815", 
     "Restore enrollment code": "\uc218\uac15\uc2e0\uccad \ucf54\ub4dc\ub97c \ubcf5\uad6c\ud558\uc138\uc694.", 
@@ -542,9 +531,6 @@
     "There was a problem creating the report. Select \"Create Executive Summary\" to try again.": "\ubcf4\uace0\uc11c\ub97c \uc0dd\uc131\ud558\ub294 \ub3d9\uc548 \ubb38\uc81c\uac00 \uc788\uc5c8\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \uc2dc\ub3c4\ud558\uae30 \uc704\ud574 Create Executive Summary\ub97c \uc120\ud0dd\ud558\uc138\uc694.", 
     "There was an error obtaining email content history for this course.": "\uc774 \uac15\uc88c\uc758 \uba54\uc77c \uc804\uc1a1 \uae30\ub85d\uc744 \uac00\uc838\uc624\ub294\ub370 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4.", 
     "There was an error obtaining email task history for this course.": "\uc774 \uac15\uc88c\uc758 \uc774\uba54\uc77c \ubc1c\uc1a1 \uae30\ub85d \uac00\uc838\uc624\uae30\uc5d0 \uc2e4\ud328\ud558\uc600\uc2b5\ub2c8\ub2e4.", 
-    "There was an error when trying to add students:": [
-      "\ud559\uc2b5\uc790\ub97c \ucd94\uac00\ud558\ub294 \ub3d9\uc548 {numErrors}\uac1c\uc758 \uc624\ub958\uac00 \ubc1c\uc0dd \ud588\uc2b5\ub2c8\ub2e4. "
-    ], 
     "There was an error, try searching again.": "\uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \uac80\uc0c9\ud558\uc138\uc694.", 
     "These users were not added as beta testers:": "\uc774 \uc774\uc6a9\uc790\ub4e4\uc740  \ubca0\ud0c0\ud14c\uc2a4\ud130\ub85c \ucd94\uac00\ub418\uc9c0 \uc54a\uc558\uc2b5\ub2c8\ub2e4.", 
     "These users were not affiliated with the course so could not be unenrolled:": "\uc774 \uc0ac\uc6a9\uc790\ub4e4\uc740 \uc774 \uac15\uc88c\uc640 \uad00\ub828\uc5c6\uc73c\ubbc0\ub85c \uc218\uac15\ucde8\uc18c\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.", 
@@ -568,7 +554,6 @@
     "Undo (Ctrl+Z)": "\ub418\ub3cc\ub9ac\uae30 (Ctrl+Z)", 
     "Unknown": "\uc54c \uc218 \uc5c6\uc74c", 
     "Unknown Error Occurred.": "\uc54c \uc218 \uc5c6\ub294 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4.", 
-    "Unknown user: {user}": "\ubbf8\ud655\uc778 \ud559\uc2b5\uc790: {user}", 
     "Unlinking": "\uc5f0\uacb0 \ud574\uc81c\ud558\uae30", 
     "Unmute": "\uc74c\uc18c\uac70 \ud574\uc81c", 
     "Updating with latest library content": "\ucd5c\uc2e0 \ucf58\ud150\uce20 \ubcf4\uad00\ud568\uc73c\ub85c \uc5c5\ub370\uc774\ud2b8", 
@@ -662,15 +647,6 @@
     "name": "\uc774\ub984", 
     "strong text": "\uac15\ud558\uac8c", 
     "team count": "\ud300 \uc778\uc6d0 \uc218", 
-    "{numMoved} student was removed from {oldCohort}": [
-      "{oldCohort}\uc5d0\uc11c \uc0ad\uc81c\ub41c \ud559\uc2b5\uc790\ub294 {numMoved} \uba85\uc785\ub2c8\ub2e4."
-    ], 
-    "{numPresent} student was already in the cohort": [
-      "{numPresent}\uba85\uc758 \ud559\uc2b5\uc790\uac00 \uc774\ubbf8 \ud559\uc2b5 \uc9d1\ub2e8\uc5d0 \uc18d\ud574 \uc788\uc2b5\ub2c8\ub2e4."
-    ], 
-    "{numUsersAdded} student has been added to this cohort": [
-      "\ubcf8 \ud559\uc2b5 \uc9d1\ub2e8\uc5d0 {numUsersAdded}\uba85\uc758 \ud559\uc2b5\uc790\uac00 \ucd94\uac00\ub418\uc5c8\uc2b5\ub2c8\ub2e4."
-    ], 
     "{platform_name} learners can see my:": "{platform_name} \ud559\uc2b5\uc790\uac00 \ub098\uc5d0 \ub300\ud574 \ubcfc \uc218 \uc788\ub294 \uac83\uc740 :", 
     "\u2026": "\u2026"
   };

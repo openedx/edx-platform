@@ -254,7 +254,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-06-08 14:59+0000\n"
+"POT-Creation-Date: 2017-06-21 14:42+0000\n"
 "PO-Revision-Date: 2017-03-16 12:39+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -462,11 +462,6 @@ msgid ""
 "This is the bulk SKU (stock keeping unit) of this mode in the external "
 "ecommerce service."
 msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Audit"
-msgstr "Auditar"
 
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -889,6 +884,38 @@ msgstr "O curso que você está procurando não começara até {date}."
 #: common/djangoapps/student/views.py
 #, python-brace-format
 msgid "The course you are looking for is closed for enrollment as of {date}."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Photos are mismatched"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Name missing from ID photo"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "ID photo not provided"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "ID is invalid"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Learner photo is blurry"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Name on ID does not match name on account"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Learner photo not provided"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "ID photo is blurry"
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -2381,8 +2408,8 @@ msgstr ""
 "ou comprometida. Para obter uma chave para o seu curso, ou para relatar um "
 "problema, por favor contate moocsupport@mathworks.com"
 
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
+#: cms/templates/index.html lms/templates/help_modal.html
+#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -5017,6 +5044,10 @@ msgstr ""
 
 #: lms/djangoapps/badges/models.py
 msgid "Please check the syntax of your entry."
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Take free online courses at edX.org"
 msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
@@ -9102,36 +9133,6 @@ msgid "Your {platform_name} verification has expired."
 msgstr "A sua verificação de {platform_name} expirou."
 
 #: lms/djangoapps/verify_student/models.py
-msgid "No photo ID was provided."
-msgstr "Nenhum documento de identificação com foto foi fornecido."
-
-#: lms/djangoapps/verify_student/models.py
-msgid "We couldn't read your name from your photo ID image."
-msgstr ""
-"Não foi possível ler o seu nome na imagem do seu documento de identificação "
-"com foto."
-
-#: lms/djangoapps/verify_student/models.py
-msgid ""
-"The name associated with your account and the name on your ID do not match."
-msgstr ""
-"O nome associado à sua conta não corresponde ao nome no seu documento de "
-"identificação."
-
-#: lms/djangoapps/verify_student/models.py
-msgid "The image of your face was not clear."
-msgstr "O seu rosto não está nítido na imagem."
-
-#: lms/djangoapps/verify_student/models.py
-msgid "Your face was not visible in your self-photo."
-msgstr ""
-"A sua face não estava visivel na fotografia que você tirou de si mesmo"
-
-#: lms/djangoapps/verify_student/models.py
-msgid "There was an error verifying your ID photos."
-msgstr "Ocorreu um erro ao verificar as suas fotos de identificação."
-
-#: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr "O curso para o qual se aplica esse prazo"
 
@@ -9217,6 +9218,11 @@ msgstr "Dados de imagem inválidos."
 #: lms/djangoapps/verify_student/views.py
 msgid "Verification photos received"
 msgstr "Fotos de verificação recebidas"
+
+#: lms/envs/common.py
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Audit"
+msgstr "Auditar"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the website name of www.facebook.com.  Please
@@ -9965,9 +9971,7 @@ msgid "Internal API URL"
 msgstr ""
 
 #: openedx/core/djangoapps/catalog/models.py
-msgid ""
-"API root to be used for server-to-server requests (e.g., https://catalog-"
-"internal.example.com/api/v1/)."
+msgid "DEPRECATED: Use the setting COURSE_CATALOG_API_URL."
 msgstr ""
 
 #: openedx/core/djangoapps/catalog/models.py
@@ -11423,6 +11427,12 @@ msgstr ""
 msgid "Reset"
 msgstr "Redefinir"
 
+#: cms/templates/widgets/footer.html lms/templates/footer.html
+#: themes/edx.org/lms/templates/footer.html
+#: themes/red-theme/lms/templates/footer.html
+msgid "Legal"
+msgstr "Legal"
+
 #: cms/templates/widgets/header.html lms/templates/navigation.html
 #: lms/templates/widgets/footer-language-selector.html
 msgid "Choose Language"
@@ -11758,11 +11768,6 @@ msgstr "Depurar erros:"
 #: lms/templates/extauth_failure.html
 msgid "External Authentication failed"
 msgstr "Falha de autenticação externa"
-
-#: lms/templates/footer.html themes/edx.org/lms/templates/footer.html
-#: themes/red-theme/lms/templates/footer.html
-msgid "Legal"
-msgstr "Legal"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Password Reset"
@@ -14554,11 +14559,9 @@ msgstr "Você ainda não está inscrito"
 
 #: lms/templates/courseware/info.html
 msgid ""
-"You are not currently enrolled in this course. {link_start}Sign up "
+"You are not currently enrolled in this course. {link_start}Enroll "
 "now!{link_end}"
 msgstr ""
-"Você não está registrado neste curso atualmente. {link_start}Inscreva-"
-"se!{link_end}"
 
 #: lms/templates/courseware/info.html
 msgid "Welcome to {org}'s {course_name}!"
@@ -14571,18 +14574,6 @@ msgstr ""
 #: lms/templates/courseware/info.html
 msgid "View Updates in Studio"
 msgstr "Visualizar atualizações no Studio"
-
-#: lms/templates/courseware/info.html
-msgid "Give yourself an additional incentive to complete"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Earn a verified certificate."
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Upgrade Now"
-msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Course Updates and News"
@@ -15231,6 +15222,25 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Current Verification Status: Denied"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your verification submission was not accepted. To receive a verified "
+"certificate, you must submit a new photo of yourself and your government-"
+"issued photo ID before the verification deadline for your course."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Your verification was denied for the following reasons:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
+msgstr "Submeter Verificação Novamente"
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Expired"
 msgstr ""
 
@@ -15240,10 +15250,6 @@ msgid ""
 "submit a new photo of yourself and your government-issued photo ID before "
 "the verification deadline for your course."
 msgstr ""
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Resubmit Verification"
-msgstr "Submeter Verificação Novamente"
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -17486,17 +17492,11 @@ msgstr "Administradores da discussão"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Discussion Admins can edit or delete any post, clear misuse flags, close and"
-" re-open threads, endorse responses, and see posts from all cohorts. Their "
+" re-open threads, endorse responses, and see posts from all groups. Their "
 "posts are marked as 'staff'. They can also add and remove the discussion "
-"moderation roles to manage course team membership. You can only give course "
-"team roles to enrolled users."
+"moderation roles to manage course team membership. Only enrolled users can "
+"be added as Discussion Admins."
 msgstr ""
-"\"Moderadores de discussão\" podem editar ou excluir qualquer post, "
-"utilização inadequada, Abrir e Fechar ou re-abrir, endossar respostas, e ver"
-" as mensagens de qualquer grupo. Suas mensagens são marcadas como «pessoal»."
-" Eles não podem gerenciar a associação da equipe é claro, adicionar ou "
-"remover função dos moderadores de discussão. Você só pode dar funções aos "
-"integrantes do grupo para usuários inscritos."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Discussion Admin"
@@ -17509,17 +17509,11 @@ msgstr "Moderadores do fórum"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Discussion Moderators can edit or delete any post, clear misuse flags, close"
-" and re-open threads, endorse responses, and see posts from all cohorts. "
+" and re-open threads, endorse responses, and see posts from all groups. "
 "Their posts are marked as 'staff'. They cannot manage course team membership"
-" by adding or removing discussion moderation roles. You can only give course"
-" team roles to enrolled users."
+" by adding or removing discussion moderation roles. Only enrolled users can "
+"be added as Discussion Moderators."
 msgstr ""
-"\"Moderadores de discussão\" podem editar ou excluir qualquer post, "
-"utilização inadequada, Abrir e Fechar ou re-abrir, endossar respostas, e ver"
-" as mensagens de qualquer grupo. Suas mensagens são marcadas como «pessoal»."
-" Eles não podem gerenciar a associação da equipe é claro, adicionar ou "
-"remover função dos moderadores de discussão. Você só pode dar funções aos "
-"integrantes do grupo para usuários inscritos."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Moderator"
@@ -17531,18 +17525,12 @@ msgstr "Assistentes de ensino da comunidade de discussão"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Community TA's are members of the community whom you deem particularly "
+"Community TAs are members of the community whom you deem particularly "
 "helpful on the discussion boards. They can edit or delete any post, clear "
 "misuse flags, close and re-open threads, endorse responses, and see posts "
-"from all cohorts. Their posts are marked as 'Community TA'. You can only "
-"give course team roles to enrolled users."
+"from all groups. Their posts are marked as 'Community TA'. Only enrolled "
+"users can be added as Community TAs."
 msgstr ""
-"A Comunidade TAs são membros da comunidade que você julga particularmente "
-"útil nos fóruns de discussão. Eles podem modificar ou apagar quaisquer "
-"postagens, apagar postagens abusivas, fechar e reabrir tópicos, apoiar "
-"respostas e ver as postagens de todos os grupos. Suas postagens são marcadas"
-" como 'Community TA'. Você pode apenas concede funções de equipe de curso "
-"para usuários inscritos."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Community TA"
@@ -21201,6 +21189,22 @@ msgid ""
 "The unique code that identifies this library. {strong_start}Note: This is "
 "part of your library URL, so no spaces or special characters are "
 "allowed.{strong_end} This cannot be changed."
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Organization and Library Settings"
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Show all courses in organization:"
+msgstr ""
+
+#: cms/templates/index.html
+msgid "For example, MITx"
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Show content libraries"
 msgstr ""
 
 #: cms/templates/index.html

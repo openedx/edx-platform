@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-06-21 14:29+0000\n"
-"PO-Revision-Date: 2017-06-21 14:30:50.629384\n"
+"POT-Creation-Date: 2017-07-06 15:10+0000\n"
+"PO-Revision-Date: 2017-07-06 15:11:43.434371\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -132,7 +132,7 @@ msgstr "Çänçél Ⱡ'σяєм ιρѕυ#"
 
 #. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
-#: lms/static/js/views/image_field.js
+#: cms/static/js/views/video_thumbnail.js lms/static/js/views/image_field.js
 msgid "Uploading"
 msgstr "Ûplöädïng Ⱡ'σяєм ιρѕυм ∂σł#"
 
@@ -4967,6 +4967,34 @@ msgstr ""
 "%(platformName)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Email Address"
+msgstr "Émäïl Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"The email address you use to sign in. Communications from {platform_name} "
+"and your courses are sent to this address."
+msgstr ""
+"Thé émäïl äddréss ýöü üsé tö sïgn ïn. Çömmünïçätïöns fröm {platform_name} "
+"änd ýöür çöürsés äré sént tö thïs äddréss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"The email address you use to sign in. Communications from {platform_name} "
+"and your courses are sent to this address.  To change the email address, "
+"please contact {contact_email}."
+msgstr ""
+"Thé émäïl äddréss ýöü üsé tö sïgn ïn. Çömmünïçätïöns fröm {platform_name} "
+"änd ýöür çöürsés äré sént tö thïs äddréss.  Tö çhängé thé émäïl äddréss, "
+"pléäsé çöntäçt {contact_email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
+"σƒƒι¢ια ∂єѕєяυηт мσłł#"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information"
 msgstr "Bäsïç Àççöünt Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
@@ -5012,18 +5040,6 @@ msgstr ""
 "α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
 "єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
 " νєłιт єѕ#"
-
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Email Address"
-msgstr "Émäïl Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid ""
-"The email address you use to sign in. Communications from {platform_name} "
-"and your courses are sent to this address."
-msgstr ""
-"Thé émäïl äddréss ýöü üsé tö sïgn ïn. Çömmünïçätïöns fröm {platform_name} "
-"änd ýöür çöürsés äré sént tö thïs äddréss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
@@ -6613,13 +6629,6 @@ msgstr ""
 "Ýöü hävé nöt çréätéd äný çöntént gröüps ýét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#. Translators: This is listed as the duration for a video
-#. that has not yet reached the point in its processing by
-#. the servers where its duration is determined.
-#: cms/static/js/views/previous_video_upload.js
-msgid "Pending"
-msgstr "Péndïng Ⱡ'σяєм ιρѕυм #"
-
 #: cms/static/js/views/previous_video_upload.js
 msgid "Are you sure you want to remove this video from the list?"
 msgstr ""
@@ -6914,6 +6923,130 @@ msgstr ""
 #: cms/static/js/views/video/translations_editor.js
 msgid "Upload translation"
 msgstr "Ûplöäd tränslätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "Add Thumbnail"
+msgstr "Àdd Thümßnäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "Edit Thumbnail"
+msgstr "Édït Thümßnäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#. Translators: This is a 2 part text which tells the image requirements.
+#: cms/static/js/views/video_thumbnail.js
+msgid ""
+"{InstructionsSpanStart}{videoImageResoultion}{lineBreak} "
+"{videoImageSupportedFileFormats}{spanEnd}"
+msgstr ""
+"{InstructionsSpanStart}{videoImageResoultion}{lineBreak} "
+"{videoImageSupportedFileFormats}{spanEnd} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "Image upload failed"
+msgstr "Ìmägé üplöäd fäïléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#. Translators: This is a 3 part text which tells the image requirements.
+#: cms/static/js/views/video_thumbnail.js
+msgid ""
+"{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak}"
+" {videoImageSupportedFileFormats}{spanEnd}"
+msgstr ""
+"{ReqTextSpanStart}Réqüïréménts{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak}"
+" {videoImageSupportedFileFormats}{spanEnd} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#. Translators: message will be like 1280x720 pixels
+#: cms/static/js/views/video_thumbnail.js
+msgid "{maxWidth}x{maxHeight} pixels"
+msgstr "{maxWidth}x{maxHeight} pïxéls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#. Translators: message will be like Thumbnail for Arrow.mp4
+#: cms/static/js/views/video_thumbnail.js
+msgid "Thumbnail for {videoName}"
+msgstr "Thümßnäïl för {videoName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#. Translators: message will be like Add Thumbnail - Arrow.mp4
+#: cms/static/js/views/video_thumbnail.js
+msgid "Add Thumbnail - {videoName}"
+msgstr "Àdd Thümßnäïl - {videoName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#. Translators: humanizeDuration will be like 10 minutes, an hour and 20
+#. minutes etc
+#: cms/static/js/views/video_thumbnail.js
+msgid "Video duration is {humanizeDuration}"
+msgstr "Vïdéö dürätïön ïs {humanizeDuration} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "minutes"
+msgstr "mïnütés Ⱡ'σяєм ιρѕυм #"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "minute"
+msgstr "mïnüté Ⱡ'σяєм ιρѕυ#"
+
+#. Translators: message will be like 15 minutes, 1 minute
+#: cms/static/js/views/video_thumbnail.js
+msgid "{minutes} {unit}"
+msgstr "{minutes} {unit} Ⱡ'σяєм ιρѕυм #"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "seconds"
+msgstr "séçönds Ⱡ'σяєм ιρѕυм #"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "second"
+msgstr "séçönd Ⱡ'σяєм ιρѕυ#"
+
+#. Translators: message will be like 20 seconds, 1 second
+#: cms/static/js/views/video_thumbnail.js
+msgid "{seconds} {unit}"
+msgstr "{seconds} {unit} Ⱡ'σяєм ιρѕυм #"
+
+#. Translators: `and` will be used to combine both miuntes and seconds like
+#. `13 minutes and 45 seconds`
+#: cms/static/js/views/video_thumbnail.js
+msgid " and "
+msgstr " änd  Ⱡ'σяєм ιρѕ#"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "Video image upload started"
+msgstr "Vïdéö ïmägé üplöäd stärtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "Video image upload completed"
+msgstr "Vïdéö ïmägé üplöäd çömplétéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid ""
+"This image file type is not supported. Supported file types are "
+"{supportedFileFormats}."
+msgstr ""
+"Thïs ïmägé fïlé týpé ïs nöt süppörtéd. Süppörtéd fïlé týpés äré "
+"{supportedFileFormats}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#. Translators: maxFileSizeInMB will be like 2 MB.
+#: cms/static/js/views/video_thumbnail.js
+msgid "The selected image must be smaller than {maxFileSizeInMB}."
+msgstr ""
+"Thé séléçtéd ïmägé müst ßé smällér thän {maxFileSizeInMB}. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#. Translators: minFileSizeInKB will be like 2 KB.
+#: cms/static/js/views/video_thumbnail.js
+msgid "The selected image must be larger than {minFileSizeInKB}."
+msgstr ""
+"Thé séléçtéd ïmägé müst ßé lärgér thän {minFileSizeInKB}. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "Could not upload the video image file"
+msgstr ""
+"Çöüld nöt üplöäd thé vïdéö ïmägé fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "Image upload failed. "
+msgstr "Ìmägé üplöäd fäïléd.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/static/js/views/xblock_editor.js
 msgid "Editor"
@@ -10378,8 +10511,8 @@ msgstr ""
 "Döwnlöäd äväïläßlé énçödïngs (.çsv) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/templates/js/previous-video-upload-list.underscore
-msgid "Duration"
-msgstr "Dürätïön Ⱡ'σяєм ιρѕυм ∂#"
+msgid "Thumbnail"
+msgstr "Thümßnäïl Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Video ID"
@@ -10893,6 +11026,15 @@ msgstr ""
 "αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
 "νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
 "σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σ#"
+
+#: cms/templates/js/video-thumbnail.underscore
+msgid ""
+"Recommended image resolution is {imageResolution}, maximum image file size "
+"should be {maxFileSize} and format must be one of {supportedImageFormats}."
+msgstr ""
+"Réçömméndéd ïmägé résölütïön ïs {imageResolution}, mäxïmüm ïmägé fïlé sïzé "
+"shöüld ßé {maxFileSize} änd förmät müst ßé öné öf {supportedImageFormats}. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Edit the name"
