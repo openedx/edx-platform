@@ -209,7 +209,7 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
 
     # Transcripts...
     transcripts_info = video_descriptor.get_transcripts_info()
-    transcript_langs = video_descriptor.available_translations(transcripts_info, verify_assets=False)
+    transcript_langs = video_descriptor.available_translations(transcripts_info)
 
     transcripts = {
         lang: reverse(

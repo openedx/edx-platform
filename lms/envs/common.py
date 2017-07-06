@@ -346,6 +346,11 @@ FEATURES = {
     # Show the language selector in the header
     'SHOW_HEADER_LANGUAGE_SELECTOR': False,
 
+    # At edX it's safe to assume that English transcripts are always available
+    # This is not the case for all installations.
+    # The default value in {lms,cms}/envs/common.py and xmodule/tests/test_video.py should be consistent.
+    'FALLBACK_TO_ENGLISH_TRANSCRIPTS': True,
+
     # Show the language selector in the footer
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
 
