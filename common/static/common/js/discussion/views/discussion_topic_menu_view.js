@@ -15,6 +15,7 @@
             initialize: function(options) {
                 this.course_settings = options.course_settings;
                 this.currentTopicId = options.topicId;
+                this.group_name = options.group_name;
                 _.bindAll(this,
                     'handleTopicEvent'
                 );
