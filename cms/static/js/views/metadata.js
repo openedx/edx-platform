@@ -453,9 +453,9 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
             _.each(value, function(value, key) {
                 var template = _.template(
                     '<li class="list-settings-item">' +
-                        '<input type="text" class="input input-key" value="<%= key %>">' +
-                        '<input type="text" class="input input-value" value="<%= value %>">' +
-                        '<a href="#" class="remove-action remove-setting" data-value="<%= value %>"><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>' +  // eslint-disable-line max-len
+                        '<input type="text" class="input input-key" value="<%- key %>">' +
+                        '<input type="text" class="input input-value" value="<%- value %>">' +
+                        '<a href="#" class="remove-action remove-setting" data-value="<%- value %>"><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>' +  // eslint-disable-line max-len
                     '</li>'
                 );
 

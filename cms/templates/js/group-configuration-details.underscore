@@ -31,9 +31,9 @@
 
     <% if(showGroups) { %>
       <% allocation = Math.floor(100 / groups.length) %>
-      <ol class="collection-items groups groups-<%= index %>">
+      <ol class="collection-items groups groups-<%- index %>">
         <% groups.each(function(group, groupIndex) { %>
-          <li class="item group group-<%= groupIndex %>">
+          <li class="item group group-<%- groupIndex %>">
             <span class="name group-name"><%- group.get('name') %></span>
             <span class="meta group-allocation"><%- allocation %>%</span>
           </li>

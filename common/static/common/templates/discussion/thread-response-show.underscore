@@ -1,8 +1,8 @@
 <header class="response-header">
   <div class="response-header-content">
-    <%= author_display %>
+    <%- author_display %>
     <p class="posted-details">
-        <span class="timeago" title="<%= created_at %>"><%= created_at %></span>
+        <span class="timeago" title="<%- created_at %>"><%- created_at %></span>
         <% if (obj.endorsement && obj.endorsed) { %>
             -
             <%
@@ -44,7 +44,7 @@
       </div>
       </div>
       <div class="response-header-actions">
-        <%=
+        <%-
             _.template(
                 $('#forum-actions').html())(
                 {

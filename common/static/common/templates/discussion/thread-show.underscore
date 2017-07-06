@@ -2,7 +2,7 @@
     <header class="post-header">
         <% if (!readOnly) { %>
             <div class="post-header-actions">
-                <%=
+                <%-
                 _.template(
                     $('#forum-actions').html())(
                     {

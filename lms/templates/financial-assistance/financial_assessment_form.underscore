@@ -34,7 +34,7 @@
 		</div>
 	</div>
 
-	<%= fields %>
+	<%- fields %>
 
 	<div class="cta-wrapper clearfix">
 		<a href="<%- student_faq_url %>" class="nav-link"><%- interpolate_text(

@@ -12,7 +12,7 @@
         ) %>
   </div>
   <div class="provider-instructions">
-    <%= fulfillment_instructions %>
+    <%- fulfillment_instructions %>
   </div>
 </div>
 

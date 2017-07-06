@@ -3,7 +3,7 @@ var summaryMessage = validation.get("summary");
 var aggregateMessageType = summaryMessage.type;
 var aggregateValidationClass = aggregateMessageType === "error"? "has-errors" : "has-warnings";
 %>
-    <div class="xblock-message validation <%= aggregateValidationClass %> <%= additionalClasses %>">
+    <div class="xblock-message validation <%- aggregateValidationClass %> <%- additionalClasses %>">
         <p class="<%- aggregateMessageType %>"><span class="icon fa <%- getIcon(aggregateMessageType) %>" aria-hidden="true"></span>
         <%- summaryMessage.text %>
         <% if (summaryMessage.action_class) { %>
@@ -25,7 +25,7 @@ var aggregateValidationClass = aggregateMessageType === "error"? "has-errors" : 
                 var messageType = message.type
                 var messageTypeDisplayName = getDisplayName(messageType)
                 %>
-                <li class="xblock-message-item <%= messageType %>">
+                <li class="xblock-message-item <%- messageType %>">
                     <span class="message-text">
                         <% if (messageTypeDisplayName) { %>
                             <span class="sr"><%- messageTypeDisplayName %>:</span>

@@ -15,7 +15,7 @@
                 </span>
             </p>
         </header>
-        <div class="post-body"><%= abbreviatedBody %></div>
+        <div class="post-body"><%- abbreviatedBody %></div>
     </div>
     <div class="post-tools">
         <a href="<%- permalink %>"><%- gettext("View discussion") %></a>

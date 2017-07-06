@@ -12,5 +12,5 @@ if (published_on && published_by) {
 %>
 
 <div class="wrapper-last-publish">
-    <p class="copy"><%= copy %></p>
+    <p class="copy"><%- copy %></p>
 </div>
