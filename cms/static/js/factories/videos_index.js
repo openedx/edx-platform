@@ -5,13 +5,16 @@ define([
     'use strict';
     var VideosIndexFactory = function(
         $contentWrapper,
+        videoImageUploadURL,
         videoHandlerUrl,
         encodingsDownloadUrl,
+        defaultVideoImageURL,
         concurrentUploadLimit,
         uploadButton,
         previousUploads,
         videoSupportedFileFormats,
-        videoUploadMaxFileSizeInGB
+        videoUploadMaxFileSizeInGB,
+        videoImageSettings
     ) {
         var activeView = new ActiveVideoUploadListView({
                 postUrl: videoHandlerUrl,
@@ -19,6 +22,7 @@ define([
                 uploadButton: uploadButton,
                 videoSupportedFileFormats: videoSupportedFileFormats,
                 videoUploadMaxFileSizeInGB: videoUploadMaxFileSizeInGB,
+                videoImageSettings: videoImageSettings,
                 onFileUploadDone: function(activeVideos) {
                     $.ajax({
                         url: videoHandlerUrl,
@@ -34,18 +38,24 @@ define([
                                        isActive[0].get('status') === ActiveVideoUpload.STATUS_COMPLETE;
                             }),
                             updatedView = new PreviousVideoUploadListView({
+                                videoImageUploadURL: videoImageUploadURL,
+                                defaultVideoImageURL: defaultVideoImageURL,
                                 videoHandlerUrl: videoHandlerUrl,
                                 collection: updatedCollection,
-                                encodingsDownloadUrl: encodingsDownloadUrl
+                                encodingsDownloadUrl: encodingsDownloadUrl,
+                                videoImageSettings: videoImageSettings
                             });
                         $contentWrapper.find('.wrapper-assets').replaceWith(updatedView.render().$el);
                     });
                 }
             }),
             previousView = new PreviousVideoUploadListView({
+                videoImageUploadURL: videoImageUploadURL,
+                defaultVideoImageURL: defaultVideoImageURL,
                 videoHandlerUrl: videoHandlerUrl,
                 collection: new Backbone.Collection(previousUploads),
-                encodingsDownloadUrl: encodingsDownloadUrl
+                encodingsDownloadUrl: encodingsDownloadUrl,
+                videoImageSettings: videoImageSettings
             });
         $contentWrapper.append(activeView.render().$el);
         $contentWrapper.append(previousView.render().$el);

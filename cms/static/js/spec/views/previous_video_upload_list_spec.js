@@ -25,7 +25,8 @@ define(
                     );
                     var view = new PreviousVideoUploadListView({
                         collection: collection,
-                        videoHandlerUrl: videoHandlerUrl
+                        videoHandlerUrl: videoHandlerUrl,
+                        videoImageSettings: {}
                     });
                     return view.render().$el;
                 },
@@ -43,10 +44,10 @@ define(
                     $el = render(numVideos),
                     firstVideoId = 'dummy_id_0',
                     requests = AjaxHelpers.requests(test),
-                    firstVideoSelector = '.js-table-body tr:first-child';
+                    firstVideoSelector = '.js-table-body .video-row:first-child';
 
                 // total number of videos should be 5 before remove
-                expect($el.find('.js-table-body tr').length).toEqual(numVideos);
+                expect($el.find('.js-table-body .video-row').length).toEqual(numVideos);
 
                 // get first video element
                 firstVideo = $el.find(firstVideoSelector);
@@ -71,7 +72,7 @@ define(
                 }
 
                 // verify total number of videos after Remove/Cancel
-                expect($el.find('.js-table-body tr').length).toEqual(numVideos);
+                expect($el.find('.js-table-body .video-row').length).toEqual(numVideos);
 
                 // verify first video id after Remove/Cancel
                 firstVideo = $el.find(firstVideoSelector);
@@ -81,13 +82,13 @@ define(
             it('should render an empty collection', function() {
                 var $el = render(0);
                 expect($el.find('.js-table-body').length).toEqual(1);
-                expect($el.find('.js-table-body tr').length).toEqual(0);
+                expect($el.find('.js-table-body .video-row').length).toEqual(0);
             });
 
             it('should render a non-empty collection', function() {
                 var $el = render(5);
                 expect($el.find('.js-table-body').length).toEqual(1);
-                expect($el.find('.js-table-body tr').length).toEqual(5);
+                expect($el.find('.js-table-body .video-row').length).toEqual(5);
             });
 
             it('removes video upon click on Remove button', function() {
