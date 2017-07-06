@@ -1,12 +1,13 @@
 """Admin views for API managment."""
 from config_models.admin import ConfigurationModelAdmin
-from ratelimitbackend import admin
+from django.contrib import admin
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.api_admin.models import ApiAccessConfig, ApiAccessRequest
 
 
+@admin.register(ApiAccessRequest)
 class ApiAccessRequestAdmin(admin.ModelAdmin):
     """Admin for API access requests."""
     list_display = ('user', 'status', 'website')
@@ -38,4 +39,3 @@ class ApiAccessRequestAdmin(admin.ModelAdmin):
         )
 
 admin.site.register(ApiAccessConfig, ConfigurationModelAdmin)
-admin.site.register(ApiAccessRequest, ApiAccessRequestAdmin)
