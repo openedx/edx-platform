@@ -1,5 +1,5 @@
 <div class="incontext-editor-action-wrapper">
-    <a href="" class="unit-container visibility-button" title="<%- gettext('Access Settings') %>">
+    <a href="" class="unit-container access-button" title="<%- gettext('Access Settings') %>">
         <span class="icon fa fa-gear" aria-hidden="true"></span><span class="sr"> <%- gettext('Set Access') %></span>
     </a>
 </div>

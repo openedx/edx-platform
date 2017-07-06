@@ -16,7 +16,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
 
             events: {
                 'click .edit-button': 'editXBlock',
-                'click .visibility-button': 'editVisibilitySettings',
+                'click .access-button': 'editVisibilitySettings',
                 'click .duplicate-button': 'duplicateXBlock',
                 'click .move-button': 'showMoveXBlockModal',
                 'click .delete-button': 'deleteXBlock',
