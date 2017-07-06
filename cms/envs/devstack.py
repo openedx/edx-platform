@@ -119,6 +119,9 @@ SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 ########################## Certificates Web/HTML View #######################
 FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
+########################## AUTHOR PERMISSION #######################
+FEATURES['ENABLE_CREATOR_GROUP'] = False
+
 ################################# DJANGO-REQUIRE ###############################
 
 # Whether to run django-require in debug mode.
