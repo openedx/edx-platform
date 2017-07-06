@@ -14,6 +14,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 from pytz import UTC
+from waffle.testutils import override_switch
 
 from branding.views import index
 from courseware.tests.helpers import LoginEnrollmentTestCase
@@ -297,18 +298,19 @@ class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
     """
     Tests for Programs List in Marketing Pages.
     """
-    @ddt.data([], ['fake_program_type'])
-    def test_get_programs_with_type_called(self, program_types):
+    @ddt.data(True, False)
+    def test_get_programs_with_type_called(self, multitenant_programs_enabled):
         views = [
             (reverse('root'), 'student.views.get_programs_with_type'),
             (reverse('branding.views.courses'), 'courseware.views.views.get_programs_with_type'),
         ]
         for url, dotted_path in views:
             with patch(dotted_path) as mock_get_programs_with_type:
-                response = self.client.get(url)
-                self.assertEqual(response.status_code, 200)
+                with override_switch('get-multitenant-programs', multitenant_programs_enabled):
+                    response = self.client.get(url)
+                    self.assertEqual(response.status_code, 200)
 
-                if program_types:
-                    mock_get_programs_with_type.assert_called_once()
-                else:
-                    mock_get_programs_with_type.assert_not_called()
+                    if multitenant_programs_enabled:
+                        mock_get_programs_with_type.assert_called_once()
+                    else:
+                        mock_get_programs_with_type.assert_not_called()
