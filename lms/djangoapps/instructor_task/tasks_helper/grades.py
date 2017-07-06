@@ -175,13 +175,13 @@ class _EnrollmentBulkContext(object):
 
 class _CourseGradeBulkContext(object):
     def __init__(self, context, users):
-        self.certs = _CertificateBulkContext(context, users)
-        self.teams = _TeamBulkContext(context, users)
-        self.enrollments = _EnrollmentBulkContext(context, users)
-        bulk_cache_cohorts(context.course_id, users)
-        BulkRoleCache.prefetch(users)
+        # self.certs = _CertificateBulkContext(context, users)
+        # self.teams = _TeamBulkContext(context, users)
+        # self.enrollments = _EnrollmentBulkContext(context, users)
+        # bulk_cache_cohorts(context.course_id, users)
+        # BulkRoleCache.prefetch(users)
         PersistentCourseGrade.prefetch(context.course_id, users)
-        BulkCourseTags.prefetch(context.course_id, users)
+        # BulkCourseTags.prefetch(context.course_id, users)
 
 
 class CourseGradeReport(object):
@@ -398,7 +398,7 @@ class CourseGradeReport(object):
         Returns a list of rows for the given users for this report.
         """
         with modulestore().bulk_operations(context.course_id):
-            # bulk_context = _CourseGradeBulkContext(context, users)
+            bulk_context = _CourseGradeBulkContext(context, users)
 
             success_rows, error_rows = [], []
             for user, course_grade, error in CourseGradeFactory().iter(
