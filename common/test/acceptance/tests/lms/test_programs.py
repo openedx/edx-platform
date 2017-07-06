@@ -8,12 +8,7 @@ from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.catalog import CacheProgramsPage
 from common.test.acceptance.pages.lms.programs import ProgramDetailsPage, ProgramListingPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest
-from openedx.core.djangoapps.catalog.tests.factories import (
-    CourseFactory,
-    CourseRunFactory,
-    ProgramFactory,
-    ProgramTypeFactory
-)
+from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
 
 
 class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourseTest):
@@ -41,8 +36,7 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
         course_run = CourseRunFactory(key=self.course_id)
         course = CourseFactory(course_runs=[course_run])
 
-        program_type = ProgramTypeFactory()
-        return ProgramFactory(courses=[course], type=program_type['name'])
+        return ProgramFactory(courses=[course])
 
     def stub_catalog_api(self, programs):
         """
@@ -50,9 +44,6 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
         """
         self.set_catalog_integration(is_enabled=True, service_username=self.username)
         CatalogFixture().install_programs(programs)
-
-        program_types = [program['type'] for program in programs]
-        CatalogFixture().install_program_types(program_types)
 
     def cache_programs(self):
         """
