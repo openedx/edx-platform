@@ -119,7 +119,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'common
             getTitle: function() {
                 var displayName = this.xblockInfo.get('display_name');
                 if (!displayName) {
-                    if (this.xblockInfo.isSequential() || this.xblockInfo.isChapter() || this.xblockInfo.isVertical()) {
+                    if (this.xblockInfo.isVertical()) {
                         displayName = gettext('Unit');
                     } else {
                         displayName = gettext('Component');
