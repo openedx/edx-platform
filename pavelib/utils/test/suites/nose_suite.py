@@ -119,7 +119,7 @@ class SystemTestSuite(NoseTestSuite):
 
         self.processes = kwargs.get('processes', None)
         self.randomize = kwargs.get('randomize', None)
-        self.settings = kwargs.get('settings', 'test')
+        self.settings = kwargs.get('settings', Env.TEST_SETTINGS)
 
         if self.processes is None:
             # Don't use multiprocessing by default

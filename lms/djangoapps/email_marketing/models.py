@@ -136,6 +136,14 @@ class EmailMarketingConfiguration(ConfigurationModel):
         )
     )
 
+    # The number of seconds to delay/timeout wait to get cookie values from sailthru.
+    user_registration_cookie_timeout_delay = models.fields.FloatField(
+        default=1.5,
+        help_text=_(
+            "The number of seconds to delay/timeout wait to get cookie values from sailthru."
+        )
+    )
+
     def __unicode__(self):
         return u"Email marketing configuration: New user list %s, Activation template: %s" % \
                (self.sailthru_new_user_list, self.sailthru_activation_template)

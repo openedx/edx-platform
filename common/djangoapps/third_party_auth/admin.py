@@ -4,7 +4,7 @@ Admin site configuration for third party authentication
 """
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
 from django import forms
-from django.contrib import admin
+from ratelimitbackend import admin
 
 from third_party_auth.provider import Registry
 

@@ -1,6 +1,7 @@
 """ Django admin pages for student app """
 from config_models.admin import ConfigurationModelAdmin
 from django import forms
+from django.contrib.admin.sites import NotRegistered
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import ugettext_lazy as _
@@ -113,7 +114,6 @@ class CourseAccessRoleForm(forms.ModelForm):
             self.fields['email'].initial = self.instance.user.email
 
 
-@admin.register(CourseAccessRole)
 class CourseAccessRoleAdmin(admin.ModelAdmin):
     """Admin panel for the Course Access Role. """
     form = CourseAccessRoleForm
@@ -138,7 +138,6 @@ class CourseAccessRoleAdmin(admin.ModelAdmin):
         super(CourseAccessRoleAdmin, self).save_model(request, obj, form, change)
 
 
-@admin.register(LinkedInAddToProfileConfiguration)
 class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     """Admin interface for the LinkedIn Add to Profile configuration. """
 
@@ -149,7 +148,6 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     exclude = ('dashboard_tracking_code',)
 
 
-@admin.register(CourseEnrollment)
 class CourseEnrollmentAdmin(admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
@@ -185,7 +183,6 @@ class UserAdmin(BaseUserAdmin):
         return django_readonly + ('username',)
 
 
-@admin.register(UserAttribute)
 class UserAttributeAdmin(admin.ModelAdmin):
     """ Admin interface for the UserAttribute model. """
     list_display = ('user', 'name', 'value',)
@@ -201,10 +198,18 @@ admin.site.register(UserTestGroup)
 admin.site.register(CourseEnrollmentAllowed)
 admin.site.register(Registration)
 admin.site.register(PendingNameChange)
+admin.site.register(CourseAccessRole, CourseAccessRoleAdmin)
+admin.site.register(CourseEnrollment, CourseEnrollmentAdmin)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
+admin.site.register(LinkedInAddToProfileConfiguration, LinkedInAddToProfileConfigurationAdmin)
 admin.site.register(LogoutViewConfiguration, ConfigurationModelAdmin)
 admin.site.register(RegistrationCookieConfiguration, ConfigurationModelAdmin)
-
+admin.site.register(UserAttribute, UserAttributeAdmin)
 
 # We must first un-register the User model since it may also be registered by the auth app.
+try:
+    admin.site.unregister(User)
+except NotRegistered:
+    pass
+
 admin.site.register(User, UserAdmin)

@@ -13,6 +13,7 @@ file and check it in at the same time as your model changes. To do that,
 import hashlib
 import json
 import logging
+from slumber.exceptions import HttpClientError
 import uuid
 from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, timedelta
@@ -1611,7 +1612,15 @@ class CourseEnrollment(models.Model):
             attribute = self.attributes.filter(namespace='order', name='order_number').last()
 
         order_number = attribute.value
-        order = ecommerce_api_client(self.user).orders(order_number).get()
+        try:
+            order = ecommerce_api_client(self.user).orders(order_number).get()
+        except HttpClientError:
+            log.warning(
+                u"Encountered HttpClientError while getting order details from ecommerce. "
+                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+
+            return None
+
         refund_window_start_date = max(
             datetime.strptime(order['date_placed'], ECOMMERCE_DATE_FORMAT),
             self.course_overview.start.replace(tzinfo=None)

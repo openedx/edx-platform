@@ -310,7 +310,10 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'streams': self.youtube_streams,
             'sub': self.sub,
             'sources': sources,
-
+            'poster': edxval_api and edxval_api.get_course_video_image_url(
+                course_id=self.runtime.course_id.for_branch(None),
+                edx_video_id=self.edx_video_id.strip()
+            ),
             # This won't work when we move to data that
             # isn't on the filesystem
             'captionDataDir': getattr(self, 'data_dir', None),
@@ -506,6 +509,16 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         if metadata_was_changed_by_user:
             self.edx_video_id = self.edx_video_id.strip()
+
+            # We want to override `youtube_id_1_0` with val youtube profile in the first place when someone adds/edits
+            # an `edx_video_id` or its underlying YT val profile. Without this, override will only happen when a user
+            # saves the video second time. This is because of the syncing of basic and advanced video settings which
+            # also syncs val youtube id from basic tab's `Video Url` to advanced tab's `Youtube ID`.
+            if self.edx_video_id and edxval_api:
+                val_youtube_id = edxval_api.get_url_for_profile(self.edx_video_id, 'youtube')
+                if val_youtube_id and self.youtube_id_1_0 != val_youtube_id:
+                    self.youtube_id_1_0 = val_youtube_id
+
             manage_video_subtitles_save(
                 self,
                 user,
@@ -643,7 +656,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         if self.edx_video_id and edxval_api:
             try:
-                xml.append(edxval_api.export_to_xml(self.edx_video_id))
+                xml.append(edxval_api.export_to_xml(
+                    self.edx_video_id,
+                    unicode(self.runtime.course_id.for_branch(None)))
+                )
             except edxval_api.ValVideoNotFoundError:
                 pass
 
