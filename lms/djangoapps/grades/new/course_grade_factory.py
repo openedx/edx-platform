@@ -107,14 +107,17 @@ class CourseGradeFactory(object):
         #    compute the grade for all students.
         # 2. Optimization: the collected course_structure is not
         #    retrieved from the data store multiple times.
+
         course_data = CourseData(
             user=None, course=course, collected_block_structure=collected_block_structure, course_key=course_key,
         )
-        stats_tags = [u'action:{}'.format(course_data.course_key)]
-        with self._course_transaction(course_data.course_key):
-            for user in users:
-                with dog_stats_api.timer('lms.grades.CourseGradeFactory.iter', tags=stats_tags):
-                    yield self._iter_grade_result(user, course_data, force_update)
+        for user in users:
+            yield self.GradeResult(user, self._create_zero(user, course_data), None)
+        # stats_tags = [u'action:{}'.format(course_data.course_key)]
+        # with self._course_transaction(course_data.course_key):
+        #     for user in users:
+        #         with dog_stats_api.timer('lms.grades.CourseGradeFactory.iter', tags=stats_tags):
+        #             yield self._iter_grade_result(user, course_data, force_update)
 
     def _iter_grade_result(self, user, course_data, force_update):
         try:
