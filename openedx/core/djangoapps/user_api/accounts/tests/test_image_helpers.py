@@ -19,7 +19,7 @@ TEST_PROFILE_IMAGE_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=
 
 
 @attr(shard=2)
-@patch.dict('openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP', TEST_SIZES, clear=True)
+@patch.dict('django.conf.settings.PROFILE_IMAGE_SIZES_MAP', TEST_SIZES, clear=True)
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class ProfileImageUrlTestCase(TestCase):
     """
