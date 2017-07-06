@@ -101,6 +101,14 @@ var wpconfig = {
                 use: 'babel-loader'
             },
             {
+                test: /\.jsx$/,
+                exclude: [
+                    /node_modules/,
+                    namespacedRequireFiles
+                ],
+                use: 'babel-loader'
+            },
+            {
                 test: /\.coffee$/,
                 exclude: /node_modules/,
                 use: 'coffee-loader'
