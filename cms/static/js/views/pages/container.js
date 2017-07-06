@@ -45,10 +45,12 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                     model: this.model
                 });
                 this.nameEditor.render();
-                this.accessEditor = new XBlockAccessEditor({
-                    el: this.$('.wrapper-xblock-field')
-                });
-                this.accessEditor.render();
+                if (this.options.isUnitPage) {
+                    this.accessEditor = new XBlockAccessEditor({
+                        el: this.$('.wrapper-xblock-field')
+                    });
+                    this.accessEditor.render();
+                }
                 if (this.options.action === 'new') {
                     this.nameEditor.$('.xblock-field-value-edit').click();
                 }
@@ -59,7 +61,9 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                 });
                 this.messageView.render();
                 this.isUnitPage = this.options.isUnitPage;
-                if (this.isUnitPage) {
+                var isSplitTest = (this.model.attributes.category === "split_test");
+                var isLibrary = (this.model.attributes.category === "library");
+                if ( (this.isUnitPage || isSplitTest) && !isLibrary) {
                     this.unitAccessView = new ContainerSubviews.UnitAccess({
                         el: this.$('.container-unit-access'),
                         model: this.model
