@@ -1,4 +1,10 @@
-define(["js/views/validation", "underscore", "jquery"], function(ValidatingView, _, $) {
+define(["js/views/validation",
+        'gettext',
+        'edx-ui-toolkit/js/utils/string-utils',
+        "edx-ui-toolkit/js/utils/html-utils",
+        "underscore",
+        "jquery"],
+    function(ValidatingView, gettext, StringUtils, HtmlUtils, _, $) {
 
 var GraderView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGrader
@@ -49,9 +55,14 @@ var GraderView = ValidatingView.extend({
             if (this.setField(event) != this.oldName && !_.isEmpty(this.oldName)) {
                 // overload the error display logic
                 this._cacheValidationErrors.push(event.currentTarget);
-                $(event.currentTarget).parent().append(
-                        this.errorTemplate({message : 'For grading to work, you must change all "' + this.oldName +
-                            '" subsections to "' + this.model.get('type') + '".'}));
+                var message = StringUtils.interpolate(
+                    gettext('For grading to work, you must change all {oldName} subsections to {newName}.'),
+                    {
+                        oldName: this.oldName,
+                        newName: this.model.get('type')
+                    }
+                );
+                HtmlUtils.append($(event.currentTarget).parent(), this.errorTemplate({message : message}));
             }
             break;
         default:

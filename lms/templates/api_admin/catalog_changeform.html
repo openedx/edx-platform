@@ -1,0 +1,49 @@
+{% extends "admin/base_site.html" %}
+{% load admin_modify staticfiles %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media }}
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static 'css/forms.css' %}" />{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %} change-form{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="../../../">Home</a> &rsaquo;
+    <a href="../../">Api_Admin</a> &rsaquo;
+    <a href="../">Catalogs</a> &rsaquo;
+    {% if change %}
+        {{form.name}}
+    {% else %}
+        Add Catalog
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    {% block object-tools %}
+    {% endblock %}
+    <form action="." method="post" enctype="multipart/form-data">{% csrf_token %}
+        <fieldset class="module aligned {{ fieldset.classes }}">
+            {% for field in form.visible_fields %}
+                <div class="form-row">
+                    {{ field.errors }}
+                    {{ field.label_tag }}{{ field }}
+                    {% if field.field.help_text %}<p class="help">{{ field.field.help_text|safe }}</p>{% endif %}
+                </div>
+            {% endfor %}
+            {% for field in form.hidden_fields %}
+            {{ field }}
+            {% endfor %}
+
+        </fieldset>
+        <input type="submit" value="Save" />
+    </form>
+</div>
+{% endblock %}

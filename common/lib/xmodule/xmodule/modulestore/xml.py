@@ -799,8 +799,13 @@ class XMLModuleStore(ModuleStoreReadBase):
         def _block_matches_all(mod_loc, module):
             if category and mod_loc.category != category:
                 return False
-            if name and mod_loc.name != name:
-                return False
+            if name:
+                if isinstance(name, list):
+                    # Support for passing a list as the name qualifier
+                    if mod_loc.name not in name:
+                        return False
+                elif mod_loc.name != name:
+                    return False
             return all(
                 self._block_matches(module, fields or {})
                 for fields in [settings, content, qualifiers]
@@ -835,6 +840,12 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         return self.courses.values()
 
+    def get_course_summaries(self, **kwargs):
+        """
+        Returns `self.get_courses()`. Use to list courses to the global staff user.
+        """
+        return self.get_courses(**kwargs)
+
     def get_errored_courses(self):
         """
         Return a dictionary of course_dir -> [(msg, exception_str)], for each
@@ -864,7 +875,8 @@ class XMLModuleStore(ModuleStoreReadBase):
         Args:
             course_key: just for signature compatibility
         """
-        return ModuleStoreEnum.Type.xml
+        # return ModuleStoreEnum.Type.xml
+        return None
 
     def get_courses_for_wiki(self, wiki_slug, **kwargs):
         """
@@ -882,7 +894,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         Returns the course count
         """
-        return {ModuleStoreEnum.Type.xml: True}
+        return {'xml': True}
 
     @contextmanager
     def branch_setting(self, branch_setting, course_id=None):  # pylint: disable=unused-argument
@@ -916,6 +928,14 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         log.warning("get_all_asset_metadata request of XML modulestore - not implemented.")
         return []
+
+    def fill_in_run(self, course_key):
+        """
+        A no-op.
+
+        Added to simplify tests which use the XML-store directly.
+        """
+        return course_key
 
 
 class LibraryXMLModuleStore(XMLModuleStore):

@@ -264,11 +264,15 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
         *expect*: The value passed to the function cfn
 
         *answer*: Inline script that calculates the answer
+
+        *answer_attr*: The "answer" attribute on the tag itself (treated as an
+        alias to "expect", though "expect" takes priority if both are given)
         """
 
         # Retrieve **kwargs
         cfn = kwargs.get('cfn', None)
         expect = kwargs.get('expect', None)
+        answer_attr = kwargs.get('answer_attr', None)
         answer = kwargs.get('answer', None)
         options = kwargs.get('options', None)
         cfn_extra_args = kwargs.get('cfn_extra_args', None)
@@ -281,6 +285,9 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
 
         if expect:
             response_element.set('expect', str(expect))
+
+        if answer_attr:
+            response_element.set('answer', str(answer_attr))
 
         if answer:
             answer_element = etree.SubElement(response_element, "answer")

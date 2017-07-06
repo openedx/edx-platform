@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 <div class="wrapper-sock wrapper">
   <ul class="list-actions list-cta">
     <li class="action-item">
-      <a href="#sock" class="cta cta-show-sock"><i class="icon fa fa-question-circle"></i>
+      <a href="#sock" class="cta cta-show-sock"><span class="icon fa fa-question-circle" aria-hidden="true"></span>
         <span class="copy-show is-shown">${_("Looking for help with {studio_name}?").format(studio_name=settings.STUDIO_SHORT_NAME)}</span>
         <span class="copy-hide is-hidden">${_("Hide {studio_name} Help").format(studio_name=settings.STUDIO_SHORT_NAME)}</span>
       </a>
@@ -14,17 +14,14 @@ from django.core.urlresolvers import reverse
   </ul>
 
   <div class="wrapper-inner wrapper">
-    <section class="sock" id="sock">
-      <header>
-        <h2 class="title sr">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
-      </header>
+    <section class="sock" id="sock" aria-labelledby="sock-heading">
+        <h2 id="sock-heading" class="title sr">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
 
       <div class="support">
         <%!
         from django.conf import settings
 
-        is_edx_domain = settings.FEATURES.get('IS_EDX_DOMAIN', False)
-        partner_email = settings.FEATURES.get('PARTNER_SUPPORT_EMAIL', '')
+        partner_email = settings.PARTNER_SUPPORT_EMAIL
 
         links = [{
             'href': 'http://docs.edx.org',
@@ -32,15 +29,10 @@ from django.core.urlresolvers import reverse
             'text': _('edX Documentation'),
             'condition': True
         }, {
-            'href': 'https://partners.edx.org',
-            'sr_mouseover_text': _('Access Course Staff Support on the Partner Portal to submit or review support tickets'),
-            'text': _('edX Partner Portal'),
-            'condition': is_edx_domain
-        }, {
             'href': 'https://open.edx.org',
             'sr_mouseover_text': _('Access the Open edX Portal'),
             'text': _('Open edX Portal'),
-            'condition': not is_edx_domain
+            'condition': True
         }, {
             'href': 'https://www.edx.org/course/overview-creating-edx-course-edx-edx101#.VO4eaLPF-n1',
             'sr_mouseover_text': _('Enroll in edX101: Overview of Creating an edX Course'),
@@ -55,7 +47,7 @@ from django.core.urlresolvers import reverse
             'href': 'mailto:{email}'.format(email=partner_email),
             'sr_mouseover_text': _('Send an email to {email}').format(email=partner_email),
             'text': _('Contact Us'),
-            'condition': 'PARTNER_SUPPORT_EMAIL' in settings.FEATURES
+            'condition': bool(partner_email)
         }]
         %>
 

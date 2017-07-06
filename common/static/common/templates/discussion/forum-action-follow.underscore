@@ -5,6 +5,6 @@
             <span class="label-unchecked"><%- gettext("Follow") %></span>
             <span class="label-checked"><%- gettext("Unfollow") %></span>
         </span>
-        <span class="action-icon"><i class="icon fa fa-star"></i></span>
+        <span class="action-icon"><span class="icon fa fa-star" aria-hidden="true"></span></span>
     </a>
 </li>

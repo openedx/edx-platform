@@ -65,12 +65,12 @@ define([
             var teamsView = createTopicTeamsView();
             spyOn(Backbone.history, 'navigate');
             teamsView.$('.browse-teams').click();
-            expect(Backbone.history.navigate.calls[0].args).toContain('browse');
+            expect(Backbone.history.navigate.calls.mostRecent().args[0]).toBe('browse');
         });
 
         it('gives the search field focus when clicking on the search teams link', function () {
             var teamsView = createTopicTeamsView();
-            spyOn($.fn, 'focus').andCallThrough();
+            spyOn($.fn, 'focus').and.callThrough();
             teamsView.$('.search-teams').click();
             expect(teamsView.$('.search-field').first().focus).toHaveBeenCalled();
         });
@@ -79,7 +79,7 @@ define([
             var teamsView = createTopicTeamsView();
             spyOn(Backbone.history, 'navigate');
             teamsView.$('a.create-team').click();
-            expect(Backbone.history.navigate.calls[0].args).toContain(
+            expect(Backbone.history.navigate.calls.mostRecent().args[0]).toBe(
                 'topics/' + TeamSpecHelpers.testTopicID + '/create-team'
             );
         });

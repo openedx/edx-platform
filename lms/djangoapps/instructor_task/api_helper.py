@@ -88,7 +88,7 @@ def _get_xmodule_instance_args(request, task_id):
     """
     request_info = {'username': request.user.username,
                     'ip': request.META['REMOTE_ADDR'],
-                    'agent': request.META.get('HTTP_USER_AGENT', ''),
+                    'agent': request.META.get('HTTP_USER_AGENT', '').decode('latin1'),
                     'host': request.META['SERVER_NAME'],
                     }
 

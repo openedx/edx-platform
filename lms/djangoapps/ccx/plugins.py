@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_noop
 
 from xmodule.tabs import CourseTab
 from student.roles import CourseCcxCoachRole
+from courseware.access import has_access
 
 
 class CcxCourseTab(CourseTab):
@@ -24,16 +25,13 @@ class CcxCourseTab(CourseTab):
         """
         Returns true if CCX has been enabled and the specified user is a coach
         """
-        if not user:
-            return True
         if not settings.FEATURES.get('CUSTOM_COURSES_EDX', False) or not course.enable_ccx:
+            # If ccx is not enable do not show ccx coach tab.
             return False
-        # Start: Added By Labster
-        # Hide the tab in CCX becasue it missleads to master course.
-        # This fix has to be removed after upgrading to Eucalyptus.
-        ccx_id = getattr(course.id, 'ccx', None)
-        if ccx_id is not None:
-            return False
-        # End: Added By Labster
+
+        if has_access(user, 'staff', course) or has_access(user, 'instructor', course):
+            # if user is staff or instructor then he can always see ccx coach tab.
+            return True
+        # check if user has coach access.
         role = CourseCcxCoachRole(course.id)
         return role.has_user(user)

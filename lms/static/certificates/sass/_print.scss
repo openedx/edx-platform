@@ -134,8 +134,8 @@
     }
 
     .hd-3 {
-        font-size: font-size(mid-large);
-        line-height: line-height(mid-large);
+        font-size: font-size(large);
+        line-height: line-height(large);
     }
 
     .hd-4 {
@@ -144,18 +144,18 @@
     }
 
     .hd-5 {
-        font-size: font-size(mid-small);
-        line-height: line-height(mid-small);
-    }
-
-    .hd-6 {
         font-size: font-size(small);
         line-height: line-height(small);
     }
 
-    .hd-7 {
+    .hd-6 {
         font-size: font-size(x-small);
-        line-height: line-height(small);
+        line-height: line-height(x-small);
+    }
+
+    .hd-7 {
+        font-size: font-size(xx-small);
+        line-height: line-height(x-small);
     }
 
     // copy

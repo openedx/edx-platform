@@ -2,7 +2,7 @@
 	<!-- FIXME what style should we use for initially hidden? --> <!-- TODO decide whether this should use codemirror -->
 	<form class="new-update-form">
 		<div class="row">
-			<label for="update-date-<%= updateModel.cid %>" class="inline-label">Date:</label>
+			<label for="update-date-<%= updateModel.cid %>" class="inline-label"><%= gettext('Date') %>:</label>
 			<!-- TODO replace w/ date widget and actual date (problem is that persisted version is "Month day" not an actual date obj -->
 			<input id="update-date-<%= updateModel.cid %>" type="text" class="date" value="<%= updateModel.get('date') %>">
 		</div>
@@ -23,8 +23,8 @@
 	</form>
 	<div class="post-preview">
 		<div class="post-actions">
-            <button class="edit-button" name="<%= updateModel.cid %>"><span class="edit-icon"></span>Edit</button>
-            <button class="delete-button" name="<%= updateModel.cid %>"><span class="delete-icon"></span>Delete</button>
+            <button class="edit-button" name="<%= updateModel.cid %>"><span class="edit-icon"></span><%= gettext('Edit') %></button>
+            <button class="delete-button" name="<%= updateModel.cid %>"><span class="delete-icon"></span><%= gettext('Delete') %></button>
 		</div>
 		<h2>
 			<span class="calendar-icon"></span><span class="date-display"><%=

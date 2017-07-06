@@ -38,7 +38,7 @@ TEST_CC_PROCESSOR = {
         'ORDERPAGE_VERSION': '7',
         'PURCHASE_ENDPOINT': '',
         'microsites': {
-            'test_microsite': {
+            'test_site': {
                 'SHARED_SECRET': 'secret_override',
                 'MERCHANT_ID': 'edx_test_override',
                 'SERIAL_NUMBER': '12345_override',
@@ -50,12 +50,12 @@ TEST_CC_PROCESSOR = {
 }
 
 
-def fakemicrosite(name, default=None):
+def fake_site(name, default=None):  # pylint: disable=unused-argument
     """
-    This is a test mocking function to return a microsite configuration
+    This is a test mocking function to return a site configuration
     """
     if name == 'cybersource_config_key':
-        return 'test_microsite'
+        return 'test_site'
     else:
         return None
 
@@ -70,12 +70,12 @@ class CyberSourceTests(TestCase):
         self.assertEqual(settings.CC_PROCESSOR['CyberSource']['MERCHANT_ID'], 'edx_test')
         self.assertEqual(settings.CC_PROCESSOR['CyberSource']['SHARED_SECRET'], 'secret')
 
-    def test_microsite_no_override_settings(self):
+    def test_site_no_override_settings(self):
         self.assertEqual(get_processor_config()['MERCHANT_ID'], 'edx_test')
         self.assertEqual(get_processor_config()['SHARED_SECRET'], 'secret')
 
-    @patch("microsite_configuration.microsite.get_value", fakemicrosite)
-    def test_microsite_override_settings(self):
+    @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_site)
+    def test_site_override_settings(self):
         self.assertEqual(get_processor_config()['MERCHANT_ID'], 'edx_test_override')
         self.assertEqual(get_processor_config()['SHARED_SECRET'], 'secret_override')
 

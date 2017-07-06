@@ -1,19 +1,24 @@
+<%page args="section_data" expression_filter="h"/>
 <%namespace name='static' file='../../static_content.html'/>
 
-<%! from django.utils.translation import ugettext as _
-import json
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 %>
 
-<%static:require_module module_name="js/certificates/factories/certificate_whitelist_factory" class_name="CertificateWhitelistFactory">
-        CertificateWhitelistFactory('${json.dumps(certificate_white_list)}', "${generate_certificate_exceptions_url}", "${certificate_exception_view_url}", "${generate_bulk_certificate_exceptions_url}");
-</%static:require_module>
+<%static:require_module_async module_name="js/certificates/factories/certificate_whitelist_factory" class_name="CertificateWhitelistFactory">
+    CertificateWhitelistFactory(${certificate_white_list | n, dump_js_escaped_json}, '${generate_certificate_exceptions_url | n, js_escaped_string}', '${certificate_exception_view_url | n, js_escaped_string}', '${generate_bulk_certificate_exceptions_url | n, js_escaped_string}', ${bool(section_data['active_certificate']) | n, dump_js_escaped_json});
+</%static:require_module_async>
 
-<%page args="section_data"/>
+<%static:require_module_async module_name="js/certificates/factories/certificate_invalidation_factory" class_name="CertificateInvalidationFactory">
+    CertificateInvalidationFactory('${certificate_invalidations | n, dump_js_escaped_json}', '${certificate_invalidation_view_url | n, js_escaped_string}');
+</%static:require_module_async>
+
 <div class="certificates-wrapper">
 
     <div class="example-certificates">
         % if not section_data['html_cert_enabled']:
-        <h2>${_('Example Certificates')}</h2>
+        <h3 class="hd hd-3">${_('Example Certificates')}</h3>
 
         <div class="generate-example-certificates-wrapper">
             <p>${_('Generate example certificates for the course.')}</p>
@@ -45,40 +50,42 @@ import json
         % endif
     </div>
 
-    <hr />
+    % if not section_data['is_self_paced']:
+        <hr />
 
-    <div class="enable-certificates">
-        <h2>${_("Student-Generated Certificates")}</h2>
-        % if section_data['enabled_for_course']:
-            <form id="enable-certificates-form" method="post" action="${section_data['urls']['enable_certificate_generation']}">
-                <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
-                <input type="hidden" id="certificates-enabled" name="certificates-enabled" value="false" />
-                <input type="submit" class="btn-blue" id="disable-certificates-submit" value="${_('Disable Student-Generated Certificates')}"/>
-            </form>
-        % elif section_data['can_enable_for_course']:
-            <form id="enable-certificates-form" method="post" action="${section_data['urls']['enable_certificate_generation']}">
-                <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
-                <input type="hidden" id="certificates-enabled" name="certificates-enabled" value="true" />
-                <input type="submit" class="btn-blue" id="enable-certificates-submit" value="${_('Enable Student-Generated Certificates')}"/>
-            </form>
-        % else:
-            <p>${_("You must successfully generate example certificates before you enable student-generated certificates.")}</p>
-            <button class="is-disabled" disabled>${_('Enable Student-Generated Certificates')}</button>
-        % endif
-    </div>
+        <div class="enable-certificates">
+            <h3 class="hd hd-3">${_("Student-Generated Certificates")}</h3>
+            % if section_data['enabled_for_course']:
+                <form id="enable-certificates-form" method="post" action="${section_data['urls']['enable_certificate_generation']}">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+                    <input type="hidden" id="certificates-enabled" name="certificates-enabled" value="false" />
+                    <input type="submit" class="btn-blue" id="disable-certificates-submit" value="${_('Disable Student-Generated Certificates')}"/>
+                </form>
+            % elif section_data['can_enable_for_course']:
+                <form id="enable-certificates-form" method="post" action="${section_data['urls']['enable_certificate_generation']}">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+                    <input type="hidden" id="certificates-enabled" name="certificates-enabled" value="true" />
+                    <input type="submit" class="btn-blue" id="enable-certificates-submit" value="${_('Enable Student-Generated Certificates')}"/>
+                </form>
+            % else:
+                <p>${_("You must successfully generate example certificates before you enable student-generated certificates.")}</p>
+                <button class="is-disabled" disabled>${_('Enable Student-Generated Certificates')}</button>
+            % endif
+        </div>
+    % endif
 
     % if section_data['instructor_generation_enabled'] and not (section_data['enabled_for_course'] and section_data['html_cert_enabled']):
         <hr class="section-divider" />
 
         <div class="start-certificate-generation">
-            <h2>${_("Generate Certificates")}</h2>
+            <h3 class="hd hd-3">${_("Generate Certificates")}</h3>
             <form id="certificates-generating-form" method="post" action="${section_data['urls']['start_certificate_generation']}">
                 % if section_data['html_cert_enabled'] and section_data['active_certificate'] is None:
                     <p>${_("Course certificate generation requires an activated web certificate configuration.")}</p>
                     <input type="button" id="disabled-btn-start-generating-certificates" class="is-disabled" aria-disabled="true" value="${_('Generate Certificates')}"/>
                 % else:
                     <p class="under-heading">
-                        ${_("When you are ready to generate certificates for your course, click Generate Certificates. You do not need to do this<br/>if you have set the certificate mode to on-demand generation.")}
+                        ${_("When you are ready to generate certificates for your course, click Generate Certificates. You do not need to do this if you have set the certificate mode to on-demand generation.")}
                     </p>
                     <input type="button" class="btn-blue" id="btn-start-generating-certificates" value="${_('Generate Certificates')}" data-endpoint="${section_data['urls']['start_certificate_generation']}"/>
                 %endif
@@ -89,7 +96,7 @@ import json
         %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
             <div class="running-tasks-container action-type-container">
                 <hr>
-                <h2> ${_("Pending Tasks")} </h2>
+                <h3 class="hd hd-3"> ${_("Pending Tasks")} </h3>
                 <div class="running-tasks-section">
                     <p>${_("The status for any active tasks appears in a table below.")} </p>
                     <br />
@@ -101,11 +108,11 @@ import json
     % endif
 
     <hr>
-    <p class="start-certificate-regeneration">
-        <h2>${_("Regenerate Certificates")}</h2>
+    <div class="start-certificate-regeneration">
+        <h3 class="hd hd-3">${_("Regenerate Certificates")}</h3>
         <form id="certificate-regenerating-form" method="post" action="${section_data['urls']['start_certificate_regeneration']}">
             <p class="under-heading">
-                ${_('To regenerate certificates for your course, chose the learners who will receive regenerated certificates and click <br/> Regenerate Certificates.')}
+                ${_('To regenerate certificates for your course, choose the learners who will receive regenerated certificates and click Regenerate Certificates.')}
             </p>
 
                 <label style="display: inline" for="certificate_status_${section_data['status'].downloadable}">
@@ -131,7 +138,7 @@ import json
 
     <hr>
     <div class="certificate-generation-history">
-        <h2 class="title">${_("Certificate Generation History")}</h2>
+        <h3 class="hd hd-3 title">${_("Certificate Generation History")}</h3>
         <div class="certificate-generation-history-content">
             <table>
                 <thead>
@@ -156,7 +163,7 @@ import json
 
     <div class="certificate-exception-container">
         <hr class="section-divider">
-        <h2> ${_("SET CERTIFICATE EXCEPTIONS")} </h2>
+        <h3 class="hd hd-3"> ${_("SET CERTIFICATE EXCEPTIONS")} </h3>
          <p class="under-heading info">
              ${_("Set exceptions to generate certificates for learners who did not qualify for a certificate but have " \
               "been given an exception by the course team. After you add learners to the exception list, click Generate " \
@@ -165,10 +172,25 @@ import json
         <div class="certificate-exception-section">
             <div id="certificate-white-list-editor"></div>
             <div class="bulk-white-list-exception"></div>
-            <div class="white-listed-students" id="white-listed-students"></div>
+            <div class="white-listed-students" id="white-listed-students">
+                <div class="ui-loading">
+                    <span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_('Loading')}</span>
+                </div>
+            </div>
             <br/>
         </div>
         <div class="no-pending-tasks-message"></div>
+    </div>
+
+    <hr class="section-divider" />
+
+    <div class="certificate-invalidation-container">
+        <h3 class="hd hd-3"> ${_("Invalidate Certificates")} </h3>
+        <div id="certificate-invalidation">
+            <div class="ui-loading">
+                <span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_('Loading')}</span>
+            </div>
+        </div>
     </div>
 
 </div>

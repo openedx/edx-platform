@@ -200,14 +200,14 @@ def auth_pipeline_urls(auth_entry, redirect_url=None):
 
 # Query string parameters that can be passed to the "finish_auth" view to manage
 # things like auto-enrollment.
-POST_AUTH_PARAMS = ('course_id', 'enrollment_action', 'course_mode', 'email_opt_in')
+POST_AUTH_PARAMS = ('course_id', 'enrollment_action', 'course_mode', 'email_opt_in', 'purchase_workflow')
 
 
 def get_next_url_for_login_page(request):
     """
     Determine the URL to redirect to following login/registration/third_party_auth
 
-    The user is currently on a login or reigration page.
+    The user is currently on a login or registration page.
     If 'course_id' is set, or other POST_AUTH_PARAMS, we will need to send the user to the
     /account/finish_auth/ view following login, which will take care of auto-enrollment in
     the specified course.

@@ -7,13 +7,10 @@ import logging
 
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements, InvalidCreditCourse
 from openedx.core.djangoapps.credit.email_utils import send_credit_notifications
+from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements, InvalidCreditCourse
 from openedx.core.djangoapps.credit.models import (
-    CreditCourse,
-    CreditRequirement,
-    CreditRequirementStatus,
-    CreditEligibility,
+    CreditCourse, CreditRequirement, CreditRequirementStatus, CreditEligibility, CreditRequest
 )
 
 # TODO: Cleanup this mess! ECOM-2908
@@ -228,13 +225,21 @@ def set_credit_requirement_status(username, course_key, req_namespace, req_name,
             )
 
     """
-    # Check if we're already eligible for credit.
-    # If so, short-circuit this process.
-    if CreditEligibility.is_user_eligible_for_credit(course_key, username):
+    # Do not allow students who have requested credit to change their eligibility
+    if CreditRequest.get_user_request_status(username, course_key):
         log.info(
-            u'Skipping update of credit requirement with namespace "%s" '
-            u'and name "%s" because the user "%s" is already eligible for credit '
-            u'in the course "%s".',
+            u'Refusing to set status of requirement with namespace "%s" and name "%s" because the '
+            u'user "%s" has already requested credit for the course "%s".',
+            req_namespace, req_name, username, course_key
+        )
+        return
+
+    # Do not allow a student who has earned eligibility to un-earn eligibility
+    eligible_before_update = CreditEligibility.is_user_eligible_for_credit(course_key, username)
+    if eligible_before_update and status == 'failed':
+        log.info(
+            u'Refusing to set status of requirement with namespace "%s" and name "%s" to "failed" because the '
+            u'user "%s" is already eligible for credit in the course "%s".',
             req_namespace, req_name, username, course_key
         )
         return
@@ -273,9 +278,9 @@ def set_credit_requirement_status(username, course_key, req_namespace, req_name,
         username, req_to_update, status=status, reason=reason
     )
 
-    # If we're marking this requirement as "satisfied", there's a chance
-    # that the user has met all eligibility requirements.
-    if status == "satisfied":
+    # If we're marking this requirement as "satisfied", there's a chance that the user has met all eligibility
+    # requirements, and should be notified. However, if the user was already eligible, do not send another notification.
+    if status == "satisfied" and not eligible_before_update:
         is_eligible, eligibility_record_created = CreditEligibility.update_eligibility(reqs, username, course_key)
         if eligibility_record_created and is_eligible:
             try:

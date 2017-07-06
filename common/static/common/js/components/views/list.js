@@ -24,18 +24,26 @@
                 this.itemViews = [];
             },
 
+            renderCollection: function() {
+                /**
+                 * Render every item in the collection.
+                 * This should push each rendered item to this.itemViews
+                 * to ensure garbage collection works.
+                 */
+                this.collection.each(function (model) {
+                    var itemView = new this.itemViewClass({model: model});
+                    this.$el.append(itemView.render().el);
+                    this.itemViews.push(itemView);
+                }, this);
+            },
+
             render: function () {
                 // Remove old children views
                 _.each(this.itemViews, function (childView) {
                     childView.remove();
                 });
                 this.itemViews = [];
-                // Render the collection
-                this.collection.each(function (model) {
-                    var itemView = new this.itemViewClass({model: model});
-                    this.$el.append(itemView.render().el);
-                    this.itemViews.push(itemView);
-                }, this);
+                this.renderCollection();
                 return this;
             }
         });

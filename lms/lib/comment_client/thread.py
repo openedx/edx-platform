@@ -1,7 +1,7 @@
 import logging
 
 from eventtracking import tracker
-from .utils import merge_dict, strip_blank, strip_none, extract, perform_request
+from .utils import merge_dict, strip_blank, strip_none, extract, perform_request, CommentClientPaginatedResult
 from .utils import CommentClientRequestError
 import models
 import settings
@@ -20,7 +20,7 @@ class Thread(models.Model):
         'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned',
         'abuse_flaggers', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
         'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
-        'context',
+        'context', 'last_activity_at',
     ]
 
     # updateable_fields are sent in PUT requests
@@ -94,7 +94,14 @@ class Thread(models.Model):
                     total_results=total_results
                 )
             )
-        return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1), response.get('corrected_text')
+
+        return CommentClientPaginatedResult(
+            collection=response.get('collection', []),
+            page=response.get('page', 1),
+            num_pages=response.get('num_pages', 1),
+            thread_count=response.get('thread_count', 0),
+            corrected_text=response.get('corrected_text', None)
+        )
 
     @classmethod
     def url_for_threads(cls, params={}):

@@ -1,5 +1,12 @@
-define(["js/views/validation", "underscore", "jquery", "jquery.ui", "js/views/settings/grader"],
-    function(ValidatingView, _, $, ui, GraderView) {
+define(["js/views/validation",
+        "underscore",
+        "jquery",
+        "jquery.ui",
+        "js/views/settings/grader",
+        'edx-ui-toolkit/js/utils/string-utils',
+        'edx-ui-toolkit/js/utils/html-utils',
+    ],
+    function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
 
 var GradingView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGradingPolicy
@@ -21,13 +28,12 @@ var GradingView = ValidatingView.extend({
     initialize : function() {
         //  load template for grading view
         var self = this;
-        this.template = _.template($("#course_grade_policy-tpl").text());
-        this.gradeCutoffTemplate = _.template('<li class="grade-specific-bar" style="width:<%= width %>%"><span class="letter-grade" contenteditable="true">' +
-                '<%= descriptor %>' +
-                '</span><span class="range"></span>' +
-                '<% if (removable) {%><a href="#" class="remove-button">remove</a><% ;} %>' +
-        '</li>');
-
+        this.template = HtmlUtils.template(
+            $("#course_grade_policy-tpl").text()
+        );
+        this.gradeCutoffTemplate = HtmlUtils.template(
+            $("#course_grade_cutoff-tpl").text()
+        );
         this.setupCutoffs();
 
         this.listenTo(this.model, 'invalid', this.handleValidationError);
@@ -68,7 +74,7 @@ var GradingView = ValidatingView.extend({
                },
                this);
         gradeCollection.each(function(gradeModel) {
-            $(gradelist).append(self.template({model : gradeModel }));
+            HtmlUtils.append(gradelist, self.template({model : gradeModel }));
             var newEle = gradelist.children().last();
             var newView = new GraderView({el: newEle,
                 model : gradeModel, collection : gradeCollection });
@@ -147,7 +153,7 @@ var GradingView = ValidatingView.extend({
     gradeBarWidth : null, // cache of value since it won't change (more certain)
 
     renderCutoffBar: function() {
-        var gradeBar =this.$el.find('.grade-bar');
+        var gradeBar = this.$el.find('.grade-bar');
         this.gradeBarWidth = gradeBar.width();
         var gradelist = gradeBar.children('.grades');
         // HACK fixing a duplicate call issue by undoing previous call effect. Need to figure out why called 2x
@@ -156,15 +162,15 @@ var GradingView = ValidatingView.extend({
         // Can probably be simplified to one variable now.
         var removable = false;
         var draggable = false; // first and last are not removable, first is not draggable
-        _.each(this.descendingCutoffs,
-                function(cutoff, index) {
-            var newBar = this.gradeCutoffTemplate({
-                descriptor : cutoff['designation'] ,
+        _.each(this.descendingCutoffs, function(cutoff) {
+            HtmlUtils.append(gradelist,  this.gradeCutoffTemplate({
+                descriptor : cutoff.designation,
                 width : nextWidth,
-                removable : removable });
-            gradelist.append(newBar);
+                contenteditable: true,
+                removable : removable})
+            );
             if (draggable) {
-                newBar = gradelist.children().last(); // get the dom object not the unparsed string
+                var newBar = gradelist.children().last(); // get the dom object not the unparsed string
                 newBar.resizable({
                     handles: "e",
                     containment : "parent",
@@ -174,19 +180,18 @@ var GradingView = ValidatingView.extend({
                 });
             }
             // prepare for next
-            nextWidth = cutoff['cutoff'];
+            nextWidth = cutoff.cutoff;
             removable = true; // first is not removable, all others are
             draggable = true;
         },
         this);
-        // add fail which is not in data
-        var failBar = $(this.gradeCutoffTemplate({
+        // Add fail which is not in data
+        HtmlUtils.append(gradelist, this.gradeCutoffTemplate({
             descriptor : this.failLabel(),
             width : nextWidth,
+            contenteditable: false,
             removable : false
         }));
-        failBar.find("span[contenteditable=true]").attr("contenteditable", false);
-        gradelist.append(failBar);
         gradelist.children().last().resizable({
             handles: "e",
             containment : "parent",
@@ -298,10 +303,13 @@ var GradingView = ValidatingView.extend({
         this.descendingCutoffs.push({designation: this.GRADES[gradeLength], cutoff: failBarWidth});
         this.descendingCutoffs[gradeLength - 1]['cutoff'] = Math.round(targetWidth);
 
-        var $newGradeBar = this.gradeCutoffTemplate({ descriptor : this.GRADES[gradeLength],
-            width : targetWidth, removable : true });
+        var newGradeHtml = this.gradeCutoffTemplate({
+            descriptor : this.GRADES[gradeLength],
+            width : targetWidth,
+            contenteditable: true,
+            removable : true });
         var gradeDom = this.$el.find('.grades');
-        gradeDom.children().last().before($newGradeBar);
+        gradeDom.children().last().before(HtmlUtils.ensureHtml(newGradeHtml).toString());
         var newEle = gradeDom.children()[gradeLength];
         $(newEle).resizable({
             handles: "e",
@@ -313,8 +321,8 @@ var GradingView = ValidatingView.extend({
 
         // Munge existing grade labels?
         // If going from Pass/Fail to 3 levels, change to Pass to A
-        if (gradeLength === 1 && this.descendingCutoffs[0]['designation'] === 'Pass') {
-            this.descendingCutoffs[0]['designation'] = this.GRADES[0];
+        if (gradeLength === 1 && this.descendingCutoffs[0].designation === 'Pass') {
+            this.descendingCutoffs[0].designation = this.GRADES[0];
             this.setTopGradeLabel();
         }
         this.setFailLabel();
@@ -349,10 +357,10 @@ var GradingView = ValidatingView.extend({
         else return 'F';
     },
     setFailLabel: function() {
-        this.$el.find('.grades .letter-grade').last().html(this.failLabel());
+        this.$el.find('.grades .letter-grade').last().text(this.failLabel());
     },
     setTopGradeLabel: function() {
-        this.$el.find('.grades .letter-grade').first().html(this.descendingCutoffs[0]['designation']);
+        this.$el.find('.grades .letter-grade').first().text(this.descendingCutoffs[0].designation);
     },
     setupCutoffs: function() {
         // Instrument grading scale

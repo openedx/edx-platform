@@ -21,7 +21,7 @@ import unicodecsv
 import uuid
 
 
-@attr('shard_6')
+@attr('shard_8')
 class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin):
     """
     Tests for cohort management on the LMS Instructor Dashboard
@@ -88,12 +88,12 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         """
         self.verify_cohort_description(
             self.manual_cohort_name,
-            'Students are added to this cohort only when you provide '
+            'Learners are added to this cohort only when you provide '
             'their email addresses or usernames on this page',
         )
         self.verify_cohort_description(
             self.auto_cohort_name,
-            'Students are added to this cohort automatically',
+            'Learners are added to this cohort automatically',
         )
 
     def test_no_content_groups(self):
@@ -547,6 +547,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         self._create_csv_file(filename, csv_contents)
         self._verify_csv_upload_acceptable_file(filename)
 
+    # TODO: Change unicode_hello_in_korean = u'ßßßßßß' to u'안녕하세요', after up gradation of Chrome driver. See TNL-3944
     def test_cohort_by_csv_unicode(self):
         """
         Scenario: the instructor can upload a file with user and cohort assignments, using both emails and usernames.
@@ -560,7 +561,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         TODO: refactor events verification to handle this scenario. Events verification assumes movements
         between other cohorts (manual and auto).
         """
-        unicode_hello_in_korean = u'안녕하세요'
+        unicode_hello_in_korean = u'ßßßßßß'
         self._verify_cohort_settings(cohort_name=unicode_hello_in_korean, assignment_type=None)
         csv_contents = [
             ['username', 'email', 'cohort'],

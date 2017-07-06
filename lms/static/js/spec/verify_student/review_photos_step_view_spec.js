@@ -2,7 +2,7 @@ define([
         'jquery',
         'underscore',
         'backbone',
-        'common/js/spec_helpers/ajax_helpers',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'common/js/spec_helpers/template_helpers',
         'js/verify_student/views/review_photos_step_view',
         'js/verify_student/models/verification_model'
@@ -42,7 +42,7 @@ define([
 
                 // Simulate the server response
                 if ( succeeds ) {
-                    AjaxHelpers.respondWithJson( requests );
+                    AjaxHelpers.respondWithJson( requests, {url: '/arbitrary-url/'} );
                 } else {
                     AjaxHelpers.respondWithTextError( requests, 400, SERVER_ERROR_MSG );
                 }

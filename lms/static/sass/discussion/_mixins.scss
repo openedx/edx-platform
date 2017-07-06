@@ -57,14 +57,14 @@
 }
 
 @mixin discussion-wmd-input {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   margin-top: 0;
-  border: 1px solid #aaa;
+  border: 1px solid $forum-color-border;
   border-radius: 3px 3px 0 0;
   padding: ($baseline/2);
   width: 100%;
   height: 125px;
-  background: $white;
+  background: $forum-color-background;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
   font-size: 13px;
   font-family: $sans-serif;
@@ -72,7 +72,7 @@
 }
 
 @mixin discussion-wmd-preview-container {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   @include border-radius(0, 0, 3px, 3px);
   border: 1px solid $gray-l1;
   border-top: none;
@@ -92,7 +92,6 @@
   padding-top: 3px;
   width: 100%;
   color: $gray-l2;
-  text-transform: uppercase;
   font-size: 11px;
 }
 
@@ -114,7 +113,7 @@
 
 // extends - content - text overflow by ellipsis
 %cont-truncated {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -128,7 +127,6 @@
   border: 1px solid;
   border-radius: 3px;
   padding: 1px 6px;
-  text-transform: uppercase;
   white-space: nowrap;
 
   border-color: $color;
@@ -156,6 +154,5 @@
   padding: 0 ($baseline/5);
   background: $color;
   font-style: normal;
-  text-transform: uppercase;
   color: white;
 }

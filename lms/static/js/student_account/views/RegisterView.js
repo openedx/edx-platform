@@ -37,7 +37,7 @@
             render: function( html ) {
                 var fields = html || '';
 
-                $(this.el).html( _.template( this.tpl, {
+                $(this.el).html(_.template(this.tpl)({
                     /* We pass the context object to the template so that
                      * we can perform variable interpolation using sprintf
                      */
@@ -78,7 +78,8 @@
                 $(this.el).show(); // Show in case the form was hidden for auto-submission
                 this.errors = _.flatten(
                     _.map(
-                        JSON.parse(error.responseText),
+                        // Something is passing this 'undefined'. Protect against this.
+                        JSON.parse(error.responseText || "[]"),
                         function(error_list) {
                             return _.map(
                                 error_list,

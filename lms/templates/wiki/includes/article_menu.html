@@ -1,33 +1,35 @@
 ## mako
+<%page expression_filter="h"/>
 <%!
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
+  from openedx.core.djangolib.markup import HTML, Text
   from wiki.core.permissions import can_change_permissions
 %>
 
 <li class="${"active" if selected_tab == "view" else ""}">
   <a href="${reverse('wiki:get', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
-    <i class="icon fa fa-eye"></i>
+    <span class="icon fa fa-eye" aria-hidden="true"></span>
     ${_("View")}
-    ${_("{span_start}(active){span_end}").format(span_start="<span class='sr'>", span_end="</span>") if selected_tab == "view" else ""}
+    ${Text(_("{span_start}(active){span_end}")).format(span_start=HTML("<span class='sr'>"), span_end=HTML("</span>")) if selected_tab == "view" else ""}
   </a>
 </li>
 
 %if article.can_write(user):
   <li class="${"active" if selected_tab == "edit" else ""}">
     <a href="${reverse('wiki:edit', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
-      <i class="icon fa fa-pencil"></i>
+      <span class="icon fa fa-pencil" aria-hidden="true"></span>
       ${_("Edit")}
-      ${_("{span_start}(active){span_end}").format(span_start="<span class='sr'>", span_end="</span>") if selected_tab == "edit" else ""}
+      ${Text(_("{span_start}(active){span_end}")).format(span_start=HTML("<span class='sr'>"), span_end=HTML("</span>")) if selected_tab == "edit" else ""}
     </a>
   </li>
 %endif
 
 <li class="${"active" if selected_tab == "history" else ""}">
   <a href="${reverse('wiki:history', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
-    <i class="icon fa fa-clock-o"></i>
+    <span class="icon fa fa-clock-o" aria-hidden="true"></span>
     ${_("Changes")}
-    ${_("{span_start}(active){span_end}").format(span_start="<span class='sr'>", span_end="</span>") if selected_tab == "history" else ""}
+    ${Text(_("{span_start}(active){span_end}")).format(span_start=HTML("<span class='sr'>"), span_end=HTML("</span>")) if selected_tab == "history" else ""}
   </a>
 </li>
 
@@ -35,9 +37,9 @@
   %if hasattr(plugin, "article_tab"):
     <li class="${"active" if selected_tab == plugin.slug else ""}">
       <a href="${reverse('wiki:plugin', kwargs={'slug' : plugin.slug, 'article_id' : article.id, 'path' : urlpath.path}) }">
-        <i class="icon fa fa-file ${plugin.article_tab[1]}"></i>
+        <span class="icon fa fa-file ${plugin.article_tab[1]}" aria-hidden="true"></span>
         ${plugin.article_tab[0]}
-        ${_("{span_start}(active){span_end}").format(span_start="<span class='sr'>", span_end="</span>") if selected_tab == plugin.slug else ""}
+        ${Text(_("{span_start}(active){span_end}")).format(span_start=HTML("<span class='sr'>"), span_end=HTML("</span>")) if selected_tab == plugin.slug else ""}
       </a>
     </li>
   %endif
@@ -51,9 +53,9 @@ ${_("This should be enabled for all non-anonymous users once the notifications a
 %if can_change_permissions(article,user):
 <li class="${"active" if selected_tab == "settings" else ""}">
   <a href="${reverse('wiki:settings', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
-    <i class="icon fa fa-cog"></i>
+    <span class="icon fa fa-cog" aria-hidden="true"></span>
     ${_("Settings")}
-    ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == "settings" else ""}
+    ${Text(_("{span_start}active{span_end}")).format(span_start=HTML("<span class='sr'>"), span_end=HTML("</span>")) if selected_tab == "settings" else ""}
   </a>
 </li>
 %endif

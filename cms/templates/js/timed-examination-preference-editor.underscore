@@ -1,65 +1,65 @@
 <form>
-    <h3 class="modal-section-title"><%- gettext('Additional Options:') %></h3>
-
+    <h3 class="modal-section-title"><%= gettext('Set as a Special Exam') %></h3>
     <div class="modal-section-content has-actions">
-
-        <div class='exam-time-list-fields'>
-            <ul class="list-fields list-input">
+        <ul class="list-fields list-input exam-types" role="group" aria-label="<%- gettext('Exam Types') %>">
+            <li class="field-radio">
+                <label class="label">
+                    <input type="radio" name="exam_type" class="input input-radio no_special_exam" checked="checked"/>
+                    <%- gettext('None') %>
+                </label>
+            </li>
+            <li class="field-radio">
+                <label class="label">
+                    <input type="radio" name="exam_type" class="input input-radio timed_exam"
+                        aria-describedby="timed-exam-description" />
+                    <%- gettext('Timed') %>
+                </label>
+                <p class='field-message' id='timed-exam-description'> <%- gettext('Use a timed exam to limit the time learners can spend on problems in this subsection. Learners must submit answers before the time expires. You can allow additional time for individual learners through the Instructor Dashboard.') %> </p>
+            </li>
+            <% if (enable_proctored_exam) { %>
                 <li class="field-radio">
-                    <input type="radio" id="id_not_timed" name="proctored" class="input input-radio" checked="checked"/>
-                    <label for="id_not_timed" class="label">
-                      <%- gettext('None') %>
+                    <label class="label">
+                        <input type="radio" name="exam_type" class="input input-radio proctored_exam"
+                            aria-describedby="proctored-exam-description" />
+                        <%- gettext('Proctored') %>
                     </label>
+                    <p class='field-message' id='proctored-exam-description'> <%- gettext('Proctored exams are timed and they record video of each learner taking the exam. The videos are then reviewed to ensure that learners follow all examination rules.') %> </p>
                 </li>
-            </ul>
-        </div>
-
-        <div class='exam-time-list-fields'>
-            <ul class="list-fields list-input">
                 <li class="field-radio">
-                    <input type="radio" id="id_timed_exam" name="proctored" class="input input-radio" />
-                    <label for="id_timed_exam" class="label" aria-describedby="timed-exam-description">
-                      <%- gettext('Timed') %>
+                    <label class="label">
+                        <input type="radio" name="exam_type" class="input input-radio practice_exam"
+                            aria-describedby="practice-exam-description"/>
+                        <%- gettext('Practice Proctored') %>
                     </label>
+                    <p class='field-message' id='practice-exam-description'> <%- gettext("Use a practice proctored exam to introduce learners to the proctoring tools and processes. Results of a practice exam do not affect a learner's grade.") %> </p>
                 </li>
-                <p class='field-message' id='timed-exam-description'> <%- gettext('Use a timed exam to limit the time learners can spend on problems in this subsection. Learners must submit answers before the time expires. You can allow additional time on per learner basis through the Instructor Dashboard.') %> </p>
-
-            </ul>
-        </div>
-        <% if (enable_proctored_exam) { %>
-            <div class='exam-time-list-fields'>
-                <ul class="list-fields list-input">
-                    <li class="field-radio">
-                        <input type="radio" id="id_proctored_exam" name="proctored" class="input input-radio" />
-                        <label for="id_proctored_exam" class="label" aria-describedby="proctored-exam-description">
-                            <%- gettext('Proctored') %>
-                        </label>
-                    </li>
-                    <p class='field-message' id='proctored-exam-description'> <%- gettext('Proctored exams are timed, and software records video of each learner taking the exam. These videos are then reviewed by a third party.') %> </p>
-                </ul>
-            </div>
-            <div class='exam-time-list-fields'>
-                <ul class="list-fields list-input">
-                    <li class="field-radio">
-                        <input type="radio" id="id_practice_exam" name="proctored" class="input input-radio" />
-                        <label for="id_practice_exam" class="label" aria-describedby="practice-exam-description">
-                          <%- gettext('Practice Proctored') %>
-                        </label>
-                    </li>
-                    <p class='field-message' id='practice-exam-description'> <%- gettext("Use a practice proctored exam to introduce learners to the proctoring tools and processes. Results of the practice exam do not count towards the learner's grade.") %> </p>
-                </ul>
-            </div>
-        <% } %>
-        <div class='exam-time-list-fields is-hidden' id='id_time_limit_div'>
-            <ul class="list-fields list-input time-limit">
-                <li class="field field-text field-time-limit">
-                    <label for="id_time_limit" class="label"><%- gettext('Time Allotted (HH:MM):') %> </label>
-                    <input type="text" id="id_time_limit" name="time_limit"
-                      value="" aria-describedby="time-limit-description"
-                      placeholder="HH:MM" class="time_limit release-time time input input-text" autocomplete="off" />
-                </li>
-                <p class='field-message' id='time-limit-description'><%- gettext('Learners see warnings when 20% and 5% of the allotted time remains. You can grant learners extra time to complete the exam through the Instructor Dashboard.') %></p>
-            </ul>
-        </div>
+            <% } %>
+        </ul>
+        <ul class="list-fields list-input exam-options">
+            <li class="field field-text field-time-limit">
+                <label class="label">
+                    <%- gettext('Time Allotted (HH:MM):') %>
+                    <input type="text" value="" aria-describedby="time-limit-description" placeholder="HH:MM"
+                        class="time_limit release-time time input input-text" autocomplete="off" />
+                </label>
+                <p class='field-message' id='time-limit-description'><%- gettext('Select a time allotment for the exam. If it is over 24 hours, type in the amount of time. You can grant individual learners extra time to complete the exam through the Instructor Dashboard.') %></p>
+            </li>
+            <li class="field field-text field-exam-review-rules">
+                <label class="label">
+                    <%- gettext('Review Rules') %> 
+                    <textarea cols="50" maxlength="255" aria-describedby="review-rules-description"
+                        class="review-rules input input-text" autocomplete="off" />
+                </label>
+                <p class='field-message' id='review-rules-description'><%- gettext('Specify any additional rules or rule exceptions that the proctoring review team should enforce when reviewing the videos. For example, you could specify that calculators are allowed.') %></p>
+            </li>
+            <li class="field-checkbox field-hide-after-due">
+                <label class="label">
+                    <input type="checkbox" class="input input-checkbox"
+                        aria-describedby="hide-after-due-description"/>
+                    <%- gettext('Hide Exam After Due Date') %>
+                </label>
+                <p class='field-message' id='hide-after-due-description'><%- gettext('By default, submitted exams are available for review after the due date has passed. Select this option to keep exams hidden after that date.') %></p>
+            </li>
+        </ul>
     </div>
 </form>

@@ -1,11 +1,20 @@
-{% extends "main_django.html" %}
-{% load i18n %}
-{% block title %}
+## mako
+
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+from django.utils.html import escape
+%>
+
+<%inherit file="../main.html"/>
+
+<%block name="title">
 <title>
 Manual Refund
 </title>
-{% endblock %}
-{% block headextra %}
+</%block>
+<%block name="headextra">
 
 <style type="text/css">
 .errorlist,.messages {
@@ -18,56 +27,57 @@ strong {
     padding-right: 10px;
 }
 </style>
-{% endblock %}
+</%block>
 
 
-{% block body %}
+<%block name="body">
 <div class="content-wrapper" id="content">
     <div class="container about">
-        <h1>{% trans "Manual Refund" %}</h1>
-        {% if messages %}
+        <h1>${_("Manual Refund")}</h1>
+        % if messages:
         <ul class="messages">
-            {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
+            % for message in messages:
+                <li class="${message.tags if message.tags else ''}">${message}</li>
+            % endfor
         </ul>
-        {% endif %}
+        % endif
 
         <form method="POST" id="refund_form">
-            {% csrf_token %}
-            {{form.as_p}}
+            <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}" />
+            ${form.as_p()}
             <p>
-            <input type="button" value="Cancel" onclick="javascript:location=location"/> <input type="submit" value="{% if cert %}Refund{% else %}Confirm{% endif %}" />
+            <input type="button" value="Cancel" onclick="javascript:location=location"/> <input type="submit" value="${'Refund' if cert else 'Confirm'}" />
             </p>
         </form>
-        {% if cert %}
+        % if cert:
         <section class="content-wrapper">
             <h2>
-                {% trans "About to refund this order:" %}
+                ${_("About to refund this order:")}
             </h2>
             <p>
-                <strong>{% trans "Order Id:" %}</strong> {{cert.order.id}}
+                <strong>${_("Order Id:")}</strong> ${cert.order.id}
             </p>
             <p>
-                <strong>{% trans "Enrollment:" %}</strong> {{enrollment.course_id|escape}} {{enrollment.mode}} ({% if enrollment.is_active %}{% trans "enrolled" %}{% else %}{% trans "unenrolled" %}{% endif %})
+                <strong>${_("Enrollment:")}</strong> ${escape(enrollment.course_id)} ${enrollment.mode}
+                (${_("enrolled") if enrollment.is_active else _("unenrolled")})
             </p>
             <p>
-                <strong>{% trans "Cost:" %}</strong> {{cert.unit_cost}} {{cert.currency}}
+                <strong>${_("Cost:")}</strong> ${cert.unit_cost} ${cert.currency}
             </p>
             <p>
-                <strong>{% trans "CertificateItem Status:" %}</strong> {{cert.status}}
+                <strong>${_("CertificateItem Status:")}</strong> ${cert.status}
             </p>
             <p>
-                <strong>{% trans "Order Status:" %}</strong> {{cert.order.status}}
+                <strong>${_("Order Status:")}</strong> ${cert.order.status}
             </p>
             <p>
-                <strong>{% trans "Fulfilled Time:" %}</strong> {{cert.fulfilled_time}}
+                <strong>${_("Fulfilled Time:")}</strong> ${cert.fulfilled_time}
             </p>
             <p>
-                <strong>{% trans "Refund Request Time:" %}</strong> {{cert.refund_requested_time}}
+                <strong>${_("Refund Request Time:")}</strong> ${cert.refund_requested_time}
             </p>
         </section>
-        {% endif %}
+        % endif
     </div>
 </div>
-{% endblock %}
+</%block>

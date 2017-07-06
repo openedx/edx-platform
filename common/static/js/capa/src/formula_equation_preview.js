@@ -58,9 +58,17 @@ formulaEquationPreview.enable = function () {
             throttledRequest(inputData, this.value);
         };
 
-        $this.on("input", initializeRequest);
-        // Ask for initial preview.
-        initializeRequest.call(this);
+        if (!$this.data("inputInitialized")) {
+            // Hack alert: since this javascript file is loaded every time a
+            // problem with mathjax preview is loaded, we wrap this step in this
+            // condition to make sure we don't attach multiple event listeners
+            // per math input if multiple such problems are loaded on a page.
+            $this.on("input", initializeRequest);
+            // Ask for initial preview.
+            initializeRequest.call(this);
+            // indicates that the initial preview is done for current $this!
+            $this.data("inputInitialized", true);
+        }
     }
 
     /**
@@ -145,7 +153,7 @@ formulaEquationPreview.enable = function () {
                             console.log("[FormulaEquationInput] Oops no mathjax for ", latex);
                             // Fall back to modifying the actual element.
                             var textNode = previewElement.childNodes[0];
-                            textNode.data = "\\[" + latex + "\\]";
+                            textNode.data = "\\(" + latex + "\\)";
                             MathJax.Hub.Queue(["Typeset", MathJax.Hub, previewElement]);
                         }
                     });

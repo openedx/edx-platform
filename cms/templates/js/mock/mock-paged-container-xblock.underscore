@@ -21,7 +21,7 @@
                     <div class="xblock-header-primary">
                         <div class="header-details">
                             <a href="#" data-tooltip="Expand or Collapse" class="action expand-collapse expand">
-                                <i class="icon fa fa-caret-down ui-toggle-expansion"></i>
+                                <span class="icon fa fa-caret-down ui-toggle-expansion" aria-hidden="true"></span>
                                 <span class="sr">Expand or Collapse</span>
                             </a>
                             <span class="xblock-display-name">Group A</span>
@@ -125,7 +125,7 @@
                     <div class="xblock-header-primary">
                         <div class="header-details">
                             <a href="#" data-tooltip="Expand or Collapse" class="action expand-collapse expand">
-                                <i class="icon fa fa-caret-down ui-toggle-expansion"></i>
+                                <span class="icon fa fa-caret-down ui-toggle-expansion" aria-hidden="true"></span>
                                 <span class="sr">Expand or Collapse</span>
                             </a>
                             <span class="xblock-display-name">Group B</span>

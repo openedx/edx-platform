@@ -24,8 +24,7 @@
     display: table;
     table-layout: fixed;
     width: 100%;
-    border-radius: 3px;
-    border: 1px solid $outer-border-color;
+    border: 1px solid $border-color-2;
     background: $container-bg;
     box-shadow: 0 1px 2px $shadow-l2;
   }
@@ -38,14 +37,16 @@
 body {
   min-height: 100%;
   background-color: $course-bg-color;
-
-  //for background texture:
-  //background-image: $course-bg-image;
 }
 
 body, h1, h2, h3, h4, h5, h6, p, label {
   @include text-align(left);
   font-family: $sans-serif;
+}
+
+// we want to hide the outline on the focusable <main> element
+main {
+    outline: none;
 }
 
 table {

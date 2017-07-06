@@ -946,6 +946,13 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         hint = correct_map.get_hint('1_2_1')
         self.assertEqual(hint, self._get_random_number_result(problem.seed))
 
+    def test_empty_answer_problem_creation_not_allowed(self):
+        """
+        Tests that empty answer string is not allowed to create a problem
+        """
+        with self.assertRaises(LoncapaProblemError):
+            self.build_problem(answer=" ", case_sensitive=False, regexp=True)
+
 
 class CodeResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = CodeResponseXMLFactory
@@ -1798,6 +1805,33 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         correct_map = problem.grade_answers(input_dict)
         self.assertEqual(correct_map.get_npoints('1_2_1'), 0.5)
         self.assertEqual(correct_map.get_correctness('1_2_1'), 'partially-correct')
+
+    def test_script_context(self):
+        # Ensure that python script variables can be used in the "expect" and "answer" fields,
+
+        script = script = textwrap.dedent("""
+            expected_ans = 42
+
+            def check_func(expect, answer_given):
+                return answer_given == expect
+        """)
+
+        problems = (
+            self.build_problem(script=script, cfn="check_func", expect="$expected_ans"),
+            self.build_problem(script=script, cfn="check_func", answer_attr="$expected_ans")
+        )
+
+        input_dict = {'1_2_1': '42'}
+
+        for problem in problems:
+            correctmap = problem.grade_answers(input_dict)
+
+            # CustomResponse also adds 'expect' to the problem context; check that directly first:
+            self.assertEqual(problem.context['expect'], '42')
+
+            # Also make sure the problem was graded correctly:
+            correctness = correctmap.get_correctness('1_2_1')
+            self.assertEqual(correctness, 'correct')
 
     def test_function_code_multiple_input_no_msg(self):
 

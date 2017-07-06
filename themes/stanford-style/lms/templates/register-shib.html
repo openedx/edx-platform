@@ -1,0 +1,187 @@
+<%inherit file="main.html" />
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+
+<%block name="pagetitle">${_("Preferences for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</%block>
+
+<%block name="bodyclass">view-register</%block>
+
+<%block name="js_extra">
+  <script type="text/javascript">
+    $(function() {
+
+      // adding js class for styling with accessibility in mind
+      $('body').addClass('js');
+
+      // new window/tab opening
+      $('a[rel="external"], a[class="new-vp"]')
+      .click( function() {
+      window.open( $(this).attr('href') );
+      return false;
+      });
+
+      // form field label styling on focus
+      $("form :input").focus(function() {
+        $("label[for='" + this.id + "']").parent().addClass("is-focused");
+      }).blur(function() {
+        $("label").parent().removeClass("is-focused");
+      });
+
+    });
+
+    (function() {
+      toggleSubmitButton(true);
+
+      $('#register-form').on('submit', function() {
+        toggleSubmitButton(false);
+      });
+
+      $('#register-form').on('ajax:error', function() {
+        toggleSubmitButton(true);
+      });
+
+      $('#register-form').on('ajax:success', function(event, json, xhr) {
+        var url = json.redirect_url || "${reverse('dashboard') | n, js_escaped_string }";
+        location.href = url;
+      });
+
+      $('#register-form').on('ajax:error', function(event, jqXHR, textStatus) {
+        toggleSubmitButton(true);
+        json = $.parseJSON(jqXHR.responseText);
+        $('.status.message.submission-error').addClass('is-shown').focus();
+        $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
+        $(".field-error").removeClass('field-error');
+        $("[data-field='"+json.field+"']").addClass('field-error')
+      });
+    })(this);
+
+    function toggleSubmitButton(enable) {
+      var $submitButton = $('form .form-actions #submit');
+
+      if(enable) {
+        $submitButton.
+          removeClass('is-disabled').
+          attr('aria-disabled', false).
+          removeProp('disabled').
+          text("${_('Update my {platform_name} Account').format(platform_name=settings.PLATFORM_NAME) | n, js_escaped_string }");
+      }
+      else {
+        $submitButton.
+          addClass('is-disabled').
+          attr('aria-disabled', true).
+          prop('disabled', true).
+          text("${_('Processing your account information') | n, js_escaped_string }");
+      }
+    }
+  </script>
+</%block>
+
+<section class="introduction">
+  <header>
+    <h1 class="sr">${_("Welcome {username}!  Please set your preferences below").format(username=extauth_id,
+                       platform_name=settings.PLATFORM_NAME)}</h1>
+  </header>
+</section>
+
+<%block name="login_button"></%block>
+<section class="register container">
+  <section role="main" class="content">
+    <form role="form" id="register-form" method="post" data-remote="true" action="/create_account" novalidate>
+
+      <!-- status messages -->
+      <div role="alert" class="status message">
+        <h3 class="message-title">${_("We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.")}</h3>
+      </div>
+
+      <div role="alert" class="status message submission-error" tabindex="-1">
+        <h3 class="message-title">${_("The following errors occurred while processing your registration:")} </h3>
+        <ul class="message-copy"> </ul>
+      </div>
+
+      <p class="instructions">
+        ${_('Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.')}
+      </p>
+
+      <fieldset class="group group-form group-form-requiredinformation">
+        <legend class="sr">${_('Required Information')}</legend>
+
+        <div class="message">
+          <p class="message-copy">${_("Enter a public username:")}</p>
+        </div>
+
+        <ol class="list-input">
+
+          <li class="field required text" id="field-username">
+            <label for="username">${_('Public Username')}</label>
+            <input id="username" type="text" name="username" value="${extauth_username}" placeholder="${_('example: JaneDoe')}" required aria-required="true" />
+            <span class="tip tip-input">${_('Will be shown in any discussions or forums you participate in')}</span>
+          </li>
+
+          % if ask_for_email:
+
+          <li class="field required text" id="field-email">
+            <label for="email">${_("E-mail")}</label>
+            <input class="" id="email" type="email" name="email" value="" placeholder="${_('example: username@domain.com')}" />
+          </li>
+
+          % endif
+
+
+          % if ask_for_fullname:
+
+          <li class="field required text" id="field-name">
+            <label for="name">${_('Full Name')}</label>
+            <input id="name" type="text" name="name" value="" placeholder="$_('example: Jane Doe')}" />
+          </li>
+
+          % endif
+
+        </ol>
+
+      </fieldset>
+
+      <fieldset class="group group-form group-form-accountacknowledgements">
+        <legend class="sr">${_("Account Acknowledgements")}</legend>
+
+        <ol class="list-input">
+          <li class="field-group">
+
+            % if ask_for_tos :
+
+            <div class="field required checkbox" id="field-tos">
+              <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
+              <label for="tos-yes">${_('I agree to the {link_start}Terms of Service{link_end}').format(
+                link_start='<a href="{url}" class="new-vp">'.format(url=marketing_link('TOS')),
+                link_end='</a>')}</label>
+            </div>
+
+            % endif
+
+            <div class="field required checkbox" id="field-honorcode">
+              <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
+              <%
+                honor_code_path = marketing_link('TOS') + "#honor"
+              %>
+              <label for="honorcode-yes">${_('I agree to the {link_start}Honor Code{link_end}').format(
+                link_start='<a href="{url}" class="new-vp">'.format(url=honor_code_path),
+                link_end='</a>')}</label>
+            </div>
+          </li>
+        </ol>
+      </fieldset>
+
+% if course_id and enrollment_action:
+      <input type="hidden" name="enrollment_action" value="${enrollment_action | h}" />
+      <input type="hidden" name="course_id" value="${course_id | h}" />
+% endif
+
+      <div class="form-actions">
+        <button name="submit" type="submit" id="submit" class="action action-primary action-update">${_('Submit')} <span class="orn-plus">+</span> ${_('Update My Account')}</button>
+      </div>
+    </form>
+  </section>
+
+</section>

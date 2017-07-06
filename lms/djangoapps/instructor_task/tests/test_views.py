@@ -7,7 +7,7 @@ from celery.states import SUCCESS, FAILURE, REVOKED, PENDING
 
 from mock import Mock, patch
 
-from django.utils.datastructures import MultiValueDict
+from django.http import QueryDict
 
 from instructor_task.models import PROGRESS
 from instructor_task.tests.test_base import (InstructorTaskTestCase,
@@ -24,14 +24,14 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
     def _get_instructor_task_status(self, task_id):
         """Returns status corresponding to task_id via api method."""
         request = Mock()
-        request.REQUEST = {'task_id': task_id}
+        request.GET = request.POST = {'task_id': task_id}
         return instructor_task_status(request)
 
     def test_instructor_task_status(self):
         instructor_task = self._create_failure_entry()
         task_id = instructor_task.task_id
         request = Mock()
-        request.REQUEST = {'task_id': task_id}
+        request.GET = request.POST = {'task_id': task_id}
         response = instructor_task_status(request)
         output = json.loads(response.content)
         self.assertEquals(output['task_id'], task_id)
@@ -39,7 +39,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
     def test_missing_instructor_task_status(self):
         task_id = "missing_id"
         request = Mock()
-        request.REQUEST = {'task_id': task_id}
+        request.GET = request.POST = {'task_id': task_id}
         response = instructor_task_status(request)
         output = json.loads(response.content)
         self.assertEquals(output, {})
@@ -50,7 +50,9 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         # list data, so the key value has "[]" appended to it.
         task_ids = [(self._create_failure_entry()).task_id for _ in range(1, 5)]
         request = Mock()
-        request.REQUEST = MultiValueDict({'task_ids[]': task_ids})
+        task_ids_query_dict = QueryDict(mutable=True)
+        task_ids_query_dict.update({'task_ids[]': task_ids})
+        request.GET = request.POST = task_ids_query_dict
         response = instructor_task_status(request)
         output = json.loads(response.content)
         self.assertEquals(len(output), len(task_ids))

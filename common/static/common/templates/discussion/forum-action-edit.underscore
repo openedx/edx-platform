@@ -1,6 +1,6 @@
 <li class="actions-item">
     <a href="javascript:void(0)" class="action-list-item action-edit" role="button">
         <span class="action-label"><%- gettext("Edit") %></span>
-        <span class="action-icon"><i class="icon fa fa-pencil"></i></span>
+        <span class="action-icon"><span class="icon fa fa-pencil" aria-hidden="true"></span></span>
     </a>
 </li>

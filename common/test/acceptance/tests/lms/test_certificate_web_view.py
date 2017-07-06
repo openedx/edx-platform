@@ -206,13 +206,13 @@ class CertificateProgressPageTest(UniqueCourseTest):
         Problems were added in the setUp
         """
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
 
         # Navigate to Test Subsection in Test Section Section
         self.course_nav.go_to_section('Test Section', 'Test Subsection')
 
         # Navigate to Test Problem 1
-        self.course_nav.go_to_sequential('Test Problem 1')
+        self.course_nav.go_to_vertical('Test Problem 1')
 
         # Select correct value for from select menu
         self.course_nav.q(css='select option[value="{}"]'.format('blue')).first.click()
@@ -232,7 +232,7 @@ class CertificateProgressPageTest(UniqueCourseTest):
         self.course_nav.go_to_section('Test Section 2', 'Test Subsection 2')
 
         # Navigate to Test Problem 2
-        self.course_nav.go_to_sequential('Test Problem 2')
+        self.course_nav.go_to_vertical('Test Problem 2')
 
         # Fill in the answer of the problem
         self.course_nav.q(css='input[id^=input_][id$=_2_1]').fill('A*x^2 + sqrt(y)')

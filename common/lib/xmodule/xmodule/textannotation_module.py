@@ -121,7 +121,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
         """ Renders parameters to template. """
         context = {
             'course_key': self.runtime.course_id,
-            'display_name': self.display_name_with_default,
+            'display_name': self.display_name_with_default_escaped,
             'tag': self.instructor_tags,
             'source': self.source,
             'instructions_html': self.instructions,
@@ -147,6 +147,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
 class TextAnnotationDescriptor(AnnotatableFields, RawDescriptor):
     ''' Text Annotation Descriptor '''
     module_class = TextAnnotationModule
+    resources_dir = None
     mako_template = "widgets/raw-edit.html"
 
     @property

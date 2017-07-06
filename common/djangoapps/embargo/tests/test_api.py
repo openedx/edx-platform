@@ -4,6 +4,7 @@ Tests for EmbargoMiddleware
 
 from contextlib import contextmanager
 import mock
+from nose.plugins.attrib import attr
 import unittest
 import pygeoip
 import ddt
@@ -11,7 +12,7 @@ import ddt
 from django.conf import settings
 from django.test.utils import override_settings
 from django.core.cache import cache
-from django.db import connection, transaction
+from django.db import connection
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -34,17 +35,18 @@ from embargo.exceptions import InvalidAccessPoint
 from mock import patch
 
 
-# Since we don't need any XML course fixtures, use a modulestore configuration
-# that disables the XML modulestore.
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
 
+@attr('shard_3')
 @ddt.ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
 class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
     """Test the embargo API calls to determine whether a user has access. """
+
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
         super(EmbargoCheckAccessApiTests, self).setUp()
@@ -238,14 +240,13 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
 class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
     """Test the embargo API calls for retrieving the blocking message URLs. """
 
+    URLCONF_MODULES = ['embargo']
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(EmbargoMessageUrlApiTests, self).setUp('embargo')
+        super(EmbargoMessageUrlApiTests, self).setUp()
         self.course = CourseFactory.create()
-
-    def tearDown(self):
-        super(EmbargoMessageUrlApiTests, self).tearDown()
-        cache.clear()
 
     @ddt.data(
         ('enrollment', '/embargo/blocked-message/enrollment/embargo/'),

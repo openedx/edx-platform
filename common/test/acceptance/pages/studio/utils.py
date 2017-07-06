@@ -61,7 +61,7 @@ def add_advanced_component(page, menu_index, name):
     click_css(page, component_css, 0)
 
 
-def add_component(page, item_type, specific_type):
+def add_component(page, item_type, specific_type, is_advanced_problem=False):
     """
     Click one of the "Add New Component" buttons.
 
@@ -81,11 +81,36 @@ def add_component(page, item_type, specific_type):
             'Wait for the add component menu to disappear'
         )
 
+        # "Common Problem Types" are shown by default.
+        # For advanced problem types you must first select the "Advanced" tab.
+        if is_advanced_problem:
+            advanced_tab = page.q(css='.problem-type-tabs a').filter(text='Advanced').first
+            advanced_tab.click()
+
+            # Wait for the advanced tab to be active
+            css = '.problem-type-tabs li.ui-tabs-active a'
+            page.wait_for(
+                lambda: len(page.q(css=css).filter(text='Advanced').execute()) > 0,
+                'Waiting for the Advanced problem tab to be active'
+            )
+
         all_options = page.q(css='.new-component-{} ul.new-component-template li button span'.format(item_type))
-        chosen_option = all_options.filter(lambda el: el.text == specific_type).first
+        chosen_option = all_options.filter(text=specific_type).first
         chosen_option.click()
     wait_for_notification(page)
     page.wait_for_ajax()
+
+
+def add_components(page, item_type, items, is_advanced_problem=False):
+    """
+    Adds multiple components of a specific type.
+    item_type should be "advanced", "html", "problem", or "video"
+    items is a list of components of specific type to be added.
+    Please note that if you want to create an advanced problem
+    then all other items must be of advanced problem type.
+    """
+    for item in items:
+        add_component(page, item_type, item, is_advanced_problem)
 
 
 def add_html_component(page, menu_index, boilerplate=None):

@@ -3,11 +3,15 @@ Utility functions related to databases.
 """
 # TransactionManagementError used below actually *does* derive from the standard "Exception" class.
 # pylint: disable=nonstandard-exception
+from contextlib import contextmanager
 from functools import wraps
 import random
 
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, Error, transaction
+import request_cache
 
+
+OUTER_ATOMIC_CACHE_NAME = 'db.outer_atomic'
 
 MYSQL_MAX_INT = (2 ** 31) - 1
 
@@ -142,6 +146,29 @@ def commit_on_success(using=None, read_committed=False):
         return CommitOnSuccessManager(using, read_committed)
 
 
+@contextmanager
+def enable_named_outer_atomic(*names):
+    """
+    Enable outer_atomics with names.
+
+    Can be used either as a decorator or a context manager.
+    See docstring of outer_atomic for details.
+
+    Arguments:
+        names (variable-lenght argument list): Names of outer_atomics.
+    """
+    if len(names) == 0:
+        raise ValueError("At least one name must be specified.")
+
+    cache = request_cache.get_cache(OUTER_ATOMIC_CACHE_NAME)
+
+    for name in names:
+        cache[name] = True
+    yield
+    for name in names:
+        del cache[name]
+
+
 class OuterAtomic(transaction.Atomic):
     """
     Atomic which cannot be nested in another atomic.
@@ -151,36 +178,46 @@ class OuterAtomic(transaction.Atomic):
     """
     ALLOW_NESTED = False
 
-    def __init__(self, using, savepoint, read_committed=False):
+    def __init__(self, using, savepoint, read_committed=False, name=None):
         self.read_committed = read_committed
+        self.name = name
         super(OuterAtomic, self).__init__(using, savepoint)
 
     def __enter__(self):
 
         connection = transaction.get_connection(self.using)
 
-        # TestCase setup nests tests in two atomics - one for the test class and one for the individual test.
-        # The outermost atomic starts a transaction - so does not have a savepoint.
-        # The inner atomic starts a savepoint around the test.
-        # So, for tests only, there should be exactly one savepoint_id and two atomic_for_testcase_calls.
-        # atomic_for_testcase_calls below is added in a monkey-patch for tests only.
-        if self.ALLOW_NESTED and (self.atomic_for_testcase_calls - len(connection.savepoint_ids)) < 1:
-            raise transaction.TransactionManagementError('Cannot be inside an atomic block.')
+        cache = request_cache.get_cache(OUTER_ATOMIC_CACHE_NAME)
 
-        # Otherwise, this shouldn't be nested in any atomic block.
-        if not self.ALLOW_NESTED and connection.in_atomic_block:
-            raise transaction.TransactionManagementError('Cannot be inside an atomic block.')
+        # By default it is enabled.
+        enable = True
+        # If name is set it is only enabled if requested by calling enable_named_outer_atomic().
+        if self.name:
+            enable = cache.get(self.name, False)
 
-        # This will set the transaction isolation level to READ COMMITTED for the next transaction.
-        if self.read_committed is True:
-            if connection.vendor == 'mysql':
-                cursor = connection.cursor()
-                cursor.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
+        if enable:
+            # TestCase setup nests tests in two atomics - one for the test class and one for the individual test.
+            # The outermost atomic starts a transaction - so does not have a savepoint.
+            # The inner atomic starts a savepoint around the test.
+            # So, for tests only, there should be exactly one savepoint_id and two atomic_for_testcase_calls.
+            # atomic_for_testcase_calls below is added in a monkey-patch for tests only.
+            if self.ALLOW_NESTED and (self.atomic_for_testcase_calls - len(connection.savepoint_ids)) < 1:
+                raise transaction.TransactionManagementError('Cannot be inside an atomic block.')
+
+            # Otherwise, this shouldn't be nested in any atomic block.
+            if not self.ALLOW_NESTED and connection.in_atomic_block:
+                raise transaction.TransactionManagementError('Cannot be inside an atomic block.')
+
+            # This will set the transaction isolation level to READ COMMITTED for the next transaction.
+            if self.read_committed is True:
+                if connection.vendor == 'mysql':
+                    cursor = connection.cursor()
+                    cursor.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
 
         super(OuterAtomic, self).__enter__()
 
 
-def outer_atomic(using=None, savepoint=True, read_committed=False):
+def outer_atomic(using=None, savepoint=True, read_committed=False, name=None):
     """
     A variant of Django's atomic() which cannot be nested inside another atomic.
 
@@ -200,6 +237,14 @@ def outer_atomic(using=None, savepoint=True, read_committed=False):
     outer_atomic(). outer_atomic() will ensure that it is not nested
     inside another atomic block.
 
+    If we need to do this to prevent IntegrityErrors, a named outer_atomic
+    should be used. You can create a named outer_atomic by passing a name.
+    A named outer_atomic only checks that it is not nested under an atomic
+    only if it is nested under enable_named_outer_atomic(name=<name>). This way
+    only the view which is causing IntegrityErrors needs to have its
+    automatic transaction management disabled and other callers are not
+    affected.
+
     Additionally, some views need to use READ COMMITTED isolation level.
     For this add @transaction.non_atomic_requests and
     @outer_atomic(read_committed=True) decorators on it.
@@ -207,6 +252,7 @@ def outer_atomic(using=None, savepoint=True, read_committed=False):
     Arguments:
         using (str): the name of the database.
         read_committed (bool): Whether to use read committed isolation level.
+        name (str): the name to give to this outer_atomic instance.
 
     Raises:
         TransactionManagementError: if already inside an atomic block.
@@ -215,7 +261,7 @@ def outer_atomic(using=None, savepoint=True, read_committed=False):
         return OuterAtomic(DEFAULT_DB_ALIAS, savepoint, read_committed)(using)
     # Decorator: @outer_atomic(...) or context manager: with outer_atomic(...): ...
     else:
-        return OuterAtomic(using, savepoint, read_committed)
+        return OuterAtomic(using, savepoint, read_committed, name)
 
 
 def generate_int_id(minimum=0, maximum=MYSQL_MAX_INT, used_ids=None):
@@ -231,3 +277,16 @@ def generate_int_id(minimum=0, maximum=MYSQL_MAX_INT, used_ids=None):
         cid = random.randint(minimum, maximum)
 
     return cid
+
+
+class NoOpMigrationModules(object):
+    """
+    Return invalid migrations modules for apps. Used for disabling migrations during tests.
+    See https://groups.google.com/d/msg/django-developers/PWPj3etj3-U/kCl6pMsQYYoJ.
+    """
+
+    def __contains__(self, item):
+        return True
+
+    def __getitem__(self, item):
+        return "notmigrations"

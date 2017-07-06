@@ -20,45 +20,50 @@
     scrollbar-track-color: #F5F5F5;
 }
 
-.mce-content-body h1 {
+.mce-content-body h1,
+.mce-content-body .hd-1 {
     color: #3c3c3c;
     font-weight: normal;
     font-size: 2em;
     line-height: 1.4em;
-    letter-spacing: 1px;
-    margin: 0 0 1.416em 0;
+    margin: 0 0 1.41575em 0;
 }
 
-.mce-content-body h2 {
+.mce-content-body h2,
+.mce-content-body .hd-2,
+.mce-content-body h3 {
     color: #646464;
     font-weight: 300;
-    font-size: 1.2em;
-    line-height: 1.2em;
-    letter-spacing: 1px;
-    margin-bottom: 15px;
+    font-size: 1.6em;
+    line-height: 1.4em;
+    margin-bottom: 1.6em;
     text-transform: uppercase;
-    -webkit-font-smoothing: antialiased;
 }
 
-.mce-content-body h3, .mce-content-body h4, .mce-content-body h5, .mce-content-body h6 {
+.mce-content-body .hd-3,
+.mce-content-body h4,
+.mce-content-body .hd-4,
+.mce-content-body h5,
+.mce-content-body .hd-5,
+.mce-content-body h6,
+.mce-content-body .hd-6 {
     margin: 0 0 10px 0;
     font-weight: 600;
 }
 
-.mce-content-body h3 {
+.mce-content-body h4,
+.mce-content-body .hd-4 {
+    font-size: 1.4em;
+}
+
+.mce-content-body h5,
+.mce-content-body .hd-5 {
     font-size: 1.2em;
 }
 
-.mce-content-body h4 {
+.mce-content-body h6,
+.mce-content-body .hd-6 {
     font-size: 1em;
-}
-
-.mce-content-body h5 {
-    font-size: .83em;
-}
-
-.mce-content-body h6 {
-    font-size: 0.75em;
 }
 
 .mce-content-body p {

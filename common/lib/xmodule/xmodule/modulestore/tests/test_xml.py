@@ -31,10 +31,6 @@ class TestXMLModuleStore(unittest.TestCase):
     """
     Test around the XML modulestore
     """
-    def test_xml_modulestore_type(self):
-        store = XMLModuleStore(DATA_DIR, source_dirs=[])
-        self.assertEqual(store.get_modulestore_type(), ModuleStoreEnum.Type.xml)
-
     @patch('xmodule.tabs.CourseTabList.initialize_default', Mock())
     def test_unicode_chars_in_xml_content(self):
         # edX/full/6.002_Spring_2012 has non-ASCII chars, and during

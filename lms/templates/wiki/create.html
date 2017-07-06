@@ -33,12 +33,12 @@
       {% wiki_form create_form %}
       <div class="form-actions">
           <button type="submit" name="save_changes" class="btn btn-primary btn-large">
-            <i class="icon fa fa-plus"></i>
+            <span class="icon fa fa-plus" aria-hidden="true"></span>
             {% trans "Create article" %}
           </button>
 
           <a href="{% url 'wiki:get' path=parent_urlpath.path %}" class="btn btn-large back">
-            <i class="icon fa fa-circle-arrow-left"></i>
+            <span class="icon fa fa-circle-arrow-left" aria-hidden="true"></span>
             {% trans "Go back" %}
           </a>
       </div>

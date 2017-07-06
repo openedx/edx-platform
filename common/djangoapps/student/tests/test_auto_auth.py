@@ -59,6 +59,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         Test to make sure multiple users are created.
         """
         self._auto_auth()
+        self.client.logout()
         self._auto_auth()
         self.assertEqual(User.objects.all().count(), 2)
 
@@ -138,6 +139,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         self.assertEqual(len(user_roles), 1)
         self.assertEqual(user_roles[0], course_roles[FORUM_ROLE_STUDENT])
 
+        self.client.logout()
         self._auto_auth({'username': 'a_moderator', 'course_id': course_id, 'roles': 'Moderator'})
         user = User.objects.get(username='a_moderator')
         user_roles = user.roles.all()
@@ -147,6 +149,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
                 course_roles[FORUM_ROLE_MODERATOR]]))
 
         # check multiple roles work.
+        self.client.logout()
         self._auto_auth({
             'username': 'an_admin', 'course_id': course_id,
             'roles': '{},{}'.format(FORUM_ROLE_MODERATOR, FORUM_ROLE_ADMINISTRATOR)
@@ -213,6 +216,17 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
             url_pattern = '/dashboard'
         else:
             url_pattern = '/home'
+
+        self.assertTrue(response.url.endswith(url_pattern))  # pylint: disable=no-member
+
+    def test_redirect_to_specified(self):
+        # Create user and redirect to specified url
+        url_pattern = '/u/test#about_me'
+        response = self._auto_auth({
+            'username': 'test',
+            'redirect_to': url_pattern,
+            'staff': 'true',
+        }, status_code=302)
 
         self.assertTrue(response.url.endswith(url_pattern))  # pylint: disable=no-member
 

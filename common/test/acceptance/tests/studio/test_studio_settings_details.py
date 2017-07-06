@@ -2,10 +2,10 @@
 Acceptance tests for Studio's Settings Details pages
 """
 from datetime import datetime, timedelta
+from flaky import flaky
 from nose.plugins.attrib import attr
 from unittest import skip
 
-from .base_studio_test import StudioCourseTest
 from ...fixtures.config import ConfigModelFixture
 from ...fixtures.course import CourseFixture
 from ...pages.studio.settings import SettingsPage
@@ -49,6 +49,7 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
 
         self.assertTrue(self.settings_detail.pre_requisite_course_options)
 
+    @skip("Too flaky for the flaky decorator  SOL-1811")  # SOL-1811
     def test_prerequisite_course_save_successfully(self):
         """
          Scenario: Selecting course from Pre-Requisite course drop down save the selected course as pre-requisite
@@ -174,6 +175,7 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
             text='Entrance Exam'
         ))
 
+    @flaky  # TODO: SOL-1595
     def test_entrance_exam_has_unit_button(self):
         """
         Test that entrance exam should be created after checking the 'enable entrance exam' checkbox.

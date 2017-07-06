@@ -15,6 +15,7 @@ class PaginatedUIMixin(object):
     PREVIOUS_PAGE_BUTTON_CSS = 'button.previous-page-link'
     PAGINATION_HEADER_TEXT_CSS = 'div.search-tools'
     CURRENT_PAGE_NUMBER_CSS = 'span.current-page'
+    TOTAL_PAGES_CSS = 'span.total-pages'
 
     def get_pagination_header_text(self):
         """Return the text showing which items the user is currently viewing."""
@@ -30,6 +31,11 @@ class PaginatedUIMixin(object):
     def get_current_page_number(self):
         """Return the the current page number."""
         return int(self.q(css=self.CURRENT_PAGE_NUMBER_CSS).text[0])
+
+    @property
+    def get_total_pages(self):
+        """Returns the total page value"""
+        return int(self.q(css=self.TOTAL_PAGES_CSS).text[0])
 
     def go_to_page(self, page_number):
         """Go to the given page_number in the paginated list results."""
@@ -57,3 +63,8 @@ class PaginatedUIMixin(object):
     def is_enabled(self, css):
         """Return whether the given element is not disabled."""
         return 'is-disabled' not in self.q(css=css).attrs('class')[0]
+
+    @property
+    def footer_visible(self):
+        """ Return True if footer is visible else False"""
+        return self.q(css='.pagination.bottom').visible

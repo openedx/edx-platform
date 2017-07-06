@@ -1,11 +1,20 @@
 ## coding=utf-8
+
+## Pages currently use v1 styling by default. Once the Pattern Library
+## rollout has been completed, this default can be switched to v2.
+<%! main_css = "style-main-v1" %>
+
+## Standard imports
 <%namespace name='static' file='static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from openedx.core.lib.js_utils import (
-    escape_json_dumps, escape_js_string
+
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
 )
 %>
+
+<%page expression_filter="h"/>
 <!doctype html>
 <!--[if lte IE 9]><html class="ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
 <!--[if !IE]><<!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
@@ -16,20 +25,26 @@ from openedx.core.lib.js_utils import (
         <%block name="title"></%block> |
         % if context_course:
         <% ctx_loc = context_course.location %>
-        ${context_course.display_name_with_default | h} |
+        ${context_course.display_name_with_default} |
         % elif context_library:
-        ${context_library.display_name_with_default | h} |
+        ${context_library.display_name_with_default} |
         % endif
         ${settings.STUDIO_NAME}
     </title>
 
+    <%
+      jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
+    %>
+
+    <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="path_prefix" content="${EDX_ROOT_URL}">
 
     <%static:css group='style-vendor'/>
     <%static:css group='style-vendor-tinymce-content'/>
     <%static:css group='style-vendor-tinymce-skin'/>
-    <%static:css group='style-main'/>
+
+    <%static:css group='${self.attr.main_css}'/>
 
     <%include file="widgets/segment-io.html" />
 
@@ -39,13 +54,13 @@ from openedx.core.lib.js_utils import (
   <body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE}">
     <%block name="view_notes"></%block>
 
-    <a class="nav-skip" href="#content">${_("Skip to main content")}</a>
+    <a class="nav-skip" href="#main">${_("Skip to main content")}</a>
 
     <script type="text/javascript">
-      window.baseUrl = "${escape_js_string(settings.STATIC_URL) | n}";
+      window.baseUrl = "${settings.STATIC_URL | n, js_escaped_string}";
       var require = {baseUrl: window.baseUrl};
     </script>
-    <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
+    <script type="text/javascript" src="${static.url("js/vendor/requirejs/require.js")}"></script>
     <script type="text/javascript" src="${static.url("cms/js/require-config.js")}"></script>
 
     <!-- view -->
@@ -57,9 +72,11 @@ from openedx.core.lib.js_utils import (
       <%block name="page_alert"></%block>
       </div>
 
-      <div id="content">
-      <%block name="content"></%block>
-      </div>
+      <main id="main" aria-label="Content" tabindex="-1">
+          <div id="content">
+          <%block name="content"></%block>
+          </div>
+      </main>
 
       % if user.is_authenticated():
         <%include file="widgets/sock.html" args="online_help_token=online_help_token" />
@@ -77,24 +94,24 @@ from openedx.core.lib.js_utils import (
     <script type="text/javascript">
       require(['common/js/common_libraries'], function () {
           require(['js/factories/base'], function () {
-            % if context_course:
-              require(['js/factories/course'], function(CourseFactory) {
-                  CourseFactory({
-                      id: "${escape_js_string(context_course.id) | n}",
-                      name: "${context_course.display_name_with_default | h}",
-                      url_name: "${context_course.location.name | h}",
-                      org: "${context_course.location.org | h}",
-                      num: "${context_course.location.course | h}",
-                      display_course_number: "${_(context_course.display_number_with_default)}",
-                      revision: "${context_course.location.revision | h}",
-                      self_paced: ${escape_json_dumps(context_course.self_paced) | n}
-                  });
+              require(['js/models/course'], function(Course) {
+                  % if context_course:
+                      window.course = new Course({
+                          id: "${context_course.id | n, js_escaped_string}",
+                          name: "${context_course.display_name_with_default | n, js_escaped_string}",
+                          url_name: "${context_course.location.name | n, js_escaped_string}",
+                          org: "${context_course.location.org | n, js_escaped_string}",
+                          num: "${context_course.location.course | n, js_escaped_string}",
+                          display_course_number: "${context_course.display_coursenumber | n, js_escaped_string}",
+                          revision: "${context_course.location.revision | n, js_escaped_string}",
+                          self_paced: ${context_course.self_paced | n, dump_js_escaped_json}
+                      });
+                  % endif
+                  % if user.is_authenticated():
+                      require(['js/sock']);
+                  % endif
+                  <%block name='requirejs'></%block>
               });
-            % endif
-            % if user.is_authenticated():
-                require(['js/sock']);
-            % endif
-            <%block name='requirejs'></%block>
           });
       });
     </script>

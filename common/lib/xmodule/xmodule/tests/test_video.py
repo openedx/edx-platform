@@ -28,7 +28,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.tests import get_test_descriptor_system
-from xmodule.video_module import VideoDescriptor, create_youtube_string, get_video_from_cdn
+from xmodule.video_module import VideoDescriptor, create_youtube_string
 from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store
 from . import LogicTest
 from .test_import import DummySystem
@@ -741,35 +741,30 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         expected = '<video url_name="SampleProblem" download_video="false"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
+    def test_export_to_xml_with_transcripts_as_none(self):
+        """
+        Test XML export with transcripts being overridden to None.
+        """
+        self.descriptor.transcripts = None
+        xml = self.descriptor.definition_to_xml(None)
+        expected = '<video url_name="SampleProblem" download_video="false"/>\n'
+        self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
-class VideoCdnTest(unittest.TestCase):
-    """
-    Tests for Video CDN.
-    """
-    @patch('requests.get')
-    def test_get_video_success(self, cdn_response):
+    def test_export_to_xml_invalid_characters_in_attributes(self):
         """
-        Test successful CDN request.
+        Test XML export will raise TypeError by lxml library if contains illegal characters.
         """
-        original_video_url = "http://www.original_video.com/original_video.mp4"
-        cdn_response_video_url = "http://www.cdn_video.com/cdn_video.mp4"
-        cdn_response_content = '{{"sources":["{cdn_url}"]}}'.format(cdn_url=cdn_response_video_url)
-        cdn_response.return_value = Mock(status_code=200, content=cdn_response_content)
-        fake_cdn_url = 'http://fake_cdn.com/'
-        self.assertEqual(
-            get_video_from_cdn(fake_cdn_url, original_video_url),
-            cdn_response_video_url
-        )
+        self.descriptor.display_name = '\x1e'
+        with self.assertRaises(ValueError):
+            self.descriptor.definition_to_xml(None)
 
-    @patch('requests.get')
-    def test_get_no_video_exists(self, cdn_response):
+    def test_export_to_xml_unicode_characters(self):
         """
-        Test if no alternative video in CDN exists.
+        Test XML export handles the unicode characters.
         """
-        original_video_url = "http://www.original_video.com/original_video.mp4"
-        cdn_response.return_value = Mock(status_code=404)
-        fake_cdn_url = 'http://fake_cdn.com/'
-        self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))
+        self.descriptor.display_name = '这是文'
+        xml = self.descriptor.definition_to_xml(None)
+        self.assertEqual(xml.get('display_name'), u'\u8fd9\u662f\u6587')
 
 
 class VideoDescriptorIndexingTestCase(unittest.TestCase):
@@ -950,3 +945,38 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
             },
             "content_type": "Video"
         })
+
+    def test_video_with_multiple_transcripts_translation_retrieval(self):
+        """
+        Test translation retrieval of a video module with
+        multiple transcripts uploaded by a user.
+        """
+        xml_data_transcripts = '''
+            <video display_name="Test Video"
+                   youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
+                   show_captions="false"
+                   download_track="false"
+                   start_time="00:00:01"
+                   download_video="false"
+                   end_time="00:01:00">
+              <source src="http://www.example.com/source.mp4"/>
+              <track src="http://www.example.com/track"/>
+              <handout src="http://www.example.com/handout"/>
+              <transcript language="ge" src="subs_grmtran1.srt" />
+              <transcript language="hr" src="subs_croatian1.srt" />
+            </video>
+        '''
+
+        descriptor = instantiate_descriptor(data=xml_data_transcripts)
+        translations = descriptor.available_translations(descriptor.get_transcripts_info(), verify_assets=False)
+        self.assertEqual(translations, ['hr', 'ge'])
+
+    def test_video_with_no_transcripts_translation_retrieval(self):
+        """
+        Test translation retrieval of a video module with
+        no transcripts uploaded by a user- ie, that retrieval
+        does not throw an exception.
+        """
+        descriptor = instantiate_descriptor(data=None)
+        translations = descriptor.available_translations(descriptor.get_transcripts_info(), verify_assets=False)
+        self.assertEqual(translations, ['en'])

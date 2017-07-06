@@ -8,8 +8,9 @@ beautifulsoup4==4.1.3
 beautifulsoup==3.2.1
 bleach==1.4
 html5lib==0.999
-boto==2.32.1
+boto==2.39.0
 celery==3.1.18
+cryptography==1.3.1
 cssselect==0.9.1
 dealer==2.0.4
 defusedxml==0.4.1
@@ -23,17 +24,30 @@ django-mako==0.1.5pre
 django-model-utils==2.3.1
 django-mptt==0.7.4
 django-oauth-plus==2.2.8
+django-oauth-toolkit==0.10.0
+django-pipeline-forgiving==1.0.0
 django-sekizai==0.8.2
-django-ses==0.7.0
+django-ses==0.7.1
 django-simple-history==1.6.3
-django-storages-redux==1.3
+django-statici18n==1.1.5
+django-storages==1.4.1
 django-method-override==0.1.0
 # We need a fix to DRF 3.2.x, for now use it from our own cherry-picked repo
 #djangorestframework>=3.1,<3.2
 git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
-django==1.8.12
+django==1.8.15
+djangorestframework-jwt==1.8.0
+djangorestframework-oauth==1.1.0
+edx-ccx-keys==0.1.2
+edx-drf-extensions==0.5.1
+edx-lint==0.4.3
+edx-django-oauth2-provider==1.1.1
+edx-django-sites-extensions==2.0.1
+edx-oauth2-provider==1.1.3
+edx-opaque-keys==0.2.1
+edx-organizations==0.4.1
 edx-rest-api-client==1.2.1
-elasticsearch==0.4.5
+edx-search==0.1.2
 facebook-sdk==0.4.0
 feedparser==5.1.3
 firebase-token-generator==1.3.2
@@ -54,12 +68,13 @@ nose-xunitmp==0.3.2
 oauthlib==0.7.2
 paramiko==1.9.0
 path.py==7.2
-Pillow==2.7.0
+piexif==1.0.2
+Pillow==3.1.1
 polib==1.0.3
 pycrypto>=2.6
 pygments==2.0.1
 pygraphviz==1.1
-PyJWT==1.0.1
+PyJWT==1.4.0
 pymongo==2.9.1
 pyparsing==2.0.1
 python-memcached==1.48
@@ -68,19 +83,20 @@ python-dateutil==2.1
 
 # This module gets monkey-patched in third_party_auth.py to fix a Django 1.8 incompatibility.
 # When this dependency gets upgraded, the monkey patch should be removed, if possible.
+# We can also remove the fix to auth_url in third_party_auth/saml.py when that fix is included upstream.
 python-social-auth==0.2.12
 
 pytz==2015.2
 pysrt==0.4.7
 PyYAML==3.10
-requests==2.7.0
+requests==2.9.1
 requests-oauthlib==0.4.1
 scipy==0.14.0
 Shapely==1.2.16
 singledispatch==3.4.0.2
 sorl-thumbnail==12.3
 sortedcontainers==0.9.2
-stevedore==0.14.1
+stevedore==1.10.0
 sure==1.2.3
 sympy==0.7.1
 xmltodict==0.4.1
@@ -89,6 +105,7 @@ unicodecsv==0.9.4
 django-require==1.0.6
 pyuca==1.1
 wrapt==1.10.5
+zendesk==1.1.1
 
 # This needs to be installed *after* Cython, which is in pre.txt
 lxml==3.4.4
@@ -100,11 +117,11 @@ reportlab==3.1.44
 pdfminer==20140328
 
 # Used for development operation
-watchdog==0.7.1
+watchdog==0.8.3
 
 # Metrics gathering and monitoring
 dogapi==1.2.1
-newrelic==2.56.0.42
+newrelic==2.64.0.48
 
 # Used for documentation gathering
 sphinx==1.1.3
@@ -112,7 +129,7 @@ sphinx_rtd_theme==0.1.5
 
 # Used for Internationalization and localization
 Babel==1.3
-transifex-client==0.11b3
+transifex-client==0.12.1
 
 # Ip network support for Embargo feature
 ipaddr==2.1.11
@@ -121,16 +138,15 @@ ipaddr==2.1.11
 django-cors-headers==1.1.0
 
 # Debug toolbar
-django_debug_toolbar==1.3.2
+django_debug_toolbar==1.5
 
 # Used for testing
-astroid==1.3.8
 before_after==0.1.3
-bok-choy==0.4.7
+bok-choy==0.5.3
 chrono==1.0.2
 coverage==4.0.2
 ddt==0.8.0
-diff-cover==0.8.0
+diff-cover==0.9.0
 django-crum==0.5
 django_nose==1.4.1
 factory_boy==2.5.1
@@ -142,16 +158,18 @@ moto==0.3.1
 nose==1.3.7
 nose-exclude
 nose-ignore-docstring
+nose-randomly==1.2.0
 nosexcover==1.0.7
 pep8==1.5.7
 PyContracts==1.7.1
 python-subunit==0.0.16
 pyquery==1.2.9
-radon==1.2
-rednose==0.4.3
-selenium==2.42.1
+radon==1.3.2
+selenium==2.53.1
 splinter==0.5.4
 testtools==0.9.34
+testfixtures==4.5.0
+nose-faulthandler==0.1
 
 # Used for Segment analytics
 analytics-python==1.1.0
@@ -166,3 +184,5 @@ pynliner==0.5.2
 # Labster requirements
 -e git+git@github.com:Livit/Livit.Learn.OverviewXBlock.git@49e6ba5fdfb3ad0c320843d1a5b302de6f342a28#egg=XBlockOverview
 raven==5.19.0
+# for sailthru integration
+sailthru-client==2.2.3

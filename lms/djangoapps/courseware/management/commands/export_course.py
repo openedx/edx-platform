@@ -3,6 +3,14 @@ A Django command that exports a course to a tar.gz file.
 
 If <filename> is '-', it pipes the file to stdout
 
+NOTE: This used to be used by Analytics research exports to provide
+researchers with course content.  It is now DEPRECATED, and
+functionality has moved to export_olx.py in
+cms/djangoapps/contentstore/management/commands.
+
+Note: when removing this file, also remove references to it
+from test_dump_course.
+
 """
 
 import os

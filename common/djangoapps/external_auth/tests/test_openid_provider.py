@@ -413,6 +413,13 @@ class OpenIdProviderLiveServerTest(LiveServerTestCase):
         request = factory.request()
         abs_provider_url = request.build_absolute_uri(location=provider_url)
 
+        # In order for this absolute URL to work (i.e. to get xrds, then authentication)
+        # in the test environment, we either need a live server that works with the default
+        # fetcher (i.e. urlopen2), or a test server that is reached through a custom fetcher.
+        # Here we do the latter:
+        fetcher = MyFetcher(self.client)
+        openid.fetchers.setDefaultFetcher(fetcher, wrap_exceptions=False)
+
         # now we can begin the login process by invoking a local openid client,
         # with a pointer to the (also-local) openid provider:
         with self.settings(OPENID_SSO_SERVER_URL=abs_provider_url):

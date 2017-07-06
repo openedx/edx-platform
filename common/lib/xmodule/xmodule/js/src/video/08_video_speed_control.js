@@ -1,9 +1,10 @@
 (function (requirejs, require, define) {
 "use strict";
 define(
-'video/08_video_speed_control.js',
-['video/00_iterator.js'],
-function (Iterator) {
+'video/08_video_speed_control.js', [
+    'video/00_iterator.js',
+    'edx-ui-toolkit/js/utils/html-utils'
+], function (Iterator, HtmlUtils) {
     /**
      * Video speed control module.
      * @exports video/08_video_speed_control.js
@@ -30,15 +31,15 @@ function (Iterator) {
     SpeedControl.prototype = {
         template: [
             '<div class="speeds menu-container" role="application">',
-                '<button class="control speed-button" aria-label="',
-                    /* jshint maxlen:200 */
-                    gettext('Speed: Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.'),
-                    '" aria-disabled="false" aria-expanded="false">',
-                    '<span class="icon-fallback-img">',
+                '<p class="sr instructions" id="speed-instructions">',
+                    gettext('Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.'), // jshint ignore: line
+                '</p>',
+                '<button class="control speed-button" aria-disabled="false" aria-expanded="false"',
+                    'title="',
+                        gettext('Adjust video speed'),
+                    '" aria-describedby="speed-instructions">',
+                    '<span>',
                         '<span class="icon fa fa-caret-right" aria-hidden="true"></span>',
-                        '<span class="sr control-text">',
-                            gettext('Speed'),
-                        '</span>',
                     '</span>',
                     '<span class="label" aria-hidden="true">',
                         gettext('Speed'),
@@ -92,23 +93,38 @@ function (Iterator) {
          * Creates any necessary DOM elements, attach them, and set their,
          * initial configuration.
          * @param {array} speeds List of speeds available for the player.
+         * @param {string} currentSpeed The current speed set to the player.
          */
-        render: function (speeds) {
+        render: function (speeds, currentSpeed) {
             var speedsContainer = this.speedsContainer,
                 reversedSpeeds = speeds.concat().reverse(),
                 speedsList = $.map(reversedSpeeds, function (speed) {
-                    return [
-                        '<li data-speed="', speed, '">',
-                            '<button class="control speed-option" tabindex="-1">',
-                                speed, 'x',
-                            '</button>',
-                        '</li>'
-                    ].join('');
+                    return HtmlUtils.interpolateHtml(
+                        HtmlUtils.HTML(
+                            [
+                                '<li data-speed="{speed}">',
+                                    '<button class="control speed-option" tabindex="-1" aria-pressed="false">',
+                                        '{speed}x',
+                                    '</button>',
+                                '</li>'
+                            ].join('')
+                        ),
+                        {
+                            speed: speed
+                        }
+                    ).toString();
                 });
 
-            speedsContainer.html(speedsList.join(''));
+            HtmlUtils.setHtml(
+                speedsContainer,
+                HtmlUtils.HTML(speedsList)
+            );
             this.speedLinks = new Iterator(speedsContainer.find('.speed-option'));
-            this.state.el.find('.secondary-controls').prepend(this.el);
+            HtmlUtils.prepend(
+                this.state.el.find('.secondary-controls'),
+                HtmlUtils.HTML(this.el)
+            );
+            this.setActiveSpeed(currentSpeed);
         },
 
         /**
@@ -213,17 +229,38 @@ function (Iterator) {
             if (speed !== this.currentSpeed || forceUpdate) {
                 this.speedsContainer
                     .find('li')
-                    .removeClass('is-active')
-                    .siblings("li[data-speed='" + speed + "']")
-                    .addClass('is-active');
+                    .siblings("li[data-speed='" + speed + "']");
 
-                this.speedButton.find('.value').html(speed + 'x');
+                this.speedButton.find('.value').text(speed + 'x');
                 this.currentSpeed = speed;
 
                 if (!silent) {
                     this.el.trigger('speedchange', [speed, this.state.speed]);
                 }
             }
+
+            this.resetActiveSpeed();
+            this.setActiveSpeed(speed);
+        },
+        
+        resetActiveSpeed: function() {
+            var speedOptions = this.speedsContainer.find('li');
+            
+            $(speedOptions).each(function(index, el) {
+                $(el).removeClass('is-active')
+                    .find('.speed-option')
+                    .attr('aria-pressed', 'false');
+            });
+        },
+        
+        setActiveSpeed: function(speed) {
+            var speedOption = this.speedsContainer.find('li[data-speed="' + speed + '"]');
+            
+            speedOption.addClass('is-active')
+                .find('.speed-option')
+                .attr('aria-pressed', 'true');
+
+            this.speedButton.attr('title', gettext('Video speed: ') + speed + 'x');
         },
 
         /**
@@ -241,10 +278,13 @@ function (Iterator) {
          * @param {jquery Event} event
          */
         clickLinkHandler: function (event) {
-            var speed = $(event.currentTarget).parent().data('speed');
-
-            this.closeMenu();
+            var el = $(event.currentTarget).parent(),
+                speed = $(el).data('speed');
+                
+            this.resetActiveSpeed();
+            this.setActiveSpeed(speed);
             this.state.videoCommands.execute('speed', speed);
+            this.closeMenu(true);
 
             return false;
         },

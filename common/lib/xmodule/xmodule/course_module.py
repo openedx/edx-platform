@@ -1,28 +1,25 @@
 """
 Django module container for classes and operations related to the "Course Module" content type
 """
+import json
 import logging
 from cStringIO import StringIO
+from datetime import datetime
+
+import requests
+from lazy import lazy
 from lxml import etree
 from path import Path as path
-import requests
-from datetime import datetime
-from lazy import lazy
+from pytz import utc
+from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
-from xmodule.exceptions import UndefinedContext
-from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
-from xmodule.tabs import CourseTabList, InvalidTabsException
 from xmodule.mixin import LicenseMixin
-import json
-
-from xblock.core import XBlock
-from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
+from xmodule.seq_module import SequenceDescriptor, SequenceModule
+from xmodule.tabs import CourseTabList, InvalidTabsException
 from .fields import Date
-from django.utils.timezone import UTC
-
 
 log = logging.getLogger(__name__)
 
@@ -109,7 +106,7 @@ class Textbook(object):
             # see if we already fetched this
             if toc_url in _cached_toc:
                 (table_of_contents, timestamp) = _cached_toc[toc_url]
-                age = datetime.now(UTC) - timestamp
+                age = datetime.now(utc) - timestamp
                 # expire every 10 minutes
                 if age.seconds < 600:
                     return table_of_contents
@@ -176,7 +173,7 @@ class CourseFields(object):
         scope=Scope.settings
     )
     textbooks = TextbookList(
-        help=_("List of pairs of (title, url) for textbooks used in this course"),
+        help=_("List of Textbook objects with (title, url) for textbooks used in this course"),
         default=[],
         scope=Scope.content
     )
@@ -304,7 +301,7 @@ class CourseFields(object):
         scope=Scope.settings, default=False,
         help=_(
             "Enter true or false. If true, discussion categories and subcategories are sorted alphabetically. "
-            "If false, they are sorted chronologically."
+            "If false, they are sorted chronologically by creation date and time."
         )
     )
     announcement = Date(
@@ -339,15 +336,6 @@ class CourseFields(object):
         help=_("Enter the unique identifier for your course's video files provided by edX."),
         scope=Scope.settings
     )
-    facebook_url = String(
-        help=_(
-            "Enter the URL for the official course Facebook group. "
-            "If you provide a URL, the mobile app includes a button that students can tap to access the group."
-        ),
-        default=None,
-        display_name=_("Facebook URL"),
-        scope=Scope.settings
-    )
     no_grade = Boolean(
         display_name=_("Course Not Graded"),
         help=_("Enter true or false. If true, the course will not be graded."),
@@ -367,8 +355,8 @@ class CourseFields(object):
     html_textbooks = List(
         display_name=_("HTML Textbooks"),
         help=_(
-            "For HTML textbooks that appear as separate tabs in the courseware, enter the name of the tab (usually "
-            "the name of the book) as well as the URLs and titles of all the chapters in the book."
+            "For HTML textbooks that appear as separate tabs in the course, enter the name of the tab (usually "
+            "the title of the book) as well as the URLs and titles of each chapter in the book."
         ),
         scope=Scope.settings
     )
@@ -395,6 +383,16 @@ class CourseFields(object):
         default=False,
         scope=Scope.settings
     )
+    ccx_connector = String(
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content.
+        display_name=_("CCX Connector URL"),
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content.
+        help=_(
+            "URL for CCX Connector application for managing creation of CCXs. (optional)."
+            " Ignored unless 'Enable CCX' is set to 'true'."
+        ),
+        scope=Scope.settings, default=""
+    )
     allow_anonymous = Boolean(
         display_name=_("Allow Anonymous Discussion Posts"),
         help=_("Enter true or false. If true, students can create discussion posts that are anonymous to all users."),
@@ -415,15 +413,15 @@ class CourseFields(object):
     )
     has_children = True
     info_sidebar_name = String(
-        display_name=_("Course Info Sidebar Name"),
+        display_name=_("Course Home Sidebar Name"),
         help=_(
-            "Enter the heading that you want students to see above your course handouts on the Course Info page. "
+            "Enter the heading that you want students to see above your course handouts on the Course Home page. "
             "Your course handouts appear in the right panel of the page."
         ),
-        scope=Scope.settings, default='Course Handouts')
+        scope=Scope.settings, default=_('Course Handouts'))
     show_timezone = Boolean(
         help=_(
-            "True if timezones should be shown on dates in the courseware. "
+            "True if timezones should be shown on dates in the course. "
             "Deprecated in favor of due_date_display_format."
         ),
         scope=Scope.settings, default=True
@@ -475,6 +473,26 @@ class CourseFields(object):
         # Ensure that courses imported from XML keep their image
         default="images_course_image.jpg"
     )
+    banner_image = String(
+        display_name=_("Course Banner Image"),
+        help=_(
+            "Edit the name of the banner image file. "
+            "You can set the banner image on the Settings & Details page."
+        ),
+        scope=Scope.settings,
+        # Ensure that courses imported from XML keep their image
+        default="images_course_image.jpg"
+    )
+    video_thumbnail_image = String(
+        display_name=_("Course Video Thumbnail Image"),
+        help=_(
+            "Edit the name of the video thumbnail image file. "
+            "You can set the video thumbnail image on the Settings & Details page."
+        ),
+        scope=Scope.settings,
+        # Ensure that courses imported from XML keep their image
+        default="images_course_image.jpg"
+    )
     issue_badges = Boolean(
         display_name=_("Issue Open Badges"),
         help=_(
@@ -486,9 +504,9 @@ class CourseFields(object):
     ## Course level Certificate Name overrides.
     cert_name_short = String(
         help=_(
-            "Use this setting only when generating PDF certificates. "
-            "Between quotation marks, enter the short name of the course to use on the certificate that "
-            "students receive when they complete the course."
+            'Use this setting only when generating PDF certificates. '
+            'Between quotation marks, enter the short name of the type of certificate that '
+            'students receive when they complete the course. For instance, "Certificate".'
         ),
         display_name=_("Certificate Name (Short)"),
         scope=Scope.settings,
@@ -496,9 +514,9 @@ class CourseFields(object):
     )
     cert_name_long = String(
         help=_(
-            "Use this setting only when generating PDF certificates. "
-            "Between quotation marks, enter the long name of the course to use on the certificate that students "
-            "receive when they complete the course."
+            'Use this setting only when generating PDF certificates. '
+            'Between quotation marks, enter the long name of the type of certificate that students '
+            'receive when they complete the course. For instance, "Certificate of Achievement".'
         ),
         display_name=_("Certificate Name (Long)"),
         scope=Scope.settings,
@@ -568,7 +586,7 @@ class CourseFields(object):
     display_organization = String(
         display_name=_("Course Organization Display String"),
         help=_(
-            "Enter the course organization that you want to appear in the courseware. This setting overrides the "
+            "Enter the course organization that you want to appear in the course. This setting overrides the "
             "organization that you entered when you created the course. To use the organization that you entered "
             "when you created the course, enter null."
         ),
@@ -578,7 +596,7 @@ class CourseFields(object):
     display_coursenumber = String(
         display_name=_("Course Number Display String"),
         help=_(
-            "Enter the course number that you want to appear in the courseware. This setting overrides the course "
+            "Enter the course number that you want to appear in the course. This setting overrides the course "
             "number that you entered when you created the course. To use the course number that you entered when "
             "you created the course, enter null."
         ),
@@ -692,12 +710,24 @@ class CourseFields(object):
 
     teams_configuration = Dict(
         display_name=_("Teams Configuration"),
+        # Translators: please don't translate "id".
         help=_(
-            "Enter configuration for the teams feature. Expects two entries: max_team_size and topics, where "
-            "topics is a list of topics."
+            'Specify the maximum team size and topics for teams inside the provided set of curly braces. '
+            'Make sure that you enclose all of the sets of topic values within a set of square brackets, '
+            'with a comma after the closing curly brace for each topic, and another comma after the '
+            'closing square brackets. '
+            'For example, to specify that teams should have a maximum of 5 participants and provide a list of '
+            '2 topics, enter the configuration in this format: {example_format}. '
+            'In "id" values, the only supported special characters are underscore, hyphen, and period.'
+        ).format(
+            # Put the sample JSON into a format variable so that translators
+            # don't muck with it.
+            example_format=(
+                '{"topics": [{"name": "Topic1Name", "description": "Topic1Description", "id": "Topic1ID"}, '
+                '{"name": "Topic2Name", "description": "Topic2Description", "id": "Topic2ID"}], "max_team_size": 5}'
+            ),
         ),
         scope=Scope.settings,
-        deprecated=True,  # Deprecated until the teams feature is made generally available
     )
 
     enable_proctored_exams = Boolean(
@@ -707,6 +737,15 @@ class CourseFields(object):
             "Note that enabling proctored exams will also enable timed exams."
         ),
         default=False,
+        scope=Scope.settings
+    )
+
+    create_zendesk_tickets = Boolean(
+        display_name=_("Create Zendesk Tickets For Suspicious Proctored Exam Attempts"),
+        help=_(
+            "Enter true or false. If this value is true, a Zendesk ticket will be created for suspicious attempts."
+        ),
+        default=True,
         scope=Scope.settings
     )
 
@@ -740,6 +779,58 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    bypass_home = Boolean(
+        display_name=_("Bypass Course Home"),
+        help=_(
+            "Bypass the course home tab when students arrive from the dashboard, "
+            "sending them directly to course content."
+        ),
+        default=False,
+        scope=Scope.settings,
+        deprecated=True
+    )
+
+    enable_subsection_gating = Boolean(
+        display_name=_("Enable Subsection Prerequisites"),
+        help=_(
+            "Enter true or false. If this value is true, you can hide a "
+            "subsection until learners earn a minimum score in another, "
+            "prerequisite subsection."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
+
+    learning_info = List(
+        display_name=_("Course Learning Information"),
+        help=_("Specify what student can learn from the course."),
+        default=[],
+        scope=Scope.settings
+    )
+
+    """
+    instructor_info dict structure:
+    {
+        "instructors": [
+            {
+                "name": "",
+                "title": "",
+                "organization": "",
+                "image": "",
+                "bio": ""
+            }
+        ]
+    }
+    """
+    instructor_info = Dict(
+        display_name=_("Course Instructor"),
+        help=_("Enter the details for Course Instructor"),
+        default={
+            "instructors": []
+        },
+        scope=Scope.settings
+    )
+
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
     """
@@ -755,12 +846,16 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     """
     module_class = CourseModule
 
+    resources_dir = None
+
     def __init__(self, *args, **kwargs):
         """
         Expects the same arguments as XModuleDescriptor.__init__
         """
         super(CourseDescriptor, self).__init__(*args, **kwargs)
         _ = self.runtime.service(self, "i18n").ugettext
+
+        self._gating_prerequisites = None
 
         if self.wiki_slug is None:
             self.wiki_slug = self.location.course
@@ -1086,83 +1181,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         """
         return course_metadata_utils.sorting_score(self.start, self.advertised_start, self.announcement)
 
-    @lazy
-    def grading_context(self):
-        """
-        This returns a dictionary with keys necessary for quickly grading
-        a student. They are used by grades.grade()
-
-        The grading context has two keys:
-        graded_sections - This contains the sections that are graded, as
-            well as all possible children modules that can affect the
-            grading. This allows some sections to be skipped if the student
-            hasn't seen any part of it.
-
-            The format is a dictionary keyed by section-type. The values are
-            arrays of dictionaries containing
-                "section_descriptor" : The section descriptor
-                "xmoduledescriptors" : An array of xmoduledescriptors that
-                    could possibly be in the section, for any student
-
-        all_descriptors - This contains a list of all xmodules that can
-            effect grading a student. This is used to efficiently fetch
-            all the xmodule state for a FieldDataCache without walking
-            the descriptor tree again.
-
-
-        """
-        # If this descriptor has been bound to a student, return the corresponding
-        # XModule. If not, just use the descriptor itself
-        try:
-            module = getattr(self, '_xmodule', None)
-            if not module:
-                module = self
-        except UndefinedContext:
-            module = self
-
-        def possibly_scored(usage_key):
-            """Can this XBlock type can have a score or children?"""
-            return usage_key.block_type in self.block_types_affecting_grading
-
-        all_descriptors = []
-        graded_sections = {}
-
-        def yield_descriptor_descendents(module_descriptor):
-            for child in module_descriptor.get_children(usage_key_filter=possibly_scored):
-                yield child
-                for module_descriptor in yield_descriptor_descendents(child):
-                    yield module_descriptor
-
-        for chapter in self.get_children():
-            for section in chapter.get_children():
-                if section.graded:
-                    xmoduledescriptors = list(yield_descriptor_descendents(section))
-                    xmoduledescriptors.append(section)
-
-                    # The xmoduledescriptors included here are only the ones that have scores.
-                    section_description = {
-                        'section_descriptor': section,
-                        'xmoduledescriptors': [child for child in xmoduledescriptors if child.has_score]
-                    }
-
-                    section_format = section.format if section.format is not None else ''
-                    graded_sections[section_format] = graded_sections.get(section_format, []) + [section_description]
-
-                    all_descriptors.extend(xmoduledescriptors)
-                    all_descriptors.append(section)
-
-        return {'graded_sections': graded_sections,
-                'all_descriptors': all_descriptors, }
-
-    @lazy
-    def block_types_affecting_grading(self):
-        """Return all block types that could impact grading (i.e. scored, or having children)."""
-        return frozenset(
-            cat for (cat, xblock_class) in XBlock.load_classes() if (
-                getattr(xblock_class, 'has_score', False) or getattr(xblock_class, 'has_children', False)
-            )
-        )
-
     @staticmethod
     def make_id(org, course, url_name):
         return '/'.join([org, course, url_name])
@@ -1172,16 +1190,17 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         """Return the course_id for this course"""
         return self.location.course_key
 
-    def start_datetime_text(self, format_string="SHORT_DATE"):
+    def start_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
         """
-        Returns the desired text corresponding the course's start date and time in UTC.  Prefers .advertised_start,
-        then falls back to .start
+        Returns the desired text corresponding the course's start date and time in specified time zone, defaulted
+        to UTC. Prefers .advertised_start, then falls back to .start
         """
         i18n = self.runtime.service(self, "i18n")
         return course_metadata_utils.course_start_datetime_text(
             self.start,
             self.advertised_start,
             format_string,
+            time_zone,
             i18n.ugettext,
             i18n.strftime
         )
@@ -1197,13 +1216,14 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             self.advertised_start
         )
 
-    def end_datetime_text(self, format_string="SHORT_DATE"):
+    def end_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
         """
         Returns the end date or date_time for the course formatted as a string.
         """
         return course_metadata_utils.course_end_datetime_text(
             self.end,
             format_string,
+            time_zone,
             self.runtime.service(self, "i18n").strftime
         )
 
@@ -1224,7 +1244,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
                     raise ValueError
             return ret
         except (TypeError, ValueError):
-            log.exception(
+            log.info(
                 "Error parsing discussion_blackouts %s for course %s",
                 self.discussion_blackouts,
                 self.id
@@ -1238,7 +1258,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         setting
         """
         blackouts = self.get_discussion_blackout_datetimes()
-        now = datetime.now(UTC())
+        now = datetime.now(utc)
         for blackout in blackouts:
             if blackout["start"] <= now <= blackout["end"]:
                 return False
@@ -1366,4 +1386,57 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Returns:
           bool: False if the course has already started, True otherwise.
         """
-        return datetime.now(UTC()) <= self.start
+        return datetime.now(utc) <= self.start
+
+
+class CourseSummary(object):
+    """
+    A lightweight course summary class, which constructs split/mongo course summary without loading
+    the course. It is used at cms for listing courses to global staff user.
+    """
+    course_info_fields = ['display_name', 'display_coursenumber', 'display_organization']
+
+    def __init__(self, course_locator, display_name=u"Empty", display_coursenumber=None, display_organization=None):
+        """
+        Initialize and construct course summary
+
+        Arguments:
+        course_locator (CourseLocator):  CourseLocator object of the course.
+
+        display_name (unicode): display name of the course. When you create a course from console, display_name
+        isn't set (course block has no key `display_name`). "Empty" name is returned when we load the course.
+        If `display_name` isn't present in the course block, use the `Empty` as default display name.
+        We can set None as a display_name in Course Advance Settings; Do not use "Empty" when display_name is
+        set to None.
+
+        display_coursenumber (unicode|None): Course number that is specified & appears in the courseware
+
+        display_organization (unicode|None): Course organization that is specified & appears in the courseware
+
+        """
+        self.display_coursenumber = display_coursenumber
+        self.display_organization = display_organization
+        self.display_name = display_name
+
+        self.id = course_locator  # pylint: disable=invalid-name
+        self.location = course_locator.make_usage_key('course', 'course')
+
+    @property
+    def display_org_with_default(self):
+        """
+        Return a display organization if it has been specified, otherwise return the 'org' that
+        is in the location
+        """
+        if self.display_organization:
+            return self.display_organization
+        return self.location.org
+
+    @property
+    def display_number_with_default(self):
+        """
+        Return a display course number if it has been specified, otherwise return the 'course' that
+        is in the location
+        """
+        if self.display_coursenumber:
+            return self.display_coursenumber
+        return self.location.course

@@ -1,24 +1,12 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%namespace file="../main.html" import="stanford_theme_enabled" />
+<%namespace name='static' file='../static_content.html'/>
 (Not currently used)
 
-## TODO: fix this ugly hack
-% if stanford_theme_enabled():
-  ${_("We are sorry. Our course staff did not approve your request to change "
-      "your name from {old_name} to {new_name}. If you need further "
-      "assistance, please e-mail the tech support at {email}"
-    ).format(
-      old_name=old_name,
-      new_name=new_name,
-      email=settings.TECH_SUPPORT_EMAIL,
-    )}
-% else:
-  ${_("We are sorry. Our course staff did not approve your request to change "
-      "your name from {old_name} to {new_name}. If you need further "
-      "assistance, please e-mail the course staff at {email}."
-    ).format(
-      old_name=old_name,
-      new_name=new_name,
-      email="ta@edx.org",
-    )}
-% endif
+${_("We are sorry. Our course staff did not approve your request to change "
+  "your name from {old_name} to {new_name}. If you need further "
+  "assistance, please e-mail the course staff at {email}."
+).format(
+  old_name=old_name,
+  new_name=new_name,
+  email=static.get_tech_support_email_address(),
+)}

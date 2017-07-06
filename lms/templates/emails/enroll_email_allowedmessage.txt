@@ -4,7 +4,7 @@ ${_("Dear student,")}
 
 ${_("You have been invited to join {course_name} at {site_name} by a "
 	"member of the course staff.").format(
-		course_name=display_name or course.display_name_with_default,
+		course_name=display_name or course.display_name_with_default_escaped,
 		site_name=site_name
 	)}
 % if is_shib_course:
@@ -26,13 +26,13 @@ ${_("To finish your registration, please visit {registration_url} and fill "
 % if auto_enroll:
 ${_("Once you have registered and activated your account, you will see "
 	"{course_name} listed on your dashboard.").format(
-		course_name=display_name or course.display_name_with_default
+		course_name=display_name or course.display_name_with_default_escaped
 	)}
 % elif course_about_url is not None:
 ${_("Once you have registered and activated your account, visit {course_about_url} "
 	"to join the course.").format(course_about_url=course_about_url)}
 % else:
-${_("You can then enroll in {course_name}.").format(course_name=display_name or course.display_name_with_default)}
+${_("You can then enroll in {course_name}.").format(course_name=display_name or course.display_name_with_default_escaped)}
 % endif
 % endif
 

@@ -1,6 +1,6 @@
 """Third party authentication. """
 
-from microsite_configuration import microsite
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 def is_enabled():
@@ -9,7 +9,7 @@ def is_enabled():
     # We do this import internally to avoid initializing settings prematurely
     from django.conf import settings
 
-    return microsite.get_value(
+    return configuration_helpers.get_value(
         "ENABLE_THIRD_PARTY_AUTH",
         settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH")
     )

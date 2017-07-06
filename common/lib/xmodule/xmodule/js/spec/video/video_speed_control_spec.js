@@ -6,7 +6,7 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
-                .andReturn(null);
+                .and.returnValue(null);
         });
 
         afterEach(function () {
@@ -26,8 +26,8 @@
                     var secondaryControls = $('.secondary-controls'),
                         li = secondaryControls.find('.video-speeds li');
 
-                    expect(secondaryControls).toContain('.speeds');
-                    expect(secondaryControls).toContain('.video-speeds');
+                    expect(secondaryControls).toContainElement('.speeds');
+                    expect(secondaryControls).toContainElement('.video-speeds');
                     expect(secondaryControls.find('.value').text())
                         .toBe('1.50x');
                     expect(li.filter('.is-active')).toHaveData(
@@ -36,9 +36,7 @@
                     expect(li.length).toBe(state.speeds.length);
 
                     $.each(li.toArray().reverse(), function (index, link) {
-                        expect($(link)).toHaveData(
-                            'speed', state.speeds[index]
-                        );
+                        expect($(link).attr('data-speed')).toEqual(state.speeds[index]);
                         expect($(link).find('.speed-option').text()).toBe(
                             state.speeds[index] + 'x'
                         );
@@ -49,7 +47,7 @@
             describe('when running on touch based device', function () {
                 $.each(['iPad', 'Android'], function (index, device) {
                     it('is not rendered on' + device, function () {
-                        window.onTouchBasedDevice.andReturn([device]);
+                        window.onTouchBasedDevice.and.returnValue([device]);
                         state = jasmine.initializePlayer();
 
                         expect(state.el.find('.speeds')).not.toExist();
@@ -205,16 +203,18 @@
         describe('onSpeedChange', function () {
             beforeEach(function () {
                 state = jasmine.initializePlayer();
-                $('li[data-speed="1.0"]').addClass('is-active');
+                $('li[data-speed="1.0"]').addClass('is-active').attr('aria-pressed', 'true');
                 state.videoSpeedControl.setSpeed(0.75);
             });
 
             it('set the new speed as active', function () {
-                expect($('.video-speeds li[data-speed="1.0"]'))
-                    .not.toHaveClass('is-active');
-                expect($('.video-speeds li[data-speed="0.75"]'))
-                    .toHaveClass('is-active');
-                expect($('.speeds .value')).toHaveHtml('0.75x');
+                expect($('li[data-speed="1.0"]')).not.toHaveClass('is-active');
+                expect($('li[data-speed="1.0"] .speed-option').attr('aria-pressed')).not.toEqual('true');
+
+                expect($('li[data-speed="0.75"]')).toHaveClass('is-active');
+                expect($('li[data-speed="0.75"] .speed-option').attr('aria-pressed')).toEqual('true');
+
+                expect($('.speeds .speed-button .value')).toHaveHtml('0.75x');
             });
         });
 

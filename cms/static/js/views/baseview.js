@@ -26,6 +26,14 @@ define(["jquery", "underscore", "backbone", "gettext", "js/utils/handle_iframe_b
             //override the constructor function
             constructor: function(options) {
                 _.bindAll(this, 'beforeRender', 'render', 'afterRender');
+
+                // Merge passed options and view's options property and
+                // attach to the view's options property
+                if (this.options) {
+                    options = _.extend({}, _.result(this, 'options'), options);
+                }
+                this.options = options;
+
                 var _this = this;
                 this.render = _.wrap(this.render, function (render, options) {
                     _this.beforeRender();

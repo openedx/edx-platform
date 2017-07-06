@@ -223,9 +223,9 @@ def get_courseware_with_tabs(course_id):
     course = get_course_by_id(course_id)
     chapters = [chapter for chapter in course.get_children() if not chapter.hide_from_toc]
     courseware = [{
-        'chapter_name': c.display_name_with_default,
+        'chapter_name': c.display_name_with_default_escaped,
         'sections': [{
-            'section_name': s.display_name_with_default,
+            'section_name': s.display_name_with_default_escaped,
             'clickable_tab_count': len(s.get_children()) if (type(s) == seq_module.SequenceDescriptor) else 0,
             'tabs': [{
                 'children_count': len(t.get_children()) if (type(t) == vertical_block.VerticalBlock) else 0,

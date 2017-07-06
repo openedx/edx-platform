@@ -1,0 +1,17 @@
+@mixin xseries-certificate-container {
+  border: 1px solid $gray-l3;
+  box-sizing: border-box;
+  padding: $baseline;
+  background: $gray-l6;
+  margin-top: $baseline;
+  .title{
+    @extend %t-title6;
+    @extend %t-weight3;
+    margin-bottom:$baseline;
+    color: $gray;
+  }
+  .certificate-link{
+    padding-top: $baseline;
+    display: block;
+  }
+}

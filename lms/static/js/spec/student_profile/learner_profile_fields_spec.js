@@ -1,4 +1,8 @@
-define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
+define(['backbone',
+        'jquery',
+        'underscore',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/js/spec_helpers/template_helpers',
         'js/spec/student_account/helpers',
         'js/student_account/models/user_account_model',
         'js/student_profile/views/learner_profile_fields',
@@ -54,6 +58,11 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 TemplateHelpers.installTemplate("templates/fields/message_banner");
             });
 
+            afterEach(function () {
+                // image_field.js's window.onBeforeUnload breaks Karma in Chrome, clean it up after each test
+                $(window).off('beforeunload');
+            });
+
             var createFakeImageFile = function (size) {
                 var fileFakeData = 'i63ljc6giwoskyb9x5sw0169bdcmcxr3cdz8boqv0lik971972cmd6yknvcxr5sw0nvc169bdcmcxsdf';
                 return new Blob(
@@ -77,14 +86,14 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 var verifyImageUploadButtonMessage = function (view, inProgress) {
                     var iconName = inProgress ? 'fa-spinner' : 'fa-camera';
                     var message = inProgress ? view.titleUploading : view.uploadButtonTitle();
-                    expect(view.$('.upload-button-icon i').attr('class')).toContain(iconName);
+                    expect(view.$('.upload-button-icon span').attr('class')).toContain(iconName);
                     expect(view.$('.upload-button-title').text().trim()).toBe(message);
                 };
 
                 var verifyImageRemoveButtonMessage = function (view, inProgress) {
                     var iconName = inProgress ? 'fa-spinner' : 'fa-remove';
                     var message = inProgress ? view.titleRemoving : view.removeButtonTitle();
-                    expect(view.$('.remove-button-icon i').attr('class')).toContain(iconName);
+                    expect(view.$('.remove-button-icon span').attr('class')).toContain(iconName);
                     expect(view.$('.remove-button-title').text().trim()).toBe(message);
                 };
 
@@ -260,6 +269,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     // Verify image upload progress message
                     verifyImageUploadButtonMessage(imageView, true);
 
+                    window.onbeforeunload = null;
                     $(window).trigger('beforeunload');
                     expect(imageView.onBeforeUnload).toHaveBeenCalled();
                 });

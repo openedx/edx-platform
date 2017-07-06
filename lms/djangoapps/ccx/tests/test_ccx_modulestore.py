@@ -25,16 +25,12 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCCXModulestoreWrapper, cls).setUpClass()
-        cls.course = course = CourseFactory.create()
-        cls.mooc_start = start = datetime.datetime(
-            2010, 5, 12, 2, 42, tzinfo=pytz.UTC
-        )
-        cls.mooc_due = due = datetime.datetime(
-            2010, 7, 7, 0, 0, tzinfo=pytz.UTC
-        )
+        cls.course = CourseFactory.create()
+        start = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=pytz.UTC)
+        due = datetime.datetime(2010, 7, 7, 0, 0, tzinfo=pytz.UTC)
         # Create a course outline
         cls.chapters = chapters = [
-            ItemFactory.create(start=start, parent=course) for _ in xrange(2)
+            ItemFactory.create(start=start, parent=cls.course) for _ in xrange(2)
         ]
         cls.sequentials = sequentials = [
             ItemFactory.create(parent=c) for _ in xrange(2) for c in chapters
@@ -48,20 +44,24 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
             ItemFactory.create(parent=v, category='html') for _ in xrange(2) for v in verticals
         ]
 
+    @classmethod
+    def setUpTestData(cls):
+        """
+        Set up models for the whole TestCase.
+        """
+        cls.user = UserFactory.create()
+        # Create instructor account
+        cls.coach = AdminFactory.create()
+
     def setUp(self):
         """
         Set up tests
         """
         super(TestCCXModulestoreWrapper, self).setUp()
-        self.user = UserFactory.create()
-
-        # Create instructor account
-        coach = AdminFactory.create()
-
         self.ccx = ccx = CustomCourseForEdX(
             course_id=self.course.id,
             display_name='Test CCX',
-            coach=coach
+            coach=self.coach
         )
         ccx.save()
 
@@ -132,12 +132,13 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
 
     def test_publication_api(self):
         """verify that we can correctly discern a published item by ccx key"""
-        for expected in self.blocks:
-            block_key = self.ccx_locator.make_usage_key(
-                expected.location.block_type, expected.location.block_id
-            )
-            self.assertTrue(self.store.has_published_version(expected))
-            self.store.unpublish(block_key, self.user.id)
-            self.assertFalse(self.store.has_published_version(expected))
-            self.store.publish(block_key, self.user.id)
-            self.assertTrue(self.store.has_published_version(expected))
+        with self.store.bulk_operations(self.ccx_locator):
+            for expected in self.blocks:
+                block_key = self.ccx_locator.make_usage_key(
+                    expected.location.block_type, expected.location.block_id
+                )
+                self.assertTrue(self.store.has_published_version(expected))
+                self.store.unpublish(block_key, self.user.id)
+                self.assertFalse(self.store.has_published_version(expected))
+                self.store.publish(block_key, self.user.id)
+                self.assertTrue(self.store.has_published_version(expected))

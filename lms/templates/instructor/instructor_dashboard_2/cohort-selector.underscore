@@ -10,5 +10,5 @@
     );
     var isSelected = selectedCohort && selectedCohort.get('id') === cohort.get('id')
     %>
-    <option value="<%- cohort.get('id') %>" <%= isSelected ? 'selected' : '' %>><%- label %></option>
+    <option value="<%- cohort.get('id') %>" <%- isSelected ? 'selected' : '' %>><%- label %></option>
 <% }); %>

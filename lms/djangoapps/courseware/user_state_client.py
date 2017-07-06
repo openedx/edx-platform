@@ -14,8 +14,8 @@ except ImportError:
 
 import dogstats_wrapper as dog_stats_api
 from django.contrib.auth.models import User
-from xblock.fields import Scope, ScopeBase
-from courseware.models import StudentModule, StudentModuleHistory
+from xblock.fields import Scope
+from courseware.models import StudentModule, BaseStudentModuleHistory
 from edx_user_state_client.interface import XBlockUserStateClient, XBlockUserState
 
 
@@ -193,6 +193,11 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         else:
             user = User.objects.get(username=username)
 
+        if user.is_anonymous():
+            # Anonymous users cannot be persisted to the database, so let's just use
+            # what we have.
+            return
+
         evt_time = time()
 
         for usage_key, state in block_keys_to_state.items():
@@ -312,9 +317,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         if len(student_modules) == 0:
             raise self.DoesNotExist()
 
-        history_entries = StudentModuleHistory.objects.prefetch_related('student_module').filter(
-            student_module__in=student_modules
-        ).order_by('-id')
+        history_entries = BaseStudentModuleHistory.get_history(student_modules)
 
         # If no history records exist, raise an error
         if not history_entries:
@@ -332,9 +335,9 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             if state == {}:
                 state = None
 
-            block_key = history_entry.student_module.module_state_key
+            block_key = history_entry.csm.module_state_key
             block_key = block_key.map_into_course(
-                history_entry.student_module.course_id
+                history_entry.csm.course_id
             )
 
             yield XBlockUserState(username, block_key, state, history_entry.created, scope)

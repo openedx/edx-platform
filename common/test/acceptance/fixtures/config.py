@@ -6,10 +6,10 @@ import re
 import json
 
 from lazy import lazy
-from . import LMS_BASE_URL
+from common.test.acceptance.fixtures import LMS_BASE_URL
 
 
-class ConfigModelFixureError(Exception):
+class ConfigModelFixtureError(Exception):
     """
     Error occurred while configuring the stub XQueue.
     """
@@ -41,7 +41,7 @@ class ConfigModelFixture(object):
         )
 
         if not response.ok:
-            raise ConfigModelFixureError(
+            raise ConfigModelFixtureError(
                 "Could not configure url '{}'.  response: {} - {}".format(
                     self._api_base,
                     response,
@@ -53,7 +53,7 @@ class ConfigModelFixture(object):
     def session_cookies(self):
         """
         Log in as a staff user, then return the cookies for the session (as a dict)
-        Raises a `ConfigModelFixureError` if the login fails.
+        Raises a `ConfigModelFixtureError` if the login fails.
         """
         return {key: val for key, val in self.session.cookies.items()}
 
@@ -92,4 +92,4 @@ class ConfigModelFixture(object):
 
         else:
             msg = "Could not log in to use ConfigModel restful API.  Status code: {0}".format(response.status_code)
-            raise ConfigModelFixureError(msg)
+            raise ConfigModelFixtureError(msg)

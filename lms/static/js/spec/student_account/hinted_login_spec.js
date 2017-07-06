@@ -4,7 +4,7 @@
             'jquery',
             'underscore',
             'common/js/spec_helpers/template_helpers',
-            'common/js/spec_helpers/ajax_helpers',
+            'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
             'js/student_account/views/HintedLoginView'
         ],
         function($, _, TemplateHelpers, AjaxHelpers, HintedLoginView) {
@@ -51,7 +51,7 @@
                 });
 
                 // Mock the redirect call
-                spyOn( view, 'redirect' ).andCallFake( function() {} );
+                spyOn( view, 'redirect' ).and.callFake( function() {} );
 
                 view.render();
             };

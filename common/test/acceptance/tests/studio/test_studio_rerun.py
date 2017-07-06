@@ -67,9 +67,10 @@ class CourseRerunTest(StudioCourseTest):
             Then I see one html component with the content 'Test Content'
         """
         course_info = (self.course_info['org'], self.course_info['number'], self.course_info['run'])
+        updated_course_info = course_info[0] + "+" + course_info[1] + "+" + course_info[2]
 
         self.dashboard_page.visit()
-        self.dashboard_page.create_rerun(self.course_info['display_name'])
+        self.dashboard_page.create_rerun(updated_course_info)
 
         rerun_page = CourseRerunPage(self.browser, *course_info)
         rerun_page.wait_for_page()

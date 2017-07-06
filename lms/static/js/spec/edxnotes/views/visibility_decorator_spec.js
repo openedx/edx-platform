@@ -1,7 +1,7 @@
 define([
     'annotator_1.2.9', 'js/edxnotes/views/visibility_decorator',
-    'js/spec/edxnotes/helpers', 'js/spec/edxnotes/custom_matchers'
-], function(Annotator, VisibilityDecorator, Helpers, customMatchers) {
+    'js/spec/edxnotes/helpers'
+], function(Annotator, VisibilityDecorator, Helpers) {
     'use strict';
     describe('EdxNotes VisibilityDecorator', function() {
         var params = {
@@ -14,14 +14,15 @@ define([
         };
 
         beforeEach(function() {
-            customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');
             this.wrapper = document.getElementById('edx-notes-wrapper-123');
         });
 
         afterEach(function () {
             VisibilityDecorator._setVisibility(null);
-            _.invoke(Annotator._instances, 'destroy');
+            while (Annotator._instances.length > 0) {
+                Annotator._instances[0].destroy();
+            }
         });
 
         it('can initialize Notes if it visibility equals True', function() {

@@ -4,6 +4,7 @@ Tests for paver quality tasks
 import os
 from path import Path as path
 import tempfile
+import textwrap
 import unittest
 from mock import patch, MagicMock, mock_open
 from ddt import ddt, file_data
@@ -59,7 +60,8 @@ class TestPaverQualityViolations(unittest.TestCase):
 
 class TestPaverReportViolationsCounts(unittest.TestCase):
     """
-    For testing run_jshint and run_complexity utils
+    For testing utility functions for getting counts from reports for
+    run_jshint, run_complexity, run_safelint, and run_safecommit_report.
     """
 
     def setUp(self):
@@ -132,6 +134,91 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
         actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "foo")  # pylint: disable=protected-access
         self.assertEqual(actual_count, None)
 
+    def test_get_safelint_counts_happy(self):
+        """
+        Test happy path getting violation counts from safelint report.
+        """
+        report = textwrap.dedent("""
+            test.html: 30:53: javascript-jquery-append:  $('#test').append(print_tos);
+
+            javascript-concat-html: 310 violations
+            javascript-escape:      7 violations
+
+            2608 violations total
+        """)
+        with open(self.f.name, 'w') as f:
+            f.write(report)
+        counts = pavelib.quality._get_safelint_counts(self.f.name)  # pylint: disable=protected-access
+        self.assertDictEqual(counts, {
+            'rules': {
+                'javascript-concat-html': 310,
+                'javascript-escape': 7,
+            },
+            'total': 2608,
+        })
+
+    def test_get_safelint_counts_bad_counts(self):
+        """
+        Test getting violation counts from truncated and malformed safelint
+        report.
+        """
+        report = textwrap.dedent("""
+            javascript-concat-html: violations
+        """)
+        with open(self.f.name, 'w') as f:
+            f.write(report)
+        counts = pavelib.quality._get_safelint_counts(self.f.name)  # pylint: disable=protected-access
+        self.assertDictEqual(counts, {
+            'rules': {},
+            'total': None,
+        })
+
+    def test_get_safecommit_count_happy(self):
+        """
+        Test happy path getting violation count from safecommit report.
+        """
+        report = textwrap.dedent("""
+            Linting lms/templates/navigation.html:
+
+            2 violations total
+
+            Linting scripts/tests/templates/test.underscore:
+
+            3 violations total
+        """)
+        with open(self.f.name, 'w') as f:
+            f.write(report)
+        count = pavelib.quality._get_safecommit_count(self.f.name)  # pylint: disable=protected-access
+
+        self.assertEqual(count, 5)
+
+    def test_get_safecommit_count_bad_counts(self):
+        """
+        Test getting violation count from truncated safecommit report.
+        """
+        report = textwrap.dedent("""
+            Linting lms/templates/navigation.html:
+        """)
+        with open(self.f.name, 'w') as f:
+            f.write(report)
+        count = pavelib.quality._get_safecommit_count(self.f.name)  # pylint: disable=protected-access
+
+        self.assertIsNone(count)
+
+    def test_get_safecommit_count_no_files(self):
+        """
+        Test getting violation count from safecommit report where no files were
+        linted.
+        """
+        report = textwrap.dedent("""
+            No files linted.
+        """)
+        with open(self.f.name, 'w') as f:
+            f.write(report)
+        count = pavelib.quality._get_safecommit_count(self.f.name)  # pylint: disable=protected-access
+
+        self.assertEqual(count, 0)
+
 
 class TestPrepareReportDir(unittest.TestCase):
     """
@@ -196,7 +283,6 @@ class TestPaverRunQuality(unittest.TestCase):
         with patch('pavelib.quality._get_pep8_violations', _mock_pep8_violations):
             with self.assertRaises(SystemExit):
                 pavelib.quality.run_quality("")
-                self.assertRaises(BuildFailure)
 
         # Test that pep8, pylint, and jshint were called by counting the calls to
         # _get_pep8_violations (for pep8) and sh (for diff-quality pylint & jshint)
@@ -215,7 +301,7 @@ class TestPaverRunQuality(unittest.TestCase):
         with patch('pavelib.quality._get_pep8_violations', _mock_pep8_violations):
             with self.assertRaises(SystemExit):
                 pavelib.quality.run_quality("")
-                self.assertRaises(BuildFailure)
+
         # Test that both pep8 and pylint were called by counting the calls
         # Assert that _get_pep8_violations (which calls "pep8") is called once
         self.assertEqual(_mock_pep8_violations.call_count, 1)

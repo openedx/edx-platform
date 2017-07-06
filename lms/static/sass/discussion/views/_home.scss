@@ -3,10 +3,10 @@
 
 // home - layout
 .container .view-discussion-home {
-  padding: ($baseline*2) ($baseline*2) ($baseline/2);
+  padding-left: $baseline;
 
   section {
-    border-bottom: 1px solid $gray-l3;
+    border-bottom: 1px solid $forum-color-border;
   }
 
   .label {
@@ -17,7 +17,6 @@
   .label-settings {
     padding-top: $baseline;
     padding-bottom: ($baseline/2);
-    text-transform: uppercase;
   }
 
   .home-header {
@@ -75,12 +74,12 @@
   .home-helpgrid {
     border-bottom: none;
     border-radius: 3px;
-    border: 1px solid $gray-l2;
+    border: 1px solid $forum-color-border;
     box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
   }
 
   .helpgrid-row {
-    border-bottom: 1px solid $gray-l2;
+    border-bottom: 1px solid $forum-color-border;
 
     .row-title {
       padding: ($baseline*1.5) $baseline;
@@ -90,7 +89,7 @@
 
     .row-item-full, .row-item {
       font-size: 12px;
-      padding: 0px $baseline/2;
+      padding: 0 ($baseline/2);
       width: 26%;
       vertical-align: middle;
 
@@ -98,6 +97,7 @@
         padding: 0 ($baseline/2);
         font-size: 24px;
         vertical-align: middle;
+        // TODO: don't use table-cell for layout purposes as it switches the screenreader mode
         display: table-cell;
       }
 
@@ -107,6 +107,7 @@
 
       .row-description {
         vertical-align: middle;
+        // TODO: don't use table-cell for layout purposes as it switches the screenreader mode
         display: table-cell;
       }
     }
@@ -114,9 +115,9 @@
     .row-item-full {
 
       .notification-checkbox {
+        @include margin-right($baseline/2);
         display: inline-block;
         @include padding($baseline/4, 0, $baseline/2, 0);
-        @include margin-right($baseline/2);
         border-radius: 5px;
         border: 1px solid gray;
 

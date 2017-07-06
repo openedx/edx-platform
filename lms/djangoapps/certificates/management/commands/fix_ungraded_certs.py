@@ -51,7 +51,7 @@ class Command(BaseCommand):
 
         for cert in ungraded:
             # grade the student
-            grade = grades.grade(cert.user, request, course)
+            grade = grades.grade(cert.user, course)
             print "grading {0} - {1}".format(cert.user, grade['percent'])
             cert.grade = grade['percent']
             if not options['noop']:

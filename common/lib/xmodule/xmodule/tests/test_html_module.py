@@ -3,7 +3,7 @@ import unittest
 from mock import Mock
 
 from xblock.field_data import DictFieldData
-from xmodule.html_module import HtmlModule, HtmlDescriptor
+from xmodule.html_module import HtmlModule, HtmlDescriptor, CourseInfoModule
 
 from . import get_test_system, get_test_descriptor_system
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -144,3 +144,40 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             "content": {"html_content": " This has HTML comment in it. HTML end. ", "display_name": "Text"},
             "content_type": "Text"
         })
+
+
+class CourseInfoModuleTestCase(unittest.TestCase):
+    """
+    Make sure that CourseInfoModule renders updates properly
+    """
+    def test_updates_render(self):
+        """
+        Tests that a course info module will render its updates, even if they are malformed.
+        """
+        sample_update_data = [
+            {
+                "id": i,
+                "date": data,
+                "content": "This is a very important update!",
+                "status": CourseInfoModule.STATUS_VISIBLE,
+            } for i, data in enumerate(
+                [
+                    'January 1, 1970',
+                    'Marchtober 45, -1963',
+                    'Welcome!',
+                    'Date means "title", right?'
+                ]
+            )
+        ]
+        info_module = CourseInfoModule(
+            Mock(),
+            get_test_system(),
+            DictFieldData({'items': sample_update_data, 'data': ""}),
+            Mock()
+        )
+
+        # Prior to TNL-4115, an exception would be raised when trying to parse invalid dates in this method
+        try:
+            info_module.get_html()
+        except ValueError:
+            self.fail("CourseInfoModule could not parse an invalid date!")

@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from opaque_keys.edx import locator
 from pytz import UTC
+from nose.plugins.attrib import attr
 import unittest
 import ddt
 from shoppingcart.models import DonationConfiguration
@@ -16,11 +17,13 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment, DashboardConfiguration
 from student.views import get_course_enrollments, _get_recently_enrolled_courses
+from common.test.utils import XssTestMixin
 
 
+@attr('shard_3')
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
-class TestRecentEnrollments(ModuleStoreTestCase):
+class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
     """
     Unit tests for getting the list of courses for a logged in user
     """
@@ -126,6 +129,30 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         response = self.client.get(reverse("dashboard"))
         self.assertContains(response, "Thank you for enrolling in")
 
+    def test_dashboard_escaped_rendering(self):
+        """
+        Tests that the dashboard renders the escaped recent enrollment messages appropriately.
+        """
+        self._configure_message_timeout(600)
+        self.client.login(username=self.student.username, password=self.PASSWORD)
+
+        # New Course
+        course_location = locator.CourseLocator('TestOrg', 'TestCourse', 'TestRun')
+        xss_content = "<script>alert('XSS')</script>"
+        course = CourseFactory.create(
+            org=course_location.org,
+            number=course_location.course,
+            run=course_location.run,
+            display_name=xss_content
+        )
+        CourseEnrollment.enroll(self.student, course.id)
+
+        response = self.client.get(reverse("dashboard"))
+        self.assertContains(response, "Thank you for enrolling in")
+
+        # Check if response is escaped
+        self.assert_no_xss(response, xss_content)
+
     @ddt.data(
         # Register as honor in any course modes with no payment option
         ([('audit', 0), ('honor', 0)], 'honor', True),
@@ -157,7 +184,7 @@ class TestRecentEnrollments(ModuleStoreTestCase):
 
         # Create the course mode(s)
         for mode, min_price in course_modes:
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id, min_price=min_price)
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id, min_price=min_price)
 
         self.enrollment.mode = enrollment_mode
         self.enrollment.save()
@@ -178,7 +205,7 @@ class TestRecentEnrollments(ModuleStoreTestCase):
 
         # Create a white-label course mode
         # (honor mode with a price set)
-        CourseModeFactory(mode_slug="honor", course_id=self.course.id, min_price=100)
+        CourseModeFactory.create(mode_slug="honor", course_id=self.course.id, min_price=100)
 
         # Check that the donate button is NOT displayed
         self.client.login(username=self.student.username, password=self.PASSWORD)

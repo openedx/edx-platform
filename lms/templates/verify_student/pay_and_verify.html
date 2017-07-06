@@ -1,6 +1,9 @@
+<%page expression_filter="h"/>
 <%!
 import json
 from django.utils.translation import ugettext as _
+
+from openedx.core.djangolib.markup import HTML, Text
 from lms.djangoapps.verify_student.views import PayAndVerifyView
 %>
 <%namespace name='static' file='../static_content.html'/>
@@ -10,13 +13,13 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
 
 <%block name="pagetitle">
   % if message_key == PayAndVerifyView.UPGRADE_MSG:
-    ${_("Upgrade Your Enrollment For {course_name}.").format(course_name=course.display_name) | h}
+    ${_("Upgrade Your Enrollment For {course_name}.").format(course_name=course.display_name)}
   % elif message_key == PayAndVerifyView.PAYMENT_CONFIRMATION_MSG:
-    ${_("Receipt For {course_name}").format(course_name=course.display_name) | h}
+    ${_("Receipt For {course_name}").format(course_name=course.display_name)}
   % elif message_key in [PayAndVerifyView.VERIFY_NOW_MSG, PayAndVerifyView.VERIFY_LATER_MSG]:
-    ${_("Verify For {course_name}").format(course_name=course.display_name) | h}
+    ${_("Verify For {course_name}").format(course_name=course.display_name)}
   % else:
-    ${_("Enroll In {course_name}").format(course_name=course.display_name) | h}
+    ${_("Enroll In {course_name}").format(course_name=course.display_name)}
   % endif
 </%block>
 
@@ -41,7 +44,6 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
     % endfor
 </%block>
 <%block name="js_extra">
-  <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
   <script src="${static.url('js/src/tooltip_manager.js')}"></script>
   <%static:js group='verify_student'/>
 </%block>
@@ -51,7 +53,7 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
 ## JavaScript views may append to this wrapper
 <div id="error-container" style="display: none;"></div>
 
-<div class="container">
+<div class="container no-min-scale">
   <section class="wrapper carousel">
     ## Payment / Verification flow
     ## Most of these data attributes are used to dynamically render
@@ -62,7 +64,7 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
       data-full-name='${user_full_name | h}'
       data-platform-name='${platform_name}'
       data-course-key='${course_key}'
-      data-course-name='${course.display_name|h}'
+      data-course-name='${course.display_name}'
       data-course-start-date='${course.start_datetime_text()}'
       data-courseware-url='${courseware_url}'
       data-course-mode-name='${course_mode.name}'
@@ -74,11 +76,12 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
       data-contribution-amount='${contribution_amount}'
       data-processors='${json.dumps(processors)}'
       data-verification-deadline='${verification_deadline}'
-      data-display-steps='${json.dumps(display_steps) | h}'
+      data-display-steps='${json.dumps(display_steps)}'
       data-current-step='${current_step}'
       data-requirements='${json.dumps(requirements)}'
       data-msg-key='${message_key}'
       data-is-active='${is_active}'
+      data-user-email='${user_email}'
       data-already-verified='${already_verified}'
       data-verification-good-until='${verification_good_until}'
       data-capture-sound='${capture_sound}'
@@ -100,7 +103,9 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
               <li class="help-item help-item-questions">
                   <h3 class="title">${_("Have questions?")}</h3>
                   <div class="copy">
-                      <p>${_("Please read {a_start}our FAQs to view common questions about our certificates{a_end}.").format(a_start='<a rel="external" href="'+ marketing_link('WHAT_IS_VERIFIED_CERT') + '">', a_end="</a>")}</p>
+                      <p>${Text(_("Please read {a_start}our FAQs to view common questions about our certificates{a_end}.")).format(
+                              a_start=HTML('<a rel="external" href="{}">').format(marketing_link('WHAT_IS_VERIFIED_CERT')),
+                              a_end=HTML('</a>'))}</p>
                   </div>
               </li>
 
@@ -108,7 +113,11 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
               <li class="help-item help-item-technical">
                   <h3 class="title">${_("Technical Requirements")}</h3>
                   <div class="copy">
-                      <p>${_("Please make sure your browser is updated to the {a_start}most recent version possible{a_end}. Also, please make sure your <strong>webcam is plugged in, turned on, and allowed to function in your web browser (commonly adjustable in your browser settings).</strong>").format(a_start='<strong><a rel="external" href="http://browsehappy.com/">', a_end="</a></strong>")}</p>
+                      <p>${Text(_("Please make sure your browser is updated to the {strong_start}{a_start}most recent version possible{a_end}{strong_end}. Also, please make sure your {strong_start}webcam is plugged in, turned on, and allowed to function in your web browser (commonly adjustable in your browser settings).{strong_end}")).format(
+                              a_start=HTML('<a rel="external" href="http://browsehappy.com/">'),
+                              a_end=HTML('</a>'),
+                              strong_start=HTML('<strong>'),
+                              strong_end=HTML('</strong>'))}</p>
                   </div>
               </li>
               % endif

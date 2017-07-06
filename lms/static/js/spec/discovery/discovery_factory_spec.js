@@ -1,5 +1,5 @@
 define([
-    'jquery', 'common/js/spec_helpers/ajax_helpers','common/js/spec_helpers/template_helpers',
+    'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers','common/js/spec_helpers/template_helpers',
     'js/discovery/discovery_factory'
 ], function($, AjaxHelpers, TemplateHelpers, DiscoveryFactory) {
     'use strict';
@@ -107,6 +107,12 @@ define([
                 'templates/discovery/filter_bar'
             ]);
             DiscoveryFactory(MEANINGS);
+
+            jasmine.clock().install();
+        });
+
+        afterEach(function () {
+            jasmine.clock().uninstall();
         });
 
         it('does search', function () {
@@ -121,15 +127,15 @@ define([
 
         it('loads more', function () {
             var requests = AjaxHelpers.requests(this);
-            jasmine.Clock.useMock();
+
             $('.discovery-input').val('test');
             $('.discovery-submit').trigger('click');
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             expect($('.courses-listing article').length).toEqual(1);
             expect($('.courses-listing .course-title')).toContainHtml('edX Demonstration Course');
+            jasmine.clock().tick(500);
             window.scroll(0, $(document).height());
             $(window).trigger('scroll');
-            jasmine.Clock.tick(500);
 
             // TODO: determine why the search API is invoked twice
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);

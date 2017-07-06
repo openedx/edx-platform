@@ -45,18 +45,3 @@ def show_parameters(request):
     for name, value in sorted(request.POST.items()):
         html.append(escape("POST {}: {!r}".format(name, value)))
     return HttpResponse("\n".join("<p>{}</p>".format(h) for h in html))
-
-
-def show_reference_template(request, template):
-    """
-    Shows the specified template as an HTML page. This is used only in debug mode to allow the UX team
-    to produce and work with static reference templates.
-    e.g. /template/ux/reference/container.html shows the template under ux/reference/container.html
-
-    Note: dynamic parameters can also be passed to the page.
-    e.g. /template/ux/reference/container.html?name=Foo
-    """
-    try:
-        return render_to_response(template, request.GET.dict())
-    except TopLevelLookupException:
-        return HttpResponseNotFound("Couldn't find template {template}".format(template=template))

@@ -20,10 +20,15 @@ log = logging.getLogger(__name__)
 CLASS_PRIORITY = ['video', 'problem']
 
 
+@XBlock.needs('user')
+@XBlock.wants('bookmarks')
 class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
     """
     Layout XBlock for rendering subblocks vertically.
     """
+
+    resources_dir = 'assets/vertical'
+
     mako_template = 'widgets/sequence-edit.html'
     js_module_name = "VerticalBlock"
 
@@ -38,8 +43,25 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         fragment = Fragment()
         contents = []
 
-        child_context = {} if not context else copy(context)
+        if context:
+            child_context = copy(context)
+        else:
+            child_context = {}
+
+        # import pdb; pdb.set_trace()
+        if 'bookmarked' not in child_context:
+            bookmarks_service = self.runtime.service(self, 'bookmarks')
+            if bookmarks_service:
+                child_context['bookmarked'] = bookmarks_service.is_bookmarked(usage_key=self.location),  # pylint: disable=no-member
+            else:
+                child_context['bookmarked'] = False
+        if 'username' not in child_context:
+            user_service = self.runtime.service(self, 'user')
+            child_context['username'] = user_service.get_current_user().opt_attrs['edx-platform.username']
+
         child_context['child_of_vertical'] = True
+
+        is_child_of_vertical = context.get('child_of_vertical', False)
 
         # pylint: disable=no-member
         for child in self.get_display_items():
@@ -54,7 +76,14 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         fragment.add_content(self.system.render_template('vert_module.html', {
             'items': contents,
             'xblock_context': context,
+            'show_bookmark_button': child_context.get('show_bookmark_button', not is_child_of_vertical),
+            'bookmarked': child_context['bookmarked'],
+            'bookmark_id': "{},{}".format(child_context['username'], unicode(self.location))
         }))
+
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/vertical_student_view.js'))
+        fragment.initialize_js('VerticalStudentView')
+
         return fragment
 
     def author_view(self, context):

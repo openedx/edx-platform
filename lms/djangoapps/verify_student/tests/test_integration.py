@@ -26,13 +26,13 @@ class TestProfEdVerification(ModuleStoreTestCase):
         self.client.login(username="rusty", password="test")
         course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         self.course_key = course.id
-        CourseModeFactory(
+        CourseModeFactory.create(
             mode_slug="professional",
             course_id=self.course_key,
             min_price=self.MIN_PRICE,
             suggested_prices=''
         )
-
+        purchase_workflow = "?purchase_workflow=single"
         self.urls = {
             'course_modes_choose': reverse(
                 'course_modes_choose',
@@ -42,7 +42,7 @@ class TestProfEdVerification(ModuleStoreTestCase):
             'verify_student_start_flow': reverse(
                 'verify_student_start_flow',
                 args=[unicode(self.course_key)]
-            ),
+            ) + purchase_workflow,
         }
 
     def test_start_flow(self):

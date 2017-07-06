@@ -1,0 +1,33 @@
+// ------------------------------
+// Open edX Certificates: Config
+
+
+// ------------------------------
+// #VARIABLES
+// ------------------------------
+
+// certificate characteristics
+$cert-base-color: palette(grayscale-cool, dark);
+$cert-distinguished-color: palette(primary, accent);
+
+$cert-decorative-color: palette(grayscale-cool, light);
+$cert-decorative-color-de-emphasized: palette(grayscale-cool, x-trans);
+$cert-decorative-color-emphasized: palette(grayscale-cool, mid-light);
+
+// typography: config
+@include font-face(
+    'Domine',
+    '../../certificates/fonts/Domine/Domine-Regular-webfont',
+    400,
+    $file-formats: woff woff2 ttf
+);
+
+@include font-face(
+    'Domine',
+    '../../certificates/fonts/Domine/Domine-Bold-webfont',
+    700,
+    $file-formats: woff woff2 ttf
+);
+
+// typography: config - stacks
+$font-family-serif: 'Domine', serif;

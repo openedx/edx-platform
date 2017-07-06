@@ -1,4 +1,4 @@
-define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers',
+define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'common/js/spec_helpers/template_helpers',
         'js/spec/student_account/helpers',
         'js/spec/student_profile/helpers',
@@ -22,10 +22,15 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 loadFixtures('js/fixtures/student_profile/student_profile.html');
             });
 
+            afterEach(function () {
+                Backbone.history.stop();
+            });
+
             var createProfilePage = function(ownProfile, options) {
                 return new LearnerProfilePage({
                     'accounts_api_url': Helpers.USER_ACCOUNTS_API_URL,
                     'preferences_api_url': Helpers.USER_PREFERENCES_API_URL,
+                    'badges_api_url': Helpers.BADGES_API_URL,
                     'own_profile': ownProfile,
                     'account_settings_page_url': Helpers.USER_ACCOUNTS_API_URL,
                     'country_options': Helpers.FIELD_OPTIONS,
@@ -37,13 +42,13 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     'profile_image_remove_url': Helpers.IMAGE_REMOVE_API_URL,
                     'default_visibility': 'all_users',
                     'platform_name': 'edX',
+                    'find_courses_url': '/courses/',
                     'account_settings_data': Helpers.createAccountSettingsData(options),
                     'preferences_data': Helpers.createUserPreferencesData()
                 });
             };
 
             it("renders the full profile for a user", function() {
-
                 requests = AjaxHelpers.requests(this);
 
                 var context = createProfilePage(true),
@@ -61,6 +66,165 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
                 LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView);
             });
+
+            it("doesn't show the mode toggle if badges are disabled", function() {
+
+                requests = AjaxHelpers.requests(this);
+
+                var context = createProfilePage(true, {accomplishments_shared: false}),
+                    tabbedView = context.learnerProfileView.tabbedView,
+                    learnerProfileView = context.learnerProfileView;
+
+                LearnerProfileHelpers.expectTabbedViewToBeHidden(requests, tabbedView);
+                LearnerProfileHelpers.expectBadgesHidden(learnerProfileView);
+            });
+
+            it("doesn't show the mode toggle if badges fail to fetch", function() {
+
+                requests = AjaxHelpers.requests(this);
+
+                var context = createProfilePage(true, {accomplishments_shared: false}),
+                    tabbedView = context.learnerProfileView.tabbedView,
+                    learnerProfileView = context.learnerProfileView;
+
+                LearnerProfileHelpers.expectTabbedViewToBeHidden(requests, tabbedView);
+                LearnerProfileHelpers.expectBadgesHidden(learnerProfileView);
+            });
+
+            it("renders the mode toggle if there are badges", function() {
+
+                requests = AjaxHelpers.requests(this);
+
+                var context = createProfilePage(true, {accomplishments_shared: true}),
+                    tabbedView = context.learnerProfileView.tabbedView;
+
+                AjaxHelpers.expectRequest(requests, 'POST', '/event');
+                AjaxHelpers.respondWithError(requests, 404);
+                AjaxHelpers.respondWithJson(requests, LearnerProfileHelpers.firstPageBadges);
+
+                LearnerProfileHelpers.expectTabbedViewToBeShown(tabbedView);
+            });
+
+            it("renders the mode toggle if badges enabled but none exist", function() {
+
+                requests = AjaxHelpers.requests(this);
+
+                var context = createProfilePage(true, {accomplishments_shared: true}),
+                    tabbedView = context.learnerProfileView.tabbedView;
+
+                AjaxHelpers.expectRequest(requests, 'POST', '/event');
+                AjaxHelpers.respondWithError(requests, 404);
+                AjaxHelpers.respondWithJson(requests, LearnerProfileHelpers.emptyBadges);
+
+                LearnerProfileHelpers.expectTabbedViewToBeShown(tabbedView);
+            });
+
+            it("displays the badges when the accomplishments toggle is selected", function () {
+
+                requests = AjaxHelpers.requests(this);
+
+                var context = createProfilePage(true, {accomplishments_shared: true}),
+                    learnerProfileView = context.learnerProfileView,
+                    tabbedView = learnerProfileView.tabbedView;
+
+                AjaxHelpers.expectRequest(requests, 'POST', '/event');
+                AjaxHelpers.respondWithError(requests, 404);
+                AjaxHelpers.respondWithJson(requests, LearnerProfileHelpers.secondPageBadges);
+
+                LearnerProfileHelpers.expectBadgesHidden(learnerProfileView);
+                tabbedView.$el.find('[data-url="accomplishments"]').click();
+                LearnerProfileHelpers.expectBadgesDisplayed(learnerProfileView, 10, false);
+                tabbedView.$el.find('[data-url="about_me"]').click();
+                LearnerProfileHelpers.expectBadgesHidden(learnerProfileView);
+            });
+
+            it("displays a placeholder on the last page of badges", function () {
+
+                requests = AjaxHelpers.requests(this);
+
+                var context = createProfilePage(true, {accomplishments_shared: true}),
+                    learnerProfileView = context.learnerProfileView,
+                    tabbedView = learnerProfileView.tabbedView;
+
+                AjaxHelpers.expectRequest(requests, 'POST', '/event');
+                AjaxHelpers.respondWithError(requests, 404);
+                AjaxHelpers.respondWithJson(requests, LearnerProfileHelpers.thirdPageBadges);
+
+                LearnerProfileHelpers.expectBadgesHidden(learnerProfileView);
+                tabbedView.$el.find('[data-url="accomplishments"]').click();
+                LearnerProfileHelpers.expectBadgesDisplayed(learnerProfileView, 10, true);
+                tabbedView.$el.find('[data-url="about_me"]').click();
+                LearnerProfileHelpers.expectBadgesHidden(learnerProfileView);
+            });
+
+            it("displays a placeholder when the accomplishments toggle is selected and no badges exist", function () {
+
+                requests = AjaxHelpers.requests(this);
+
+                var context = createProfilePage(true, {accomplishments_shared: true}),
+                    learnerProfileView = context.learnerProfileView,
+                    tabbedView = learnerProfileView.tabbedView;
+
+                AjaxHelpers.expectRequest(requests, 'POST', '/event');
+                AjaxHelpers.respondWithError(requests, 404);
+                AjaxHelpers.respondWithJson(requests, LearnerProfileHelpers.emptyBadges);
+
+                LearnerProfileHelpers.expectBadgesHidden(learnerProfileView);
+                tabbedView.$el.find('[data-url="accomplishments"]').click();
+                LearnerProfileHelpers.expectBadgesDisplayed(learnerProfileView, 0, true);
+                tabbedView.$el.find('[data-url="about_me"]').click();
+                LearnerProfileHelpers.expectBadgesHidden(learnerProfileView);
+            });
+
+            it("shows a paginated list of badges", function() {
+                requests = AjaxHelpers.requests(this);
+
+                var context = createProfilePage(true, {accomplishments_shared: true}),
+                    learnerProfileView = context.learnerProfileView,
+                    tabbedView = learnerProfileView.tabbedView;
+
+                AjaxHelpers.expectRequest(requests, 'POST', '/event');
+                AjaxHelpers.respondWithError(requests, 404);
+                AjaxHelpers.respondWithJson(requests, LearnerProfileHelpers.firstPageBadges);
+
+                tabbedView.$el.find('[data-url="accomplishments"]').click();
+                LearnerProfileHelpers.expectBadgesDisplayed(learnerProfileView, 10, false);
+                LearnerProfileHelpers.expectPage(learnerProfileView, LearnerProfileHelpers.firstPageBadges);
+            });
+
+            it("allows forward and backward navigation of badges", function () {
+                requests = AjaxHelpers.requests(this);
+
+                var context = createProfilePage(true, {accomplishments_shared: true}),
+                    learnerProfileView = context.learnerProfileView,
+                    tabbedView = learnerProfileView.tabbedView,
+                    badgeListContainer = context.badgeListContainer;
+
+                AjaxHelpers.expectRequest(requests, 'POST', '/event');
+                AjaxHelpers.respondWithError(requests, 404);
+                AjaxHelpers.respondWithJson(requests, LearnerProfileHelpers.firstPageBadges);
+
+                tabbedView.$el.find('[data-url="accomplishments"]').click();
+
+                badgeListContainer.$el.find('.next-page-link').click();
+                AjaxHelpers.respondWithJson(requests, LearnerProfileHelpers.secondPageBadges);
+                LearnerProfileHelpers.expectPage(learnerProfileView, LearnerProfileHelpers.secondPageBadges);
+
+                badgeListContainer.$el.find('.next-page-link').click();
+                AjaxHelpers.respondWithJson(requests, LearnerProfileHelpers.thirdPageBadges);
+                LearnerProfileHelpers.expectBadgesDisplayed(learnerProfileView, 10, true);
+                LearnerProfileHelpers.expectPage(learnerProfileView, LearnerProfileHelpers.thirdPageBadges);
+
+                badgeListContainer.$el.find('.previous-page-link').click();
+                AjaxHelpers.respondWithJson(requests, LearnerProfileHelpers.secondPageBadges);
+                LearnerProfileHelpers.expectPage(learnerProfileView, LearnerProfileHelpers.secondPageBadges);
+                LearnerProfileHelpers.expectBadgesDisplayed(learnerProfileView, 10, false);
+
+                badgeListContainer.$el.find('.previous-page-link').click();
+                AjaxHelpers.respondWithJson(requests, LearnerProfileHelpers.firstPageBadges);
+                LearnerProfileHelpers.expectPage(learnerProfileView, LearnerProfileHelpers.firstPageBadges);
+            });
+
 
             it("renders the limited profile for under 13 users", function() {
 

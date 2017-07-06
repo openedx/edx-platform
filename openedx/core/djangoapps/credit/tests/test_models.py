@@ -5,11 +5,13 @@ Tests for credit course models.
 
 import ddt
 from django.test import TestCase
+from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditRequirement
 
 
+@attr('shard_2')
 @ddt.ddt
 class CreditEligibilityModelTests(TestCase):
     """

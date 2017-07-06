@@ -5,15 +5,16 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
-from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
 
-from student.models import UserProfile, LanguageProficiency
-from ..models import UserPreference
-from .image_helpers import get_profile_image_urls_for_user
+from lms.djangoapps.badges.utils import badges_enabled
 from . import (
-    ACCOUNT_VISIBILITY_PREF_KEY, ALL_USERS_VISIBILITY, PRIVATE_VISIBILITY,
+    NAME_MIN_LENGTH, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY,
+    ALL_USERS_VISIBILITY,
 )
+from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
+from student.models import UserProfile, LanguageProficiency
+from .image_helpers import get_profile_image_urls_for_user
 
 
 PROFILE_IMAGE_KEY_PREFIX = 'image_url'
@@ -52,7 +53,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             self.configuration = settings.ACCOUNT_VISIBILITY_CONFIGURATION
 
         # Don't pass the 'custom_fields' arg up to the superclass
-        self.custom_fields = kwargs.pop('custom_fields', None)
+        self.custom_fields = kwargs.pop('custom_fields', [])
 
         super(UserReadOnlySerializer, self).__init__(*args, **kwargs)
 
@@ -63,6 +64,7 @@ class UserReadOnlySerializer(serializers.Serializer):
         :return: Dict serialized account
         """
         profile = user.profile
+        accomplishments_shared = badges_enabled()
 
         data = {
             "username": user.username,
@@ -83,7 +85,6 @@ class UserReadOnlySerializer(serializers.Serializer):
                 user,
                 self.context.get('request')
             ),
-            "time_zone": None,
             "language_proficiencies": LanguageProficiencySerializer(
                 profile.language_proficiencies.all(),
                 many=True
@@ -95,42 +96,19 @@ class UserReadOnlySerializer(serializers.Serializer):
             "level_of_education": AccountLegacyProfileSerializer.convert_empty_to_None(profile.level_of_education),
             "mailing_address": profile.mailing_address,
             "requires_parental_consent": profile.requires_parental_consent(),
-            "account_privacy": self._get_profile_visibility(profile, user),
+            "accomplishments_shared": accomplishments_shared,
+            "account_privacy": get_profile_visibility(profile, user, self.configuration),
         }
 
+        if self.custom_fields:
+            fields = self.custom_fields
+        else:
+            fields = _visible_fields(profile, user, self.configuration)
+
         return self._filter_fields(
-            self._visible_fields(profile, user),
+            fields,
             data
         )
-
-    def _visible_fields(self, user_profile, user):
-        """
-        Return what fields should be visible based on user settings
-
-        :param user_profile: User profile object
-        :param user: User object
-        :return: whitelist List of fields to be shown
-        """
-
-        if self.custom_fields:
-            return self.custom_fields
-
-        profile_visibility = self._get_profile_visibility(user_profile, user)
-
-        if profile_visibility == ALL_USERS_VISIBILITY:
-            return self.configuration.get('shareable_fields')
-        else:
-            return self.configuration.get('public_fields')
-
-    def _get_profile_visibility(self, user_profile, user):
-        """Returns the visibility level for the specified user profile."""
-        if user_profile.requires_parental_consent():
-            return PRIVATE_VISIBILITY
-
-        # Calling UserPreference directly because the requesting user may be different from existing_user
-        # (and does not have to be is_staff).
-        profile_privacy = UserPreference.get_value(user, ACCOUNT_VISIBILITY_PREF_KEY)
-        return profile_privacy if profile_privacy else self.configuration.get('default_visibility')
 
     def _filter_fields(self, field_whitelist, serialized_account):
         """
@@ -260,3 +238,37 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
             ])
 
         return instance
+
+
+def get_profile_visibility(user_profile, user, configuration=None):
+    """Returns the visibility level for the specified user profile."""
+    if user_profile.requires_parental_consent():
+        return PRIVATE_VISIBILITY
+
+    if not configuration:
+        configuration = settings.ACCOUNT_VISIBILITY_CONFIGURATION
+
+    # Calling UserPreference directly because the requesting user may be different from existing_user
+    # (and does not have to be is_staff).
+    profile_privacy = UserPreference.get_value(user, ACCOUNT_VISIBILITY_PREF_KEY)
+    return profile_privacy if profile_privacy else configuration.get('default_visibility')
+
+
+def _visible_fields(user_profile, user, configuration=None):
+    """
+    Return what fields should be visible based on user settings
+
+    :param user_profile: User profile object
+    :param user: User object
+    :param configuration: A visibility configuration dictionary.
+    :return: whitelist List of fields to be shown
+    """
+
+    if not configuration:
+        configuration = settings.ACCOUNT_VISIBILITY_CONFIGURATION
+
+    profile_visibility = get_profile_visibility(user_profile, user, configuration)
+    if profile_visibility == ALL_USERS_VISIBILITY:
+        return configuration.get('shareable_fields')
+    else:
+        return configuration.get('public_fields')

@@ -7,10 +7,10 @@ data: |
   <p>
   In math expression input problems, learners enter text that represents a
   mathematical expression into a field, and text is converted to a symbolic
-  expression that appears below that field. You can refer learners to 
-  <a href="http://edx.readthedocs.org/projects/edx-guide-for-students/en/latest/SFD_mathformatting.html" target="_blank">
-  Entering Mathematical and Scientific Expressions</a> in the <i>edX Guide for
-  Students</i> for information about how to enter text into the field.
+  expression that appears below that field. You can refer learners to
+  <a href="http://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/completing_assignments/SFD_mathformatting.html" target="_blank">
+  Entering Mathematical and Scientific Expressions</a> in the <i>EdX Learner's
+  Guide</i> for information about how to enter text into the field.
   </p>
   <p>
   Math expression problems can include unknown variables and relatively
@@ -22,14 +22,14 @@ data: |
   <p>
   To create these problems, you use MathJax to change your plain text into
   "beautiful math." For more information about how to use MathJax in Studio,
-  see <a href="http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/mathjax.html" target="_blank">
+  see <a href="http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/mathjax.html" target="_blank">
   A Brief Introduction to MathJax in Studio</a> in <i>Building and Running an edx
-  Course</i>.  
+  Course</i>.
   </p>
-  <p>When you add the problem, be sure to select <strong>Settings</strong> 
+  <p>When you add the problem, be sure to select <strong>Settings</strong>
   to specify a <strong>Display Name</strong> and other values that apply.</p>
   <p>You can use the following example problems as models.</p>
-  
+
   <p>Write an expression for the product of \( R_1\), \( R_2\), and
   the inverse of \( R_3\) .</p>
   <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="$VoVi">
@@ -43,7 +43,7 @@ data: |
 
   <p>Let \( x\) be a variable, and let \( n\) be an arbitrary constant.
   What is the derivative of \( x^n\)?</p>
-  
+
   <script type="loncapa/python">
   derivative = "n*x^(n-1)"
   </script>

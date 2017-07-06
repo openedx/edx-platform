@@ -3,16 +3,16 @@ xModule implementation of a learning sequence
 """
 
 # pylint: disable=abstract-method
-
+import collections
 import json
 import logging
 from pkg_resources import resource_string
-import warnings
 
 from lxml import etree
 from xblock.core import XBlock
-from xblock.fields import Integer, Scope, Boolean
+from xblock.fields import Integer, Scope, Boolean, String
 from xblock.fragment import Fragment
+import newrelic.agent
 
 from .exceptions import NotFoundError
 from .fields import Date
@@ -88,6 +88,25 @@ class ProctoringFields(object):
         scope=Scope.settings,
     )
 
+    exam_review_rules = String(
+        display_name=_("Software Secure Review Rules"),
+        help=_(
+            "This setting indicates what rules the proctoring team should follow when viewing the videos."
+        ),
+        default='',
+        scope=Scope.settings,
+    )
+
+    hide_after_due = Boolean(
+        display_name=_("Hide Exam Results After Due Date"),
+        help=_(
+            "This setting overrides the default behavior of showing exam results after the due date has passed."
+            " Currently only supported for timed exams."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
     is_practice_exam = Boolean(
         display_name=_("Is Practice Exam"),
         help=_(
@@ -110,9 +129,12 @@ class ProctoringFields(object):
 
 @XBlock.wants('proctoring')
 @XBlock.wants('credit')
+@XBlock.needs("user")
+@XBlock.needs("bookmarks")
 class SequenceModule(SequenceFields, ProctoringFields, XModule):
-    ''' Layout module which lays out content in a temporal sequence
-    '''
+    """
+    Layout module which lays out content in a temporal sequence
+    """
     js = {
         'coffee': [resource_string(__name__, 'js/src/sequence/display.coffee')],
         'js': [resource_string(__name__, 'js/src/sequence/display/jquery.sequence.js')],
@@ -128,16 +150,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         # If position is specified in system, then use that instead.
         position = getattr(self.system, 'position', None)
         if position is not None:
-            try:
-                self.position = int(self.system.position)
-            except (ValueError, TypeError):
-                # Check for https://openedx.atlassian.net/browse/LMS-6496
-                warnings.warn(
-                    "Sequential position cannot be converted to an integer: {pos!r}".format(
-                        pos=self.system.position,
-                    ),
-                    RuntimeWarning,
-                )
+            assert isinstance(position, int)
+            self.position = self.system.position
 
     def get_progress(self):
         ''' Return the total progress, adding total done and total available.
@@ -164,45 +178,68 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         raise NotFoundError('Unexpected dispatch type')
 
     def student_view(self, context):
+        display_items = self.get_display_items()
+
         # If we're rendering this sequence, but no position is set yet,
+        # or exceeds the length of the displayable items,
         # default the position to the first element
-        if self.position is None:
+        if context.get('requested_child') == 'first':
+            self.position = 1
+        elif context.get('requested_child') == 'last':
+            self.position = len(display_items) or 1
+        elif self.position is None or self.position > len(display_items):
             self.position = 1
 
         ## Returns a set of all types of all sub-children
         contents = []
 
         fragment = Fragment()
+        context = context or {}
+
+        bookmarks_service = self.runtime.service(self, "bookmarks")
+        context["username"] = self.runtime.service(self, "user").get_current_user().opt_attrs['edx-platform.username']
+
+        parent_module = self.get_parent()
+        display_names = [
+            parent_module.display_name_with_default,
+            self.display_name_with_default
+        ]
+
+        # We do this up here because proctored exam functionality could bypass
+        # rendering after this section.
+        self._capture_basic_metrics()
 
         # Is this sequential part of a timed or proctored exam?
+        masquerading = context.get('specific_masquerade', False)
+        special_exam_html = None
         if self.is_time_limited:
-            view_html = self._time_limited_student_view(context)
+            special_exam_html = self._time_limited_student_view(context)
 
-            # Do we have an alternate rendering
+            # Do we have an applicable alternate rendering
             # from the edx_proctoring subsystem?
-            if view_html:
-                fragment.add_content(view_html)
+            if special_exam_html and not masquerading:
+                fragment.add_content(special_exam_html)
                 return fragment
 
-        for child in self.get_display_items():
+        for child in display_items:
+            is_bookmarked = bookmarks_service.is_bookmarked(usage_key=child.scope_ids.usage_id)
+            context["bookmarked"] = is_bookmarked
+
             progress = child.get_progress()
             rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_frag_resources(rendered_child)
 
-            # `titles` is a list of titles to inject into the sequential tooltip display.
-            # We omit any blank titles to avoid blank lines in the tooltip display.
-            titles = [title.strip() for title in child.get_content_titles() if title.strip()]
             childinfo = {
                 'content': rendered_child.content,
-                'title': "\n".join(titles),
-                'page_title': titles[0] if titles else '',
+                'page_title': getattr(child, 'tooltip_title', ''),
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
                 'id': child.scope_ids.usage_id.to_deprecated_string(),
+                'bookmarked': is_bookmarked,
+                'path': " > ".join(display_names + [child.display_name_with_default]),
             }
-            if childinfo['title'] == '':
-                childinfo['title'] = child.display_name_with_default
+
             contents.append(childinfo)
 
         params = {
@@ -212,11 +249,84 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             'position': self.position,
             'tag': self.location.category,
             'ajax_url': self.system.ajax_url,
+            'next_url': context.get('next_url'),
+            'prev_url': context.get('prev_url'),
+            'override_hidden_exam': masquerading and special_exam_html is not None,
         }
 
         fragment.add_content(self.system.render_template("seq_module.html", params))
 
+        self._capture_full_seq_item_metrics(display_items)
+        self._capture_current_unit_metrics(display_items)
+
+        # Get all descendant XBlock types and counts
         return fragment
+
+    def _locations_in_subtree(self, node):
+        """
+        The usage keys for all descendants of an XBlock/XModule as a flat list.
+
+        Includes the location of the node passed in.
+        """
+        stack = [node]
+        locations = []
+
+        while stack:
+            curr = stack.pop()
+            locations.append(curr.location)
+            if curr.has_children:
+                stack.extend(curr.get_children())
+
+        return locations
+
+    def _capture_basic_metrics(self):
+        """
+        Capture basic information about this sequence in New Relic.
+        """
+        newrelic.agent.add_custom_parameter('seq.block_id', unicode(self.location))
+        newrelic.agent.add_custom_parameter('seq.display_name', self.display_name or '')
+        newrelic.agent.add_custom_parameter('seq.position', self.position)
+        newrelic.agent.add_custom_parameter('seq.is_time_limited', self.is_time_limited)
+
+    def _capture_full_seq_item_metrics(self, display_items):
+        """
+        Capture information about the number and types of XBlock content in
+        the sequence as a whole. We send this information to New Relic so that
+        we can do better performance analysis of courseware.
+        """
+        # Basic count of the number of Units (a.k.a. VerticalBlocks) we have in
+        # this learning sequence
+        newrelic.agent.add_custom_parameter('seq.num_units', len(display_items))
+
+        # Count of all modules (leaf nodes) in this sequence (e.g. videos,
+        # problems, etc.) The units (verticals) themselves are not counted.
+        all_item_keys = self._locations_in_subtree(self)
+        newrelic.agent.add_custom_parameter('seq.num_items', len(all_item_keys))
+
+        # Count of all modules by block_type (e.g. "video": 2, "discussion": 4)
+        block_counts = collections.Counter(usage_key.block_type for usage_key in all_item_keys)
+        for block_type, count in block_counts.items():
+            newrelic.agent.add_custom_parameter('seq.block_counts.{}'.format(block_type), count)
+
+    def _capture_current_unit_metrics(self, display_items):
+        """
+        Capture information about the current selected Unit within the Sequence.
+        """
+        # Positions are stored with indexing starting at 1. If we get into a
+        # weird state where the saved position is out of bounds (e.g. the
+        # content was changed), avoid going into any details about this unit.
+        if 1 <= self.position <= len(display_items):
+            # Basic info about the Unit...
+            current = display_items[self.position - 1]
+            newrelic.agent.add_custom_parameter('seq.current.block_id', unicode(current.location))
+            newrelic.agent.add_custom_parameter('seq.current.display_name', current.display_name or '')
+
+            # Examining all items inside the Unit (or split_test, conditional, etc.)
+            child_locs = self._locations_in_subtree(current)
+            newrelic.agent.add_custom_parameter('seq.current.num_items', len(child_locs))
+            curr_block_counts = collections.Counter(usage_key.block_type for usage_key in child_locs)
+            for block_type, count in curr_block_counts.items():
+                newrelic.agent.add_custom_parameter('seq.current.block_counts.{}'.format(block_type), count)
 
     def _time_limited_student_view(self, context):
         """
@@ -295,6 +405,7 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
     """
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
+    resources_dir = None
 
     show_in_read_only_mode = True
 

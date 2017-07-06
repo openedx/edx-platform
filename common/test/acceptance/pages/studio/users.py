@@ -80,6 +80,7 @@ class UsersPageMixin(PageObject):
         """ Submit the "New User" form """
         self.q(css='.form-create.create-user .action-primary').click()
         wait_for_ajax_or_reload(self.browser)
+        self.wait_for_element_visibility('.user-list', 'wait for team to load')
 
     def get_user(self, email):
         """ Gets user wrapper by email """
@@ -93,6 +94,7 @@ class UsersPageMixin(PageObject):
         self.click_add_button()
         self.set_new_user_email(email)
         self.click_submit_new_user_form()
+        self.wait_for_page()
 
     def delete_user_from_course(self, email):
         """ Deletes user from course/library """

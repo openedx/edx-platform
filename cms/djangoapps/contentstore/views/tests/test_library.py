@@ -30,10 +30,10 @@ class UnitTestLibraries(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        user_password = super(UnitTestLibraries, self).setUp()
+        super(UnitTestLibraries, self).setUp()
 
         self.client = AjaxEnabledTestClient()
-        self.client.login(username=self.user.username, password=user_password)
+        self.client.login(username=self.user.username, password=self.user_password)
 
     ######################################################
     # Tests for /library/ - list and create libraries:

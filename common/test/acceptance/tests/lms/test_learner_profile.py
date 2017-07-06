@@ -4,8 +4,9 @@ End-to-end tests for Student's Profile Page.
 """
 from contextlib import contextmanager
 
-from datetime import datetime
 from bok_choy.web_app_test import WebAppTest
+from datetime import datetime
+from flaky import flaky
 from nose.plugins.attrib import attr
 
 from ...pages.common.logout import LogoutPage
@@ -48,6 +49,8 @@ class LearnerProfileTestMixin(EventsTestMixin):
         profile_page.value_for_dropdown_field('language_proficiencies', 'English')
         profile_page.value_for_dropdown_field('country', 'United Arab Emirates')
         profile_page.set_value_for_textarea_field('bio', 'Nothing Special')
+        # Waits here for text to appear/save on bio field
+        profile_page.wait_for_ajax()
 
     def visit_profile_page(self, username, privacy=None):
         """
@@ -750,6 +753,15 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.verify_profile_page_is_public(profile_page, is_editable=False)
         self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PUBLIC)
 
+    def test_badge_share_modal(self):
+        username = 'testcert'
+        AutoAuthPage(self.browser, username=username).visit()
+        profile_page = self.visit_profile_page(username)
+        profile_page.display_accomplishments()
+        badge = profile_page.badges[0]
+        badge.display_modal()
+        badge.close_modal()
+
 
 @attr('a11y')
 class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
@@ -767,8 +779,6 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
 
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
-                'color-contrast',  # TODO: AC-232
-                'skip-link',  # TODO: AC-179
                 'link-href',  # TODO: AC-231
             ],
         })
@@ -796,9 +806,26 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
 
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
-                'skip-link',  # TODO: AC-179
                 'link-href',  # TODO: AC-231
             ],
         })
 
+        profile_page.a11y_audit.check_for_accessibility_errors()
+
+    def test_badges_accessibility(self):
+        """
+        Test the accessibility of the badge listings and sharing modal.
+        """
+        username = 'testcert'
+        AutoAuthPage(self.browser, username=username).visit()
+        profile_page = self.visit_profile_page(username)
+
+        profile_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'link-href',  # TODO: AC-231
+            ],
+        })
+        profile_page.display_accomplishments()
+        profile_page.a11y_audit.check_for_accessibility_errors()
+        profile_page.badges[0].display_modal()
         profile_page.a11y_audit.check_for_accessibility_errors()

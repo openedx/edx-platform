@@ -303,7 +303,7 @@ $outline-indent-width: $baseline;
 %outline-item-status {
   @extend %t-copy-sub2;
   @extend %t-strong;
-  color: $color-copy-base;
+  color: $gray-d1;
 
   .icon {
     @extend %t-icon5;
@@ -335,6 +335,20 @@ $outline-indent-width: $baseline;
 
       .status-message .icon {
         color: $color-staff-only;
+      }
+    }
+  }
+
+  // CASE: has gated content
+  &.is-gated {
+
+    // needed to make sure direct children only
+    > .section-status,
+    > .subsection-status,
+    > .unit-status {
+
+      .status-message .icon {
+        color: $color-gated;
       }
     }
   }
@@ -421,6 +435,11 @@ $outline-indent-width: $baseline;
         border-left-color: $color-staff-only;
       }
 
+      // CASE: has gated content
+      &.is-gated {
+        border-left-color: $color-gated;
+      }
+
       // CASE: has unpublished content
       &.has-warnings {
         border-left-color: $color-warning;
@@ -505,6 +524,11 @@ $outline-indent-width: $baseline;
       border-left-color: $color-staff-only;
     }
 
+    // CASE: is presented for gated
+    &.is-gated {
+      border-left-color: $color-gated;
+    }
+
     // CASE: has unpublished content
     &.has-warnings {
       border-left-color: $color-warning;
@@ -552,12 +576,16 @@ $outline-indent-width: $baseline;
       > .subsection-status .status-timed-proctored-exam {
         opacity: 1.0;
       }
+
+      > .subsection-status .status-hide-after-due {
+        opacity: 1.0;
+      }
     }
 
     // status - grading
-    .status-grading, .status-timed-proctored-exam  {
+    .status-grading, .status-timed-proctored-exam, .status-hide-after-due {
       @include transition(opacity $tmg-f2 ease-in-out 0s);
-      opacity: 0.65;
+      opacity: 0.75;
     }
 
     .status-grading-value, .status-proctored-exam-value {
@@ -697,4 +725,3 @@ $outline-indent-width: $baseline;
     }
   }
 }
-

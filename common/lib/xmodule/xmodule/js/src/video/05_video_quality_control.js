@@ -4,25 +4,27 @@
 'use strict';
 define(
 'video/05_video_quality_control.js',
-[],
-function () {
-    var template = [
-        '<button class="control quality-control is-hidden" aria-disabled="false">',
-            '<span class="icon-fallback-img">',
-                '<span class="icon icon-hd" aria-hidden="true">HD</span>', // "HD" is treated as a proper noun
-                // Translator note:
-                // HD stands for high definition
+['edx-ui-toolkit/js/utils/html-utils'],
+function (HtmlUtils) {
+    var template = HtmlUtils.interpolateHtml(
+        HtmlUtils.HTML([
+            '<button class="control quality-control is-hidden" aria-disabled="false" title="',
+                '{highDefinition}',
+            '">',
+                '<span class="icon icon-hd" aria-hidden="true">HD</span>',
                 '<span class="sr text-translation">',
-                    gettext('High Definition'),
+                    '{highDefinition}',
                 '</span>&nbsp;',
-                '<span class="text control-text">',
-                    // Translator note:
-                    // Values are 'off' or 'on' depending on the state of the HD control
-                    gettext('off'),
+                '<span class="sr control-text">',
+                    '{off}',
                 '</span>',
-            '</span>',
-        '</button>'
-    ].join('');
+            '</button>'
+        ].join('')),
+        {
+            highDefinition: gettext('High Definition'),
+            off: gettext('off')
+        }
+    );
 
     // VideoQualityControl() function - what this module "exports".
     return function (state) {
@@ -79,9 +81,9 @@ function () {
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
     function _renderElements(state) {
-        var element = state.videoQualityControl.el = $(template);
+        var element = state.videoQualityControl.el = $(template.toString());
         state.videoQualityControl.quality = 'large';
-        state.el.find('.secondary-controls').append(element);
+        HtmlUtils.append(state.el.find('.secondary-controls'), HtmlUtils.HTML(element));
     }
 
     // function _bindHandlers(state)

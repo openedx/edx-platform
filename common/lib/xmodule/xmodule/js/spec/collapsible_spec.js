@@ -40,8 +40,8 @@
             it('Default container initialized correctly', function () {
                 initialize(html);
 
-                expect(el.find('.shortform')).toContain('.full-top');
-                expect(el.find('.shortform')).toContain('.full-bottom');
+                expect(el.find('.shortform')).toContainElement('.full-top');
+                expect(el.find('.shortform')).toContainElement('.full-bottom');
                 expect(el.find('.longform')).toBeHidden();
                 expect(el.find('.full')).toHandle('click');
             });
@@ -49,7 +49,7 @@
             it('Custom container initialized correctly', function () {
                 initialize(html_custom);
 
-                expect(el.find('.shortform-custom')).toContain('.full-custom');
+                expect(el.find('.shortform-custom')).toContainElement('.full-custom');
                 expect(el.find('.full-custom')).toHaveText('Show shortform-custom');
                 expect(el.find('.longform')).toBeHidden();
                 expect(el.find('.full-custom')).toHandle('click');

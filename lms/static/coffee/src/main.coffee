@@ -32,7 +32,7 @@ $ ->
   # fix for ie
   if !Array::indexOf
   	Array::indexOf = (obj, start = 0) ->
-  		for ele, i in this[start..]
-            if ele is obj
-                return i + start
+  	  for ele, i in this[start..]
+        if ele is obj
+          return i + start
         return -1

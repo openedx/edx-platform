@@ -2,7 +2,10 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
-from openedx.core.lib.js_utils import escape_json_dumps
+
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
 %>
 <%def name="online_help_token()"><% return "team_course" %></%def>
 <%block name="title">${_("Course Team Settings")}</%block>
@@ -29,7 +32,7 @@ from openedx.core.lib.js_utils import escape_json_dumps
       <ul>
         %if allow_actions:
         <li class="nav-item">
-          <a href="#" class="button new-button create-user-button"><i class="icon fa fa-plus"></i> ${_("New Team Member")}</a>
+          <a href="#" class="button new-button create-user-button"><span class="icon fa fa-plus" aria-hidden="true"></span> ${_("New Team Member")}</a>
         </li>
         %endif
       </ul>
@@ -69,7 +72,7 @@ from openedx.core.lib.js_utils import escape_json_dumps
 
       <ol class="user-list" id="user-list">
         <div class="ui-loading">
-          <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading</span></p>
+          <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_('Loading')}</span></p>
         </div>
       </ol>
 
@@ -84,7 +87,7 @@ from openedx.core.lib.js_utils import escape_json_dumps
 
         <ul class="list-actions">
           <li class="action-item">
-            <a href="#" class="action action-primary button new-button create-user-button"><i class="icon fa fa-plus icon-inline"></i> ${_('Add a New Team Member')}</a>
+            <a href="#" class="action action-primary button new-button create-user-button"><span class="icon fa fa-plus icon-inline" aria-hidden="true"></span> ${_('Add a New Team Member')}</a>
           </li>
         </ul>
       </div>
@@ -114,11 +117,11 @@ from openedx.core.lib.js_utils import escape_json_dumps
 <%block name="requirejs">
   require(["js/factories/manage_users"], function(ManageCourseUsersFactory) {
       ManageCourseUsersFactory(
-        "${context_course.display_name | h}",
-        ${escape_json_dumps(users) | n},
-        "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(context_course.id), 'email': '@@EMAIL@@'})}",
-        ${ request.user.id },
-        ${str(allow_actions).lower()}
+        "${context_course.display_name_with_default | h}",
+        ${users | n, dump_js_escaped_json},
+        "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(context_course.id), 'email': '@@EMAIL@@'}) | n, js_escaped_string}",
+        ${request.user.id | n, dump_js_escaped_json},
+        ${allow_actions | n, dump_js_escaped_json}
       );
   });
 </%block>

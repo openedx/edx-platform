@@ -1,7 +1,7 @@
 """
 Helper methods for testing cohorts.
 """
-import factory
+
 from factory import post_generation, Sequence
 from factory.django import DjangoModelFactory
 import json

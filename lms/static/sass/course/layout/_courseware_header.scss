@@ -12,51 +12,51 @@
     @extend %inner-wrapper;
   }
 
-  ol.course-tabs {
+  .course-tabs {
     @include border-top-radius(4px);
     @include clearfix();
-    @include margin-left(10px);
     padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
 
     li {
       @include float(left);
       list-style: none;
-      margin-right: 6px;
 
       &.prominent {
-        margin-right: 16px;
-        background: rgba(255, 255, 255, .5);
+        @include margin-right(16px);
+        background: rgba(255, 255, 255, 0.5);
         border-radius: 3px;
       }
 
       &.prominent + li {
-          padding-left: ($baseline*0.75);
-          border-left: 1px solid #333;
+        @include padding-left($baseline*0.75);
+        @include border-left(1px solid $gray-d3);
       }
 
-      a {
-        border-radius: 3px;
-        color: #555;
+      a,
+      a:visited {
+        @include padding(($baseline/2), ($baseline*0.75), 13px, ($baseline*0.75));
+        @extend %t-title7;
+        @extend %t-regular;
+        color: $gray-d1;
         display: block;
         text-align: center;
-        padding: ($baseline/2) 13px 12px;
-        font-size: 14px;
-        font-weight: bold;
         text-decoration: none;
-        // text-shadow: 0 1px 0 rgba(0, 0, 0, .4);
 
-        &:hover, &:focus {
-          color: #333;
-          background: rgba(255, 255, 255, .6);
+        &:hover,
+        &:focus {
+          color: $blue;
+          border-bottom: 4px solid $blue;
         }
 
         &.active {
-          // background: $shadow;
-          @include linear-gradient(top, rgba(0, 0, 0, .4), rgba(0, 0, 0, .25));
+          border-bottom: 4px solid $blue;
           background-color: transparent;
-          box-shadow: 0 1px 0 rgba(255, 255, 255, .5), 0 1px 1px rgba(0, 0, 0, .3) inset;
-          color: $white;
-          text-shadow: 0 1px 0 rgba(0, 0, 0, .4);
+          color: $blue;
+
+          &:hover,
+          &:focus {
+            color: $blue;
+          }
         }
       }
     }
@@ -71,7 +71,7 @@
   }
 }
 
-header.global.slim {
+.header-global.slim {
   box-shadow: 0 1px 2px $shadow-l1;
   height: auto;
   padding: ($baseline/4) 0 ($baseline/2) 0;
@@ -87,7 +87,7 @@ header.global.slim {
   }
 
   .guest .secondary {
-    margin-right: 0;
+    @include margin-right(0);
   }
 
   .guest .secondary a {

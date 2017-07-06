@@ -142,7 +142,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.open_advanced_tab()
         self.video.upload_translation('1mb_transcripts.srt', 'uk')
         self.save_unit_settings()
-        self.assertTrue(self.video.is_captions_visible())
+        self.video.wait_for(self.video.is_captions_visible, 'Captions are visible', timeout=10)
         unicode_text = "Привіт, edX вітає вас.".decode('utf-8')
         self.assertIn(unicode_text, self.video.captions_lines())
 

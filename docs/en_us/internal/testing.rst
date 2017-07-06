@@ -70,6 +70,12 @@ UI Acceptance Tests
    write end-user acceptance tests directly in Python, using the
    framework to maximize reliability and maintainability.
 
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+-  Any new text that is added should be internationalized and translated.
+
+
 Test Locations
 --------------
 
@@ -167,6 +173,12 @@ To run these tests without ``collectstatic``, which is faster, append the follow
 
     paver test_system -s lms --fasttest
 
+For even more speed, use the ``--disable-migrations`` option to run tests without applying migrations and instead create tables directly from apps' models.
+
+::
+
+    paver test_system -s lms --disable-migrations
+
 To run cms python tests without ``collectstatic`` use this command.
 
 ::
@@ -195,6 +207,24 @@ To run a single test format the command like this.
 ::
 
     paver test_system -t lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest.test_activate_login
+
+The ``lms`` suite of tests runs with randomized order, by default.
+You can override these by using ``--no-randomize`` to disable randomization.
+
+You can also enable test concurrency with the ``--processes=N`` flag (where ``N``
+is the number of processes to run tests with, and ``-1`` means one process per
+available core). Note, however, that when running concurrently, breakpoints may
+not work correctly, and you will not be able to run single test methods (only
+single test classes).
+
+For example:
+
+::
+    # This will run all tests in the order that they appear in their files, serially
+    paver test_system -s lms --no-randomize --processes=0
+
+    # This will run using only 2 processes for tests
+    paver test_system -s lms --processes=2
 
 To re-run all failing django tests from lms or cms, use the
 ``--failed``,\ ``-f`` flag (see note at end of section).
@@ -238,20 +268,20 @@ These are examples of how to run a single test and get stdout and get coverage.
 
 ::
 
-    python -m coverage run --rcfile=./common/lib/xmodule/.coveragerc which ./manage.py cms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000 contentstore.tests.test_import_nostatic -s # cms example
-    python -m coverage run --rcfile=./lms/.coveragerc which ./manage.py lms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000  courseware.tests.test_module_render -s # lms example
+    python -m coverage run which ./manage.py cms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000 contentstore.tests.test_import_nostatic -s # cms example
+    python -m coverage run which ./manage.py lms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000  courseware.tests.test_module_render -s # lms example
 
 Use this command to generate coverage report.
 
 ::
 
-    coverage report --rcfile=./common/lib/xmodule/.coveragerc
+    coverage report
 
 Use this command to generate an HTML report.
 
 ::
 
-    coverage html --rcfile=./common/lib/xmodule/.coveragerc
+    coverage html
 
 The report is then saved in reports/common/lib/xmodule/cover/index.html
 
@@ -262,13 +292,21 @@ you can run one of these commands.
 ::
 
     paver test_system -s cms -t common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
-    python -m coverage run --rcfile=cms/.coveragerc `which ./manage.py` cms --settings test test --traceback common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
+    python -m coverage run `which ./manage.py` cms --settings test test --traceback common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
 
 Very handy: if you pass the ``--pdb`` flag to a paver test function, or
 uncomment the ``pdb=1`` line in ``setup.cfg``, the test runner
 will drop you into pdb on error. This lets you go up and down the stack
 and see what the values of the variables are. Check out `the pdb
 documentation <http://docs.python.org/library/pdb.html>`__
+
+Use this command to put a temporary debugging breakpoint in a test.
+If you check this in, your tests will hang on jenkins.
+
+::
+
+    from nose.tools import set_trace; set_trace()
+
 
 Note: More on the ``--failed`` functionality
 
@@ -321,16 +359,15 @@ To run JavaScript tests in a browser, run these commands.
 To debug these tests on devstack in a local browser:
 
  * first run the appropriate test_js_dev command from above which will open a browser using XQuartz
- * open the same URL in your browser but change the IP address to 192.168.33.10, e.g.
-    http://192.168.33.10:TEST_PORT/suite/cms
+ * open http://192.168.33.10:9876/debug.html in your host system's browser of choice
  * this will run all the tests and show you the results including details of any failures
  * you can click on an individually failing test and/or suite to re-run it by itself
  * you can now use the browser's developer tools to debug as you would any other JavaScript code
 
 Note: the port is also output to the console that you ran the tests from if you find that easier.
 
-These paver commands call through to a custom test runner. For more
-info, see `js-test-tool <https://github.com/edx/js-test-tool>`__.
+These paver commands call through to Karma. For more
+info, see `karma-runner.github.io <https://karma-runner.github.io/>`__.
 
 Running Bok Choy Acceptance Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -385,7 +422,7 @@ common/test/acceptance/tests. This is another example.
 
     paver test_bokchoy -t studio/test_studio_bad_data.py
 
-To run a single test faster by not repeating setup tasks us the ``--fasttest`` option.
+To run a single test faster by not repeating setup tasks use the ``--fasttest`` option.
 
 ::
 
@@ -407,7 +444,8 @@ test case method.
 During acceptance test execution, log files and also screenshots of
 failed tests are captured in test\_root/log.
 
-Use this command to put a debugging breakpoint in a test.
+Use this command to put a temporary debugging breakpoint in a test.
+If you check this in, your tests will hang on jenkins.
 
 ::
 
@@ -595,6 +633,41 @@ During acceptance test execution, Django log files are written to
 
 **Note**: The acceptance tests can *not* currently run in parallel.
 
+
+Testing internationalization with dummy translations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Any text you add to the platform should be internationalized. To generate
+translations for your new strings, run the following command.
+
+::
+
+    paver i18n_dummy
+
+This command generates dummy translations for each dummy language in the
+platform and puts the dummy strings in the appropriate language files.
+You can then preview the dummy languages on your local machine and also in
+your sandbox, if and when you create one.
+
+The dummy language files that are generated during this process can be
+found in the following locations.
+
+::
+
+    conf/locale/{LANG_CODE}
+
+There are a few JavaScript files that are generated from this process. You
+can find those in the following locations.
+
+::
+
+    lms/static/js/i18n/{LANG_CODE}
+    cms/static/js/i18n/{LANG_CODE}
+
+Do not commit the ``.po``, ``.mo``, ``.js`` files that are generated
+in the above locations during the dummy translation process!
+
+
 Debugging Acceptance Tests on Vagrant
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -738,13 +811,13 @@ Code Complexity Tools
 Two tools are available for evaluating complexity of edx-platform code:
 
 - `radon <https://radon.readthedocs.org/en/latest/>`__ for Python code complexity.
-   * To obtain complexity, run 
+   * To obtain complexity, run
 
 ::
 
        paver run_complexity
 
-- `plato <https://github.com/es-analysis/plato>`__ for JavaScript code complexity. Several options are available on the command line; see documentation. 
+- `plato <https://github.com/es-analysis/plato>`__ for JavaScript code complexity. Several options are available on the command line; see documentation.
     * Below, the following command will produce an html report in a subdirectory called "jscomplexity"
 
 ::

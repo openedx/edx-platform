@@ -767,15 +767,15 @@ class TestMongoKeyValueStore(unittest.TestCase):
     def test_write(self):
         yield (self._check_write, KeyValueStore.Key(Scope.content, None, None, 'foo'), 'new_data')
         yield (self._check_write, KeyValueStore.Key(Scope.children, None, None, 'children'), [])
+        yield (self._check_write, KeyValueStore.Key(Scope.children, None, None, 'parent'), None)
         yield (self._check_write, KeyValueStore.Key(Scope.settings, None, None, 'meta'), 'new_settings')
-        # write Scope.parent raises InvalidScope, which is covered in test_write_invalid_scope
 
     def test_write_non_dict_data(self):
         self.kvs = MongoKeyValueStore('xml_data', self.parent, self.children, self.metadata)
         self._check_write(KeyValueStore.Key(Scope.content, None, None, 'data'), 'new_data')
 
     def test_write_invalid_scope(self):
-        for scope in (Scope.preferences, Scope.user_info, Scope.user_state, Scope.parent):
+        for scope in (Scope.preferences, Scope.user_info, Scope.user_state):
             with assert_raises(InvalidScopeError):
                 self.kvs.set(KeyValueStore.Key(scope, None, None, 'foo'), 'new_value')
 

@@ -4,7 +4,7 @@
             'jquery',
             'jquery.url',
             'utility',
-            'common/js/spec_helpers/ajax_helpers',
+            'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
             'js/student_account/views/FinishAuthView',
             'js/student_account/enrollment',
             'js/student_account/shoppingcart',
@@ -27,13 +27,13 @@
                 view = new FinishAuthView({});
 
                 // Mock the redirect call
-                spyOn( view, 'redirect' ).andCallFake( function() {} );
+                spyOn( view, 'redirect' ).and.callFake( function() {} );
 
                 // Mock the enrollment and shopping cart interfaces
-                spyOn( EnrollmentInterface, 'enroll' ).andCallFake( function() {} );
-                spyOn( ShoppingCartInterface, 'addCourseToCart' ).andCallFake( function() {} );
+                spyOn( EnrollmentInterface, 'enroll' ).and.callFake( function() {} );
+                spyOn( ShoppingCartInterface, 'addCourseToCart' ).and.callFake( function() {} );
                 spyOn( EmailOptInInterface, 'setPreference' )
-                    .andCallFake( function() { return {'always': function(r) { r(); }}; } );
+                    .and.callFake( function() { return {'always': function(r) { r(); }}; } );
 
                 view.render();
             };
@@ -45,7 +45,7 @@
              * should be prefixed with '?'
              */
             var setFakeQueryParams = function( params ) {
-                spyOn( $, 'url' ).andCallFake(function( requestedParam ) {
+                spyOn( $, 'url' ).and.callFake(function( requestedParam ) {
                     if ( params.hasOwnProperty(requestedParam) ) {
                         return params[requestedParam];
                     }
@@ -95,6 +95,24 @@
                 );
             });
 
+            it('sends the user to the course mode selection flow with bulk purchase workflow', function() {
+                // Simulate providing enrollment query string params
+                setFakeQueryParams({
+                    '?enrollment_action': 'enroll',
+                    '?course_id': COURSE_KEY,
+                    '?purchase_workflow': 'bulk'
+                });
+
+                ajaxSpyAndInitialize(this);
+
+                // Expect that the view redirected to the course
+                // mode select flow with the purchase_workflow parameter
+                expect( EnrollmentInterface.enroll ).toHaveBeenCalledWith(
+                    COURSE_KEY,
+                    '/course_modes/choose/' + COURSE_KEY + '/?purchase_workflow=bulk'
+                );
+            });
+
             it('sends the user to the payment flow for a paid course mode', function() {
                 // Simulate providing enrollment query string params
                 // AND specifying a course mode.
@@ -111,6 +129,28 @@
                 expect( EnrollmentInterface.enroll ).toHaveBeenCalledWith(
                     COURSE_KEY,
                     '/verify_student/start-flow/' + COURSE_KEY + '/'
+                );
+            });
+
+            it('sends the user to the payment flow for a paid course mode with bulk purchase workflow', function() {
+                // Simulate providing enrollment query string params
+                // AND specifying a course mode
+                // AND purchase workflow type.
+                setFakeQueryParams({
+                    '?enrollment_action': 'enroll',
+                    '?course_id': COURSE_KEY,
+                    '?course_mode': 'professional-no-id',
+                    '?purchase_workflow': 'bulk'
+                });
+
+                ajaxSpyAndInitialize(this);
+
+                // Expect that the view tried to auto-enroll the student
+                // with a redirect into the payment flow including the
+                // purchase_workflow parameter.
+                expect( EnrollmentInterface.enroll ).toHaveBeenCalledWith(
+                    COURSE_KEY,
+                    '/verify_student/start-flow/' + COURSE_KEY + '/?purchase_workflow=bulk'
                 );
             });
 

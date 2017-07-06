@@ -1,0 +1,28 @@
+<%page expression_filter="h"/>
+<%include file="_underscore_templates.html" />
+<%!
+from django.utils.translation import ugettext as _
+from json import dumps as json_dumps
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+
+<div class="discussion-module" data-discussion-id="${discussion_id}" data-user-create-comment="${json_dumps(can_create_comment)}" data-user-create-subcomment="${json_dumps(can_create_subcomment)}" data-read-only="false">
+    <a class="discussion-show control-button" href="javascript:void(0)" data-discussion-id="${discussion_id}" role="button">
+        <span class="show-hide-discussion-icon"></span><span class="button-text">${_("Show Discussion")}</span>
+    </a>
+    % if can_create_thread:
+        <button class="new-post-btn btn-neutral btn-small">${_("Add a Post")}</button>
+    % endif
+</div>
+<script type="text/javascript">
+/* global DiscussionModuleView */
+/* exported DiscussionInlineBlock, $$course_id */
+var $$course_id = "${course_id | n, js_escaped_string}";
+
+function DiscussionInlineBlock(runtime, element) {
+    'use strict';
+    var el = $(element).find('.discussion-module');
+    /* jshint nonew:false */
+    new DiscussionModuleView({ el: el });
+}
+</script>

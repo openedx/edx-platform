@@ -1,9 +1,12 @@
+<%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 <%inherit file="../main.html" />
 
 <%block name="pagetitle">${_("Terms of Service")}</%block>
 
-<section class="container about">
-<h1>${_("Terms of Service")}</h1>
-<p>${_("This page left intentionally blank. It is not used by edx.org but is left here for possible use by installations of Open edX.")}</p>
-</section>
+<main id="main" aria-label="Content" tabindex="-1">
+    <section class="container about">
+        <h1>${_("Terms of Service")}</h1>
+        <p>${_("This page left intentionally blank. Feel free to add your own content.")}</p>
+    </section>
+</main>

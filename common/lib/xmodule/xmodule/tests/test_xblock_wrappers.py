@@ -31,12 +31,9 @@ from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, Descripto
 from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
-from xmodule.discussion_module import DiscussionDescriptor
-from xmodule.gst_module import GraphicalSliderToolDescriptor
 from xmodule.html_module import HtmlDescriptor
 from xmodule.poll_module import PollDescriptor
 from xmodule.word_cloud_module import WordCloudDescriptor
-from xmodule.crowdsource_hinter import CrowdsourceHinterDescriptor
 #from xmodule.video_module import VideoDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
@@ -52,8 +49,6 @@ from xmodule.tests import get_test_descriptor_system, get_test_system
 LEAF_XMODULES = {
     AnnotatableDescriptor: [{}],
     CapaDescriptor: [{}],
-    DiscussionDescriptor: [{}],
-    GraphicalSliderToolDescriptor: [{}],
     HtmlDescriptor: [{}],
     PollDescriptor: [{'display_name': 'Poll Display Name'}],
     WordCloudDescriptor: [{}],
@@ -68,18 +63,15 @@ LEAF_XMODULES = {
 CONTAINER_XMODULES = {
     ConditionalDescriptor: [{}],
     CourseDescriptor: [{}],
-    CrowdsourceHinterDescriptor: [{}],
     RandomizeDescriptor: [{}],
     SequenceDescriptor: [{}],
     VerticalBlock: [{}],
     WrapperBlock: [{}],
 }
 
-# These modules are editable in studio yet
+# These modules are not editable in studio yet
 NOT_STUDIO_EDITABLE = (
-    CrowdsourceHinterDescriptor,
-    GraphicalSliderToolDescriptor,
-    PollDescriptor
+    PollDescriptor,
 )
 
 

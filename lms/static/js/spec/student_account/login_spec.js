@@ -3,13 +3,14 @@
     define([
             'jquery',
             'underscore',
+            'sinon',
             'common/js/spec_helpers/template_helpers',
-            'common/js/spec_helpers/ajax_helpers',
+            'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
             'js/student_account/models/LoginModel',
             'js/student_account/views/LoginView',
             'js/student_account/models/PasswordResetModel'
         ],
-        function($, _, TemplateHelpers, AjaxHelpers, LoginModel, LoginView, PasswordResetModel) {
+        function($, _, sinon, TemplateHelpers, AjaxHelpers, LoginModel, LoginView, PasswordResetModel) {
 
         describe('edx.student.account.LoginView', function() {
             var model = null,
@@ -127,7 +128,7 @@
                 // spying on `view.validate` twice
                 if ( !_.isUndefined(validationSuccess) ) {
                     // Force validation to return as expected
-                    spyOn(view, 'validate').andReturn({
+                    spyOn(view, 'validate').and.returnValue({
                         isValid: validationSuccess,
                         message: 'Submission was validated.'
                     });
@@ -173,7 +174,7 @@
 
                 // Simulate that the user is attempting to enroll in a course
                 // by setting the course_id query string param.
-                spyOn($, 'url').andCallFake(function( param ) {
+                spyOn($, 'url').and.callFake(function( param ) {
                     if (param === '?course_id') {
                         return encodeURIComponent( COURSE_ID );
                     }
@@ -267,13 +268,25 @@
             });
 
             it('displays an error if there is no internet connection', function () {
+                var clock,
+                    oldTimeout,
+                    timeout;
+
+                // We're defining "no internet connection" in this case as the
+                // request timing out.  We use a combination of the sinon fake
+                // timer and jQuery.ajaxSetup() to force a request timeout.
+                clock = sinon.useFakeTimers();
+                oldTimeout = $.ajaxSetup().timeout;
+                timeout = 1;
+                $.ajaxSetup({timeout: timeout});
+
                 createLoginView(this);
 
                 // Submit the form, with successful validation
                 submitForm(true);
 
-                // Simulate an error from the LMS servers
-                AjaxHelpers.respondWithError(requests, 0);
+                // Simulate a request timeout
+                clock.tick(timeout + 1);
 
                 // Expect that an error is displayed and that auth complete is not triggered
                 expect(view.$errors).not.toHaveClass('hidden');
@@ -281,7 +294,12 @@
                 expect(view.$errors.text()).toContain(
                     'An error has occurred. Check your Internet connection and try again.'
                 );
+
+                // Finally, restore the old timeout and turn off the fake timer.
+                $.ajaxSetup({timeout: oldTimeout});
+                clock.restore();
             });
+
             it('displays an error if there is a server error', function () {
                 createLoginView(this);
 

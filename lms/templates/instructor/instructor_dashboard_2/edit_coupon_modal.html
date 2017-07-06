@@ -1,12 +1,13 @@
+<%page args="section_data" expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
-<%page args="section_data"/>
-<section id="edit-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Edit Coupon Code')}">
+<section id="edit-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-labelledby="header-edit-coupon-code">
+    <h2 id="header-edit-coupon-code" class="hd hd-2">${_("Edit Coupon Code")}</h2>
   <div class="inner-wrapper">
     <button class="close-modal">
-      <i class="icon fa fa-remove"></i>
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_('Close')}
@@ -14,10 +15,6 @@ from django.core.urlresolvers import reverse
     </button>
 
     <div id="coupon-content">
-      <header>
-        <h2>${_("Edit Coupon Code")}</h2>
-      </header>
-
       <div class="instructions">
         <p>
           ${_("Edit Coupon Code Information")}</p>

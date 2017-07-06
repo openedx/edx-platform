@@ -36,7 +36,7 @@
                     window.Video = jasmine.createSpy('Video');
                     removeVideo = true;
                 }
-                window.Video.andReturn(videoModule);
+                window.Video.and.returnValue(videoModule);
 
                 editCallback = jasmine.createSpy('editCallback');
                 $(document).on('XModule.loaded.edit', editCallback);
@@ -171,7 +171,7 @@
                 el = 'dummy object';
                 obj = new XModule.Descriptor(el);
 
-                spyOn(obj, 'save').andCallThrough();
+                spyOn(obj, 'save').and.callThrough();
             });
 
             afterEach(function () {
@@ -225,7 +225,7 @@
                 obj.onUpdate(callback1);
                 obj.onUpdate(callback2);
 
-                obj.save.andReturn(testValue);
+                obj.save.and.returnValue(testValue);
                 obj.update();
 
                 expect(callback1).toHaveBeenCalledWith(testValue);

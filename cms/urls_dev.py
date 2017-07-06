@@ -7,5 +7,5 @@ from django.conf.urls import url
 
 urlpatterns = (
     url(r'^dev_mode$', 'contentstore.views.dev.dev_mode', name='dev_mode'),
-    url(r'^template/(?P<template>.+)$', 'contentstore.views.dev.dev_show_template'),
+    url(r'^template/(?P<template>.+)$', 'openedx.core.djangoapps.debug.views.show_reference_template'),
 )

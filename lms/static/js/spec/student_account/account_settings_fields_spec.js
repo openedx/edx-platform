@@ -1,4 +1,8 @@
-define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
+define(['backbone',
+        'jquery',
+        'underscore',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/js/spec_helpers/template_helpers',
         'js/views/fields',
         'js/spec/views/fields_helpers',
         'js/spec/student_account/account_settings_fields_helpers',
@@ -16,7 +20,11 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
             beforeEach(function () {
                 timerCallback = jasmine.createSpy('timerCallback');
-                jasmine.Clock.useMock();
+                jasmine.clock().install();
+            });
+
+            afterEach(function() {
+                jasmine.clock().uninstall();
             });
 
             it("sends request to reset password on clicking link in PasswordFieldView", function() {
@@ -28,7 +36,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 });
 
                 var view = new AccountSettingsFieldViews.PasswordFieldView(fieldData).render();
-                view.$('.u-field-value > a').click();
+                view.$('.u-field-value > button').click();
                 AjaxHelpers.expectRequest(requests, 'POST', '/password_reset', "email=legolas%40woodland.middlearth");
                 AjaxHelpers.respondWithJson(requests, {"success": "true"});
                 FieldViewsSpecHelpers.expectMessageContains(

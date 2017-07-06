@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%namespace name='static' file='static_content.html'/>
 
 <%!
@@ -6,9 +7,9 @@ import pytz
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.tabs import CourseTabList
-from microsite_configuration import microsite
-from microsite_configuration.templatetags.microsite import platform_name
 %>
 
 % if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
@@ -17,11 +18,11 @@ from microsite_configuration.templatetags.microsite import platform_name
   <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
 </div>
 
-<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label="${_("{platform_name} Help").format(platform_name=platform_name())}">
+<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label="${_("{platform_name} Help").format(platform_name=static.get_platform_name())}">
   <div class="inner-wrapper" id="help_wrapper">
     ## TODO: find a way to refactor this
     <button class="close-modal "tabindex="0">
-      <i class="icon fa fa-remove"></i>
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_('Close')}
@@ -30,8 +31,8 @@ from microsite_configuration.templatetags.microsite import platform_name
 
     <header>
       <h2>
-	${_('{platform_name} Help').format(
-	    platform_name=u'<span class="edx">{}</span>'.format(platform_name())
+	${Text(_('{platform_name} Help')).format(
+	    platform_name=HTML(u'<span class="edx">{}</span>').format(static.get_platform_name())
 	)}
       </h2>
       <hr>
@@ -43,23 +44,31 @@ from microsite_configuration.templatetags.microsite import platform_name
 %>
 
 % if discussion_link:
-    <p>${_('For <strong>questions on course lectures, homework, tools, or materials for this course</strong>, post in the {link_start}course discussion forum{link_end}.').format(
-      link_start='<a href="{url}" target="_blank">'.format(url=discussion_link),
-      link_end='</a>',
+    <p>${Text(_('For {strong_start}questions on course lectures, homework, tools, or materials for this course{strong_end}, post in the {link_start}course discussion forum{link_end}.')).format(
+      strong_start=HTML('<strong>'),
+      strong_end=HTML('</strong>'),
+      link_start=HTML('<a href="{url}" target="_blank">').format(
+        url=discussion_link
+      ),
+      link_end=HTML('</a>'),
       )}
     </p>
 % endif
 
-    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.').format(
-        link_start='<a href="{url}" target="_blank">'.format(
+    <p>${Text(_('Have {strong_start}general questions about {platform_name}{strong_end}? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.')).format(
+        strong_start=HTML('<strong>'),
+        strong_end=HTML('</strong>'),
+        link_start=HTML('<a href="{url}" target="_blank">').format(
           url=marketing_link('FAQ')
         ),
-        link_end='</a>',
-        platform_name=platform_name())}
+        link_end=HTML('</a>'),
+        platform_name=static.get_platform_name())}
       </p>
 
-    <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(
-        platform_name=platform_name()
+    <p>${Text(_('Have a {strong_start}question about something specific{strong_end}? You can contact the {platform_name} general support team directly:')).format(
+        strong_start=HTML('<strong>'),
+        strong_end=HTML('</strong>'),
+        platform_name=static.get_platform_name()
       )}</p>
     <hr>
 
@@ -70,14 +79,14 @@ from microsite_configuration.templatetags.microsite import platform_name
     </div>
 
     <p class="note">${_('Please note: The {platform_name} support team is English speaking. While we will do our best to address your inquiry in any language, our responses will be in English.').format(
-        platform_name=platform_name()
+        platform_name=static.get_platform_name()
       )}</p>
 
   </div>
 
   <div class="inner-wrapper" id="feedback_form_wrapper">
     <button class="close-modal">
-      <i class="icon fa fa-remove"></i>
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_('Close')}
@@ -101,7 +110,7 @@ from microsite_configuration.templatetags.microsite import platform_name
       <textarea name="details" id="feedback_form_details" aria-required="true"></textarea>
       <input name="issue_type" type="hidden">
 % if course:
-      <input name="course_id" type="hidden" value="${course.id.to_deprecated_string() | h}">
+      <input name="course_id" type="hidden" value="${unicode(course.id)}">
 % endif
       <div class="submit">
         <input name="submit" type="submit" value="${_('Submit')}" id="feedback_submit">
@@ -111,7 +120,7 @@ from microsite_configuration.templatetags.microsite import platform_name
 
   <div class="inner-wrapper" id="feedback_success_wrapper" tabindex="0">
     <button class="close-modal" tabindex="0">
-      <i class="icon fa fa-remove"></i>
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_('Close')}
@@ -133,16 +142,16 @@ from microsite_configuration.templatetags.microsite import platform_name
         close_time = "22:00"
     %>
     <p>
-    ${_(
+    ${Text(_(
         'Thank you for your inquiry or feedback.  We typically respond to a request '
         'within one business day (Monday to Friday, {open_time} UTC to {close_time} UTC.) In the meantime, please '
         'review our {link_start}detailed FAQs{link_end} where most questions have '
         'already been answered.'
-    ).format(
+    )).format(
         open_time=open_time,
         close_time=close_time,
-        link_start='<a href="{}" target="_blank" id="feedback-faq-link" tabindex="0">'.format(marketing_link('FAQ')),
-        link_end='</a>'
+        link_start=HTML('<a href="{}" target="_blank" id="feedback-faq-link" tabindex="0">').format(marketing_link('FAQ')),
+        link_end=HTML('</a>')
     )}
     </p>
   </div>
@@ -203,29 +212,32 @@ from microsite_configuration.templatetags.microsite import platform_name
     $("#feedback_link_problem").click(function(event) {
         showFeedback(
             event,
-            "${_('problem')}",
-            "${_('Report a Problem')}",
-            "${_('Brief description of the problem')}" + "*",
-            "${_('Details of the problem you are encountering')}" + "*" + "<span class='tip'>" +
-              "${_('Include error messages, steps which lead to the issue, etc.')}" + "</span>"
+            "${_('problem') | n, js_escaped_string}",
+            "${_('Report a Problem') | n, js_escaped_string}",
+            "${_('Brief description of the problem') + '*' | n, js_escaped_string}" ,
+            "${Text(_('Details of the problem you are encountering{asterisk}{begin_span}Include error messages, steps which lead to the issue, etc.{end_span}')).format(
+                asterisk='*',
+                begin_span=HTML('<span class=tip>'),
+                end_span=HTML('</span>'),
+            ) | n, js_escaped_string}"
         );
     });
     $("#feedback_link_suggestion").click(function(event) {
         showFeedback(
             event,
-            "${_('suggestion')}",
-            "${_('Make a Suggestion')}",
-            "${_('Brief description of your suggestion')}" + "*",
-            "${_('Details')}" + "*"
+            "${_('suggestion') | n, js_escaped_string}",
+            "${_('Make a Suggestion') | n, js_escaped_string}",
+            "${_('Brief description of your suggestion') + '*' | n, js_escaped_string}",
+            "${_('Details') + '*' | n, js_escaped_string}"
         );
     });
     $("#feedback_link_question").click(function(event) {
         showFeedback(
             event,
-            "${_('question')}",
-            "${_('Ask a Question')}",
-            "${_('Brief summary of your question')}" + "*",
-            "${_('Details')}" + "*"
+            "${_('question') | n, js_escaped_string}",
+            "${_('Ask a Question') | n, js_escaped_string}",
+            "${_('Brief summary of your question') + '*' | n, js_escaped_string}",
+            "${_('Details') + '*' | n, js_escaped_string}"
         );
     });
     $("#feedback_form").submit(function() {
@@ -253,21 +265,21 @@ from microsite_configuration.templatetags.microsite import platform_name
             $("#feedback_error").html(responseData.error).stop().css("display", "block");
         } else {
             // If no data (or malformed data) is returned, a server error occurred
-            htmlStr = "${_('An error has occurred.')}";
+            htmlStr = "${_('An error has occurred.') | n, js_escaped_string}";
 % if settings.FEEDBACK_SUBMISSION_EMAIL:
-            htmlStr += " " + _.template(
-              "${_('Please {link_start}send us e-mail{link_end}.')}",
-              {link_start: '<a href="#" id="feedback_email">', link_end: '</a>'},
-              {interpolate: /\{(.+?)\}/g})
+            htmlStr += " " + "${Text(_('Please {link_start}send us e-mail{link_end}.')).format(
+              link_start=HTML('<a href="#" id="feedback_email">'),
+              link_end=HTML('</a>'),
+            ) | n, js_escaped_string}";
 % else:
             // If no email is configured, we can't do much other than
             // ask the user to try again later
-            htmlStr += "${_('Please try again later.')}";
+            htmlStr += " " + "${_('Please try again later.') | n, js_escaped_string}";
 % endif
             $("#feedback_error").html(htmlStr).stop().css("display", "block");
 % if settings.FEEDBACK_SUBMISSION_EMAIL:
             $("#feedback_email").click(function(e) {
-                mailto = "mailto:" + "${settings.FEEDBACK_SUBMISSION_EMAIL}" +
+                mailto = "mailto:" + "${settings.FEEDBACK_SUBMISSION_EMAIL | n, js_escaped_string}" +
                     "?subject=" + $("#feedback_form input[name='subject']").val() +
                     "&body=" + $("#feedback_form textarea[name='details']").val();
                 window.open(mailto);

@@ -1,0 +1,531 @@
+// lms - utilities - variables
+// ====================
+
+// #CONFIG:         paths and configuration
+// #UNITS:          Basic units of measurement
+// #GRID:           Grid and layout variables
+// #COLORS:         Base, palette and theme color definitions + application
+// #TYPOGRAPHY:     Font definitions and scales
+// #DEPTH:          UI depth-based scale
+// #SPACING:        General UI spacing variables and scale
+// #FORMS:          form field/interaction variables
+// #TIMING:         Event timing variables
+// #APPLICATIONS:   Applying configuration
+// #DEPRECATED:     sunsetted and not to be used variables
+
+// ----------------------------
+// #CONFIG
+// ----------------------------
+$static-path: '..' !default;
+
+
+// ----------------------------
+// #UNITS
+// ----------------------------
+$baseline: 20px !default;
+
+
+// ----------------------------
+// #GRID
+// ----------------------------
+$gw-column: 80px !default;
+$gw-gutter: 20px !default;
+$fg-column: $gw-column !default;
+$fg-gutter: $gw-gutter !default;
+$fg-max-columns: 12 !default;
+$fg-max-width: 1400px !default;
+$fg-min-width: 810px !default;
+
+
+// ----------------------------
+// #COLORS
+// ----------------------------
+$transparent: rgba(0,0,0,0) !default; // used when color value is needed for UI width/transitions but element is transparent
+
+$black:     rgb(0,0,0) !default;
+$black-t0:  rgba($black, 0.125) !default;
+$black-t1:  rgba($black, 0.25) !default;
+$black-t2:  rgba($black, 0.5) !default;
+$black-t3:  rgba($black, 0.75) !default;
+
+$white:     rgb(255,255,255) !default;
+$white-t0:  rgba($white, 0.125) !default;
+$white-t1:  rgba($white, 0.25) !default;
+$white-t2:  rgba($white, 0.5) !default;
+$white-t3:  rgba($white, 0.75) !default;
+
+$gray:      rgb(118,118,118) !default;
+$gray-l1:   tint($gray,20%) !default;
+$gray-l2:   tint($gray,40%) !default;
+$gray-l3:   tint($gray,60%) !default;
+$gray-l4:   tint($gray,80%) !default;
+$gray-l5:   tint($gray,90%) !default;
+$gray-l6:   tint($gray,95%) !default;
+$gray-l7:   tint($gray,99%) !default;
+$gray-d1:   shade($gray,20%) !default;
+$gray-d2:   shade($gray,40%) !default;
+$gray-d3:   shade($gray,60%) !default;
+$gray-d4:   shade($gray,80%) !default;
+
+$yellow: rgb(255, 252, 221);
+
+$pink: rgb(182,37,103);
+$pink-l1: tint($pink,20%);
+$pink-l2: tint($pink,40%);
+$pink-l3: tint($pink,60%);
+$pink-l4: tint($pink,80%);
+$pink-l5: tint($pink,90%);
+$pink-d1: shade($pink,20%);
+$pink-d2: shade($pink,40%);
+$pink-d3: shade($pink,60%);
+$pink-d4: shade($pink,80%);
+$pink-s1: saturate($pink,15%);
+$pink-s2: saturate($pink,30%);
+$pink-s3: saturate($pink,45%);
+$pink-u1: desaturate($pink,15%);
+$pink-u2: desaturate($pink,30%);
+$pink-u3: desaturate($pink,45%);
+
+$red: rgb(178, 6, 16);
+$red-l1: tint($red,20%);
+$red-l2: tint($red,40%);
+$red-l3: tint($red,60%);
+$red-l4: tint($red,80%);
+$red-l5: tint($red,90%);
+$red-d1: shade($red,20%);
+$red-d2: shade($red,40%);
+$red-d3: shade($red,60%);
+$red-d4: shade($red,80%);
+$red-s1: saturate($red,15%);
+$red-s2: saturate($red,30%);
+$red-s3: saturate($red,45%);
+$red-u1: desaturate($red,15%);
+$red-u2: desaturate($red,30%);
+$red-u3: desaturate($red,45%);
+
+$green: rgb(37, 184, 90);
+$green-l1: tint($green,20%);
+$green-l2: tint($green,40%);
+$green-l3: tint($green,60%);
+$green-l4: tint($green,80%);
+$green-l5: tint($green,90%);
+$green-d1: shade($green,20%);
+$green-d2: shade($green,40%);
+$green-d3: shade($green,60%);
+$green-d4: shade($green,80%);
+$green-s1: saturate($green,15%);
+$green-s2: saturate($green,30%);
+$green-s3: saturate($green,45%);
+$green-u1: desaturate($green,15%);
+$green-u2: desaturate($green,30%);
+$green-u3: desaturate($green,45%);
+
+$yellow: rgb(255, 252, 221);      // yellow color used by LMS
+//$yellow: rgb(237, 189, 60);     // yellow color used by Studio
+$yellow-l1: tint($yellow,20%);
+$yellow-l2: tint($yellow,40%);
+$yellow-l3: tint($yellow,60%);
+$yellow-l4: tint($yellow,80%);
+$yellow-l5: tint($yellow,90%);
+$yellow-d1: shade($yellow,20%);
+$yellow-d2: shade($yellow,40%);
+$yellow-d3: shade($yellow,60%);
+$yellow-d4: shade($yellow,80%);
+$yellow-s1: saturate($yellow,15%);
+$yellow-s2: saturate($yellow,30%);
+$yellow-s3: saturate($yellow,45%);
+$yellow-u1: desaturate($yellow,15%);
+$yellow-u2: desaturate($yellow,30%);
+$yellow-u3: desaturate($yellow,45%);
+
+$blue: rgb(0, 121, 188);
+$blue-l1: tint($blue,20%);
+$blue-l2: tint($blue,40%);
+$blue-l3: tint($blue,60%);
+$blue-l4: tint($blue,80%);
+$blue-l5: tint($blue,90%);
+$blue-d1: shade($blue,20%);
+$blue-d2: shade($blue,40%);
+$blue-d3: shade($blue,60%);
+$blue-d4: shade($blue,80%);
+$blue-s1: saturate($blue,15%);
+$blue-s2: saturate($blue,30%);
+$blue-s3: saturate($blue,45%);
+$blue-u1: desaturate($blue,15%);
+$blue-u2: desaturate($blue,30%);
+$blue-u3: desaturate($blue,45%);
+$blue-t0: rgba($blue, 0.125);
+$blue-t1: rgba($blue, 0.25);
+$blue-t2: rgba($blue, 0.50);
+$blue-t3: rgba($blue, 0.75);
+
+$orange: rgb(237, 189, 60);
+$orange-l1: tint($orange,20%);
+$orange-l2: tint($orange,40%);
+$orange-l3: tint($orange,60%);
+$orange-l4: tint($orange,80%);
+$orange-l5: tint($orange,90%);
+$orange-d1: shade($orange,20%);
+$orange-d2: shade($orange,40%);
+$orange-d3: shade($orange,60%);
+$orange-d4: shade($orange,80%);
+$orange-s1: saturate($orange,15%);
+$orange-s2: saturate($orange,30%);
+$orange-s3: saturate($orange,45%);
+$orange-u1: desaturate($orange,15%);
+$orange-u2: desaturate($orange,30%);
+$orange-u3: desaturate($orange,45%);
+
+// ====================
+
+// copied from cms/static/sass/_variables.scss
+$ui-notification-height: ($baseline*10);
+
+
+// ====================
+
+// social platforms
+$twitter-blue: #55ACEE;
+$facebook-blue: #3B5998;
+$linkedin-blue: #0077B5;
+$google-red: #DD4B39;
+$microsoft-blue: #00BCF2;
+
+// shadows
+$shadow: rgba(0,0,0,0.2) !default;
+$shadow-l1: rgba(0,0,0,0.1) !default;
+$shadow-l2: rgba(0,0,0,0.05) !default;
+$shadow-d1: rgba(0,0,0,0.4) !default;
+$shadow-d2: rgba($black, 0.6) !default;
+
+// system feedback-based colors
+$error-color: rgb(253, 87, 87) !default;
+$warning-color: rgb(181,42,103) !default;
+$confirm-color: rgb(0, 132, 1) !default;
+$active-color: $blue !default;
+$highlight-color: rgb(255,255,0) !default;
+$alert-color: rgb(212, 64, 64) !default;
+$warning-color: rgb(237, 189, 60) !default;
+$success-color: rgb(37, 184, 90) !default;
+
+// newer color variables
+$dark-gray1: rgb(74,74,74);
+$light-gray1: rgb(242,242,242);
+$light-gray2: rgb(171,171,171);
+$light-gray3: rgb(249,249,249);
+$light-gray4: rgb(252,252,252);
+$dark-gray2: rgb(151,151,151);
+$blue1: rgb(74,144,226);
+$blue2: rgb(0,161,229);
+$green1: rgb(97,161,46);
+$red1: rgb(208,2,27);
+
+// edx-specific: marketing site variables
+$m-gray: rgb(138,140,143); //C8F
+$m-gray-l1: rgb(151,153,155);
+$m-gray-l2: rgb(164,166,168);
+$m-gray-l3: rgb(177,178,180);
+$m-gray-l4: rgb(245,245,245);
+$m-gray-d1: rgb(111, 112, 116);
+$m-gray-d2: rgb(112,114,118);
+$m-gray-d3: rgb(100,102,104);
+$m-gray-d4: rgb(5,5,5);
+$m-gray-t0: rgba($m-gray,0.125);
+$m-gray-t1: rgba($m-gray,0.25);
+$m-gray-t2: rgba($m-gray,0.50);
+$m-gray-t3: rgba($m-gray,0.75);
+
+$m-blue: rgb(26,161,222);
+$m-blue-l1: rgb(43,172,230);
+$m-blue-l2: rgb(66,181,233);
+$m-blue-l3: rgb(89,190,236);
+$m-blue-l4: tint($m-blue,90%);
+$m-blue-l5: tint($m-blue,95%);
+$m-blue-l6: #4bb4fb;
+$m-blue-d1: rgb(23,144,199);
+$m-blue-d2: $blue;
+$m-blue-d3: rgb(18,111,154);
+$m-blue-d4: rgb(10,74,103);
+$m-blue-d5: rgb(0,158,231);
+$m-blue-d6: #256A97;
+$m-blue-t0: rgba($m-blue,0.125);
+$m-blue-t1: rgba($m-blue,0.25);
+$m-blue-t2: rgba($m-blue,0.50);
+$m-blue-t3: rgba($m-blue,0.75);
+
+$m-pink: rgb(181,42,103);
+$m-pink-l1: rgb(202,47,115);
+$m-pink-l2: rgb(211,63,128);
+$m-pink-l3: rgb(215,84,142);
+$m-pink-l4: tint($m-pink,75%);
+$m-pink-l5: tint($m-pink,85%);
+$m-pink-d1: rgb(160,37,91);
+$m-pink-d2: rgb(140,32,79);
+$m-pink-d3: rgb(119,28,68);
+
+$m-green: rgb(0, 136, 1);
+$m-green-s1: rgb(96, 188, 97);
+$m-green-l1: tint($m-green,20%);
+$m-green-l2: tint($m-green,40%);
+$m-green-l3: tint($m-green,60%);
+$m-green-l4: tint($m-green,90%);
+$m-green-l5: tint($m-green,95%);
+$m-green-d1: shade($m-green,20%);
+$m-green-d2: shade($m-green,40%);
+$m-green-d3: shade($m-green,60%);
+$m-green-d4: shade($m-green,90%);
+$m-green-t0: rgba($m-green,0.125);
+$m-green-t1: rgba($m-green,0.25);
+$m-green-t2: rgba($m-green,0.50);
+$m-green-t3: rgba($m-green,0.75);
+
+// edx-specific: verified
+$verified-color-lvl1: $m-green;
+$verified-color-lvl2: $m-green-l1;
+$verified-color-lvl3: $m-green-l2;
+$verified-color-lvl4: $m-green-l3;
+$verified-color-lvl5: $m-green-l4;
+
+// edx-specific: professional ed
+$professional-color-lvl1: $m-pink;
+$professional-color-lvl2: $m-pink-l1;
+$professional-color-lvl3: $m-pink-l2;
+$professional-color-lvl4: $m-pink-l3;
+$professional-color-lvl5: $m-pink-l4;
+
+// edx-specific: honor code
+$honorcode-color-lvl1: rgb(50, 165, 217);
+$honorcode-color-lvl2: tint($honorcode-color-lvl1, 33%);
+
+// edx-specific: audit
+$audit-color-lvl1: rgb(221, 221, 221);
+$audit-color-lvl2: tint($audit-color-lvl1, 33%);
+
+// edx-specific: credit
+$credit-color-base: rgb(244,195,0); // accessible with black text
+
+// edx-specific: Studio/Staff actions
+$staff-color: $pink;
+
+
+// ----------------------------
+// #TYPOGRAPHY
+// ----------------------------
+$sans-serif: 'Open Sans', $verdana, sans-serif !default;
+$monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace !default;
+$body-font-family: $sans-serif !default;
+$serif: $georgia !default;
+
+// newer variables/standards
+$f-serif: 'Bree Serif', Georgia, Cambria, 'Times New Roman', Times, serif !default;
+$f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif !default;
+$f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace !default;
+
+$font-light: 300 !default;
+$font-regular: 400 !default;
+$font-semibold: 600 !default;
+$font-bold: 700 !default;
+
+$m-base-font-size: em(15) !default;
+
+
+// ----------------------------
+// #DEPTH
+// ----------------------------
+
+
+// ----------------------------
+// #TIMING
+// ----------------------------
+$tmg-s3: 3.0s !default;
+$tmg-s2: 2.0s !default;
+$tmg-s1: 1.0s !default;
+$tmg-avg: 0.75s !default;
+$tmg-f1: 0.50s !default;
+$tmg-f2: 0.25s !default;
+$tmg-f3: 0.125s !default;
+
+
+// ----------------------------
+// #FORMS
+// ----------------------------
+$form-bg-color: $white !default;
+
+// ----------------------------
+// #APPLICATIONS
+// ----------------------------
+// font sizes
+$body-font-size: em(14) !default;
+$body-line-height: golden-ratio(.875em, 1) !default;
+
+$base-font-color: rgb(60,60,60) !default;
+$baseFontColor: $base-font-color;
+
+$lighter-base-font-color: rgb(100,100,100) $base-font-color;
+$very-light-text: rgb(255,255,255) !default;
+$text-color: rgb(51, 51, 51) !default;
+
+// borders
+$border-color-1: rgb(190,190,190) !default;
+$border-color-2: rgb(200,200,200) !default;
+$border-color-3: rgb(100,100,100) !default;
+$border-color-4: rgb(252,252,252) !default;
+$border-color-l1: $m-gray-l1 !default;
+$border-color-l2: $m-gray-l2 !default;
+$border-color-l3: $m-gray-l3 !default;
+$border-color-l4: $m-gray-l4 !default;
+
+// visual horizontal rules
+$faded-hr-image-1: linear-gradient(180deg, rgba(200,200,200, 0) 0%, rgba(200,200,200, 1) 50%, rgba(200,200,200, 0));
+$faded-hr-image-2: linear-gradient(180deg, rgba(200,200,200, 0) 0%, rgba(200,200,200, 1));
+$faded-hr-image-3: linear-gradient(180deg, rgba(200,200,200, 1) 0%, rgba(200,200,200, 0));
+$faded-hr-image-4: linear-gradient(180deg, rgba(240,240,240, 0) 0%, rgba(240,240,240, 1) 50%, rgba(240,240,240, 0));
+$faded-hr-image-5: linear-gradient(180deg, rgba(255,255,255, 0) 0%, rgba(255,255,255, 0.8) 50%, rgba(255,255,255, 0));
+$faded-hr-image-6: linear-gradient(90deg, rgba(255,255,255, 0) 0%, rgba(255,255,255, 0.6) 50%, rgba(255,255,255, 0));
+
+// notifications
+$notify-banner-bg-1: rgb(56,56,56) !default;
+$notify-banner-bg-2: rgb(136,136,136) !default;
+$notify-banner-bg-3: $shadow-l2 !default;
+$msg-bg: $m-blue-d3 !default;
+
+// actions
+$button-bg-image: linear-gradient(rgb(255,255,255) 0%, rgb(250,250,250) 50%, rgb(237,237,237) 50%, rgb(220,220,220) 100%) !default;
+$button-bg-color: transparent !default;
+$button-bg-hover-color: $white !default;
+
+// action - primary
+$action-primary-bg: $m-blue-d3 !default;
+$action-primary-fg: $white !default;
+$action-primary-shadow: $m-blue-d4 !default;
+$action-primary-focused-bg: $m-blue-d1 !default;
+$action-primary-focused-fg: $white !default;
+$action-primary-active-bg: $m-blue !default;
+$action-primary-active-fg: $m-blue-d3 !default;
+$action-primary-active-shadow: $m-blue-d2 !default;
+$action-primary-active-focused-fg: $m-blue-d4 !default;
+$action-primary-active-focused-shadow: $m-blue-d3 !default;
+$action-primary-disabled-bg: $m-gray-d3 !default;
+$action-prmary-disabled-fg: $white !default;
+
+// action - secondary
+$action-secondary-bg: $m-pink !default;
+$action-secondary-fg: $white !default;
+$action-secondary-shadow: $m-pink-d2 !default;
+$action-secondary-focused-bg: $m-pink-l3 !default;
+$action-secondary-focused-fg: $white !default;
+$action-secondary-active-bg: $m-pink-l2 !default;
+$action-secondary-active-fg: $m-pink-d1 !default;
+$action-secondary-active-shadow: $m-pink-d1 !default;
+$action-secondary-active-focused-fg: $m-pink-d3 !default;
+$action-secondary-active-focused-shadow: $m-pink-d2 !default;
+$action-secondary-disabled-bg: $m-gray-d3 !default;
+$action-secondary-disabled-fg: $white !default;
+
+// actions - misc
+$link-color: $blue !default;
+$link-color-d1: $blue !default;
+$link-hover: $blue-l1 !default; // from our Pattern Library http://ux.edx.org/elements/colors/
+$site-status-color: $pink !default;
+$button-color: $blue !default;
+$button-archive-color: rgb(238,238,238) !default; // #eeeeee
+
+// larger, random elements
+$dark-trans-bg: rgba(0, 0, 0, .75);
+
+$body-bg: rgb(250,250,250) !default;
+
+$container-bg: $white !default;
+
+// header
+$header-image: linear-gradient(-90deg, rgba(255,255,255, 1), rgba(230,230,230, 0.9)) !default;
+$header-bg: $white !default;
+$header-graphic-super-color: $m-blue-d1;
+$header-graphic-sub-color: $m-gray-d2;
+$header-sans-serif: 'Open Sans', Arial, Helvetica, sans-serif !default;
+$header_image_margin: -69px !default;
+
+// footer
+$footer-bg: $white !default;
+$footer_margin: ($baseline/4) 0 ($baseline*1.5) 0 !default;
+
+// modal
+$shadow-color: $blue !default;
+$modal-bg-color: rgb(245,245,245) !default;
+
+// courseware elements
+$courseware-header-image: linear-gradient(top, rgb(255,255,255), rgb(238,238,238)) !default;
+$courseware-header-bg: transparent !default;
+$courseware-footer-border: none !default;
+$courseware-footer-shadow: none !default;
+$courseware-footer-margin: 0px !default;
+$courseware-border-bottom-color: rgb(68,162,222) !default;
+$courseware-button-border-color: rgb(230,230,230) !default;
+$courseware-hover-color: rgb(51,52,53) !default;
+$courseware-navigation-color: $blue !default;
+
+// homepage, onboarding, and course discovery
+$homepage__header--gradient__color--alpha: lighten($gray, 15%) !default;
+$homepage__header--gradient__color--bravo: saturate($gray, 30%) !default;
+$homepage__header--background: lighten($gray, 15%) !default;
+$homepage-background: rgb(252, 252, 252);
+$course-card-height: ($baseline*18) !default;
+$course-image-height: ($baseline*8) !default;
+$course-info-height: ($baseline*10) !default;
+$course-title-height: ($baseline*3.6) !default;
+$homepage-bg-image: none !default;
+$login-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png') !default;
+$register-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png') !default;
+$passwordreset-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png') !default;
+
+$video-thumb-url: '#{$static-path}/images/homepage-hero-video-thumb.jpg' !default;
+
+// dashboard elements
+$dashboard-profile-header-image: linear-gradient(-90deg, rgb(255,255,255), rgb(245,245,245)) !default;
+$dashboard-profile-header-color: transparent !default;
+$dashboard-profile-color: rgb(252,252,252) !default;
+$dot-color: rgb(221, 221, 221) !default;
+$dashboard-course-cover-border: rgb(221, 221, 221) !default;
+
+// course elements
+$content-wrapper-bg: $white !default;
+$course-bg-color: #f2f2f2 !default;
+$account-content-wrapper-bg: shade($body-bg, 2%) !default;
+$course-profile-bg: rgb(245,245,245) !default;
+$course-header-bg: rgba(255,255,255, 0.93) !default;
+
+// search/listing results
+$result-highlight-color-base: rgba($highlight-color, 0.25) !default;
+
+// sidebar
+$sidebar-chapter-bg-top: rgba(255, 255, 255, .5);
+$sidebar-chapter-bg-bottom: rgba(255, 255, 255, 0);
+$sidebar-chapter-bg: rgb(246,246,246) !default;
+$sidebar-active-image: linear-gradient(top, rgb(230,230,230), rgb(214,214,214)) !default;
+
+
+// student notes
+$student-notes-highlight-color-base: saturate($yellow, 65%) !default;
+$student-notes-highlight-color: tint($student-notes-highlight-color-base, 50%) !default;
+$student-notes-highlight-color-focus: $student-notes-highlight-color-base !default;
+
+// ----------------------------
+// #DEPRECATED
+// ----------------------------
+$danger-red: rgb(212, 64, 64) !default;
+$light-gray: rgb(221, 221, 221) !default;
+$dark-gray: rgb(51, 51, 51) !default;
+$border-color: rgb(200, 200, 200) !default;
+$sidebar-color: rgb(246, 246, 246) !default;
+$outer-border-color: $gray-l3;
+
+// used by descriptor css
+$lightGrey: rgb(237,241,245) !default;
+$mediumGrey: #ced2db;
+$darkGrey: rgb(136,145,161) !default;
+$extraDarkGrey: #3d4043;
+$lightGrey1: $gray-l3 !default;
+$paleYellow: #fffcf1;
+$blue-d1: shade($blue,20%);
+$blue-d2: shade($blue,40%);
+$blue-d4: shade($blue,80%);

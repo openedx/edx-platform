@@ -1,0 +1,21 @@
+// discussion - utilities - variables
+// ====================
+
+// color variables
+$forum-color-background: $white;
+$forum-color-active-thread: $white !default;
+$forum-color-active-text: $base-font-color !default;
+$forum-color-pinned: $pink !default;
+$forum-color-reported: $pink !default;
+$forum-color-closed: $black !default;
+$forum-color-following: $blue !default;
+$forum-color-staff: $blue !default;
+$forum-color-community-ta: $green-d1 !default;
+$forum-color-marked-answer: $green-d1 !default;
+$forum-color-border: $gray-l3 !default;
+$forum-color-error: $red !default;
+
+// post images
+$post-image-dimension: ($baseline*3) !default;  // image size  + margin
+$response-image-dimension: ($baseline*2.5) !default; // image size  + margin
+$comment-image-dimension: ($baseline*2) !default; // image size  + margin

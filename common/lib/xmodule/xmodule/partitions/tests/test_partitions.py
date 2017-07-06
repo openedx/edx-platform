@@ -131,6 +131,9 @@ class PartitionTestCase(TestCase):
             extensions, namespace=USER_PARTITION_SCHEME_NAMESPACE
         )
 
+        # Be sure to clean up the global scheme_extensions after the test.
+        self.addCleanup(self.cleanup_scheme_extensions)
+
         # Create a test partition
         self.user_partition = UserPartition(
             self.TEST_ID,
@@ -144,6 +147,12 @@ class PartitionTestCase(TestCase):
         # Make sure the names are set on the schemes (which happens normally in code, but may not happen in tests).
         self.user_partition.get_scheme(self.non_random_scheme.name)
         self.user_partition.get_scheme(self.random_scheme.name)
+
+    def cleanup_scheme_extensions(self):
+        """
+        Unset the UserPartition.scheme_extensions cache.
+        """
+        UserPartition.scheme_extensions = None
 
 
 class TestUserPartition(PartitionTestCase):

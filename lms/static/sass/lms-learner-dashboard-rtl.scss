@@ -1,0 +1,13 @@
+// ------------------------------
+// LMS Learner Dashboard styling
+// users the Pattern Library
+
+// NOTE: This is the right-to-left (RTL) configured style compile.
+// It should mirror lms-learner-dashboard-rtl w/ the exception of bi-app references.
+
+
+// Load the RTL version of lms main
+@import 'lms-main-v2-rtl';
+
+// Load the shared build
+@import 'build-learner-dashboard';

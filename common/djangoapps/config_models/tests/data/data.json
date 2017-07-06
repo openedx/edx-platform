@@ -1,0 +1,14 @@
+{
+  "model": "config_models.ExampleDeserializeConfig",
+  "data": [
+    {
+      "name": "betty",
+      "enabled": true,
+      "int_field": 5
+    },
+    {
+      "name": "fred",
+      "enabled": false
+    }
+  ]
+}

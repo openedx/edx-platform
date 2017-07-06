@@ -82,9 +82,6 @@
 
 .header-app {
 
-    .logo {
-        @extend %reset-link;
-    }
 }
 
 // ------------------------------
@@ -116,9 +113,15 @@
 
     .message-actions .action {
 
+        // STATE: hover, active, focus
+        &:hover, &:active, &:focus {
+            // customizations from UXPL
+           color: palette(grayscale-cool, x-dark);
+        }
+
         .icon {
             @include margin-right(spacing-horizontal(x-small));
-            font-size: font-size(mid-large);
+            font-size: font-size(large);
         }
 
         // CASE: icon display only
@@ -464,7 +467,7 @@
     }
 
     .accomplishment-main {
-        background: transparentize($cert-base-color, 0.9);
+        background: transparentize(palette(grayscale-cool, dark), 0.9);
     }
 
     .accomplishment-rendering {
@@ -489,7 +492,7 @@
     }
 
     .accomplishment-main {
-        background: transparentize($cert-distinguished-color, 0.9);
+        background: transparentize(palette(primary, accent), 0.9);
     }
 
     .accomplishment-rendering {

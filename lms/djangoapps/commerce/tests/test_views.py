@@ -1,15 +1,14 @@
 """ Tests for commerce views. """
-import json
-from uuid import uuid4
+
 from nose.plugins.attrib import attr
 
 import ddt
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 import mock
 
 from student.tests.factories import UserFactory
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 
 
 class UserMixin(object):
@@ -86,7 +85,7 @@ class ReceiptViewTests(UserMixin, TestCase):
         self.assertRegexpMatches(response.content, user_message if is_user_message_expected else system_message)
         self.assertNotRegexpMatches(response.content, user_message if not is_user_message_expected else system_message)
 
-    @mock.patch.dict(settings.FEATURES, {"IS_EDX_DOMAIN": True})
+    @with_comprehensive_theme("edx.org")
     def test_hide_nav_header(self):
         self._login()
         post_data = {'decision': 'ACCEPT', 'reason_code': '200', 'signed_field_names': 'dummy'}

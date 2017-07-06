@@ -3,6 +3,8 @@ Serializers to be used in APIs.
 """
 
 from rest_framework import serializers
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 
 class CollapsedReferenceSerializer(serializers.HyperlinkedModelSerializer):
@@ -37,3 +39,33 @@ class CollapsedReferenceSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta(object):
         fields = ("url",)
+
+
+class CourseKeyField(serializers.Field):
+    """ Serializer field for a model CourseKey field. """
+
+    def to_representation(self, data):
+        """Convert a course key to unicode. """
+        return unicode(data)
+
+    def to_internal_value(self, data):
+        """Convert unicode to a course key. """
+        try:
+            return CourseKey.from_string(data)
+        except InvalidKeyError as ex:
+            raise serializers.ValidationError("Invalid course key: {msg}".format(msg=ex.msg))
+
+
+class UsageKeyField(serializers.Field):
+    """ Serializer field for a model UsageKey field. """
+
+    def to_representation(self, data):
+        """Convert a usage key to unicode. """
+        return unicode(data)
+
+    def to_internal_value(self, data):
+        """Convert unicode to a usage key. """
+        try:
+            return UsageKey.from_string(data)
+        except InvalidKeyError as ex:
+            raise serializers.ValidationError("Invalid usage key: {msg}".format(msg=ex.msg))

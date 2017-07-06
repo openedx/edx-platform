@@ -1,10 +1,10 @@
 # pylint: disable=missing-docstring
 # pylint: disable=redefined-outer-name
+# pylint: disable=unused-argument
 
 from lettuce import world, step
 from common import course_location
 from problems_setup import PROBLEM_DICT
-from nose.tools import assert_in
 
 
 @step(u'I am viewing a course with multiple sections')
@@ -108,36 +108,34 @@ def when_i_navigate_to_a_subsection(step):
 
 @step(u'I navigate to an item in a sequence')
 def when_i_navigate_to_an_item_in_a_sequence(step):
-    sequence_css = 'a[data-element="2"]'
+    sequence_css = '.nav-item[data-element="2"]'
     world.css_click(sequence_css)
 
 
 @step(u'I see the content of the section')
 def then_i_see_the_content_of_the_section(step):
-    wait_for_problem('PROBLEM 2')
+    """
+    Uppercasing the title here since CSS does it on the front-end
+    """
+    wait_for_problem('Problem 2')
 
 
 @step(u'I see the content of the subsection')
 def then_i_see_the_content_of_the_subsection(step):
-    wait_for_problem('PROBLEM 4')
+    wait_for_problem('Problem 4')
 
 
 @step(u'I see the content of the sequence item')
 def then_i_see_the_content_of_the_sequence_item(step):
-    wait_for_problem('PROBLEM 6')
+    wait_for_problem('Problem 6')
 
 
-@step(u'I return to the courseware')
-def and_i_return_to_the_courseware(step):
+@step(u'I return to the course')
+def and_i_return_to_the_course(step):
     world.visit('/')
     world.click_link("View Course")
-    world.click_link("Courseware")
-
-
-@step(u'I see that I was most recently in the subsection')
-def then_i_see_that_i_was_most_recently_in_the_subsection(step):
-    message = world.css_text('section.course-content > p')
-    assert_in("You were most recently in Test Subsection 2", message)
+    course = 'a[href*="/courseware"]'
+    world.css_click(course)
 
 
 def create_course():
@@ -183,6 +181,6 @@ def wait_for_problem(display_name):
     world.wait_for_ajax_complete()
 
     wait_func = lambda _: world.css_has_text(
-        'h2.problem-header', display_name, strip=True
+        '.problem-header', display_name, strip=True
     )
     world.wait_for(wait_func)

@@ -6,7 +6,7 @@
             <span class="label-checked"><%- gettext("Unpin") %></span>
         </span>
         <span class="action-icon">
-          <i class="icon fa fa-thumb-tack"></i>
+          <span class="icon fa fa-thumb-tack" aria-hidden="true"></span>
         </span>
     </a>
 </li>

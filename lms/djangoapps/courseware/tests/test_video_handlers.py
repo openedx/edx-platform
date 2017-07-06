@@ -20,7 +20,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
-from cache_toolbox.core import del_cached_content
+from contentserver.caching import del_cached_content
 from xmodule.exceptions import NotFoundError
 
 from xmodule.video_module.transcripts_utils import (

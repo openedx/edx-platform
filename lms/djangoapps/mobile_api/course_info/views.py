@@ -1,12 +1,12 @@
 """
 Views for course info API
 """
-from django.http import Http404
+
 from rest_framework import generics
 from rest_framework.response import Response
 
 from courseware.courses import get_course_info_section_module
-from static_replace import make_static_urls_absolute, replace_static_urls
+from static_replace import make_static_urls_absolute
 from openedx.core.lib.xblock_utils import get_course_update_items
 
 from ..utils import mobile_view, mobile_course_access
@@ -21,7 +21,7 @@ class CourseUpdatesList(generics.ListAPIView):
 
     **Example Request**
 
-        GET /api/mobile/v0.5/course_info/{organization}/{course_number}/{course_run}/updates
+        GET /api/mobile/v0.5/course_info/{course_id}/updates
 
     **Response Values**
 
@@ -37,7 +37,7 @@ class CourseUpdatesList(generics.ListAPIView):
 
     @mobile_course_access()
     def list(self, request, course, *args, **kwargs):
-        course_updates_module = get_course_info_section_module(request, course, 'updates')
+        course_updates_module = get_course_info_section_module(request, request.user, course, 'updates')
         update_items = get_course_update_items(course_updates_module)
 
         updates_to_show = [
@@ -46,12 +46,7 @@ class CourseUpdatesList(generics.ListAPIView):
         ]
 
         for item in updates_to_show:
-            content = item['content']
-            content = replace_static_urls(
-                content,
-                course_id=course.id,
-                static_asset_path=course.static_asset_path)
-            item['content'] = make_static_urls_absolute(request, content)
+            item['content'] = apply_wrappers_to_content(item['content'], course_updates_module, request)
 
         return Response(updates_to_show)
 
@@ -65,7 +60,7 @@ class CourseHandoutsList(generics.ListAPIView):
 
     **Example Request**
 
-        GET /api/mobile/v0.5/course_info/{organization}/{course_number}/{course_run}/handouts
+        GET /api/mobile/v0.5/course_info/{course_id}/handouts
 
     **Response Values**
 
@@ -77,15 +72,37 @@ class CourseHandoutsList(generics.ListAPIView):
 
     @mobile_course_access()
     def list(self, request, course, *args, **kwargs):
-        course_handouts_module = get_course_info_section_module(request, course, 'handouts')
+        course_handouts_module = get_course_info_section_module(request, request.user, course, 'handouts')
         if course_handouts_module:
-            handouts_html = course_handouts_module.data
-            handouts_html = replace_static_urls(
-                handouts_html,
-                course_id=course.id,
-                static_asset_path=course.static_asset_path)
-            handouts_html = make_static_urls_absolute(self.request, handouts_html)
+            if course_handouts_module.data == "<ol></ol>":
+                handouts_html = None
+            else:
+                handouts_html = apply_wrappers_to_content(course_handouts_module.data, course_handouts_module, request)
             return Response({'handouts_html': handouts_html})
         else:
             # course_handouts_module could be None if there are no handouts
-            raise Http404(u"No handouts for {}".format(unicode(course.id)))
+            return Response({'handouts_html': None})
+
+
+def apply_wrappers_to_content(content, module, request):
+    """
+    Updates a piece of html content with the filter functions stored in its module system, then replaces any
+    static urls with absolute urls.
+
+    Args:
+        content: The html content to which to apply the content wrappers generated for this module system.
+        module: The module containing a reference to the module system which contains functions to apply to the
+        content. These functions include:
+            * Replacing static url's
+            * Replacing course url's
+            * Replacing jump to id url's
+        request: The request, used to replace static URLs with absolute URLs.
+
+    Returns: A piece of html content containing the original content updated by each wrapper.
+
+    """
+    content = module.system.replace_urls(content)
+    content = module.system.replace_course_urls(content)
+    content = module.system.replace_jump_to_id_urls(content)
+
+    return make_static_urls_absolute(request, content)

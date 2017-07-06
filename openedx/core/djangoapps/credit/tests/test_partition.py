@@ -4,6 +4,7 @@ Tests for In-Course Reverification Access Control Partition scheme
 """
 
 import ddt
+from nose.plugins.attrib import attr
 import unittest
 
 from django.conf import settings
@@ -21,6 +22,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@attr('shard_2')
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class ReverificationPartitionTest(ModuleStoreTestCase):
@@ -29,6 +31,7 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
     SUBMITTED = "submitted"
     APPROVED = "approved"
     DENIED = "denied"
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
         super(ReverificationPartitionTest, self).setUp()

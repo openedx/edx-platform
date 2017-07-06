@@ -7,11 +7,10 @@ import logging
 from django.dispatch import receiver
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
-
-from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
-from openedx.core.djangoapps.credit.verification_access import update_verification_partitions
 from xmodule.modulestore.django import SignalHandler
 
+from openedx.core.djangoapps.credit.verification_access import update_verification_partitions
+from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 
 log = logging.getLogger(__name__)
 
@@ -55,8 +54,7 @@ def on_pre_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argu
 
 @receiver(GRADES_UPDATED)
 def listen_for_grade_calculation(sender, username, grade_summary, course_key, deadline, **kwargs):  # pylint: disable=unused-argument
-    """Receive 'MIN_GRADE_REQUIREMENT_STATUS' signal and update minimum grade
-    requirement status.
+    """Receive 'MIN_GRADE_REQUIREMENT_STATUS' signal and update minimum grade requirement status.
 
     Args:
         sender: None
@@ -81,12 +79,39 @@ def listen_for_grade_calculation(sender, username, grade_summary, course_key, de
             criteria = requirements[0].get('criteria')
             if criteria:
                 min_grade = criteria.get('min_grade')
-                if grade_summary['percent'] >= min_grade:
-                    reason_dict = {'final_grade': grade_summary['percent']}
+                passing_grade = grade_summary['percent'] >= min_grade
+                now = timezone.now()
+                status = None
+                reason = None
+
+                if (deadline and now < deadline) or not deadline:
+                    # Student completed coursework on-time
+
+                    if passing_grade:
+                        # Student received a passing grade
+                        status = 'satisfied'
+                        reason = {'final_grade': grade_summary['percent']}
+                else:
+                    # Submission after deadline
+
+                    if passing_grade:
+                        # Grade was good, but submission arrived too late
+                        status = 'failed'
+                        reason = {
+                            'current_date': now,
+                            'deadline': deadline
+                        }
+                    else:
+                        # Student failed to receive minimum grade
+                        status = 'failed'
+                        reason = {
+                            'final_grade': grade_summary['percent'],
+                            'minimum_grade': min_grade
+                        }
+
+                # We do not record a status if the user has not yet earned the minimum grade, but still has
+                # time to do so.
+                if status and reason:
                     api.set_credit_requirement_status(
-                        username, course_id, 'grade', 'grade', status="satisfied", reason=reason_dict
-                    )
-                elif deadline and deadline < timezone.now():
-                    api.set_credit_requirement_status(
-                        username, course_id, 'grade', 'grade', status="failed", reason={}
+                        username, course_id, 'grade', 'grade', status=status, reason=reason
                     )

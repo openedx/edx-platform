@@ -6,6 +6,7 @@ from django.forms import models
 from django.contrib import admin
 from django.contrib.admin import ListFilter
 from django.core.cache import caches, InvalidCacheBackendError
+from django.core.files.base import File
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -31,7 +32,17 @@ class ConfigurationModelAdmin(admin.ModelAdmin):
         }
 
     def get_list_display(self, request):
-        return self.model._meta.get_all_field_names()
+        return self.get_displayable_field_names()
+
+    def get_displayable_field_names(self):
+        """
+        Return all field names, excluding reverse foreign key relationships.
+        """
+        return [
+            f.name
+            for f in self.model._meta.get_fields()
+            if not f.one_to_many
+        ]
 
     # Don't allow deletion of configuration
     def has_delete_permission(self, request, obj=None):
@@ -40,7 +51,7 @@ class ConfigurationModelAdmin(admin.ModelAdmin):
     # Make all fields read-only when editing an object
     def get_readonly_fields(self, request, obj=None):
         if obj:  # editing an existing object
-            return self.model._meta.get_all_field_names()
+            return self.get_displayable_field_names()
         return self.readonly_fields
 
     def add_view(self, request, form_url='', extra_context=None):
@@ -160,7 +171,7 @@ class KeyedConfigurationModelAdmin(ConfigurationModelAdmin):
 
     def get_list_display(self, request):
         """ Add a link to each row for creating a new row using the chosen row as a template """
-        return self.model._meta.get_all_field_names() + ['edit_link']
+        return self.get_displayable_field_names() + ['edit_link']
 
     def add_view(self, request, form_url='', extra_context=None):
         # Prepopulate new configuration entries with the value of the current config, if given:
@@ -168,7 +179,16 @@ class KeyedConfigurationModelAdmin(ConfigurationModelAdmin):
             get = request.GET.copy()
             source_id = int(get.pop('source')[0])
             source = get_object_or_404(self.model, pk=source_id)
-            get.update(models.model_to_dict(source))
+            source_dict = models.model_to_dict(source)
+            for field_name, field_value in source_dict.items():
+                # read files into request.FILES, if:
+                # * user hasn't ticked the "clear" checkbox
+                # * user hasn't uploaded a new file
+                if field_value and isinstance(field_value, File):
+                    clear_checkbox_name = '{0}-clear'.format(field_name)
+                    if request.POST.get(clear_checkbox_name) != 'on':
+                        request.FILES.setdefault(field_name, field_value)
+                get[field_name] = field_value
             request.GET = get
         # Call our grandparent's add_view, skipping the parent code
         # because the parent code has a different way to prepopulate new configuration entries

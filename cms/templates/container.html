@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()">
 <%
@@ -8,35 +9,40 @@ else:
 %>
 </%def>
 <%!
-from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
 from django.utils.translation import ugettext as _
-from openedx.core.lib.js_utils import escape_json_dumps
+
+from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+from openedx.core.djangolib.markup import HTML, Text
 %>
-<%block name="title">${xblock.display_name_with_default} ${xblock_type_display_name(xblock) | h}</%block>
+
+<%block name="title">${xblock.display_name_with_default} ${xblock_type_display_name(xblock)}</%block>
 <%block name="bodyclass">is-signedin course container view-container</%block>
 
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="header_extras">
 % for template_name in templates:
-<script type="text/template" id="${template_name | h}-tpl">
+<script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>
 % endfor
 <script type="text/template" id="image-modal-tpl">
     <%static:include path="common/templates/image-modal.underscore" />
 </script>
-<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css') | h}" />
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
 </%block>
 
 <%block name="requirejs">
     require(["js/factories/container"], function(ContainerFactory) {
         ContainerFactory(
-            ${ escape_json_dumps(component_templates) | n },
-            ${ escape_json_dumps(xblock_info) | n },
-            "${action | h}",
+            ${component_templates | n, dump_js_escaped_json},
+            ${xblock_info | n, dump_js_escaped_json},
+            "${action | n, js_escaped_string}",
             {
-                isUnitPage: ${ escape_json_dumps(is_unit_page) | n },
+                isUnitPage: ${is_unit_page | n, dump_js_escaped_json},
                 canEdit: true
             }
         );
@@ -55,15 +61,15 @@ from openedx.core.lib.js_utils import escape_json_dumps
                     ancestor_url = xblock_studio_url(ancestor)
                     %>
                     % if ancestor_url:
-                        <a href="${ancestor_url | h}" class="navigation-item navigation-link navigation-parent">${ancestor.display_name_with_default | h}</a>
+                        <a href="${ancestor_url}" class="navigation-item navigation-link navigation-parent">${ancestor.display_name_with_default}</a>
                     % else:
-                        <span class="navigation-item navigation-parent">${ancestor.display_name_with_default | h}</span>
+                        <span class="navigation-item navigation-parent">${ancestor.display_name_with_default}</span>
                     % endif
                 % endfor
             </small>
             <div class="wrapper-xblock-field incontext-editor is-editable"
                  data-field="display_name" data-field-display-name="${_("Display Name")}">
-                <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${xblock.display_name_with_default | h}</span></h1>
+                <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${xblock.display_name_with_default}</span></h1>
             </div>
         </div>
 
@@ -72,19 +78,19 @@ from openedx.core.lib.js_utils import escape_json_dumps
             <ul>
                 % if is_unit_page:
                     <li class="action-item action-view nav-item">
-                        <a href="${published_preview_link | h}" class="button button-view action-button is-disabled" aria-disabled="true" rel="external" title="${_('Open the courseware in the LMS')}">
+                        <a href="${published_preview_link}" class="button button-view action-button is-disabled" aria-disabled="true" rel="external" title="${_('Open the courseware in the LMS')}">
                             <span class="action-button-text">${_("View Live Version")}</span>
                         </a>
                     </li>
                     <li class="action-item action-preview nav-item">
-                        <a href="${draft_preview_link | h}" class="button button-preview action-button" rel="external" title="${_('Preview the courseware in the LMS')}">
+                        <a href="${draft_preview_link}" class="button button-preview action-button" rel="external" title="${_('Preview the courseware in the LMS')}">
                             <span class="action-button-text">${_("Preview")}</span>
                         </a>
                     </li>
                 % else:
                     <li class="action-item action-edit nav-item">
                         <a href="#" class="button button-edit action-button edit-button">
-                            <i class="icon fa fa-pencil"></i>
+                            <span class="icon fa fa-pencil" aria-hidden="true"></span>
                             <span class="action-button-text">${_("Edit")}</span>
                         </a>
                     </li>
@@ -100,20 +106,26 @@ from openedx.core.lib.js_utils import escape_json_dumps
 
             <article class="content-primary">
                 <div class="container-message wrapper-message"></div>
-                <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator | h}" data-course-key="${xblock_locator.course_key | h}">
+                <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator}" data-course-key="${xblock_locator.course_key}">
                 </section>
                 <div class="ui-loading">
-                    <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
+                    <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
                 </div>
             </article>
             <aside class="content-supplementary" role="complementary">
                 % if xblock.category == 'split_test':
                     <div class="bit">
                         <h3 class="title-3">${_("Adding components")}</h3>
-                        <p>${_("Select a component type under {em_start}Add New Component{em_end}. Then select a template.").format(em_start='<strong>', em_end="</strong>") | h}</p>
+                        <p>${Text(_("Select a component type under {strong_start}Add New Component{strong_end}. Then select a template.")).format(
+                                    strong_start=HTML('<strong>'),
+                                    strong_end=HTML("</strong>"),
+                            )}</p>
                         <p>${_("The new component is added at the bottom of the page or group. You can then edit and move the component.")}</p>
                         <h3 class="title-3">${_("Editing components")}</h3>
-                        <p>${_("Click the {em_start}Edit{em_end} icon in a component to edit its content.").format(em_start='<strong>', em_end="</strong>") | h}</p>
+                        <p>${Text(_("Click the {strong_start}Edit{strong_end} icon in a component to edit its content.")).format(
+                                    strong_start=HTML('<strong>'),
+                                    strong_end=HTML("</strong>"),
+                            )}</p>
                         <h3 class="title-3">${_("Reorganizing components")}</h3>
                         <p>${_("Drag components to new locations within this component.")}</p>
                         <p>${_("For content experiments, you can drag components to other groups.")}</p>
@@ -121,7 +133,7 @@ from openedx.core.lib.js_utils import escape_json_dumps
                         <p>${_("Confirm that you have properly configured content in each of your experiment groups.")}</p>
                     </div>
                     <div class="bit external-help">
-                        <a href="${get_online_help_info(online_help_token())['doc_url'] | h}" target="_blank" class="button external-help-button">${_("Learn more about component containers")}</a>
+                        <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about component containers")}</a>
                     </div>
                 % elif is_unit_page:
                     <div id="publish-unit"></div>
@@ -131,7 +143,7 @@ from openedx.core.lib.js_utils import escape_json_dumps
                         <div class="wrapper-unit-id bar-mod-content">
                             <h5 class="title">${_("Location ID")}</h5>
                             <p class="unit-id">
-                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.name | h}</span>
+                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.name}</span>
                                 <span class="tip"><span class="sr">Tip: </span>${_("Use this ID when you create links to this unit from other course content. You enter the ID in the URL field.")}</span>
                             </p>
                         </div>

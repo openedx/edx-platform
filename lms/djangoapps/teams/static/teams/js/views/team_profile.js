@@ -3,12 +3,19 @@
  */
 ;(function (define) {
     'use strict';
-    define(['backbone', 'underscore', 'gettext', 'teams/js/views/team_discussion',
+    define([
+            'backbone',
+            'underscore',
+            'gettext',
+            'edx-ui-toolkit/js/utils/html-utils',
+            'teams/js/views/team_discussion',
             'common/js/components/utils/view_utils',
             'teams/js/views/team_utils',
             'text!teams/templates/team-profile.underscore',
-            'text!teams/templates/team-member.underscore'],
-        function (Backbone, _, gettext, TeamDiscussionView, ViewUtils, TeamUtils, teamTemplate, teamMemberTemplate) {
+            'text!teams/templates/team-member.underscore'
+        ],
+        function (Backbone, _, gettext, HtmlUtils, TeamDiscussionView, ViewUtils, TeamUtils,
+                  teamTemplate, teamMemberTemplate) {
             var TeamProfileView = Backbone.View.extend({
 
                 errorMessage: gettext("An error occurred. Try again."),
@@ -16,6 +23,7 @@
                 events: {
                     'click .leave-team-link': 'leaveTeam'
                 },
+                
                 initialize: function (options) {
                     this.teamEvents = options.teamEvents;
                     this.context = options.context;
@@ -31,17 +39,21 @@
                     var memberships = this.model.get('membership'),
                         discussionTopicID = this.model.get('discussion_topic_id'),
                         isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username);
-                    this.$el.html(_.template(teamTemplate, {
-                        courseID: this.context.courseID,
-                        discussionTopicID: discussionTopicID,
-                        readOnly: !(this.context.userInfo.privileged || isMember),
-                        country: this.countries[this.model.get('country')],
-                        language: this.languages[this.model.get('language')],
-                        membershipText: TeamUtils.teamCapacityText(memberships.length, this.context.maxTeamSize),
-                        isMember: isMember,
-                        hasCapacity: memberships.length < this.context.maxTeamSize,
-                        hasMembers: memberships.length >= 1
-                    }));
+
+                    HtmlUtils.setHtml(
+                        this.$el,
+                        HtmlUtils.template(teamTemplate)({
+                            courseID: this.context.courseID,
+                            discussionTopicID: discussionTopicID,
+                            readOnly: !(this.context.userInfo.privileged || isMember),
+                            country: this.countries[this.model.get('country')],
+                            language: this.languages[this.model.get('language')],
+                            membershipText: TeamUtils.teamCapacityText(memberships.length, this.context.maxTeamSize),
+                            isMember: isMember,
+                            hasCapacity: memberships.length < this.context.maxTeamSize,
+                            hasMembers: memberships.length >= 1
+                        })
+                    );
                     this.discussionView = new TeamDiscussionView({
                         el: this.$('.discussion-module')
                     });
@@ -56,11 +68,14 @@
                 renderTeamMembers: function() {
                     var view = this;
                     _.each(this.model.get('membership'), function(membership) {
-                        view.$('.members-info').append(_.template(teamMemberTemplate, {
-                            imageUrl: membership.user.profile_image.image_url_medium,
-                            username: membership.user.username,
-                            memberProfileUrl: '/u/' + membership.user.username
-                        }));
+                        HtmlUtils.append(
+                            view.$('.members-info'),
+                            HtmlUtils.template(teamMemberTemplate)({
+                                imageUrl: membership.user.profile_image.image_url_medium,
+                                username: membership.user.username,
+                                memberProfileUrl: '/u/' + membership.user.username
+                            })
+                        );
                     });
                 },
 

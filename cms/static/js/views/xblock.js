@@ -1,5 +1,6 @@
-define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
-    function ($, _, BaseView, XBlock) {
+define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/views/baseview", "xblock/runtime.v1"],
+    function ($, _, ViewUtils, BaseView, XBlock) {
+        'use strict';
 
         var XBlockView = BaseView.extend({
             // takes XBlockInfo as a model
@@ -29,6 +30,13 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
                 });
             },
 
+            initRuntimeData: function(xblock, options) {
+                if (options && options.initRuntimeData && xblock && xblock.runtime && !xblock.runtime.page) {
+                    xblock.runtime.page = options.initRuntimeData;
+                }
+                return xblock;
+            },
+
             handleXBlockFragment: function(fragment, options) {
                 var self = this,
                     wrapper = this.$el,
@@ -43,8 +51,14 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
                     xblockElement = self.$('.xblock').first();
                     try {
                         xblock = XBlock.initializeBlock(xblockElement);
-                        self.xblock = xblock;
-                        self.xblockReady(xblock);
+                        self.xblock = self.initRuntimeData(xblock, options);
+                        self.xblockReady(self.xblock);
+                        self.$('.xblock_asides-v1').each(function() {
+                             if (!$(this).hasClass('xblock-initialized')) {
+                                 var aside = XBlock.initializeBlock($(this));
+                                 self.initRuntimeData(aside, options);
+                             }
+                        });
                         if (successCallback) {
                             successCallback(xblock);
                         }
@@ -75,6 +89,15 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
                 var runtime = this.xblock && this.xblock.runtime;
                 if (runtime) {
                     runtime.notify(eventName, data);
+                } else if (this.xblock) {
+                    var xblock_children = this.xblock.element && $(this.xblock.element).prop('xblock_children');
+                    if (xblock_children) {
+                        $(xblock_children).each(function () {
+                            if (this.runtime) {
+                                this.runtime.notify(eventName, data);
+                            }
+                        });
+                    }
                 }
             },
 
@@ -83,7 +106,7 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
              * may have thrown JavaScript errors after rendering in which case the xblock parameter
              * will be null.
              */
-            xblockReady: function(xblock) {
+            xblockReady: function(xblock) {  // jshint ignore:line
                 // Do nothing
             },
 
@@ -95,7 +118,7 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
              * represents this process.
              * @param fragment The fragment returned from the xblock_handler
              * @param element The element into which to render the fragment (defaults to this.$el)
-             * @returns {jQuery promise} A promise representing the rendering process
+             * @returns {Promise} A promise representing the rendering process
              */
             renderXBlockFragment: function(fragment, element) {
                 var html = fragment.html,
@@ -131,7 +154,7 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
              * Dynamically loads all of an XBlock's dependent resources. This is an asynchronous
              * process so a promise is returned.
              * @param resources The resources to be rendered
-             * @returns {jQuery promise} A promise representing the rendering process
+             * @returns {Promise} A promise representing the rendering process
              */
             addXBlockFragmentResources: function(resources) {
                 var self = this,
@@ -171,7 +194,7 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
             /**
              * Loads the specified resource into the page.
              * @param resource The resource to be loaded.
-             * @returns {jQuery promise} A promise representing the loading of the resource.
+             * @returns {Promise} A promise representing the loading of the resource.
              */
             loadResource: function(resource) {
                 var head = $('head'),
@@ -189,8 +212,7 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
                     if (kind === "text") {
                         head.append("<script>" + data + "</script>");
                     } else if (kind === "url") {
-                        // Return a promise for the script resolution
-                        return $.getScript(data);
+                        return ViewUtils.loadJavaScript(data);
                     }
                 } else if (mimetype === "text/html") {
                     if (placement === "head") {
@@ -202,11 +224,11 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
             },
 
             fireNotificationActionEvent: function(event) {
-               var eventName = $(event.currentTarget).data("notification-action");
-               if (eventName) {
-                   event.preventDefault();
-                   this.notifyRuntime(eventName, this.model.get("id"));
-               }
+                var eventName = $(event.currentTarget).data("notification-action");
+                if (eventName) {
+                    event.preventDefault();
+                    this.notifyRuntime(eventName, this.model.get("id"));
+                }
             }
         });
 

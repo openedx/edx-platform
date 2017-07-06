@@ -1,0 +1,1 @@
+../../../assets/library_content/public/js/library_content_edit.js

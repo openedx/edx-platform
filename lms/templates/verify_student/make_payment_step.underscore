@@ -1,34 +1,51 @@
 <div id="wrapper-review" tab-index="0" class="wrapper-view make-payment-step">
   <div class="review view">
     <% if ( !upgrade ) { %>
-      <h2 class="title center-col">
-        <%= _.sprintf(
-            gettext( "You are enrolling in: %(courseName)s"),
-            { courseName: '<span class="course-title">' + courseName + '</span>' }
-          ) %>
+      <h2 class="right-col">
+        <%= HtmlUtils.interpolateHtml(
+            gettext( "You are enrolling in: {courseName}"),
+            { courseName: HtmlUtils.joinHtml(
+                HtmlUtils.HTML('<span class="course-title">'),
+                courseName,
+                HtmlUtils.HTML('</span>')
+            ) }
+        ) %>
       </h2>
     <% } else { %>
       <h2 class="title">
-        <%= _.sprintf(
-            gettext( "You are upgrading your enrollment for: %(courseName)s"),
-            { courseName: '<span class="course-title">' + courseName + '</span>' }
-          ) %>
+        <%= HtmlUtils.interpolateHtml(
+            gettext( "You are upgrading your enrollment for: {courseName}"),
+            { courseName: HtmlUtils.joinHtml(
+                HtmlUtils.HTML('<span class="course-title">'),
+                courseName,
+                HtmlUtils.HTML('</span>')
+            ) }
+        ) %>
       </h2>
       <div class="instruction">
         <%- gettext( "You can now enter your payment information and complete your enrollment." ) %>
       </div>
     <% } %>
 
-    <div class="instruction <% if ( !upgrade ) { %>center-col<% } %>">
+    <div class="instruction <% if ( !upgrade && isActive ) { %>center-col<% } %>">
       <% if ( _.some( requirements, function( isVisible ) { return isVisible; } ) ) { %>
-      <p>
+      <p class="instruction-info">
         <% if ( verificationDeadline ) { %>
           <%- _.sprintf(
             gettext( "You can pay now even if you don't have the following items available, but you will need to have these by %(date)s to qualify to earn a Verified Certificate." ),
             { date: verificationDeadline }
           ) %>
         <% } else if ( !isActive ) { %>
-          <%- gettext( "You need to activate your account before you can enroll in courses. Check your inbox for an activation email. After you complete activation you can return and refresh this page." ) %>
+          <i class="fa fa-envelope-o" aria-hidden="true"></i>
+          <%= HtmlUtils.interpolateHtml(
+                gettext( "An email has been sent to {userEmail} with a link for you to activate your account."),
+                {userEmail: userEmail}
+            )
+          %>
+          <h3 class="activate"><%- gettext("Why activate?") %></h3>
+          <div class="activate-info">
+            <%- gettext("We ask you to activate your account to ensure it is really you creating the account and to prevent fraud.") %>
+          <div>
         <% } else { %>
             <%- gettext( "You can pay now even if you don't have the following items available, but you will need to have these to qualify to earn a Verified Certificate." ) %>
         <% } %>
@@ -39,26 +56,13 @@
     <% if ( requirements['account-activation-required'] || requirements['photo-id-required'] || requirements['webcam-required']) { %>
     <div class="requirements-container">
       <ul class="list-reqs <% if ( requirements['account-activation-required'] ) { %>account-not-activated<% } %>">
-        <% if ( requirements['account-activation-required'] ) { %>
-          <li class="req req-0 req-activate">
-            <h3 class="title"><%- gettext( "Activate Your Account" ) %></h3>
-            <div class="placeholder-art">
-              <i class="icon fa fa-envelope-o" aria-hidden="true"></i>
-            </div>
-
-            <div class="copy">
-              <p>
-                <span class="copy-super"><%- gettext( "Check Your Email" ) %></span>
-              </p>
-            </div>
-          </li>
-        <% } else {%>
+        <% if (!requirements['account-activation-required']) {%>
           <% if ( requirements['photo-id-required'] ) { %>
           <li class="req req-1 req-id">
             <h3 class="title"><%- gettext( "Government-Issued Photo ID" ) %></h3>
             <div class="placeholder-art fa-lg">
-              <i class="icon fa fa-list-alt fa-stack-2x" aria-hidden="true"></i>
-              <i class="icon fa fa-user id-photo fa-stack-1x" aria-hidden="true"></i>
+              <span class="icon fa fa-list-alt fa-stack-2x" aria-hidden="true"></span>
+              <span class="icon fa fa-user id-photo fa-stack-1x" aria-hidden="true"></span>
             </div>
 
             <div class="copy"></div>
@@ -69,7 +73,7 @@
           <li class="req req-2 req-webcam">
             <h3 class="title"><%- gettext( "Webcam" ) %></h3>
             <div class="placeholder-art">
-              <i class="icon fa fa-video-camera" aria-hidden="true"></i>
+              <span class="icon fa fa-video-camera" aria-hidden="true"></span>
             </div>
 
             <div class="copy"></div>
@@ -89,9 +93,9 @@
     <div class="container register is-verified">
       <h3 class="title"><%- gettext( "You have already verified your ID!" ) %></h3>
       <p>
-        <%= _.sprintf(
-        gettext( "Your verification status is good until %(verificationGoodUntil)s." ),
-         { verificationGoodUntil: verificationGoodUntil }
+        <%- StringUtils.interpolate(
+          gettext( "Your verification status is good until {verificationGoodUntil}." ),
+          { verificationGoodUntil: verificationGoodUntil }
         ) %>
       </p>
     </div>

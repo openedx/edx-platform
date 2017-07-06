@@ -1,4 +1,5 @@
-define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
+define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/js/spec_helpers/template_helpers',
         'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/content_group',
         'js/groups/models/course_cohort_settings', 'js/utils/animation', 'js/vendor/jquery.qubit',
         'js/groups/views/course_cohort_settings_notification', 'js/groups/models/cohort_discussions',
@@ -13,12 +14,14 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
         describe("Cohorts View", function () {
             var catLoversInitialCount = 123, dogLoversInitialCount = 456, unknownUserMessage,
                 createMockCohort, createMockCohorts, createMockContentGroups, createMockCohortSettingsJson,
-                createCohortsView, cohortsView, requests, respondToRefresh, verifyMessage, verifyNoMessage,
-                verifyDetailedMessage, verifyHeader, expectCohortAddRequest, getAddModal, selectContentGroup,
-                clearContentGroup, saveFormAndExpectErrors, createMockCohortSettings, MOCK_COHORTED_USER_PARTITION_ID,
+                createMockVerifiedTrackCohortsJson, flushVerifiedTrackCohortRequests, createCohortsView,
+                cohortsView, requests, respondToRefresh, verifyMessage, verifyNoMessage, verifyDetailedMessage,
+                verifyHeader, verifyVerifiedTrackMessage, verifyVerifiedTrackUIUpdates, expectCohortAddRequest,
+                getAddModal, selectContentGroup, clearContentGroup,
+                saveFormAndExpectErrors, createMockCohortSettings, MOCK_COHORTED_USER_PARTITION_ID,
                 MOCK_UPLOAD_COHORTS_CSV_URL, MOCK_STUDIO_ADVANCED_SETTINGS_URL, MOCK_STUDIO_GROUP_CONFIGURATIONS_URL,
-                MOCK_MANUAL_ASSIGNMENT, MOCK_RANDOM_ASSIGNMENT, createMockCohortDiscussionsJson,
-                createMockCohortDiscussions, showAndAssertDiscussionTopics;
+                MOCK_VERIFIED_TRACK_COHORTING_URL, MOCK_MANUAL_ASSIGNMENT, MOCK_RANDOM_ASSIGNMENT,
+                createMockCohortDiscussionsJson, createMockCohortDiscussions, showAndAssertDiscussionTopics;
 
             // Selectors
             var discussionsToggle ='.toggle-cohort-management-discussions',
@@ -34,6 +37,7 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
             MOCK_UPLOAD_COHORTS_CSV_URL = 'http://upload-csv-file-url/';
             MOCK_STUDIO_ADVANCED_SETTINGS_URL = 'http://studio/settings/advanced';
             MOCK_STUDIO_GROUP_CONFIGURATIONS_URL = 'http://studio/group_configurations';
+            MOCK_VERIFIED_TRACK_COHORTING_URL = 'http://courses/foo/verified_track_content/settings';
 
             createMockCohort = function (name, id, userCount, groupId, userPartitionId, assignmentType) {
                 return {
@@ -129,6 +133,18 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
                 );
             };
 
+            createMockVerifiedTrackCohortsJson = function (enabled) {
+                if (enabled) {
+                    return {
+                        enabled: true,
+                        verified_cohort_name: "Verified Track"
+                    };
+                }
+                else {
+                    return { enabled: false };
+                }
+            };
+
             createCohortsView = function (test, options) {
                 var cohortsJson, cohorts, contentGroups, cohortSettings, cohortDiscussions;
                 options = options || {};
@@ -151,13 +167,29 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
                         discussionTopicsSettingsModel: cohortDiscussions,
                         uploadCohortsCsvUrl: MOCK_UPLOAD_COHORTS_CSV_URL,
                         studioAdvancedSettingsUrl: MOCK_STUDIO_ADVANCED_SETTINGS_URL,
-                        studioGroupConfigurationsUrl: MOCK_STUDIO_GROUP_CONFIGURATIONS_URL
+                        studioGroupConfigurationsUrl: MOCK_STUDIO_GROUP_CONFIGURATIONS_URL,
+                        verifiedTrackCohortingUrl: MOCK_VERIFIED_TRACK_COHORTING_URL
                     }
                 });
 
                 cohortsView.render();
                 if (options && options.selectCohort) {
                     cohortsView.$('.cohort-select').val(options.selectCohort.toString()).change();
+                }
+
+                flushVerifiedTrackCohortRequests(options.enableVerifiedTrackCohorting);
+            };
+
+            // Flush out all requests to get verified track cohort information.
+            // The order relative to other requests is not important to encode,
+            // and for pre-existing test cases, we don't care about these additional requests.
+            flushVerifiedTrackCohortRequests = function (enableVerifiedTrackCohorting) {
+                for (var i = requests.length-1; i >= 0 ; i--) {
+                    if (requests[i].url === MOCK_VERIFIED_TRACK_COHORTING_URL) {
+                        AjaxHelpers.respondWithJson(
+                            requests, createMockVerifiedTrackCohortsJson(enableVerifiedTrackCohorting), i
+                        );
+                    }
                 }
             };
 
@@ -192,7 +224,7 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
             clearContentGroup = function() {
                 cohortsView.$('.radio-no').prop('checked', true).change();
                 expect(cohortsView.$('.input-cohort-group-association').prop('disabled')).toBeTruthy();
-                expect(cohortsView.$('.input-cohort-group-association').val()).toBe('None');
+                expect(cohortsView.$('.input-cohort-group-association').val()).toBe(null);
             };
 
             verifyMessage = function(expectedTitle, expectedMessageType, expectedAction, hasDetails) {
@@ -211,6 +243,27 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
 
             verifyNoMessage = function() {
                 expect(cohortsView.$('.message').length).toBe(0);
+            };
+
+            verifyVerifiedTrackMessage = function(type, expectedText) {
+                if (type) {
+                    expect($('.message').length).toBe(1);
+                    expect($('.message-' + type).length).toBe(1);
+                    expect($('.message-title').text()).toContain(expectedText);
+                }
+                else {
+                    expect($('.message').length).toBe(0);
+                }
+            };
+
+            verifyVerifiedTrackUIUpdates = function(enableCohortsCheckbox, disableCohortNameField) {
+                expect(cohortsView.$('.cohorts-state').prop('disabled')).toBe(enableCohortsCheckbox);
+                // Select settings tab
+                if (disableCohortNameField !== undefined) {
+                    cohortsView.$('.cohort-select').val('1').change();
+                    cohortsView.$('.tab-settings a').click();
+                    expect(cohortsView.$('.cohort-name').prop('readonly')).toBe(disableCohortNameField);
+                }
             };
 
             verifyDetailedMessage = function(expectedTitle, expectedMessageType, expectedDetails, expectedAction) {
@@ -240,9 +293,10 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
                     )
                 );
                 assignmentType = assignmentType || MOCK_MANUAL_ASSIGNMENT;
-                var manualMessage = "Students are added to this cohort only when you provide their email addresses or usernames on this page.";
-                var randomMessage = "Students are added to this cohort automatically.";
-                var message = (assignmentType == MOCK_MANUAL_ASSIGNMENT) ? manualMessage : randomMessage;
+                var manualMessage = "Learners are added to this cohort only when you provide their email addresses " +
+                    "or usernames on this page.";
+                var randomMessage = "Learners are added to this cohort automatically.";
+                var message = (assignmentType === MOCK_MANUAL_ASSIGNMENT) ? manualMessage : randomMessage;
                 expect(header.find('.cohort-management-group-setup .setup-value').text().trim().split('\n')[0]).toBe(message);
             };
 
@@ -300,7 +354,9 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
             };
 
             beforeEach(function () {
-                setFixtures('<ul class="instructor-nav"><li class="nav-item"><<a href data-section="cohort_management" class="active-section">Cohort Management</a></li></ul><div></div><div class="cohort-state-message"></div>');
+                setFixtures('<ul class="instructor-nav"><li class="nav-item"><<a href data-section=' +
+                    '"cohort_management" class="active-section">Cohort Management</a></li></ul><div></div>' +
+                    '<div class="cohort-management"><div class="cohort-state-message"></div></div>');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohorts');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-form');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-selector');
@@ -389,6 +445,53 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
                 });
             });
 
+            describe("Verified Track Cohorting Settings View", function () {
+                it('displays no message if the feature is disabled', function () {
+                    createCohortsView(this);
+                    verifyVerifiedTrackMessage(false);
+                    verifyVerifiedTrackUIUpdates(false, false);
+                });
+
+                it('displays a confirmation if the feature is enabled and a verified track cohort exists', function () {
+                    var cohortName = "Verified Track";
+                    createCohortsView(this, {
+                        cohorts: [
+                            {
+                                id: 1,
+                                name: cohortName,
+                                assignment_type: MOCK_MANUAL_ASSIGNMENT,
+                                group_id: 111,
+                                user_partition_id: MOCK_COHORTED_USER_PARTITION_ID
+                            }
+                        ],
+                        enableVerifiedTrackCohorting: true
+                    });
+                    verifyVerifiedTrackMessage(
+                        "confirmation", "automatic cohorting for verified track learners. You cannot disable cohorts"
+                    );
+                    verifyVerifiedTrackUIUpdates(true, true);
+                });
+
+                it('displays an error if no verified track cohort exists', function () {
+                    createCohortsView(this, {enableVerifiedTrackCohorting: true});
+                    verifyVerifiedTrackMessage(
+                        "error", "cohorting enabled for verified track learners, but the required cohort does not exist"
+                    );
+                    verifyVerifiedTrackUIUpdates(true, false);
+                });
+
+                it('displays an error if cohorting is disabled', function () {
+                    createCohortsView(this, {
+                        cohortSettings: createMockCohortSettings(false),
+                        enableVerifiedTrackCohorting: true
+                    });
+                    verifyVerifiedTrackMessage(
+                        "error", "automatic cohorting enabled for verified track learners, but cohorts are disabled"
+                    );
+                    verifyVerifiedTrackUIUpdates(false);
+                });
+            });
+
             describe("Course Cohort Settings", function () {
                 it('can enable and disable cohorting', function () {
                     createCohortsView(this, {cohortSettings: createMockCohortSettings(false)});
@@ -440,7 +543,7 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
                     expect(cohortsView.$('.cohorts-state').prop('checked')).toBeFalsy();
                     cohortsView.$('.cohorts-state').prop('checked', true).change();
                     AjaxHelpers.respondWithError(requests, 500);
-                    var expectedTitle = "We've encountered an error. Refresh your browser and then try again."
+                    var expectedTitle = "We've encountered an error. Refresh your browser and then try again.";
                     expect(cohortsView.$('.message-title').text().trim()).toBe(expectedTitle);
                 });
             });
@@ -455,7 +558,7 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
                             assignment_type: assignment_type,
                             group_id: null,
                             user_partition_id: null
-                        }
+                        };
                     };
                     createCohortsView(this, {
                         cohorts: [
@@ -519,8 +622,7 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
                 var assignmentType = 'random';
 
                 it("can add a cohort", function() {
-                    var contentGroupId = 0,
-                        contentGroupUserPartitionId = 0;
+                    var contentGroupId = 0;
                     createCohortsView(this, {cohorts: []});
                     cohortsView.$('.action-create').click();
                     expect(cohortsView.$('.cohort-management-settings-form').length).toBe(1);
@@ -988,7 +1090,7 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
                                 assignment_type: assignment_type,
                                 group_id: null,
                                 user_partition_id: null
-                            }
+                            };
                         };
                         createCohortsView(this, {
                             cohorts: [

@@ -92,7 +92,7 @@ def click_a_button(step, button):  # pylint: disable=unused-argument
         # Expect to see a message that grade report is being generated
         expected_msg = "The grade report is being created." \
                        " To view the status of the report, see" \
-                       " Pending Instructor Tasks below."
+                       " Pending Tasks below."
         world.wait_for_visible('#report-request-response')
         assert_in(
             expected_msg, world.css_text('#report-request-response'),

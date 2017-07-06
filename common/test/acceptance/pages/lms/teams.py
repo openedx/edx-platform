@@ -285,6 +285,7 @@ class BaseTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin, BreadcrumbsMix
         """
         self.q(css='.search-field').first.fill(string)
         self.q(css='.action-search').first.click()
+        self.wait_for_ajax()
         self.wait_for(
             lambda: self._showing_search_results,
             description="Showing search results"

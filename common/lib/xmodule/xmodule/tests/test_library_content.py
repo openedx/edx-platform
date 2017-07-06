@@ -287,7 +287,7 @@ class TestLibraryContentRender(LibraryContentTest):
     """
     Rendering unit tests for LibraryContentModule
     """
-    def test_preivew_view(self):
+    def test_preview_view(self):
         """ Test preview view rendering """
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)

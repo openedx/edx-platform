@@ -2,7 +2,6 @@
 Unittests for deleting a course in an chosen modulestore
 """
 
-import unittest
 import mock
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey

@@ -1,46 +1,48 @@
 """Unit tests for the Paver server tasks."""
 
 import ddt
-import os
 from paver.easy import call_task
 
 from .utils import PaverTestCase
 
 EXPECTED_COFFEE_COMMAND = (
-    "node_modules/.bin/coffee --compile `find {platform_root}/lms "
-    "{platform_root}/cms {platform_root}/common -type f -name \"*.coffee\"`"
+    u"node_modules/.bin/coffee --compile `find {platform_root}/lms "
+    u"{platform_root}/cms {platform_root}/common -type f -name \"*.coffee\"`"
 )
 EXPECTED_SASS_COMMAND = (
-    "sass --update --cache-location /tmp/sass-cache --default-encoding utf-8 --style compressed"
-    " --quiet"
-    " --load-path ."
-    " --load-path common/static"
-    " --load-path common/static/sass"
-    " --load-path lms/static/sass"
-    " --load-path lms/static/themed_sass"
-    " --load-path cms/static/sass --load-path common/static/sass"
-    " --load-path lms/static/certificates/sass"
-    " lms/static/sass:lms/static/css"
-    " lms/static/themed_sass:lms/static/css"
-    " cms/static/sass:cms/static/css"
-    " common/static/sass:common/static/css"
-    " lms/static/certificates/sass:lms/static/certificates/css"
+    u"libsass {sass_directory}"
 )
+EXPECTED_COMMON_SASS_DIRECTORIES = [
+    u"common/static/sass",
+]
+EXPECTED_LMS_SASS_DIRECTORIES = [
+    u"lms/static/sass",
+    u"lms/static/certificates/sass",
+]
+EXPECTED_CMS_SASS_DIRECTORIES = [
+    u"cms/static/sass",
+]
+EXPECTED_LMS_SASS_COMMAND = [
+    u"python manage.py lms --settings={asset_settings} compile_sass lms ",
+]
+EXPECTED_CMS_SASS_COMMAND = [
+    u"python manage.py cms --settings={asset_settings} compile_sass cms ",
+]
 EXPECTED_PREPROCESS_ASSETS_COMMAND = (
-    "python manage.py {system} --settings={asset_settings} preprocess_assets"
-    " {system}/static/sass/*.scss {system}/static/themed_sass"
+    u"python manage.py {system} --settings={asset_settings} preprocess_assets"
+    u" {system}/static/sass/*.scss {system}/static/themed_sass"
 )
 EXPECTED_COLLECT_STATIC_COMMAND = (
-    "python manage.py {system} --settings={asset_settings} collectstatic --noinput > /dev/null"
+    u"python manage.py {system} --settings={asset_settings} collectstatic --noinput {log_string}"
 )
 EXPECTED_CELERY_COMMAND = (
-    "python manage.py lms --settings={settings} celery worker --beat --loglevel=INFO --pythonpath=."
+    u"python manage.py lms --settings={settings} celery worker --beat --loglevel=INFO --pythonpath=."
 )
 EXPECTED_RUN_SERVER_COMMAND = (
-    "python manage.py {system} --settings={settings} runserver --traceback --pythonpath=. 0.0.0.0:{port}"
+    u"python manage.py {system} --settings={settings} runserver --traceback --pythonpath=. 0.0.0.0:{port}"
 )
 EXPECTED_INDEX_COURSE_COMMAND = (
-    "python manage.py {system} --settings={settings} reindex_course --setup"
+    u"python manage.py {system} --settings={settings} reindex_course --setup"
 )
 
 
@@ -158,7 +160,8 @@ class TestPaverServerTasks(PaverTestCase):
         """
         settings = options.get("settings", "devstack")
         call_task("pavelib.servers.update_db", options=options)
-        db_command = "python manage.py {server} --settings={settings} migrate --traceback --pythonpath=."
+        # pylint: disable=line-too-long
+        db_command = "NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{server} --traceback --pythonpath=. "
         self.assertEquals(
             self.task_messages,
             [
@@ -194,6 +197,7 @@ class TestPaverServerTasks(PaverTestCase):
         """
         Verify the output of a server task.
         """
+        log_string = options.get("log_string", "> /dev/null")
         settings = options.get("settings", None)
         asset_settings = options.get("asset-settings", None)
         is_optimized = options.get("optimized", False)
@@ -229,17 +233,17 @@ class TestPaverServerTasks(PaverTestCase):
             expected_settings = "devstack_optimized"
             expected_asset_settings = "test_static_optimized"
         expected_collect_static = not is_fast and expected_settings != "devstack"
-        platform_root = os.getcwd()
         if not is_fast:
             expected_messages.append(EXPECTED_PREPROCESS_ASSETS_COMMAND.format(
                 system=system, asset_settings=expected_asset_settings
             ))
-            expected_messages.append("xmodule_assets common/static/xmodule")
-            expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=platform_root))
-            expected_messages.append(EXPECTED_SASS_COMMAND)
+            expected_messages.append(u"xmodule_assets common/static/xmodule")
+            expected_messages.append(u"install npm_assets")
+            expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))
+            expected_messages.extend(self.expected_sass_commands(system=system, asset_settings=expected_asset_settings))
         if expected_collect_static:
             expected_messages.append(EXPECTED_COLLECT_STATIC_COMMAND.format(
-                system=system, asset_settings=expected_asset_settings
+                system=system, asset_settings=expected_asset_settings, log_string=log_string
             ))
         expected_run_server_command = EXPECTED_RUN_SERVER_COMMAND.format(
             system=system,
@@ -255,6 +259,7 @@ class TestPaverServerTasks(PaverTestCase):
         """
         Verify the output of a server task.
         """
+        log_string = options.get("log_string", "> /dev/null")
         settings = options.get("settings", None)
         asset_settings = options.get("asset_settings", None)
         is_optimized = options.get("optimized", False)
@@ -267,7 +272,6 @@ class TestPaverServerTasks(PaverTestCase):
             expected_settings = "devstack_optimized"
             expected_asset_settings = "test_static_optimized"
         expected_collect_static = not is_fast and expected_settings != "devstack"
-        platform_root = os.getcwd()
         expected_messages = []
         if not is_fast:
             expected_messages.append(EXPECTED_PREPROCESS_ASSETS_COMMAND.format(
@@ -276,15 +280,16 @@ class TestPaverServerTasks(PaverTestCase):
             expected_messages.append(EXPECTED_PREPROCESS_ASSETS_COMMAND.format(
                 system="cms", asset_settings=expected_asset_settings
             ))
-            expected_messages.append("xmodule_assets common/static/xmodule")
-            expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=platform_root))
-            expected_messages.append(EXPECTED_SASS_COMMAND)
+            expected_messages.append(u"xmodule_assets common/static/xmodule")
+            expected_messages.append(u"install npm_assets")
+            expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))
+            expected_messages.extend(self.expected_sass_commands(asset_settings=expected_asset_settings))
         if expected_collect_static:
             expected_messages.append(EXPECTED_COLLECT_STATIC_COMMAND.format(
-                system="lms", asset_settings=expected_asset_settings
+                system="lms", asset_settings=expected_asset_settings, log_string=log_string
             ))
             expected_messages.append(EXPECTED_COLLECT_STATIC_COMMAND.format(
-                system="cms", asset_settings=expected_asset_settings
+                system="cms", asset_settings=expected_asset_settings, log_string=log_string
             ))
         expected_messages.append(
             EXPECTED_RUN_SERVER_COMMAND.format(
@@ -302,3 +307,14 @@ class TestPaverServerTasks(PaverTestCase):
         )
         expected_messages.append(EXPECTED_CELERY_COMMAND.format(settings="dev_with_worker"))
         self.assertEquals(self.task_messages, expected_messages)
+
+    def expected_sass_commands(self, system=None, asset_settings=u"test_static_optimized"):
+        """
+        Returns the expected SASS commands for the specified system.
+        """
+        expected_sass_commands = []
+        if system != 'cms':
+            expected_sass_commands.extend(EXPECTED_LMS_SASS_COMMAND)
+        if system != 'lms':
+            expected_sass_commands.extend(EXPECTED_CMS_SASS_COMMAND)
+        return [command.format(asset_settings=asset_settings) for command in expected_sass_commands]

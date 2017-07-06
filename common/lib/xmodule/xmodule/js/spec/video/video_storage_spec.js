@@ -19,7 +19,7 @@ function (VideoStorage) {
             });
 
             it('without namespace and id', function () {
-                spyOn(Number.prototype, 'toString').andReturn('0.abcdedg');
+                spyOn(Number.prototype, 'toString').and.returnValue('0.abcdedg');
                 var storage = VideoStorage();
 
                 expect(window.VideoStorage).toBeDefined();

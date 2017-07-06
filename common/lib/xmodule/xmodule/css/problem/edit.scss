@@ -7,6 +7,7 @@
       margin-top: -4px;
       padding: 3px 9px;
       font-size: 12px;
+      color: $link-color;
 
       &.current {
         border: 1px solid $lightGrey !important;
@@ -16,7 +17,8 @@
         pointer-events: none;
         cursor: none;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           box-shadow: 0 0 0 0 !important;
           background-color: $white;
         }
@@ -79,11 +81,15 @@
   }
 
   .col {
-    float: left;
+    display: block;
 
     &.sample {
       width: 60px;
       margin-right: 30px;
+
+      .icon {
+          height: ($baseline * 1.5);
+      }
     }
   }
 
@@ -110,40 +116,5 @@
   width: 26px;
   height: 21px;
   vertical-align: middle;
-  background: url('#{$static-path}/images/problem-editor-icons.png') no-repeat;
+  color: $base-font-color;
 }
-
-.problem-editor-icon.heading1 {
-  width: 18px;
-  background-position: -265px 0;
-}
-
-.problem-editor-icon.multiple-choice {
-  background-position: 0 0;
-}
-
-.problem-editor-icon.checks {
-  background-position: -56px 0;
-}
-
-.problem-editor-icon.string {
-  width: 28px;
-  background-position: -111px 0;
-}
-
-.problem-editor-icon.number {
-  width: 24px;
-  background-position: -168px 0;
-}
-
-.problem-editor-icon.dropdown {
-  width: 17px;
-  background-position: -220px 0;
-}
-
-.problem-editor-icon.explanation {
-  width: 17px;
-  background-position: -307px 0;
-}
-
-

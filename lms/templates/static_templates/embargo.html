@@ -1,16 +1,22 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
 <%inherit file="../main.html" />
 
 <%block name="pagetitle">${_("This Course Unavailable In Your Country")}</%block>
 
-<section class="outside-app">
-<p>
-${_("Our system indicates that you are trying to access this {platform_name} "
-    "course from a country or region currently subject to U.S. economic and trade "
-    "sanctions. Unfortunately, at this time {platform_name} must comply with "
-    "export controls, and we cannot allow you to access this course."
-  ).format(
-    platform_name=settings.PLATFORM_NAME,
-  )}
-</p>
-</section>
+<main id="main" aria-label="Content" tabindex="-1">
+    <section class="outside-app">
+    <p>
+    ${Text(_("Our system indicates that you are trying to access this {platform_name} "
+        "course from a country or region currently subject to U.S. economic and trade "
+        "sanctions. Unfortunately, at this time {platform_name} must comply with "
+        "export controls, and we cannot allow you to access this course."
+      )).format(
+        platform_name=Text(settings.PLATFORM_NAME),
+      )}
+    </p>
+    </section>
+</main>

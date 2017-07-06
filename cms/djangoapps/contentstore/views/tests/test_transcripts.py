@@ -13,7 +13,7 @@ from django.test.utils import override_settings
 from django.conf import settings
 
 from contentstore.tests.utils import CourseTestCase, mock_requests_get
-from cache_toolbox.core import del_cached_content
+from contentserver.caching import del_cached_content
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent

@@ -1,15 +1,27 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'text!templates/student_profile/learner_profile.underscore'],
-        function (gettext, $, _, Backbone, learnerProfileTemplate) {
+        'gettext', 'jquery', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/html-utils',
+        'common/js/components/views/tabbed_view',
+        'js/student_profile/views/section_two_tab',
+        'text!templates/student_profile/learner_profile.underscore'],
+        function (gettext, $, _, Backbone, HtmlUtils, TabbedView, SectionTwoTab, learnerProfileTemplate) {
 
         var LearnerProfileView = Backbone.View.extend({
 
-            initialize: function () {
+            initialize: function (options) {
+                this.options = _.extend({}, options);
                 _.bindAll(this, 'showFullProfile', 'render', 'renderFields', 'showLoadingError');
                 this.listenTo(this.options.preferencesModel, "change:" + 'account_privacy', this.render);
+                var Router = Backbone.Router.extend({
+                    routes: {":about_me": "loadTab", ":accomplishments": "loadTab"}
+                });
+
+                this.router = new Router();
+                this.firstRender = true;
             },
+            
+            template: _.template(learnerProfileTemplate),
 
             showFullProfile: function () {
                 var isAboveMinimumAge = this.options.accountSettingsModel.isAboveMinimumAge();
@@ -20,13 +32,73 @@
                 }
             },
 
+            setActiveTab: function(tab) {
+                // This tab may not actually exist.
+                if (this.tabbedView.getTabMeta(tab).tab) {
+                    this.tabbedView.setActiveTab(tab);
+                }
+            },
+
             render: function () {
-                this.$el.html(_.template(learnerProfileTemplate, {
-                    username: this.options.accountSettingsModel.get('username'),
-                    ownProfile: this.options.ownProfile,
-                    showFullProfile: this.showFullProfile()
+                var self = this;
+
+                this.sectionTwoView = new SectionTwoTab({
+                    viewList: this.options.sectionTwoFieldViews,
+                    showFullProfile: this.showFullProfile,
+                    ownProfile: this.options.ownProfile
+                });
+
+                var tabs = [
+                    {view: this.sectionTwoView, title: gettext("About Me"), url: "about_me"}
+                ];
+
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(learnerProfileTemplate)({
+                    username: self.options.accountSettingsModel.get('username'),
+                    ownProfile: self.options.ownProfile,
+                    showFullProfile: self.showFullProfile()
                 }));
                 this.renderFields();
+
+                if (this.showFullProfile() && (this.options.accountSettingsModel.get('accomplishments_shared'))) {
+                    tabs.push({
+                        view: this.options.badgeListContainer,
+                        title: gettext("Accomplishments"),
+                        url: "accomplishments"
+                    });
+                    this.options.badgeListContainer.collection.fetch().done(function () {
+                        self.options.badgeListContainer.render();
+                    }).error(function () {
+                        self.options.badgeListContainer.renderError();
+                    });
+                }
+                this.tabbedView = new TabbedView({
+                    tabs: tabs,
+                    router: this.router,
+                    viewLabel: gettext("Profile")
+                });
+
+                this.tabbedView.render();
+
+                if (tabs.length === 1) {
+                    // If the tab is unambiguous, don't display the tab interface.
+                    this.tabbedView.$el.find('.page-content-nav').hide();
+                }
+
+                this.$el.find('.account-settings-container').append(this.tabbedView.el);
+
+                if (this.firstRender) {
+                    this.router.on("route:loadTab", _.bind(this.setActiveTab, this));
+                    Backbone.history.start();
+                    this.firstRender = false;
+                    // Load from history.
+                    this.router.navigate((Backbone.history.getFragment() || 'about_me'), {trigger: true});
+                } else {
+                    // Restart the router so the tab will be brought up anew.
+                    Backbone.history.stop();
+                    Backbone.history.start();
+                }
+
+
                 return this;
             },
 
@@ -54,9 +126,6 @@
                         view.$('.profile-section-one-fields').append(fieldView.render().el);
                     });
 
-                    _.each(this.options.sectionTwoFieldViews, function (fieldView) {
-                        view.$('.profile-section-two-fields').append(fieldView.render().el);
-                    });
                 }
             },
 

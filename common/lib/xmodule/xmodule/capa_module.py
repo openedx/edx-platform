@@ -49,6 +49,12 @@ class CapaModule(CapaMixin, XModule):
         """
         super(CapaModule, self).__init__(*args, **kwargs)
 
+    def author_view(self, context):
+        """
+        Renders the Studio preview view.
+        """
+        return self.student_view(context)
+
     def handle_ajax(self, dispatch, data):
         """
         This is called by courseware.module_render, to handle an AJAX call.
@@ -92,12 +98,24 @@ class CapaModule(CapaMixin, XModule):
         try:
             result = handlers[dispatch](data)
 
-        except NotFoundError as err:
-            _, _, traceback_obj = sys.exc_info()
+        except NotFoundError:
+            log.info(
+                "Unable to find data when dispatching %s to %s for user %s",
+                dispatch,
+                self.scope_ids.usage_id,
+                self.scope_ids.user_id
+            )
+            _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
             raise ProcessingError(not_found_error_message), None, traceback_obj
 
         except Exception as err:
-            _, _, traceback_obj = sys.exc_info()
+            log.exception(
+                "Unknown error when dispatching %s to %s for user %s",
+                dispatch,
+                self.scope_ids.usage_id,
+                self.scope_ids.user_id
+            )
+            _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
             raise ProcessingError(generic_error_message), None, traceback_obj
 
         after = self.get_progress()
@@ -110,6 +128,19 @@ class CapaModule(CapaMixin, XModule):
 
         return json.dumps(result, cls=ComplexEncoder)
 
+    @property
+    def display_name_with_default(self):
+        """
+        Constructs the display name for a CAPA problem.
+
+        Default to the display_name if it isn't None or not an empty string,
+        else fall back to problem category.
+        """
+        if self.display_name is None or not self.display_name.strip():
+            return self.location.block_type
+
+        return self.display_name
+
 
 class CapaDescriptor(CapaFields, RawDescriptor):
     """
@@ -119,6 +150,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     INDEX_CONTENT_TYPE = 'CAPA'
 
     module_class = CapaModule
+    resources_dir = None
 
     has_score = True
     show_in_read_only_mode = True
@@ -126,6 +158,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     mako_template = "widgets/problem-edit.html"
     js = {'coffee': [resource_string(__name__, 'js/src/problem/edit.coffee')]}
     js_module_name = "MarkdownEditingDescriptor"
+    has_author_view = True
     css = {
         'scss': [
             resource_string(__name__, 'css/editor/edit.scss'),

@@ -482,6 +482,36 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             groups=["First Group", "Group C", "Group D"]
         )
 
+    def test_focus_management_in_experiment_group_inputs(self):
+        """
+        Scenario: Ensure that selecting the focus inputs in the groups list
+        sets the .is-focused class on the fieldset
+        Given I have a course with experiment group configurations
+        When I click the name of the first group
+        Then the fieldset wrapping the group names whould get class .is-focused
+        When I click away from the first group
+        Then the fieldset should not have class .is-focused anymore
+        """
+        self.page.visit()
+        self.page.create_experiment_group_configuration()
+        config = self.page.experiment_group_configurations[0]
+        group_a = config.groups[0]
+
+        # Assert the fieldset doesn't have .is-focused class
+        self.assertFalse(self.page.q(css="fieldset.groups-fields.is-focused").visible)
+
+        # Click on the Group A input field
+        self.page.q(css=group_a.prefix).click()
+
+        # Assert the fieldset has .is-focused class applied
+        self.assertTrue(self.page.q(css="fieldset.groups-fields.is-focused").visible)
+
+        # Click away
+        self.page.q(css=".page-header").click()
+
+        # Assert the fieldset doesn't have .is-focused class
+        self.assertFalse(self.page.q(css="fieldset.groups-fields.is-focused").visible)
+
     def test_use_group_configuration(self):
         """
         Scenario: Ensure that the group configuration can be used by split_module correctly

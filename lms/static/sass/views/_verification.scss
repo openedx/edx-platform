@@ -109,12 +109,12 @@
   }
 
   // reset: navigation (needed due to edX's new global-header styling)
-  .global-new .nav-global a {
+  .header-global-new .nav-global a {
     padding-bottom: ($baseline +1);
   }
 
   // HACK: fix global header height in verification flow ECOM-1808
-  header.global {
+  .header-global {
     height: 76px;
   }
 

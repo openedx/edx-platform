@@ -117,6 +117,8 @@ urlpatterns = patterns(
         'instructor.views.api.get_exec_summary_report', name="get_exec_summary_report"),
     url(r'get_course_survey_results$',
         'instructor.views.api.get_course_survey_results', name="get_course_survey_results"),
+    url(r'export_ora2_data',
+        'instructor.views.api.export_ora2_data', name="export_ora2_data"),
 
     # Coupon Codes..
     url(r'get_coupon_codes',
@@ -161,4 +163,8 @@ urlpatterns = patterns(
     url(r'^generate_bulk_certificate_exceptions',
         'instructor.views.api.generate_bulk_certificate_exceptions',
         name='generate_bulk_certificate_exceptions'),
+
+    url(r'^certificate_invalidation_view/$',
+        'instructor.views.api.certificate_invalidation_view',
+        name='certificate_invalidation_view'),
 )

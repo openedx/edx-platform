@@ -1,0 +1,3 @@
+<p class="api-copy-body">
+  <%- gettext('There was an error retrieving preview results for this catalog. Please check that your query is correct and try again.') %>
+</p>

@@ -1,12 +1,15 @@
+<%page expression_filter="h"/>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
 %>
 
 <%block name="pagetitle">${_("CCX Coach Dashboard")}</%block>
-<%block name="nav_skip">#ccx-coach-dashboard-content</%block>
 
 <%block name="headextra">
   <%static:css group='style-course-vendor'/>
@@ -19,61 +22,68 @@ from django.core.urlresolvers import reverse
 
 <section class="container">
   <div class="instructor-dashboard-wrapper-2">
-    <section class="instructor-dashboard-content-2" id="ccx-coach-dashboard-content">
-      <h1>${_("CCX Coach Dashboard")}</h1>
+        <main id="main" aria-label="Content" tabindex="-1">
+        <section class="instructor-dashboard-content-2" id="ccx-coach-dashboard-content" aria-labelledby="header-ccx-dashboard">
+          <h2 class="hd hd-2" id="header-ccx-dashboard">${_("CCX Coach Dashboard")}</h2>
 
-      %if not ccx:
-        % if messages:
-          <ul class="messages">
-            % for message in messages:
-              % if message.tags:
-                <li class="${message.tags}">${message}</li>
-              % else:
-                <li>${message}</li>
-              % endif
-            % endfor
+          %if not ccx:
+            % if messages:
+              <ul class="messages">
+                % for message in messages:
+                  % if message.tags:
+                    <li class="${message.tags}">${message}</li>
+                  % else:
+                    <li>${message}</li>
+                  % endif
+                % endfor
+              </ul>
+            % endif
+            <div>
+              <p class="request-response-error" id="ccx-create-message"></p>
+              <form action="${create_ccx_url}" class="ccx-form" method="POST" onsubmit="return validateForm(this)">
+                <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+                <div class="field">
+                  <label class="sr" for="ccx_name">${_('Name your CCX')}</label>
+                  <input name="name" id="ccx_name" placeholder="${_('Name your CCX')}"/><br/>
+                </div>
+                <div class="field">
+                  <button id="create-ccx" type="submit">${_('Create a new Custom Course for edX')}</button>
+                </div>
+              </form>
+          </div>
+          %endif
+
+          %if ccx:
+          <ul class="instructor-nav">
+            <li class="nav-item">
+              <a href="#" data-section="membership">${_("Enrollment")}</a>
+            </li>
+            <li class="nav-item">
+              <a href="#" data-section="schedule">${_("Schedule")}</a>
+            </li>
+            <li class="nav-item">
+              <a href="#" data-section="student_admin">${_("Student Admin")}</a>
+            </li>
+            <li class="nav-item">
+              <a href="#" data-section="grading_policy">${_("Grading Policy")}</a>
+            </li>
           </ul>
-        % endif
-        <section>
-          <form action="${create_ccx_url}" method="POST">
-            <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
-            <label class="sr" for="ccx_name">${_('Name your CCX')}</label>
-            <input name="name" id="ccx_name" placeholder="${_('Name your CCX')}"/><br/>
-            <button id="create-ccx">Coach a new Custom Course for EdX</button>
-          </form>
-        </section>
-      %endif
+          <section id="membership" class="idash-section" aria-label="${_('Batch Enrollment')}">
+            <%include file="enrollment.html" args="" />
+          </section>
+          <section id="schedule" class="idash-section" aria-label="${_('Schedule')}">
+            <%include file="schedule.html" args="" />
+          </section>
+          <section id="student_admin" class="idash-section" aria-label="${_('Student Grades')}">
+            <%include file="student_admin.html" args="" />
+          </section>
+          <section id="grading_policy" class="idash-section" aria-label="${_('Grading Policy')}">
+            <%include file="grading_policy.html" args="" />
+          </section>
+          %endif
 
-      %if ccx:
-      <ul class="instructor-nav">
-        <li class="nav-item">
-          <a href="#" data-section="membership">${_("Enrollment")}</a>
-        </li>
-        <li class="nav-item">
-          <a href="#" data-section="schedule">${_("Schedule")}</a>
-        </li>
-        <li class="nav-item">
-          <a href="#" data-section="student_admin">${_("Student Admin")}</a>
-        </li>
-        <li class="nav-item">
-          <a href="#" data-section="grading_policy">${_("Grading Policy")}</a>
-        </li>
-      </ul>
-      <section id="membership" class="idash-section">
-        <%include file="enrollment.html" args="" />
       </section>
-      <section id="schedule" class="idash-section">
-        <%include file="schedule.html" args="" />
-      </section>
-      <section id="student_admin" class="idash-section">
-        <%include file="student_admin.html" args="" />
-      </section>
-      <section id="grading_policy" class="idash-section">
-        <%include file="grading_policy.html" args="" />
-      </section>
-      %endif
-
-    </section>
+        </main>
   </div>
 </section>
 
@@ -155,4 +165,22 @@ from django.core.urlresolvers import reverse
       $('#ccx_std_list_messages')[0].focus();
     }
   });
+  function validateForm(form) {
+    var newCCXName = $(form).find('#ccx_name').val();
+    var $errorMessage =  $('#ccx-create-message');
+    var hasCcxConnector = ${has_ccx_connector | n, dump_js_escaped_json} === 'true';
+
+    if (!newCCXName && !hasCcxConnector) {
+      $errorMessage.text("${_('Please enter a valid CCX name.') | n, js_escaped_string}");
+      $errorMessage.show();
+      return false;
+    } else if (hasCcxConnector) {
+      $errorMessage.html('${use_ccx_con_error_message | n, js_escaped_string}');
+      $errorMessage.show();
+      return false;
+    }
+
+    $errorMessage.hide();
+    return true;
+  }
 </script>

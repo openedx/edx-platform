@@ -288,13 +288,13 @@ class ProblemWithMathjax(ProblemsTest):
 
         # The hint button rotates through multiple hints
         problem_page.click_hint()
-        self.assertIn("Hint (1 of 2): mathjax should work1", problem_page.hint_text)
+        self.assertIn("Hint (1 of 2): mathjax should work1", problem_page.extract_hint_text_from_html)
         problem_page.verify_mathjax_rendered_in_hint()
 
         # Rotate the hint and check the problem hint
         problem_page.click_hint()
 
-        self.assertIn("Hint (2 of 2): mathjax should work2", problem_page.hint_text)
+        self.assertIn("Hint (2 of 2): mathjax should work2", problem_page.extract_hint_text_from_html)
         problem_page.verify_mathjax_rendered_in_hint()
 
 

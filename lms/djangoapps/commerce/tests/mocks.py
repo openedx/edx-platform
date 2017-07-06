@@ -3,7 +3,7 @@ import json
 
 import httpretty
 
-from commerce.tests import TEST_API_URL
+from commerce.tests import TEST_API_URL, factories
 
 
 class mock_ecommerce_api_endpoint(object):  # pylint: disable=invalid-name
@@ -117,3 +117,26 @@ class mock_order_endpoint(mock_ecommerce_api_endpoint):  # pylint: disable=inval
 
     def get_uri(self):
         return TEST_API_URL + '/orders/{}/'.format(self.order_number)
+
+
+class mock_get_orders(mock_ecommerce_api_endpoint):  # pylint: disable=invalid-name
+    """ Mocks calls to E-Commerce API client order get method. """
+
+    default_response = {
+        'results': [
+            factories.OrderFactory(
+                lines=[
+                    factories.OrderLineFactory(
+                        product=factories.ProductFactory(attribute_values=[factories.ProductAttributeFactory(
+                            name='certificate_type',
+                            value='verified'
+                        )])
+                    )
+                ]
+            )
+        ]
+    }
+    method = httpretty.GET
+
+    def get_uri(self):
+        return TEST_API_URL + '/orders/'

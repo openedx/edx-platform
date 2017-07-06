@@ -15,7 +15,8 @@ from opaque_keys import InvalidKeyError
 from courseware.access import is_mobile_available_for_user
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
-from courseware.views import get_current_child, save_positions_recursively_up
+from courseware.views.index import save_positions_recursively_up
+from courseware.views.views import get_current_child
 from student.models import CourseEnrollment, User
 
 from xblock.fields import Scope
@@ -236,7 +237,6 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             it is enabled, otherwise null.
           * end: The end date of the course.
           * id: The unique ID of the course.
-          * latest_updates: Reserved for future use.
           * name: The name of the course.
           * number: The course number.
           * org: The organization that created the course.

@@ -5,7 +5,7 @@
     <div class="tip videolist-url-tip setting-help"><%= model.get('help') %></div>
     <div class="wrapper-videolist-urls">
       <a href="#" class="collapse-action collapse-setting">
-        <i class="icon fa fa-plus"></i><%= gettext("Add URLs for additional versions") %> <span class="sr"><%= model.get('display_name')%></span>
+        <span class="icon fa fa-plus" aria-hidden="true"></span><%= gettext("Add URLs for additional versions") %> <span class="sr"><%= model.get('display_name')%></span>
       </a>
       <div class="videolist-extra-videos">
         <span class="tip videolist-extra-videos-tip setting-help"><%= gettext("To be sure all students can access the video, we recommend providing both an .mp4 and a .webm version of your video. Click below to add a URL for another version. These URLs cannot be YouTube URLs. The first listed video that's compatible with the student's computer will play.") %></span>

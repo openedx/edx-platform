@@ -8,7 +8,7 @@
   box-sizing: border-box;
   margin: 0;
   border-radius: 3px;
-  padding: ($baseline);
+  padding: $baseline;
   max-width: 1180px;
 
   .post-field {
@@ -18,19 +18,20 @@
       display: inline-block;
       width: 50%;
       vertical-align: top;
-      line-height: 40px;
+      margin: 0;
 
       .field-input {
         display: inline-block;
         width: 100%;
         vertical-align: top;
+        border-width: 0;
+        padding: 0 ($baseline/2);
       }
 
       .field-label-text {
         display: inline-block;
         width: 25%;
         vertical-align: top;
-        text-transform: uppercase;
         font-size: 12px;
         line-height: 40px;
       }
@@ -42,7 +43,7 @@
 
     // UI: support text for input fields
     .field-help {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       display: inline-block;
       @include padding-left($baseline);
       width: 50%;
@@ -57,7 +58,7 @@
 
 // CASE: inline styling
 .discussion-module .forum-new-post-form {
-  background: $white;
+  background: $forum-color-background;
 }
 
 // ====================
@@ -70,6 +71,7 @@
     @extend %cont-truncated;
     z-index: 1000;
     padding: 0 $baseline 0 ($baseline*0.75);
+    width: 100%;
     height: 40px;
     font-size: 14px;
     line-height: 36px;
@@ -86,9 +88,9 @@
 
   .post-type-label {
     @extend %cont-truncated;
-    @include box-sizing(border-box);
     @include white-button;
     @include font-size(14);
+    box-sizing: border-box;
     display: inline-block;
     padding: 0 ($baseline/2);
     width: 48%;
@@ -105,6 +107,7 @@
 
   .post-type-input:checked + .post-type-label {
     background-color: $forum-color-active-thread;
+    color: $forum-color-active-text;
     background-image: none;
     box-shadow: 0 1px 1px rgba(0, 0,  0, 0.4) inset;
   }
@@ -114,8 +117,8 @@
   }
 
   input[type=text].field-input {
-    @include box-sizing(border-box);
-    border: 1px solid $gray-l2;
+    box-sizing: border-box;
+    border: 1px solid $forum-color-border;
     border-radius: 3px;
     padding: 0 $baseline/2;
     height: 40px;
@@ -127,7 +130,7 @@
   }
 
   .post-option {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     display: inline-block;
     @include margin-right($baseline);
     border: 1px solid transparent;
@@ -185,7 +188,7 @@
 
     .post-error {
       padding: ($baseline/2) $baseline 12px 45px;
-      border-bottom: 1px solid $red;
+      border-bottom: 1px solid $forum-color-error;
       background: url('#{$static-path}/images/white-error-icon.png') no-repeat 15px 14px;
 
       &:last-child {
@@ -205,25 +208,25 @@
   position: relative;
 
   .topic-menu-wrapper {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     @extend %ui-depth4;
     position: absolute;
     top: 40px;
     left: 0;
-    border: 1px solid $gray-l3;
+    border: 1px solid $forum-color-border;
     width: 100%;
-    background: $white;
+    background: $forum-color-background;
     box-shadow: 0 2px 1px $shadow;
   }
 
   .topic-filter-label {
-    border-bottom: 1px solid $gray-l2;
+    border-bottom: 1px solid $forum-color-border;
     padding: ($baseline/4);
   }
 
   .topic-filter-input {
-    @include box-sizing(border-box);
-    border: 1px solid $gray-l3;
+    box-sizing: border-box;
+    border: 1px solid $forum-color-border;
     padding: 0 15px;
     width: 100%;
     height: 30px;
@@ -245,7 +248,7 @@
 
   .topic-title {
     display: block;
-    border-bottom: 1px solid $gray-l3;
+    border-bottom: 1px solid $forum-color-border;
     padding: ($baseline/2);
     font-size: 14px;
   }

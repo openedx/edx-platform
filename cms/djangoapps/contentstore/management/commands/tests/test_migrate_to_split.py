@@ -59,7 +59,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestMigrateToSplit, self).setUp(create_user=True)
+        super(TestMigrateToSplit, self).setUp()
         self.course = CourseFactory(default_store=ModuleStoreEnum.Type.mongo)
 
     def test_user_email(self):

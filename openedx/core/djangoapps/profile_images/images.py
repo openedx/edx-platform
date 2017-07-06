@@ -3,13 +3,16 @@ Image file manipulation functions related to profile images.
 """
 from cStringIO import StringIO
 from collections import namedtuple
+from contextlib import closing
 
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.utils.translation import ugettext as _, ugettext_noop as _noop
+from django.utils.translation import ugettext as _
+import piexif
 from PIL import Image
 
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
+from .exceptions import ImageValidationError
 
 
 ImageType = namedtuple('ImageType', ('extensions', 'mimetypes', 'magic'))
@@ -33,49 +36,47 @@ IMAGE_TYPES = {
 }
 
 
-def user_friendly_size(size):
+def create_profile_images(image_file, profile_image_names):
     """
-    Convert size in bytes to user friendly size.
+    Generates a set of image files based on image_file and stores them
+    according to the sizes and filenames specified in `profile_image_names`.
 
     Arguments:
-        size (int): size in bytes
+
+        image_file (file):
+            The uploaded image file to be cropped and scaled to use as a
+            profile image.  The image is cropped to the largest possible square,
+            and centered on this image.
+
+        profile_image_names (dict):
+            A dictionary that maps image sizes to file names.  The image size
+            is an integer representing one side of the equilateral image to be
+            created.
 
     Returns:
-        user friendly size
+
+        None
     """
-    units = [_('bytes'), _('KB'), _('MB')]
-    i = 0
-    while size >= 1024:
-        size /= 1024
-        i += 1
-    return u'{} {}'.format(size, units[i])
+    storage = get_profile_image_storage()
+
+    original = Image.open(image_file)
+    image = _set_color_mode_to_rgb(original)
+    image = _crop_image_to_square(image)
+
+    for size, name in profile_image_names.items():
+        scaled = _scale_image(image, size)
+        exif = _get_corrected_exif(scaled, original)
+        with closing(_create_image_file(scaled, exif)) as scaled_image_file:
+            storage.save(name, scaled_image_file)
 
 
-def get_valid_file_types():
+def remove_profile_images(profile_image_names):
     """
-    Return comma separated string of valid file types.
+    Physically remove the image files specified in `profile_image_names`
     """
-    return ', '.join([', '.join(IMAGE_TYPES[ft].extensions) for ft in IMAGE_TYPES.keys()])
-
-
-FILE_UPLOAD_TOO_LARGE = _noop(u'The file must be smaller than {image_max_size} in size.'.format(image_max_size=user_friendly_size(settings.PROFILE_IMAGE_MAX_BYTES)))  # pylint: disable=line-too-long
-FILE_UPLOAD_TOO_SMALL = _noop(u'The file must be at least {image_min_size} in size.'.format(image_min_size=user_friendly_size(settings.PROFILE_IMAGE_MIN_BYTES)))  # pylint: disable=line-too-long
-FILE_UPLOAD_BAD_TYPE = _noop(u'The file must be one of the following types: {valid_file_types}.'.format(valid_file_types=get_valid_file_types()))  # pylint: disable=line-too-long
-FILE_UPLOAD_BAD_EXT = _noop(u'The file name extension for this file does not match the file data. The file may be corrupted.')  # pylint: disable=line-too-long
-FILE_UPLOAD_BAD_MIMETYPE = _noop(u'The Content-Type header for this file does not match the file data. The file may be corrupted.')  # pylint: disable=line-too-long
-
-
-class ImageValidationError(Exception):
-    """
-    Exception to use when the system rejects a user-supplied source image.
-    """
-    @property
-    def user_message(self):
-        """
-        Translate the developer-facing exception message for API clients.
-        """
-        # pylint: disable=translation-of-non-string
-        return _(self.message)
+    storage = get_profile_image_storage()
+    for name in profile_image_names.values():
+        storage.delete(name)
 
 
 def validate_uploaded_image(uploaded_file):
@@ -90,74 +91,153 @@ def validate_uploaded_image(uploaded_file):
     # see also: http://en.wikipedia.org/wiki/Magic_number_%28programming%29
 
     if uploaded_file.size > settings.PROFILE_IMAGE_MAX_BYTES:
-        raise ImageValidationError(FILE_UPLOAD_TOO_LARGE)
+        file_upload_too_large = _(
+            u'The file must be smaller than {image_max_size} in size.'
+        ).format(
+            image_max_size=_user_friendly_size(settings.PROFILE_IMAGE_MAX_BYTES)
+        )
+        raise ImageValidationError(file_upload_too_large)
     elif uploaded_file.size < settings.PROFILE_IMAGE_MIN_BYTES:
-        raise ImageValidationError(FILE_UPLOAD_TOO_SMALL)
+        file_upload_too_small = _(
+            u'The file must be at least {image_min_size} in size.'
+        ).format(
+            image_min_size=_user_friendly_size(settings.PROFILE_IMAGE_MIN_BYTES)
+        )
+        raise ImageValidationError(file_upload_too_small)
 
     # check the file extension looks acceptable
     filename = unicode(uploaded_file.name).lower()
     filetype = [ft for ft in IMAGE_TYPES if any(filename.endswith(ext) for ext in IMAGE_TYPES[ft].extensions)]
     if not filetype:
-        raise ImageValidationError(FILE_UPLOAD_BAD_TYPE)
+        file_upload_bad_type = _(
+            u'The file must be one of the following types: {valid_file_types}.'
+        ).format(valid_file_types=_get_valid_file_types())
+        raise ImageValidationError(file_upload_bad_type)
     filetype = filetype[0]
 
     # check mimetype matches expected file type
     if uploaded_file.content_type not in IMAGE_TYPES[filetype].mimetypes:
-        raise ImageValidationError(FILE_UPLOAD_BAD_MIMETYPE)
+        file_upload_bad_mimetype = _(
+            u'The Content-Type header for this file does not match '
+            u'the file data. The file may be corrupted.'
+        )
+        raise ImageValidationError(file_upload_bad_mimetype)
 
     # check magic number matches expected file type
     headers = IMAGE_TYPES[filetype].magic
     if uploaded_file.read(len(headers[0]) / 2).encode('hex') not in headers:
-        raise ImageValidationError(FILE_UPLOAD_BAD_EXT)
+        file_upload_bad_ext = _(
+            u'The file name extension for this file does not match '
+            u'the file data. The file may be corrupted.'
+        )
+        raise ImageValidationError(file_upload_bad_ext)
     # avoid unexpected errors from subsequent modules expecting the fp to be at 0
     uploaded_file.seek(0)
 
 
-def _get_scaled_image_file(image_obj, size):
+def _crop_image_to_square(image):
     """
-    Given a PIL.Image object, get a resized copy using `size` (square) and
-    return a file-like object containing the data saved as a JPEG.
+    Given a PIL.Image object, return a copy cropped to a square around the
+    center point with each side set to the size of the smaller dimension.
+    """
+    width, height = image.size
+    if width != height:
+        side = width if width < height else height
+        left = (width - side) // 2
+        top = (height - side) // 2
+        right = (width + side) // 2
+        bottom = (height + side) // 2
+        image = image.crop((left, top, right, bottom))
+    return image
 
-    Note that the file object returned is a django ContentFile which holds
-    data in memory (not on disk).
+
+def _set_color_mode_to_rgb(image):
     """
-    if image_obj.mode != "RGB":
-        image_obj = image_obj.convert("RGB")
-    scaled = image_obj.resize((size, size), Image.ANTIALIAS)
+    Given a PIL.Image object, return a copy with the color mode set to RGB.
+    """
+    return image.convert('RGB')
+
+
+def _scale_image(image, side_length):
+    """
+    Given a PIL.Image object, get a resized copy with each side being
+    `side_length` pixels long.  The scaled image will always be square.
+    """
+    return image.resize((side_length, side_length), Image.ANTIALIAS)
+
+
+def _create_image_file(image, exif):
+    """
+    Given a PIL.Image object, create and return a file-like object containing
+    the data saved as a JPEG.
+
+    Note that the file object returned is a django ContentFile which holds data
+    in memory (not on disk).
+    """
     string_io = StringIO()
-    scaled.save(string_io, format='JPEG')
+
+    # The if/else dance below is required, because PIL raises an exception if
+    # you pass None as the value of the exif kwarg.
+    if exif is None:
+        image.save(string_io, format='JPEG')
+    else:
+        image.save(string_io, format='JPEG', exif=exif)
+
     image_file = ContentFile(string_io.getvalue())
     return image_file
 
 
-def create_profile_images(image_file, profile_image_names):
+def _get_corrected_exif(image, original):
     """
-    Generates a set of image files based on image_file and
-    stores them according to the sizes and filenames specified
-    in `profile_image_names`.
+    If the original image contains exif data, use that data to
+    preserve image orientation in the new image.
     """
-    image_obj = Image.open(image_file)
-
-    # first center-crop the image if needed (but no scaling yet).
-    width, height = image_obj.size
-    if width != height:
-        side = width if width < height else height
-        image_obj = image_obj.crop(((width - side) / 2, (height - side) / 2, (width + side) / 2, (height + side) / 2))
-
-    storage = get_profile_image_storage()
-    for size, name in profile_image_names.items():
-        scaled_image_file = _get_scaled_image_file(image_obj, size)
-        # Store the file.
-        try:
-            storage.save(name, scaled_image_file)
-        finally:
-            scaled_image_file.close()
+    if 'exif' in original.info:
+        image_exif = image.info.get('exif', piexif.dump({}))
+        original_exif = original.info['exif']
+        image_exif = _update_exif_orientation(image_exif, _get_exif_orientation(original_exif))
+        return image_exif
 
 
-def remove_profile_images(profile_image_names):
+def _update_exif_orientation(exif, orientation):
     """
-    Physically remove the image files specified in `profile_image_names`
+    Given an exif value and an integer value 1-8, reflecting a valid value for
+    the exif orientation, return a new exif with the orientation set.
     """
-    storage = get_profile_image_storage()
-    for name in profile_image_names.values():
-        storage.delete(name)
+    exif_dict = piexif.load(exif)
+    exif_dict['0th'][piexif.ImageIFD.Orientation] = orientation
+    return piexif.dump(exif_dict)
+
+
+def _get_exif_orientation(exif):
+    """
+    Return the orientation value for the given Image object, or None if the
+    value is not set.
+    """
+    exif_dict = piexif.load(exif)
+    return exif_dict['0th'].get(piexif.ImageIFD.Orientation)
+
+
+def _get_valid_file_types():
+    """
+    Return comma separated string of valid file types.
+    """
+    return ', '.join([', '.join(IMAGE_TYPES[ft].extensions) for ft in IMAGE_TYPES.keys()])
+
+
+def _user_friendly_size(size):
+    """
+    Convert size in bytes to user friendly size.
+
+    Arguments:
+        size (int): size in bytes
+
+    Returns:
+        user friendly size
+    """
+    units = [_('bytes'), _('KB'), _('MB')]
+    i = 0
+    while size >= 1024 and i < len(units):
+        size /= 1024
+        i += 1
+    return u'{} {}'.format(size, units[i])

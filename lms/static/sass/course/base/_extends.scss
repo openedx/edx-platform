@@ -67,8 +67,7 @@ h1.top-header {
   width: flex-grid(3);
   background: $sidebar-color;
 
-  h1, h2 {
-   font-size: em(20);
+  h1, h2, h3, h4 {
    font-weight: bold;
    letter-spacing: 0;
    text-transform: none;
@@ -79,7 +78,19 @@ h1.top-header {
 
   h1 {
     font-size: 18px;
-    padding: 32px 26px 20px 26px;
+    margin-bottom: 15px;
+  }
+
+  h2 {
+    font-size: 16px;
+  }
+
+  h3 {
+    font-size: 14px;
+  }
+
+  h4 {
+    font-size: 12px;
   }
 
   a {
@@ -95,40 +106,12 @@ h1.top-header {
     display: none;
   }
 
-  h3 {
-    background: none;
-    border: none;
-    color: $black;
-    font-weight: normal;
-    margin: 0;
-    overflow: hidden;
-    font-size: 1em;
-
-    a {
-      display: block;
-      text-decoration: none;
-      @include transition(none);
-    }
-
-    &.active {
-      // @extend .bottom-border;
-      color: $black;
-      font-weight: bold;
-
-      a {
-        color: $black;
-      }
-    }
-  }
-
   ul, ol {
-    list-style: none;
     margin: 0;
     padding-left: 0;
 
     li {
-      // @extend .bottom-border;
-      @extend .clearfix;
+      @include margin-left(20px);
       background: none;
       position: relative;
       padding: 0;

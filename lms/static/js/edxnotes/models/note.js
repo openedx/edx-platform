@@ -51,10 +51,6 @@ define(['backbone', 'js/edxnotes/utils/utils', 'underscore.string'], function (B
             }
 
             return message;
-        },
-
-        getText: function () {
-            return Utils.nl2br(this.get('text'));
         }
 
     });

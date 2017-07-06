@@ -98,6 +98,7 @@ class RandomizeModule(RandomizeFields, XModule):
 class RandomizeDescriptor(RandomizeFields, SequenceDescriptor):
     # the editing interface can be the same as for sequences -- just a container
     module_class = RandomizeModule
+    resources_dir = None
 
     filename_extension = "xml"
 

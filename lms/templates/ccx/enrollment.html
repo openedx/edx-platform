@@ -1,9 +1,13 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
 
+<h2 class="hd hd-2">${_("Batch Enrollment")}</h2>
 <div class="batch-enrollment" style="float:left;width:50%">
   <form method="POST" action="ccx_invite">
   <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-  <h2> ${_("Batch Enrollment")} </h2>
   <label for="student-ids" class="sr">${_("Email Addresses/Usernames")}</label>
   <p id="label_student_ids" class="text-helper">
       ${_("Enter email addresses and/or usernames separated by new lines or commas.")}
@@ -18,8 +22,16 @@
     <div class="hint auto-enroll-hint">
       <span class="hint-caret"></span>
       <p class="text-helper" id="auto-enroll-helper">
-	${_("If this option is <em>checked</em>, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
-	${_("If this option is left <em>unchecked</em>, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME)}
+	${Text(_("If this option is {em_start}checked{em_end}, users who have not yet registered for {platform_name} will be automatically enrolled.")).format(
+        em_start=HTML('<em>'),
+        em_end=HTML('</em>'),
+        platform_name=settings.PLATFORM_NAME,
+    )}
+	${Text(_("If this option is left {em_start}unchecked{em_end}, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.")).format(
+        em_start=HTML('<em>'),
+        em_end=HTML('</em>'),
+        platform_name=settings.PLATFORM_NAME,
+    )}
 	<br /><br />
 	${_("Checking this box has no effect if 'Unenroll' is selected.")}
       </p>
@@ -32,7 +44,10 @@
     <div class="hint email-students-hint">
       <span class="hint-caret"></span>
       <p class="text-helper" id="email-students-helper">
-	${_("If this option is <em>checked</em>, users will receive an email notification.")}
+	${Text(_("If this option is {em_start}checked{em_end}, users will receive an email notification.")).format(
+        em_start=HTML('<em>'),
+        em_end=HTML('</em>'),
+    )}
       </p>
     </div>
   </div>
@@ -74,7 +89,7 @@
             <tr>
               <td>${member.user}</td>
               <td>${member.user.email}</td>
-              <td><a class="revoke"><i class="fa fa-times-circle" aria-hidden="true"></i> ${_("Revoke access")}</a></td>
+              <td><a class="revoke"><span class="fa fa-times-circle" aria-hidden="true"></span> ${_("Revoke access")}</a></td>
             </tr>
             %endfor
           </tbody>
@@ -90,8 +105,16 @@
             <div class="hint auto-enroll-hint">
               <span class="hint-caret"></span>
               <p class="text-helper" id="auto-enroll-helper">
-                ${_("If this option is <em>checked</em>, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
-                ${_("If this option is left <em>unchecked</em>, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME)}
+                ${Text(_("If this option is {em_start}checked{em_end}, users who have not yet registered for {platform_name} will be automatically enrolled.")).format(
+                    em_start=HTML('<em>'),
+                    em_end=HTML('</em>'),
+                    platform_name=settings.PLATFORM_NAME,
+                )}
+                ${Text(_("If this option is left {em_start}unchecked{em_end}, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.")).format(
+                    em_start=HTML('<em>'),
+                    em_end=HTML('</em>'),
+                    platform_name=settings.PLATFORM_NAME,
+                )}
                 <br /><br />
                 ${_("Checking this box has no effect if 'Revoke' is clicked.")}
               </p>
@@ -103,7 +126,10 @@
             <div class="hint email-students-hint">
               <span class="hint-caret"></span>
               <p class="text-helper" id="email-students-helper">
-                ${_("If this option is <em>checked</em>, users will receive an email notification.")}
+                ${Text(_("If this option is {em_start}checked{em_end}, users will receive an email notification.")).format(
+                    em_start=HTML('<em>'),
+                    em_end=HTML('</em>'),
+                )}
               </p>
             </div>
         </div>

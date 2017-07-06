@@ -20,6 +20,11 @@ body {
   background: $body-bg;
 }
 
+// removing the outline on any element that we make programmatically focusable
+[tabindex="-1"] {
+    outline: none;
+}
+
 h1, h2, h3, h4, h5, h6 {
   color: $base-font-color;
   font: normal 1.2em/1.2em $serif;
@@ -127,6 +132,10 @@ a, a:visited {
   max-width: grid-width(12);
   min-width: 760px;
   width: flex-grid(12);
+}
+
+.no-min-scale {
+  min-width: 0px !important;
 }
 
 span.edx {
@@ -327,29 +336,31 @@ mark {
 }
 
 // UI - semantically hide text
-.sr {
+.sr, .sr-only {
   @extend %text-sr;
   @extend %a11y-ensure-contrast;
 }
 
 // UI - skipnav
-.nav-skip {
+.nav-skip,
+.transcript-skip {
   @extend %ui-print-excluded;
 
-  display: block;
+  display: inline-block;
   position: absolute;
   left: 0;
   top: -($baseline*30);
-  width: 1px;
-  height: 1px;
   overflow: hidden;
   background: $white;
   border-bottom: 1px solid $border-color-4;
   padding: ($baseline*0.75) ($baseline/2);
 
-  &:focus, &:active {
-    position: static;
+  &:focus,
+  &:active {
+    position: relative;
+    top: auto;
     width: auto;
     height: auto;
+    margin: 0;
   }
 }

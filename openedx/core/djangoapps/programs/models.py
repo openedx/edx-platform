@@ -18,6 +18,7 @@ class ProgramsApiConfig(ConfigurationModel):
     """
     OAUTH2_CLIENT_NAME = 'programs'
     CACHE_KEY = 'programs.api.data'
+    API_NAME = 'programs'
 
     api_version_number = models.IntegerField(verbose_name=_("API Version"))
 
@@ -53,8 +54,38 @@ class ProgramsApiConfig(ConfigurationModel):
         verbose_name=_("Enable Student Dashboard Displays"),
         default=False
     )
+
     enable_studio_tab = models.BooleanField(
         verbose_name=_("Enable Studio Authoring Interface"),
+        default=False
+    )
+
+    enable_certification = models.BooleanField(
+        verbose_name=_("Enable Program Certificate Generation"),
+        default=False
+    )
+
+    max_retries = models.PositiveIntegerField(
+        verbose_name=_("Maximum Certification Retries"),
+        default=11,  # This gives about 30 minutes wait before the final attempt
+        help_text=_(
+            "When making requests to award certificates, make at most this many attempts "
+            "to retry a failing request."
+        )
+    )
+
+    xseries_ad_enabled = models.BooleanField(
+        verbose_name=_("Do we want to show xseries program advertising"),
+        default=False
+    )
+
+    program_listing_enabled = models.BooleanField(
+        verbose_name=_("Do we want to show program listing page"),
+        default=False
+    )
+
+    program_details_enabled = models.BooleanField(
+        verbose_name=_("Do we want to show program details pages"),
         default=False
     )
 
@@ -108,3 +139,32 @@ class ProgramsApiConfig(ConfigurationModel):
             bool(self.authoring_app_js_path) and
             bool(self.authoring_app_css_path)
         )
+
+    @property
+    def is_certification_enabled(self):
+        """
+        Indicates whether background tasks should be initiated to grant
+        certificates for Program completion.
+        """
+        return self.enabled and self.enable_certification
+
+    @property
+    def show_xseries_ad(self):
+        """
+        Indicates whether we should show xseries add
+        """
+        return self.enabled and self.xseries_ad_enabled
+
+    @property
+    def show_program_listing(self):
+        """
+        Indicates whether we want to show program listing page
+        """
+        return self.enabled and self.program_listing_enabled
+
+    @property
+    def show_program_details(self):
+        """
+        Indicates whether we want to show program details pages
+        """
+        return self.enabled and self.program_details_enabled

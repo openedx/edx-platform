@@ -9,14 +9,14 @@ data: |
   problem, students click inside a defined region in an image. You define this
   region by including coordinates in the body of the problem. You can define
   one rectangular region, multiple rectangular regions, or one non-rectangular
-  region. For more information, see 
-  <a href="http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/image_mapped_input.html" target="_blank">Image Mapped Input
+  region. For more information, see
+  <a href="http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/image_mapped_input.html" target="_blank">Image Mapped Input
   Problem</a> in <i>Building and Running an edx Course</i>.
   </p>
-  <p>When you add the problem, be sure to select <strong>Settings</strong> 
+  <p>When you add the problem, be sure to select <strong>Settings</strong>
   to specify a <strong>Display Name</strong> and other values that apply.</p>
   <p>You can use the following example problem as a model.</p>
-  
+
   <p>What country is home to the Great Pyramid of Giza as well as the cities
   of Cairo and Memphis? Click the country on the map below.</p>
     <imageresponse>

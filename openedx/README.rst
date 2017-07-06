@@ -6,6 +6,7 @@ from Open edX will eventually live here, including the code in the lms, cms,
 and common directories.
 
 If you're adding a new Django app, place it in core/djangoapps. If you're adding
+utilities that require Django, place them in core/djangolib.  If you're adding
 code that defines no Django models or views of its own but is widely useful, put it
 in core/lib.
 

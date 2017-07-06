@@ -31,7 +31,7 @@ define([
 
             it('bind the ajax call and the result will be success', function() {
                 var submitCallback;
-                spyOn($, "ajax").andCallFake(function(params) {
+                spyOn($, "ajax").and.callFake(function(params) {
                     params.success({
                         row_errors: {},
                         general_errors: [],
@@ -41,7 +41,7 @@ define([
                         always: function() {}
                     };
                 });
-                submitCallback = jasmine.createSpy().andReturn();
+                submitCallback = jasmine.createSpy().and.returnValue();
                 this.view.$el.find(SELECTORS.bulk_white_list_exception_form).submit(submitCallback);
                 this.view.$el.find(SELECTORS.upload_csv_button).click();
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner is successfully added to the ' +
@@ -50,7 +50,7 @@ define([
 
             it('bind the ajax call and the result will be general error', function() {
                 var submitCallback;
-                spyOn($, "ajax").andCallFake(function(params) {
+                spyOn($, "ajax").and.callFake(function(params) {
                     params.success({
                         row_errors: {},
                         general_errors: ["File is not attached."],
@@ -60,7 +60,7 @@ define([
                         always: function() {}
                     };
                 });
-                submitCallback = jasmine.createSpy().andReturn();
+                submitCallback = jasmine.createSpy().and.returnValue();
                 this.view.$el.find(SELECTORS.bulk_white_list_exception_form).submit(submitCallback);
                 this.view.$el.find(SELECTORS.upload_csv_button).click();
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('File is not attached.');
@@ -68,7 +68,7 @@ define([
 
             it('bind the ajax call and the result will be singular form of row errors', function() {
                 var submitCallback;
-                spyOn($, "ajax").andCallFake(function(params) {
+                spyOn($, "ajax").and.callFake(function(params) {
                     params.success({
                         general_errors: [],
                         row_errors: {
@@ -83,7 +83,7 @@ define([
                         always: function() {}
                     };
                 });
-                submitCallback = jasmine.createSpy().andReturn();
+                submitCallback = jasmine.createSpy().and.returnValue();
                 this.view.$el.find(SELECTORS.bulk_white_list_exception_form).submit(submitCallback);
                 this.view.$el.find(SELECTORS.upload_csv_button).click();
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('1 record is not in correct format');
@@ -95,7 +95,7 @@ define([
 
             it('bind the ajax call and the result will be plural form of row errors', function() {
                 var submitCallback;
-                spyOn($, "ajax").andCallFake(function(params) {
+                spyOn($, "ajax").and.callFake(function(params) {
                     params.success({
                         general_errors: [],
                         row_errors: {
@@ -110,7 +110,7 @@ define([
                         always: function() {}
                     };
                 });
-                submitCallback = jasmine.createSpy().andReturn();
+                submitCallback = jasmine.createSpy().and.returnValue();
                 this.view.$el.find(SELECTORS.bulk_white_list_exception_form).submit(submitCallback);
                 this.view.$el.find(SELECTORS.upload_csv_button).click();
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('2 records are not in correct format');
@@ -122,7 +122,7 @@ define([
 
             it('toggle message details', function() {
                 var submitCallback;
-                spyOn($, "ajax").andCallFake(function(params) {
+                spyOn($, "ajax").and.callFake(function(params) {
                     params.success({
                         row_errors: {},
                         general_errors: [],
@@ -132,7 +132,7 @@ define([
                         always: function() {}
                     };
                 });
-                submitCallback = jasmine.createSpy().andReturn();
+                submitCallback = jasmine.createSpy().and.returnValue();
                 this.view.$el.find(SELECTORS.bulk_white_list_exception_form).submit(submitCallback);
                 this.view.$el.find(SELECTORS.upload_csv_button).click();
                 expect(this.view.$el.find("div.message > .successfully-added")).toBeHidden();

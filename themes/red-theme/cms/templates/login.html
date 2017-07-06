@@ -1,0 +1,57 @@
+<%page expression_filter="h"/>
+
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "login" %></%def>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
+<%block name="title">${_("Sign In")}</%block>
+<%block name="bodyclass">not-signedin view-signin</%block>
+
+<%block name="content">
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <header>
+      <h1 class="title title-1">${_("Sign In to {studio_name}").format(studio_name=settings.STUDIO_NAME)}</h1>
+      <a href="${reverse('signup')}" class="action action-signin">${_("Don't have a {studio_name} Account? Sign up!").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
+    </header>
+    <!-- Login Page override for red-theme. -->
+    <article class="content-primary" role="main">
+      <form id="login_form" method="post" action="login_post" onsubmit="return false;">
+
+        <fieldset>
+          <legend class="sr">${_("Required Information to Sign In to {studio_name}").format(studio_name=settings.STUDIO_NAME)}</legend>
+          <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf }" />
+
+          <ol class="list-input">
+            <li class="field text required" id="field-email">
+              <label for="email">${_("E-mail")}</label>
+              <input id="email" type="email" name="email" placeholder="${_('example: username@domain.com')}"/>
+            </li>
+
+            <li class="field text required" id="field-password">
+              <label for="password">${_("Password")}</label>
+              <input id="password" type="password" name="password" />
+              <a href="${forgot_password_link}" class="action action-forgotpassword">${_("Forgot password?")}</a>
+            </li>
+          </ol>
+        </fieldset>
+
+        <div class="form-actions">
+          <button type="submit" id="submit" name="submit" class="action action-primary">${_("Sign In to {studio_name}").format(studio_name=settings.STUDIO_NAME)}</button>
+        </div>
+
+        <!-- no honor code for CMS, but need it because we're using the lms student object -->
+        <input name="honor_code" type="checkbox" value="true" checked="true" hidden="true">
+      </form>
+    </article>
+  </section>
+</div>
+</%block>
+
+<%block name="requirejs">
+  require(["js/factories/login"], function(LoginFactory) {
+      LoginFactory("${reverse('homepage')}");
+  });
+</%block>

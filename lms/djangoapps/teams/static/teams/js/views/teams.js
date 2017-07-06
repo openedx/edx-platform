@@ -11,9 +11,11 @@
             type: 'teams',
 
             srInfo: {
-                id: "heading-browse-teams",
+                id: 'heading-browse-teams',
                 text: gettext('All teams')
             },
+
+            paginationLabel: gettext('Teams Pagination'),
 
             initialize: function (options) {
                 this.context = options.context;

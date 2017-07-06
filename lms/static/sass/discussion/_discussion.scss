@@ -6,23 +6,11 @@ body.discussion {
 
   .course-tabs .right {
     @include float(right);
-
-    .new-post-btn {
-      @include blue-button;
-      @include margin-right(4px);
-    }
-
-    .new-post-icon {
-      @include margin-right(7px);
-      font-size: 16px;
-      vertical-align: middle;
-      color: $white;
-    }
   }
 
   .edit-post-form {
     @include clearfix();
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     width: 100%;
 
     h1 {
@@ -52,8 +40,8 @@ body.discussion {
     }
 
     .edit-post-title {
-      @include box-sizing(border-box);
-      border: 1px solid #aaa;
+      box-sizing: border-box;
+      border: 1px solid $forum-color-border;
       border-radius: 3px;
       padding: 0 ($baseline/2);
       width: 100%;
@@ -78,6 +66,7 @@ body.discussion {
   }
 
   section.user-profile {
+    // TODO: don't use table-cell for layout purposes as it switches the screenreader mode
     display: table-cell;
     border-right: 1px solid #ddd;
     border-radius: 3px 0 0 3px;
@@ -120,7 +109,7 @@ body.discussion {
 
   .wmd-input {
     @include border-radius(3px, 3px, 0, 0);
-    border: 1px solid $gray-l3;
+    border: 1px solid $forum-color-border;
     width: 100%;
     height: 150px;
     background-color: $gray-l4;
@@ -169,8 +158,7 @@ body.discussion {
     display: inline-block;
     width: 20px;
     height: 20px;
-    background-image: url('/static/images/wmd-buttons-transparent.png');
-    background-position: 0px 0px;
+    background-image: url('#{$static-path}/images/wmd-buttons-transparent.png');
     background-repeat: no-repeat;
   }
 
@@ -191,7 +179,7 @@ body.discussion {
 
   .wmd-prompt-dialog {
     @extend .modal;
-    background: $white;
+    background: $forum-color-background;
   }
 
   .wmd-prompt-dialog {
@@ -241,20 +229,17 @@ body.discussion {
 
   .discussion-column {
     @include float(right);
-    @include box-sizing(border-box);
+    box-sizing: border-box;
+    padding-left: ($baseline/2);
     width: 68%;
     max-width: 800px;
     min-height: 500px;
-    border: 1px solid #aaa;
     border-radius: 3px;
-    background: $white;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
   }
 
   .discussion-article {
     position: relative;
     min-height: 500px;
-    background-image: url('#{$static-path}/images/bg-texture.png');
 
     a {
       word-wrap: break-word;
@@ -297,8 +282,8 @@ body.discussion {
     width: 100%;
     height: 31px;
     padding: 0 ($baseline/2);
-    @include box-sizing(border-box);
-    border: 1px solid $gray-l2;
+    box-sizing: border-box;
+    border: 1px solid $forum-color-border;
     border-radius: 3px;
     box-shadow: 0 1px 3px $shadow-l1 inset;
     @include transition(border-color .1s linear 0s);
@@ -314,9 +299,9 @@ body.discussion {
   }
 
   .discussion-reply-new {
-    padding: $baseline ($baseline*1.5);
     @include clearfix();
     @include transition(opacity .2s linear 0s);
+    padding: 0 ($baseline/2);
 
     h4 {
       font-size: 16px;
@@ -376,37 +361,15 @@ body.discussion {
     }
   }
 
+  .new-post-btn {
+    @include float(right);
+    @include margin-right(4px);
+    @include blue-button;
+  }
+
   div.add-response.post-extended-content {
     margin-top: $baseline;
     margin-bottom: $baseline;
-
-    button.add-response-btn {
-      @include white-button;
-      @include linear-gradient(top, $white 35%, $gray-l4);
-      position: relative;
-      padding-left: ($baseline*1.5);
-      width: 100%;
-      box-shadow: 0 1px 1px $shadow-l1;
-      @include text-align(left);
-
-      .fa-reply:before {
-        @include ltr {
-          content: "\f112"; // FA icon arrow to the left
-        }
-
-        @include rtl {
-          content: "\f064"; // FA icon arrow to the right
-        }
-      }
-
-      &:hover, &:focus {
-        @include linear-gradient(top, $white 35%, #ddd);
-      }
-
-      span.add-response-btn-text {
-        padding-left: 4px;
-      }
-    }
   }
 
   .loading-animation {
@@ -437,11 +400,6 @@ body.discussion {
     }
   }
 
-  .new-post-btn {
-    display: inline-block;
-    @include float(right);
-  }
-
   section.discussion {
     clear: both;
     padding-top: $baseline;
@@ -460,19 +418,20 @@ body.discussion {
 
       .discussion-article {
         @include transition(all .2s linear 0s);
-        border: 1px solid #ddd;
+        border: 1px solid $forum-color-border;
         border-radius: 3px;
         min-height: 0;
-        background: $white;
-        padding: 0;
+        background: $forum-color-background;
         box-shadow: 0 1px 0 $shadow;
         @include transition(all .2s linear 0s);
 
         .thread-wrapper {
+          @include border-radius(3px, 3px, 0, 0);
           position: relative;
           overflow-x: hidden;
           overflow-y: auto;
           max-height: 600px;
+          background-color: $forum-color-background;
 
           .discussion-post {
 
@@ -570,26 +529,6 @@ body.discussion {
     }
   }
 
-  .new-post-btn {
-    @include blue-button;
-    display: inline-block;
-    font-size: 13px;
-    margin-right: 4px;
-  }
-
-  .new-post-icon {
-    display: block;
-    float: left;
-    width: 16px;
-    height: 17px;
-    margin-top: 8px;
-    @include margin-right(7px);
-    font-size: 16px;
-    @include padding-right($baseline/2);
-    vertical-align: middle;
-    color: $white;
-  }
-
   section.discussion-pagination {
     margin-top: ($baseline*1.5);
 
@@ -608,7 +547,7 @@ body.discussion {
             display: inline-block;
             height: 35px;
             padding: 0 ($baseline*0.75);
-            border: 1px solid $gray-l3;
+            border: 1px solid $forum-color-border;
             border-radius: 3px;
             font-size: 13px;
             font-weight: 700;
@@ -625,7 +564,7 @@ body.discussion {
     width: 100%;
     margin-bottom: $baseline;
     @include clearfix();
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     .form-row {
       margin-top: $baseline;
@@ -653,9 +592,9 @@ body.discussion {
       width: 100%;
       height: 40px;
       padding: 0 ($baseline/2);
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       border-radius: 3px;
-      border: 1px solid #aaa;
+      border: 1px solid $forum-color-border;
       font-size: 16px;
       font-family: $sans-serif;
       color: $gray-d3;
@@ -680,17 +619,12 @@ body.discussion {
 
 // post pagination
 .response-count {
-  margin-top: $baseline;
-  padding: 0 ($baseline*1.5);
-  color: $gray;
-  font-size: 14px;
+  @include float(right);
 }
 
 .response-pagination {
   visibility: visible;
-  padding: ($baseline/2) ($baseline*1.5);
-  background-color: $gray-l6;
-  box-shadow: 0 1px 1px $gray-l4 inset, 0 -1px 1px $gray-l4 inset;
+  padding: 0 ($baseline/2);
 
   &:empty {
     visibility: hidden;
@@ -708,15 +642,10 @@ body.discussion {
     @include linear-gradient(top, $white 35%, $gray-l4);
     position: relative;
     margin: ($baseline/2) 0;
-    border: 1px solid $gray-l2;
+    border: 1px solid $forum-color-border;
     width: 100%;
     box-shadow: 0 1px 1px $shadow-l1;
     text-align: left;
     font-weight: normal;
-
-    span.add-response-btn-text {
-      padding-left: ($baseline/5);
-    }
   }
 }
-

@@ -6,8 +6,9 @@ of the tricky interactions between DRF and the code.
 Most of that information is available by accessing the course objects directly.
 """
 from collections import OrderedDict
+from openedx.core.lib.exceptions import CourseNotFoundError
 from .serializers import GradingPolicySerializer, CourseStructureSerializer
-from .errors import CourseNotFoundError, CourseStructureNotAvailableError
+from .errors import CourseStructureNotAvailableError
 from openedx.core.djangoapps.content.course_structures import models, tasks
 from util.cache import cache
 from xmodule.modulestore.django import modulestore

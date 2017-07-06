@@ -7,7 +7,7 @@ from lazy.lazy import lazy
 import time
 from datetime import datetime
 from dateutil.tz import tzutc
-from mock import patch, call
+from mock import patch
 from pytz import UTC
 from uuid import uuid4
 from unittest import skip
@@ -20,14 +20,12 @@ from xmodule.library_tools import normalize_key_for_search
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
 from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
     TEST_DATA_MONGO_MODULESTORE,
-    TEST_DATA_SPLIT_MODULESTORE
-)
+    TEST_DATA_SPLIT_MODULESTORE,
+    SharedModuleStoreTestCase)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.tests.utils import (
@@ -125,15 +123,6 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
                 'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
                 'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                 'OPTIONS': modulestore_options
-            },
-            {
-                'NAME': 'xml',
-                'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-                'OPTIONS': {
-                    'data_dir': DATA_DIR,
-                    'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-                    'xblock_mixins': modulestore_options['xblock_mixins'],
-                }
             },
         ],
         'xblock_mixins': modulestore_options['xblock_mixins'],
@@ -490,7 +479,8 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         verified_mode = CourseMode(
             course_id=unicode(self.course.id),
             mode_slug=CourseMode.VERIFIED,
-            mode_display_name=CourseMode.VERIFIED
+            mode_display_name=CourseMode.VERIFIED,
+            min_price=1
         )
         verified_mode.save()
         self.reindex_course(store)
@@ -692,7 +682,7 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
         self._perform_test_using_store(store_type, self._test_large_course_deletion)
 
 
-class TestTaskExecution(ModuleStoreTestCase):
+class TestTaskExecution(SharedModuleStoreTestCase):
     """
     Set of tests to ensure that the task code will do the right thing when
     executed directly. The test course and library gets created without the listeners
@@ -700,52 +690,53 @@ class TestTaskExecution(ModuleStoreTestCase):
     executed, it is done as expected.
     """
 
-    def setUp(self):
-        super(TestTaskExecution, self).setUp()
+    @classmethod
+    def setUpClass(cls):
+        super(TestTaskExecution, cls).setUpClass()
         SignalHandler.course_published.disconnect(listen_for_course_publish)
         SignalHandler.library_updated.disconnect(listen_for_library_update)
-        self.course = CourseFactory.create(start=datetime(2015, 3, 1, tzinfo=UTC))
+        cls.course = CourseFactory.create(start=datetime(2015, 3, 1, tzinfo=UTC))
 
-        self.chapter = ItemFactory.create(
-            parent_location=self.course.location,
+        cls.chapter = ItemFactory.create(
+            parent_location=cls.course.location,
             category='chapter',
             display_name="Week 1",
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        self.sequential = ItemFactory.create(
-            parent_location=self.chapter.location,
+        cls.sequential = ItemFactory.create(
+            parent_location=cls.chapter.location,
             category='sequential',
             display_name="Lesson 1",
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        self.vertical = ItemFactory.create(
-            parent_location=self.sequential.location,
+        cls.vertical = ItemFactory.create(
+            parent_location=cls.sequential.location,
             category='vertical',
             display_name='Subsection 1',
             publish_item=True,
             start=datetime(2015, 4, 1, tzinfo=UTC),
         )
         # unspecified start - should inherit from container
-        self.html_unit = ItemFactory.create(
-            parent_location=self.vertical.location,
+        cls.html_unit = ItemFactory.create(
+            parent_location=cls.vertical.location,
             category="html",
             display_name="Html Content",
             publish_item=False,
         )
 
-        self.library = LibraryFactory.create()
+        cls.library = LibraryFactory.create()
 
-        self.library_block1 = ItemFactory.create(
-            parent_location=self.library.location,
+        cls.library_block1 = ItemFactory.create(
+            parent_location=cls.library.location,
             category="html",
             display_name="Html Content",
             publish_item=False,
         )
 
-        self.library_block2 = ItemFactory.create(
-            parent_location=self.library.location,
+        cls.library_block2 = ItemFactory.create(
+            parent_location=cls.library.location,
             category="html",
             display_name="Html Content 2",
             publish_item=False,

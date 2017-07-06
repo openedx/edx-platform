@@ -51,7 +51,8 @@
                     enrollmentAction: $.url( '?enrollment_action' ),
                     courseId: $.url( '?course_id' ),
                     courseMode: $.url( '?course_mode' ),
-                    emailOptIn: $.url( '?email_opt_in')
+                    emailOptIn: $.url( '?email_opt_in' ),
+                    purchaseWorkflow: $.url( '?purchase_workflow' )
                 };
                 for (var key in queryParams) {
                     if (queryParams[key]) {
@@ -63,6 +64,7 @@
                 this.courseMode = queryParams.courseMode;
                 this.emailOptIn = queryParams.emailOptIn;
                 this.nextUrl = this.urls.defaultNextUrl;
+                this.purchaseWorkflow = queryParams.purchaseWorkflow;
                 if (queryParams.next) {
                     // Ensure that the next URL is internal for security reasons
                     if ( ! window.isExternal( queryParams.next ) ) {
@@ -85,6 +87,15 @@
                 // We don't display any detailed status updates to the user
                 // but we do log them to the console to help with debugging.
                 console.log(desc);
+            },
+
+            appendPurchaseWorkflow: function(redirectUrl) {
+                if (this.purchaseWorkflow) {
+                    // Append the purchase_workflow parameter to indicate
+                    // whether this is a bulk purchase or a single seat purchase
+                    redirectUrl += '?purchase_workflow=' + this.purchaseWorkflow;
+                }
+                return redirectUrl;
             },
 
             /**
@@ -123,7 +134,7 @@
                         The track selection page would allow the user to select the course mode
                         ("verified", "honor", etc.) -- or, if the only course mode was "honor",
                         it would redirect the user to the dashboard. */
-                        redirectUrl = this.urls.trackSelection + courseId + '/';
+                        redirectUrl = this.appendPurchaseWorkflow(this.urls.trackSelection + courseId + '/');
                     } else if ( this.courseMode === 'honor' || this.courseMode === 'audit' ) {
                         /* The newer version of the course details page allows the user
                         to specify which course mode to enroll as.  If the student has
@@ -133,7 +144,7 @@
                     } else {
                         /* If the user selected any other kind of course mode, send them
                         to the payment/verification flow. */
-                        redirectUrl = this.urls.payment + courseId + '/';
+                        redirectUrl = this.appendPurchaseWorkflow(this.urls.payment + courseId + '/');
                     }
 
                     /* Attempt to auto-enroll the user in a free mode of the course,

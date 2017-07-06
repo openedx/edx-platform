@@ -1,4 +1,4 @@
-define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/ajax_helpers",
+define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers",
         "common/js/spec_helpers/template_helpers", "js/spec_helpers/edit_helpers",
         "js/views/pages/container", "js/views/pages/paged_container", "js/models/xblock_info", "jquery.simulate"],
     function ($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, ContainerPage, PagedContainerPage, XBlockInfo) {
@@ -70,7 +70,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                     containerPage.render();
                     respondWithHtml(html);
                     AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
-                    AjaxHelpers.respondWithJson(requests, options);
+                    AjaxHelpers.respondWithJson(requests, options || {});
                 };
 
                 handleContainerPageRefresh = function(requests) {
@@ -519,7 +519,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                         var getButtonIcon, getButtonText;
 
                         getButtonIcon = function (containerPage) {
-                            return containerPage.$('.action-toggle-preview i');
+                            return containerPage.$('.action-toggle-preview .fa');
                         };
 
                         getButtonText = function (containerPage) {

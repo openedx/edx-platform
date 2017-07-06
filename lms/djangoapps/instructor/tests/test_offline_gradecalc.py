@@ -16,7 +16,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..offline_gradecalc import offline_grade_calculation, student_grades
 
 
-def mock_grade(_student, _request, course, **_kwargs):
+def mock_grade(_student, course, **_kwargs):
     """ Return some fake grade data to mock grades.grade() """
     return {
         'grade': u'Pass',
@@ -104,4 +104,4 @@ class TestOfflineGradeCalc(ModuleStoreTestCase):
         offline_grade_calculation(self.course.id)
         with patch('courseware.grades.grade', side_effect=AssertionError('Should not re-grade')):
             result = student_grades(self.user, None, self.course, use_offline=True)
-        self.assertEqual(result, mock_grade(self.user, None, self.course))
+        self.assertEqual(result, mock_grade(self.user, self.course))

@@ -1,8 +1,11 @@
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
 <%!
     from django.core.urlresolvers import reverse
     from util.date_utils import get_time_display
     from django.utils.translation import ugettext as _
     from django.conf import settings
+    from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <%def name="make_chapter(chapter)">
@@ -24,18 +27,21 @@ else:
     <div class="chapter-menu">
         % for section in chapter['sections']:
         <div class="menu-item ${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
-            <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
-                <p>${section['display_name']} ${'<span class="sr"> current section</span>' if 'active' in section and section['active'] else ''}</p>
+            <a class="accordion-nav" href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
+                <p class="accordion-display-name">${section['display_name']} ${Text(_('{span_start}current section{span_end}')).format(
+                        span_start=HTML('<span class="sr">'),
+                        span_end=HTML('</span>'),
+                    ) if 'active' in section and section['active'] else ''}</p>
                 <%
                 if section.get('due') is None:
                     due_date = ''
                 else:
-                    formatted_string = get_time_display(section['due'], due_date_display_format, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
+                    formatted_string = get_time_display(section['due'], due_date_display_format, coerce_tz=time_zone)
                     due_date = '' if len(formatted_string)==0 else _('due {date}').format(date=formatted_string)
                 %>
 
                 ## There is behavior differences between
-                ## rending of sections which have proctoring/timed examinations
+                ## rendering of sections which have proctoring/timed examinations
                 ## and those that do not.
                 ##
                 ## Proctoring exposes a exam status message field as well as
@@ -75,3 +81,10 @@ else:
 % for chapter in toc:
     ${make_chapter(chapter)}
 % endfor
+
+
+% if toc:
+    <%static:require_module_async module_name="js/courseware/accordion_events" class_name="AccordionEvents">
+        AccordionEvents();
+    </%static:require_module_async>
+% endif

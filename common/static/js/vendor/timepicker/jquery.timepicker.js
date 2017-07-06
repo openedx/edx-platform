@@ -304,9 +304,8 @@ requires jQuery 1.7+
 			// make sure the end time is greater than start time, otherwise there will be no list to show
 			end += _ONE_DAY;
 		}
-
 		for (var i=start; i <= end; i += settings.step*60) {
-			var timeInt = i%_ONE_DAY;
+			var timeInt = i;
 			var row = $('<li />');
 			row.data('time', timeInt);
 			row.text(_int2time(timeInt, settings.timeFormat));
@@ -609,6 +608,8 @@ requires jQuery 1.7+
 
 				case 'H':
 					hour = time.getHours();
+					if (seconds >= _ONE_DAY)
+						hour = Math.floor(seconds / (60 * 60));
 					output += (hour > 9) ? hour : '0'+hour;
 					break;
 

@@ -33,9 +33,8 @@ def forwards(apps, schema_editor):
         }
     }
     certificate_html_view_configuration_model = apps.get_model("certificates", "CertificateHtmlViewConfiguration")
-    db_alias = schema_editor.connection.alias
 
-    objects = certificate_html_view_configuration_model.objects.using(db_alias)
+    objects = certificate_html_view_configuration_model.objects
     if not objects.exists():
         objects.create(
             configuration=json.dumps(config),
@@ -47,9 +46,8 @@ def backwards(apps, schema_editor):
     Rolling back to zero-state, so remove all currently-defined configurations
     """
     certificate_html_view_configuration_model = apps.get_model("certificates", "CertificateHtmlViewConfiguration")
-    db_alias = schema_editor.connection.alias
 
-    certificate_html_view_configuration_model.objects.using(db_alias).all().delete()
+    certificate_html_view_configuration_model.objects.all().delete()
 
 class Migration(migrations.Migration):
 

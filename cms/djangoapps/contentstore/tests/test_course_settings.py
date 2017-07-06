@@ -14,7 +14,6 @@ from django.utils.timezone import UTC
 from django.test.utils import override_settings
 
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.views.component import ADVANCED_COMPONENT_POLICY_KEY
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
@@ -27,7 +26,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.tabs import InvalidTabsException
-from util.milestones_helpers import seed_milestone_relationship_types
+from milestones.tests.utils import MilestonesTestCaseMixin
 
 from .utils import CourseTestCase, AjaxEnabledTestClient
 
@@ -53,6 +52,18 @@ class CourseSettingsEncoderTest(CourseTestCase):
         self.assertIsNone(jsondetails['effort'], "effort somehow initialized")
         self.assertIsNone(jsondetails['language'], "language somehow initialized")
 
+    def test_pre_1900_date(self):
+        """
+        Tests that the encoder can handle a pre-1900 date, since strftime
+        doesn't work for these dates.
+        """
+        details = CourseDetails.fetch(self.course.id)
+        pre_1900 = datetime.datetime(1564, 4, 23, 1, 1, 1, tzinfo=UTC())
+        details.enrollment_start = pre_1900
+        dumped_jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
+        loaded_jsondetails = json.loads(dumped_jsondetails)
+        self.assertEqual(loaded_jsondetails['enrollment_start'], pre_1900.isoformat())
+
     def test_ooc_encoder(self):
         """
         Test the encoder out of its original constrained purpose to see if it functions for general use
@@ -70,7 +81,7 @@ class CourseSettingsEncoderTest(CourseTestCase):
 
 
 @ddt.ddt
-class CourseDetailsViewTest(CourseTestCase):
+class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     """
     Tests for modifying content on the first course settings page (course dates, overview, etc.).
     """
@@ -157,14 +168,12 @@ class CourseDetailsViewTest(CourseTestCase):
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_pre_requisite_course_list_present(self):
-        seed_milestone_relationship_types()
         settings_details_url = get_url(self.course.id)
         response = self.client.get_html(settings_details_url)
         self.assertContains(response, "Prerequisite Course")
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_pre_requisite_course_update_and_fetch(self):
-        seed_milestone_relationship_types()
         url = get_url(self.course.id)
         resp = self.client.get_json(url)
         course_detail_json = json.loads(resp.content)
@@ -192,7 +201,6 @@ class CourseDetailsViewTest(CourseTestCase):
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_invalid_pre_requisite_course(self):
-        seed_milestone_relationship_types()
         url = get_url(self.course.id)
         resp = self.client.get_json(url)
         course_detail_json = json.loads(resp.content)
@@ -247,15 +255,20 @@ class CourseDetailsViewTest(CourseTestCase):
             self.assertContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
-            self.assertContains(response, "Course Image")
+            self.assertContains(response, "Course Card Image")
             self.assertContains(response, "Course Short Description")
+            self.assertNotContains(response, "Course Title")
+            self.assertNotContains(response, "Course Subtitle")
+            self.assertNotContains(response, "Course Duration")
+            self.assertNotContains(response, "Course Description")
             self.assertNotContains(response, "Course Overview")
             self.assertNotContains(response, "Course Introduction Video")
             self.assertNotContains(response, "Requirements")
+            self.assertNotContains(response, "Course Banner Image")
+            self.assertNotContains(response, "Course Video Thumbnail Image")
 
     @unittest.skipUnless(settings.FEATURES.get('ENTRANCE_EXAMS', False), True)
     def test_entrance_exam_created_updated_and_deleted_successfully(self):
-        seed_milestone_relationship_types()
         settings_details_url = get_url(self.course.id)
         data = {
             'entrance_exam_enabled': 'true',
@@ -306,7 +319,6 @@ class CourseDetailsViewTest(CourseTestCase):
         test that creating an entrance exam should store the default value, if key missing in json request
         or entrance_exam_minimum_score_pct is an empty string
         """
-        seed_milestone_relationship_types()
         settings_details_url = get_url(self.course.id)
         test_data_1 = {
             'entrance_exam_enabled': 'true',
@@ -361,7 +373,8 @@ class CourseDetailsViewTest(CourseTestCase):
     def test_regular_site_fetch(self):
         settings_details_url = get_url(self.course.id)
 
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False,
+                                                               'ENABLE_EXTENDED_COURSE_DETAILS': True}):
             response = self.client.get_html(settings_details_url)
             self.assertContains(response, "Course Summary Page")
             self.assertContains(response, "Send a note to students via email")
@@ -374,11 +387,17 @@ class CourseDetailsViewTest(CourseTestCase):
             self.assertNotContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
-            self.assertContains(response, "Course Image")
+            self.assertContains(response, "Course Card Image")
+            self.assertContains(response, "Course Title")
+            self.assertContains(response, "Course Subtitle")
+            self.assertContains(response, "Course Duration")
+            self.assertContains(response, "Course Description")
             self.assertContains(response, "Course Short Description")
             self.assertContains(response, "Course Overview")
             self.assertContains(response, "Course Introduction Video")
             self.assertContains(response, "Requirements")
+            self.assertContains(response, "Course Banner Image")
+            self.assertContains(response, "Course Video Thumbnail Image")
 
 
 @ddt.ddt
@@ -910,14 +929,14 @@ class CourseMetadataEditingTest(CourseTestCase):
 
         # Now enable student notes and verify that the "My Notes" tab has been added
         self.client.ajax_post(self.course_setting_url, {
-            ADVANCED_COMPONENT_POLICY_KEY: {"value": ["notes"]}
+            'advanced_modules': {"value": ["notes"]}
         })
         course = modulestore().get_course(self.course.id)
         self.assertIn(self.notes_tab, course.tabs)
 
         # Disable student notes and verify that the "My Notes" tab is gone
         self.client.ajax_post(self.course_setting_url, {
-            ADVANCED_COMPONENT_POLICY_KEY: {"value": [""]}
+            'advanced_modules': {"value": [""]}
         })
         course = modulestore().get_course(self.course.id)
         self.assertNotIn(self.notes_tab, course.tabs)
@@ -925,7 +944,7 @@ class CourseMetadataEditingTest(CourseTestCase):
     def test_advanced_components_munge_tabs_validation_failure(self):
         with patch('contentstore.views.course._refresh_course_tabs', side_effect=InvalidTabsException):
             resp = self.client.ajax_post(self.course_setting_url, {
-                ADVANCED_COMPONENT_POLICY_KEY: {"value": ["notes"]}
+                'advanced_modules': {"value": ["notes"]}
             })
             self.assertEqual(resp.status_code, 400)
 
@@ -942,14 +961,14 @@ class CourseMetadataEditingTest(CourseTestCase):
             self.assertNotIn("notes", course.advanced_modules)
 
     @ddt.data(
-        [{'type': 'courseware'}, {'type': 'course_info'}, {'type': 'wiki', 'is_hidden': True}],
-        [{'type': 'courseware', 'name': 'Courses'}, {'type': 'course_info', 'name': 'Info'}],
+        [{'type': 'course_info'}, {'type': 'courseware'}, {'type': 'wiki', 'is_hidden': True}],
+        [{'type': 'course_info', 'name': 'Home'}, {'type': 'courseware', 'name': 'Course'}],
     )
     def test_course_tab_configurations(self, tab_list):
         self.course.tabs = tab_list
         modulestore().update_item(self.course, self.user.id)
         self.client.ajax_post(self.course_setting_url, {
-            ADVANCED_COMPONENT_POLICY_KEY: {"value": ["notes"]}
+            'advanced_modules': {"value": ["notes"]}
         })
         course = modulestore().get_course(self.course.id)
         tab_list.append(self.notes_tab)

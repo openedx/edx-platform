@@ -9,7 +9,7 @@
   }
 
   small.author {
-    text-align: right;
+    @include text-align(right);
     display: block;
     color: rgb(100, 100, 100);
   }
@@ -26,8 +26,8 @@
     .photo {
       background: rgb(255,255,255);
       border: 1px solid rgb(210,210,210);
-      float: left;
-      margin-right: flex-gutter();
+      @include float(left);
+      @include margin-right(flex-gutter());
       padding: 1px;
       width: flex-grid(4);
 
@@ -39,11 +39,11 @@
     }
 
     header {
-      float: left;
+      @include float(left);
       width: flex-grid(7);
 
       blockquote {
-        margin-left: 0;
+        @include margin-left(0);
         margin-bottom: ($baseline*2);
 
         &:last-child {
@@ -51,7 +51,7 @@
         }
 
         p {
-          margin-left: 0;
+          @include margin-left(0);
           font-style: italic;
           line-height: 1.6;
           font-size: 1.1em;
@@ -70,7 +70,7 @@
 
   .jobs-wrapper {
     @include clearfix();
-    float: left;
+    @include float(left);
     padding-top: 80px;
     width: flex-grid(12);
 
@@ -83,7 +83,7 @@
     .jobs-sidebar {
       @include box-sizing(border-box);
       border: 1px solid rgb(220,220,220);
-      float: left;
+      @include float(left);
       padding: 20px;
       width: flex-grid(3);
 
@@ -94,8 +94,8 @@
           display: block;
           letter-spacing: 1px;
           margin: 0px -20px;
-          padding: 12px 0px 12px 20px;
-          text-align: left;
+          @include padding(12px, 0px, 12px, 20px);
+          @include text-align(left);
 
           &:hover, &:focus {
             background: rgb(245,245,245);
@@ -110,8 +110,8 @@
     }
 
     .jobs-listing {
-      float: left;
-      margin-right: flex-gutter();
+      @include float(left);
+      @include margin-right(flex-gutter());
       width: flex-grid(9);
 
       .job {
@@ -145,7 +145,7 @@
         }
 
         ul {
-          padding-left: 50px;
+          @include padding-left(50px);
         }
 
         li {

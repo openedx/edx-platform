@@ -1,5 +1,5 @@
 define([
-    'backbone', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/models/team',
+    'backbone', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'teams/js/models/team',
     'teams/js/views/team_profile_header_actions', 'teams/js/spec_helpers/team_spec_helpers'
 ], function (Backbone, _, AjaxHelpers, TeamModel, TeamProfileHeaderActionsView, TeamSpecHelpers) {
     'use strict';
@@ -250,7 +250,7 @@ define([
                 expect(editButton.length).toEqual(1);
                 $(editButton).click();
 
-                expect(Backbone.history.navigate.calls[0].args[0]).toContain('/edit-team');
+                expect(Backbone.history.navigate.calls.mostRecent().args[0]).toContain('/edit-team');
             });
         });
     });

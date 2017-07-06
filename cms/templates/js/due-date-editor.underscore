@@ -15,7 +15,7 @@
 <ul class="list-actions">
     <li class="action-item">
         <a href="#" data-tooltip="<%= gettext('Clear Grading Due Date') %>" class="clear-date action-button action-clear">
-            <i class="icon fa fa-undo"></i>
+            <span class="icon fa fa-undo" aria-hidden="true"></span>
             <span class="sr"><%= gettext('Clear Grading Due Date') %></span>
         </a>
     </li>

@@ -15,7 +15,6 @@ from django.utils.translation import override as override_language
 from nose.plugins.attrib import attr
 from ccx_keys.locator import CCXLocator
 from student.tests.factories import UserFactory
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from lms.djangoapps.ccx.tests.factories import CcxFactory
@@ -371,7 +370,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         # lambda to reload the module state from the database
         module = lambda: StudentModule.objects.get(student=self.user, course_id=self.course_key, module_state_key=msk)
         self.assertEqual(json.loads(module().state)['attempts'], 32)
-        reset_student_attempts(self.course_key, self.user, msk)
+        reset_student_attempts(self.course_key, self.user, msk, requesting_user=self.user)
         self.assertEqual(json.loads(module().state)['attempts'], 0)
 
     def test_delete_student_attempts(self):
@@ -389,7 +388,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
                 course_id=self.course_key,
                 module_state_key=msk
             ).count(), 1)
-        reset_student_attempts(self.course_key, self.user, msk, delete_module=True)
+        reset_student_attempts(self.course_key, self.user, msk, requesting_user=self.user, delete_module=True)
         self.assertEqual(
             StudentModule.objects.filter(
                 student=self.user,
@@ -425,7 +424,8 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         # Delete student state using the instructor dash
         reset_student_attempts(
             self.course_key, user, problem_location,
-            delete_module=True
+            requesting_user=user,
+            delete_module=True,
         )
 
         # Verify that the student's scores have been reset in the submissions API
@@ -451,7 +451,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         self.assertEqual(unrelated_state['attempts'], 12)
         self.assertEqual(unrelated_state['brains'], 'zombie')
 
-        reset_student_attempts(self.course_key, self.user, self.parent.location)
+        reset_student_attempts(self.course_key, self.user, self.parent.location, requesting_user=self.user)
 
         parent_state = json.loads(self.get_state(self.parent.location))
         self.assertEqual(json.loads(self.get_state(self.parent.location))['attempts'], 0)
@@ -478,7 +478,13 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         self.assertEqual(unrelated_state['attempts'], 12)
         self.assertEqual(unrelated_state['brains'], 'zombie')
 
-        reset_student_attempts(self.course_key, self.user, self.parent.location, delete_module=True)
+        reset_student_attempts(
+            self.course_key,
+            self.user,
+            self.parent.location,
+            requesting_user=self.user,
+            delete_module=True,
+        )
 
         self.assertRaises(StudentModule.DoesNotExist, self.get_state, self.parent.location)
         self.assertRaises(StudentModule.DoesNotExist, self.get_state, self.child.location)

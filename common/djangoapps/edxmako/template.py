@@ -15,11 +15,9 @@
 import edxmako
 
 from django.conf import settings
-from edxmako.middleware import get_template_request_context
+from edxmako.request_context import get_template_request_context
 from edxmako.shortcuts import marketing_link
 from mako.template import Template as MakoTemplate
-
-DJANGO_VARIABLES = ['output_encoding', 'encoding_errors']
 
 # TODO: We should make this a Django Template subclass that simply has the MakoTemplate inside of it? (Intead of inheriting from MakoTemplate)
 
@@ -34,9 +32,7 @@ class Template(MakoTemplate):
     def __init__(self, *args, **kwargs):
         """Overrides base __init__ to provide django variable overrides"""
         if not kwargs.get('no_django', False):
-            overrides = {k: getattr(edxmako, k, None) for k in DJANGO_VARIABLES}
-            overrides['lookup'] = edxmako.LOOKUP['main']
-            kwargs.update(overrides)
+            kwargs['lookup'] = edxmako.LOOKUP['main']
         super(Template, self).__init__(*args, **kwargs)
 
     def render(self, context_instance):

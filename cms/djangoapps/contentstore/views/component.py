@@ -16,45 +16,32 @@ from xmodule.modulestore.django import modulestore
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
-from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
 from contentstore.utils import get_lms_link_for_item
 from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from contentstore.views.item import create_xblock_info, add_container_page_publishing_info
+from contentstore.views.item import create_xblock_info, add_container_page_publishing_info, StudioEditModuleRuntime
 
 from opaque_keys.edx.keys import UsageKey
 
 from student.auth import has_course_author_access
 from django.utils.translation import ugettext as _
-from models.settings.course_grading import CourseGradingModel
+from xblock_django.models import XBlockDisableConfig
 
 __all__ = [
-    'ADVANCED_COMPONENT_POLICY_KEY',
     'container_handler',
     'component_handler'
 ]
 
 log = logging.getLogger(__name__)
 
-# NOTE: it is assumed that this list is disjoint from ADVANCED_COMPONENT_TYPES
+# NOTE: This list is disjoint from ADVANCED_COMPONENT_TYPES
 COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
 
-# Constants for determining if these components should be enabled for this course
-SPLIT_TEST_COMPONENT_TYPE = 'split_test'
-NOTE_COMPONENT_TYPES = ['notes']
-
-if settings.FEATURES.get('ALLOW_ALL_ADVANCED_COMPONENTS'):
-    ADVANCED_COMPONENT_TYPES = sorted(set(name for name, class_ in XBlock.load_classes()) - set(COMPONENT_TYPES))
-else:
-    ADVANCED_COMPONENT_TYPES = settings.ADVANCED_COMPONENT_TYPES
-
-ADVANCED_COMPONENT_CATEGORY = 'advanced'
-ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
+ADVANCED_COMPONENT_TYPES = sorted(set(name for name, class_ in XBlock.load_classes()) - set(COMPONENT_TYPES))
 
 ADVANCED_PROBLEM_TYPES = settings.ADVANCED_PROBLEM_TYPES
-
 
 CONTAINER_TEMPLATES = [
     "basic-modal", "modal-button", "edit-xblock-modal",
@@ -69,7 +56,8 @@ def _advanced_component_types():
     """
     Return advanced component types which can be created.
     """
-    return [c_type for c_type in ADVANCED_COMPONENT_TYPES if c_type not in settings.DEPRECATED_ADVANCED_COMPONENT_TYPES]
+    disabled_create_block_types = XBlockDisableConfig.disabled_create_block_types()
+    return [c_type for c_type in ADVANCED_COMPONENT_TYPES if c_type not in disabled_create_block_types]
 
 
 def _load_mixed_class(category):
@@ -106,7 +94,7 @@ def container_handler(request, usage_key_string):
             component_templates = get_component_templates(course)
             ancestor_xblocks = []
             parent = get_parent_xblock(xblock)
-            action = request.REQUEST.get('action', 'view')
+            action = request.GET.get('action', 'view')
 
             is_unit_page = is_unit(xblock)
             unit = xblock if is_unit_page else None
@@ -342,6 +330,7 @@ def component_handler(request, usage_key_string, handler, suffix=''):
     usage_key = UsageKey.from_string(usage_key_string)
 
     descriptor = modulestore().get_item(usage_key)
+    descriptor.xmodule_runtime = StudioEditModuleRuntime(request.user)
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
 

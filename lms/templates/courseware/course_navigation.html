@@ -1,4 +1,5 @@
 ## mako
+<%page args="active_page=None" expression_filter="h" />
 <%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
@@ -6,19 +7,15 @@ from courseware.tabs import get_course_tab_list
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from openedx.core.djangolib.markup import HTML, Text
 from student.models import CourseEnrollment
 %>
-<%page args="active_page=None" />
 
 <%
 if active_page is None and active_page_context is not UNDEFINED:
   # If active_page is not passed in as an argument, it may be in the context as active_page_context
   active_page = active_page_context
-
-def url_class(is_active):
-  if is_active:
-    return "active"
-  return ""
 
 def selected(is_selected):
   return "selected" if is_selected else ""
@@ -34,13 +31,13 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
 %>
 
 % if include_special_exams:
-  <%static:js group='proctoring'/>
-  % for template_name in ["proctored-exam-status"]:
-    <script type="text/template" id="${template_name}-tpl">
-        <%static:include path="courseware/${template_name}.underscore" />
-    </script>
-  % endfor
-<div class="proctored_exam_status"></div>
+    <%static:js group='proctoring'/>
+    % for template_name in ["proctored-exam-status"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="courseware/${template_name}.underscore" />
+        </script>
+    % endfor
+    <div class="proctored_exam_status"></div>
 % endif
 % if show_preview_menu:
     <nav class="wrapper-preview-menu" aria-label="${_('Course View')}">
@@ -70,115 +67,46 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
                 </li>
             </ol>
             % if specific_student_selected:
-            <div class="preview-specific-student-notice">
-                <p>
-                    ${_("You are now viewing the course as <i>{user_name}</i>.").format(user_name=masquerade_user_name)}
-                </p>
-            </div>
+                <div class="preview-specific-student-notice">
+                    <p>
+                        ${Text(_("You are now viewing the course as {i_start}{user_name}{i_end}.")).format(
+                            user_name=masquerade_user_name,
+                            i_start=HTML(u'<i>'),
+                            i_end=HTML(u'</i>'),
+                        )}
+                    </p>
+                </div>
             % endif
         </div>
     </nav>
 % endif
 
 % if disable_tabs is UNDEFINED or not disable_tabs:
-<nav class="${active_page} wrapper-course-material" aria-label="${_('Course Material')}">
-  <div class="course-material">
-    <ol class="course-tabs">
-      % for tab in get_course_tab_list(request, course):
-        <%
-            tab_is_active = (tab.tab_id == active_page) or (tab.tab_id == default_tab)
-        %>
-          <li>
-             <a href="${tab.link_func(course, reverse) | h}" class="${url_class(tab_is_active)}">
-                 ${_(tab.name) | h}
-                 % if tab_is_active:
-                   <span class="sr">, current location</span>
-                 %endif
-                 % if tab_image:
-                   ## Translators: 'needs attention' is an alternative string for the
-                   ## notification image that indicates the tab "needs attention".
-                   <img src="${tab_image}" alt="${_('needs attention')}" />
-                 %endif
-             </a>
-          </li>
-      % endfor
-      <%block name="extratabs" />
-    </ol>
-  </div>
-</nav>
+    <nav class="${active_page} wrapper-course-material" aria-label="${_('Course Material')}">
+        <div class="course-material">
+            <%
+            tab_list = get_course_tab_list(request, course)
+            tabs_tmpl = static.get_template_path('/courseware/tabs.html')
+            %>
+            <ol class="tabs course-tabs">
+                <%include file="${tabs_tmpl}" args="tab_list=tab_list,active_page=active_page,default_tab=default_tab,tab_image=tab_image" />
+                <%block name="extratabs" />
+            </ol>
+        </div>
+    </nav>
 %endif
 
 % if show_preview_menu:
-<script type="text/javascript">
-(function() {
-    var selectElement = $('.action-preview-select');
-    var userNameElement = $('#action-preview-username');
-    var userNameContainer = $('.action-preview-username-container')
-
-    % if disable_student_access:
-        selectElement.attr("disabled", true);
-        selectElement.attr("title", "${_("Course is not yet visible to students.")}");
-    % endif
-
-    % if specific_student_selected:
-        userNameContainer.css('display', 'inline-block');
-        userNameElement.val('${masquerade_user_name}');
-    % endif
-
-    selectElement.change(function() {
-        var selectedOption;
-        if (selectElement.attr("disabled")) {
-           return alert("${_("You cannot view the course as a student or beta tester before the course release date.")}");
-        }
-        selectedOption = selectElement.find('option:selected');
-        if (selectedOption.val() === 'specific student') {
-            userNameContainer.css('display', 'inline-block');
-        } else {
-            userNameContainer.hide();
-            masquerade(selectedOption);
-        }
-    });
-
-    userNameElement.keypress(function(event) {
-        if (event.keyCode === 13) {
-            // Avoid submitting the form on enter, since the submit action isn't implemented.  Instead, blur the
-            // element to trigger a change event in case the value was edited, which in turn will trigger an AJAX
-            // request to update the masquerading data.
-            userNameElement.blur();
-            return false;
-        }
-        return true;
-    });
-
-    userNameElement.change(function() {
-        masquerade(selectElement.find('option:selected'));
-    });
-
-    function masquerade(selectedOption) {
-        var data = {
-            role: selectedOption.val() === 'staff' ? 'staff' : 'student',
-            user_partition_id: ${cohorted_user_partition.id if cohorted_user_partition else 'null'},
-            group_id: selectedOption.data('group-id'),
-            user_name: selectedOption.val() === 'specific student' ? userNameElement.val() : null
-        };
-        $.ajax({
-            url: '/courses/${course.id}/masquerade',
-            type: 'POST',
-            dataType: 'json',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function(result) {
-                if (result.success) {
-                    location.reload();
-                } else {
-                    alert(result.error);
-                }
-            },
-            error: function() {
-                alert('Error: cannot connect to server');
-            }
-        });
+    <%
+    preview_options = {
+        "courseId": course.id,
+        "disableStudentAccess": disable_student_access if disable_student_access is not UNDEFINED else False,
+        "specificStudentSelected": specific_student_selected,
+        "cohortedUserPartitionId": cohorted_user_partition.id if cohorted_user_partition else None,
+        "masqueradeUsername" : masquerade_user_name if masquerade_user_name is not UNDEFINED else None,
     }
-}());
-</script>
+    %>
+    <%static:require_module_async module_name="lms/js/preview/preview_factory" class_name="PreviewFactory">
+        PreviewFactory(${preview_options | n, dump_js_escaped_json});
+    </%static:require_module_async>
 % endif

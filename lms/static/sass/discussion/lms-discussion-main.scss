@@ -1,0 +1,15 @@
+// ------------------------------
+// LMS discussion main styling
+//
+// NOTE: This is the left-to-right (LTR) configured style compile.
+// It should mirror lms-discussion-main-rtl w/ the exception of bi-app references.
+
+// Load the LTR version of the edX Pattern Library
+$pattern-library-path: '../../edx-pattern-library' !default;
+@import 'edx-pattern-library/pattern-library/sass/edx-pattern-library-ltr';
+
+// Configure LTR variables
+@import 'base/variables-ltr';
+
+// Load the shared build
+@import 'build';

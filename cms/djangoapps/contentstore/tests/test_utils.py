@@ -3,13 +3,12 @@ import collections
 from datetime import datetime, timedelta
 
 import mock
-import ddt
 from pytz import UTC
 from django.test import TestCase
 from django.test.utils import override_settings
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import UserPartition, Group
@@ -110,16 +109,17 @@ class ExtraPanelTabTestCase(TestCase):
         return course
 
 
-class XBlockVisibilityTestCase(ModuleStoreTestCase):
+class XBlockVisibilityTestCase(SharedModuleStoreTestCase):
     """Tests for xblock visibility for students."""
 
-    def setUp(self):
-        super(XBlockVisibilityTestCase, self).setUp()
+    @classmethod
+    def setUpClass(cls):
+        super(XBlockVisibilityTestCase, cls).setUpClass()
 
-        self.dummy_user = ModuleStoreEnum.UserID.test
-        self.past = datetime(1970, 1, 1, tzinfo=UTC)
-        self.future = datetime.now(UTC) + timedelta(days=1)
-        self.course = CourseFactory.create()
+        cls.dummy_user = ModuleStoreEnum.UserID.test
+        cls.past = datetime(1970, 1, 1, tzinfo=UTC)
+        cls.future = datetime.now(UTC) + timedelta(days=1)
+        cls.course = CourseFactory.create()
 
     def test_private_unreleased_xblock(self):
         """Verifies that a private unreleased xblock is not visible"""
@@ -484,18 +484,18 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         expected = [
             {
                 "id": 0,
-                "name": "Cohort user partition",
-                "scheme": "cohort",
+                "name": u"Cohort user partition",
+                "scheme": u"cohort",
                 "groups": [
                     {
                         "id": 0,
-                        "name": "Group A",
+                        "name": u"Group A",
                         "selected": False,
                         "deleted": False,
                     },
                     {
                         "id": 1,
-                        "name": "Group B",
+                        "name": u"Group B",
                         "selected": False,
                         "deleted": False,
                     },
@@ -503,12 +503,12 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
             },
             {
                 "id": 1,
-                "name": "Random user partition",
-                "scheme": "random",
+                "name": u"Random user partition",
+                "scheme": u"random",
                 "groups": [
                     {
                         "id": 0,
-                        "name": "Group C",
+                        "name": u"Group C",
                         "selected": False,
                         "deleted": False,
                     },

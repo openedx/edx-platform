@@ -1,9 +1,10 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%page args="section_data"/>
-
+<%page args="section_data" expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
 
 <div class="data-download-container action-type-container">
-  <h2>${_("Data Download")}</h2>
   <div class="request-response-error msg msg-error copy" id="data-request-response-error"></div>
 
 
@@ -18,10 +19,10 @@
   <p><input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" ></p>
 </div>
 
-%if settings.FEATURES.get('ENABLE_S3_GRADE_DOWNLOADS'):
+%if settings.FEATURES.get('ENABLE_GRADE_DOWNLOADS'):
   <div class="reports-download-container action-type-container">
     <hr>
-    <h2> ${_("Reports")}</h2>
+    <h3 class="hd hd-3">${_("Reports")}</h3>
 
     <p>${_("For large courses, generating some reports can take several hours. When report generation is complete, a link that includes the date and time of generation appears in the table below. These reports are generated in the background, meaning it is OK to navigate away from this page while your report is generating.")}</p>
 
@@ -75,17 +76,18 @@
 
   %if settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
     <p>${_("Click to generate a CSV grade report for all currently enrolled students.")}</p>
-
-    <p><input type="button" name="calculate-grades-csv" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/></p>
-
-    <p><input type="button" name="problem-grade-report" value="${_("Generate Problem Grade Report")}" data-endpoint="${ section_data['problem_grade_report_url'] }"/></p>
+    <p>
+      <input type="button" name="calculate-grades-csv" class="async-report-btn" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/>
+      <input type="button" name="problem-grade-report" class="async-report-btn" value="${_("Generate Problem Grade Report")}" data-endpoint="${ section_data['problem_grade_report_url'] }"/>
+      <input type="button" name="export-ora2-data" class="async-report-btn" value="${_("Generate ORA Data Report")}" data-endpoint="${ section_data['export_ora2_data_url'] }"/>
+    </p>
   %endif
 
     <div class="request-response msg msg-confirm copy" id="report-request-response"></div>
     <div class="request-response-error msg msg-error copy" id="report-request-response-error"></div>
     <br>
 
-    <p><b>${_("Reports Available for Download")}</b></p>
+    <h3 class="hd hd-3">${_("Reports Available for Download")}</h3>
     <p>
       ${_("The reports listed below are available for download. A link to every report remains available on this page, identified by the UTC date and time of generation. Reports are not deleted, so you will always be able to access previously generated reports from this page.")}
     </p>
@@ -97,7 +99,12 @@
   %endif
 
     ## Translators: a table of URL links to report files appears after this sentence.
-    <p>${_("<b>Note</b>: To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.")}</p><br>
+    <p>
+        ${Text(_("{strong_start}Note{strong_end}: To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.")).format(
+            strong_start=HTML("<strong>"),
+            strong_end=HTML("</strong>"),
+        )}
+    </p><br>
 
     <div class="report-downloads-table" id="report-downloads-table" data-endpoint="${ section_data['list_report_downloads_url'] }" ></div>
   </div>
@@ -106,7 +113,7 @@
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
-    <h2> ${_("Pending Tasks")} </h2>
+    <h3 class="hd hd-3">${_("Pending Tasks")}</h3>
     <div class="running-tasks-section">
       <p>${_("The status for any active tasks appears in a table below.")} </p>
       <br />

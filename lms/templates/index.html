@@ -1,102 +1,65 @@
+<%page expression_filter="h"/>
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
-from microsite_configuration import microsite
+
+from openedx.core.djangolib.markup import HTML, Text
 %>
 
-<%
-  homepage_overlay_html = microsite.get_value('homepage_overlay_html')
-
-  ## To display a welcome video, change False to True, and add a YouTube ID (11 chars, eg "123456789xX") in the following line
-  show_homepage_promo_video = microsite.get_value('show_homepage_promo_video', False)
-  homepage_promo_video_youtube_id = microsite.get_value('homepage_promo_video_youtube_id', "your-youtube-id")
-
-  show_partners = microsite.get_value('show_partners', True)
-
-%>
-
-<section class="home">
-  <header>
-    <div class="outer-wrapper">
-      <div class="title">
-        <hgroup>
-          % if homepage_overlay_html:
-            ${homepage_overlay_html}
-          % else:
-            % if self.stanford_theme_enabled():
-              <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
-              <h2>${_("For anyone, anywhere, anytime")}</h2>
-            % else:
-              ## Translators: 'Open edX' is a brand, please keep this untranslated. See http://openedx.org for more information.
-              <h1>${_("Welcome to Open edX!")}</h1>
-              ## Translators: 'Open edX' is a brand, please keep this untranslated. See http://openedx.org for more information.
-              <h2>${_("It works! This is the default homepage for this Open edX instance.")}</h2>
+<main id="main" aria-label="Content" tabindex="-1">
+    <section class="home">
+      <header>
+        <div class="outer-wrapper">
+          <div class="title">
+            <div class="heading-group">
+              % if homepage_overlay_html:
+                ${homepage_overlay_html | n, decode.utf8}
+              % else:
+                  ## Translators: 'Open edX' is a registered trademark, please keep this untranslated. See http://open.edx.org for more information.
+                  <h1>${Text(_(u"Welcome to the Open edX{registered_trademark} platform!")).format(registered_trademark=HTML("<sup style='font-size: 65%'>&reg;</sup>"))}</h1>
+                  ## Translators: 'Open edX' is a registered trademark, please keep this untranslated. See http://open.edx.org for more information.
+                  <p>${_("It works! This is the default homepage for this Open edX instance.")}</p>
+              % endif
+            </div>
+            % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+              <div class="course-search">
+                <form method="get" action="/courses">
+                  <label><span class="sr">${_("Search for a course")}</span>
+                    <input class="search-input" name="search_query" type="text" placeholder="${_("Search for a course")}"></input>
+                  </label>
+                  <button class="search-button" type="submit">
+                    <span class="icon fa fa-search" aria-hidden="true"></span><span class="sr">${_("Search")}</span>
+                  </button>
+                </form>
+              </div>
             % endif
+
+          </div>
+
+          % if show_homepage_promo_video:
+            <a href="#video-modal" class="media" rel="leanModal">
+              <div class="hero">
+                <div class="play-intro"></div>
+              </div>
+            </a>
           % endif
-        </hgroup>
-        % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-          <div class="course-search">
-            <form method="get" action="/courses">
-              <label><span class="sr">${_("Search for a course")}</span>
-                <input class="search-input" name="search_query" type="text" placeholder="${_("Search for a course")}"></input>
-              </label>
-              <button class="search-button" type="submit">
-                <i class="icon fa fa-search" aria-hidden="true"></i><span class="sr">${_("Search")}</span>
-              </button>
-            </form>
-          </div>
-        % endif
+        </div>
 
-      </div>
-
-      % if show_homepage_promo_video:
-        <a href="#video-modal" class="media" rel="leanModal">
-          <div class="hero">
-            <div class="play-intro"></div>
-          </div>
-        </a>
-      % endif
-    </div>
-
-  </header>
-  <section class="courses-container">
-    <section class="highlighted-courses">
-
-      % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-        <section class="courses">
-            <ul class="courses-listing">
-            ## limiting the course number by using HOMEPAGE_COURSE_MAX as the maximum number of courses
-            %for course in courses[:settings.HOMEPAGE_COURSE_MAX]:
-              <li class="courses-listing-item">
-                <%include file="course.html" args="course=course" />
-              </li>
-            %endfor
-            </ul>
-        </section>
-        ## in case there are courses that are not shown on the homepage, a 'View all Courses' link should appear
-        % if settings.HOMEPAGE_COURSE_MAX and len(courses) > settings.HOMEPAGE_COURSE_MAX:
-          <div class="courses-more">
-            <a class="courses-more-cta" href="${marketing_link('COURSES')}" > ${_("View all Courses")} </a>
-          </div>
-        % endif
-      % endif
+      </header>
+      <%include file="${courses_list}" />
 
     </section>
-  </section>
-</section>
+</main>
 
-<section id="video-modal" class="modal home-page-video-modal video-modal">
-  <div class="inner-wrapper">
-    <%
-      youtube_video_id = homepage_promo_video_youtube_id
-      if self.stanford_theme_enabled():
-        youtube_video_id = "2gmreZObCY4"
-    %>
-    <iframe title="YouTube Video" width="640" height="360" src="//www.youtube.com/embed/${youtube_video_id}?showinfo=0" frameborder="0" allowfullscreen></iframe>
-  </div>
-</section>
+% if show_homepage_promo_video:
+  <section id="video-modal" class="modal home-page-video-modal video-modal">
+    <div class="inner-wrapper">
+      <iframe title="YouTube Video" width="640" height="360" src="//www.youtube.com/embed/${homepage_promo_video_youtube_id}?showinfo=0" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </section>
+% endif
 
 <%block name="js_extra">
    <script type="text/javascript">

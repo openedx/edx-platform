@@ -12,9 +12,11 @@ import httpretty
 from provider import scope
 import social.apps.django_app.utils as social_utils
 
-from auth_exchange.forms import AccessTokenExchangeForm
-from auth_exchange.tests.utils import AccessTokenExchangeTestMixin
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
+
+from ..forms import AccessTokenExchangeForm
+from .utils import AccessTokenExchangeTestMixin
+from .mixins import DOPAdapterMixin, DOTAdapterMixin
 
 
 class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
@@ -31,7 +33,7 @@ class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
         self.request.backend = social_utils.load_backend(self.request.social_strategy, self.BACKEND, redirect_uri)
 
     def _assert_error(self, data, expected_error, expected_error_description):
-        form = AccessTokenExchangeForm(request=self.request, data=data)
+        form = AccessTokenExchangeForm(request=self.request, oauth2_adapter=self.oauth2_adapter, data=data)
         self.assertEqual(
             form.errors,
             {"error": expected_error, "error_description": expected_error_description}
@@ -39,7 +41,7 @@ class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
         self.assertNotIn("partial_pipeline", self.request.session)
 
     def _assert_success(self, data, expected_scopes):
-        form = AccessTokenExchangeForm(request=self.request, data=data)
+        form = AccessTokenExchangeForm(request=self.request, oauth2_adapter=self.oauth2_adapter, data=data)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data["user"], self.user)
         self.assertEqual(form.cleaned_data["client"], self.oauth_client)
@@ -49,13 +51,15 @@ class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
 # This is necessary because cms does not implement third party auth
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
 @httpretty.activate
-class AccessTokenExchangeFormTestFacebook(
+class DOPAccessTokenExchangeFormTestFacebook(
+        DOPAdapterMixin,
         AccessTokenExchangeFormTest,
         ThirdPartyOAuthTestMixinFacebook,
-        TestCase
+        TestCase,
 ):
     """
-    Tests for AccessTokenExchangeForm used with Facebook
+    Tests for AccessTokenExchangeForm used with Facebook, tested against
+    django-oauth2-provider (DOP).
     """
     pass
 
@@ -63,12 +67,46 @@ class AccessTokenExchangeFormTestFacebook(
 # This is necessary because cms does not implement third party auth
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
 @httpretty.activate
-class AccessTokenExchangeFormTestGoogle(
+class DOTAccessTokenExchangeFormTestFacebook(
+        DOTAdapterMixin,
         AccessTokenExchangeFormTest,
-        ThirdPartyOAuthTestMixinGoogle,
-        TestCase
+        ThirdPartyOAuthTestMixinFacebook,
+        TestCase,
 ):
     """
-    Tests for AccessTokenExchangeForm used with Google
+    Tests for AccessTokenExchangeForm used with Facebook, tested against
+    django-oauth-toolkit (DOT).
+    """
+    pass
+
+
+# This is necessary because cms does not implement third party auth
+@unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
+@httpretty.activate
+class DOPAccessTokenExchangeFormTestGoogle(
+        DOPAdapterMixin,
+        AccessTokenExchangeFormTest,
+        ThirdPartyOAuthTestMixinGoogle,
+        TestCase,
+):
+    """
+    Tests for AccessTokenExchangeForm used with Google, tested against
+    django-oauth2-provider (DOP).
+    """
+    pass
+
+
+# This is necessary because cms does not implement third party auth
+@unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
+@httpretty.activate
+class DOTAccessTokenExchangeFormTestGoogle(
+        DOTAdapterMixin,
+        AccessTokenExchangeFormTest,
+        ThirdPartyOAuthTestMixinGoogle,
+        TestCase,
+):
+    """
+    Tests for AccessTokenExchangeForm used with Google, tested against
+    django-oauth-toolkit (DOT).
     """
     pass

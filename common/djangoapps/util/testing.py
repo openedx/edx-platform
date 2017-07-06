@@ -29,8 +29,16 @@ class UrlResetMixin(object):
     that affect the contents of urls.py
     """
 
-    def _reset_urls(self, urlconf_modules):
+    URLCONF_MODULES = None
+
+    def reset_urls(self, urlconf_modules=None):
         """Reset `urls.py` for a set of Django apps."""
+
+        if urlconf_modules is None:
+            urlconf_modules = [settings.ROOT_URLCONF]
+            if self.URLCONF_MODULES is not None:
+                urlconf_modules.extend(self.URLCONF_MODULES)
+
         for urlconf in urlconf_modules:
             if urlconf in sys.modules:
                 reload(sys.modules[urlconf])
@@ -39,32 +47,28 @@ class UrlResetMixin(object):
         # Resolve a URL so that the new urlconf gets loaded
         resolve('/')
 
-    def setUp(self, *args, **kwargs):
+    def setUp(self):
         """Reset Django urls before tests and after tests
 
         If you need to reset `urls.py` from a particular Django app (or apps),
-        specify these modules in *args.
+        specify these modules by setting the URLCONF_MODULES class attribute.
 
         Examples:
 
             # Reload only the root urls.py
-            super(MyTestCase, self).setUp()
+            URLCONF_MODULES = None
 
             # Reload urls from my_app
-            super(MyTestCase, self).setUp("my_app.urls")
+            URLCONF_MODULES = ['myapp.url']
 
             # Reload urls from my_app and another_app
-            super(MyTestCase, self).setUp("my_app.urls", "another_app.urls")
+            URLCONF_MODULES = ['myapp.url', 'another_app.urls']
 
         """
-        super(UrlResetMixin, self).setUp(**kwargs)
+        super(UrlResetMixin, self).setUp()
 
-        urlconf_modules = [settings.ROOT_URLCONF]
-        if args:
-            urlconf_modules.extend(args)
-
-        self._reset_urls(urlconf_modules)
-        self.addCleanup(lambda: self._reset_urls(urlconf_modules))
+        self.reset_urls()
+        self.addCleanup(self.reset_urls)
 
 
 class EventTestMixin(object):
@@ -159,3 +163,11 @@ def patch_testcase():
     # pylint: disable=protected-access
     TestCase._enter_atomics = enter_atomics_wrapper(TestCase._enter_atomics)
     TestCase._rollback_atomics = rollback_atomics_wrapper(TestCase._rollback_atomics)
+
+
+def patch_sessions():
+    """
+    Override the Test Client's session and login to support safe cookies.
+    """
+    from openedx.core.djangoapps.safe_sessions.testing import safe_cookie_test_session_patch
+    safe_cookie_test_session_patch()

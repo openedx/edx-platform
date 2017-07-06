@@ -43,11 +43,11 @@
 %endif
       <p>${_("Your username, email, and full name will be sent to {destination}, where the collection and use of this information will be governed by their terms of service and privacy policy.").format(destination=return_to)}</p>
       <label>${_("E-mail")}</label>
-      <input type="text" name="email" placeholder="${_('E-mail')}" tabindex="1" autofocus="autofocus" />
+      <input type="text" name="email" placeholder="${_('E-mail')}" autofocus="autofocus" />
       <label>${_("Password")}</label>
-      <input type="password" name="password" placeholder="${_('Password')}" tabindex="2" />
+      <input type="password" name="password" placeholder="${_('Password')}" />
       <div class="submit">
-        <input name="submit" type="submit" value="${_('Return To %s') % return_to}" tabindex="3" />
+        <input name="submit" type="submit" value="${_('Return To %s') % return_to}" />
       </div>
     </form>
   </div>

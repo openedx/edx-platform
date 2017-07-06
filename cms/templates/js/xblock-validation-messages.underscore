@@ -4,7 +4,7 @@ var aggregateMessageType = summaryMessage.type;
 var aggregateValidationClass = aggregateMessageType === "error"? "has-errors" : "has-warnings";
 %>
     <div class="xblock-message validation <%= aggregateValidationClass %> <%= additionalClasses %>">
-        <p class="<%= aggregateMessageType %>"><i class="icon fa <%= getIcon(aggregateMessageType) %>"></i>
+        <p class="<%- aggregateMessageType %>"><span class="icon fa <%- getIcon(aggregateMessageType) %>" aria-hidden="true"></span>
         <%- summaryMessage.text %>
         <% if (summaryMessage.action_class) { %>
             <a href="#" class="button action-button <%- summaryMessage.action_class %>">

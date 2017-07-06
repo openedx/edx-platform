@@ -11,12 +11,34 @@
     @include text-align(right);
 
     .actions-item {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       display: block;
       margin: ($baseline/4) 0;
 
       &.is-hidden {
         display: none;
+      }
+
+      &.is-disabled {
+        a {
+          pointer-events: none;
+
+          .action-icon {
+            display: none;
+          }
+
+          .action-label {
+            padding-right: 0px;
+          }
+
+          &:hover {
+            border-color: transparent;
+
+            .action-label {
+              color: $forum-color-active-text;
+            }
+          }
+        }
       }
     }
 
@@ -44,7 +66,7 @@
     }
 
     .actions-dropdown-list {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       box-shadow: 0 1px 1px $shadow-l1;
       position: relative;
       width: 100%;
@@ -52,7 +74,7 @@
       margin: ($baseline/4) 0 0 0;
       border: 1px solid $gray-l3;
       padding: ($baseline/2) ($baseline*0.75);
-      background: $white;
+      background: $forum-color-background;
 
       // ui triangle/nub
       &:after,
@@ -76,7 +98,7 @@
 
       &:before {
         border-color: $transparent;
-        border-bottom-color: $gray-l3;
+        border-bottom-color: $forum-color-border;
         border-width: 7px;
       }
     }
@@ -96,7 +118,7 @@
   // UI: general action
   .action-button {
     @include transition(border .5s linear 0s);
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     display: inline-block;
     border: 1px solid transparent;
     border-radius: ($baseline/4);
@@ -196,7 +218,7 @@
 
       &:hover, &:focus {
         border-color: $blue-d2;
-        background-color: $white;
+        background-color: $forum-color-background;
 
         .action-label {
           color: $blue-d2;
@@ -217,7 +239,7 @@
 
       &:hover, &:focus {
         border-color: $green-d1;
-        background-color: $white;
+        background-color: $forum-color-background;
 
         .action-label {
           color: $green-d2;
@@ -231,7 +253,7 @@
 
       &:hover, &:focus {
         border-color: $gray;
-        background-color: $white;
+        background-color: $forum-color-background;
 
         .action-icon {
           border: 1px solid $gray;

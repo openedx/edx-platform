@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
 from third_party_auth import pipeline
@@ -14,9 +15,9 @@ from third_party_auth import pipeline
             <div class="auth-provider">
                 <div class="status">
                     % if state.has_account:
-                        <i class="icon fa fa-link"></i> <span class="copy">${_('Linked')}</span>
+                        <span class="icon fa fa-link" aria-hidden="true"></span> <span class="copy">${_('Linked')}</span>
                     % else:
-                        <i class="icon fa fa-unlink"></i><span class="copy">${_('Not Linked')}</span>
+                        <span class="icon fa fa-unlink" aria-hidden="true"></span><span class="copy">${_('Not Linked')}</span>
                     % endif
                 </div>
                 <span class="provider">${state.provider.name}</span>

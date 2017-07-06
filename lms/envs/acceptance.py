@@ -72,6 +72,14 @@ DATABASES = {
             'timeout': 30,
         },
         'ATOMIC_REQUESTS': True,
+    },
+    'student_module_history': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': TEST_ROOT / "db" / "test_student_module_history.db",
+        'TEST_NAME': TEST_ROOT / "db" / "test_student_module_history.db",
+        'OPTIONS': {
+            'timeout': 30,
+        },
     }
 }
 
@@ -119,10 +127,7 @@ THIRD_PARTY_AUTH = {
 # Enable fake payment processing page
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
 
-# Enable email on the instructor dash
-FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
-FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False
-
+# Enable special exams
 FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 
 # Don't actually send any requests to Software Secure for student identity
@@ -145,7 +150,9 @@ LETTUCE_APPS = ('courseware', 'instructor')
 # This causes some pretty cryptic errors as lettuce tries
 # to parse files in `instructor_task` as features.
 # As a quick workaround, explicitly exclude the `instructor_task` app.
-LETTUCE_AVOID_APPS = ('instructor_task',)
+# The coursewarehistoryextended app also falls prey to this fuzzy
+# for the courseware app.
+LETTUCE_AVOID_APPS = ('instructor_task', 'coursewarehistoryextended')
 
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
 

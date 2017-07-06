@@ -1,11 +1,9 @@
 define([
     'jquery', 'underscore', 'common/js/spec_helpers/template_helpers', 'js/spec/edxnotes/helpers',
     'js/edxnotes/collections/notes', 'js/edxnotes/collections/tabs',
-    'js/edxnotes/views/tabs/course_structure', 'js/spec/edxnotes/custom_matchers',
-    'jasmine-jquery'
+    'js/edxnotes/views/tabs/course_structure'
 ], function(
-    $, _, TemplateHelpers, Helpers, NotesCollection, TabsCollection, CourseStructureView,
-    customMatchers
+    $, _, TemplateHelpers, Helpers, NotesCollection, TabsCollection, CourseStructureView
 ) {
     'use strict';
     describe('EdxNotes CourseStructureView', function() {
@@ -34,13 +32,12 @@ define([
         };
 
         beforeEach(function () {
-            customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
             ]);
 
-            this.collection = new NotesCollection(notes);
+            this.collection = new NotesCollection(notes, {perPage: 10, parse: true});
             this.tabsCollection = new TabsCollection();
         });
 

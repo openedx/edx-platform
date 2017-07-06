@@ -1,5 +1,5 @@
-<%! 
-from django.utils.translation import ugettext as _ 
+<%!
+from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
 
@@ -22,7 +22,7 @@ from django.core.urlresolvers import reverse
   ## Disable help unless the FAQ marketing link is enabled
   % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
     <h3>${_("Need Help?")}</h3>
-    <p>${_("Looking for help in logging in or with your {platform_name} account?").format(platform_name=platform_name)}
+    <p>${_("Looking for help signing in or with your {platform_name} account?").format(platform_name=platform_name)}
     <a href="${marketing_link('FAQ')}">
         ${_("View our help section for answers to commonly asked questions.")}
     </a></p>

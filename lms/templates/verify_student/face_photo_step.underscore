@@ -16,7 +16,7 @@
   <div class="facephoto view">
     <h3 class="title"><%- gettext( "Take Your Photo" ) %></h2>
     <div class="instruction">
-      <p><%=  _.sprintf( gettext( "When your face is in position, use the camera button %(icon)s below to take your photo." ), { icon: '<span class="example">(<i class="icon fa fa-camera" aria-hidden="true"></i><span class="sr">icon</span>)</span>' } ) %></p>
+      <p><%=  HtmlUtils.interpolateHtml( gettext( "When your face is in position, use the camera button {icon} below to take your photo." ), { icon: HtmlUtils.HTML('<span class="example">(<span class="icon fa fa-camera" aria-hidden="true"></span><span class="sr">icon</span>)</span>') } ) %></p>
     </div>
 
     <div class="wrapper-task">
@@ -31,7 +31,7 @@
               <li class="help-item"><%- gettext( "The photo of your face matches the photo on your ID." ) %></li>
             </ul>
 
-            <p class="copy-extra"><%=  _.sprintf( gettext( "To use the current photo, select the camera button %(icon)s. To take another photo, select the retake button %(icon)s." ), { icon: '<span class="example">(<i class="icon fa fa-camera" aria-hidden="true"></i><span class="sr">icon</span>)</span>' } ) %></p>
+            <p class="copy-extra"><%=  HtmlUtils.interpolateHtml( gettext( "To use the current photo, select the camera button {icon}. To take another photo, select the retake button {icon}." ), { icon: HtmlUtils.HTML('<span class="example">(<span class="icon fa fa-camera" aria-hidden="true"></span><span class="sr">icon</span>)</span>') } ) %></p>
           </div>
         </div>
 

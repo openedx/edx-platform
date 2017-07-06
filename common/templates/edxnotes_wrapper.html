@@ -1,17 +1,23 @@
+<%namespace name='static' file='/static_content.html'/>
+<%page expression_filter="h"/>
+
 <%!
 import json
 from django.utils.translation import ugettext as _
 from student.models import anonymous_id_for_user
+from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
 %>
-<%namespace name='static' file='/static_content.html'/>
+
 <%
     if user:
         params.update({'user': anonymous_id_for_user(user, None)})
 %>
+
 <div id="edx-notes-wrapper-${uid}" class="edx-notes-wrapper">
-    <div class="edx-notes-wrapper-content">${content}</div>
+    <div class="edx-notes-wrapper-content">${content | n, decode.utf8 }</div>
 </div>
-<%static:require_module module_name="js/edxnotes/views/notes_visibility_factory" class_name="NotesVisibilityFactory">
-    var element = document.getElementById('edx-notes-wrapper-${uid}');
-    NotesVisibilityFactory.VisibilityDecorator.factory(element, ${json.dumps(params)}, ${edxnotes_visibility});
-</%static:require_module>
+
+<%static:require_module_async module_name="js/edxnotes/views/notes_visibility_factory" class_name="NotesVisibilityFactory">
+    var element = document.getElementById('edx-notes-wrapper-${uid | n, js_escaped_string}');
+    NotesVisibilityFactory.VisibilityDecorator.factory(element, ${params | n, dump_js_escaped_json}, ${edxnotes_visibility | n, decode.utf8});
+</%static:require_module_async>

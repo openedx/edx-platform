@@ -3,6 +3,7 @@ Courseware page.
 """
 
 from .course_page import CoursePage
+from bok_choy.promise import EmptyPromise
 from selenium.webdriver.common.action_chains import ActionChains
 
 
@@ -18,6 +19,13 @@ class CoursewarePage(CoursePage):
 
     def is_browser_on_page(self):
         return self.q(css='body.courseware').present
+
+    @property
+    def chapter_count_in_navigation(self):
+        """
+        Returns count of chapters available on LHS navigation.
+        """
+        return len(self.q(css='nav.course-navigation a.chapter'))
 
     @property
     def num_sections(self):
@@ -77,16 +85,18 @@ class CoursewarePage(CoursePage):
         else:
             return self.q(css=self.xblock_component_selector).attrs('innerHTML')[index].strip()
 
-    def tooltips_displayed(self):
+    def verify_tooltips_displayed(self):
         """
-        Verify if sequence navigation bar tooltips are being displayed upon mouse hover.
+        Verify that all sequence navigation bar tooltips are being displayed upon mouse hover.
+
+        If a tooltip does not appear, raise a BrokenPromise.
         """
         for index, tab in enumerate(self.q(css='#sequence-list > li')):
             ActionChains(self.browser).move_to_element(tab).perform()
-            if not self.q(css='#tab_{index} > p'.format(index=index)).visible:
-                return False
-
-        return True
+            self.wait_for_element_visibility(
+                '#tab_{index} > .sequence-tooltip'.format(index=index),
+                'Tab {index} should appear'.format(index=index)
+            )
 
     @property
     def course_license(self):
@@ -98,11 +108,66 @@ class CoursewarePage(CoursePage):
             return element.text[0]
         return None
 
-    def get_active_subsection_url(self):
+    def go_to_sequential_position(self, sequential_position):
         """
-        return the url of the active subsection in the left nav
+        Within a section/subsection navigate to the sequential position specified by `sequential_position`.
+
+        Arguments:
+            sequential_position (int): position in sequential bar
         """
-        return self.q(css='.chapter-content-container .menu-item.active a').attrs('href')[0]
+        sequential_position_css = '#sequence-list #tab_{0}'.format(sequential_position - 1)
+        self.q(css=sequential_position_css).first.click()
+
+    @property
+    def sequential_position(self):
+        """
+        Returns the position of the active tab in the sequence.
+        """
+        tab_id = self._active_sequence_tab.attrs('id')[0]
+        return int(tab_id.split('_')[1])
+
+    @property
+    def _active_sequence_tab(self):  # pylint: disable=missing-docstring
+        return self.q(css='#sequence-list .nav-item.active')
+
+    @property
+    def is_next_button_enabled(self):  # pylint: disable=missing-docstring
+        return not self.q(css='.sequence-nav > .sequence-nav-button.button-next.disabled').is_present()
+
+    @property
+    def is_previous_button_enabled(self):  # pylint: disable=missing-docstring
+        return not self.q(css='.sequence-nav > .sequence-nav-button.button-previous.disabled').is_present()
+
+    def click_next_button_on_top(self):  # pylint: disable=missing-docstring
+        self._click_navigation_button('sequence-nav', 'button-next')
+
+    def click_next_button_on_bottom(self):  # pylint: disable=missing-docstring
+        self._click_navigation_button('sequence-bottom', 'button-next')
+
+    def click_previous_button_on_top(self):  # pylint: disable=missing-docstring
+        self._click_navigation_button('sequence-nav', 'button-previous')
+
+    def click_previous_button_on_bottom(self):  # pylint: disable=missing-docstring
+        self._click_navigation_button('sequence-bottom', 'button-previous')
+
+    def _click_navigation_button(self, top_or_bottom_class, next_or_previous_class):
+        """
+        Clicks the navigation button, given the respective CSS classes.
+        """
+        previous_tab_id = self._active_sequence_tab.attrs('data-id')[0]
+
+        def is_at_new_tab_id():
+            """
+            Returns whether the active tab has changed. It is defensive
+            against the case where the page is still being loaded.
+            """
+            active_tab = self._active_sequence_tab
+            return active_tab and previous_tab_id != active_tab.attrs('data-id')[0]
+
+        self.q(
+            css='.{} > .sequence-nav-button.{}'.format(top_or_bottom_class, next_or_previous_class)
+        ).first.click()
+        EmptyPromise(is_at_new_tab_id, "Button navigation fulfilled").fulfill()
 
     @property
     def can_start_proctored_exam(self):
@@ -135,7 +200,14 @@ class CoursewarePage(CoursePage):
         self.q(css='button.start-timed-exam[data-start-immediately="false"]').first.click()
 
         # Wait for the unique exam code to appear.
-        # elf.wait_for_element_presence(".proctored-exam-code", "unique exam code")
+        # self.wait_for_element_presence(".proctored-exam-code", "unique exam code")
+
+    def has_submitted_exam_message(self):
+        """
+        Returns whether the "you have submitted your exam" message is present.
+        This being true implies "the exam contents and results are hidden".
+        """
+        return self.q(css="div.proctored-exam.completed").visible
 
     @property
     def entrance_exam_message_selector(self):
@@ -158,18 +230,43 @@ class CoursewarePage(CoursePage):
             and "You have passed the entrance exam" in self.entrance_exam_message_selector.text[0]
 
     @property
-    def chapter_count_in_navigation(self):
-        """
-        Returns count of chapters available on LHS navigation.
-        """
-        return len(self.q(css='nav.course-navigation a.chapter'))
-
-    @property
     def is_timer_bar_present(self):
         """
         Returns True if the timed/proctored exam timer bar is visible on the courseware.
         """
         return self.q(css=".proctored_exam_status .exam-timer").is_present()
+
+    def active_usage_id(self):
+        """ Returns the usage id of active sequence item """
+        get_active = lambda el: 'active' in el.get_attribute('class')
+        attribute_value = lambda el: el.get_attribute('data-id')
+        return self.q(css='#sequence-list .nav-item').filter(get_active).map(attribute_value).results[0]
+
+    @property
+    def breadcrumb(self):
+        """ Return the course tree breadcrumb shown above the sequential bar """
+        return [part.strip() for part in self.q(css='.path').text[0].split('>')]
+
+    def bookmark_button_visible(self):
+        """ Check if bookmark button is visible """
+        EmptyPromise(lambda: self.q(css='.bookmark-button').visible, "Bookmark button visible").fulfill()
+        return True
+
+    @property
+    def bookmark_button_state(self):
+        """ Return `bookmarked` if button is in bookmarked state else '' """
+        return 'bookmarked' if self.q(css='.bookmark-button.bookmarked').present else ''
+
+    @property
+    def bookmark_icon_visible(self):
+        """ Check if bookmark icon is visible on active sequence nav item """
+        return self.q(css='.active .bookmark-icon').visible
+
+    def click_bookmark_unit_button(self):
+        """ Bookmark a unit by clicking on Bookmark button """
+        previous_state = self.bookmark_button_state
+        self.q(css='.bookmark-button').first.click()
+        EmptyPromise(lambda: self.bookmark_button_state != previous_state, "Bookmark button toggled").fulfill()
 
 
 class CoursewareSequentialTabPage(CoursePage):

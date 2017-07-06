@@ -19,16 +19,72 @@
     @include float(right);
     @include margin-left(flex-gutter());
     width: flex-grid(3);
-    margin-top: ($baseline*2);
-    border-top: 3px solid $blue;
-    padding: $baseline 0;
+
+    .course-advertise {
+      @include clearfix();
+      box-sizing: border-box;
+      padding: $baseline;
+      background-color: $body-bg;
+      border: 1px solid $border-color-l3;
+      .advertise-message {
+        @include font-size(12);
+        color: $gray-d4;
+        margin-bottom: $baseline;
+      }
+      .ad-link {
+        @include text-align(center);
+        .btn-neutral {
+          padding-bottom: 12px;
+          padding-top: 12px;
+        }
+        a {
+          @include font-size(16);
+          @include line-height(17);
+          padding: $baseline * 0.5;
+          border: 1px solid $blue;
+          color: $blue;
+          text-decoration: none;
+          display: block;
+          &:hover,
+          &:focus,
+          &:active {
+            color: $white;
+            background-color: $blue;
+          }
+          span {
+            @include margin-left($baseline*0.25);
+          }
+          .icon {
+            @include margin-right($baseline*0.25);
+          }
+        }
+      }
+    }
+  }
+
+  .wrapper-xseries-certificates{
+    @include float(right);
+    @include margin-left(flex-gutter());
+    width: flex-grid(3);
+
+    .title{
+      @extend %t-title7;
+      @extend %t-weight4;
+    }
+
+    ul{
+      @include padding-left(0);
+      margin-top: ($baseline/2);
+    }
+
+    li{
+      @include line-height(20);
+      list-style-type: none;
+    }
 
     .copy {
       @extend %t-copy-sub1;
-    }
-
-    .btn-find-courses {
-      @extend %btn-pl-elevated-alt;
+      margin-top: ($baseline/2);
     }
   }
 
@@ -38,8 +94,6 @@
     @include margin-left(flex-gutter());
     width: flex-grid(3);
     margin-top: ($baseline*2);
-    border-top: 3px solid $blue;
-    padding: $baseline 0;
 
     .user-info {
       @include clearfix();
@@ -57,12 +111,6 @@
           list-style: none;
           margin-bottom: ($baseline*0.75);
           padding-bottom: 17px;
-
-          &:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-          }
 
           &:hover, &:focus {
             .title .icon {
@@ -171,6 +219,12 @@
       // status
       .status {
 
+        @include clearfix();
+        box-sizing: border-box;
+        padding: $baseline;
+        background-color: $body-bg;
+        border: 1px solid $border-color-l3;
+
         .list--nav {
           margin: ($baseline/2) 0 0 0;
           padding: 0;
@@ -186,12 +240,48 @@
   }
 }
 
+// CASE: empty dashboard
+    .empty-dashboard-message {
+      border: 3px solid $gray-l4;
+      background: $gray-l6;
+      padding: ($baseline*2) 0;
+      text-align: center;
+
+      p {
+        @include font-size(24);
+        color: $lighter-base-font-color;
+        margin-bottom: $baseline;
+        text-shadow: 0 1px rgba(255,255,255, 0.6);
+      }
+
+      a {
+        background-color: $blue;
+        border: 1px solid $blue;
+        box-shadow: 0 1px 8px 0 $shadow-l1;
+        @include box-sizing(border-box);
+        color: $white;
+        font-family: $sans-serif;
+        display: inline-block;
+        letter-spacing: 1px;
+        margin-top: ($baseline/4);
+        margin-left: ($baseline/4);
+        padding: 15px 20px;
+
+        &:hover, &:focus {
+          background: $blue-l2;
+          text-decoration: none;
+        }
+      }
+    }
+
 // +Dashboard - Course Listing
 // ====================
 .dashboard {
+
   .my-courses {
     @include float(left);
     margin: 0;
+    margin-bottom: $baseline * 2;
     width: flex-grid(9);
 
 
@@ -204,43 +294,6 @@
         @include padding-right($baseline/2);
       }
     }
-
-    // CASE: empty dashboard
-    .empty-dashboard-message {
-      padding: ($baseline*2) 0;
-      text-align: center;
-
-      p {
-        color: $lighter-base-font-color;
-        font-style: italic;
-        margin-bottom: $baseline;
-        text-shadow: 0 1px rgba(255,255,255, 0.6);
-      }
-
-      a {
-        background: rgb(240,240,240);
-        @include background-image($button-bg-image);
-        background-color: $button-bg-color;
-        border: 1px solid $border-color-2;
-        border-radius: 4px;
-        box-shadow: 0 1px 8px 0 $shadow-l1;
-        @include box-sizing(border-box);
-        color: $base-font-color;
-        font-family: $sans-serif;
-        display: inline-block;
-        letter-spacing: 1px;
-        margin-left: ($baseline/4);
-        padding: 5px 10px;
-        text-shadow: 0 1px rgba(255,255,255, 0.6);
-
-        &:hover, &:focus {
-          color: $link-color;
-          text-decoration: none;
-        }
-      }
-    }
-
-    // ====================
 
     // UI: course list
     .listing-courses {
@@ -289,6 +342,10 @@
 // +Dashboard - Course
 // ====================
 .dashboard .my-courses {
+
+  &:focus {
+    outline: none;
+  }
 
   // UI: individual course item
   .course {
@@ -428,7 +485,7 @@
           }
 
           // TYPE: facebook share
-          &.action-facebook, {
+          &.action-facebook {
             color: $facebook-blue;
           }
 
@@ -444,13 +501,23 @@
           position: relative;
           @include float(right);
 
+          .action-more {
+            @include font-size(14);
+            box-shadow: none;
+            background: $white;
+            background-image: none;
+            color: $gray;
+            line-height: 16px;
+            text-shadow: none;
+          }
+
           .actions-dropdown {
             @extend %ui-no-list;
             @extend %ui-depth1;
             display: none;
             position: absolute;
             top: ($baseline*2);
-            right: 19px;
+            @include right(19px);
             pointer-events: none;
             min-width: ($baseline*7);
 
@@ -476,7 +543,7 @@
               &:after,
               &:before {
                 bottom: 100%;
-                right: 6px;
+                @include right(6px);
                 border: solid transparent;
                 content: " ";
                 height: 0;
@@ -525,7 +592,7 @@
         border: 1px solid $border-color-2;
         box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
         margin-top: 17px;
-        margin-right: flex-gutter();
+        @include margin-right(flex-gutter());
         padding: ($baseline/4);
         width: flex-grid(8);
         @include float(left);
@@ -688,7 +755,7 @@
               @include font-size(18);
               display: inline-block;
               vertical-align: middle;
-              margin-right: ($baseline/4);
+              @include margin-right($baseline/4);
             }
 
             .message-copy {
@@ -718,8 +785,8 @@
             @extend %btn-primary-green;
             @include clearfix();
             position: relative;
-            left: ($baseline/2);
-            padding: ($baseline * 0.4) 0 ($baseline * 0.4) ($baseline * 0.75);
+            @include left($baseline/2);
+            @include padding(($baseline * 0.4), 0, ($baseline * 0.4), ($baseline * 0.75));
 
             .action-upgrade-icon{
               @include float(left);
@@ -737,7 +804,7 @@
             .deco-graphic {
               position: absolute;
               top: -($baseline/4);
-              left: -($baseline*0.75);
+              @include left(-($baseline*0.75));
               width: ($baseline*2);
             }
 
@@ -753,7 +820,7 @@
             .copy {
               @extend %t-action3;
               @extend %t-weight4;
-              margin-right: $baseline;
+              @include margin-right($baseline);
             }
 
             .copy-sub {
@@ -785,7 +852,7 @@
             .credit-btn {
               @extend %btn-pl-yellow-base;
               @include float(right);
-              margin-right: 5px;
+              @include margin-right(5px);
               background-image: none ;
               text-shadow: none;
               box-shadow: none;
@@ -812,7 +879,7 @@
               @extend %btn-pl-black-border;
               @include float(right);
               position: relative;
-              left: 10px;
+              @include left(10px);
               padding: ($baseline*0.4) ($baseline*0.6);
               background-image: none ;
               text-shadow: none;
@@ -851,7 +918,7 @@
               @extend %btn-pl-black-base;
               @include float(right);
               position: relative;
-              left: 10px;
+              @include left(10px);
               padding: ($baseline*0.4) ($baseline*0.6);
               background-image: none ;
               text-shadow: none;
@@ -891,9 +958,9 @@
 
             .action {
               @include float(left);
-              margin: 0 15px 0 0;
+              @include margin(0, 15px, 0, 0);
 
-              .btn, .cta {
+              .btn {
                 display: inline-block;
               }
 
@@ -916,7 +983,7 @@
                 }
               }
 
-              .cta {
+              .btn {
                 @include float(left);
                 font: normal 0.8rem/1.2rem $sans-serif;
                 letter-spacing: 1px;
@@ -975,7 +1042,7 @@
 
           &.course-status-certrendering {
 
-            .cta {
+            .btn {
               margin-top: 2px;
             }
           }
@@ -1055,7 +1122,7 @@
             @include float(left);
             position: relative;
 
-            .cta {
+            .btn {
               @extend %btn-pl-green-base;
               @include float(right);
             }
@@ -1210,10 +1277,6 @@
   .status-note {
     @extend %t-copy-sub2;
     position: relative;
-    margin-top: $baseline;
-    border-top: 1px solid $black-t0;
-    padding-top: ($baseline/2);
-
     p {
       @extend %t-copy-sub2;
     }
@@ -1221,22 +1284,18 @@
     .deco-arrow {
       @include triangle(($baseline/2), $m-gray-d3, up);
       position: absolute;
-      left: 45%;
+      @include left(45%);
       top: -6px;
     }
   }
 
   // CASE: is denied
   &.is-denied {
+    border-top: 3px solid $red !important;
 
     .status-data-message {
       color: $error-color;
       border-bottom-color: rgba($error-color, 0.25);
-    }
-
-    .status-note {
-      color: desaturate($error-color, 65%);
-      border-top-color: rgba($error-color, 0.25);
     }
 
     .action-reverify {
@@ -1246,6 +1305,10 @@
       @include font-size(14);
     }
 
+    .btn-reverify {
+      margin-top: ($baseline/2);
+    }
+
     .deco-arrow {
       @include triangle(($baseline/2), $error-color, up);
     }
@@ -1253,15 +1316,11 @@
 
   // CASE: is accepted
   &.is-accepted {
+    border-top: 3px solid $green !important;
 
     .status-data-message {
       color: $verified-color-lvl1;
       border-bottom-color: $verified-color-lvl4;
-    }
-
-    .status-note {
-      color: $m-gray-l1;
-      border-top-color: $verified-color-lvl4;
     }
 
     .deco-arrow {
@@ -1276,11 +1335,6 @@
       color: $m-gray-d3;
       border-bottom-color: $m-gray-l4;
     }
-
-    .status-note {
-      color: $m-gray-l1;
-      border-top-color: $m-gray-d3;
-    }
   }
 }
 
@@ -1294,7 +1348,7 @@
   }
 
   .list--nav {
-    margin-left: 26px;
+    @include margin-left(26px);
   }
 
   // STATE: is denied
@@ -1308,7 +1362,7 @@
 
 // message
 .msg {
-  margin: ($baseline/2) 0 ($baseline/2) 26px;
+  @include margin(($baseline/2), 0, ($baseline/2), 26px);
 }
 
 .msg__title {

@@ -1,10 +1,12 @@
 define([
-    'jquery', 'backbone', 'common/js/spec_helpers/template_helpers', 'js/edxnotes/collections/tabs',
-    'js/edxnotes/views/tabs_list', 'js/edxnotes/views/tab_view',
-    'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
-], function(
-    $, Backbone, TemplateHelpers, TabsCollection, TabsListView, TabView, customMatchers
-) {
+    'jquery',
+    'backbone',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'common/js/spec_helpers/template_helpers',
+    'js/edxnotes/collections/tabs',
+    'js/edxnotes/views/tabs_list',
+    'js/edxnotes/views/tab_view'
+], function ($, Backbone, HtmlUtils, TemplateHelpers, TabsCollection, TabsListView, TabView) {
     'use strict';
     describe('EdxNotes TabView', function() {
         var TestSubView = Backbone.View.extend({
@@ -41,7 +43,6 @@ define([
         };
 
         beforeEach(function () {
-            customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
@@ -96,7 +97,8 @@ define([
         it('can show/hide error messages', function () {
             var view = getView(this.tabsCollection),
                 errorHolder = view.$('.wrapper-msg');
-            view.showErrorMessage('<p>error message is here</p>');
+
+            view.showErrorMessageHtml(HtmlUtils.HTML('<p>error message is here</p>'));
             expect(errorHolder).not.toHaveClass('is-hidden');
             expect(errorHolder.find('.copy')).toContainHtml('<p>error message is here</p>');
 
@@ -108,7 +110,7 @@ define([
         it('should hide error messages before rendering', function () {
             var view = getView(this.tabsCollection),
                 errorHolder = view.$('.wrapper-msg');
-            view.showErrorMessage('<p>error message is here</p>');
+            view.showErrorMessageHtml('<p>error message is here</p>');
             view.render();
             expect(errorHolder).toHaveClass('is-hidden');
             expect(errorHolder.find('.copy')).toBeEmpty();

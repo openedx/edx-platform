@@ -1,8 +1,10 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%page args="section_data"/>
+<%page args="section_data" expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+%>
 
 <div id="set-extension">
-  <h2>${_("Individual due date extensions")}</h2>
+  <h3 class="hd hd-3">${_("Individual due date extensions")}</h3>
   <p>
     ${_("In this section, you have the ability to grant extensions on specific "
         "units to individual students. Please note that the latest date is always "
@@ -40,7 +42,7 @@
 </div>
 <hr/>
 <div id="view-granted-extensions">
-  <h2>${_("Viewing granted extensions")}</h2>
+  <h3 class="hd hd-3">${_("Viewing granted extensions")}</h3>
   <p>
     ${_("Here you can see what extensions have been granted on particular "
         "units or for a particular student.")}
@@ -81,7 +83,7 @@
 </div>
 <hr/>
 <div id="reset-extension">
-  <h2>${_("Resetting extensions")}</h2>
+  <h3 class="hd hd-3">${_("Resetting extensions")}</h3>
   <p>
     ${_("Resetting a problem's due date rescinds a due date extension for a "
         "student on a particular unit. This will revert the due date for the "
@@ -109,4 +111,3 @@
            data-endpoint="${section_data['reset_due_date_url']}">
   </p>
 </div>
-

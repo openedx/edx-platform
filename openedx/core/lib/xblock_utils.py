@@ -5,13 +5,16 @@ Functions that can are used to modify XBlock fragments for use in the LMS and St
 import datetime
 import json
 import logging
+import markupsafe
+import re
 import static_replace
 import uuid
-import markupsafe
 from lxml import html, etree
 from contracts import contract
 
 from django.conf import settings
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.urlresolvers import reverse
 from django.utils.timezone import UTC
 from django.utils.html import escape
 from django.contrib.auth.models import User
@@ -128,7 +131,73 @@ def wrap_xblock(
     template_context = {
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
-        'display_name': block.display_name_with_default,
+        'display_name': block.display_name_with_default_escaped,
+        'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
+                                     for key, value in data.iteritems()),
+    }
+
+    if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
+        # Replace / with \/ so that "</script>" in the data won't break things.
+        template_context['js_init_parameters'] = json.dumps(frag.json_init_args).replace("/", r"\/")
+    else:
+        template_context['js_init_parameters'] = ""
+
+    return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
+
+
+def wrap_xblock_aside(
+        runtime_class,
+        aside,
+        view,
+        frag,
+        context,                        # pylint: disable=unused-argument
+        usage_id_serializer,
+        request_token,                   # pylint: disable=redefined-outer-name
+        extra_data=None
+):
+    """
+    Wraps the results of rendering an XBlockAside view in a standard <section> with identifying
+    data so that the appropriate javascript module can be loaded onto it.
+
+    :param runtime_class: The name of the javascript runtime class to use to load this block
+    :param aside: An XBlockAside
+    :param view: The name of the view that rendered the fragment being wrapped
+    :param frag: The :class:`Fragment` to be wrapped
+    :param context: The context passed to the view being rendered
+    :param usage_id_serializer: A function to serialize the block's usage_id for use by the
+        front-end Javascript Runtime.
+    :param request_token: An identifier that is unique per-request, so that only xblocks
+        rendered as part of this request will have their javascript initialized.
+    :param extra_data: A dictionary with extra data values to be set on the wrapper
+    """
+
+    if extra_data is None:
+        extra_data = {}
+
+    data = {}
+    data.update(extra_data)
+
+    css_classes = [
+        'xblock-{}'.format(markupsafe.escape(view)),
+        'xblock-{}-{}'.format(
+            markupsafe.escape(view),
+            markupsafe.escape(aside.scope_ids.block_type),
+        ),
+        'xblock_asides-v1'
+    ]
+
+    if frag.js_init_fn:
+        data['init'] = frag.js_init_fn
+        data['runtime-class'] = runtime_class
+        data['runtime-version'] = frag.js_init_version
+
+    data['block-type'] = aside.scope_ids.block_type
+    data['usage-id'] = usage_id_serializer(aside.scope_ids.usage_id)
+    data['request-token'] = request_token
+
+    template_context = {
+        'content': frag.content,
+        'classes': css_classes,
         'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
                                      for key, value in data.iteritems()),
     }
@@ -145,7 +214,7 @@ def wrap_xblock(
 def replace_jump_to_id_urls(course_id, jump_to_id_base_url, block, view, frag, context):  # pylint: disable=unused-argument
     """
     This will replace a link between courseware in the format
-    /jump_to/<id> with a URL for a page that will correctly redirect
+    /jump_to_id/<id> with a URL for a page that will correctly redirect
     This is similar to replace_course_urls, but much more flexible and
     durable for Studio authored courses. See more comments in static_replace.replace_jump_to_urls
 
@@ -156,7 +225,7 @@ def replace_jump_to_id_urls(course_id, jump_to_id_base_url, block, view, frag, c
         the end of this URL at re-write time
 
     output: a new :class:`~xblock.fragment.Fragment` that modifies `frag` with
-        content that has been update with /jump_to links replaced
+        content that has been update with /jump_to_id links replaced
     """
     return wrap_fragment(frag, static_replace.replace_jump_to_id_urls(frag.content, course_id, jump_to_id_base_url))
 
@@ -211,6 +280,14 @@ def grade_histogram(module_id):
     return grades
 
 
+def sanitize_html_id(html_id):
+    """
+    Template uses element_id in js function names, so can't allow dashes and colons.
+    """
+    sanitized_html_id = re.sub(r'[:-]', '_', html_id)
+    return sanitized_html_id
+
+
 @contract(user=User, has_instructor_access=bool, block=XBlock, view=basestring, frag=Fragment, context="dict|None")
 def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, block, view, frag, context):  # pylint: disable=unused-argument
     """
@@ -225,10 +302,9 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
     # TODO: make this more general, eg use an XModule attribute instead
     if isinstance(block, VerticalBlock) and (not context or not context.get('child_of_vertical', False)):
         # check that the course is a mongo backed Studio course before doing work
-        is_mongo_course = modulestore().get_modulestore_type(block.location.course_key) != ModuleStoreEnum.Type.xml
         is_studio_course = block.course_edit_method == "Studio"
 
-        if is_studio_course and is_mongo_course:
+        if is_studio_course:
             # build edit link to unit in CMS. Can't use reverse here as lms doesn't load cms's urls.py
             edit_link = "//" + settings.CMS_BASE + '/container/' + unicode(block.location)
 
@@ -293,13 +369,13 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
     staff_context = {
         'fields': field_contents,
         'xml_attributes': getattr(block, 'xml_attributes', {}),
+        'tags': block._class_tags,  # pylint: disable=protected-access
         'location': block.location,
         'xqa_key': block.xqa_key,
         'source_file': source_file,
         'source_url': '%s/%s/tree/master/%s' % (giturl, data_dir, source_file),
         'category': str(block.__class__.__name__),
-        # Template uses element_id in js function names, so can't allow dashes
-        'element_id': block.location.html_id().replace('-', '_'),
+        'element_id': sanitize_html_id(block.location.html_id()),
         'edit_link': edit_link,
         'user': user,
         'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
@@ -371,3 +447,23 @@ def get_course_update_items(course_updates, provided_index=0):
                         return payload
 
     return course_update_items
+
+
+def xblock_local_resource_url(block, uri):
+    """
+    Returns the URL for an XBlock's local resource.
+
+    Note: when running with the full Django pipeline, the file will be accessed
+    as a static asset which will use a CDN in production.
+    """
+    xblock_class = getattr(block.__class__, 'unmixed_class', block.__class__)
+    if settings.PIPELINE_ENABLED or not settings.REQUIRE_DEBUG:
+        return staticfiles_storage.url('xblock/resources/{package_name}/{path}'.format(
+            package_name=xblock_class.__module__,
+            path=uri
+        ))
+    else:
+        return reverse('xblock_resource_url', kwargs={
+            'block_type': block.scope_ids.block_type,
+            'uri': uri,
+        })

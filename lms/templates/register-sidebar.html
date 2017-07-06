@@ -1,8 +1,9 @@
+<%page expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
-<%namespace file='main.html' import="login_query, stanford_theme_enabled"/>
+<%namespace file='main.html' import="login_query"/>
 <%namespace name='static' file='static_content.html'/>
 
 
@@ -12,10 +13,10 @@ from django.core.urlresolvers import reverse
 
 % if has_extauth_info is UNDEFINED:
 
-<div class="cta cta-login">
+<div class="btn-brand btn-login">
   <h3 class="title">${_("Already registered?")}</h3>
   <p class="instructions">
-    <a class="cta-login-action" href="${reverse('signin_user')}${login_query()}">
+    <a class="btn-login-action" href="${reverse('signin_user')}${login_query()}">
       ${_("Log in")}
     </a>
   </p>
@@ -25,29 +26,23 @@ from django.core.urlresolvers import reverse
 
 ## TODO: Use a %block tag or something to allow themes to
 ##       override in a more generalizable fashion.
-% if not stanford_theme_enabled():
-  <div class="cta cta-welcome">
-    <h3>${_("Welcome to {platform_name}").format(platform_name=platform_name)}</h3>
-    <p>${_("Registering with {platform_name} gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list - we will update you as courses are added.").format(platform_name=platform_name)}</p>
-  </div>
-% endif
+<div class="cta cta-welcome">
+  <h3>${_("Welcome to {platform_name}").format(platform_name=platform_name)}</h3>
+  <p>${_("Registering with {platform_name} gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list - we will update you as courses are added.").format(platform_name=platform_name)}</p>
+</div>
 
 <div class="cta cta-nextsteps">
   <h3>${_("Next Steps")}</h3>
-  % if stanford_theme_enabled():
-    <p>${_("You will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark emails from class.stanford.edu as 'not spam', since you'll want to be able to receive email from your courses.")}</p>
-  % else:
-    <p>${_("As part of joining {platform_name}, you will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark {platform_name} emails as 'not spam'.  At {platform_name}, we communicate mostly through email.").format(platform_name=platform_name)}</p>
-  % endif
+    <p>${_("As part of joining {platform_name}, you will receive an email message with instructions for activating your account. Don't see the email? Check your spam folder and mark {platform_name} emails as 'not spam'. At {platform_name}, we communicate mostly through email.").format(platform_name=platform_name)}</p>
 </div>
 
 % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
   <div class="cta cta-help">
     <h3>${_("Need Help?")}</h3>
-    <p>${_("Need help in registering with {platform_name}?").format(platform_name=platform_name)}
+    <p>${_("Need help registering with {platform_name}?").format(platform_name=platform_name)}
       <a href="${marketing_link('FAQ')}">
           ${_("View our FAQs for answers to commonly asked questions.")}
       </a>
-      ${_("Once registered, most questions can be answered in the course specific discussion forums or through the FAQs.")}</p>
+      ${_("You can find the answers to most of your questions in our list of FAQs. After you enroll in a course, you can also find answers in the course discussions.")}</p>
   </div>
 % endif

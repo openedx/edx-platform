@@ -73,7 +73,6 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
-from django.utils.translation import ugettext as _
 from social.apps.django_app.default import models
 from social.exceptions import AuthException
 from social.pipeline import partial

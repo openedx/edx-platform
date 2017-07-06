@@ -3,6 +3,9 @@
 Acceptance tests for Studio's Setting pages
 """
 from __future__ import unicode_literals
+import os
+
+from mock import patch
 from nose.plugins.attrib import attr
 
 from base_studio_test import StudioCourseTest
@@ -18,6 +21,7 @@ from textwrap import dedent
 from xmodule.partitions.partitions import Group
 
 
+@attr('shard_8')
 class ContentGroupConfigurationTest(StudioCourseTest):
     """
     Tests for content groups in the Group Configurations Page.
@@ -229,6 +233,7 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         ).fulfill()
 
 
+@attr('shard_8')
 class AdvancedSettingsValidationTest(StudioCourseTest):
     """
     Tests for validation feature in Studio's advanced settings tab
@@ -473,3 +478,143 @@ class ContentLicenseTest(StudioCourseTest):
         # The course_license text will include a bunch of screen reader text to explain
         # the selected options
         self.assertIn("Some Rights Reserved", self.lms_courseware.course_license)
+
+
+@attr('a11y')
+class StudioSettingsA11yTest(StudioCourseTest):
+
+    """
+    Class to test Studio pages accessibility.
+    """
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(StudioSettingsA11yTest, self).setUp()
+        self.settings_page = SettingsPage(self.browser, self.course_info['org'], self.course_info['number'],
+                                          self.course_info['run'])
+
+    def test_studio_settings_page_a11y(self):
+        """
+        Check accessibility of SettingsPage.
+        """
+        self.settings_page.visit()
+        self.settings_page.wait_for_page()
+
+        # There are several existing color contrast errors on this page,
+        # we will ignore this error in the test until we fix them.
+        self.settings_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'color-contrast',  # TODO: AC-225
+                'link-href',  # TODO: AC-226
+                'nav-aria-label',  # TODO: AC-227
+                'icon-aria-hidden',  # TODO: AC-229
+            ],
+        })
+
+        # TODO: Figure out how to get CodeMirror to pass accessibility testing
+        # We use the CodeMirror Javascript library to
+        # add code editing to a number of textarea elements
+        # on this page. CodeMirror generates markup that does
+        # not pass our accessibility testing rules.
+        self.settings_page.a11y_audit.config.set_scope(
+            exclude=['.CodeMirror textarea']
+        )
+
+        self.settings_page.a11y_audit.check_for_accessibility_errors()
+
+
+@attr('a11y')
+class StudioSubsectionSettingsA11yTest(StudioCourseTest):
+    """
+    Class to test accessibility on the subsection settings modals.
+    """
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        browser = os.environ.get('SELENIUM_BROWSER', 'firefox')
+
+        # This test will fail if run using phantomjs < 2.0, due to an issue with bind()
+        # See https://github.com/ariya/phantomjs/issues/10522 for details.
+
+        # The course_outline uses this function, and as such will not fully load when run
+        # under phantomjs 1.9.8. So, to prevent this test from timing out at course_outline.visit(),
+        # force the use of firefox vs the standard a11y test usage of phantomjs 1.9.8.
+
+        # TODO: remove this block once https://openedx.atlassian.net/browse/TE-1047 is resolved.
+        if browser == 'phantomjs':
+            browser = 'firefox'
+
+        with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
+            super(StudioSubsectionSettingsA11yTest, self).setUp(is_staff=True)
+
+        self.course_outline = CourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+    def populate_course_fixture(self, course_fixture):
+        course_fixture.add_advanced_settings({
+            "enable_proctored_exams": {"value": "true"}
+        })
+
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection 1').add_children(
+                    XBlockFixtureDesc('problem', 'Test Problem 1')
+                )
+            )
+        )
+
+    def test_special_exams_menu_a11y(self):
+        """
+        Given that I am a staff member
+        And I am editing settings on the special exams menu
+        Then that menu is accessible
+        """
+        self.course_outline.visit()
+        self.course_outline.open_subsection_settings_dialog()
+        self.course_outline.select_advanced_tab()
+
+        # limit the scope of the audit to the special exams tab on the modal dialog
+        self.course_outline.a11y_audit.config.set_scope(
+            include=['section.edit-settings-timed-examination']
+        )
+        self.course_outline.a11y_audit.check_for_accessibility_errors()
+
+
+class StudioSettingsImageUploadTest(StudioCourseTest):
+    """
+    Class to test course settings image uploads.
+    """
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(StudioSettingsImageUploadTest, self).setUp()
+        self.settings_page = SettingsPage(self.browser, self.course_info['org'], self.course_info['number'],
+                                          self.course_info['run'])
+        # from nose.tools import set_trace; set_trace()
+        self.settings_page.visit()
+
+        # Ensure jquery is loaded before running a jQuery
+        self.settings_page.wait_for_ajax()
+        # This text appears towards the end of the work that jQuery is performing on the page
+        self.settings_page.wait_for_jquery_value('input#course-name:text', 'test_run')
+
+    def test_upload_course_card_image(self):
+
+        # upload image
+        file_to_upload = 'image.jpg'
+        self.settings_page.upload_image('#upload-course-image', file_to_upload)
+        self.assertIn(file_to_upload, self.settings_page.get_uploaded_image_path('#course-image'))
+
+    def test_upload_course_banner_image(self):
+
+        # upload image
+        file_to_upload = 'image.jpg'
+        self.settings_page.upload_image('#upload-banner-image', file_to_upload)
+        self.assertIn(file_to_upload, self.settings_page.get_uploaded_image_path('#banner-image'))
+
+    def test_upload_course_video_thumbnail_image(self):
+
+        # upload image
+        file_to_upload = 'image.jpg'
+        self.settings_page.upload_image('#upload-video-thumbnail-image', file_to_upload)
+        self.assertIn(file_to_upload, self.settings_page.get_uploaded_image_path('#video-thumbnail-image'))

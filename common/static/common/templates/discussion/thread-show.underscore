@@ -21,16 +21,16 @@
             %>
             </p>
             <div class="post-labels">
-                <span class="post-label-pinned"><i class="icon fa fa-thumb-tack"></i><%- gettext("Pinned") %></span>
-                <span class="post-label-reported"><i class="icon fa fa-flag"></i><%- gettext("Reported") %></span>
-                <span class="post-label-closed"><i class="icon fa fa-lock"></i><%- gettext("Closed") %></span>
+                <span class="post-label-pinned"><span class="icon fa fa-thumb-tack" aria-hidden="true"></span><%- gettext("Pinned") %></span>
+                <span class="post-label-reported"><span class="icon fa fa-flag" aria-hidden="true"></span><%- gettext("Reported") %></span>
+                <span class="post-label-closed"><span class="icon fa fa-lock" aria-hidden="true"></span><%- gettext("Closed") %></span>
             </div>
         </div>
         <% if (!readOnly) { %>
             <div class="post-header-actions post-extended-content">
                 <%=
                 _.template(
-                    $('#forum-actions').html(),
+                    $('#forum-actions').html())(
                     {
                         contentId: cid,
                         contentType: 'post',

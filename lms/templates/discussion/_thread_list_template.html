@@ -1,24 +1,28 @@
+<%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 <script type="text/template" id="thread-list-template">
     <div class="forum-nav-header">
-        <a href="#" class="forum-nav-browse" aria-haspopup="true">
+        <button type="button" class="forum-nav-browse" id="forum-nav-browse" aria-haspopup="true">
             ## There is no whitespace between these because the front-end JS code
             ## needs to precisely compute the available width for forum-nav-
             ## browse-current in order to do truncation of topic names.
-            <i class="icon fa fa-reorder"></i><span class="sr">${_("Discussion topics; current selection is: ")}</span><span class="forum-nav-browse-current">${_("All Discussions")}</span><span class="forum-nav-browse-drop-arrow">▾</span>
-        </a>
+            <span class="icon fa fa-reorder" aria-hidden="true"></span>
+            <span class="sr">${_("Discussion topics; currently listing: ")}</span>
+            <span class="forum-nav-browse-current">${_("All Discussions")}</span>
+            <span class="forum-nav-browse-drop-arrow" aria-hidden="true">▾</span>
+        </button>
         <form class="forum-nav-search">
             <div class="forum-nav-search-ff-position-fix">
                 <label>
-                    <span class="sr">${_("Search")}</span>
-                    <input class="forum-nav-search-input" type="text" placeholder="${_("Search all posts")}">
-                    <i class="icon fa fa-search"></i>
+                    <span class="sr">${_("Search all posts")}</span>
+                    <input class="forum-nav-search-input" id="forum-nav-search" type="text" placeholder="${_("Search all posts")}">
+                    <span class="icon fa fa-search" aria-hidden="true"></span>
                 </label>
             </div>
         </form>
     </div>
     <%include file="_filter_dropdown.html" />
-    <div class="forum-nav-thread-list-wrapper">
+    <div class="forum-nav-thread-list-wrapper" id="sort-filter-wrapper" tabindex="-1">
         <div class="forum-nav-refine-bar">
             <label class="forum-nav-filter-main">
                 ## Translators: This labels a filter menu in forum navigation
@@ -37,7 +41,8 @@
                         <option value="flagged">${_("Flagged")}</option>
                     %endif
                 </select>
-            </label>${"<% if (isCohorted && isPrivilegedUser) { %>"}<label class="forum-nav-filter-cohort">
+            ## safe-lint: disable=python-parse-error,python-wrap-html
+            </label>${"<% if (isCohorted && isPrivilegedUser) { %>" | n, decode.utf8}<label class="forum-nav-filter-cohort">
                 ## Translators: This labels a cohort menu in forum navigation
                 <span class="sr">${_("Cohort:")}</span>
                 <select class="forum-nav-filter-cohort-control">
@@ -46,12 +51,13 @@
                             <option value="${c['id']}">${c['name']}</option>
                         %endfor
                 </select>
-            </label>${"<% } %>"}<label class="forum-nav-sort">
+            ## safe-lint: disable=python-parse-error,python-wrap-html
+            </label>${"<% } %>" | n, decode.utf8}<label class="forum-nav-sort">
                 ## Translators: This labels a sort menu in forum navigation
                 <span class="sr">${_("Sort:")}</span>
                 <select class="forum-nav-sort-control">
                     ## Translators: This is a menu option for sorting forum threads
-                    <option value="date">${_("by recent activity")}</option>
+                    <option value="activity">${_("by recent activity")}</option>
                     ## Translators: This is a menu option for sorting forum threads
                     <option value="comments">${_("by most activity")}</option>
                     ## Translators: This is a menu option for sorting forum threads

@@ -1,6 +1,7 @@
 """
 Serializers for Course Blocks related return objects.
 """
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
@@ -16,10 +17,14 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         Get the field value requested.  The field may be an XBlock field, a
         transformer block field, or an entire tranformer block data dict.
         """
+        value = None
         if transformer is None:
             value = self.context['block_structure'].get_xblock_field(block_key, field_name)
         elif field_name is None:
-            value = self.context['block_structure'].get_transformer_block_data(block_key, transformer)
+            try:
+                value = self.context['block_structure'].get_transformer_block_data(block_key, transformer).fields
+            except KeyError:
+                pass
         else:
             value = self.context['block_structure'].get_transformer_block_field(block_key, transformer, field_name)
 
@@ -38,11 +43,18 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
                 request=self.context['request'],
             ),
             'student_view_url': reverse(
-                'courseware.views.render_xblock',
+                'courseware.views.views.render_xblock',
                 kwargs={'usage_key_string': unicode(block_key)},
                 request=self.context['request'],
             ),
         }
+
+        if settings.FEATURES.get("ENABLE_LTI_PROVIDER") and 'lti_url' in self.context['requested_fields']:
+            data['lti_url'] = reverse(
+                'lti_provider_launch',
+                kwargs={'course_id': unicode(block_key.course_key), 'usage_id': unicode(block_key)},
+                request=self.context['request'],
+            )
 
         # add additional requested fields that are supported by the various transformers
         for supported_field in SUPPORTED_FIELDS:

@@ -2,7 +2,7 @@ define([
         'jquery',
         'underscore',
         'backbone',
-        'common/js/spec_helpers/ajax_helpers',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'common/js/spec_helpers/template_helpers',
         'js/verify_student/views/make_payment_step_view'
     ],
@@ -37,7 +37,7 @@ define([
                 }).render();
 
                 // Stub the payment form submission
-                spyOn( view, 'submitForm' ).andCallFake( function() {} );
+                spyOn( view, 'submitForm' ).and.callFake( function() {} );
                 return view;
             };
 
@@ -97,7 +97,7 @@ define([
                 var form;
 
                 expect(view.submitForm).toHaveBeenCalled();
-                form = view.submitForm.mostRecentCall.args[0];
+                form = view.submitForm.calls.mostRecent().args[0];
 
                 expect(form.serialize()).toEqual($.param(params));
                 expect(form.attr('method')).toEqual('POST');

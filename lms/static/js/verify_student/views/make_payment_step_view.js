@@ -37,7 +37,8 @@ var edx = edx || {};
                 alreadyVerified: false,
                 courseModeSlug: 'audit',
                 verificationGoodUntil: '',
-                isABTesting: false
+                isABTesting: false,
+                userEmail: ''
             };
         },
 

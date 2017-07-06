@@ -115,7 +115,7 @@ class CourseAccessHandler(object):
 
     For a description of the function naming and arguments, see:
 
-        `oauth2_provider/oidc/handlers.py`
+        `edx_oauth2_provider/oidc/handlers.py`
 
     """
 

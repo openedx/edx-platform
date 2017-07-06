@@ -15,6 +15,7 @@ from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentF
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from bulk_email.models import BulkEmailFlag
 
 
 @attr('shard_1')
@@ -42,6 +43,11 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
             'course_id': self.course.id.to_deprecated_string(),
             'success': True,
         }
+        BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
+
+    def tearDown(self):
+        super(TestOptoutCourseEmails, self).tearDown()
+        BulkEmailFlag.objects.all().delete()
 
     def navigate_to_email_view(self):
         """Navigate to the instructor dash's email view"""
@@ -49,10 +55,9 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
-        # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False
+        # If this fails, it is likely because BulkEmailFlag.is_enabled() is set to False
         self.assertTrue(email_section in response.content)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_optout_course(self):
         """
         Make sure student does not receive course email after opting out.
@@ -70,17 +75,17 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["myself", "staff", "learners"]',
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
         self.assertEquals(json.loads(response.content), self.success_content)
 
-        # Assert that self.student.email not in mail.to, outbox should be empty
-        self.assertEqual(len(mail.outbox), 0)
+        # Assert that self.student.email not in mail.to, outbox should only contain "myself" target
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to[0], self.instructor.email)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_optin_course(self):
         """
         Make sure student receives course email after opting in.
@@ -98,14 +103,15 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["myself", "staff", "learners"]',
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
         self.assertEquals(json.loads(response.content), self.success_content)
 
-        # Assert that self.student.email in mail.to
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(len(mail.outbox[0].to), 1)
-        self.assertEquals(mail.outbox[0].to[0], self.student.email)
+        # Assert that self.student.email in mail.to, along with "myself" target
+        self.assertEqual(len(mail.outbox), 2)
+        sent_addresses = [message.to[0] for message in mail.outbox]
+        self.assertIn(self.student.email, sent_addresses)
+        self.assertIn(self.instructor.email, sent_addresses)

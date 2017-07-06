@@ -6,11 +6,11 @@ import json
 from collections import OrderedDict
 
 from django.test.client import Client
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from survey.models import SurveyForm, SurveyAnswer
 
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -29,7 +29,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
 
         # Create two accounts
         self.password = 'abc'
-        self.student = User.objects.create_user('student', 'student@test.com', self.password)
+        self.student = UserFactory.create(username='student', email='student@test.com', password=self.password)
 
         self.test_survey_name = 'TestSurvey'
         self.test_form = '''

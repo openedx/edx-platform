@@ -5,7 +5,7 @@ by the individual custom courses feature.
 import json
 import logging
 
-from django.db import transaction, IntegrityError
+from django.db import transaction
 
 import request_cache
 
@@ -50,12 +50,11 @@ class CustomCoursesForEdxOverrideProvider(FieldOverrideProvider):
         return default
 
     @classmethod
-    def enabled_for(cls, course):
-        """CCX field overrides are enabled per-course
-
-        protect against missing attributes
+    def enabled_for(cls, block):
         """
-        return getattr(course, 'enable_ccx', False)
+        CCX field overrides are enabled for CCX blocks.
+        """
+        return getattr(block.location, 'ccx', None) or getattr(block, 'enable_ccx', False)
 
 
 def get_current_ccx(course_key):
@@ -86,12 +85,9 @@ def get_override_for_ccx(ccx, block, name, default=None):
     """
     overrides = _get_overrides_for_ccx(ccx)
 
-    if isinstance(block.location, CCXBlockUsageLocator):
-        non_ccx_key = block.location.to_block_locator()
-    else:
-        non_ccx_key = block.location
+    clean_ccx_key = _clean_ccx_key(block.location)
 
-    block_overrides = overrides.get(non_ccx_key, {})
+    block_overrides = overrides.get(clean_ccx_key, {})
     if name in block_overrides:
         try:
             return block.fields[name].from_json(block_overrides[name])
@@ -99,6 +95,21 @@ def get_override_for_ccx(ccx, block, name, default=None):
             return block_overrides[name]
     else:
         return default
+
+
+def _clean_ccx_key(block_location):
+    """
+    Converts the given BlockUsageKey from a CCX key to the
+    corresponding key for its parent course, while handling the case
+    where no conversion is needed.  Also strips any version and
+    branch information from the key.
+    Returns the cleaned key.
+    """
+    if isinstance(block_location, CCXBlockUsageLocator):
+        clean_key = block_location.to_block_locator()
+    else:
+        clean_key = block_location
+    return clean_key.version_agnostic().for_branch(None)
 
 
 def _get_overrides_for_ccx(ccx):
@@ -136,6 +147,7 @@ def override_field_for_ccx(ccx, block, name, value):
     value_json = field.to_json(value)
     serialized_value = json.dumps(value_json)
     override_has_changes = False
+    clean_ccx_key = _clean_ccx_key(block.location)
 
     override = get_override_for_ccx(ccx, block, name + "_instance")
     if override:
@@ -149,7 +161,7 @@ def override_field_for_ccx(ccx, block, name, value):
             defaults={'value': serialized_value},
         )
         if created:
-            _get_overrides_for_ccx(ccx).setdefault(block.location, {})[name + "_id"] = override.id
+            _get_overrides_for_ccx(ccx).setdefault(clean_ccx_key, {})[name + "_id"] = override.id
         else:
             override_has_changes = serialized_value != override.value
 
@@ -157,8 +169,8 @@ def override_field_for_ccx(ccx, block, name, value):
         override.value = serialized_value
         override.save()
 
-    _get_overrides_for_ccx(ccx).setdefault(block.location, {})[name] = value_json
-    _get_overrides_for_ccx(ccx).setdefault(block.location, {})[name + "_instance"] = override
+    _get_overrides_for_ccx(ccx).setdefault(clean_ccx_key, {})[name] = value_json
+    _get_overrides_for_ccx(ccx).setdefault(clean_ccx_key, {})[name + "_instance"] = override
 
 
 def clear_override_for_ccx(ccx, block, name):
@@ -185,7 +197,8 @@ def clear_ccx_field_info_from_ccx_map(ccx, block, name):  # pylint: disable=inva
     Remove field information from ccx overrides mapping dictionary
     """
     try:
-        ccx_override_map = _get_overrides_for_ccx(ccx).setdefault(block.location, {})
+        clean_ccx_key = _clean_ccx_key(block.location)
+        ccx_override_map = _get_overrides_for_ccx(ccx).setdefault(clean_ccx_key, {})
         ccx_override_map.pop(name)
         ccx_override_map.pop(name + "_id")
         ccx_override_map.pop(name + "_instance")

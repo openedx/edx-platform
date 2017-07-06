@@ -32,7 +32,12 @@
               <a href="${link['url']}">${link['title']}</a>
               % endfor
           </nav>
-          <p class="copyright">${footer['copyright']}</p>
+          <p class="copyright">${_(
+          u"\u00A9 edX Inc.  All rights reserved except where noted.  "
+          u"EdX, Open edX and the edX and Open EdX logos are registered trademarks "
+          u"or trademarks of edX Inc."
+          )}
+          </p>
 
           ## The OpenEdX link may be hidden when this view is served
           ## through an API to partner sites (such as marketing sites or blogs),
@@ -47,22 +52,26 @@
       </div>
 
       <div class="external-links">
-        <div class="social-media-links">
-          % for link in footer['social_links']:
-          <a href="${link['url']}" class="sm-link external" title="${link['title']}" rel="noreferrer">
-            <span class="icon fa ${link['icon-class']}" aria-hidden="true"></span>
-            <span class="sr">${link['action']}</span>
-          </a>
-          % endfor
-        </div>
+        <ul class="social-media-links">
+            % for link in footer['social_links']:
+            <li class="list-item">
+                <a href="${link['url']}" class="sm-link external" title="${link['title']}" rel="noreferrer">
+                    <span class="icon fa ${link['icon-class']}" aria-hidden="true"></span>
+                    <span class="sr">${link['action']}</span>
+                </a>
+            </li>
+            % endfor
+        </ul>
 
-        <div class="mobile-app-links">
-          % for link in footer['mobile_links']:
-          <a href="${link['url']}" class="app-link external">
-            <img alt="${link['title']}" src="${link['image']}">
-          </a>
-          % endfor
-        </div>
+        <ul class="mobile-app-links">
+            % for link in footer['mobile_links']:
+            <li class="list-item">
+                <a href="${link['url']}" class="app-link external">
+                    <img alt="${link['title']}" src="${link['image']}">
+                </a>
+            </li>
+            % endfor
+        </ul>
       </div>
     </div>
 </footer>
@@ -72,6 +81,12 @@
   <%include file="widgets/segment-io.html" />
   <%include file="widgets/segment-io-footer.html" />
 % endif
+% if bidi == 'rtl':
+<%static:css group='style-lms-footer-edx-rtl'/>
+% else:
+<%static:css group='style-lms-footer-edx'/>
+% endif
+
 % if footer_css_urls:
   % for url in footer_css_urls:
     <link rel="stylesheet" type="text/css" href="${url}"></link>
@@ -80,4 +95,3 @@
 % if footer_js_url:
   <script type="text/javascript" src="${footer_js_url}"></script>
 % endif
-

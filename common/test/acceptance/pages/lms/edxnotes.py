@@ -1,6 +1,7 @@
 from bok_choy.page_object import PageObject, PageLoadError, unguarded
 from bok_choy.promise import BrokenPromise, EmptyPromise
 from .course_page import CoursePage
+from ..common.paging import PaginatedUIMixin
 from ...tests.helpers import disable_animations
 from selenium.webdriver.common.action_chains import ActionChains
 
@@ -114,7 +115,7 @@ class EdxNotesPageItem(NoteChild):
     """
     BODY_SELECTOR = ".note"
     UNIT_LINK_SELECTOR = "a.reference-unit-link"
-    TAG_SELECTOR = "a.reference-tags"
+    TAG_SELECTOR = "span.reference-tags"
 
     def go_to_unit(self, unit_page=None):
         self.q(css=self._bounded_selector(self.UNIT_LINK_SELECTOR)).click()
@@ -242,7 +243,7 @@ class SearchResultsView(EdxNotesPageView):
     TAB_SELECTOR = ".tab#view-search-results"
 
 
-class EdxNotesPage(CoursePage):
+class EdxNotesPage(CoursePage, PaginatedUIMixin):
     """
     EdxNotes page.
     """
@@ -348,6 +349,10 @@ class EdxNotesPage(CoursePage):
         children = self.q(css='.note-group')
         return [EdxNotesTagsGroup(self.browser, child.get_attribute("id")) for child in children]
 
+    def count(self):
+        """ Returns the total number of notes in the list """
+        return len(self.q(css='div.wrapper-note-excerpts').results)
+
 
 class EdxNotesPageNoContent(CoursePage):
     """
@@ -384,7 +389,7 @@ class EdxNotesUnitPage(CoursePage):
         Moves mouse to the element that matches `selector(str)`.
         """
         body = self.q(css=selector)[0]
-        ActionChains(self.browser).move_to_element(body).release().perform()
+        ActionChains(self.browser).move_to_element(body).perform()
         return self
 
     def click(self, selector):
@@ -480,6 +485,7 @@ class EdxNoteHighlight(NoteChild):
     ADDER_SELECTOR = ".annotator-adder"
     VIEWER_SELECTOR = ".annotator-viewer"
     EDITOR_SELECTOR = ".annotator-editor"
+    NOTE_SELECTOR = ".annotator-note"
 
     def __init__(self, browser, element, parent_id):
         super(EdxNoteHighlight, self).__init__(browser, parent_id)
@@ -531,7 +537,7 @@ class EdxNoteHighlight(NoteChild):
         """
         Creates selection for the element and clicks `add note` button.
         """
-        ActionChains(self.browser).double_click(self.element).release().perform()
+        ActionChains(self.browser).double_click(self.element).perform()
         self.wait_for_adder_visibility()
         self.q(css=self._bounded_selector(self.ADDER_SELECTOR)).first.click()
         self.wait_for_editor_visibility()
@@ -541,21 +547,21 @@ class EdxNoteHighlight(NoteChild):
         """
         Clicks on the highlighted text.
         """
-        ActionChains(self.browser).move_to_element(self.element).click().release().perform()
+        ActionChains(self.browser).move_to_element(self.element).click().perform()
         return self
 
     def click_on_viewer(self):
         """
         Clicks on the note viewer.
         """
-        self.q(css=self._bounded_selector(self.VIEWER_SELECTOR)).first.click()
+        self.q(css=self.NOTE_SELECTOR).first.click()
         return self
 
     def show(self):
         """
         Hover over highlighted text -> shows note.
         """
-        ActionChains(self.browser).move_to_element(self.element).release().perform()
+        ActionChains(self.browser).move_to_element(self.element).perform()
         self.wait_for_viewer_visibility()
         return self
 
@@ -563,7 +569,7 @@ class EdxNoteHighlight(NoteChild):
         """
         Clicks cancel button.
         """
-        self.q(css=self._bounded_selector(".annotator-cancel")).first.click()
+        self.q(css=self._bounded_selector(".annotator-close")).first.click()
         self.wait_for_notes_invisibility("Note is canceled.")
         return self
 
@@ -604,8 +610,7 @@ class EdxNoteHighlight(NoteChild):
             text = element.text[0].strip()
         else:
             text = None
-        self.q(css=("body")).first.click()
-        self.wait_for_notes_invisibility()
+        self.cancel()
         return text
 
     @text.setter
@@ -628,8 +633,7 @@ class EdxNoteHighlight(NoteChild):
         if tags:
             for tag in tags:
                 tag_text.append(tag.text)
-        self.q(css="body").first.click()
-        self.wait_for_notes_invisibility()
+        self.cancel()
         return tag_text
 
     @tags.setter

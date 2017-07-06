@@ -478,9 +478,10 @@ def cas_login(request, next_page=None, required=False):
 
     if request.user.is_authenticated():
         user = request.user
-        if not UserProfile.objects.filter(user=user):
-            user_profile = UserProfile(name=user.username, user=user)
-            user_profile.save()
+        UserProfile.objects.get_or_create(
+            user=user,
+            defaults={'name': user.username}
+        )
 
     return ret
 
@@ -756,7 +757,10 @@ def provider_login(request):
     # first check to see if the request is an OpenID request.
     # If so, the client will have specified an 'openid.mode' as part
     # of the request.
-    querydict = dict(request.REQUEST.items())
+    if request.method == 'GET':
+        querydict = dict(request.GET.items())
+    else:
+        querydict = dict(request.POST.items())
     error = False
     if 'openid.mode' in request.GET or 'openid.mode' in request.POST:
         # decode request
@@ -899,9 +903,8 @@ def provider_login(request):
         return HttpResponseRedirect(openid_request_url)
 
     # determine consumer domain if applicable
-    return_to = ''
-    if 'openid.return_to' in request.REQUEST:
-        return_to = request.REQUEST['openid.return_to']
+    return_to = request.GET.get('openid.return_to') or request.POST.get('openid.return_to') or ''
+    if return_to:
         matches = re.match(r'\w+:\/\/([\w\.-]+)', return_to)
         return_to = matches.group(1)
 

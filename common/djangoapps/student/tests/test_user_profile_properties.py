@@ -7,13 +7,16 @@ from django.test import TestCase
 from student.models import UserProfile
 from student.tests.factories import UserFactory
 from django.core.cache import cache
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 
 @ddt.ddt
-class UserProfilePropertiesTest(TestCase):
+class UserProfilePropertiesTest(CacheIsolationTestCase):
     """Unit tests for age, gender_display, and level_of_education_display properties ."""
 
     password = "test"
+
+    ENABLED_CACHES = ['default']
 
     def setUp(self):
         super(UserProfilePropertiesTest, self).setUp()
@@ -42,11 +45,15 @@ class UserProfilePropertiesTest(TestCase):
         self.profile.save()
 
     @ddt.data(0, 1, 13, 20, 100)
-    def test_age(self, age):
+    def test_age(self, years_ago):
         """Verify the age calculated correctly."""
         current_year = datetime.datetime.now().year
-        self._set_year_of_birth(current_year - age)
+        self._set_year_of_birth(current_year - years_ago)
 
+        # In the year that your turn a certain age you will also have been a
+        # year younger than that in that same year.  We calculate age based off of
+        # the youngest you could be that year.
+        age = years_ago - 1
         self.assertEqual(self.profile.age, age)
 
     def test_age_no_birth_year(self):

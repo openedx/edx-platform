@@ -2,7 +2,7 @@
   <div class="response-body"><%- body %></div>
   <%=
       _.template(
-          $('#forum-actions').html(),
+          $('#forum-actions').html())(
           {
               contentId: cid,
               contentType: 'comment',
@@ -28,6 +28,6 @@
     ) %>
   </p>
   <div class="post-labels">
-    <span class="post-label-reported"><i class="icon fa fa-flag"></i><%- gettext("Reported") %></span>
+    <span class="post-label-reported"><span class="icon fa fa-flag" aria-hidden="true"></span><%- gettext("Reported") %></span>
   </div>
 </div>

@@ -2,10 +2,9 @@ define([
     'backbone',
     'underscore',
     'teams/js/collections/team',
-    'teams/js/collections/team_membership',
     'teams/js/collections/topic',
     'teams/js/models/topic'
-], function (Backbone, _, TeamCollection, TeamMembershipCollection, TopicCollection, TopicModel) {
+], function (Backbone, _, TeamCollection, TopicCollection, TopicModel) {
     'use strict';
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
         createMockTopicData, createMockTopicCollection, createMockTopic,
@@ -63,9 +62,9 @@ define([
         return new collectionType(
             createMockTeamsResponse(responseOptions),
             _.extend({
+                perPage: 5,
                 teamEvents: teamEvents,
                 course_id: testCourseID,
-                per_page: 2,
                 parse: true
             }, options)
         );

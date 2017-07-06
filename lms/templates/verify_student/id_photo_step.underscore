@@ -19,7 +19,7 @@
               <li class="help-item"><%- gettext( "Ensure that you can see your photo and read your name" ) %></li>
               <li class="help-item"><%- gettext( "Make sure your ID is well-lit" ) %></li>
               <li class="help-item">
-                <%=  _.sprintf( gettext( "Once in position, use the camera button %(icon)s to capture your ID" ), { icon: '<span class="example">(<i class="icon fa fa-camera" aria-hidden="true"></i>)</span>' } ) %>
+                <%=  HtmlUtils.interpolateHtml( gettext( "Once in position, use the camera button {icon} to capture your ID" ), { icon: HtmlUtils.HTML('<span class="example">(<span class="icon fa fa-camera" aria-hidden="true"></span>)</span>') } ) %>
               </li>
               <li class="help-item"><%- gettext( "Use the retake photo button if you are not pleased with your photo" ) %></li>
             </ul>

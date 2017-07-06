@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from django.dispatch import Signal
 from markupsafe import escape
 from mock import Mock, patch
+import moto
 
 
 @contextmanager
@@ -34,7 +35,7 @@ class XssTestMixin(object):
     Mixin for testing XSS vulnerabilities.
     """
 
-    def assert_xss(self, response, xss_content):
+    def assert_no_xss(self, response, xss_content):
         """Assert that `xss_content` is not present in the content of
         `response`, and that its escaped version is present. Uses the
         same `markupsafe.escape` function as Mako templates.
@@ -107,3 +108,18 @@ def skip_signal(signal, **kwargs):
     signal.disconnect(**kwargs)
     yield
     signal.connect(**kwargs)
+
+
+class MockS3Mixin(object):
+    """
+    TestCase mixin that stubs S3 using the moto library. Note that this will
+    activate httpretty, which will monkey patch socket.
+    """
+    def setUp(self):
+        super(MockS3Mixin, self).setUp()
+        self._mock_s3 = moto.mock_s3()
+        self._mock_s3.start()
+
+    def tearDown(self):
+        self._mock_s3.stop()
+        super(MockS3Mixin, self).tearDown()

@@ -52,12 +52,14 @@ define([
         },
 
         initialize: function (options) {
+            this.options = _.extend({}, options);
             _.bindAll(this, 'onBeforeSearchStart', 'onSearch', 'onSearchError');
             TabView.prototype.initialize.call(this, options);
             this.searchResults = null;
             this.searchBox = new SearchBoxView({
                 el: document.getElementById('search-notes-form'),
                 debug: this.options.debug,
+                perPage: this.options.perPage,
                 beforeSearchStart: this.onBeforeSearchStart,
                 search: this.onSearch,
                 error: this.onSearchError
@@ -81,7 +83,8 @@ define([
                     return new this.PanelConstructor({
                         collection: collection,
                         searchQuery: this.searchResults.searchQuery,
-                        scrollToTag: this.options.scrollToTag
+                        scrollToTag: this.options.scrollToTag,
+                        createHeaderFooter: this.options.createHeaderFooter
                     });
                 } else {
                     return new this.NoResultsViewConstructor({
@@ -103,6 +106,7 @@ define([
 
         onClose: function () {
             this.searchResults = null;
+            this.searchBox.clearInput();
         },
 
         onBeforeSearchStart: function () {
@@ -122,10 +126,9 @@ define([
             }
         },
 
-        onSearch: function (collection, total, searchQuery) {
+        onSearch: function (collection, searchQuery) {
             this.searchResults = {
                 collection: collection,
-                total: total,
                 searchQuery: searchQuery
             };
 
@@ -139,7 +142,7 @@ define([
         },
 
         onSearchError: function (errorMessage) {
-            this.showErrorMessage(errorMessage);
+            this.showErrorMessageHtml(errorMessage);
             if (this.searchDeferred) {
                 this.searchDeferred.reject();
             }

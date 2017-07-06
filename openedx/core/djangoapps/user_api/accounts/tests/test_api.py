@@ -9,6 +9,7 @@ from dateutil.parser import parse as parse_datetime
 
 from mock import Mock, patch
 from django.test import TestCase
+from nose.plugins.attrib import attr
 from nose.tools import raises
 import unittest
 from student.tests.factories import UserFactory
@@ -33,6 +34,7 @@ def mock_render_to_string(template_name, context):
     return str((template_name, sorted(context.iteritems())))
 
 
+@attr('shard_2')
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class TestAccountApi(UserSettingsEventTestMixin, TestCase):
     """
@@ -55,13 +57,13 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
 
     def test_get_username_provided(self):
         """Test the difference in behavior when a username is supplied to get_account_settings."""
-        account_settings = get_account_settings(self.default_request)
+        account_settings = get_account_settings(self.default_request)[0]
         self.assertEqual(self.user.username, account_settings["username"])
 
-        account_settings = get_account_settings(self.default_request, username=self.user.username)
+        account_settings = get_account_settings(self.default_request, usernames=[self.user.username])[0]
         self.assertEqual(self.user.username, account_settings["username"])
 
-        account_settings = get_account_settings(self.default_request, username=self.different_user.username)
+        account_settings = get_account_settings(self.default_request, usernames=[self.different_user.username])[0]
         self.assertEqual(self.different_user.username, account_settings["username"])
 
     def test_get_configuration_provided(self):
@@ -79,20 +81,20 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         }
 
         # With default configuration settings, email is not shared with other (non-staff) users.
-        account_settings = get_account_settings(self.default_request, self.different_user.username)
+        account_settings = get_account_settings(self.default_request, [self.different_user.username])[0]
         self.assertNotIn("email", account_settings)
 
         account_settings = get_account_settings(
             self.default_request,
-            self.different_user.username,
-            configuration=config
-        )
+            [self.different_user.username],
+            configuration=config,
+        )[0]
         self.assertEqual(self.different_user.email, account_settings["email"])
 
     def test_get_user_not_found(self):
         """Test that UserNotFound is thrown if there is no user with username."""
         with self.assertRaises(UserNotFound):
-            get_account_settings(self.default_request, username="does_not_exist")
+            get_account_settings(self.default_request, usernames=["does_not_exist"])
 
         self.user.username = "does_not_exist"
         request = self.request_factory.get("/api/user/v1/accounts/")
@@ -103,11 +105,11 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
     def test_update_username_provided(self):
         """Test the difference in behavior when a username is supplied to update_account_settings."""
         update_account_settings(self.user, {"name": "Mickey Mouse"})
-        account_settings = get_account_settings(self.default_request)
+        account_settings = get_account_settings(self.default_request)[0]
         self.assertEqual("Mickey Mouse", account_settings["name"])
 
         update_account_settings(self.user, {"name": "Donald Duck"}, username=self.user.username)
-        account_settings = get_account_settings(self.default_request)
+        account_settings = get_account_settings(self.default_request)[0]
         self.assertEqual("Donald Duck", account_settings["name"])
 
         with self.assertRaises(UserNotAuthorized):
@@ -187,7 +189,7 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         self.assertIn("Error thrown from do_email_change_request", context_manager.exception.developer_message)
 
         # Verify that the name change happened, even though the attempt to send the email failed.
-        account_settings = get_account_settings(self.default_request)
+        account_settings = get_account_settings(self.default_request)[0]
         self.assertEqual("Mickey Mouse", account_settings["name"])
 
     @patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')
@@ -230,6 +232,7 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         verify_event_emitted([], [{"code": "en"}, {"code": "fr"}])
 
 
+@attr('shard_2')
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
 @patch.dict(
     'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
@@ -252,7 +255,7 @@ class AccountSettingsOnCreationTest(TestCase):
         user = User.objects.get(username=self.USERNAME)
         request = RequestFactory().get("/api/user/v1/accounts/")
         request.user = user
-        account_settings = get_account_settings(request)
+        account_settings = get_account_settings(request)[0]
 
         # Expect a date joined field but remove it to simplify the following comparison
         self.assertIsNotNone(account_settings['date_joined'])
@@ -279,9 +282,11 @@ class AccountSettingsOnCreationTest(TestCase):
             'requires_parental_consent': True,
             'language_proficiencies': [],
             'account_privacy': PRIVATE_VISIBILITY,
+            'accomplishments_shared': False,
         })
 
 
+@attr('shard_2')
 @ddt.ddt
 class AccountCreationActivationAndPasswordChangeTest(TestCase):
     """
@@ -336,14 +341,14 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
 
         request = RequestFactory().get("/api/user/v1/accounts/")
         request.user = user
-        account = get_account_settings(request)
+        account = get_account_settings(request)[0]
         self.assertEqual(self.USERNAME, account["username"])
         self.assertEqual(self.EMAIL, account["email"])
         self.assertFalse(account["is_active"])
 
         # Activate the account and verify that it is now active
         activate_account(activation_key)
-        account = get_account_settings(request)
+        account = get_account_settings(request)[0]
         self.assertTrue(account['is_active'])
 
     def test_create_account_duplicate_username(self):

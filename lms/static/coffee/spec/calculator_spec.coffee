@@ -37,19 +37,25 @@ describe 'Calculator', ->
       $('form#calculator').submit()
 
   describe 'toggle', ->
-    it 'focuses the input when toggled', ->
+    it 'focuses the input when toggled', (done)->
 
-      # Since the focus is called asynchronously, we need to
-      # wait until focus() is called.
-      didFocus = false
-      runs ->
-          spyOn($.fn, 'focus').andCallFake (elementName) -> didFocus = true
-          @calculator.toggle(jQuery.Event("click"))
+      self = this
+      focus = ()->
+        deferred = $.Deferred()
 
-      waitsFor (-> didFocus), "focus() should have been called on the input", 1000
+        # Since the focus is called asynchronously, we need to
+        # wait until focus() is called.
+        spyOn($.fn, 'focus').and.callFake (elementName) ->
+          deferred.resolve()
 
-      runs ->
-          expect($('#calculator_wrapper #calculator_input').focus).toHaveBeenCalled()
+        self.calculator.toggle(jQuery.Event("click"))
+
+      	 deferred.promise()
+
+      focus().then(
+        ->
+        	expect($('#calculator_wrapper #calculator_input').focus).toHaveBeenCalled()
+      ).always(done)
 
     it 'toggle the close button on the calculator button', ->
       @calculator.toggle(jQuery.Event("click"))
@@ -99,7 +105,7 @@ describe 'Calculator', ->
 
       expect(element.focus).toHaveBeenCalled()
       expect(@calculator.activeHint).toEqual(element)
-      expect(@calculator.hintPopup).toHaveAttr('aria-activedescendant', element.attr('id'))
+      expect(@calculator.hintPopup).toHaveAttr('data-calculator-hint', element.attr('id'))
 
     it 'select the first hint if argument element is not passed', ->
           @calculator.selectHint()
@@ -305,10 +311,10 @@ describe 'Calculator', ->
             'prevHint': calc
 
       $.each(cases, (key, data) ->
-        calc.hideHint.reset()
-        calc.prevHint.reset()
-        calc.nextHint.reset()
-        $.fn.focus.reset()
+        calc.hideHint.calls.reset()
+        calc.prevHint.calls.reset()
+        calc.nextHint.calls.reset()
+        $.fn.focus.calls.reset()
 
         e = jQuery.Event('keydown', data.event or {});
         value = calc.handleKeyDownOnHint(e)
@@ -334,7 +340,7 @@ describe 'Calculator', ->
   describe 'calculate', ->
     beforeEach ->
       $('#calculator_input').val '1+2'
-      spyOn($, 'getWithPrefix').andCallFake (url, data, callback) ->
+      spyOn($, 'getWithPrefix').and.callFake (url, data, callback) ->
         callback({ result: 3 })
       @calculator.calculate()
 

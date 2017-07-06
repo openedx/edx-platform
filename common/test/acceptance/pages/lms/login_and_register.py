@@ -86,6 +86,26 @@ class ResetPasswordPage(PageObject):
             self.q(css="#password-reset-form").visible
         )
 
+    def fill_password_reset_form(self, email):
+        """
+        Fill in the form and submit it
+        """
+        self.wait_for_element_visibility('#password-reset-email', 'Reset Email field is shown')
+        self.q(css="#password-reset-email").fill(email)
+        self.q(css="button.js-reset").click()
+
+    def is_success_visible(self, selector):
+        """
+        Check element is visible
+        """
+        self.wait_for_element_visibility(selector, 'Success div is shown')
+
+    def get_success_message(self):
+        """
+        Return a success message displayed to the user
+        """
+        return self.q(css=".submission-success h4").text
+
 
 class CombinedLoginAndRegisterPage(PageObject):
     """Interact with combined login and registration page.
@@ -168,7 +188,10 @@ class CombinedLoginAndRegisterPage(PageObject):
             "Finish toggling to the other form"
         ).fulfill()
 
-    def register(self, email="", password="", username="", full_name="", country="", terms_of_service=False):
+    def register(
+            self, email="", password="", username="", full_name="", country="", favorite_movie="",
+            terms_of_service=False
+    ):
         """Fills in and submits the registration form.
 
         Requires that the "register" form is visible.
@@ -197,6 +220,8 @@ class CombinedLoginAndRegisterPage(PageObject):
             self.q(css="#register-password").fill(password)
         if country:
             self.q(css="#register-country option[value='{country}']".format(country=country)).click()
+        if favorite_movie:
+            self.q(css="#register-favorite_movie").fill(favorite_movie)
         if terms_of_service:
             self.q(css="#register-honor_code").click()
 

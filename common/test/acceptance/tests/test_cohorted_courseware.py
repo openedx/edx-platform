@@ -18,6 +18,7 @@ from ..pages.lms.auto_auth import AutoAuthPage as LmsAutoAuthPage
 from ..tests.lms.test_lms_user_preview import verify_expected_problem_visibility
 
 from bok_choy.promise import EmptyPromise
+from bok_choy.page_object import XSS_INJECTION
 
 
 @attr('shard_5')
@@ -28,8 +29,8 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
         super(EndToEndCohortedCoursewareTest, self).setUp(is_staff=is_staff)
         self.staff_user = self.user
 
-        self.content_group_a = "Content Group A"
-        self.content_group_b = "Content Group B"
+        self.content_group_a = "Content Group A" + XSS_INJECTION
+        self.content_group_b = "Content Group B" + XSS_INJECTION
 
         # Create a student who will be in "Cohort A"
         self.cohort_a_student_username = "cohort_a_student"

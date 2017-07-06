@@ -11,7 +11,6 @@ from uuid import uuid4
 
 from celery.states import SUCCESS, FAILURE
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.test.testcases import TestCase
 from django.contrib.auth.models import User
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
@@ -151,6 +150,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
     def login_username(self, username):
         """Login the user, given the `username`."""
         if self.current_user != username:
+            self.logout()
             user_email = User.objects.get(username=username).email
             self.login(user_email, "test")
             self.current_user = username
@@ -175,7 +175,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
     def get_task_status(task_id):
         """Use api method to fetch task status, using mock request."""
         mock_request = Mock()
-        mock_request.REQUEST = {'task_id': task_id}
+        mock_request.GET = mock_request.POST = {'task_id': task_id}
         response = instructor_task_status(mock_request)
         status = json.loads(response.content)
         return status
@@ -291,9 +291,14 @@ class TestReportMixin(object):
     Cleans up after tests that place files in the reports directory.
     """
     def tearDown(self):
-        reports_download_path = settings.GRADES_DOWNLOAD['ROOT_PATH']
-        if os.path.exists(reports_download_path):
-            shutil.rmtree(reports_download_path)
+        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+        try:
+            reports_download_path = report_store.storage.path('')
+        except NotImplementedError:
+            pass  # storage backend does not use the local filesystem
+        else:
+            if os.path.exists(reports_download_path):
+                shutil.rmtree(reports_download_path)
 
     def verify_rows_in_csv(self, expected_rows, file_index=0, verify_order=True, ignore_other_columns=False):
         """
@@ -316,7 +321,8 @@ class TestReportMixin(object):
         """
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         report_csv_filename = report_store.links_for(self.course.id)[file_index][0]
-        with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
+        report_path = report_store.path_to(self.course.id, report_csv_filename)
+        with report_store.storage.open(report_path) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
             csv_rows = [row for row in unicodecsv.DictReader(csv_file)]
 
@@ -329,3 +335,14 @@ class TestReportMixin(object):
                 self.assertEqual(csv_rows, expected_rows)
             else:
                 self.assertItemsEqual(csv_rows, expected_rows)
+
+    def get_csv_row_with_headers(self):
+        """
+        Helper function to return list with the column names from the CSV file (the first row)
+        """
+        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+        report_csv_filename = report_store.links_for(self.course.id)[0][0]
+        report_path = report_store.path_to(self.course.id, report_csv_filename)
+        with report_store.storage.open(report_path) as csv_file:
+            rows = unicodecsv.reader(csv_file, encoding='utf-8')
+            return rows.next()

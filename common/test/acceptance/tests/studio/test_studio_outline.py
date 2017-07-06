@@ -1546,7 +1546,7 @@ class PublishSectionTest(CourseOutlineTest):
         self.assertTrue(section.publish_action)
         self.courseware.visit()
         self.assertEqual(1, self.courseware.num_xblock_components)
-        self.course_nav.go_to_sequential_position(2)
+        self.courseware.go_to_sequential_position(2)
         self.assertEqual(1, self.courseware.num_xblock_components)
 
     def test_section_publishing(self):
@@ -1571,7 +1571,7 @@ class PublishSectionTest(CourseOutlineTest):
         self.assertFalse(unit.publish_action)
         self.courseware.visit()
         self.assertEqual(1, self.courseware.num_xblock_components)
-        self.course_nav.go_to_sequential_position(2)
+        self.courseware.go_to_sequential_position(2)
         self.assertEqual(1, self.courseware.num_xblock_components)
         self.course_nav.go_to_section(SECTION_NAME, 'Test Subsection 2')
         self.assertEqual(1, self.courseware.num_xblock_components)

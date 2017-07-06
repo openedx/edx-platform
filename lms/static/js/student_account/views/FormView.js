@@ -55,7 +55,7 @@
             render: function( html ) {
                 var fields = html || '';
 
-                $(this.el).html( _.template( this.tpl, {
+                $(this.el).html( _.template(this.tpl)({
                     fields: fields
                 }));
 
@@ -84,7 +84,7 @@
                         data[i].errorMessages = this.escapeStrings( data[i].errorMessages );
                     }
 
-                    html.push( _.template( fieldTpl, $.extend( data[i], {
+                    html.push( _.template(fieldTpl)($.extend( data[i], {
                         form: this.formType,
                         requiredStr: this.requiredStr
                     }) ) );

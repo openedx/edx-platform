@@ -2,7 +2,7 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'common/js/spec_helpers/ajax_helpers',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/page_helpers',
     'teams/js/views/edit_team',
     'teams/js/models/team',
@@ -140,7 +140,7 @@ define([
             AjaxHelpers.respondWithJson(requests, _.extend({}, teamsData, teamAction === 'create' ? {id: '123'} : {}));
 
             expect(teamEditView.$('.create-team.wrapper-msg .copy').text().trim().length).toBe(0);
-            expect(Backbone.history.navigate.calls[0].args).toContain(expectedUrl);
+            expect(Backbone.history.navigate.calls.mostRecent().args[0]).toBe(expectedUrl);
         };
 
         var assertValidationMessagesWhenFieldsEmpty = function(that) {
@@ -217,7 +217,7 @@ define([
         var assertRedirectsToCorrectUrlOnCancel = function(expectedUrl) {
             var teamEditView = createEditTeamView();
             teamEditView.$('.create-team.form-actions .action-cancel').click();
-            expect(Backbone.history.navigate.calls[0].args).toContain(expectedUrl);
+            expect(Backbone.history.navigate.calls.mostRecent().args[0]).toBe(expectedUrl);
         };
 
         describe('NewTeam', function () {

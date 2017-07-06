@@ -3,7 +3,6 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.conf import settings
-from microsite_configuration import microsite
 %>
 <%block name="pagetitle">${_("Shopping cart")}</%block>
 <%block name="headextra">
@@ -13,7 +12,7 @@ from microsite_configuration import microsite
 
 <div class="container">
   <header class="wrapper confirm-enrollment shopping-cart">
-  <h1> ${_("{platform_name} -  Shopping Cart").format(platform_name=microsite.get_value('platform_name', settings.PLATFORM_NAME))}</h1>
+  <h1> ${_("{platform_name} -  Shopping Cart").format(platform_name=static.get_platform_name())}</h1>
       % if shoppingcart_items:
       <ol class="steps">
           <li <%block name="review_highlight"/>>${_('Review')}</li>

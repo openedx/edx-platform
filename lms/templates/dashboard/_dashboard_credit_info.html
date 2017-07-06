@@ -15,11 +15,15 @@
 
         # Translators: provider_name is the name of a credit provider or university (e.g. State University)
         credit_msg = _("You have completed this course and are eligible to purchase course credit. Select <strong>Get Credit</strong> to get started.")
+        if credit_status['provider_name']:
+            credit_msg = _("You are now eligible for credit from {provider}. Congratulations!").format(provider=credit_status['provider_name'])
+
         credit_msg_class = "credit-eligibility-msg"
         credit_btn_class = "purchase-credit-btn"
         credit_btn_label = _("Get Credit")
+        ecommerce_url_root = static.get_value('ECOMMERCE_PUBLIC_URL_ROOT', settings.ECOMMERCE_PUBLIC_URL_ROOT)
         credit_btn_href = '{root}/credit/checkout/{course_id}/'.format(
-            root=settings.ECOMMERCE_PUBLIC_URL_ROOT,
+            root=ecommerce_url_root,
             course_id=credit_status['course_key'])
 
         if credit_status["purchased"]:

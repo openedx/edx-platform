@@ -1,9 +1,9 @@
-(function () {
+(function() {
     'use strict';
 
-    var getModulesList = function (modules) {
-        return modules.map(function (moduleName) {
-            return { name: moduleName };
+    var getModulesList = function(modules) {
+        return modules.map(function(moduleName) {
+            return {name: moduleName};
         });
     };
 
@@ -11,18 +11,23 @@
         process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE : 'uglify2';
 
     return {
-        namespace: "RequireJS",
+        namespace: 'RequireJS',
         /**
          * List the modules that will be optimized. All their immediate and deep
          * dependencies will be included in the module's file when the build is
          * done.
          */
         modules: getModulesList([
+            'js/api_admin/catalog_preview_factory',
+            'js/courseware/courseware_factory',
             'js/discovery/discovery_factory',
             'js/edxnotes/views/notes_visibility_factory',
             'js/edxnotes/views/page_factory',
             'js/financial-assistance/financial_assistance_form_factory',
             'js/groups/views/cohorts_dashboard_factory',
+            'js/header_factory',
+            'js/learner_dashboard/program_details_factory',
+            'js/learner_dashboard/program_list_factory',
             'js/search/course/course_search_factory',
             'js/search/dashboard/dashboard_search_factory',
             'js/student_account/logistration_factory',
@@ -30,8 +35,10 @@
             'js/student_account/views/finish_auth_factory',
             'js/student_profile/views/learner_profile_factory',
             'js/views/message_banner',
-            'teams/js/teams_tab_factory',
-            'support/js/certificates_factory'
+            'lms/js/preview/preview_factory',
+            'support/js/certificates_factory',
+            'support/js/enrollment_factory',
+            'teams/js/teams_tab_factory'
         ]),
 
         /**
@@ -60,14 +67,21 @@
             'gettext': 'empty:',
             'coffee/src/ajax_prefix': 'empty:',
             'jquery': 'empty:',
+            'jquery-migrate': 'empty:',
             'jquery.cookie': 'empty:',
             'jquery.url': 'empty:',
             'backbone': 'empty:',
             'underscore': 'empty:',
+            'underscore.string': 'empty:',
             'logger': 'empty:',
             'utility': 'empty:',
             'URI': 'empty:',
-            'DiscussionModuleView': 'empty:'
+            'DiscussionModuleView': 'empty:',
+            'modernizr': 'empty',
+
+            // Don't bundle UI Toolkit helpers as they are loaded into the "edx" namespace
+            'edx-ui-toolkit/js/utils/html-utils': 'empty:',
+            'edx-ui-toolkit/js/utils/string-utils': 'empty:'
         },
 
         /**
@@ -78,7 +92,7 @@
         /**
          * Stub out requireJS text in the optimized file, but leave available for non-optimized development use.
          */
-        stubModules: ["text"],
+        stubModules: ['text'],
 
         /**
          * If shim config is used in the app during runtime, duplicate the config
@@ -148,4 +162,4 @@
          */
         logLevel: 1
     };
-} ())
+}())

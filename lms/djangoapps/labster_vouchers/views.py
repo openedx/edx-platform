@@ -18,8 +18,9 @@ from django.http import Http404
 
 from edxmako.shortcuts import render_to_response
 from enrollment.api import add_enrollment
+from openedx.core.lib.exceptions import CourseNotFoundError
 from enrollment.errors import (
-    CourseNotFoundError, CourseEnrollmentError, CourseEnrollmentExistsError
+    CourseEnrollmentError, CourseEnrollmentExistsError
 )
 from labster_course_license.models import CourseLicense
 from labster_vouchers import forms, tasks

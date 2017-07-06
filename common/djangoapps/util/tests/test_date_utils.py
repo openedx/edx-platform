@@ -9,8 +9,7 @@ import unittest
 import ddt
 from mock import patch
 from nose.tools import assert_equals, assert_false  # pylint: disable=no-name-in-module
-from pytz import UTC
-
+from pytz import utc
 from util.date_utils import (
     get_default_time_display, get_time_display, almost_same_datetime,
     strftime_localized,
@@ -19,7 +18,7 @@ from util.date_utils import (
 
 def test_get_default_time_display():
     assert_equals("", get_default_time_display(None))
-    test_time = datetime(1992, 3, 12, 15, 3, 30, tzinfo=UTC)
+    test_time = datetime(1992, 3, 12, 15, 3, 30, tzinfo=utc)
     assert_equals(
         "Mar 12, 1992 at 15:03 UTC",
         get_default_time_display(test_time))
@@ -34,12 +33,12 @@ def test_get_dflt_time_disp_notz():
 
 def test_get_time_disp_ret_empty():
     assert_equals("", get_time_display(None))
-    test_time = datetime(1992, 3, 12, 15, 3, 30, tzinfo=UTC)
+    test_time = datetime(1992, 3, 12, 15, 3, 30, tzinfo=utc)
     assert_equals("", get_time_display(test_time, ""))
 
 
 def test_get_time_display():
-    test_time = datetime(1992, 3, 12, 15, 3, 30, tzinfo=UTC)
+    test_time = datetime(1992, 3, 12, 15, 3, 30, tzinfo=utc)
     assert_equals("dummy text", get_time_display(test_time, 'dummy text'))
     assert_equals("Mar 12 1992", get_time_display(test_time, '%b %d %Y'))
     assert_equals("Mar 12 1992 UTC", get_time_display(test_time, '%b %d %Y %Z'))
@@ -47,15 +46,15 @@ def test_get_time_display():
 
 
 def test_get_time_pass_through():
-    test_time = datetime(1992, 3, 12, 15, 3, 30, tzinfo=UTC)
+    test_time = datetime(1992, 3, 12, 15, 3, 30, tzinfo=utc)
     assert_equals("Mar 12, 1992 at 15:03 UTC", get_time_display(test_time))
     assert_equals("Mar 12, 1992 at 15:03 UTC", get_time_display(test_time, None))
     assert_equals("Mar 12, 1992 at 15:03 UTC", get_time_display(test_time, "%"))
 
 
 def test_get_time_display_coerce():
-    test_time_standard = datetime(1992, 1, 12, 15, 3, 30, tzinfo=UTC)
-    test_time_daylight = datetime(1992, 7, 12, 15, 3, 30, tzinfo=UTC)
+    test_time_standard = datetime(1992, 1, 12, 15, 3, 30, tzinfo=utc)
+    test_time_daylight = datetime(1992, 7, 12, 15, 3, 30, tzinfo=utc)
     assert_equals("Jan 12, 1992 at 07:03 PST",
                   get_time_display(test_time_standard, None, coerce_tz="US/Pacific"))
     assert_equals("Jan 12, 1992 at 15:03 UTC",

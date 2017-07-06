@@ -13,7 +13,7 @@ from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
 import dogstats_wrapper as dog_stats_api
 from edxmako.shortcuts import render_to_response
 import zendesk
-from microsite_configuration import microsite
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 import calc
 import track.views
@@ -214,7 +214,7 @@ def _record_feedback_in_zendesk(
 
     # Per edX support, we would like to be able to route white label feedback items
     # via tagging
-    white_label_org = microsite.get_value('course_org_filter')
+    white_label_org = configuration_helpers.get_value('course_org_filter')
     if white_label_org:
         zendesk_tags = zendesk_tags + ["whitelabel_{org}".format(org=white_label_org)]
 
@@ -374,3 +374,22 @@ def accepts(request, media_type):
     """Return whether this request has an Accept header that matches type"""
     accept = parse_accept_header(request.META.get("HTTP_ACCEPT", ""))
     return media_type in [t for (t, p, q) in accept]
+
+
+def add_p3p_header(view_func):
+    """
+    This decorator should only be used with views which may be displayed through the iframe.
+    It adds additional headers to response and therefore gives IE browsers an ability to save cookies inside the iframe
+    Details:
+    http://blogs.msdn.com/b/ieinternals/archive/2013/09/17/simple-introduction-to-p3p-cookie-blocking-frame.aspx
+    http://stackoverflow.com/questions/8048306/what-is-the-most-broad-p3p-header-that-will-work-with-ie
+    """
+    @wraps(view_func)
+    def inner(request, *args, **kwargs):
+        """
+        Helper function
+        """
+        response = view_func(request, *args, **kwargs)
+        response['P3P'] = settings.P3P_HEADER
+        return response
+    return inner

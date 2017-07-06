@@ -1,6 +1,7 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "schedule" %></%def>
-<%block name="title">${_("Schedule &amp; Details Settings")}</%block>
+<%block name="title">${_("Schedule & Details Settings")}</%block>
 <%block name="bodyclass">is-signedin course schedule view-settings feature-upload</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -8,11 +9,14 @@
   import urllib
   from django.utils.translation import ugettext as _
   from contentstore import utils
-  from openedx.core.lib.js_utils import escape_json_dumps
+  from openedx.core.djangolib.js_utils import (
+      dump_js_escaped_json, js_escaped_string
+  )
+  from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <%block name="header_extras">
-% for template_name in ["basic-modal", "modal-button", "upload-dialog", "license-selector"]:
+% for template_name in ["basic-modal", "modal-button", "upload-dialog", "license-selector", "course-settings-learning-fields", "course-instructor-details"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -25,13 +29,16 @@
   <script type="text/javascript">
 window.CMS = window.CMS || {};
 CMS.URL = CMS.URL || {};
-CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
+CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
   </script>
 </%block>
 
 <%block name="requirejs">
     require(["js/factories/settings"], function(SettingsFactory) {
-        SettingsFactory("${details_url}", ${escape_json_dumps(show_min_grade_warning) | n});
+        SettingsFactory(
+            "${details_url | n, js_escaped_string}",
+            ${show_min_grade_warning | n, dump_js_escaped_json}
+        );
     });
 </%block>
 
@@ -46,10 +53,10 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 </div>
 
 <div class="wrapper-content wrapper">
-  <section class="content">
-    <article class="content-primary" role="main">
+  <div class="content">
+    <div class="content-primary">
       <form id="settings_details" class="settings-details" method="post" action="">
-        <section class="group-settings basic">
+        <div class="group-settings basic">
           <header>
             <h2 class="title-2">${_("Basic Information")}</h2>
             <span class="tip">${_("The nuts and bolts of your course")}</span>
@@ -99,7 +106,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                 %>
                 <a title="${_('Send a note to students via email')}"
                     href="mailto:someone@domain.com?Subject=${email_subject}&body=${email_body}" class="action action-primary">
-                    <i class="icon fa fa-envelope-o icon-inline"></i>${_("Invite your students")}</a>
+                    <span class="icon fa fa-envelope-o icon-inline" aria-hidden="true"></span>${_("Invite your students")}</a>
               </li>
             </ul>
           </div>
@@ -117,11 +124,11 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
             </div>
           </div>
           % endif
-        </section>
+        </div>
         <hr class="divide" />
 
         % if credit_eligibility_enabled and is_credit_course:
-          <section class="group-settings basic">
+          <div class="group-settings basic">
             <header>
               <h2 class="title-2">${_("Course Credit Requirements")}</h2>
               <span class="tip">${_("Steps required to earn course credit")}</span>
@@ -166,11 +173,11 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               % else:
                 <p>No credit requirements found.</p>
               % endif
-          </section>
+          </div>
           <hr class="divide" />
         % endif
 
-        <section class="group-settings schedule">
+        <div class="group-settings schedule">
           <header>
             <h2 class="title-2">${_('Course Schedule')}</h2>
             <span class="tip">${_('Dates that control when your course can be viewed')}</span>
@@ -221,7 +228,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               </div>
             </li>
             <%
-              enrollment_end_readonly = "readonly aria-readonly=\"true\"" if not enrollment_end_editable else ""
+              enrollment_end_readonly = HTML("readonly aria-readonly=\"true\"") if not enrollment_end_editable else ""
               enrollment_end_editable_class = "is-not-editable" if not enrollment_end_editable else ""
             %>
             <li class="field-group field-group-enrollment-end" id="enrollment-end">
@@ -248,19 +255,22 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
           <div class="notice notice-incontext notice-workflow">
             <h3 class="title">${_("These Dates Are Not Used When Promoting Your Course")}</h3>
             <div class="copy">
-              <p>${_(
-                'These dates impact <strong>when your courseware can be viewed</strong>, '
-                'but they are <strong>not the dates shown on your course summary page</strong>. '
+              <p>${Text(_(
+                'These dates impact {strong_start}when your courseware can be viewed{strong_end}, '
+                'but they are {strong_start}not the dates shown on your course summary page{strong_end}. '
                 'To provide the course start and registration dates as shown on your course '
                 'summary page, follow the instructions provided by your Program Manager.'
+                )).format(
+                  strong_start=HTML('<strong>'),
+                  strong_end=HTML('</strong>')
               )}</p>
             </div>
           </div>
           % endif
-        </section>
+        </div>
 
         % if about_page_editable:
-        <section class="group-settings course_details">
+        <div class="group-settings course_details">
           <header>
             <h2 class="title-2">${_('Course Details')}</h2>
             <span class="tip">${_('Provide useful information about your course')}</span>
@@ -277,19 +287,43 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               <span class="tip tip-stacked">${_("Identify the course language here. This is used to assist users find courses that are taught in a specific language.")}</span>
             </li>
           </ol>
-        </section>
+        </div>
         % endif
 
         <hr class="divide" />
-            <section class="group-settings marketing">
+            <div class="group-settings marketing">
               <header>
                 <h2 class="title-2">${_("Introducing Your Course")}</h2>
                 <span class="tip">${_("Information for prospective students")}</span>
               </header>
               <ol class="list-input">
+
+                % if enable_extended_course_details:
+                <li class="field text" id="field-course-title">
+                  <label for="course-title">${_("Course Title")}</label>
+                  <input type="text" id="course-title" data-display-name="${context_course.display_name}">
+                  <span class="tip tip-stacked">${_("Displayed as title on the course details page. Limit to 50 characters.")}</span>
+                </li>
+                <li class="field text" id="field-course-subtitle">
+                  <label for="course-subtitle">${_("Course Subtitle")}</label>
+                  <input type="text" id="course-subtitle">
+                  <span class="tip tip-stacked">${_("Displayed as subtitle on the course details page. Limit to 150 characters.")}</span>
+                </li>
+                <li class="field text" id="field-course-duration">
+                  <label for="course-duration">${_("Course Duration")}</label>
+                  <input type="text" id="course-duration">
+                  <span class="tip tip-stacked">${_("Displayed on the course details page. Limit to 50 characters.")}</span>
+                </li>
+                <li class="field text" id="field-course-description">
+                  <label for="course-description">${_("Course Description")}</label>
+                  <textarea class="text" id="course-description"></textarea>
+                  <span class="tip tip-stacked">${_("Displayed on the course details page. Limit to 1000 characters.")}</span>
+                </li>
+                % endif
+
                 % if short_description_editable:
                 <li class="field text" id="field-course-short-description">
-                  <label for="course-overview">${_("Course Short Description")}</label>
+                  <label for="course-short-description">${_("Course Short Description")}</label>
                   <textarea class="text" id="course-short-description"></textarea>
                   <span class="tip tip-stacked">${_("Appears on the course catalog page when students roll over the course name. Limit to ~150 characters")}</span>
                 </li>
@@ -299,31 +333,32 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                 <li class="field text" id="field-course-overview">
                   <label for="course-overview">${_("Course Overview")}</label>
                   <textarea class="tinymce text-editor" id="course-overview"></textarea>
-                  <%def name='overview_text()'><%
-                    a_link_start = '<a class="link-courseURL" rel="external" href="'
-                    a_link_end = '">' + _("your course summary page") + '</a>'
-                    a_link = a_link_start + lms_link_for_about_page + a_link_end
-                    text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link
-                    %>${text}</%def>
-                  <span class="tip tip-stacked">${overview_text()}</span>
+                  <span class="tip tip-stacked">${
+                    Text(_("Introductions, prerequisites, FAQs that are used on {a_link_start}your course summary page{a_link_end} (formatted in HTML)")).format(
+                      a_link_start=HTML("<a class='link-courseURL' rel='external' href='{lms_link_for_about_page}'>").format(lms_link_for_about_page=lms_link_for_about_page),
+                      a_link_end=HTML("</a>")
+                    )}</span>
                 </li>
                 % endif
 
                 <li class="field image" id="field-course-image">
-                  <label>${_("Course Image")}</label>
+                  <label for="course-image-url">${_("Course Card Image")}</label>
                   <div class="current current-course-image">
                     % if context_course.course_image:
                     <span class="wrapper-course-image">
-                      <img class="course-image" id="course-image" src="${course_image_url}" alt="${_('Course Image')}"/>
+                      <img class="course-image" id="course-image" src="${course_image_url}" alt="${_('Course Card Image')}"/>
                     </span>
 
                     <span class="msg msg-help">
-                    ${_("You can manage this image along with all of your other <a href='{}'>files &amp; uploads</a>").format(upload_asset_url)}
+                    ${Text(_("You can manage this image along with all of your other {a_link_start}files and uploads{a_link_end}")).format(
+                      a_link_start=HTML("<a href='{upload_asset_url}'>").format(upload_asset_url=upload_asset_url),
+                      a_link_end=HTML("</a>")
+                      )}
                     </span>
 
                     % else:
                     <span class="wrapper-course-image">
-                      <img class="course-image placeholder" id="course-image" src="${course_image_url}" alt="${_('Course Image')}"/>
+                      <img class="course-image placeholder" id="course-image" src="${course_image_url}" alt="${_('Course Card Image')}"/>
                     </span>
                     <span class="msg msg-empty">${_("Your course currently does not have an image. Please upload one (JPEG or PNG format, and minimum suggested dimensions are 375px wide by 200px tall)")}</span>
                     % endif
@@ -335,13 +370,81 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                       <input type="text" dir="ltr" class="long new-course-image-url" id="course-image-url" value="" placeholder="${_("Your course image URL")}" autocomplete="off" />
                       <span class="tip tip-stacked">${_("Please provide a valid path and name to your course image (Note: only JPEG or PNG format supported)")}</span>
                     </div>
-                    <button type="button" class="action action-upload-image">${_("Upload Course Image")}</button>
+                    <button type="button" class="action action-upload-image" id="upload-course-image">${_("Upload Course Card Image")}</button>
                   </div>
                 </li>
 
+                % if enable_extended_course_details:
+                <li class="field image" id="field-banner-image">
+                  <label for="banner-image-url">${_("Course Banner Image")}</label>
+                  <div class="current current-course-image">
+                    % if context_course.banner_image:
+                    <span class="wrapper-course-image">
+                      <img class="course-image" id="banner-image" src="${banner_image_url}" alt="${_('Course Banner Image')}"/>
+                    </span>
+
+                    <span class="msg msg-help">
+                    ${Text(_("You can manage this image along with all of your other {a_link_start}files and uploads{a_link_end}")).format(
+                      a_link_start=HTML("<a href='{upload_asset_url}'>").format(upload_asset_url=upload_asset_url),
+                      a_link_end=HTML("</a>")
+                      )}
+                    </span>
+
+                    % else:
+                    <span class="wrapper-course-image">
+                      <img class="course-image placeholder" id="banner-image" src="${banner_image_url}" alt="${_('Course Banner Image')}"/>
+                    </span>
+                    <span class="msg msg-empty">${_("Your course currently does not have an image. Please upload one (JPEG or PNG format, and minimum suggested dimensions are 1440px wide by 400px tall)")}</span>
+                    % endif
+                  </div>
+
+                  <div class="wrapper-input">
+                    <div class="input">
+                      ## Translators: This is the placeholder text for a field that requests the URL for a course banner image
+                      <input type="text" dir="ltr" class="long new-course-image-url" id="banner-image-url" value="" placeholder="${_("Your banner image URL")}" autocomplete="off" />
+                      <span class="tip tip-stacked">${_("Please provide a valid path and name to your banner image (Note: only JPEG or PNG format supported)")}</span>
+                    </div>
+                    <button type="button" class="action action-upload-image" id="upload-banner-image">${_("Upload Course Banner Image")}</button>
+                  </div>
+                </li>
+
+                <li class="field image" id="field-video-thumbnail-image">
+                  <label for="video-thumbnail-image-url">${_("Course Video Thumbnail Image")}</label>
+                  <div class="current current-course-image">
+                    % if context_course.video_thumbnail_image:
+                    <span class="wrapper-course-image">
+                      <img class="course-image" id="video-thumbnail-image" src="${video_thumbnail_image_url}" alt="${_('Video Thumbnail Image')}"/>
+                    </span>
+
+                    <span class="msg msg-help">
+                    ${Text(_("You can manage this image along with all of your other {a_link_start}files and uploads{a_link_end}")).format(
+                      a_link_start=HTML("<a href='{upload_asset_url}'>").format(upload_asset_url=upload_asset_url),
+                      a_link_end=HTML("</a>")
+                      )}
+                    </span>
+
+                    % else:
+                    <span class="wrapper-course-image">
+                      <img class="course-image placeholder" id="video-thumbnail-image" src="${video_thumbnail_image_url}" alt="${_('Video Thumbnail Image')}"/>
+                    </span>
+                    <span class="msg msg-empty">${_("Your course currently does not have a video thumbnail image. Please upload one (JPEG or PNG format, and minimum suggested dimensions are 375px wide by 200px tall)")}</span>
+                    % endif
+                  </div>
+
+                  <div class="wrapper-input">
+                    <div class="input">
+                      ## Translators: This is the placeholder text for a field that requests the URL for a course video thumbnail image
+                      <input type="text" dir="ltr" class="long new-course-image-url" id="video-thumbnail-image-url" value="" placeholder="${_("Your video thumbnail image URL")}" autocomplete="off" />
+                      <span class="tip tip-stacked">${_("Please provide a valid path and name to your video thumbnail image (Note: only JPEG or PNG format supported)")}</span>
+                    </div>
+                    <button type="button" class="action action-upload-image" id="upload-video-thumbnail-image">${_("Upload Video Thumbnail Image")}</button>
+                  </div>
+                </li>
+                % endif
+
                 % if about_page_editable:
                 <li class="field video" id="field-course-introduction-video">
-                  <label for="course-overview">${_("Course Introduction Video")}</label>
+                  <label for="course-introduction-video">${_("Course Introduction Video")}</label>
                   <div class="input input-existing">
                     <div class="current current-course-introduction-video">
                       <iframe width="618" height="350" title="${_('Course Introduction Video')}" src="" frameborder="0" allowfullscreen></iframe>
@@ -357,14 +460,48 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                     <span class="tip tip-stacked">${_("Enter your YouTube video's ID (along with any restriction parameters)")}</span>
                   </div>
                 </li>
-                % endif
+                  % endif
               </ol>
-            </section>
+            </div>
+
+          % if enable_extended_course_details:
+            <hr class="divide" />
+            <div class="group-settings course-learning-info">
+              <header>
+                <h2 class="title-2">${_("Learning Outcomes")}</h2>
+                <span class="tip">${_("Add the learning outcomes for this course")}</span>
+              </header>
+              <ol class="list-input enum">
+                <li class="course-settings-learning-fields"></li>
+              </ol>
+              <div class="actions">
+                <button type="button" class="action action-primary button new-button add-course-learning-info">
+                  <span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>${_("Add Learning Outcome")}
+                </button>
+              </div>
+            </div>
+
+            <hr class="divide" />
+            <div class="group-settings instructor-types">
+              <header>
+                <h2 class="title-2">${_("Instructors")}</h2>
+                <span class="tip">${_("Add details about the instructors for this course")}</span>
+              </header>
+              <ol class="list-input enum">
+                <li class="course-instructor-details-fields"></li>
+              </ol>
+              <div class="actions">
+                <button type="button" class="action action-primary button new-button add-course-instructor-info">
+                  <span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>${_("Add Instructor")}
+                </button>
+              </div>
+            </div>
+          % endif
 
           % if about_page_editable or is_prerequisite_courses_enabled or is_entrance_exams_enabled:
             <hr class="divide" />
 
-            <section class="group-settings requirements">
+            <div class="group-settings requirements">
               <header>
                 <h2 class="title-2">${_("Requirements")}</h2>
                 <span class="tip">${_("Expectations of the students taking this course")}</span>
@@ -400,7 +537,11 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                             <label for="entrance-exam-enabled">${_("Require students to pass an exam before beginning the course.")}</label>
                         </div>
                          <div class="div-grade-requirements" hidden="hidden">
-                          <p><span class="tip tip-inline">${_("You can now view and author your course entrance exam from the {link_start}Course Outline{link_end}.").format(link_start="<a href='{}'>".format(course_handler_url), link_end="</a>")}</span></p>
+                          <p><span class="tip tip-inline">
+                            ${Text(_("You can now view and author your course entrance exam from the {link_start}Course Outline{link_end}.")).format(
+                              link_start=HTML("<a href='{course_handler_url}'>").format(course_handler_url=course_handler_url),
+                              link_end=HTML("</a>")
+                            )}</span></p>
                           <p><h3>${_("Grade Requirements")}</h3></p>
                           <p><div><input type="text" id="entrance-exam-minimum-score-pct" aria-describedby="min-score-format"><span id="min-score-format" class="tip tip-inline">${_(" %")}</span></div></p>
                           <p><span class="tip tip-inline">${_("The score student must meet in order to successfully complete the entrance exam. ")}</span></p>
@@ -409,14 +550,14 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                 </li>
                 % endif
               </ol>
-            </section>
+            </div>
           % endif
 
           % if self_paced_enabled:
 
             <hr class="divide" />
 
-            <section class="group-settings pacing">
+            <div class="group-settings pacing">
               <header>
                 <h2 class="title-2">${_("Course Pacing")}</h2>
                 <span class="tip">${_("Set the pacing for this course")}</span>
@@ -435,14 +576,14 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                   <span class="tip">${_("Self-paced courses do not have release dates for course content or due dates for assignments. Learners can complete course material at any time before the course end date.")}</span>
                 </li>
               </ol>
-            </section>
+            </div>
 
           % endif
 
           % if settings.FEATURES.get("LICENSING", False):
             <hr class="divide" />
 
-            <section class="group-settings license">
+            <div class="group-settings license">
               <header>
                 <h2 class="title-2">${_("Course Content License")}</h2>
                 ## Translators: At the course settings, the editor is able to select the default course content license.
@@ -456,11 +597,11 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                   <div id="course-license-selector"></div>
                 </li>
               </ol>
-            </section>
+            </div>
           % endif
       </form>
-    </article>
-    <aside class="content-supplementary" role="complementary">
+    </div>
+    <div class="content-supplementary" role="complementary">
      <div class="bit">
         <h3 class="title-3">${_("How are these settings used?")}</h3>
         <p>${_("Your course's schedule determines when students can enroll in and begin a course.")}</p>
@@ -486,7 +627,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
         </nav>
      % endif
      </div>
-    </aside>
-  </section>
+    </div>
+  </div>
 </div>
 </%block>

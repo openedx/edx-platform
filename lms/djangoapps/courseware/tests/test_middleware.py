@@ -10,18 +10,21 @@ from nose.plugins.attrib import attr
 
 import courseware.courses as courses
 from courseware.middleware import RedirectUnenrolledMiddleware
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr('shard_1')
-class CoursewareMiddlewareTestCase(ModuleStoreTestCase):
+class CoursewareMiddlewareTestCase(SharedModuleStoreTestCase):
     """Tests that courseware middleware is correctly redirected"""
+
+    @classmethod
+    def setUpClass(cls):
+        super(CoursewareMiddlewareTestCase, cls).setUpClass()
+        cls.course = CourseFactory.create()
 
     def setUp(self):
         super(CoursewareMiddlewareTestCase, self).setUp()
-
-        self.course = CourseFactory.create()
 
     def check_user_not_enrolled_redirect(self):
         """A UserNotEnrolled exception should trigger a redirect"""

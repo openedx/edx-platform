@@ -1,0 +1,43 @@
+<div class="section">
+    <div class="course-meta-container col-12 md-col-8 sm-col-12">
+        <div class="course-image-container">
+            <% if (course_url){ %>
+                <a href="<%- course_url %>" class="course-image-link">
+                    <img
+                        class="header-img"
+                        src="<%- course_image_url %>"
+                        alt="<%= interpolate(gettext('%(courseName)s Home Page.'), {courseName: display_name}, true) %>"/>
+                </a>
+            <% } else { %>
+                <img
+                    class="header-img"
+                    src="<%- course_image_url %>"
+                    alt="" />
+            <% } %>
+
+        </div>
+        <div class="course-details">
+            <h3 class="course-title">
+                <% if (course_url){ %>
+                    <a href="<%- course_url %>" class="course-title-link">
+                        <%- display_name %>
+                    </a>
+                <% }else{ %>
+                    <%- display_name %>
+                <% } %>
+            </h3>
+            <div class="course-text">
+                <% if (start_date && end_date){ %>
+                    <span class="run-period"><%- start_date %> - <%- end_date %></span>
+                    -
+                <% } %>
+                <span class="course-key"><%- key %></span>
+            </div>
+        </div>
+    </div>
+    <div class="course-actions col-12 md-col-4 sm-col-12">        
+    </div>
+</div>
+<div class="section action-msg-view"></div>
+<div class="section upgrade-message"></div>
+<div class="section certificate-status"></div>

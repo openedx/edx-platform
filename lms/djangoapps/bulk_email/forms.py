@@ -100,11 +100,4 @@ class CourseAuthorizationAdminForm(forms.ModelForm):
             msg += 'Please recheck that you have supplied a valid course id.'
             raise forms.ValidationError(msg)
 
-        # Now, try and discern if it is a Studio course - HTML editor doesn't work with XML courses
-        is_studio_course = modulestore().get_modulestore_type(course_key) != ModuleStoreEnum.Type.xml
-        if not is_studio_course:
-            msg = "Course Email feature is only available for courses authored in Studio. "
-            msg += '"{0}" appears to be an XML backed course.'.format(course_key.to_deprecated_string())
-            raise forms.ValidationError(msg)
-
         return course_key

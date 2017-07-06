@@ -4,7 +4,9 @@ Command-line utility to start a stub service.
 import sys
 import time
 import logging
+
 from .comments import StubCommentsService
+from .ecommerce import StubEcommerceService
 from .xqueue import StubXQueueService
 from .youtube import StubYouTubeService
 from .lti import StubLtiService
@@ -23,6 +25,7 @@ SERVICES = {
     'video': VideoSourceHttpService,
     'edxnotes': StubEdxNotesService,
     'programs': StubProgramsService,
+    'ecommerce': StubEcommerceService,
 }
 
 # Log to stdout, including debug messages

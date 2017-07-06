@@ -39,5 +39,5 @@ class MatlabProblemPage(PageObject):
         """
         Returns the text value of given class.
         """
-        self.wait_for_ajax()
+        self.wait_for_element_visibility(class_name, 'Grader message is visible')
         return self.q(css=class_name).text

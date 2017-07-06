@@ -22,7 +22,7 @@ class DashboardPage(PageObject):
     url = "{base}/dashboard".format(base=BASE_URL)
 
     def is_browser_on_page(self):
-        return self.q(css='section.my-courses').present
+        return self.q(css='.my-courses').present
 
     @property
     def current_courses_text(self):
@@ -31,7 +31,7 @@ class DashboardPage(PageObject):
         shows all the courses that the student is enrolled in.
         The string displayed is defined in lms/templates/dashboard.html.
         """
-        text_items = self.q(css='section#my-courses').text
+        text_items = self.q(css='#my-courses').text
         if len(text_items) > 0:
             return text_items[0]
         else:
@@ -192,3 +192,14 @@ class DashboardPage(PageObject):
         Click on `Account` link.
         """
         self.q(css='.dropdown-menu li a').nth(2).click()
+
+    @property
+    def language_selector(self):
+        """
+        return language selector
+        """
+        self.wait_for_element_visibility(
+            '#settings-language-value',
+            'Language selector element is available'
+        )
+        return self.q(css='#settings-language-value')

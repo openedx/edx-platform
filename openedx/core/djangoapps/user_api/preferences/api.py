@@ -21,6 +21,8 @@ from ..helpers import intercept_errors
 from ..models import UserOrgTag, UserPreference
 from ..serializers import UserSerializer, RawUserPreferenceSerializer
 
+from pytz import common_timezones_set
+
 log = logging.getLogger(__name__)
 
 
@@ -390,6 +392,17 @@ def validate_user_preference_serializer(serializer, preference_key, preference_v
             preference_key: {
                 "developer_message": developer_message,
                 "user_message": user_message,
+            }
+        })
+    if preference_key == "time_zone" and preference_value not in common_timezones_set:
+        developer_message = ugettext_noop(u"Value '{preference_value}' not valid for preference '{preference_key}': Not in timezone set.")  # pylint: disable=line-too-long
+        user_message = ugettext_noop(u"Value '{preference_value}' is not a valid time zone selection.")
+        raise PreferenceValidationError({
+            preference_key: {
+                "developer_message": developer_message.format(
+                    preference_key=preference_key, preference_value=preference_value
+                ),
+                "user_message": user_message.format(preference_key=preference_key, preference_value=preference_value)
             }
         })
 

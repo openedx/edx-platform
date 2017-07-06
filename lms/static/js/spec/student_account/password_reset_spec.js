@@ -4,7 +4,7 @@
             'jquery',
             'underscore',
             'common/js/spec_helpers/template_helpers',
-            'common/js/spec_helpers/ajax_helpers',
+            'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
             'js/student_account/models/PasswordResetModel',
             'js/student_account/views/PasswordResetView'
         ],
@@ -58,7 +58,7 @@
                 // spying on `view.validate` twice
                 if ( !_.isUndefined(validationSuccess) ) {
                     // Force validation to return as expected
-                    spyOn(view, 'validate').andReturn({
+                    spyOn(view, 'validate').and.returnValue({
                         isValid: validationSuccess,
                         message: 'Submission was validated.'
                     });

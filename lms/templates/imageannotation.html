@@ -11,7 +11,7 @@
 <div class="annotatable-wrapper">
     <div class="annotatable-header">
         % if display_name is not UNDEFINED and display_name is not None:
-            <div class="annotatable-title">${display_name}</div>
+            <h3 class="hd hd-2 annotatable-title">${display_name}</h3>
         % endif
     </div>
     % if instructions_html is not UNDEFINED and instructions_html is not None:
@@ -27,12 +27,12 @@
     % endif
     <div class="annotatable-section">
         <div class="annotatable-content">
-            <div id="imageHolder" class="openseadragon1"> 
+            <div id="imageHolder" class="openseadragon1">
                 <%namespace name='static' file='/static_content.html'/>
                 ${static.css(group='style-vendor-tinymce-content', raw=True)}
                 ${static.css(group='style-vendor-tinymce-skin', raw=True)}
                 ${static.css(group='style-xmodule-annotations', raw=True)}
-            </div> 
+            </div>
             <div id="catchDIV">
                 <div class="annotationListContainer">${_('Note: only instructors may annotate.')}</div>
             </div>
@@ -57,9 +57,9 @@
         $(this).parents('.annotatable-section:first').find('.annotatable-instructions')[slideMethod]();
     }
     $('.annotatable-toggle-instructions').on('click', onClickHideInstructions);
-    
+
     //Grab uri of the course
-    var parts = window.location.href.split("/"), 
+    var parts = window.location.href.split("/"),
         uri = '',
     courseid;
     for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
@@ -79,16 +79,16 @@
         optionsAnnotator: {
             permissions:{
                 user: {
-                    id:"${user.email}", 
+                    id:"${user.email}",
                     name:"${user.username}"
                 },
                 userString: function (user) {
-                    if (user && user.name) 
+                    if (user && user.name)
                         return user.name;
                     return user;
                 },
                 userId: function (user) {
-                    if (user && user.id) 
+                    if (user && user.id)
                         return user.id;
                     return user;
                 },
@@ -112,7 +112,7 @@
                       }
                       for (_i = 0, _len = tokens.length; _i < _len; _i++) {
                         token = tokens[_i];
-                        
+
                         if (this.userId(user) === token) {
 
                           return true;
@@ -199,7 +199,7 @@
         window.osda = osda;
         // END TODO
 
-        var userId = ('${default_tab}'.toLowerCase() === 'instructor') ? 
+        var userId = ('${default_tab}'.toLowerCase() === 'instructor') ?
             '${instructor_email}':
             '${user.email}';
 

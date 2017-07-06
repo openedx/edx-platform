@@ -14,18 +14,19 @@ data: |
       edX grading system.
       </p>
       <p>
-      The JS Input problem that you create must use HTML, JavaScript, and cascading
-      style sheets (CSS). You can use any application creation tool, such as the
-      Google Web Toolkit (GWT), to create your JS Input problem.
+      The JS Input problem that you create must use HTML, JavaScript, and
+      cascading style sheets (CSS). You can use any application creation tool,
+      such as the Google Web Toolkit (GWT), to create your JS Input problem.
       </p>
-      <p>      
-      For more information, see 
-      <a href="http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/custom_javascript.html" target="_blank">
+      <p>
+      For more information, see
+      <a href="http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/custom_javascript.html" target="_blank">
       Custom JavaScript Problem</a> in <i>Building and Running an edX Course</i>.
       </p>
-      <p>JavaScript developers should also see <a href="http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/extending_platform/javascript.html" target="_blank">
+      <p>JavaScript developers can also see
+      <a href="http://edx.readthedocs.io/projects/edx-developer-guide/en/latest/extending_platform/javascript.html" target="_blank">
       Custom JavaScript Applications</a> in the <i>EdX Developer's Guide</i>.</p>
-      <p>When you add the problem, be sure to select <strong>Settings</strong> 
+      <p>When you add the problem, be sure to select <strong>Settings</strong>
       to specify a <strong>Display Name</strong> and other values that apply.</p>
       <p>You can use the following example problem as a model.</p>
 
@@ -52,7 +53,7 @@ data: |
         '''
       ]]>
       </script>
-      <p>In the following image, click the objects until the cone is yellow 
+      <p>In the following image, click the objects until the cone is yellow
       and the cube is blue.</p>
       <customresponse cfn="vglcfn">
         <jsinput gradefn="WebGLDemo.getGrade"

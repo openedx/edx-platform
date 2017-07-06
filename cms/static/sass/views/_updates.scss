@@ -66,13 +66,29 @@
       line-height: 30px;
       color: #646464;
       letter-spacing: 1px;
-      text-transform: uppercase;
     }
 
     h3 {
       @extend %t-title6;
       @extend %t-strong;
       margin: 34px 0 11px;
+    }
+
+    .display-date {
+        padding-right: 15px;
+    }
+
+    .message-error {
+        display: inline-block;
+        font-weight: normal;
+        font-size: 1.2em;
+
+        &:before {
+            content: "\f06a";
+            font-family: FontAwesome;
+            color: #fdbc56;
+            padding: 5px;
+        }
     }
   }
 

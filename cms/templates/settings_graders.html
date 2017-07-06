@@ -9,11 +9,13 @@
   from contentstore import utils
   from django.utils.translation import ugettext as _
   from models.settings.encoder import CourseSettingsEncoder
-  from openedx.core.lib.js_utils import escape_json_dumps
+  from openedx.core.djangolib.js_utils import (
+      dump_js_escaped_json, js_escaped_string
+  )
 %>
 
 <%block name="header_extras">
-% for template_name in ["course_grade_policy"]:
+% for template_name in ["course_grade_policy", "course_grade_cutoff"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -25,7 +27,11 @@
 </%block>
 <%block name="requirejs">
     require(["js/factories/settings_graders"], function(SettingsGradersFactory) {
-        SettingsGradersFactory(_.extend(${escape_json_dumps(course_details, cls=CourseSettingsEncoder) | n}, {is_credit_course: ${escape_json_dumps(is_credit_course) | n}}), "${grading_url}");
+        SettingsGradersFactory(
+            _.extend(${dump_js_escaped_json(course_details, cls=CourseSettingsEncoder) | n},
+                {is_credit_course: ${is_credit_course | n, dump_js_escaped_json}}),
+            "${grading_url | n, js_escaped_string}"
+        );
     });
 </%block>
 
@@ -52,7 +58,7 @@
           <ol class="list-input">
             <li class="field" id="field-course-grading-range">
               <div class="grade-controls course-grading-range well">
-                <a href="#" class="new-grade-button"><span class="icon fa fa-plus"></span></a>
+                <a href="#" class="new-grade-button"><span class="icon fa fa-plus" aria-hidden="true"></span><span class="sr">${_("Add grade")}</span></a>
                 <div class="grade-slider" dir="ltr">
                   <div class="grade-bar">
                     <ol class="increments">
@@ -125,7 +131,7 @@
 
           <div class="actions">
             <a href="#" class="new-button new-course-grading-item add-grading-data">
-              <i class="icon fa fa-plus"></i> ${_("New Assignment Type")}
+              <span class="icon fa fa-plus" aria-hidden="true"></span> ${_("New Assignment Type")}
             </a>
           </div>
         </section>

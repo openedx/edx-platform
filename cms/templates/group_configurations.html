@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="content_groups_help_token()"><% return "content_groups" %></%def>
 <%def name="experiment_group_configurations_help_token()"><% return "group_configurations" %></%def>
@@ -5,7 +6,10 @@
 <%!
 from contentstore import utils
 from django.utils.translation import ugettext as _
-from openedx.core.lib.js_utils import escape_json_dumps
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <%block name="title">${_("Group Configurations")}</%block>
@@ -21,7 +25,13 @@ from openedx.core.lib.js_utils import escape_json_dumps
 
 <%block name="requirejs">
   require(["js/factories/group_configurations"], function(GroupConfigurationsFactory) {
-      GroupConfigurationsFactory(${escape_json_dumps(should_show_experiment_groups) | n}, ${escape_json_dumps(experiment_group_configurations) | n}, ${escape_json_dumps(content_group_configuration) | n}, "${group_configuration_url}", "${course_outline_url}");
+      GroupConfigurationsFactory(
+          ${should_show_experiment_groups | n, dump_js_escaped_json},
+          ${experiment_group_configurations | n, dump_js_escaped_json},
+          ${content_group_configuration | n, dump_js_escaped_json},
+          "${group_configuration_url | n, js_escaped_string}",
+          "${course_outline_url | n, js_escaped_string}"
+      );
   });
 </%block>
 
@@ -41,7 +51,7 @@ from openedx.core.lib.js_utils import escape_json_dumps
         <div class="wrapper-groups content-groups">
           <h3 class="title">${_("Content Groups")}</h3>
             <div class="ui-loading">
-                <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
+                <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
             </div>
         </div>
 
@@ -56,7 +66,7 @@ from openedx.core.lib.js_utils import escape_json_dumps
             </div>
           % else:
             <div class="ui-loading">
-                <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
+                <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
             </div>
           % endif
         </div>
@@ -68,7 +78,7 @@ from openedx.core.lib.js_utils import escape_json_dumps
               <h3 class="title-3">${_("Content Groups")}</h3>
               <p>${_("If you have cohorts enabled in your course, you can use content groups to create cohort-specific courseware. In other words, you can customize the content that particular cohorts see in your course.")}</p>
               <p>${_("Each content group that you create can be associated with one or more cohorts. In addition to course content that is intended for all students, you can designate some content as visible only to specified content groups. Only learners in the cohorts that are associated with the specified content groups see the additional content.")}</p>
-              <p>${_("Click {em_start}New content group{em_end} to add a new content group. To edit the name of a content group, hover over its box and click {em_start}Edit{em_end}. You can delete a content group only if it is not in use by a unit. To delete a content group, hover over its box and click the delete icon.").format(em_start="<strong>", em_end="</strong>")}</p>
+              <p>${Text(_("Click {em_start}New content group{em_end} to add a new content group. To edit the name of a content group, hover over its box and click {em_start}Edit{em_end}. You can delete a content group only if it is not in use by a unit. To delete a content group, hover over its box and click the delete icon.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
               <p><a href="${get_online_help_info(content_groups_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn More")}</a></p>
           </div>
         </div>
@@ -77,7 +87,7 @@ from openedx.core.lib.js_utils import escape_json_dumps
           <div class="experiment-groups-doc">
             <h3 class="title-3">${_("Experiment Group Configurations")}</h3>
             <p>${_("Use experiment group configurations if you are conducting content experiments, also known as A/B testing, in your course. Experiment group configurations define how many groups of students are in a content experiment. When you create a content experiment for a course, you select the group configuration to use.")}</p>
-            <p>${_("Click {em_start}New Group Configuration{em_end} to add a new configuration. To edit a configuration, hover over its box and click {em_start}Edit{em_end}. You can delete a group configuration only if it is not in use in an experiment. To delete a configuration, hover over its box and click the delete icon.").format(em_start="<strong>", em_end="</strong>")}</p>
+            <p>${Text(_("Click {em_start}New Group Configuration{em_end} to add a new configuration. To edit a configuration, hover over its box and click {em_start}Edit{em_end}. You can delete a group configuration only if it is not in use in an experiment. To delete a configuration, hover over its box and click the delete icon.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
             <p><a href="${get_online_help_info(experiment_group_configurations_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn More")}</a></p>
           </div>
         </div>
@@ -93,7 +103,7 @@ from openedx.core.lib.js_utils import escape_json_dumps
       <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related" aria-label="${_('Other Course Settings')}">
           <ul>
-            <li class="nav-item"><a href="${details_url}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${details_url}">${_("Details & Schedule")}</a></li>
             <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>

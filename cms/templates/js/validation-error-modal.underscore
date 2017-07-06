@@ -2,17 +2,17 @@
     <div class "error-header">
         <p>
         <%= _.template(
-        ngettext(
-            "There was {strong_start}{num_errors} validation error{strong_end} while trying to save the course settings in the database.",
-            "There were {strong_start}{num_errors} validation errors{strong_end} while trying to save the course settings in the database.",
-            num_errors
-        ),
-        {
-            strong_start:'<strong>',
-            num_errors: num_errors,
-            strong_end: '</strong>'
-        },
-        {interpolate: /\{(.+?)\}/g})%>
+            ngettext(
+                "There was {strong_start}{num_errors} validation error{strong_end} while trying to save the course settings in the database.",
+                "There were {strong_start}{num_errors} validation errors{strong_end} while trying to save the course settings in the database.",
+                num_errors
+            ),
+            {interpolate: /\{(.+?)\}/g})(
+            {
+                strong_start:'<strong>',
+                num_errors: num_errors,
+                strong_end: '</strong>'
+            })%>
         <%= gettext("Please check the following validation feedbacks and reflect them in your course settings:")%></p>
     </div>
 
@@ -23,7 +23,7 @@
 
             <li class = "error-item">
                 <span class='error-item-title'>
-                    <i class="icon fa fa-warning"></i>
+                    <span class="icon fa fa-warning" aria-hidden="true"></span>
                     <strong><%= value.model.display_name %></strong>:
                 </span>
                 <textarea class = "error-item-message" disabled='disabled'><%=value.message%></textarea>

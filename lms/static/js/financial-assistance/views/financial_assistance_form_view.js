@@ -38,14 +38,10 @@
                     var context = data.context,
                         fields = context.fields;
 
-                    // Add default option to array
-                    if ( fields[0].options.length > 1 ) {
-                        fields[0].options.unshift({
-                            name: '- ' + gettext('Choose one') + ' -',
-                            value: '',
-                            default: true
-                        });
-                    }
+                    // Add default option to course array
+                    this.addDefaultOption(fields, 0);
+                    // Add default option to household income array
+                    this.addDefaultOption(fields, 1);
 
                     // Set non-form data needed to render the View
                     this.context = {
@@ -76,7 +72,7 @@
                         fields: html || '',
                     });
 
-                    this.$el.html(_.template(this.tpl, data));
+                    this.$el.html(_.template(this.tpl)(data));
 
                     this.postRender();
                     this.validateCountry();
@@ -85,7 +81,7 @@
                 },
 
                 renderSuccess: function() {
-                    this.$el.html(_.template(successTpl, {
+                    this.$el.html(_.template(successTpl)({
                         course: this.model.get('course'),
                         dashboard_url: this.context.dashboard_url
                     }));
@@ -137,6 +133,16 @@
                         $errorMessageContainer.append("<li>" + msg + "</li>");
                         this.toggleDisableButton(true);
                         $submissionContainer.removeClass('hidden');
+                    }
+                },
+
+                addDefaultOption: function(array, index) {
+                    if ( array[index].options.length > 1 ) {
+                        array[index].options.unshift({
+                            name: '- ' + gettext('Choose one') + ' -',
+                            value: '',
+                            default: true
+                        });
                     }
                 }
             });

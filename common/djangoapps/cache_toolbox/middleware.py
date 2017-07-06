@@ -78,11 +78,18 @@ choice for most environments but you may be happy with the trade-offs of the
 
 """
 
-from django.contrib.auth import SESSION_KEY
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib.auth import HASH_SESSION_KEY
+from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.middleware import AuthenticationMiddleware
+from django.utils.crypto import constant_time_compare
+from logging import getLogger
 
+from openedx.core.djangoapps.safe_sessions.middleware import SafeSessionMiddleware
 from .model import cache_model
+
+
+log = getLogger(__name__)
 
 
 class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware):
@@ -92,7 +99,39 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware):
     def process_request(self, request):
         try:
             # Try and construct a User instance from data stored in the cache
-            request.user = User.get_cached(request.session[SESSION_KEY])
+            session_user_id = SafeSessionMiddleware.get_user_id_from_session(request)
+            request.user = User.get_cached(session_user_id)  # pylint: disable=no-member
+            if request.user.id != session_user_id:
+                log.error(
+                    "CacheBackedAuthenticationMiddleware cached user '%s' does not match requested user '%s'.",
+                    request.user.id,
+                    session_user_id,
+                )
+                # Raise an exception to fall through to the except clause below.
+                raise Exception
+            self._verify_session_auth(request)
         except:
             # Fallback to constructing the User from the database.
             super(CacheBackedAuthenticationMiddleware, self).process_request(request)
+
+    def _verify_session_auth(self, request):
+        """
+        Ensure that the user's session hash hasn't changed. We check that
+        SessionAuthenticationMiddleware is enabled in order to match Django's
+        behavior.
+        """
+        session_auth_class = 'django.contrib.auth.middleware.SessionAuthenticationMiddleware'
+        session_auth_enabled = session_auth_class in settings.MIDDLEWARE_CLASSES
+        # Auto-auth causes issues in Bok Choy tests because it resets
+        # the requesting user. Since session verification is a
+        # security feature, we can turn it off when auto-auth is
+        # enabled since auto-auth is highly insecure and only for
+        # tests.
+        auto_auth_enabled = settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING', False)
+        if not auto_auth_enabled and session_auth_enabled and hasattr(request.user, 'get_session_auth_hash'):
+            session_hash = request.session.get(HASH_SESSION_KEY)
+            if not (session_hash and constant_time_compare(session_hash, request.user.get_session_auth_hash())):
+                # The session hash has changed due to a password
+                # change. Log the user out.
+                request.session.flush()
+                request.user = AnonymousUser()

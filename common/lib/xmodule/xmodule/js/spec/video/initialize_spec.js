@@ -82,7 +82,7 @@ function (Initialize) {
                         '1.50': 'videoId'
                     },
                     youtubeId: Initialize.prototype.youtubeId,
-                    isFlashMode: jasmine.createSpy().andReturn(false)
+                    isFlashMode: jasmine.createSpy().and.returnValue(false)
                 };
             });
 
@@ -100,7 +100,7 @@ function (Initialize) {
                 it('returns duration for current video', function () {
                     var expected;
 
-                    state.isFlashMode.andReturn(true);
+                    state.isFlashMode.and.returnValue(true);
                     expected = Initialize.prototype.getDuration.call(state);
 
                     expect(expected).toEqual(100);
@@ -110,7 +110,7 @@ function (Initialize) {
                 it(msg, function () {
                     var expected;
 
-                    state.isFlashMode.andReturn(true);
+                    state.isFlashMode.and.returnValue(true);
                     state.speed = '2.0';
                     expected = Initialize.prototype.getDuration.call(state);
 
@@ -128,7 +128,7 @@ function (Initialize) {
                         '1.0': 'cogebirgzzM',
                         '1.50': 'abcdefghijkl'
                     },
-                    isFlashMode: jasmine.createSpy().andReturn(false)
+                    isFlashMode: jasmine.createSpy().and.returnValue(false)
                 };
             });
 
@@ -148,7 +148,7 @@ function (Initialize) {
                 it('return the video id for current speed', function () {
                     var expected;
 
-                    state.isFlashMode.andReturn(true);
+                    state.isFlashMode.and.returnValue(true);
                     expected = Initialize.prototype.youtubeId.call(state);
 
                     expect(expected).toEqual('abcdefghijkl');
@@ -279,7 +279,7 @@ function (Initialize) {
         describe('isFlashMode', function () {
             it('returns `true` if player in `flash` mode', function () {
                 var state = {
-                        getPlayerMode: jasmine.createSpy().andReturn('flash'),
+                        getPlayerMode: jasmine.createSpy().and.returnValue('flash'),
                     },
                     isFlashMode = Initialize.prototype.isFlashMode,
                     actual = isFlashMode.call(state);
@@ -289,7 +289,7 @@ function (Initialize) {
 
             it('returns `false` if player is not in `flash` mode', function () {
                 var state = {
-                        getPlayerMode: jasmine.createSpy().andReturn('html5'),
+                        getPlayerMode: jasmine.createSpy().and.returnValue('html5'),
                     },
                     isFlashMode = Initialize.prototype.isFlashMode,
                     actual = isFlashMode.call(state);
@@ -301,7 +301,7 @@ function (Initialize) {
         describe('isHtml5Mode', function () {
             it('returns `true` if player in `html5` mode', function () {
                 var state = {
-                        getPlayerMode: jasmine.createSpy().andReturn('html5'),
+                        getPlayerMode: jasmine.createSpy().and.returnValue('html5'),
                     },
                     isHtml5Mode = Initialize.prototype.isHtml5Mode,
                     actual = isHtml5Mode.call(state);
@@ -311,7 +311,7 @@ function (Initialize) {
 
             it('returns `false` if player is not in `html5` mode', function () {
                 var state = {
-                        getPlayerMode: jasmine.createSpy().andReturn('flash'),
+                        getPlayerMode: jasmine.createSpy().and.returnValue('flash'),
                     },
                     isHtml5Mode = Initialize.prototype.isHtml5Mode,
                     actual = isHtml5Mode.call(state);

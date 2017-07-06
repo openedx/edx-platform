@@ -6,11 +6,12 @@ import os
 from tempfile import NamedTemporaryFile
 
 from django.core.files.uploadedfile import UploadedFile
+import piexif
 from PIL import Image
 
 
 @contextmanager
-def make_image_file(dimensions=(320, 240), extension=".jpeg", force_size=None):
+def make_image_file(dimensions=(320, 240), extension=".jpeg", force_size=None, orientation=None):
     """
     Yields a named temporary file created with the specified image type and
     options.
@@ -24,7 +25,11 @@ def make_image_file(dimensions=(320, 240), extension=".jpeg", force_size=None):
     image = Image.new('RGB', dimensions, "green")
     image_file = NamedTemporaryFile(suffix=extension)
     try:
-        image.save(image_file)
+        if orientation and orientation in xrange(1, 9):
+            exif_bytes = piexif.dump({'0th': {piexif.ImageIFD.Orientation: orientation}})
+            image.save(image_file, exif=exif_bytes)
+        else:
+            image.save(image_file)
         if force_size is not None:
             image_file.seek(0, os.SEEK_END)
             bytes_to_pad = force_size - image_file.tell()

@@ -6,7 +6,7 @@
             <span class="label-checked"><%- gettext("Unreport") %></span>
         </span>
         <span class="action-icon">
-          <i class="icon fa fa-flag"></i>
+          <span class="icon fa fa-flag" aria-hidden="true"></span>
         </span>
     </a>
 </li>

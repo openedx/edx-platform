@@ -4,6 +4,7 @@ import datetime
 import json
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.utils import override_settings
 from freezegun import freeze_time
@@ -44,7 +45,7 @@ class EdxRestApiClientTest(TestCase):
 
     @httpretty.activate
     @freeze_time('2015-7-2')
-    @override_settings(JWT_ISSUER='http://example.com/oauth', JWT_EXPIRATION=30)
+    @override_settings(JWT_AUTH={'JWT_ISSUER': 'http://example.com/oauth', 'JWT_EXPIRATION': 30})
     def test_tracking_context(self):
         """
         Ensure the tracking context is set up in the api client correctly and
@@ -70,8 +71,8 @@ class EdxRestApiClientTest(TestCase):
             'username': self.user.username,
             'full_name': self.user.profile.name,
             'email': self.user.email,
-            'iss': settings.JWT_ISSUER,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=settings.JWT_EXPIRATION),
+            'iss': settings.JWT_AUTH['JWT_ISSUER'],
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=settings.JWT_AUTH['JWT_EXPIRATION']),
             'tracking_context': {
                 'lms_user_id': self.user.id,  # pylint: disable=no-member
                 'lms_client_id': self.TEST_CLIENT_ID,
@@ -99,3 +100,13 @@ class EdxRestApiClientTest(TestCase):
         )
         actual_object = ecommerce_api_client(self.user).baskets(1).order.get()
         self.assertEqual(actual_object, {u"result": u"Préparatoire"})
+
+    def test_client_with_user_without_profile(self):
+        """
+        Verify client initialize successfully for users having no profile.
+        """
+        worker = User.objects.create_user(username='test_worker', email='test@example.com')
+        api_client = ecommerce_api_client(worker)
+
+        self.assertEqual(api_client._store['session'].auth.__dict__['username'], worker.username)  # pylint: disable=protected-access
+        self.assertIsNone(api_client._store['session'].auth.__dict__['full_name'])  # pylint: disable=protected-access

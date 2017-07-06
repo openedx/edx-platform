@@ -6,13 +6,13 @@ import ddt
 
 from django.conf import settings
 from django.core.cache import caches
-from django.test.client import Client, RequestFactory
+from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
-from request_cache.middleware import RequestCache
 from mock import patch, ANY, Mock
 from nose.tools import assert_true, assert_equal
+from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from lms.lib.comment_client import Thread
 
@@ -23,11 +23,12 @@ from django_comment_client.tests.utils import CohortedTestCase
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles, ThreadContext
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseAccessRoleFactory
+
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseAccessRoleFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
@@ -48,6 +49,7 @@ class MockRequestSetupMixin(object):
         mock_request.return_value = self._create_response_mock(data)
 
 
+@attr('shard_2')
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class CreateThreadGroupIdTestCase(
         MockRequestSetupMixin,
@@ -83,6 +85,7 @@ class CreateThreadGroupIdTestCase(
         self._assert_json_response_contains_group_info(response)
 
 
+@attr('shard_2')
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 @disable_signal(views, 'thread_edited')
 @disable_signal(views, 'thread_voted')
@@ -177,12 +180,6 @@ class ThreadActionGroupIdTestCase(
 
 
 class ViewsTestCaseMixin(object):
-    """
-    This class is used by both ViewsQueryCountTestCase and ViewsTestCase. By
-    breaking out set_up_course into its own method, ViewsQueryCountTestCase
-    can build a course in a particular modulestore, while ViewsTestCase can
-    just run it in setUp for all tests.
-    """
 
     def set_up_course(self, module_count=0):
         """
@@ -234,7 +231,6 @@ class ViewsTestCaseMixin(object):
             CourseEnrollmentFactory(user=self.moderator, course_id=self.course.id)
             self.moderator.roles.add(Role.objects.get(name="Moderator", course_id=self.course.id))
 
-            self.client = Client()
             assert_true(self.client.login(username='student', password=self.password))
 
     def _setup_mock_request(self, mock_request, include_depth=False):
@@ -347,21 +343,19 @@ class ViewsTestCaseMixin(object):
         self.assertEqual(data['commentable_id'], 'some_topic')
 
 
+@attr('shard_2')
 @ddt.ddt
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 @disable_signal(views, 'thread_created')
 @disable_signal(views, 'thread_edited')
 class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin, ViewsTestCaseMixin):
 
+    CREATE_USER = False
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(ViewsQueryCountTestCase, self).setUp(create_user=False)
-
-    def clear_caches(self):
-        """Clears caches so that query count numbers are accurate."""
-        for cache in settings.CACHES:
-            caches[cache].clear()
-        RequestCache.clear_request_cache()
+        super(ViewsQueryCountTestCase, self).setUp()
 
     def count_queries(func):  # pylint: disable=no-self-argument
         """
@@ -378,10 +372,8 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 4, 26),
-        (ModuleStoreEnum.Type.mongo, 20, 4, 26),
-        (ModuleStoreEnum.Type.split, 3, 13, 26),
-        (ModuleStoreEnum.Type.split, 20, 13, 26),
+        (ModuleStoreEnum.Type.mongo, 3, 4, 31),
+        (ModuleStoreEnum.Type.split, 3, 13, 31),
     )
     @ddt.unpack
     @count_queries
@@ -389,10 +381,8 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 3, 20),
-        (ModuleStoreEnum.Type.mongo, 20, 3, 20),
-        (ModuleStoreEnum.Type.split, 3, 10, 20),
-        (ModuleStoreEnum.Type.split, 20, 10, 20),
+        (ModuleStoreEnum.Type.mongo, 3, 3, 25),
+        (ModuleStoreEnum.Type.split, 3, 10, 25),
     )
     @ddt.unpack
     @count_queries
@@ -400,23 +390,67 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         self.update_thread_helper(mock_request)
 
 
+@attr('shard_2')
 @ddt.ddt
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class ViewsTestCase(
         UrlResetMixin,
-        ModuleStoreTestCase,
+        SharedModuleStoreTestCase,
         MockRequestSetupMixin,
         ViewsTestCaseMixin,
         MockSignalHandlerMixin
 ):
+
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(ViewsTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create(
+                org='MITx', course='999',
+                discussion_topics={"Some Topic": {"id": "some_topic"}},
+                display_name='Robot Super Course',
+            )
+
+    @classmethod
+    def setUpTestData(cls):
+        super(ViewsTestCase, cls).setUpTestData()
+
+        cls.course_id = cls.course.id
+
+        # seed the forums permissions and roles
+        call_command('seed_permissions_roles', unicode(cls.course_id))
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         # Patching the ENABLE_DISCUSSION_SERVICE value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
-        super(ViewsTestCase, self).setUp(create_user=False)
-        self.set_up_course()
+        super(ViewsTestCase, self).setUp()
+
+        # Patch the comment client user save method so it does not try
+        # to create a new cc user when creating a django user
+        with patch('student.models.cc.User.save'):
+            uname = 'student'
+            email = 'student@edx.org'
+            self.password = 'test'  # pylint: disable=attribute-defined-outside-init
+
+            # Create the user and make them active so we can log them in.
+            self.student = User.objects.create_user(uname, email, self.password)  # pylint: disable=attribute-defined-outside-init
+            self.student.is_active = True
+            self.student.save()
+
+            # Add a discussion moderator
+            self.moderator = UserFactory.create(password=self.password)  # pylint: disable=attribute-defined-outside-init
+
+            # Enroll the student in the course
+            CourseEnrollmentFactory(user=self.student,
+                                    course_id=self.course_id)
+
+            # Enroll the moderator and give them the appropriate roles
+            CourseEnrollmentFactory(user=self.moderator, course_id=self.course.id)
+            self.moderator.roles.add(Role.objects.get(name="Moderator", course_id=self.course.id))
+
+            assert_true(self.client.login(username='student', password=self.password))
 
     @contextmanager
     def assert_discussion_signals(self, signal, user=None):
@@ -984,20 +1018,35 @@ class ViewsTestCase(
         self.assertEqual(response.status_code, 200)
 
 
+@attr('shard_2')
 @patch("lms.lib.comment_client.utils.requests.request", autospec=True)
 @disable_signal(views, 'comment_endorsed')
-class ViewPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
+class ViewPermissionsTestCase(UrlResetMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
+
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(ViewPermissionsTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+
+    @classmethod
+    def setUpTestData(cls):
+        super(ViewPermissionsTestCase, cls).setUpTestData()
+
+        seed_permissions_roles(cls.course.id)
+
+        cls.password = "test password"
+        cls.student = UserFactory.create(password=cls.password)
+        cls.moderator = UserFactory.create(password=cls.password)
+
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+        CourseEnrollmentFactory(user=cls.moderator, course_id=cls.course.id)
+
+        cls.moderator.roles.add(Role.objects.get(name="Moderator", course_id=cls.course.id))
+
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(ViewPermissionsTestCase, self).setUp()
-        self.password = "test password"
-        self.course = CourseFactory.create()
-        seed_permissions_roles(self.course.id)
-        self.student = UserFactory.create(password=self.password)
-        self.moderator = UserFactory.create(password=self.password)
-        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
-        CourseEnrollmentFactory(user=self.moderator, course_id=self.course.id)
-        self.moderator.roles.add(Role.objects.get(name="Moderator", course_id=self.course.id))
 
     def test_pin_thread_as_student(self, mock_request):
         self._set_mock_request_data(mock_request, {})
@@ -1079,14 +1128,22 @@ class ViewPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         self.assertEqual(response.status_code, 200)
 
 
-class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
-    def setUp(self):
-        super(CreateThreadUnicodeTestCase, self).setUp()
+@attr('shard_2')
+class CreateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
 
-        self.course = CourseFactory.create()
-        seed_permissions_roles(self.course.id)
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(CreateThreadUnicodeTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+
+    @classmethod
+    def setUpTestData(cls):
+        super(CreateThreadUnicodeTestCase, cls).setUpTestData()
+
+        seed_permissions_roles(cls.course.id)
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request,):
@@ -1107,15 +1164,23 @@ class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
         self.assertEqual(mock_request.call_args[1]["data"]["title"], text)
 
 
+@attr('shard_2')
 @disable_signal(views, 'thread_edited')
-class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
-    def setUp(self):
-        super(UpdateThreadUnicodeTestCase, self).setUp()
+class UpdateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
 
-        self.course = CourseFactory.create()
-        seed_permissions_roles(self.course.id)
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(UpdateThreadUnicodeTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+
+    @classmethod
+    def setUpTestData(cls):
+        super(UpdateThreadUnicodeTestCase, cls).setUpTestData()
+
+        seed_permissions_roles(cls.course.id)
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
     @patch('django_comment_client.utils.get_discussion_categories_ids', return_value=["test_commentable"])
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
@@ -1137,15 +1202,23 @@ class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
         self.assertEqual(mock_request.call_args[1]["data"]["commentable_id"], "test_commentable")
 
 
+@attr('shard_2')
 @disable_signal(views, 'comment_created')
-class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
-    def setUp(self):
-        super(CreateCommentUnicodeTestCase, self).setUp()
+class CreateCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
 
-        self.course = CourseFactory.create()
-        seed_permissions_roles(self.course.id)
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(CreateCommentUnicodeTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+
+    @classmethod
+    def setUpTestData(cls):
+        super(CreateCommentUnicodeTestCase, cls).setUpTestData()
+
+        seed_permissions_roles(cls.course.id)
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1172,15 +1245,23 @@ class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRe
             del Thread.commentable_id
 
 
+@attr('shard_2')
 @disable_signal(views, 'comment_edited')
-class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
-    def setUp(self):
-        super(UpdateCommentUnicodeTestCase, self).setUp()
+class UpdateCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
 
-        self.course = CourseFactory.create()
-        seed_permissions_roles(self.course.id)
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(UpdateCommentUnicodeTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+
+    @classmethod
+    def setUpTestData(cls):
+        super(UpdateCommentUnicodeTestCase, cls).setUpTestData()
+
+        seed_permissions_roles(cls.course.id)
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1198,18 +1279,25 @@ class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRe
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
 
 
+@attr('shard_2')
 @disable_signal(views, 'comment_created')
-class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
+class CreateSubCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     """
     Make sure comments under a response can handle unicode.
     """
-    def setUp(self):
-        super(CreateSubCommentUnicodeTestCase, self).setUp()
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(CreateSubCommentUnicodeTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create()
 
-        self.course = CourseFactory.create()
-        seed_permissions_roles(self.course.id)
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+    @classmethod
+    def setUpTestData(cls):
+        super(CreateSubCommentUnicodeTestCase, cls).setUpTestData()
+
+        seed_permissions_roles(cls.course.id)
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1238,6 +1326,7 @@ class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, Moc
             del Thread.commentable_id
 
 
+@attr('shard_2')
 @ddt.ddt
 @patch("lms.lib.comment_client.utils.requests.request", autospec=True)
 @disable_signal(views, 'thread_voted')
@@ -1245,7 +1334,7 @@ class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, Moc
 @disable_signal(views, 'comment_created')
 @disable_signal(views, 'comment_voted')
 @disable_signal(views, 'comment_deleted')
-class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
+class TeamsPermissionsTestCase(UrlResetMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
     # Most of the test points use the same ddt data.
     # args: user, commentable_id, status_code
     ddt_permissions_args = [
@@ -1261,38 +1350,48 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
         ('moderator', 'team_commentable_id', 200)
     ]
 
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(TeamsPermissionsTestCase, cls).setUpClassAndTestData():
+            teams_configuration = {
+                'topics': [{'id': "topic_id", 'name': 'Solar Power', 'description': 'Solar power is hot'}]
+            }
+            cls.course = CourseFactory.create(teams_configuration=teams_configuration)
+
+    @classmethod
+    def setUpTestData(cls):
+        super(TeamsPermissionsTestCase, cls).setUpTestData()
+
+        cls.password = "test password"
+        seed_permissions_roles(cls.course.id)
+
+        # Create 3 users-- student in team, student not in team, discussion moderator
+        cls.student_in_team = UserFactory.create(password=cls.password)
+        cls.student_not_in_team = UserFactory.create(password=cls.password)
+        cls.moderator = UserFactory.create(password=cls.password)
+        CourseEnrollmentFactory(user=cls.student_in_team, course_id=cls.course.id)
+        CourseEnrollmentFactory(user=cls.student_not_in_team, course_id=cls.course.id)
+        CourseEnrollmentFactory(user=cls.moderator, course_id=cls.course.id)
+        cls.moderator.roles.add(Role.objects.get(name="Moderator", course_id=cls.course.id))
+
+        # Create a team.
+        cls.team_commentable_id = "team_discussion_id"
+        cls.team = CourseTeamFactory.create(
+            name=u'The Only Team',
+            course_id=cls.course.id,
+            topic_id='topic_id',
+            discussion_topic_id=cls.team_commentable_id
+        )
+
+        cls.team.add_user(cls.student_in_team)
+
+        # Dummy commentable ID not linked to a team
+        cls.course_commentable_id = "course_level_commentable"
+
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(TeamsPermissionsTestCase, self).setUp()
-        self.password = "test password"
-        teams_configuration = {
-            'topics': [{'id': "topic_id", 'name': 'Solar Power', 'description': 'Solar power is hot'}]
-        }
-        self.course = CourseFactory.create(teams_configuration=teams_configuration)
-        seed_permissions_roles(self.course.id)
-
-        # Create 3 users-- student in team, student not in team, discussion moderator
-        self.student_in_team = UserFactory.create(password=self.password)
-        self.student_not_in_team = UserFactory.create(password=self.password)
-        self.moderator = UserFactory.create(password=self.password)
-        CourseEnrollmentFactory(user=self.student_in_team, course_id=self.course.id)
-        CourseEnrollmentFactory(user=self.student_not_in_team, course_id=self.course.id)
-        CourseEnrollmentFactory(user=self.moderator, course_id=self.course.id)
-        self.moderator.roles.add(Role.objects.get(name="Moderator", course_id=self.course.id))
-
-        # Create a team.
-        self.team_commentable_id = "team_discussion_id"
-        self.team = CourseTeamFactory.create(
-            name=u'The Only Team',
-            course_id=self.course.id,
-            topic_id='topic_id',
-            discussion_topic_id=self.team_commentable_id
-        )
-
-        self.team.add_user(self.student_in_team)
-
-        # Dummy commentable ID not linked to a team
-        self.course_commentable_id = "course_level_commentable"
 
     def _setup_mock(self, user, mock_request, data):
         user = getattr(self, user)
@@ -1499,20 +1598,29 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
 TEAM_COMMENTABLE_ID = 'test-team-discussion'
 
 
+@attr('shard_2')
 @disable_signal(views, 'comment_created')
 @ddt.ddt
-class ForumEventTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
+class ForumEventTestCase(SharedModuleStoreTestCase, MockRequestSetupMixin):
     """
     Forum actions are expected to launch analytics events. Test these here.
     """
-    def setUp(self):
-        super(ForumEventTestCase, self).setUp()
-        self.course = CourseFactory.create()
-        seed_permissions_roles(self.course.id)
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
-        self.student.roles.add(Role.objects.get(name="Student", course_id=self.course.id))
-        CourseAccessRoleFactory(course_id=self.course.id, user=self.student, role='Wizard')
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(ForumEventTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+
+    @classmethod
+    def setUpTestData(cls):
+        super(ForumEventTestCase, cls).setUpTestData()
+
+        seed_permissions_roles(cls.course.id)
+
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+        cls.student.roles.add(Role.objects.get(name="Student", course_id=cls.course.id))
+        CourseAccessRoleFactory(course_id=cls.course.id, user=cls.student, role='Wizard')
 
     @patch('eventtracking.tracker.emit')
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
@@ -1676,7 +1784,25 @@ class ForumEventTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
         self.assertEqual(event['vote_value'], 'up')
 
 
-class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
+@attr('shard_2')
+class UsersEndpointTestCase(SharedModuleStoreTestCase, MockRequestSetupMixin):
+
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(UsersEndpointTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+
+    @classmethod
+    def setUpTestData(cls):
+        super(UsersEndpointTestCase, cls).setUpTestData()
+
+        seed_permissions_roles(cls.course.id)
+
+        cls.student = UserFactory.create()
+        cls.enrollment = CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+        cls.other_user = UserFactory.create(username="other")
+        CourseEnrollmentFactory(user=cls.other_user, course_id=cls.course.id)
 
     def set_post_counts(self, mock_request, threads_count=1, comments_count=1):
         """
@@ -1686,16 +1812,6 @@ class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
             "threads_count": threads_count,
             "comments_count": comments_count,
         })
-
-    def setUp(self):
-        super(UsersEndpointTestCase, self).setUp()
-
-        self.course = CourseFactory.create()
-        seed_permissions_roles(self.course.id)
-        self.student = UserFactory.create()
-        self.enrollment = CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
-        self.other_user = UserFactory.create(username="other")
-        CourseEnrollmentFactory(user=self.other_user, course_id=self.course.id)
 
     def make_request(self, method='get', course_id=None, **kwargs):
         course_id = course_id or self.course.id

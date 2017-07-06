@@ -1,0 +1,58 @@
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from django.conf import settings
+%>
+
+<header>
+  % if static.get_value('course_about_show_social_links', True):
+  <div class="social-sharing">
+    <div class="sharing-message">${_("Share with friends and family!")}</div>
+    ## TODO: this should probably be an overrideable block,
+    ##       or something allowing themes to do whatever they
+    ##       want here (and on this whole page, really).
+      <%
+        site_domain = static.get_value('site_domain', settings.SITE_NAME)
+        platform_name = static.get_platform_name()
+
+        ## Translators: This text will be automatically posted to the student's
+        ## Twitter account. {url} should appear at the end of the text.
+        tweet_text = _("I just enrolled in {number} {title} through {account}: {url}").format(
+            number=course.number,
+            title=course.display_name_with_default_escaped,
+            account=static.get_value('course_about_twitter_account', settings.PLATFORM_TWITTER_ACCOUNT),
+            url=u"http://{domain}{path}".format(
+                domain=site_domain,
+                path=reverse('about_course', args=[course.id.to_deprecated_string()])
+            )
+        ).replace(u" ", u"+")
+        tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text)
+
+        facebook_link = static.get_value('course_about_facebook_link', settings.PLATFORM_FACEBOOK_ACCOUNT)
+
+        email_subject = u"mailto:?subject={subject}&body={body}".format(
+            subject=_("Take a course with {platform} online").format(platform=platform_name),
+            body=_("I just enrolled in {number} {title} through {platform} {url}").format(
+                number=course.number,
+                title=course.display_name_with_default_escaped,
+                platform=platform_name,
+                url=u"http://{domain}{path}".format(
+                    domain=site_domain,
+                    path=reverse('about_course', args=[course.id.to_deprecated_string()]),
+                )
+            )
+        ).replace(u" ", u"%20")
+      %>
+      <a href="${tweet_action}" class="share">
+        <span class="icon fa fa-twitter" aria-hidden="true"></span><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
+      </a>
+      <a href="${facebook_link}" class="share">
+        <span class="icon fa fa-thumbs-up" aria-hidden="true"></span><span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
+      </a>
+      <a href="${email_subject}" class="share">
+        <span class="icon fa fa-envelope" aria-hidden="true"></span><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
+      </a>
+  </div>
+  % endif
+</header>

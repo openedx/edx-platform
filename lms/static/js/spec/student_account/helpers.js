@@ -3,8 +3,10 @@ define(['underscore'], function(_) {
 
     var USER_ACCOUNTS_API_URL = '/api/user/v0/accounts/student';
     var USER_PREFERENCES_API_URL = '/api/user/v0/preferences/student';
+    var BADGES_API_URL = '/api/badges/v1/assertions/user/student/';
     var IMAGE_UPLOAD_API_URL = '/api/profile_images/v0/staff/upload';
     var IMAGE_REMOVE_API_URL = '/api/profile_images/v0/staff/remove';
+    var FIND_COURSES_URL = '/courses';
 
     var PROFILE_IMAGE = {
         image_url_large: '/media/profile-images/image.jpg',
@@ -23,7 +25,8 @@ define(['underscore'], function(_) {
         language: null,
         bio: "About the student",
         language_proficiencies: [{code: '1'}],
-        profile_image: PROFILE_IMAGE
+        profile_image: PROFILE_IMAGE,
+        accomplishments_shared: false
     };
 
     var createAccountSettingsData = function(options) {
@@ -31,7 +34,8 @@ define(['underscore'], function(_) {
     };
 
     var DEFAULT_USER_PREFERENCES_DATA = {
-        'pref-lang': '2'
+        'pref-lang': '2',
+        'time_zone': null
     };
 
     var createUserPreferencesData = function(options) {
@@ -72,8 +76,8 @@ define(['underscore'], function(_) {
 
         if ('fieldValue' in view) {
             expect(view.fieldValue()).toBe(view.modelValue());
-        } else if (view.fieldType === 'link') {
-            expect($(element).find('a').length).toBe(1);
+        } else if (view.fieldType === 'button') {
+            expect($(element).find('button').length).toBe(1);
         } else {
             throw new Error('Unexpected field type: ' + view.fieldType);
         }
@@ -84,7 +88,7 @@ define(['underscore'], function(_) {
     };
 
     var expectSettingsSectionsAndFieldsToBeRendered = function (accountSettingsView, fieldsAreRendered) {
-        var sectionsData = accountSettingsView.options.sectionsData;
+        var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
 
         var sectionElements = accountSettingsView.$('.section');
         expect(sectionElements.length).toBe(sectionsData.length);
@@ -97,7 +101,14 @@ define(['underscore'], function(_) {
             if (fieldsAreRendered === false) {
                 expect(sectionFieldElements.length).toBe(0);
             } else {
-                expect(sectionFieldElements.length).toBe(sectionsData[sectionIndex].fields.length);
+                var visible_count = 0;
+                _.each(sectionsData[sectionIndex].fields, function(field) {
+                    if (field.view.enabled) {
+                        visible_count++;
+                    }
+                });
+
+                expect(sectionFieldElements.length).toBe(visible_count);
 
                 _.each(sectionFieldElements, function (sectionFieldElement, fieldIndex) {
                     expectElementContainsField(sectionFieldElement, sectionsData[sectionIndex].fields[fieldIndex]);
@@ -109,6 +120,8 @@ define(['underscore'], function(_) {
     return {
         USER_ACCOUNTS_API_URL: USER_ACCOUNTS_API_URL,
         USER_PREFERENCES_API_URL: USER_PREFERENCES_API_URL,
+        BADGES_API_URL: BADGES_API_URL,
+        FIND_COURSES_URL: FIND_COURSES_URL,
         IMAGE_UPLOAD_API_URL: IMAGE_UPLOAD_API_URL,
         IMAGE_REMOVE_API_URL: IMAGE_REMOVE_API_URL,
         IMAGE_MAX_BYTES: IMAGE_MAX_BYTES,

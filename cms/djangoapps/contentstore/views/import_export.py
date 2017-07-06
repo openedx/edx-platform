@@ -16,7 +16,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation, PermissionDenied
 from django.core.files.temp import NamedTemporaryFile
 from django.core.servers.basehttp import FileWrapper
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_GET
@@ -489,6 +489,8 @@ def export_handler(request, course_key_string):
         }
     else:
         courselike_module = modulestore().get_course(course_key)
+        if courselike_module is None:
+            raise Http404
         context = {
             'context_course': courselike_module,
             'courselike_home_url': reverse_course_url("course_handler", course_key),
@@ -498,7 +500,7 @@ def export_handler(request, course_key_string):
     context['export_url'] = export_url + '?_accept=application/x-tgz'
 
     # an _accept URL parameter will be preferred over HTTP_ACCEPT in the header.
-    requested_format = request.REQUEST.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
+    requested_format = request.GET.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
 
     if 'application/x-tgz' in requested_format:
         try:

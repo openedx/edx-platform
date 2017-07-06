@@ -15,6 +15,7 @@
                 },
 
                 initialize: function(options) {
+                    this.options = _.extend({}, options);
                     this.showSortControls = options.showSortControls;
                     this.context = options.context;
                     this.myTeamsCollection = options.myTeamsCollection;
@@ -51,7 +52,7 @@
                                     'span_end': '</a>'
                                 }
                             );
-                            self.$el.append(_.template(teamActionsTemplate, {message: message}));
+                            self.$el.append(_.template(teamActionsTemplate)({message: message}));
                         }
                     });
                     return this;

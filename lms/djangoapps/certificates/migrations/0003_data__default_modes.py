@@ -11,7 +11,9 @@ def forwards(apps, schema_editor):
     """Add default modes"""
     BadgeImageConfiguration = apps.get_model("certificates", "BadgeImageConfiguration")
     db_alias = schema_editor.connection.alias
-
+    # This will need to be changed if badges/certificates get moved out of the default db for some reason.
+    if db_alias != 'default':
+        return
     objects = BadgeImageConfiguration.objects.using(db_alias)
     if not objects.exists():
         for mode in ['honor', 'verified', 'professional']:
@@ -24,6 +26,9 @@ def forwards(apps, schema_editor):
 
             conf.save()
 
+def backwards(apps, schema_editor):
+    """Do nothing, assumptions too dangerous."""
+    pass
 
 class Migration(migrations.Migration):
 
@@ -32,5 +37,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(forwards)
+        migrations.RunPython(forwards, backwards)
     ]

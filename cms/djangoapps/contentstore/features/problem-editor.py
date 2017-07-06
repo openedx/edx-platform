@@ -125,7 +125,10 @@ def my_display_name_change_is_persisted_on_save(step):
 
 @step('the problem display name is "(.*)"$')
 def verify_problem_display_name(step, name):
-    assert_equal(name.upper(), world.browser.find_by_css('.problem-header').text)
+    """
+    name is uppercased because the heading styles are uppercase in css
+    """
+    assert_equal(name, world.browser.find_by_css('.problem-header').text)
 
 
 @step('I can specify special characters in the display name')
@@ -332,8 +335,8 @@ def i_edit_blank_problem_for_annotation_response(_step):
 
 @step(u'I can see cheatsheet$')
 def verify_cheat_sheet_displaying(_step):
-    world.css_click("a.cheatsheet-toggle")
-    css_selector = 'article.simple-editor-cheatsheet'
+    world.css_click(".cheatsheet-toggle")
+    css_selector = '.simple-editor-cheatsheet'
     world.wait_for_visible(css_selector)
 
 

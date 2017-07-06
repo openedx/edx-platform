@@ -1,10 +1,9 @@
+<%page args="section_data" expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
-<%page args="section_data"/>
-
 <div>
   %if section_data['is_small_course']:
   ## Show the gradebook for small courses
-    <h2>${_("Student Gradebook")}</h2>
+    <h3 class="hd hd-3">${_("Student Gradebook")}</h3>
       <p>
 	${_("Click here to view the gradebook for enrolled students. This feature is only visible to courses with a small number of total enrolled students.")}
       </p>
@@ -17,7 +16,7 @@
 </div>
 
 <div class="student-specific-container action-type-container">
-  <h2>${_("Student-specific grade inspection")}</h2>
+  <h3 class="hd hd-3">${_("Student-specific grade inspection")}</h3>
   <div class="request-response-error"></div>
   <br />
   <label>
@@ -38,7 +37,7 @@
 </div>
 
 <div class="student-grade-container action-type-container">
-  <h2>${_("Student-specific grade adjustment")}</h2>
+  <h3 class="hd hd-3">${_("Student-specific grade adjustment")}</h3>
   <div class="request-response-error"></div>
   <p>
   <label>
@@ -90,7 +89,7 @@
 
 % if course.entrance_exam_enabled:
 <div class="entrance-exam-grade-container action-type-container">
-  <h2>${_("Entrance Exam Adjustment")}</h2>
+  <h3 class="hd hd-3">${_("Entrance Exam Adjustment")}</h3>
   <div class="request-response-error"></div>
   <label>
   ${_("Student's {platform_name} email address or username:").format(platform_name=settings.PLATFORM_NAME)}
@@ -132,7 +131,7 @@
 
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
   <div class="course-specific-container action-type-container">
-    <h2>${_('Course-specific grade adjustment')}</h2>
+    <h3 class="hd hd-3">${_('Course-specific grade adjustment')}</h3>
     <div class="request-response-error"></div>
 
     <label>
@@ -161,7 +160,7 @@
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
-    <h2> ${_("Pending Tasks")} </h2>
+    <h3 class="hd hd-3">${_("Pending Tasks")}</h3>
     <div class="running-tasks-section">
       <p>${_("The status for any active tasks appears in a table below.")} </p>
       <br />

@@ -4,7 +4,7 @@ Tests for the force_publish management command
 import mock
 from django.core.management import call_command, CommandError
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from contentstore.management.commands.force_publish import Command
 from contentstore.management.commands.utils import get_course_versions
@@ -62,7 +62,19 @@ class TestForcePublish(SharedModuleStoreTestCase):
         with self.assertRaisesRegexp(CommandError, errstring):
             call_command('force_publish', unicode(course.id))
 
-    @SharedModuleStoreTestCase.modifies_courseware
+
+class TestForcePublishModifications(ModuleStoreTestCase):
+    """
+    Tests for the force_publish management command that modify the courseware
+    during the test.
+    """
+
+    def setUp(self):
+        super(TestForcePublishModifications, self).setUp()
+        self.course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+        self.test_user_id = ModuleStoreEnum.UserID.test
+        self.command = Command()
+
     def test_force_publish(self):
         """
         Test 'force_publish' command

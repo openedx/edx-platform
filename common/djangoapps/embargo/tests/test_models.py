@@ -8,9 +8,14 @@ from embargo.models import (
     Country, CountryAccessRule, CourseAccessRuleHistory
 )
 
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
-class EmbargoModelsTest(TestCase):
+
+class EmbargoModelsTest(CacheIsolationTestCase):
     """Test each of the 3 models in embargo.models"""
+
+    ENABLED_CACHES = ['default']
+
     def test_course_embargo(self):
         course_id = CourseLocator('abc', '123', 'doremi')
         # Test that course is not authorized by default
@@ -101,8 +106,10 @@ class EmbargoModelsTest(TestCase):
         self.assertFalse('1.2.0.0' in cblacklist)
 
 
-class RestrictedCourseTest(TestCase):
+class RestrictedCourseTest(CacheIsolationTestCase):
     """Test RestrictedCourse model. """
+
+    ENABLED_CACHES = ['default']
 
     def test_unicode_values(self):
         course_id = CourseLocator('abc', '123', 'doremi')
@@ -162,8 +169,9 @@ class CountryTest(TestCase):
         self.assertEquals(unicode(country), "New Zealand (NZ)")
 
 
-class CountryAccessRuleTest(TestCase):
+class CountryAccessRuleTest(CacheIsolationTestCase):
     """Test CountryAccessRule model. """
+    ENABLED_CACHES = ['default']
 
     def test_unicode_values(self):
         course_id = CourseLocator('abc', '123', 'doremi')

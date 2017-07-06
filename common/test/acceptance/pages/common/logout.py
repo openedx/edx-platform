@@ -13,4 +13,4 @@ class LogoutPage(PageObject):
     url = BASE_URL + "/logout"
 
     def is_browser_on_page(self):
-        return self.q(css='.cta-login').present
+        return self.q(css='.btn-login').present

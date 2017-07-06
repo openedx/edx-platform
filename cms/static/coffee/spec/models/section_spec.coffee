@@ -1,4 +1,4 @@
-define ["js/models/section", "common/js/spec_helpers/ajax_helpers", "js/utils/module"], (Section, AjaxHelpers, ModuleUtils) ->
+define ["js/models/section", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "js/utils/module"], (Section, AjaxHelpers, ModuleUtils) ->
     describe "Section", ->
         describe "basic", ->
             beforeEach ->
@@ -34,7 +34,7 @@ define ["js/models/section", "common/js/spec_helpers/ajax_helpers", "js/utils/mo
                 })
 
             it "show/hide a notification when it saves to the server", ->
-                server = AjaxHelpers.server(this, [200, {}, ''])
+                server = AjaxHelpers.server([200, {"Content-Type": "application/json"}, "{}"])
 
                 @model.save()
                 expect(Section.prototype.showNotification).toHaveBeenCalled()
@@ -43,7 +43,7 @@ define ["js/models/section", "common/js/spec_helpers/ajax_helpers", "js/utils/mo
 
             it "don't hide notification when saving fails", ->
                 # this is handled by the global AJAX error handler
-                server = AjaxHelpers.server(this, [500, {}, ''])
+                server = AjaxHelpers.server([500, {"Content-Type": "application/json"}, "{}"])
 
                 @model.save()
                 server.respond()

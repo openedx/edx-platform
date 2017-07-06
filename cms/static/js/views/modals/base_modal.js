@@ -26,7 +26,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
                 'click .action-cancel': 'cancel'
             },
 
-            options: $.extend({}, BaseView.prototype.options, {
+            options: _.extend({}, BaseView.prototype.options, {
                 type: 'prompt',
                 closeIcon: false,
                 icon: false,
@@ -145,6 +145,14 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
              */
             getActionButton: function(type) {
                 return this.getActionBar().find('.action-' + type);
+            },
+
+            enableActionButton: function(type) {
+                this.getActionBar().find('.action-' + type).prop('disabled', false).removeClass('is-disabled');
+            },
+
+            disableActionButton: function(type) {
+                this.getActionBar().find('.action-' + type).prop('disabled', true).addClass('is-disabled');
             },
 
             resize: function() {

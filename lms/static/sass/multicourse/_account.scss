@@ -217,7 +217,7 @@
   // aside
   aside {
 
-    .cta {
+    .btn {
       margin: 0 0 ($baseline*2) 0;
 
       &:last-child {
@@ -230,7 +230,7 @@
       }
     }
 
-    .cta-login {
+    .btn-login {
 
       h3.title,
       .instructions {
@@ -238,10 +238,10 @@
         margin-bottom: 0;
       }
 
-      .cta-login-action {
+      .btn-login-action {
         @extend %btn-secondary-grey-outline;
         padding: ($baseline/10) ($baseline*0.75);
-        margin-left: ($baseline/4);
+        @include margin-left($baseline/4);
       }
     }
   }
@@ -393,7 +393,7 @@
           cursor: text;
 
           &:after {
-            margin-left: ($baseline/4);
+            @include margin-left($baseline/4);
           }
         }
 
@@ -445,7 +445,7 @@
         }
 
         label:after {
-          margin-left: ($baseline/4);
+          @include margin-left($baseline/4);
           content: "*";
         }
       }
@@ -472,11 +472,11 @@
 
     .action-secondary {
       display: block;
-      float: right;
+      @include float(right);
       width: flex-grid(3,8);
       margin: $baseline $baseline 0 0;
       font-size: em(14);
-      text-align: right;
+      @include text-align(right);
     }
 
     &.error {
@@ -498,7 +498,7 @@
       @extend %t-weight4;
       position: absolute;
       top: -($baseline);
-      left: 43%;
+      @include left(43%);
       padding: ($baseline/4) ($baseline*1.5);
       background: white;
       text-align: center;
@@ -521,11 +521,12 @@
     button[type="submit"] {
       @extend %btn-secondary-blue-outline;
       width: flex-grid(4,8);
-      margin-right: ($baseline/2);
+      @include margin-right($baseline/2);
 
       .icon {
-        color: inherit;
+        @extend %sso-icon;
         @include margin-right($baseline/2);
+        color: inherit;
       }
 
       &:last-child {
@@ -630,7 +631,7 @@
 // login
 .view-login {
 
-  header.global  .nav-courseware .cta-login {
+  .header-global  .nav-courseware .btn-login {
     display: none;
   }
 
@@ -656,7 +657,7 @@
 // password reset
 .view-passwordreset {
 
-  header.global .nav-courseware .cta-login {
+  .header-global .nav-courseware .btn-login {
     display: none;
   }
 
