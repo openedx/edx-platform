@@ -201,6 +201,11 @@ def index(request, extra_context=None, user=AnonymousUser()):
     # 1) Change False to True
     context['show_homepage_promo_video'] = configuration_helpers.get_value('show_homepage_promo_video', False)
 
+    # Maximum number of courses to display on the homepage.
+    context['homepage_course_max'] = configuration_helpers.get_value(
+        'HOMEPAGE_COURSE_MAX', settings.HOMEPAGE_COURSE_MAX
+    )
+
     # 2) Add your video's YouTube ID (11 chars, eg "123456789xX"), or specify via site configuration
     # Note: This value should be moved into a configuration setting and plumbed-through to the
     # context via the site configuration workflow, versus living here
