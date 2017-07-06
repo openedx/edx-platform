@@ -78,7 +78,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-06-08 14:59+0000\n"
+"POT-Creation-Date: 2017-06-21 14:42+0000\n"
 "PO-Revision-Date: 2017-03-29 06:21+0000\n"
 "Last-Translator: e2f_HE c1 <e2f_HE_c1@outlook.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -286,11 +286,6 @@ msgid ""
 "ecommerce service."
 msgstr ""
 "זוהי ה-SKU (יחידת אחזקת מלאי) של מצב זה בשירות המסחר האלקטרוני החיצוני."
-
-#: common/djangoapps/course_modes/models.py
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Audit"
-msgstr "שומע חופשי"
 
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -715,6 +710,38 @@ msgstr "הקורס שאתה מחפש לא מתחיל עד {date}."
 #, python-brace-format
 msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr "הקורס שאתה מחפש סגור להרשמה החל מ-{date}."
+
+#: common/djangoapps/student/views.py
+msgid "Photos are mismatched"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Name missing from ID photo"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "ID photo not provided"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "ID is invalid"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Learner photo is blurry"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Name on ID does not match name on account"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Learner photo not provided"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "ID photo is blurry"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -2178,8 +2205,9 @@ msgstr ""
 " בו שימוש לרעה. כדי להשיג מפתח עבור הקורס שלך או כדי לדווח על בעיה, צור קשר "
 "עם moocsupport@mathworks.com"
 
-#: common/lib/xmodule/xmodule/capa_base.py lms/templates/help_modal.html
-#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
+#: common/lib/xmodule/xmodule/capa_base.py cms/templates/index.html
+#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
+#: lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -4751,6 +4779,10 @@ msgstr ""
 #: lms/djangoapps/badges/models.py
 msgid "Please check the syntax of your entry."
 msgstr "בדוק את תחביר הערך שלך."
+
+#: lms/djangoapps/branding/api.py
+msgid "Take free online courses at edX.org"
+msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
@@ -8713,31 +8745,6 @@ msgid "Your {platform_name} verification has expired."
 msgstr "אימות ל {platform_name} פג תוקף."
 
 #: lms/djangoapps/verify_student/models.py
-msgid "No photo ID was provided."
-msgstr "לא סופקה תעודה מזהה."
-
-#: lms/djangoapps/verify_student/models.py
-msgid "We couldn't read your name from your photo ID image."
-msgstr "לא הצלחנו לקרוא את שמך בתמונת התעודה מזהה."
-
-#: lms/djangoapps/verify_student/models.py
-msgid ""
-"The name associated with your account and the name on your ID do not match."
-msgstr "השם המשויך לחשבונך והשם בתעודת זהותך אינם תואמים."
-
-#: lms/djangoapps/verify_student/models.py
-msgid "The image of your face was not clear."
-msgstr "תמונת פניך לא הייתה ברורה."
-
-#: lms/djangoapps/verify_student/models.py
-msgid "Your face was not visible in your self-photo."
-msgstr "פנייך לא היו גלויים לעין בתמונה העצמית שלך."
-
-#: lms/djangoapps/verify_student/models.py
-msgid "There was an error verifying your ID photos."
-msgstr "אירעה שגיאה באימות תמונת תעודת הזהות שלך."
-
-#: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr "הקורס שעליו חל תאריך היעד"
 
@@ -8817,6 +8824,11 @@ msgstr "נתוני תמונה אינם תקינים."
 #: lms/djangoapps/verify_student/views.py
 msgid "Verification photos received"
 msgstr "התקבלו תמונות אימות"
+
+#: lms/envs/common.py
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Audit"
+msgstr "שומע חופשי"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the website name of www.facebook.com.  Please
@@ -9573,12 +9585,8 @@ msgid "Internal API URL"
 msgstr "כתובת URL ל-API פנימי"
 
 #: openedx/core/djangoapps/catalog/models.py
-msgid ""
-"API root to be used for server-to-server requests (e.g., https://catalog-"
-"internal.example.com/api/v1/)."
+msgid "DEPRECATED: Use the setting COURSE_CATALOG_API_URL."
 msgstr ""
-"יש להשתמש בשורש API לבקשות שרת לשרת (למשל, https://catalog-"
-"internal.example.com/api/v1/)."
 
 #: openedx/core/djangoapps/catalog/models.py
 msgid ""
@@ -11004,6 +11012,12 @@ msgstr "תצוגה מקדימה של הגדרות שפה"
 msgid "Reset"
 msgstr "אתחל"
 
+#: cms/templates/widgets/footer.html lms/templates/footer.html
+#: themes/edx.org/lms/templates/footer.html
+#: themes/red-theme/lms/templates/footer.html
+msgid "Legal"
+msgstr "משפטי"
+
 #: cms/templates/widgets/header.html lms/templates/navigation.html
 #: lms/templates/widgets/footer-language-selector.html
 msgid "Choose Language"
@@ -11340,11 +11354,6 @@ msgstr "תיקון באגים"
 #: lms/templates/extauth_failure.html
 msgid "External Authentication failed"
 msgstr "אימות חיצוני נכשל"
-
-#: lms/templates/footer.html themes/edx.org/lms/templates/footer.html
-#: themes/red-theme/lms/templates/footer.html
-msgid "Legal"
-msgstr "משפטי"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Password Reset"
@@ -14292,9 +14301,9 @@ msgstr " אינך רשום עדיין"
 
 #: lms/templates/courseware/info.html
 msgid ""
-"You are not currently enrolled in this course. {link_start}Sign up "
+"You are not currently enrolled in this course. {link_start}Enroll "
 "now!{link_end}"
-msgstr "אינך רשום כרגע לקורס זה. {link_start}הירשם עכשיו!{link_end}"
+msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Welcome to {org}'s {course_name}!"
@@ -14307,18 +14316,6 @@ msgstr "המשך בקורס"
 #: lms/templates/courseware/info.html
 msgid "View Updates in Studio"
 msgstr "ראה עדכונים בסטודיו"
-
-#: lms/templates/courseware/info.html
-msgid "Give yourself an additional incentive to complete"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Earn a verified certificate."
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Upgrade Now"
-msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Course Updates and News"
@@ -14960,6 +14957,25 @@ msgid ""
 msgstr "האימות שלך ב-edX נמצא בהמתנה. פרטי האימות שלך הוגשו והם יבדקו בקרוב."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Current Verification Status: Denied"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your verification submission was not accepted. To receive a verified "
+"certificate, you must submit a new photo of yourself and your government-"
+"issued photo ID before the verification deadline for your course."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Your verification was denied for the following reasons:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
+msgstr "הגש מחדש אימות"
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Expired"
 msgstr "מצב אימות נוכחי: פג תוקף"
 
@@ -14972,10 +14988,6 @@ msgstr ""
 "תוקף האימות שלך ב-edX פג. כדי לקבל תעודה מאומתת, עליך להגיש תמונה חדשה שלך "
 "ותעודה מזהה בעלת תמונה, שהונפקה בידי הממשלה, לפני מועד סיום האימות של הקורס."
 "   "
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Resubmit Verification"
-msgstr "הגש מחדש אימות"
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -17107,16 +17119,11 @@ msgstr "מנהלי דיונים"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Discussion Admins can edit or delete any post, clear misuse flags, close and"
-" re-open threads, endorse responses, and see posts from all cohorts. Their "
+" re-open threads, endorse responses, and see posts from all groups. Their "
 "posts are marked as 'staff'. They can also add and remove the discussion "
-"moderation roles to manage course team membership. You can only give course "
-"team roles to enrolled users."
+"moderation roles to manage course team membership. Only enrolled users can "
+"be added as Discussion Admins."
 msgstr ""
-"מנהלי דיונים יכולים לערוך או למחוק כל פוסט, להסיר דגלים שנעשה בהם שימוש "
-"לרעה, לסגור ולפתוח מחדש שרשורים ולראות פוסטים מכל חברי קבוצת הלמידה. הפוסטים"
-" שלהם מסומנים כ'צוות'. הם יכולים גם להוסיף ולהסיר את תפקידי מתווך הדיונים על"
-" מנת לנהל את חברות צוות הקורס. תוכל להעניק תפקידי צוות קורס רק למשתמשים "
-"רשומים."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Discussion Admin"
@@ -17129,15 +17136,11 @@ msgstr "מנחי דיונים"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Discussion Moderators can edit or delete any post, clear misuse flags, close"
-" and re-open threads, endorse responses, and see posts from all cohorts. "
+" and re-open threads, endorse responses, and see posts from all groups. "
 "Their posts are marked as 'staff'. They cannot manage course team membership"
-" by adding or removing discussion moderation roles. You can only give course"
-" team roles to enrolled users."
+" by adding or removing discussion moderation roles. Only enrolled users can "
+"be added as Discussion Moderators."
 msgstr ""
-"מנחי דיונים יכולים לערוך או למחוק כל פוסט, להסיר דגלים שנעשה בהם שימוש לרעה,"
-" לסגור ולפתוח מחדש שרשורים ולראות פוסטים מכל חברי קבוצת הלמידה. הפוסטים שלהם"
-" מסומנים כ'צוות'. הם אינם יכולים לנהל את חברות צוות הקורס באמצעות הוספה או "
-"הסרת תפקיד מנחי הדיונים. תוכל להעניק תפקידי צוות קורס רק למשתמשים רשומים."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Moderator"
@@ -17149,17 +17152,12 @@ msgstr "דיון עוזרי הוראה קהילתיים"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Community TA's are members of the community whom you deem particularly "
+"Community TAs are members of the community whom you deem particularly "
 "helpful on the discussion boards. They can edit or delete any post, clear "
 "misuse flags, close and re-open threads, endorse responses, and see posts "
-"from all cohorts. Their posts are marked as 'Community TA'. You can only "
-"give course team roles to enrolled users."
+"from all groups. Their posts are marked as 'Community TA'. Only enrolled "
+"users can be added as Community TAs."
 msgstr ""
-"עוזרי הוראה קהילתיים הם חברי קהילה המועילים ביותר לדעתך בלוחות דיונים. הם "
-"יכולים לערוך או למחוק כל פוסט, להסיר דגלים שנעשה בהם שימוש לרעה, לסגור "
-"ולפתוח מחדש שרשורים ולראות פוסטים מכל חברי קבוצת הלמידה. הפוסטים שלהם "
-"מסומנים כ'עוזרי הוראה קהילתיים'. תוכל להעניק תפקידי צוות קורס רק למשתמשים "
-"רשומים."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Community TA"
@@ -20765,6 +20763,22 @@ msgstr ""
 "הקוד הייחודי המזהה ספריה זו. {strong_start}הערה: מספר זה הוא חלק מכתובת האתר"
 " של הספריה, לכן לא ניתן להוסיף רווחים או תווים מיוחדים.{strong_end} לא ניתן "
 "לשנות זאת."
+
+#: cms/templates/index.html
+msgid "Organization and Library Settings"
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Show all courses in organization:"
+msgstr ""
+
+#: cms/templates/index.html
+msgid "For example, MITx"
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Show content libraries"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Courses Being Processed"

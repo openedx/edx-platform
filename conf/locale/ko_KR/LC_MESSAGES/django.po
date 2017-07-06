@@ -90,7 +90,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-06-08 14:59+0000\n"
+"POT-Creation-Date: 2017-06-21 14:42+0000\n"
 "PO-Revision-Date: 2017-03-16 12:39+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -263,10 +263,6 @@ msgid ""
 "This is the bulk SKU (stock keeping unit) of this mode in the external "
 "ecommerce service."
 msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Audit"
-msgstr "청강"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Honor"
@@ -674,6 +670,38 @@ msgstr ""
 #: common/djangoapps/student/views.py
 #, python-brace-format
 msgid "The course you are looking for is closed for enrollment as of {date}."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Photos are mismatched"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Name missing from ID photo"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "ID photo not provided"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "ID is invalid"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Learner photo is blurry"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Name on ID does not match name on account"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Learner photo not provided"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "ID photo is blurry"
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -2064,8 +2092,8 @@ msgid ""
 "contact moocsupport@mathworks.com"
 msgstr ""
 
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
+#: cms/templates/index.html lms/templates/help_modal.html
+#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -4343,6 +4371,10 @@ msgstr ""
 msgid "Please check the syntax of your entry."
 msgstr ""
 
+#: lms/djangoapps/branding/api.py
+msgid "Take free online courses at edX.org"
+msgstr ""
+
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
 #: lms/djangoapps/branding/api.py
@@ -5090,7 +5122,7 @@ msgid "Upgrade to Verified Certificate"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
-#: cms/templates/group_configurations.html lms/templates/courseware/info.html
+#: cms/templates/group_configurations.html
 msgid "Learn More"
 msgstr ""
 
@@ -7918,31 +7950,6 @@ msgid "Your {platform_name} verification has expired."
 msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
-msgid "No photo ID was provided."
-msgstr ""
-
-#: lms/djangoapps/verify_student/models.py
-msgid "We couldn't read your name from your photo ID image."
-msgstr ""
-
-#: lms/djangoapps/verify_student/models.py
-msgid ""
-"The name associated with your account and the name on your ID do not match."
-msgstr ""
-
-#: lms/djangoapps/verify_student/models.py
-msgid "The image of your face was not clear."
-msgstr ""
-
-#: lms/djangoapps/verify_student/models.py
-msgid "Your face was not visible in your self-photo."
-msgstr ""
-
-#: lms/djangoapps/verify_student/models.py
-msgid "There was an error verifying your ID photos."
-msgstr ""
-
-#: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr ""
 
@@ -8022,6 +8029,10 @@ msgstr ""
 #: lms/djangoapps/verify_student/views.py
 msgid "Verification photos received"
 msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Audit"
+msgstr "청강"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Facebook"
@@ -8742,9 +8753,7 @@ msgid "Internal API URL"
 msgstr ""
 
 #: openedx/core/djangoapps/catalog/models.py
-msgid ""
-"API root to be used for server-to-server requests (e.g., https://catalog-"
-"internal.example.com/api/v1/)."
+msgid "DEPRECATED: Use the setting COURSE_CATALOG_API_URL."
 msgstr ""
 
 #: openedx/core/djangoapps/catalog/models.py
@@ -10086,6 +10095,12 @@ msgstr ""
 msgid "Reset"
 msgstr "초기화"
 
+#: cms/templates/widgets/footer.html lms/templates/footer.html
+#: themes/edx.org/lms/templates/footer.html
+#: themes/red-theme/lms/templates/footer.html
+msgid "Legal"
+msgstr "법률적"
+
 #: cms/templates/widgets/header.html lms/templates/navigation.html
 #: lms/templates/widgets/footer-language-selector.html
 msgid "Choose Language"
@@ -10418,11 +10433,6 @@ msgstr "디버그:"
 #: lms/templates/extauth_failure.html
 msgid "External Authentication failed"
 msgstr "외부 인증 실패"
-
-#: lms/templates/footer.html themes/edx.org/lms/templates/footer.html
-#: themes/red-theme/lms/templates/footer.html
-msgid "Legal"
-msgstr "법률적"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Password Reset"
@@ -13093,7 +13103,7 @@ msgstr "당신은 아직 등록되지 않았습니다. "
 
 #: lms/templates/courseware/info.html
 msgid ""
-"You are not currently enrolled in this course. {link_start}Sign up "
+"You are not currently enrolled in this course. {link_start}Enroll "
 "now!{link_end}"
 msgstr ""
 
@@ -13107,18 +13117,6 @@ msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "View Updates in Studio"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Give yourself an additional incentive to complete"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Earn a verified certificate."
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Upgrade Now"
 msgstr ""
 
 #: lms/templates/courseware/info.html
@@ -13714,6 +13712,25 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Current Verification Status: Denied"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your verification submission was not accepted. To receive a verified "
+"certificate, you must submit a new photo of yourself and your government-"
+"issued photo ID before the verification deadline for your course."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Your verification was denied for the following reasons:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
+msgstr "인증 다시 제출하기"
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Expired"
 msgstr ""
 
@@ -13723,10 +13740,6 @@ msgid ""
 "submit a new photo of yourself and your government-issued photo ID before "
 "the verification deadline for your course."
 msgstr ""
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Resubmit Verification"
-msgstr "인증 다시 제출하기"
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -15756,15 +15769,11 @@ msgstr "게시판 관리자"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Discussion Admins can edit or delete any post, clear misuse flags, close and"
-" re-open threads, endorse responses, and see posts from all cohorts. Their "
+" re-open threads, endorse responses, and see posts from all groups. Their "
 "posts are marked as 'staff'. They can also add and remove the discussion "
-"moderation roles to manage course team membership. You can only give course "
-"team roles to enrolled users."
+"moderation roles to manage course team membership. Only enrolled users can "
+"be added as Discussion Admins."
 msgstr ""
-"게시판 관리자는 모든 게시글을 편집하거나 삭제할 수 있으며, 잘못 사용된 표시를 바로 잡을 수 있습니다. 또한 게시물을 닫거나 다시 열 "
-"수 있으며, 답안을 지지할 수 있고, 모든 학습 집단의 게시글을 볼 수 있습니다. 뿐만 아니라, 강좌 운영팀의 멤버쉽을 관리하기 위해 "
-"토론 조정 역할을 추가하거나 제거할 수 있습니다. 이렇게 강좌 관리 역할은 등록된 이용자에게만 부여할 수 있습니다. 한편 관리자의 글은 "
-"'관리자'라고 표시됩니다. "
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Discussion Admin"
@@ -15777,15 +15786,11 @@ msgstr "토의 진행자"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Discussion Moderators can edit or delete any post, clear misuse flags, close"
-" and re-open threads, endorse responses, and see posts from all cohorts. "
+" and re-open threads, endorse responses, and see posts from all groups. "
 "Their posts are marked as 'staff'. They cannot manage course team membership"
-" by adding or removing discussion moderation roles. You can only give course"
-" team roles to enrolled users."
+" by adding or removing discussion moderation roles. Only enrolled users can "
+"be added as Discussion Moderators."
 msgstr ""
-"Discussion Moderators는 모든 게시글을 편집하거나 삭제할 수 있으며, 잘못 사용된 표시를 바로 잡을 수 있습니다. 또한 "
-"게시물을 닫거나 다시 열 수 있으며, 답안을 지지할 수 있고, 모든 학습 집단의 게시글을 볼 수 있습니다. 그리고 Moderators의 "
-"글은 '관리자' 표시가 붙습니다.  이러한 강좌 관리 역할은 등록된 이용자에게만 부여할 수 있습니다. 한편, 강좌 운영팀의 멤버쉽을 "
-"관리하기 위해 토론 조정 역할을 추가하거나 제거할 수 있습니다.  "
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Moderator"
@@ -15797,16 +15802,12 @@ msgstr "게시판 커뮤니티 조교"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Community TA's are members of the community whom you deem particularly "
+"Community TAs are members of the community whom you deem particularly "
 "helpful on the discussion boards. They can edit or delete any post, clear "
 "misuse flags, close and re-open threads, endorse responses, and see posts "
-"from all cohorts. Their posts are marked as 'Community TA'. You can only "
-"give course team roles to enrolled users."
+"from all groups. Their posts are marked as 'Community TA'. Only enrolled "
+"users can be added as Community TAs."
 msgstr ""
-"커뮤니티 조교는 커뮤니티 구성원 중에서 토의 게시판 운영에 도움을 줄 수 있는 사람입니다.    모든 게시글을 편집하거나 삭제할 수 "
-"있으며, 잘못 사용된 표시를 바로 잡을 수 있습니다. 또한 게시물을 닫거나 다시 열 수 있으며, 답안을 지지할 수 있고, 모든 학습 "
-"집단의 게시글을 볼 수 있습니다. 이렇게 강좌 관리 역할은 등록된 이용자에게만 부여할 수 있습니다. 한편 커뮤니티 조교의 글에는 "
-"'커뮤니티 조교'라고 표시됩니다. "
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Community TA"
@@ -19194,6 +19195,22 @@ msgid ""
 "The unique code that identifies this library. {strong_start}Note: This is "
 "part of your library URL, so no spaces or special characters are "
 "allowed.{strong_end} This cannot be changed."
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Organization and Library Settings"
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Show all courses in organization:"
+msgstr ""
+
+#: cms/templates/index.html
+msgid "For example, MITx"
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Show content libraries"
 msgstr ""
 
 #: cms/templates/index.html
