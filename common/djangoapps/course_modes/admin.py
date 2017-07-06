@@ -4,10 +4,9 @@ Django admin page for course modes
 from django.conf import settings
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.admin import widgets
+from django.contrib import admin
 
 from pytz import timezone, UTC
-from ratelimitbackend import admin
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -55,7 +54,7 @@ class CourseModeForm(forms.ModelForm):
             "OPTIONAL: After this date/time, users will no longer be able to submit photos for verification.  "
             "This appies ONLY to modes that require verification."
         ),
-        widget=widgets.AdminSplitDateTime,
+        widget=admin.widgets.AdminSplitDateTime,
     )
 
     def __init__(self, *args, **kwargs):
