@@ -12,6 +12,7 @@ from urlparse import parse_qs, urlsplit, urlunsplit
 
 import analytics
 import edx_oauth2_provider
+import waffle
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -174,6 +175,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
     if extra_context is None:
         extra_context = {}
 
+    programs_list = []
     courses = get_courses(user)
 
     if configuration_helpers.get_value(
@@ -207,7 +209,11 @@ def index(request, extra_context=None, user=AnonymousUser()):
     # Insert additional context for use in the template
     context.update(extra_context)
 
-    context['programs_list'] = get_programs_with_type(include_hidden=False)
+    # Add marketable programs to the context if the multi-tenant programs switch is enabled.
+    if waffle.switch_is_active('get-multitenant-programs'):
+        programs_list = get_programs_with_type(include_hidden=False)
+
+    context['programs_list'] = programs_list
 
     return render_to_response('index.html', context)
 
