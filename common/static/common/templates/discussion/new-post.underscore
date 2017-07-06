@@ -29,6 +29,13 @@
             </div>
         </label>
     </div>
+    <% } else if (is_discussion_division_enabled) { %>
+    <div class="post-field group-visibility">
+        <label class="field-label">
+            <!-- Wrapper for the visibility message filled out by a separate template -->
+            <span class="field-label-text"></span>
+	</label>
+    </div>
     <% } %>
     <div class="post-field">
         <label class="field-label">
