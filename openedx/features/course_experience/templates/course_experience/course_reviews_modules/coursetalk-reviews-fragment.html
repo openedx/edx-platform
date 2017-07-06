@@ -2,9 +2,11 @@
 
 <%page expression_filter="h"/>
 
-<%namespace name='static' file='../static_content.html'/>
+<%namespace name='static' file='../../static_content.html'/>
 
 <%!
+from django.conf import settings
+from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.features.course_experience import SHOW_REVIEWS_TOOL_FLAG
 %>
 
@@ -13,6 +15,12 @@ from openedx.features.course_experience import SHOW_REVIEWS_TOOL_FLAG
         ## Coursetalk Widget
         <div id="ct-custom-read-review-widget" data-provider="${platform_key}" data-course="${course.id}"></div>
     </div>
-
-    <script src="//d3q6qq2zt8nhwv.cloudfront.net/s/js/widgets/coursetalk-read-reviews.js"></script>
 % endif
+
+<%static:webpack entry="CourseTalkReviews">
+    new CourseTalkReviews({
+        toggleButton: '.toggle-read-write-reviews',
+        readSrc: "${settings.COURSE_TALK_READ_ONLY_SOURCE | n, js_escaped_string}",
+        writeSrc: "${settings.COURSE_TALK_WRITE_ONLY_SOURCE | n, js_escaped_string}"
+    });
+</%static:webpack>
