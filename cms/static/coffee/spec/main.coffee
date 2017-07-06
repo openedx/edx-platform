@@ -46,8 +46,7 @@ requirejs.config({
         "domReady": "xmodule_js/common_static/js/vendor/domReady",
         "URI": "xmodule_js/common_static/js/vendor/URI.min",
         "mock-ajax": "xmodule_js/common_static/js/vendor/mock-ajax",
-
-        "mathjax": "//cdn.mathjax.org/mathjax/2.4-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
+	"mathjax": "//cdnjs.cloudflare.com/ajax/libs/mathjax/2.4.0/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
         "youtube": "//www.youtube.com/player_api?noext",
         "tender": "//api.tenderapp.com/tender_widget",
 
