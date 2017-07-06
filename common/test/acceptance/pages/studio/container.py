@@ -288,7 +288,7 @@ class ContainerPage(PageObject, HelpMixin):
         """
         Clicks the edit visibility button for this container.
         """
-        return _click_edit(self, '.visibility-button', '.xblock-visibility_view')
+        return _click_edit(self, '.access-button', '.xblock-visibility_view')
 
     def verify_confirmation_message(self, message, verify_hidden=False):
         """
