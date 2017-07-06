@@ -293,7 +293,10 @@ class CourseFields(object):
             '{"id": "i4x-InstitutionName-CourseNumber-course-CourseRun"}. For example, one discussion '
             'category may be "Lydian Mode": {"id": "i4x-UniversityX-MUS101-course-2015_T1"}. The "id" '
             'value for each category must be unique. In "id" values, the only special characters that are '
-            'supported are underscore, hyphen, and period.'
+            'supported are underscore, hyphen, and period. You can also specify a category as the default '
+            'for new posts in the Discussion page by setting its "default" attribute to true. For example, '
+            '"Lydian Mode": {"id": "i4x-UniversityX-MUS101-course-2015_T1", "default": true}.'
+
         ),
         scope=Scope.settings
     )

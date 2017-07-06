@@ -387,6 +387,12 @@ def _create_base_discussion_view_context(request, course_key):
     }
 
 
+def _get_discussion_default_topic_id(course):
+    for topic, entry in course.discussion_topics.items():
+        if entry.get('default') is True:
+            return entry['id']
+
+
 def _create_discussion_board_context(request, course_key, discussion_id=None, thread_id=None):
     """
     Returns the template context for rendering the discussion board.
@@ -447,6 +453,8 @@ def _create_discussion_board_context(request, course_key, discussion_id=None, th
         'upgrade_link': check_and_get_upgrade_link(request, user, course.id),
         'upgrade_price': get_cosmetic_verified_display_price(course),
         # ENDTODO
+        # If the default topic id is None the front-end code will look for a topic that contains "General"
+        'discussion_default_topic_id': _get_discussion_default_topic_id(course),
     })
     return context
 

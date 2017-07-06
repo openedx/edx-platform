@@ -32,6 +32,7 @@ from django_comment_common.models import CourseDiscussionSettings, ForumsConfig
 from django_comment_common.utils import ThreadContext
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion import views
+from lms.djangoapps.discussion.views import _get_discussion_default_topic_id
 from lms.djangoapps.discussion.views import course_discussions_settings_handler
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from lms.lib.comment_client.utils import CommentClientPaginatedResult
@@ -1884,3 +1885,35 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
             CourseDiscussionSettings.COHORT, CourseDiscussionSettings.ENROLLMENT_TRACK
         ]
         self.assertEqual(response, expected_response)
+
+
+class DefaultTopicIdGetterTestCase(ModuleStoreTestCase):
+    """
+    Tests the `_get_discussion_default_topic_id` helper.
+    """
+
+    def test_no_default_topic(self):
+        discussion_topics = {
+            'dummy discussion': {
+                'id': 'dummy_discussion_id',
+            },
+        }
+        course = CourseFactory.create(discussion_topics=discussion_topics)
+        expected_id = None
+        result = _get_discussion_default_topic_id(course)
+        self.assertEqual(expected_id, result)
+
+    def test_default_topic_id(self):
+        discussion_topics = {
+            'dummy discussion': {
+                'id': 'dummy_discussion_id',
+            },
+            'another discussion': {
+                'id': 'another_discussion_id',
+                'default': True,
+            },
+        }
+        course = CourseFactory.create(discussion_topics=discussion_topics)
+        expected_id = 'another_discussion_id'
+        result = _get_discussion_default_topic_id(course)
+        self.assertEqual(expected_id, result)
