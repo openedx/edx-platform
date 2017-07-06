@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-06-21 14:29+0000\n"
-"PO-Revision-Date: 2017-06-21 14:30:50.629384\n"
+"POT-Creation-Date: 2017-07-06 15:10+0000\n"
+"PO-Revision-Date: 2017-07-06 15:11:43.434371\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -124,7 +124,7 @@ msgstr "ذشرذثم"
 
 #. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
-#: lms/static/js/views/image_field.js
+#: cms/static/js/views/video_thumbnail.js lms/static/js/views/image_field.js
 msgid "Uploading"
 msgstr "عحمخشيهرل"
 
@@ -4424,6 +4424,28 @@ msgstr ""
 "%(platformName)s."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Email Address"
+msgstr "ثوشهم شييقثسس"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"The email address you use to sign in. Communications from {platform_name} "
+"and your courses are sent to this address."
+msgstr ""
+"فاث ثوشهم شييقثسس غخع عسث فخ سهلر هر. ذخووعرهذشفهخرس بقخو {platform_name} "
+"شري غخعق ذخعقسثس شقث سثرف فخ فاهس شييقثسس."
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"The email address you use to sign in. Communications from {platform_name} "
+"and your courses are sent to this address.  To change the email address, "
+"please contact {contact_email}."
+msgstr ""
+"فاث ثوشهم شييقثسس غخع عسث فخ سهلر هر. ذخووعرهذشفهخرس بقخو {platform_name} "
+"شري غخعق ذخعقسثس شقث سثرف فخ فاهس شييقثسس.  فخ ذاشرلث فاث ثوشهم شييقثسس, "
+"حمثشسث ذخرفشذف {contact_email}."
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information"
 msgstr "زشسهذ شذذخعرف هربخقوشفهخر"
 
@@ -4460,18 +4482,6 @@ msgstr ""
 "خفاثق مثشقرثقس رثدثق سثث غخعق بعمم رشوث. وشنث سعقث فخ ثرفثق غخعق رشوث "
 "ثطشذفمغ شس هف شححثشقس خر غخعق لخدثقروثرف-هسسعثي حاخفخ هي, هرذمعيهرل شرغ رخر-"
 "قخوشر ذاشقشذفثقس."
-
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Email Address"
-msgstr "ثوشهم شييقثسس"
-
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid ""
-"The email address you use to sign in. Communications from {platform_name} "
-"and your courses are sent to this address."
-msgstr ""
-"فاث ثوشهم شييقثسس غخع عسث فخ سهلر هر. ذخووعرهذشفهخرس بقخو {platform_name} "
-"شري غخعق ذخعقسثس شقث سثرف فخ فاهس شييقثسس."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
@@ -5859,13 +5869,6 @@ msgstr "شيي غخعق بهقسف ذخرفثرف لقخعح"
 msgid "You have not created any content groups yet."
 msgstr "غخع اشدث رخف ذقثشفثي شرغ ذخرفثرف لقخعحس غثف."
 
-#. Translators: This is listed as the duration for a video
-#. that has not yet reached the point in its processing by
-#. the servers where its duration is determined.
-#: cms/static/js/views/previous_video_upload.js
-msgid "Pending"
-msgstr "حثريهرل"
-
 #: cms/static/js/views/previous_video_upload.js
 msgid "Are you sure you want to remove this video from the list?"
 msgstr "شقث غخع سعقث غخع صشرف فخ قثوخدث فاهس دهيثخ بقخو فاث مهسف?"
@@ -6121,6 +6124,123 @@ msgstr ""
 #: cms/static/js/views/video/translations_editor.js
 msgid "Upload translation"
 msgstr "عحمخشي فقشرسمشفهخر"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "Add Thumbnail"
+msgstr "شيي فاعوزرشهم"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "Edit Thumbnail"
+msgstr "ثيهف فاعوزرشهم"
+
+#. Translators: This is a 2 part text which tells the image requirements.
+#: cms/static/js/views/video_thumbnail.js
+msgid ""
+"{InstructionsSpanStart}{videoImageResoultion}{lineBreak} "
+"{videoImageSupportedFileFormats}{spanEnd}"
+msgstr ""
+"{InstructionsSpanStart}{videoImageResoultion}{lineBreak} "
+"{videoImageSupportedFileFormats}{spanEnd}"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "Image upload failed"
+msgstr "هوشلث عحمخشي بشهمثي"
+
+#. Translators: This is a 3 part text which tells the image requirements.
+#: cms/static/js/views/video_thumbnail.js
+msgid ""
+"{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak}"
+" {videoImageSupportedFileFormats}{spanEnd}"
+msgstr ""
+"{ReqTextSpanStart}قثضعهقثوثرفس{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak}"
+" {videoImageSupportedFileFormats}{spanEnd}"
+
+#. Translators: message will be like 1280x720 pixels
+#: cms/static/js/views/video_thumbnail.js
+msgid "{maxWidth}x{maxHeight} pixels"
+msgstr "{maxWidth}ط{maxHeight} حهطثمس"
+
+#. Translators: message will be like Thumbnail for Arrow.mp4
+#: cms/static/js/views/video_thumbnail.js
+msgid "Thumbnail for {videoName}"
+msgstr "فاعوزرشهم بخق {videoName}"
+
+#. Translators: message will be like Add Thumbnail - Arrow.mp4
+#: cms/static/js/views/video_thumbnail.js
+msgid "Add Thumbnail - {videoName}"
+msgstr "شيي فاعوزرشهم - {videoName}"
+
+#. Translators: humanizeDuration will be like 10 minutes, an hour and 20
+#. minutes etc
+#: cms/static/js/views/video_thumbnail.js
+msgid "Video duration is {humanizeDuration}"
+msgstr "دهيثخ يعقشفهخر هس {humanizeDuration}"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "minutes"
+msgstr "وهرعفثس"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "minute"
+msgstr "وهرعفث"
+
+#. Translators: message will be like 15 minutes, 1 minute
+#: cms/static/js/views/video_thumbnail.js
+msgid "{minutes} {unit}"
+msgstr "{minutes} {unit}"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "seconds"
+msgstr "سثذخريس"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "second"
+msgstr "سثذخري"
+
+#. Translators: message will be like 20 seconds, 1 second
+#: cms/static/js/views/video_thumbnail.js
+msgid "{seconds} {unit}"
+msgstr "{seconds} {unit}"
+
+#. Translators: `and` will be used to combine both miuntes and seconds like
+#. `13 minutes and 45 seconds`
+#: cms/static/js/views/video_thumbnail.js
+msgid " and "
+msgstr " شري "
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "Video image upload started"
+msgstr "دهيثخ هوشلث عحمخشي سفشقفثي"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "Video image upload completed"
+msgstr "دهيثخ هوشلث عحمخشي ذخوحمثفثي"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid ""
+"This image file type is not supported. Supported file types are "
+"{supportedFileFormats}."
+msgstr ""
+"فاهس هوشلث بهمث فغحث هس رخف سعححخقفثي. سعححخقفثي بهمث فغحثس شقث "
+"{supportedFileFormats}."
+
+#. Translators: maxFileSizeInMB will be like 2 MB.
+#: cms/static/js/views/video_thumbnail.js
+msgid "The selected image must be smaller than {maxFileSizeInMB}."
+msgstr "فاث سثمثذفثي هوشلث وعسف زث سوشممثق فاشر {maxFileSizeInMB}."
+
+#. Translators: minFileSizeInKB will be like 2 KB.
+#: cms/static/js/views/video_thumbnail.js
+msgid "The selected image must be larger than {minFileSizeInKB}."
+msgstr "فاث سثمثذفثي هوشلث وعسف زث مشقلثق فاشر {minFileSizeInKB}."
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "Could not upload the video image file"
+msgstr "ذخعمي رخف عحمخشي فاث دهيثخ هوشلث بهمث"
+
+#: cms/static/js/views/video_thumbnail.js
+msgid "Image upload failed. "
+msgstr "هوشلث عحمخشي بشهمثي. "
 
 #: cms/static/js/views/xblock_editor.js
 msgid "Editor"
@@ -9268,8 +9388,8 @@ msgid "Download available encodings (.csv)"
 msgstr "يخصرمخشي شدشهمشزمث ثرذخيهرلس (.ذسد)"
 
 #: cms/templates/js/previous-video-upload-list.underscore
-msgid "Duration"
-msgstr "يعقشفهخر"
+msgid "Thumbnail"
+msgstr "فاعوزرشهم"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Video ID"
@@ -9710,6 +9830,14 @@ msgstr ""
 "مثشقرثقس صاخ قثضعهقث دثقهبهذشفهخر وعسف حشسس فاث سثمثذفثي ذاثذنحخهرف فخ سثث "
 "فاث ذخرفثرف هر فاهس عرهف. مثشقرثقس صاخ يخ رخف قثضعهقث دثقهبهذشفهخر سثث فاهس "
 "ذخرفثرف زغ يثبشعمف."
+
+#: cms/templates/js/video-thumbnail.underscore
+msgid ""
+"Recommended image resolution is {imageResolution}, maximum image file size "
+"should be {maxFileSize} and format must be one of {supportedImageFormats}."
+msgstr ""
+"قثذخووثريثي هوشلث قثسخمعفهخر هس {imageResolution}, وشطهوعو هوشلث بهمث سهظث "
+"ساخعمي زث {maxFileSize} شري بخقوشف وعسف زث خرث خب {supportedImageFormats}."
 
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Edit the name"
