@@ -10,7 +10,7 @@
 -e git+https://github.com/edx-solutions/xblock-adventure.git@7bdeb62b1055377dc04a7b503f7eea8264f5847b#egg=xblock-adventure
 -e git+https://github.com/open-craft/xblock-poll.git@copy-change-patch#egg=xblock-poll
 -e git+https://github.com/edx/edx-notifications.git@0.6.0#egg=edx-notifications==0.6.0
--e git+https://github.com/open-craft/problem-builder.git@934d768ba2dc95d2740d7220669f7f5a659048ea#egg=problem-builder
+-e git+https://github.com/open-craft/problem-builder.git@d312e9a587e4376b9afadb982f5fc28e4a9061fc#egg=problem-builder
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/open-craft/xblock-chat.git@d3218cb6c549f953749a2a246952bf7557ed4739#egg=xblock-chat
 -e git+https://github.com/open-craft/xblock-eoc-journal.git@7985ded027aa2742a48ebd7578ac62ce89b9e799#egg=xblock-eoc-journal
