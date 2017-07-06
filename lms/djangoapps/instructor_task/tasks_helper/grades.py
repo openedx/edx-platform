@@ -223,13 +223,13 @@ class CourseGradeReport(object):
         """
         return (
             ["Student ID", "Email", "Username", "Grade"] +
-            self._grades_header(context) +
-            (['Cohort Name'] if context.cohorts_enabled else []) +
-            [u'Experiment Group ({})'.format(partition.name) for partition in context.course_experiments] +
-            (['Team Name'] if context.teams_enabled else []) +
-            ['Enrollment Track', 'Verification Status'] +
-            ['Certificate Eligible', 'Certificate Delivered', 'Certificate Type'] +
-            ['Enrollment Status']
+            self._grades_header(context)  # +
+            # (['Cohort Name'] if context.cohorts_enabled else []) +
+            # [u'Experiment Group ({})'.format(partition.name) for partition in context.course_experiments] +
+            # (['Team Name'] if context.teams_enabled else []) +
+            # ['Enrollment Track', 'Verification Status'] +
+            # ['Certificate Eligible', 'Certificate Delivered', 'Certificate Type'] +
+            # ['Enrollment Status']
         )
 
     def _error_headers(self):
@@ -398,7 +398,7 @@ class CourseGradeReport(object):
         Returns a list of rows for the given users for this report.
         """
         with modulestore().bulk_operations(context.course_id):
-            bulk_context = _CourseGradeBulkContext(context, users)
+            # bulk_context = _CourseGradeBulkContext(context, users)
 
             success_rows, error_rows = [], []
             for user, course_grade, error in CourseGradeFactory().iter(
@@ -413,13 +413,13 @@ class CourseGradeReport(object):
                 else:
                     success_rows.append(
                         [user.id, user.email, user.username] +
-                        self._user_grade_results(course_grade, context) +
-                        self._user_cohort_group_names(user, context) +
-                        self._user_experiment_group_names(user, context) +
-                        self._user_team_names(user, bulk_context.teams) +
-                        self._user_verification_mode(user, context, bulk_context.enrollments) +
-                        self._user_certificate_info(user, context, course_grade, bulk_context.certs) +
-                        [_user_enrollment_status(user, context.course_id)]
+                        self._user_grade_results(course_grade, context)  # +
+                        # self._user_cohort_group_names(user, context) +
+                        # self._user_experiment_group_names(user, context) +
+                        # self._user_team_names(user, bulk_context.teams) +
+                        # self._user_verification_mode(user, context, bulk_context.enrollments) +
+                        # self._user_certificate_info(user, context, course_grade, bulk_context.certs) +
+                        # [_user_enrollment_status(user, context.course_id)]
                     )
             return success_rows, error_rows
 
