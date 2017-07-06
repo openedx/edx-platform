@@ -3,11 +3,11 @@ import 'jquery.cookie';
 
 export class WelcomeMessage {  // eslint-disable-line import/prefer-default-export
 
-  constructor(dismissUrl) {
+  constructor(options) {
     $('.dismiss-message button').click(() => {
       $.ajax({
         type: 'POST',
-        url: dismissUrl,
+        url: options.dismissUrl,
         headers: {
           'X-CSRFToken': $.cookie('csrftoken'),
         },
