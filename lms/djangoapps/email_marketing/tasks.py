@@ -17,6 +17,46 @@ log = logging.getLogger(__name__)
 SAILTHRU_LIST_CACHE_KEY = "email.marketing.cache"
 
 
+@task(bind=True)
+def get_email_cookies_via_sailthru(self, user_email, post_parms):
+    """
+    Adds/updates Sailthru cookie information for a new user.
+     Args:
+        post_parms(dict): User profile information to pass as 'vars' to Sailthru
+    Returns:
+        cookie(str): cookie fetched from Sailthru
+    """
+
+    email_config = EmailMarketingConfiguration.current()
+    if not email_config.enabled:
+        return None
+
+    try:
+        sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
+        log.info(
+            'Sending to Sailthru the user interest cookie [%s] for user [%s]',
+            post_parms.get('cookies', ''),
+            user_email
+        )
+        sailthru_response = sailthru_client.api_post("user", post_parms)
+    except SailthruClientError as exc:
+        log.error("Exception attempting to obtain cookie from Sailthru: %s", unicode(exc))
+        raise SailthruClientError
+
+    if sailthru_response.is_ok():
+        if 'keys' in sailthru_response.json and 'cookie' in sailthru_response.json['keys']:
+            cookie = sailthru_response.json['keys']['cookie']
+            return cookie
+        else:
+            log.error("No cookie returned attempting to obtain cookie from Sailthru for %s", user_email)
+    else:
+        error = sailthru_response.get_error()
+        # generally invalid email address
+        log.info("Error attempting to obtain cookie from Sailthru: %s", error.get_message())
+
+    return None
+
+
 # pylint: disable=not-callable
 @task(bind=True, default_retry_delay=3600, max_retries=24)
 def update_user(self, sailthru_vars, email, site=None, new_user=False, activation=False):
