@@ -569,14 +569,15 @@ def get_user_group_ids(course_id, content, user=None):
     content_user_group_id = None
     user_group_id = None
     if course_id is not None:
+        course_discussion_settings = get_course_discussion_settings(course_id)
         if content.get('username'):
             try:
                 content_user = get_user_by_username_or_email(content.get('username'))
-                content_user_group_id = get_group_id_for_user(content_user, get_course_discussion_settings(course_id))
+                content_user_group_id = get_group_id_for_user(content_user, course_discussion_settings)
             except User.DoesNotExist:
                 content_user_group_id = None
 
-        user_group_id = get_group_id_for_user(user, get_course_discussion_settings(course_id)) if user else None
+        user_group_id = get_group_id_for_user(user, course_discussion_settings) if user else None
     return user_group_id, content_user_group_id
 
 
@@ -822,7 +823,7 @@ def get_group_id_for_user(user, course_discussion_settings):
     elif division_scheme == CourseDiscussionSettings.ENROLLMENT_TRACK:
         partition_service = PartitionService(course_discussion_settings.course_id)
         group_id = partition_service.get_user_group_id_for_partition(user, ENROLLMENT_TRACK_PARTITION_ID)
-        # We negate the group_ids from dynamic [partitions so that they will not conflict
+        # We negate the group_ids from dynamic partitions so that they will not conflict
         # with cohort IDs (which are an auto-incrementing integer field, starting at 1).
         return -1 * group_id if group_id is not None else None
     else:
