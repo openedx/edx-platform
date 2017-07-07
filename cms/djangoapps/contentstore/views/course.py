@@ -458,12 +458,14 @@ def _accessible_courses_list_from_groups(request):
     return courses_list.values(), in_process_course_actions
 
 
-def _accessible_libraries_iter(user):
+def _accessible_libraries_iter(user, org=None):
     """
-    List all libraries available to the logged in user by iterating through all libraries
+    List all libraries available to the logged in user by iterating through all libraries.
+
+    If 'org' is present, only libraries from that org will be returned.
     """
     # No need to worry about ErrorDescriptors - split's get_libraries() never returns them.
-    return (lib for lib in modulestore().get_libraries() if has_studio_read_access(user, lib.location.library_key))
+    return (lib for lib in modulestore().get_libraries(org=org) if has_studio_read_access(user, lib.location.library_key))
 
 
 @login_required
@@ -475,15 +477,10 @@ def course_listing(request):
     optimization_enabled = GlobalStaff().has_user(request.user) and \
         WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
 
-    if optimization_enabled:
-        org = request.GET.get('org', '')
-        show_libraries = LIBRARIES_ENABLED and request.GET.get('libraries', 'false').lower() == 'true'
-    else:
-        org = None
-        show_libraries = LIBRARIES_ENABLED
+    org = request.GET.get('org', '') if optimization_enabled else None
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     user = request.user
-    libraries = _accessible_libraries_iter(request.user) if show_libraries else []
+    libraries = _accessible_libraries_iter(request.user, org) if LIBRARIES_ENABLED else []
 
     def format_in_process_course_view(uca):
         """
@@ -525,9 +522,9 @@ def course_listing(request):
     return render_to_response(u'index.html', {
         u'courses': list(courses_iter),
         u'in_process_course_actions': in_process_course_actions,
-        u'libraries_enabled': show_libraries,
+        u'libraries_enabled': LIBRARIES_ENABLED,
         u'libraries': [format_library_for_view(lib) for lib in libraries],
-        u'show_new_library_button': show_libraries and get_library_creator_status(user),
+        u'show_new_library_button': get_library_creator_status(user),
         u'user': user,
         u'request_course_creator_url': reverse(u'contentstore.views.request_course_creator'),
         u'course_creator_status': _get_course_creator_status(user),
