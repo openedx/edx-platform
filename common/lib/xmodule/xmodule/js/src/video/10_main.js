@@ -45,6 +45,7 @@
             'video/06_video_progress_slider.js',
             'video/07_video_volume_control.js',
             'video/08_video_speed_control.js',
+            'video/08_video_auto_advance_control.js',
             'video/09_video_caption.js',
             'video/09_play_placeholder.js',
             'video/09_play_pause_control.js',
@@ -61,9 +62,9 @@
         ],
         function(
             VideoStorage, initialize, FocusGrabber, VideoAccessibleMenu, VideoControl, VideoFullScreen,
-            VideoQualityControl, VideoProgressSlider, VideoVolumeControl, VideoSpeedControl, VideoCaption,
-            VideoPlayPlaceholder, VideoPlayPauseControl, VideoPlaySkipControl, VideoSkipControl, VideoBumper,
-            VideoSaveStatePlugin, VideoEventsPlugin, VideoEventsBumperPlugin, VideoPoster,
+            VideoQualityControl, VideoProgressSlider, VideoVolumeControl, VideoSpeedControl, VideoAutoAdvanceControl,
+            VideoCaption, VideoPlayPlaceholder, VideoPlayPauseControl, VideoPlaySkipControl, VideoSkipControl,
+            VideoBumper, VideoSaveStatePlugin, VideoEventsPlugin, VideoEventsBumperPlugin, VideoPoster,
             VideoCompletionHandler, VideoCommands, VideoContextMenu
         ) {
             var youtubeXhr = null,
@@ -74,10 +75,13 @@
                     id = el.attr('id').replace(/video_/, ''),
                     storage = VideoStorage('VideoState', id),
                     bumperMetadata = el.data('bumper-metadata'),
-                    mainVideoModules = [FocusGrabber, VideoControl, VideoPlayPlaceholder,
-                        VideoPlayPauseControl, VideoProgressSlider, VideoSpeedControl, VideoVolumeControl,
-                        VideoQualityControl, VideoFullScreen, VideoCaption, VideoCommands, VideoContextMenu,
-                        VideoSaveStatePlugin, VideoEventsPlugin, VideoCompletionHandler],
+                    autoAdvanceEnabled = el.data('autoadvance-enabled') === 'True',
+                    mainVideoModules = [
+                        FocusGrabber, VideoControl, VideoPlayPlaceholder,
+                        VideoPlayPauseControl, VideoProgressSlider, VideoSpeedControl,
+                        VideoVolumeControl, VideoQualityControl, VideoFullScreen, VideoCaption, VideoCommands,
+                        VideoContextMenu, VideoSaveStatePlugin, VideoEventsPlugin, VideoCompletionHandler
+                    ].concat(autoAdvanceEnabled ? [VideoAutoAdvanceControl] : []),
                     bumperVideoModules = [VideoControl, VideoPlaySkipControl, VideoSkipControl,
                         VideoVolumeControl, VideoCaption, VideoCommands, VideoSaveStatePlugin,
                         VideoEventsBumperPlugin, VideoCompletionHandler],

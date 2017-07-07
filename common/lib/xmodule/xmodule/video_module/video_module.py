@@ -144,6 +144,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             resource_string(module, 'js/src/video/06_video_progress_slider.js'),
             resource_string(module, 'js/src/video/07_video_volume_control.js'),
             resource_string(module, 'js/src/video/08_video_speed_control.js'),
+            resource_string(module, 'js/src/video/08_video_auto_advance_control.js'),
             resource_string(module, 'js/src/video/09_video_caption.js'),
             resource_string(module, 'js/src/video/09_play_placeholder.js'),
             resource_string(module, 'js/src/video/09_play_pause_control.js'),
@@ -338,6 +339,19 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         else:
             completion_enabled = False
 
+        # This is the setting that controls whether the autoadvance button will be visible, not whether the
+        # video will autoadvance or not.
+        # For autoadvance controls to be shown, both the feature flag and the course setting must be true.
+        # This allows to enable the feature for certain courses only.
+        autoadvance_enabled = settings.FEATURES.get('ENABLE_AUTOADVANCE_VIDEOS', False) and \
+            getattr(self, 'video_auto_advance', False)
+
+        # This is the current status of auto-advance (not the control visibility).
+        # But when controls aren't visible we force it to off. The student might have once set the preference to
+        # true, but now staff or admin have hidden the autoadvance button and the student won't be able to disable
+        # it anymore; therefore we force-disable it in this case (when controls aren't visible).
+        autoadvance_this_video = self.auto_advance and autoadvance_enabled
+
         metadata = {
             'saveStateUrl': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
@@ -353,6 +367,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'showCaptions': json.dumps(self.show_captions),
             'generalSpeed': self.global_speed,
             'speed': self.speed,
+            'autoAdvance': autoadvance_this_video,
             'savedVideoPosition': self.saved_video_position.total_seconds(),
             'start': self.start_time.total_seconds(),
             'end': self.end_time.total_seconds(),
@@ -395,6 +410,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         bumperize(self)
 
         context = {
+            'autoadvance_enabled': autoadvance_enabled,
             'bumper_metadata': json.dumps(self.bumper['metadata']),  # pylint: disable=E1101
             'metadata': json.dumps(OrderedDict(metadata)),
             'poster': json.dumps(get_poster(self)),

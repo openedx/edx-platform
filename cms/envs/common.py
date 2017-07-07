@@ -170,6 +170,10 @@ FEATURES = {
     # Don't autoplay videos for course authors
     'AUTOPLAY_VIDEOS': False,
 
+    # Move the course author to next page when a video finishes. Set to True to
+    # show an auto-advance button in videos. If False, videos never auto-advance.
+    'ENABLE_AUTOADVANCE_VIDEOS': False,
+
     # If set to True, new Studio users won't be able to author courses unless
     # an Open edX admin has added them to the course creator group.
     'ENABLE_CREATOR_GROUP': True,

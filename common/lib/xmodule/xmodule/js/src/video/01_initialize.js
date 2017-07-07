@@ -62,6 +62,7 @@ function(VideoPlayer, i18n, moment, _) {
             });
         },
 
+        /* eslint-disable no-use-before-define */
         methodsDict = {
             bindTo: bindTo,
             fetchMetadata: fetchMetadata,
@@ -77,6 +78,7 @@ function(VideoPlayer, i18n, moment, _) {
             parseYoutubeStreams: parseYoutubeStreams,
             setPlayerMode: setPlayerMode,
             setSpeed: setSpeed,
+            setAutoAdvance: setAutoAdvance,
             speedToString: speedToString,
             trigger: trigger,
             youtubeId: youtubeId,
@@ -84,6 +86,7 @@ function(VideoPlayer, i18n, moment, _) {
             loadYoutubePlayer: loadYoutubePlayer,
             loadYouTubeIFrameAPI: loadYouTubeIFrameAPI
         },
+        /* eslint-enable no-use-before-define */
 
         _youtubeApiDeferred = null,
         _oldOnYouTubeIframeAPIReady;
@@ -375,6 +378,14 @@ function(VideoPlayer, i18n, moment, _) {
                 showCaptions: isBoolean,
                 autoplay: isBoolean,
                 autohideHtml5: isBoolean,
+                autoAdvance: function(value) {
+                    var shouldAutoAdvance = storage.getItem('auto_advance');
+                    if (_.isUndefined(shouldAutoAdvance)) {
+                        return isBoolean(value) || false;
+                    } else {
+                        return shouldAutoAdvance;
+                    }
+                },
                 savedVideoPosition: function(value) {
                     return storage.getItem('savedVideoPosition', true) ||
                             Number(value) ||
@@ -568,6 +579,7 @@ function(VideoPlayer, i18n, moment, _) {
         this.speed = this.speedToString(
             this.config.speed || this.config.generalSpeed
         );
+        this.auto_advance = this.config.autoAdvance;
         this.htmlPlayerLoaded = false;
         this.duration = this.metadata.duration;
 
@@ -702,6 +714,10 @@ function(VideoPlayer, i18n, moment, _) {
             newSpeed = map[newSpeed];
             this.speed = _.contains(this.speeds, newSpeed) ? newSpeed : '1.0';
         }
+    }
+
+    function setAutoAdvance(enabled) {
+        this.auto_advance = enabled;
     }
 
     function getVideoMetadata(url, callback) {
