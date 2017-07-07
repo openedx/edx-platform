@@ -122,7 +122,7 @@
                 userId = this.get('user_id');
                 if (userId) {
                     this.set('staff_authored', DiscussionUtil.isStaff(userId));
-                    this.set('community_ta_authored', DiscussionUtil.isTA(userId));
+                    this.set('community_ta_authored', DiscussionUtil.isTA(userId) || DiscussionUtil.isGroupTA(userId));
                 } else {
                     this.set('staff_authored', false);
                     this.set('community_ta_authored', false);
