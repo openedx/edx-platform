@@ -222,11 +222,13 @@ def inline_discussion(request, course_key, discussion_id):
     threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
     with newrelic_function_trace("add_courseware_context"):
         add_courseware_context(threads, course, request.user)
+    course_discussion_settings = get_course_discussion_settings(course.id)
 
     return utils.JsonResponse({
         'is_commentable_divided': is_commentable_divided(course_key, discussion_id),
         'discussion_data': threads,
         'user_info': user_info,
+        'user_group_id': get_group_id_for_user(request.user, course_discussion_settings),
         'annotated_content_info': annotated_content_info,
         'page': query_params['page'],
         'num_pages': query_params['num_pages'],

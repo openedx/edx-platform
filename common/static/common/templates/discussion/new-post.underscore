@@ -29,6 +29,12 @@
             </div>
         </label>
     </div>
+    <% } else if (is_discussion_division_enabled) { %>
+    <div class="post-field group-visibility">
+        <label class="field-label">
+            <span class="field-label-text"></span>
+	</label>
+    </div>
     <% } %>
     <div class="post-field">
         <label class="field-label">
