@@ -1696,6 +1696,10 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
     """Test utils functionality related to forums "abilities" (permissions) for group moderators"""
 
     def _check_condition(user, condition, content):
+        """
+        Mocks check_condition method because is_open and is_team_member_if_applicable must always be true
+        in order to interact with a thread or comment.
+        """
         return True if condition == 'is_open' or condition == 'is_team_member_if_applicable' else False
 
     def setUp(self):
@@ -1716,7 +1720,7 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         # Create four users: group_moderator (who is within the verified enrollment track and in the cohort),
         # verified_user (who is in the verified enrollment track but not the cohort),
         # cohorted_user (who is in the cohort but not the verified enrollment track),
-        # and plain_user (who is neither in the cohort nor the verified enrollment track)x
+        # and plain_user (who is neither in the cohort nor the verified enrollment track)
         self.group_moderator = UserFactory(username='group_moderator', email='group_moderator@edx.org')
         self.group_moderator.id = 1
         CourseEnrollmentFactory(
