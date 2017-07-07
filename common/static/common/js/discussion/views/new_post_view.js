@@ -73,7 +73,7 @@
                         course_settings: this.course_settings,
                         group_name: this.getGroupName()
                     });
-                    this.topicView.on('thread:topic_change', this.toggleGroupDropDown);
+                    this.topicView.on('thread:topic_change', this.toggleGroupDropdown);
                     if (this.course_settings.get('is_discussion_division_enabled')) {
                         this.topicView.on('thread:topic_change', this.updateVisibilityMessage);
                     }
