@@ -571,7 +571,7 @@ class XBlockWrapper(PageObject):
         Click on Advanced Tab.
         """
         self._click_button('advanced_tab')
-    
+
     def open_basic_tab(self):
         """
         Click on Basic Tab.
