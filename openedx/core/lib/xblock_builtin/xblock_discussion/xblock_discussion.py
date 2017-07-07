@@ -4,7 +4,7 @@ Discussion XBlock
 """
 import logging
 
-from django.templatetags.static import static
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.utils.translation import get_language_bidi
 
 from xblockutils.resources import ResourceLoader
@@ -136,14 +136,14 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
         """
         # Head dependencies
         for vendor_js_file in self.vendor_js_dependencies():
-            fragment.add_resource_url(static(vendor_js_file), "application/javascript", "head")
+            fragment.add_resource_url(staticfiles_storage.url(vendor_js_file), "application/javascript", "head")
 
         for css_file in self.css_dependencies():
-            fragment.add_css_url(static(css_file))
+            fragment.add_css_url(staticfiles_storage.url(css_file))
 
         # Body dependencies
         for js_file in self.js_dependencies():
-            fragment.add_javascript_url(static(js_file))
+            fragment.add_javascript_url(staticfiles_storage.url(js_file))
 
     def has_permission(self, permission):
         """
