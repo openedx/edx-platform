@@ -40,12 +40,14 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
             initialize: function(options) {
                 BasePage.prototype.initialize.call(this, options);
                 this.viewClass = options.viewClass || this.defaultViewClass;
+                this.isUnitPage = this.options.isUnitPage;
+                this.isSplitTest = (this.model.attributes.category === "split_test");
                 this.nameEditor = new XBlockStringFieldEditor({
                     el: this.$('.wrapper-xblock-field'),
                     model: this.model
                 });
                 this.nameEditor.render();
-                if (this.options.isUnitPage) {
+                if (this.isUnitPage || this.isSplitTest) {
                     this.accessEditor = new XBlockAccessEditor({
                         el: this.$('.wrapper-xblock-field')
                     });
@@ -60,15 +62,13 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                     model: this.model
                 });
                 this.messageView.render();
-                this.isUnitPage = this.options.isUnitPage;
-                var isSplitTest = (this.model.attributes.category === "split_test");
-                var isLibrary = (this.model.attributes.category === "library");
-                if ( (this.isUnitPage || isSplitTest) && !isLibrary) {
-                    this.unitAccessView = new ContainerSubviews.UnitAccess({
-                        el: this.$('.container-unit-access'),
+                // Display access message on units and split test components
+                if (this.isUnitPage || this.isSplitTest) {
+                    this.containerAccessView = new ContainerSubviews.ContainerAccess({
+                        el: this.$('.container-access'),
                         model: this.model
                     });
-                    this.unitAccessView.render();
+                    this.containerAccessView.render();
 
                     this.xblockPublisher = new ContainerSubviews.Publisher({
                         el: this.$('#publish-unit'),

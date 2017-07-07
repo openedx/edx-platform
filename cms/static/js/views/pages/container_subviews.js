@@ -32,10 +32,10 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
             render: function() {}
         });
 
-        var UnitAccess = ContainerStateListenerView.extend({
+        var ContainerAccess = ContainerStateListenerView.extend({
             initialize: function() {
                 ContainerStateListenerView.prototype.initialize.call(this);
-                this.template = this.loadTemplate('container-unit-access');
+                this.template = this.loadTemplate('container-access');
             },
 
             shouldRefresh: function(model) {
@@ -297,6 +297,6 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
             ViewLiveButtonController: ViewLiveButtonController,
             Publisher: Publisher,
             PublishHistory: PublishHistory,
-            UnitAccess: UnitAccess
+            ContainerAccess: ContainerAccess
         };
     }); // end define();
