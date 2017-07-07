@@ -1704,6 +1704,14 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         # Create course, seed permissions roles, and create team
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
+        verified_coursemode = CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.VERIFIED
+        )
+        audit_coursemode = CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.AUDIT
+        )
 
         # Create four users: group_moderator (who is within the verified enrollment track and in the cohort),
         # verified_user (who is in the verified enrollment track but not the cohort),
@@ -1714,28 +1722,28 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         CourseEnrollmentFactory(
             course_id=self.course.id,
             user=self.group_moderator,
-            mode=CourseMode.VERIFIED
+            mode=verified_coursemode
         )
         self.verified_user = UserFactory(username='verified', email='verified@edx.org')
         self.verified_user.id = 2
         CourseEnrollmentFactory(
             course_id=self.course.id,
             user=self.verified_user,
-            mode=CourseMode.VERIFIED
+            mode=verified_coursemode
         )
         self.cohorted_user = UserFactory(username='cohort', email='cohort@edx.org')
         self.cohorted_user.id = 3
         CourseEnrollmentFactory(
             course_id=self.course.id,
             user=self.cohorted_user,
-            mode=CourseMode.AUDIT
+            mode=audit_coursemode
         )
         self.plain_user = UserFactory(username='plain', email='plain@edx.org')
         self.plain_user.id = 4
         CourseEnrollmentFactory(
             course_id=self.course.id,
             user=self.plain_user,
-            mode=CourseMode.AUDIT
+            mode=audit_coursemode
         )
         CohortFactory(
             course_id=self.course.id,
