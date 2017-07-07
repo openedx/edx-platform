@@ -45,7 +45,12 @@ from certificates.models import CertificateInvalidation, CertificateStatuses, Ce
 from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_course_with_access
 from courseware.models import StudentModule
-from django_comment_client.utils import has_forum_access
+from django_comment_client.utils import (
+    has_forum_access,
+    get_course_discussion_settings,
+    get_group_name,
+    get_group_id_for_user
+)
 from django_comment_common.models import (
     Role,
     FORUM_ROLE_ADMINISTRATOR,
@@ -933,6 +938,7 @@ def list_course_role_members(request, course_id):
 
     def extract_user_info(user):
         """ convert user into dicts for json view """
+
         return {
             'username': user.username,
             'email': user.email,
@@ -2505,18 +2511,25 @@ def list_forum_members(request, course_id):
     except Role.DoesNotExist:
         users = []
 
+    course_discussion_settings = get_course_discussion_settings(course_id)
+
     def extract_user_info(user):
         """ Convert user to dict for json rendering. """
+        group_id = get_group_id_for_user(user, course_discussion_settings)
+        group_name = get_group_name(group_id, course_discussion_settings)
+
         return {
             'username': user.username,
             'email': user.email,
             'first_name': user.first_name,
             'last_name': user.last_name,
+            'group_name': group_name,
         }
 
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
         rolename: map(extract_user_info, users),
+        'division_scheme': course_discussion_settings.division_scheme,
     }
     return JsonResponse(response_payload)
 
