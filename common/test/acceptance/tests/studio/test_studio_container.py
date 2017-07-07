@@ -430,7 +430,12 @@ class BaseGroupConfigurationsTest(ContainerBase):
         """
         unit_access_editor = self.edit_unit_visibility(unit)
         unit_access_editor.select_groups_in_partition_scheme(partition_label, groups)
+
+        if not groups:
+            partition_label = self.CHOOSE_ONE
         unit_access_editor = self.edit_unit_visibility(unit)
+        self.verify_selected_partition_scheme(unit_access_editor, partition_label)
+        self.verify_selected_groups(unit_access_editor, groups)
         unit_access_editor.save()
 
     def verify_component_validation_error(self, component):
