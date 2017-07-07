@@ -148,6 +148,11 @@ class VideoFields(object):
         scope=Scope.preferences,
         default=1.0
     )
+    auto_advance = Boolean(
+        help=_("Specify whether to advance automatically to the next unit when the video ends."),
+        scope=Scope.preferences,
+        default=False
+    )
     youtube_is_available = Boolean(
         help=_("Specify whether YouTube is available for the user."),
         scope=Scope.user_info,

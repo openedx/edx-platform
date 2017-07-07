@@ -77,6 +77,7 @@ function(VideoPlayer, i18n, moment, _) {
             parseYoutubeStreams: parseYoutubeStreams,
             setPlayerMode: setPlayerMode,
             setSpeed: setSpeed,
+            setAutoAdvance: setAutoAdvance,
             speedToString: speedToString,
             trigger: trigger,
             youtubeId: youtubeId,
@@ -388,6 +389,11 @@ function(VideoPlayer, i18n, moment, _) {
                             value ||
                             '1.0';
                 },
+                'autoAdvance': function(value) {
+                    return storage.getItem('auto_advance') ||
+                            value ||
+                            false;
+                },
                 'transcriptLanguage': function(value) {
                     return storage.getItem('language') ||
                             value ||
@@ -568,6 +574,7 @@ function(VideoPlayer, i18n, moment, _) {
         this.speed = this.speedToString(
             this.config.speed || this.config.generalSpeed
         );
+        this.auto_advance = this.config.autoAdvance;
         this.htmlPlayerLoaded = false;
 
         _setConfigurations(this);
@@ -701,6 +708,10 @@ function(VideoPlayer, i18n, moment, _) {
             newSpeed = map[newSpeed];
             this.speed = _.contains(this.speeds, newSpeed) ? newSpeed : '1.0';
         }
+    }
+
+    function setAutoAdvance(enabled) {
+        this.auto_advance = enabled;
     }
 
     function getVideoMetadata(url, callback) {
