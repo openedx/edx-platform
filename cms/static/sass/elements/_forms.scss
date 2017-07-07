@@ -396,6 +396,16 @@ form {
 // TODO: abstract this out into a Sass placeholder
 .incontext-editor.is-editable {
 
+  .access-editor-action-wrapper {
+    @include margin-left(-10px);
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 80%;
+
+    .icon.icon {
+      vertical-align: baseline;
+    }
+  }
   .incontext-editor-value,
   .incontext-editor-action-wrapper {
     @extend %cont-truncated;
@@ -430,6 +440,9 @@ form {
     }
   }
 }
+
+// +Form - Edit Xblock access
+
 
 // +Form - Create New Wrapper
 // ====================
