@@ -141,7 +141,7 @@ from pipeline_mako import render_require_js_path_overrides
         <%include file="/preview_menu.html" />
     % endif
 
-    <div class="content-wrapper ${"container-fluid" if uses_bootstrap else "container" } main-container" id="content">
+    <div class="content-wrapper ${"container-fluid" if uses_bootstrap else "" } main-container" id="content">
       ${self.body()}
       <%block name="bodyextra"/>
     </div>
