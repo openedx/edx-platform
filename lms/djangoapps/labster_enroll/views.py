@@ -14,7 +14,7 @@ from rest_framework import status
 from ccx_keys.locator import CCXLocator
 from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.ccx.utils import ccx_students_enrrolling_center
+from lms.djangoapps.ccx.utils import ccx_students_enrolling_center
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from instructor.views.api import _split_input_list
 from instructor.enrollment import get_email_params
@@ -97,7 +97,7 @@ def ccx_invite(request, course_id):
     )
 
     if action:
-        ccx_students_enrrolling_center(
+        ccx_students_enrolling_center(
             action.capitalize(), identifiers, email_students, course_key, email_params, ccx.coach
         )
         log.info(
