@@ -186,7 +186,7 @@ class TestCourseGradeFactory(GradeTestBase):
             self.assertEqual(course_grade.letter_grade, u'Pass' if expected_pass else None)
             self.assertEqual(course_grade.percent, 0.5)
 
-        with self.assertNumQueries(11), mock_get_score(1, 2):
+        with self.assertNumQueries(13), mock_get_score(1, 2):
             _assert_create(expected_pass=True)
 
         with self.assertNumQueries(13), mock_get_score(1, 2):

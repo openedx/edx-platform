@@ -16,6 +16,9 @@ COURSE_CERT_AWARDED = Signal(providing_args=["user", "course_key", "mode", "stat
 COURSE_GRADE_NOW_PASSED = Signal(
     providing_args=[
         'user',  # user object
-        'course_key',  # course.id
+        'course_id',  # course.id
     ]
 )
+
+# Signal that indicates that a user has become verified
+LEARNER_NOW_VERIFIED = Signal(providing_args=['user'])
