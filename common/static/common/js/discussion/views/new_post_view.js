@@ -112,21 +112,21 @@
             NewPostView.prototype.getGroupName = function() {
                 var userGroupId;
                 var group;
-                var group_name = null;
+                var groupName = null;
                 if (this.course_settings.get('is_discussion_division_enabled')) {
                     userGroupId = $('#discussion-container').data('user-group-id');
                     if (!userGroupId) {
                         userGroupId = this.user_group_id;
                     }
-                    group = this.course_settings.get('groups').find(function(group) {
-                        return group.id == userGroupId;
+                    group = this.course_settings.get('groups').find(function(courseSettingsGroup) {
+                        return courseSettingsGroup.id === String(userGroupId);
                     });
                     if (group) {
-                        group_name = group.name;
+                        groupName = group.name;
                     }
                 }
 
-                return group_name;
+                return groupName;
             };
 
             NewPostView.prototype.events = {
@@ -150,15 +150,15 @@
                 }
             };
 
-            NewPostView.prototype.updateVisibilityMessage = function($target, force_divided) {
-                var visEl = $('.group-visibility .field-label-text');
+            NewPostView.prototype.updateVisibilityMessage = function($target, forceDivided) {
+                var $visEl = $('.group-visibility .field-label-text');
                 var visTemplate = edx.HtmlUtils.template($('#new-post-visibility-template').html());
-                var group_name = null;
-                if (($target && $target.data('divided')) || force_divided) {
-                    group_name = this.group_name;
+                var groupName = null;
+                if (($target && $target.data('divided')) || forceDivided) {
+                    groupName = this.group_name;
                 }
 
-                edx.HtmlUtils.setHtml(visEl, visTemplate({group_name: group_name}));
+                edx.HtmlUtils.setHtml($visEl, visTemplate({group_name: groupName}));
             };
 
             NewPostView.prototype.postOptionChange = function(event) {
