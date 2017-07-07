@@ -93,15 +93,7 @@ var wpconfig = {
                 )
             },
             {
-                test: /\.js$/,
-                exclude: [
-                    /node_modules/,
-                    namespacedRequireFiles
-                ],
-                use: 'babel-loader'
-            },
-            {
-                test: /\.jsx$/,
+                test: /\.(js|jsx)$/,
                 exclude: [
                     /node_modules/,
                     namespacedRequireFiles
@@ -133,7 +125,7 @@ var wpconfig = {
     },
 
     resolve: {
-        extensions: ['.js', '.json', '.coffee'],
+        extensions: ['.js','.jsx', '.json', '.coffee'],
         alias: {
             'edx-ui-toolkit': 'edx-ui-toolkit/src/',  // @TODO: some paths in toolkit are not valid relative paths
             'jquery.ui': 'jQuery-File-Upload/js/vendor/jquery.ui.widget.js',
