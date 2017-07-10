@@ -30,8 +30,6 @@ class TestComprehensiveTheming(TestCase):
         self.assertEqual(resp.status_code, 200)
         # This string comes from footer.html
         self.assertContains(resp, "super-ugly")
-        # This string comes from header.html
-        self.assertContains(resp, "This file is only for demonstration, and is horrendous!")
 
     def test_theme_outside_repo(self):
         # Need to create a temporary theme, and defer decorating the function
