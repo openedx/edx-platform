@@ -1,9 +1,9 @@
-from nose.plugins.attrib import attr
-
 from django.test import TestCase
+from nose.plugins.attrib import attr
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
 from django_comment_common.models import Role
 from models import CourseDiscussionSettings
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.course_groups.cohorts import CourseCohortsSettings
 from student.models import CourseEnrollment, User
 from utils import get_course_discussion_settings, set_course_discussion_settings

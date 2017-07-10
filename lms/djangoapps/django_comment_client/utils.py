@@ -25,6 +25,7 @@ from edxmako import lookup_template
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted
 from request_cache.middleware import request_cached
+from student.models import get_user_by_username_or_email
 from student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
@@ -516,11 +517,33 @@ def get_ability(course_id, content, user):
     """
     Return a dictionary of forums-oriented actions and the user's permission to perform them
     """
+    (user_group_id, content_user_group_id) = get_user_group_ids(course_id, content, user)
     return {
-        'editable': check_permissions_by_view(user, course_id, content, "update_thread" if content['type'] == 'thread' else "update_comment"),
+        'editable': check_permissions_by_view(
+            user,
+            course_id,
+            content,
+            "update_thread" if content['type'] == 'thread' else "update_comment",
+            user_group_id,
+            content_user_group_id
+        ),
         'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment"),
-        'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if content['type'] == 'thread' else "delete_comment"),
-        'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if content['type'] == 'thread' else False,
+        'can_delete': check_permissions_by_view(
+            user,
+            course_id,
+            content,
+            "delete_thread" if content['type'] == 'thread' else "delete_comment",
+            user_group_id,
+            content_user_group_id
+        ),
+        'can_openclose': check_permissions_by_view(
+            user,
+            course_id,
+            content,
+            "openclose_thread" if content['type'] == 'thread' else False,
+            user_group_id,
+            content_user_group_id
+        ),
         'can_vote': not is_content_authored_by(content, user) and check_permissions_by_view(
             user,
             course_id,
@@ -536,6 +559,26 @@ def get_ability(course_id, content, user):
     }
 
 # TODO: RENAME
+
+
+def get_user_group_ids(course_id, content, user=None):
+    """
+    Given a user, course ID, and the content of the thread or comment, returns the group ID for the current user
+    and the user that posted the thread/comment.
+    """
+    content_user_group_id = None
+    user_group_id = None
+    if course_id is not None:
+        course_discussion_settings = get_course_discussion_settings(course_id)
+        if content.get('username'):
+            try:
+                content_user = get_user_by_username_or_email(content.get('username'))
+                content_user_group_id = get_group_id_for_user(content_user, course_discussion_settings)
+            except User.DoesNotExist:
+                content_user_group_id = None
+
+        user_group_id = get_group_id_for_user(user, course_discussion_settings) if user else None
+    return user_group_id, content_user_group_id
 
 
 def get_annotated_content_info(course_id, content, user, user_info):

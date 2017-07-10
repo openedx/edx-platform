@@ -4,6 +4,7 @@ import json
 
 import ddt
 import mock
+from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase
 from django.utils.timezone import UTC as django_utc
@@ -20,10 +21,20 @@ from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
-from django_comment_common.models import CourseDiscussionSettings, ForumsConfig
-from django_comment_common.utils import get_course_discussion_settings, set_course_discussion_settings
+from django_comment_common.models import (
+    FORUM_ROLE_GROUP_MODERATOR,
+    CourseDiscussionSettings,
+    ForumsConfig,
+    Role,
+    assign_role
+)
+from django_comment_common.utils import (
+    get_course_discussion_settings,
+    seed_permissions_roles,
+    set_course_discussion_settings
+)
 from edxmako import add_lookup
-from lms.djangoapps.teams.tests.factories import CourseTeamFactory
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from lms.lib.comment_client.utils import CommentClientMaintenanceError, perform_request
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups import cohorts
@@ -1679,6 +1690,151 @@ class PermissionsTestCase(ModuleStoreTestCase):
         # content has no known author
         del content['user_id']
         self.assertFalse(utils.is_content_authored_by(content, user))
+
+
+class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
+    """Test utils functionality related to forums "abilities" (permissions) for group moderators"""
+
+    def _check_condition(user, condition, content):
+        """
+        Mocks check_condition method because is_open and is_team_member_if_applicable must always be true
+        in order to interact with a thread or comment.
+        """
+        return True if condition == 'is_open' or condition == 'is_team_member_if_applicable' else False
+
+    def setUp(self):
+        super(GroupModeratorPermissionsTestCase, self).setUp()
+
+        # Create course, seed permissions roles, and create team
+        self.course = CourseFactory.create()
+        seed_permissions_roles(self.course.id)
+        verified_coursemode = CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.VERIFIED
+        )
+        audit_coursemode = CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.AUDIT
+        )
+
+        # Create four users: group_moderator (who is within the verified enrollment track and in the cohort),
+        # verified_user (who is in the verified enrollment track but not the cohort),
+        # cohorted_user (who is in the cohort but not the verified enrollment track),
+        # and plain_user (who is neither in the cohort nor the verified enrollment track)
+        self.group_moderator = UserFactory(username='group_moderator', email='group_moderator@edx.org')
+        self.group_moderator.id = 1
+        CourseEnrollmentFactory(
+            course_id=self.course.id,
+            user=self.group_moderator,
+            mode=verified_coursemode
+        )
+        self.verified_user = UserFactory(username='verified', email='verified@edx.org')
+        self.verified_user.id = 2
+        CourseEnrollmentFactory(
+            course_id=self.course.id,
+            user=self.verified_user,
+            mode=verified_coursemode
+        )
+        self.cohorted_user = UserFactory(username='cohort', email='cohort@edx.org')
+        self.cohorted_user.id = 3
+        CourseEnrollmentFactory(
+            course_id=self.course.id,
+            user=self.cohorted_user,
+            mode=audit_coursemode
+        )
+        self.plain_user = UserFactory(username='plain', email='plain@edx.org')
+        self.plain_user.id = 4
+        CourseEnrollmentFactory(
+            course_id=self.course.id,
+            user=self.plain_user,
+            mode=audit_coursemode
+        )
+        CohortFactory(
+            course_id=self.course.id,
+            name='Test Cohort',
+            users=[self.verified_user, self.cohorted_user]
+        )
+
+        # Give group moderator permissions to group_moderator
+        assign_role(self.course.id, self.group_moderator, 'Group Moderator')
+
+    @mock.patch('django_comment_client.permissions._check_condition', side_effect=_check_condition)
+    def test_not_divided(self, check_condition_function):
+        """
+        Group moderator should not have moderator permissions if the discussions are not divided.
+        """
+        content = {'user_id': self.plain_user.id, 'type': 'thread', 'username': self.plain_user.username}
+        self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
+            'editable': False,
+            'can_reply': True,
+            'can_delete': False,
+            'can_openclose': False,
+            'can_vote': True,
+            'can_report': True
+        })
+        content = {'user_id': self.cohorted_user.id, 'type': 'thread'}
+        self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
+            'editable': False,
+            'can_reply': True,
+            'can_delete': False,
+            'can_openclose': False,
+            'can_vote': True,
+            'can_report': True
+        })
+        content = {'user_id': self.verified_user.id, 'type': 'thread'}
+        self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
+            'editable': False,
+            'can_reply': True,
+            'can_delete': False,
+            'can_openclose': False,
+            'can_vote': True,
+            'can_report': True
+        })
+
+    @mock.patch('django_comment_client.permissions._check_condition', side_effect=_check_condition)
+    def test_divided_within_group(self, check_condition_function):
+        """
+        Group moderator should have moderator permissions within their group if the discussions are divided.
+        """
+        set_discussion_division_settings(self.course.id, enable_cohorts=True,
+                                         division_scheme=CourseDiscussionSettings.COHORT)
+        content = {'user_id': self.cohorted_user.id, 'type': 'thread', 'username': self.cohorted_user.username}
+        self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
+            'editable': True,
+            'can_reply': True,
+            'can_delete': True,
+            'can_openclose': True,
+            'can_vote': True,
+            'can_report': True
+        })
+
+        set_discussion_division_settings(self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK)
+        content = {'user_id': self.verified_user.id, 'type': 'thread', 'username': self.verified_user.username}
+        self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
+            'editable': True,
+            'can_reply': True,
+            'can_delete': True,
+            'can_openclose': True,
+            'can_vote': True,
+            'can_report': True
+        })
+
+    @mock.patch('django_comment_client.permissions._check_condition', side_effect=_check_condition)
+    def test_divided_outside_group(self, check_condition_function):
+        """
+        Group moderator should not have moderator permissions outside of their group.
+        """
+        content = {'user_id': self.plain_user.id, 'type': 'thread', 'username': self.plain_user.username}
+        set_discussion_division_settings(self.course.id, division_scheme=CourseDiscussionSettings.NONE)
+
+        self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
+            'editable': False,
+            'can_reply': True,
+            'can_delete': False,
+            'can_openclose': False,
+            'can_vote': True,
+            'can_report': True
+        })
 
 
 class ClientConfigurationTestCase(TestCase):

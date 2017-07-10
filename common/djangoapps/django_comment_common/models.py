@@ -16,6 +16,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 FORUM_ROLE_ADMINISTRATOR = ugettext_noop('Administrator')
 FORUM_ROLE_MODERATOR = ugettext_noop('Moderator')
+FORUM_ROLE_GROUP_MODERATOR = ugettext_noop('Group Moderator')
 FORUM_ROLE_COMMUNITY_TA = ugettext_noop('Community TA')
 FORUM_ROLE_STUDENT = ugettext_noop('Student')
 
