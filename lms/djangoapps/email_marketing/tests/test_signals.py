@@ -3,6 +3,7 @@ import datetime
 import logging
 
 import ddt
+from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.test import TestCase
@@ -28,6 +29,7 @@ from email_marketing.tasks import (
     update_user_email,
     get_email_cookies_via_sailthru
 )
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from student.tests.factories import UserFactory, UserProfileFactory
 from util.json_request import JsonResponse
 
@@ -450,11 +452,27 @@ class EmailMarketingTests(TestCase):
         email_marketing_register_user(None, user=self.user, profile=self.profile)
         self.assertTrue(mock_update_user.called)
 
+    @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
+    def test_register_user_language_preference(self, mock_update_user):
+        """
+        make sure register user call invokes update_user and includes language preference
+        """
+        # If the user hasn't set an explicit language preference, we should send the application's default.
+        self.assertIsNone(self.user.preferences.model.get_value(self.user, LANGUAGE_KEY))
+        email_marketing_register_user(None, user=self.user, profile=self.profile)
+        self.assertEqual(mock_update_user.call_args[0][0]['ui_lang'], settings.LANGUAGE_CODE)
+
+        # If the user has set an explicit language preference, we should send it.
+        self.user.preferences.create(key=LANGUAGE_KEY, value='es-419')
+        email_marketing_register_user(None, user=self.user, profile=self.profile)
+        self.assertEqual(mock_update_user.call_args[0][0]['ui_lang'], 'es-419')
+
     @patch('email_marketing.signals.crum.get_current_request')
     @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
     @ddt.data(('auth_userprofile', 'gender', 'f', True),
               ('auth_user', 'is_active', 1, True),
-              ('auth_userprofile', 'shoe_size', 1, False))
+              ('auth_userprofile', 'shoe_size', 1, False),
+              ('user_api_userpreference', 'pref-lang', 'en', True))
     @ddt.unpack
     def test_modify_field(self, table, setting, value, result, mock_update_user, mock_get_current_request):
         """
@@ -463,6 +481,25 @@ class EmailMarketingTests(TestCase):
         mock_get_current_request.return_value = self.request
         email_marketing_user_field_changed(None, self.user, table=table, setting=setting, new_value=value)
         self.assertEqual(mock_update_user.called, result)
+
+    @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
+    def test_modify_language_preference(self, mock_update_user):
+        """
+        Test that update_user is called with new language preference
+        """
+        # If the user hasn't set an explicit language preference, we should send the application's default.
+        self.assertIsNone(self.user.preferences.model.get_value(self.user, LANGUAGE_KEY))
+        email_marketing_user_field_changed(
+            None, self.user, table='user_api_userpreference', setting=LANGUAGE_KEY, new_value=None
+        )
+        self.assertEqual(mock_update_user.call_args[0][0]['ui_lang'], settings.LANGUAGE_CODE)
+
+        # If the user has set an explicit language preference, we should send it.
+        self.user.preferences.create(key=LANGUAGE_KEY, value='fr')
+        email_marketing_user_field_changed(
+            None, self.user, table='user_api_userpreference', setting=LANGUAGE_KEY, new_value='fr'
+        )
+        self.assertEqual(mock_update_user.call_args[0][0]['ui_lang'], 'fr')
 
     @patch('lms.djangoapps.email_marketing.tasks.update_user_email.delay')
     def test_modify_email(self, mock_update_user):
