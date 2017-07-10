@@ -1,12 +1,13 @@
 <%
 var selectedGroupsLabel = userPartitionInfo['selected_groups_label'];
 var selectedPartitionIndex = userPartitionInfo['selected_partition_index'];
+console.dir(this.model.attributes);
 var category = this.model.attributes.category;
 var blockType = "";
-if (category == "split_test") {
-    blockType = "component";
+if (category == "vertical") {
+    blockType = gettext("unit")
 } else {
-    blockType = "unit"
+    blockType = gettext("component")
 }
 %>
 <% if (selectedGroupsLabel) { %>

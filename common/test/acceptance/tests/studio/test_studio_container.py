@@ -366,14 +366,14 @@ class BaseGroupConfigurationsTest(ContainerBase):
 
     def edit_component_visibility(self, component):
         """
-        Edit the visibility of an xblock on the container page.
+        Edit the visibility of an xblock on the container page and returns an XBlockVisibilityEditorView.
         """
         component.edit_visibility()
         return XBlockVisibilityEditorView(self.browser, component.locator)
 
     def edit_unit_visibility(self, unit):
         """
-        Edit the visibility of a unit on the container page.
+        Edit the visibility of a unit on the container page and returns an XBlockVisibilityEditorView.
         """
         unit.edit_visibility()
         return XBlockVisibilityEditorView(self.browser, unit.locator)
