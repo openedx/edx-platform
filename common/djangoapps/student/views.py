@@ -87,7 +87,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import course_home_url_name
-from openedx.features.enterprise_support.api import get_dashboard_consent_notification
+from openedx.features.enterprise_support.api import get_dashboard_consent_notification, enterprise_customer_for_request
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
 from student.cookies import delete_logged_in_cookies, set_logged_in_cookies, set_user_info_cookie
@@ -1815,7 +1815,10 @@ def create_account_with_params(request, params):
     is_third_party_auth_enabled = third_party_auth.is_enabled()
 
     if is_third_party_auth_enabled and (pipeline.running(request) or third_party_auth_credentials_in_api):
-        params["password"] = pipeline.make_random_password()
+
+        # For enterprise account creation we are taking user password even for SSO
+        if not enterprise_customer_for_request(request):
+            params["password"] = pipeline.make_random_password()
 
     # in case user is registering via third party (Google, Facebook) and pipeline has expired, show appropriate
     # error message
