@@ -134,6 +134,8 @@ def anonymous_id_for_user(user, course_id, save=True):
     save -- Whether the id should be saved in an AnonymousUserId object.
     """
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
+    assert user
+
     if user.is_anonymous():
         return None
 
@@ -681,6 +683,8 @@ class PasswordHistory(models.Model):
         Returns whether a password has 'expired' and should be reset. Note there are two different
         expiry policies for staff and students
         """
+        assert user
+
         if not settings.FEATURES['ADVANCED_SECURITY']:
             return False
 
@@ -736,6 +740,8 @@ class PasswordHistory(models.Model):
         """
         Verifies that the password adheres to the reuse policies
         """
+        assert user
+
         if not settings.FEATURES['ADVANCED_SECURITY']:
             return True
 
@@ -1082,6 +1088,10 @@ class CourseEnrollment(models.Model):
         Returns:
             Course enrollment object or None
         """
+        assert user
+
+        if user.is_anonymous():
+            return None
         try:
             return cls.objects.get(
                 user=user,
@@ -1397,11 +1407,8 @@ class CourseEnrollment(models.Model):
 
         `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
         """
-        if not user.is_authenticated():
-            return False
-        else:
-            enrollment_state = cls._get_enrollment_state(user, course_key)
-            return enrollment_state.is_active or False
+        enrollment_state = cls._get_enrollment_state(user, course_key)
+        return enrollment_state.is_active or False
 
     @classmethod
     def is_enrolled_by_partial(cls, user, course_id_partial):
@@ -1497,6 +1504,8 @@ class CourseEnrollment(models.Model):
         Returns:
             str: Hash of the user's active enrollments. If the user is anonymous, `None` is returned.
         """
+        assert user
+
         if user.is_anonymous():
             return None
 
@@ -1704,6 +1713,10 @@ class CourseEnrollment(models.Model):
         Returns the CourseEnrollmentState for the given user
         and course_key, caching the result for later retrieval.
         """
+        assert user
+
+        if user.is_anonymous():
+            return CourseEnrollmentState(None, None)
         enrollment_state = cls._get_enrollment_in_request_cache(user, course_key)
         if not enrollment_state:
             try:

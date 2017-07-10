@@ -13,7 +13,7 @@ from django.utils.translation import ugettext as _
   <%block name="navigation_global_links_authenticated">
     % if settings.FEATURES.get('COURSES_ARE_BROWSABLE') and not show_program_listing:
       <li class="item nav-global-01">
-        <a href="${marketing_link('COURSES')}">${_('Explore courses')}</a>
+        <a class="btn" href="${marketing_link('COURSES')}">${_('Explore courses')}</a>
       </li>
     % endif
     % if show_program_listing:
@@ -28,12 +28,12 @@ from django.utils.translation import ugettext as _
         </a>
       </li>
     % endif
-    %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
+    % if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
       <li class="item">
         ## Translators: This is short for "System administration".
-        <a href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
+        <a class="btn" href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
       </li>
-    %endif
+    % endif
   </%block>
 </ol>
 

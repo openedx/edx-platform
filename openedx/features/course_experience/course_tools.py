@@ -65,3 +65,11 @@ class CourseToolsPluginManager(PluginManager):
         course_tools = cls.get_available_plugins().values()
         course_tools.sort(key=lambda course_tool: course_tool.title())
         return course_tools
+
+    @classmethod
+    def get_enabled_course_tools(cls, request, course_key):
+        """
+        Returns the course tools applicable to the current user and course.
+        """
+        course_tools = CourseToolsPluginManager.get_course_tools()
+        return filter(lambda tool: tool.is_enabled(request, course_key), course_tools)

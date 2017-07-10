@@ -1,21 +1,19 @@
 """
 View for Courseware Index
 """
+
+# pylint: disable=attribute-defined-outside-init
+
 import logging
 import urllib
-# pylint: disable=attribute-defined-outside-init
-from datetime import datetime
 
-import waffle
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.http import Http404
-from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
-from django.utils.timezone import UTC
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View

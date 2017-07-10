@@ -115,7 +115,7 @@ class DateSummary(object):
         future.
         """
         if self.date is not None:
-            return datetime.now(utc) <= self.date
+            return datetime.now(utc).date() <= self.date.date()
         return False
 
     def deadline_has_passed(self):
