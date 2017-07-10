@@ -17,7 +17,7 @@ from xblock.fragment import Fragment
 
 from course_api.blocks.tests.helpers import deserialize_usage_key
 from courseware.module_render import get_module_for_descriptor_internal
-from lms.djangoapps.courseware.tests import XModuleRenderingTestBase
+from lms.djangoapps.courseware.tests.helpers import XModuleRenderingTestBase
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xblock_discussion import DiscussionXBlock, loader
 from xmodule.modulestore import ModuleStoreEnum

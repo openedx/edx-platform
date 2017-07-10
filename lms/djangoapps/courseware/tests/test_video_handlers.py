@@ -22,7 +22,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.video_module.transcripts_utils import TranscriptException, TranscriptsGenerationException
 from xmodule.x_module import STUDENT_VIEW
 
-from . import BaseTestXmodule
+from .helpers import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
 
 TRANSCRIPT = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}

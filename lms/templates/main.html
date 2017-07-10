@@ -165,7 +165,9 @@ from pipeline_mako import render_require_js_path_overrides
 </html>
 
 <%def name="login_query()">${
-  u"?next={0}".format(urlquote_plus(login_redirect_url)) if login_redirect_url else ""
+  u"?next={next}".format(
+    next=urlquote_plus(login_redirect_url if login_redirect_url else request.path)
+  ) if (login_redirect_url or request) else ""
 }</%def>
 
 <!-- Performance beacon for onload times -->

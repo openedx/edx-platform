@@ -25,7 +25,7 @@ from xmodule.video_module import VideoDescriptor, bumper_utils, rewrite_video_ur
 from xmodule.video_module.transcripts_utils import Transcript, save_to_store
 from xmodule.x_module import STUDENT_VIEW
 
-from . import BaseTestXmodule
+from .helpers import BaseTestXmodule
 from .test_video_handlers import TestVideo
 from .test_video_xml import SOURCE_XML
 

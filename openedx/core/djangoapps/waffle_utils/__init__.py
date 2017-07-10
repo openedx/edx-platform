@@ -290,19 +290,21 @@ class CourseWaffleFlag(WaffleFlag):
             return None
         return course_override_callback
 
-    def is_enabled(self, course_id=None):
+    def is_enabled(self, course_key=None):
         """
         Returns whether or not the flag is enabled.
 
         Arguments:
-            course_id (CourseKey): The course to check for override before
+            course_key (CourseKey): The course to check for override before
             checking waffle.
         """
         # validate arguments
-        assert issubclass(type(course_id), CourseKey), "The course_id '{}' must be a CourseKey.".format(str(course_id))
+        assert issubclass(type(course_key), CourseKey), "The course_id '{}' must be a CourseKey.".format(
+            str(course_key)
+        )
 
         return self.waffle_namespace.is_flag_active(
             self.flag_name,
-            check_before_waffle_callback=self._get_course_override_callback(course_id),
+            check_before_waffle_callback=self._get_course_override_callback(course_key),
             flag_undefined_default=self.flag_undefined_default
         )
