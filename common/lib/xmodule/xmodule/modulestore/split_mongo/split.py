@@ -192,6 +192,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
     mongo_connection.
     """
     _bulk_ops_record_type = SplitBulkWriteRecord
+    _bulk_ops_on_readonly_op = False
 
     def _get_bulk_ops_record(self, course_key, ignore_case=False):
         """
@@ -721,7 +722,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         self.db_connection._drop_database(database, collections, connections)  # pylint: disable=protected-access
 
-    def cache_items(self, system, base_block_ids, course_key, depth=0, lazy=True):
+    def cache_items(self, system, base_block_ids, course_key, depth=0, lazy=True, readonly=False):
         """
         Handles caching of items once inheritance and any other one time
         per course per fetch operations are done.
@@ -733,7 +734,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             depth: how deep below these to prefetch
             lazy: whether to load definitions now or later
         """
-        with self.bulk_operations(course_key, emit_signals=False):
+        with self.bulk_operations(course_key, emit_signals=False, readonly_op=readonly):
             new_module_data = {}
             for block_id in base_block_ids:
                 new_module_data = self.descendants(
@@ -786,7 +787,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             should_cache_items = True
 
         if should_cache_items:
-            self.cache_items(runtime, block_keys, course_entry.course_key, depth, lazy)
+            self.cache_items(runtime, block_keys, course_entry.course_key, depth, lazy, readonly=True)
 
         return [runtime.load_item(block_key, course_entry, **kwargs) for block_key in block_keys]
 

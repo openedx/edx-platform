@@ -418,7 +418,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    wildcard query, 6! load pertinent items for inheritance calls, load parents, course root fetch (why)
     # Split:
     #    active_versions (with regex), structure, and spurious active_versions refetch
-    @ddt.data((ModuleStoreEnum.Type.mongo, 14, 0), (ModuleStoreEnum.Type.split, 3, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 14, 0), (ModuleStoreEnum.Type.split, 2, 0))
     @ddt.unpack
     def test_get_items(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
@@ -1043,7 +1043,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #   1) wildcard split search,
     #   2-4) active_versions, structure, definition (s/b lazy; so, unnecessary)
     #   5) wildcard draft mongo which has none
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0), (ModuleStoreEnum.Type.split, 5, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0), (ModuleStoreEnum.Type.split, 4, 0))
     @ddt.unpack
     def test_get_courses(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
