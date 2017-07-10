@@ -178,22 +178,29 @@ class BulkOperationsMixin(object):
         self.signal_handler = None
 
     @contextmanager
-    def bulk_operations(self, course_id, emit_signals=True, ignore_case=False):
+    def bulk_operations(self, course_id, emit_signals=True, ignore_case=False, readonly_op=False):
         """
         A context manager for notifying the store of bulk operations. This affects only the current thread.
 
         In the case of Mongo, it temporarily disables refreshing the metadata inheritance tree
         until the bulk operation is completed.
+
+        In the case of a read-only operation being performed, and a store that
+        doesn't care to know about those ops, this contextmanager is a noop.
         """
+        should_bulk = not (readonly_op and not self._bulk_ops_on_readonly_op)
         try:
-            self._begin_bulk_operation(course_id, ignore_case)
+            if should_bulk:
+                self._begin_bulk_operation(course_id, ignore_case)
             yield
         finally:
-            self._end_bulk_operation(course_id, emit_signals, ignore_case)
+            if should_bulk:
+                self._end_bulk_operation(course_id, emit_signals, ignore_case)
 
     # the relevant type of bulk_ops_record for the mixin (overriding classes should override
     # this variable)
     _bulk_ops_record_type = BulkOpsRecord
+    _bulk_ops_on_readonly_op = True
 
     def _get_bulk_ops_record(self, course_key, ignore_case=False):
         """
