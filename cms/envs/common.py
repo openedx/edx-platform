@@ -932,6 +932,9 @@ INSTALLED_APPS = (
     # Site configuration for theming and behavioral modification
     'openedx.core.djangoapps.site_configuration',
 
+    # Ability to detect and special-case crawler behavior
+    'openedx.core.djangoapps.crawlers',
+
     # comment common
     'django_comment_common',
 
