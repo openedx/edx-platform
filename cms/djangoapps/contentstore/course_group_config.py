@@ -111,9 +111,14 @@ class GroupConfiguration(object):
         """
         Get usage info for unit/module.
         """
+        if unit.category == 'sequential' or item.category == 'split_test':
+            unit_for_url = item
+        else:
+            unit_for_url = unit
+
         unit_url = reverse_usage_url(
             'container_handler',
-            course.location.course_key.make_usage_key(unit.location.block_type, unit.location.name)
+            course.location.course_key.make_usage_key(unit_for_url.location.block_type, unit_for_url.location.name)
         )
 
         usage_dict = {'label': u"{} / {}".format(unit.display_name, item.display_name), 'url': unit_url}
@@ -214,8 +219,6 @@ class GroupConfiguration(object):
                 usage_info[group_id] = []
 
             unit = item.get_parent()
-            if unit.category == 'sequential':
-                unit = item
             if not unit:
                 log.warning("Unable to find parent for component %s", item.location)
                 continue
