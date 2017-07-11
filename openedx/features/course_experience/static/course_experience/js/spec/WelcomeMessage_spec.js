@@ -13,7 +13,7 @@ describe('Welcome Message factory', () => {
 
     beforeEach(() => {
       loadFixtures('course_experience/fixtures/welcome-message-fragment.html');
-      new WelcomeMessage(endpointUrl);  // eslint-disable-line no-new
+      new WelcomeMessage({ dismissUrl: endpointUrl });  // eslint-disable-line no-new
     });
 
     it('When button click is made, ajax call is made and message is hidden.', () => {

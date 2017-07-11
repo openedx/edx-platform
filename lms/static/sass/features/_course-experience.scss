@@ -200,6 +200,21 @@
 }
 
 // Course Reviews Page
-.course-reviews-tool {
-  margin: ($baseline * 2) ($baseline * 3);
+.course-reviews {
+  .page-header.has-secondary > .page-header-main  {
+    display: block;
+    position: relative;
+
+    .toggle-read-write-reviews {
+      position: absolute;
+      top: $baseline * (-1/2);
+      right: $baseline / 2;
+      cursor: pointer;
+    }
+  }
+
+  .course-reviews-tool {
+    margin: ($baseline * 2) ($baseline * 3);
+    position: relative;
+  }
 }
