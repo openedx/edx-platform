@@ -6,6 +6,7 @@ var path = require('path');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 var StringReplace = require('string-replace-webpack-plugin');
+var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var isProd = process.env.NODE_ENV === 'production';
 
@@ -13,6 +14,11 @@ var namespacedRequireFiles = [
     path.resolve(__dirname, 'common/static/common/js/components/views/feedback_notification.js'),
     path.resolve(__dirname, 'common/static/common/js/components/views/feedback.js')
 ];
+
+const extractSass = new ExtractTextPlugin({
+    filename: "css/[name].[contenthash].css",
+    disable: !isProd
+});
 
 var wpconfig = {
     context: __dirname,
@@ -77,7 +83,9 @@ var wpconfig = {
             name: 'commons',
             filename: 'commons.js',
             minChunks: 2
-        })
+        }),
+
+        extractSass
     ],
 
     module: {
@@ -129,22 +137,43 @@ var wpconfig = {
                     }
                 }
             },
+            // {
+            //     test: /\.scss$/,
+            //     use: [
+            //         {
+            //             loader: 'style-loader',
+            //         },
+            //         {
+            //             loader: 'css-loader',
+            //             options: {
+            //                 modules: true,
+            //                 localIdentName: '[name]__[local]___[hash:base64:5]',
+            //                 sourceMap: true,
+            //             },
+            //         },
+            //         {
+            //             loader: 'sass-loader',
+            //             options: {
+            //                 data: '$base-rem-size: 0.625; @import "paragon-reset";',
+            //                 includePaths: [
+            //                     path.join(__dirname, 'node_modules/paragon/src/utils'),
+            //                 ],
+            //                 sourceMap: true,
+            //             },
+            //         },
+            //     ],
+            // },
             {
-                test: /\.scss$/,
-                use: [
-                    {
-                        loader: 'style-loader',
-                    },
-                    {
-                        loader: 'css-loader',
+            test: /\.scss$/,
+                use: extractSass.extract({
+                    use: [{
+                        loader: "css-loader",
                         options: {
                             modules: true,
-                            localIdentName: '[name]__[local]___[hash:base64:5]',
-                            sourceMap: true,
-                        },
-                    },
-                    {
-                        loader: 'sass-loader',
+                            localIdentName: '[name]__[local]___[hash:base64:5]'
+                        }
+                    }, {
+                        loader: "sass-loader",
                         options: {
                             data: '$base-rem-size: 0.625; @import "paragon-reset";',
                             includePaths: [
@@ -152,8 +181,10 @@ var wpconfig = {
                             ],
                             sourceMap: true,
                         },
-                    },
-                ],
+                    }],
+                    // use style-loader in development
+                    fallback: "style-loader"
+                })
             }
         ]
     },

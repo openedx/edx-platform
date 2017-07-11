@@ -16,6 +16,7 @@
     "edx-pattern-library": "0.18.1",
     "edx-ui-toolkit": "1.5.2",
     "exports-loader": "^0.6.4",
+    "extract-text-webpack-plugin": "^2.1.2",
     "hls.js": "0.7.2",
     "imports-loader": "^0.7.1",
     "jquery": "~2.2.0",

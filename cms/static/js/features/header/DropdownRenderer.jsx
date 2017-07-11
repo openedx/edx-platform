@@ -64,7 +64,6 @@ class DropdownMenu extends React.Component {
 
 export class DropdownRenderer {
   constructor({selector, context}) {
-    console.log('im a renderer');
     ReactDOM.render(
       <DropdownMenu {...context} />,
       document.querySelector(selector)
