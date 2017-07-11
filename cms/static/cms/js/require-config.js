@@ -84,7 +84,6 @@
         waitSeconds: 60,
         paths: {
             'domReady': 'js/vendor/domReady',
-            'mustache': 'js/vendor/mustache',
             'codemirror': 'js/vendor/codemirror-compressed',
             'codemirror/stex': 'js/vendor/CodeMirror/stex',
             'jquery': 'common/js/vendor/jquery',

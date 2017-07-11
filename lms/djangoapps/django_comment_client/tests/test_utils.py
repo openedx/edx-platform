@@ -1234,21 +1234,6 @@ class JsonResponseTestCase(TestCase, UnicodeTestMixin):
         self.assertEqual(reparsed, text)
 
 
-@attr(shard=1)
-class RenderMustacheTests(TestCase):
-    """
-    Test the `render_mustache` utility function.
-    """
-
-    @mock.patch('edxmako.LOOKUP', {})
-    def test_it(self):
-        """
-        Basic test.
-        """
-        add_lookup('main', '', package=__name__)
-        self.assertEqual(utils.render_mustache('test.mustache', {}), 'Testing 1 2 3.\n')
-
-
 class DiscussionTabTestCase(ModuleStoreTestCase):
     """ Test visibility of the discussion tab. """
 
