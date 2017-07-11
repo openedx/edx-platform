@@ -40,7 +40,6 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
             initialize: function(options) {
                 BasePage.prototype.initialize.call(this, options);
                 this.viewClass = options.viewClass || this.defaultViewClass;
-                this.isUnitPage = this.options.isUnitPage;
                 this.isLibraryPage = (this.model.attributes.category === 'library');
                 this.nameEditor = new XBlockStringFieldEditor({
                     el: this.$('.wrapper-xblock-field'),
@@ -63,7 +62,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                 });
                 this.messageView.render();
                 // Display access message on units and split test components
-                if (this.isUnitPage || this.isSplitTest) {
+                if (!this.isLibraryPage) {
                     this.containerAccessView = new ContainerSubviews.ContainerAccess({
                         el: this.$('.container-access'),
                         model: this.model
