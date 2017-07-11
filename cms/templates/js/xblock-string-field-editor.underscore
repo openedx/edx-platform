@@ -1,5 +1,5 @@
 <div class="incontext-editor-action-wrapper">
-    <button class="action-edit action-inline xblock-field-value-edit incontext-editor-open-action" title="<%- gettext('Edit the name') %>">
+    <button class="action-edit action-inline xblock-field-value-edit incontext-editor-open-action">
         <span class="icon fa fa-pencil" aria-hidden="true"></span><span class="sr"> <%- gettext('Edit') %></span>
     </button>
 </div>
