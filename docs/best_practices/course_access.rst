@@ -1,10 +1,3 @@
-#######################################
-edx-platform Development Best Practices
-#######################################
-
-There are many general best practices documented for `Open edX Development in
-Confluence`_. The following best-practices are specific to edx-platform.
-
 Course Access in LMS
 ********************
 
@@ -48,7 +41,6 @@ the `Course Blocks`_, you can load the student module data from the modulestore
 without loading the full course. Here is an `example loading the student module
 data`_ in the course outline feature.
 
-.. _Open edX Development in Confluence: https://openedx.atlassian.net/wiki/display/OpenDev/Open+edX+Development
 .. _Course Overviews: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/content/course_overviews/__init__.py
 .. _example use of course overviews: https://github.com/edx/edx-platform/blob/f81c21902eb0e8d026612b052557142ce1527153/openedx/features/course_experience/views/course_outline.py#L26
 .. _Course Blocks: https://openedx.atlassian.net/wiki/display/EDUCATOR/Course+Blocks
