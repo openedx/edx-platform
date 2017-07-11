@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Dropdown from 'paragon/dist/Dropdown.js';
+import { Dropdown } from 'paragon';
 
 class DropdownMenu extends React.Component {
   static insertIf (property, entry) {
@@ -64,6 +64,7 @@ class DropdownMenu extends React.Component {
 
 export class DropdownRenderer {
   constructor({selector, context}) {
+    console.log('im a renderer');
     ReactDOM.render(
       <DropdownMenu {...context} />,
       document.querySelector(selector)

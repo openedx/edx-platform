@@ -21,9 +21,9 @@ var wpconfig = {
         CourseOutline: './openedx/features/course_experience/static/course_experience/js/CourseOutline.js',
         CourseSock: './openedx/features/course_experience/static/course_experience/js/CourseSock.js',
         WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js',
-        DropdownRenderer: './cms/static/js/features/header/DropdownRenderer.js',
+        DropdownRenderer: './cms/static/js/features/header/DropdownRenderer.jsx',
         Import: './cms/static/js/features/import/factories/import.js',
-        UserMenu: './cms/static/js/features/header/UserMenu.js'
+        UserMenu: './cms/static/js/features/header/UserMenu.jsx'
     },
 
     output: {
@@ -97,7 +97,7 @@ var wpconfig = {
             {
                 test: /\.(js|jsx)$/,
                 exclude: [
-                    /node_modules/,
+                    /node_modules\/(?!(paragon)\/).*/,
                     namespacedRequireFiles
                 ],
                 use: 'babel-loader'
@@ -122,6 +122,32 @@ var wpconfig = {
                             'exports-loader?this.AjaxPrefix!../../../../common/static/coffee/src/ajax_prefix.coffee'
                     }
                 }
+            },
+            {
+                test: /\.scss$/,
+                use: [
+                    {
+                        loader: 'style-loader',
+                    },
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: true,
+                            localIdentName: '[name]__[local]___[hash:base64:5]',
+                            sourceMap: true,
+                        },
+                    },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            data: '$base-rem-size: 0.625; @import "paragon-reset";',
+                            includePaths: [
+                                path.join(__dirname, 'node_modules/paragon/src/utils'),
+                            ],
+                            sourceMap: true,
+                        },
+                    },
+                ],
             }
         ]
     },
