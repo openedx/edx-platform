@@ -24,7 +24,6 @@ var options = {
         {pattern: 'js/vendor/jquery.leanModal.js', included: true},
         {pattern: 'js/vendor/jquery.timeago.js', included: true},
         {pattern: 'js/vendor/jquery.truncate.js', included: true},
-        {pattern: 'js/vendor/mustache.js', included: true},
         {pattern: 'js/vendor/URI.min.js', included: true},
         {pattern: 'js/test/add_ajax_prefix.js', included: true},
         {pattern: 'js/test/i18n.js', included: true},

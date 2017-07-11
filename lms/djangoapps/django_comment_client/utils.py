@@ -653,13 +653,6 @@ def get_metadata_for_threads(course_id, threads, user, user_info):
     metadata = reduce(merge_dict, map(infogetter, threads), {})
     return metadata
 
-# put this method in utils.py to avoid circular import dependency between helpers and mustache_helpers
-
-
-def render_mustache(template_name, dictionary, *args, **kwargs):
-    template = lookup_template('main', template_name).source
-    return pystache.render(template, dictionary)
-
 
 def permalink(content):
     if isinstance(content['course_id'], CourseKey):
