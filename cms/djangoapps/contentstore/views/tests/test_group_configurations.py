@@ -762,7 +762,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         Test if group configurations json updated successfully with usage information.
         """
         self._add_user_partitions(count=2)
-        vertical, __ = self._create_content_experiment(cid=0, name_suffix='0')
+        __, split_test = self._create_content_experiment(cid=0, name_suffix='0')
         self._create_content_experiment(name_suffix='1')
 
         actual = GroupConfiguration.get_split_test_partitions_with_usage(self.store, self.course)
@@ -779,7 +779,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 2, 'name': 'Group C', 'version': 1},
             ],
             'usage': [{
-                'url': '/container/{}'.format(vertical.location),
+                'url': '/container/{}'.format(split_test.location),
                 'label': 'Test Unit 0 / Test Content Experiment 0',
                 'validation': None,
             }],
@@ -809,7 +809,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
          characters are being used in content experiment
         """
         self._add_user_partitions(count=1)
-        vertical, __ = self._create_content_experiment(cid=0, name_suffix='0', special_characters=u"JOSÉ ANDRÉS")
+        __, split_test = self._create_content_experiment(cid=0, name_suffix='0', special_characters=u"JOSÉ ANDRÉS")
 
         actual = GroupConfiguration.get_split_test_partitions_with_usage(self.store, self.course, )
 
@@ -825,7 +825,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 2, 'name': 'Group C', 'version': 1},
             ],
             'usage': [{
-                'url': '/container/{}'.format(vertical.location),
+                'url': '/container/i4x://org.25/course_25/split_test/Test_Content_Experiment_0JOS%C3%89_ANDR%C3%89S',
                 'label': u"Test Unit 0 / Test Content Experiment 0JOSÉ ANDRÉS",
                 'validation': None,
             }],
@@ -841,8 +841,8 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         group configuration.
         """
         self._add_user_partitions()
-        vertical, __ = self._create_content_experiment(cid=0, name_suffix='0')
-        vertical1, __ = self._create_content_experiment(cid=0, name_suffix='1')
+        __, split_test = self._create_content_experiment(cid=0, name_suffix='0')
+        __, split_test1 = self._create_content_experiment(cid=0, name_suffix='1')
 
         actual = GroupConfiguration.get_split_test_partitions_with_usage(self.store, self.course)
 
@@ -858,11 +858,11 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 2, 'name': 'Group C', 'version': 1},
             ],
             'usage': [{
-                'url': '/container/{}'.format(vertical.location),
+                'url': '/container/{}'.format(split_test.location),
                 'label': 'Test Unit 0 / Test Content Experiment 0',
                 'validation': None,
             }, {
-                'url': '/container/{}'.format(vertical1.location),
+                'url': '/container/{}'.format(split_test1.location),
                 'label': 'Test Unit 1 / Test Content Experiment 1',
                 'validation': None,
             }],

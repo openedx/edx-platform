@@ -113,6 +113,10 @@ class GroupConfiguration(object):
         """
         if unit.category == 'sequential' or item.category == 'split_test':
             unit_for_url = item
+        elif unit.get_parent() and unit.get_parent().category == 'split_test':
+            unit_for_url = unit.get_parent()
+            item = unit
+            unit = unit.get_parent()
         else:
             unit_for_url = unit
 
