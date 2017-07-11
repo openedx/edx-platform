@@ -63,6 +63,7 @@ def add_email_marketing_cookies(sender, response=None, user=None,
         sailthru_response.get(timeout=email_config.user_registration_cookie_timeout_delay,
                               propagate=True)
         cookie = sailthru_response.result
+        _log_sailthru_api_call_time(time_before_call)
 
     except TimeoutError as exc:
         log.error("Timeout error while attempting to obtain cookie from Sailthru: %s", unicode(exc))
@@ -82,7 +83,7 @@ def add_email_marketing_cookies(sender, response=None, user=None,
             domain=settings.SESSION_COOKIE_DOMAIN,
             path='/',
         )
-        _log_sailthru_api_call_time(time_before_call)
+        log.info("sailthru_hid cookie:%s successfully retrieved for user %s", cookie, user.email)
 
     return response
 
