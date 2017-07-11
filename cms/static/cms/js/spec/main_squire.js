@@ -10,7 +10,6 @@
         baseUrl: '/base/',
         paths: {
             'gettext': 'xmodule_js/common_static/js/test/i18n',
-            'mustache': 'xmodule_js/common_static/js/vendor/mustache',
             'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
             'jquery': 'common/js/vendor/jquery',
             'jquery-migrate': 'common/js/vendor/jquery-migrate',

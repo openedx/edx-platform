@@ -26,7 +26,6 @@
         baseUrl: '/base/',
         paths: {
             'gettext': 'xmodule_js/common_static/js/test/i18n',
-            'mustache': 'xmodule_js/common_static/js/vendor/mustache',
             'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
             'jquery': 'xmodule_js/common_static/common/js/vendor/jquery',
             'jquery-migrate': 'xmodule_js/common_static/common/js/vendor/jquery-migrate',
