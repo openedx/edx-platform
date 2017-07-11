@@ -40,10 +40,16 @@ class LmsXBlockMixinTestCase(ModuleStoreTestCase):
         subsection = ItemFactory.create(parent=section, category='sequential', display_name='Test Subsection')
         vertical = ItemFactory.create(parent=subsection, category='vertical', display_name='Test Unit')
         video = ItemFactory.create(parent=vertical, category='video', display_name='Test Video 1')
+        split_test = ItemFactory.create(parent=vertical, category='split_test', display_name='Test Content Experiment')
+        child_vertical = ItemFactory.create(parent=split_test, category='vertical')
+        child_html_module = ItemFactory.create(parent=child_vertical, category='html')
         self.section_location = section.location
         self.subsection_location = subsection.location
         self.vertical_location = vertical.location
         self.video_location = video.location
+        self.split_test_location = split_test.location
+        self.child_vertical_location = child_vertical.location
+        self.child_html_module_location = child_html_module.location
 
     def set_group_access(self, block_location, access_dict):
         """
@@ -129,6 +135,33 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.verify_validation_message(
             validation.messages[0],
             INVALID_USER_PARTITION_GROUP_VALIDATION,
+            ValidationMessage.ERROR,
+        )
+
+    def test_validate_nonsensical_access_for_split_test_children(self):
+        """
+        Test the validation messages produced for components within
+        a content group experiment (also known as a split_test).
+        Ensures that children of split_test xblocks only validate
+        their access settings off the parent, rather than any
+        grandparent.
+        """
+        # Test that no validation message is displayed on split_test child when child agrees with parent
+        self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
+        self.set_group_access(self.split_test_location, {self.user_partition.id: [self.group2.id]})
+        self.set_group_access(self.child_vertical_location, {self.user_partition.id: [self.group2.id]})
+        self.set_group_access(self.child_html_module_location, {self.user_partition.id: [self.group2.id]})
+        validation = self.store.get_item(self.child_html_module_location).validate()
+        self.assertEqual(len(validation.messages), 0)
+
+        # Test that a validation message is displayed on split_test child when the child contradicts the parent,
+        # even though the child agrees with the grandparent unit.
+        self.set_group_access(self.child_html_module_location, {self.user_partition.id: [self.group1.id]})
+        validation = self.store.get_item(self.child_html_module_location).validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            NONSENSICAL_ACCESS_RESTRICTION,
             ValidationMessage.ERROR,
         )
 

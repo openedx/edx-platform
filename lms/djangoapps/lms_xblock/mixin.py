@@ -8,7 +8,6 @@ from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Scope, String, XBlockMixin
 from xblock.validation import ValidationMessage
 
-from lms.lib.utils import get_parent_unit
 from xmodule.modulestore.inheritance import UserPartitionList
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 
@@ -18,7 +17,7 @@ _ = lambda text: text
 
 INVALID_USER_PARTITION_VALIDATION = _(u"This component's access settings refer to deleted or invalid group configurations.")
 INVALID_USER_PARTITION_GROUP_VALIDATION = _(u"This component's access settings refer to deleted or invalid groups.")
-NONSENSICAL_ACCESS_RESTRICTION = _(u"This component's access settings contradict the unit's access settings.")
+NONSENSICAL_ACCESS_RESTRICTION = _(u"This component's access settings contradict its parent's access settings.")
 
 
 class GroupAccessDict(Dict):
@@ -149,29 +148,30 @@ class LmsBlockMixin(XBlockMixin):
         Checks if a block's group access settings do not make sense.
 
         By nonsensical access settings, we mean a component's access
-        settings which contradict the unit level access in that they
+        settings which contradict its parent's access in that they
         restrict access to the component to a group that already
         will not be able to see that content.
         Note:  This contradiction can occur when a component
         restricts access to the same partition but a different group
-        than the unit, or when there is a unit access restriction
-        but the component attempts to allow access to all learners.
+        than its parent, or when there is a parent access
+        restriction but the component attempts to allow access to
+        all learners.
 
         Returns:
-            bool: True if the block is a component and its access
-            settings contradict the unit level access.
+            bool: True if the block's access settings contradict its
+            parent's access settings.
         """
-        parent_unit = get_parent_unit(self)
-        if not parent_unit:
+        parent = self.get_parent()
+        if not parent:
             return False
 
-        unit_group_access = parent_unit.group_access
+        parent_group_access = parent.group_access
         component_group_access = self.group_access
 
-        for user_partition_id, unit_group_ids in unit_group_access.iteritems():
+        for user_partition_id, parent_group_ids in parent_group_access.iteritems():
             component_group_ids = component_group_access.get(user_partition_id)
             if component_group_ids:
-                return unit_group_ids and not set(component_group_ids).issubset(set(unit_group_ids))
+                return parent_group_ids and not set(component_group_ids).issubset(set(parent_group_ids))
             else:
                 return not component_group_access
         else:
