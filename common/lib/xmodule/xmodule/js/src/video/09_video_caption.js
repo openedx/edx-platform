@@ -596,8 +596,8 @@
             },
 
             /**
-            * @desc Fetch the list of available translations. Upon successful receipt,
-            *    the list of available translations will be updated.
+            * @desc Fetch the list of available language codes. Upon successful receipt
+            * the list of available languages will be updated.
             *
             * @returns {jquery Promise}
             */
@@ -618,8 +618,6 @@
                         self.container.find('.langs-list').remove();
 
                         if (_.keys(newLanguages).length) {
-                            // And try again to fetch transcript.
-                            self.fetchCaption();
                             self.renderLanguageMenu(newLanguages);
                         }
                     },
