@@ -779,7 +779,6 @@
                 Caption.fetchAvailableTranslations();
 
                 expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.fetchCaption).toHaveBeenCalled();
                 expect(state.config.transcriptLanguages).toEqual({
                     'uk': 'Ukrainian',
                     'de': 'German'
@@ -799,7 +798,6 @@
                 Caption.fetchAvailableTranslations();
 
                 expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.fetchCaption).not.toHaveBeenCalled();
                 expect(state.config.transcriptLanguages).toEqual({});
                 expect(Caption.renderLanguageMenu).not.toHaveBeenCalled();
             });
