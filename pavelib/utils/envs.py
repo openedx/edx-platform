@@ -6,6 +6,7 @@ from __future__ import print_function
 import json
 import os
 import sys
+from time import sleep
 
 import memcache
 from lazy import lazy
@@ -15,13 +16,40 @@ from paver.easy import sh
 from pavelib.utils.cmd import django_cmd
 
 
+def repo_root():
+    """
+    Get the root of the git repository (edx-platform).
+
+    This sometimes fails on Docker Devstack, so it's been broken
+    down with some additional error handling.  It usually starts
+    working within 30 seconds or so; for more details, see
+    https://openedx.atlassian.net/browse/PLAT-1629 and
+    https://github.com/docker/for-mac/issues/1509
+    """
+    file_path = path(__file__)
+    attempt = 1
+    while True:
+        try:
+            absolute_path = file_path.abspath()
+            break
+        except OSError:
+            print('Attempt {}/60 to get an absolute path failed'.format(attempt))
+            if attempt <= 60:
+                attempt += 1
+                sleep(1)
+            else:
+                print('Unable to determine the absolute path of the edx-platform repo, aborting')
+                raise
+    return absolute_path.parent.parent.parent
+
+
 class Env(object):
     """
     Load information about the execution environment.
     """
 
     # Root of the git repository (edx-platform)
-    REPO_ROOT = path(__file__).abspath().parent.parent.parent
+    REPO_ROOT = repo_root()
 
     # Reports Directory
     REPORT_DIR = REPO_ROOT / 'reports'
