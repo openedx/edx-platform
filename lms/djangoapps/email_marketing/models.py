@@ -138,7 +138,7 @@ class EmailMarketingConfiguration(ConfigurationModel):
 
     # The number of seconds to delay/timeout wait to get cookie values from sailthru.
     user_registration_cookie_timeout_delay = models.fields.FloatField(
-        default=1.5,
+        default=3.0,
         help_text=_(
             "The number of seconds to delay/timeout wait to get cookie values from sailthru."
         )
