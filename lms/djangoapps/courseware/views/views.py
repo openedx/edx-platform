@@ -511,9 +511,6 @@ class CourseTabView(EdxFragmentView):
             'upgrade_link': check_and_get_upgrade_link(request, request.user, course.id),
             'upgrade_price': get_cosmetic_verified_display_price(course),
             # ENDTODO
-            # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/3.+Planning+Prompts
-            'display_planning_prompt': _should_display_planning_prompt(request, course),
-            # ENDTODO
         }
 
     def render_to_fragment(self, request, course=None, page_context=None, **kwargs):
@@ -531,25 +528,6 @@ class CourseTabView(EdxFragmentView):
             page_context = self.create_page_context(request, course=course, tab=tab, **kwargs)
         page_context['fragment'] = fragment
         return render_to_response('courseware/tab-view.html', page_context)
-
-
-# TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/3.+Planning+Prompts
-def _should_display_planning_prompt(request, course):
-    """
-    A planning prompt is enabled in the experiment for all enrollments whose
-    content availability date is less than 14 days from today.
-
-    The content availability date is defined as either the course start date
-    or the enrollment date, whichever was most recent.
-    """
-    is_course_in_english = not course.language or course.language.lower() == u'en'
-    if is_course_in_english:
-        enrollment = CourseEnrollment.get_enrollment(request.user, course.id)
-        if enrollment and enrollment.is_active:
-            content_availability_date = max(course.start, enrollment.created)
-            return content_availability_date > (datetime.now(utc) - timedelta(days=14))
-    return False
-# ENDTODO
 
 
 @ensure_csrf_cookie
