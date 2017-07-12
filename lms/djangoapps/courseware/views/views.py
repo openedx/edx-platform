@@ -8,36 +8,10 @@ from collections import OrderedDict, namedtuple
 from datetime import datetime, timedelta
 
 import analytics
-import waffle
-from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import AnonymousUser, User
-from django.core.context_processors import csrf
-from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
-from django.db import transaction
-from django.db.models import Q
-from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, QueryDict
-from django.shortcuts import redirect
-from django.utils.decorators import method_decorator
-from django.utils.text import slugify
-from django.utils.timezone import UTC
-from django.utils.translation import ugettext as _
-from django.views.decorators.cache import cache_control
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_GET, require_http_methods, require_POST
-from django.views.generic import View
-from ipware.ip import get_ip
-from markupsafe import escape
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from pytz import utc
-from rest_framework import status
-from web_fragments.fragment import Fragment
-
 import shoppingcart
 import survey.utils
 import survey.views
+import waffle
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses
 from commerce.utils import EcommerceService
@@ -64,9 +38,28 @@ from courseware.model_data import FieldDataCache
 from courseware.models import BaseStudentModuleHistory, StudentModule
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import AnonymousUser, User
+from django.core.context_processors import csrf
+from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
+from django.db import transaction
+from django.db.models import Q
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, QueryDict
+from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
+from django.utils.text import slugify
+from django.utils.timezone import UTC
+from django.utils.translation import ugettext as _
+from django.views.decorators.cache import cache_control
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
+from django.views.generic import View
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from enrollment.api import add_enrollment
 from eventtracking import tracker
+from ipware.ip import get_ip
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.ccx.utils import prep_course_for_grading
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
@@ -74,6 +67,9 @@ from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from markupsafe import escape
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import (
@@ -91,6 +87,8 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_h
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
+from pytz import utc
+from rest_framework import status
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import CourseEnrollment, UserTestGroup
 from survey.utils import must_answer_survey
@@ -99,6 +97,7 @@ from util.date_utils import strftime_localized
 from util.db import outer_atomic
 from util.milestones_helpers import get_prerequisite_courses_display
 from util.views import _record_feedback_in_zendesk, ensure_valid_course_key, ensure_valid_usage_key
+from web_fragments.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
@@ -233,6 +232,8 @@ def course_info(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
+    # TODO: LEARNER-611: This can be deleted with Course Info removal.  The new
+    #    Course Home is using its own processing of last accessed.
     def get_last_accessed_courseware(course, request, user):
         """
         Returns the courseware module URL that the user last accessed, or None if it cannot be found.
@@ -262,29 +263,13 @@ def course_info(request, course_id):
         return redirect(reverse(course_home_url_name(course_key), args=[course_id]))
 
     with modulestore().bulk_operations(course_key):
-        course = get_course_by_id(course_key, depth=2)
-        access_response = has_access(request.user, 'load', course, course_key)
-
-        if not access_response:
-
-            # The user doesn't have access to the course. If they're
-            # denied permission due to the course not being live yet,
-            # redirect to the dashboard page.
-            if isinstance(access_response, StartDateError):
-                start_date = strftime_localized(course.start, 'SHORT_DATE')
-                params = QueryDict(mutable=True)
-                params['notlive'] = start_date
-                return redirect('{dashboard_url}?{params}'.format(
-                    dashboard_url=reverse('dashboard'),
-                    params=params.urlencode()
-                ))
-            # Otherwise, give a 404 to avoid leaking info about access
-            # control.
-            raise Http404("Course not found.")
+        course = get_course_with_access(request.user, 'load', course_key)
 
         staff_access = has_access(request.user, 'staff', course)
         masquerade, user = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
 
+        # LEARNER-612: CCX redirect handled by new Course Home (DONE)
+        # TODO: LEARNER-1697: Transition banner messages to new Course Home.
         # if user is not enrolled in a course then app will show enroll/get register link inside course info page.
         user_is_enrolled = CourseEnrollment.is_enrolled(user, course.id)
         show_enroll_banner = request.user.is_authenticated() and not user_is_enrolled
@@ -294,20 +279,24 @@ def course_info(request, course_id):
         if not user_is_enrolled and not can_self_enroll_in_course(course_key):
             return redirect(reverse('dashboard'))
 
+        # TODO: LEARNER-1865: Handle prereqs and course survey in new Course Home.
         # Redirect the user if they are not yet allowed to view this course
         check_access_to_course(request, course)
 
+        # LEARNER-170: Entrance exam is handled by new Course Outline. (DONE)
         # If the user needs to take an entrance exam to access this course, then we'll need
         # to send them to that specific course module before allowing them into other areas
         if not user_can_skip_entrance_exam(user, course):
             return redirect(reverse('courseware', args=[unicode(course.id)]))
 
+        # TODO: LEARNER-611: Remove deprecated course.bypass_home.
         # If the user is coming from the dashboard and bypass_home setting is set,
         # redirect them straight to the courseware page.
         is_from_dashboard = reverse('dashboard') in request.META.get('HTTP_REFERER', [])
         if course.bypass_home and is_from_dashboard:
             return redirect(reverse('courseware', args=[course_id]))
 
+        # TODO: LEARNER-1697: Transition handling of enroll links in new Course Home.
         # link to where the student should go to enroll in the course:
         # about page if there is not marketing site, SITE_NAME if there is
         url_to_enroll = reverse(course_about, args=[course_id])
@@ -318,7 +307,9 @@ def course_info(request, course_id):
         dates_fragment = None
 
         if request.user.is_authenticated():
+            # TODO: LEARNER-611: Remove enable_course_home_improvements
             if SelfPacedConfiguration.current().enable_course_home_improvements:
+                # Shared code with the new Course Home (DONE)
                 dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id)
 
         # This local import is due to the circularity of lms and openedx references.
@@ -326,9 +317,7 @@ def course_info(request, course_id):
         # as plugins, and to avoid the direct import.
         from openedx.features.course_experience.views.course_reviews import CourseReviewsModuleFragmentView
 
-        # Decide whether or not to show the reviews link in the course tools bar
-        show_reviews_link = CourseReviewsModuleFragmentView.is_configured()
-
+        # Shared code with the new Course Home (DONE)
         # Get the course tools enabled for this user and course
         course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
 
@@ -346,7 +335,6 @@ def course_info(request, course_id):
             'user_is_enrolled': user_is_enrolled,
             'dates_fragment': dates_fragment,
             'url_to_enroll': url_to_enroll,
-            'show_reviews_link': show_reviews_link,
             'course_tools': course_tools,
 
             # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
@@ -358,9 +346,11 @@ def course_info(request, course_id):
 
         # Get the URL of the user's last position in order to display the 'where you were last' message
         context['resume_course_url'] = None
+        # TODO: LEARNER-611: Remove enable_course_home_improvements
         if SelfPacedConfiguration.current().enable_course_home_improvements:
             context['resume_course_url'] = get_last_accessed_courseware(course, request, user)
 
+        # LEARNER-981/LEARNER-837: Hide masquerade as necessary in Course Home (DONE)
         if not is_course_open_for_learner(user, course):
             # Disable student view button if user is staff and
             # course is not yet visible to students.
@@ -1697,6 +1687,7 @@ def check_access_to_course(request, course):
     """
     Raises Redirect exceptions if the user does not have course access.
     """
+    # TODO: LEARNER-1865: Handle prereqs in new Course Home.
     # Redirect to the dashboard if not all prerequisites have been met
     if not has_access(request.user, 'view_courseware_with_prerequisites', course):
         log.info(
@@ -1705,6 +1696,7 @@ def check_access_to_course(request, course):
             request.user.id, unicode(course.id))
         raise CourseAccessRedirect(reverse('dashboard'))
 
+    # TODO: LEARNER-1865: Handle course surveys in new Course Home.
     # Redirect if the user must answer a survey before entering the course.
     if must_answer_survey(course, request.user):
         raise CourseAccessRedirect(reverse('course_survey', args=[unicode(course.id)]))
