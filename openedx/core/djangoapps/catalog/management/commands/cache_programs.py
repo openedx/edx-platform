@@ -41,7 +41,7 @@ class Command(BaseCommand):
                 user = User.objects.get(username=username)
             except User.DoesNotExist:
                 logger.error(
-                    'Failed to create API client. Service user {username} does not exist.'.format(username)
+                    'Failed to create API client. Service user {username} does not exist.'.format(username=username)
                 )
                 raise
 
@@ -85,7 +85,7 @@ class Command(BaseCommand):
                 client = create_catalog_api_client(user)
             except User.DoesNotExist:
                 logger.error(
-                    'Failed to create API client. Service user {username} does not exist.'.format(username)
+                    'Failed to create API client. Service user {username} does not exist.'.format(username=username)
                 )
                 raise
 
