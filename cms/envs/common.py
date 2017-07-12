@@ -224,6 +224,9 @@ FEATURES = {
     # Show video bumper in Studio
     'ENABLE_VIDEO_BUMPER': False,
 
+    # Show issue open badges in Studio
+    'ENABLE_OPENBADGES': False,
+
     # How many seconds to show the bumper again, default is 7 days:
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
 
