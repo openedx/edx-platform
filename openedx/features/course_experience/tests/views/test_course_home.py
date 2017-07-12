@@ -1,15 +1,19 @@
+# coding=utf-8
 """
 Tests for the course home page.
 """
 import ddt
-
+import mock
 from courseware.tests.factories import StaffFactory
+from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.http import QueryDict
 from django.utils.http import urlquote_plus
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.features.course_experience import SHOW_REVIEWS_TOOL_FLAG, UNIFIED_COURSE_TAB_FLAG
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
+from util.date_utils import strftime_localized
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
@@ -28,12 +32,25 @@ QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 def course_home_url(course):
     """
-    Returns the URL for the course's home page
+    Returns the URL for the course's home page.
+
+    Arguments:
+        course (CourseDescriptor): The course being tested.
+    """
+    return course_home_url_from_string(unicode(course.id))
+
+
+def course_home_url_from_string(course_key_string):
+    """
+    Returns the URL for the course's home page.
+
+    Arguments:
+        course_key_string (String): The course key as string.
     """
     return reverse(
         'openedx.course_experience.course_home',
         kwargs={
-            'course_id': unicode(course.id),
+            'course_id': course_key_string,
         }
     )
 
@@ -211,3 +228,54 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         url = course_home_url(self.course)
         response = self.client.get(url)
         self.assertContains(response, '/login?next={url}'.format(url=urlquote_plus(url)))
+
+    @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
+    def test_non_live_course(self):
+        """
+        Ensure that a user accessing a non-live course sees a redirect to
+        the student dashboard, not a 404.
+        """
+        self.user = self.create_user_for_course(self.course, CourseUserType.ENROLLED)
+
+        url = course_home_url(self.course)
+        response = self.client.get(url)
+        start_date = strftime_localized(self.course.start, 'SHORT_DATE')
+        expected_params = QueryDict(mutable=True)
+        expected_params['notlive'] = start_date
+        expected_url = '{url}?{params}'.format(
+            url=reverse('dashboard'),
+            params=expected_params.urlencode()
+        )
+        self.assertRedirects(response, expected_url)
+
+    @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
+    @mock.patch("util.date_utils.strftime_localized")
+    def test_non_live_course_other_language(self, mock_strftime_localized):
+        """
+        Ensure that a user accessing a non-live course sees a redirect to
+        the student dashboard, not a 404, even if the localized date is unicode
+        """
+        self.user = self.create_user_for_course(self.course, CourseUserType.ENROLLED)
+
+        fake_unicode_start_time = u"üñîçø∂é_ßtå®t_tîµé"
+        mock_strftime_localized.return_value = fake_unicode_start_time
+
+        url = course_home_url(self.course)
+        response = self.client.get(url)
+        expected_params = QueryDict(mutable=True)
+        expected_params['notlive'] = fake_unicode_start_time
+        expected_url = u'{url}?{params}'.format(
+            url=reverse('dashboard'),
+            params=expected_params.urlencode()
+        )
+        self.assertRedirects(response, expected_url)
+
+    def test_nonexistent_course(self):
+        """
+        Ensure a non-existent course results in a 404.
+        """
+        self.user = self.create_user_for_course(self.course, CourseUserType.ANONYMOUS)
+
+        url = course_home_url_from_string('not/a/course')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)

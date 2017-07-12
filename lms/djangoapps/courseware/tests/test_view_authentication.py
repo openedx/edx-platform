@@ -60,7 +60,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Check that non-staff don't have access to dark urls.
         """
 
-        names = ['courseware', 'instructor_dashboard', 'progress']
+        names = ['courseware', 'progress']
         urls = self._reverse_urls(names, course)
         urls.extend([
             reverse('book', kwargs={'course_id': course.id.to_deprecated_string(),
@@ -68,7 +68,11 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
             for index, __ in enumerate(course.textbooks)
         ])
         for url in urls:
-            self.assert_request_status_code(404, url)
+            self.assert_request_status_code(302, url)
+
+        self.assert_request_status_code(
+            404, reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
+        )
 
     def _check_staff(self, course):
         """
@@ -97,7 +101,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 'student_id': self.enrolled_user.id,
             }
         )
-        self.assert_request_status_code(404, url)
+        self.assert_request_status_code(302, url)
 
         # The courseware url should redirect, not 200
         url = self._reverse_urls(['courseware'], course)[0]
@@ -351,9 +355,9 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.enroll(self.test_course, True)
 
         # should now be able to get to everything for self.course
+        self._check_staff(self.course)
         self._check_non_staff_light(self.test_course)
         self._check_non_staff_dark(self.test_course)
-        self._check_staff(self.course)
 
     @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_global_staff(self):
