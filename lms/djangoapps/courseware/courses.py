@@ -131,6 +131,19 @@ def check_course_access(course, user, action, check_if_enrolled=False):
             raise CourseAccessRedirect(reverse('about_course', args=[unicode(course.id)]))
 
 
+def can_self_enroll_in_course(course_key):
+    """
+    Returns True if the user can enroll themselves in a course.
+
+    Note: an example of a course that a user cannot enroll in directly
+    is a CCX course. For such courses, a user can only be enrolled by
+    a CCX coach.
+    """
+    if hasattr(course_key, 'ccx'):
+        return False
+    return True
+
+
 def find_file(filesystem, dirs, filename):
     """
     Looks for a filename in a list of dirs on a filesystem, in the specified order.

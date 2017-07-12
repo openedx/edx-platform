@@ -11,6 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
 from courseware.courses import get_course_with_access
+from student.models import CourseEnrollment
 from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
@@ -45,12 +46,14 @@ class CourseReviewsFragmentView(EdxFragmentView):
 
         """
         course_key = CourseKey.from_string(course_id)
-        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
         course_url_name = default_course_url_name(course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
 
+        is_enrolled = CourseEnrollment.is_enrolled(request.user, course.id)
+
         # Create the fragment
-        course_reviews_provider_fragment = CourseReviewsModuleFragmentView().render_to_fragment(
+        course_reviews_fragment = CourseReviewsModuleFragmentView().render_to_fragment(
             request,
             course=course,
             **kwargs
@@ -59,7 +62,8 @@ class CourseReviewsFragmentView(EdxFragmentView):
         context = {
             'course': course,
             'course_url': course_url,
-            'course_reviews_provider_fragment': course_reviews_provider_fragment
+            'course_reviews_fragment': course_reviews_fragment,
+            'is_enrolled': is_enrolled,
         }
 
         html = render_to_string('course_experience/course-reviews-fragment.html', context)

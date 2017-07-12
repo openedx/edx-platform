@@ -154,6 +154,11 @@
           background: linear-gradient(to bottom, #008100 0%,#0a570a 100%);
           filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#008100', endColorstr='#0a570a',GradientType=0 );
           border: 0;
+          &:hover{
+            background: -moz-linear-gradient(top, #006200 0%, #006200 100%);
+            background: -webkit-linear-gradient(top, #006200 0%,#006200 100%);
+            background: linear-gradient(to bottom, #006200 0%,#006200 100%);
+          }
         }
       }
     }
@@ -584,8 +589,8 @@
 
               p,
               ul {
-                  color: #4a4a4a;
-                  font-size: .85em;
+                  color: $dark-gray1 !important;
+                  font-size: 1em !important;
                   line-height: 1.5em;
                   margin-bottom: 15px;
 
@@ -605,7 +610,9 @@
 
                   li {
                       padding-left: 0 !important;
-                      color: #4a4a4a;
+                      + div {
+                        color: $dark-gray1;
+                      }
                   }
               }
           }
@@ -1044,7 +1051,7 @@
                 @extend .tbl-col;
                 display: block;
                 width: 100%;
-                color: palette(primary, dark);
+                color: $dark-gray1 !important;
                 line-height: 1.4em;
 
                 @media (min-width: 768px) {
@@ -1069,7 +1076,7 @@
                 }
 
                 &:first-child {
-                    color: palette(primary, dark);
+                    color: $dark-gray1 !important;
                     margin-bottom: 5px;
                     @media (max-width: 767px) {
                         margin-bottom: 0;
@@ -1080,7 +1087,7 @@
                     }
                     @media (min-width: 768px) {
                         width: 48%;
-                        color: palette(primary, dark);
+                        color: $dark-gray1 !important;
                         margin-bottom: 0;
                         font-size: 1.024em;
                     }
@@ -1204,7 +1211,7 @@
                 & + div {
                     padding: 10px 30px;
                     font-size: 1rem;
-                    color: $black;
+                    color: $dark-gray1 !important;
                 }
             }
             &.expanded {
