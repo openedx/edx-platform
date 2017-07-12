@@ -1,4 +1,4 @@
-/* globals $$course_id, Content, Markdown, MathJax, URI */
+/* globals $$course_id, Content, Markdown, MathJax, URI, _ */
 (function() {
     'use strict';
     this.DiscussionUtil = (function() {
@@ -39,6 +39,16 @@
             }
             ta = _.union(this.roleIds['Community TA']);
             return _.include(ta, parseInt(userId));
+        };
+
+        DiscussionUtil.isGroupTA = function(userId) {
+            var groupTa,
+                localUserId = userId;
+            if (_.isUndefined(userId)) {
+                localUserId = this.user ? this.user.id : void 0;
+            }
+            groupTa = _.union(this.roleIds['Group Moderator']);
+            return _.include(groupTa, parseInt(localUserId, 10));
         };
 
         DiscussionUtil.isPrivilegedUser = function(userId) {
