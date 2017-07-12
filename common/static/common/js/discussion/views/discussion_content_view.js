@@ -508,7 +508,8 @@
                     return _.template($('#post-user-display-template').html())({
                         username: endorsement.username,
                         user_url: DiscussionUtil.urlFor('user_profile', endorsement.user_id),
-                        is_community_ta: DiscussionUtil.isTA(endorsement.user_id),
+                        is_community_ta: DiscussionUtil.isTA(endorsement.user_id) ||
+                                         DiscussionUtil.isGroupTA(endorsement.user_id),
                         is_staff: DiscussionUtil.isStaff(endorsement.user_id)
                     });
                 } else {
