@@ -16,9 +16,9 @@
 -e git+https://github.com/open-craft/xblock-eoc-journal.git@f2749cf50adf1ed053d71d907357e1d3e76e9e37#egg=xblock-eoc-journal
 git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.2#egg=xblock-group-project-v2
 git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.1#egg=xblock-diagnostic-feedback==0.2.1
-git+https://github.com/edx-solutions/api-integration.git@v1.1.9#egg=api-integration==1.1.9
+git+https://github.com/edx-solutions/api-integration.git@v1.1.10#egg=api-integration==1.1.10
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.1.4#egg=organizations-edx-platform-extensions==1.1.4
-git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.0.8#egg=gradebook-edx-platform-extensions==1.0.8
+git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.0.9#egg=gradebook-edx-platform-extensions==1.0.9
 git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.0.9#egg=projects-edx-platform-extensions==1.0.9
 git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.0.6#egg=discussion-edx-platform-extensions==1.0.6
 git+https://github.com/edx-solutions/course-edx-platform-extensions.git@v1.0.3#egg=course-edx-platform-extensions==1.0.3
