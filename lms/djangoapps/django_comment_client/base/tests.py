@@ -39,6 +39,7 @@ from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMe
 from lms.lib.comment_client import Thread
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from student.roles import CourseStaffRole, UserBasedRole
 from student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -59,6 +60,8 @@ from event_transformers import ForumThreadViewedEventTransformer
 log = logging.getLogger(__name__)
 
 CS_PREFIX = "http://localhost:4567/api/v1"
+
+QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 # pylint: disable=missing-docstring
 
@@ -395,7 +398,7 @@ class ViewsQueryCountTestCase(
             with modulestore().default_store(default_store):
                 self.set_up_course(module_count=module_count)
                 self.clear_caches()
-                with self.assertNumQueries(sql_queries):
+                with self.assertNumQueries(sql_queries, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
                     with check_mongo_calls(mongo_calls):
                         func(self, *args, **kwargs)
         return inner

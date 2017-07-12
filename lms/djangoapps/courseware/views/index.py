@@ -39,7 +39,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
 
 from ..access import has_access
-from ..access_utils import in_preview_mode, is_course_open_for_learner
+from ..access_utils import in_preview_mode, check_course_open_for_learner
 from ..courses import get_course_with_access, get_current_child, get_studio_url
 from ..entrance_exams import (
     course_has_entrance_exam,
@@ -372,7 +372,7 @@ class CoursewareIndex(View):
         self._add_entrance_exam_to_context(courseware_context)
 
         # staff masquerading data
-        if not is_course_open_for_learner(self.effective_user, self.course):
+        if not check_course_open_for_learner(self.effective_user, self.course):
             # Disable student view button if user is staff and
             # course is not yet visible to students.
             courseware_context['disable_student_access'] = True

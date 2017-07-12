@@ -18,7 +18,7 @@ from commerce.utils import EcommerceService
 from course_modes.models import CourseMode
 from courseware.access import has_access, has_ccx_coach_role
 from courseware.access_response import StartDateError
-from courseware.access_utils import in_preview_mode, is_course_open_for_learner
+from courseware.access_utils import in_preview_mode, check_course_open_for_learner
 from courseware.courses import (
     can_self_enroll_in_course,
     get_course,
@@ -350,8 +350,7 @@ def course_info(request, course_id):
         if SelfPacedConfiguration.current().enable_course_home_improvements:
             context['resume_course_url'] = get_last_accessed_courseware(course, request, user)
 
-        # LEARNER-981/LEARNER-837: Hide masquerade as necessary in Course Home (DONE)
-        if not is_course_open_for_learner(user, course):
+        if not check_course_open_for_learner(user, course):
             # Disable student view button if user is staff and
             # course is not yet visible to students.
             context['disable_student_access'] = True
@@ -486,7 +485,7 @@ class CourseTabView(EdxFragmentView):
         else:
             masquerade = None
 
-        if course and not is_course_open_for_learner(request.user, course):
+        if course and not check_course_open_for_learner(request.user, course):
             # Disable student view button if user is staff and
             # course is not yet visible to students.
             supports_preview_menu = False

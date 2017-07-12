@@ -19,7 +19,6 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 import courseware.access as access
 import courseware.access_response as access_response
-from ccx.tests.factories import CcxFactory
 from courseware.masquerade import CourseMasquerade
 from courseware.tests.factories import (
     BetaTesterFactory,
@@ -31,6 +30,7 @@ from courseware.tests.factories import (
 from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole, CourseStaffRole
 from student.tests.factories import (
@@ -45,7 +45,6 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_NONE
 )
-from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
@@ -54,10 +53,9 @@ from xmodule.modulestore.tests.django_utils import (
     SharedModuleStoreTestCase
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition
-from xmodule.tests import get_test_system
 
+QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 # pylint: disable=protected-access
 
@@ -847,5 +845,5 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
             num_queries = 0
 
         course_overview = CourseOverview.get_from_id(course.id)
-        with self.assertNumQueries(num_queries):
+        with self.assertNumQueries(num_queries, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             bool(access.has_access(user, action, course_overview, course_key=course.id))

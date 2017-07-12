@@ -247,6 +247,13 @@ class WaffleFlag(object):
         self.flag_name = flag_name
         self.flag_undefined_default = flag_undefined_default
 
+    @property
+    def namespaced_flag_name(self):
+        """
+        Returns the fully namespaced flag name.
+        """
+        return self.waffle_namespace._namespaced_name(self.flag_name)
+
     def is_enabled(self):
         """
         Returns whether or not the flag is enabled.

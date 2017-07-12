@@ -4,19 +4,15 @@ from datetime import datetime
 
 import ddt
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, Http404
+from django.http import Http404
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.utils import translation
 from mock import ANY, Mock, call, patch
 from nose.tools import assert_true
-from rest_framework.test import APIRequestFactory
 
-from common.test.utils import MockSignalHandlerMixin, disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from discussion_api import api
-from discussion_api.tests.utils import CommentsServiceMockMixin, make_minimal_cs_thread
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.permissions import get_team
 from django_comment_client.tests.group_id import (
@@ -24,7 +20,6 @@ from django_comment_client.tests.group_id import (
     GroupIdAssertionMixin,
     NonCohortedTopicGroupIdTestMixin
 )
-from django_comment_client.base.views import create_thread
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import (
     CohortedTestCase,
@@ -37,7 +32,6 @@ from django_comment_common.models import (
     CourseDiscussionSettings,
     ForumsConfig,
     FORUM_ROLE_STUDENT,
-    Role
 )
 from django_comment_common.utils import ThreadContext, seed_permissions_roles
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -50,9 +44,10 @@ from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.course_groups.tests.test_views import CohortViewsTestCase
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.roles import CourseStaffRole, UserBasedRole
-from student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin, UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -64,6 +59,8 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 log = logging.getLogger(__name__)
+
+QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 # pylint: disable=missing-docstring
 
@@ -467,7 +464,7 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             [num_cached_mongo_calls, num_cached_sql_queries],
         ]
         for expected_mongo_calls, expected_sql_queries in cached_calls:
-            with self.assertNumQueries(expected_sql_queries):
+            with self.assertNumQueries(expected_sql_queries, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
                 with check_mongo_calls(expected_mongo_calls):
                     call_single_thread()
 
