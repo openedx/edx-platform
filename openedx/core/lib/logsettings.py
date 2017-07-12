@@ -141,6 +141,8 @@ def get_logger_config(log_dir,
         # for production environments we will only
         # log INFO and up
         logger_config['loggers']['']['level'] = 'INFO'
+        # requests is so loud at INFO (logs every connection) that we force it to warn in production environments
+        logger_config['loggers']['requests.packages.urllib3'] = {'level': 'WARN'}
         logger_config['handlers'].update({
             'local': {
                 'level': local_loglevel,
