@@ -42,8 +42,8 @@ such that the value can be defined later than this assignment (file load order).
                 add_btn_label: 'Add Member',
                 add_handler: function() {}
             });
-            templateHtml = window.Mustache.render($('#member-list-widget-template').html(), memberListParams);
-            edx.HtmlUtils.setHtml(this.$container, edx.HtmlUtils.HTML(templateHtml));
+            templateHtml = edx.HtmlUtils.template($('#membership-list-widget-tpl').text())(memberListParams);
+            edx.HtmlUtils.setHtml(this.$container, templateHtml);
             this.$('input[type="button"].add').click(function() {
                 condition = typeof memberListParams.add_handler === 'function';
                 return condition ? memberListParams.add_handler(memberlistwidget.$('.add-field').val()) : undefined;

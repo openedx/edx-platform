@@ -1,36 +1,9 @@
+<%page args="section_data" expression_filter="h"/>
 <%namespace name='static' file='/static_content.html'/>
-<%page args="section_data"/>
 <%!
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
 %>
-<script type="text/template" id="member-list-widget-template">
-  <div class="member-list-widget">
-    <div class="header">
-      <div class="title"> {{title}} </div>
-    </div>
-    <div class="info"> {{info}} </div>
-    <div class="member-list">
-      <table>
-        <thead>
-          <tr>
-            {{#labels}}
-              <th class="label" scope="column">{{.}}</th>
-            {{/labels}}
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <div class="bottom-bar">
-      <label>
-          <span class="label-text sr">{{add_placeholder}}</span>
-          <input type="text" name="add-field" class="add-field" placeholder="{{add_placeholder}}">
-      </label>
-      <input type="button" name="add" class="add" value="{{add_btn_label}}">
-    </div>
-  </div>
-</script>
-
 <fieldset class="batch-enrollment membership-section">
     <legend id="heading-batch-enrollment" class="hd hd-3">${_("Batch Enrollment")}</legend>
     <label>
@@ -54,8 +27,8 @@ from django.utils.translation import ugettext as _
             <div class="hint auto-enroll-hint">
                 <span class="hint-caret"></span>
                 <p id="auto-enroll-tip">
-                    ${_("If this option is <em>checked</em>, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
-                    ${_("If this option is left <em>unchecked</em>, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME)}
+                    ${Text(_("If this option is {em_start}checked{em_end}, users who have not yet registered for {platform_name} will be automatically enrolled.")).format(em_start=HTML('<em>'), em_end=HTML('</em>'), platform_name=settings.PLATFORM_NAME)}
+                    ${Text(_("If this option is left {em_start}unchecked{em_end}, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.")).format(em_start=HTML('<em>'), em_end=HTML('</em>'), platform_name=settings.PLATFORM_NAME)}
                     <br /><br />
                     ${_("Checking this box has no effect if 'Unenroll' is selected.")}
                 </p>
@@ -70,7 +43,7 @@ from django.utils.translation import ugettext as _
             <div class="hint email-students-hint">
                 <span class="hint-caret"></span>
                 <p id="email-students-tip">
-                    ${_("If this option is <em>checked</em>, users will receive an email notification.")}
+                    ${Text(_("If this option is {em_start}checked{em_end}, users will receive an email notification.")).format(em_start=HTML('<em>'), em_end=HTML('</em>'))}
                 </p>
             </div>
         </label>
@@ -122,7 +95,7 @@ from django.utils.translation import ugettext as _
             <div class="hint auto-enroll-beta-hint">
                 <span class="hint-caret"></span>
                 <p id="auto-enroll-beta-tip">
-                    ${_("If this option is <em>checked</em>, users who have not enrolled in your course will be automatically enrolled.")}
+                    ${Text(_("If this option is {em_start}checked{em_end}, users who have not enrolled in your course will be automatically enrolled.")).format(em_start=HTML('<em>'), em_end=HTML('</em>'))}
                     <br /><br />
                     ${_("Checking this box has no effect if 'Remove beta testers' is selected.")}
                 </p>
@@ -136,7 +109,7 @@ from django.utils.translation import ugettext as _
             <div class="hint email-students-beta-hint">
                 <span class="hint-caret"></span>
                 <p id="email-students-beta-tip">
-                    ${_("If this option is <em>checked</em>, users will receive an email notification.")}
+                    ${Text(_("If this option is {em_start}checked{em_end}, users will receive an email notification.")).format(em_start=HTML('<em>'), em_end=HTML('</em>'))}
                 </p>
             </div>
         </label>
