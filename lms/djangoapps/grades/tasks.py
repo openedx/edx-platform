@@ -64,9 +64,8 @@ def compute_all_grades_for_course(**kwargs):
             'course_key': course_key_string,
             'offset': offset,
             'batch_size': batch_size,
-            'routing_key': settings.POLICY_CHANGE_GRADES_ROUTING_KEY,
         })
-        compute_grades_for_course_v2.apply_async(kwargs=kwargs)
+        compute_grades_for_course_v2.apply_async(kwargs=kwargs, routing_key=settings.POLICY_CHANGE_GRADES_ROUTING_KEY)
 
 
 @task(base=_BaseTask, bind=True, default_retry_delay=30, max_retries=1)
