@@ -2,8 +2,12 @@
 """
 Tests for the course home page.
 """
+import datetime
 import ddt
 import mock
+import pytz
+from waffle.testutils import override_flag
+
 from courseware.tests.factories import StaffFactory
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -18,6 +22,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
+from ... import COURSE_PRE_START_ACCESS_FLAG
 from .helpers import add_course_mode
 from .test_course_updates import create_course_update
 
@@ -141,6 +146,26 @@ class TestCourseHomePage(CourseHomePageTestCase):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
+
+    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_start_date_handling(self):
+        """
+        Verify that the course home page handles start dates correctly.
+        """
+        now = datetime.datetime.now(pytz.UTC)
+        tomorrow = now + datetime.timedelta(days=1)
+        self.course.start = tomorrow
+
+        # The course home page should 404 for a course starting in the future
+        url = course_home_url(self.course)
+        response = self.client.get(url)
+        self.assertRedirects(response, '/dashboard?notlive=Jan+01%2C+2030')
+
+        # With the Waffle flag enabled, the course should be visible
+        with override_flag(COURSE_PRE_START_ACCESS_FLAG.namespaced_flag_name, True):
+            url = course_home_url(self.course)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
 
 
 @ddt.ddt

@@ -25,6 +25,8 @@ class CourseOutlineFragmentView(EdxFragmentView):
         course_overview = get_course_overview_with_access(request.user, 'load', course_key, check_if_enrolled=True)
 
         course_block_tree = get_course_outline_block_tree(request, course_id)
+        if not course_block_tree:
+            return None
 
         context = {
             'csrf': csrf(request)['csrf_token'],

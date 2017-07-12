@@ -20,7 +20,7 @@ from certificates.tests.factories import CertificateInvalidationFactory, Generat
 from commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.access_utils import is_course_open_for_learner
+from courseware.access_utils import check_course_open_for_learner
 from courseware.model_data import FieldDataCache, set_score
 from courseware.module_render import get_module
 from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory
@@ -2567,9 +2567,10 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
         (-1, True)
     )
     @ddt.unpack
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_is_course_open_for_learner(self, start_date_modifier, expected_value):
         staff_user = AdminFactory()
         start_date = datetime.now(UTC) + timedelta(days=start_date_modifier)
         course = CourseFactory.create(start=start_date)
 
-        self.assertEqual(is_course_open_for_learner(staff_user, course), expected_value)
+        self.assertEqual(bool(check_course_open_for_learner(staff_user, course)), expected_value)
