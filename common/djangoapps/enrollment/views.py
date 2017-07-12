@@ -637,7 +637,9 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     unicode(course_id),
                     mode=mode,
                     is_active=is_active,
-                    enrollment_attributes=enrollment_attributes
+                    enrollment_attributes=enrollment_attributes,
+                    # If we are updating enrollment by authorized api caller, we should allow expired modes
+                    include_expired=has_api_key_permissions
                 )
             else:
                 # Will reactivate inactive enrollments.
