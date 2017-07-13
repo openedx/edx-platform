@@ -462,7 +462,8 @@ class EventsTestMixin(TestCase):
     """
     def setUp(self):
         super(EventsTestMixin, self).setUp()
-        self.event_collection = MongoClient()["test"]["events"]
+        mongo_host = 'edx.devstack.mongo' if 'BOK_CHOY_HOSTNAME' in os.environ else 'localhost'
+        self.event_collection = MongoClient(mongo_host)["test"]["events"]
         self.start_time = datetime.now()
 
     def reset_event_tracking(self):
@@ -735,8 +736,9 @@ class AcceptanceTest(WebAppTest):
     """
 
     def __init__(self, *args, **kwargs):
-        # Hack until we upgrade Firefox and install geckodriver in devstack and Jenkins
-        DesiredCapabilities.FIREFOX['marionette'] = False
+        if 'BOK_CHOY_HOSTNAME' not in os.environ:
+            # Hack until we upgrade Firefox and install geckodriver in Vagrant and Jenkins
+            DesiredCapabilities.FIREFOX['marionette'] = False
         super(AcceptanceTest, self).__init__(*args, **kwargs)
 
         # Use long messages so that failures show actual and expected values
