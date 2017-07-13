@@ -33,8 +33,8 @@ def repo_root():
             absolute_path = file_path.abspath()
             break
         except OSError:
-            print('Attempt {}/60 to get an absolute path failed'.format(attempt))
-            if attempt <= 60:
+            print('Attempt {}/180 to get an absolute path failed'.format(attempt))
+            if attempt < 180:
                 attempt += 1
                 sleep(1)
             else:
@@ -169,7 +169,11 @@ class Env(object):
     TEST_DIR = REPO_ROOT / ".testids"
 
     # Configured browser to use for the js test suites
-    KARMA_BROWSER = 'FirefoxDocker' if USING_DOCKER else 'FirefoxNoUpdates'
+    SELENIUM_BROWSER = os.environ.get('SELENIUM_BROWSER', 'firefox')
+    if USING_DOCKER:
+        KARMA_BROWSER = 'ChromeDocker' if SELENIUM_BROWSER == 'chrome' else 'FirefoxDocker'
+    else:
+        KARMA_BROWSER = 'FirefoxNoUpdates'
 
     # Files used to run each of the js test suites
     # TODO:  Store this as a dict. Order seems to matter for some

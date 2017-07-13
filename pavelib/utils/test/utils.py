@@ -83,9 +83,9 @@ def check_firefox_version():
         # Firefox is running in a separate Docker container; get its version via Selenium
         driver = browser()
         capabilities = driver.capabilities
-        if capabilities['browserName'] == 'firefox':
+        if capabilities['browserName'].lower() == 'firefox':
             firefox_version_regex = re.compile(r'^\d+\.\d+')
-            version_key = 'browserVersion' if 'browserVersion' in 'capabilities' else 'version'
+            version_key = 'browserVersion' if 'browserVersion' in capabilities else 'version'
             try:
                 firefox_ver = float(firefox_version_regex.search(capabilities[version_key]).group(0))
             except AttributeError:
