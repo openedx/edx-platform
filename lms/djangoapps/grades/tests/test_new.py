@@ -683,9 +683,9 @@ class TestCourseGradeLogging(ProblemSubmissionTestMixin, SharedModuleStoreTestCa
         matches the expected totals passed in to the function.
         """
         factory_method(self.request.user, self.course)
-        self.assertIn(log_statement, log_mock.info.call_args[0][0])
-        self.assertIn(unicode(self.course.id), log_mock.info.call_args[0][1])
-        self.assertEquals(self.request.user.id, log_mock.info.call_args[0][2])
+        self.assertIn(log_statement, log_mock.call_args[0][0])
+        self.assertIn(unicode(self.course.id), log_mock.call_args[0][1])
+        self.assertEquals(self.request.user.id, log_mock.call_args[0][2])
 
     def test_course_grade_logging(self):
         grade_factory = CourseGradeFactory()
@@ -698,16 +698,16 @@ class TestCourseGradeLogging(ProblemSubmissionTestMixin, SharedModuleStoreTestCa
             with patch('lms.djangoapps.grades.new.course_grade_factory.log') as log_mock:
                 # returns Zero when no grade, with ASSUME_ZERO_GRADE_IF_ABSENT
                 with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=True):
-                    self._create_course_grade_and_check_logging(grade_factory.create, log_mock, u'CreateZero')
+                    self._create_course_grade_and_check_logging(grade_factory.create, log_mock.info, u'CreateZero')
 
                 # read, but not persisted
-                self._create_course_grade_and_check_logging(grade_factory.create, log_mock, u'Update')
+                self._create_course_grade_and_check_logging(grade_factory.create, log_mock.info, u'Update')
 
                 # update and persist
-                self._create_course_grade_and_check_logging(grade_factory.update, log_mock, u'Update')
+                self._create_course_grade_and_check_logging(grade_factory.update, log_mock.info, u'Update')
 
                 # read from persistence, using create
-                self._create_course_grade_and_check_logging(grade_factory.create, log_mock, u'Read')
+                self._create_course_grade_and_check_logging(grade_factory.create, log_mock.debug, u'Read')
 
                 # read from persistence, using read
-                self._create_course_grade_and_check_logging(grade_factory.read, log_mock, u'Read')
+                self._create_course_grade_and_check_logging(grade_factory.read, log_mock.debug, u'Read')
