@@ -294,7 +294,7 @@ class SubmitFeedbackTest(EnterpriseServiceMockMixin, TestCase):
             email=fields["email"],
             subject=fields["subject"],
             details=fields["details"],
-            tags=[fields["issue_type"], "LMS", "whitelabel_{}".format(fake_get_value("course_org_filter"))]
+            tags=[fields["issue_type"], "LMS", "site_name_{}".format(fake_get_value("SITE_NAME").replace(".", "_"))]
         )
 
         ticket_update = self._build_zendesk_ticket_update(TEST_REQUEST_HEADERS)
