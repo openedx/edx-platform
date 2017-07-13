@@ -2,6 +2,7 @@
 .navigation-container {
   border-bottom: 1px solid $brand-primary;
   text-decoration: none;
+  background-color: $header-bg;
 
   &.slim {
     border-bottom: 1px solid $inverse-color;
@@ -29,7 +30,7 @@
     .nav-item {
       margin: 0 $baseline 0 0;
       font-weight: $font-weight-normal;
-      font-family: $font-family-sans-serif;
+      font-family: $font-family-base;
       text-transform: uppercase;
       list-style: none;
 
@@ -47,7 +48,7 @@
         display: none;
       }
 
-      @media (max-width: map-get($grid-breakpoints,lg)) {
+      @media (max-width: map-get($grid-breakpoints,md)) {
         &.nav-item-open-collapsed, &.nav-item-open-collapsed-only {
           display: initial;
           margin: $baseline/4 $baseline/2;
@@ -73,7 +74,7 @@
     }
 
     .navbar-right .nav-item {
-      @media (min-width: map-get($grid-breakpoints,lg)) {
+      @media (min-width: map-get($grid-breakpoints,md)) {
         .nav-link {
           text-transform: none;
           color: $brand-inverse;
