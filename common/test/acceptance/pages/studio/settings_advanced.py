@@ -182,7 +182,6 @@ class AdvancedSettingsPage(CoursePage):
             'advertised_start',
             'announcement',
             'display_name',
-            'info_sidebar_name',
             'is_new',
             'issue_badges',
             'max_student_enrollments_allowed',
