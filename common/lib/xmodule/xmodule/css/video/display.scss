@@ -215,7 +215,8 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
     .closed-captions {
       @include left(5%);
       position: absolute;
-      width: 85%;
+      width: 90%;
+      box-sizing: border-box;
       top: 70%;
       text-align: center;
     }
@@ -715,7 +716,11 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
   &.video-fullscreen {
 
       .closed-captions {
-          width: 60%;
+          width: 65%;
+      }
+
+      &.closed .closed-captions {
+          width: 90%;
       }
   }
 
