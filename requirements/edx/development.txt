@@ -1,7 +1,7 @@
 #
 # Dependencies that are used in development only - and are *NOT* needed to be installed in staging/production.
 #
-# These must be installed manually in your development environment using:
+# These are installed automatically in devstack, and can also be installed manually using:
 #
 #    pip install -r requirements/edx/development.txt
 #
