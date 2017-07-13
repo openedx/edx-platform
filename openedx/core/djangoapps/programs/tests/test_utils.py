@@ -445,6 +445,14 @@ class TestProgramProgressMeter(TestCase):
         )
         self.assertEqual(meter.completed_programs, [program_uuid])
 
+    def test_empty_programs(self, mock_get_programs):
+        """Verify that programs with no courses do not count as completed."""
+        program = ProgramFactory()
+        program['courses'] = []
+        meter = ProgramProgressMeter(self.user)
+        program_complete = meter._is_program_complete(program)
+        self.assertFalse(program_complete)
+
     @mock.patch(UTILS_MODULE + '.ProgramProgressMeter.completed_course_runs', new_callable=mock.PropertyMock)
     def test_completed_programs(self, mock_completed_course_runs, mock_get_programs):
         """Verify that completed programs are correctly identified."""

@@ -244,7 +244,8 @@ class ProgramProgressMeter(object):
         Returns:
             bool, indicating whether the program is complete.
         """
-        return all(self._is_course_complete(course) for course in program['courses'])
+        return all(self._is_course_complete(course) for course in program['courses']) \
+            and len(program['courses']) > 0
 
     def _is_course_complete(self, course):
         """Check if a user has completed a course.
