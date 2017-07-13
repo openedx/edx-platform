@@ -899,7 +899,12 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         self.assert_enrollment_status(username='fake-user', expected_status=status.HTTP_406_NOT_ACCEPTABLE,
                                       as_server=True)
 
-    def test_update_enrollment_with_expired_mode_throws_error(self):
+    @ddt.data(
+        (True, CourseMode.VERIFIED),
+        (False, CourseMode.DEFAULT_MODE_SLUG)
+    )
+    @ddt.unpack
+    def test_update_enrollment_with_expired_mode(self, using_api_key, updated_mode):
         """Verify that if verified mode is expired than it's enrollment cannot be updated. """
         for mode in [CourseMode.DEFAULT_MODE_SLUG, CourseMode.VERIFIED]:
             CourseModeFactory.create(
@@ -922,13 +927,13 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         mode.expiration_datetime = datetime.datetime(year=1970, month=1, day=1, tzinfo=pytz.utc)
         mode.save()
         self.assert_enrollment_status(
-            as_server=True,
+            as_server=using_api_key,
             mode=CourseMode.VERIFIED,
-            expected_status=status.HTTP_400_BAD_REQUEST
+            expected_status=status.HTTP_200_OK if using_api_key else status.HTTP_403_FORBIDDEN
         )
         course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
         self.assertTrue(is_active)
-        self.assertEqual(course_mode, CourseMode.DEFAULT_MODE_SLUG)
+        self.assertEqual(course_mode, updated_mode)
 
     def test_enterprise_course_enrollment_invalid_consent(self):
         """Verify that the enterprise_course_consent must be a boolean. """
