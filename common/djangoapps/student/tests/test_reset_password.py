@@ -185,18 +185,22 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             req = self.request_factory.post(
                 '/password_reset/', {'email': self.user.email}
             )
+            req.is_secure = Mock(return_value=True)
             req.get_host = Mock(return_value=domain_override)
             req.user = self.user
             password_reset(req)
             _, msg, _, _ = send_email.call_args[0]
 
-            reset_msg = "you requested a password reset for your user account at {}"
-            if domain_override:
-                reset_msg = reset_msg.format(domain_override)
-            else:
-                reset_msg = reset_msg.format(settings.SITE_NAME)
+            reset_intro_msg = "you requested a password reset for your user account at {}".format(platform_name)
+            self.assertIn(reset_intro_msg, msg)
 
-            self.assertIn(reset_msg, msg)
+            reset_link = "https://{}/"
+            if domain_override:
+                reset_link = reset_link.format(domain_override)
+            else:
+                reset_link = reset_link.format(settings.SITE_NAME)
+
+            self.assertIn(reset_link, msg)
 
             sign_off = "The {} Team".format(platform_name)
             self.assertIn(sign_off, msg)
@@ -221,7 +225,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         password_reset(req)
         _, msg, from_addr, _ = send_email.call_args[0]
 
-        reset_msg = "you requested a password reset for your user account at openedx.localhost"
+        reset_msg = "you requested a password reset for your user account at {}".format(fake_get_value('platform_name'))
 
         self.assertIn(reset_msg, msg)
 
@@ -297,3 +301,21 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         self.assertEquals(confirm_kwargs['extra_context']['platform_name'], 'Fake University')
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.is_active)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    @patch('django.core.mail.send_mail')
+    @ddt.data('Crazy Awesome Site', 'edX')
+    def test_reset_password_email_subject(self, platform_name, send_email):
+        """
+        Tests that the right platform name is included in
+        the reset password email subject
+        """
+        with patch("django.conf.settings.PLATFORM_NAME", platform_name):
+            req = self.request_factory.post(
+                '/password_reset/', {'email': self.user.email}
+            )
+            req.user = self.user
+            password_reset(req)
+            subj, _, _, _ = send_email.call_args[0]
+
+            self.assertIn(platform_name, subj)
