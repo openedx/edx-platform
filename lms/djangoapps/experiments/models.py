@@ -30,8 +30,8 @@ class ExperimentKeyValue(TimeStampedModel):
     value = models.TextField()
 
     class Meta(object):
-        verbose_name = 'Experiment Data'
-        verbose_name_plural = 'Experiment Data'
+        verbose_name = 'Experiment Key-Value Pair'
+        verbose_name_plural = 'Experiment Key-Value Pairs'
         unique_together = (
             ('experiment_id', 'key'),
         )
