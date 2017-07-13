@@ -56,7 +56,7 @@ edx-django-sites-extensions==2.3.0
 edx-enterprise==0.36.5
 edx-oauth2-provider==1.2.0
 edx-opaque-keys==0.4.0
-edx-organizations==0.4.4
+edx-organizations==0.4.5
 edx-rest-api-client==1.7.1
 edx-search==1.0.1
 facebook-sdk==0.4.0
