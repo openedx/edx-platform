@@ -223,7 +223,7 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             display_content('.page-title').contents()[0]
         )
         self.assertIn(
-            display_course.display_name_with_default,
+            display_course.display_number_with_default,
             display_content('.page-subtitle').contents()
         )
 
