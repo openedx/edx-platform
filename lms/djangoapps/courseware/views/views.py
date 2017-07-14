@@ -17,12 +17,10 @@ from certificates.models import CertificateStatuses
 from commerce.utils import EcommerceService
 from course_modes.models import CourseMode
 from courseware.access import has_access, has_ccx_coach_role
-from courseware.access_response import StartDateError
-from courseware.access_utils import in_preview_mode, check_course_open_for_learner
+from courseware.access_utils import check_course_open_for_learner
 from courseware.courses import (
     can_self_enroll_in_course,
     get_course,
-    get_course_by_id,
     get_course_overview_with_access,
     get_course_with_access,
     get_courses,
@@ -49,6 +47,7 @@ from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, QueryDict
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
+from django.utils.http import urlquote_plus
 from django.utils.text import slugify
 from django.utils.timezone import UTC
 from django.utils.translation import ugettext as _
@@ -83,17 +82,17 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.util.user_messages import register_warning_message
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from pytz import utc
 from rest_framework import status
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import CourseEnrollment, UserTestGroup
 from survey.utils import must_answer_survey
 from util.cache import cache, cache_if_anonymous
-from util.date_utils import strftime_localized
 from util.db import outer_atomic
 from util.milestones_helpers import get_prerequisite_courses_display
 from util.views import _record_feedback_in_zendesk, ensure_valid_course_key, ensure_valid_usage_key
@@ -269,7 +268,7 @@ def course_info(request, course_id):
         masquerade, user = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
 
         # LEARNER-612: CCX redirect handled by new Course Home (DONE)
-        # TODO: LEARNER-1697: Transition banner messages to new Course Home.
+        # LEARNER-1697: Transition banner messages to new Course Home (DONE)
         # if user is not enrolled in a course then app will show enroll/get register link inside course info page.
         user_is_enrolled = CourseEnrollment.is_enrolled(user, course.id)
         show_enroll_banner = request.user.is_authenticated() and not user_is_enrolled
@@ -295,13 +294,6 @@ def course_info(request, course_id):
         is_from_dashboard = reverse('dashboard') in request.META.get('HTTP_REFERER', [])
         if course.bypass_home and is_from_dashboard:
             return redirect(reverse('courseware', args=[course_id]))
-
-        # TODO: LEARNER-1697: Transition handling of enroll links in new Course Home.
-        # link to where the student should go to enroll in the course:
-        # about page if there is not marketing site, SITE_NAME if there is
-        url_to_enroll = reverse(course_about, args=[course_id])
-        if settings.FEATURES.get('ENABLE_MKTG_SITE'):
-            url_to_enroll = marketing_link('COURSES')
 
         # Construct the dates fragment
         dates_fragment = None
@@ -334,7 +326,7 @@ def course_info(request, course_id):
             'show_enroll_banner': show_enroll_banner,
             'user_is_enrolled': user_is_enrolled,
             'dates_fragment': dates_fragment,
-            'url_to_enroll': url_to_enroll,
+            'url_to_enroll': CourseTabView.url_to_enroll(course_key),
             'course_tools': course_tools,
 
             # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
@@ -391,6 +383,10 @@ class StaticCourseTabView(EdxFragmentView):
         tab = CourseTabList.get_tab_by_slug(course.tabs, tab_slug)
         if tab is None:
             raise Http404
+
+        # Show warnings if the user has limited access
+        CourseTabView.register_user_access_warning_messages(request, course_key)
+
         return super(StaticCourseTabView, self).get(request, course=course, tab=tab, **kwargs)
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
@@ -431,6 +427,9 @@ class CourseTabView(EdxFragmentView):
                 # Verify that the user has access to the course
                 check_access_to_course(request, course)
 
+                # Show warnings if the user has limited access
+                self.register_user_access_warning_messages(request, course_key)
+
                 # Render the page
                 tab = CourseTabList.get_tab_by_type(course.tabs, tab_type)
                 page_context = self.create_page_context(request, course=course, tab=tab, **kwargs)
@@ -438,6 +437,48 @@ class CourseTabView(EdxFragmentView):
                 return super(CourseTabView, self).get(request, course=course, page_context=page_context, **kwargs)
             except Exception as exception:  # pylint: disable=broad-except
                 return CourseTabView.handle_exceptions(request, course, exception)
+
+    @staticmethod
+    def url_to_enroll(course_key):
+        """
+        Returns the URL to use to enroll in the specified course.
+        """
+        url_to_enroll = reverse('about_course', args=[unicode(course_key)])
+        if settings.FEATURES.get('ENABLE_MKTG_SITE'):
+            url_to_enroll = marketing_link('COURSES')
+        return url_to_enroll
+
+    @staticmethod
+    def register_user_access_warning_messages(request, course_key):
+        """
+        Register messages to be shown to the user if they have limited access.
+        """
+        is_enrolled = CourseEnrollment.is_enrolled(request.user, course_key)
+        is_staff = has_access(request.user, 'staff', course_key)
+        if request.user.is_anonymous():
+            register_warning_message(
+                request,
+                Text(_("To see course content, {sign_in_link} or {register_link}.")).format(
+                    sign_in_link=HTML('<a href="/login?next={current_url}">{sign_in_label}</a>').format(
+                        sign_in_label=_("sign in"),
+                        current_url=urlquote_plus(request.path),
+                    ),
+                    register_link=HTML('<a href="/register?next={current_url}">{register_label}</a>').format(
+                        register_label=_("register"),
+                        current_url=urlquote_plus(request.path),
+                    ),
+                )
+            )
+        elif not is_enrolled and not is_staff:
+            register_warning_message(
+                request,
+                Text(_('You must be enrolled in the course to see course content. {enroll_link}.')).format(
+                    enroll_link=HTML('<a href="{url_to_enroll}">{enroll_link_label}</a>').format(
+                        url_to_enroll=CourseTabView.url_to_enroll(course_key),
+                        enroll_link_label=_("Enroll now"),
+                    )
+                )
+            )
 
     @staticmethod
     def handle_exceptions(request, course, exception):
