@@ -64,6 +64,18 @@ AUTHENTICATION_BACKENDS = (
     'organizations.backends.OrganizationMemberBackend',
 )
 
+if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+    AUTHENTICATION_BACKENDS = list(AUTHENTICATION_BACKENDS) + (
+        ENV_TOKENS.get('THIRD_PARTY_AUTH_BACKENDS', [
+            'social.backends.google.GoogleOAuth2',
+            'social.backends.linkedin.LinkedinOAuth2',
+            'social.backends.facebook.FacebookOAuth2',
+            'social.backends.azuread.AzureADOAuth2',
+            'third_party_auth.saml.SAMLAuthBackend',
+            'third_party_auth.lti.LTIAuthBackend',
+        ])
+    )
+
 # SENTRY
 SENTRY_DSN = AUTH_TOKENS.get('SENTRY_DSN', False)
 
