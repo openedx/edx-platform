@@ -62,3 +62,23 @@ $lms-dark-icon-background-color: palette(grayscale, black) !default;
 $site-status-color: rgb(182,37,103) !default;
 
 $shadow-l1: rgba(0,0,0,0.1) !default;
+
+// ----------------------------
+// #ALERTS
+// ----------------------------
+
+$state-success-text:             $black !default;
+$state-success-bg:               #dff0d8 !default;
+$state-success-border:           darken($state-success-bg, 5%) !default;
+
+$state-info-text:                $black !default;
+$state-info-bg:                  #d9edf7 !default;
+$state-info-border:              darken($state-info-bg, 7%) !default;
+
+$state-warning-text:             $black !default;
+$state-warning-bg:               #fcf8e3 !default;
+$state-warning-border:           darken($state-warning-bg, 5%) !default;
+
+$state-danger-text:              $black !default;
+$state-danger-bg:                #f2dede !default;
+$state-danger-border:            darken($state-danger-bg, 5%) !default;

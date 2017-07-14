@@ -221,6 +221,26 @@ $success-color: rgb(0, 155, 0) !default;
 $success-color-hover: rgb(0, 129, 0) !default;
 
 // ----------------------------
+// #COLORS- Bootstrap-style
+// ----------------------------
+
+$state-success-text: $black !default;
+$state-success-bg: #dff0d8 !default;
+$state-success-border: darken($state-success-bg, 5%) !default;
+
+$state-info-text: $black !default;
+$state-info-bg: #d9edf7 !default;
+$state-info-border: darken($state-info-bg, 7%) !default;
+
+$state-warning-text: $black !default;
+$state-warning-bg: #fcf8e3 !default;
+$state-warning-border: darken($state-warning-bg, 5%) !default;
+
+$state-danger-text: $black !default;
+$state-danger-bg: #f2dede !default;
+$state-danger-border: darken($state-danger-bg, 5%) !default;
+
+// ----------------------------
 // #COLORS- EDX-SPECIFIC
 // ----------------------------
 

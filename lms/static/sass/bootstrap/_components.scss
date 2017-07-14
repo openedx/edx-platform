@@ -1,0 +1,19 @@
+// Open edX: components
+// ====================
+
+// Page banner
+.page-banner {
+  max-width: $lms-max-width;
+  margin: 0 auto;
+
+  .user-messages {
+    margin-top: $baseline;
+  }
+}
+
+// Alerts
+.alert {
+  .icon-alert {
+    margin-right: $baseline / 4;
+  }
+}
