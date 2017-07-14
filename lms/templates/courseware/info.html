@@ -60,8 +60,8 @@ from openedx.core.djangolib.markup import HTML, Text
     <div class="container">
       <div class="home">
         <div class="page-header-main">
-            <h3 class="page-title">${_("Welcome to {org}'s {course_name}!").format(org=course.display_org_with_default, course_name=course.display_number_with_default)}
-              <div class="page-subtitle">${course.display_name_with_default}</div>
+            <h3 class="page-title">${_("Welcome to {org}'s {course_name}!").format(org=course.display_org_with_default, course_name=course.display_name_with_default)}
+              <div class="page-subtitle">${course.display_number_with_default}</div>
             </h3>
         </div>
         % if last_accessed_courseware_url:
