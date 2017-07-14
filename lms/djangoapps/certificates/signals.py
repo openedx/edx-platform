@@ -61,7 +61,9 @@ def _listen_for_course_pacing_changed(sender, course_key, course_self_paced, **k
     the self-generated certificates according to course-pacing.
     """
     toggle_self_generated_certs.delay(unicode(course_key), course_self_paced)
-
+    log.info(u'Certificate Generation Setting Toggled for {course} via pacing change'.format(
+        course=course_key
+    ))
 
 @task()
 def toggle_self_generated_certs(course_key, course_self_paced):

@@ -22,3 +22,5 @@ COURSE_GRADE_NOW_PASSED = Signal(
 
 # Signal that indicates that a user has become verified
 LEARNER_NOW_VERIFIED = Signal(providing_args=['user'])
+
+COURSE_PACING_CHANGE = Signal(providing_args=["course_key", "course_self_paced"])
