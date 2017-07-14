@@ -28,7 +28,8 @@ from courseware.access_utils import (
     adjust_start_date,
     check_start_date,
     debug,
-    in_preview_mode
+    in_preview_mode,
+    check_course_open_for_learner,
 )
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
@@ -173,31 +174,6 @@ def has_staff_access_to_preview_mode(user, course_key):
     return has_admin_access_to_course or is_masquerading_as_student(user, course_key)
 
 
-def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pylint: disable=invalid-name
-    """
-    Checks if a user has access to a descriptor based on its start date.
-
-    If there is no start date specified, grant access.
-    Else, check if we're past the start date.
-
-    Note:
-        We do NOT check whether the user is staff or if the descriptor
-        is detached... it is assumed both of these are checked by the caller.
-
-    Arguments:
-        user (User): the user whose descriptor access we are checking.
-        descriptor (AType): the descriptor for which we are checking access,
-            where AType is CourseDescriptor, CourseOverview, or any other class
-            that represents a descriptor and has the attributes .location, .id,
-            .start, and .days_early_for_beta.
-
-    Returns:
-        AccessResponse: The result of this access check. Possible results are
-            ACCESS_GRANTED or a StartDateError.
-    """
-    return check_start_date(user, descriptor.days_early_for_beta, descriptor.start, course_key)
-
-
 def _can_view_courseware_with_prerequisites(user, course):  # pylint: disable=invalid-name
     """
     Checks if a user has access to a course based on its prerequisites.
@@ -333,7 +309,7 @@ def _has_access_course(user, action, courselike):
         """
         response = (
             _visible_to_nonstaff_users(courselike) and
-            _can_access_descriptor_with_start_date(user, courselike, courselike.id)
+            check_course_open_for_learner(user, courselike)
         )
 
         return (
@@ -519,7 +495,7 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
             _can_access_descriptor_with_milestones(user, descriptor, course_key) and
             (
                 _has_detached_class_tag(descriptor) or
-                _can_access_descriptor_with_start_date(user, descriptor, course_key)
+                check_start_date(user, descriptor.days_early_for_beta, descriptor.start, course_key)
             )
         )
 

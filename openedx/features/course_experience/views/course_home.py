@@ -83,14 +83,14 @@ class CourseHomeFragmentView(EdxFragmentView):
             return block
 
         course_outline_root_block = get_course_outline_block_tree(request, course_id)
-        last_accessed_block = get_last_accessed_block(course_outline_root_block)
+        last_accessed_block = get_last_accessed_block(course_outline_root_block) if course_outline_root_block else None
         has_visited_course = bool(last_accessed_block)
         if last_accessed_block:
             resume_course_url = last_accessed_block['lms_web_url']
         else:
-            resume_course_url = course_outline_root_block['lms_web_url']
+            resume_course_url = course_outline_root_block['lms_web_url'] if course_outline_root_block else None
 
-        return (has_visited_course, resume_course_url)
+        return has_visited_course, resume_course_url
 
     def _get_course_handouts(self, request, course):
         """
@@ -137,9 +137,6 @@ class CourseHomeFragmentView(EdxFragmentView):
 
         # Get the handouts
         handouts_html = self._get_course_handouts(request, course)
-
-        # Get the course tools enabled for this user and course
-        course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
 
         # Get the course tools enabled for this user and course
         course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
