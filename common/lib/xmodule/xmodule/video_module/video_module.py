@@ -304,16 +304,20 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             if xblock_settings and 'YOUTUBE_API_KEY' in xblock_settings:
                 yt_api_key = xblock_settings['YOUTUBE_API_KEY']
 
+        poster = None
+        if edxval_api and self.edx_video_id:
+            poster = edxval_api.get_course_video_image_url(
+                course_id=self.runtime.course_id.for_branch(None),
+                edx_video_id=self.edx_video_id.strip()
+            )
+
         metadata = {
             'saveStateUrl': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'streams': self.youtube_streams,
             'sub': self.sub,
             'sources': sources,
-            'poster': edxval_api and edxval_api.get_course_video_image_url(
-                course_id=self.runtime.course_id.for_branch(None),
-                edx_video_id=self.edx_video_id.strip()
-            ),
+            'poster': poster,
             # This won't work when we move to data that
             # isn't on the filesystem
             'captionDataDir': getattr(self, 'data_dir', None),
@@ -508,7 +512,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     break
 
         if metadata_was_changed_by_user:
-            self.edx_video_id = self.edx_video_id.strip()
+            self.edx_video_id = self.edx_video_id and self.edx_video_id.strip()
 
             # We want to override `youtube_id_1_0` with val youtube profile in the first place when someone adds/edits
             # an `edx_video_id` or its underlying YT val profile. Without this, override will only happen when a user
