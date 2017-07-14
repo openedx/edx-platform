@@ -23,6 +23,7 @@ class TestCourseWaffleFlag(TestCase):
     NAMESPACED_FLAG_NAME = NAMESPACE_NAME + "." + FLAG_NAME
 
     TEST_COURSE_KEY = CourseKey.from_string("edX/DemoX/Demo_Course")
+    TEST_COURSE_2_KEY = CourseKey.from_string("edX/DemoX/Demo_Course_2")
     TEST_NAMESPACE = WaffleFlagNamespace(NAMESPACE_NAME)
     TEST_COURSE_FLAG = CourseWaffleFlag(TEST_NAMESPACE, FLAG_NAME)
 
@@ -49,6 +50,16 @@ class TestCourseWaffleFlag(TestCase):
                     self.NAMESPACED_FLAG_NAME,
                     self.TEST_COURSE_KEY
                 )
+
+        # check flag for a second course
+        if data['course_override'] == WaffleFlagCourseOverrideModel.ALL_CHOICES.unset:
+            # When course override wasn't set for the first course, the second course will get the same
+            # cached value from waffle.
+            self.assertEqual(self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_2_KEY), data['waffle_enabled'])
+        else:
+            # When course override was set for the first course, it should not apply to the second
+            # course which should get the default value of False.
+            self.assertEqual(self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_2_KEY), False)
 
     @ddt.data(
         {'flag_undefined_default': None, 'result': False},

@@ -193,24 +193,29 @@ class WaffleFlagNamespace(WaffleNamespace):
         If check_before_waffle_callback returns None, or if it is not supplied,
             then waffle is used to check the flag.
 
+        Important: Caching for the check_before_waffle_callback must be handled
+            by the callback itself.
+
         Arguments:
             flag_name (String): The name of the flag to check.
             check_before_waffle_callback (function): (Optional) A function that
                 will be checked before continuing on to waffle. If
                 check_before_waffle_callback(namespaced_flag_name) returns True
-                or False, it is cached and returned.  If it returns None, then
-                waffle is used.
+                or False, it is returned. If it returns None, then waffle is
+                used.
             flag_undefined_default (Boolean): A default value to be returned if
                 the waffle flag is to be checked, but doesn't exist.
         """
         # validate arguments
         namespaced_flag_name = self._namespaced_name(flag_name)
-        value = self._cached_flags.get(namespaced_flag_name)
+
+        if check_before_waffle_callback:
+            value = check_before_waffle_callback(namespaced_flag_name)
 
         if value is None:
-            if check_before_waffle_callback:
-                value = check_before_waffle_callback(namespaced_flag_name)
-
+            # Do not get cached value for the callback, because the key might be different.
+            # The callback needs to handle its own caching if it wants it.
+            value = self._cached_flags.get(namespaced_flag_name)
             if value is None:
 
                 if flag_undefined_default is not None:
@@ -223,7 +228,7 @@ class WaffleFlagNamespace(WaffleNamespace):
                 if value is None:
                     value = flag_is_active(get_request(), namespaced_flag_name)
 
-            self._cached_flags[namespaced_flag_name] = value
+                self._cached_flags[namespaced_flag_name] = value
         return value
 
 
@@ -264,12 +269,12 @@ class CourseWaffleFlag(WaffleFlag):
     Uses a cached waffle namespace.
     """
 
-    def _get_course_override_callback(self, course_id):
+    def _get_course_override_callback(self, course_key):
         """
         Returns a function to use as the check_before_waffle_callback.
 
         Arguments:
-            course_id (CourseKey): The course to check for override before
+            course_key (CourseKey): The course to check for override before
             checking waffle.
         """
         def course_override_callback(namespaced_flag_name):
@@ -277,17 +282,25 @@ class CourseWaffleFlag(WaffleFlag):
             Returns True/False if the flag was forced on or off for the provided
             course.  Returns None if the flag was not overridden.
 
+            Note: Has side effect of caching the override value.
+
             Arguments:
                 namespaced_flag_name (String): A namespaced version of the flag
                     to check.
             """
-            force_override = WaffleFlagCourseOverrideModel.override_value(namespaced_flag_name, course_id)
+            cache_key = u'{}.{}'.format(namespaced_flag_name, unicode(course_key))
+            force_override = self.waffle_namespace._cached_flags.get(cache_key)
+
+            if force_override is None:
+                force_override = WaffleFlagCourseOverrideModel.override_value(namespaced_flag_name, course_key)
+                self.waffle_namespace._cached_flags[cache_key] = force_override
 
             if force_override == WaffleFlagCourseOverrideModel.ALL_CHOICES.on:
                 return True
             if force_override == WaffleFlagCourseOverrideModel.ALL_CHOICES.off:
                 return False
             return None
+
         return course_override_callback
 
     def is_enabled(self, course_key=None):
@@ -299,7 +312,7 @@ class CourseWaffleFlag(WaffleFlag):
             checking waffle.
         """
         # validate arguments
-        assert issubclass(type(course_key), CourseKey), "The course_id '{}' must be a CourseKey.".format(
+        assert issubclass(type(course_key), CourseKey), "The course_key '{}' must be a CourseKey.".format(
             str(course_key)
         )
 
