@@ -812,6 +812,13 @@ if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
 
     )
 
+if configuration_helpers.get_value('ENABLE_BULK_ENROLLMENT_VIEW',
+                                   settings.FEATURES['ENABLE_BULK_ENROLLMENT_VIEW']):
+    urlpatterns += (
+        url(r'^api/bulk_enroll/v1/', include('bulk_enroll.urls')),
+    )
+
+
 # Shopping cart
 urlpatterns += (
     url(r'^shoppingcart/', include('shoppingcart.urls')),

@@ -80,6 +80,8 @@ FEATURES['MILESTONES_APP'] = True
 
 FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 
+FEATURES['ENABLE_BULK_ENROLLMENT_VIEW'] = True
+
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 
