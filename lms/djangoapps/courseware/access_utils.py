@@ -11,6 +11,7 @@ from django.utils.timezone import UTC
 
 from courseware.access_response import AccessResponse, StartDateError
 from courseware.masquerade import is_masquerading_as_student
+from openedx.features.course_experience import COURSE_PRE_START_ACCESS_FLAG
 from student.roles import CourseBetaTesterRole
 from xmodule.util.django import get_current_request_hostname
 
@@ -83,10 +84,13 @@ def in_preview_mode():
     return bool(preview_lms_base and hostname and hostname.split(':')[0] == preview_lms_base.split(':')[0])
 
 
-def is_course_open_for_learner(user, course):
+def check_course_open_for_learner(user, course):
     """
     Check if the course is open for learners based on the start date.
+
+    Returns:
+        AccessResponse: Either ACCESS_GRANTED or StartDateError.
     """
-    now = datetime.now(UTC())
-    effective_start = adjust_start_date(user, course.days_early_for_beta, course.start, course.id)
-    return not(not in_preview_mode() and now < effective_start)
+    if COURSE_PRE_START_ACCESS_FLAG.is_enabled(course.id):
+        return ACCESS_GRANTED
+    return check_start_date(user, course.days_early_for_beta, course.start, course.id)
