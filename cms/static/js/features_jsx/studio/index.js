@@ -65,18 +65,24 @@ class CourseOrLibraryListing extends React.Component {
 
 export class StudioCourseIndex {
     constructor(selector, context, allowReruns) {
+      const element = document.querySelector(selector);
+      if (element !== null) {
         ReactDOM.render(
             <CourseOrLibraryListing items={context} linkClass="course-link" allowReruns={allowReruns}/>,
-            document.querySelector(selector)
+            element
         );
+      }
     }
 }
 
 export class StudioLibraryIndex {
     constructor(selector, context) {
+      const element = document.querySelector(selector);
+      if (element !== null) {
         ReactDOM.render(
             <CourseOrLibraryListing items={context} linkClass="library-link" allowReruns={false}/>,
-            document.querySelector(selector)
+            element
         );
+      }
     }
 }
