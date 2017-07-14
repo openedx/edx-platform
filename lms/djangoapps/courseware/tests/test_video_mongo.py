@@ -934,6 +934,19 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         self.assertIn('"poster": "/media/video-images/poster.png"', context)
 
+    @patch('xmodule.video_module.video_module.edxval_api.get_course_video_image_url')
+    def test_poster_image_without_edx_video_id(self, get_course_video_image_url):
+        """
+        Verify that poster image is set to None and there is no crash when no edx_video_id.
+        """
+        video_xml = '<video display_name="Video" download_video="true" edx_video_id="null">[]</video>'
+        get_course_video_image_url.return_value = '/media/video-images/poster.png'
+
+        self.initialize_module(data=video_xml)
+        context = self.item_descriptor.render(STUDENT_VIEW).content
+
+        self.assertIn("\'poster\': \'null\'", context)
+
 
 @attr(shard=1)
 class TestVideoCDNRewriting(BaseTestXmodule):
