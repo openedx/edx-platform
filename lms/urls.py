@@ -998,7 +998,10 @@ if settings.DEBUG:
         settings.PROFILE_IMAGE_BACKEND['options']['base_url'],
         document_root=settings.PROFILE_IMAGE_BACKEND['options']['location']
     )
+    # TODO: re-enable this after removing the URL below
+    # urlpatterns += url(r'^template/(?P<template>.+)$', 'openedx.core.djangoapps.debug.views.show_reference_template')
 
+# TODO: DO NOT MERGE
 urlpatterns += url(r'^template/(?P<template>.+)$', 'openedx.core.djangoapps.debug.views.show_reference_template'),
 
 if 'debug_toolbar' in settings.INSTALLED_APPS:
