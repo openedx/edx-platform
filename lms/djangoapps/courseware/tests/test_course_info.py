@@ -198,7 +198,7 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         content = pq(response.content)
         expected_title = "Welcome to {org}'s {course_name}!".format(
             org=self.course.display_org_with_default,
-            course_name=self.course.display_number_with_default
+            course_name=self.course.display_name_with_default
         )
         display_course = CourseFactory.create(
             org="HogwartZ",
@@ -212,7 +212,7 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         display_content = pq(display_response.content)
         expected_display_title = "Welcome to {org}'s {course_name}!".format(
             org=display_course.display_org_with_default,
-            course_name=display_course.display_number_with_default
+            course_name=display_course.display_name_with_default
         )
         self.assertIn(
             expected_title,
@@ -223,7 +223,7 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             display_content('.page-title').contents()[0]
         )
         self.assertIn(
-            display_course.display_name_with_default,
+            display_course.display_number_with_default,
             display_content('.page-subtitle').contents()
         )
 
