@@ -19,7 +19,6 @@ from mock import Mock, patch
 
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 import openedx.core.djangoapps.external_auth.views as external_auth_views
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import UserFactory
@@ -55,7 +54,6 @@ class SSLClientTest(ModuleStoreTestCase):
         """Creates a basic request for SSL use."""
         request = self.factory.get(url)
         request.META['SSL_CLIENT_S_DN'] = self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
-        request.site = SiteFactory.create()
         request.user = AnonymousUser()
         middleware = SessionMiddleware()
         middleware.process_request(request)

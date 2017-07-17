@@ -17,8 +17,8 @@ from django.conf import settings as django_settings
 from social import actions, exceptions
 from social.apps.django_app import utils as social_utils
 from social.apps.django_app import views as social_views
+
 from lms.djangoapps.commerce.tests import TEST_API_URL, TEST_API_SIGNING_KEY
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from student import models as student_models
 from student import views as student_views
 from student.tests.factories import UserFactory
@@ -514,7 +514,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         request = self.request_factory.get(
             pipeline.get_complete_url(self.backend_name) +
             '?redirect_state=redirect_state_value&code=code_value&state=state_value')
-        request.site = SiteFactory.create()
         request.user = auth_models.AnonymousUser()
         request.session = cache.SessionStore()
         request.session[self.backend_name + '_state'] = 'state_value'

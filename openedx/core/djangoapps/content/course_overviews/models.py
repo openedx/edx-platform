@@ -446,12 +446,12 @@ class CourseOverview(TimeStampedModel):
         return course_overviews
 
     @classmethod
-    def get_all_courses(cls, orgs=None, filter_=None):
+    def get_all_courses(cls, org=None, filter_=None):
         """
         Returns all CourseOverview objects in the database.
 
         Arguments:
-            orgs (list[string]): Optional parameter that allows case-insensitive
+            org (string): Optional parameter that allows case-insensitive
                 filtering by organization.
             filter_ (dict): Optional parameter that allows custom filtering.
         """
@@ -460,11 +460,11 @@ class CourseOverview(TimeStampedModel):
         # created. For tests using CourseFactory, use emit_signals=True.
         course_overviews = CourseOverview.objects.all()
 
-        if orgs:
+        if org:
             # In rare cases, courses belonging to the same org may be accidentally assigned
             # an org code with a different casing (e.g., Harvardx as opposed to HarvardX).
-            # Case-insensitive matching allows us to deal with this kind of dirty data.
-            course_overviews = course_overviews.filter(org__iregex=r'(' + '|'.join(orgs) + ')')
+            # Case-insensitive exact matching allows us to deal with this kind of dirty data.
+            course_overviews = course_overviews.filter(org__iexact=org)
 
         if filter_:
             course_overviews = course_overviews.filter(**filter_)
