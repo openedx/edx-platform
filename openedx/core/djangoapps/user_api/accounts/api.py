@@ -187,7 +187,7 @@ def update_account_settings(requesting_user, update, username=None):
         # We have not found a way using signals to get the language proficiency changes (grouped by user).
         # As a workaround, store old and new values here and emit them after save is complete.
         if "language_proficiencies" in update:
-            old_language_proficiencies = legacy_profile_serializer.data["language_proficiencies"]
+            old_language_proficiencies = list(existing_user_profile.language_proficiencies.values('code'))
 
         for serializer in user_serializer, legacy_profile_serializer:
             serializer.save()

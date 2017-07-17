@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django_filters.rest_framework import DjangoFilterBackend
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import list_route
-from rest_framework.filters import DjangoFilterBackend
 from rest_framework.response import Response
 
 from experiments import filters, serializers

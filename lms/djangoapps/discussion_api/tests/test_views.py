@@ -1,6 +1,8 @@
 """
 Tests for Discussion API views
 """
+from __future__ import unicode_literals
+
 import json
 from datetime import datetime
 from urlparse import urlparse
@@ -376,7 +378,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             results=expected_threads,
             count=1,
             num_pages=2,
-            next_link="http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&page=2",
+            next_link="http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&following=&page=2",
             previous_link=None
         )
         expected_response.update({"text_search_rewrite": None})
