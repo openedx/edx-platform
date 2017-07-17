@@ -45,32 +45,6 @@ from .models import UserPreference, UserProfile
 from .preferences.api import get_country_time_zones, update_email_opt_in
 from .serializers import CountryTimeZoneSerializer, UserPreferenceSerializer, UserSerializer
 
-# Begin test code
-import sys
-import traceback
-from django.core import mail
-from django.views.debug import ExceptionReporter
-from django.views.debug import SafeExceptionReporterFilter
-
-# Necessary for testing because SafeExceptionReporterFilter is only active in production mode
-class CustomExceptionReporterFilter(SafeExceptionReporterFilter):
-    def is_active(self, request):
-        return True
-
-def send_manually_exception_email(request, e):
-    exc_info = sys.exc_info()
-    reporter = ExceptionReporter(request, is_email=True, *exc_info)
-    reporter.filter = CustomExceptionReporterFilter()
-    subject = e.message.replace('\n', '\\n').replace('\r', '\\r')[:989]
-    message = "%s\n\n%s" % (
-        '\n'.join(traceback.format_exception(*exc_info)),
-        reporter.filter.get_request_repr(request)
-    )
-    mail.mail_admins(
-        subject, message, fail_silently=True,
-        html_message=reporter.get_traceback_html()
-    )
-# End test code
 
 class LoginSessionView(APIView):
     """HTTP end-points for logging in users. """
@@ -149,14 +123,6 @@ class LoginSessionView(APIView):
     @method_decorator(require_post_params(["email", "password"]))
     @method_decorator(csrf_protect)
     def post(self, request):
-        # Begin test code
-        try:
-            raise Exception
-        except Exception as e:
-            request.META['SERVER_NAME'] = 'blah'
-            request.META['SERVER_PORT'] = 18010
-            send_manually_exception_email(request, e)
-        # End test code
         """Log in a user.
 
         You must send all required form fields with the request.
@@ -347,14 +313,6 @@ class RegistrationView(APIView):
 
     @method_decorator(csrf_exempt)
     def post(self, request):
-        # Begin test code
-        try:
-            raise Exception
-        except Exception as e:
-            request.META['SERVER_NAME'] = 'blah'
-            request.META['SERVER_PORT'] = 18010
-            send_manually_exception_email(request, e)
-        # End test code
         """Create the user's account.
 
         You must send all required form fields with the request.
