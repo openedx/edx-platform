@@ -44,3 +44,50 @@ $full-width-banner-margin: 20px;
         right: $full-width-banner-margin;
     }
 }
+
+.page-banner {
+    max-width: $lms-max-width;
+    margin: 0 auto;
+
+    .user-messages {
+        padding-top: $baseline;
+    }
+
+    .alert {
+        margin-bottom: $baseline !important;
+        padding: $baseline;
+        border: 1px solid;
+
+        .icon-alert {
+            margin-right: $baseline / 4;
+        }
+
+        &.alert-info {
+            color: $state-info-text;
+            background-color: $state-info-bg;
+            border-color: $state-info-border;
+            box-shadow: none;
+        }
+
+        &.alert-success {
+            color: $state-success-text;
+            background-color: $state-success-bg;
+            border-color: $state-success-border;
+            box-shadow: none;
+        }
+
+        &.alert-warning {
+            color: $state-warning-text;
+            background-color: $state-warning-bg;
+            border-color: $state-warning-border;
+            box-shadow: none;
+        }
+
+        &.alert-danger {
+            color: $state-danger-text;
+            background-color: $state-danger-bg;
+            border-color: $state-danger-border;
+            box-shadow: none;
+        }
+    }
+}
