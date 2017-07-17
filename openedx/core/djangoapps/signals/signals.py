@@ -1,5 +1,5 @@
 """
-This module contains all signals.
+This module contains all general use signals.
 """
 
 from django.dispatch import Signal
