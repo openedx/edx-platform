@@ -9,6 +9,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
+from django.views.decorators.debug import sensitive_post_parameters
 from django_countries import countries
 from django_filters.rest_framework import DjangoFilterBackend
 from opaque_keys import InvalidKeyError
@@ -44,6 +45,32 @@ from .models import UserPreference, UserProfile
 from .preferences.api import get_country_time_zones, update_email_opt_in
 from .serializers import CountryTimeZoneSerializer, UserPreferenceSerializer, UserSerializer
 
+# Begin test code
+import sys
+import traceback
+from django.core import mail
+from django.views.debug import ExceptionReporter
+from django.views.debug import SafeExceptionReporterFilter
+
+# Necessary for testing because SafeExceptionReporterFilter is only active in production mode
+class CustomExceptionReporterFilter(SafeExceptionReporterFilter):
+    def is_active(self, request):
+        return True
+
+def send_manually_exception_email(request, e):
+    exc_info = sys.exc_info()
+    reporter = ExceptionReporter(request, is_email=True, *exc_info)
+    reporter.filter = CustomExceptionReporterFilter()
+    subject = e.message.replace('\n', '\\n').replace('\r', '\\r')[:989]
+    message = "%s\n\n%s" % (
+        '\n'.join(traceback.format_exception(*exc_info)),
+        reporter.filter.get_request_repr(request)
+    )
+    mail.mail_admins(
+        subject, message, fail_silently=True,
+        html_message=reporter.get_traceback_html()
+    )
+# End test code
 
 class LoginSessionView(APIView):
     """HTTP end-points for logging in users. """
@@ -122,6 +149,14 @@ class LoginSessionView(APIView):
     @method_decorator(require_post_params(["email", "password"]))
     @method_decorator(csrf_protect)
     def post(self, request):
+        # Begin test code
+        try:
+            raise Exception
+        except Exception as e:
+            request.META['SERVER_NAME'] = 'blah'
+            request.META['SERVER_PORT'] = 18010
+            send_manually_exception_email(request, e)
+        # End test code
         """Log in a user.
 
         You must send all required form fields with the request.
@@ -155,6 +190,10 @@ class LoginSessionView(APIView):
         # from the student Django app.
         from student.views import login_user
         return shim_student_view(login_user, check_logged_in=True)(request)
+
+    @method_decorator(sensitive_post_parameters("password"))
+    def dispatch(self, request, *args, **kwargs):
+        return super(LoginSessionView, self).dispatch(request, *args, **kwargs)
 
 
 class RegistrationView(APIView):
@@ -308,6 +347,14 @@ class RegistrationView(APIView):
 
     @method_decorator(csrf_exempt)
     def post(self, request):
+        # Begin test code
+        try:
+            raise Exception
+        except Exception as e:
+            request.META['SERVER_NAME'] = 'blah'
+            request.META['SERVER_PORT'] = 18010
+            send_manually_exception_email(request, e)
+        # End test code
         """Create the user's account.
 
         You must send all required form fields with the request.
@@ -380,6 +427,10 @@ class RegistrationView(APIView):
         response = JsonResponse({"success": True})
         set_logged_in_cookies(request, response, user)
         return response
+
+    @method_decorator(sensitive_post_parameters("password"))
+    def dispatch(self, request, *args, **kwargs):
+        return super(RegistrationView, self).dispatch(request, *args, **kwargs)
 
     def _add_email_field(self, form_desc, required=True):
         """Add an email field to a form description.
