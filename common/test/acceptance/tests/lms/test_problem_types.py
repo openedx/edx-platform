@@ -6,6 +6,7 @@ See also lettuce tests in lms/djangoapps/courseware/features/problems.feature
 import random
 import textwrap
 from abc import ABCMeta, abstractmethod
+from flaky import flaky
 
 import ddt
 from nose import SkipTest
@@ -143,6 +144,7 @@ class ProblemTypeA11yTestMixin(object):
     Shared a11y tests for all problem types.
     """
     @attr('a11y')
+    @flaky  # TE-2179
     def test_problem_type_a11y(self):
         """
         Run accessibility audit for the problem type.
