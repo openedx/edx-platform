@@ -8,11 +8,14 @@ wrap in (-> ... apply) to defer evaluation
 such that the value can be defined later than this assignment (file load order).
 */
 
-
 (function() {
     'use strict';
-    var AuthListWidget, BatchEnrollment, BetaTesterBulkAddition,
-        MemberListWidget, Membership, emailStudents, plantTimeout, statusAjaxError, enableAddButton,
+    var AuthListWidget,
+        Membership,
+        BatchEnrollment,
+        BetaTesterBulkAddition,
+        MemberListWidget,
+        emailStudents, plantTimeout, statusAjaxError, enableAddButton,
         /* eslint-disable */
         __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -223,7 +226,7 @@ such that the value can be defined later than this assignment (file load order).
 
         AuthListWidget.prototype.get_member_list = function(cb) {
             var authlistwidgetgetmemberlist = this;
-            return $.ajax({
+            $.ajax({
                 type: 'POST',
                 dataType: 'json',
                 url: this.list_endpoint,
@@ -1004,7 +1007,6 @@ such that the value can be defined later than this assignment (file load order).
             this.$list_selector.change(function() {
                 var $opt, j, len1, ref1;
                 $opt = thismembership.$list_selector.children('option:selected');
-
                 if (!($opt.length > 0)) {
                     return;
                 }

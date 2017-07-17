@@ -306,6 +306,21 @@
                 exports: 'js/instructor_dashboard/certificates',
                 deps: ['jquery', 'gettext', 'underscore']
             },
+            'js/instructor_dashboard/membership': {
+                exports: 'js/instructor_dashboard/membership',
+                deps: ['jquery', 'underscore'],
+                init: function() {
+                    // Set global variables that the util code is expecting to be defined
+                    require([  // eslint-disable-line global-require
+                        'edx-ui-toolkit/js/utils/html-utils',
+                        'edx-ui-toolkit/js/utils/string-utils'
+                    ], function(HtmlUtils, StringUtils) {
+                        window.edx = window.edx || {};
+                        window.edx.HtmlUtils = HtmlUtils;
+                        window.edx.StringUtils = StringUtils;
+                    });
+                }
+            },
             // LMS class loaded explicitly until they are converted to use RequireJS
             'js/student_account/account': {
                 exports: 'js/student_account/account',
@@ -341,6 +356,7 @@
                 exports: 'edx.instructor_dashboard.ecommerce.ExpiryCouponView',
                 deps: ['backbone', 'jquery', 'underscore']
             },
+
             'js/models/notification': {
                 exports: 'NotificationModel',
                 deps: ['backbone']
@@ -738,6 +754,7 @@
         'js/spec/instructor_dashboard/certificates_invalidation_spec.js',
         'js/spec/instructor_dashboard/certificates_spec.js',
         'js/spec/instructor_dashboard/ecommerce_spec.js',
+        'js/spec/instructor_dashboard/membership_auth_spec.js',
         'js/spec/instructor_dashboard/student_admin_spec.js',
         'js/spec/learner_dashboard/collection_list_view_spec.js',
         'js/spec/learner_dashboard/program_card_view_spec.js',
