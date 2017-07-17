@@ -17,4 +17,4 @@ class SignalConfig(AppConfig):
         """
         # Can't import models at module level in AppConfigs, and models get
         # included from the signal handlers
-        from . import signals  # pylint: disable=unused-variable
+        from . import signals, handlers  # pylint: disable=unused-variable
