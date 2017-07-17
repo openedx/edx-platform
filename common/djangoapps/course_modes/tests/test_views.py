@@ -237,52 +237,6 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.assertContains(response, 'Audit This Course')
 
     @httpretty.activate
-    @patch('course_modes.views.get_enterprise_consent_url')
-    @ddt.data(
-        (True, True),
-        (True, False),
-        (False, True),
-        (False, False),
-    )
-    @ddt.unpack
-    def test_enterprise_course_enrollment_creation(
-            self,
-            enterprise_enrollment_exists,
-            course_in_catalog,
-            get_consent_url_mock,
-    ):
-        for mode in ('audit', 'honor', 'verified'):
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
-
-        catalog_integration = self.create_catalog_integration()
-        UserFactory(username=catalog_integration.service_username)
-
-        courses_in_catalog = [str(self.course.id)] if course_in_catalog else []
-        enterprise_enrollment = {'course_id': str(self.course.id)} if enterprise_enrollment_exists else {}
-
-        self.mock_course_discovery_api_for_catalog_contains(
-            catalog_id=1, course_run_ids=courses_in_catalog
-        )
-        self.mock_enterprise_course_enrollment_get_api(**enterprise_enrollment)
-        self.mock_enterprise_course_enrollment_post_api()
-        self.mock_enterprise_learner_api(enable_audit_enrollment=True)
-
-        get_consent_url_mock.return_value = 'http://appropriate-consent-url.com/'
-
-        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
-
-        response = self.client.post(url, self.POST_PARAMS_FOR_COURSE_MODE['audit'])
-
-        final_url = reverse('dashboard') if not course_in_catalog else 'http://appropriate-consent-url.com/'
-
-        self.assertRedirects(response, final_url, fetch_redirect_response=False)
-        if course_in_catalog:
-            if enterprise_enrollment_exists:
-                self.assertEquals(httpretty.last_request().method, 'GET')
-            else:
-                self.assertEquals(httpretty.last_request().method, 'POST')
-
-    @httpretty.activate
     @ddt.data(
         '',
         '1,,2',
@@ -380,7 +334,6 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         'unsupported': {'unsupported_mode': True},
     }
 
-    @httpretty.activate
     @ddt.data(
         ('audit', 'dashboard'),
         ('honor', 'dashboard'),
@@ -388,8 +341,6 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
     )
     @ddt.unpack
     def test_choose_mode_redirect(self, course_mode, expected_redirect):
-        self.mock_enterprise_learner_api()
-        self.mock_enterprise_course_enrollment_get_api()
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
             min_price = 0 if mode in ["honor", "audit"] else 1
@@ -412,38 +363,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
         self.assertRedirects(response, redirect_url)
 
-    @httpretty.activate
-    def test_choose_mode_audit_enroll_on_get(self):
-        """
-        Confirms that the learner will be enrolled in Audit track if it is the only possible option
-        """
-        self.mock_enterprise_learner_api()
-        self.mock_enterprise_course_enrollment_get_api()
-        # Create the course mode
-        audit_mode = 'audit'
-        CourseModeFactory.create(mode_slug=audit_mode, course_id=self.course.id, min_price=0)
-
-        # Assert learner is not enrolled in Audit track pre-POST
-        mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
-        self.assertIsNone(mode)
-        self.assertIsNone(is_active)
-
-        # Choose the audit mode (POST request)
-        choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
-        response = self.client.get(choose_track_url)
-
-        # Assert learner is enrolled in Audit track and sent to the dashboard
-        mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
-        self.assertEquals(mode, audit_mode)
-        self.assertTrue(is_active)
-
-        redirect_url = reverse('dashboard')
-        self.assertRedirects(response, redirect_url)
-
-    @httpretty.activate
     def test_choose_mode_audit_enroll_on_post(self):
-        self.mock_enterprise_learner_api()
-        self.mock_enterprise_course_enrollment_get_api()
         audit_mode = 'audit'
         # Create the course modes
         for mode in (audit_mode, 'verified'):
@@ -478,10 +398,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.assertEqual(mode, audit_mode)
         self.assertTrue(is_active)
 
-    @httpretty.activate
     def test_remember_donation_for_course(self):
-        self.mock_enterprise_learner_api()
-        self.mock_enterprise_course_enrollment_get_api()
         # Create the course modes
         CourseModeFactory.create(mode_slug='honor', course_id=self.course.id)
         CourseModeFactory.create(mode_slug='verified', course_id=self.course.id, min_price=1)
@@ -498,10 +415,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         expected_amount = decimal.Decimal(self.POST_PARAMS_FOR_COURSE_MODE['verified']['contribution'])
         self.assertEqual(actual_amount, expected_amount)
 
-    @httpretty.activate
     def test_successful_default_enrollment(self):
-        self.mock_enterprise_learner_api()
-        self.mock_enterprise_course_enrollment_get_api()
         # Create the course modes
         for mode in (CourseMode.DEFAULT_MODE_SLUG, 'verified'):
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
@@ -523,10 +437,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.assertEqual(mode, CourseMode.DEFAULT_MODE_SLUG)
         self.assertEqual(is_active, True)
 
-    @httpretty.activate
     def test_unsupported_enrollment_mode_failure(self):
-        self.mock_enterprise_learner_api()
-        self.mock_enterprise_course_enrollment_get_api()
         # Create the supported course modes
         for mode in ('honor', 'verified'):
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
