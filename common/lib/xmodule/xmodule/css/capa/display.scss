@@ -291,6 +291,7 @@ div.problem {
 
     legend {
       margin-bottom: $baseline;
+      display: inline-block;
     }
 
     legend + .question-description {
