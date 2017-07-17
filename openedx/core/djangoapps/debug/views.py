@@ -7,12 +7,7 @@ from django.http import HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from edxmako.shortcuts import render_to_response
 from mako.exceptions import TopLevelLookupException
-from openedx.core.djangoapps.util.user_messages import (
-    register_error_message,
-    register_info_message,
-    register_success_message,
-    register_warning_message,
-)
+from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 
 
 def show_reference_template(request, template):
@@ -40,10 +35,10 @@ def show_reference_template(request, template):
 
         # Add some messages to the course skeleton pages
         if u'course-skeleton.html' in request.path:
-            register_info_message(request, _('This is a test message'))
-            register_success_message(request, _('This is a success message'))
-            register_warning_message(request, _('This is a test warning'))
-            register_error_message(request, _('This is a test error'))
+            PageLevelMessages.register_info_message(request, _('This is a test message'))
+            PageLevelMessages.register_success_message(request, _('This is a success message'))
+            PageLevelMessages.register_warning_message(request, _('This is a test warning'))
+            PageLevelMessages.register_error_message(request, _('This is a test error'))
 
         return render_to_response(template, context)
     except TopLevelLookupException:

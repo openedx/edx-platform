@@ -14,12 +14,12 @@ There are two common use cases:
    used to show a success message to the use.
 """
 
+from abc import abstractmethod
 from enum import Enum
 
 from django.contrib import messages
-from openedx.core.djangolib.markup import Text
-
-EDX_USER_MESSAGE_TAG = 'edx-user-message'
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import Text, HTML
 
 
 class UserMessageType(Enum):
@@ -49,7 +49,7 @@ ICON_CLASSES = {
 
 class UserMessage():
     """
-    Representation of a message to be shown to a user
+    Representation of a message to be shown to a user.
     """
     def __init__(self, type, message_html):
         assert isinstance(type, UserMessageType)
@@ -67,71 +67,124 @@ class UserMessage():
     def icon_class(self):
         """
         Returns the CSS icon class representing the message type.
-        Returns:
         """
         return ICON_CLASSES[self.type]
 
 
-def register_user_message(request, message_type, message, title=None):
+class UserMessageCollection():
     """
-    Register a message to be shown to the user in the next page.
+    A collection of messages to be shown to a user.
     """
-    assert isinstance(message_type, UserMessageType)
-    messages.add_message(request, message_type.value, Text(message), extra_tags=EDX_USER_MESSAGE_TAG)
-
-
-def register_info_message(request, message, **kwargs):
-    """
-    Registers an information message to be shown to the user.
-    """
-    register_user_message(request, UserMessageType.INFO, message, **kwargs)
-
-
-def register_success_message(request, message, **kwargs):
-    """
-    Registers a success message to be shown to the user.
-    """
-    register_user_message(request, UserMessageType.SUCCESS, message, **kwargs)
-
-
-def register_warning_message(request, message, **kwargs):
-    """
-    Registers a warning message to be shown to the user.
-    """
-    register_user_message(request, UserMessageType.WARNING, message, **kwargs)
-
-
-def register_error_message(request, message, **kwargs):
-    """
-    Registers an error message to be shown to the user.
-    """
-    register_user_message(request, UserMessageType.ERROR, message, **kwargs)
-
-
-def user_messages(request):
-    """
-    Returns any outstanding user messages.
-
-    Note: this function also marks these messages as being complete
-    so they won't be returned in the next request.
-    """
-    def _get_message_type_for_level(level):
+    @classmethod
+    @abstractmethod
+    def get_namespace(self):
         """
-        Returns the user message type associated with a level.
-        """
-        for __, type in UserMessageType.__members__.items():
-            if type.value is level:
-                return type
-        raise 'Unable to find UserMessageType for level {level}'.format(level=level)
+        Returns the namespace of the message collection.
 
-    def _create_user_message(message):
+        The name is used to namespace the subset of django messages.
+        For example, return 'course_home_messages'.
         """
-        Creates a user message from a Django message.
-        """
-        return UserMessage(
-            type=_get_message_type_for_level(message.level),
-            message_html=unicode(message.message),
-        )
+        raise NotImplementedError('Subclasses must define a namespace for messages.')
 
-    django_messages = messages.get_messages(request)
-    return (_create_user_message(message) for message in django_messages if EDX_USER_MESSAGE_TAG in message.tags)
+    @classmethod
+    def get_message_html(self, body_html, title=None):
+        """
+        Returns the entire HTML snippet for the message.
+
+        Classes that extend this base class can override the message styling
+        by implementing their own version of this function. Messages that do
+        not use a title can just pass the body_html.
+        """
+        if title:
+            return Text(_('{header_open}{title}{header_close}{body}')).format(
+                header_open=HTML('<div class="message-header">'),
+                title=title,
+                body=body_html,
+                header_close=HTML('</div>')
+            )
+        return body_html
+
+    @classmethod
+    def register_user_message(self, request, message_type, body_html, title=None):
+        """
+        Register a message to be shown to the user in the next page.
+
+        Arguments:
+            message_type (UserMessageType): the user message type
+            body_html (str): body of the message in html format
+            title (str): optional title for the message as plain text
+        """
+        assert isinstance(message_type, UserMessageType)
+        message = Text(self.get_message_html(body_html, title))
+        messages.add_message(request, message_type.value, Text(message), extra_tags=self.get_namespace())
+
+    @classmethod
+    def register_info_message(self, request, message, **kwargs):
+        """
+        Registers an information message to be shown to the user.
+        """
+        self.register_user_message(request, UserMessageType.INFO, message, **kwargs)
+
+    @classmethod
+    def register_success_message(self, request, message, **kwargs):
+        """
+        Registers a success message to be shown to the user.
+        """
+        self.register_user_message(request, UserMessageType.SUCCESS, message, **kwargs)
+
+    @classmethod
+    def register_warning_message(self, request, message, **kwargs):
+        """
+        Registers a warning message to be shown to the user.
+        """
+        self.register_user_message(request, UserMessageType.WARNING, message, **kwargs)
+
+    @classmethod
+    def register_error_message(self, request, message, **kwargs):
+        """
+        Registers an error message to be shown to the user.
+        """
+        self.register_user_message(request, UserMessageType.ERROR, message, **kwargs)
+
+    @classmethod
+    def user_messages(self, request):
+        """
+        Returns any outstanding user messages.
+
+        Note: this function also marks these messages as being complete
+        so they won't be returned in the next request.
+        """
+        def _get_message_type_for_level(level):
+            """
+            Returns the user message type associated with a level.
+            """
+            for __, type in UserMessageType.__members__.items():
+                if type.value is level:
+                    return type
+            raise 'Unable to find UserMessageType for level {level}'.format(level=level)
+
+        def _create_user_message(message):
+            """
+            Creates a user message from a Django message.
+            """
+            return UserMessage(
+                type=_get_message_type_for_level(message.level),
+                message_html=unicode(message.message),
+            )
+
+        django_messages = messages.get_messages(request)
+        return (_create_user_message(message) for message in django_messages if self.get_namespace() in message.tags)
+
+
+class PageLevelMessages(UserMessageCollection):
+    """
+    This set of messages appears as top page level messages.
+    """
+    NAMESPACE = 'page_level_messages'
+
+    @classmethod
+    def get_namespace(self):
+        """
+        Returns the namespace of the message collection.
+        """
+        return self.NAMESPACE

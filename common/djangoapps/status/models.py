@@ -26,10 +26,10 @@ class GlobalStatusMessage(ConfigurationModel):
         msg = self.message
         if course_key:
             try:
-                course_message = self.coursemessage_set.get(course_key=course_key)
-                # Don't add the message if course_message is blank.
-                if course_message:
-                    msg = u"{} <br /> {}".format(msg, course_message.message)
+                course_home_message = self.coursemessage_set.get(course_key=course_key)
+                # Don't add the message if course_home_message is blank.
+                if course_home_message:
+                    msg = u"{} <br /> {}".format(msg, course_home_message.message)
             except CourseMessage.DoesNotExist:
                 # We don't have a course-specific message, so pass.
                 pass
