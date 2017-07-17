@@ -82,7 +82,7 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.util.user_messages import register_warning_message
+from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
@@ -456,7 +456,7 @@ class CourseTabView(EdxFragmentView):
         is_enrolled = CourseEnrollment.is_enrolled(request.user, course_key)
         is_staff = has_access(request.user, 'staff', course_key)
         if request.user.is_anonymous():
-            register_warning_message(
+            PageLevelMessages.register_warning_message(
                 request,
                 Text(_("To see course content, {sign_in_link} or {register_link}.")).format(
                     sign_in_link=HTML('<a href="/login?next={current_url}">{sign_in_label}</a>').format(
@@ -470,7 +470,7 @@ class CourseTabView(EdxFragmentView):
                 )
             )
         elif not is_enrolled and not is_staff:
-            register_warning_message(
+            PageLevelMessages.register_warning_message(
                 request,
                 Text(_('You must be enrolled in the course to see course content. {enroll_link}.')).format(
                     enroll_link=HTML('<a href="{url_to_enroll}">{enroll_link_label}</a>').format(

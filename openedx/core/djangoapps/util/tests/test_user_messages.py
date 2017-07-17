@@ -10,15 +10,7 @@ from django.test import RequestFactory
 from openedx.core.djangolib.markup import HTML, Text
 from student.tests.factories import UserFactory
 
-from ..user_messages import (
-    register_error_message,
-    register_info_message,
-    register_success_message,
-    register_user_message,
-    register_warning_message,
-    user_messages,
-    UserMessageType,
-)
+from ..user_messages import PageLevelMessages, UserMessageType
 
 TEST_MESSAGE = 'Test message'
 
@@ -26,7 +18,7 @@ TEST_MESSAGE = 'Test message'
 @ddt.ddt
 class UserMessagesTestCase(TestCase):
     """
-    Unit tests for user messages.
+    Unit tests for page level user messages.
     """
     def setUp(self):
         super(UserMessagesTestCase, self).setUp()
@@ -46,8 +38,8 @@ class UserMessagesTestCase(TestCase):
         """
         Verifies that a user message is escaped correctly.
         """
-        register_user_message(self.request, UserMessageType.INFO, message)
-        messages = list(user_messages(self.request))
+        PageLevelMessages.register_user_message(self.request, UserMessageType.INFO, message)
+        messages = list(PageLevelMessages.user_messages(self.request))
         self.assertEqual(len(messages), 1)
         self.assertEquals(messages[0].message_html, expected_message_html)
 
@@ -62,17 +54,17 @@ class UserMessagesTestCase(TestCase):
         """
         Verifies that a user message returns the correct CSS and icon classes.
         """
-        register_user_message(self.request, message_type, TEST_MESSAGE)
-        messages = list(user_messages(self.request))
+        PageLevelMessages.register_user_message(self.request, message_type, TEST_MESSAGE)
+        messages = list(PageLevelMessages.user_messages(self.request))
         self.assertEqual(len(messages), 1)
         self.assertEquals(messages[0].css_class, expected_css_class)
         self.assertEquals(messages[0].icon_class, expected_icon_class)
 
     @ddt.data(
-        (register_error_message, UserMessageType.ERROR),
-        (register_info_message, UserMessageType.INFO),
-        (register_success_message, UserMessageType.SUCCESS),
-        (register_warning_message, UserMessageType.WARNING),
+        (PageLevelMessages.register_error_message, UserMessageType.ERROR),
+        (PageLevelMessages.register_info_message, UserMessageType.INFO),
+        (PageLevelMessages.register_success_message, UserMessageType.SUCCESS),
+        (PageLevelMessages.register_warning_message, UserMessageType.WARNING),
     )
     @ddt.unpack
     def test_message_type(self, register_message_function, expected_message_type):
@@ -80,6 +72,6 @@ class UserMessagesTestCase(TestCase):
         Verifies that each user message function returns the correct type.
         """
         register_message_function(self.request, TEST_MESSAGE)
-        messages = list(user_messages(self.request))
+        messages = list(PageLevelMessages.user_messages(self.request))
         self.assertEqual(len(messages), 1)
         self.assertEquals(messages[0].type, expected_message_type)
