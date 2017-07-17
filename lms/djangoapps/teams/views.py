@@ -499,7 +499,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         data = request.data.copy()
-        data['course_id'] = course_key
+        data['course_id'] = unicode(course_key)
 
         serializer = CourseTeamCreationSerializer(data=data)
         add_serializer_errors(serializer, data, field_errors)

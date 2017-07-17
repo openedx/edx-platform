@@ -454,7 +454,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         ("country", "GB", "XY", u'"XY" is not a valid choice.'),
         ("year_of_birth", 2009, "not_an_int", u"A valid integer is required."),
         ("name", "bob", "z" * 256, u"Ensure this value has at most 255 characters (it has 256)."),
-        ("name", u"ȻħȺɍłɇs", "z   ", "The name field must be at least 2 characters long."),
+        ("name", u"ȻħȺɍłɇs", "z   ", u"The name field must be at least 2 characters long."),
         ("goals", "Smell the roses"),
         ("mailing_address", "Sesame Street"),
         # Note that we store the raw data, so it is up to client to escape the HTML.
@@ -677,16 +677,25 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             self.assertItemsEqual(response.data["language_proficiencies"], proficiencies)
 
     @ddt.data(
-        (u"not_a_list", {u'non_field_errors': [u'Expected a list of items but got type "unicode".']}),
-        ([u"not_a_JSON_object"], [{u'non_field_errors': [u'Invalid data. Expected a dictionary, but got unicode.']}]),
-        ([{}], [OrderedDict([('code', [u'This field is required.'])])]),
+        (
+            u"not_a_list",
+            {u'non_field_errors': [u'Expected a list of items but got type "unicode".']}
+        ),
+        (
+            [u"not_a_JSON_object"],
+            [{u'non_field_errors': [u'Invalid data. Expected a dictionary, but got unicode.']}]
+        ),
+        (
+            [{}],
+            [{'code': [u'This field is required.']}]
+        ),
         (
             [{u"code": u"invalid_language_code"}],
-            [OrderedDict([('code', [u'"invalid_language_code" is not a valid choice.'])])]
+            [{'code': [u'"invalid_language_code" is not a valid choice.']}]
         ),
         (
             [{u"code": u"kw"}, {u"code": u"el"}, {u"code": u"kw"}],
-            ['The language_proficiencies field must consist of unique languages']
+            [u'The language_proficiencies field must consist of unique languages']
         ),
     )
     @ddt.unpack
