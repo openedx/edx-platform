@@ -526,7 +526,8 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         self.assertEqual(enrollment_mode, 'verified')
 
 
-class CourseWikiTest(UniqueCourseTest):
+@attr('a11y')
+class CourseWikiA11yTest(UniqueCourseTest):
     """
     Tests that verify the course wiki.
     """
@@ -535,7 +536,7 @@ class CourseWikiTest(UniqueCourseTest):
         """
         Initialize pages and install a course fixture.
         """
-        super(CourseWikiTest, self).setUp()
+        super(CourseWikiA11yTest, self).setUp()
 
         # self.course_info['number'] must be shorter since we are accessing the wiki. See TNL-1751
         self.course_info['number'] = self.unique_id[0:6]
@@ -562,41 +563,20 @@ class CourseWikiTest(UniqueCourseTest):
         self.course_wiki_page.open_editor()
         self.course_wiki_edit_page.wait_for_page()
 
-    @attr(shard=1)
-    def test_edit_course_wiki(self):
-        """
-        Wiki page by default is editable for students.
-
-        After accessing the course wiki,
-        Replace the content of the default page
-        Confirm new content has been saved
-
-        """
-        content = "hello"
-        self._open_editor()
-        self.course_wiki_edit_page.replace_wiki_content(content)
-        self.assertEqual(content, self.course_wiki_edit_page.get_wiki_editor_content())
-        self.course_wiki_edit_page.save_wiki_content()
-        actual_content = unicode(self.course_wiki_page.q(css='.wiki-article p').text[0])
-        self.assertEqual(content, actual_content)
-
-    @attr('a11y')
-    def test_view_a11y(self):
+    def test_view(self):
         """
         Verify the basic accessibility of the wiki page as initially displayed.
         """
         self.course_wiki_page.a11y_audit.check_for_accessibility_errors()
 
-    @attr('a11y')
-    def test_edit_a11y(self):
+    def test_edit(self):
         """
         Verify the basic accessibility of edit wiki page.
         """
         self._open_editor()
         self.course_wiki_edit_page.a11y_audit.check_for_accessibility_errors()
 
-    @attr('a11y')
-    def test_changes_a11y(self):
+    def test_changes(self):
         """
         Verify the basic accessibility of changes wiki page.
         """
@@ -605,8 +585,7 @@ class CourseWikiTest(UniqueCourseTest):
         history_page.wait_for_page()
         history_page.a11y_audit.check_for_accessibility_errors()
 
-    @attr('a11y')
-    def test_children_a11y(self):
+    def test_children(self):
         """
         Verify the basic accessibility of changes wiki page.
         """
