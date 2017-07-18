@@ -5,6 +5,7 @@ import json
 import pickle
 from datetime import datetime
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.utils.timezone import UTC
@@ -17,13 +18,16 @@ from courseware.masquerade import (
     CourseMasquerade,
     MasqueradingKeyValueStore,
     get_masquerading_user_group,
-    handle_ajax,
-    setup_masquerade
 )
 from courseware.tests.factories import StaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangoapps.user_api.preferences.api import (
+    get_user_preference,
+    set_user_preference
+)
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -311,6 +315,22 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         progress = '%s/%s' % (str(json_data['current_score']), str(json_data['total_possible']))
         return progress
 
+    def assertExpectedLanguageInPreference(self, user, expected_language_code):
+        """
+        This method is a custom assertion verifies that a given user has expected
+        language code in the preference and in cookies.
+
+        Arguments:
+            user: User model instance
+            expected_language_code: string indicating a language code
+        """
+        self.assertEqual(
+            get_user_preference(user, LANGUAGE_KEY), expected_language_code
+        )
+        self.assertEqual(
+            self.client.cookies[settings.LANGUAGE_COOKIE].value, expected_language_code
+        )
+
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_masquerade_as_specific_user_on_self_paced(self):
         """
@@ -374,6 +394,31 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         # Verify the student state did not change.
         self.login_student()
         self.assertEqual(self.get_progress_detail(), u'2/2')
+
+    def test_masquerading_with_language_preference(self):
+        """
+        Tests that masquerading as a specific user for the course does not update preference language
+        for the staff.
+
+        Login as a staff user and set user's language preference to english and visit the courseware page.
+        Set masquerade to view same page as a specific student having different language preference and
+        revisit the courseware page.
+        """
+        english_language_code = 'en'
+        set_user_preference(self.test_user, preference_key=LANGUAGE_KEY, preference_value=english_language_code)
+        self.login_staff()
+
+        # Reload the page and check we have expected language preference in system and in cookies.
+        self.get_courseware_page()
+        self.assertExpectedLanguageInPreference(self.test_user, english_language_code)
+
+        # Set student language preference and set masquerade to view same page the student.
+        set_user_preference(self.student_user, preference_key=LANGUAGE_KEY, preference_value='es-419')
+        self.update_masquerade(role='student', user_name=self.student_user.username)
+
+        # Reload the page and check we have expected language preference in system and in cookies.
+        self.get_courseware_page()
+        self.assertExpectedLanguageInPreference(self.test_user, english_language_code)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_masquerade_as_specific_student_course_info(self):
