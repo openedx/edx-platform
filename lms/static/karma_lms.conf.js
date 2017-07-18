@@ -31,14 +31,18 @@ var options = {
         {pattern: 'course_search/**/!(*spec).js'},
         {pattern: 'discussion/js/**/!(*spec).js'},
         {pattern: 'js/**/!(*spec|djangojs).js'},
+        {pattern: 'learner_profile/**/!(*spec).js'},
         {pattern: 'lms/js/**/!(*spec).js'},
         {pattern: 'support/js/**/!(*spec).js'},
         {pattern: 'teams/js/**/!(*spec).js'}
     ],
 
     specFiles: [
-        {pattern: '../**/*spec.js'},
-        {pattern: 'course_experience/js/**/*_spec.js', webpack: true}
+        // Define the Webpack-built spec files first
+        {pattern: 'course_experience/js/**/*_spec.js', webpack: true},
+
+        // Add all remaining spec files to be used without Webpack
+        {pattern: '../**/*spec.js'}
     ],
 
     fixtureFiles: [

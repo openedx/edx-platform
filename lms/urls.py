@@ -604,15 +604,6 @@ urlpatterns += (
         include('student_account.urls')
     ),
 
-    # Student profile
-    url(
-        r'^u/{username_pattern}$'.format(
-            username_pattern=settings.USERNAME_PATTERN,
-        ),
-        'student_profile.views.learner_profile',
-        name='learner_profile',
-    ),
-
     # Student Notes
     url(
         r'^courses/{}/edxnotes'.format(
@@ -650,6 +641,12 @@ urlpatterns += (
             settings.COURSE_ID_PATTERN,
         ),
         include('openedx.features.course_search.urls'),
+    ),
+
+    # Learner profile
+    url(
+        r'^u/',
+        include('openedx.features.learner_profile.urls'),
     ),
 )
 
