@@ -4,8 +4,6 @@ This module contains all general use or cross-use handlers.
 import logging
 
 from celery.task import task
-from celery_utils.logged_task import LoggedTask
-from celery_utils.persist_on_failure import PersistOnFailureTask
 from django.dispatch import receiver
 
 from certificates.models import CertificateGenerationCourseSetting
@@ -27,14 +25,7 @@ def _listen_for_course_pacing_changed(sender, course_key, course_self_paced, **k
     ))
 
 
-class _BaseSelfCertTask(PersistOnFailureTask, LoggedTask):  # pylint: disable=abstract-method
-    """
-    Include persistence features, as well as logging of task invocation.
-    """
-    abstract = True
-
-
-@task(base=_BaseSelfCertTask)
+@task
 def toggle_self_generated_certs(course_key, course_self_paced):
     """
     Enable or disable self-generated certificates for a course according to pacing.
