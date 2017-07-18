@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from rest_framework.test import APIRequestFactory, APITestCase, force_authenticate
 
+from bulk_enroll.serializers import BulkEnrollmentSerializer
 from bulk_enroll.views import BulkEnrollView
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from microsite_configuration import microsite
@@ -73,6 +74,22 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         response = self.view(request)
         response.render()
         return response
+
+    def test_course_list_serializer(self):
+        """
+        Test that the course serializer will work when passed a string or list.
+
+        Internally, DRF passes the data into the value conversion method as a list instead of
+        a string, so StringListField needs to work with both.
+        """
+        for key in [self.course_key, [self.course_key]]:
+            serializer = BulkEnrollmentSerializer(data={
+                'identifiers': 'percivaloctavius',
+                'action': 'enroll',
+                'email_students': False,
+                'courses': key,
+            })
+            self.assertTrue(serializer.is_valid())
 
     def test_non_staff(self):
         """ Test that non global staff users are forbidden from API use. """
