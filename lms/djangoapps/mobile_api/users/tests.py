@@ -18,7 +18,7 @@ from certificates.api import generate_user_certificates
 from certificates.models import CertificateStatuses
 from certificates.tests.factories import GeneratedCertificateFactory
 from course_modes.models import CourseMode
-from courseware.access_response import MilestoneError, StartDateError, VisibilityError
+from courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from mobile_api.testutils import (
     MobileAPITestCase,
@@ -155,7 +155,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         ]
 
         expected_error_codes = [
-            MilestoneError().error_code,  # 'unfulfilled_milestones'
+            MilestoneAccessError().error_code,  # 'unfulfilled_milestones'
             StartDateError(self.NEXT_WEEK).error_code,  # 'course_not_started'
             VisibilityError().error_code,  # 'not_visible_to_user'
             None,
