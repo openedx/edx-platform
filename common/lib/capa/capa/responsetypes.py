@@ -1602,8 +1602,9 @@ class NumericalResponse(LoncapaResponse):
             student_float = evaluator({}, {}, student_answer)
         except UndefinedVariable as undef_var:
             raise StudentInputError(
-                _(u"Answers can include numerals, operation signs, and a few specific characters, "
-                  u"such as the constants e and i.")
+                _(u"You may not use variables ({bad_variables}) in numerical problems.").format(
+                    bad_variables=undef_var.message,
+                )
             )
         except ValueError as val_err:
             if 'factorial' in val_err.message:
@@ -3108,8 +3109,7 @@ class FormulaResponse(LoncapaResponse):
                     cgi.escape(answer)
                 )
                 raise StudentInputError(
-                    _(u"Answers can include numerals, operation signs, and a few specific characters, "
-                      u"such as the constants e and i.")
+                    _("Invalid input: {bad_input} not permitted in answer.").format(bad_input=err.message)
                 )
             except ValueError as err:
                 if 'factorial' in err.message:
