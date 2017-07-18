@@ -22,6 +22,7 @@ from edxmako.shortcuts import render_to_string
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.fragment import Fragment
+from xblock.scorable import ScorableXBlockMixin
 
 from xmodule.seq_module import SequenceModule
 from xmodule.vertical_block import VerticalBlock
@@ -383,9 +384,13 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
         'is_released': is_released,
         'has_instructor_access': has_instructor_access,
         'can_reset_attempts': 'attempts' in block.fields,
-        'can_rescore_problem': any(hasattr(block, rescore) for rescore in ['rescore_problem', 'rescore']),
+        'can_rescore_problem': hasattr(block, 'rescore'),
+        'can_override_problem_score': isinstance(block, ScorableXBlockMixin),
         'disable_staff_debug_info': disable_staff_debug_info,
     }
+    if isinstance(block, ScorableXBlockMixin):
+        staff_context['max_problem_score'] = block.max_score()
+
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
 
 
