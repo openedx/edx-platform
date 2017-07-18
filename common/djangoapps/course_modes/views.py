@@ -25,7 +25,6 @@ from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.features.enterprise_support import api as enterprise_api
-from openedx.features.enterprise_support.api import get_enterprise_consent_url
 from student.models import CourseEnrollment
 from third_party_auth.decorators import tpa_hint_ends_existing_session
 from util import organizations_helpers as organization_api
@@ -108,16 +107,6 @@ class ChooseModeView(View):
         # If there isn't a verified mode available, then there's nothing
         # to do on this page.  Send the user to the dashboard.
         if not CourseMode.has_verified_mode(modes):
-            # If the learner has arrived at this screen via the traditional enrollment workflow,
-            # then they should already be enrolled in an audit mode for the course, assuming one has
-            # been configured.  However, alternative enrollment workflows have been introduced into the
-            # system, such as third-party discovery.  These workflows result in learners arriving
-            # directly at this screen, and they will not necessarily be pre-enrolled in the audit mode.
-            # In this particular case, Audit is the ONLY option available, and thus we need to ensure
-            # that the learner is truly enrolled before we redirect them away to the dashboard.
-            if len(modes) == 1 and modes.get(CourseMode.AUDIT):
-                CourseEnrollment.enroll(request.user, course_key, CourseMode.AUDIT)
-                return redirect(self._get_redirect_url_for_audit_enrollment(request, course_id))
             return redirect(reverse('dashboard'))
 
         # If a user has already paid, redirect them to the dashboard.
@@ -252,14 +241,19 @@ class ChooseModeView(View):
         allowed_modes = CourseMode.modes_for_course_dict(course_key)
         if requested_mode not in allowed_modes:
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
-        if requested_mode in CourseMode.AUDIT_MODES:
+
+        if requested_mode == 'audit':
             # If the learner has arrived at this screen via the traditional enrollment workflow,
             # then they should already be enrolled in an audit mode for the course, assuming one has
             # been configured.  However, alternative enrollment workflows have been introduced into the
             # system, such as third-party discovery.  These workflows result in learners arriving
             # directly at this screen, and they will not necessarily be pre-enrolled in the audit mode.
+            CourseEnrollment.enroll(request.user, course_key, CourseMode.AUDIT)
+            return redirect(reverse('dashboard'))
+
+        if requested_mode == 'honor':
             CourseEnrollment.enroll(user, course_key, mode=requested_mode)
-            return redirect(self._get_redirect_url_for_audit_enrollment(request, course_id))
+            return redirect(reverse('dashboard'))
 
         mode_info = allowed_modes[requested_mode]
 
@@ -289,44 +283,6 @@ class ChooseModeView(View):
                     kwargs={'course_id': unicode(course_key)}
                 )
             )
-
-    def _get_redirect_url_for_audit_enrollment(self, request, course_id):
-        """
-        After a user has been enrolled in a course in an audit mode, determine the appropriate location
-        to which they ought to be redirected, bearing in mind enterprise data sharing consent considerations.
-        """
-        enterprise_learner_data = enterprise_api.get_enterprise_learner_data(site=request.site, user=request.user)
-
-        if enterprise_learner_data:
-            enterprise_learner = enterprise_learner_data[0]
-            # If we have an enterprise learner, check to see if the current course is in the enterprise's catalog.
-            is_course_in_enterprise_catalog = enterprise_api.is_course_in_enterprise_catalog(
-                site=request.site,
-                course_id=course_id,
-                enterprise_catalog_id=enterprise_learner['enterprise_customer']['catalog']
-            )
-            # If the course is in the catalog, check for an existing Enterprise enrollment
-            if is_course_in_enterprise_catalog:
-                client = enterprise_api.EnterpriseApiClient()
-                if not client.get_enterprise_course_enrollment(enterprise_learner['id'], course_id):
-                    # If there's no existing Enterprise enrollment, create one.
-                    client.post_enterprise_course_enrollment(request.user.username, course_id, None)
-                # Check if consent is required, and generate a redirect URL to the
-                # consent service if so; this function returns None if consent
-                # is not required or has already been granted.
-                consent_url = get_enterprise_consent_url(
-                    request,
-                    course_id,
-                    user=request.user,
-                    return_to='dashboard',
-                    course_specific_return=False,
-                )
-                # If we got a redirect URL for consent, go there.
-                if consent_url:
-                    return consent_url
-
-        # If the enrollment isn't Enterprise-linked, or if consent isn't necessary, go to the Dashboard.
-        return reverse('dashboard')
 
     def _get_requested_mode(self, request_dict):
         """Get the user's requested mode
