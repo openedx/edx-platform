@@ -501,7 +501,7 @@ html.video-fullscreen {
         }
       }
 
-      .vert > .xblock-student_view {
+      .vert {
         @extend .clearfix;
         border-bottom: 1px solid #ddd;
         margin-bottom: ($baseline*0.75);
