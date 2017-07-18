@@ -7,6 +7,7 @@ import logging
 import re
 import json
 import datetime
+import traceback
 
 from pytz import UTC
 from collections import defaultdict
@@ -157,7 +158,19 @@ class ActiveBulkThread(threading.local):
     """
     def __init__(self, bulk_ops_record_type, **kwargs):
         super(ActiveBulkThread, self).__init__(**kwargs)
-        self.records = defaultdict(bulk_ops_record_type)
+        self._records = defaultdict(bulk_ops_record_type)
+        self.CMS_LEAK_DEBUG_GLOBAL = True  # only log once per process
+
+    @property
+    def records(self):
+        if self.CMS_LEAK_DEBUG_GLOBAL and len(self._records) > 2000:  # arbitrary limit, we peak around ~2750 on edx.org
+            log.info(
+                "EDUCATOR-768: The memory leak issue may be in progress. How we got here:\n{}".format(
+                    "".join(traceback.format_stack())
+                )
+            )
+            self.CMS_LEAK_DEBUG_GLOBAL = False
+        return self._records
 
 
 class BulkOperationsMixin(object):
