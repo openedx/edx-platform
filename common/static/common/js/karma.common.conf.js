@@ -41,6 +41,8 @@
 var path = require('path');
 var _ = require('underscore');
 var appRoot = path.join(__dirname, '../../../../');
+var webdriver = require('selenium-webdriver');
+var firefox = require('selenium-webdriver/firefox');
 var webpackConfig = require(path.join(appRoot, 'webpack.config.js'));
 
 delete webpackConfig.entry;
@@ -269,8 +271,15 @@ function getBaseConfig(config, useRequireJs) {
     };
 
     var hostname = 'localhost';
+    var port = 9876;
     if (process.env.hasOwnProperty('BOK_CHOY_HOSTNAME')) {
         hostname = process.env.BOK_CHOY_HOSTNAME;
+        if (hostname === 'edx.devstack.lms') {
+            port = 19876;
+        }
+        else {
+            port = 19877;
+        }
     }
 
     initFrameworks.$inject = ['config.files'];
@@ -296,7 +305,7 @@ function getBaseConfig(config, useRequireJs) {
             'karma-chrome-launcher',
             'karma-firefox-launcher',
             'karma-spec-reporter',
-            'karma-webdriver-launcher',
+            'karma-selenium-webdriver-launcher',
             'karma-webpack',
             'karma-sourcemap-loader',
             customPlugin
@@ -324,7 +333,7 @@ function getBaseConfig(config, useRequireJs) {
 
         // web server hostname and port
         hostname: hostname,
-        port: 9876,
+        port: port,
 
 
         // enable / disable colors in the output (reporters and logs)
@@ -354,12 +363,29 @@ function getBaseConfig(config, useRequireJs) {
                     'app.update.enabled': false
                 }
             },
+            ChromeDocker: {
+                base: 'SeleniumWebdriver',
+                browserName: 'chrome',
+                getDriver: function () {
+                    return new webdriver.Builder()
+                        .forBrowser('chrome')
+                        .usingServer('http://edx.devstack.chrome:4444/wd/hub')
+                        .build();
+                }
+            },
             FirefoxDocker: {
-                base: 'WebDriver',
+                base: 'SeleniumWebdriver',
                 browserName: 'firefox',
-                config: {
-                    hostname: 'edx.devstack.firefox',
-                    port: 4444
+                getDriver: function () {
+                    var options = new firefox.Options(),
+                        profile = new firefox.Profile();
+                    profile.setPreference('focusmanager.testmode', true);
+                    options.setProfile(profile);
+                    return new webdriver.Builder()
+                        .forBrowser('firefox')
+                        .usingServer('http://edx.devstack.firefox:4444/wd/hub')
+                        .setFirefoxOptions(options)
+                        .build();
                 }
             }
         },
