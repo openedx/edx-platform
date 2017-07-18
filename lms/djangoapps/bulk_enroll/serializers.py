@@ -8,10 +8,11 @@ from rest_framework import serializers
 
 class StringListField(serializers.ListField):
     def to_internal_value(self, data):
-        try:
-            return data[0].split(',')
-        except IndexError:
+        if not data:
             return []
+        if isinstance(data, list):
+            data = data[0]
+        return data.split(',')
 
 
 class BulkEnrollmentSerializer(serializers.Serializer):
