@@ -5,15 +5,13 @@ import re
 import logging
 
 from django.conf import settings
-from django.dispatch import Signal
 
 from xmodule.fields import Date
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangoapps.signals.signals import COURSE_PACING_CHANGE
 from openedx.core.lib.courses import course_image_url
 from xmodule.modulestore.django import modulestore
-
-COURSE_PACING_CHANGE = Signal(providing_args=["course_key", "course_self_paced"])
 
 
 # This list represents the attribute keys for a course's 'about' info.

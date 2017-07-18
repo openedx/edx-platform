@@ -3,10 +3,8 @@ Signal handler for enabling/disabling self-generated certificates based on the c
 """
 import logging
 
-from celery.task import task
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from opaque_keys.edx.keys import CourseKey
 
 from .config import waffle
 from certificates.models import \
@@ -16,7 +14,6 @@ from certificates.models import \
 from certificates.tasks import generate_certificate
 from courseware import courses
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
-from openedx.core.djangoapps.models.course_details import COURSE_PACING_CHANGE
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, LEARNER_NOW_VERIFIED
 from student.models import CourseEnrollment
 
@@ -52,24 +49,6 @@ def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # pyl
         user=instance.user.id,
         course=instance.course_id
     ))
-
-
-@receiver(COURSE_PACING_CHANGE, dispatch_uid="course_pacing_changed")
-def _listen_for_course_pacing_changed(sender, course_key, course_self_paced, **kwargs):  # pylint: disable=unused-argument
-    """
-    Catches the signal that course pacing has changed and enable/disable
-    the self-generated certificates according to course-pacing.
-    """
-    toggle_self_generated_certs.delay(unicode(course_key), course_self_paced)
-
-
-@task()
-def toggle_self_generated_certs(course_key, course_self_paced):
-    """
-    Enable or disable self-generated certificates for a course according to pacing.
-    """
-    course_key = CourseKey.from_string(course_key)
-    CertificateGenerationCourseSetting.set_enabled_for_course(course_key, course_self_paced)
 
 
 @receiver(COURSE_GRADE_NOW_PASSED, dispatch_uid="new_passing_learner")
