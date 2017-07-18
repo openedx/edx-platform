@@ -186,12 +186,13 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
     @ddt.data(
-        CourseUserType.ANONYMOUS,
-        CourseUserType.ENROLLED,
-        CourseUserType.UNENROLLED,
-        CourseUserType.UNENROLLED_STAFF,
+        [CourseUserType.ANONYMOUS, 'To see course content'],
+        [CourseUserType.ENROLLED, None],
+        [CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
+        [CourseUserType.UNENROLLED_STAFF, None],
     )
-    def test_home_page(self, user_type):
+    @ddt.unpack
+    def test_home_page(self, user_type, expected_message):
         self.user = self.create_user_for_course(self.course, user_type)
 
         # Render the course home page
@@ -212,15 +213,21 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, 'Learn About Verified Certificate', count=expected_count)
         self.assertContains(response, TEST_WELCOME_MESSAGE, count=expected_count)
 
+        # Verify that the expected message is shown to the user
+        self.assertContains(response, '<div class="user-messages">', count=1 if expected_message else 0)
+        if expected_message:
+            self.assertContains(response, expected_message)
+
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
     @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
     @ddt.data(
-        CourseUserType.ANONYMOUS,
-        CourseUserType.ENROLLED,
-        CourseUserType.UNENROLLED,
-        CourseUserType.UNENROLLED_STAFF,
+        [CourseUserType.ANONYMOUS, 'To see course content'],
+        [CourseUserType.ENROLLED, None],
+        [CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
+        [CourseUserType.UNENROLLED_STAFF, None],
     )
-    def test_home_page_not_unified(self, user_type):
+    @ddt.unpack
+    def test_home_page_not_unified(self, user_type, expected_message):
         """
         Verifies the course home tab when not unified.
         """
@@ -245,6 +252,11 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, TEST_CHAPTER_NAME, count=expected_count)
         self.assertContains(response, 'Start Course', count=expected_count)
         self.assertContains(response, 'Learn About Verified Certificate', count=expected_count)
+
+        # Verify that the expected message is shown to the user
+        self.assertContains(response, '<div class="user-messages">', count=1 if expected_message else 0)
+        if expected_message:
+            self.assertContains(response, expected_message)
 
     def test_sign_in_button(self):
         """
