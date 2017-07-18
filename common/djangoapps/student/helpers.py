@@ -2,6 +2,7 @@
 import logging
 import mimetypes
 import urllib
+import urlparse
 from datetime import datetime
 
 from django.conf import settings
@@ -16,6 +17,7 @@ from pytz import UTC
 import third_party_auth
 from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
 
 # Enumeration of per-course verification statuses
@@ -240,6 +242,8 @@ def get_next_url_for_login_page(request):
 
     Otherwise, we go to the ?next= query param or to the dashboard if nothing else is
     specified.
+
+    If THIRD_PARTY_AUTH_HINT is set, then `tpa_hint=<hint>` is added as a query parameter.
     """
     redirect_to = get_redirect_to(request)
     if not redirect_to:
@@ -247,6 +251,7 @@ def get_next_url_for_login_page(request):
             redirect_to = reverse('dashboard')
         except NoReverseMatch:
             redirect_to = reverse('home')
+
     if any(param in request.GET for param in POST_AUTH_PARAMS):
         # Before we redirect to next/dashboard, we need to handle auto-enrollment:
         params = [(param, request.GET[param]) for param in POST_AUTH_PARAMS if param in request.GET]
@@ -255,6 +260,23 @@ def get_next_url_for_login_page(request):
         # Note: if we are resuming a third party auth pipeline, then the next URL will already
         # be saved in the session as part of the pipeline state. That URL will take priority
         # over this one.
+
+    # Append a tpa_hint query parameter, if one is configured
+    tpa_hint = configuration_helpers.get_value(
+        "THIRD_PARTY_AUTH_HINT",
+        settings.FEATURES.get("THIRD_PARTY_AUTH_HINT", '')
+    )
+    if tpa_hint:
+        # Don't add tpa_hint if we're already in the TPA pipeline (prevent infinite loop),
+        # and don't overwrite any existing tpa_hint params (allow tpa_hint override).
+        running_pipeline = third_party_auth.pipeline.get(request)
+        (scheme, netloc, path, query, fragment) = list(urlparse.urlsplit(redirect_to))
+        if not running_pipeline and 'tpa_hint' not in query:
+            params = urlparse.parse_qs(query)
+            params['tpa_hint'] = [tpa_hint]
+            query = urllib.urlencode(params, doseq=True)
+            redirect_to = urlparse.urlunsplit((scheme, netloc, path, query, fragment))
+
     return redirect_to
 
 
