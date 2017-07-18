@@ -5,7 +5,7 @@ End-to-end tests for the LMS Instructor Dashboard.
 
 import ddt
 from bok_choy.promise import EmptyPromise
-from flaky import flaky
+from unittest import skip
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
@@ -396,6 +396,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Stop the timed exam.
         self.courseware_page.stop_timed_exam()
 
+    @skip("EDUCATOR-949")
     def test_can_add_remove_allowance(self):
         """
         Make sure that allowances can be added and removed.
@@ -425,7 +426,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Then, the added record should be visible
         self.assertTrue(allowance_section.is_allowance_record_visible)
 
-    @flaky  # See EDUCATOR-551
+    @skip("EDUCATOR-551, EDUCATOR-949")
     def test_can_reset_attempts(self):
         """
         Make sure that Exam attempts are visible and can be reset.
@@ -1374,7 +1375,7 @@ class StudentAdminTest(BaseInstructorDashboardTest):
         self.username, _ = self.log_in_as_instructor()
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
 
-    @flaky  # See EDUCATOR-552
+    @skip("EDUCATOR-552, EDUCATOR-949")
     def test_rescore_nonrescorable(self):
         student_admin_section = self.instructor_dashboard_page.select_student_admin(StudentSpecificAdmin)
         student_admin_section.set_student_email_or_username(self.username)
