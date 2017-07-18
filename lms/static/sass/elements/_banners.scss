@@ -51,6 +51,13 @@ $full-width-banner-margin: 20px;
 
     .user-messages {
         padding-top: $baseline;
+
+        // Hack: force override the global important rule
+        // that courseware links don't have an underline.
+        a:hover {
+            color: $link-color;
+            text-decoration: underline !important;
+        }
     }
 
     .alert {
