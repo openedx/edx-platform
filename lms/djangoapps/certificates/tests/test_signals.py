@@ -11,7 +11,7 @@ from certificates.models import \
     CertificateWhitelist, \
     GeneratedCertificate, \
     CertificateStatuses
-from certificates.signals import _listen_for_course_pacing_changed
+from openedx.core.djangoapps.signals.handlers import _listen_for_course_pacing_changed
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
