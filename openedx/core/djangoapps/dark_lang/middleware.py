@@ -130,14 +130,16 @@ class DarkLangMiddleware(object):
         """
         auth_user = request.user.is_authenticated()
 
-        if request.method == 'POST':
-            self.process_darklang_request(request)
-        elif auth_user:
+        if auth_user:
+            # If this is a post, process a preview language update if requested
+            if request.method == 'POST':
+                self.process_darklang_request(request)
+
             # Get the request user's dark lang preference
             preview_lang = get_user_preference(request.user, DARK_LANGUAGE_KEY)
 
+            # Set the session key to the requested preview lang, if set
             if preview_lang:
-                # Set the session key to the requested preview lang
                 request.session[LANGUAGE_SESSION_KEY] = preview_lang
 
     def process_darklang_request(self, request):
@@ -151,21 +153,17 @@ class DarkLangMiddleware(object):
             HttpResponse: View containing the form for setting the preview lang with the status
                 included in the context
         """
-        context = {
-            'disable_courseware_js': True,
-            'uses_bootstrap': True,
-        }
-        response = None
         if not DarkLangConfig.current().enabled:
-            register_error_message(request, _('Preview Language is currently disabled'))
-        elif 'set_language' in request.POST:
-            # Set the Preview Language
-            self._set_preview_language(request, context)
-        elif 'reset' in request.POST:
-            # Reset and clear the language preference
-            self._clear_preview_language(request, context)
+            return
 
-    def _set_preview_language(self, request, context):
+        if 'set_preview_lang' in request.POST:
+            # Set the Preview Language
+            self._set_preview_language(request)
+        elif 'reset_preview_lang' in request.POST:
+            # Reset and clear the language preference
+            self._clear_preview_language(request)
+
+    def _set_preview_language(self, request):
         """
         Set the Preview language
 
@@ -197,7 +195,7 @@ class DarkLangMiddleware(object):
                 )
             )
 
-    def _clear_preview_language(self, request, context):
+    def _clear_preview_language(self, request):
         """
         Clears the dark language preview
 
