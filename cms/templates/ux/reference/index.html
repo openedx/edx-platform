@@ -1,12 +1,9 @@
-## Override the default styles_version to the Pattern Library version (version 2)
-<%! main_css = "style-main-v2" %>
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/studio-main.css" %>
 
 <%page expression_filter="h"/>
-<%inherit file="../../base.html" />
 
-<%block name="view_notes">
-  <%include file="_note-usage.html" />
-</%block>
+<%inherit file="../../base.html" />
 
 <%block name="title">UX Style Reference</%block>
 <%block name="bodyclass">is-signedin course uploads view-container</%block>
@@ -16,22 +13,11 @@
     <div class="inner-wrapper">
         <div class="main-column">
             <article class="window unit-body">
-                <h1>UX Style Reference</h1>
+                <h2>UX Style Reference</h2>
 
-                <section>
-                    <h3>v1-style LMS Pages</h3>
-                    <ul>
-                    </ul>
-
-                    <h3>Pattern Library</h3>
-                    <ul>
-                        <li><a href="pattern-library/test.html">Test page</a></li>
-                    </ul>
-
-                    <h3>Bootstrap</h3>
-                    <ul>
-                    </ul>
-                </section>
+                <ul>
+                    <a href="bootstrap/test.html">Bootstrap Test Page</a>
+                </ul>
             </article>
         </div>
     </div>

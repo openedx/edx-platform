@@ -28,13 +28,14 @@ def show_reference_template(request, template):
     e.g. /template/ux/reference/index.html?name=Foo
     """
     try:
-        uses_bootstrap = u'/bootstrap/' in request.path
         uses_pattern_library = u'/pattern-library/' in request.path
         is_v1 = u'/v1/' in request.path
+        uses_bootstrap = not uses_pattern_library and not is_v1
         context = {
-            "disable_courseware_js": not is_v1,
-            "uses_pattern_library": uses_pattern_library,
-            "uses_bootstrap": uses_bootstrap,
+            'request': request,
+            'disable_courseware_js': not is_v1,
+            'uses_pattern_library': uses_pattern_library,
+            'uses_bootstrap': uses_bootstrap,
         }
         context.update(request.GET.dict())
 
@@ -47,4 +48,4 @@ def show_reference_template(request, template):
 
         return render_to_response(template, context)
     except TopLevelLookupException:
-        return HttpResponseNotFound("Couldn't find template {template}".format(template=template))
+        return HttpResponseNotFound('Missing template {template}'.format(template=template))
