@@ -2,7 +2,10 @@
 API views for Bulk Enrollment
 """
 import json
-from edx_rest_framework_extensions.authentication import JwtAuthentication
+from edx_rest_framework_extensions.authentication import (
+    JwtAuthentication,
+    BearerAuthentication
+)
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,7 +13,6 @@ from rest_framework.views import APIView
 from bulk_enroll.serializers import BulkEnrollmentSerializer
 from enrollment.views import EnrollmentUserThrottle
 from instructor.views.api import students_update_enrollment
-from openedx.core.lib.api.authentication import OAuth2Authentication
 from openedx.core.lib.api.permissions import IsStaff
 from util.disable_rate_limit import can_disable_rate_limit
 
@@ -53,9 +55,9 @@ class BulkEnrollView(APIView):
         enrollment)
     """
 
-    authentication_classes = JwtAuthentication, OAuth2Authentication
-    permission_classes = IsStaff,
-    throttle_classes = EnrollmentUserThrottle,
+    authentication_classes = (JwtAuthentication, BearerAuthentication,)
+    permission_classes = (IsStaff,)
+    throttle_classes = (EnrollmentUserThrottle,)
 
     def post(self, request):
         serializer = BulkEnrollmentSerializer(data=request.data)
