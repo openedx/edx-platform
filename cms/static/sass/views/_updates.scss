@@ -141,6 +141,11 @@
       background: none;
       padding: 0;
     }
+
+    img {
+      margin: $baseline/2;
+      max-width: 100%;
+    }
   }
 
 
