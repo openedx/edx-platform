@@ -385,7 +385,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
     def test_user_does_not_match_param(self):
         """
         The view should return status 404 if the enrollment username does not match the username of the user
-        making the request, unless the request is made by a superuser or with a server API key.
+        making the request, unless the request is made by a staff user or with a server API key.
         """
         CourseModeFactory.create(
             course_id=self.course.id,
@@ -403,9 +403,9 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         response = self.client.get(url, **{'HTTP_X_EDX_API_KEY': self.API_KEY})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # Verify superusers have access to this endpoint
-        superuser = UserFactory.create(password=self.PASSWORD, is_superuser=True)
-        self.client.login(username=superuser.username, password=self.PASSWORD)
+        # Verify staff have access to this endpoint
+        staff_user = UserFactory.create(password=self.PASSWORD, is_staff=True)
+        self.client.login(username=staff_user.username, password=self.PASSWORD)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
