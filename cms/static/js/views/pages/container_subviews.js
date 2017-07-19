@@ -32,30 +32,6 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
             render: function() {}
         });
 
-        var ContainerAccess = ContainerStateListenerView.extend({
-            initialize: function() {
-                ContainerStateListenerView.prototype.initialize.call(this);
-                this.template = this.loadTemplate('container-access');
-            },
-
-            shouldRefresh: function(model) {
-                return ViewUtils.hasChangedAttributes(model, ['has_partition_group_components', 'user_partitions']);
-            },
-
-            render: function() {
-                HtmlUtils.setHtml(
-                    this.$el,
-                    HtmlUtils.HTML(
-                        this.template({
-                            hasPartitionGroupComponents: this.model.get('has_partition_group_components'),
-                            userPartitionInfo: this.model.get('user_partition_info')
-                        })
-                    )
-                );
-                return this;
-            }
-        });
-
         var MessageView = ContainerStateListenerView.extend({
             initialize: function() {
                 ContainerStateListenerView.prototype.initialize.call(this);
@@ -122,7 +98,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
             onSync: function(model) {
                 if (ViewUtils.hasChangedAttributes(model, [
                     'has_changes', 'published', 'edited_on', 'edited_by', 'visibility_state',
-                    'has_explicit_staff_lock'
+                    'has_explicit_staff_lock', 'has_partition_group_components'
                 ])) {
                     this.render();
                 }
@@ -148,6 +124,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
                             releaseDateFrom: this.model.get('release_date_from'),
                             hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
                             staffLockFrom: this.model.get('staff_lock_from'),
+                            hasPartitionGroupComponents: this.model.get('has_partition_group_components'),
                             course: window.course,
                             HtmlUtils: HtmlUtils
                         })
@@ -293,10 +270,9 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
         });
 
         return {
-            MessageView: MessageView,
-            ViewLiveButtonController: ViewLiveButtonController,
-            Publisher: Publisher,
-            PublishHistory: PublishHistory,
-            ContainerAccess: ContainerAccess
+            'MessageView': MessageView,
+            'ViewLiveButtonController': ViewLiveButtonController,
+            'Publisher': Publisher,
+            'PublishHistory': PublishHistory
         };
     }); // end define();

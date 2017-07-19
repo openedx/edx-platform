@@ -6,9 +6,9 @@ from common.test.acceptance.pages.common.utils import click_css
 from common.test.acceptance.tests.helpers import get_selected_option_text, select_option_by_text
 
 
-class BaseXBlockEditorView(PageObject):
+class BaseComponentEditorView(PageObject):
     """
-    A base :class:`.PageObject` for the xblock and visibility editors.
+    A base :class:`.PageObject` for the component and visibility editors.
 
     This class assumes that the editor is our default editor as displayed for xmodules.
     """
@@ -20,7 +20,7 @@ class BaseXBlockEditorView(PageObject):
             browser (selenium.webdriver): The Selenium-controlled browser that this page is loaded in.
             locator (str): The locator that identifies which xblock this :class:`.xblock-editor` relates to.
         """
-        super(BaseXBlockEditorView, self).__init__(browser)
+        super(BaseComponentEditorView, self).__init__(browser)
         self.locator = locator
 
     def is_browser_on_page(self):
@@ -28,7 +28,7 @@ class BaseXBlockEditorView(PageObject):
 
     def _bounded_selector(self, selector):
         """
-        Return `selector`, but limited to this particular `XBlockEditorView` context
+        Return `selector`, but limited to this particular `ComponentEditorView` context
         """
         return '{}[data-locator="{}"] {}'.format(
             self.BODY_SELECTOR,
@@ -55,9 +55,9 @@ class BaseXBlockEditorView(PageObject):
         click_css(self, 'a.action-cancel', require_notification=False)
 
 
-class XBlockEditorView(BaseXBlockEditorView):
+class ComponentEditorView(BaseComponentEditorView):
     """
-    A :class:`.PageObject` representing the rendered view of an xblock editor.
+    A :class:`.PageObject` representing the rendered view of a component editor.
     """
     def get_setting_element(self, label):
         """
@@ -106,9 +106,9 @@ class XBlockEditorView(BaseXBlockEditorView):
             return None
 
 
-class XBlockVisibilityEditorView(BaseXBlockEditorView):
+class ComponentVisibilityEditorView(BaseComponentEditorView):
     """
-    A :class:`.PageObject` representing the rendered view of an xblock visibility editor.
+    A :class:`.PageObject` representing the rendered view of a component visibility editor.
     """
     OPTION_SELECTOR = '.partition-group-control .field'
     ALL_LEARNERS_AND_STAFF = 'All Learners and Staff'

@@ -14,9 +14,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 ) {
     'use strict';
     var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, AbstractEditor, BaseDateEditor,
-        ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
-        StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
-        AccessEditor, ShowCorrectnessEditor;
+        ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor, StaffLockEditor,
+        ContentVisibilityEditor, TimedExaminationPreferenceEditor, AccessEditor, ShowCorrectnessEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
@@ -111,6 +110,18 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 gettext('{display_name} Settings'),
                 {display_name: this.model.get('display_name')}
             );
+        },
+
+        getIntroductionMessage: function() {
+            var message = '';
+            var tabs = this.options.tabs;
+            if (!tabs || tabs.length < 2) {
+                message = StringUtils.interpolate(
+                    gettext('Change the settings for {display_name}'),
+                    {display_name: this.model.get('display_name')}
+                );
+            }
+            return message;
         },
 
         initializeEditors: function() {
@@ -568,7 +579,6 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     });
 
     AbstractVisibilityEditor = AbstractEditor.extend({
-
         afterRender: function() {
             AbstractEditor.prototype.afterRender.call(this);
         },
@@ -616,96 +626,6 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                     metadata: {
                         visible_to_staff_only: this.isLocked() ? true : null
                     }
-                };
-            } else {
-                return {};
-            }
-        }
-    });
-
-    UnitAccessEditor = AbstractVisibilityEditor.extend({
-        templateName: 'unit-access-editor',
-        className: 'edit-unit-access',
-        events: {
-            'change .user-partition-select': function() {
-                this.hideCheckboxDivs();
-                this.showSelectedDiv(this.getSelectedEnrollmentTrackId());
-            }
-        },
-
-        afterRender: function() {
-            var groupAccess,
-                keys;
-            AbstractVisibilityEditor.prototype.afterRender.call(this);
-            this.hideCheckboxDivs();
-            if (this.model.attributes.group_access) {
-                groupAccess = this.model.attributes.group_access;
-                keys = Object.keys(groupAccess);
-                if (keys.length === 1) { // should be only one partition key
-                    if (groupAccess.hasOwnProperty(keys[0]) && groupAccess[keys[0]].length > 0) {
-                        // Select the option that has group access, provided there is a specific group within the scheme
-                        this.$('.user-partition-select option[value=' + keys[0] + ']').prop('selected', true);
-                        this.showSelectedDiv(keys[0]);
-                        // Change default option to 'All Learners and Staff' if unit is currently restricted
-                        this.$('#partition-select option:first').text(gettext('All Learners and Staff'));
-                    }
-                }
-            }
-        },
-
-        getSelectedEnrollmentTrackId: function() {
-            return parseInt(this.$('.user-partition-select').val(), 10);
-        },
-
-        getCheckboxDivs: function() {
-            return $('.user-partition-group-checkboxes').children('div');
-        },
-
-        getSelectedCheckboxesByDivId: function(contentGroupId) {
-            var $checkboxes = $('#' + contentGroupId + '-checkboxes input:checked'),
-                selectedCheckboxValues = [],
-                i;
-            for (i = 0; i < $checkboxes.length; i++) {
-                selectedCheckboxValues.push(parseInt($($checkboxes[i]).val(), 10));
-            }
-            return selectedCheckboxValues;
-        },
-
-        showSelectedDiv: function(contentGroupId) {
-            $('#' + contentGroupId + '-checkboxes').show();
-        },
-
-        hideCheckboxDivs: function() {
-            this.getCheckboxDivs().hide();
-        },
-
-        hasChanges: function() {
-            // compare the group access object retrieved vs the current selection
-            return (JSON.stringify(this.model.get('group_access')) !== JSON.stringify(this.getGroupAccessData()));
-        },
-
-        getGroupAccessData: function() {
-            var userPartitionId = this.getSelectedEnrollmentTrackId(),
-                groupAccess = {};
-            if (userPartitionId !== -1 && !isNaN(userPartitionId)) {
-                groupAccess[userPartitionId] = this.getSelectedCheckboxesByDivId(userPartitionId);
-                return groupAccess;
-            } else {
-                return {};
-            }
-        },
-
-        getRequestData: function() {
-            var metadata = {},
-                groupAccessData = this.getGroupAccessData();
-
-            if (this.hasChanges()) {
-                if (groupAccessData) {
-                    metadata.group_access = groupAccessData;
-                }
-                return {
-                    publish: 'republish',
-                    metadata: metadata
                 };
             } else {
                 return {};
@@ -862,7 +782,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 editors: []
             };
             if (xblockInfo.isVertical()) {
-                editors = [StaffLockEditor, UnitAccessEditor];
+                editors = [StaffLockEditor];
             } else {
                 tabs = [
                     {
