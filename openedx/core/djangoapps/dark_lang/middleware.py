@@ -9,11 +9,21 @@ the SessionMiddleware.
 """
 from django.conf import settings
 from django.utils.translation import LANGUAGE_SESSION_KEY
+from django.utils.translation import ugettext as _
 from django.utils.translation.trans_real import parse_accept_lang_header
 
 from openedx.core.djangoapps.dark_lang import DARK_LANGUAGE_KEY
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
-from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.user_api.preferences.api import (
+    delete_user_preference,
+    get_user_preference,
+    set_user_preference
+)
+from openedx.core.djangoapps.util.user_messages import (
+    register_error_message,
+    register_success_message,
+)
 
 # If django 1.7 or higher is used, the right-side can be updated with new-style codes.
 CHINESE_LANGUAGE_CODE_MAP = {
@@ -29,6 +39,8 @@ CHINESE_LANGUAGE_CODE_MAP = {
     'zh-mo': 'zh-TW',  # Chinese (Traditional, Macau)
     'zh-sg': 'zh-CN',  # Chinese (Simplified, Singapore)
 }
+
+LANGUAGE_INPUT_FIELD = 'preview_lang'
 
 
 def _dark_parse_accept_lang_header(accept):
@@ -117,14 +129,104 @@ class DarkLangMiddleware(object):
         Check the user's dark language setting in the session and apply it
         """
         auth_user = request.user.is_authenticated()
-        preview_lang = None
-        if auth_user:
+
+        if request.method == 'POST':
+            self.process_darklang_request(request)
+        elif auth_user:
             # Get the request user's dark lang preference
             preview_lang = get_user_preference(request.user, DARK_LANGUAGE_KEY)
 
-        # User doesn't have a dark lang preference, so just return
-        if not preview_lang:
-            return
+            if preview_lang:
+                # Set the session key to the requested preview lang
+                request.session[LANGUAGE_SESSION_KEY] = preview_lang
 
-        # Set the session key to the requested preview lang
-        request.session[LANGUAGE_SESSION_KEY] = preview_lang
+    def process_darklang_request(self, request):
+        """
+        Proccess the request to set or clear the DarkLang depending on the incoming request.
+
+        Arguments:
+            request (Request): The Django Request Object
+
+        Returns:
+            HttpResponse: View containing the form for setting the preview lang with the status
+                included in the context
+        """
+        context = {
+            'disable_courseware_js': True,
+            'uses_bootstrap': True,
+        }
+        response = None
+        if not DarkLangConfig.current().enabled:
+            register_error_message(request, _('Preview Language is currently disabled'))
+        elif 'set_language' in request.POST:
+            # Set the Preview Language
+            self._set_preview_language(request, context)
+        elif 'reset' in request.POST:
+            # Reset and clear the language preference
+            self._clear_preview_language(request, context)
+
+    def _set_preview_language(self, request, context):
+        """
+        Set the Preview language
+
+        Arguments:
+            request (Request): The incoming Django Request
+            context dict: The basic context for the Response
+
+        Returns:
+            HttpResponse: View containing the form for setting the preview lang with the status
+                included in the context
+        """
+        preview_lang = request.POST.get(LANGUAGE_INPUT_FIELD, '')
+        if not preview_lang.strip():
+            register_error_message(request, _('Language code not provided'))
+        else:
+            # Set the session key to the requested preview lang
+            request.session[LANGUAGE_SESSION_KEY] = preview_lang
+
+            # Make sure that we set the requested preview lang as the dark lang preference for the
+            # user, so that the lang_pref middleware doesn't clobber away the dark lang preview.
+            auth_user = request.user
+            if auth_user:
+                set_user_preference(request.user, DARK_LANGUAGE_KEY, preview_lang)
+
+            register_success_message(
+                request,
+                _('Language set to language code: {preview_language_code}').format(
+                    preview_language_code=preview_lang
+                )
+            )
+
+    def _clear_preview_language(self, request, context):
+        """
+        Clears the dark language preview
+
+        Arguments:
+            request (Request): The incoming Django Request
+            context dict: The basic context for the Response
+        Returns:
+            HttpResponse: View containing the form for setting the preview lang with the status
+                included in the context
+        """
+        # delete the session language key (if one is set)
+        if LANGUAGE_SESSION_KEY in request.session:
+            del request.session[LANGUAGE_SESSION_KEY]
+
+        user_pref = ''
+        auth_user = request.user
+        if auth_user:
+            # Reset user's dark lang preference to null
+            delete_user_preference(auth_user, DARK_LANGUAGE_KEY)
+            # Get & set user's preferred language
+            user_pref = get_user_preference(auth_user, LANGUAGE_KEY)
+            if user_pref:
+                request.session[LANGUAGE_SESSION_KEY] = user_pref
+        if user_pref is None:
+            register_success_message(request, _('Language reset to the default language code'))
+        else:
+            register_success_message(
+                request,
+                _("Language reset to user's preference: {preview_language_code}").format(
+                    preview_language_code=user_pref
+                )
+            )
