@@ -113,6 +113,8 @@ NOSE_PLUGINS = [
 TEST_ROOT = path("test_root")
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
+INSTALLED_APPS = tuple(app for app in INSTALLED_APPS if app != 'webpack_loader')
+INSTALLED_APPS += ('openedx.tests.util.webpack_loader',)
 WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
 
 STATUS_MESSAGE_PATH = TEST_ROOT / "status_message.json"
