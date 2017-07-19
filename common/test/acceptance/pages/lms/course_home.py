@@ -131,6 +131,13 @@ class CourseOutlinePage(PageObject):
 
         return len(self.q(css=self.SUBSECTION_TITLES_SELECTOR.format(section_index)))
 
+    @property
+    def num_units(self):
+        """
+        Return the number of units in the first subsection
+        """
+        return len(self.q(css='.sequence-list-wrapper ol li'))
+
     def go_to_section(self, section_title, subsection_title):
         """
         Go to the section/subsection in the courseware.

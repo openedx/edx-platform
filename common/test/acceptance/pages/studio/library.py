@@ -9,7 +9,7 @@ from selenium.webdriver.support.select import Select
 
 from common.test.acceptance.pages.common.utils import confirm_prompt, sync_on_notification
 from common.test.acceptance.pages.studio import BASE_URL
-from common.test.acceptance.pages.studio.component_editor import ComponentEditorView
+from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
 from common.test.acceptance.pages.studio.container import XBlockWrapper
 from common.test.acceptance.pages.studio.pagination import PaginatedMixin
 from common.test.acceptance.pages.studio.users import UsersPageMixin
@@ -133,7 +133,7 @@ class LibraryEditPage(LibraryPage, PaginatedMixin, UsersPageMixin):
         )
 
 
-class StudioLibraryContentEditor(ComponentEditorView):
+class StudioLibraryContentEditor(XBlockEditorView):
     """
     Library Content XBlock Modal edit window
     """
