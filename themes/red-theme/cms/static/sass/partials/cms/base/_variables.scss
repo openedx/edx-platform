@@ -1,0 +1,14 @@
+// Color overrides
+$white: rgb(255,255,255);
+$red: #d9534f !default;
+
+$footer-bg: $white;
+$header-bg: $white;
+$header-border-color: $red;
+
+$base-font-color: $red;
+$link-color: $red;
+$lms-active-color: $red;
+$lms-label-color: $red;
+
+@import 'cms/static/sass/partials/cms/base/variables';
