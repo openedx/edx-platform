@@ -23,7 +23,6 @@ from courseware.access import has_access
 from courseware.courses import get_current_child
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
-from lms.lib.utils import get_parent_unit
 from openedx.core.lib.token_utils import JwtBuilder
 from student.models import anonymous_id_for_user
 from util.date_utils import get_default_time_display
@@ -119,6 +118,21 @@ def send_request(user, course_id, page, page_size, path="", text=None):
         raise EdxNotesServiceUnavailable(_("EdxNotes Service is unavailable. Please try again in a few minutes."))
 
     return response
+
+
+def get_parent_unit(xblock):
+    """
+    Find vertical that is a unit, not just some container.
+    """
+    while xblock:
+        xblock = xblock.get_parent()
+        if xblock is None:
+            return None
+        parent = xblock.get_parent()
+        if parent is None:
+            return None
+        if parent.category == 'sequential':
+            return xblock
 
 
 def preprocess_collection(user, course, collection):

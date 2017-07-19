@@ -1,60 +1,53 @@
 """Tests for items views."""
 import json
 from datetime import datetime, timedelta
-
 import ddt
+
+from mock import patch, Mock, PropertyMock
+from pytz import UTC
+from pyquery import PyQuery
+from webob import Response
+
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
-from mock import Mock, PropertyMock, patch
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locations import Location
-from pyquery import PyQuery
-from pytz import UTC
-from webob import Response
-from xblock.core import XBlockAside
-from xblock.exceptions import NoSuchHandlerError
-from xblock.fields import Scope, ScopeIds, String
-from xblock.fragment import Fragment
-from xblock.runtime import DictKeyValueStore, KvsFieldData
-from xblock.test.tools import TestRuntime
-from xblock.validation import ValidationMessage
+from django.core.urlresolvers import reverse
+from contentstore.utils import reverse_usage_url, reverse_course_url
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.views.component import component_handler, get_component_templates
-from contentstore.views.item import (
-    ALWAYS,
-    VisibilityState,
-    _get_module_info,
-    _get_source_index,
-    _xblock_type_and_display_name,
-    add_container_page_publishing_info,
-    create_xblock_info
-)
-from lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
+from opaque_keys import InvalidKeyError
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from contentstore.views.component import (
+    component_handler, get_component_templates
+)
+
+from contentstore.views.item import (
+    create_xblock_info, _get_source_index, _get_module_info, ALWAYS, VisibilityState, _xblock_type_and_display_name,
+    add_container_page_publishing_info
+)
+from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
 from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
-from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.capa_module import CapaDescriptor
-from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
+from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls, CourseFactory
+from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
+from xmodule.course_module import DEFAULT_START_DATE
+from xblock.core import XBlockAside
+from xblock.fields import Scope, String, ScopeIds
+from xblock.fragment import Fragment
+from xblock.runtime import DictKeyValueStore, KvsFieldData
+from xblock.test.tools import TestRuntime
+from xblock.exceptions import NoSuchHandlerError
+from xblock_django.user_service import DjangoXBlockUserService
+from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.locations import Location
 from xmodule.partitions.partitions import (
-    ENROLLMENT_TRACK_PARTITION_ID,
-    MINIMUM_STATIC_PARTITION_ID,
-    Group,
-    UserPartition
+    Group, UserPartition, ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID
 )
-from xmodule.partitions.tests.test_partitions import MockPartitionService
-from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
 
 
 class AsideTest(XBlockAside):
@@ -1161,64 +1154,6 @@ class TestMoveItem(ItemTest):
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
         self.assertEqual(response['error'], 'Patch request did not recognise any parameters to handle.')
-
-    def _verify_validation_message(self, message, expected_message, expected_message_type):
-        """
-        Verify that the validation message has the expected validation message and type.
-        """
-        self.assertEqual(message.text, expected_message)
-        self.assertEqual(message.type, expected_message_type)
-
-    def test_move_component_nonsensical_access_restriction_validation(self):
-        """
-        Test that moving a component with non-contradicting access
-        restrictions into a unit that has contradicting access
-        restrictions brings up the nonsensical access validation
-        message and that the message does not show up when moved
-        into a unit where the component's access settings do not
-        contradict the unit's access settings.
-        """
-        group1 = self.course.user_partitions[0].groups[0]
-        group2 = self.course.user_partitions[0].groups[1]
-        vert2 = self.store.get_item(self.vert2_usage_key)
-        html = self.store.get_item(self.html_usage_key)
-
-        # Inject mock partition service as obtaining the course from the draft modulestore
-        # (which is the default for these tests) does not work.
-        partitions_service = MockPartitionService(
-            self.course,
-            course_id=self.course.id,
-        )
-        html.runtime._services['partitions'] = partitions_service
-
-        # Set access settings so html will contradict vert2 when moved into that unit
-        vert2.group_access = {self.course.user_partitions[0].id: [group1.id]}
-        html.group_access = {self.course.user_partitions[0].id: [group2.id]}
-        self.store.update_item(html, self.user.id)
-        self.store.update_item(vert2, self.user.id)
-
-        # Verify that there is no warning when html is in a non contradicting unit
-        validation = html.validate()
-        self.assertEqual(len(validation.messages), 0)
-
-        # Now move it and confirm that the html component has been moved into vertical 2
-        self.assert_move_item(self.html_usage_key, self.vert2_usage_key)
-        html.parent = self.vert2_usage_key
-        self.store.update_item(html, self.user.id)
-        validation = html.validate()
-        self.assertEqual(len(validation.messages), 1)
-        self._verify_validation_message(
-            validation.messages[0],
-            NONSENSICAL_ACCESS_RESTRICTION,
-            ValidationMessage.ERROR,
-        )
-
-        # Move the html component back and confirm that the warning is gone again
-        self.assert_move_item(self.html_usage_key, self.vert_usage_key)
-        html.parent = self.vert_usage_key
-        self.store.update_item(html, self.user.id)
-        validation = html.validate()
-        self.assertEqual(len(validation.messages), 0)
 
     @patch('contentstore.views.item.log')
     def test_move_logging(self, mock_logger):

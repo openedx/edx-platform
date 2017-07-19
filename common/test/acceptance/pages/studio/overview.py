@@ -14,7 +14,7 @@ from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 from common.test.acceptance.pages.studio.container import ContainerPage
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.utils import set_input_value, set_input_value_and_save
-from common.test.acceptance.tests.helpers import disable_animations, enable_animations, select_option_by_text
+from common.test.acceptance.tests.helpers import disable_animations, enable_animations
 
 
 @js_defined('jQuery')
@@ -89,11 +89,6 @@ class CourseOutlineItem(object):
         return self.status_message == 'Contains staff only content' if self.has_status_message else False
 
     @property
-    def has_restricted_warning(self):
-        """ Returns True if the 'Access to this unit is restricted to' message is visible """
-        return 'Access to this unit is restricted to' in self.status_message if self.has_status_message else False
-
-    @property
     def is_staff_only(self):
         """ Returns True if the visiblity state of this item is staff only (has a black sidebar) """
         return "is-staff-only" in self.q(css=self._bounded_selector(''))[0].get_attribute("class")  # pylint: disable=no-member
@@ -133,29 +128,6 @@ class CourseOutlineItem(object):
         modal = self.edit()
         modal.is_explicitly_locked = is_locked
         modal.save()
-
-    def get_enrollment_select_options(self):
-        """
-        Gets the option names available for unit group access
-        """
-        modal = self.edit()
-        group_options = self.q(css='.group-select-title option').text
-        modal.cancel()
-        return group_options
-
-    def toggle_unit_access(self, partition_name, group_ids):
-        """
-        Toggles unit access to the groups in group_ids
-        """
-        if group_ids:
-            modal = self.edit()
-            groups_select = self.q(css='.group-select-title select')
-            select_option_by_text(groups_select, partition_name)
-
-            for group_id in group_ids:
-                checkbox = self.q(css='#content-group-{group_id}'.format(group_id=group_id))
-                checkbox.click()
-            modal.save()
 
     def in_editable_form(self):
         """
@@ -1110,7 +1082,7 @@ class CourseOutlineModal(object):
         """
         self.ensure_staff_lock_visible()
         if value != self.is_explicitly_locked:
-            self.find_css('#staff_lock').click()
+            self.find_css('label[for="staff_lock"]').click()
         EmptyPromise(lambda: value == self.is_explicitly_locked, "Explicit staff lock is updated").fulfill()
 
     def shows_staff_lock_warning(self):

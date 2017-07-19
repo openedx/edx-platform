@@ -240,7 +240,7 @@ class GroupConfiguration(object):
         """
         Set group configuration name.
         """
-        return self.find_css('.collection-name-input').first.fill(value)
+        self.find_css('.collection-name-input').first.fill(value)
 
     @property
     def description(self):

@@ -30,7 +30,6 @@ from contentstore.utils import (
     find_staff_lock_source,
     get_split_group_display_name,
     get_user_partition_info,
-    get_visibility_partition_info,
     has_children_visible_to_specific_partition_groups,
     is_currently_visible_to_students,
     is_self_paced
@@ -1232,11 +1231,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             else:
                 xblock_info['staff_only_message'] = False
 
-            xblock_info['has_partition_group_components'] = has_children_visible_to_specific_partition_groups(
+            xblock_info["has_partition_group_components"] = has_children_visible_to_specific_partition_groups(
                 xblock
             )
-        xblock_info['user_partition_info'] = get_visibility_partition_info(xblock, course=course)
-
     return xblock_info
 
 

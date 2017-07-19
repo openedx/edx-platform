@@ -4,9 +4,6 @@ var visibilityState = xblockInfo.get('visibility_state');
 var published = xblockInfo.get('published');
 var prereq = xblockInfo.get('prereq');
 var hasPartitionGroups = xblockInfo.get('has_partition_group_components');
-var userPartitionInfo = xblockInfo.get('user_partition_info');
-var selectedGroupsLabel = userPartitionInfo['selected_groups_label'];
-var selectedPartitionIndex = userPartitionInfo['selected_partition_index'];
 
 var statusMessages = [];
 var messageType;
@@ -60,16 +57,7 @@ if (staffOnlyMessage) {
         addStatusMessage(messageType, messageText);
     }
 
-    if (selectedPartitionIndex !== -1 && !isNaN(selectedPartitionIndex) && xblockInfo.isVertical()) {
-        messageType = 'partition-groups';
-        messageText = edx.StringUtils.interpolate(
-                gettext('Access to this unit is restricted to: {selectedGroupsLabel}'),
-                {
-                    selectedGroupsLabel: selectedGroupsLabel
-                }
-        )
-        addStatusMessage(messageType, messageText);
-    } else if (hasPartitionGroups && xblockInfo.isVertical()) {
+    if (hasPartitionGroups) {
         addStatusMessage(
             'partition-groups',
             gettext('Access to some content in this unit is restricted to specific groups of learners')
