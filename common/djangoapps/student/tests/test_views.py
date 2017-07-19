@@ -15,6 +15,7 @@ from edx_oauth2_provider.constants import AUTHORIZED_CLIENTS_SESSION_KEY
 from edx_oauth2_provider.tests.factories import ClientFactory, TrustedClientFactory
 from mock import patch
 from pyquery import PyQuery as pq
+from opaque_keys import InvalidKeyError
 
 from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
@@ -44,7 +45,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         """ Create a course and user, then log in. """
         super(TestStudentDashboardUnenrollments, self).setUp()
         self.user = UserFactory()
-        CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
+        self.enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
         self.cert_status = None
         self.client.login(username=self.user.username, password=PASSWORD)
 
@@ -118,6 +119,30 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
             response = self.client.get(reverse('dashboard'))
 
             self.assertEqual(response.status_code, 200)
+
+    def test_course_run_refund_status_successful(self):
+        """ Assert that view:course_run_refund_status returns correct Json for successful refund call."""
+        with patch('student.models.CourseEnrollment.refundable', return_value=True):
+            response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
+
+        self.assertEquals(json.loads(response.content), {'course_refundable_status': True})
+        self.assertEqual(response.status_code, 200)
+
+        with patch('student.models.CourseEnrollment.refundable', return_value=False):
+            response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
+
+        self.assertEquals(json.loads(response.content), {'course_refundable_status': False})
+        self.assertEqual(response.status_code, 200)
+
+    def test_course_run_refund_status_invalid_course_key(self):
+        """ Assert that view:course_run_refund_status returns correct Json for Invalid Course Key ."""
+        with patch('opaque_keys.edx.keys.CourseKey.from_string') as mock_method:
+            mock_method.side_effect = InvalidKeyError('CourseKey', 'The course key used to get refund status caused \
+                                                        InvalidKeyError during look up.')
+            response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
+
+        self.assertEquals(json.loads(response.content), {'course_refundable_status': ''})
+        self.assertEqual(response.status_code, 406)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

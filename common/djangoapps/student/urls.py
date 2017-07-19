@@ -38,6 +38,9 @@ urlpatterns = (
         'password_reset_confirm_wrapper',
         name='password_reset_confirm',
     ),
+    url(r'^course_run/{}/refund_status$'.format(settings.COURSE_ID_PATTERN),
+        'course_run_refund_status',
+        name="course_run_refund_status"),
 
 )
 

@@ -76,19 +76,25 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
                 'org': 'test_org',
                 'number': self.unique_id,
                 'run': 'test_run_A',
-                'display_name': 'Test Course A'
+                'display_name': 'Test Course A',
+                'enrollment_mode': 'audit',
+                'cert_name_long': 'Certificate of Audit Achievement'
             },
             'B': {
                 'org': 'test_org',
                 'number': self.unique_id,
                 'run': 'test_run_B',
-                'display_name': 'Test Course B'
+                'display_name': 'Test Course B',
+                'enrollment_mode': 'verified',
+                'cert_name_long': 'Certificate of Verified Achievement'
             },
             'C': {
                 'org': 'test_org',
                 'number': self.unique_id,
                 'run': 'test_run_C',
-                'display_name': 'Test Course C'
+                'display_name': 'Test Course C',
+                'enrollment_mode': 'credit',
+                'cert_name_long': 'Certificate of Credit Achievement'
             }
         }
 
@@ -113,7 +119,8 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
             )
 
             course_fixture.add_advanced_settings({
-                u"social_sharing_url": {u"value": "http://custom/course/url"}
+                u"social_sharing_url": {u"value": "http://custom/course/url"},
+                u"cert_name_long": {u"value": value['cert_name_long']}
             })
 
             course_fixture.install()
@@ -126,7 +133,8 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
                 self.browser,
                 username=self.username,
                 email=self.email,
-                course_id=course_key
+                course_id=course_key,
+                enrollment_mode=value['enrollment_mode']
             ).visit()
 
         # Navigate the authenticated, enrolled user to the dashboard page and get testing!
@@ -344,6 +352,50 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         """
         profile_img = self.dashboard_page.get_profile_img()
         self.assertEqual(profile_img.attrs('alt')[0], '')
+
+
+class LmsDashboardCourseUnEnrollDialogMessageTest(BaseLmsDashboardTestMultiple):
+    """
+        Class to test lms student dashboard unenroll dialog messages.
+    """
+
+    def test_audit_course_run_unenroll_dialog_msg(self):
+        """
+        Validate unenroll dialog message when user clicks unenroll button for a audit course
+        """
+
+        self.dashboard_page.visit()
+        dialog_message = self.dashboard_page.view_course_unenroll_dialog_message(str(self.course_keys['A']))
+        course_number = self.courses['A']['number']
+        course_name = self.courses['A']['display_name']
+
+        expected_track_message = u'Are you sure you want to unenroll from' + \
+                                 u' <span id="unenroll_course_name">' + course_name + u'</span>' + \
+                                 u' (<span id="unenroll_course_number">' + course_number + u'</span>)?'
+
+        self.assertEqual(dialog_message['track-info'][0], expected_track_message)
+
+    def test_verified_course_run_unenroll_dialog_msg(self):
+        """
+        Validate unenroll dialog message when user clicks unenroll button for a verified course passed refund
+        deadline
+        """
+
+        self.dashboard_page.visit()
+        dialog_message = self.dashboard_page.view_course_unenroll_dialog_message(str(self.course_keys['B']))
+        course_number = self.courses['B']['number']
+        course_name = self.courses['B']['display_name']
+        cert_long_name = self.courses['B']['cert_name_long']
+
+        expected_track_message = u'Are you sure you want to unenroll from the verified' + \
+                                 u' <span id="unenroll_cert_name">' + cert_long_name + u'</span>' + \
+                                 u' track of <span id="unenroll_course_name">' + course_name + u'</span>' +  \
+                                 u' (<span id="unenroll_course_number">' + course_number + u'</span>)?'
+
+        expected_refund_message = u'The refund deadline for this course has passed,so you will not receive a refund.'
+
+        self.assertEqual(dialog_message['track-info'][0], expected_track_message)
+        self.assertEqual(dialog_message['refund-info'][0], expected_refund_message)
 
 
 @attr('a11y')
