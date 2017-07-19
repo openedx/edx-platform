@@ -25,6 +25,7 @@ from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from student.cookies import set_logged_in_cookies
 from student.forms import get_registration_extension_form
 from student.views import create_account_with_params
@@ -942,11 +943,28 @@ class RegistrationView(APIView):
                         running_pipeline.get('kwargs')
                     )
 
+                    # When the TPA Provider is configured to skip the registration form and we are in an
+                    # enterprise context, we need to hide all fields except for terms of service and
+                    # ensure that the user explicitly checks that field.
+                    hide_registration_fields_except_tos = (current_provider.skip_registration_form and
+                                                           enterprise_customer_for_request(request))
+
                     for field_name in self.DEFAULT_FIELDS + self.EXTRA_FIELDS:
                         if field_name in field_overrides:
                             form_desc.override_field_properties(
                                 field_name, default=field_overrides[field_name]
                             )
+
+                            if (field_name not in ['terms_of_service', 'honor_code']
+                                    and field_overrides[field_name]
+                                    and hide_registration_fields_except_tos):
+
+                                form_desc.override_field_properties(
+                                    field_name,
+                                    field_type="hidden",
+                                    label="",
+                                    instructions="",
+                                )
 
                     # Hide the password field
                     form_desc.override_field_properties(
