@@ -40,6 +40,8 @@
     {% endwith %}
 
   </div>
+    {% load render_bundle from webpack_loader %}
+    {% render_bundle "commons" %}
 
     {% javascript 'base_application' %}
 
