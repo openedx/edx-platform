@@ -4,6 +4,7 @@
   @include border-left(solid 4px $black);
   margin-bottom: $baseline;
   padding: $baseline;
+  overflow: hidden;
 
   h1, h2, h3 {
     font-size: font-size(large);
@@ -11,8 +12,14 @@
     color: $black;
   }
 
+  img {
+    @include float(left);
+    margin: $baseline/2;
+    max-width: 100%;
+  }
+
   .dismiss-message {
-      @include float(right);
+    @include float(right);
   }
 }
 
@@ -128,8 +135,8 @@
 .date-summary-container {
   .date-summary {
     @include clearfix;
-    padding: 10px;
     @include border-left(3px solid $gray-l3);
+    padding: $baseline/2;
 
     .heading {
       font-size: 1.1rem;
@@ -186,14 +193,21 @@
       margin: ($baseline*6/5) 0;
       padding-bottom: ($baseline*6/5);
       border-bottom: 1px solid $lms-border-color;
+
       .date {
         font-size: font-size(small);
-        font-weight: 300;
+        font-weight: $font-light;
         float: none;
         padding-bottom: ($baseline/4);
       }
+
       &:last-child {
         border-bottom: 0;
+      }
+
+      img {
+        margin: $baseline/2;
+        max-width: 100%;
       }
     }
   }
