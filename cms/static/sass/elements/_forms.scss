@@ -396,6 +396,15 @@ form {
 // TODO: abstract this out into a Sass placeholder
 .incontext-editor.is-editable {
 
+  .access-editor-action-wrapper {
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 80%;
+
+    .icon.icon {
+      vertical-align: baseline;
+    }
+  }
   .incontext-editor-value,
   .incontext-editor-action-wrapper {
     @extend %cont-truncated;
@@ -404,7 +413,7 @@ form {
     max-width: 80%;
   }
 
-  .incontext-editor-open-action {
+  .incontext-editor-open-action, .access-button {
     @extend %ui-btn-non-blue;
     @extend %t-copy-base;
     padding-top: ($baseline/10);
