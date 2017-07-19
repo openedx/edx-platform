@@ -75,7 +75,7 @@ from openedx.core.djangolib.markup import HTML, Text
                         <h3 class="title v1">
                             ${title_content}
                         </h3>
-                        <!-- This div was added as part of the LEARNER-1312 experiment. The v2 class should be removed if the experiment is implemented-->
+                        <!-- This div was added as part of the LEARNER-1726 experiment. The v2 class should be removed if the experiment is implemented-->
                         <h3 class="title v2 hidden">
                             Next, Select Your Learning Path
                         </h3>
@@ -86,7 +86,7 @@ from openedx.core.djangolib.markup import HTML, Text
                         b_tag_kwargs = {'b_start': HTML('<b>'), 'b_end': HTML('</b>')}
                         %>
                         % if "verified" in modes:
-                            <!-- This div was added as part of the LEARNER-1312 experiment. The v2 class should be removed if the experiment is implemented-->
+                            <!-- This div was added as part of the LEARNER-1726 experiment. The v2 class should be removed if the experiment is implemented-->
                             <div class="register-choice register-choice-certificate v2 hidden">
                                 <h4 class="title">Pursue a Verified Certificate</h4>
                                 <div class="wrapper-copy-inline">
@@ -102,7 +102,14 @@ from openedx.core.djangolib.markup import HTML, Text
                                     <li class="action action-select">
                                       <input type="hidden" name="contribution" value="${min_price}" />
                                       <!-- The class verified_mode should be added to this selector if the experiment is implemented-->
-                                      <input type="submit" name="verified_mode" value="Upgrade to a Certificate ($${min_price} USD)" />
+                                      <div class="upgradev1">
+                                        <input type="submit" name="verified_mode" value="Upgrade to a Certificate ($${min_price} USD)" />
+                                      </div>
+                                      <div class="upgradev2 hidden">
+                                          <button type="submit" name="verified_mode">Upgrade to a Certificate (<del>$${min_price} USD</del>)</button>
+                                          <br>
+                                          <div class="savings-message">Save 5% if you upgrade now! ($${int(min_price * .95)} USD)</div>
+                                      </div>
                                     </li>
                                   </ul>
                                 </div>
@@ -192,41 +199,41 @@ from openedx.core.djangolib.markup import HTML, Text
                             <span class="deco-divider v1">
                                 <span class="copy">${_("or")}</span>
                             </span>
-                            <!-- This div was added as part of the LEARNER-1312 experiment. The v2 class should be removed if the experiment is implemented-->
+                            <!-- This div was added as part of the LEARNER-1726 experiment. The v2 class should be removed if the experiment is implemented-->
                             <span class="deco-divider v2 hidden">
                                 <span class="copy">${_("or")}</span>
                             </span>
 
-                            <!-- This div was added as part of the LEARNER-1312 experiment. The v2 class should be removed if the experiment is implemented-->
+                            <!-- This div was added as part of the LEARNER-1726 experiment. The v2 class should be removed if the experiment is implemented-->
                             <div class="register-choice register-choice-donate v2 hidden">
                                 <h4 class="title">
-                                    Donate to Support our Non-Profit Mission
+                                    I Don't Want to Upgrade or Donate Today
                                 </h4>
                                 <div class="wrapper-copy-inline">
                                     <div class="wrapper-copy">
-                                        Any amount will support our mission to make the world's best education more accessible.
+                                        If you do not want to add a certificate or donate to edX's mission today, you can skip this step for now and continue to the course.
                                     </div>
                                     <img src="/static/images/edx-home-graphic.png" class="visual-reference img-donate" alt="Visual of two hands forming a heart shape" >
                                 </div>
                                 <div class="copy-inline">
                                     <ul class="list-actions">
                                       <li class="action action-select">
-                                        <a class="donation-link" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=MJUBGL54QTCTA">Donate and Continue to Course</a>
+                                        <a class="donation-link" href="/dashboard">Continue to Course</a>
                                       </li>
                                     </ul>
                                 </div>
                             </div>
 
-                            <!-- This div was added as part of the LEARNER-1312 experiment. The v2 class should be removed if the experiment is implemented-->
+                            <!-- This div was added as part of the LEARNER-1726 experiment. The v2 class should be removed if the experiment is implemented-->
                             <div class="register-choice register-choice-v2-audit register-choice-view v2 hidden">
-                              <h4 class="title">I Don't Want to Upgrade or Donate Today</h4>
+                              <h4 class="title">Donate to Support our Non-Profit Mission</h4>
                               <div class="wrapper-copy-inline">
                                 <div class="wrapper-copy">
-                                    If you do not want to buy a certificate or donate to edX's mission today, you can skip this step for now and continue to the course.
+                                    Even if you are not interested in pursuing a Verified Certificate, a donation helps edX continue to work towards its non-profit mission of making the world's best education more accessible to learners everywhere.
                                 </div>
                                 <div class="copy-inline">
                                 <ul class="list-actions">
-                                    <input type="submit" name="audit_mode" value="Continue to Course">
+                                    <input type="submit" name="audit_mode" action="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AG9VK2LC29L5Y" value="Donate and Continue to Course">
                                 </ul>
                               </div>
                               </div>
