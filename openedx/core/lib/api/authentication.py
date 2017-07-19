@@ -3,11 +3,11 @@
 import logging
 
 import django.utils.timezone
+from edx_rest_framework_extensions.authentication import BearerAuthentication
 from oauth2_provider import models as dot_models
 from provider.oauth2 import models as dop_models
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.authentication import SessionAuthentication
-from rest_framework_oauth.authentication import OAuth2Authentication
 
 
 OAUTH2_TOKEN_ERROR = u'token_error'
@@ -67,7 +67,7 @@ class SessionAuthenticationAllowInactiveUser(SessionAuthentication):
         return (user, None)
 
 
-class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
+class OAuth2AuthenticationAllowInactiveUser(BearerAuthentication):
     """
     This is a temporary workaround while the is_active field on the user is coupled
     with whether or not the user has verified ownership of their claimed email address.
