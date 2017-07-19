@@ -74,7 +74,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
                         <ul class="list-unstyled">
                             % for course_tool in course_tools:
                                 <li>
-                                    <a href="${course_tool.url(course_key)}">
+                                    <a class="course-tool-link" href="${course_tool.url(course_key)}">
                                         <span class="icon ${course_tool.icon_classes()}" aria-hidden="true"></span>
                                         ${course_tool.title()}
                                     </a>
@@ -102,3 +102,9 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
     % endif
 </div>
 </%block>
+
+<%static:webpack entry="CourseHome">
+    new CourseHome({
+        courseToolLink: ".course-tool-link",
+    });
+</%static:webpack>
