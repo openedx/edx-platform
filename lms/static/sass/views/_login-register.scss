@@ -224,6 +224,16 @@
         &:focus {
             outline: none;
         }
+
+        div[class*="hidden-"] {
+            margin: 0;
+            display: none;
+        }
+
+        .auto-register-message {
+            font-size: 1.1em;
+            line-height: 1.3em;
+        }
     }
 
     %bold-label {
