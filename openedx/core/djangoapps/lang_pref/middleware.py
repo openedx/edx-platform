@@ -5,11 +5,11 @@ Middleware for Language Preferences
 from django.conf import settings
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
+from lms.djangoapps.courseware.masquerade import MASQUERADE_SETTINGS_KEY
 
 from openedx.core.djangoapps.lang_pref import COOKIE_DURATION, LANGUAGE_HEADER, LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.errors import UserAPIInternalError, UserAPIRequestError
 from openedx.core.djangoapps.user_api.preferences.api import (
-    delete_user_preference,
     get_user_preference,
     set_user_preference
 )
@@ -51,18 +51,22 @@ class LanguagePreferenceMiddleware(object):
                 del request.session[LANGUAGE_SESSION_KEY]
 
     def process_response(self, request, response):
-        # If the user is logged in, check for their language preference
-        if getattr(request, 'user', None) and request.user.is_authenticated():
-            user_pref = None
+        # If the user is logged in, check for their language preference. Also check for real user
+        # if current user is a masquerading user,
+        user_pref = None
+        current_user = None
+        if hasattr(request, 'user'):
+            current_user = getattr(request.user, 'real_user', request.user)
 
+        if current_user and current_user.is_authenticated():
             anonymous_cookie_lang = getattr(request, '_anonymous_user_cookie_lang', None)
             if anonymous_cookie_lang:
                 user_pref = anonymous_cookie_lang
-                set_user_preference(request.user, LANGUAGE_KEY, anonymous_cookie_lang)
+                set_user_preference(current_user, LANGUAGE_KEY, anonymous_cookie_lang)
             else:
                 # Get the user's language preference
                 try:
-                    user_pref = get_user_preference(request.user, LANGUAGE_KEY)
+                    user_pref = get_user_preference(current_user, LANGUAGE_KEY)
                 except (UserAPIRequestError, UserAPIInternalError):
                     # If we can't find the user preferences, then don't modify the cookie
                     pass
