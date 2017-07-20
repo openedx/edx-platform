@@ -2,8 +2,8 @@
  * XBlockAccessEditor is a view that allows the user to restrict access at the unit level on the container page.
  * This view renders the button to restrict unit access into the appropriate place in the unit page.
  */
-define(['js/views/baseview'],
-    function(BaseView) {
+define(['js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils'],
+    function(BaseView, HtmlUtils) {
         'use strict';
         var XBlockAccessEditor = BaseView.extend({
             // takes XBlockInfo as a model
@@ -13,7 +13,10 @@ define(['js/views/baseview'],
             },
 
             render: function() {
-                this.$el.append(this.template({}));
+                HtmlUtils.append(
+                    this.$el,
+                    HtmlUtils.HTML(this.template({}))
+                );
                 return this;
             }
         });
