@@ -106,7 +106,7 @@ def compute_grades_for_course_v2(self, **kwargs):
 @task(base=_BaseTask)
 def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pylint: disable=unused-argument
     """
-    Compute grades for a set of students in the specified course.
+    Compute and save grades for a set of students in the specified course.
 
     The set of students will be determined by the order of enrollment date, and
     limited to at most <batch_size> students, starting from the specified

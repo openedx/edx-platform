@@ -246,6 +246,20 @@ class TestCourseGradeFactory(GradeTestBase):
             else:
                 self.assertIsNone(course_grade)
 
+    @ddt.data(True, False)
+    def test_iter_force_update(self, force_update):
+        base_string = 'lms.djangoapps.grades.new.subsection_grade_factory.SubsectionGradeFactory.{}'
+        desired_method_name = base_string.format('update' if force_update else 'create')
+        undesired_method_name = base_string.format('create' if force_update else 'update')
+        with patch(desired_method_name) as desired_call:
+            with patch(undesired_method_name) as undesired_call:
+                set(CourseGradeFactory().iter(
+                    users=[self.request.user], course=self.course, force_update=force_update
+                ))
+
+        self.assertTrue(desired_call.called)
+        self.assertFalse(undesired_call.called)
+
 
 @ddt.ddt
 class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
