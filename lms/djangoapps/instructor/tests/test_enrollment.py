@@ -13,7 +13,7 @@ from django.utils.translation import override as override_language
 from django.utils.translation import get_language
 from mock import patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.models import StudentModule
@@ -44,7 +44,7 @@ class TestSettableEnrollmentState(CacheIsolationTestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
         super(TestSettableEnrollmentState, self).setUp()
-        self.course_key = SlashSeparatedCourseKey('Robot', 'fAKE', 'C-%-se-%-ID')
+        self.course_key = CourseLocator('Robot', 'fAKE', 'C-%-se-%-ID')
 
     def test_mes_create(self):
         """
@@ -75,7 +75,7 @@ class TestEnrollmentChangeBase(CacheIsolationTestCase):
 
     def setUp(self):
         super(TestEnrollmentChangeBase, self).setUp()
-        self.course_key = SlashSeparatedCourseKey('Robot', 'fAKE', 'C-%-se-%-ID')
+        self.course_key = CourseLocator('Robot', 'fAKE', 'C-%-se-%-ID')
 
     def _run_state_change_test(self, before_ideal, after_ideal, action):
         """

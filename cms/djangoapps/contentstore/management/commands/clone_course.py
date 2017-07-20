@@ -2,9 +2,7 @@
 Script for cloning a course
 """
 from django.core.management.base import BaseCommand, CommandError
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore import ModuleStoreEnum
@@ -22,10 +20,7 @@ class Command(BaseCommand):
         """
         Convert the command line arg into a course key
         """
-        try:
-            return CourseKey.from_string(arg)
-        except InvalidKeyError:
-            return SlashSeparatedCourseKey.from_deprecated_string(arg)
+        return CourseKey.from_string(arg)
 
     def handle(self, *args, **options):
         "Execute the command"

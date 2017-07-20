@@ -26,7 +26,7 @@ from contracts import contract, new_contract
 from fs.osfs import OSFS
 from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import UsageKey, CourseKey, AssetKey
-from opaque_keys.edx.locations import Location, BlockUsageLocator, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import Location, BlockUsageLocator
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from path import Path as path
 from pytz import UTC
@@ -837,7 +837,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # first get non-draft in a round-trip
         query = {
             '_id': {'$in': [
-                course_key.make_usage_key_from_deprecated_string(item).to_deprecated_son() for item in items
+                UsageKey.from_string(item).map_into_course(course_key) for item in items
             ]}
         }
         return list(self.collection.find(query))
@@ -1021,7 +1021,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         courses_summaries = []
         for course in course_records:
             if not (course['_id']['org'] == 'edx' and course['_id']['course'] == 'templates'):
-                locator = SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name'])
+                locator = CourseLocator(course['_id']['org'], course['_id']['course'], course['_id']['name'])
                 course_summary = extract_course_summary(course)
                 courses_summaries.append(
                     CourseSummary(locator, **course_summary)
@@ -1045,7 +1045,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         base_list = sum(
             [
                 self._load_items(
-                    SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name']),
+                    CourseLocator(course['_id']['org'], course['_id']['course'], course['_id']['name']),
                     [course]
                 )
                 for course
@@ -1136,7 +1136,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             course_query = {'_id': location.to_deprecated_son()}
         course = self.collection.find_one(course_query, projection={'_id': True})
         if course:
-            return SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name'])
+            return CourseLocator(course['_id']['org'], course['_id']['course'], course['_id']['name'])
         else:
             return None
 
@@ -1289,7 +1289,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Raises:
             InvalidLocationError: If a course with the same org, course, and run already exists
         """
-        course_id = SlashSeparatedCourseKey(org, course, run)
+        course_id = CourseLocator(org, course, run)
 
         # Check if a course with this org/course has been defined before (case-insensitive)
         course_search_location = SON([
@@ -1735,7 +1735,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 )
             all_reachable = all_reachable.union(item.get('definition', {}).get('children', []))
         item_locs -= all_reachable
-        return [course_key.make_usage_key_from_deprecated_string(item_loc) for item_loc in item_locs]
+        return [UsageKey.from_string(item_loc).map_into_course(course_key) for item_loc in item_locs]
 
     def get_courses_for_wiki(self, wiki_slug, **kwargs):
         """

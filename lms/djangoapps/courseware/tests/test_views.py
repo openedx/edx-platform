@@ -41,7 +41,8 @@ from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, PropertyMock, create_autospec, patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locations import Location
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -86,7 +87,7 @@ class TestJumpTo(ModuleStoreTestCase):
     def setUp(self):
         super(TestJumpTo, self).setUp()
         # Use toy course from XML
-        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        self.course_key = CourseLocator('edX', 'toy', '2012_Fall')
 
     def test_jumpto_invalid_location(self):
         location = self.course_key.make_usage_key(None, 'NoSuchPlace')
@@ -1187,7 +1188,7 @@ class StartDateTests(ModuleStoreTestCase):
     )
     @unittest.skip
     def test_format_localized_in_xml_course(self):
-        response = self.get_about_response(SlashSeparatedCourseKey('edX', 'toy', 'TT_2012_Fall'))
+        response = self.get_about_response(CourseLocator('edX', 'toy', 'TT_2012_Fall'))
         # The start date is set in common/test/data/two_toys/policies/TT_2012_Fall/policy.json
         self.assertContains(response, "2015-JULY-17")
 

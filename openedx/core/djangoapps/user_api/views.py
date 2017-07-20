@@ -14,7 +14,7 @@ from django_countries import countries
 from django_filters.rest_framework import DjangoFilterBackend
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx import locator
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from rest_framework import authentication, generics, status, viewsets
 from rest_framework.exceptions import ParseError
 from rest_framework.views import APIView
@@ -1072,7 +1072,7 @@ class ForumRoleUsersListView(generics.ListAPIView):
         course_id_string = self.request.query_params.get('course_id')
         if not course_id_string:
             raise ParseError('course_id must be specified')
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id_string)
+        course_id = CourseKey.from_string(course_id_string)
         role = Role.objects.get_or_create(course_id=course_id, name=name)[0]
         users = role.users.prefetch_related("preferences").select_related("profile").all()
         return users

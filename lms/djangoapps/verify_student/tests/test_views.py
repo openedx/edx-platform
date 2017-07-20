@@ -24,7 +24,6 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from mock import Mock, patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 from waffle.testutils import override_switch
 
@@ -1310,7 +1309,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
         self.course_id = 'Robot/999/Test_Course'
         self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         verified_mode = CourseMode(
-            course_id=SlashSeparatedCourseKey("Robot", "999", 'Test_Course'),
+            course_id=CourseLocator("Robot", "999", 'Test_Course'),
             mode_slug="verified",
             mode_display_name="Verified Certificate",
             min_price=50

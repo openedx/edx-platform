@@ -10,7 +10,7 @@ from django.test import override_settings
 from django.utils.http import urlencode, urlquote
 from mock import Mock, patch
 from nose.tools import assert_equals, assert_false, assert_true  # pylint: disable=no-name-in-module
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from PIL import Image
 
 from static_replace import (
@@ -32,7 +32,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from xmodule.modulestore.xml import XMLModuleStore
 
 DATA_DIRECTORY = 'data_dir'
-COURSE_KEY = SlashSeparatedCourseKey('org', 'course', 'run')
+COURSE_KEY = CourseLocator('org', 'course', 'run')
 STATIC_SOURCE = '"/static/file.png"'
 
 

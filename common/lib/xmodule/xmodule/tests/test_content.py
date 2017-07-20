@@ -8,7 +8,8 @@ from path import Path as path
 
 from xmodule.contentstore.content import StaticContent, StaticContentStream
 from xmodule.contentstore.content import ContentStore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
+from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locations import AssetLocation
 from xmodule.static_content import _write_js, _list_descriptors
 
 SAMPLE_STRING = """
@@ -158,7 +159,7 @@ class ContentTest(unittest.TestCase):
         # We had a bug that __ got converted into a single _. Make sure that substitution of INVALID_CHARS (like space)
         # still happen.
         asset_location = StaticContent.compute_location(
-            SlashSeparatedCourseKey('mitX', '400', 'ignore'), 'subs__1eo_jXvZnE .srt.sjson'
+            CourseLocator('mitX', '400', 'ignore'), 'subs__1eo_jXvZnE .srt.sjson'
         )
         self.assertEqual(
             AssetLocation(u'mitX', u'400', u'ignore', u'asset', u'subs__1eo_jXvZnE_.srt.sjson', None),

@@ -24,7 +24,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
 from ipware.ip import get_ip
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.models import CourseMode
@@ -110,7 +110,7 @@ def add_course_to_cart(request, course_id):
         log.info(u"Anon user trying to add course %s to cart", course_id)
         return HttpResponseForbidden(_('You must be logged-in to add to a shopping cart'))
     cart = Order.get_cart_for_user(request.user)
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     # All logging from here handled by the model
     try:
         paid_course_item = PaidCourseRegistration.add_to_order(cart, course_key)

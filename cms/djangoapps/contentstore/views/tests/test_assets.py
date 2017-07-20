@@ -10,7 +10,8 @@ from ddt import data, ddt
 from django.conf import settings
 from django.test.utils import override_settings
 from mock import patch
-from opaque_keys.edx.locations import AssetLocation, SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locations import AssetLocation
 from PIL import Image
 from pytz import UTC
 
@@ -80,7 +81,7 @@ class BasicAssetsTestCase(AssetsTestCase):
 
     def test_static_url_generation(self):
 
-        course_key = SlashSeparatedCourseKey('org', 'class', 'run')
+        course_key = CourseLocator('org', 'class', 'run')
         location = course_key.make_asset_key('asset', 'my_file_name.jpg')
         path = StaticContent.get_static_path_from_location(location)
         self.assertEquals(path, '/static/my_file_name.jpg')
@@ -101,7 +102,7 @@ class BasicAssetsTestCase(AssetsTestCase):
         # Test valid contentType for pdf asset (textbook.pdf)
         resp = self.client.get(url, HTTP_ACCEPT='application/json')
         self.assertContains(resp, "/c4x/edX/toy/asset/textbook.pdf")
-        asset_location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/textbook.pdf')
+        asset_location = AssetLocation.from_string('/c4x/edX/toy/asset/textbook.pdf')
         content = contentstore().find(asset_location)
         # Check after import textbook.pdf has valid contentType ('application/pdf')
 
@@ -348,7 +349,7 @@ class AssetToJsonTestCase(AssetsTestCase):
     def test_basic(self):
         upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
         content_type = 'image/jpg'
-        course_key = SlashSeparatedCourseKey('org', 'class', 'run')
+        course_key = CourseLocator('org', 'class', 'run')
         location = course_key.make_asset_key('asset', 'my_file_name.jpg')
         thumbnail_location = course_key.make_asset_key('thumbnail', 'my_file_name_thumb.jpg')
 
@@ -441,7 +442,7 @@ class DeleteAssetTestCase(AssetsTestCase):
         self.assertEquals(response.status_code, 200)
         self.uploaded_url = json.loads(response.content)['asset']['url']
 
-        self.asset_location = AssetLocation.from_deprecated_string(self.uploaded_url)
+        self.asset_location = AssetLocation.from_string(self.uploaded_url)
         self.content = contentstore().find(self.asset_location)
 
     def test_delete_asset(self):
@@ -467,7 +468,7 @@ class DeleteAssetTestCase(AssetsTestCase):
         thumbnail_url = json.loads(response.content)['asset']['url']
         thumbnail_location = StaticContent.get_location_from_path(thumbnail_url)
 
-        image_asset_location = AssetLocation.from_deprecated_string(uploaded_image_url)
+        image_asset_location = AssetLocation.from_string(uploaded_image_url)
         content = contentstore().find(image_asset_location)
         content.thumbnail_location = thumbnail_location
         contentstore().save(content)
