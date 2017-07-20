@@ -319,7 +319,8 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
     }
 
     if third_party_auth.is_enabled():
-        if not enterprise_customer_for_request(request):
+        enterprise_customer = enterprise_customer_for_request(request)
+        if not enterprise_customer:
             for enabled in third_party_auth.provider.Registry.displayed_for_login(tpa_hint=tpa_hint):
                 info = {
                     "id": enabled.provider_id,
@@ -348,8 +349,18 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
                 context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.backend_name)
 
                 if current_provider.skip_registration_form:
-                    # As a reliable way of "skipping" the registration form, we just submit it automatically
-                    context["autoSubmitRegForm"] = True
+                    # For enterprise (and later for everyone), we need to get explicit consent to the
+                    # Terms of service instead of auto submitting the registration form outright.
+                    if not enterprise_customer:
+                        # As a reliable way of "skipping" the registration form, we just submit it automatically
+                        context["autoSubmitRegForm"] = True
+                    else:
+                        context["autoRegisterWelcomeMessage"] = (
+                            'Thank you for joining {}. '
+                            'Just a couple steps before you start learning!'
+                        ).format(
+                            configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+                        )
 
         # Check for any error messages we may want to display:
         for msg in messages.get_messages(request):
