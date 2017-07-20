@@ -509,7 +509,7 @@
         }
 
         &.button-oa2-azuread-oauth2 {
-            color: darken($microsoft-black, 20%);
+            color: $microsoft-black;
 
             .icon {
                 background: $microsoft-black;
