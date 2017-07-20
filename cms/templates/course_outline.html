@@ -1,8 +1,7 @@
 <%page expression_filter="h"/>
 <%inherit file="base.html" />
-<%def name="online_help_token()"><% return "develop_course" %>
-    </%def>
-    <%!
+<%def name="online_help_token()"><% return "develop_course" %></%def>
+<%!
 import logging
 from util.date_utils import get_default_time_display
 from django.utils.translation import ugettext as _
@@ -10,8 +9,10 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from contentstore.utils import reverse_usage_url
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
 %>
-        <%block name="title">${_("Course Outline")}</%block>
+<%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course view-outline</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -143,6 +144,22 @@ from openedx.core.djangolib.markup import HTML, Text
                     <a href="${lms_link}" rel="external" class="button view-button view-live-button"
                        title="${_('Click to open the courseware in the LMS in a new tab')}">${_("View Live")}</a>
                 </li>
+                <%
+                    sites = configuration_helpers.get_lms_base_values(
+                        context_course.display_org_with_default,settings.SITE_NAME
+                    )
+                %>
+                <li class="nav-item">
+                    <select name="site_name" class="form-control site_name">
+                        % if sites != settings.SITE_NAME:
+                            % for name, site in sites.items():
+                                <option value="${site}" ${'selected' if loop and loop.first else ''}>${name}</option>
+                            % endfor
+                        % else:
+                                <option value="${settings.SITE_NAME}" selected>${settings.SITE_NAME}</option>
+                        % endif
+                    </select>
+                </li>
             </ul>
         </nav>
     </header>
@@ -181,47 +198,45 @@ from openedx.core.djangolib.markup import HTML, Text
                 <%
                 course_locator = context_course.location
                 %>
-            <h2 class="sr">${_("Course Outline")}</h2>
-            <article class="outline outline-complex outline-course" data-locator="${course_locator}" data-course-key="${course_locator.course_key}">
-            </article>
+                <h2 class="sr">${_("Course Outline")}</h2>
+                <article class="outline outline-complex outline-course" data-locator="${course_locator}" data-course-key="${course_locator.course_key}">
+                </article>
             </div>
             <div class="ui-loading">
                 <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
             </div>
-            </article>
-            <aside class="content-supplementary" role="complementary">
-                <div class="bit">
-                    <h3 class="title-3">${_("Creating your course organization")}</h3>
-                    <p>${_("You add sections, subsections, and units directly in the outline.")}</p>
-                    <p>${_("Create a section, then add subsections and units. Open a unit to add course components.")}</p>
-                </div>
-                <div class="bit">
-                    <h3 class="title-3">${_("Reorganizing your course")}</h3>
-                    <p>${_("Drag sections, subsections, and units to new locations in the outline.")}</p>
-                    <div class="external-help">
-                        <a href="${get_online_help_info('outline')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about the course outline")}</a>
-                    </div>
-                </div>
-                <div class="bit">
-                    <h3 class="title-3">${_("Setting release dates and grading policies")}</h3>
-                    <p>${_("Select the Configure icon for a section or subsection to set its release date. When you configure a subsection, you can also set the grading policy and due date.")}</p>
-                    <div class="external-help">
-                        <a href="${get_online_help_info('grading')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about grading policy settings")}</a>
-                    </div>
-                </div>
-                <div class="bit">
-                    <h3 class="title-3">${_("Changing the content learners see")}</h3>
-                    <p>${_("To publish draft content, select the Publish icon for a section, subsection, or unit.")}</p>
-                    <p>${Text(_("To make a section, subsection, or unit unavailable to learners, select the Configure icon for that level, then select the appropriate {em_start}Hide{em_end} option. Grades for hidden sections, subsections, and units are not
-                        included in grade calculations.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
-                    <p>${Text(_("To hide the content of a subsection from learners after the subsection due date has passed, select the Configure icon for a subsection, then select {em_start}Hide content after due date{em_end}. Grades for the subsection
-                        remain included in grade calculations.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
-                    <div class="external-help">
-                        <a href="${get_online_help_info('visibility')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about content visibility settings")}</a>
-                    </div>
-                </div>
-
-            </aside>
-            </section>
+        </article>
+        <aside class="content-supplementary" role="complementary">
+            <div class="bit">
+                <h3 class="title-3">${_("Creating your course organization")}</h3>
+                <p>${_("You add sections, subsections, and units directly in the outline.")}</p>
+                <p>${_("Create a section, then add subsections and units. Open a unit to add course components.")}</p>
             </div>
-        </%block>
+            <div class="bit">
+                <h3 class="title-3">${_("Reorganizing your course")}</h3>
+                <p>${_("Drag sections, subsections, and units to new locations in the outline.")}</p>
+                <div class="external-help">
+                    <a href="${get_online_help_info('outline')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about the course outline")}</a>
+                </div>
+            </div>
+            <div class="bit">
+                <h3 class="title-3">${_("Setting release dates and grading policies")}</h3>
+                <p>${_("Select the Configure icon for a section or subsection to set its release date. When you configure a subsection, you can also set the grading policy and due date.")}</p>
+                <div class="external-help">
+                    <a href="${get_online_help_info('grading')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about grading policy settings")}</a>
+                </div>
+            </div>
+            <div class="bit">
+                <h3 class="title-3">${_("Changing the content learners see")}</h3>
+                <p>${_("To publish draft content, select the Publish icon for a section, subsection, or unit.")}</p>
+                <p>${Text(_("To make a section, subsection, or unit unavailable to learners, select the Configure icon for that level, then select the appropriate {em_start}Hide{em_end} option. Grades for hidden sections, subsections, and units are not included in grade calculations.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
+                <p>${Text(_("To hide the content of a subsection from learners after the subsection due date has passed, select the Configure icon for a subsection, then select {em_start}Hide content after due date{em_end}. Grades for the subsection remain included in grade calculations.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
+                <div class="external-help">
+                    <a href="${get_online_help_info('visibility')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about content visibility settings")}</a>
+                </div>
+            </div>
+
+        </aside>
+    </section>
+</div>
+</%block>

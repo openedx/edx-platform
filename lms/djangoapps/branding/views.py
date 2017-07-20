@@ -14,7 +14,6 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 
 from edxmako.shortcuts import render_to_response
 import student.views
-from student.models import CourseEnrollment
 import courseware.views.views
 from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
@@ -23,24 +22,6 @@ import branding.api as branding_api
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
-
-
-def get_course_enrollments(user):
-    """
-    Returns the course enrollments for the passed in user within the context of current org, that
-    is filtered by course_org_filter
-    """
-    enrollments = CourseEnrollment.enrollments_for_user(user)
-    course_org = configuration_helpers.get_value('course_org_filter')
-    if course_org:
-        site_enrollments = [
-            enrollment for enrollment in enrollments if enrollment.course_id.org == course_org
-        ]
-    else:
-        site_enrollments = [
-            enrollment for enrollment in enrollments
-        ]
-    return site_enrollments
 
 
 @ensure_csrf_cookie

@@ -34,7 +34,7 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
             field_dictionary['course'] = [unicode(enrollment.course_id) for enrollment in user_enrollments]
 
         # if we have an org filter, only include results for this org filter
-        course_org_filter = configuration_helpers.get_value('course_org_filter')
+        course_org_filter = configuration_helpers.get_current_site_orgs()
         if course_org_filter:
             field_dictionary['org'] = course_org_filter
 
@@ -45,7 +45,7 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
             Exclude any courses defined outside the current org.
         """
         exclude_dictionary = super(LmsSearchFilterGenerator, self).exclude_dictionary(**kwargs)
-        course_org_filter = configuration_helpers.get_value('course_org_filter')
+        course_org_filter = configuration_helpers.get_current_site_orgs()
         # If we have a course filter we are ensuring that we only get those courses above
         if not course_org_filter:
             org_filter_out_set = configuration_helpers.get_all_orgs()
