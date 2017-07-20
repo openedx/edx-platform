@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-07-06 15:11+0000\n"
-"PO-Revision-Date: 2017-07-06 15:11:42.951849\n"
+"POT-Creation-Date: 2017-07-20 11:48+0000\n"
+"PO-Revision-Date: 2017-07-20 11:48:32.252217\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -291,6 +291,11 @@ msgid "Moderator"
 msgstr ""
 
 #: common/djangoapps/django_comment_common/models.py
+msgid "Group Moderator"
+msgstr ""
+
+#: common/djangoapps/django_comment_common/models.py
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Community TA"
 msgstr ""
 
@@ -1686,9 +1691,8 @@ msgid "Could not interpret '{student_answer}' as a number."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-msgid ""
-"Answers can include numerals, operation signs, and a few specific "
-"characters, such as the constants e and i."
+#, python-brace-format
+msgid "You may not use variables ({bad_variables}) in numerical problems."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
@@ -1805,6 +1809,11 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Math Expression Input"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: {bad_input} not permitted in answer."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
@@ -2029,6 +2038,10 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Dictionary with the current student responses"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Dictionary with the current student score"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -4963,6 +4976,7 @@ msgid "Percent of Students"
 msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Score"
 msgstr ""
 
@@ -5219,6 +5233,29 @@ msgstr ""
 #: lms/djangoapps/courseware/tabs.py cms/templates/textbooks.html
 #: cms/templates/widgets/header.html
 msgid "Textbooks"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
+msgid "To see course content, {sign_in_link} or {register_link}."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "sign in"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "register"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
+msgid ""
+"You must be enrolled in the course to see course content. {enroll_link}."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Enroll now"
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
@@ -6601,6 +6638,14 @@ msgid "This component cannot be rescored."
 msgstr ""
 
 #: lms/djangoapps/instructor_task/api_helper.py
+msgid "This component does not support score override."
+msgstr ""
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "Scores must be between 0 and the value of the problem."
+msgstr ""
+
+#: lms/djangoapps/instructor_task/api_helper.py
 msgid "Not all problems in entrance exam support re-scoring."
 msgstr ""
 
@@ -6608,6 +6653,12 @@ msgstr ""
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "rescored"
+msgstr ""
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "overridden"
 msgstr ""
 
 #. Translators: This is a past-tense verb that is inserted into task progress
@@ -6903,6 +6954,11 @@ msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "This component's access settings refer to deleted or invalid groups."
+msgstr ""
+
+#: lms/djangoapps/lms_xblock/mixin.py
+msgid ""
+"This component's access settings contradict its parent's access settings."
 msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
@@ -8260,6 +8316,11 @@ msgid ""
 "opportunities from the world's best universities."
 msgstr ""
 
+#: lms/templates/emails/password_reset_subject.txt
+#, python-format
+msgid "Password reset on %(platform_name)s"
+msgstr ""
+
 #: lms/templates/logout.html
 msgid "Signed Out"
 msgstr ""
@@ -8300,7 +8361,6 @@ msgstr ""
 #: lms/templates/oauth2_provider/authorize.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/modal/accessible_confirm.html
 msgid "Cancel"
 msgstr ""
 
@@ -8318,7 +8378,7 @@ msgstr ""
 #, python-format
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
-" user account at %(site_name)s."
+" user account at %(platform_name)s."
 msgstr ""
 
 #: lms/templates/registration/password_reset_email.html
@@ -8434,7 +8494,6 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/modal/accessible_confirm.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Close"
 msgstr ""
@@ -9068,6 +9127,22 @@ msgstr ""
 #: openedx/core/djangoapps/dark_lang/views.py
 #, python-brace-format
 msgid "Language reset to user's preference: {preview_language_code}"
+msgstr ""
+
+#: openedx/core/djangoapps/debug/views.py
+msgid "This is a test message"
+msgstr ""
+
+#: openedx/core/djangoapps/debug/views.py
+msgid "This is a success message"
+msgstr ""
+
+#: openedx/core/djangoapps/debug/views.py
+msgid "This is a test warning"
+msgstr ""
+
+#: openedx/core/djangoapps/debug/views.py
+msgid "This is a test error"
 msgstr ""
 
 #: openedx/core/djangoapps/embargo/forms.py
@@ -10138,7 +10213,6 @@ msgstr ""
 #: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/student_profile/learner_profile.html
 msgid "Loading"
 msgstr ""
 
@@ -10182,7 +10256,6 @@ msgstr ""
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Courses"
 msgstr ""
 
@@ -10370,7 +10443,6 @@ msgid "Usermenu dropdown"
 msgstr ""
 
 #: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Sign Out"
 msgstr ""
 
@@ -10568,12 +10640,10 @@ msgid "Go back to the {link_start}home page{link_end}."
 msgstr ""
 
 #: lms/templates/email_change_successful.html
-#: lms/templates/emails_change_successful.html
 msgid "E-mail change successful!"
 msgstr ""
 
 #: lms/templates/email_change_successful.html
-#: lms/templates/emails_change_successful.html
 msgid "You should see your new email in your {link_start}dashboard{link_end}."
 msgstr ""
 
@@ -11504,12 +11574,16 @@ msgid "Add comment"
 msgstr ""
 
 #: lms/templates/staff_problem_info.html
-msgid "Staff Debug"
+msgid "Staff Debug:"
 msgstr ""
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Actions"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+msgid "Score (for override only)"
 msgstr ""
 
 #: lms/templates/staff_problem_info.html
@@ -11529,6 +11603,10 @@ msgstr ""
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore Only If Score Improves"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+msgid "Override Score"
 msgstr ""
 
 #: lms/templates/staff_problem_info.html
@@ -11743,7 +11821,7 @@ msgid ""
 " not mean to do this, {undo_link_start}you can re-subscribe{link_end}."
 msgstr ""
 
-#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
+#: lms/templates/user_dropdown.html
 msgid "Dashboard for:"
 msgstr ""
 
@@ -12619,12 +12697,14 @@ msgid "Auto Enroll"
 msgstr ""
 
 #: lms/templates/ccx/enrollment.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "If this option is {em_start}checked{em_end}, users who have not yet "
 "registered for {platform_name} will be automatically enrolled."
 msgstr ""
 
 #: lms/templates/ccx/enrollment.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "If this option is left {em_start}unchecked{em_end}, users who have not yet "
 "registered for {platform_name} will not be enrolled, but will be allowed to "
@@ -12642,6 +12722,7 @@ msgid "Notify users by email"
 msgstr ""
 
 #: lms/templates/ccx/enrollment.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "If this option is {em_start}checked{em_end}, users will receive an email "
 "notification."
@@ -13172,7 +13253,7 @@ msgstr ""
 msgid "Courseware"
 msgstr ""
 
-#: lms/templates/courseware/courseware.html lms/templates/courseware/info.html
+#: lms/templates/courseware/courseware.html
 msgid "Bookmarks"
 msgstr ""
 
@@ -13251,10 +13332,6 @@ msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Course Tools"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Reviews"
 msgstr ""
 
 #: lms/templates/courseware/news.html
@@ -15805,25 +15882,6 @@ msgid "Reason"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid ""
-"If this option is <em>checked</em>, users who have not yet registered for "
-"{platform_name} will be automatically enrolled."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid ""
-"If this option is left <em>unchecked</em>, users who have not yet registered"
-" for {platform_name} will not be enrolled, but will be allowed to enroll "
-"once they make an account."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid ""
-"If this option is <em>checked</em>, users will receive an email "
-"notification."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Register/Enroll Students"
 msgstr ""
 
@@ -15855,8 +15913,8 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"If this option is <em>checked</em>, users who have not enrolled in your "
-"course will be automatically enrolled."
+"If this option is {em_start}checked{em_end}, users who have not enrolled in "
+"your course will be automatically enrolled."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -15974,16 +16032,30 @@ msgid "Add Moderator"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Discussion Community TAs"
+msgid "Group Community TA"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Community TAs are members of the community whom you deem particularly "
-"helpful on the discussion boards. They can edit or delete any post, clear "
-"misuse flags, close and re-open threads, endorse responses, and see posts "
-"from all groups. Their posts are marked as 'Community TA'. Only enrolled "
-"users can be added as Community TAs."
+"Group Community TAs are members of the community who help course teams "
+"moderate discussions. Group Community TAs see only posts by learners in "
+"their assigned group. They can edit or delete posts, clear flags, close and "
+"re-open threads, and endorse responses, but only for posts by learners in "
+"their group. Their posts are marked as 'Community TA'. Only enrolled "
+"learners can be added as Group Community TAs."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Group Community TA"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"Community TAs are members of the community who help course teams moderate "
+"discussions. They can see posts by all learners, and can edit or delete "
+"posts, clear flags, close or re-open threads, and endorse responses. Their "
+"posts are marked as 'Community TA'. Only enrolled learners can be added as "
+"Community TAs."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -16210,7 +16282,7 @@ msgid "View a specific learner's grades and progress"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Learner's {platform_name} email address or username *"
+msgid "Learner's {platform_name} email address or username"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -16226,7 +16298,7 @@ msgid "Adjust a learner's grade for a specific problem"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Location of problem in course *"
+msgid "Location of problem in course"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -16259,6 +16331,23 @@ msgid ""
 "For the specified problem, rescore the learner's responses. The 'Rescore "
 "Only If Score Improves' option updates the learner's score only if it "
 "improves in the learner's favor."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Score Override"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "For the specified problem, override the learner's score."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"New score for problem, out of the total points available for the problem"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Override Learner's Score"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -16375,7 +16464,6 @@ msgstr ""
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Programs"
 msgstr ""
 
@@ -16397,28 +16485,9 @@ msgid ""
 "translator!{link_end}"
 msgstr ""
 
-#: lms/templates/modal/accessible_confirm.html
-msgid "Confirm"
-msgstr ""
-
-#. Translators: this text gives status on if the modal interface (a menu or
-#. piece of UI that takes the full focus of the screen) is open or not
-#: lms/templates/modal/accessible_confirm.html
-msgid "modal open"
-msgstr ""
-
-#: lms/templates/modal/accessible_confirm.html
-msgid "OK"
-msgstr ""
-
-#: lms/templates/modal/accessible_confirm.html
-msgid "open"
-msgstr ""
-
 #. Translators: This is short for "System administration".
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Sysadmin"
 msgstr ""
 
@@ -16426,27 +16495,23 @@ msgstr ""
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/shoppingcart/shopping_cart.html
 #: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Shopping Cart"
 msgstr ""
 
 #: lms/templates/navigation/navbar-logo-header.html
 #: lms/templates/navigation/bootstrap/navbar-logo-header.html
 #: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid "{platform_name} Home Page"
 msgstr ""
 
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid "How it Works"
 msgstr ""
 
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Schools"
 msgstr ""
 
@@ -16457,12 +16522,10 @@ msgstr ""
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Sign in"
 msgstr ""
 
 #: lms/templates/navigation/navigation.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr ""
 
@@ -17210,7 +17273,6 @@ msgid "Currently the {platform_name} servers are overloaded"
 msgstr ""
 
 #: lms/templates/student_account/account_settings.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Account Settings"
 msgstr ""
 
@@ -17220,40 +17282,6 @@ msgstr ""
 
 #: lms/templates/student_account/login_and_register.html
 msgid "Sign in or Register"
-msgstr ""
-
-#: lms/templates/student_profile/learner_profile.html
-msgid "Learner Profile"
-msgstr ""
-
-#. Translators: this section lists all the third-party authentication
-#. providers
-#. (for example, Google and LinkedIn) the user can link with or unlink from
-#. their edX account.
-#: lms/templates/student_profile/third_party_auth.html
-msgid "Connected Accounts"
-msgstr ""
-
-#: lms/templates/student_profile/third_party_auth.html
-msgid "Linked"
-msgstr ""
-
-#: lms/templates/student_profile/third_party_auth.html
-msgid "Not Linked"
-msgstr ""
-
-#. Translators: clicking on this removes the link between a user's edX account
-#. and their account with an external authentication provider (like Google or
-#. LinkedIn).
-#: lms/templates/student_profile/third_party_auth.html
-msgid "Unlink"
-msgstr ""
-
-#. Translators: clicking on this creates a link between a user's edX account
-#. and their account with an external authentication provider (like Google or
-#. LinkedIn).
-#: lms/templates/student_profile/third_party_auth.html
-msgid "Link"
 msgstr ""
 
 #: lms/templates/support/certificates.html lms/templates/support/index.html
@@ -17516,7 +17544,6 @@ msgid "Main"
 msgstr ""
 
 #: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Find Courses"
 msgstr ""
 
@@ -17542,18 +17569,6 @@ msgstr ""
 msgid ""
 "{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
 "Code{honor_link_end}"
-msgstr ""
-
-#: themes/red-theme/lms/templates/header.html
-msgid "More options dropdown"
-msgstr ""
-
-#: themes/red-theme/lms/templates/header.html
-msgid "My Profile"
-msgstr ""
-
-#: themes/red-theme/lms/templates/header.html
-msgid "Register Now"
 msgstr ""
 
 #: themes/stanford-style/lms/templates/footer.html
@@ -17720,17 +17735,12 @@ msgstr ""
 msgid "Files & Uploads"
 msgstr ""
 
-#: cms/templates/asset_index.html cms/templates/container.html
-#: cms/templates/course-create-rerun.html cms/templates/course_info.html
-#: cms/templates/course_outline.html cms/templates/edit-tabs.html
-#: cms/templates/index.html cms/templates/library.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: cms/templates/textbooks.html cms/templates/videos_index.html
-msgid "Page Actions"
-msgstr ""
-
 #: cms/templates/asset_index.html cms/templates/videos_index.html
 msgid "Upload New File"
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid "Help adding Files and Uploads"
 msgstr ""
 
 #: cms/templates/asset_index.html
@@ -17918,6 +17928,15 @@ msgstr ""
 #: cms/templates/component.html cms/templates/edit-tabs.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Drag to reorder"
+msgstr ""
+
+#: cms/templates/container.html cms/templates/course-create-rerun.html
+#: cms/templates/course_info.html cms/templates/course_outline.html
+#: cms/templates/edit-tabs.html cms/templates/index.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html cms/templates/textbooks.html
+#: cms/templates/videos_index.html
+msgid "Page Actions"
 msgstr ""
 
 #: cms/templates/container.html
@@ -19347,10 +19366,6 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "For example, MITx"
-msgstr ""
-
-#: cms/templates/index.html
-msgid "Show content libraries"
 msgstr ""
 
 #: cms/templates/index.html
