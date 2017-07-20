@@ -418,6 +418,10 @@ FEATURES = {
 
     # Whether HTML XBlocks/XModules return HTML content with the Course Blocks API student_view_data
     'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA': False,
+
+    # Whether to send an email for failed password reset attempts or not. This is mainly useful for notifying users
+    # that they don't have an account associated with email addresses they believe they've registered with.
+    'ENABLE_PASSWORD_RESET_FAILURE_EMAIL': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
