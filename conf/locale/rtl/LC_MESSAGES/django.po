@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-07-06 15:11+0000\n"
-"PO-Revision-Date: 2017-07-06 15:11:42.951849\n"
+"POT-Creation-Date: 2017-07-20 11:48+0000\n"
+"PO-Revision-Date: 2017-07-20 11:48:32.252217\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -309,6 +309,11 @@ msgid "Moderator"
 msgstr "وخيثقشفخق"
 
 #: common/djangoapps/django_comment_common/models.py
+msgid "Group Moderator"
+msgstr "لقخعح وخيثقشفخق"
+
+#: common/djangoapps/django_comment_common/models.py
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Community TA"
 msgstr "ذخووعرهفغ فش"
 
@@ -1803,12 +1808,9 @@ msgid "Could not interpret '{student_answer}' as a number."
 msgstr "ذخعمي رخف هرفثقحقثف '{student_answer}' شس ش رعوزثق."
 
 #: common/lib/capa/capa/responsetypes.py
-msgid ""
-"Answers can include numerals, operation signs, and a few specific "
-"characters, such as the constants e and i."
-msgstr ""
-"شرسصثقس ذشر هرذمعيث رعوثقشمس, خحثقشفهخر سهلرس, شري ش بثص سحثذهبهذ "
-"ذاشقشذفثقس, سعذا شس فاث ذخرسفشرفس ث شري ه."
+#, python-brace-format
+msgid "You may not use variables ({bad_variables}) in numerical problems."
+msgstr "غخع وشغ رخف عسث دشقهشزمثس ({bad_variables}) هر رعوثقهذشم حقخزمثوس."
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
@@ -1929,6 +1931,11 @@ msgstr "ثطفثقرشم لقشيثق"
 #: common/lib/capa/capa/responsetypes.py
 msgid "Math Expression Input"
 msgstr "وشفا ثطحقثسسهخر هرحعف"
+
+#: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: {bad_input} not permitted in answer."
+msgstr "هردشمهي هرحعف: {bad_input} رخف حثقوهففثي هر شرسصثق."
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
@@ -2165,6 +2172,10 @@ msgstr "يهذفهخرشقغ بخق وشهرفشهرهرل فاث سفشفث خ�
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Dictionary with the current student responses"
 msgstr "يهذفهخرشقغ صهفا فاث ذعققثرف سفعيثرف قثسحخرسثس"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Dictionary with the current student score"
+msgstr "يهذفهخرشقغ صهفا فاث ذعققثرف سفعيثرف سذخقث"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether or not the answers have been saved since last submit"
@@ -5537,6 +5548,7 @@ msgid "Percent of Students"
 msgstr "حثقذثرف خب سفعيثرفس"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Score"
 msgstr "سذخقث"
 
@@ -5818,6 +5830,30 @@ msgstr "حقخلقثسس"
 #: cms/templates/widgets/header.html
 msgid "Textbooks"
 msgstr "فثطفزخخنس"
+
+#: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
+msgid "To see course content, {sign_in_link} or {register_link}."
+msgstr "فخ سثث ذخعقسث ذخرفثرف, {sign_in_link} خق {register_link}."
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "sign in"
+msgstr "سهلر هر"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "register"
+msgstr "قثلهسفثق"
+
+#: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
+msgid ""
+"You must be enrolled in the course to see course content. {enroll_link}."
+msgstr ""
+"غخع وعسف زث ثرقخممثي هر فاث ذخعقسث فخ سثث ذخعقسث ذخرفثرف. {enroll_link}."
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Enroll now"
+msgstr "ثرقخمم رخص"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This will look like '$50', where {currency_symbol} is a symbol
@@ -7326,6 +7362,14 @@ msgid "This component cannot be rescored."
 msgstr "فاهس ذخوحخرثرف ذشررخف زث قثسذخقثي."
 
 #: lms/djangoapps/instructor_task/api_helper.py
+msgid "This component does not support score override."
+msgstr "فاهس ذخوحخرثرف يخثس رخف سعححخقف سذخقث خدثققهيث."
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "Scores must be between 0 and the value of the problem."
+msgstr "سذخقثس وعسف زث زثفصثثر 0 شري فاث دشمعث خب فاث حقخزمثو."
+
+#: lms/djangoapps/instructor_task/api_helper.py
 msgid "Not all problems in entrance exam support re-scoring."
 msgstr "رخف شمم حقخزمثوس هر ثرفقشرذث ثطشو سعححخقف قث-سذخقهرل."
 
@@ -7334,6 +7378,12 @@ msgstr "رخف شمم حقخزمثوس هر ثرفقشرذث ثطشو سعححخ
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "rescored"
 msgstr "قثسذخقثي"
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "overridden"
+msgstr "خدثققهييثر"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -7634,6 +7684,12 @@ msgstr ""
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "This component's access settings refer to deleted or invalid groups."
 msgstr "فاهس ذخوحخرثرف'س شذذثسس سثففهرلس قثبثق فخ يثمثفثي خق هردشمهي لقخعحس."
+
+#: lms/djangoapps/lms_xblock/mixin.py
+msgid ""
+"This component's access settings contradict its parent's access settings."
+msgstr ""
+"فاهس ذخوحخرثرف'س شذذثسس سثففهرلس ذخرفقشيهذف هفس حشقثرف'س شذذثسس سثففهرلس."
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Whether to display this module in the table of contents"
@@ -9237,6 +9293,11 @@ msgstr ""
 "{start_bold}{platform_name}{end_bold} فخ خببثق غخع اهلا-ضعشمهفغ مثشقرهرل "
 "خححخقفعرهفهثس بقخو فاث صخقمي'س زثسف عرهدثقسهفهثس."
 
+#: lms/templates/emails/password_reset_subject.txt
+#, python-format
+msgid "Password reset on %(platform_name)s"
+msgstr "حشسسصخقي قثسثف خر %(platform_name)s"
+
 #: lms/templates/logout.html
 msgid "Signed Out"
 msgstr "سهلرثي خعف"
@@ -9284,7 +9345,6 @@ msgstr ""
 #: lms/templates/oauth2_provider/authorize.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/modal/accessible_confirm.html
 msgid "Cancel"
 msgstr "ذشرذثم"
 
@@ -9302,10 +9362,10 @@ msgstr "ثققخق"
 #, python-format
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
-" user account at %(site_name)s."
+" user account at %(platform_name)s."
 msgstr ""
 "غخع'قث قثذثهدهرل فاهس ث-وشهم زثذشعسث غخع قثضعثسفثي ش حشسسصخقي قثسثف بخق غخعق"
-" عسثق شذذخعرف شف %(site_name)s."
+" عسثق شذذخعرف شف %(platform_name)s."
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Please go to the following page and choose a new password:"
@@ -9426,7 +9486,6 @@ msgstr "حقثدهثص"
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/modal/accessible_confirm.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Close"
 msgstr "ذمخسث"
@@ -10118,6 +10177,22 @@ msgstr "مشرلعشلث قثسثف فخ فاث يثبشعمف مشرلعشلث 
 #, python-brace-format
 msgid "Language reset to user's preference: {preview_language_code}"
 msgstr "مشرلعشلث قثسثف فخ عسثق'س حقثبثقثرذث: {preview_language_code}"
+
+#: openedx/core/djangoapps/debug/views.py
+msgid "This is a test message"
+msgstr "فاهس هس ش فثسف وثسسشلث"
+
+#: openedx/core/djangoapps/debug/views.py
+msgid "This is a success message"
+msgstr "فاهس هس ش سعذذثسس وثسسشلث"
+
+#: openedx/core/djangoapps/debug/views.py
+msgid "This is a test warning"
+msgstr "فاهس هس ش فثسف صشقرهرل"
+
+#: openedx/core/djangoapps/debug/views.py
+msgid "This is a test error"
+msgstr "فاهس هس ش فثسف ثققخق"
 
 #: openedx/core/djangoapps/embargo/forms.py
 #: openedx/core/djangoapps/verified_track_content/forms.py
@@ -11270,7 +11345,6 @@ msgstr "ذخرفثرف"
 #: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/student_profile/learner_profile.html
 msgid "Loading"
 msgstr "مخشيهرل"
 
@@ -11314,7 +11388,6 @@ msgstr "ذخعقسث رعوزثق:"
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Courses"
 msgstr "ذخعقسثس"
 
@@ -11502,7 +11575,6 @@ msgid "Usermenu dropdown"
 msgstr "عسثقوثرع يقخحيخصر"
 
 #: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Sign Out"
 msgstr "سهلر خعف"
 
@@ -11702,12 +11774,10 @@ msgid "Go back to the {link_start}home page{link_end}."
 msgstr "لخ زشذن فخ فاث {link_start}اخوث حشلث{link_end}."
 
 #: lms/templates/email_change_successful.html
-#: lms/templates/emails_change_successful.html
 msgid "E-mail change successful!"
 msgstr "ث-وشهم ذاشرلث سعذذثسسبعم!"
 
 #: lms/templates/email_change_successful.html
-#: lms/templates/emails_change_successful.html
 msgid "You should see your new email in your {link_start}dashboard{link_end}."
 msgstr ""
 "غخع ساخعمي سثث غخعق رثص ثوشهم هر غخعق {link_start}يشسازخشقي{link_end}."
@@ -12708,13 +12778,17 @@ msgid "Add comment"
 msgstr "شيي ذخووثرف"
 
 #: lms/templates/staff_problem_info.html
-msgid "Staff Debug"
-msgstr "سفشبب يثزعل"
+msgid "Staff Debug:"
+msgstr "سفشبب يثزعل:"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Actions"
 msgstr "شذفهخرس"
+
+#: lms/templates/staff_problem_info.html
+msgid "Score (for override only)"
+msgstr "سذخقث (بخق خدثققهيث خرمغ)"
 
 #: lms/templates/staff_problem_info.html
 msgid "Reset Learner's Attempts to Zero"
@@ -12734,6 +12808,10 @@ msgstr "قثسذخقث مثشقرثق'س سعزوهسسهخر"
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore Only If Score Improves"
 msgstr "قثسذخقث خرمغ هب سذخقث هوحقخدثس"
+
+#: lms/templates/staff_problem_info.html
+msgid "Override Score"
+msgstr "خدثققهيث سذخقث"
 
 #: lms/templates/staff_problem_info.html
 msgid "Module Fields"
@@ -12952,7 +13030,7 @@ msgstr ""
 "غخع وشغ {dashboard_link_start}قثفعقر فخ غخعق يشسازخشقي{link_end}. هب غخع يهي"
 " رخف وثشر فخ يخ فاهس, {undo_link_start}غخع ذشر قث-سعزسذقهزث{link_end}."
 
-#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
+#: lms/templates/user_dropdown.html
 msgid "Dashboard for:"
 msgstr "يشسازخشقي بخق:"
 
@@ -14106,6 +14184,7 @@ msgid "Auto Enroll"
 msgstr "شعفخ ثرقخمم"
 
 #: lms/templates/ccx/enrollment.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "If this option is {em_start}checked{em_end}, users who have not yet "
 "registered for {platform_name} will be automatically enrolled."
@@ -14114,6 +14193,7 @@ msgstr ""
 "قثلهسفثقثي بخق {platform_name} صهمم زث شعفخوشفهذشممغ ثرقخممثي."
 
 #: lms/templates/ccx/enrollment.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "If this option is left {em_start}unchecked{em_end}, users who have not yet "
 "registered for {platform_name} will not be enrolled, but will be allowed to "
@@ -14134,6 +14214,7 @@ msgid "Notify users by email"
 msgstr "رخفهبغ عسثقس زغ ثوشهم"
 
 #: lms/templates/ccx/enrollment.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "If this option is {em_start}checked{em_end}, users will receive an email "
 "notification."
@@ -14712,7 +14793,7 @@ msgstr "ذخعقسث عفهمهفهثس"
 msgid "Courseware"
 msgstr "ذخعقسثصشقث"
 
-#: lms/templates/courseware/courseware.html lms/templates/courseware/info.html
+#: lms/templates/courseware/courseware.html
 msgid "Bookmarks"
 msgstr "زخخنوشقنس"
 
@@ -14796,10 +14877,6 @@ msgstr "اشريخعف رشدهلشفهخر"
 #: lms/templates/courseware/info.html
 msgid "Course Tools"
 msgstr "ذخعقسث فخخمس"
-
-#: lms/templates/courseware/info.html
-msgid "Reviews"
-msgstr "قثدهثصس"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -17652,32 +17729,6 @@ msgid "Reason"
 msgstr "قثشسخر"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid ""
-"If this option is <em>checked</em>, users who have not yet registered for "
-"{platform_name} will be automatically enrolled."
-msgstr ""
-"هب فاهس خحفهخر هس <em>ذاثذنثي</em>, عسثقس صاخ اشدث رخف غثف قثلهسفثقثي بخق "
-"{platform_name} صهمم زث شعفخوشفهذشممغ ثرقخممثي."
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid ""
-"If this option is left <em>unchecked</em>, users who have not yet registered"
-" for {platform_name} will not be enrolled, but will be allowed to enroll "
-"once they make an account."
-msgstr ""
-"هب فاهس خحفهخر هس مثبف <em>عرذاثذنثي</em>, عسثقس صاخ اشدث رخف غثف قثلهسفثقثي"
-" بخق {platform_name} صهمم رخف زث ثرقخممثي, زعف صهمم زث شممخصثي فخ ثرقخمم "
-"خرذث فاثغ وشنث شر شذذخعرف."
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid ""
-"If this option is <em>checked</em>, users will receive an email "
-"notification."
-msgstr ""
-"هب فاهس خحفهخر هس <em>ذاثذنثي</em>, عسثقس صهمم قثذثهدث شر ثوشهم "
-"رخفهبهذشفهخر."
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Register/Enroll Students"
 msgstr "قثلهسفثق/ثرقخمم سفعيثرفس"
 
@@ -17715,11 +17766,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"If this option is <em>checked</em>, users who have not enrolled in your "
-"course will be automatically enrolled."
+"If this option is {em_start}checked{em_end}, users who have not enrolled in "
+"your course will be automatically enrolled."
 msgstr ""
-"هب فاهس خحفهخر هس <em>ذاثذنثي</em>, عسثقس صاخ اشدث رخف ثرقخممثي هر غخعق "
-"ذخعقسث صهمم زث شعفخوشفهذشممغ ثرقخممثي."
+"هب فاهس خحفهخر هس {em_start}ذاثذنثي{em_end}, عسثقس صاخ اشدث رخف ثرقخممثي هر "
+"غخعق ذخعقسث صهمم زث شعفخوشفهذشممغ ثرقخممثي."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Checking this box has no effect if 'Remove beta testers' is selected."
@@ -17861,22 +17912,42 @@ msgid "Add Moderator"
 msgstr "شيي وخيثقشفخق"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Discussion Community TAs"
-msgstr "يهسذعسسهخر ذخووعرهفغ فشس"
+msgid "Group Community TA"
+msgstr "لقخعح ذخووعرهفغ فش"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Community TAs are members of the community whom you deem particularly "
-"helpful on the discussion boards. They can edit or delete any post, clear "
-"misuse flags, close and re-open threads, endorse responses, and see posts "
-"from all groups. Their posts are marked as 'Community TA'. Only enrolled "
-"users can be added as Community TAs."
+"Group Community TAs are members of the community who help course teams "
+"moderate discussions. Group Community TAs see only posts by learners in "
+"their assigned group. They can edit or delete posts, clear flags, close and "
+"re-open threads, and endorse responses, but only for posts by learners in "
+"their group. Their posts are marked as 'Community TA'. Only enrolled "
+"learners can be added as Group Community TAs."
 msgstr ""
-"ذخووعرهفغ فشس شقث وثوزثقس خب فاث ذخووعرهفغ صاخو غخع يثثو حشقفهذعمشقمغ "
-"اثمحبعم خر فاث يهسذعسسهخر زخشقيس. فاثغ ذشر ثيهف خق يثمثفث شرغ حخسف, ذمثشق "
-"وهسعسث بمشلس, ذمخسث شري قث-خحثر فاقثشيس, ثريخقسث قثسحخرسثس, شري سثث حخسفس "
-"بقخو شمم لقخعحس. فاثهق حخسفس شقث وشقنثي شس 'ذخووعرهفغ فش'. خرمغ ثرقخممثي "
-"عسثقس ذشر زث شييثي شس ذخووعرهفغ فشس."
+"لقخعح ذخووعرهفغ فشس شقث وثوزثقس خب فاث ذخووعرهفغ صاخ اثمح ذخعقسث فثشوس "
+"وخيثقشفث يهسذعسسهخرس. لقخعح ذخووعرهفغ فشس سثث خرمغ حخسفس زغ مثشقرثقس هر "
+"فاثهق شسسهلرثي لقخعح. فاثغ ذشر ثيهف خق يثمثفث حخسفس, ذمثشق بمشلس, ذمخسث شري "
+"قث-خحثر فاقثشيس, شري ثريخقسث قثسحخرسثس, زعف خرمغ بخق حخسفس زغ مثشقرثقس هر "
+"فاثهق لقخعح. فاثهق حخسفس شقث وشقنثي شس 'ذخووعرهفغ فش'. خرمغ ثرقخممثي "
+"مثشقرثقس ذشر زث شييثي شس لقخعح ذخووعرهفغ فشس."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Group Community TA"
+msgstr "شيي لقخعح ذخووعرهفغ فش"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"Community TAs are members of the community who help course teams moderate "
+"discussions. They can see posts by all learners, and can edit or delete "
+"posts, clear flags, close or re-open threads, and endorse responses. Their "
+"posts are marked as 'Community TA'. Only enrolled learners can be added as "
+"Community TAs."
+msgstr ""
+"ذخووعرهفغ فشس شقث وثوزثقس خب فاث ذخووعرهفغ صاخ اثمح ذخعقسث فثشوس وخيثقشفث "
+"يهسذعسسهخرس. فاثغ ذشر سثث حخسفس زغ شمم مثشقرثقس, شري ذشر ثيهف خق يثمثفث "
+"حخسفس, ذمثشق بمشلس, ذمخسث خق قث-خحثر فاقثشيس, شري ثريخقسث قثسحخرسثس. فاثهق "
+"حخسفس شقث وشقنثي شس 'ذخووعرهفغ فش'. خرمغ ثرقخممثي مثشقرثقس ذشر زث شييثي شس "
+"ذخووعرهفغ فشس."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Community TA"
@@ -18121,8 +18192,8 @@ msgid "View a specific learner's grades and progress"
 msgstr "دهثص ش سحثذهبهذ مثشقرثق'س لقشيثس شري حقخلقثسس"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Learner's {platform_name} email address or username *"
-msgstr "مثشقرثق'س {platform_name} ثوشهم شييقثسس خق عسثقرشوث *"
+msgid "Learner's {platform_name} email address or username"
+msgstr "مثشقرثق'س {platform_name} ثوشهم شييقثسس خق عسثقرشوث"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner email address or username"
@@ -18137,8 +18208,8 @@ msgid "Adjust a learner's grade for a specific problem"
 msgstr "شيتعسف ش مثشقرثق'س لقشيث بخق ش سحثذهبهذ حقخزمثو"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Location of problem in course *"
-msgstr "مخذشفهخر خب حقخزمثو هر ذخعقسث *"
+msgid "Location of problem in course"
+msgstr "مخذشفهخر خب حقخزمثو هر ذخعقسث"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Example"
@@ -18175,6 +18246,24 @@ msgstr ""
 "بخق فاث سحثذهبهثي حقخزمثو, قثسذخقث فاث مثشقرثق'س قثسحخرسثس. فاث 'قثسذخقث "
 "خرمغ هب سذخقث هوحقخدثس' خحفهخر عحيشفثس فاث مثشقرثق'س سذخقث خرمغ هب هف "
 "هوحقخدثس هر فاث مثشقرثق'س بشدخق."
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Score Override"
+msgstr "سذخقث خدثققهيث"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "For the specified problem, override the learner's score."
+msgstr "بخق فاث سحثذهبهثي حقخزمثو, خدثققهيث فاث مثشقرثق'س سذخقث."
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"New score for problem, out of the total points available for the problem"
+msgstr ""
+"رثص سذخقث بخق حقخزمثو, خعف خب فاث فخفشم حخهرفس شدشهمشزمث بخق فاث حقخزمثو"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Override Learner's Score"
+msgstr "خدثققهيث مثشقرثق'س سذخقث"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Problem History"
@@ -18303,7 +18392,6 @@ msgstr "حقخلقشو يثفشهمس"
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Programs"
 msgstr "حقخلقشوس"
 
@@ -18327,28 +18415,9 @@ msgstr ""
 "يخر'ف سثث غخعق حقثبثققثي مشرلعشلث? {link_start}دخمعرفثثق فخ زثذخوث ش "
 "فقشرسمشفخق!{link_end}"
 
-#: lms/templates/modal/accessible_confirm.html
-msgid "Confirm"
-msgstr "ذخربهقو"
-
-#. Translators: this text gives status on if the modal interface (a menu or
-#. piece of UI that takes the full focus of the screen) is open or not
-#: lms/templates/modal/accessible_confirm.html
-msgid "modal open"
-msgstr "وخيشم خحثر"
-
-#: lms/templates/modal/accessible_confirm.html
-msgid "OK"
-msgstr "خن"
-
-#: lms/templates/modal/accessible_confirm.html
-msgid "open"
-msgstr "خحثر"
-
 #. Translators: This is short for "System administration".
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Sysadmin"
 msgstr "سغسشيوهر"
 
@@ -18356,27 +18425,23 @@ msgstr "سغسشيوهر"
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/shoppingcart/shopping_cart.html
 #: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Shopping Cart"
 msgstr "ساخححهرل ذشقف"
 
 #: lms/templates/navigation/navbar-logo-header.html
 #: lms/templates/navigation/bootstrap/navbar-logo-header.html
 #: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid "{platform_name} Home Page"
 msgstr "{platform_name} اخوث حشلث"
 
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid "How it Works"
 msgstr "اخص هف صخقنس"
 
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Schools"
 msgstr "سذاخخمس"
 
@@ -18387,12 +18452,10 @@ msgstr "ثطحمخقث ذخعقسثس"
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Sign in"
 msgstr "سهلر هر"
 
 #: lms/templates/navigation/navigation.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "لمخزشم"
 
@@ -19223,7 +19286,6 @@ msgid "Currently the {platform_name} servers are overloaded"
 msgstr "ذعققثرفمغ فاث {platform_name} سثقدثقس شقث خدثقمخشيثي"
 
 #: lms/templates/student_account/account_settings.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Account Settings"
 msgstr "شذذخعرف سثففهرلس"
 
@@ -19234,40 +19296,6 @@ msgstr "حمثشسث صشهف"
 #: lms/templates/student_account/login_and_register.html
 msgid "Sign in or Register"
 msgstr "سهلر هر خق قثلهسفثق"
-
-#: lms/templates/student_profile/learner_profile.html
-msgid "Learner Profile"
-msgstr "مثشقرثق حقخبهمث"
-
-#. Translators: this section lists all the third-party authentication
-#. providers
-#. (for example, Google and LinkedIn) the user can link with or unlink from
-#. their edX account.
-#: lms/templates/student_profile/third_party_auth.html
-msgid "Connected Accounts"
-msgstr "ذخررثذفثي شذذخعرفس"
-
-#: lms/templates/student_profile/third_party_auth.html
-msgid "Linked"
-msgstr "مهرنثي"
-
-#: lms/templates/student_profile/third_party_auth.html
-msgid "Not Linked"
-msgstr "رخف مهرنثي"
-
-#. Translators: clicking on this removes the link between a user's edX account
-#. and their account with an external authentication provider (like Google or
-#. LinkedIn).
-#: lms/templates/student_profile/third_party_auth.html
-msgid "Unlink"
-msgstr "عرمهرن"
-
-#. Translators: clicking on this creates a link between a user's edX account
-#. and their account with an external authentication provider (like Google or
-#. LinkedIn).
-#: lms/templates/student_profile/third_party_auth.html
-msgid "Link"
-msgstr "مهرن"
 
 #: lms/templates/support/certificates.html lms/templates/support/index.html
 msgid "Student Support"
@@ -19560,7 +19588,6 @@ msgid "Main"
 msgstr "وشهر"
 
 #: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid "Find Courses"
 msgstr "بهري ذخعقسثس"
 
@@ -19593,18 +19620,6 @@ msgid ""
 msgstr ""
 "{tos_link_start}فثقوس خب سثقدهذث{tos_link_end} شري {honor_link_start}اخرخق "
 "ذخيث{honor_link_end}"
-
-#: themes/red-theme/lms/templates/header.html
-msgid "More options dropdown"
-msgstr "وخقث خحفهخرس يقخحيخصر"
-
-#: themes/red-theme/lms/templates/header.html
-msgid "My Profile"
-msgstr "وغ حقخبهمث"
-
-#: themes/red-theme/lms/templates/header.html
-msgid "Register Now"
-msgstr "قثلهسفثق رخص"
 
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -19803,18 +19818,13 @@ msgstr ""
 msgid "Files & Uploads"
 msgstr "بهمثس & عحمخشيس"
 
-#: cms/templates/asset_index.html cms/templates/container.html
-#: cms/templates/course-create-rerun.html cms/templates/course_info.html
-#: cms/templates/course_outline.html cms/templates/edit-tabs.html
-#: cms/templates/index.html cms/templates/library.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: cms/templates/textbooks.html cms/templates/videos_index.html
-msgid "Page Actions"
-msgstr "حشلث شذفهخرس"
-
 #: cms/templates/asset_index.html cms/templates/videos_index.html
 msgid "Upload New File"
 msgstr "عحمخشي رثص بهمث"
+
+#: cms/templates/asset_index.html
+msgid "Help adding Files and Uploads"
+msgstr "اثمح شييهرل بهمثس شري عحمخشيس"
 
 #: cms/templates/asset_index.html
 msgid "Adding Files for Your Course"
@@ -20031,6 +20041,15 @@ msgstr "يثمثفث فاهس ذخوحخرثرف"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Drag to reorder"
 msgstr "يقشل فخ قثخقيثق"
+
+#: cms/templates/container.html cms/templates/course-create-rerun.html
+#: cms/templates/course_info.html cms/templates/course_outline.html
+#: cms/templates/edit-tabs.html cms/templates/index.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html cms/templates/textbooks.html
+#: cms/templates/videos_index.html
+msgid "Page Actions"
+msgstr "حشلث شذفهخرس"
 
 #: cms/templates/container.html
 msgid "Open the courseware in the LMS"
@@ -21716,10 +21735,6 @@ msgstr "ساخص شمم ذخعقسثس هر خقلشرهظشفهخر:"
 #: cms/templates/index.html
 msgid "For example, MITx"
 msgstr "بخق ثطشوحمث, وهفط"
-
-#: cms/templates/index.html
-msgid "Show content libraries"
-msgstr "ساخص ذخرفثرف مهزقشقهثس"
 
 #: cms/templates/index.html
 msgid "Courses Being Processed"
