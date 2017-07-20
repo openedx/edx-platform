@@ -30,7 +30,8 @@ var options = {
         {pattern: 'cms/**/*spec.js'},
         {pattern: 'coffee/spec/**/*spec.js'},
         {pattern: 'js/certificates/spec/**/*spec.js'},
-        {pattern: 'js/spec/**/*spec.js'}
+        {pattern: 'js/spec/**/*spec.js'},
+        {pattern: 'js/features/**/*test.jsx', webpack: true}
     ],
 
     fixtureFiles: [
@@ -40,8 +41,16 @@ var options = {
 
     runFiles: [
         {pattern: 'cms/js/spec/main.js', included: true}
-    ]
+    ],
+
+    preprocessors: {}
 };
+
+options.specFiles
+    .filter(function(file) { return file.webpack; })
+    .forEach(function(file) {
+        options.preprocessors[file.pattern] = ['webpack', 'sourcemap'];
+    });
 
 module.exports = function(config) {
     configModule.configure(config, options);

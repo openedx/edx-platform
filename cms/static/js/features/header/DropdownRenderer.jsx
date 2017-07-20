@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Dropdown } from 'paragon';
 
-class DropdownMenu extends React.Component {
+export class DropdownMenu extends React.Component {
   static insertIf (property, entry) {
     return property ? entry : [];
   }
