@@ -702,7 +702,6 @@
     "Paste row before": "\u5728\u4e0a\u65b9\u7c98\u8d34\u884c", 
     "Paste your embed code below:": "\u5c06\u5185\u5d4c\u4ee3\u7801\u7c98\u8d34\u5230\u4e0b\u65b9\uff1a", 
     "Pause": "\u6682\u505c", 
-    "Pending": "\u6302\u8d77", 
     "Photo Captured successfully.": "\u7167\u7247\u83b7\u53d6\u6210\u529f\uff01", 
     "Photo ID": "\u6709\u7167\u7247\u7684\u8eab\u4efd\u8bc1\u4ef6", 
     "Photo Identification": "\u7167\u7247\u8bc6\u522b", 
