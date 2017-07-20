@@ -1,65 +1,96 @@
-// Open edX: LMS footer
-// ====================
+// Open edX: Studio footer
+// =======================
+//
+// Note: these styles replicate the Studio styles directly
+// rather than benefiting from any Bootstrap classes. Ideally
+// the header should be reimagined using Bootstrap and then
+// these styles will no longer be necessary.
 
 .wrapper-footer {
-  box-shadow: 0 -1px 5px 0 $black-t0;
-  border-top: 1px solid $navbar-light-disabled-color;
-  background-color: $footer-bg;
-  margin-top: $baseline/2;
+  position: relative;
+  width: 100%;
+  margin: 0 0 $baseline 0;
   padding: $baseline;
-  font-family: $font-family-sans-serif;
 
-  footer {
+  footer.primary {
+    @extend %t-copy-sub2;
+    @include clearfix();
     max-width: $studio-max-width;
+    width: flex-grid(12);
     margin: 0 auto;
+    color: $gray-light;
 
-    .site-nav {
-      padding: 0;
+    .footer-content-primary {
+      @include clearfix();
+    }
+
+    .colophon {
+      width: flex-grid(4, 12);
+      float: left;
+      margin-right: flex-gutter(2);
+    }
+
+    .nav-peripheral {
+      width: flex-grid(6, 12);
+      float: right;
+      text-align: right;
 
       .nav-item {
-        margin-right: $baseline;
+        display: inline-block;
+        margin-right: $baseline/4;
 
-        .nav-link {
-          text-decoration: none;
-          padding: 0;
-          color: $brand-inverse;
+        &:last-child {
+          margin-right: 0;
+        }
 
-          &:hover {
-            color: $brand-primary;
+        a {
+          border-radius: 2px;
+          padding: ($baseline/2) ($baseline/2);
+          background: transparent;
+
+          .icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: $baseline/4;
           }
         }
       }
     }
 
-    .legal-nav {
-      padding: 0;
-
-      .nav-item {
-        .nav-link {
-          text-decoration: none;
-          padding: 0;
-          margin-right: $baseline/4;
-          font-size: $font-size-sm;
-        }
-      }
-
-      li:not(:first-child) a:before {
-        content: "- ";
-      }
-    }
-
-    footer-language-selector {
-      margin: $baseline 0;
-    }
-
-    .copyright {
+    .footer-content-secondary {
+      @include clearfix();
       margin-top: $baseline;
-      font-size: $font-size-xs;
-      color: $gray-dark;
     }
 
+    .footer-about-copyright, .footer-about-openedx {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    // platform trademarks
+    .footer-about-copyright {
+      width: flex-grid(4, 12);
+      float: left;
+      margin-right: flex-gutter(2);
+    }
+
+    // platform Open edX logo and link
     .footer-about-openedx {
       float: right;
+      text-align: right;
+
+      a {
+        display: inline-block;
+
+        img {
+          display: block;
+          width: ($baseline* 6);
+        }
+
+        &:hover {
+          border-bottom: none;
+        }
+      }
     }
   }
 }

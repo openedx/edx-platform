@@ -1,3 +1,6 @@
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/studio-main.css" %>
+
 <%page expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
@@ -8,6 +11,9 @@ from django.utils.translation import ugettext as _
 <%block name="bodyclass">is-signedin pattern-library</%block>
 
 <%block name="content">
-    <%include file="/dark_lang/preview_lang_include.html" />
+<div class="wrapper-content wrapper">
+    <section class="content">
+        <%include file="/dark_lang/preview_lang_include.html" />
+    </section>
+</div>
 </%block>
-

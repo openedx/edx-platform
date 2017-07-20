@@ -1,5 +1,5 @@
 // -----------------------------
-// LMS main styles for Bootstrap
+// Studio main styles for Bootstrap
 // -----------------------------
 
 // Bootstrap theme
@@ -7,9 +7,12 @@
 @import 'bootstrap/scss/bootstrap';
 
 // Variables
+@import 'mixins';
 @import 'variables';
+@import 'base';
 
 // Elements
+@import 'header';
 @import 'footer';
 @import 'navigation';
 @import 'layouts';

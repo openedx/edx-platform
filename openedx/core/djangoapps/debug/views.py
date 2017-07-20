@@ -39,6 +39,16 @@ def show_reference_template(request, template):
         }
         context.update(request.GET.dict())
 
+        # Support dynamic rendering of messages
+        if request.GET.get('alert'):
+            register_info_message(request, request.GET.get('alert'))
+        if request.GET.get('success'):
+            register_success_message(request, request.GET.get('success'))
+        if request.GET.get('warning'):
+            register_warning_message(request, request.GET.get('warning'))
+        if request.GET.get('error'):
+            register_error_message(request, request.GET.get('error'))
+
         # Add some messages to the course skeleton pages
         if u'course-skeleton.html' in request.path:
             register_info_message(request, _('This is a test message'))

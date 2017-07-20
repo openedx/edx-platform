@@ -9,7 +9,7 @@
     "backbone.paginator": "~2.0.3",
     "coffee-loader": "^0.7.3",
     "coffee-script": "1.6.1",
-    "edx-bootstrap": "~0.1.6",
+    "edx-bootstrap": "~0.1.7",
     "edx-pattern-library": "0.18.1",
     "edx-ui-toolkit": "1.5.2",
     "exports-loader": "^0.6.4",
