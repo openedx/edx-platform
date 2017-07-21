@@ -5,7 +5,11 @@ import ddt
 from nose.plugins.attrib import attr
 
 from lms_xblock.mixin import (
-    INVALID_USER_PARTITION_VALIDATION, INVALID_USER_PARTITION_GROUP_VALIDATION, NONSENSICAL_ACCESS_RESTRICTION
+    INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
+    INVALID_USER_PARTITION_GROUP_VALIDATION_UNIT,
+    INVALID_USER_PARTITION_VALIDATION_COMPONENT,
+    INVALID_USER_PARTITION_VALIDATION_UNIT,
+    NONSENSICAL_ACCESS_RESTRICTION
 )
 from xblock.validation import ValidationMessage
 from xmodule.modulestore import ModuleStoreEnum
@@ -92,14 +96,14 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
 
     def test_validate_invalid_user_partitions(self):
         """
-        Test the validation messages produced for an xblock referring to non-existent user partitions.
+        Test the validation messages produced for a component referring to non-existent user partitions.
         """
         self.set_group_access(self.video_location, {999: [self.group1.id]})
         validation = self.store.get_item(self.video_location).validate()
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            INVALID_USER_PARTITION_VALIDATION,
+            INVALID_USER_PARTITION_VALIDATION_COMPONENT,
             ValidationMessage.ERROR,
         )
 
@@ -111,7 +115,32 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            INVALID_USER_PARTITION_VALIDATION,
+            INVALID_USER_PARTITION_VALIDATION_COMPONENT,
+            ValidationMessage.ERROR,
+        )
+
+    def test_validate_invalid_user_partitions_unit(self):
+        """
+        Test the validation messages produced for a unit referring to non-existent user partitions.
+        """
+        self.set_group_access(self.vertical_location, {999: [self.group1.id]})
+        validation = self.store.get_item(self.vertical_location).validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            INVALID_USER_PARTITION_VALIDATION_UNIT,
+            ValidationMessage.ERROR,
+        )
+
+        # Now add a second invalid user partition and validate again.
+        # Note that even though there are two invalid configurations,
+        # only a single error message will be returned.
+        self.set_group_access(self.vertical_location, {998: [self.group2.id]})
+        validation = self.store.get_item(self.vertical_location).validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            INVALID_USER_PARTITION_VALIDATION_UNIT,
             ValidationMessage.ERROR,
         )
 
@@ -124,7 +153,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            INVALID_USER_PARTITION_GROUP_VALIDATION,
+            INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
             ValidationMessage.ERROR,
         )
 
@@ -134,7 +163,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            INVALID_USER_PARTITION_GROUP_VALIDATION,
+            INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
             ValidationMessage.ERROR,
         )
 
@@ -162,6 +191,19 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.verify_validation_message(
             validation.messages[0],
             NONSENSICAL_ACCESS_RESTRICTION,
+            ValidationMessage.ERROR,
+        )
+
+    def test_validate_invalid_groups_for_unit(self):
+        """
+        Test the validation messages produced for a unit-level xblock referring to non-existent groups.
+        """
+        self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id, 999]})
+        validation = self.store.get_item(self.vertical_location).validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            INVALID_USER_PARTITION_GROUP_VALIDATION_UNIT,
             ValidationMessage.ERROR,
         )
 
@@ -221,7 +263,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.assertEqual(len(validation.messages), 2)
         self.verify_validation_message(
             validation.messages[0],
-            INVALID_USER_PARTITION_GROUP_VALIDATION,
+            INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
             ValidationMessage.ERROR,
         )
         self.verify_validation_message(
