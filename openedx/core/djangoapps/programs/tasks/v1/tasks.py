@@ -5,6 +5,7 @@ from celery import task
 from celery.utils.log import get_task_logger  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from edx_rest_api_client import exceptions
 from edx_rest_api_client.client import EdxRestApiClient
@@ -55,18 +56,19 @@ def get_api_client(api_config, student):
     return EdxRestApiClient(api_config.internal_api_url, jwt=jwt)
 
 
-def get_completed_programs(student):
+def get_completed_programs(site, student):
     """
     Given a set of completed courses, determine which programs are completed.
 
     Args:
+        site (Site): Site for which data should be retrieved.
         student (User): Representing the student whose completed programs to check for.
 
     Returns:
         list of program UUIDs
 
     """
-    meter = ProgramProgressMeter(student)
+    meter = ProgramProgressMeter(site, student)
     return meter.completed_programs
 
 
@@ -80,7 +82,7 @@ def get_certified_programs(student):
             User object representing the student
 
     Returns:
-        UUIDs of the programs for which the student has been awarded a certificate
+        str[]: UUIDs of the programs for which the student has been awarded a certificate
 
     """
     certified_programs = []
@@ -129,8 +131,7 @@ def award_program_certificates(self, username):
     student.
 
     Args:
-        username:
-            The username of the student
+        username (str): The username of the student
 
     Returns:
         None
@@ -158,16 +159,16 @@ def award_program_certificates(self, username):
             LOGGER.exception('Task award_program_certificates was called with invalid username %s', username)
             # Don't retry for this case - just conclude the task.
             return
-
-        program_uuids = get_completed_programs(student)
+        program_uuids = []
+        for site in Site.objects.all():
+            program_uuids.extend(get_completed_programs(site, student))
         if not program_uuids:
             # No reason to continue beyond this point unless/until this
             # task gets updated to support revocation of program certs.
             LOGGER.info('Task award_program_certificates was called for user %s with no completed programs', username)
             return
 
-        # Determine which program certificates the user has already been
-        # awarded, if any.
+        # Determine which program certificates the user has already been awarded, if any.
         existing_program_uuids = get_certified_programs(student)
 
     except Exception as exc:  # pylint: disable=broad-except
