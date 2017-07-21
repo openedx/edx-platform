@@ -50,6 +50,7 @@ class Command(BaseCommand):
                 site_config = getattr(site, 'configuration', None)
                 if site_config is None or not site_config.get_value('COURSE_CATALOG_API_URL'):
                     logger.info('Skipping site {domain}. No configuration.'.format(domain=site.domain))
+                    cache.set(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [], None)
                     continue
 
                 client = create_catalog_api_client(user, site=site)
