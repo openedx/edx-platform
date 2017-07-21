@@ -543,7 +543,7 @@ def course_listing_simplified(request):
     """
     courses, in_process_course_actions = get_courses_accessible_to_user(request)
     courses = _remove_in_process_courses(courses, in_process_course_actions)
-    return JsonResponse(courses)
+    return JsonResponse(list(courses))
 
 
 def _get_rerun_link_for_item(course_key):
