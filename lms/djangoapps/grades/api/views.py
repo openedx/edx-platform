@@ -185,13 +185,13 @@ class UserGradeView(GradeViewMixin, GenericAPIView):
             return grade_user
 
         prep_course_for_grading(course, request)
-        course_grade = CourseGradeFactory().create(grade_user, course)
+        course_grade = CourseGradeFactory().read(grade_user, course)
         return Response([{
             'username': grade_user.username,
             'course_key': course_id,
-            'passed': course_grade.passed,
-            'percent': course_grade.percent,
-            'letter_grade': course_grade.letter_grade,
+            'passed': getattr(course_grade, 'passed', None),
+            'percent': getattr(course_grade, 'percent', None),
+            'letter_grade': getattr(course_grade, 'letter_grade', None),
         }])
 
 
