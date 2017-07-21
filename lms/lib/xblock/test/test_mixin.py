@@ -5,7 +5,7 @@ import ddt
 from nose.plugins.attrib import attr
 
 from lms_xblock.mixin import (
-    INVALID_USER_PARTITION_VALIDATION, INVALID_USER_PARTITION_GROUP_VALIDATION, NONSENSICAL_ACCESS_RESTRICTION
+    INVALID_USER_PARTITION_VALIDATION, INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT, INVALID_USER_PARTITION_GROUP_VALIDATION_UNIT, NONSENSICAL_ACCESS_RESTRICTION
 )
 from xblock.validation import ValidationMessage
 from xmodule.modulestore import ModuleStoreEnum
@@ -124,7 +124,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            INVALID_USER_PARTITION_GROUP_VALIDATION,
+            INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
             ValidationMessage.ERROR,
         )
 
@@ -134,7 +134,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            INVALID_USER_PARTITION_GROUP_VALIDATION,
+            INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
             ValidationMessage.ERROR,
         )
 
@@ -221,7 +221,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.assertEqual(len(validation.messages), 2)
         self.verify_validation_message(
             validation.messages[0],
-            INVALID_USER_PARTITION_GROUP_VALIDATION,
+            INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
             ValidationMessage.ERROR,
         )
         self.verify_validation_message(

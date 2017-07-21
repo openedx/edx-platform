@@ -14,6 +14,7 @@ section_class = "level-nesting" if show_inline else "level-element"
 collapsible_class = "is-collapsible" if xblock.has_children else ""
 label = xblock.display_name_with_default or xblock.scope_ids.block_type
 messages = xblock.validate().to_json()
+is_unit = xblock._is_unit()
 %>
 
 <%namespace name='static' file='static_content.html'/>
@@ -30,6 +31,7 @@ messages = xblock.validate().to_json()
             ${messages | n, dump_js_escaped_json},
             ${bool(xblock_url) | n, dump_js_escaped_json},  // xblock_url will be None or a string
             ${bool(is_root) | n, dump_js_escaped_json},  // is_root will be None or a boolean
+            ${bool(is_unit) | n, dump_js_escaped_json},  // is_unit will be None or a boolean
             $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
         );
     });
