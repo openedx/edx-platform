@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
@@ -80,3 +81,9 @@ class CourseBookmarksFragmentView(EdxFragmentView):
         self.add_fragment_resource_urls(fragment)
         fragment.add_javascript(inline_js)
         return fragment
+
+    def standalone_page_title(self, request, fragment, **kwargs):
+        """
+        Returns the standalone page title.
+        """
+        return _('Bookmarks')
