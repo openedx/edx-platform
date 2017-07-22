@@ -11,8 +11,8 @@ from django.db import models, transaction
 from logging import getLogger
 
 from model_utils.models import TimeStampedModel
+from openedx.core.djangoapps.util.storage import get_storage
 from openedx.core.djangoapps.xmodule_django.models import UsageKeyWithRunField
-from openedx.core.storage import get_storage
 
 from . import config
 from .exceptions import BlockStructureNotFound

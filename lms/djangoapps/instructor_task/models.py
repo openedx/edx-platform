@@ -24,7 +24,7 @@ from django.core.files.base import ContentFile
 from django.db import models, transaction
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-from openedx.core.storage import get_storage
+from openedx.core.djangoapps.util.storage import get_storage
 
 # define custom states used by InstructorTask
 QUEUING = 'QUEUING'

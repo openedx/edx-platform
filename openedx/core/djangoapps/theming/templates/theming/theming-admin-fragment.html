@@ -1,0 +1,33 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+<h3>
+    ${_("Theming Administration")}
+</h3>
+<div>
+    <form class="form" action="${request.path}" method="post">
+        <fieldset class="form-group">
+            <div class="field">
+                <label class="field-label">${_("Preview Theme")}
+                    <input class="field-input input-text" type="text" name="preview_theme"
+                           placeholder="${_('e.g. red-theme')}" />
+                </label>
+            </div>
+        </fieldset>
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit" name="set_preview_theme" value="set_language">${_("Submit")}</button>
+            <button class="btn btn-secondary" type="submit" name="reset_preview_theme" value="reset">${_("Reset")}</button>
+        </div>
+
+        <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }"/>
+    </form>
+
+    <p>See also <a href="/admin">Django admin</a> for more theming settings.</p>
+</div>

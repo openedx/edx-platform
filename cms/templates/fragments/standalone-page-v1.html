@@ -1,0 +1,24 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%! from openedx.core.djangolib.markup import HTML %>
+
+<%inherit file="../base.html" />
+<%block name="title">${page_title}</%block>
+
+<%block name="head_extra">
+    ${HTML(fragment.head_html())}
+</%block>
+
+<%block name="footer_extra">
+    ${HTML(fragment.foot_html())}
+</%block>
+
+<%block name="content">
+<div class="wrapper-content wrapper">
+    <section class="content">
+        ${HTML(fragment.body_html())}
+    </section>
+</div>
+</%block>
