@@ -26,7 +26,8 @@ def get_user_preview_site_theme(request):
     """
     Returns the preview site for the current user, or None if not set.
     """
-    preview_site_name = get_user_preference(request.user, PREVIEW_SITE_THEME_PREFERENCE_KEY)
+    user = request.user
+    preview_site_name = get_user_preference(user, PREVIEW_SITE_THEME_PREFERENCE_KEY) if user else None
     if not preview_site_name:
         return None
     return SiteTheme(site=request.site, theme_dir_name=preview_site_name)
@@ -40,6 +41,8 @@ def set_user_preview_site_theme(request, preview_site_theme):
         request: the current request
         preview_site_theme: the preview site theme (or None to remove it)
     """
+    if not request.user or request.user.is_anonymous():
+        return
     if preview_site_theme:
         if isinstance(preview_site_theme, SiteTheme):
             preview_site_theme_name = preview_site_theme.theme_dir_name

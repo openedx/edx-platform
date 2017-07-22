@@ -21,20 +21,27 @@ class CurrentSiteThemeMiddleware(object):
         """
         Set the request's 'site_theme' attribute based upon the current user.
         """
-        # If this is a post, apply any updates first
-        if 'set_preview_theme' in request.POST:
-            preview_theme_name = request.POST.get(PREVIEW_THEME_FIELD, '')
-            set_user_preview_site_theme(request, preview_theme_name)
-        elif 'reset_preview_theme' in request.POST:
-            set_user_preview_site_theme(request, None)
+        site_theme = None
 
-        # Determine if the user has specified a preview site
-        preview_site_theme = get_user_preview_site_theme(request)
-        if preview_site_theme:
-            site_theme = preview_site_theme
-        else:
+        # Authenticated users can have preview themes
+        if request.user and not request.user.is_anonymous():
+            # If this is a post, apply any updates first
+            if 'set_preview_theme' in request.POST:
+                preview_theme_name = request.POST.get(PREVIEW_THEME_FIELD, '')
+                set_user_preview_site_theme(request, preview_theme_name)
+            elif 'reset_preview_theme' in request.POST:
+                set_user_preview_site_theme(request, None)
+
+            # Determine if the user has specified a preview site
+            preview_site_theme = get_user_preview_site_theme(request)
+            if preview_site_theme:
+                site_theme = preview_site_theme
+
+        # If no preview theme was provided, find the site's theme
+        if not site_theme:
             default_theme = None
             if settings.DEFAULT_SITE_THEME:
                 default_theme = SiteTheme(site=request.site, theme_dir_name=settings.DEFAULT_SITE_THEME)
             site_theme = SiteTheme.get_theme(request.site, default=default_theme)
+
         request.site_theme = site_theme
