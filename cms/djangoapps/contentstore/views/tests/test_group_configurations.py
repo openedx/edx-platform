@@ -250,6 +250,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         Basic check that the groups configuration page responds correctly.
         """
 
+        # This creates a random UserPartition.
         self.course.user_partitions = [
             UserPartition(0, 'First name', 'First description', [Group(0, 'Group A'), Group(1, 'Group B'), Group(2, 'Group C')]),
         ]
@@ -261,7 +262,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
 
         response = self.client.get(self._url())
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'First name')
+        self.assertContains(response, 'First name', count=1)
         self.assertContains(response, 'Group C')
         self.assertContains(response, CONTENT_GROUP_CONFIGURATION_NAME)
 
