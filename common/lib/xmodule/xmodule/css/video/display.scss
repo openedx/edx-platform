@@ -438,6 +438,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
         .volume,
         .add-fullscreen,
         .grouped-controls,
+        .auto-advance,
         .quality-control {
           @include border-left(1px dotted rgb(79, 89, 93)); // UXPL grayscale-cool x-dark
         }
@@ -445,6 +446,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
         .speed-button,
         .volume > .control,
         .add-fullscreen,
+        .auto-advance,
         .quality-control,
         .toggle-transcript {
 

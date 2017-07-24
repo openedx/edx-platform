@@ -41,6 +41,7 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
             onReady: onReady,
             onSlideSeek: onSeek,
             onSpeedChange: onSpeedChange,
+            onAutoAdvanceChange: onAutoAdvanceChange,
             onStateChange: onStateChange,
             onUnstarted: onUnstarted,
             onVolumeChange: onVolumeChange,
@@ -427,6 +428,10 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
         this.videoPlayer.setPlaybackRate(newSpeed);
     }
 
+    function onAutoAdvanceChange(enabled) {
+        this.setAutoAdvance(enabled);
+    }
+
     // Every 200 ms, if the video is playing, we call the function update, via
     // clearInterval. This interval is called updateInterval.
     // It is created on a onPlay event. Cleared on a onPause event.
@@ -562,6 +567,10 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
 
         this.el.on('speedchange', function(event, speed) {
             _this.videoPlayer.onSpeedChange(speed);
+        });
+
+        this.el.on('autoadvancechange', function(event, enabled) {
+            _this.videoPlayer.onAutoAdvanceChange(enabled);
         });
 
         this.el.on('volumechange volumechange:silent', function(event, volume) {
