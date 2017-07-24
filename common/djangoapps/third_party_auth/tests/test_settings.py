@@ -2,7 +2,6 @@
 
 import unittest
 
-from openedx.features.enterprise_support.api import enterprise_enabled
 from third_party_auth import provider, settings
 from third_party_auth.tests import testutil
 
@@ -56,8 +55,3 @@ class SettingsUnitTest(testutil.TestCase):
         # bad in prod.
         settings.apply_settings(self.settings)
         self.assertFalse(self.settings.SOCIAL_AUTH_RAISE_EXCEPTIONS)
-
-    @unittest.skipUnless(enterprise_enabled(), 'enterprise not enabled')
-    def test_enterprise_elements_inserted(self):
-        settings.apply_settings(self.settings)
-        self.assertIn('enterprise.tpa_pipeline.handle_enterprise_logistration', self.settings.SOCIAL_AUTH_PIPELINE)
