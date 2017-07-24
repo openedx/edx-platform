@@ -16,6 +16,14 @@ class CourseTool(object):
     not a requirement, and plugin implementations outside of this repo should
     simply follow the contract defined below.
     """
+    @classmethod
+    def analytics_id(cls):
+        """
+        Returns an id to uniquely identify this tool in analytics events.
+
+        For example, 'edx.bookmarks'.  New tools may warrant doc updates for the new id.
+        """
+        raise NotImplementedError("Must specify an id to enable course tool eventing.")
 
     @classmethod
     def is_enabled(cls, request, course_key):
