@@ -44,7 +44,11 @@ from openedx.core.djangolib.js_utils import (
     <%static:css group='style-vendor-tinymce-content'/>
     <%static:css group='style-vendor-tinymce-skin'/>
 
-    <%static:css group='${self.attr.main_css}'/>
+    % if uses_bootstrap:
+      <link rel="stylesheet" href="${static.url(self.attr.main_css)}" type="text/css" media="all" />
+    % else:
+      <%static:css group='${self.attr.main_css}'/>
+    % endif
 
     <%include file="widgets/segment-io.html" />
 
