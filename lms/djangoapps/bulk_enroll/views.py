@@ -60,6 +60,12 @@ class BulkEnrollView(APIView):
     def post(self, request):
         serializer = BulkEnrollmentSerializer(data=request.data)
         if serializer.is_valid():
+            # Setting the content type to be form data makes Django Rest Framework v3.6.3 treat all passed JSON data as
+            # POST parameters. This is necessary because this request is forwarded on to the student_update_enrollment
+            # view, which requires all of the parameters to be passed in via POST parameters.
+            metadata = request._request.META  # pylint: disable=protected-access
+            metadata['CONTENT_TYPE'] = 'application/x-www-form-urlencoded'
+
             response_dict = {
                 'auto_enroll': serializer.data.get('auto_enroll'),
                 'email_students': serializer.data.get('email_students'),

@@ -1,6 +1,7 @@
 """
 Tests for the Bulk Enrollment views.
 """
+import ddt
 import json
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -25,6 +26,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @override_settings(ENABLE_BULK_ENROLLMENT_VIEW=True)
+@ddt.ddt
 class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCase):
     """
     Test the bulk enrollment endpoint
@@ -67,9 +69,13 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         self.about_path = '/courses/{}/about'.format(self.course.id)
         self.course_path = '/courses/{}/'.format(self.course.id)
 
-    def request_bulk_enroll(self, data=None, **extra):
+    def request_bulk_enroll(self, data=None, use_json=False, **extra):
         """ Make an authenticated request to the bulk enrollment API. """
-        request = self.request_factory.post(self.url, data=data, **extra)
+        content_type = None
+        if use_json:
+            content_type = 'application/json'
+            data = json.dumps(data)
+        request = self.request_factory.post(self.url, data=data, content_type=content_type, **extra)
         force_authenticate(request, user=self.staff)
         response = self.view(request)
         response.render()
@@ -221,14 +227,15 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         res_json = json.loads(response.content)
         self.assertEqual(res_json, expected)
 
-    def test_enroll_with_email(self):
+    @ddt.data(False, True)
+    def test_enroll_with_email(self, use_json):
         """ Test enrolling using a username as the identifier. """
         response = self.request_bulk_enroll({
             'identifiers': self.notenrolled_student.email,
             'action': 'enroll',
             'email_students': False,
             'courses': self.course_key,
-        })
+        }, use_json=use_json)
         self.assertEqual(response.status_code, 200)
 
         # test that the user is now enrolled
@@ -274,10 +281,15 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         # Check the outbox
         self.assertEqual(len(mail.outbox), 0)
 
-    def test_unenroll(self):
+    @ddt.data(False, True)
+    def test_unenroll(self, use_json):
         """ Test unenrolling a user. """
-        response = self.request_bulk_enroll({'identifiers': self.enrolled_student.email, 'action': 'unenroll',
-                                             'email_students': False, 'courses': self.course_key, })
+        response = self.request_bulk_enroll({
+            'identifiers': self.enrolled_student.email,
+            'action': 'unenroll',
+            'email_students': False,
+            'courses': self.course_key,
+        }, use_json=use_json)
         self.assertEqual(response.status_code, 200)
 
         # test that the user is now unenrolled
