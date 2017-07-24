@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 
 import analytics
 import shoppingcart
-import survey.utils
 import survey.views
 import waffle
 from certificates import api as certs_api
@@ -91,7 +90,6 @@ from openedx.features.enterprise_support.api import data_sharing_consent_require
 from rest_framework import status
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import CourseEnrollment, UserTestGroup
-from survey.utils import must_answer_survey
 from util.cache import cache, cache_if_anonymous
 from util.db import outer_atomic
 from util.milestones_helpers import get_prerequisite_courses_display
@@ -278,10 +276,6 @@ def course_info(request, course_id):
         if not user_is_enrolled and not can_self_enroll_in_course(course_key):
             return redirect(reverse('dashboard'))
 
-        # TODO: LEARNER-1865: Handle prereqs and course survey in new Course Home.
-        # Redirect the user if they are not yet allowed to view this course
-        check_access_to_course(request, course)
-
         # LEARNER-170: Entrance exam is handled by new Course Outline. (DONE)
         # If the user needs to take an entrance exam to access this course, then we'll need
         # to send them to that specific course module before allowing them into other areas
@@ -424,9 +418,6 @@ class CourseTabView(EdxFragmentView):
         with modulestore().bulk_operations(course_key):
             course = get_course_with_access(request.user, 'load', course_key)
             try:
-                # Verify that the user has access to the course
-                check_access_to_course(request, course)
-
                 # Show warnings if the user has limited access
                 self.register_user_access_warning_messages(request, course_key)
 
@@ -739,8 +730,7 @@ def course_about(request, course_id):
 
         show_courseware_link = bool(
             (
-                has_access(request.user, 'load', course) and
-                has_access(request.user, 'view_courseware_with_prerequisites', course)
+                has_access(request.user, 'load', course)
             ) or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
         )
 
@@ -920,9 +910,6 @@ def _progress(request, course_key, student_id):
 
     # NOTE: To make sure impersonation by instructor works, use
     # student instead of request.user in the rest of the function.
-
-    # Redirect the user if they are not yet allowed to view this course
-    check_access_to_course(request, course)
 
     # The pre-fetching of groups is done to make auth checks not require an
     # additional DB lookup (this kills the Progress page in particular).
@@ -1311,7 +1298,7 @@ def course_survey(request, course_id):
     """
 
     course_key = CourseKey.from_string(course_id)
-    course = get_course_with_access(request.user, 'load', course_key)
+    course = get_course_with_access(request.user, 'load', course_key, check_survey_complete=False)
 
     redirect_url = reverse(course_home_url_name(course.id), args=[course_id])
 
@@ -1721,22 +1708,3 @@ def get_financial_aid_courses(user):
             )
 
     return financial_aid_courses
-
-
-def check_access_to_course(request, course):
-    """
-    Raises Redirect exceptions if the user does not have course access.
-    """
-    # TODO: LEARNER-1865: Handle prereqs in new Course Home.
-    # Redirect to the dashboard if not all prerequisites have been met
-    if not has_access(request.user, 'view_courseware_with_prerequisites', course):
-        log.info(
-            u'User %d tried to view course %s '
-            u'without fulfilling prerequisites',
-            request.user.id, unicode(course.id))
-        raise CourseAccessRedirect(reverse('dashboard'))
-
-    # TODO: LEARNER-1865: Handle course surveys in new Course Home.
-    # Redirect if the user must answer a survey before entering the course.
-    if must_answer_survey(course, request.user):
-        raise CourseAccessRedirect(reverse('course_survey', args=[unicode(course.id)]))

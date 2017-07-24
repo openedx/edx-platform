@@ -4,7 +4,7 @@ Milestone related tests for the mobile_api
 from django.conf import settings
 from mock import patch
 
-from courseware.access_response import MilestoneError
+from courseware.access_response import MilestoneAccessError
 from courseware.tests.test_entrance_exam import add_entrance_exam_milestone, answer_entrance_exam_problem
 from openedx.core.djangolib.testing.utils import get_mock_request
 from util.milestones_helpers import add_prerequisite_course, fulfill_course_milestone
@@ -136,4 +136,4 @@ class MobileAPIMilestonesMixin(object):
             self.api_response()
         else:
             response = self.api_response(expected_response_code=404)
-            self.assertEqual(response.data, MilestoneError().to_json())
+            self.assertEqual(response.data, MilestoneAccessError().to_json())

@@ -734,7 +734,6 @@ def dashboard(request):
     show_courseware_links_for = frozenset(
         enrollment.course_id for enrollment in course_enrollments
         if has_access(request.user, 'load', enrollment.course_overview)
-        and has_access(request.user, 'view_courseware_with_prerequisites', enrollment.course_overview)
     )
 
     # Find programs associated with course runs being displayed. This information
