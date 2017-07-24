@@ -15,18 +15,19 @@ from courseware.courses import get_course_date_blocks
 from courseware.date_summary import (
     CourseEndDate,
     CourseStartDate,
-    DateSummary,
     TodaysDate,
     VerificationDeadlineDate,
     VerifiedUpgradeDeadlineDate
 )
+from courseware.models import DynamicUpgradeDeadlineConfiguration, CourseDynamicUpgradeDeadlineConfiguration
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory, TEST_PASSWORD
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -56,12 +57,12 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     ):
         """Set up the course and user for this test."""
         now = datetime.now(utc)
-        if create_user:
-            self.user = UserFactory.create(username='mrrobot', password='test')  # pylint: disable=attribute-defined-outside-init
 
-        self.course = CourseFactory.create(  # pylint: disable=attribute-defined-outside-init
-            start=now + timedelta(days=days_till_start)
-        )
+        # pylint: disable=attribute-defined-outside-init
+        if create_user:
+            self.user = UserFactory()
+
+        self.course = CourseFactory.create(start=now + timedelta(days=days_till_start))
 
         if days_till_end is not None:
             self.course.end = now + timedelta(days=days_till_end)
@@ -96,7 +97,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_course_info_feature_flag(self):
         SelfPacedConfiguration(enable_course_home_improvements=False).save()
         self.setup_course_and_user()
-        self.client.login(username='mrrobot', password='test')
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
         url = reverse('info', args=(self.course.id,))
         response = self.client.get(url)
         self.assertNotIn('date-summary', response.content)
@@ -198,7 +199,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_todays_date_no_timezone(self, url_name):
         with freeze_time('2015-01-02'):
             self.setup_course_and_user()
-            self.client.login(username='mrrobot', password='test')
+            self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
             html_elements = [
                 '<h3 class="hd hd-6 handouts-header">Important Course Dates</h3>',
@@ -209,7 +210,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 'data-string="Today is {date}"',
                 'data-timezone="None"'
             ]
-            url = reverse(url_name, args=(self.course.id, ))
+            url = reverse(url_name, args=(self.course.id,))
             response = self.client.get(url, follow=True)
             for html in html_elements:
                 self.assertContains(response, html)
@@ -222,7 +223,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_todays_date_timezone(self, url_name):
         with freeze_time('2015-01-02'):
             self.setup_course_and_user()
-            self.client.login(username='mrrobot', password='test')
+            self.client.login(username=self.user.username, password=TEST_PASSWORD)
             set_user_preference(self.user, "time_zone", "America/Los_Angeles")
             url = reverse(url_name, args=(self.course.id,))
             response = self.client.get(url, follow=True)
@@ -253,7 +254,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_start_date_render(self, url_name):
         with freeze_time('2015-01-02'):
             self.setup_course_and_user()
-            self.client.login(username='mrrobot', password='test')
+            self.client.login(username=self.user.username, password=TEST_PASSWORD)
             url = reverse(url_name, args=(self.course.id,))
             response = self.client.get(url, follow=True)
             html_elements = [
@@ -271,7 +272,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_start_date_render_time_zone(self, url_name):
         with freeze_time('2015-01-02'):
             self.setup_course_and_user()
-            self.client.login(username='mrrobot', password='test')
+            self.client.login(username=self.user.username, password=TEST_PASSWORD)
             set_user_preference(self.user, "time_zone", "America/Los_Angeles")
             url = reverse(url_name, args=(self.course.id,))
             response = self.client.get(url, follow=True)
@@ -389,3 +390,62 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             )
             block = VerificationDeadlineDate(self.course, self.user)
             self.assertEqual(block.relative_datestring, expected_date_string)
+
+    def create_self_paced_course_run(self, **kwargs):
+        defaults = {
+            'enroll_user': False,
+            'days_till_upgrade_deadline': 100,
+        }
+        defaults.update(kwargs)
+        self.setup_course_and_user(**defaults)
+        self.course.self_paced = True
+        self.store.update_item(self.course, self.user.id)
+        overview = CourseOverview.get_from_id(self.course.id)
+        self.assertTrue(overview.self_paced)
+
+    def test_date_with_self_paced(self):
+        """ The date returned for self-paced course runs should be dependent on the learner's enrollment date. """
+        global_config = DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
+
+        # Enrollments made before the course start should use the course start date as the content availability date
+        self.create_self_paced_course_run(days_till_start=3)
+        CourseEnrollmentFactory.create(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
+        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
+        overview = CourseOverview.get_from_id(self.course.id)
+        expected = overview.start + timedelta(days=global_config.deadline_days)
+        self.assertEqual(block.date, expected)
+
+        # Enrollments made after the course start should use the enrollment date as the content availability date
+        self.create_self_paced_course_run(days_till_start=-1)
+        enrollment = CourseEnrollmentFactory.create(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
+        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
+        expected = enrollment.created + timedelta(days=global_config.deadline_days)
+        self.assertEqual(block.date, expected)
+
+        # Courses should be able to override the deadline
+        course_config = CourseDynamicUpgradeDeadlineConfiguration.objects.create(
+            enabled=True, course_id=self.course.id, opt_out=False, deadline_days=3
+        )
+        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
+        expected = enrollment.created + timedelta(days=course_config.deadline_days)
+        self.assertEqual(block.date, expected)
+
+        # Disabling the functionality should result in the verified mode's expiration date being returned.
+        global_config.enabled = False
+        global_config.save()
+        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
+        expected = CourseMode.objects.get(course_id=self.course.id, mode_slug=CourseMode.VERIFIED).expiration_datetime
+        self.assertEqual(block.date, expected)
+
+    def test_date_with_self_paced_with_course_opt_out(self):
+        """ If the course run has opted out of the dynamic deadline, the course mode's deadline should be used. """
+        self.create_self_paced_course_run(days_till_start=-1)
+        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
+        CourseEnrollmentFactory.create(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
+
+        # Opt the course out of the dynamic upgrade deadline
+        CourseDynamicUpgradeDeadlineConfiguration.objects.create(enabled=True, course_id=self.course.id, opt_out=True)
+
+        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
+        expected = CourseMode.objects.get(course_id=self.course.id, mode_slug=CourseMode.VERIFIED).expiration_datetime
+        self.assertEqual(block.date, expected)
