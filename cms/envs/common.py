@@ -312,8 +312,11 @@ TEMPLATES = [
         # Options specific to this backend.
         'OPTIONS': {
             'loaders': (
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
+                # We have to use mako-aware template loaders to be able to include
+                # mako templates inside django templates (such as main_django.html).
+                'openedx.core.djangoapps.theming.template_loaders.ThemeTemplateLoader',
+                'edxmako.makoloader.MakoFilesystemLoader',
+                'edxmako.makoloader.MakoAppDirectoriesLoader',
             ),
             'context_processors': (
                 'django.template.context_processors.request',
@@ -709,6 +712,10 @@ base_vendor_js = [
     'edx-ui-toolkit/js/utils/global-loader.js',
     'edx-ui-toolkit/js/utils/string-utils.js',
     'edx-ui-toolkit/js/utils/html-utils.js',
+
+    # Load Bootstrap and supporting libraries
+    'common/js/vendor/tether.js',
+    'common/js/vendor/bootstrap.js',
 
     # Finally load RequireJS
     'common/js/vendor/require.js'
