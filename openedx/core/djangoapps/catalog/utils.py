@@ -4,6 +4,7 @@ import logging
 
 import waffle
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from edx_rest_api_client.client import EdxRestApiClient
@@ -55,8 +56,14 @@ def get_programs(uuid=None):
             logger.warning(missing_details_msg_tpl.format(uuid=uuid))
 
         return program
+    uuids = []
     if waffle.switch_is_active('get-multitenant-programs'):
-        uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=get_current_site().domain), [])
+        # TODO: LEARNER-1146 we have to cover this in test cases, when we remove the waffle check.
+        if get_current_site():
+            uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=get_current_site().domain), [])
+        else:
+            for domain in Site.objects.all().values_list('domain', flat=True):
+                uuids.extend(cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=domain), []))
     else:
         uuids = cache.get(PROGRAM_UUIDS_CACHE_KEY, [])
     if not uuids:
