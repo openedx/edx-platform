@@ -18,7 +18,7 @@ from courseware.date_summary import (
     VerifiedUpgradeDeadlineDate
 )
 from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module, get_module_for_descriptor
+from courseware.module_render import get_module
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404, QueryDict
