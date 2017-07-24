@@ -1,12 +1,11 @@
-define([ // jshint ignore:line
+define([
     'jquery',
     'underscore',
     'gettext',
     'common/js/components/utils/view_utils',
     'edx-ui-toolkit/js/utils/string-utils',
     'edx-ui-toolkit/js/utils/html-utils'
-],
-function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
+], function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
     'use strict';
     return function(maintenanceViewURL) {
         var showError;
@@ -22,7 +21,9 @@ function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
         showError = function(containerElSelector, error) {
             var errorWrapperElSelector, errorHtml;
             errorWrapperElSelector = containerElSelector + ' .wrapper-error';
-            errorHtml = '<div class="error" aria-live="polite" id="course-id-error">' + error + '</div>';
+            errorHtml = StringUtils.interpolate(
+                '<div class="error" aria-live="polite" id="course-id-error">{error}</div>', {error: error}
+            );
             HtmlUtils.setHtml($(errorWrapperElSelector), HtmlUtils.HTML(errorHtml));
             $(errorWrapperElSelector).css('display', 'inline-block');
             $(errorWrapperElSelector).fadeOut(5000);

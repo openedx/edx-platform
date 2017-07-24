@@ -1,4 +1,14 @@
-define(['jquery.cookie', 'utility', 'common/js/components/utils/view_utils'], function(cookie, utility, ViewUtils) {
+define([
+    'jquery.cookie',
+    'utility',
+    'common/js/components/utils/view_utils',
+    'edx-ui-toolkit/js/utils/string-utils'
+], function(
+    cookie,
+    utility,
+    ViewUtils,
+    StringUtils
+) {
     'use strict';
     return function(homepageURL) {
         function postJSON(url, data, callback) {
@@ -38,9 +48,11 @@ define(['jquery.cookie', 'utility', 'common/js/components/utils/view_utils'], fu
                     }
                 } else if ($('#login_error').length === 0) {
                     $('#login_form').prepend(
-                        '<div id="login_error" class="message message-status error">' +
-                        json.value +
-                        '</span></div>'
+                        StringUtils.interpolate(
+                            '<div id="login_error" class="message message-status error">{value}</div>', {
+                                value: json.value
+                            }
+                        )
                     );
                     $('#login_error').addClass('is-shown');
                     deferred.resolve();

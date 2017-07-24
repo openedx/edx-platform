@@ -1,21 +1,28 @@
 // Backbone Application View: Signatory Editor
 
 define([
-    'jquery',
-    'underscore',
-    'backbone',
+    'jquery', 'underscore', 'backbone',
     'gettext',
     'js/utils/templates',
     'common/js/components/utils/view_utils',
+    'edx-ui-toolkit/js/utils/string-utils',
     'common/js/components/views/feedback_prompt',
     'common/js/components/views/feedback_notification',
     'js/models/uploads',
     'js/views/uploads',
     'text!templates/signatory-editor.underscore'
-],
-function($, _, Backbone, gettext,
-          TemplateUtils, ViewUtils, PromptView, NotificationView, FileUploadModel, FileUploadDialog,
-          signatoryEditorTemplate) {
+], function(
+    $, _, Backbone,
+    gettext,
+    TemplateUtils,
+    ViewUtils,
+    StringUtils,
+    PromptView,
+    NotificationView,
+    FileUploadModel,
+    FileUploadDialog,
+    signatoryEditorTemplate
+) {
     'use strict';
     var SignatoryEditorView = Backbone.View.extend({
         tagName: 'div',
@@ -198,7 +205,11 @@ function($, _, Backbone, gettext,
                 if (!$(selector).hasClass('error')) {
                     var errorMessage = this.model.validationError[modelAttribute];
                     $(selector).addClass('error');
-                    $(selector).append("<span class='message-error'>" + errorMessage + '</span>');
+                    $(selector).append(
+                        StringUtils.interpolate('<span class="message-error">{errorMessage}</span>', {
+                            errorMessage: errorMessage
+                        })
+                    );
                 }
             }
             else {

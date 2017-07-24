@@ -1,13 +1,28 @@
-define(
-    [
-        'js/views/baseview', 'underscore', 'js/models/metadata', 'js/views/abstract_editor',
-        'js/models/uploads', 'js/views/uploads',
-        'js/models/license', 'js/views/license',
-        'js/views/video/transcripts/metadata_videolist',
-        'js/views/video/translations_editor'
-    ],
-function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
-         LicenseModel, LicenseView, VideoList, VideoTranslations) {
+define([
+    'js/views/baseview',
+    'underscore',
+    'js/models/metadata',
+    'js/views/abstract_editor',
+    'js/models/uploads',
+    'js/views/uploads',
+    'js/models/license',
+    'js/views/license',
+    'js/views/video/transcripts/metadata_videolist',
+    'js/views/video/translations_editor',
+    'edx-ui-toolkit/js/utils/string-utils'
+], function(
+    BaseView,
+    _,
+    MetadataModel,
+    AbstractEditor,
+    FileUpload,
+    UploadDialog,
+    LicenseModel,
+    LicenseView,
+    VideoList,
+    VideoTranslations,
+    StringUtils
+) {
     var Metadata = {};
 
     Metadata.Editor = BaseView.extend({
@@ -286,11 +301,14 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
             list.empty();
             _.each(value, function(ele, index) {
                 var template = _.template(
-                    '<li class="list-settings-item">' +
-                        '<input type="text" class="input" value="<%- ele %>">' +
-                        '<a href="#" class="remove-action remove-setting" data-index="<%- index %>"><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">' + gettext('Remove') + '</span></a>' +   // eslint-disable-line max-len
+                    '<li class="list-settings-item">'.concat(
+                        '<input type="text" class="input" value="<%- ele %>">'.concat(
+                        '<a href="#" class="remove-action remove-setting" data-index="<%- index %>">'.concat(
+                            '<span class="icon fa fa-times-circle" aria-hidden="true"></span>'.concat(
+                            StringUtils.interpolate('<span class="sr">{text}</span>', {text: gettext('Remove')}).concat(
+                        '</a>'.concat(
                     '</li>'
-                );
+                )))))));
                 list.append($(template({'ele': ele, 'index': index})));
             });
         },
@@ -452,12 +470,15 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
 
             _.each(value, function(value, key) {
                 var template = _.template(
-                    '<li class="list-settings-item">' +
-                        '<input type="text" class="input input-key" value="<%= key %>">' +
-                        '<input type="text" class="input input-value" value="<%= value %>">' +
-                        '<a href="#" class="remove-action remove-setting" data-value="<%= value %>"><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>' +  // eslint-disable-line max-len
+                    '<li class="list-settings-item">'.concat(
+                        '<input type="text" class="input input-key" value="<%= key %>">'.concat(
+                        '<input type="text" class="input input-value" value="<%= value %>">'.concat(
+                        '<a href="#" class="remove-action remove-setting" data-value="<%= value %>">'.concat(
+                            '<span class="icon fa fa-times-circle" aria-hidden="true"></span>'.concat(
+                            '<span class="sr">Remove</span>'.concat(
+                        '</a>'.concat(
                     '</li>'
-                );
+                ))))))));
 
                 frag.appendChild($(template({'key': key, 'value': value}))[0]);
             });
