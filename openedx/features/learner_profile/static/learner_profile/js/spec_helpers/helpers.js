@@ -44,6 +44,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         expect(sectionOneFieldElements.length).toBe(4);
         expectProfileElementContainsField(sectionOneFieldElements[0], learnerProfileView.options.profileImageFieldView);
         expectProfileElementContainsField(sectionOneFieldElements[1], learnerProfileView.options.usernameFieldView);
+        expectProfileElementContainsField(sectionOneFieldElements[2], learnerProfileView.options.nameFieldView);
 
         _.each(_.rest(sectionOneFieldElements, 2), function(sectionFieldElement, fieldIndex) {
             expectProfileElementContainsField(
@@ -86,6 +87,10 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         expectProfileElementContainsField(
             sectionOneFieldElements[1],
             learnerProfileView.options.usernameFieldView
+        );
+        expectProfileElementContainsField(
+            sectionOneFieldElements[2],
+            learnerProfileView.options.nameFieldView
         );
 
         if (othersProfile) {

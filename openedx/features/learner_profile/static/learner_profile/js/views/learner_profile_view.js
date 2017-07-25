@@ -55,6 +55,7 @@
 
                     HtmlUtils.setHtml(this.$el, HtmlUtils.template(learnerProfileTemplate)({
                         username: self.options.accountSettingsModel.get('username'),
+                        name: self.options.accountSettingsModel.get('name'),
                         ownProfile: self.options.ownProfile,
                         showFullProfile: self.showFullProfile()
                     }));
@@ -121,6 +122,7 @@
                     }
 
                     this.$('.profile-section-one-fields').append(this.options.usernameFieldView.render().el);
+                    this.$('.profile-section-one-fields').append(this.options.nameFieldView.render().el);
 
                     imageView = this.options.profileImageFieldView;
                     this.$('.profile-image-field').append(imageView.render().el);

@@ -73,13 +73,18 @@ define(
                     helpMessage: ''
                 });
 
+                var nameFieldView = new FieldViews.ReadonlyFieldView({
+                    model: accountSettingsModel,
+                    valueAttribute: 'name',
+                    helpMessage: ''
+                });
+
                 var sectionOneFieldViews = [
                     new FieldViews.DropdownFieldView({
                         model: accountSettingsModel,
                         required: false,
                         editable: editable,
                         showMessages: false,
-                        iconName: 'fa-map-marker',
                         placeholderValue: '',
                         valueAttribute: 'country',
                         options: Helpers.FIELD_OPTIONS,
@@ -91,7 +96,6 @@ define(
                         required: false,
                         editable: editable,
                         showMessages: false,
-                        iconName: 'fa-comment',
                         placeholderValue: 'Add language',
                         valueAttribute: 'language_proficiencies',
                         options: Helpers.FIELD_OPTIONS,
@@ -131,6 +135,7 @@ define(
                         preferencesModel: accountPreferencesModel,
                         accountPrivacyFieldView: accountPrivacyFieldView,
                         usernameFieldView: usernameFieldView,
+                        nameFieldView: nameFieldView,
                         profileImageFieldView: profileImageFieldView,
                         sectionOneFieldViews: sectionOneFieldViews,
                         sectionTwoFieldViews: sectionTwoFieldViews,

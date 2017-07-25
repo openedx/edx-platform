@@ -48,6 +48,7 @@
             var accountPrivacyFieldView,
                 profileImageFieldView,
                 usernameFieldView,
+                nameFieldView,
                 sectionOneFieldViews,
                 sectionTwoFieldViews,
                 BadgeCollection,
@@ -97,6 +98,13 @@
                 helpMessage: ''
             });
 
+            nameFieldView = new FieldsView.ReadonlyFieldView({
+                model: accountSettingsModel,
+                screenReaderTitle: gettext('Full Name'),
+                valueAttribute: 'name',
+                helpMessage: ''
+            });
+
             sectionOneFieldViews = [
                 new FieldsView.DropdownFieldView({
                     model: accountSettingsModel,
@@ -105,12 +113,16 @@
                     required: true,
                     editable: editable,
                     showMessages: false,
-                    iconName: 'fa-map-marker',
                     placeholderValue: gettext('Add Country'),
                     valueAttribute: 'country',
                     options: options.country_options,
                     helpMessage: '',
                     persistChanges: true
+                }),
+                new Backbone.View({
+                    id: 'test',
+                    el: 'h2',
+                    title: "Haryy Rein",
                 }),
                 new AccountSettingsFieldViews.LanguageProficienciesFieldView({
                     model: accountSettingsModel,
@@ -119,7 +131,6 @@
                     required: false,
                     editable: editable,
                     showMessages: false,
-                    iconName: 'fa-comment',
                     placeholderValue: gettext('Add language'),
                     valueAttribute: 'language_proficiencies',
                     options: options.language_options,
@@ -172,6 +183,7 @@
                 accountPrivacyFieldView: accountPrivacyFieldView,
                 profileImageFieldView: profileImageFieldView,
                 usernameFieldView: usernameFieldView,
+                nameFieldView: nameFieldView,
                 sectionOneFieldViews: sectionOneFieldViews,
                 sectionTwoFieldViews: sectionTwoFieldViews,
                 badgeListContainer: badgeListContainer
