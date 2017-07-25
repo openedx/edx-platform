@@ -838,7 +838,7 @@ def program_marketing(request, program_uuid):
     """
     Display the program marketing page.
     """
-    program_data = get_programs(uuid=program_uuid)
+    program_data = get_programs(request.site, uuid=program_uuid)
 
     if not program_data:
         raise Http404
