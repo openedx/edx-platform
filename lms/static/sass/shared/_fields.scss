@@ -12,7 +12,7 @@
         border-radius: 3px;
 
         span {
-            color: $gray;
+            color: $gray-d1;
         }
 
         &:hover {
@@ -84,7 +84,7 @@
 .u-field-title {
     width: flex-grid(3, 12);
     display: inline-block;
-    color: $gray;
+    color: $gray-d1;
     vertical-align: top;
     margin-bottom: 0;
     -webkit-font-smoothing: antialiased;
