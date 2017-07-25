@@ -163,6 +163,10 @@
       }
       b {
         padding-right: ($baseline/5);
+
+        &.timer-hidden {
+          visibility: hidden;
+        }
       }
     }
   }

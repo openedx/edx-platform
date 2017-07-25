@@ -20,7 +20,7 @@
         </span>
         <span class="sr timer-announce" aria-live="assertive"></span>
         <span class="exam-timer-clock">
-            <span id="time_remaining_id" style="visibility: visible;">
+            <span id="time_remaining_id">
                 <b>
                 </b>
             </span>
