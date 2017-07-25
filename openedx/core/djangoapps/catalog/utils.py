@@ -14,7 +14,6 @@ from openedx.core.djangoapps.catalog.cache import (
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
-from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
 
@@ -35,10 +34,13 @@ def create_catalog_api_client(user, site=None):
     return EdxRestApiClient(url, jwt=jwt)
 
 
-def get_programs(uuid=None):
+def get_programs(site, uuid=None):
     """Read programs from the cache.
 
     The cache is populated by a management command, cache_programs.
+
+    Arguments:
+        site (Site): django.contrib.sites.models object
 
     Keyword Arguments:
         uuid (string): UUID identifying a specific program to read from the cache.
@@ -56,7 +58,7 @@ def get_programs(uuid=None):
 
         return program
     if waffle.switch_is_active('get-multitenant-programs'):
-        uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=get_current_site().domain), [])
+        uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
     else:
         uuids = cache.get(PROGRAM_UUIDS_CACHE_KEY, [])
     if not uuids:
@@ -121,12 +123,15 @@ def get_program_types(name=None):
         return []
 
 
-def get_programs_with_type(include_hidden=True):
+def get_programs_with_type(site, include_hidden=True):
     """
     Return the list of programs. You can filter the types of programs returned by using the optional
     include_hidden parameter. By default hidden programs will be included.
 
     The program dict is updated with the fully serialized program type.
+
+    Arguments:
+        site (Site): django.contrib.sites.models object
 
     Keyword Arguments:
         include_hidden (bool): whether to include hidden programs
@@ -135,7 +140,7 @@ def get_programs_with_type(include_hidden=True):
         list of dict, representing the active programs.
     """
     programs_with_type = []
-    programs = get_programs()
+    programs = get_programs(site)
 
     if programs:
         program_types = {program_type['name']: program_type for program_type in get_program_types()}

@@ -1,13 +1,13 @@
 """Tests covering utilities for integrating with the catalog service."""
 # pylint: disable=missing-docstring
 import copy
-import uuid
 
 import ddt
 import mock
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
+from student.tests.factories import UserFactory
 
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, PROGRAM_UUIDS_CACHE_KEY
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -19,8 +19,8 @@ from openedx.core.djangoapps.catalog.utils import (
     get_programs,
     get_programs_with_type
 )
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from student.tests.factories import UserFactory
 
 UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
 User = get_user_model()  # pylint: disable=invalid-name
@@ -31,6 +31,10 @@ User = get_user_model()  # pylint: disable=invalid-name
 @mock.patch(UTILS_MODULE + '.logger.warning')
 class TestGetPrograms(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
+
+    def setUp(self):
+        super(TestGetPrograms, self).setUp()
+        self.site = SiteFactory()
 
     def test_get_many(self, mock_warning, mock_info):
         programs = ProgramFactory.create_batch(3)
@@ -43,7 +47,7 @@ class TestGetPrograms(CacheIsolationTestCase):
 
         # When called before UUIDs are cached, the function should return an
         # empty list and log a warning.
-        self.assertEqual(get_programs(), [])
+        self.assertEqual(get_programs(self.site), [])
         mock_warning.assert_called_once_with('Failed to get program UUIDs from the cache.')
         mock_warning.reset_mock()
 
@@ -54,7 +58,7 @@ class TestGetPrograms(CacheIsolationTestCase):
             None
         )
 
-        actual_programs = get_programs()
+        actual_programs = get_programs(self.site)
 
         # The 2 cached programs should be returned while info and warning
         # messages should be logged for the missing one.
@@ -82,7 +86,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         }
         cache.set_many(all_programs, None)
 
-        actual_programs = get_programs()
+        actual_programs = get_programs(self.site)
 
         # All 3 programs should be returned.
         self.assertEqual(
@@ -116,7 +120,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         mock_cache.get.return_value = [program['uuid'] for program in programs]
         mock_cache.get_many.side_effect = fake_get_many
 
-        actual_programs = get_programs()
+        actual_programs = get_programs(self.site)
 
         # All 3 cached programs should be returned. An info message should be
         # logged about the one that was initially missing, but the code should
@@ -136,7 +140,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         expected_program = ProgramFactory()
         expected_uuid = expected_program['uuid']
 
-        self.assertEqual(get_programs(uuid=expected_uuid), None)
+        self.assertEqual(get_programs(self.site, uuid=expected_uuid), None)
         mock_warning.assert_called_once_with(
             'Failed to get details for program {uuid} from the cache.'.format(uuid=expected_uuid)
         )
@@ -148,7 +152,7 @@ class TestGetPrograms(CacheIsolationTestCase):
             None
         )
 
-        actual_program = get_programs(uuid=expected_uuid)
+        actual_program = get_programs(self.site, uuid=expected_uuid)
         self.assertEqual(actual_program, expected_program)
         self.assertFalse(mock_warning.called)
 
@@ -156,6 +160,9 @@ class TestGetPrograms(CacheIsolationTestCase):
 @skip_unless_lms
 @ddt.ddt
 class TestGetProgramsWithType(TestCase):
+    def setUp(self):
+        super(TestGetProgramsWithType, self).setUp()
+        self.site = SiteFactory()
 
     @mock.patch(UTILS_MODULE + '.get_programs')
     @mock.patch(UTILS_MODULE + '.get_program_types')
@@ -176,7 +183,7 @@ class TestGetProgramsWithType(TestCase):
         mock_get_programs.return_value = programs
         mock_get_program_types.return_value = program_types
 
-        actual = get_programs_with_type()
+        actual = get_programs_with_type(self.site)
         self.assertEqual(actual, programs_with_program_type)
 
     @ddt.data(False, True)
@@ -202,7 +209,7 @@ class TestGetProgramsWithType(TestCase):
         mock_get_programs.return_value = programs
         mock_get_program_types.return_value = program_types
 
-        actual = get_programs_with_type(include_hidden=include_hidden)
+        actual = get_programs_with_type(self.site, include_hidden=include_hidden)
         self.assertEqual(actual, programs_with_program_type)
 
 

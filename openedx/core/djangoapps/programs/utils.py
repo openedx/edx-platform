@@ -70,7 +70,8 @@ class ProgramProgressMeter(object):
             will only inspect this one program, not all programs the user may be
             engaged with.
     """
-    def __init__(self, user, enrollments=None, uuid=None):
+    def __init__(self, site, user, enrollments=None, uuid=None):
+        self.site = site
         self.user = user
 
         self.enrollments = enrollments or list(CourseEnrollment.enrollments_for_user(self.user))
@@ -89,9 +90,9 @@ class ProgramProgressMeter(object):
             self.course_run_ids.append(enrollment_id)
 
         if uuid:
-            self.programs = [get_programs(uuid=uuid)]
+            self.programs = [get_programs(self.site, uuid=uuid)]
         else:
-            self.programs = attach_program_detail_url(get_programs())
+            self.programs = attach_program_detail_url(get_programs(self.site))
 
     def invert_programs(self):
         """Intersect programs and enrollments.
