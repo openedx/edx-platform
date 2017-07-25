@@ -14,6 +14,13 @@ class CourseBookmarksTool(CourseTool):
     The course bookmarks tool.
     """
     @classmethod
+    def analytics_id(cls):
+        """
+        Returns an id to uniquely identify this tool in analytics events.
+        """
+        return 'edx.bookmarks'
+
+    @classmethod
     def is_enabled(cls, request, course_key):
         """
         The bookmarks tool is only enabled for enrolled users or staff.

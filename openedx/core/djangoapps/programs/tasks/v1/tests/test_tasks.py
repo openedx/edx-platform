@@ -16,6 +16,7 @@ from edx_rest_api_client.client import EdxRestApiClient
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.programs.tasks.v1 import tasks
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 
@@ -130,6 +131,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         super(AwardProgramCertificatesTestCase, self).setUp()
         self.create_credentials_config()
         self.student = UserFactory.create(username='test-student')
+        self.site = SiteFactory()
 
         self.catalog_integration = self.create_catalog_integration()
         ClientFactory.create(name='credentials')
@@ -146,7 +148,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         programs.
         """
         tasks.award_program_certificates.delay(self.student.username).get()
-        mock_get_completed_programs.assert_called_once_with(self.student)
+        mock_get_completed_programs.assert_called(self.site, self.student)
 
     @ddt.data(
         ([1], [2, 3]),
@@ -282,7 +284,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         """
         mock_get_completed_programs.side_effect = self._make_side_effect([Exception('boom'), None])
         tasks.award_program_certificates.delay(self.student.username).get()
-        self.assertEqual(mock_get_completed_programs.call_count, 2)
+        self.assertEqual(mock_get_completed_programs.call_count, 3)
 
     def test_retry_on_credentials_api_errors(
         self,

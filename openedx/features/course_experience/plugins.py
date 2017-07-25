@@ -20,6 +20,13 @@ class CourseUpdatesTool(CourseTool):
     The course updates tool.
     """
     @classmethod
+    def analytics_id(cls):
+        """
+        Returns an analytics id for this tool, used for eventing.
+        """
+        return 'edx.updates'
+
+    @classmethod
     def title(cls):
         """
         Returns the title of this tool.
@@ -57,6 +64,13 @@ class CourseReviewsTool(CourseTool):
     """
     The course reviews tool.
     """
+    @classmethod
+    def analytics_id(cls):
+        """
+        Returns an id to uniquely identify this tool in analytics events.
+        """
+        return 'edx.reviews'
+
     @classmethod
     def title(cls):
         """

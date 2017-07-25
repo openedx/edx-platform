@@ -1,0 +1,408 @@
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/studio-main.css" %>
+
+<%page expression_filter="h"/>
+
+<%!
+from openedx.core.djangoapps.util.user_messages import (
+    register_error_message,
+    register_info_message,
+    register_success_message,
+    register_warning_message,
+)
+%>
+
+<%
+register_info_message(request, _('This is a test message'))
+%>
+
+<%inherit file="/base.html" />
+<%block name="title">Bootstrap Test Page</%block>
+<%block name="bodyclass">bootstrap-test</%block>
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+        <h1 class="page-header">
+            <small class="subtitle">Content</small>
+            <span class="sr">&gt; </span>Course Outline
+        </h1>
+
+        <nav class="nav-actions" aria-label="Page Actions">
+            <h3 class="sr">Page Actions</h3>
+            <ul>
+                <li class="nav-item">
+                    <a href="#" class="button button-new" data-category="chapter" data-parent="block-v1:AndyA+AA101+1+type@course+block@course" data-default-name="Section" title="Click to add a new section">
+                        <span class="icon fa fa-plus" aria-hidden="true"></span>New Section
+                    </a>
+                </li>
+                    <li class="nav-item">
+                        <a href="/course/course-v1:AndyA+AA101+1/search_reindex" class="button button-reindex" data-category="reindex" title="Reindex current course">
+                            <span class="icon-arrow-right" aria-hidden="true"></span>Reindex
+                        </a>
+                    </li>
+                <li class="nav-item">
+                    <a href="#" class="button button-toggle button-toggle-expand-collapse collapse-all">
+                        <span class="collapse-all"><span class="icon fa fa-arrow-up" aria-hidden="true"></span> <span class="label">Collapse All Sections</span></span>
+                        <span class="expand-all"><span class="icon fa fa-arrow-down" aria-hidden="true"></span> <span class="label">Expand All Sections</span></span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="//localhost:8000/courses/course-v1:AndyA+AA101+1/jump_to/block-v1:AndyA+AA101+1+type@course+block@course" rel="external" class="button view-button view-live-button" title="Click to open the courseware in the LMS in a new tab" target="_blank">View Live</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+</div>
+
+<div class="wrapper-content wrapper">
+    <section class="content">
+        <article class="content-primary" role="main">
+            <div class="course-status">
+                <div class="status-release">
+                    <h2 class="status-release-label">Course Start Date:</h2>
+                    <p class="status-release-value">Jan 01, 2015 at 00:00 UTC</p>
+
+                    <ul class="status-actions">
+                      <li class="action-item action-edit">
+                        <a href="/settings/details/course-v1:AndyA+AA101+1" class="edit-button action-button" data-tooltip="Edit Start Date">
+                            <span class="icon fa fa-pencil" aria-hidden="true"></span>
+                            <span class="action-button-text sr">Edit Start Date</span>
+                        </a>
+                      </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="wrapper-dnd" lang="en">
+
+                <h2 class="sr">Course Outline</h2>
+                <article class="outline outline-complex outline-course" data-locator="block-v1:AndyA+AA101+1+type@course+block@course" data-course-key="course-v1:AndyA+AA101+1">
+
+
+
+
+        <div class="outline-content course-content">
+            <ol class="list-sections is-sortable">
+                <li class="ui-splint ui-splint-indicator">
+                    <span class="draggable-drop-indicator draggable-drop-indicator-initial"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
+                </li>
+            <li class="outline-item outline-section is-live is-draggable is-collapsible " data-parent="block-v1:AndyA+AA101+1+type@course+block@course" data-locator="block-v1:AndyA+AA101+1+type@chapter+block@3a1a345f6bd94bb4abebe9e144cd03b6" style="position: relative;">
+
+    <span class="draggable-drop-indicator draggable-drop-indicator-before"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
+
+    <div class="section-header">
+
+            <h3 class="section-header-details expand-collapse collapse ui-toggle-expansion" title="Collapse/Expand this section">
+                <span class="icon fa fa-caret-down" aria-hidden="true"></span>
+
+
+                    <span class="wrapper-section-title wrapper-xblock-field incontext-editor is-editable" data-field="display_name" data-field-display-name="Display Name">
+                        <span class="section-title item-title xblock-field-value incontext-editor-value">Section</span>
+
+    <div class="incontext-editor-action-wrapper">
+    <a href="" class="action-edit action-inline xblock-field-value-edit incontext-editor-open-action" title="Edit the name">
+        <span class="icon fa fa-pencil" aria-hidden="true"></span><span class="sr"> Edit</span>
+    </a>
+</div>
+
+<div class="xblock-string-field-editor incontext-editor-form">
+  <form>
+
+    <label><span class="sr">Edit Display Name (required)</span>
+      <input type="text" value="Section" class="xblock-field-input incontext-editor-input" data-metadata-name="display_name" title="Edit the name">
+    </label>
+    <button class="sr action action-primary" name="submit" type="submit">Save</button>
+    <button class="sr action action-secondary" name="cancel" type="button">Cancel</button>
+  </form>
+</div>
+
+</span>
+
+            </h3>
+
+        <div class="section-header-actions">
+            <ul class="actions-list">
+
+                    <li class="action-item action-publish">
+                        <a href="#" data-tooltip="Publish" class="publish-button action-button">
+                            <span class="icon fa fa-upload" aria-hidden="true"></span>
+                            <span class="sr action-button-text">Publish</span>
+                        </a>
+                    </li>
+
+
+                    <li class="action-item action-configure">
+                        <a href="#" data-tooltip="Configure" class="configure-button action-button">
+                            <span class="icon fa fa-gear" aria-hidden="true"></span>
+                            <span class="sr action-button-text">Configure</span>
+                        </a>
+                    </li>
+
+
+                    <li class="action-item action-duplicate">
+                        <a href="#" data-tooltip="Duplicate" class="duplicate-button action-button">
+                            <span class="icon fa fa-copy" aria-hidden="true"></span>
+                            <span class="sr action-button-text">Duplicate</span>
+                        </a>
+                    </li>
+
+
+                    <li class="action-item action-delete">
+                        <a href="#" data-tooltip="Delete" class="delete-button action-button">
+                            <span class="icon fa fa-trash-o" aria-hidden="true"></span>
+                            <span class="sr action-button-text">Delete</span>
+                        </a>
+                    </li>
+
+
+                <li class="action-item action-drag">
+                    <span data-tooltip="Drag to reorder" class="drag-handle section-drag-handle action">
+                        <span class="sr">Drag to reorder</span>
+                    </span>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+    <div class="section-status">
+
+
+              <div class="status-release">
+                <p>
+                    <span class="sr status-release-label">Release Status:</span>
+                    <span class="status-release-value">
+
+
+                                <span class="icon fa fa-check" aria-hidden="true"></span>
+                                Released:
+
+
+                                Jan 01, 2015 at 00:00 UTC
+
+
+                    </span>
+                </p>
+              </div>
+
+
+            <div class="status-hide-after-due">
+                <p>
+
+                </p>
+            </div>
+
+
+    </div>
+
+
+
+
+        <div class="outline-content section-content">
+            <ol class="list-subsections is-sortable">
+                <li class="ui-splint ui-splint-indicator">
+                    <span class="draggable-drop-indicator draggable-drop-indicator-initial"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
+                </li>
+            <li class="outline-item outline-subsection is-live is-draggable is-collapsible is-collapsed" data-parent="block-v1:AndyA+AA101+1+type@chapter+block@3a1a345f6bd94bb4abebe9e144cd03b6" data-locator="block-v1:AndyA+AA101+1+type@sequential+block@dc1b2b84c9be4646a404f6425792eb90" style="position: relative;">
+
+    <span class="draggable-drop-indicator draggable-drop-indicator-before"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
+
+    <div class="subsection-header">
+
+            <h3 class="subsection-header-details expand-collapse expand ui-toggle-expansion" title="Collapse/Expand this subsection">
+                <span class="icon fa fa-caret-down" aria-hidden="true"></span>
+
+
+                    <span class="wrapper-subsection-title wrapper-xblock-field incontext-editor is-editable" data-field="display_name" data-field-display-name="Display Name">
+                        <span class="subsection-title item-title xblock-field-value incontext-editor-value">Subsection</span>
+
+    <div class="incontext-editor-action-wrapper">
+    <a href="" class="action-edit action-inline xblock-field-value-edit incontext-editor-open-action" title="Edit the name">
+        <span class="icon fa fa-pencil" aria-hidden="true"></span><span class="sr"> Edit</span>
+    </a>
+</div>
+
+<div class="xblock-string-field-editor incontext-editor-form">
+  <form>
+
+    <label><span class="sr">Edit Display Name (required)</span>
+      <input type="text" value="Subsection" class="xblock-field-input incontext-editor-input" data-metadata-name="display_name" title="Edit the name">
+    </label>
+    <button class="sr action action-primary" name="submit" type="submit">Save</button>
+    <button class="sr action action-secondary" name="cancel" type="button">Cancel</button>
+  </form>
+</div>
+
+</span>
+
+            </h3>
+
+        <div class="subsection-header-actions">
+            <ul class="actions-list">
+
+                    <li class="action-item action-publish">
+                        <a href="#" data-tooltip="Publish" class="publish-button action-button">
+                            <span class="icon fa fa-upload" aria-hidden="true"></span>
+                            <span class="sr action-button-text">Publish</span>
+                        </a>
+                    </li>
+
+
+                    <li class="action-item action-configure">
+                        <a href="#" data-tooltip="Configure" class="configure-button action-button">
+                            <span class="icon fa fa-gear" aria-hidden="true"></span>
+                            <span class="sr action-button-text">Configure</span>
+                        </a>
+                    </li>
+
+
+                    <li class="action-item action-duplicate">
+                        <a href="#" data-tooltip="Duplicate" class="duplicate-button action-button">
+                            <span class="icon fa fa-copy" aria-hidden="true"></span>
+                            <span class="sr action-button-text">Duplicate</span>
+                        </a>
+                    </li>
+
+
+                    <li class="action-item action-delete">
+                        <a href="#" data-tooltip="Delete" class="delete-button action-button">
+                            <span class="icon fa fa-trash-o" aria-hidden="true"></span>
+                            <span class="sr action-button-text">Delete</span>
+                        </a>
+                    </li>
+
+
+                <li class="action-item action-drag">
+                    <span data-tooltip="Drag to reorder" class="drag-handle subsection-drag-handle action">
+                        <span class="sr">Drag to reorder</span>
+                    </span>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+    <div class="subsection-status">
+
+
+              <div class="status-release">
+                <p>
+                    <span class="sr status-release-label">Release Status:</span>
+                    <span class="status-release-value">
+
+
+                                <span class="icon fa fa-check" aria-hidden="true"></span>
+                                Released:
+
+
+                                Jan 01, 2015 at 00:00 UTC
+
+
+                    </span>
+                </p>
+              </div>
+
+
+            <div class="status-hide-after-due">
+                <p>
+
+                </p>
+            </div>
+
+
+    </div>
+
+
+
+
+        <div class="outline-content subsection-content">
+            <ol class="list-units is-sortable">
+                <li class="ui-splint ui-splint-indicator">
+                    <span class="draggable-drop-indicator draggable-drop-indicator-initial"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
+                </li>
+            </ol>
+
+
+
+                <div class="add-unit add-item">
+                    <a href="#" class="button button-new" data-category="vertical" data-parent="block-v1:AndyA+AA101+1+type@sequential+block@dc1b2b84c9be4646a404f6425792eb90" data-default-name="Unit" title="Click to add a new Unit">
+                        <span class="icon fa fa-plus" aria-hidden="true"></span>New Unit
+                    </a>
+                </div>
+
+
+        </div>
+
+
+
+    <span class="draggable-drop-indicator draggable-drop-indicator-after"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
+</li></ol>
+
+
+
+                <div class="add-subsection add-item">
+                    <a href="#" class="button button-new" data-category="sequential" data-parent="block-v1:AndyA+AA101+1+type@chapter+block@3a1a345f6bd94bb4abebe9e144cd03b6" data-default-name="Subsection" title="Click to add a new Subsection">
+                        <span class="icon fa fa-plus" aria-hidden="true"></span>New Subsection
+                    </a>
+                </div>
+
+
+        </div>
+
+
+
+    <span class="draggable-drop-indicator draggable-drop-indicator-after"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
+</li></ol>
+
+
+
+                <div class="add-section add-item">
+                    <a href="#" class="button button-new" data-category="chapter" data-parent="block-v1:AndyA+AA101+1+type@course+block@course" data-default-name="Section" title="Click to add a new Section">
+                        <span class="icon fa fa-plus" aria-hidden="true"></span>New Section
+                    </a>
+                </div>
+
+
+        </div>
+
+
+
+
+</article>
+            </div>
+            <div class="ui-loading is-hidden">
+                <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">Loading</span></p>
+            </div>
+        </article>
+        <aside class="content-supplementary" role="complementary">
+            <div class="bit">
+                <h3 class="title-3">Creating your course organization</h3>
+                <p>You add sections, subsections, and units directly in the outline.</p>
+                <p>Create a section, then add subsections and units. Open a unit to add course components.</p>
+            </div>
+            <div class="bit">
+                <h3 class="title-3">Reorganizing your course</h3>
+                <p>Drag sections, subsections, and units to new locations in the outline.</p>
+                <div class="external-help">
+                    <a href="http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/developing_course/course_outline.html" target="_blank" class="button external-help-button">Learn more about the course outline</a>
+                </div>
+            </div>
+            <div class="bit">
+                <h3 class="title-3">Setting release dates and grading policies</h3>
+                <p>Select the Configure icon for a section or subsection to set its release date. When you configure a subsection, you can also set the grading policy and due date.</p>
+                <div class="external-help">
+                    <a href="http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/grading/index.html" target="_blank" class="button external-help-button">Learn more about grading policy settings</a>
+                </div>
+            </div>
+            <div class="bit">
+                <h3 class="title-3">Changing the content learners see</h3>
+                <p>To publish draft content, select the Publish icon for a section, subsection, or unit.</p>
+                <p>To make a section, subsection, or unit unavailable to learners, select the Configure icon for that level, then select the appropriate <strong>Hide</strong> option. Grades for hidden sections, subsections, and units are not included in grade calculations.</p>
+                <p>To hide the content of a subsection from learners after the subsection due date has passed, select the Configure icon for a subsection, then select <strong>Hide content after due date</strong>. Grades for the subsection remain included in grade calculations.</p>
+                <div class="external-help">
+                    <a href="http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/developing_course/controlling_content_visibility.html" target="_blank" class="button external-help-button">Learn more about content visibility settings</a>
+                </div>
+            </div>
+
+        </aside>
+    </section>
+</div>
+</%block>

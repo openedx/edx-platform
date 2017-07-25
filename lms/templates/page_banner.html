@@ -7,11 +7,11 @@
 <%!
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML
-from openedx.core.djangoapps.util.user_messages import user_messages
+from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 %>
 
 <%
-banner_messages = list(user_messages(request))
+banner_messages = list(PageLevelMessages.user_messages(request))
 %>
 
 % if banner_messages:
