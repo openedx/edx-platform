@@ -108,7 +108,6 @@ from student.models import (
     DashboardConfiguration,
     LinkedInAddToProfileConfiguration,
     LoginFailures,
-    LogoutViewConfiguration,
     ManualEnrollmentAudit,
     PasswordHistory,
     PendingEmailChange,
@@ -2871,7 +2870,7 @@ class LogoutView(TemplateView):
         logout(request)
 
         # If we don't need to deal with OIDC logouts, just redirect the user.
-        if LogoutViewConfiguration.current().enabled and self.oauth_client_ids:
+        if self.oauth_client_ids:
             response = super(LogoutView, self).dispatch(request, *args, **kwargs)
         else:
             response = redirect(self.target)
