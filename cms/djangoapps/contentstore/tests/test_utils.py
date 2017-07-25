@@ -514,6 +514,31 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
             "deleted": True
         })
 
+    def test_singular_deleted_group(self):
+        """
+        Verify that a partition with only one deleted group is
+        shown in the partition info with the group marked as deleted
+        """
+        self._set_partitions([
+            UserPartition(
+                id=0,
+                name="Cohort user partition",
+                scheme=UserPartition.get_scheme("cohort"),
+                description="Cohorted user partition",
+                groups=[],
+            ),
+        ])
+        self._set_group_access({0: [1]})
+        partitions = self._get_partition_info()
+        groups = partitions[0]["groups"]
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0], {
+            "id": 1,
+            "name": "Deleted Group",
+            "selected": True,
+            "deleted": True,
+        })
+
     def test_filter_by_partition_scheme(self):
         partitions = self._get_partition_info(schemes=["random"])
         self.assertEqual(len(partitions), 1)
