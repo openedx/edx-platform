@@ -1,3 +1,69 @@
+// ------------------------------
+// Styling for files located in the openedx/features repository.
+
+// Course call to action message
+.course-message {
+  .message-author {
+    display: inline-block;
+    width: 70px;
+    border-radius: $baseline*7/4;
+    border: 1px solid $lms-border-color;
+
+    @media (max-width: $grid-breakpoints-md) {
+      display: none;
+    }
+  }
+
+  .message-content {
+    position: relative;
+    border: 1px solid $lms-border-color;
+    margin: 0 $baseline $baseline/2;
+    padding: $baseline/2 $baseline;
+    border-radius: $baseline/4;
+
+    @media (max-width: $grid-breakpoints-md) {
+      width: 100%;
+      margin: $baseline 0;
+    }
+
+    &:after, &:before {
+      @include left(0);
+      bottom: 35%;
+      border: solid transparent;
+      height: 0;
+      width: 0;
+      content: " ";
+      position: absolute;
+
+      @media (max-width: $grid-breakpoints-md) {
+        display: none;
+      }
+    }
+
+    &:after {
+      @include border-right-color($white);
+      @include margin-left($baseline*-1+1);
+      border-width: $baseline/2;
+    }
+
+    &:before {
+      @include margin-left($baseline*-1);
+      @include border-right-color($lms-border-color);
+      border-width: $baseline/2;
+    }
+
+    .message-header {
+      font-weight: $font-semibold;
+      margin-bottom: $baseline/4;
+    }
+
+    a {
+      font-weight: $font-semibold;
+      text-decoration: underline;
+    }
+  }
+}
+
 // Welcome message
 .welcome-message {
   border: solid 1px $lms-border-color;

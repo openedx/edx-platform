@@ -6,10 +6,13 @@
 // Configuration
 @import 'config';
 
-// Extensions
-@import 'partials/variables';
+// +Base - Utilities
+// ====================
+@import 'partials/cms/base/variables';
 @import 'mixins-v2';
 @import 'base-v2';
+
+// Pattern Library styling
 @import 'elements-v2/controls';
 @import 'elements-v2/header';
 @import 'elements-v2/navigation';

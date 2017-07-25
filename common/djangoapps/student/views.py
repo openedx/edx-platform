@@ -734,13 +734,12 @@ def dashboard(request):
     show_courseware_links_for = frozenset(
         enrollment.course_id for enrollment in course_enrollments
         if has_access(request.user, 'load', enrollment.course_overview)
-        and has_access(request.user, 'view_courseware_with_prerequisites', enrollment.course_overview)
     )
 
     # Find programs associated with course runs being displayed. This information
     # is passed in the template context to allow rendering of program-related
     # information on the dashboard.
-    meter = ProgramProgressMeter(user, enrollments=course_enrollments)
+    meter = ProgramProgressMeter(request.site, user, enrollments=course_enrollments)
     inverted_programs = meter.invert_programs()
 
     # Construct a dictionary of course mode information

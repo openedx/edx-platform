@@ -26,5 +26,7 @@ class SiteFactory(DjangoModelFactory):
         model = Site
         django_get_or_create = ('domain',)
 
+    # TODO These should be generated. Otherwise, code that creates multiple Site
+    # objects will only end up with a single Site since domain has a unique constraint.
     domain = 'testserver.fake'
     name = 'testserver.fake'

@@ -1,0 +1,13 @@
+// Sample red theme to demonstrate SASS overrides
+
+// Theme colors
+//
+// Note: define colors needed by your theme first
+$red: #d9534f !default;
+$brand-primary: $red;
+
+// Theme fonts
+$font-family-sans-serif: cursive;
+
+// Initialize the Open edX bootstrap theme
+@import 'edx-bootstrap/sass/open-edx/theme';

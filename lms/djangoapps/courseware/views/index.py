@@ -52,7 +52,6 @@ from ..model_data import FieldDataCache
 from ..module_render import get_module_for_descriptor, toc_for_course
 from .views import (
     CourseTabView,
-    check_access_to_course,
     check_and_get_upgrade_link,
     get_cosmetic_verified_display_price
 )
@@ -136,7 +135,6 @@ class CoursewareIndex(View):
         """
         Render the index page.
         """
-        check_access_to_course(request, self.course)
         self._redirect_if_needed_to_pay_for_course()
         self._prefetch_and_bind_course(request)
 

@@ -25,7 +25,7 @@ def program_listing(request):
     if not programs_config.enabled:
         raise Http404
 
-    meter = ProgramProgressMeter(request.user)
+    meter = ProgramProgressMeter(request.site, request.user)
 
     context = {
         'disable_courseware_js': True,
@@ -48,7 +48,7 @@ def program_details(request, program_uuid):
     if not programs_config.enabled:
         raise Http404
 
-    meter = ProgramProgressMeter(request.user, uuid=program_uuid)
+    meter = ProgramProgressMeter(request.site, request.user, uuid=program_uuid)
     program_data = meter.programs[0]
 
     if not program_data:
