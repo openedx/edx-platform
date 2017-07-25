@@ -23,6 +23,7 @@ from lms.djangoapps.grades.models import (
     BlockRecordList,
     PersistentCourseGrade,
     PersistentSubsectionGrade,
+    PersistentSubsectionGradeOverride,
     VisibleBlocks
 )
 from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
@@ -305,6 +306,14 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         with patch('lms.djangoapps.grades.models.tracker') as tracker_mock:
             grade = PersistentSubsectionGrade.create_grade(**self.params)
         self._assert_tracker_emitted_event(tracker_mock, grade)
+
+    def test_grade_override(self):
+        grade = PersistentSubsectionGrade.create_grade(**self.params)
+        override = PersistentSubsectionGradeOverride(grade=grade, earned_all_override=0.0, earned_graded_override=0.0)
+        override.save()
+        grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
+        self.assertEqual(grade.earned_all, 0.0)
+        self.assertEqual(grade.earned_graded, 0.0)
 
     def _assert_tracker_emitted_event(self, tracker_mock, grade):
         """

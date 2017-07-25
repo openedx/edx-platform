@@ -411,6 +411,24 @@ class PersistentSubsectionGrade(DeleteGradesMixin, TimeStampedModel):
         user_id = params.pop('user_id')
         usage_key = params.pop('usage_key')
 
+        # apply grade override if one exists before saving model
+        try:
+            override = PersistentSubsectionGradeOverride.objects.get(
+                grade__user_id=user_id,
+                grade__course_id=usage_key.course_key,
+                grade__usage_key=usage_key,
+            )
+            if override.earned_all_override is not None:
+                params['earned_all'] = override.earned_all_override
+            if override.possible_all_override is not None:
+                params['possible_all'] = override.possible_all_override
+            if override.earned_graded_override is not None:
+                params['earned_graded'] = override.earned_graded_override
+            if override.possible_graded_override is not None:
+                params['possible_graded'] = override.possible_graded_override
+        except PersistentSubsectionGradeOverride.DoesNotExist:
+            pass
+
         grade, _ = cls.objects.update_or_create(
             user_id=user_id,
             course_id=usage_key.course_key,
@@ -666,3 +684,20 @@ class PersistentCourseGrade(DeleteGradesMixin, TimeStampedModel):
                     'grading_policy_hash': unicode(grade.grading_policy_hash),
                 }
             )
+
+
+class PersistentSubsectionGradeOverride(models.Model):
+    """
+    A django model tracking persistent grades overrides at the subsection level.
+    """
+    class Meta(object):
+        app_label = "grades"
+
+    grade = models.OneToOneField(PersistentSubsectionGrade, related_name='override')
+
+    # earned/possible refers to the number of points achieved and available to achieve.
+    # graded refers to the subset of all problems that are marked as being graded.
+    earned_all_override = models.FloatField(null=True, blank=True)
+    possible_all_override = models.FloatField(null=True, blank=True)
+    earned_graded_override = models.FloatField(null=True, blank=True)
+    possible_graded_override = models.FloatField(null=True, blank=True)
