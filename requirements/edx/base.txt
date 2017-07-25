@@ -25,7 +25,7 @@ django-ipware==1.1.0
 django-model-utils==2.3.1
 django-mptt==0.7.4
 django-oauth-plus==2.2.8
-django-oauth-toolkit==0.10.0
+django-oauth-toolkit==0.12.0
 django-pipeline-forgiving==1.0.0
 django-pyfs==1.0.6
 django-sekizai==0.8.2
