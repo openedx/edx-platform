@@ -93,6 +93,7 @@ source, template_path = Loader(engine).load_template_source(path)
     </%doc>
     <%
         from django.template import Template, Context
+        from webpack_loader.exceptions import WebpackLoaderBadStatsError
         try:
             return Template("""
                 {% load render_bundle from webpack_loader %}
@@ -105,9 +106,9 @@ source, template_path = Loader(engine).load_template_source(path)
                 'entry': entry,
                 'body': capture(caller.body)
             }))
-        except IOError as e:
+        except (IOError, WebpackLoaderBadStatsError) as e:
             # Don't break Mako template rendering if the bundle or webpack-stats can't be found, but log it
-            logger.error(e)
+            logger.error('[LEARNER-1938] {error}'.format(error=e))
     %>
 </%def>
 

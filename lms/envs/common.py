@@ -2846,9 +2846,7 @@ ADVANCED_SECURITY_CONFIG = {}
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
 
-### Analytics Data API + Dashboard (Insights) settings
-ANALYTICS_DATA_URL = ""
-ANALYTICS_DATA_TOKEN = ""
+### Analytics Dashboard (Insights) settings
 ANALYTICS_DASHBOARD_URL = ""
 ANALYTICS_DASHBOARD_NAME = PLATFORM_NAME + " Insights"
 

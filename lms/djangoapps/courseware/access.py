@@ -21,7 +21,11 @@ from django.utils.timezone import UTC
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from xblock.core import XBlock
 
-from courseware.access_response import MilestoneError, MobileAvailabilityError, VisibilityError
+from courseware.access_response import (
+    MilestoneAccessError,
+    MobileAvailabilityError,
+    VisibilityError,
+)
 from courseware.access_utils import (
     ACCESS_DENIED,
     ACCESS_GRANTED,
@@ -309,7 +313,8 @@ def _has_access_course(user, action, courselike):
         """
         response = (
             _visible_to_nonstaff_users(courselike) and
-            check_course_open_for_learner(user, courselike)
+            check_course_open_for_learner(user, courselike) and
+            _can_view_courseware_with_prerequisites(user, courselike)
         )
 
         return (
@@ -355,8 +360,6 @@ def _has_access_course(user, action, courselike):
 
     checkers = {
         'load': can_load,
-        'view_courseware_with_prerequisites':
-            lambda: _can_view_courseware_with_prerequisites(user, courselike),
         'load_mobile': lambda: can_load() and _can_load_course_on_mobile(user, courselike),
         'enroll': can_enroll,
         'see_exists': see_exists,
@@ -770,7 +773,7 @@ def _has_fulfilled_all_milestones(user, course_id):
         course_id: ID of the course to check
         user_id: ID of the user to check
     """
-    return MilestoneError() if any_unfulfilled_milestones(course_id, user.id) else ACCESS_GRANTED
+    return MilestoneAccessError() if any_unfulfilled_milestones(course_id, user.id) else ACCESS_GRANTED
 
 
 def _has_fulfilled_prerequisites(user, course_id):
@@ -782,7 +785,7 @@ def _has_fulfilled_prerequisites(user, course_id):
         user: user to check
         course_id: ID of the course to check
     """
-    return MilestoneError() if get_pre_requisite_courses_not_completed(user, course_id) else ACCESS_GRANTED
+    return MilestoneAccessError() if get_pre_requisite_courses_not_completed(user, course_id) else ACCESS_GRANTED
 
 
 def _has_catalog_visibility(course, visibility_type):

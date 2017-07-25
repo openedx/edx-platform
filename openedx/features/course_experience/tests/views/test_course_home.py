@@ -2,10 +2,10 @@
 """
 Tests for the course home page.
 """
-import datetime
+from datetime import datetime, timedelta
 import ddt
 import mock
-import pytz
+from pytz import UTC
 from waffle.testutils import override_flag
 
 from courseware.tests.factories import StaffFactory
@@ -31,6 +31,10 @@ TEST_CHAPTER_NAME = 'Test Chapter'
 TEST_WELCOME_MESSAGE = '<h2>Welcome!</h2>'
 TEST_UPDATE_MESSAGE = '<h2>Test Update!</h2>'
 TEST_COURSE_UPDATES_TOOL = '/course/updates">'
+TEST_COURSE_HOME_MESSAGE = 'course-message'
+TEST_COURSE_HOME_MESSAGE_ANONYMOUS = '/login'
+TEST_COURSE_HOME_MESSAGE_UNENROLLED = 'Enroll now'
+TEST_COURSE_HOME_MESSAGE_PRE_START = 'Course starts in'
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
@@ -73,7 +77,12 @@ class CourseHomePageTestCase(SharedModuleStoreTestCase):
         # pylint: disable=super-method-not-called
         with super(CourseHomePageTestCase, cls).setUpClassAndTestData():
             with cls.store.default_store(ModuleStoreEnum.Type.split):
-                cls.course = CourseFactory.create(org='edX', number='test', display_name='Test Course')
+                cls.course = CourseFactory.create(
+                    org='edX',
+                    number='test',
+                    display_name='Test Course',
+                    start=datetime.now(UTC) - timedelta(days=30),
+                )
                 with cls.store.bulk_operations(cls.course.id):
                     chapter = ItemFactory.create(
                         category='chapter',
@@ -91,6 +100,15 @@ class CourseHomePageTestCase(SharedModuleStoreTestCase):
         cls.staff_user = StaffFactory(course_key=cls.course.id, password=TEST_PASSWORD)
         cls.user = UserFactory(password=TEST_PASSWORD)
         CourseEnrollment.enroll(cls.user, cls.course.id)
+
+    def create_future_course(self, specific_date=None):
+        """
+        Creates and returns a course in the future.
+        """
+        return CourseFactory.create(
+            display_name='Test Future Course',
+            start=specific_date if specific_date else datetime.now(UTC) + timedelta(days=30),
+        )
 
 
 class TestCourseHomePage(CourseHomePageTestCase):
@@ -142,7 +160,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         course_home_url(self.course)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(38, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(37, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -152,18 +170,15 @@ class TestCourseHomePage(CourseHomePageTestCase):
         """
         Verify that the course home page handles start dates correctly.
         """
-        now = datetime.datetime.now(pytz.UTC)
-        tomorrow = now + datetime.timedelta(days=1)
-        self.course.start = tomorrow
-
         # The course home page should 404 for a course starting in the future
-        url = course_home_url(self.course)
+        future_course = self.create_future_course(datetime(2030, 1, 1, tzinfo=UTC))
+        url = course_home_url(future_course)
         response = self.client.get(url)
         self.assertRedirects(response, '/dashboard?notlive=Jan+01%2C+2030')
 
         # With the Waffle flag enabled, the course should be visible
         with override_flag(COURSE_PRE_START_ACCESS_FLAG.namespaced_flag_name, True):
-            url = course_home_url(self.course)
+            url = course_home_url(future_course)
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
@@ -272,11 +287,12 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Ensure that a user accessing a non-live course sees a redirect to
         the student dashboard, not a 404.
         """
-        self.user = self.create_user_for_course(self.course, CourseUserType.ENROLLED)
+        future_course = self.create_future_course()
+        self.user = self.create_user_for_course(future_course, CourseUserType.ENROLLED)
 
-        url = course_home_url(self.course)
+        url = course_home_url(future_course)
         response = self.client.get(url)
-        start_date = strftime_localized(self.course.start, 'SHORT_DATE')
+        start_date = strftime_localized(future_course.start, 'SHORT_DATE')
         expected_params = QueryDict(mutable=True)
         expected_params['notlive'] = start_date
         expected_url = '{url}?{params}'.format(
@@ -292,12 +308,13 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Ensure that a user accessing a non-live course sees a redirect to
         the student dashboard, not a 404, even if the localized date is unicode
         """
-        self.user = self.create_user_for_course(self.course, CourseUserType.ENROLLED)
+        future_course = self.create_future_course()
+        self.user = self.create_user_for_course(future_course, CourseUserType.ENROLLED)
 
         fake_unicode_start_time = u"üñîçø∂é_ßtå®t_tîµé"
         mock_strftime_localized.return_value = fake_unicode_start_time
 
-        url = course_home_url(self.course)
+        url = course_home_url(future_course)
         response = self.client.get(url)
         expected_params = QueryDict(mutable=True)
         expected_params['notlive'] = fake_unicode_start_time
@@ -316,3 +333,44 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         url = course_home_url_from_string('not/a/course')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
+    @override_waffle_flag(COURSE_PRE_START_ACCESS_FLAG, active=True)
+    def test_course_messaging(self):
+        """
+        Ensure that the following four use cases work as expected
+
+        1) Anonymous users are shown a course message linking them to the login page
+        2) Unenrolled users are shown a course message allowing them to enroll
+        3) Enrolled users who show up on the course page after the course has begun
+        are not shown a course message.
+        4) Enrolled users who show up on the course page before the course begins
+        are shown a message explaining when the course starts as well as a call to
+        action button that allows them to add a calendar event.
+        """
+        # Verify that anonymous users are shown a login link in the course message
+        url = course_home_url(self.course)
+        response = self.client.get(url)
+        self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
+        self.assertContains(response, TEST_COURSE_HOME_MESSAGE_ANONYMOUS)
+
+        # Verify that unenrolled users are shown an enroll call to action message
+        self.user = self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
+        url = course_home_url(self.course)
+        response = self.client.get(url)
+        self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
+        self.assertContains(response, TEST_COURSE_HOME_MESSAGE_UNENROLLED)
+
+        # Verify that enrolled users are not shown a message when enrolled and course has begun
+        CourseEnrollment.enroll(self.user, self.course.id)
+        url = course_home_url(self.course)
+        response = self.client.get(url)
+        self.assertNotContains(response, TEST_COURSE_HOME_MESSAGE)
+
+        # Verify that enrolled users are shown 'days until start' message before start date
+        future_course = self.create_future_course()
+        CourseEnrollment.enroll(self.user, future_course.id)
+        url = course_home_url(future_course)
+        response = self.client.get(url)
+        self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
+        self.assertContains(response, TEST_COURSE_HOME_MESSAGE_PRE_START)

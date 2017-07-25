@@ -234,11 +234,6 @@ FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info'
 
-########################## ANALYTICS TESTING ########################
-
-ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
-ANALYTICS_API_KEY = ""
-
 ##### Segment  ######
 
 # If there's an environment variable set, grab it
