@@ -114,11 +114,8 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
             CourseHomeMessages.register_info_message(
                 request,
                 Text(_(
-                    "{add_reminder_open_tag}Don't forget to add a calendar reminder!{add_reminder_close_tag}."
-                )).format(
-                    add_reminder_open_tag='',
-                    add_reminder_close_tag=''
-                ),
+                    "Don't forget to add a calendar reminder!"
+                )),
                 title=Text("Course starts in {days_until_start_string} on {course_start_date}.").format(
                     days_until_start_string=course_start_data['days_until_start_string'],
                     course_start_date=course_start_data['course_start_date']

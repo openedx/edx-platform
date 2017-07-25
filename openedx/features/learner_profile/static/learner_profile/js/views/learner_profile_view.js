@@ -6,9 +6,10 @@
             'gettext', 'jquery', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/html-utils',
             'common/js/components/views/tabbed_view',
             'learner_profile/js/views/section_two_tab',
-            'text!learner_profile/templates/learner_profile.underscore'
+            'text!learner_profile/templates/learner_profile.underscore',
+            'edx-ui-toolkit/js/utils/string-utils'
         ],
-        function(gettext, $, _, Backbone, HtmlUtils, TabbedView, SectionTwoTab, learnerProfileTemplate) {
+        function(gettext, $, _, Backbone, HtmlUtils, TabbedView, SectionTwoTab, learnerProfileTemplate, StringUtils) {
             var LearnerProfileView = Backbone.View.extend({
 
                 initialize: function(options) {
@@ -53,10 +54,19 @@
                         ownProfile: this.options.ownProfile
                     });
 
+
                     HtmlUtils.setHtml(this.$el, HtmlUtils.template(learnerProfileTemplate)({
                         username: self.options.accountSettingsModel.get('username'),
+                        name: self.options.accountSettingsModel.get('name'),
                         ownProfile: self.options.ownProfile,
-                        showFullProfile: self.showFullProfile()
+                        showFullProfile: self.showFullProfile(),
+                        profile_header: gettext('My Profile'),
+                        profile_subheader:
+                            StringUtils.interpolate(
+                                gettext('Build out your profile to personalize your identity on {platform_name}.'), {
+                                    platform_name: self.options.platformName
+                                }
+                            )
                     }));
                     this.renderFields();
 
@@ -98,7 +108,7 @@
                             Backbone.history.start();
                         }
                     } else {
-                        this.$el.find('.account-settings-container').append(this.sectionTwoView.render().el);
+                        this.$el.find('.wrapper-profile-section-container-two').append(this.sectionTwoView.render().el);
                     }
                     return this;
                 },
@@ -120,6 +130,10 @@
                         fieldView.delegateEvents();
                     }
 
+                    // Do not show name when in limited mode or no name has been set
+                    if (this.showFullProfile() && this.options.accountSettingsModel.get('name')) {
+                        this.$('.profile-section-one-fields').append(this.options.nameFieldView.render().el);
+                    }
                     this.$('.profile-section-one-fields').append(this.options.usernameFieldView.render().el);
 
                     imageView = this.options.profileImageFieldView;
