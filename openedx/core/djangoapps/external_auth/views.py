@@ -36,6 +36,7 @@ import student.views
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.external_auth.djangostore import DjangoOpenIDStore
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+from openedx.core.djangoapps.site_configuration.helpers import get_value
 from student.helpers import get_next_url_for_login_page
 from student.models import UserProfile
 from xmodule.modulestore.django import modulestore
@@ -171,7 +172,7 @@ def _external_login_or_signup(request,
                         "an external login like WebAuth or Shibboleth. "
                         "Please contact {tech_support_email} for support."
                     ).format(
-                        tech_support_email=settings.TECH_SUPPORT_EMAIL,
+                        tech_support_email=get_value('email_from_address', settings.TECH_SUPPORT_EMAIL),
                     )
                     return default_render_failure(request, failure_msg)
             except User.DoesNotExist:

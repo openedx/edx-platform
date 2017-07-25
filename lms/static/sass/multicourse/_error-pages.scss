@@ -6,6 +6,7 @@ section.outside-app {
   h1 {
     @extend h2;
     margin-bottom: ($baseline*2);
+    text-align: center;
   }
 
   p, ul, form {
