@@ -15,6 +15,9 @@ def dump_memory(signum, frame):
     Dump memory stats for the current process to a temp directory.
     Uses the meliae output format.
     """
+    import logging
+    log = logging.getLogger(__name__)
+    log.info("starting the memory dump...")
 
     timestamp = datetime.now().isoformat()
     format_str = '{}/meliae.{}.{}.{{}}.dump'.format(
@@ -31,6 +34,7 @@ def dump_memory(signum, frame):
         scanner.dump_all_objects(
             format_str.format("gc-gen-{}".format(gen))
         )
+    log.info("done with memory dump")
 
 
 def install_memory_dumper(dump_signal=signal.SIGPROF):
