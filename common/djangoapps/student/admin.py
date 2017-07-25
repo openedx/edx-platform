@@ -15,7 +15,6 @@ from student.models import (
     CourseEnrollmentAllowed,
     DashboardConfiguration,
     LinkedInAddToProfileConfiguration,
-    LogoutViewConfiguration,
     PendingNameChange,
     Registration,
     RegistrationCookieConfiguration,
@@ -203,7 +202,6 @@ admin.site.register(CourseEnrollmentAllowed)
 admin.site.register(Registration)
 admin.site.register(PendingNameChange)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
-admin.site.register(LogoutViewConfiguration, ConfigurationModelAdmin)
 admin.site.register(RegistrationCookieConfiguration, ConfigurationModelAdmin)
 
 
