@@ -110,6 +110,10 @@
              var course_number = element.data('course-number');
              var course_name = element.data('course-name');
              var cert_name_long = element.data('cert-name-long');
+
+             $('#track-info').empty();
+             $('#refund-info').empty();
+
              $('#track-info').html(interpolate(track_info, {
                  course_number: "<span id='unenroll_course_number'>" + course_number + '</span>',
                  course_name: "<span id='unenroll_course_name'>" + course_name + '</span>',
