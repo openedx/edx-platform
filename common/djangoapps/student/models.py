@@ -2469,7 +2469,7 @@ class UserAttribute(TimeStampedModel):
 
 
 class LogoutViewConfiguration(ConfigurationModel):
-    """ Configuration for the logout view. """
+    """ DEPRECATED: Configuration for the logout view. """
 
     def __unicode__(self):
         """Unicode representation of the instance. """
