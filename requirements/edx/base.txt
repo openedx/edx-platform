@@ -149,7 +149,7 @@ ipaddr==2.1.11
 django-cors-headers==1.1.0
 
 # Debug toolbar
-django_debug_toolbar==1.5
+django_debug_toolbar==1.8
 sqlparse>=0.2.0,<0.3.0
 
 # Used for testing
