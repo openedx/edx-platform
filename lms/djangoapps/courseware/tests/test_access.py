@@ -595,16 +595,16 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
 
         # user should not be able to load course even if enrolled
         CourseEnrollmentFactory(user=user, course_id=course.id)
-        response = access._has_access_course(user, 'view_courseware_with_prerequisites', course)
+        response = access._has_access_course(user, 'load', course)
         self.assertFalse(response)
-        self.assertIsInstance(response, access_response.MilestoneError)
+        self.assertIsInstance(response, access_response.MilestoneAccessError)
         # Staff can always access course
         staff = StaffFactory.create(course_key=course.id)
-        self.assertTrue(access._has_access_course(staff, 'view_courseware_with_prerequisites', course))
+        self.assertTrue(access._has_access_course(staff, 'load', course))
 
         # User should be able access after completing required course
         fulfill_course_milestone(pre_requisite_course.id, user)
-        self.assertTrue(access._has_access_course(user, 'view_courseware_with_prerequisites', course))
+        self.assertTrue(access._has_access_course(user, 'load', course))
 
     @ddt.data(
         (True, True, True),
@@ -615,8 +615,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         """
         Test course access on mobile for staff and students.
         """
-        descriptor = Mock(id=self.course.id, user_partitions=[])
-        descriptor._class_tags = {}
+        descriptor = CourseFactory()
         descriptor.visible_to_staff_only = False
         descriptor.mobile_available = mobile_available
 
@@ -773,7 +772,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
 
     PREREQUISITES_TEST_DATA = list(itertools.product(
         ['user_normal', 'user_completed_pre_requisite', 'user_staff', 'user_anonymous'],
-        ['view_courseware_with_prerequisites'],
+        ['load'],
         ['course_default', 'course_with_pre_requisite', 'course_with_pre_requisites'],
     ))
 

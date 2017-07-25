@@ -33,6 +33,7 @@ from openedx.core.djangoapps.programs.utils import (
     ProgramMarketingDataExtender,
     get_certificates,
 )
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import AnonymousUserFactory, UserFactory, CourseEnrollmentFactory
 from util.date_utils import strftime_localized
@@ -55,6 +56,7 @@ class TestProgramProgressMeter(TestCase):
         super(TestProgramProgressMeter, self).setUp()
 
         self.user = UserFactory()
+        self.site = SiteFactory()
 
     def _create_enrollments(self, *course_run_ids):
         """Variadic helper used to create course run enrollments."""
@@ -92,7 +94,7 @@ class TestProgramProgressMeter(TestCase):
         data = [ProgramFactory()]
         mock_get_programs.return_value = data
 
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
 
         self.assertEqual(meter.engaged_programs, [])
         self._assert_progress(meter)
@@ -104,7 +106,7 @@ class TestProgramProgressMeter(TestCase):
 
         course_run_id = generate_course_run_key()
         self._create_enrollments(course_run_id)
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
 
         self.assertEqual(meter.engaged_programs, [])
         self._assert_progress(meter)
@@ -129,7 +131,7 @@ class TestProgramProgressMeter(TestCase):
         mock_get_programs.return_value = data
 
         self._create_enrollments(course_run_key)
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
 
         self._attach_detail_url(data)
         program = data[0]
@@ -159,7 +161,7 @@ class TestProgramProgressMeter(TestCase):
 
         self._create_enrollments(course_run_key)
 
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
 
         program = data[0]
         expected = [
@@ -195,7 +197,7 @@ class TestProgramProgressMeter(TestCase):
             mode=CourseMode.NO_ID_PROFESSIONAL_MODE
         )
 
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
 
         program = data[0]
         expected = [
@@ -236,7 +238,7 @@ class TestProgramProgressMeter(TestCase):
 
         CourseEnrollmentFactory(user=self.user, course_id=course_run_key, mode='audit')
 
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
 
         program = data[0]
         expected = [
@@ -278,7 +280,7 @@ class TestProgramProgressMeter(TestCase):
         # The creation time of the enrollments matters to the test. We want
         # the first_course_run_key to represent the newest enrollment.
         self._create_enrollments(older_course_run_key, newer_course_run_key)
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
 
         self._attach_detail_url(data)
         programs = data[:2]
@@ -323,7 +325,7 @@ class TestProgramProgressMeter(TestCase):
 
         # Enrollment for the shared course run created last (most recently).
         self._create_enrollments(solo_course_run_key, shared_course_run_key)
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
 
         self._attach_detail_url(data)
         programs = data[:3]
@@ -354,13 +356,13 @@ class TestProgramProgressMeter(TestCase):
         mock_get_programs.return_value = data
 
         # No enrollments, no programs in progress.
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
         self._assert_progress(meter)
         self.assertEqual(meter.completed_programs, [])
 
         # One enrollment, one program in progress.
         self._create_enrollments(first_course_run_key)
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
         program, program_uuid = data[0], data[0]['uuid']
         self._assert_progress(
             meter,
@@ -370,7 +372,7 @@ class TestProgramProgressMeter(TestCase):
 
         # Two enrollments, all courses in progress.
         self._create_enrollments(second_course_run_key)
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
         self._assert_progress(
             meter,
             ProgressFactory(uuid=program_uuid, in_progress=2)
@@ -381,7 +383,7 @@ class TestProgramProgressMeter(TestCase):
         mock_completed_course_runs.return_value = [
             {'course_run_id': first_course_run_key, 'type': MODES.verified},
         ]
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
         self._assert_progress(
             meter,
             ProgressFactory(uuid=program_uuid, completed=1, in_progress=1)
@@ -393,7 +395,7 @@ class TestProgramProgressMeter(TestCase):
             {'course_run_id': first_course_run_key, 'type': MODES.verified},
             {'course_run_id': second_course_run_key, 'type': MODES.honor},
         ]
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
         self._assert_progress(
             meter,
             ProgressFactory(uuid=program_uuid, completed=1, in_progress=1)
@@ -405,7 +407,7 @@ class TestProgramProgressMeter(TestCase):
             {'course_run_id': first_course_run_key, 'type': MODES.verified},
             {'course_run_id': second_course_run_key, 'type': MODES.verified},
         ]
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
         self._assert_progress(
             meter,
             ProgressFactory(uuid=program_uuid, completed=2)
@@ -436,7 +438,7 @@ class TestProgramProgressMeter(TestCase):
         mock_completed_course_runs.return_value = [
             {'course_run_id': course_run_key, 'type': MODES.honor},
         ]
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
 
         program, program_uuid = data[0], data[0]['uuid']
         self._assert_progress(
@@ -449,7 +451,7 @@ class TestProgramProgressMeter(TestCase):
         """Verify that programs with no courses do not count as completed."""
         program = ProgramFactory()
         program['courses'] = []
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
         program_complete = meter._is_program_complete(program)
         self.assertFalse(program_complete)
 
@@ -469,7 +471,7 @@ class TestProgramProgressMeter(TestCase):
                     course_run_keys.append(course_run['key'])
 
         # Verify that no programs are complete.
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
         self.assertEqual(meter.completed_programs, [])
 
         # Complete all programs.
@@ -480,7 +482,7 @@ class TestProgramProgressMeter(TestCase):
         ]
 
         # Verify that all programs are complete.
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
         self.assertEqual(meter.completed_programs, program_uuids)
 
     @mock.patch(UTILS_MODULE + '.certificate_api.get_certificates_for_user')
@@ -494,7 +496,7 @@ class TestProgramProgressMeter(TestCase):
             self._make_certificate_result(status='unknown', course_key='unknown-course'),
         ]
 
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
         self.assertEqual(
             meter.completed_course_runs,
             [
@@ -517,7 +519,7 @@ class TestProgramProgressMeter(TestCase):
         mock_get_programs.return_value = [program]
 
         # Verify that the test program is not complete.
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
         self.assertEqual(meter.completed_programs, [])
 
         # Grant a 'no-id-professional' certificate for one of the course runs,
@@ -527,7 +529,7 @@ class TestProgramProgressMeter(TestCase):
         ]
 
         # Verify that the program is complete.
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
         self.assertEqual(meter.completed_programs, [program['uuid']])
 
     @mock.patch(UTILS_MODULE + '.ProgramProgressMeter.completed_course_runs', new_callable=mock.PropertyMock)
@@ -543,7 +545,7 @@ class TestProgramProgressMeter(TestCase):
         program = ProgramFactory(courses=[course])
         mock_get_programs.return_value = [program]
         self._create_enrollments(course_run_key)
-        meter = ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.site, self.user)
         mock_completed_course_runs.return_value = [{'course_run_id': course_run_key, 'type': 'verified'}]
         self.assertEqual(meter._is_course_complete(course), True)
 

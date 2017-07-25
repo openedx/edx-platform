@@ -26,7 +26,6 @@ from openedx.core.lib.token_utils import JwtBuilder
 try:
     from enterprise import utils as enterprise_utils
     from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer
-    from enterprise.tpa_pipeline import get_enterprise_customer_for_request
     from enterprise.utils import consent_necessary_for_course
 except ImportError:
     pass
@@ -240,9 +239,9 @@ def enterprise_customer_for_request(request, tpa_hint=None):
     if not enterprise_enabled():
         return None
 
-    ec = get_enterprise_customer_for_request(request)
+    ec = None
 
-    if not ec and tpa_hint:
+    if tpa_hint:
         try:
             ec = EnterpriseCustomer.objects.get(enterprise_customer_identity_provider__provider_id=tpa_hint)
         except EnterpriseCustomer.DoesNotExist:
@@ -306,24 +305,6 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None):
     full_url = reverse('grant_data_sharing_permissions') + '?' + querystring
     LOGGER.info('Redirecting to %s to complete data sharing consent', full_url)
     return full_url
-
-
-def insert_enterprise_pipeline_elements(pipeline):
-    """
-    If the enterprise app is enabled, insert additional elements into the
-    pipeline so that data sharing consent views are used.
-    """
-    if not enterprise_enabled():
-        return
-
-    additional_elements = (
-        'enterprise.tpa_pipeline.handle_enterprise_logistration',
-    )
-    # Find the item we need to insert the data sharing consent elements before
-    insert_point = pipeline.index('social_core.pipeline.social_auth.load_extra_data')
-
-    for index, element in enumerate(additional_elements):
-        pipeline.insert(insert_point + index, element)
 
 
 def get_cache_key(**kwargs):

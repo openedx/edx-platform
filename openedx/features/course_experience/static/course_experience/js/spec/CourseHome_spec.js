@@ -15,15 +15,19 @@ describe('Course Home factory', () => {
     });
 
     it('sends an event when an course tool is clicked', () => {
-      document.querySelector('.course-tool-link').dispatchEvent(new Event('click'));
-      const courseToolName = document.querySelector('.course-tool-link').text.trim().toLowerCase();
-      expect(Logger.log).toHaveBeenCalledWith(
-        'edx.course.tool.accessed',
-        {
-          tool_name: courseToolName,
-          page: 'course_home',
-        },
-      );
+      const courseToolNames = document.querySelectorAll('.course-tool-link');
+      for (let i = 0; i < courseToolNames.length; i += 1) {
+        const courseToolName = courseToolNames[i].dataset['analytics-id']; // eslint-disable-line dot-notation
+        const event = new CustomEvent('click');
+        event.srcElement = { dataset: { 'analytics-id': courseToolName } };
+        courseToolNames[i].dispatchEvent(event);
+        expect(Logger.log).toHaveBeenCalledWith(
+          'edx.course.tool.accessed',
+          {
+            tool_name: courseToolName,
+          },
+        );
+      }
     });
   });
 });

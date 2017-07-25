@@ -318,7 +318,7 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 3, 13),
+        (ModuleStoreEnum.Type.split, 4, 23),
         (ModuleStoreEnum.Type.mongo, USER_COURSES_COUNT, 2)
     )
     @ddt.unpack

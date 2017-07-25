@@ -26,6 +26,7 @@ from web_fragments.fragment import Fragment
 
 from ..utils import get_course_outline_block_tree
 from .course_dates import CourseDatesFragmentView
+from .course_home_messages import CourseHomeMessageFragmentView
 from .course_outline import CourseOutlineFragmentView
 from .course_sock import CourseSockFragmentView
 from .welcome_message import WelcomeMessageFragmentView
@@ -113,9 +114,12 @@ class CourseHomeFragmentView(EdxFragmentView):
 
         # Render the full content to enrolled users, as well as to course and global staff.
         # Unenrolled users who are not course or global staff are given only a subset.
-        is_enrolled = CourseEnrollment.is_enrolled(request.user, course_key)
-        is_staff = has_access(request.user, 'staff', course_key)
-        if is_enrolled or is_staff:
+        user_access = {
+            'is_anonymous': request.user.is_anonymous(),
+            'is_enrolled': CourseEnrollment.is_enrolled(request.user, course_key),
+            'is_staff': has_access(request.user, 'staff', course_key),
+        }
+        if user_access['is_enrolled'] or user_access['is_staff']:
             outline_fragment = CourseOutlineFragmentView().render_to_fragment(request, course_id=course_id, **kwargs)
             welcome_message_fragment = WelcomeMessageFragmentView().render_to_fragment(
                 request, course_id=course_id, **kwargs
@@ -141,6 +145,11 @@ class CourseHomeFragmentView(EdxFragmentView):
         # Get the course tools enabled for this user and course
         course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
 
+        # Grab the course home messages fragment to render any relevant django messages
+        course_home_message_fragment = CourseHomeMessageFragmentView().render_to_fragment(
+            request, course_id=course_id, user_access=user_access, **kwargs
+        )
+
         # Render the course home fragment
         context = {
             'request': request,
@@ -149,6 +158,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             'course_key': course_key,
             'outline_fragment': outline_fragment,
             'handouts_html': handouts_html,
+            'course_home_message_fragment': course_home_message_fragment,
             'has_visited_course': has_visited_course,
             'resume_course_url': resume_course_url,
             'course_tools': course_tools,
