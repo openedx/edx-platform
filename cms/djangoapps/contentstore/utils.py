@@ -391,17 +391,18 @@ def get_user_partition_info(xblock, schemes=None, course=None):
     for p in sorted(get_all_partitions_for_course(course, active_only=True), key=lambda p: p.name):
 
         # Exclude disabled partitions, partitions with no groups defined
+        # The exception to this case is when there is a selected group within that partition, which means there is
+        # a deleted group
         # Also filter by scheme name if there's a filter defined.
-        if p.groups and (schemes is None or p.scheme.name in schemes):
+        selected_groups = set(xblock.group_access.get(p.id, []) or [])
+        if (p.groups or selected_groups) and (schemes is None or p.scheme.name in schemes):
 
             # First, add groups defined by the partition
             groups = []
             for g in p.groups:
-
                 # Falsey group access for a partition mean that all groups
                 # are selected.  In the UI, though, we don't show the particular
                 # groups selected, since there's a separate option for "all users".
-                selected_groups = set(xblock.group_access.get(p.id, []) or [])
                 groups.append({
                     "id": g.id,
                     "name": g.name,
