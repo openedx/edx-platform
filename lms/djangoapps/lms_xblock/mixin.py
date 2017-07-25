@@ -7,8 +7,8 @@ from lazy import lazy
 from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Scope, String, XBlockMixin
 from xblock.validation import ValidationMessage
-from lms.lib.utils import get_parent_unit
 
+from lms.lib.utils import get_parent_unit
 from xmodule.modulestore.inheritance import UserPartitionList
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 
@@ -180,7 +180,14 @@ class LmsBlockMixin(XBlockMixin):
         else:
             return False
 
-    def _is_unit(self):
+    def is_unit(self):
+        """
+        Returns whether the xblock is a unit.
+
+        Get_parent_unit() returns None if the current xblock either does not have a parent unit or is itself a unit.
+        To make sure that get_parent_unit() isn't returning None because the xblock is an orphan, we check that the
+        xblock has a parent.
+        """
         return get_parent_unit(self) is None and self.get_parent()
 
     def validate(self):
@@ -215,20 +222,12 @@ class LmsBlockMixin(XBlockMixin):
             )
 
         if has_invalid_groups:
-            if self._is_unit():
-                validation.add(
-                    ValidationMessage(
-                        ValidationMessage.ERROR,
-                        INVALID_USER_PARTITION_GROUP_VALIDATION_UNIT
-                    )
+            validation.add(
+                ValidationMessage(
+                    ValidationMessage.ERROR,
+                    INVALID_USER_PARTITION_GROUP_VALIDATION_UNIT if self.is_unit() else INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT
                 )
-            else:
-                validation.add(
-                    ValidationMessage(
-                        ValidationMessage.ERROR,
-                        INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT
-                    )
-                )
+            )
 
         if self._has_nonsensical_access_settings():
             validation.add(

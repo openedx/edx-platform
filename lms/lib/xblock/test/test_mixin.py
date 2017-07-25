@@ -230,6 +230,19 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
             ValidationMessage.ERROR,
         )
 
+    def test_validate_invalid_groups_for_unit(self):
+        """
+        Test the validation messages produced for a unit-level xblock referring to non-existent groups.
+        """
+        self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id, 999]})
+        validation = self.store.get_item(self.vertical_location).validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            INVALID_USER_PARTITION_GROUP_VALIDATION_UNIT,
+            ValidationMessage.ERROR,
+        )
+
 
 class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
     """
