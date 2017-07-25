@@ -788,7 +788,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         if should_cache_items:
             self.cache_items(runtime, block_keys, course_entry.course_key, depth, lazy)
 
-        return [runtime.load_item(block_key, course_entry, **kwargs) for block_key in block_keys]
+        with self.bulk_operations(course_entry.course_key, emit_signals=False):
+            return [runtime.load_item(block_key, course_entry, **kwargs) for block_key in block_keys]
 
     def _get_cache(self, course_version_guid):
         """
