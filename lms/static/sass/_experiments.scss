@@ -14,17 +14,17 @@
     text-align: left !important;
 }
 
-.v2.register-choice-donate .list-actions {
+.v2.register-choice-continue .list-actions {
     margin-bottom: 0 !important;
 }
 
-.v2.register-choice-donate .action-select {
+.v2.register-choice-continue .action-select {
     display: inline-block !important;
     list-style-type: none !important;
     width: 100% !important;
 }
 
-.v2.register-choice-donate .donation-link {
+.v2.register-choice-continue .continue-link {
     display: inline-block !important;
     padding: 10px 15px !important;
     border-radius: 3px !important;
@@ -38,13 +38,7 @@
     font-weight: 500 !important;
 }
 
-@media (min-width: 375px) {
-    .donation-link {
-        font-size: 16px;
-    }
-}
-
-.v2.register-choice-v2-audit {
+.v2.register-choice-v2-donate {
     height: 300px;
     background: none !important;
     border-top-color: grey !important;
@@ -52,16 +46,16 @@
 }
 
 @media screen and (min-width: 375px) {
-    .v2.register-choice-v2-audit {
+    .v2.register-choice-v2-donate {
         height: 250px;
     }
 }
 
-.v2.register-choice-v2-audit .list-actions {
+.v2.register-choice-v2-donate .list-actions {
     margin-bottom: 0 !important;
 }
 
-.v2.register-choice-v2-audit .list-actions input {
+.v2.register-choice-v2-donate .list-actions a {
     background: transparent !important;
     color: #0075b4 !important;
     box-shadow: none !important;
@@ -70,13 +64,13 @@
     white-space: normal;
 }
 
-.v2.register-choice-v2-audit .wrapper-copy-inline {
+.v2.register-choice-v2-donate .wrapper-copy-inline {
     height: 70px !important;
     width: 100% !important;
     display: flex !important;
 }
 
-.v2.register-choice-v2-audit .wrapper-copy {
+.v2.register-choice-v2-donate .wrapper-copy {
     width: 70% !important;
     height: auto !important;
 }
@@ -90,17 +84,17 @@
     margin-left: 5px;
 }
 
-.v2 .donation-link {
+.v2 .continue-link {
     font-weight: bold !important;
 }
 
 .v2.register-choice-certificate,
-.v2.register-choice-donate,
+.v2.register-choice-continue,
 .v2.register-choice-view {
     width: 100%;
 }
 
-.v2.register-choice-donate {
+.v2.register-choice-continue {
     border-color: #D7548E !important;
 }
 
@@ -108,15 +102,15 @@
     max-height: 115px;
 }
 
-.v2.register-choice-v2-audit .wrapper-copy-inline {
+.v2.register-choice-v2-donate .wrapper-copy-inline {
     display: block !important;
 }
 
-.v2.register-choice-v2-audit .copy-inline {
+.v2.register-choice-v2-donate .copy-inline {
     width: 100% !important;
 }
 
-.v2.register-choice-v2-audit .list-actions {
+.v2.register-choice-v2-donate .list-actions {
     width: 100% !important;
     margin-top: 20px !important;
     text-align: center !important;
@@ -126,7 +120,7 @@
     width: 100% !important;
 }
 
-.v2 input{
+.v2 input, .v2 a {
     font-size: 15px !important;
 }
 
@@ -164,7 +158,7 @@
     }
 }
 
-.v2 .donation-link, .v2 input, .v2 button {
+.v2 .continue-link, .v2 input, .v2 button, .v2 a {
     width: 100%;
 }
 
@@ -189,21 +183,22 @@
 
 @media (min-width: 768px) {
     .v2.register-choice-certificate,
-    .v2.register-choice-donate {
+    .v2.register-choice-continue,
+    .v2.deco-divider {
         width: 46.5% !important;
         display: inline-block;
         min-height: 270px;
     }
 
-    .v2.register-choice-v2-audit .wrapper-copy-inline {
+    .v2.register-choice-v2-donate .wrapper-copy-inline {
         display: flex !important;
     }
 
-    .v2.register-choice-v2-audit .copy-inline {
+    .v2.register-choice-v2-donate .copy-inline {
         width: 40% !important;
     }
 
-    .v2.register-choice-v2-audit .list-actions {
+    .v2.register-choice-v2-donate .list-actions {
         margin-top: 0 !important;
         text-align: right !important;
     }
@@ -212,16 +207,16 @@
         width: 100% !important;
     }
 
-    .v2 input {
+    .v2 input, .v2 a {
         font-size: 15px !important;
     }
 
-    .v2 .donation-link, .v2.register-choice-certificate button {
+    .v2 .continue-link, .v2.register-choice-certificate button, .v2.register-choice-certificate input {
         margin-top: 20px;
         width: initial;
     }
 
-    .v2.register-choice-v2-audit input {
+    .v2.register-choice-v2-donate a {
         width: 100% !important;
     }
 
@@ -237,7 +232,7 @@
         margin: 0 2% 20px 0;
     }
 
-    .v2.register-choice-donate .wrapper-copy-inline .wrapper-copy, .v2.register-choice-certificate .wrapper-copy-inline .wrapper-copy {
+    .v2.register-choice-continue .wrapper-copy-inline .wrapper-copy, .v2.register-choice-certificate .wrapper-copy-inline .wrapper-copy {
         width: 60%;
     }
 
@@ -249,7 +244,7 @@
         padding: 15px !important;
     }
 
-    .v2.register-choice-donate .wrapper-copy-inline .wrapper-copy, .v2.register-choice-certificate .wrapper-copy-inline .wrapper-copy {
+    .v2.register-choice-continue .wrapper-copy-inline .wrapper-copy, .v2.register-choice-certificate .wrapper-copy-inline .wrapper-copy {
         width: 60%;
     }
 
@@ -271,14 +266,14 @@
         width: 100% !important;
     }
 
-    .v2 .donation-link:hover,
-    .v2 .donation-link:focus {
+    .v2 .continue-link:hover,
+    .v2 .continue-link:focus {
         background-color: #D7548E !important;
         color: white !important;
         text-decoration: none;
     }
 
-    .v2 .donation-link:hover {
+    .v2 .continue-link:hover {
         cursor: pointer;
     }
 
@@ -366,13 +361,14 @@
 
 @media (min-width: 835px) {
     .v2.register-choice-certificate,
-    .v2.register-choice-donate {
+    .v2.register-choice-continue,
+    .v2.deco-divider {
         min-height: 250px;
     }
 }
 
 @media (min-width: 1024px) {
-    .v2 .donation-link {
+    .v2 .continue-link {
         width: 55%;
     }
     .v2.deco-divider .copy {
@@ -380,15 +376,18 @@
     }
 }
 
-@media (min-width: 1064px) {
+@media (min-width: 1096px) {
     .v2.register-choice-certificate,
-    .v2.register-choice-donate {
+    .v2.register-choice-continue,
+    .v2.deco-divider {
         min-height: 260px;
     }
     .v2 .img-certificate, .v2 .img-donate {
+        margin-top: 10px;
         display: initial;
     }
-    .v2 .donation-link, .v2.register-choice-certificate button {
+    .v2 .continue-link, .v2.register-choice-certificate button,
+    .v2.register-choice-certificate input {
         margin-top: -22px !important;
     }
 }
