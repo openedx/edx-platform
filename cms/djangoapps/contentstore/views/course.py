@@ -464,10 +464,16 @@ def _accessible_libraries_iter(user, org=None):
     """
     List all libraries available to the logged in user by iterating through all libraries.
 
-    If 'org' is present, only libraries from that org will be returned.
+    org (string): if not None, this value will limit the libraries returned. An empty
+        string will result in no libraries, and otherwise only libraries with the
+        specified org will be returned. The default value is None.
     """
+    if org is not None:
+        libraries = [] if org == '' else modulestore().get_libraries(org=org)
+    else:
+        libraries = modulestore().get_libraries()
     # No need to worry about ErrorDescriptors - split's get_libraries() never returns them.
-    return (lib for lib in modulestore().get_libraries(org=org) if has_studio_read_access(user, lib.location.library_key))
+    return (lib for lib in libraries if has_studio_read_access(user, lib.location.library_key))
 
 
 @login_required
