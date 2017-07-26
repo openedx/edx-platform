@@ -29,6 +29,9 @@ import os
 from path import Path as path
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
+from collections import OrderedDict
+from operator import itemgetter
+
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.
 SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
@@ -906,3 +909,16 @@ ENTERPRISE_ENROLLMENT_API_URL = ENV_TOKENS.get('ENTERPRISE_ENROLLMENT_API_URL', 
 _COUNTRIES_OVERRIDE = ENV_TOKENS.get('COUNTRIES_OVERRIDE', None)
 if _COUNTRIES_OVERRIDE:
     COUNTRIES_OVERRIDE = _COUNTRIES_OVERRIDE
+
+# all-languages overrides, here if the language is null we remove the language from the language dictionary
+#otherwise if we are adding the new language code or existing code ,it should be added to the ALL_LANGUAGE_DUPLICATE which will be 
+#validated, when adding into the language proficiency table and then adding the language to ALL_LANGUAGES_DICT dictionary.
+ALL_LANGUAGES_OVERRIDE = ENV_TOKENS.get('ALL_LANGUAGES_OVERRIDE', None)
+if ALL_LANGUAGES_OVERRIDE:
+    for code, language in ALL_LANGUAGES_OVERRIDE.iteritems():
+        if language is None or language == "null":
+            del ALL_LANGUAGES_DICT[code]
+        elif code not in ALL_LANGUAGES_DICT:
+            ALL_LANGUAGES_DUPLICATE = ALL_LANGUAGES_DUPLICATE + ([code, language],)
+            ALL_LANGUAGES_DICT[code] = language
+    ALL_LANGUAGES_DICT = OrderedDict(sorted(ALL_LANGUAGES_DICT.items(), key=itemgetter(1)))

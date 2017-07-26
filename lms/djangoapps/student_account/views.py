@@ -458,7 +458,7 @@ def account_settings_context(request):
             }, 'year_of_birth': {
                 'options': year_of_birth_options,
             }, 'preferred_language': {
-                'options': all_languages(),
+                'options': [(choice[0], (choice[1])) for choice in settings.ALL_LANGUAGES_DICT.items()],
             }, 'time_zone': {
                 'options': TIME_ZONE_CHOICES,
             }

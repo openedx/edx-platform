@@ -2190,7 +2190,7 @@ class LanguageProficiency(models.Model):
     code = models.CharField(
         max_length=16,
         blank=False,
-        choices=settings.ALL_LANGUAGES,
+        choices=settings.ALL_LANGUAGES_DUPLICATE,
         help_text=_("The ISO 639-1 language code for this language.")
     )
 

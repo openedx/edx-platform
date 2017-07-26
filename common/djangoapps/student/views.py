@@ -1596,7 +1596,7 @@ def _do_create_account(form, custom_form=None):
 
     profile_fields = [
         "name", "level_of_education", "gender", "mailing_address", "city", "country", "goals",
-        "year_of_birth"
+        "year_of_birth",
     ]
     profile = UserProfile(
         user=user,
@@ -1610,6 +1610,10 @@ def _do_create_account(form, custom_form=None):
     except Exception:  # pylint: disable=broad-except
         log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
         raise
+    #added to create the record in languageProficiency table
+    if form.cleaned_data.get("language") != None:
+        profile.language_proficiencies.create(code=form.cleaned_data.get("language"))
+        profile.save()
 
     return (user, profile, registration)
 
