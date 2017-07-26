@@ -792,6 +792,14 @@ class CourseInfoTabTestCase(TabTestCase):
         tabs = get_course_tab_list(self.request, self.course)
         self.assertEqual(tabs[0].type, 'courseware')
 
+    # TODO: LEARNER-611 - remove once course_info is removed.
+    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
+    def test_default_tab_for_displayable(self):
+        tabs = xmodule_tabs.CourseTabList.iterate_displayable(self.course, self.user)
+        for i, tab in enumerate(tabs):
+            if i == 0:
+                self.assertEqual(tab.type, 'course_info')
+
 
 @attr(shard=1)
 class DiscussionLinkTestCase(TabTestCase):
