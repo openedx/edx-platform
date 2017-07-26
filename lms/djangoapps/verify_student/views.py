@@ -6,6 +6,7 @@ import datetime
 import decimal
 import json
 import logging
+import urllib
 
 import analytics
 import waffle
@@ -434,6 +435,21 @@ class PayAndVerifyView(View):
 
         return render_to_response("verify_student/pay_and_verify.html", context)
 
+    def add_utm_params_to_url(self, url):
+        # utm_params is [(u'utm_content', u'course-v1:IDBx IDB20.1x 1T2017'),...
+        utm_params = [item for item in self.request.GET.items() if 'utm_' in item[0]]
+        # utm_params is utm_content=course-v1%3AIDBx+IDB20.1x+1T2017&...
+        utm_params = urllib.urlencode(utm_params, True)
+        # utm_params is utm_content=course-v1:IDBx+IDB20.1x+1T2017&...
+        # (course-keys do not have url encoding)
+        utm_params = urllib.unquote(utm_params)
+        if utm_params:
+            if '?' in url:
+                url = url + '&' + utm_params
+            else:
+                url = url + '?' + utm_params
+        return url
+
     def _redirect_if_necessary(
             self, message, already_verified, already_paid, is_enrolled, course_key,  # pylint: disable=bad-continuation
             user_is_trying_to_pay, user, sku  # pylint: disable=bad-continuation
@@ -504,6 +520,8 @@ class PayAndVerifyView(View):
 
         # Redirect if necessary, otherwise implicitly return None
         if url is not None:
+            if waffle.switch_is_active('add-utm-params'):
+                url = self.add_utm_params_to_url(url)
             return redirect(url)
 
     def _get_paid_mode(self, course_key):
