@@ -1,6 +1,7 @@
 import ddt
 from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
-from lms.djangoapps.grades.services import GradesService
+from lms.djangoapps.grades.services import GradesService, _get_key
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -33,7 +34,17 @@ class GradesServiceTests(ModuleStoreTestCase):
         self.assertDictEqual(self.service.get_subsection_grade(
             user_id=self.user.id,
             course_key_or_id=self.course.id,
-            subsection=self.subsection.location
+            usage_key_or_id=self.subsection.location
+        ), {
+            'earned_all': 6.0,
+            'earned_graded': 5.0
+        })
+
+        # test with id strings as parameters instead
+        self.assertDictEqual(self.service.get_subsection_grade(
+            user_id=self.user.id,
+            course_key_or_id=str(self.course.id),
+            usage_key_or_id=str(self.subsection.location)
         ), {
             'earned_all': 6.0,
             'earned_graded': 5.0
@@ -76,7 +87,7 @@ class GradesServiceTests(ModuleStoreTestCase):
         self.service.override_subsection_grade(
             user_id=self.user.id,
             course_key_or_id=self.course.id,
-            subsection=self.subsection.location,
+            usage_key_or_id=self.subsection.location,
             earned_all=override['earned_all'],
             earned_graded=override['earned_graded']
         )
@@ -89,3 +100,17 @@ class GradesServiceTests(ModuleStoreTestCase):
 
         self.assertEqual(grade.earned_all, expected['earned_all'])
         self.assertEqual(grade.earned_graded, expected['earned_graded'])
+
+    @ddt.data(
+        ['edX/DemoX/Demo_Course', CourseKey.from_string('edX/DemoX/Demo_Course'), CourseKey],
+        ['course-v1:edX+DemoX+Demo_Course', CourseKey.from_string('course-v1:edX+DemoX+Demo_Course'), CourseKey],
+        [CourseKey.from_string('course-v1:edX+DemoX+Demo_Course'),
+         CourseKey.from_string('course-v1:edX+DemoX+Demo_Course'), CourseKey],
+        ['block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow',
+         UsageKey.from_string('block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow'), UsageKey],
+        [UsageKey.from_string('block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow'),
+         UsageKey.from_string('block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow'), UsageKey],
+    )
+    @ddt.unpack
+    def test_get_key(self, input_key, output_key, key_cls):
+        self.assertEqual(_get_key(input_key, key_cls), output_key)
