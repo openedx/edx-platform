@@ -103,10 +103,10 @@
         .exam-timer-clock {
           background-color: transparent;
           border: 1px solid $white;
-          a, b {
+          #toggle_timer, b {
             color: $white;
           }
-          a {
+          #toggle_timer {
             // Overrides:
             border-top: none;
             border-right: none;
@@ -152,7 +152,7 @@
       background-color: $gray-l3;
       border-radius: 3px;
 
-      a {
+      #toggle_timer {
         @extend .exam-button-turn-in-exam;
 
         //Overrides:
