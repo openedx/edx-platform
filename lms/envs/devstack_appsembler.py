@@ -109,6 +109,8 @@ HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'
 
 USE_S3_FOR_CUSTOMER_THEMES = False
 
+LMS_BASE = ENV_TOKENS.get('LMS_BASE')
+
 try:
     from .private import *
 except ImportError:

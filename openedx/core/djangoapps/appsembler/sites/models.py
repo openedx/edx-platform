@@ -1,6 +1,7 @@
 """ Django Sites framework models overrides """
-
+from django.conf import settings
 from django.core.cache import caches
+from django.db import models
 from django.http.request import split_domain_port
 from django.contrib.sites.models import Site, SiteManager, SITE_CACHE
 from django.core.exceptions import ImproperlyConfigured
@@ -71,6 +72,32 @@ def patched_clear_site_cache(sender, **kwargs):
         del SITE_CACHE[site.domain]
     except KeyError:
         pass
+
+
+class AlternativeDomain(models.Model):
+    site = models.OneToOneField(Site, related_name='alternative_domain')
+    domain = models.CharField(max_length=500)
+
+    def __unicode__(self):
+        return self.domain
+
+    def switch_with_active(self):
+        """
+        Switches the currently active site with the alternative domain (custom or default) and saves
+        the currently active site as the alternative domain.
+        """
+        current_domain = self.site.domain
+        self.site.domain = self.domain
+        self.domain = current_domain
+        self.site.save()
+        self.save()
+
+    def is_tahoe_domain(self):
+        """
+        Checks if the domain is the default Tahoe domain and not a custom domain
+        :return:
+        """
+        return settings.LMS_BASE in self.domain
 
 
 django.contrib.sites.models.clear_site_cache = patched_clear_site_cache
