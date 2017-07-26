@@ -22,6 +22,8 @@ from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.utils import create_catalog_api_client
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.token_utils import JwtBuilder
+from third_party_auth.pipeline import get as get_partial_pipeline
+from third_party_auth.provider import Registry
 
 try:
     from enterprise import utils as enterprise_utils
@@ -241,13 +243,22 @@ def enterprise_customer_for_request(request, tpa_hint=None):
 
     ec = None
 
+    running_pipeline = get_partial_pipeline(request)
+    if running_pipeline:
+        # Determine if the user is in the middle of a third-party auth pipeline,
+        # and set the tpa_hint parameter to match if so.
+        tpa_hint = Registry.get_from_pipeline(running_pipeline).provider_id
+
     if tpa_hint:
+        # If we have a third-party auth provider, get the linked enterprise customer.
         try:
             ec = EnterpriseCustomer.objects.get(enterprise_customer_identity_provider__provider_id=tpa_hint)
         except EnterpriseCustomer.DoesNotExist:
             pass
 
     ec_uuid = request.GET.get('enterprise_customer') or request.COOKIES.get(settings.ENTERPRISE_CUSTOMER_COOKIE_NAME)
+    # If we haven't obtained an EnterpriseCustomer through the other methods, check the
+    # session cookies and URL parameters for an explicitly-passed EnterpriseCustomer.
     if not ec and ec_uuid:
         try:
             ec = EnterpriseCustomer.objects.get(uuid=ec_uuid)
