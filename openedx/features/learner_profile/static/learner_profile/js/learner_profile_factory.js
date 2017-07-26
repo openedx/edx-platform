@@ -150,7 +150,10 @@
                     valueAttribute: 'bio',
                     helpMessage: '',
                     persistChanges: true,
-                    messagePosition: 'header'
+                    messagePosition: 'header',
+                    maxCharacters: 300,
+                    charCountMessage: gettext('characters remaining'),
+                    charCountMessageSingular: gettext('character remaining'),
                 })
             ];
 

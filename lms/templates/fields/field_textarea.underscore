@@ -15,7 +15,7 @@
 
     <div class="u-field-value" id="u-field-value-<%- id %>"
         <% if (mode === 'edit') { %>
-            aria-labelledby="u-field-title-<%- id %>"><textarea id="u-field-textarea-<%- id %>" rows="4"
+            aria-labelledby="u-field-title-<%- id %>"><textarea maxlength="<%- maxCharacters%>" id="u-field-textarea-<%- id %>" rows="4"
             <% if (message) { %>
                 aria-describedby="u-field-message-help-<%- id %>"
             <% } %>
@@ -42,6 +42,14 @@
                 <span class="u-field-message-notification" aria-live="polite"></span>
                 <span class="u-field-message-help" id="u-field-message-help-<%- id %>"> <%- message %></span>
             </span>
+        <% } %>
+        <% if (mode === 'edit') { %>
+          <div class="profile-about-character-count">
+            <span class="cur-char-count"><%- (maxCharacters - value.length) %></span>
+            <span class="cur-char-count-msg">
+                <%-(maxCharacters - value.length) == 1 ? charCountMessageSingular : charCountMessage %>
+            </span>
+          </div>
         <% } %>
     </div>
 </div>

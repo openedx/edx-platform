@@ -515,15 +515,15 @@
                 'click .wrapper-u-field': 'startEditing',
                 'click .u-field-placeholder': 'startEditing',
                 'focusout textarea': 'finishEditing',
-                'change textarea': 'adjustTextareaHeight',
-                'keyup textarea': 'adjustTextareaHeight',
+                'change textarea': 'manageTextareaContentChange',
+                'keyup textarea': 'manageTextareaContentChange',
                 'keydown textarea': 'onKeyDown',
-                'paste textarea': 'adjustTextareaHeight',
-                'cut textarea': 'adjustTextareaHeight'
+                'paste textarea': 'manageTextareaContentChange',
+                'cut textarea': 'manageTextareaContentChange'
             },
 
             initialize: function(options) {
-                _.bindAll(this, 'render', 'onKeyDown', 'adjustTextareaHeight', 'fieldValue', 'saveValue', 'updateView');
+                _.bindAll(this, 'render', 'onKeyDown', 'adjustTextareaHeight', 'manageTextareaContentChange', 'fieldValue', 'saveValue', 'updateView');
                 this._super(options);
                 this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateView);
             },
@@ -541,7 +541,9 @@
                     value: value,
                     message: this.helpMessage,
                     messagePosition: this.options.messagePosition || 'footer',
-                    placeholderValue: this.options.placeholderValue
+                    placeholderValue: this.options.placeholderValue,
+                    maxCharacters: this.options.maxCharacters || '',
+                    charCountMessage: this.options.charCountMessage || '',
                 }));
                 this.delegateEvents();
                 this.title((this.modelValue() || this.mode === 'edit') ?
@@ -562,10 +564,26 @@
                 }
             },
 
+            updateCharCount: function() {
+                // Update character count for textarea
+                if (this.options.maxCharacters){
+                    var curCharCount = $('#u-field-textarea-' + this.options.valueAttribute).val().length;
+                    var remainingCharCount = this.options.maxCharacters - curCharCount;
+                    var charCountMessage = remainingCharCount == 1 ? this.options.charCountMessageSingular : this.options.charCountMessage;
+                    $('.u-field-footer .cur-char-count').text(remainingCharCount);
+                    $('.u-field-footer .cur-char-count-msg').text(charCountMessage);
+                }
+            },
+
             adjustTextareaHeight: function() {
                 if (this.persistChanges === false) { return; }
                 var textarea = this.$('textarea');
                 textarea.css('height', 'auto').css('height', textarea.prop('scrollHeight') + 10);
+            },
+
+            manageTextareaContentChange: function() {
+                this.updateCharCount();
+                this.adjustTextareaHeight();
             },
 
             modelValue: function() {

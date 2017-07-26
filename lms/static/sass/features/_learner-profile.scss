@@ -197,7 +197,7 @@
             @extend %t-weight4;
             @include padding(0, 0, 0, 3px);
             margin-bottom: ($baseline/4);
-            color: $black-t3;
+            color: $learner-profile-text-dark;
             font-size: em(24);
         }
 
@@ -205,7 +205,7 @@
         .u-field-country,
         .u-field-language_proficiencies {
             font-size: $body-font-size;
-            color: $gray;
+            color: $learner-profile-text-light;
             font-weight: $font-light;
             margin-bottom: 0;
         }
@@ -265,12 +265,12 @@
         }
 
         .u-field-title {
-            @extend %t-title5;
-            @extend %t-weight4;
+            @extend %t-title6;
+            @extend %t-weight5;
             display: inline-block;
             margin-top: 0;
             margin-bottom: ($baseline/4);
-            color: inherit;
+            color: $learner-profile-text-dark;
             width: 100%;
         }
 
@@ -281,7 +281,13 @@
             textarea {
                 width: 100%;
                 background-color: transparent;
+                border-radius: 5px;
+                border-color: $learner-profile-text-light;
+                resize: none;
                 white-space: pre-line;
+                outline: 0;
+                box-shadow: none;
+                -webkit-appearance: none;
             }
 
             a {
@@ -305,7 +311,7 @@
                 font-size: 12px;
                 @include padding-right(5px);
                 vertical-align: middle;
-                color: $gray;
+                color: $learner-profile-text-light;
             }
             .u-field-title {
                 width: 100%;
@@ -316,7 +322,7 @@
                 text-align: center;
                 line-height: 1.5em;
                 @extend %t-copy-sub1;
-                color: $gray;
+                color: $learner-profile-text-light;
             }
         }
 
@@ -325,6 +331,19 @@
             .u-field-title,
             i {
                 color: $link-color;
+            }
+        }
+
+        .wrapper-u-field {
+            color: $learner-profile-text-light;
+            font-size: $body-font-size;
+
+            .u-field-footer {
+                .profile-about-character-count {
+                    @extend %t-weight1;
+                    @include float(right);
+                    margin-top: $baseline/4;
+                }
             }
         }
     }
