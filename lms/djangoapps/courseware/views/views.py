@@ -19,6 +19,7 @@ from courseware.access import has_access, has_ccx_coach_role
 from courseware.access_utils import check_course_open_for_learner
 from courseware.courses import (
     can_self_enroll_in_course,
+    course_open_for_self_enrollment,
     get_course,
     get_course_overview_with_access,
     get_course_with_access,
@@ -312,6 +313,7 @@ def course_info(request, course_id):
             'request': request,
             'masquerade_user': user,
             'course_id': course_key.to_deprecated_string(),
+            'url_to_enroll': CourseTabView.url_to_enroll(course_key),
             'cache': None,
             'course': course,
             'staff_access': staff_access,
@@ -321,7 +323,6 @@ def course_info(request, course_id):
             'show_enroll_banner': show_enroll_banner,
             'user_is_enrolled': user_is_enrolled,
             'dates_fragment': dates_fragment,
-            'url_to_enroll': CourseTabView.url_to_enroll(course_key),
             'course_tools': course_tools,
         }
         context.update(
@@ -449,15 +450,22 @@ class CourseTabView(EdxFragmentView):
                 )
             )
         elif not is_enrolled and not is_staff:
-            PageLevelMessages.register_warning_message(
-                request,
-                Text(_('You must be enrolled in the course to see course content. {enroll_link}.')).format(
-                    enroll_link=HTML('<a href="{url_to_enroll}">{enroll_link_label}</a>').format(
-                        url_to_enroll=CourseTabView.url_to_enroll(course_key),
-                        enroll_link_label=_("Enroll now"),
+            # Only show enroll button if course is open for enrollment.
+            if course_open_for_self_enrollment(course_key):
+                enroll_message = _('You must be enrolled in the course to see course content. \
+                        {enroll_link_start}Enroll now{enroll_link_end}.')
+                PageLevelMessages.register_warning_message(
+                    request,
+                    Text(enroll_message).format(
+                        enroll_link_start=HTML('<button class="enroll-btn btn-link">'),
+                        enroll_link_end=HTML('</button>')
                     )
                 )
-            )
+            else:
+                PageLevelMessages.register_warning_message(
+                    request,
+                    Text(_('You must be enrolled in the course to see course content.'))
+                )
 
     @staticmethod
     def handle_exceptions(request, course, exception):
