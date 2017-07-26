@@ -16,7 +16,7 @@
 -e git+https://github.com/open-craft/xblock-eoc-journal.git@60b2b4913e80c64f373d35dfb4993bc63f0609a4#egg=xblock-eoc-journal
 git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.2#egg=xblock-group-project-v2
 git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.1#egg=xblock-diagnostic-feedback==0.2.1
-git+https://github.com/edx-solutions/api-integration.git@v1.1.11#egg=api-integration==1.1.11
+git+https://github.com/edx-solutions/api-integration.git@v1.1.12#egg=api-integration==1.1.12
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.1.4#egg=organizations-edx-platform-extensions==1.1.4
 git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.0.9#egg=gradebook-edx-platform-extensions==1.0.9
 git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.0.9#egg=projects-edx-platform-extensions==1.0.9
