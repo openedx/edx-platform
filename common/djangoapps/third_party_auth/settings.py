@@ -22,6 +22,7 @@ _SOCIAL_AUTH_AZUREAD_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
     'msafed': 0
 }
 
+
 def apply_settings(django_settings):
     """Set provider-independent settings."""
 
