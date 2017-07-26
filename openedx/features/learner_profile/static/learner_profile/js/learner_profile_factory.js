@@ -107,9 +107,10 @@
 
             sectionOneFieldViews = [
                 new FieldsView.DropdownFieldView({
+                    title: gettext('Location'),
+                    titleVisible: true,
                     model: accountSettingsModel,
                     screenReaderTitle: gettext('Country'),
-                    titleVisible: false,
                     required: true,
                     editable: editable,
                     showMessages: false,
@@ -119,15 +120,12 @@
                     helpMessage: '',
                     persistChanges: true
                 }),
-                new Backbone.View({
-                    id: 'test',
-                    el: 'h2',
-                    title: "Haryy Rein",
-                }),
+
                 new AccountSettingsFieldViews.LanguageProficienciesFieldView({
+                    title: gettext('Language'),
+                    titleVisible: true,
                     model: accountSettingsModel,
                     screenReaderTitle: gettext('Preferred Language'),
-                    titleVisible: false,
                     required: false,
                     editable: editable,
                     showMessages: false,

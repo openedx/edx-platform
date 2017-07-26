@@ -1,6 +1,7 @@
 /* eslint-disable vars-on-top */
 define(
     [
+        'gettext',
         'backbone',
         'jquery',
         'underscore',
@@ -18,7 +19,7 @@ define(
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner'
     ],
-    function(Backbone, $, _, PagingCollection, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers,
+    function(gettext, Backbone, $, _, PagingCollection, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers,
               FieldViews, UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
               BadgeListContainer, AccountSettingsFieldViews, MessageBannerView) {
         'use strict';
@@ -81,6 +82,7 @@ define(
 
                 var sectionOneFieldViews = [
                     new FieldViews.DropdownFieldView({
+                        title: gettext('Location'),
                         model: accountSettingsModel,
                         required: false,
                         editable: editable,
@@ -92,6 +94,7 @@ define(
                     }),
 
                     new AccountSettingsFieldViews.LanguageProficienciesFieldView({
+                        title: gettext('Language'),
                         model: accountSettingsModel,
                         required: false,
                         editable: editable,

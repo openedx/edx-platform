@@ -544,6 +544,7 @@
                     placeholderValue: this.options.placeholderValue,
                     maxCharacters: this.options.maxCharacters || '',
                     charCountMessage: this.options.charCountMessage || '',
+                    charCountMessageSingular: this.options.charCountMessageSingular || '',
                 }));
                 this.delegateEvents();
                 this.title((this.modelValue() || this.mode === 'edit') ?

@@ -47,9 +47,11 @@
                 width: $profile-image-dimension;
                 height: $profile-image-dimension;
                 border-radius: ($profile-image-dimension/2);
+                overflow: hidden;
                 border: 3px solid $light-gray4;
                 margin-top: $baseline*-0.75;
                 background: $learner-profile-card-bg;
+
             }
 
             .u-field-upload-button {
@@ -196,9 +198,35 @@
         .u-field {
             @extend %t-weight4;
             @include padding(0, 0, 0, 3px);
-            margin-bottom: ($baseline/4);
             color: $learner-profile-text-dark;
-            font-size: em(24);
+
+            .u-field-value {
+                @extend %t-weight4;
+                width: calc(100% - 40px);
+
+                .u-field-value-display {
+                    @extend %t-weight3;
+                }
+            }
+
+            .u-field-title {
+                color: $learner-profile-text-light;
+                font-size: $body-font-size;
+                display: block;
+            }
+
+            &.u-field-dropdown {
+                margin-top: $baseline/5;
+
+                &:not(.editable-never) {
+                    cursor: pointer;
+                }
+
+                &:not(:last-child) {
+                    padding-bottom: $baseline/4;
+                    border-bottom: 1px solid $learner-profile-border-light;
+                }
+            }
         }
 
         .u-field-username,
@@ -214,15 +242,8 @@
             .u-field-value {
                 @extend %t-title4;
                 font-weight: 600;
+                font-size: em(24);
             }
-        }
-
-        .u-field-title {
-            width: 0;
-        }
-
-        .u-field-value {
-            width: calc(100% - 40px);
         }
 
         select {
