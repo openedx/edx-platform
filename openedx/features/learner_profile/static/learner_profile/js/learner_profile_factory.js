@@ -66,10 +66,7 @@
                 required: true,
                 editable: 'always',
                 showMessages: false,
-                title: StringUtils.interpolate(
-                    gettext('{platform_name} learners can see my:'),
-                    {platform_name: options.platform_name}
-                ),
+                title: gettext('Profile Visibility:'),
                 valueAttribute: 'account_privacy',
                 options: [
                     ['private', gettext('Limited Profile')],

@@ -57,7 +57,9 @@
                         username: self.options.accountSettingsModel.get('username'),
                         name: self.options.accountSettingsModel.get('name'),
                         ownProfile: self.options.ownProfile,
-                        showFullProfile: self.showFullProfile()
+                        showFullProfile: self.showFullProfile(),
+                        profile_header: gettext('My Profile'),
+                        profile_subheader: gettext('Build out your profile to personalize your identity on edX')
                     }));
                     this.renderFields();
 
@@ -99,7 +101,7 @@
                             Backbone.history.start();
                         }
                     } else {
-                        this.$el.find('.account-settings-container').append(this.sectionTwoView.render().el);
+                        this.$el.find('.wrapper-profile-section-container-two').prepend(this.sectionTwoView.render().el);
                     }
                     return this;
                 },

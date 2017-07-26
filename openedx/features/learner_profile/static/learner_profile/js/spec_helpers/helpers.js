@@ -94,10 +94,10 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         );
 
         if (othersProfile) {
-            expect($('.profile-private--message').text())
+            expect($('.profile-private-message').text())
                 .toBe('This learner is currently sharing a limited profile.');
         } else {
-            expect($('.profile-private--message').text()).toBe('You are currently sharing a limited profile.');
+            expect($('.profile-private-message').text()).toBe('You are currently sharing a limited profile.');
         }
     };
 

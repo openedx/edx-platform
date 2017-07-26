@@ -565,12 +565,13 @@
                 }
             },
 
-            updateCharCount: function() {
+            updateCharCount: function(event) {
                 // Update character count for textarea
                 if (this.options.maxCharacters){
                     var curCharCount = $('#u-field-textarea-' + this.options.valueAttribute).val().length;
                     var remainingCharCount = this.options.maxCharacters - curCharCount;
                     var charCountMessage = remainingCharCount == 1 ? this.options.charCountMessageSingular : this.options.charCountMessage;
+
                     $('.u-field-footer .cur-char-count').text(remainingCharCount);
                     $('.u-field-footer .cur-char-count-msg').text(charCountMessage);
                 }
