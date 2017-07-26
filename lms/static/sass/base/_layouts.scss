@@ -18,6 +18,10 @@ body.view-in-course {
 
     .wrapper-header {
       min-width: auto;
+
+      .user-dropdown, .dropdown {
+        padding: ($baseline/2);
+      }
     }
   }
 
