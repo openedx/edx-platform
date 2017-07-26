@@ -107,14 +107,13 @@
             color: $white;
           }
           #toggle_timer {
-            // Overrides:
             border-top: none;
             border-right: none;
             border-bottom: none;
             border-top-right-radius: 2px;
             border-bottom-right-radius: 2px;
+
             &:hover {
-              // Overrides:
               border-top: none;
               border-right: none;
               border-bottom: none;
@@ -155,7 +154,6 @@
       #toggle_timer {
         @extend .exam-button-turn-in-exam;
 
-        //Overrides:
         padding: ($baseline/5) ($baseline/3);
         border-bottom-left-radius: 0;
         border-top-left-radius: 0;
