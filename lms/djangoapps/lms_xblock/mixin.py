@@ -8,7 +8,7 @@ from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Scope, String, XBlockMixin
 from xblock.validation import ValidationMessage
 
-from lms.lib.utils import get_parent_unit
+from lms.lib.utils import is_unit
 from xmodule.modulestore.inheritance import UserPartitionList
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 
@@ -16,10 +16,16 @@ from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPa
 # more information can be found here: https://openedx.atlassian.net/browse/PLAT-902
 _ = lambda text: text
 
-INVALID_USER_PARTITION_VALIDATION = _(u"This component's access settings refer to deleted or invalid group configurations.")
-INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT = _(u"This component's access settings refer to deleted or invalid groups.")
+INVALID_USER_PARTITION_VALIDATION_COMPONENT = _(
+    u"This component's access settings refer to deleted or invalid group configurations."
+)
+INVALID_USER_PARTITION_VALIDATION_UNIT = _(
+    u"This unit's access settings refer to deleted or invalid group configurations."
+)
+INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT = _(
+    u"This component's access settings refer to deleted or invalid groups."
+)
 INVALID_USER_PARTITION_GROUP_VALIDATION_UNIT = _(u"This unit's access settings refer to deleted or invalid groups.")
-NONSENSICAL_ACCESS_RESTRICTION = _(u"This component's access settings contradict the unit's access settings.")
 NONSENSICAL_ACCESS_RESTRICTION = _(u"This component's access settings contradict its parent's access settings.")
 
 
@@ -35,6 +41,7 @@ class GroupAccessDict(Dict):
 
 
 @XBlock.needs('partitions')
+@XBlock.needs('i18n')
 class LmsBlockMixin(XBlockMixin):
     """
     Mixin that defines fields common to all blocks used in the LMS
@@ -180,16 +187,6 @@ class LmsBlockMixin(XBlockMixin):
         else:
             return False
 
-    def is_unit(self):
-        """
-        Returns whether the xblock is a unit.
-
-        Get_parent_unit() returns None if the current xblock either does not have a parent unit or is itself a unit.
-        To make sure that get_parent_unit() isn't returning None because the xblock is an orphan, we check that the
-        xblock has a parent.
-        """
-        return get_parent_unit(self) is None and self.get_parent()
-
     def validate(self):
         """
         Validates the state of this xblock instance.
@@ -198,6 +195,7 @@ class LmsBlockMixin(XBlockMixin):
         validation = super(LmsBlockMixin, self).validate()
         has_invalid_user_partitions = False
         has_invalid_groups = False
+        block_is_unit = is_unit(self)
 
         for user_partition_id, group_ids in self.group_access.iteritems():
             try:
@@ -217,7 +215,9 @@ class LmsBlockMixin(XBlockMixin):
             validation.add(
                 ValidationMessage(
                     ValidationMessage.ERROR,
-                    INVALID_USER_PARTITION_VALIDATION
+                    (INVALID_USER_PARTITION_VALIDATION_UNIT
+                     if block_is_unit
+                     else INVALID_USER_PARTITION_VALIDATION_COMPONENT)
                 )
             )
 
@@ -225,7 +225,9 @@ class LmsBlockMixin(XBlockMixin):
             validation.add(
                 ValidationMessage(
                     ValidationMessage.ERROR,
-                    INVALID_USER_PARTITION_GROUP_VALIDATION_UNIT if self.is_unit() else INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT
+                    (INVALID_USER_PARTITION_GROUP_VALIDATION_UNIT
+                     if block_is_unit
+                     else INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT)
                 )
             )
 
