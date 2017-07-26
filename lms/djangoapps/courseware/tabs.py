@@ -70,10 +70,7 @@ class CourseInfoTab(CourseTab):
 
     @classmethod
     def is_enabled(cls, course, user=None):
-        """
-        The "Home" tab is not shown for the new unified course experience.
-        """
-        return not UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id)
+        return True
 
 
 class SyllabusTab(EnrolledTab):
@@ -326,6 +323,9 @@ def get_course_tab_list(request, course):
             if tab.type != 'courseware':
                 continue
             tab.name = _("Entrance Exam")
+        # TODO: LEARNER-611 - once the course_info tab is removed, remove this code
+        if UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id) and tab.type == 'course_info':
+                continue
         if tab.type == 'static_tab' and tab.course_staff_only and \
                 not bool(user and has_access(user, 'staff', course, course.id)):
             continue
