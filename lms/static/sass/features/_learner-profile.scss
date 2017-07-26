@@ -339,6 +339,7 @@
 
         .u-field.mode-placeholder {
             padding: $baseline;
+            margin: $baseline * 0.75;
             border: 2px dashed $gray-l3;
             i {
                 font-size: 12px;

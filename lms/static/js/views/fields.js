@@ -523,7 +523,8 @@
             },
 
             initialize: function(options) {
-                _.bindAll(this, 'render', 'onKeyDown', 'adjustTextareaHeight', 'manageTextareaContentChange', 'fieldValue', 'saveValue', 'updateView');
+                _.bindAll(this, 'render', 'onKeyDown', 'adjustTextareaHeight', 'manageTextareaContentChange',
+                    'fieldValue', 'saveValue', 'updateView');
                 this._super(options);
                 this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateView);
             },
@@ -544,7 +545,7 @@
                     placeholderValue: this.options.placeholderValue,
                     maxCharacters: this.options.maxCharacters || '',
                     charCountMessage: this.options.charCountMessage || '',
-                    charCountMessageSingular: this.options.charCountMessageSingular || '',
+                    charCountMessageSingular: this.options.charCountMessageSingular || ''
                 }));
                 this.delegateEvents();
                 this.title((this.modelValue() || this.mode === 'edit') ?
@@ -565,12 +566,16 @@
                 }
             },
 
-            updateCharCount: function(event) {
+            updateCharCount: function() {
+                var curCharCount,
+                    remainingCharCount,
+                    charCountMessage;
                 // Update character count for textarea
-                if (this.options.maxCharacters){
-                    var curCharCount = $('#u-field-textarea-' + this.options.valueAttribute).val().length;
-                    var remainingCharCount = this.options.maxCharacters - curCharCount;
-                    var charCountMessage = remainingCharCount == 1 ? this.options.charCountMessageSingular : this.options.charCountMessage;
+                if (this.options.maxCharacters) {
+                    curCharCount = $('#u-field-textarea-' + this.options.valueAttribute).val().length;
+                    remainingCharCount = this.options.maxCharacters - curCharCount;
+                    charCountMessage = remainingCharCount === 1 ?
+                        this.options.charCountMessageSingular : this.options.charCountMessage;
 
                     $('.u-field-footer .cur-char-count').text(remainingCharCount);
                     $('.u-field-footer .cur-char-count-msg').text(charCountMessage);
