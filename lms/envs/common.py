@@ -1967,6 +1967,7 @@ YOUTUBE = {
 YOUTUBE_API_KEY = None
 
 ################################### APPS ######################################
+
 INSTALLED_APPS = (
     # Standard ones that are always installed...
     'django.contrib.auth',

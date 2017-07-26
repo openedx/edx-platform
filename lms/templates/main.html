@@ -81,6 +81,8 @@ from pipeline_mako import render_require_js_path_overrides
     <%static:js group='lms_bootstrap'/>
   % endif
 
+  <%static:webpack entry="commons"/>
+
   <script>
     window.baseUrl = "${settings.STATIC_URL | n, js_escaped_string}";
     (function (require) {
