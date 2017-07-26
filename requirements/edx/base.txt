@@ -47,7 +47,8 @@ edx-lint==0.4.3
 # astroid 1.3.8 is an unmet dependency of the version of pylint used in edx-lint 0.4.3
 # when upgrading edx-lint, we should try to remove this from the platform
 astroid==1.3.8
-edx-django-oauth2-provider==1.1.4
+# edx-django-oauth2-provider==1.1.4
+git+https://github.com/edx/django-oauth2-provider.git@bmedx/django_1.11_PLAT-1574#egg=edx-django-oauth2-provider==1.2.1
 edx-django-sites-extensions==2.3.0
 edx-enterprise==0.38.6
 edx-oauth2-provider==1.2.0
