@@ -15,6 +15,9 @@ _MIDDLEWARE_CLASSES = (
     'third_party_auth.middleware.ExceptionMiddleware',
 )
 _SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
+_SOCIAL_AUTH_AZUREAD_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
+    'msafed': 0
+}
 
 
 def apply_settings(django_settings):
@@ -34,6 +37,9 @@ def apply_settings(django_settings):
 
     # Where to send the user once social authentication is successful.
     django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL = _SOCIAL_AUTH_LOGIN_REDIRECT_URL
+
+    # Adding extra key value pair in the url query string for microsoft as per request
+    django_settings.SOCIAL_AUTH_AZUREAD_OAUTH2_AUTH_EXTRA_ARGUMENTS = _SOCIAL_AUTH_AZUREAD_OAUTH2_AUTH_EXTRA_ARGUMENTS
 
     # Inject our customized auth pipeline. All auth backends must work with
     # this pipeline.
