@@ -46,7 +46,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         expectProfileElementContainsField(sectionOneFieldElements[1], learnerProfileView.options.usernameFieldView);
         expectProfileElementContainsField(sectionOneFieldElements[2], learnerProfileView.options.nameFieldView);
 
-        _.each(_.rest(sectionOneFieldElements, 2), function(sectionFieldElement, fieldIndex) {
+        _.each(_.rest(sectionOneFieldElements, 3), function(sectionFieldElement, fieldIndex) {
             expectProfileElementContainsField(
                 sectionFieldElement,
                 learnerProfileView.options.sectionOneFieldViews[fieldIndex]
