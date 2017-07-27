@@ -3216,6 +3216,7 @@ ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ['audit', 'honor']
 # and are overridden by the configuration parameter accessors defined in aws.py
 
 ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
+ENTERPRISE_CONSENT_API_URL = LMS_ROOT_URL + '/consent/api/v1/'
 ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit in KB's

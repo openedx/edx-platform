@@ -16,7 +16,7 @@ from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 from edx_rest_api_client.client import EdxRestApiClient
 from requests.exceptions import ConnectionError, Timeout
-from slumber.exceptions import HttpClientError, HttpServerError, SlumberBaseException
+from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerError, SlumberBaseException
 
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.utils import create_catalog_api_client
@@ -26,9 +26,7 @@ from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
 
 try:
-    from enterprise import utils as enterprise_utils
     from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer
-    from enterprise.utils import consent_necessary_for_course
 except ImportError:
     pass
 
@@ -41,6 +39,62 @@ class EnterpriseApiException(Exception):
     Exception for errors while communicating with the Enterprise service API.
     """
     pass
+
+
+class ConsentApiClient(object):
+    """
+    Class for producing an Enterprise Consent service API client
+    """
+
+    def __init__(self):
+        """
+        Initialize a consent service API client, authenticated using the Enterprise worker username.
+        """
+        self.user = User.objects.get(username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME)
+        jwt = JwtBuilder(self.user).build_token([])
+        url = configuration_helpers.get_value('ENTERPRISE_CONSENT_API_URL', settings.ENTERPRISE_CONSENT_API_URL)
+        self.client = EdxRestApiClient(
+            url,
+            jwt=jwt,
+            append_slash=False,
+        )
+        self.consent_endpoint = self.client.data_sharing_consent
+
+    def revoke_consent(self, **kwargs):
+        """
+        Revoke consent from any existing records that have it at the given scope.
+
+        This endpoint takes any given kwargs, which are understood as filtering the
+        conceptual scope of the consent involved in the request.
+        """
+        return self.consent_endpoint.delete(**kwargs)
+
+    def provide_consent(self, **kwargs):
+        """
+        Provide consent at the given scope.
+
+        This endpoint takes any given kwargs, which are understood as filtering the
+        conceptual scope of the consent involved in the request.
+        """
+        return self.consent_endpoint.post(kwargs)
+
+    def consent_required(self, enrollment_exists=False, **kwargs):
+        """
+        Determine if consent is required at the given scope.
+
+        This endpoint takes any given kwargs, which are understood as filtering the
+        conceptual scope of the consent involved in the request.
+        """
+
+        # Call the endpoint with the given kwargs, and check the value that it provides.
+        response = self.consent_endpoint.get(**kwargs)
+
+        # No Enterprise record exists, but we're already enrolled in a course. So, go ahead and proceed.
+        if enrollment_exists and not response.get('exists', False):
+            return False
+
+        # In all other cases, just trust the Consent API.
+        return response['consent_required']
 
 
 class EnterpriseApiClient(object):
@@ -58,6 +112,10 @@ class EnterpriseApiClient(object):
             configuration_helpers.get_value('ENTERPRISE_API_URL', settings.ENTERPRISE_API_URL),
             jwt=jwt
         )
+
+    def get_enterprise_customer(self, uuid):
+        endpoint = getattr(self.client, 'enterprise-customer')
+        return endpoint(uuid).get()
 
     def post_enterprise_course_enrollment(self, username, course_id, consent_granted):
         """
@@ -166,25 +224,16 @@ class EnterpriseApiClient(object):
 
         api_resource_name = 'enterprise-learner'
 
-        cache_key = get_cache_key(
-            site_domain=site.domain,
-            resource=api_resource_name,
-            username=user.username
-        )
-
-        response = cache.get(cache_key)
-        if not response:
-            try:
-                endpoint = getattr(self.client, api_resource_name)
-                querystring = {'username': user.username}
-                response = endpoint().get(**querystring)
-                cache.set(cache_key, response, settings.ENTERPRISE_API_CACHE_TIMEOUT)
-            except (HttpClientError, HttpServerError):
-                message = ("An error occurred while getting EnterpriseLearner data for user {username}".format(
-                    username=user.username
-                ))
-                LOGGER.exception(message)
-                return None
+        try:
+            endpoint = getattr(self.client, api_resource_name)
+            querystring = {'username': user.username}
+            response = endpoint().get(**querystring)
+        except (HttpClientError, HttpServerError):
+            message = ("An error occurred while getting EnterpriseLearner data for user {username}".format(
+                username=user.username
+            ))
+            LOGGER.exception(message)
+            return None
 
         return response
 
@@ -210,7 +259,7 @@ def data_sharing_consent_required(view_func):
         Otherwise, just call the wrapped view function.
         """
         # Redirect to the consent URL, if consent is required.
-        consent_url = get_enterprise_consent_url(request, course_id)
+        consent_url = get_enterprise_consent_url(request, course_id, enrollment_exists=True)
         if consent_url:
             real_user = getattr(request.user, 'real_user', request.user)
             LOGGER.warning(
@@ -233,52 +282,98 @@ def enterprise_enabled():
     return 'enterprise' in settings.INSTALLED_APPS and getattr(settings, 'ENABLE_ENTERPRISE_INTEGRATION', True)
 
 
-def enterprise_customer_for_request(request, tpa_hint=None):
+def enterprise_customer_for_request(request):
     """
     Check all the context clues of the request to determine if
     the request being made is tied to a particular EnterpriseCustomer.
     """
+
     if not enterprise_enabled():
         return None
 
     ec = None
+    sso_provider_id = request.GET.get('tpa_hint')
 
     running_pipeline = get_partial_pipeline(request)
     if running_pipeline:
         # Determine if the user is in the middle of a third-party auth pipeline,
-        # and set the tpa_hint parameter to match if so.
-        tpa_hint = Registry.get_from_pipeline(running_pipeline).provider_id
+        # and set the sso_provider_id parameter to match if so.
+        sso_provider_id = Registry.get_from_pipeline(running_pipeline).provider_id
 
-    if tpa_hint:
+    if sso_provider_id:
         # If we have a third-party auth provider, get the linked enterprise customer.
         try:
-            ec = EnterpriseCustomer.objects.get(enterprise_customer_identity_provider__provider_id=tpa_hint)
+            # FIXME: Implement an Enterprise API endpoint where we can get the EC
+            # directly via the linked SSO provider
+            # Check if there's an Enterprise Customer such that the linked SSO provider
+            # has an ID equal to the ID we got from the running pipeline or from the
+            # request tpa_hint URL parameter.
+            ec_uuid = EnterpriseCustomer.objects.get(
+                enterprise_customer_identity_provider__provider_id=sso_provider_id
+            ).uuid
         except EnterpriseCustomer.DoesNotExist:
-            pass
+            # If there is not an EnterpriseCustomer linked to this SSO provider, set
+            # the UUID variable to be null.
+            ec_uuid = None
+    else:
+        # Check if we got an Enterprise UUID passed directly as either a query
+        # parameter, or as a value in the Enterprise cookie.
+        ec_uuid = request.GET.get('enterprise_customer') or request.COOKIES.get(settings.ENTERPRISE_CUSTOMER_COOKIE_NAME)
 
-    ec_uuid = request.GET.get('enterprise_customer') or request.COOKIES.get(settings.ENTERPRISE_CUSTOMER_COOKIE_NAME)
-    # If we haven't obtained an EnterpriseCustomer through the other methods, check the
-    # session cookies and URL parameters for an explicitly-passed EnterpriseCustomer.
-    if not ec and ec_uuid:
+    if not ec_uuid and request.user.is_authenticated():
+        # If there's no way to get an Enterprise UUID for the request, check to see
+        # if there's already an Enterprise attached to the requesting user on the backend.
+        learner_data = get_enterprise_learner_data(request.site, request.user)
+        if learner_data:
+            ec_uuid = learner_data[0]['enterprise_customer']['uuid']
+    if ec_uuid:
+        # If we were able to obtain an EnterpriseCustomer UUID, go ahead
+        # and use it to attempt to retrieve EnterpriseCustomer details
+        # from the EnterpriseCustomer API.
         try:
-            ec = EnterpriseCustomer.objects.get(uuid=ec_uuid)
-        except (EnterpriseCustomer.DoesNotExist, ValueError):
+            ec = EnterpriseApiClient().get_enterprise_customer(ec_uuid)
+        except HttpNotFoundError:
             ec = None
 
     return ec
 
 
-def consent_needed_for_course(user, course_id):
+def consent_needed_for_course(request, user, course_id, enrollment_exists=False):
     """
     Wrap the enterprise app check to determine if the user needs to grant
     data sharing permissions before accessing a course.
     """
     if not enterprise_enabled():
         return False
-    return consent_necessary_for_course(user, course_id)
+
+    consent_key = ('data_sharing_consent_needed', course_id)
+
+    if request.session.get(consent_key) is False:
+        return False
+
+    enterprise_learner_details = get_enterprise_learner_data(request.site, user)
+    if not enterprise_learner_details:
+        consent_needed = False
+    else:
+        client = ConsentApiClient()
+        consent_needed = any(
+            client.consent_required(
+                username=user.username,
+                course_id=course_id,
+                enterprise_customer_uuid=learner['enterprise_customer']['uuid'],
+                enrollment_exists=enrollment_exists,
+            )
+            for learner in enterprise_learner_details
+        )
+    if not consent_needed:
+        # Set an ephemeral item in the user's session to prevent us from needing
+        # to make a Consent API request every time this function is called.
+        request.session[consent_key] = False
+
+    return consent_needed
 
 
-def get_enterprise_consent_url(request, course_id, user=None, return_to=None):
+def get_enterprise_consent_url(request, course_id, user=None, return_to=None, enrollment_exists=False):
     """
     Build a URL to redirect the user to the Enterprise app to provide data sharing
     consent for a specific course ID.
@@ -290,10 +385,13 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None):
     * return_to: url name label for the page to return to after consent is granted.
                  If None, return to request.path instead.
     """
+    if not enterprise_enabled():
+        return ''
+
     if user is None:
         user = request.user
 
-    if not consent_needed_for_course(user, course_id):
+    if not consent_needed_for_course(request, user, course_id, enrollment_exists=enrollment_exists):
         return None
 
     if return_to is None:
@@ -316,30 +414,6 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None):
     full_url = reverse('grant_data_sharing_permissions') + '?' + querystring
     LOGGER.info('Redirecting to %s to complete data sharing consent', full_url)
     return full_url
-
-
-def get_cache_key(**kwargs):
-    """
-    Get MD5 encoded cache key for given arguments.
-
-    Here is the format of key before MD5 encryption.
-        key1:value1__key2:value2 ...
-
-    Example:
-        >>> get_cache_key(site_domain="example.com", resource="enterprise-learner")
-        # Here is key format for above call
-        # "site_domain:example.com__resource:enterprise-learner"
-        a54349175618ff1659dee0978e3149ca
-
-    Arguments:
-        **kwargs: Key word arguments that need to be present in cache key.
-
-    Returns:
-         An MD5 encoded key uniquely identified by the key word arguments.
-    """
-    key = '__'.join(['{}:{}'.format(item, value) for item, value in six.iteritems(kwargs)])
-
-    return hashlib.md5(key).hexdigest()
 
 
 def get_enterprise_learner_data(site, user):
@@ -366,42 +440,40 @@ def get_dashboard_consent_notification(request, user, course_enrollments):
     Returns:
         str: Either an empty string, or a string containing the HTML code for the notification banner.
     """
+    if not enterprise_enabled():
+        return ''
+
     enrollment = None
-    enterprise_enrollment = None
+    consent_needed = False
     course_id = request.GET.get(CONSENT_FAILED_PARAMETER)
 
     if course_id:
+
+        enterprise_customer = enterprise_customer_for_request(request)
+        if not enterprise_customer:
+            return ''
+
         for course_enrollment in course_enrollments:
             if str(course_enrollment.course_id) == course_id:
                 enrollment = course_enrollment
                 break
 
-        try:
-            enterprise_enrollment = EnterpriseCourseEnrollment.objects.get(
-                course_id=course_id,
-                enterprise_customer_user__user_id=user.id,
-            )
-        except EnterpriseCourseEnrollment.DoesNotExist:
-            pass
+        client = ConsentApiClient()
+        consent_needed = client.consent_required(
+            enterprise_customer_uuid=enterprise_customer['uuid'],
+            username=user.username,
+            course_id=course_id,
+        )
 
-    if enterprise_enrollment and enrollment:
-        enterprise_customer = enterprise_enrollment.enterprise_customer_user.enterprise_customer
-        contact_info = getattr(enterprise_customer, 'contact_email', None)
+    if consent_needed and enrollment:
 
-        if contact_info is None:
-            message_template = _(
-                'If you have concerns about sharing your data, please contact your administrator '
-                'at {enterprise_customer_name}.'
-            )
-        else:
-            message_template = _(
-                'If you have concerns about sharing your data, please contact your administrator '
-                'at {enterprise_customer_name} at {contact_info}.'
-            )
+        message_template = _(
+            'If you have concerns about sharing your data, please contact your administrator '
+            'at {enterprise_customer_name}.'
+        )
 
         message = message_template.format(
-            enterprise_customer_name=enterprise_customer.name,
-            contact_info=contact_info,
+            enterprise_customer_name=enterprise_customer['name'],
         )
         title = _(
             'Enrollment in {course_name} was not complete.'
@@ -417,52 +489,3 @@ def get_dashboard_consent_notification(request, user, course_enrollments):
             }
         )
     return ''
-
-
-def is_course_in_enterprise_catalog(site, course_id, enterprise_catalog_id):
-    """
-    Verify that the provided course id exists in the site base list of course
-    run keys from the provided enterprise course catalog.
-
-    Arguments:
-        course_id (str): The course ID.
-        site: (django.contrib.sites.Site) site instance
-        enterprise_catalog_id (Int): Course catalog id of enterprise
-
-    Returns:
-        Boolean
-
-    """
-    cache_key = get_cache_key(
-        site_domain=site.domain,
-        resource='catalogs.contains',
-        course_id=course_id,
-        catalog_id=enterprise_catalog_id
-    )
-    response = cache.get(cache_key)
-    if not response:
-        catalog_integration = CatalogIntegration.current()
-        if not catalog_integration.enabled:
-            LOGGER.error("Catalog integration is not enabled.")
-            return False
-
-        try:
-            user = User.objects.get(username=catalog_integration.service_username)
-        except User.DoesNotExist:
-            LOGGER.exception("Catalog service user '%s' does not exist.", catalog_integration.service_username)
-            return False
-
-        try:
-            # GET: /api/v1/catalogs/{catalog_id}/contains?course_run_id={course_run_ids}
-            response = create_catalog_api_client(user=user).catalogs(enterprise_catalog_id).contains.get(
-                course_run_id=course_id
-            )
-            cache.set(cache_key, response, settings.COURSES_API_CACHE_TIMEOUT)
-        except (ConnectionError, SlumberBaseException, Timeout):
-            LOGGER.exception('Unable to connect to Course Catalog service for catalog contains endpoint.')
-            return False
-
-    try:
-        return response['courses'][course_id]
-    except KeyError:
-        return False

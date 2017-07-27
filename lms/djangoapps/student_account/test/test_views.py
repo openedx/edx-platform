@@ -472,34 +472,24 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
 
     @mock.patch('student_account.views.enterprise_customer_for_request')
     @ddt.data(
-        ('signin_user', False, None, None, None),
-        ('register_user', False, None, None, None),
-        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg', u'{enterprise_name} - {platform_name}'),
-        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg', u'{enterprise_name} - {platform_name}'),
-        ('signin_user', True, 'Fake EC', None, u'{enterprise_name} - {platform_name}'),
-        ('register_user', True, 'Fake EC', None, u'{enterprise_name} - {platform_name}'),
-        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg', None),
-        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg', None),
-        ('signin_user', True, 'Fake EC', None, None),
-        ('register_user', True, 'Fake EC', None, None),
+        ('signin_user', False, None, None),
+        ('register_user', False, None, None),
+        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg'),
+        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg'),
+        ('signin_user', True, 'Fake EC', None),
+        ('register_user', True, 'Fake EC', None),
     )
     @ddt.unpack
-    def test_enterprise_register(self, url_name, ec_present, ec_name, logo_url, welcome_message, mock_get_ec):
+    def test_enterprise_register(self, url_name, ec_present, ec_name, logo_url, mock_get_ec):
         """
         Verify that when an EnterpriseCustomer is received on the login and register views,
         the appropriate sidebar is rendered.
         """
         if ec_present:
-            mock_ec = mock_get_ec.return_value
-            mock_ec.name = ec_name
-            if logo_url:
-                mock_ec.branding_configuration.logo.url = logo_url
-            else:
-                mock_ec.branding_configuration.logo = None
-            if welcome_message:
-                mock_ec.branding_configuration.welcome_message = welcome_message
-            else:
-                del mock_ec.branding_configuration.welcome_message
+            mock_get_ec.return_value = {
+                'name': ec_name,
+                'branding_configuration': {'logo': logo_url}
+            }
         else:
             mock_get_ec.return_value = None
 
@@ -511,8 +501,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             self.assertNotContains(response, text=enterprise_sidebar_div_id)
         else:
             self.assertContains(response, text=enterprise_sidebar_div_id)
-            if not welcome_message:
-                welcome_message = settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
+            welcome_message = settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
             expected_message = welcome_message.format(
                 start_bold=u'<b>',
                 end_bold=u'</b>',
