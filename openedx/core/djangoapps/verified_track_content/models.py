@@ -3,6 +3,7 @@ Models for verified track selections.
 """
 import logging
 
+from config_models.models import ConfigurationModel
 from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
@@ -147,3 +148,30 @@ class VerifiedTrackCohortedCourse(models.Model):
 def invalidate_verified_track_cache(sender, **kwargs):   # pylint: disable=unused-argument
     """Invalidate the cache of VerifiedTrackCohortedCourse. """
     RequestCache.clear_request_cache(name=VerifiedTrackCohortedCourse.CACHE_NAMESPACE)
+
+
+class MigrateVerifiedTrackCohortsSetting(ConfigurationModel):
+    """
+    Configuration for the swap_from_auto_track_cohorts management command.
+    """
+    class Meta(object):
+        app_label = "verified_track_content"
+
+    old_course_key = CourseKeyField(
+        max_length=255,
+        blank=False,
+        help_text="Course key for which to migrate verified track cohorts from"
+    )
+    rerun_course_key = CourseKeyField(
+        max_length=255,
+        blank=False,
+        help_text="Course key for which to migrate verified track cohorts to enrollment tracks to"
+    )
+    audit_cohort_names = models.TextField(
+        help_text="Comma-separated list of audit cohort names"
+    )
+
+    @classmethod
+    def get_audit_cohort_names(cls):
+        """Get the list of audit cohort names for the course"""
+        return [cohort_name for cohort_name in cls.current().audit_cohort_names.split(",") if cohort_name]
