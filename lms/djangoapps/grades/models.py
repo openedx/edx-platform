@@ -695,6 +695,10 @@ class PersistentSubsectionGradeOverride(models.Model):
 
     grade = models.OneToOneField(PersistentSubsectionGrade, related_name='override')
 
+    # Created/modified timestamps prevent race-conditions when using with async rescoring tasks
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified = models.DateTimeField(auto_now=True, db_index=True)
+
     # earned/possible refers to the number of points achieved and available to achieve.
     # graded refers to the subset of all problems that are marked as being graded.
     earned_all_override = models.FloatField(null=True, blank=True)

@@ -1,10 +1,16 @@
 import ddt
+import pytz
+from datetime import datetime
+from freezegun import freeze_time
 from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
 from lms.djangoapps.grades.services import GradesService, _get_key
+from mock import patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+from ..constants import ScoreDatabaseTableEnum
 
 
 @ddt.ddt
@@ -29,25 +35,71 @@ class GradesServiceTests(ModuleStoreTestCase):
             earned_graded=5.0,
             possible_graded=5.0
         )
+        self.patcher = patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.apply_async')
+        self.mock_recalculate = self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def subsection_grade_to_dict(self, grade):
+        return {
+            'earned_all': grade.earned_all,
+            'earned_graded': grade.earned_graded
+        }
+
+    def subsection_grade_override_to_dict(self, grade):
+        return {
+            'earned_all_override': grade.earned_all_override,
+            'earned_graded_override': grade.earned_graded_override
+        }
 
     def test_get_subsection_grade(self):
-        self.assertDictEqual(self.service.get_subsection_grade(
+        self.assertDictEqual(self.subsection_grade_to_dict(self.service.get_subsection_grade(
             user_id=self.user.id,
             course_key_or_id=self.course.id,
             usage_key_or_id=self.subsection.location
-        ), {
+        )), {
             'earned_all': 6.0,
             'earned_graded': 5.0
         })
 
         # test with id strings as parameters instead
-        self.assertDictEqual(self.service.get_subsection_grade(
+        self.assertDictEqual(self.subsection_grade_to_dict(self.service.get_subsection_grade(
             user_id=self.user.id,
-            course_key_or_id=str(self.course.id),
-            usage_key_or_id=str(self.subsection.location)
-        ), {
+            course_key_or_id=unicode(self.course.id),
+            usage_key_or_id=unicode(self.subsection.location)
+        )), {
             'earned_all': 6.0,
             'earned_graded': 5.0
+        })
+
+    def test_get_subsection_grade_override(self):
+        override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(grade=self.grade)
+
+        self.assertDictEqual(self.subsection_grade_override_to_dict(self.service.get_subsection_grade_override(
+            user_id=self.user.id,
+            course_key_or_id=self.course.id,
+            usage_key_or_id=self.subsection.location
+        )), {
+            'earned_all_override': override.earned_all_override,
+            'earned_graded_override': override.earned_graded_override
+        })
+
+        override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(
+            grade=self.grade,
+            defaults={
+                'earned_all_override': 9.0
+            }
+        )
+
+        # test with id strings as parameters instead
+        self.assertDictEqual(self.subsection_grade_override_to_dict(self.service.get_subsection_grade_override(
+            user_id=self.user.id,
+            course_key_or_id=unicode(self.course.id),
+            usage_key_or_id=unicode(self.subsection.location)
+        )), {
+            'earned_all_override': override.earned_all_override,
+            'earned_graded_override': override.earned_graded_override
         })
 
     @ddt.data(
@@ -92,14 +144,48 @@ class GradesServiceTests(ModuleStoreTestCase):
             earned_graded=override['earned_graded']
         )
 
-        grade = PersistentSubsectionGrade.objects.get(
+        override_obj = self.service.get_subsection_grade_override(
+            self.user.id,
+            self.course.id,
+            self.subsection.location
+        )
+        self.assertIsNotNone(override_obj)
+        self.assertEqual(override_obj.earned_all_override, override['earned_all'])
+        self.assertEqual(override_obj.earned_graded_override, override['earned_graded'])
+
+        self.mock_recalculate.called_with(
+            sender=None,
             user_id=self.user.id,
-            course_id=self.course.id,
-            usage_key=self.subsection.location
+            course_id=unicode(self.course.id),
+            usage_id=unicode(self.subsection.location),
+            only_if_higher=False,
+            expected_modified=override_obj.modified,
+            score_db_table=ScoreDatabaseTableEnum.overrides
         )
 
-        self.assertEqual(grade.earned_all, expected['earned_all'])
-        self.assertEqual(grade.earned_graded, expected['earned_graded'])
+    @freeze_time('2017-01-01')
+    def test_undo_override_subsection_grade(self):
+        override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(grade=self.grade)
+
+        self.service.undo_override_subsection_grade(
+            user_id=self.user.id,
+            course_key_or_id=self.course.id,
+            usage_key_or_id=self.subsection.location,
+        )
+
+        override = self.service.get_subsection_grade_override(self.user.id, self.course.id, self.subsection.location)
+        self.assertIsNone(override)
+
+        self.mock_recalculate.called_with(
+            sender=None,
+            user_id=self.user.id,
+            course_id=unicode(self.course.id),
+            usage_id=unicode(self.subsection.location),
+            only_if_higher=False,
+            expected_modified=datetime.now().replace(tzinfo=pytz.UTC),
+            score_deleted=True,
+            score_db_table=ScoreDatabaseTableEnum.overrides
+        )
 
     @ddt.data(
         ['edX/DemoX/Demo_Course', CourseKey.from_string('edX/DemoX/Demo_Course'), CourseKey],
