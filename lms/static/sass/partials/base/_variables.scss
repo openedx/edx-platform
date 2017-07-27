@@ -225,6 +225,8 @@ $success-color-hover: rgb(0, 129, 0) !default;
 // ----------------------------
 
 $gray-dark: #4e5455 !default;
+$gray-lighter: #eceeef !default;
+$gray-lightest: #f7f7f9 !default;
 
 $state-success-text: $black !default;
 $state-success-bg: #dff0d8 !default;
@@ -549,10 +551,6 @@ $palette-success-text: #008100;
 
 // learner profile elements
 $learner-profile-container-flex: 660px;
-$learner-profile-card-bg: $white;
-$learner-profile-card-width: 300px;
-$learner-profile-border-light: $gray-l4;
-$learner-profile-text-dark: $black-t3;
 
 // course elements
 $content-wrapper-bg: $white !default;

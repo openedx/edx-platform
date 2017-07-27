@@ -48,10 +48,9 @@
                 height: $profile-image-dimension;
                 border-radius: ($profile-image-dimension/2);
                 overflow: hidden;
-                border: 3px solid $light-gray4;
+                border: 3px solid $gray-lightest;
                 margin-top: $baseline*-0.75;
-                background: $learner-profile-card-bg;
-
+                background: $white;
             }
 
             .u-field-upload-button {
@@ -185,8 +184,8 @@
     .wrapper-profile-section-one {
         @include float(left);
         @include margin-left($baseline*3);
-        width: $learner-profile-card-width;
-        background-color: $learner-profile-card-bg;
+        width: 300px;
+        background-color: $white;
         border-top: 5px solid $blue;
         padding-bottom: $baseline;
 
@@ -228,7 +227,7 @@
 
                 &:not(:last-child) {
                     padding-bottom: $baseline/4;
-                    border-bottom: 1px solid $learner-profile-border-light;
+                    border-bottom: 1px solid $gray-lighter;
                 }
             }
         }
