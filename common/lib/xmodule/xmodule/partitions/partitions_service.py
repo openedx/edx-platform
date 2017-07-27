@@ -62,7 +62,6 @@ def _create_enrollment_track_partition(course):
 
     used_ids = set(p.id for p in course.user_partitions)
     if ENROLLMENT_TRACK_PARTITION_ID in used_ids:
-        # TODO: change to Exception after this has been in production for awhile, see TNL-6796.
         log.warning(
             "Can't add 'enrollment_track' partition, as ID {id} is assigned to {partition} in course {course}.".format(
                 id=ENROLLMENT_TRACK_PARTITION_ID,
