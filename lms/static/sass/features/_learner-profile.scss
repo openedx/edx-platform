@@ -277,7 +277,7 @@
     .wrapper-profile-section-container-two {
         @include float(left);
         width: calc(100% - 380px);
-        max-width: 650px;
+        max-width: $learner-profile-container-flex; // Switch to map-get($grid-breakpoints,md) for bootstrap
 
         @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
             width: 100%;
@@ -292,9 +292,9 @@
                 position: relative;
 
                 .u-field-message {
+                    @include right(0);
+                    top: $baseline/4;
                     position: absolute;
-                    @include right($baseline);
-                    width: 0;
                 }
             }
 
