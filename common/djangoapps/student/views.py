@@ -1723,6 +1723,11 @@ def _do_create_account(form, custom_form=None):
                 custom_model.save()
     except IntegrityError:
         # Figure out the cause of the integrity error
+        # TODO duplicate email is already handled by form.errors above as a ValidationError.
+        # The checks for duplicate email/username should occur in the same place with an
+        # AccountValidationError and a consistent user message returned (i.e. both should
+        # return "It looks like {username} belongs to an existing account. Try again with a
+        # different username.")
         if len(User.objects.filter(username=user.username)) > 0:
             raise AccountValidationError(
                 _("An account with the Public Username '{username}' already exists.").format(username=user.username),
@@ -1796,6 +1801,14 @@ def create_account_with_params(request, params):
     * The user-facing text is rather unfriendly (e.g. "Username must be a
       minimum of two characters long" rather than "Please use a username of
       at least two characters").
+    * Duplicate email raises a ValidationError (rather than the expected
+      AccountValidationError). Duplicate username returns an inconsistent
+      user message (i.e. "An account with the Public Username '{username}'
+      already exists." rather than "It looks like {username} belongs to an
+      existing account. Try again with a different username.") The two checks
+      occur at different places in the code; as a result, registering with
+      both a duplicate username and email raises only a ValidationError for
+      email only.
     """
     # Copy params so we can modify it; we can't just do dict(params) because if
     # params is request.POST, that results in a dict containing lists of values

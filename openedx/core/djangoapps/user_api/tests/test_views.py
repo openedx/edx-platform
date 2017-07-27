@@ -774,6 +774,142 @@ class PasswordResetViewTest(UserAPITestCase):
 
 @ddt.ddt
 @skip_unless_lms
+class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCase):
+    """
+    Tests for catching duplicate email and username validation errors within
+    the registration end-points of the User API.
+    """
+
+    maxDiff = None
+
+    USERNAME = "bob"
+    EMAIL = "bob@example.com"
+    PASSWORD = "password"
+    NAME = "Bob Smith"
+    EDUCATION = "m"
+    YEAR_OF_BIRTH = "1998"
+    ADDRESS = "123 Fake Street"
+    CITY = "Springfield"
+    COUNTRY = "us"
+    GOALS = "Learn all the things!"
+
+    def setUp(self):
+        super(RegistrationViewValidationErrorTest, self).setUp()
+        self.url = reverse("user_api_registration")
+
+    @mock.patch('openedx.core.djangoapps.user_api.views.check_account_exists')
+    def test_register_duplicate_email_validation_error(self, dummy_check_account_exists):
+        dummy_check_account_exists.return_value = []
+        # Register the first user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+
+        # Try to create a second user with the same email address
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": "Someone Else",
+            "username": "someone_else",
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertEqual(response.status_code, 400)
+        response_json = json.loads(response.content)
+        self.assertEqual(
+            response_json,
+            {
+                "email": [{
+                    "user_message": (
+                        "It looks like {} belongs to an existing account. "
+                        "Try again with a different email address."
+                    ).format(
+                        self.EMAIL
+                    )
+                }]
+            }
+        )
+
+    @mock.patch('openedx.core.djangoapps.user_api.views.check_account_exists')
+    def test_register_duplicate_username_account_validation_error(self, dummy_check_account_exists):
+        dummy_check_account_exists.return_value = []
+        # Register the first user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+
+        # Try to create a second user with the same username
+        response = self.client.post(self.url, {
+            "email": "someone+else@example.com",
+            "name": "Someone Else",
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertEqual(response.status_code, 409)
+        response_json = json.loads(response.content)
+        self.assertEqual(
+            response_json,
+            {
+                u"username": [{
+                    u"user_message": (
+                        u"An account with the Public Username '{}' already exists."
+                    ).format(
+                        self.USERNAME
+                    )
+                }]
+            }
+        )
+
+    @mock.patch('openedx.core.djangoapps.user_api.views.check_account_exists')
+    def test_register_duplicate_username_and_email_validation_errors(self, dummy_check_account_exists):
+        dummy_check_account_exists.return_value = []
+        # Register the first user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+
+        # Try to create a second user with the same username
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": "Someone Else",
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertEqual(response.status_code, 400)
+        response_json = json.loads(response.content)
+        self.assertEqual(
+            response_json,
+            {
+                "email": [{
+                    "user_message": (
+                        "It looks like {} belongs to an existing account. "
+                        "Try again with a different email address."
+                    ).format(
+                        self.EMAIL
+                    )
+                }]
+            }
+        )
+
+
+@ddt.ddt
+@skip_unless_lms
 class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     """Tests for the registration end-points of the User API. """
 
