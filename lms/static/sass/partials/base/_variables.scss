@@ -224,6 +224,8 @@ $success-color-hover: rgb(0, 129, 0) !default;
 // #COLORS- Bootstrap-style
 // ----------------------------
 
+$gray-dark: #4e5455 !default;
+
 $state-success-text: $black !default;
 $state-success-bg: #dff0d8 !default;
 $state-success-border: darken($state-success-bg, 5%) !default;
@@ -550,7 +552,6 @@ $learner-profile-container-flex: 660px;
 $learner-profile-card-bg: $white;
 $learner-profile-card-width: 300px;
 $learner-profile-border-light: $gray-l4;
-$learner-profile-text-light: $gray;
 $learner-profile-text-dark: $black-t3;
 
 // course elements
