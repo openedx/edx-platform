@@ -5,7 +5,6 @@ and disabling for instructor-paced courses.
 import mock
 
 from certificates import api as certs_api
-from certificates.config import waffle
 from certificates.models import \
     CertificateGenerationConfiguration, \
     CertificateWhitelist, \
@@ -15,6 +14,7 @@ from openedx.core.djangoapps.signals.handlers import _listen_for_course_pacing_c
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
