@@ -548,6 +548,7 @@ such that the value can be defined later than this assignment (file load order).
             this.$reason_field = this.$container.find("textarea[name='reason-field']");
             this.$checkbox_autoenroll = this.$container.find("input[name='auto-enroll']");
             this.$checkbox_emailstudents = this.$container.find("input[name='email-students']");
+            this.checkbox_emailstudents_initialstate = this.$checkbox_emailstudents.is(':checked');
             this.$task_response = this.$container.find('.request-response');
             this.$request_response_error = this.$container.find('.request-response-error');
             this.$enrollment_button.click(function(event) {
@@ -584,7 +585,7 @@ such that the value can be defined later than this assignment (file load order).
         batchEnrollment.prototype.clear_input = function() {
             this.$identifier_input.val('');
             this.$reason_field.val('');
-            this.$checkbox_emailstudents.attr('checked', true);
+            this.$checkbox_emailstudents.attr('checked', this.checkbox_emailstudents_initialstate);
             return this.$checkbox_autoenroll.attr('checked', true);
         };
 
