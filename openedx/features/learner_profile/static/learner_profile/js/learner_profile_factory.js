@@ -148,7 +148,7 @@
                     messagePosition: 'header',
                     maxCharacters: 300,
                     charCountMessage: gettext('characters remaining'),
-                    charCountMessageSingular: gettext('character remaining'),
+                    charCountMessageSingular: gettext('character remaining')
                 })
             ];
 

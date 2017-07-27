@@ -101,7 +101,8 @@
                             Backbone.history.start();
                         }
                     } else {
-                        this.$el.find('.wrapper-profile-section-container-two').prepend(this.sectionTwoView.render().el);
+                        this.$el.find('.wrapper-profile-section-container-two')
+                            .prepend(this.sectionTwoView.render().el);
                     }
                     return this;
                 },

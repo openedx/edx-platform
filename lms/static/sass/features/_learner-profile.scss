@@ -10,8 +10,9 @@
     $profile-image-dimension: 120px;
 
     .profile-header {
-        @include margin-left($baseline*3);
-        padding-top: $baseline;
+        @include padding($baseline, 0, 0, $baseline*3);
+        margin: 0 auto;
+        max-width: $lms-max-width;
 
         .header {
             @extend %t-title4;
