@@ -114,7 +114,7 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
             CourseHomeMessages.register_info_message(
                 request,
                 Text(_(
-                    "{add_reminder_open_tag}Don't forget to add a calendar reminder!{add_reminder_close_tag}."
+                    "{add_reminder_open_tag}Don't forget to add a calendar reminder!{add_reminder_close_tag}"
                 )).format(
                     add_reminder_open_tag='',
                     add_reminder_close_tag=''

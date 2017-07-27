@@ -41,7 +41,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     var expectSectionOneTobeRendered = function(learnerProfileView) {
         var sectionOneFieldElements = $(learnerProfileView.$('.wrapper-profile-section-one')).find('.u-field');
 
-        expect(sectionOneFieldElements.length).toBe(4);
+        expect(sectionOneFieldElements.length).toBe(5);
         expectProfileElementContainsField(sectionOneFieldElements[0], learnerProfileView.options.profileImageFieldView);
         expectProfileElementContainsField(sectionOneFieldElements[1], learnerProfileView.options.usernameFieldView);
         expectProfileElementContainsField(sectionOneFieldElements[2], learnerProfileView.options.nameFieldView);
@@ -79,7 +79,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 
         expectProfilePrivacyFieldTobeRendered(learnerProfileView, othersProfile);
 
-        expect(sectionOneFieldElements.length).toBe(2);
+        expect(sectionOneFieldElements.length).toBe(3);
         expectProfileElementContainsField(
             sectionOneFieldElements[0],
             learnerProfileView.options.profileImageFieldView
