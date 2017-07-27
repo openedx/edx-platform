@@ -1,4 +1,5 @@
 <div class="profile <%- ownProfile ? 'profile-self' : 'profile-other' %>">
+    <div class="wrapper-profile-field-account-privacy"></div>
     <div class="wrapper-profile-sections account-settings-container">
         <% if (ownProfile) { %>
             <div class="profile-header">
@@ -19,7 +20,6 @@
             </div>
         </div>
         <div class="wrapper-profile-section-container-two">
-            <div class="wrapper-profile-field-account-privacy"></div>
         </div>
     </div>
 </div>

@@ -79,7 +79,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 
         expectProfilePrivacyFieldTobeRendered(learnerProfileView, othersProfile);
 
-        expect(sectionOneFieldElements.length).toBe(3);
+        expect(sectionOneFieldElements.length).toBe(2);
         expectProfileElementContainsField(
             sectionOneFieldElements[0],
             learnerProfileView.options.profileImageFieldView
@@ -87,10 +87,6 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         expectProfileElementContainsField(
             sectionOneFieldElements[1],
             learnerProfileView.options.usernameFieldView
-        );
-        expectProfileElementContainsField(
-            sectionOneFieldElements[2],
-            learnerProfileView.options.nameFieldView
         );
 
         if (othersProfile) {

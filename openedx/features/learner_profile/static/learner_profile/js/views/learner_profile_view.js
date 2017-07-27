@@ -101,8 +101,7 @@
                             Backbone.history.start();
                         }
                     } else {
-                        this.$el.find('.wrapper-profile-section-container-two')
-                            .prepend(this.sectionTwoView.render().el);
+                        this.$el.find('.wrapper-profile-section-container-two').append(this.sectionTwoView.render().el);
                     }
                     return this;
                 },
@@ -124,8 +123,11 @@
                         fieldView.delegateEvents();
                     }
 
+                    // Do not show name when in limited mode or no name has been set
+                    if (this.showFullProfile() && this.options.accountSettingsModel.get('name')) {
+                        this.$('.profile-section-one-fields').append(this.options.nameFieldView.render().el);
+                    }
                     this.$('.profile-section-one-fields').append(this.options.usernameFieldView.render().el);
-                    this.$('.profile-section-one-fields').append(this.options.nameFieldView.render().el);
 
                     imageView = this.options.profileImageFieldView;
                     this.$('.profile-image-field').append(imageView.render().el);
