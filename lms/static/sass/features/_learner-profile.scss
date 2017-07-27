@@ -9,22 +9,6 @@
 .view-profile {
     $profile-image-dimension: 120px;
 
-    .profile-header {
-        @include padding($baseline, 0, 0, $baseline*3);
-        margin: 0 auto;
-        max-width: $lms-max-width;
-
-        .header {
-            @extend %t-title4;
-            @extend %t-ultrastrong;
-            display: inline-block;
-        }
-
-        .subheader {
-            @extend %t-title6;
-        }
-    }
-
     .window-wrap,
     .content-wrapper {
         background-color: $white;
@@ -181,6 +165,20 @@
         @media (max-width: $learner-profile-container-flex) {
             @include margin-left(0);
             @include padding($baseline*1.5, 0, $baseline*1.5, 0);
+        }
+    }
+
+    .profile-header {
+        @include padding(0, 0, $baseline, $baseline*3);
+
+        .header {
+            @extend %t-title4;
+            @extend %t-ultrastrong;
+            display: inline-block;
+        }
+
+        .subheader {
+            @extend %t-title6;
         }
     }
 

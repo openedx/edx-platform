@@ -1,11 +1,11 @@
-<% if (ownProfile) { %>
-    <div class="profile-header">
-        <div class="header"> <%- profile_header %></div>
-        <div class="subheader"> <%- profile_subheader %></div>
-    </div>
-<% } %>
 <div class="profile <%- ownProfile ? 'profile-self' : 'profile-other' %>">
     <div class="wrapper-profile-sections account-settings-container">
+        <% if (ownProfile) { %>
+            <div class="profile-header">
+                <div class="header"> <%- profile_header %></div>
+                <div class="subheader"> <%- profile_subheader %></div>
+            </div>
+        <% } %>
         <div class="wrapper-profile-section-container-one">
             <div class="wrapper-profile-section-one">
                 <div class="profile-image-field">
