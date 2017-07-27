@@ -1,5 +1,11 @@
+from datetime import datetime
+
+import pytz
+
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
+
+from .constants import ScoreDatabaseTableEnum
+from .models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
 
 
 def _get_key(key_or_id, key_cls):
@@ -24,9 +30,44 @@ class GradesService(object):
     def get_subsection_grade(self, user_id, course_key_or_id, usage_key_or_id):
         """
         Finds and returns the earned subsection grade for user
-
-        Result is a dict of two key value pairs with keys: earned_all and earned_graded.
         """
+        course_key = _get_key(course_key_or_id, CourseKey)
+        usage_key = _get_key(usage_key_or_id, UsageKey)
+
+        return PersistentSubsectionGrade.objects.get(
+            user_id=user_id,
+            course_id=course_key,
+            usage_key=usage_key
+        )
+
+    def get_subsection_grade_override(self, user_id, course_key_or_id, usage_key_or_id):
+        """
+        Finds the subsection grade for user and returns the override for that grade if it exists
+
+        If override does not exist, returns None. If subsection grade does not exist, will raise an exception.
+        """
+        course_key = _get_key(course_key_or_id, CourseKey)
+        usage_key = _get_key(usage_key_or_id, UsageKey)
+
+        grade = self.get_subsection_grade(user_id, course_key, usage_key)
+
+        try:
+            return PersistentSubsectionGradeOverride.objects.get(
+                grade=grade
+            )
+        except PersistentSubsectionGradeOverride.DoesNotExist:
+            return None
+
+    def override_subsection_grade(self, user_id, course_key_or_id, usage_key_or_id, earned_all=None,
+                                  earned_graded=None):
+        """
+        Override subsection grade (the PersistentSubsectionGrade model must already exist)
+
+        Fires off a recalculate_subsection_grade async task to update the PersistentSubsectionGrade table. Will not
+        override earned_all or earned_graded value if they are None. Both default to None.
+        """
+        from .tasks import recalculate_subsection_grade_v3  # prevent circular import
+
         course_key = _get_key(course_key_or_id, CourseKey)
         usage_key = _get_key(usage_key_or_id, UsageKey)
 
@@ -35,37 +76,47 @@ class GradesService(object):
             course_id=course_key,
             usage_key=usage_key
         )
-        return {
-            'earned_all': grade.earned_all,
-            'earned_graded': grade.earned_graded
-        }
-
-    def override_subsection_grade(self, user_id, course_key_or_id, usage_key_or_id, earned_all=None,
-                                  earned_graded=None):
-        """
-        Override subsection grade (the PersistentSubsectionGrade model must already exist)
-
-        Will not override earned_all or earned_graded value if they are None. Both default to None.
-        """
-        course_key = _get_key(course_key_or_id, CourseKey)
-        subsection_key = _get_key(usage_key_or_id, UsageKey)
-
-        grade = PersistentSubsectionGrade.objects.get(
-            user_id=user_id,
-            course_id=course_key,
-            usage_key=subsection_key
-        )
 
         # Create override that will prevent any future updates to grade
-        PersistentSubsectionGradeOverride.objects.create(
+        override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(
             grade=grade,
             earned_all_override=earned_all,
             earned_graded_override=earned_graded
         )
 
-        # Change the grade as it is now
-        if earned_all is not None:
-            grade.earned_all = earned_all
-        if earned_graded is not None:
-            grade.earned_graded = earned_graded
-        grade.save()
+        # Recalculation will call PersistentSubsectionGrade.update_or_create_grade which will use the above override
+        # to update the grade before writing to the table.
+        recalculate_subsection_grade_v3.apply_async(
+            sender=None,
+            user_id=user_id,
+            course_id=unicode(course_key),
+            usage_id=unicode(usage_key),
+            only_if_higher=False,
+            expeected_modified=override.modified,
+            score_db_table=ScoreDatabaseTableEnum.overrides
+        )
+
+    def undo_override_subsection_grade(self, user_id, course_key_or_id, usage_key_or_id):
+        """
+        Delete the override subsection grade row (the PersistentSubsectionGrade model must already exist)
+
+        Fires off a recalculate_subsection_grade async task to update the PersistentSubsectionGrade table.
+        """
+        from .tasks import recalculate_subsection_grade_v3  # prevent circular import
+
+        course_key = _get_key(course_key_or_id, CourseKey)
+        usage_key = _get_key(usage_key_or_id, UsageKey)
+
+        override = self.get_subsection_grade_override(user_id, course_key, usage_key)
+        override.delete()
+
+        recalculate_subsection_grade_v3.apply_async(
+            sender=None,
+            user_id=user_id,
+            course_id=unicode(course_key),
+            usage_id=unicode(usage_key),
+            only_if_higher=False,
+            expected_modified=datetime.now().replace(tzinfo=pytz.UTC),  # Not used when score_deleted=True
+            score_deleted=True,
+            score_db_table=ScoreDatabaseTableEnum.overrides
+        )
