@@ -52,17 +52,25 @@
                      this.render();
                  },
 
+                 getUrl: function(base, programData) {
+                     if (programData.uuid) {
+                         return base + '&bundle=' + encodeURIComponent(programData.uuid);
+                     }
+                     return base;
+                 },
+
                  render: function() {
                      var completedCount = this.completedCourseCollection.length,
                          inProgressCount = this.inProgressCourseCollection.length,
                          remainingCount = this.remainingCourseCollection.length,
                          totalCount = completedCount + inProgressCount + remainingCount,
+                         buyButtonUrl = this.getUrl(this.options.urls.buy_button_url, this.options.programData),
                          data = {
                              totalCount: totalCount,
                              inProgressCount: inProgressCount,
                              remainingCount: remainingCount,
                              completedCount: completedCount,
-                             completeProgramURL: this.options.urls.buy_button_url
+                             completeProgramURL: buyButtonUrl
                          };
                      data = $.extend(data, this.programModel.toJSON());
                      HtmlUtils.setHtml(this.$el, this.tpl(data));
