@@ -110,7 +110,7 @@ stevedore==1.10.0
 sure==1.2.3
 sympy==0.7.1
 xmltodict==0.4.1
-django-ratelimit-backend==1.0
+django-ratelimit-backend==1.1.1
 unicodecsv==0.14.1
 django-require==1.0.11
 django-webpack-loader==0.4.1
