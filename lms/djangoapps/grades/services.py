@@ -100,7 +100,8 @@ class GradesService(object):
         """
         Delete the override subsection grade row (the PersistentSubsectionGrade model must already exist)
 
-        Fires off a recalculate_subsection_grade async task to update the PersistentSubsectionGrade table.
+        Fires off a recalculate_subsection_grade async task to update the PersistentSubsectionGrade table. If the
+        override does not exist, no error is raised, it just triggers the recalculation.
         """
         from .tasks import recalculate_subsection_grade_v3  # prevent circular import
 
@@ -108,7 +109,9 @@ class GradesService(object):
         usage_key = _get_key(usage_key_or_id, UsageKey)
 
         override = self.get_subsection_grade_override(user_id, course_key, usage_key)
-        override.delete()
+        # Older rejected exam attempts that transition to verified might not have an override created
+        if override is not None:
+            override.delete()
 
         recalculate_subsection_grade_v3.apply_async(
             sender=None,
