@@ -214,18 +214,6 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.wait_for_ajax()
         return self.q(css='#u-field-select-account_privacy').visible
 
-    def field_icon_present(self, field_id):
-        """
-        Check if an icon is present for a field. Only dropdown fields have icons.
-
-        Arguments:
-            field_id (str): field id
-
-        Returns:
-            True/False
-        """
-        return self.icon_for_field(field_id, FIELD_ICONS[field_id])
-
     def wait_for_public_fields(self):
         """
         Wait for `country`, `language` and `bio` fields to be visible.

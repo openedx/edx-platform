@@ -544,8 +544,7 @@
                     messagePosition: this.options.messagePosition || 'footer',
                     placeholderValue: this.options.placeholderValue,
                     maxCharacters: this.options.maxCharacters || '',
-                    charCountMessage: this.options.charCountMessage || '',
-                    charCountMessageSingular: this.options.charCountMessageSingular || ''
+                    charCountMessage: this.options.charCountMessage || ''
                 }));
                 this.delegateEvents();
                 this.title((this.modelValue() || this.mode === 'edit') ?
@@ -573,12 +572,7 @@
                 // Update character count for textarea
                 if (this.options.maxCharacters) {
                     curCharCount = $('#u-field-textarea-' + this.options.valueAttribute).val().length;
-                    remainingCharCount = this.options.maxCharacters - curCharCount;
-                    charCountMessage = remainingCharCount === 1 ?
-                        this.options.charCountMessageSingular : this.options.charCountMessage;
-
-                    $('.u-field-footer .cur-char-count').text(remainingCharCount);
-                    $('.u-field-footer .cur-char-count-msg').text(charCountMessage);
+                    $('.u-field-footer .current-char-count').text(curCharCount);
                 }
             },
 

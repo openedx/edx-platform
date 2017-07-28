@@ -109,7 +109,7 @@
                     model: accountSettingsModel,
                     screenReaderTitle: gettext('Country'),
                     required: true,
-                    editable: editable,
+                    editable: 'toggle',
                     showMessages: false,
                     placeholderValue: gettext('Add Country'),
                     valueAttribute: 'country',
@@ -124,7 +124,7 @@
                     model: accountSettingsModel,
                     screenReaderTitle: gettext('Preferred Language'),
                     required: false,
-                    editable: editable,
+                    editable: 'toggle'  ,
                     showMessages: false,
                     placeholderValue: gettext('Add language'),
                     valueAttribute: 'language_proficiencies',
@@ -147,8 +147,7 @@
                     persistChanges: true,
                     messagePosition: 'header',
                     maxCharacters: 300,
-                    charCountMessage: gettext('characters remaining'),
-                    charCountMessageSingular: gettext('character remaining')
+                    charCountMessage: gettext('of 300')
                 })
             ];
 
@@ -184,7 +183,8 @@
                 nameFieldView: nameFieldView,
                 sectionOneFieldViews: sectionOneFieldViews,
                 sectionTwoFieldViews: sectionTwoFieldViews,
-                badgeListContainer: badgeListContainer
+                badgeListContainer: badgeListContainer,
+                platformName: options.platform_name,
             });
 
             getProfileVisibility = function() {

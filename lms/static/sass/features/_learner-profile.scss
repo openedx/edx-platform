@@ -223,7 +223,7 @@
             }
 
             .u-field-title {
-                color: $gray;
+                color: $body-color;
                 font-size: $body-font-size;
                 display: block;
             }
@@ -245,7 +245,7 @@
         &>.u-field {
             &:not(:first-child) {
                 font-size: $body-font-size;
-                color: $gray;
+                color: $body-color;
                 font-weight: $font-light;
                 margin-bottom: 0;
             }
@@ -322,7 +322,7 @@
                 width: 100%;
                 background-color: transparent;
                 border-radius: 5px;
-                border-color: $gray;
+                border-color: $body-color;
                 resize: none;
                 white-space: pre-line;
                 outline: 0;
@@ -348,11 +348,12 @@
             padding: $baseline;
             margin: $baseline * 0.75;
             border: 2px dashed $gray-l3;
+
             i {
                 font-size: 12px;
                 @include padding-right(5px);
                 vertical-align: middle;
-                color: $gray;
+                color: $body-color;
             }
             .u-field-title {
                 width: 100%;
@@ -363,7 +364,7 @@
                 text-align: center;
                 line-height: 1.5em;
                 @extend %t-copy-sub1;
-                color: $gray;
+                color: $body-color;
             }
         }
 
@@ -376,11 +377,11 @@
         }
 
         .wrapper-u-field {
-            color: $gray;
+            color: $body-color;
             font-size: $body-font-size;
 
             .u-field-footer {
-                .profile-about-character-count {
+                .field-textarea-character-count {
                     @extend %t-weight1;
                     @include float(right);
                     margin-top: $baseline/4;

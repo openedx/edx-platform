@@ -44,10 +44,10 @@
             </span>
         <% } %>
         <% if (mode === 'edit') { %>
-          <div class="profile-about-character-count">
-            <span class="cur-char-count"><%- (maxCharacters - value.length) %></span>
-            <span class="cur-char-count-msg">
-                <%-(maxCharacters - value.length) == 1 ? charCountMessageSingular : charCountMessage %>
+          <div class="field-textarea-character-count">
+            <span class="current-char-count"><%- (maxCharacters - value.length) %></span>
+            <span class="current-char-count-msg">
+                <%-charCountMessage %>
             </span>
           </div>
         <% } %>

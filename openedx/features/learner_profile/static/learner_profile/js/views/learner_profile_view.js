@@ -53,13 +53,15 @@
                         ownProfile: this.options.ownProfile
                     });
 
+
                     HtmlUtils.setHtml(this.$el, HtmlUtils.template(learnerProfileTemplate)({
                         username: self.options.accountSettingsModel.get('username'),
                         name: self.options.accountSettingsModel.get('name'),
                         ownProfile: self.options.ownProfile,
                         showFullProfile: self.showFullProfile(),
                         profile_header: gettext('My Profile'),
-                        profile_subheader: gettext('Build out your profile to personalize your identity on edX')
+                        profile_subheader: gettext('Build out your profile to personalize your identity on '
+                            + self.options.platformName)
                     }));
                     this.renderFields();
 
