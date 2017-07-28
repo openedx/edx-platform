@@ -92,7 +92,12 @@ DEBUG_TOOLBAR_CONFIG = {
 
 def should_show_debug_toolbar(request):
     # We always want the toolbar on devstack unless running tests from another Docker container
-    return not request.get_host().startswith('edx.devstack.studio:')
+    if request.get_host().startswith('edx.devstack.studio:'):
+        return False
+    # Only display for non-ajax requests.
+    if request.is_ajax():
+        return False
+    return True
 
 
 # To see stacktraces for MongoDB queries, set this to True.
