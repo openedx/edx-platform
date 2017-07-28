@@ -285,8 +285,10 @@
     }
 
     .program-heading {
-        width: 100%;
         margin-bottom: 40px;
+        display: flex;
+        justify-content: flex-start;
+        flex-direction: column;
 
         .program-heading-title {
             font-family: "Open Sans";
@@ -300,6 +302,7 @@
         .program-heading-message {
             font-weight: 300;
         }
+
     }
 
     .course-enroll-view {
@@ -387,7 +390,34 @@
             padding: 0;
         }
     }
-   
+
+   .upgrade-button {
+        background: palette(success, text);
+        border-color: palette(success, text);
+        border-radius: 0;
+        padding: 7px;
+        text-align: center;
+        font-size: 0.9375em;
+
+        /* IE11 CSS styles */
+        @media(min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+            @include float(right);
+        }
+        &.complete-program {
+            margin: 10px 15px 10px 5px;
+            align-self: flex-start;
+
+            @media(min-width: $bp-screen-md) {
+                align-self: flex-end;
+            }
+            
+            .list-price {
+                text-decoration: line-through;
+            }
+        }
+    }
+
+
     .program-course-card {
         width: 100%;
         padding: 15px;
@@ -461,22 +491,6 @@
 
         .upgrade-message {
             flex-wrap: wrap;
-
-            .upgrade-button {
-                background: palette(success, text);
-                border-color: palette(success, text);
-                height: 37px;
-                width: 128px;
-                border-radius: 0;
-                padding: 7px 0 0 0;
-                text-align: center;
-                font-size: 0.9375em;
-                
-                /* IE11 CSS styles */
-                @media(min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-                    @include float(right);
-                }
-            }
 
             .action {
                 width: 100%;

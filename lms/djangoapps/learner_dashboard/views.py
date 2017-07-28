@@ -5,11 +5,12 @@ from django.http import Http404
 from django.views.decorators.http import require_GET
 
 from edxmako.shortcuts import render_to_response
+from commerce.utils import EcommerceService
+
 from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
-from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import (
-    ProgramDataExtender,
+    ProgramMarketingDataExtender,
     ProgramProgressMeter,
     get_certificates,
     get_program_marketing_url
@@ -54,11 +55,13 @@ def program_details(request, program_uuid):
     if not program_data:
         raise Http404
 
-    program_data = ProgramDataExtender(program_data, request.user).extend()
+    program_data = ProgramMarketingDataExtender(program_data, request.user).extend()
     course_data = meter.progress(programs=[program_data], count_only=False)[0]
     certificate_data = get_certificates(request.user, program_data)
 
     program_data.pop('courses')
+    skus = program_data.get('skus')
+    ecommerce_service = EcommerceService()
 
     urls = {
         'program_listing_url': reverse('program_listing_view'),
@@ -66,6 +69,7 @@ def program_details(request, program_uuid):
             reverse('course_modes_choose', kwargs={'course_id': FAKE_COURSE_KEY})
         ),
         'commerce_api_url': reverse('commerce_api:v0:baskets:create'),
+        'buy_button_url': ecommerce_service.get_checkout_page_url(*skus)
     }
 
     context = {
@@ -77,7 +81,7 @@ def program_details(request, program_uuid):
         'user_preferences': get_user_preferences(request.user),
         'program_data': program_data,
         'course_data': course_data,
-        'certificate_data': certificate_data,
+        'certificate_data': certificate_data
     }
 
     return render_to_response('learner_dashboard/program_details.html', context)
