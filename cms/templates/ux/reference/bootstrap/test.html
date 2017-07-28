@@ -1,20 +1,9 @@
-## Override the default styles_version to use Bootstrap
-<%! main_css = "css/bootstrap/studio-main.css" %>
+## mako
 
 <%page expression_filter="h"/>
 
-<%!
-from openedx.core.djangoapps.util.user_messages import (
-    register_error_message,
-    register_info_message,
-    register_success_message,
-    register_warning_message,
-)
-%>
-
-<%
-register_info_message(request, _('This is a test message'))
-%>
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/studio-main.css" %>
 
 <%inherit file="/base.html" />
 <%block name="title">Bootstrap Test Page</%block>

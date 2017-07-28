@@ -1,8 +1,10 @@
 // LMS layouts
 
 .content-wrapper {
+    margin-top: $baseline;
+
     .course-tabs {
-        padding-bottom: none;
+        padding-bottom: 0;
 
         .nav-item {
             &.active, &:hover{

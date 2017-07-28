@@ -366,6 +366,16 @@ def get_themes(themes_dir=None):
     return themes
 
 
+def theme_exists(theme_name, themes_dir=None):
+    """
+    Returns True if a theme exists with the specified name.
+    """
+    for theme in get_themes(themes_dir=themes_dir):
+        if theme.theme_dir_name == theme_name:
+            return True
+    return False
+
+
 def get_theme_dirs(themes_dir=None):
     """
     Returns theme dirs in given dirs
