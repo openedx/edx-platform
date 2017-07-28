@@ -45,4 +45,5 @@ def get_experiment_user_metadata_context(request, course, user):
         'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',
         'upgrade_deadline': upgrade_data and upgrade_data.date,
         'course_key': course.id,
+        'course_start': course.start,
     }
