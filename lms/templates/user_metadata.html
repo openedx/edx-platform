@@ -23,7 +23,7 @@ if user:
     user_metadata['username'] = user.username
     user_metadata['user_id'] = user.id
 
-for datekey in ('schedule_start', 'enrollment_time'):
+for datekey in ('schedule_start', 'enrollment_time', 'course_start'):
     user_metadata[datekey] = (
         context.get(datekey).isoformat() if context.get(datekey) else None
     )
