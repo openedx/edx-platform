@@ -4,14 +4,6 @@
     @include box-sizing(border-box);
   }
 
-  .content-primary {
-    @extend .ui-col-wide;
-  }
-
-  .content-supplementary {
-    @extend .ui-col-narrow;
-  }
-
   .nav-actions {
 
     .fa-cloud-upload {
@@ -23,21 +15,50 @@
 
   .file-upload-form {
     @include clearfix();
-    margin-bottom: ($baseline*1.5);
     width: 100%;
 
     .file-drop-area {
       border: 2px dashed $gray-l3;
       border-radius: ($baseline/5);
-      padding: ($baseline*3);
+      padding: ($baseline*1.25);
       background: $white;
-      text-align: center;
+      @include text-align(center);
+      cursor: pointer;
 
       &:hover,
       &.is-dragged {
         background: $blue-l5;
         border-style: solid;
         border-color: $blue-l4;
+      }
+
+      &:hover .upload-text-link {
+        text-decoration:underline;
+      }
+
+      .fa-cloud-upload{
+        font-size:7em;
+        vertical-align: top;
+        @include margin-right(0.1em);
+      }
+
+      .text-container {
+        display: inline-block;
+        @include text-align(left);
+
+        .upload-text-link {
+          color: $ui-link-color;
+        }
+
+        .video-uploads-header {
+          font-size: 1.5em;
+          margin-bottom: .25em;
+          font-weight: 600
+        }
+
+        .video-max-file-size-text {
+          margin-top: ($baseline/2);
+        }
       }
     }
   }
