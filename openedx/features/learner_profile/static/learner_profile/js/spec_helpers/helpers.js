@@ -12,6 +12,8 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         if ('fieldValue' in view || 'imageUrl' in view) {
             if ('imageUrl' in view) {
                 expect($($element.find('.image-frame')[0]).attr('src')).toBe(view.imageUrl());
+            } else if (view.fieldType === 'date') {
+                expect(view.fieldValue()).toBe(view.timezoneFormattedDate());
             } else if (view.fieldValue()) {
                 expect(view.fieldValue()).toBe(view.modelValue());
             } else if ('optionForValue' in view) {
@@ -41,7 +43,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     var expectSectionOneTobeRendered = function(learnerProfileView) {
         var sectionOneFieldElements = $(learnerProfileView.$('.wrapper-profile-section-one')).find('.u-field');
 
-        expect(sectionOneFieldElements.length).toBe(5);
+        expect(sectionOneFieldElements.length).toBe(6);
         expectProfileElementContainsField(sectionOneFieldElements[0], learnerProfileView.options.profileImageFieldView);
         expectProfileElementContainsField(sectionOneFieldElements[1], learnerProfileView.options.usernameFieldView);
         expectProfileElementContainsField(sectionOneFieldElements[2], learnerProfileView.options.nameFieldView);

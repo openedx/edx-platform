@@ -74,7 +74,8 @@ define(['underscore'], function(_) {
         year_of_birth: '3',    // Note: test birth year range is a string from 0-3
         requires_parental_consent: false,
         country: '1',
-        language: null,
+        language: 'en-US',
+        date_joined: 'December 17, 1995 03:24:00',
         bio: 'About the student',
         language_proficiencies: [{code: '1'}],
         profile_image: PROFILE_IMAGE,
@@ -82,7 +83,7 @@ define(['underscore'], function(_) {
     };
     var DEFAULT_USER_PREFERENCES_DATA = {
         'pref-lang': '2',
-        'time_zone': null
+        time_zone: 'America/New_York'
     };
 
     var createAccountSettingsData = function(options) {
