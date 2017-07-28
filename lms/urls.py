@@ -8,7 +8,7 @@ from django.conf.urls import include, patterns, url
 from django.conf.urls.static import static
 from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
-
+from django.contrib.admin import autodiscover as django_autodiscover
 from courseware.views.index import CoursewareIndex
 from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from django_comment_common.models import ForumsConfig
@@ -20,9 +20,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.features.enterprise_support.api import enterprise_enabled
 
 
-# Uncomment the next two lines to enable the admin:
-if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
-    admin.autodiscover()
+django_autodiscover()
 
 # Use urlpatterns formatted as within the Django docs with first parameter "stuck" to the open parenthesis
 urlpatterns = (
