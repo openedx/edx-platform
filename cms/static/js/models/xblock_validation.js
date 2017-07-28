@@ -19,7 +19,11 @@ define(['backbone', 'gettext', 'underscore'], function(Backbone, gettext, _) {
                 var summary = 'summary' in response ? response.summary : {};
                 var messages = 'messages' in response ? response.messages : [];
                 if (!summary.text) {
-                    summary.text = gettext('This component has validation issues.');
+                    if (response.isUnit) {
+                        summary.text = gettext('This unit has validation issues.');
+                    } else {
+                        summary.text = gettext('This component has validation issues.');
+                    }
                 }
                 if (!summary.type) {
                     summary.type = this.WARNING;

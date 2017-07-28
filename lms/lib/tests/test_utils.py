@@ -57,3 +57,11 @@ class LmsUtilsTest(ModuleStoreTestCase):
         self.assertIsNone(utils.get_parent_unit(self.course))
         self.assertIsNone(utils.get_parent_unit(self.chapter))
         self.assertIsNone(utils.get_parent_unit(self.sequential))
+
+    def test_is_unit(self):
+        """
+        Tests `is_unit` method for the successful result.
+        """
+        self.assertFalse(utils.is_unit(self.html_module_1))
+        self.assertFalse(utils.is_unit(self.child_vertical))
+        self.assertTrue(utils.is_unit(self.vertical))
