@@ -1,13 +1,14 @@
 '''
 django admin pages for courseware model
 '''
-
 from django.contrib import admin
 
-from courseware.models import OfflineComputedGrade, OfflineComputedGradeLog, StudentModule
+from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
 
-admin.site.register(StudentModule)
+from courseware import models
 
-admin.site.register(OfflineComputedGrade)
-
-admin.site.register(OfflineComputedGradeLog)
+admin.site.register(models.DynamicUpgradeDeadlineConfiguration, ConfigurationModelAdmin)
+admin.site.register(models.OfflineComputedGrade)
+admin.site.register(models.OfflineComputedGradeLog)
+admin.site.register(models.CourseDynamicUpgradeDeadlineConfiguration, KeyedConfigurationModelAdmin)
+admin.site.register(models.StudentModule)

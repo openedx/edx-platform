@@ -4,6 +4,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from contentstore.utils import ancestor_has_staff_lock, get_visibility_partition_info
 from openedx.core.djangolib.markup import HTML, Text
+from lms.lib.utils import is_unit
 
 partition_info = get_visibility_partition_info(xblock)
 selectable_partitions = partition_info["selectable_partitions"]
@@ -11,18 +12,30 @@ selected_partition_index = partition_info["selected_partition_index"]
 selected_groups_label = partition_info["selected_groups_label"]
 
 is_staff_locked = ancestor_has_staff_lock(xblock)
+block_is_unit = is_unit(xblock)
 %>
-
 <div class="modal-section visibility-summary">
     % if len(selectable_partitions) == 0:
         <div class="is-not-configured has-actions">
             <h3 class="title">${_('Access is not restricted')}</h3>
             <div class="copy">
-                <p>${_('Access to this component is not restricted, but visibility might be affected by inherited settings.')}</p>
-                % if settings.FEATURES.get('ENABLE_ENROLLMENT_TRACK_USER_PARTITION'):
-                <p>${_('You can restrict access to this component to learners in specific enrollment tracks or content groups.')}</p>
+                % if block_is_unit:
+                    <p>${_('Access to this unit is not restricted, but visibility might be affected by inherited settings.')}</p>
                 % else:
-                <p>${_('You can restrict access to this component to learners in specific content groups.')}</p>
+                    <p>${_('Access to this component is not restricted, but visibility might be affected by inherited settings.')}</p>
+                %endif
+                % if settings.FEATURES.get('ENABLE_ENROLLMENT_TRACK_USER_PARTITION'):
+                    % if block_is_unit:
+                        <p>${_('You can restrict access to this unit to learners in specific enrollment tracks or content groups.')}</p>
+                    % else:
+                        <p>${_('You can restrict access to this component to learners in specific enrollment tracks or content groups.')}</p>
+                    % endif
+                % else:
+                    % if block_is_unit:
+                        <p>${_('You can restrict access to this unit to learners in specific content groups.')}</p>
+                    % else:
+                        <p>${_('You can restrict access to this component to learners in specific content groups.')}</p>
+                    % endif
                 % endif
             </div>
 
@@ -98,7 +111,9 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                             % if group["deleted"]:
                             <label for="visibility-group-${partition["id"]}-${group["id"]}" class="label">
                                 ${_("Deleted Group")}
-                                <span class="note">${_('This group no longer exists. Choose another group or do not restrict access to this component.')}</span>
+                                <span class="note">
+                                    ${_('This group no longer exists.  Choose another group or remove the access restriction.')}
+                                </span>
                             </label>
                             % else:
                             <label for="visibility-group-${partition["id"]}-${group["id"]}" class="label">${group["name"]}</label>
