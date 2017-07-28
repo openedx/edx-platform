@@ -4,7 +4,6 @@ import json
 
 import ddt
 import httpretty
-import waffle
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -266,7 +265,6 @@ class CatalogSearchViewTest(CatalogTest):
         self.assertEqual(response.status_code, 200)
 
     @httpretty.activate
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_post(self):
         catalog_user = UserFactory()
         self.mock_catalog_endpoint({'results': []})
@@ -289,7 +287,6 @@ class CatalogListViewTest(CatalogTest):
         self.url = reverse('api_admin:catalog-list', kwargs={'username': self.catalog_user.username})
 
     @httpretty.activate
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_get(self):
         catalog = CatalogFactory(viewers=[self.catalog_user.username])
         self.mock_catalog_endpoint({'results': [catalog.attributes]})
@@ -298,7 +295,6 @@ class CatalogListViewTest(CatalogTest):
         self.assertIn(catalog.name, response.content.decode('utf-8'))
 
     @httpretty.activate
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_get_no_catalogs(self):
         """Verify that the view works when no catalogs are set up."""
         self.mock_catalog_endpoint({}, status_code=404)
@@ -306,7 +302,6 @@ class CatalogListViewTest(CatalogTest):
         self.assertEqual(response.status_code, 200)
 
     @httpretty.activate
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_post(self):
         catalog_data = {
             'name': 'test-catalog',
@@ -321,7 +316,6 @@ class CatalogListViewTest(CatalogTest):
         self.assertRedirects(response, reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog_id}))
 
     @httpretty.activate
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_post_invalid(self):
         catalog = CatalogFactory(viewers=[self.catalog_user.username])
         self.mock_catalog_endpoint({'results': [catalog.attributes]})
@@ -347,7 +341,6 @@ class CatalogEditViewTest(CatalogTest):
         self.url = reverse('api_admin:catalog-edit', kwargs={'catalog_id': self.catalog.id})
 
     @httpretty.activate
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_get(self):
         self.mock_catalog_endpoint(self.catalog.attributes, catalog_id=self.catalog.id)
         response = self.client.get(self.url)
@@ -355,7 +348,6 @@ class CatalogEditViewTest(CatalogTest):
         self.assertIn(self.catalog.name, response.content.decode('utf-8'))
 
     @httpretty.activate
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_delete(self):
         self.mock_catalog_endpoint(
             self.catalog.attributes,
@@ -372,7 +364,6 @@ class CatalogEditViewTest(CatalogTest):
         self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
 
     @httpretty.activate
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_edit(self):
         self.mock_catalog_endpoint(self.catalog.attributes, method=httpretty.PATCH, catalog_id=self.catalog.id)
         new_attributes = dict(self.catalog.attributes, **{'delete-catalog': 'off', 'name': 'changed'})
@@ -381,7 +372,6 @@ class CatalogEditViewTest(CatalogTest):
         self.assertRedirects(response, reverse('api_admin:catalog-edit', kwargs={'catalog_id': self.catalog.id}))
 
     @httpretty.activate
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_edit_invalid(self):
         self.mock_catalog_endpoint(self.catalog.attributes, catalog_id=self.catalog.id)
         new_attributes = dict(self.catalog.attributes, **{'delete-catalog': 'off', 'name': ''})
@@ -401,7 +391,6 @@ class CatalogPreviewViewTest(CatalogTest):
         self.url = reverse('api_admin:catalog-preview')
 
     @httpretty.activate
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_get(self):
         data = {'count': 1, 'results': ['test data'], 'next': None, 'prev': None}
         httpretty.register_uri(
@@ -414,7 +403,6 @@ class CatalogPreviewViewTest(CatalogTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content), data)
 
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_get_without_query(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)

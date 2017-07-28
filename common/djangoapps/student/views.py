@@ -208,11 +208,8 @@ def index(request, extra_context=None, user=AnonymousUser()):
     # Insert additional context for use in the template
     context.update(extra_context)
 
-    # Add marketable programs to the context if the multi-tenant programs switch is enabled.
-    if waffle.switch_is_active('get-multitenant-programs'):
-        programs_list = get_programs_with_type(request.site, include_hidden=False)
-
-    context['programs_list'] = programs_list
+    # Add marketable programs to the context.
+    context['programs_list'] = get_programs_with_type(request.site, include_hidden=False)
 
     return render_to_response('index.html', context)
 
