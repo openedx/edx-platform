@@ -8,15 +8,16 @@
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@v2.0.8#egg=xblock-ooyala==2.0.8
 -e git+https://github.com/edx-solutions/xblock-group-project.git@6a68ea09478e49e796ee4c0a985018ec4257b7d7#egg=xblock-group-project
 -e git+https://github.com/edx-solutions/xblock-adventure.git@7bdeb62b1055377dc04a7b503f7eea8264f5847b#egg=xblock-adventure
--e git+https://github.com/open-craft/xblock-poll.git@copy-change-patch#egg=xblock-poll
+# This is currently using a custom branch: https://github.com/open-craft/xblock-poll/tree/copy-change-patch
+-e git+https://github.com/open-craft/xblock-poll.git@3a06ef4782f9f90d6a8594c4eb4a84a277182fb8#egg=xblock-poll
 -e git+https://github.com/edx/edx-notifications.git@0.6.0#egg=edx-notifications==0.6.0
 -e git+https://github.com/open-craft/problem-builder.git@fa1bcb6ac4216beda6c96b0d8539e87cea805f7e#egg=xblock-problem-builder
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/open-craft/xblock-chat.git@4e1ec8b4778377288577fdb4208460a1bbb0cceb#egg=xblock-chat
 -e git+https://github.com/open-craft/xblock-eoc-journal.git@60b2b4913e80c64f373d35dfb4993bc63f0609a4#egg=xblock-eoc-journal
 -e git+https://github.com/raccoongang/edx_xblock_scorm.git#egg=edx_xblock_scorm
+-e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@1df2a4f8de4d947ff2dd67ca716b02373b45e44a#egg=xblock-diagnostic-feedback
 git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.2#egg=xblock-group-project-v2
-git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.1#egg=xblock-diagnostic-feedback==0.2.1
 git+https://github.com/edx-solutions/api-integration.git@v1.2.0#egg=api-integration==1.2.0
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.1.5#egg=organizations-edx-platform-extensions==1.1.5
 git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.1.0#egg=gradebook-edx-platform-extensions==1.1.0
