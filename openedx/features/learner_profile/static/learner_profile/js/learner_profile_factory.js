@@ -131,7 +131,17 @@
                     options: options.language_options,
                     helpMessage: '',
                     persistChanges: true
+                }),
+
+                new FieldsView.ReadonlyFieldView({
+                    title: gettext('Joined'),
+                    titleVisible: true,
+                    model: accountSettingsModel,
+                    screenReaderTitle: gettext('Joined Date'),
+                    valueAttribute: 'date_joined',
+                    helpMessage: '',
                 })
+
             ];
 
             sectionTwoFieldViews = [
