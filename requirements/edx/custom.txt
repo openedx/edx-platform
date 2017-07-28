@@ -14,13 +14,13 @@
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/open-craft/xblock-chat.git@4e1ec8b4778377288577fdb4208460a1bbb0cceb#egg=xblock-chat
 -e git+https://github.com/open-craft/xblock-eoc-journal.git@60b2b4913e80c64f373d35dfb4993bc63f0609a4#egg=xblock-eoc-journal
+-e git+https://github.com/raccoongang/edx_xblock_scorm.git#egg=edx_xblock_scorm
 git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.2#egg=xblock-group-project-v2
 git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.1#egg=xblock-diagnostic-feedback==0.2.1
-git+https://github.com/edx-solutions/api-integration.git@v1.1.12#egg=api-integration==1.1.12
-git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.1.4#egg=organizations-edx-platform-extensions==1.1.4
-git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.0.9#egg=gradebook-edx-platform-extensions==1.0.9
+git+https://github.com/edx-solutions/api-integration.git@v1.2.0#egg=api-integration==1.2.0
+git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.1.5#egg=organizations-edx-platform-extensions==1.1.5
+git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.1.0#egg=gradebook-edx-platform-extensions==1.1.0
 git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.0.9#egg=projects-edx-platform-extensions==1.0.9
-git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.0.6#egg=discussion-edx-platform-extensions==1.0.6
+git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.0.8#egg=discussion-edx-platform-extensions==1.0.8
 git+https://github.com/edx-solutions/course-edx-platform-extensions.git@v1.0.3#egg=course-edx-platform-extensions==1.0.3
-git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@1.0.3#egg=progress-edx-platform-extensions==1.0.3
--e git+https://github.com/raccoongang/edx_xblock_scorm.git#egg=edx_xblock_scorm
+git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@1.0.4#egg=progress-edx-platform-extensions==1.0.4
