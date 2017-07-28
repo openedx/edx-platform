@@ -2392,7 +2392,7 @@ class MakoTemplateLinter(BaseLinter):
         contexts = [{'index': 0, 'type': 'html'}]
         javascript_types = [
             'text/javascript', 'text/ecmascript', 'application/ecmascript', 'application/javascript',
-            'text/x-mathjax-config', 'json/xblock-args'
+            'text/x-mathjax-config', 'json/xblock-args', 'application/json',
         ]
         html_types = ['text/template']
         for context in contexts_re.finditer(mako_template):
