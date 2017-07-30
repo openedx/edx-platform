@@ -58,5 +58,8 @@ setup(
             "milestones = lms.djangoapps.course_api.blocks.transformers.milestones:MilestonesAndSpecialExamsTransformer",
             "grades = lms.djangoapps.grades.transformer:GradesTransformer",
         ],
+        "openedx.ace.policy": [
+            "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout"
+        ],
     }
 )

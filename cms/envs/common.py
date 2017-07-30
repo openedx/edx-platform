@@ -1067,6 +1067,9 @@ INSTALLED_APPS = [
     # Waffle related utilities
     'openedx.core.djangoapps.waffle_utils',
 
+    # Dynamic schedules
+    'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
+
     # DRF filters
     'django_filters',
 ]

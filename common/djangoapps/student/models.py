@@ -50,9 +50,12 @@ import lms.lib.comment_client as cc
 import request_cache
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
+from courseware.models import DynamicUpgradeDeadlineConfiguration, CourseDynamicUpgradeDeadlineConfiguration
 from enrollment.api import _default_course_mode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.schedules.models import ScheduleConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 from track import contexts
 from util.milestones_helpers import is_entrance_exams_enabled
@@ -1715,7 +1718,11 @@ class CourseEnrollment(models.Model):
             return None
 
         try:
-            if self.schedule:
+            schedule_driven_deadlines_enabled = (
+                DynamicUpgradeDeadlineConfiguration.is_enabled()
+                or CourseDynamicUpgradeDeadlineConfiguration.is_enabled(self.course_id)
+            )
+            if schedule_driven_deadlines_enabled and self.schedule and self.schedule.upgrade_deadline is not None:
                 log.debug(
                     'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
                     self.id, self.schedule.id

@@ -398,5 +398,5 @@ class CourseDynamicUpgradeDeadlineConfiguration(ConfigurationModel):
     )
     opt_out = models.BooleanField(
         default=False,
-        help_text=_('Disable the dynamic upgrade deadline for this course run.')
+        help_text=_('This does not do anything and is no longer used. Setting enabled=False has the same effect.')
     )

@@ -25,3 +25,9 @@ class ScheduleAdmin(admin.ModelAdmin):
         qs = super(ScheduleAdmin, self).get_queryset(request)
         qs = qs.select_related('enrollment', 'enrollment__user')
         return qs
+
+
+@admin.register(models.ScheduleConfig)
+class ScheduleConfigAdmin(admin.ModelAdmin):
+    search_fields = ('site',)
+    list_display = ('site', 'create_schedules', 'enqueue_recurring_nudge', 'deliver_recurring_nudge')

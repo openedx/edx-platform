@@ -126,7 +126,9 @@ class CourseEnrollmentFactory(DjangoModelFactory):
         model = CourseEnrollment
 
     user = factory.SubFactory(UserFactory)
-    course_id = CourseKey.from_string('edX/toy/2012_Fall')
+    course = factory.SubFactory(
+        'openedx.core.djangoapps.content.course_overviews.tests.factories.CourseOverviewFactory',
+    )
 
 
 class CourseAccessRoleFactory(DjangoModelFactory):
