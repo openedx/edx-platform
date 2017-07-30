@@ -1,0 +1,78 @@
+
+
+Running migrations: source /edx/app/edxapp/edxapp_env && paver update_db --settings devstack_docker
+
+Current Design:
+* A single Sailthru template per email type (verified upgrade reminder, weekly update)
+* The Sailthru template will basically just be a shell, with almost everything passed in as variables, it will just define the HTML skeleton for the message:
+    - template_content: the main body of the message
+    - template_from: the human readable "From:" name for the email
+    - template_subject: the subject of the message
+    - template_preview_text: the preview text to inject at the top of the template
+* Those vars are defined per user and pushed into a dictionary that maps user email addresses to a dict that contains each of those keys and their corresponding values
+  Example:
+        {
+            'user@example.com': {
+                'template_from': 'Python for Beginners Course Team',
+                'template_subject': 'Upgrade today!',
+                'template_content': 'Hi user!<br/>This is some enrollment-specific <b>html</b> content.',
+                'template_preview_text': 'Some preview text',
+            },
+            'hnor@example.com': {
+                'template_from': 'Python for Beginners Course Team',
+                'template_subject': 'Upgrade today!',
+                'template_content': 'Hi honor!<br/>This is some enrollment-specific <b>html</b> content.',
+                'template_preview_text': 'Some preview text',
+            },
+        }
+* This dictionary is constructed in each celery task for a batch of users.
+* The celery task sends the emails for each user using an EmailService (Sailthru, django email backend etc).
+* The management command queries the database to identify the templates that need to be sent to each user for that date.
+* The date can be passed in as a parameter if you need to re-process a day for whatever reason.
+
+TODO
+* create sailthru templates
+* course ids and asset ids in URLs do not have their "+" signs escaped
+* accessible email template
+* get docker devstack to run LMS workers
+* respect bulk email opt-out
+* bulk fetch course metadata for each celery task (course overviews and course modes)
+* how does this relate to lms/djangoapps/email_marketing? and bulk_email?
+* handle courses that don't have a verified mode
+* use read replica database instead of the live database
+* from address
+* allow configuration to change the type of BatchEmail object created (sailthru vs. django vs. ???)
+* what to do about white label?
+* SECURITY - is it safe to allow translators to write strings that are processed by jinja2?
+* analytics - how can we analyze behavior on a per-course basis?
+* user can configure their time zone?
+
+
+Scheduled emails
+
+Conditions
+- <n> days before enrollment verification deadline
+- <n> days after enrollment schedule start
+
+Email
+- template (jinja2? sailthru?)
+- context (dict with a bunch of enrollment-specific vars)
+  - user_username
+  - user_full_name
+  - user_email
+  - user_schedule_start_date
+  - course_id
+  - course_title
+  - course_home_url
+  - course_forum_url
+  - verified_upgrade_deadline
+  - verified_seat_price
+  - verified_upgrade_purchase_url
+
+  - function: call_to_action_button(url, text)
+  - function: link(url, text)
+  - function: days_until(date)
+  - function: days_after(date)
+
+
+Jenkins -> management command -> celery task -> Sailthru
