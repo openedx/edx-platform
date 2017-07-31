@@ -20,7 +20,7 @@ from lazy import lazy
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from coursewarehistoryextended.fields import UnsignedBigIntAutoField
+from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
 from eventtracking import tracker
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 from request_cache import get_cache
@@ -693,7 +693,7 @@ class PersistentSubsectionGradeOverride(models.Model):
     class Meta(object):
         app_label = "grades"
 
-    grade = models.OneToOneField(PersistentSubsectionGrade, related_name='override')
+    grade = UnsignedBigIntOneToOneField(PersistentSubsectionGrade, related_name='override')
 
     # Created/modified timestamps prevent race-conditions when using with async rescoring tasks
     created = models.DateTimeField(auto_now_add=True, db_index=True)
