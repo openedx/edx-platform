@@ -520,16 +520,16 @@
         }
 
         &.button-oa2-azuread-oauth2 {
-            color: darken($microsoft-blue, 20%);
+            color: $microsoft-black;
 
             .icon {
-                background: $microsoft-blue;
+                background: $microsoft-black;
             }
 
             &:hover,
             &:focus {
-                background-color: $microsoft-blue;
-                border: 1px solid $microsoft-blue;
+                background-color: $microsoft-black;
+                border: 1px solid $microsoft-black;
                 color: $white;
             }
         }

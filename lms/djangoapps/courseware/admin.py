@@ -1,13 +1,10 @@
-'''
-django admin pages for courseware model
-'''
-
+from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
 from ratelimitbackend import admin
 
-from courseware.models import OfflineComputedGrade, OfflineComputedGradeLog, StudentModule
+from courseware import models
 
-admin.site.register(StudentModule)
-
-admin.site.register(OfflineComputedGrade)
-
-admin.site.register(OfflineComputedGradeLog)
+admin.site.register(models.DynamicUpgradeDeadlineConfiguration, ConfigurationModelAdmin)
+admin.site.register(models.OfflineComputedGrade)
+admin.site.register(models.OfflineComputedGradeLog)
+admin.site.register(models.CourseDynamicUpgradeDeadlineConfiguration, KeyedConfigurationModelAdmin)
+admin.site.register(models.StudentModule)
