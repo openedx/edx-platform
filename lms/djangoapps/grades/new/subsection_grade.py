@@ -81,9 +81,11 @@ class ZeroSubsectionGrade(SubsectionGradeBase):
         ):
             block = self.course_data.structure[block_key]
             if getattr(block, 'has_score', False):
-                locations[block_key] = get_score(
+                problem_score = get_score(
                     submissions_scores={}, csm_scores={}, persisted_block=None, block=block,
                 )
+                if problem_score is not None:
+                    locations[block_key] = problem_score
         return locations
 
 
