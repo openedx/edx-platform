@@ -98,7 +98,8 @@ class GradesService(object):
                 course_id=unicode(course_key),
                 usage_id=unicode(usage_key),
                 only_if_higher=False,
-                expected_modified=to_timestamp(override.modified),
+                expected_modified_time=to_timestamp(override.modified),
+                score_deleted=True,
                 event_transaction_id=unicode(event_transaction_id),
                 event_transaction_type=SUBSECTION_RESCORE_EVENT_TYPE,
                 score_db_table=ScoreDatabaseTableEnum.overrides
@@ -133,7 +134,7 @@ class GradesService(object):
                 usage_id=unicode(usage_key),
                 only_if_higher=False,
                 # Not used when score_deleted=True:
-                expected_modified=to_timestamp(datetime.now().replace(tzinfo=pytz.UTC)),
+                expected_modified_time=to_timestamp(datetime.now().replace(tzinfo=pytz.UTC)),
                 score_deleted=True,
                 event_transaction_id=unicode(event_transaction_id),
                 event_transaction_type=SUBSECTION_RESCORE_EVENT_TYPE,
