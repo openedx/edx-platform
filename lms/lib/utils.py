@@ -28,3 +28,19 @@ def get_parent_unit(xblock):
         if parent.category == "vertical" and grandparent.category == "sequential":
             return parent
         xblock = parent
+
+
+def is_unit(xblock):
+    """
+    Checks whether the xblock is a unit.
+
+    Get_parent_unit() returns None if the current xblock either does
+    not have a parent unit or is itself a unit.
+    To make sure that get_parent_unit() isn't returning None because
+    the xblock is an orphan, we check that the xblock has a parent.
+
+    Returns:
+        True if the xblock is itself a unit, False otherwise.
+    """
+
+    return get_parent_unit(xblock) is None and xblock.get_parent()

@@ -582,9 +582,6 @@ TEMPLATES = [
 ]
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 
-# The template used to render a web fragment as a standalone page
-STANDALONE_FRAGMENT_VIEW_TEMPLATE = 'fragment-view-chromeless.html'
-
 ###############################################################################################
 
 # use the ratelimit backend to prevent brute force attacks
@@ -1967,6 +1964,7 @@ YOUTUBE = {
 YOUTUBE_API_KEY = None
 
 ################################### APPS ######################################
+
 INSTALLED_APPS = (
     # Standard ones that are always installed...
     'django.contrib.auth',

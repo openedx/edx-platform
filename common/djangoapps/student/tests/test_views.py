@@ -18,7 +18,7 @@ from pyquery import PyQuery as pq
 
 from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
-from student.models import CourseEnrollment, LogoutViewConfiguration, UserProfile
+from student.models import CourseEnrollment, UserProfile
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -126,7 +126,6 @@ class LogoutTests(TestCase):
         super(LogoutTests, self).setUp()
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=PASSWORD)
-        LogoutViewConfiguration.objects.create(enabled=True)
 
     def create_oauth_client(self):
         """ Creates a trusted OAuth client. """
@@ -170,20 +169,6 @@ class LogoutTests(TestCase):
         url = '{}?{}'.format(reverse('logout'), 'redirect_url=/courses')
         response = self.client.get(url)
         self.assertRedirects(response, '/courses', fetch_redirect_response=False)
-
-    def test_switch_default(self):
-        """ Verify the IDA logout functionality is disabled if the associated switch is disabled. """
-        LogoutViewConfiguration.objects.create(enabled=False)
-        oauth_client = self.create_oauth_client()
-        self.authenticate_with_oauth(oauth_client)
-        self.assert_logout_redirects_to_root()
-
-    def test_switch_with_redirect_url(self):
-        """ Verify the IDA logout functionality is disabled if the associated switch is disabled. """
-        LogoutViewConfiguration.objects.create(enabled=False)
-        oauth_client = self.create_oauth_client()
-        self.authenticate_with_oauth(oauth_client)
-        self.assert_logout_redirects_with_target()
 
     def test_without_session_value(self):
         """ Verify logout works even if the session does not contain an entry with

@@ -28,6 +28,8 @@ PYTHON_REQ_FILES = [
     'requirements/edx/local.txt',
     'requirements/edx/base.txt',
     'requirements/edx/paver.txt',
+    'requirements/edx/development.txt',
+    'requirements/edx/testing.txt',
     'requirements/edx/post.txt',
 ]
 

@@ -319,7 +319,7 @@ class BaseGroupConfigurationsTest(ContainerBase):
     CHOOSE_ONE = "Select a group type"
     CONTENT_GROUP_PARTITION = XBlockVisibilityEditorView.CONTENT_GROUP_PARTITION
     ENROLLMENT_TRACK_PARTITION = XBlockVisibilityEditorView.ENROLLMENT_TRACK_PARTITION
-    MISSING_GROUP_LABEL = 'Deleted Group\nThis group no longer exists. Choose another group or do not restrict access to this component.'
+    MISSING_GROUP_LABEL = 'Deleted Group\nThis group no longer exists. Choose another group or remove the access restriction.'
     VALIDATION_ERROR_LABEL = 'This component has validation issues.'
     VALIDATION_ERROR_MESSAGE = "Error:\nThis component's access settings refer to deleted or invalid groups."
     GROUP_VISIBILITY_MESSAGE = 'Access to some content in this unit is restricted to specific groups of learners.'

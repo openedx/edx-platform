@@ -10,7 +10,7 @@ LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
 LOGGING['loggers']['tracking']['handlers'] = ['console']
 
 LMS_BASE = 'edx.devstack.lms:18000'
-CMS_BASE = 'edx.devstack.cms:18010'
+CMS_BASE = 'edx.devstack.studio:18010'
 LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 
 

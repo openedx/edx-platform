@@ -185,7 +185,7 @@
 
     .user-dropdown, .dropdown {
       font-size: $body-font-size;
-      padding: 0 ($baseline/2);
+      padding: ($baseline/4) ($baseline/2);
       color: $base-font-color;
       border: none;
       background: $white;
