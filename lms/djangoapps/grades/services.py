@@ -99,7 +99,7 @@ class GradesService(object):
                 usage_id=unicode(usage_key),
                 only_if_higher=False,
                 expected_modified_time=to_timestamp(override.modified),
-                score_deleted=True,
+                score_deleted=False,
                 event_transaction_id=unicode(event_transaction_id),
                 event_transaction_type=SUBSECTION_RESCORE_EVENT_TYPE,
                 score_db_table=ScoreDatabaseTableEnum.overrides
