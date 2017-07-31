@@ -18,6 +18,7 @@ try:
 except ImportError:
     dog_stats_api = None
 from pytz import utc
+from django.utils.encoding import smart_text
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.inputtypes import Status
@@ -700,7 +701,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         content = {
             'name': self.display_name_with_default,
-            'html': html,
+            'html': smart_text(html),
             'weight': self.weight,
         }
 
