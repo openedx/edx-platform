@@ -4,9 +4,11 @@ from datetime import datetime
 from freezegun import freeze_time
 from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
 from lms.djangoapps.grades.services import GradesService, _get_key
+from lms.djangoapps.grades.signals.handlers import SUBSECTION_RESCORE_EVENT_TYPE
 from mock import patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from student.tests.factories import UserFactory
+from util.date_utils import to_timestamp
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -35,11 +37,18 @@ class GradesServiceTests(ModuleStoreTestCase):
             earned_graded=5.0,
             possible_graded=5.0
         )
-        self.patcher = patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.apply_async')
-        self.mock_recalculate = self.patcher.start()
+        self.recalc_patcher = patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.apply_async')
+        self.mock_recalculate = self.recalc_patcher.start()
+        self.id_patcher = patch('lms.djangoapps.grades.services.create_new_event_transaction_id')
+        self.mock_create_id = self.id_patcher.start()
+        self.mock_create_id.return_value = 1
+        self.type_patcher = patch('lms.djangoapps.grades.services.set_event_transaction_type')
+        self.mock_set_type = self.type_patcher.start()
 
     def tearDown(self):
-        self.patcher.stop()
+        self.recalc_patcher.stop()
+        self.id_patcher.stop()
+        self.type_patcher.stop()
 
     def subsection_grade_to_dict(self, grade):
         return {
@@ -153,14 +162,19 @@ class GradesServiceTests(ModuleStoreTestCase):
         self.assertEqual(override_obj.earned_all_override, override['earned_all'])
         self.assertEqual(override_obj.earned_graded_override, override['earned_graded'])
 
-        self.mock_recalculate.called_with(
-            sender=None,
-            user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            usage_id=unicode(self.subsection.location),
-            only_if_higher=False,
-            expected_modified=override_obj.modified,
-            score_db_table=ScoreDatabaseTableEnum.overrides
+        self.assertDictEqual(
+            self.mock_recalculate.call_args[1]['kwargs'],
+            dict(
+                user_id=self.user.id,
+                course_id=unicode(self.course.id),
+                usage_id=unicode(self.subsection.location),
+                only_if_higher=False,
+                expected_modified_time=to_timestamp(override_obj.modified),
+                score_deleted=False,
+                event_transaction_id=unicode(self.mock_create_id.return_value),
+                event_transaction_type=SUBSECTION_RESCORE_EVENT_TYPE,
+                score_db_table=ScoreDatabaseTableEnum.overrides
+            )
         )
 
     @freeze_time('2017-01-01')
@@ -176,15 +190,19 @@ class GradesServiceTests(ModuleStoreTestCase):
         override = self.service.get_subsection_grade_override(self.user.id, self.course.id, self.subsection.location)
         self.assertIsNone(override)
 
-        self.mock_recalculate.called_with(
-            sender=None,
-            user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            usage_id=unicode(self.subsection.location),
-            only_if_higher=False,
-            expected_modified=datetime.now().replace(tzinfo=pytz.UTC),
-            score_deleted=True,
-            score_db_table=ScoreDatabaseTableEnum.overrides
+        self.assertDictEqual(
+            self.mock_recalculate.call_args[1]['kwargs'],
+            dict(
+                user_id=self.user.id,
+                course_id=unicode(self.course.id),
+                usage_id=unicode(self.subsection.location),
+                only_if_higher=False,
+                expected_modified_time=to_timestamp(datetime.now().replace(tzinfo=pytz.UTC)),
+                score_deleted=True,
+                event_transaction_id=unicode(self.mock_create_id.return_value),
+                event_transaction_type=SUBSECTION_RESCORE_EVENT_TYPE,
+                score_db_table=ScoreDatabaseTableEnum.overrides
+            )
         )
 
     @ddt.data(
