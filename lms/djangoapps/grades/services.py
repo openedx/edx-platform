@@ -8,7 +8,6 @@ from util.date_utils import to_timestamp
 
 from .constants import ScoreDatabaseTableEnum
 from .models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
-from .signals.handlers import SUBSECTION_RESCORE_EVENT_TYPE
 
 
 def _get_key(key_or_id, key_cls):
@@ -69,7 +68,9 @@ class GradesService(object):
         Fires off a recalculate_subsection_grade async task to update the PersistentSubsectionGrade table. Will not
         override earned_all or earned_graded value if they are None. Both default to None.
         """
-        from .tasks import recalculate_subsection_grade_v3  # prevent circular import
+        # prevent circular imports:
+        from .signals.handlers import SUBSECTION_RESCORE_EVENT_TYPE
+        from .tasks import recalculate_subsection_grade_v3
 
         course_key = _get_key(course_key_or_id, CourseKey)
         usage_key = _get_key(usage_key_or_id, UsageKey)
@@ -111,7 +112,9 @@ class GradesService(object):
         Fires off a recalculate_subsection_grade async task to update the PersistentSubsectionGrade table. If the
         override does not exist, no error is raised, it just triggers the recalculation.
         """
-        from .tasks import recalculate_subsection_grade_v3  # prevent circular import
+        # prevent circular imports:
+        from .signals.handlers import SUBSECTION_RESCORE_EVENT_TYPE
+        from .tasks import recalculate_subsection_grade_v3
 
         course_key = _get_key(course_key_or_id, CourseKey)
         usage_key = _get_key(usage_key_or_id, UsageKey)
