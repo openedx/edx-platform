@@ -3,10 +3,12 @@ from datetime import datetime
 import pytz
 
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 from util.date_utils import to_timestamp
 
 from .constants import ScoreDatabaseTableEnum
 from .models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
+from .signals.handlers import SUBSECTION_RESCORE_EVENT_TYPE
 
 
 def _get_key(key_or_id, key_cls):
@@ -87,6 +89,8 @@ class GradesService(object):
 
         # Recalculation will call PersistentSubsectionGrade.update_or_create_grade which will use the above override
         # to update the grade before writing to the table.
+        event_transaction_id = create_new_event_transaction_id()
+        set_event_transaction_type(SUBSECTION_RESCORE_EVENT_TYPE)
         recalculate_subsection_grade_v3.apply_async(
             kwargs=dict(
                 user_id=user_id,
@@ -94,6 +98,8 @@ class GradesService(object):
                 usage_id=unicode(usage_key),
                 only_if_higher=False,
                 expected_modified=to_timestamp(override.modified),
+                event_transaction_id=unicode(event_transaction_id),
+                event_transaction_type=SUBSECTION_RESCORE_EVENT_TYPE,
                 score_db_table=ScoreDatabaseTableEnum.overrides
             )
         )
@@ -115,6 +121,8 @@ class GradesService(object):
         if override is not None:
             override.delete()
 
+        event_transaction_id = create_new_event_transaction_id()
+        set_event_transaction_type(SUBSECTION_RESCORE_EVENT_TYPE)
         recalculate_subsection_grade_v3.apply_async(
             kwargs=dict(
                 user_id=user_id,
@@ -124,6 +132,8 @@ class GradesService(object):
                 # Not used when score_deleted=True:
                 expected_modified=to_timestamp(datetime.now().replace(tzinfo=pytz.UTC)),
                 score_deleted=True,
+                event_transaction_id=unicode(event_transaction_id),
+                event_transaction_type=SUBSECTION_RESCORE_EVENT_TYPE,
                 score_db_table=ScoreDatabaseTableEnum.overrides
             )
         )

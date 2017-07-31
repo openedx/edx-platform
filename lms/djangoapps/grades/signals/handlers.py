@@ -38,6 +38,7 @@ log = getLogger(__name__)
 # define values to be used in grading events
 GRADES_RESCORE_EVENT_TYPE = 'edx.grades.problem.rescored'
 PROBLEM_SUBMITTED_EVENT_TYPE = 'edx.grades.problem.submitted'
+SUBSECTION_RESCORE_EVENT_TYPE = 'edx.grades.subsection.rescored'
 
 
 @receiver(score_set)
@@ -288,6 +289,19 @@ def _emit_event(kwargs):
                 'new_weighted_possible': kwargs.get('weighted_possible'),
                 'only_if_higher': kwargs.get('only_if_higher'),
                 'instructor_id': unicode(instructor_id),
+                'event_transaction_id': unicode(get_event_transaction_id()),
+                'event_transaction_type': unicode(root_type),
+            }
+        )
+
+    if root_type in [SUBSECTION_RESCORE_EVENT_TYPE]:
+        tracker.emit(
+            unicode(SUBSECTION_RESCORE_EVENT_TYPE),
+            {
+                'course_id': unicode(kwargs['course_id']),
+                'user_id': unicode(kwargs['user_id']),
+                'problem_id': unicode(kwargs['usage_id']),
+                'only_if_higher': kwargs.get('only_if_higher'),
                 'event_transaction_id': unicode(get_event_transaction_id()),
                 'event_transaction_type': unicode(root_type),
             }
