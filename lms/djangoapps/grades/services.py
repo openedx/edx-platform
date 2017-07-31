@@ -3,6 +3,7 @@ from datetime import datetime
 import pytz
 
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from util.date_utils import to_timestamp
 
 from .constants import ScoreDatabaseTableEnum
 from .models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
@@ -92,7 +93,7 @@ class GradesService(object):
             course_id=unicode(course_key),
             usage_id=unicode(usage_key),
             only_if_higher=False,
-            expeected_modified=override.modified,
+            expected_modified=to_timestamp(override.modified),
             score_db_table=ScoreDatabaseTableEnum.overrides
         )
 
