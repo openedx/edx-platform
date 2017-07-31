@@ -10,6 +10,14 @@ class HijackableUserAdmin(UserAdmin, HijackUserAdminMixin):
         'hijack_field',
     )
 
+
+class AlternativeDomainAdmin(admin.ModelAdmin):
+    list_display = (
+        'domain',
+        'site'
+    )
+
+
 admin.site.unregister(User)
 admin.site.register(User, HijackableUserAdmin)
-admin.site.register(AlternativeDomain)
+admin.site.register(AlternativeDomain, AlternativeDomainAdmin)

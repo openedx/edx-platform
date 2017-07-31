@@ -2,11 +2,11 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.files.storage import DefaultStorage, get_storage_class
-from django.db import transaction
 from rest_framework import generics, views, viewsets
 from rest_framework import status
+from rest_framework.generics import CreateAPIView
 from rest_framework.parsers import MultiPartParser
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -17,11 +17,10 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
 )
 
-from organizations.models import Organization
-
+from .models import AlternativeDomain
 from .permissions import AMCAdminPermission
-from .serializers import SiteConfigurationSerializer, SiteConfigurationListSerializer, SiteSerializer,\
-    RegistrationSerializer
+from .serializers import SiteConfigurationSerializer, SiteConfigurationListSerializer, SiteSerializer, \
+    RegistrationSerializer, AlternativeDomainSerializer
 from .utils import delete_site
 
 
@@ -103,3 +102,26 @@ class DomainAvailabilityView(APIView):
         except Site.DoesNotExist:
             return Response(None, status=status.HTTP_404_NOT_FOUND)
 
+
+class DomainRevertView(APIView):
+    def post(self, request, format=None):
+        site_id = request.data.get('id')
+        if site_id:
+            return Response("Site ID needed", status=status.HTTP_400_BAD_REQUEST)
+        try:
+            site = Site.objects.get(id=site_id)
+            if not site.alternative_domain:
+                return Response("Site {} does not have a custom domain".format(site.domain),
+                                status=status.HTTP_404_NOT_FOUND)
+            site.alternative_domain.switch_with_active()
+            return Response(status=status.HTTP_200_OK)
+        except Site.DoesNotExist:
+            return Response("The site with ID {} does not exist".format(site_id),
+                            status=status.HTTP_404_NOT_FOUND)
+
+
+class CustomDomainView(CreateAPIView):
+    authentication_classes = []
+    permission_classes = (AllowAny,)
+    queryset = AlternativeDomain.objects.all()
+    serializer_class = AlternativeDomainSerializer

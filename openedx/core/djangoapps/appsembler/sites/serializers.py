@@ -4,8 +4,10 @@ from opaque_keys.edx.locator import CourseLocator
 from rest_framework import serializers
 from organizations import api as organizations_api
 from organizations.models import Organization
+
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.appsembler.sites.tasks import clone_course
+from .models import AlternativeDomain
 from .utils import sass_to_dict, dict_to_sass, bootstrap_site
 
 
@@ -120,3 +122,23 @@ class RegistrationSerializer(serializers.Serializer):
             'password': 'hashed',
             'initial_values': initial_values,
         }
+
+
+class AlternativeDomainSerializer(serializers.ModelSerializer):
+    site = serializers.PrimaryKeyRelatedField(queryset=Site.objects.all())
+
+    class Meta:
+        model = AlternativeDomain
+        fields = ('id', 'site', 'domain')
+
+    def create(self, validated_data):
+        """
+        Allow only one alternative domain per Site model.
+        """
+        domain, created = AlternativeDomain.objects.get_or_create(
+            site=validated_data.get('site', None),
+            defaults={'domain': validated_data.get('domain', None)})
+        if not created:
+            domain.domain = validated_data.get('domain', None)
+            domain.save()
+        return domain
