@@ -75,6 +75,7 @@ class CourseOverview(TimeStampedModel):
     has_any_active_web_certificate = BooleanField(default=False)
     cert_name_short = TextField()
     cert_name_long = TextField()
+    certificate_available_date = DateTimeField(default=None, null=True)
 
     # Grading
     lowest_passing_grade = DecimalField(max_digits=5, decimal_places=2, null=True)
@@ -172,6 +173,7 @@ class CourseOverview(TimeStampedModel):
         course_overview.has_any_active_web_certificate = (get_active_web_certificate(course) is not None)
         course_overview.cert_name_short = course.cert_name_short
         course_overview.cert_name_long = course.cert_name_long
+        course_overview.certificate_available_date = course.certificate_available_date
         course_overview.lowest_passing_grade = lowest_passing_grade
         course_overview.end_of_course_survey_url = course.end_of_course_survey_url
 
@@ -476,7 +478,8 @@ class CourseOverview(TimeStampedModel):
         return course_metadata_utils.may_certify_for_course(
             self.certificates_display_behavior,
             self.certificates_show_before_end,
-            self.has_ended()
+            self.has_ended(),
+            self.certificate_available_date
         )
 
     @property

@@ -67,6 +67,7 @@ from django.utils.http import urlquote_plus
                                 <h4 class="hd hd-4 title">${certificate_data.title}</h4>
                                 <p class="copy">${certificate_data.msg}</p>
                             </div>
+                            %if certificate_data.may_view_certificate:
                             <div class="msg-actions">
                                 %if certificate_data.cert_web_view_url:
                                 <a class="btn" href="${certificate_data.cert_web_view_url}" target="_blank">${_("View Certificate")} <span class="sr">${_("Opens in a new browser window")}</span></a>
@@ -76,6 +77,7 @@ from django.utils.http import urlquote_plus
                                 <button class="btn generate_certs" data-endpoint="${post_url}" id="btn_generate_cert">${_('Request Certificate')}</button>
                                 %endif
                             </div>
+                            %endif
                         </div>
                     </div>
                     %endif

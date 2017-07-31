@@ -93,7 +93,12 @@ def course_start_date_is_default(start, advertised_start):
     return advertised_start is None and start == DEFAULT_START_DATE
 
 
-def may_certify_for_course(certificates_display_behavior, certificates_show_before_end, has_ended):
+def may_certify_for_course(
+        certificates_display_behavior,
+        certificates_show_before_end,
+        has_ended,
+        certificate_available_date
+):
     """
     Returns whether it is acceptable to show the student a certificate download
     link for a course.
@@ -105,12 +110,24 @@ def may_certify_for_course(certificates_display_behavior, certificates_show_befo
         certificates_show_before_end (bool): whether user can download the
             course's certificates before the course has ended.
         has_ended (bool): Whether the course has ended.
+        certificate_available_date (datetime): the date the certificate is available on for the course.
     """
     show_early = (
         certificates_display_behavior in ('early_with_info', 'early_no_info')
         or certificates_show_before_end
     )
-    return show_early or has_ended
+    past_availability_date = (
+        certificate_available_date
+        and certificate_available_date < datetime.now(utc)
+    )
+
+    if show_early:
+        return True
+    if past_availability_date:
+        return True
+    if (certificate_available_date is None) and has_ended:
+        return True
+    return False
 
 
 def sorting_score(start, advertised_start, announcement):
