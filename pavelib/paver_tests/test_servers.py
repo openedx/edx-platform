@@ -5,6 +5,7 @@ from paver.easy import call_task
 
 from ..utils.envs import Env
 from .utils import PaverTestCase
+from mock import Mock, MagicMock, patch
 
 EXPECTED_COFFEE_COMMAND = (
     u"node_modules/.bin/coffee --compile `find {platform_root}/lms "
@@ -48,16 +49,27 @@ EXPECTED_PRINT_SETTINGS_COMMAND = [
 EXPECTED_WEBPACK_COMMAND = (
     u"NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack"
 )
+RCYNC_FIRST_COMMAND = (
+    u'python manage.py lms --settings={} print_settings STATIC_ROOT_BASE --format=value 2>/dev/null'
+)
+RCYNC_SECOND_COMMAND = (
+    u'python manage.py lms --settings={} print_settings EDX_PLATFORM_STATIC_ROOT_BASE --format=value 2>/dev/null'
+)
+
+
+get_static_collector_root_mock = Mock()
+get_static_collector_root_mock.return_value = Env.STATIC_COLLECTOR_ROOT_TEST
 
 
 @ddt.ddt
+@patch('pavelib.assets.get_static_collector_root', get_static_collector_root_mock)
 class TestPaverServerTasks(PaverTestCase):
     """
     Test the Paver server tasks.
     """
     @ddt.data(
         [{}],
-        [{"settings": "aws"}],
+        [{"settings": "static_collector"}],
         [{"asset-settings": "test_static_optimized"}],
         [{"settings": "devstack_optimized", "asset-settings": "test_static_optimized"}],
         [{"fast": True}],
@@ -68,11 +80,16 @@ class TestPaverServerTasks(PaverTestCase):
         """
         Test the "devstack" task.
         """
-        self.verify_server_task("lms", options)
+        if 'settings' in options or ('optimized' in options and 'fast' not in options):
+            rsync_output = True
+        else:
+            rsync_output = False
+
+        self.verify_server_task("lms", options, rsync_output=rsync_output)
 
     @ddt.data(
         [{}],
-        [{"settings": "aws"}],
+        [{"settings": "static_collector"}],
         [{"asset-settings": "test_static_optimized"}],
         [{"settings": "devstack_optimized", "asset-settings": "test_static_optimized"}],
         [{"fast": True}],
@@ -83,11 +100,16 @@ class TestPaverServerTasks(PaverTestCase):
         """
         Test the "devstack" task.
         """
-        self.verify_server_task("studio", options)
+        if 'settings' in options or ('optimized' in options and 'fast' not in options):
+            rsync_output = True
+        else:
+            rsync_output = False
+
+        self.verify_server_task("studio", options, rsync_output=rsync_output)
 
     @ddt.data(
         [{}],
-        [{"settings": "aws"}],
+        [{"settings": "static_collector"}],
         [{"asset-settings": "test_static_optimized"}],
         [{"settings": "devstack_optimized", "asset-settings": "test_static_optimized"}],
         [{"fast": True}],
@@ -101,6 +123,10 @@ class TestPaverServerTasks(PaverTestCase):
         Test the "devstack" task.
         """
         options = server_options.copy()
+        if 'settings' in options or('optimized' in options and 'fast' not in options):
+            rsync_output = True
+        else:
+            rsync_output = False
         is_optimized = options.get("optimized", False)
         expected_settings = "devstack_optimized" if is_optimized else options.get("settings", Env.DEVSTACK_SETTINGS)
 
@@ -112,7 +138,7 @@ class TestPaverServerTasks(PaverTestCase):
                 settings=expected_settings,
             )
         ]
-        self.verify_server_task("devstack", options, contracts_default=True)
+        self.verify_server_task("devstack", options, contracts_default=True, rsync_output=rsync_output)
 
         # Then test with Studio
         options["system"] = "cms"
@@ -122,11 +148,11 @@ class TestPaverServerTasks(PaverTestCase):
                 settings=expected_settings,
             )
         ]
-        self.verify_server_task("devstack", options, contracts_default=True)
+        self.verify_server_task("devstack", options, contracts_default=True, rsync_output=rsync_output)
 
     @ddt.data(
         [{}],
-        [{"settings": "aws"}],
+        [{"settings": "static_collector"}],
         [{"asset_settings": "test_static_optimized"}],
         [{"settings": "devstack_optimized", "asset-settings": "test_static_optimized"}],
         [{"fast": True}],
@@ -142,7 +168,7 @@ class TestPaverServerTasks(PaverTestCase):
 
     @ddt.data(
         [{}],
-        [{"settings": "aws"}],
+        [{"settings": "static_collector"}],
     )
     @ddt.unpack
     def test_celery(self, options):
@@ -155,7 +181,7 @@ class TestPaverServerTasks(PaverTestCase):
 
     @ddt.data(
         [{}],
-        [{"settings": "aws"}],
+        [{"settings": "static_collector"}],
     )
     @ddt.unpack
     def test_update_db(self, options):
@@ -176,9 +202,9 @@ class TestPaverServerTasks(PaverTestCase):
 
     @ddt.data(
         ["lms", {}],
-        ["lms", {"settings": "aws"}],
+        ["lms", {"settings": "static_collector"}],
         ["cms", {}],
-        ["cms", {"settings": "aws"}],
+        ["cms", {"settings": "static_collector"}],
     )
     @ddt.unpack
     def test_check_settings(self, system, options):
@@ -197,7 +223,7 @@ class TestPaverServerTasks(PaverTestCase):
             ]
         )
 
-    def verify_server_task(self, task_name, options, contracts_default=False):
+    def verify_server_task(self, task_name, options, contracts_default=False, rsync_output=False):
         """
         Verify the output of a server task.
         """
@@ -257,9 +283,32 @@ class TestPaverServerTasks(PaverTestCase):
             settings=expected_settings,
             port=port,
         )
+
+        if rsync_output:
+            if 'asset-settings' in options:
+                settings = options['asset-settings']
+            elif 'settings' in options:
+                settings = options['settings']
+            elif 'optimized' in options and options['optimized'] is True:
+                settings = 'test_static_optimized'
+            else:
+                settings = 'static_collector'
+
+            first = RCYNC_FIRST_COMMAND.format(settings)
+            second = RCYNC_SECOND_COMMAND.format(settings)
+
+            expected_messages.append(first)
+            expected_messages.append(second)
+            if system == 'lms':
+                expected_messages.append(first)
+                expected_messages.append(second)
+                expected_messages.append(first)
+                expected_messages.append(second)
+
         if not no_contracts:
             expected_run_server_command += " --contracts"
         expected_messages.append(expected_run_server_command)
+
         self.assertEquals(self.task_messages, expected_messages)
 
     def verify_run_all_servers_task(self, options):

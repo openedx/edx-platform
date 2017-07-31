@@ -73,7 +73,9 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         super(CommonCertificatesTestCase, self).setUp()
         self.client = Client()
         self.course = CourseFactory.create(
-           org='testorg', number='run1', display_name='refundable course'
+            org='testorg',
+            number='run1',
+            display_name='refundable course'
         )
         self.course_id = self.course.location.course_key
         self.user = UserFactory.create(

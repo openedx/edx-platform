@@ -4,7 +4,7 @@ import os
 from unittest import TestCase
 
 import ddt
-from mock import patch
+from mock import Mock, MagicMock, patch
 from paver.easy import call_task, path
 from watchdog.observers.polling import PollingObserver
 
@@ -12,6 +12,9 @@ from pavelib.assets import COLLECTSTATIC_LOG_DIR_ARG, collect_assets
 
 from ..utils.envs import Env
 from .utils import PaverTestCase
+from django.conf import settings
+
+settings.configure()
 
 ROOT_PATH = path(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 TEST_THEME = ROOT_PATH / "common/test/test-theme"  # pylint: disable=invalid-name
@@ -310,13 +313,17 @@ class TestUpdateAssetsTask(PaverTestCase):
         """
         Scoped test that only looks at what is passed to the collecstatic options
         """
-        cmd_args = options.get("cmd_args", [""])
-        expected_substring = options.get("expected_substring", None)
-        call_task('pavelib.assets.update_assets', args=cmd_args)
-        self.assertTrue(
-            self._is_substring_in_list(self.task_messages, expected_substring),
-            msg="{substring} not found in messages".format(substring=expected_substring)
-        )
+        with patch('django.conf.settings', settings):
+            with patch('os.environ.setdefault', MagicMock()) as magic_mock:
+                with patch('pavelib.assets.get_static_collector_root', Mock()) as mock:
+                    mock.return_value = Env.STATIC_COLLECTOR_ROOT_TEST
+                    cmd_args = options.get("cmd_args", [""])
+                    expected_substring = options.get("expected_substring", None)
+                    call_task('pavelib.assets.update_assets', args=cmd_args)
+                    self.assertTrue(
+                        self._is_substring_in_list(self.task_messages, expected_substring),
+                        msg="{substring} not found in messages".format(substring=expected_substring)
+                    )
 
     def _is_substring_in_list(self, messages_list, expected_substring):
         """
