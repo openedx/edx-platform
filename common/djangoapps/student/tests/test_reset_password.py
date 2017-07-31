@@ -13,6 +13,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
 from django.utils.http import int_to_base36
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from mock import Mock, patch
@@ -286,6 +287,35 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         # the user is not marked as active.
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(User.objects.get(pk=self.user.pk).is_active)
+
+    @override_settings(PASSWORD_MIN_LENGTH=2)
+    @override_settings(PASSWORD_MAX_LENGTH=10)
+    @ddt.data(
+        {
+            'password': '1',
+            'error_message': 'Password: Invalid Length (must be 2 characters or more)',
+        },
+        {
+            'password': '01234567891',
+            'error_message': 'Password: Invalid Length (must be 10 characters or fewer)'
+        }
+    )
+    def test_password_reset_with_invalid_length(self, password_dict):
+        """Tests that if we provide password characters less then PASSWORD_MIN_LENGTH,
+        or more than PASSWORD_MAX_LENGTH, password reset will fail with error message.
+        """
+
+        url = reverse(
+            'password_reset_confirm',
+            kwargs={'uidb36': self.uidb36, 'token': self.token}
+        )
+        request_params = {'new_password1': password_dict['password'], 'new_password2': password_dict['password']}
+        confirm_request = self.request_factory.post(url, data=request_params)
+
+        # Make a password reset request with minimum/maximum passwords characters.
+        response = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
+
+        self.assertEqual(response.context_data['err_msg'], password_dict['error_message'])
 
     @patch('student.views.password_reset_confirm')
     @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
