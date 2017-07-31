@@ -1,1 +1,76 @@
-* -text
+# based on https://github.com/alexkaratarakis/gitattributes
+
+## Default
+* text=auto   eol=lf
+
+## Python Binary files
+*.db     binary
+*.p      binary
+*.pkl    binary
+*.pyc    binary
+*.pyd    binary
+*.pyo    binary
+
+## GRAPHICS
+*.ai     binary
+*.bmp    binary
+*.eps    binary
+*.gif    binary
+*.ico    binary
+*.jng    binary
+*.jp2    binary
+*.jpg    binary
+*.jpeg   binary
+*.jpx    binary
+*.jxr    binary
+*.pdf    binary
+*.png    binary
+*.psb    binary
+*.psd    binary
+*.svg    binary
+*.svgz   binary
+*.tif    binary
+*.tiff   binary
+*.wbmp   binary
+*.webp   binary
+
+## VIDEO
+*.3gpp   binary
+*.3gp    binary
+*.as     binary
+*.asf    binary
+*.asx    binary
+*.fla    binary
+*.flv    binary
+*.m4v    binary
+*.mng    binary
+*.mov    binary
+*.mp4    binary
+*.mpeg   binary
+*.mpg    binary
+*.ogv    binary
+*.swc    binary
+*.swf    binary
+*.webm   binary
+
+## ARCHIVES
+*.7z     binary
+*.gz     binary
+*.jar    binary
+*.rar    binary
+*.tar    binary
+*.zip    binary
+
+## Localization
+*.mo     binary
+
+## FONTS
+*.bcmap  binary
+*.ttf    binary
+*.eot    binary
+*.otf    binary
+*.woff   binary
+*.woff2  binary
+
+## Misc
+*.dat    binary
