@@ -367,23 +367,40 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         self.assertEqual(mock_read_saved_grade.called, feature_flag and course_setting)
 
 
+@ddt.ddt
 class ZeroGradeTest(GradeTestBase):
     """
     Tests ZeroCourseGrade (and, implicitly, ZeroSubsectionGrade)
     functionality.
     """
-    def test_zero(self):
+    @ddt.data(True, False)
+    def test_zero(self, assume_zero_enabled):
         """
         Creates a ZeroCourseGrade and ensures it's empty.
         """
-        course_data = CourseData(self.request.user, structure=self.course_structure)
-        chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
-        for chapter in chapter_grades:
-            for section in chapter_grades[chapter]['sections']:
-                for score in section.problem_scores.itervalues():
-                    self.assertEqual(score.earned, 0)
-                    self.assertEqual(score.first_attempted, None)
-                self.assertEqual(section.all_total.earned, 0)
+        with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=assume_zero_enabled):
+            course_data = CourseData(self.request.user, structure=self.course_structure)
+            chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
+            for chapter in chapter_grades:
+                for section in chapter_grades[chapter]['sections']:
+                    for score in section.problem_scores.itervalues():
+                        self.assertEqual(score.earned, 0)
+                        self.assertEqual(score.first_attempted, None)
+                    self.assertEqual(section.all_total.earned, 0)
+
+    @ddt.data(True, False)
+    def test_zero_null_scores(self, assume_zero_enabled):
+        """
+        Creates a zero course grade and ensures that null scores aren't included in the section problem scores.
+        """
+        with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=assume_zero_enabled):
+            with patch('lms.djangoapps.grades.new.subsection_grade.get_score', return_value=None):
+                course_data = CourseData(self.request.user, structure=self.course_structure)
+                chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
+                for chapter in chapter_grades:
+                    self.assertNotEqual({}, chapter_grades[chapter]['sections'])
+                    for section in chapter_grades[chapter]['sections']:
+                        self.assertEqual({}, section.problem_scores)
 
 
 class SubsectionGradeTest(GradeTestBase):
