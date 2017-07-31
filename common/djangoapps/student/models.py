@@ -1678,6 +1678,55 @@ class CourseEnrollment(models.Model):
                 self._course_overview = None
         return self._course_overview
 
+    @property
+    def upgrade_deadline(self):
+        """
+        Returns the upgrade deadline for this enrollment, if it is upgradeable.
+
+        If the seat cannot be upgraded, None is returned.
+
+        Note:
+            When loading this model, use `select_related` to retrieve the associated schedule object.
+
+        Returns:
+            datetime|None
+        """
+        log.debug('Schedules: Determining upgrade deadline for CourseEnrollment %d...', self.id)
+        if not CourseMode.is_mode_upgradeable(self.mode):
+            log.debug(
+                'Schedules: %s mode of %s is not upgradeable. Returning None for upgrade deadline.',
+                self.mode, self.course_id
+            )
+            return None
+
+        try:
+            if self.schedule:
+                log.debug(
+                    'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
+                    self.id, self.schedule.id
+                )
+                return self.schedule.upgrade_deadline
+        except ObjectDoesNotExist:
+            # NOTE: Schedule has a one-to-one mapping with CourseEnrollment. If no schedule is associated
+            # with this enrollment, Django will raise an exception rather than return None.
+            log.debug('Schedules: No schedule exists for CourseEnrollment %d.', self.id)
+            pass
+
+        try:
+            verified_mode = CourseMode.verified_mode_for_course(self.course_id)
+
+            if verified_mode:
+                log.debug('Schedules: Defaulting to verified mode expiration date-time for %s.', self.course_id)
+                return verified_mode.expiration_datetime
+            else:
+                log.debug('Schedules: No verified mode located for %s.', self.course_id)
+        except CourseMode.DoesNotExist:
+            log.debug('Schedules: %s has no verified mode.', self.course_id)
+            pass
+
+        log.debug('Schedules: Returning default of `None`')
+        return None
+
     def is_verified_enrollment(self):
         """
         Check the course enrollment mode is verified or not

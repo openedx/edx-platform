@@ -1,17 +1,24 @@
 # pylint: disable=missing-docstring
 
+import datetime
 import hashlib
 
+import ddt
+import pytz
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.db.models.functions import Lower
 
+from course_modes.models import CourseMode
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import CourseEnrollment
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseModeFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@ddt.ddt
 class CourseEnrollmentTests(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
@@ -20,8 +27,8 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
 
     def setUp(self):
         super(CourseEnrollmentTests, self).setUp()
-        self.user = UserFactory.create()
-        self.user_2 = UserFactory.create()
+        self.user = UserFactory()
+        self.user_2 = UserFactory()
 
     def test_enrollment_status_hash_cache_key(self):
         username = 'test-user'
@@ -103,3 +110,25 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
             CourseEnrollment.objects.users_enrolled_in(self.course.id, include_inactive=True)
         )
         self.assertListEqual([self.user, self.user_2], all_enrolled_users)
+
+    @skip_unless_lms
+    def test_upgrade_deadline(self):
+        """ The property should use either the CourseMode or related Schedule to determine the deadline. """
+        course_mode = CourseModeFactory(
+            course_id=self.course.id,
+            mode_slug=CourseMode.VERIFIED,
+            expiration_datetime=datetime.datetime.now(pytz.UTC)
+        )
+        enrollment = CourseEnrollmentFactory(course_id=self.course.id, mode=CourseMode.AUDIT)
+        self.assertEqual(enrollment.upgrade_deadline, course_mode.expiration_datetime)
+
+        # The schedule's upgrade deadline should be used if a schedule exists
+        schedule = ScheduleFactory(enrollment=enrollment)
+        self.assertEqual(enrollment.upgrade_deadline, schedule.upgrade_deadline)
+
+    @skip_unless_lms
+    @ddt.data(*(set(CourseMode.ALL_MODES) - set(CourseMode.AUDIT_MODES)))
+    def test_upgrade_deadline_for_non_upgradeable_enrollment(self, mode):
+        """ The property should return None if an upgrade cannot be upgraded. """
+        enrollment = CourseEnrollmentFactory(course_id=self.course.id, mode=mode)
+        self.assertIsNone(enrollment.upgrade_deadline)
