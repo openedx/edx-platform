@@ -103,10 +103,10 @@ class DomainAvailabilityView(APIView):
             return Response(None, status=status.HTTP_404_NOT_FOUND)
 
 
-class DomainRevertView(APIView):
+class DomainSwitchView(APIView):
     def post(self, request, format=None):
-        site_id = request.data.get('id')
-        if site_id:
+        site_id = request.data.get('site')
+        if not site_id:
             return Response("Site ID needed", status=status.HTTP_400_BAD_REQUEST)
         try:
             site = Site.objects.get(id=site_id)
@@ -121,7 +121,5 @@ class DomainRevertView(APIView):
 
 
 class CustomDomainView(CreateAPIView):
-    authentication_classes = []
-    permission_classes = (AllowAny,)
     queryset = AlternativeDomain.objects.all()
     serializer_class = AlternativeDomainSerializer
