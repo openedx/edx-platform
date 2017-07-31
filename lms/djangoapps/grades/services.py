@@ -88,13 +88,14 @@ class GradesService(object):
         # Recalculation will call PersistentSubsectionGrade.update_or_create_grade which will use the above override
         # to update the grade before writing to the table.
         recalculate_subsection_grade_v3.apply_async(
-            sender=None,
-            user_id=user_id,
-            course_id=unicode(course_key),
-            usage_id=unicode(usage_key),
-            only_if_higher=False,
-            expected_modified=to_timestamp(override.modified),
-            score_db_table=ScoreDatabaseTableEnum.overrides
+            kwargs=dict(
+                user_id=user_id,
+                course_id=unicode(course_key),
+                usage_id=unicode(usage_key),
+                only_if_higher=False,
+                expected_modified=to_timestamp(override.modified),
+                score_db_table=ScoreDatabaseTableEnum.overrides
+            )
         )
 
     def undo_override_subsection_grade(self, user_id, course_key_or_id, usage_key_or_id):
@@ -115,12 +116,14 @@ class GradesService(object):
             override.delete()
 
         recalculate_subsection_grade_v3.apply_async(
-            sender=None,
-            user_id=user_id,
-            course_id=unicode(course_key),
-            usage_id=unicode(usage_key),
-            only_if_higher=False,
-            expected_modified=datetime.now().replace(tzinfo=pytz.UTC),  # Not used when score_deleted=True
-            score_deleted=True,
-            score_db_table=ScoreDatabaseTableEnum.overrides
+            kwargs=dict(
+                user_id=user_id,
+                course_id=unicode(course_key),
+                usage_id=unicode(usage_key),
+                only_if_higher=False,
+                # Not used when score_deleted=True:
+                expected_modified=to_timestamp(datetime.now().replace(tzinfo=pytz.UTC)),
+                score_deleted=True,
+                score_db_table=ScoreDatabaseTableEnum.overrides
+            )
         )
