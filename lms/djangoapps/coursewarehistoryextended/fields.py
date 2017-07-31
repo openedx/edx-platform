@@ -23,3 +23,13 @@ class UnsignedBigIntAutoField(AutoField):
             return "BIGSERIAL"
         else:
             return None
+
+    def rel_db_type(self, connection):
+        if connection.settings_dict['ENGINE'] == 'django.db.backends.mysql':
+            return "bigint UNSIGNED"
+        elif connection.settings_dict['ENGINE'] == 'django.db.backends.sqlite3':
+            return "integer"
+        elif connection.settings_dict['ENGINE'] == 'django.db.backends.postgresql_psycopg2':
+            return "BIGSERIAL"
+        else:
+            return None
