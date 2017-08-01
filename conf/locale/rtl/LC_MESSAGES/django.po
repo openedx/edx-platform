@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-07-20 11:48+0000\n"
-"PO-Revision-Date: 2017-07-20 11:48:32.252217\n"
+"POT-Creation-Date: 2017-08-01 21:22+0000\n"
+"PO-Revision-Date: 2017-08-01 21:22:49.685108\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -261,6 +261,28 @@ msgstr ""
 #: common/djangoapps/course_modes/models.py
 msgid "Verified modes cannot be free."
 msgstr "دثقهبهثي وخيثس ذشررخف زث بقثث."
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This will look like '$50', where {currency_symbol} is a symbol
+#. such as '$' and {price} is a
+#. numerical amount in that currency. Adjust this display as needed for your
+#. language.
+#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
+#. Translators: currency_symbol is a symbol indicating type of currency, ex
+#. "$".
+#. This string would look like this when all variables are in:
+#. "$500.00"
+#: common/djangoapps/course_modes/models.py
+#: lms/templates/shoppingcart/shopping_cart.html
+#, python-brace-format
+msgid "{currency_symbol}{price}"
+msgstr "{currency_symbol}{price}"
+
+#. Translators: This refers to the cost of the course. In this case, the
+#. course costs nothing so it is free.
+#: common/djangoapps/course_modes/models.py
+msgid "Free"
+msgstr "بقثث"
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -2258,6 +2280,8 @@ msgstr ""
 #: lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
+#: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Submit"
 msgstr "سعزوهف"
@@ -2904,6 +2928,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 #: lms/templates/courseware/info.html
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Course Handouts"
 msgstr "ذخعقسث اشريخعفس"
 
@@ -5814,6 +5839,16 @@ msgstr ""
 "فاهس فغحث خب ذخوحخرثرف ذشررخف زث ساخصر صاهمث دهثصهرل فاث ذخعقسث شس ش "
 "سحثذهبهذ سفعيثرف."
 
+#: lms/djangoapps/courseware/models.py
+msgid ""
+"Number of days a learner has to upgrade after content is made available"
+msgstr ""
+"رعوزثق خب يشغس ش مثشقرثق اشس فخ عحلقشيث شبفثق ذخرفثرف هس وشيث شدشهمشزمث"
+
+#: lms/djangoapps/courseware/models.py
+msgid "Disable the dynamic upgrade deadline for this course run."
+msgstr "يهسشزمث فاث يغرشوهذ عحلقشيث يثشيمهرث بخق فاهس ذخعقسث قعر."
+
 #: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
 msgid "Syllabus"
 msgstr "سغممشزعس"
@@ -5854,28 +5889,6 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 msgid "Enroll now"
 msgstr "ثرقخمم رخص"
-
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This will look like '$50', where {currency_symbol} is a symbol
-#. such as '$' and {price} is a
-#. numerical amount in that currency. Adjust this display as needed for your
-#. language.
-#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-#. Translators: currency_symbol is a symbol indicating type of currency, ex
-#. "$".
-#. This string would look like this when all variables are in:
-#. "$500.00"
-#: lms/djangoapps/courseware/views/views.py
-#: lms/templates/shoppingcart/shopping_cart.html
-#, python-brace-format
-msgid "{currency_symbol}{price}"
-msgstr "{currency_symbol}{price}"
-
-#. Translators: This refers to the cost of the course. In this case, the
-#. course costs nothing so it is free.
-#: lms/djangoapps/courseware/views/views.py
-msgid "Free"
-msgstr "بقثث"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your enrollment: Audit track"
@@ -7682,8 +7695,20 @@ msgstr ""
 "ذخربهلعقشفهخرس."
 
 #: lms/djangoapps/lms_xblock/mixin.py
+msgid ""
+"This unit's access settings refer to deleted or invalid group "
+"configurations."
+msgstr ""
+"فاهس عرهف'س شذذثسس سثففهرلس قثبثق فخ يثمثفثي خق هردشمهي لقخعح "
+"ذخربهلعقشفهخرس."
+
+#: lms/djangoapps/lms_xblock/mixin.py
 msgid "This component's access settings refer to deleted or invalid groups."
 msgstr "فاهس ذخوحخرثرف'س شذذثسس سثففهرلس قثبثق فخ يثمثفثي خق هردشمهي لقخعحس."
+
+#: lms/djangoapps/lms_xblock/mixin.py
+msgid "This unit's access settings refer to deleted or invalid groups."
+msgstr "فاهس عرهف'س شذذثسس سثففهرلس قثبثق فخ يثمثفثي خق هردشمهي لقخعحس."
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -9753,6 +9778,8 @@ msgstr ""
 #: lms/templates/courseware/courses.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/edxnotes/edxnotes.html
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: openedx/features/course_search/templates/course_search/course-search-fragment.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/stanford-style/lms/templates/index.html
 msgid "Search"
@@ -10329,6 +10356,25 @@ msgstr "حشفا عسثي فخ ذخرسفقعذف عقمس فخ حقخلقشوس
 msgid "Enable course home page improvements."
 msgstr "ثرشزمث ذخعقسث اخوث حشلث هوحقخدثوثرفس."
 
+#: openedx/core/djangoapps/theming/views.py
+#, python-brace-format
+msgid "Site theme changed to {site_theme}"
+msgstr "سهفث فاثوث ذاشرلثي فخ {site_theme}"
+
+#: openedx/core/djangoapps/theming/views.py
+#, python-brace-format
+msgid "Theme {site_theme} does not exist"
+msgstr "فاثوث {site_theme} يخثس رخف ثطهسف"
+
+#: openedx/core/djangoapps/theming/views.py
+msgid "Site theme reverted to the default"
+msgstr "سهفث فاثوث قثدثقفثي فخ فاث يثبشعمف"
+
+#: openedx/core/djangoapps/theming/views.py
+#: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
+msgid "Theming Administration"
+msgstr "فاثوهرل شيوهرهسفقشفهخر"
+
 #: openedx/core/djangoapps/user_api/accounts/api.py
 #, python-brace-format
 msgid "The '{field_name}' field cannot be edited."
@@ -10575,6 +10621,11 @@ msgstr "غخع وعسف شلقثث فخ فاث {platform_name} {terms_of_service
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Review the Terms of Service"
 msgstr "قثدهثص فاث فثقوس خب سثقدهذث"
+
+#: openedx/core/djangoapps/util/user_messages.py
+#, python-brace-format
+msgid "{header_open}{title}{header_close}{body}"
+msgstr "{header_open}{title}{header_close}{body}"
 
 #: openedx/core/djangoapps/verified_track_content/models.py
 msgid "The course key for the course we would like to be auto-cohorted."
@@ -11345,6 +11396,7 @@ msgstr "ذخرفثرف"
 #: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "Loading"
 msgstr "مخشيهرل"
 
@@ -11360,6 +11412,16 @@ msgstr "سثففهرلس"
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "ذخعقسث رعوزثق"
+
+#: cms/templates/course_outline.html
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Course Outline"
+msgstr "ذخعقسث خعفمهرث"
+
+#: cms/templates/course_outline.html cms/templates/index.html
+#: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
+msgid "Dismiss"
+msgstr "يهسوهسس"
 
 #: cms/templates/course_outline.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -11478,11 +11540,14 @@ msgstr "دهثص"
 
 #: cms/templates/darklang/preview_lang.html
 #: lms/templates/darklang/preview_lang.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
 msgid "Preview Language Setting"
 msgstr "حقثدهثص مشرلعشلث سثففهرل"
 
 #: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
+#: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 msgid "Reset"
 msgstr "قثسثف"
 
@@ -11491,6 +11556,11 @@ msgstr "قثسثف"
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "مثلشم"
+
+#: cms/templates/widgets/header.html
+#: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
+msgid "Updates"
+msgstr "عحيشفثس"
 
 #: cms/templates/widgets/header.html lms/templates/navigation/navigation.html
 #: lms/templates/widgets/footer-language-selector.html
@@ -14626,6 +14696,7 @@ msgstr "{span_start}ذعققثرف سثذفهخر{span_end}"
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "due {date}"
 msgstr "يعث {date}"
 
@@ -14634,6 +14705,7 @@ msgid "{section_format} due {{date}}"
 msgstr "{section_format} يعث {{date}}"
 
 #: lms/templates/courseware/accordion.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "This content is graded"
 msgstr "فاهس ذخرفثرف هس لقشيثي"
 
@@ -14781,6 +14853,7 @@ msgstr "قثبهرث غخعق سثشقذا"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
 msgid "{course_number} Courseware"
 msgstr "{course_number} ذخعقسثصشقث"
 
@@ -14794,6 +14867,7 @@ msgid "Courseware"
 msgstr "ذخعقسثصشقث"
 
 #: lms/templates/courseware/courseware.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
 msgid "Bookmarks"
 msgstr "زخخنوشقنس"
 
@@ -14859,6 +14933,8 @@ msgid "Welcome to {org}'s {course_name}!"
 msgstr "صثمذخوث فخ {org}'س {course_name}!"
 
 #: lms/templates/courseware/info.html
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Resume Course"
 msgstr "قثسعوث ذخعقسث"
 
@@ -14875,6 +14951,7 @@ msgid "Handout Navigation"
 msgstr "اشريخعف رشدهلشفهخر"
 
 #: lms/templates/courseware/info.html
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Course Tools"
 msgstr "ذخعقسث فخخمس"
 
@@ -19504,10 +19581,12 @@ msgstr "قثفعقر فخ غخعق يشسازخشقي"
 #: lms/templates/widgets/cookie-consent.html
 msgid ""
 "This website uses cookies to ensure you get the best experience on our "
-"website."
+"website. If you continue browsing this site, we understand that you accept "
+"the use of cookies."
 msgstr ""
 "فاهس صثزسهفث عسثس ذخخنهثس فخ ثرسعقث غخع لثف فاث زثسف ثطحثقهثرذث خر خعق "
-"صثزسهفث."
+"صثزسهفث. هب غخع ذخرفهرعث زقخصسهرل فاهس سهفث, صث عريثقسفشري فاشف غخع شذذثحف "
+"فاث عسث خب ذخخنهثس."
 
 #: lms/templates/widgets/cookie-consent.html
 msgid "Got it!"
@@ -19536,6 +19615,135 @@ msgstr "ذخعقسث صهنه"
 #: lms/templates/wiki/includes/breadcrumbs.html
 msgid "Add article"
 msgstr "شيي شقفهذمث"
+
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
+msgid "Language Code"
+msgstr "مشرلعشلث ذخيث"
+
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
+msgid "For example use en for English"
+msgstr "بخق ثطشوحمث عسث ثر بخق ثرلمهسا"
+
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
+msgid "Please refresh the page to see the changes applied."
+msgstr "حمثشسث قثبقثسا فاث حشلث فخ سثث فاث ذاشرلثس شححمهثي."
+
+#: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
+msgid "Preview Theme"
+msgstr "حقثدهثص فاثوث"
+
+#: openedx/core/lib/license/templates/license.html
+msgid "All Rights Reserved"
+msgstr "شمم قهلافس قثسثقدثي"
+
+#: openedx/core/lib/license/templates/license.html
+msgid "Attribution"
+msgstr "شففقهزعفهخر"
+
+#: openedx/core/lib/license/templates/license.html
+msgid "Noncommercial"
+msgstr "رخرذخووثقذهشم"
+
+#: openedx/core/lib/license/templates/license.html
+msgid "No Derivatives"
+msgstr "رخ يثقهدشفهدثس"
+
+#: openedx/core/lib/license/templates/license.html
+msgid "Share Alike"
+msgstr "ساشقث شمهنث"
+
+#: openedx/core/lib/license/templates/license.html
+msgid "Creative Commons licensed content, with terms as follow:"
+msgstr "ذقثشفهدث ذخووخرس مهذثرسثي ذخرفثرف, صهفا فثقوس شس بخممخص:"
+
+#: openedx/core/lib/license/templates/license.html
+msgid "Some Rights Reserved"
+msgstr "سخوث قهلافس قثسثقدثي"
+
+#: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
+msgid "Important Course Dates"
+msgstr "هوحخقفشرف ذخعقسث يشفثس"
+
+#: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
+msgid "Today is {date}"
+msgstr "فخيشغ هس {date}"
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: openedx/features/course_search/templates/course_search/course-search-fragment.html
+msgid "Search the course"
+msgstr "سثشقذا فاث ذخعقسث"
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Start Course"
+msgstr "سفشقف ذخعقسث"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "{subsection_format} due {{date}}"
+msgstr "{subsection_format} يعث {{date}}"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "This is your last visited course section."
+msgstr "فاهس هس غخعق مشسف دهسهفثي ذخعقسث سثذفهخر."
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "This course has not started yet."
+msgstr "فاهس ذخعقسث اشس رخف سفشقفثي غثف."
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "We're still working on course content."
+msgstr "صث'قث سفهمم صخقنهرل خر ذخعقسث ذخرفثرف."
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid ""
+"This course has not started yet, and will launch on {launch_date_html}."
+msgstr ""
+"فاهس ذخعقسث اشس رخف سفشقفثي غثف, شري صهمم مشعرذا خر {launch_date_html}."
+
+#: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
+msgid "Reviews"
+msgstr "قثدهثصس"
+
+#: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
+msgid "This course does not have any updates."
+msgstr "فاهس ذخعقسث يخثس رخف اشدث شرغ عحيشفثس."
+
+#: openedx/features/course_search/templates/course_search/course-search-fragment.html
+msgid "Search Results"
+msgstr "سثشقذا قثسعمفس"
+
+#. Translators: this section lists all the third-party authentication
+#. providers
+#. (for example, Google and LinkedIn) the user can link with or unlink from
+#. their edX account.
+#: openedx/features/learner_profile/static/learner_profile/templates/third_party_auth.html
+msgid "Connected Accounts"
+msgstr "ذخررثذفثي شذذخعرفس"
+
+#: openedx/features/learner_profile/static/learner_profile/templates/third_party_auth.html
+msgid "Linked"
+msgstr "مهرنثي"
+
+#: openedx/features/learner_profile/static/learner_profile/templates/third_party_auth.html
+msgid "Not Linked"
+msgstr "رخف مهرنثي"
+
+#. Translators: clicking on this removes the link between a user's edX account
+#. and their account with an external authentication provider (like Google or
+#. LinkedIn).
+#: openedx/features/learner_profile/static/learner_profile/templates/third_party_auth.html
+msgid "Unlink"
+msgstr "عرمهرن"
+
+#. Translators: clicking on this creates a link between a user's edX account
+#. and their account with an external authentication provider (like Google or
+#. LinkedIn).
+#: openedx/features/learner_profile/static/learner_profile/templates/third_party_auth.html
+msgid "Link"
+msgstr "مهرن"
+
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Learner Profile"
+msgstr "مثشقرثق حقخبهمث"
 
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid ""
@@ -20316,10 +20524,6 @@ msgstr ""
 "قثسحخري فخ سفعيثرف ضعثسفهخرس. غخع شيي خق ثيهف عحيشفثس هر افوم."
 
 #: cms/templates/course_outline.html
-msgid "Course Outline"
-msgstr "ذخعقسث خعفمهرث"
-
-#: cms/templates/course_outline.html
 msgid ""
 "This course was created as a re-run. Some manual configuration is needed."
 msgstr ""
@@ -20336,10 +20540,6 @@ msgstr ""
 "سعقث فخ قثدهثص شري قثسثف شمم يشفثس, هرذمعيهرل فاث ذخعقسث سفشقف يشفث; سثف عح "
 "فاث ذخعقسث فثشو; قثدهثص ذخعقسث عحيشفثس شري خفاثق شسسثفس بخق يشفثي وشفثقهشم; "
 "شري سثثي فاث يهسذعسسهخرس شري صهنه."
-
-#: cms/templates/course_outline.html cms/templates/index.html
-msgid "Dismiss"
-msgstr "يهسوهسس"
 
 #: cms/templates/course_outline.html
 msgid "Warning"
@@ -22432,6 +22632,14 @@ msgid "Course End Time"
 msgstr "ذخعقسث ثري فهوث"
 
 #: cms/templates/settings.html
+msgid "Certificates Available Date"
+msgstr "ذثقفهبهذشفثس شدشهمشزمث يشفث"
+
+#: cms/templates/settings.html
+msgid "By default, 48 hours after course end date"
+msgstr "زغ يثبشعمف, 48 اخعقس شبفثق ذخعقسث ثري يشفث"
+
+#: cms/templates/settings.html
 msgid "Enrollment Start Date"
 msgstr "ثرقخمموثرف سفشقف يشفث"
 
@@ -23122,6 +23330,14 @@ msgstr "شذذثسس هس رخف قثسفقهذفثي"
 
 #: cms/templates/visibility_editor.html
 msgid ""
+"Access to this unit is not restricted, but visibility might be affected by "
+"inherited settings."
+msgstr ""
+"شذذثسس فخ فاهس عرهف هس رخف قثسفقهذفثي, زعف دهسهزهمهفغ وهلاف زث شببثذفثي زغ "
+"هراثقهفثي سثففهرلس."
+
+#: cms/templates/visibility_editor.html
+msgid ""
 "Access to this component is not restricted, but visibility might be affected"
 " by inherited settings."
 msgstr ""
@@ -23130,11 +23346,25 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid ""
+"You can restrict access to this unit to learners in specific enrollment "
+"tracks or content groups."
+msgstr ""
+"غخع ذشر قثسفقهذف شذذثسس فخ فاهس عرهف فخ مثشقرثقس هر سحثذهبهذ ثرقخمموثرف "
+"فقشذنس خق ذخرفثرف لقخعحس."
+
+#: cms/templates/visibility_editor.html
+msgid ""
 "You can restrict access to this component to learners in specific enrollment"
 " tracks or content groups."
 msgstr ""
 "غخع ذشر قثسفقهذف شذذثسس فخ فاهس ذخوحخرثرف فخ مثشقرثقس هر سحثذهبهذ ثرقخمموثرف"
 " فقشذنس خق ذخرفثرف لقخعحس."
+
+#: cms/templates/visibility_editor.html
+msgid ""
+"You can restrict access to this unit to learners in specific content groups."
+msgstr ""
+"غخع ذشر قثسفقهذف شذذثسس فخ فاهس عرهف فخ مثشقرثقس هر سحثذهبهذ ذخرفثرف لقخعحس."
 
 #: cms/templates/visibility_editor.html
 msgid ""
@@ -23182,11 +23412,11 @@ msgstr "سثمثذف خرث خق وخقث لقخعحس:"
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"This group no longer exists. Choose another group or do not restrict access "
-"to this component."
+"This group no longer exists.  Choose another group or remove the access "
+"restriction."
 msgstr ""
-"فاهس لقخعح رخ مخرلثق ثطهسفس. ذاخخسث شرخفاثق لقخعح خق يخ رخف قثسفقهذف شذذثسس "
-"فخ فاهس ذخوحخرثرف."
+"فاهس لقخعح رخ مخرلثق ثطهسفس.  ذاخخسث شرخفاثق لقخعح خق قثوخدث فاث شذذثسس "
+"قثسفقهذفهخر."
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
@@ -23355,10 +23585,6 @@ msgstr "ذخعقسث رشدهلشفهخر"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "خعفمهرث"
-
-#: cms/templates/widgets/header.html
-msgid "Updates"
-msgstr "عحيشفثس"
 
 #: cms/templates/widgets/header.html
 msgid "Import"
