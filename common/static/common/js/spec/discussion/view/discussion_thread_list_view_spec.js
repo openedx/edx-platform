@@ -585,11 +585,16 @@
 
             it('makes correct ajax calls', function() {
                 $.ajax.and.callFake(function(params) {
-                    expect(params.data.username).toEqual('testing-username');
-                    expect(params.url.path()).toEqual(DiscussionUtil.urlFor('users'));
-                    params.success({
-                        users: []
-                    }, 'success');
+                    if (params.data.text) {
+                        expect(params.data.text).toEqual('testing-username');
+                        expect(params.url.path()).toEqual(DiscussionUtil.urlFor('search'));
+                    } else if (params.data.username) {
+                        expect(params.data.username).toEqual('testing-username');
+                        expect(params.url.path()).toEqual(DiscussionUtil.urlFor('users'));
+                        params.success({
+                            users: []
+                        }, 'success');
+                    }
                     return {
                         always: function() {
                         }
@@ -621,11 +626,11 @@
             };
 
             it('gets called after a thread search succeeds', function() {
-                spyOn(this.view, 'searchForUser').and.callThrough();
+                spyOn(this.view, 'searchFor').and.callThrough();
                 setAjaxResults(true, []);
-                this.view.searchFor('gizmo');
-                expect(this.view.searchForUser).toHaveBeenCalled();
-                return expect($.ajax.calls.mostRecent().args[0].data.username).toEqual('gizmo');
+                this.view.searchForUser('gizmo');
+                expect(this.view.searchFor).toHaveBeenCalled();
+                return expect($.ajax.calls.mostRecent().args[0].data.text).toEqual('gizmo');
             });
 
             it('does not get called after a thread search fails', function() {
@@ -637,24 +642,31 @@
 
             it('adds a search alert when an username was matched', function() {
                 spyOn(this.view, 'addSearchAlert');
-                setAjaxResults(true, [
-                    {
-                        username: 'gizmo',
-                        id: '1'
-                    }
-                ]);
+                $.ajax.and.callFake(function(params) {
+                    params.success({
+                        users: [{
+                            username: 'gizmo',
+                            id: '1'
+                        }]}, 'success');
+                    return {
+                        always: function() {
+                        }
+                    };
+                });
                 this.view.searchForUser('dummy');
                 expect($.ajax).toHaveBeenCalled();
                 expect(this.view.addSearchAlert).toHaveBeenCalled();
                 return expect(this.view.addSearchAlert.calls.mostRecent().args[0]).toMatch(/gizmo/);
             });
 
-            it('does not add a search alert when no username was matched', function() {
+            it('does not add a username search alert when no username was matched', function() {
                 spyOn(this.view, 'addSearchAlert');
                 setAjaxResults(true, []);
                 this.view.searchForUser('dummy');
                 expect($.ajax).toHaveBeenCalled();
-                return expect(this.view.addSearchAlert).not.toHaveBeenCalled();
+                expect(this.view.addSearchAlert).toHaveBeenCalled();
+                expect(this.view.addSearchAlert.calls.count()).toEqual(1);
+                expect(this.view.addSearchAlert.calls.first().args[0].text).toContain('No results found');
             });
         });
 

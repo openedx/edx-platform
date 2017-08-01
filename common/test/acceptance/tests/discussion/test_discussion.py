@@ -1342,6 +1342,13 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         actual = self.page.get_search_alert_messages()
         self.assertTrue(all(map(lambda msg, sub: msg.lower().find(sub.lower()) >= 0, actual, expected)))
 
+    def check_search_alert_message_for_user(self, expected):
+        """
+        Check that the serached user has notification message.
+        """
+        actual = self.page.get_search_alert_messages()
+        self.assertEqual(actual, expected)
+
     @attr(shard=2)
     def test_no_rewrite(self):
         self.setup_corrected_text(None)
@@ -1374,13 +1381,13 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
     def test_rewrite_and_user(self):
         self.setup_corrected_text("foo")
         self.page.perform_search(self.SEARCHED_USERNAME)
-        self.check_search_alert_messages(["foo", self.SEARCHED_USERNAME])
+        self.check_search_alert_message_for_user([u'Show posts by %s.' % self.SEARCHED_USERNAME])
 
     @attr(shard=2)
     def test_user_only(self):
         self.setup_corrected_text(None)
         self.page.perform_search(self.SEARCHED_USERNAME)
-        self.check_search_alert_messages(["no posts", self.SEARCHED_USERNAME])
+        self.check_search_alert_message_for_user([u'Show posts by %s.' % self.SEARCHED_USERNAME])
         # make sure clicking the link leads to the user profile page
         UserProfileViewFixture([]).push()
         self.page.get_search_alert_links().first.click()
