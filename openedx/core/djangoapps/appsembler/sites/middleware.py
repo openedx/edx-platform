@@ -20,7 +20,7 @@ class RedirectMiddleware(object):
                 lambda p: p in request.path,
                 settings.MAIN_SITE_REDIRECT_WHITELIST))
             if (site.id == settings.SITE_ID) and not in_whitelist:
-                return redirect(settings.AMC_APP_URL)
+                return redirect("https://appsembler.com/tahoe/")
         except Exception:
             # I'm not entirely sure this middleware get's called only in LMS or in other apps as well.
             # Soooo just in case
