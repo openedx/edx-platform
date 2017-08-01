@@ -23,12 +23,18 @@ define(['js/views/baseview', 'jquery', 'js/views/edit_textbook', 'js/views/show_
                                 view = new ShowTextbookView({model: textbook});
                             }
                             that.$el.append(view.render().el);
+                            that.listenTo(textbook, 'add_textbook', that.addTextbook);
                         });
                     }
                     return this;
                 },
                 events: {
                     'click .new-button': 'addOne'
+                },
+                addTextbook: function(model) {
+                    if (!this.collection.get(model.cid)) {
+                        this.collection.add(model);
+                    }
                 },
                 addOne: function(e) {
                     var $sectionEl, $inputEl;
