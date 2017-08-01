@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-07-20 11:47+0000\n"
-"PO-Revision-Date: 2017-07-20 11:48:32.711353\n"
+"POT-Creation-Date: 2017-08-01 21:22+0000\n"
+"PO-Revision-Date: 2017-08-01 21:22:50.339993\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5829,6 +5829,13 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: cms/static/js/models/settings/course_details.js
+msgid ""
+"The certificate available date must be later than the enrollment start date."
+msgstr ""
+"Thé çértïfïçäté äväïläßlé däté müst ßé lätér thän thé énröllmént stärt däté."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: cms/static/js/models/settings/course_details.js
 msgid "The enrollment start date cannot be after the enrollment end date."
 msgstr ""
 "Thé énröllmént stärt däté çännöt ßé äftér thé énröllmént énd däté. Ⱡ'σяєм "
@@ -5921,6 +5928,11 @@ msgstr ""
 #: lms/templates/student_account/institution_register.underscore
 msgid "or"
 msgstr "ör Ⱡ'σя#"
+
+#: cms/static/js/models/xblock_validation.js
+msgid "This unit has validation issues."
+msgstr ""
+"Thïs ünït häs välïdätïön ïssüés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: cms/static/js/models/xblock_validation.js
 msgid "This component has validation issues."
