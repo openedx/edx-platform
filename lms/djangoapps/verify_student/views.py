@@ -520,8 +520,7 @@ class PayAndVerifyView(View):
 
         # Redirect if necessary, otherwise implicitly return None
         if url is not None:
-            if waffle.switch_is_active('add-utm-params'):
-                url = self.add_utm_params_to_url(url)
+            url = self.add_utm_params_to_url(url)
             return redirect(url)
 
     def _get_paid_mode(self, course_key):
