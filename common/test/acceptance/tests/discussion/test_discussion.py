@@ -1226,6 +1226,7 @@ class DiscussionUserProfileTest(UniqueCourseTest):
         self.profiled_user_id = self.setup_user(username=self.PROFILED_USERNAME)
         # now create a second user who will view the profile.
         self.user_id = self.setup_user()
+        UserProfileViewFixture([]).push()
 
     def setup_course(self):
         """

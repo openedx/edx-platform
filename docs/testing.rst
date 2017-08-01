@@ -437,14 +437,14 @@ To test only a certain feature, specify the file and the testcase class.
 
 ::
 
-    paver test_bokchoy -t studio/test_studio_bad_data.py:BadComponentTest
+    paver test_bokchoy -t studio/test_studio_bad_data.py::BadComponentTest
 
 To execute only a certain test case, specify the file name, class, and
 test case method.
 
 ::
 
-    paver test_bokchoy -t lms/test_lms.py:RegistrationTest.test_register
+    paver test_bokchoy -t lms/test_lms.py::RegistrationTest::test_register
 
 During acceptance test execution, log files and also screenshots of
 failed tests are captured in test\_root/log.
@@ -454,7 +454,7 @@ If you check this in, your tests will hang on jenkins.
 
 ::
 
-    from nose.tools import set_trace; set_trace()
+    import pdb; pdb.set_trace()
 
 By default, all bokchoy tests are run with the 'split' ModuleStore. To
 override the modulestore that is used, use the default\_store option.
@@ -506,7 +506,7 @@ relative to the ``common/test/acceptance/tests`` directory. This is an example f
 
 ::
 
-    paver test_a11y -t lms/test_lms_dashboard.py:LmsDashboardA11yTest.test_dashboard_course_listings_a11y
+    paver test_a11y -t lms/test_lms_dashboard.py::LmsDashboardA11yTest::test_dashboard_course_listings_a11y
 
 **Coverage**:
 
@@ -644,7 +644,7 @@ Running Tests on Paver Scripts
 
 To run tests on the scripts that power the various Paver commands, use the following command::
 
-  nosetests paver
+  nosetests pavelib
 
 
 Testing internationalization with dummy translations
