@@ -23,6 +23,7 @@ from course_modes.models import CourseMode
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.features.enterprise_support import api as enterprise_api
 from student.models import CourseEnrollment
@@ -151,6 +152,13 @@ class ChooseModeView(View):
             "responsive": True,
             "nav_hidden": True,
         }
+        context.update(
+            get_experiment_user_metadata_context(
+                request,
+                course,
+                request.user,
+            )
+        )
 
         title_content = _("Congratulations!  You are now enrolled in {course_name}").format(
             course_name=course.display_name_with_default_escaped

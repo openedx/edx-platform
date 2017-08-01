@@ -14,7 +14,7 @@ import waffle
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses
 from commerce.utils import EcommerceService
-from course_modes.models import CourseMode
+from course_modes.models import (CourseMode, get_course_prices)
 from courseware.access import has_access, has_ccx_coach_role
 from courseware.access_utils import check_course_open_for_learner
 from courseware.courses import (
@@ -61,6 +61,7 @@ from ipware.ip import get_ip
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.ccx.utils import prep_course_for_grading
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
+from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
@@ -322,13 +323,14 @@ def course_info(request, course_id):
             'dates_fragment': dates_fragment,
             'url_to_enroll': CourseTabView.url_to_enroll(course_key),
             'course_tools': course_tools,
-
-            # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
-            'upgrade_link': check_and_get_upgrade_link(request, user, course.id),
-            'upgrade_price': get_cosmetic_verified_display_price(course),
-            'course_tools': course_tools,
-            # ENDTODO
         }
+        context.update(
+            get_experiment_user_metadata_context(
+                request,
+                course,
+                user,
+            )
+        )
 
         # Get the URL of the user's last position in order to display the 'where you were last' message
         context['resume_course_url'] = None
@@ -346,20 +348,6 @@ def course_info(request, course_id):
 
 
 UPGRADE_COOKIE_NAME = 'show_upgrade_notification'
-
-
-# TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
-def check_and_get_upgrade_link(request, user, course_id):
-    upgrade_link = None
-
-    if request.user.is_authenticated():
-        upgrade_data = VerifiedUpgradeDeadlineDate(None, user, course_id=course_id)
-        if upgrade_data.is_enabled:
-            upgrade_link = upgrade_data.link
-            request.need_to_set_upgrade_cookie = True
-
-    return upgrade_link
-# ENDTODO
 
 
 class StaticCourseTabView(EdxFragmentView):
@@ -521,7 +509,8 @@ class CourseTabView(EdxFragmentView):
             # Disable student view button if user is staff and
             # course is not yet visible to students.
             supports_preview_menu = False
-        return {
+
+        context = {
             'course': course,
             'tab': tab,
             'active_page': tab.get('type', None),
@@ -530,11 +519,15 @@ class CourseTabView(EdxFragmentView):
             'supports_preview_menu': supports_preview_menu,
             'uses_pattern_library': True,
             'disable_courseware_js': True,
-            # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
-            'upgrade_link': check_and_get_upgrade_link(request, request.user, course.id),
-            'upgrade_price': get_cosmetic_verified_display_price(course),
-            # ENDTODO
         }
+        context.update(
+            get_experiment_user_metadata_context(
+                request,
+                course,
+                request.user,
+            )
+        )
+        return context
 
     def render_to_fragment(self, request, course=None, page_context=None, **kwargs):
         """
@@ -583,59 +576,6 @@ def registered_for_course(course, user):
         return CourseEnrollment.is_enrolled(user, course.id)
     else:
         return False
-
-
-def get_cosmetic_verified_display_price(course):
-    """
-    Returns the minimum verified cert course price as a string preceded by correct currency, or 'Free'.
-    """
-    return get_course_prices(course, verified_only=True)[1]
-
-
-def get_cosmetic_display_price(course):
-    """
-    Returns the course price as a string preceded by correct currency, or 'Free'.
-    """
-    return get_course_prices(course)[1]
-
-
-def get_course_prices(course, verified_only=False):
-    """
-    Return registration_price and cosmetic_display_prices.
-    registration_price is the minimum price for the course across all course modes.
-    cosmetic_display_prices is the course price as a string preceded by correct currency, or 'Free'.
-    """
-    # Find the
-    if verified_only:
-        registration_price = CourseMode.min_course_price_for_verified_for_currency(
-            course.id,
-            settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
-        )
-    else:
-        registration_price = CourseMode.min_course_price_for_currency(
-            course.id,
-            settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
-        )
-
-    currency_symbol = settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
-
-    if registration_price > 0:
-        price = registration_price
-    # Handle course overview objects which have no cosmetic_display_price
-    elif hasattr(course, 'cosmetic_display_price'):
-        price = course.cosmetic_display_price
-    else:
-        price = None
-
-    if price:
-        # Translators: This will look like '$50', where {currency_symbol} is a symbol such as '$' and {price} is a
-        # numerical amount in that currency. Adjust this display as needed for your language.
-        cosmetic_display_price = _("{currency_symbol}{price}").format(currency_symbol=currency_symbol, price=price)
-    else:
-        # Translators: This refers to the cost of the course. In this case, the course costs nothing so it is free.
-        cosmetic_display_price = _('Free')
-
-    return registration_price, cosmetic_display_price
 
 
 class EnrollStaffView(View):
@@ -927,7 +867,6 @@ def _progress(request, course_key, student_id):
     grade_summary = course_grade.summary
 
     studio_url = get_studio_url(course, 'settings/grading')
-
     # checking certificate generation configuration
     enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(student, course_key)
 
@@ -943,11 +882,14 @@ def _progress(request, course_key, student_id):
         'passed': is_course_passed(course, grade_summary),
         'credit_course_requirements': _credit_course_requirements(course_key, student),
         'certificate_data': _get_cert_data(student, course, course_key, is_active, enrollment_mode),
-        # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
-        'upgrade_link': check_and_get_upgrade_link(request, student, course.id),
-        'upgrade_price': get_cosmetic_verified_display_price(course),
-        # ENDTODO
     }
+    context.update(
+        get_experiment_user_metadata_context(
+            request,
+            course,
+            student,
+        )
+    )
 
     with outer_atomic():
         response = render_to_response('courseware/progress.html', context)

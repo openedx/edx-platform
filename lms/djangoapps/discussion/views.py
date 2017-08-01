@@ -24,6 +24,7 @@ from rest_framework import status
 from web_fragments.fragment import Fragment
 
 import django_comment_client.utils as utils
+from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 import lms.lib.comment_client as cc
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
@@ -44,7 +45,6 @@ from django_comment_client.utils import (
     strip_none
 )
 from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
-from lms.djangoapps.courseware.views.views import check_and_get_upgrade_link, get_cosmetic_verified_display_price
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse, expect_json
@@ -481,13 +481,16 @@ def _create_discussion_board_context(request, base_context, thread=None):
         'category_map': course_settings["category_map"],
         'course_settings': course_settings,
         'is_commentable_divided': is_commentable_divided(course_key, discussion_id, course_discussion_settings),
-        # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
-        'upgrade_link': check_and_get_upgrade_link(request, user, course.id),
-        'upgrade_price': get_cosmetic_verified_display_price(course),
-        # ENDTODO
         # If the default topic id is None the front-end code will look for a topic that contains "General"
         'discussion_default_topic_id': _get_discussion_default_topic_id(course),
     })
+    context.update(
+        get_experiment_user_metadata_context(
+            request,
+            course,
+            user,
+        )
+    )
     return context
 
 
