@@ -38,17 +38,30 @@ class SiteConfigurationListSerializer(SiteConfigurationSerializer):
         fields = ('id', 'name', 'domain')
 
 
+class AlternativeDomainSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlternativeDomain
+        fields = ('id', 'domain', 'site')
+
+
 class SiteSerializer(serializers.ModelSerializer):
     configuration = SiteConfigurationSerializer(read_only=True)
+    alternativeDomain = AlternativeDomainSerializer(source='alternative_domain', read_only=True)
+    customDomainActive = serializers.SerializerMethodField('is_custom_domain_active', read_only=True)
 
     class Meta:
         model = Site
-        fields = ('id', 'name', 'domain', 'configuration')
+        fields = ('id', 'name', 'domain', 'configuration', 'alternativeDomain', 'customDomainActive')
 
     def create(self, validated_data):
         site = super(SiteSerializer, self).create(validated_data)
         organization, site, user = bootstrap_site(site)
         return site
+
+    def is_custom_domain_active(self, obj):
+        if not hasattr(obj, 'alternative_domain'):
+            return False
+        return obj.alternative_domain.is_tahoe_domain()
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
