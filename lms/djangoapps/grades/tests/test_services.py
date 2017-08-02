@@ -12,7 +12,16 @@ from util.date_utils import to_timestamp
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
+from ..config.waffle import REJECTED_EXAM_OVERRIDES_GRADE
 from ..constants import ScoreDatabaseTableEnum
+
+
+class MockWaffleFlag():
+    def __init__(self, state):
+        self.state = state
+
+    def is_enabled(self, course_key):
+        return self.state
 
 
 @ddt.ddt
@@ -44,11 +53,17 @@ class GradesServiceTests(ModuleStoreTestCase):
         self.mock_create_id.return_value = 1
         self.type_patcher = patch('lms.djangoapps.grades.services.set_event_transaction_type')
         self.mock_set_type = self.type_patcher.start()
+        self.flag_patcher = patch('lms.djangoapps.grades.services.waffle_flags')
+        self.mock_waffle_flags = self.flag_patcher.start()
+        self.mock_waffle_flags.return_value = {
+            REJECTED_EXAM_OVERRIDES_GRADE: MockWaffleFlag(True)
+        }
 
     def tearDown(self):
         self.recalc_patcher.stop()
         self.id_patcher.stop()
         self.type_patcher.stop()
+        self.flag_patcher.stop()
 
     def subsection_grade_to_dict(self, grade):
         return {
@@ -218,3 +233,10 @@ class GradesServiceTests(ModuleStoreTestCase):
     @ddt.unpack
     def test_get_key(self, input_key, output_key, key_cls):
         self.assertEqual(_get_key(input_key, key_cls), output_key)
+
+    def test_should_override_grade_on_rejected_exam(self):
+        self.assertTrue(self.service.should_override_grade_on_rejected_exam('course-v1:edX+DemoX+Demo_Course'))
+        self.mock_waffle_flags.return_value = {
+            REJECTED_EXAM_OVERRIDES_GRADE: MockWaffleFlag(False)
+        }
+        self.assertFalse(self.service.should_override_grade_on_rejected_exam('course-v1:edX+DemoX+Demo_Course'))
