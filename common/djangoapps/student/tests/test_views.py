@@ -18,7 +18,7 @@ from pyquery import PyQuery as pq
 
 from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
-from student.models import CourseEnrollment, UserProfile
+from student.models import CourseEnrollment, REFUND_ORDER, UserProfile
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -91,16 +91,19 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         self.cert_status = cert_status
 
         with patch('student.views.cert_info', side_effect=self.mock_cert):
-            response = self.client.post(
-                reverse('change_enrollment'),
-                {'enrollment_action': 'unenroll', 'course_id': self.course.id}
-            )
+            with patch('commerce.signals.handle_refund_order') as mock_refund_handler:
+                REFUND_ORDER.connect(mock_refund_handler)
+                response = self.client.post(
+                    reverse('change_enrollment'),
+                    {'enrollment_action': 'unenroll', 'course_id': self.course.id}
+                )
 
-            self.assertEqual(response.status_code, status_code)
-            if status_code == 200:
-                course_enrollment.assert_called_with(self.user, self.course.id)
-            else:
-                course_enrollment.assert_not_called()
+                self.assertEqual(response.status_code, status_code)
+                if status_code == 200:
+                    course_enrollment.assert_called_with(self.user, self.course.id)
+                    self.assertTrue(mock_refund_handler.called)
+                else:
+                    course_enrollment.assert_not_called()
 
     def test_no_cert_status(self):
         """ Assert that the dashboard loads when cert_status is None."""
