@@ -38,146 +38,158 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""
 
     def setUp(self):
-        SelfPacedConfiguration(enable_course_home_improvements=True).save()
         super(CourseDateSummaryTest, self).setUp()
+        SelfPacedConfiguration.objects.create(enable_course_home_improvements=True)
 
-    def setup_course_and_user(
-            self,
-            days_till_start=1,
-            days_till_end=14,
-            days_till_upgrade_deadline=4,
-            enroll_user=True,
-            enrollment_mode=CourseMode.VERIFIED,
-            user_enrollment_mode=None,
-            course_min_price=100,
-            days_till_verification_deadline=14,
-            verification_status=None,
-            sku=None,
-            create_user=True
-    ):
-        """Set up the course and user for this test."""
+    def create_course_run(self, days_till_start=1, days_till_end=14, days_till_upgrade_deadline=4,
+                          days_till_verification_deadline=14):
+        """ Create a new course run and course modes.
+
+        All date-related arguments are relative to the current date-time (now) unless otherwise specified.
+
+        Both audit and verified `CourseMode` objects will be created for the course run.
+
+        Arguments:
+            days_till_end (int): Number of days until the course ends.
+            days_till_start (int): Number of days until the course starts.
+            days_till_upgrade_deadline (int): Number of days until the course run's upgrade deadline.
+            days_till_verification_deadline (int): Number of days until the course run's verification deadline. If this
+                value is set to `None` no deadline will be verification deadline will be created.
+        """
         now = datetime.now(utc)
+        course = CourseFactory.create(start=now + timedelta(days=days_till_start))
 
-        # pylint: disable=attribute-defined-outside-init
-        if create_user:
-            self.user = UserFactory()
-
-        self.course = CourseFactory.create(start=now + timedelta(days=days_till_start))
-
+        course.end = None
         if days_till_end is not None:
-            self.course.end = now + timedelta(days=days_till_end)
-        else:
-            self.course.end = None
+            course.end = now + timedelta(days=days_till_end)
 
-        if enrollment_mode is not None and days_till_upgrade_deadline is not None:
-            CourseModeFactory.create(
-                course_id=self.course.id,
-                mode_slug=enrollment_mode,
-                expiration_datetime=now + timedelta(days=days_till_upgrade_deadline),
-                min_price=course_min_price,
-                sku=sku
-            )
-
-        if enroll_user:
-            if user_enrollment_mode:
-                CourseEnrollmentFactory.create(course_id=self.course.id, user=self.user, mode=user_enrollment_mode)
-            else:
-                enrollment_mode = enrollment_mode or CourseMode.DEFAULT_MODE_SLUG
-                CourseEnrollmentFactory.create(course_id=self.course.id, user=self.user, mode=enrollment_mode)
+        CourseModeFactory(course_id=course.id, mode_slug=CourseMode.AUDIT)
+        CourseModeFactory(
+            course_id=course.id,
+            mode_slug=CourseMode.VERIFIED,
+            expiration_datetime=now + timedelta(days=days_till_upgrade_deadline)
+        )
 
         if days_till_verification_deadline is not None:
             VerificationDeadline.objects.create(
-                course_key=self.course.id,
+                course_key=course.id,
                 deadline=now + timedelta(days=days_till_verification_deadline)
             )
 
+        return course
+
+    def create_user(self, verification_status=None):
+        """ Create a new User instance.
+
+        Arguments:
+            verification_status (str): User's verification status. If this value is set an instance of
+                SoftwareSecurePhotoVerification will be created for the user with the specified status.
+        """
+        user = UserFactory()
+
         if verification_status is not None:
-            SoftwareSecurePhotoVerificationFactory.create(user=self.user, status=verification_status)
+            SoftwareSecurePhotoVerificationFactory.create(user=user, status=verification_status)
+
+        return user
 
     def test_course_info_feature_flag(self):
         SelfPacedConfiguration(enable_course_home_improvements=False).save()
-        self.setup_course_and_user()
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        url = reverse('info', args=(self.course.id,))
+        course = self.create_course_run()
+        user = self.create_user()
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
+
+        self.client.login(username=user.username, password=TEST_PASSWORD)
+        url = reverse('info', args=(course.id,))
         response = self.client.get(url)
         self.assertNotIn('date-summary', response.content)
 
     def test_course_info_logged_out(self):
-        self.setup_course_and_user()
-        url = reverse('info', args=(self.course.id,))
+        course = self.create_course_run()
+        url = reverse('info', args=(course.id,))
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
 
     # Tests for which blocks are enabled
-    def assert_block_types(self, expected_blocks):
+    def assert_block_types(self, course, user, expected_blocks):
         """Assert that the enabled block types for this course are as expected."""
-        blocks = get_course_date_blocks(self.course, self.user)
+        blocks = get_course_date_blocks(course, user)
         self.assertEqual(len(blocks), len(expected_blocks))
         self.assertEqual(set(type(b) for b in blocks), set(expected_blocks))
 
     @ddt.data(
         # Verified enrollment with no photo-verification before course start
-        ({}, (CourseEndDate, CourseStartDate, TodaysDate, VerificationDeadlineDate)),
+        ({}, {}, (CourseEndDate, CourseStartDate, TodaysDate, VerificationDeadlineDate)),
         # Verified enrollment with `approved` photo-verification after course end
         ({'days_till_start': -10,
           'days_till_end': -5,
           'days_till_upgrade_deadline': -6,
           'days_till_verification_deadline': -5,
-          'verification_status': 'approved'},
+          },
+         {'verification_status': 'approved'},
          (TodaysDate, CourseEndDate)),
         # Verified enrollment with `expired` photo-verification during course run
-        ({'days_till_start': -10,
-          'verification_status': 'expired'},
+        ({'days_till_start': -10},
+         {'verification_status': 'expired'},
          (TodaysDate, CourseEndDate, VerificationDeadlineDate)),
         # Verified enrollment with `approved` photo-verification during course run
-        ({'days_till_start': -10,
-          'verification_status': 'approved'},
-         (TodaysDate, CourseEndDate)),
-        # Audit enrollment and non-upsell course.
-        ({'days_till_start': -10,
-          'days_till_upgrade_deadline': None,
-          'days_till_verification_deadline': None,
-          'course_min_price': 0,
-          'enrollment_mode': CourseMode.AUDIT},
+        ({'days_till_start': -10, },
+         {'verification_status': 'approved'},
          (TodaysDate, CourseEndDate)),
         # Verified enrollment with *NO* course end date
         ({'days_till_end': None},
+         {},
          (CourseStartDate, TodaysDate, VerificationDeadlineDate)),
         # Verified enrollment with no photo-verification during course run
         ({'days_till_start': -1},
+         {},
          (TodaysDate, CourseEndDate, VerificationDeadlineDate)),
         # Verification approved
         ({'days_till_start': -10,
           'days_till_upgrade_deadline': -1,
           'days_till_verification_deadline': 1,
-          'verification_status': 'approved'},
+          },
+         {'verification_status': 'approved'},
          (TodaysDate, CourseEndDate)),
         # After upgrade deadline
         ({'days_till_start': -10,
           'days_till_upgrade_deadline': -1},
+         {},
          (TodaysDate, CourseEndDate, VerificationDeadlineDate)),
         # After verification deadline
         ({'days_till_start': -10,
           'days_till_upgrade_deadline': -2,
           'days_till_verification_deadline': -1},
+         {},
          (TodaysDate, CourseEndDate, VerificationDeadlineDate)),
-        # Un-enrolled user before course start
-        ({'enroll_user': False},
-         (CourseStartDate, TodaysDate, CourseEndDate, VerifiedUpgradeDeadlineDate)),
-        # Un-enrolled user during course run
-        ({'days_till_start': -1,
-          'enroll_user': False},
-         (TodaysDate, CourseEndDate, VerifiedUpgradeDeadlineDate)),
-        # Un-enrolled user after course end.
-        ({'enroll_user': False,
-          'days_till_start': -10,
-          'days_till_end': -5},
+    )
+    @ddt.unpack
+    def test_enabled_block_types(self, course_kwargs, user_kwargs, expected_blocks):
+        course = self.create_course_run(**course_kwargs)
+        user = self.create_user(**user_kwargs)
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
+        self.assert_block_types(course, user, expected_blocks)
+
+    @ddt.data(
+        # Course not started
+        ({}, (CourseStartDate, TodaysDate, CourseEndDate, VerifiedUpgradeDeadlineDate)),
+        # Course active
+        ({'days_till_start': -1}, (TodaysDate, CourseEndDate, VerifiedUpgradeDeadlineDate)),
+        # Course ended
+        ({'days_till_start': -10, 'days_till_end': -5},
          (TodaysDate, CourseEndDate, VerifiedUpgradeDeadlineDate)),
     )
     @ddt.unpack
-    def test_enabled_block_types(self, course_options, expected_blocks):
-        self.setup_course_and_user(**course_options)
-        self.assert_block_types(expected_blocks)
+    def test_enabled_block_types_without_enrollment(self, course_kwargs, expected_blocks):
+        course = self.create_course_run(**course_kwargs)
+        user = self.create_user()
+        self.assert_block_types(course, user, expected_blocks)
+
+    def test_enabled_block_types_with_non_upgradeable_course_run(self):
+        course = self.create_course_run(days_till_start=-10, days_till_verification_deadline=None)
+        user = self.create_user()
+        CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.VERIFIED).delete()
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
+        self.assert_block_types(course, user, (TodaysDate, CourseEndDate))
 
     def test_todays_date_block(self):
         """
@@ -185,8 +197,9 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         and displays the correct time, accounting for daylight savings
         """
         with freeze_time('2015-01-02'):
-            self.setup_course_and_user()
-            block = TodaysDate(self.course, self.user)
+            course = self.create_course_run()
+            user = self.create_user()
+            block = TodaysDate(course, user)
             self.assertTrue(block.is_enabled)
             self.assertEqual(block.date, datetime.now(utc))
             self.assertEqual(block.title, 'current_datetime')
@@ -198,8 +211,9 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_todays_date_no_timezone(self, url_name):
         with freeze_time('2015-01-02'):
-            self.setup_course_and_user()
-            self.client.login(username=self.user.username, password=TEST_PASSWORD)
+            course = self.create_course_run()
+            user = self.create_user()
+            self.client.login(username=user.username, password=TEST_PASSWORD)
 
             html_elements = [
                 '<h3 class="hd hd-6 handouts-header">Important Course Dates</h3>',
@@ -210,7 +224,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 'data-string="Today is {date}"',
                 'data-timezone="None"'
             ]
-            url = reverse(url_name, args=(self.course.id,))
+            url = reverse(url_name, args=(course.id,))
             response = self.client.get(url, follow=True)
             for html in html_elements:
                 self.assertContains(response, html)
@@ -222,10 +236,11 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_todays_date_timezone(self, url_name):
         with freeze_time('2015-01-02'):
-            self.setup_course_and_user()
-            self.client.login(username=self.user.username, password=TEST_PASSWORD)
-            set_user_preference(self.user, "time_zone", "America/Los_Angeles")
-            url = reverse(url_name, args=(self.course.id,))
+            course = self.create_course_run()
+            user = self.create_user()
+            self.client.login(username=user.username, password=TEST_PASSWORD)
+            set_user_preference(user, 'time_zone', 'America/Los_Angeles')
+            url = reverse(url_name, args=(course.id,))
             response = self.client.get(url, follow=True)
 
             html_elements = [
@@ -242,9 +257,10 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
     ## Tests Course Start Date
     def test_course_start_date(self):
-        self.setup_course_and_user()
-        block = CourseStartDate(self.course, self.user)
-        self.assertEqual(block.date, self.course.start)
+        course = self.create_course_run()
+        user = self.create_user()
+        block = CourseStartDate(course, user)
+        self.assertEqual(block.date, course.start)
 
     @ddt.data(
         'info',
@@ -253,9 +269,10 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_start_date_render(self, url_name):
         with freeze_time('2015-01-02'):
-            self.setup_course_and_user()
-            self.client.login(username=self.user.username, password=TEST_PASSWORD)
-            url = reverse(url_name, args=(self.course.id,))
+            course = self.create_course_run()
+            user = self.create_user()
+            self.client.login(username=user.username, password=TEST_PASSWORD)
+            url = reverse(url_name, args=(course.id,))
             response = self.client.get(url, follow=True)
             html_elements = [
                 'data-string="in 1 day - {date}"',
@@ -271,10 +288,11 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_start_date_render_time_zone(self, url_name):
         with freeze_time('2015-01-02'):
-            self.setup_course_and_user()
-            self.client.login(username=self.user.username, password=TEST_PASSWORD)
-            set_user_preference(self.user, "time_zone", "America/Los_Angeles")
-            url = reverse(url_name, args=(self.course.id,))
+            course = self.create_course_run()
+            user = self.create_user()
+            self.client.login(username=user.username, password=TEST_PASSWORD)
+            set_user_preference(user, 'time_zone', 'America/Los_Angeles')
+            url = reverse(url_name, args=(course.id,))
             response = self.client.get(url, follow=True)
             html_elements = [
                 'data-string="in 1 day - {date}"',
@@ -286,16 +304,20 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
     ## Tests Course End Date Block
     def test_course_end_date_for_certificate_eligible_mode(self):
-        self.setup_course_and_user(days_till_start=-1)
-        block = CourseEndDate(self.course, self.user)
+        course = self.create_course_run(days_till_start=-1)
+        user = self.create_user()
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
+        block = CourseEndDate(course, user)
         self.assertEqual(
             block.description,
             'To earn a certificate, you must complete all requirements before this date.'
         )
 
     def test_course_end_date_for_non_certificate_eligible_mode(self):
-        self.setup_course_and_user(days_till_start=-1, enrollment_mode=CourseMode.AUDIT)
-        block = CourseEndDate(self.course, self.user)
+        course = self.create_course_run(days_till_start=-1)
+        user = self.create_user()
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
+        block = CourseEndDate(course, user)
         self.assertEqual(
             block.description,
             'After this date, course content will be archived.'
@@ -303,8 +325,10 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.assertEqual(block.title, 'Course End')
 
     def test_course_end_date_after_course(self):
-        self.setup_course_and_user(days_till_start=-2, days_till_end=-1)
-        block = CourseEndDate(self.course, self.user)
+        course = self.create_course_run(days_till_start=-2, days_till_end=-1)
+        user = self.create_user()
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
+        block = CourseEndDate(course, user)
         self.assertEqual(
             block.description,
             'This course is archived, which means you can review course content but it is no longer active.'
@@ -315,25 +339,38 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         """Verify the block link redirects to ecommerce checkout if it's enabled."""
         sku = 'TESTSKU'
         configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
-        self.setup_course_and_user(sku=sku)
-        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
+        course = self.create_course_run()
+        user = self.create_user()
+        course_mode = CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.VERIFIED)
+        course_mode.sku = sku
+        course_mode.save()
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
+
+        block = VerifiedUpgradeDeadlineDate(course, user)
         self.assertEqual(block.link, '{}?sku={}'.format(configuration.MULTIPLE_ITEMS_BASKET_PAGE_URL, sku))
 
     ## VerificationDeadlineDate
     def test_no_verification_deadline(self):
-        self.setup_course_and_user(days_till_start=-1, days_till_verification_deadline=None)
-        block = VerificationDeadlineDate(self.course, self.user)
+        course = self.create_course_run(days_till_start=-1, days_till_verification_deadline=None)
+        user = self.create_user()
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
+        block = VerificationDeadlineDate(course, user)
         self.assertFalse(block.is_enabled)
 
     def test_no_verified_enrollment(self):
-        self.setup_course_and_user(days_till_start=-1, enrollment_mode=CourseMode.AUDIT)
-        block = VerificationDeadlineDate(self.course, self.user)
+        course = self.create_course_run(days_till_start=-1)
+        user = self.create_user()
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
+        block = VerificationDeadlineDate(course, user)
         self.assertFalse(block.is_enabled)
 
     def test_verification_deadline_date_upcoming(self):
         with freeze_time('2015-01-02'):
-            self.setup_course_and_user(days_till_start=-1)
-            block = VerificationDeadlineDate(self.course, self.user)
+            course = self.create_course_run(days_till_start=-1)
+            user = self.create_user()
+            CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
+
+            block = VerificationDeadlineDate(course, user)
             self.assertEqual(block.css_class, 'verification-deadline-upcoming')
             self.assertEqual(block.title, 'Verification Deadline')
             self.assertEqual(block.date, datetime.now(utc) + timedelta(days=14))
@@ -342,12 +379,15 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 'You must successfully complete verification before this date to qualify for a Verified Certificate.'
             )
             self.assertEqual(block.link_text, 'Verify My Identity')
-            self.assertEqual(block.link, reverse('verify_student_verify_now', args=(self.course.id,)))
+            self.assertEqual(block.link, reverse('verify_student_verify_now', args=(course.id,)))
 
     def test_verification_deadline_date_retry(self):
         with freeze_time('2015-01-02'):
-            self.setup_course_and_user(days_till_start=-1, verification_status='denied')
-            block = VerificationDeadlineDate(self.course, self.user)
+            course = self.create_course_run(days_till_start=-1)
+            user = self.create_user(verification_status='denied')
+            CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
+
+            block = VerificationDeadlineDate(course, user)
             self.assertEqual(block.css_class, 'verification-deadline-retry')
             self.assertEqual(block.title, 'Verification Deadline')
             self.assertEqual(block.date, datetime.now(utc) + timedelta(days=14))
@@ -360,12 +400,11 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
     def test_verification_deadline_date_denied(self):
         with freeze_time('2015-01-02'):
-            self.setup_course_and_user(
-                days_till_start=-10,
-                verification_status='denied',
-                days_till_verification_deadline=-1,
-            )
-            block = VerificationDeadlineDate(self.course, self.user)
+            course = self.create_course_run(days_till_start=-10, days_till_verification_deadline=-1)
+            user = self.create_user(verification_status='denied')
+            CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
+
+            block = VerificationDeadlineDate(course, user)
             self.assertEqual(block.css_class, 'verification-deadline-passed')
             self.assertEqual(block.title, 'Missed Verification Deadline')
             self.assertEqual(block.date, datetime.now(utc) + timedelta(days=-1))
@@ -383,69 +422,76 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     @ddt.unpack
     def test_render_date_string_past(self, delta, expected_date_string):
         with freeze_time('2015-01-02'):
-            self.setup_course_and_user(
-                days_till_start=-10,
-                verification_status='denied',
-                days_till_verification_deadline=delta,
-            )
-            block = VerificationDeadlineDate(self.course, self.user)
+            course = self.create_course_run(days_till_start=-10, days_till_verification_deadline=delta)
+            user = self.create_user(verification_status='denied')
+            CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
+
+            block = VerificationDeadlineDate(course, user)
             self.assertEqual(block.relative_datestring, expected_date_string)
 
     def create_self_paced_course_run(self, **kwargs):
         defaults = {
-            'enroll_user': False,
             'days_till_upgrade_deadline': 100,
         }
         defaults.update(kwargs)
-        self.setup_course_and_user(**defaults)
-        self.course.self_paced = True
-        self.store.update_item(self.course, self.user.id)
-        overview = CourseOverview.get_from_id(self.course.id)
+
+        course = self.create_course_run(**defaults)
+        course.self_paced = True
+        self.store.update_item(course, None)
+        overview = CourseOverview.get_from_id(course.id)
         self.assertTrue(overview.self_paced)
 
-    def test_date_with_self_paced(self):
-        """ The date returned for self-paced course runs should be dependent on the learner's enrollment date. """
-        global_config = DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
+        return course
 
-        # Enrollments made before the course start should use the course start date as the content availability date
-        self.create_self_paced_course_run(days_till_start=3)
-        CourseEnrollmentFactory.create(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
-        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
-        overview = CourseOverview.get_from_id(self.course.id)
-        expected = overview.start + timedelta(days=global_config.deadline_days)
+    def assert_upgrade_deadline(self, course, expected):
+        """ Asserts the VerifiedUpgradeDeadlineDate block's date matches the expected value. """
+        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
+        block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         self.assertEqual(block.date, expected)
 
-        # Enrollments made after the course start should use the enrollment date as the content availability date
-        self.create_self_paced_course_run(days_till_start=-1)
-        enrollment = CourseEnrollmentFactory.create(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
-        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
+    def test_date_with_self_paced_with_enrollment_before_course_start(self):
+        """ Enrolling before a course begins should result in the upgrade deadline being set relative to the
+        course start date. """
+        global_config = DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
+        course = self.create_self_paced_course_run(days_till_start=3)
+        overview = CourseOverview.get_from_id(course.id)
+        expected = overview.start + timedelta(days=global_config.deadline_days)
+        self.assert_upgrade_deadline(course, expected)
+
+    def test_date_with_self_paced_with_enrollment_after_course_start(self):
+        """ Enrolling after a course begins should result in the upgrade deadline being set relative to the
+        enrollment date. """
+        global_config = DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
+        course = self.create_self_paced_course_run(days_till_start=-1)
+        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
+        block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         expected = enrollment.created + timedelta(days=global_config.deadline_days)
         self.assertEqual(block.date, expected)
 
         # Courses should be able to override the deadline
         course_config = CourseDynamicUpgradeDeadlineConfiguration.objects.create(
-            enabled=True, course_id=self.course.id, opt_out=False, deadline_days=3
+            enabled=True, course_id=course.id, opt_out=False, deadline_days=3
         )
-        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
+        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
+        block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         expected = enrollment.created + timedelta(days=course_config.deadline_days)
         self.assertEqual(block.date, expected)
 
-        # Disabling the functionality should result in the verified mode's expiration date being returned.
-        global_config.enabled = False
-        global_config.save()
-        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
-        expected = CourseMode.objects.get(course_id=self.course.id, mode_slug=CourseMode.VERIFIED).expiration_datetime
-        self.assertEqual(block.date, expected)
+    def test_date_with_self_paced_without_dynamic_upgrade_deadline(self):
+        """ Disabling the dynamic upgrade deadline functionality should result in the verified mode's
+        expiration date being returned. """
+        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=False)
+        course = self.create_self_paced_course_run()
+        expected = CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.VERIFIED).expiration_datetime
+        self.assert_upgrade_deadline(course, expected)
 
     def test_date_with_self_paced_with_course_opt_out(self):
         """ If the course run has opted out of the dynamic deadline, the course mode's deadline should be used. """
-        self.create_self_paced_course_run(days_till_start=-1)
+        course = self.create_self_paced_course_run(days_till_start=-1)
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
-        CourseEnrollmentFactory.create(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
+        CourseDynamicUpgradeDeadlineConfiguration.objects.create(enabled=True, course_id=course.id, opt_out=True)
+        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
 
-        # Opt the course out of the dynamic upgrade deadline
-        CourseDynamicUpgradeDeadlineConfiguration.objects.create(enabled=True, course_id=self.course.id, opt_out=True)
-
-        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
-        expected = CourseMode.objects.get(course_id=self.course.id, mode_slug=CourseMode.VERIFIED).expiration_datetime
+        block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
+        expected = CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.VERIFIED).expiration_datetime
         self.assertEqual(block.date, expected)
