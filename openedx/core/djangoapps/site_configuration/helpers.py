@@ -6,6 +6,7 @@ from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from microsite_configuration import microsite
 
 
+
 def get_current_site_configuration():
     """
     Return configuration for the current site.

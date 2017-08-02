@@ -47,17 +47,18 @@ def get_library_creator_status(user):
     """
 
     if not LIBRARIES_ENABLED:
-        library_creater_status =  False
+        library_creater_status = False
     elif user.is_active and (user.is_staff or user.is_superuser):
-        library_creater_status =  True
+        library_creater_status = True
     elif settings.FEATURES.get('DISABLE_LIBRARY_CREATION', False):
         library_creater_status = False
     elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
         return get_course_creator_status(user) == 'granted'
     else:
-        library_creater_status =  True
+        library_creater_status = True
 
     return library_creater_status
+
 
 @login_required
 @ensure_csrf_cookie

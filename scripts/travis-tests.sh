@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
+# docker ps -a
+# docker --version
+
+
 set -e
 
 # Return status is that of the last command to fail in a
 # piped command, or a zero if they all succeed.
-set -o pipefail
+# set -o pipefail
 
 # There is no need to install the prereqs, as this was already
 # just done via the dependencies override section of circle.yml.
@@ -12,6 +16,18 @@ export NO_PREREQ_INSTALL='true'
 PAVER_ARGS="--with-flaky --processes=-1 --cov-args='-p' --with-xunitmp --fasttest"
 
 EXIT=0
+
+
+# docker exec -it devstack /bin/bash -s <<EOF
+# sudo su edxapp -s /bin/bash
+# source /edx/app/edxapp/edxapp_env
+# cd /edx/app/edxapp/edx-platform
+# paver test_system -s lms --with-flaky --processes=-1 --cov-args='-p' --with-xunitmp
+# echo 'running'
+# EOF
+
+echo "TEST_SUITE:"
+echo $TEST_SUITE
 
 case "$TEST_SUITE" in
 
@@ -103,4 +119,6 @@ case "$TEST_SUITE" in
     "cms-acceptance")
         paver test_acceptance -s cms -vvv --with-xunit
         ;;
+    *)
+        echo "TEST_SUITE not set"
 esac

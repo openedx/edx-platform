@@ -1,3 +1,5 @@
+"Provides management command to ship tracking logs to cloud storage"
+
 from os import listdir, remove, stat
 from os.path import isfile, join
 
@@ -30,7 +32,7 @@ class Command(BaseCommand):
            DEFAULT: 'tracking-logs'
 
         -f <folder-name>
-           The name of the folder in the container/bukcet to 
+           The name of the folder in the container/bukcet to
            put these files. This can be used to segregate tracking logs
            from multiple Open edX, in the case that it is a shared storage
            repository. The Open edX hostname might be a good choice of folder.
@@ -108,7 +110,7 @@ class Command(BaseCommand):
             print 'Inspecting {} ....'.format(file)
             local_path = join(path, file)
             try:
-                with open(local_path,'r') as f:
+                with open(local_path, 'r') as f:
                     dest_fn = '{}/{}'.format(folder, file)
                     exists = storage.exists(dest_fn)
                     # does it already exist? Don't overwrite
@@ -129,10 +131,10 @@ class Command(BaseCommand):
 
                         print 'Shipping {} to remote storage...'.format(file)
                         storage.save(dest_fn, f)
-                        
+
                         if delete_local:
-                          print 'Deleting {} from disk...'.format(file)
-                          remove(local_path)
+                            print 'Deleting {} from disk...'.format(file)
+                            remove(local_path)
                     else:
                         print 'File {} already exists in remote storage. Skipping...'.format(file)
             except Exception, ex:

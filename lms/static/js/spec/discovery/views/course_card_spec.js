@@ -21,7 +21,7 @@ define([
                         'display_name': 'edX Demonstration Course',
                         'number': 'DemoX'
                     },
-                    'start': '1970-01-01T05:00:00+00:00',
+                    start: '1970-01-01T08:00:00+00:00',
                     'image_url': '/c4x/edX/DemoX/asset/images_course_image.jpg',
                     'org': 'edX',
                     'id': 'edX/DemoX/Demo_Course'

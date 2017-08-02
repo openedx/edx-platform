@@ -1,80 +1,83 @@
+sudo: required
+
 language: python
 python:
   - "2.7"
+  
 services:
-  - mongodb
-  - mysql
-  - rabbitmq
-  - memcached
+  - docker
   
 env:
-  - TEST_SUITE="lms-unit"
-    SHARD=1
-  - TEST_SUITE="lms-unit"
-    SHARD=2
-  - TEST_SUITE="lms-unit"
-    SHARD=3
-  - TEST_SUITE="lms-unit"
-    SHARD=4
+  - TEST_SUITE="quality"
+  - TEST_SUITE="lms-unit" SHARD=1
+  - TEST_SUITE="lms-unit" SHARD=2
+  - TEST_SUITE="lms-unit" SHARD=3
+  - TEST_SUITE="lms-unit" SHARD=4
   - TEST_SUITE="cms-unit"
-  - TEST_SUITE="lib"  
+  - TEST_SUITE="commonlib-unit"
   - TEST_SUITE="js-unit"
-  
-cache:
-  pip: true
-  directories: node_modules
+  - TEST_SUITE="lms-acceptance"
+  - TEST_SUITE="cms-acceptance"
+  - TEST_SUITE="bok-choy" SHARD=1
+  - TEST_SUITE="bok-choy" SHARD=2
+  - TEST_SUITE="bok-choy" SHARD=3
+  - TEST_SUITE="bok-choy" SHARD=4
+  - TEST_SUITE="bok-choy" SHARD=5
+  - TEST_SUITE="bok-choy" SHARD=6
+  - TEST_SUITE="bok-choy" SHARD=7
+  - TEST_SUITE="bok-choy" SHARD=8
+  - TEST_SUITE="bok-choy" SHARD=9
+  - TEST_SUITE="bok-choy" SHARD=10
+  - TEST_SUITE="bok-choy" SHARD=11
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - env: TEST_SUITE="lms-acceptance"
+    - env: TEST_SUITE="cms-acceptance"
+    - env: TEST_SUITE="bok-choy" SHARD=1
+    - env: TEST_SUITE="bok-choy" SHARD=2
+    - env: TEST_SUITE="bok-choy" SHARD=3
+    - env: TEST_SUITE="bok-choy" SHARD=4
+    - env: TEST_SUITE="bok-choy" SHARD=5
+    - env: TEST_SUITE="bok-choy" SHARD=6
+    - env: TEST_SUITE="bok-choy" SHARD=7
+    - env: TEST_SUITE="bok-choy" SHARD=8
+    - env: TEST_SUITE="bok-choy" SHARD=9
+    - env: TEST_SUITE="bok-choy" SHARD=10
+    - env: TEST_SUITE="bok-choy" SHARD=11
 
 branches:
   only:
   - master
   - oxa/master.fic
-  - oxa/devfic
   - oxa/dev.fic
+  - oxa/dev.fic-hotfix
+  - oxa/dev.fic-quality
   - oxa/ci
+  - oxa/ci-docker
+  - oxa/ci-docker-qual
 
-# command to install dependencies
-install: 
-  - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install 6.9.4
-  - npm install
+before_install:
+# Login and fetch container from Azure container registry
+- docker login oxacontainerregistry.azurecr.io -u $DOCKER_USERNAME2 -p $DOCKER_PASSWORD2
+- docker pull oxacontainerregistry.azurecr.io/ci/devstack
 
-  # Fixes errors with boto package. 
-  # google-compute-engine required for 
-  # django-storages to recognize boto packages
-  # See open edx answers here:
-  # https://openedx.atlassian.net/wiki/pages/viewpage.action?pageId=158663390
-  - pip install --exists-action w google-compute-engine
-
-  - pip install setuptools
-  - pip install --exists-action w -r requirements/edx/paver.txt
-
-  # Mirror what paver install_prereqs does.
-  # After a successful build, Travis will
-  # cache the virtualenv at that state, so that  
-  # the next build will not need to install them
-  # from scratch again.
-  - pip install --exists-action w -r requirements/edx/pre.txt
-  - pip install --exists-action w -r requirements/edx/github.txt
-  - pip install --exists-action w -r requirements/edx/local.txt
-  
-  - pip install --exists-action w pbr==0.9.0
-  - pip install --exists-action w -r requirements/edx/base.txt
-  - sudo apt-get update
-  - sudo apt-get install libxmlsec1-dev
-  - sudo apt-get install swig
-  - if [ -e requirements/edx/post.txt ]; then pip install --exists-action w -r requirements/edx/post.txt ; fi
-
+install:
+  - docker run -d --name devstack --add-host "localhost preview.localhost":127.0.0.1 --security-opt seccomp=unconfined --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro -e TEST_SUITE="$TEST_SUITE" -e SHARD="$SHARD" -e CODE_COV_TOKEN="$CODE_COV_TOKEN" -t oxacontainerregistry.azurecr.io/ci/devstack
+  - docker ps -a
+  # Prepare cgroup on the host at /tmp/cgroup to avoid error: "failed to connect to bus: no such file or directory"
+  - sudo mkdir -p /tmp/cgroup/systemd && sudo mount -t cgroup systemd /tmp/cgroup/systemd -o ro,noexec,nosuid,nodev,none,name=systemd
   
 before_script:
-  - "export PATH=$PATH:$PWD/node_modules/.bin"
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3
+  
+script: 
+  - ./scripts/docker-run-tests.sh
 
-# command to run tests
-script: ./scripts/travis-tests.sh
-
-addons:
-  firefox: "45.0"
-  chrome: stable
+after_success:
+  - ./scripts/docker-report.sh
 
 dist: trusty
