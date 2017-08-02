@@ -316,6 +316,7 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
         "secondaryProviders": [],
         "finishAuthUrl": None,
         "errorMessage": None,
+        "registerFormSubmitButtonText": _("Create Account"),
     }
 
     if third_party_auth.is_enabled():
@@ -361,6 +362,7 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
                         ).format(
                             configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
                         )
+                        context["registerFormSubmitButtonText"] = _("Continue")
 
         # Check for any error messages we may want to display:
         for msg in messages.get_messages(request):
