@@ -185,6 +185,7 @@
                         )
                     ];
                     this.renderErrors(this.defaultFormErrorsTitle, this.errors);
+                    this.scrollToFormFeedback();
                     this.toggleDisableButton(false);
                 },
 
@@ -193,49 +194,16 @@
              */
                 renderErrors: function(title, errorMessages) {
                     this.clearFormErrors();
-
-                    if (title || errorMessages.length) {
-                        this.renderFormFeedback(this.formErrorsTpl, {
-                            jsHook: this.formErrorsJsHook,
-                            title: title,
-                            messagesHtml: HtmlUtils.HTML(errorMessages.join(''))
-                        });
-                    }
+                    this.renderFormFeedback(this.formErrorsTpl, {
+                        jsHook: this.formErrorsJsHook,
+                        title: title,
+                        messagesHtml: HtmlUtils.HTML(errorMessages.join(''))
+                    });
                 },
 
                 renderFormFeedback: function(template, context) {
                     var tpl = HtmlUtils.template(template);
                     HtmlUtils.prepend(this.$formFeedback, tpl(context));
-                },
-
-                doOnErrorList: function(id, action) {
-                    var i;
-                    for (i = 0; i < this.errors.length; ++i) {
-                        if (this.errors[i].includes(id)) {
-                            action(i);
-                        }
-                    }
-                },
-
-                updateError: function(error, id) {
-                    this.deleteError(id);
-                    this.addError(error, id);
-                },
-
-                deleteError: function(id) {
-                    var self = this;
-                    this.doOnErrorList(id, function(index) {
-                        self.errors.splice(index, 1);
-                    });
-                },
-
-                addError: function(error, id) {
-                    this.errors.push(StringUtils.interpolate(
-                        '<li id="{errorId}">{error}</li>', {
-                            errorId: id,
-                            error: error
-                        }
-                    ));
                 },
 
             /* Allows extended views to add non-form attributes
@@ -261,14 +229,7 @@
                         this.clearFormErrors();
                     } else {
                         this.renderErrors(this.defaultFormErrorsTitle, this.errors);
-
-                    // Scroll to feedback container
-                        $('html,body').animate({
-                            scrollTop: this.$formFeedback.offset().top
-                        }, 'slow');
-
-                    // Focus on the feedback container to ensure screen readers see the messages.
-                        this.$formFeedback.focus();
+                        this.scrollToFormFeedback();
                         this.toggleDisableButton(false);
                     }
 
@@ -279,6 +240,10 @@
              * code after form submission
              */
                 postFormSubmission: function() {
+                    return true;
+                },
+
+                resetValidationVariables: function() {
                     return true;
                 },
 
@@ -306,6 +271,19 @@
                     if (this.$submitButton) {
                         this.$submitButton.attr('disabled', disabled);
                     }
+                },
+
+                scrollToFormFeedback: function() {
+                    var self = this;
+                // Scroll to feedback container
+                    $('html,body').animate({
+                        scrollTop: this.$formFeedback.offset().top
+                    }, 'slow', function() {
+                        self.resetValidationVariables();
+                    });
+
+                // Focus on the feedback container to ensure screen readers see the messages.
+                    this.$formFeedback.focus();
                 },
 
                 validate: function($el) {

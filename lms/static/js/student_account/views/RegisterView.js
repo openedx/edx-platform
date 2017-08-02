@@ -43,6 +43,9 @@
                 positiveValidationIcon: 'fa-check',
                 negativeValidationIcon: 'fa-exclamation',
                 successfulValidationDisplaySeconds: 3,
+            // These are reset to true on form submission.
+                positiveValidationEnabled: true,
+                negativeValidationEnabled: true,
 
                 preRender: function(data) {
                     this.providers = data.thirdPartyAuth.providers || [];
@@ -148,9 +151,9 @@
                         hasError = decisions.validation_decisions[name] !== '',
                         error = isCheckbox ? '' : decisions.validation_decisions[name];
 
-                    if (hasError) {
+                    if (hasError && this.negativeValidationEnabled) {
                         this.renderLiveValidationError($el, $label, $requiredTextLabel, $icon, $errorTip, error);
-                    } else {
+                    } else if (this.positiveValidationEnabled) {
                         this.renderLiveValidationSuccess($el, $label, $requiredTextLabel, $icon, $errorTip);
                     }
                 },
@@ -265,6 +268,7 @@
                         )
                     );
                     this.renderErrors(this.defaultFormErrorsTitle, this.errors);
+                    this.scrollToFormFeedback();
                     this.toggleDisableButton(false);
                 },
 
@@ -273,6 +277,11 @@
                     // The form did not get submitted due to validation errors.
                         $(this.el).show(); // Show in case the form was hidden for auto-submission
                     }
+                },
+
+                resetValidationVariables: function() {
+                    this.positiveValidationEnabled = true;
+                    this.negativeValidationEnabled = true;
                 },
 
                 renderAuthWarning: function() {
@@ -291,36 +300,30 @@
                     });
                 },
 
-                getFormData: function() {
-                    var obj = FormView.prototype.getFormData.apply(this, arguments),
-                        $form = this.$form,
-                        $emailElement = $form.find('input[name=email]'),
-                        $confirmEmail = $form.find('input[name=confirm_email]'),
-                        elements = $form[0].elements,
+                submitForm: function(event) { // eslint-disable-line no-unused-vars
+                    var elements = this.$form[0].elements,
                         $el,
-                        key = '',
                         i;
+
+                // As per requirements, disable positive validation for submission.
+                    this.positiveValidationEnabled = false;
 
                     for (i = 0; i < elements.length; i++) {
                         $el = $(elements[i]);
-                        key = $el.attr('name') || false;
-
-                        // Due to a bug in firefox, whitespaces in email type field are not removed.
-                        // TODO: Remove this code once firefox bug is resolved.
-                        if (key === 'email') {
-                            $el.val($el.val().trim());
-                        }
 
                         // Simulate live validation.
                         if ($el.attr('required')) {
                             $el.blur();
-
-                            // Special case: show required string for errors even if we're not focused.
-                            if ($el.hasClass('error')) {
-                                this.renderRequiredMessage($el);
-                            }
                         }
                     }
+
+                    FormView.prototype.submitForm.apply(this, arguments);
+                },
+
+                getFormData: function() {
+                    var obj = FormView.prototype.getFormData.apply(this, arguments),
+                        $emailElement = this.$form.find('input[name=email]'),
+                        $confirmEmail = this.$form.find('input[name=confirm_email]');
 
                     if ($confirmEmail.length) {
                         if (!$confirmEmail.val() || ($emailElement.val() !== $confirmEmail.val())) {
