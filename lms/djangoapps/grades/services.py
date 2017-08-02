@@ -6,6 +6,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 from util.date_utils import to_timestamp
 
+from .config.waffle import waffle_flags, REJECTED_EXAM_OVERRIDES_GRADE
 from .constants import ScoreDatabaseTableEnum
 from .models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
 
@@ -141,3 +142,7 @@ class GradesService(object):
                 score_db_table=ScoreDatabaseTableEnum.overrides
             )
         )
+
+    def should_override_grade_on_rejected_exam(self, course_key):
+        """Convienence function to return the state of the CourseWaffleFlag REJECTED_EXAM_OVERRIDES_GRADE"""
+        return waffle_flags()[REJECTED_EXAM_OVERRIDES_GRADE].is_enabled(course_key)
