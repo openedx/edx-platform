@@ -211,7 +211,7 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
         """
         def verify_course_summery_fields(course_summary):
             """ Verify that every `course_summary` object has all the required fields """
-            expected_fields = CourseSummary.course_info_fields + ['id', 'location']
+            expected_fields = CourseSummary.course_info_fields + ['id', 'location', 'has_ended']
             return all([hasattr(course_summary, field) for field in expected_fields])
 
         self.assertTrue(all(verify_course_summery_fields(course_summary) for course_summary in course_summaries))
