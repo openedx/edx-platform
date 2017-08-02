@@ -179,6 +179,7 @@ class GradesServiceTests(ModuleStoreTestCase):
         self.assertEqual(
             self.mock_signal.call_args,
             call(
+                sender=None,
                 user_id=self.user.id,
                 course_id=unicode(self.course.id),
                 usage_id=unicode(self.subsection.location),
@@ -205,6 +206,7 @@ class GradesServiceTests(ModuleStoreTestCase):
         self.assertEqual(
             self.mock_signal.call_args,
             call(
+                sender=None,
                 user_id=self.user.id,
                 course_id=unicode(self.course.id),
                 usage_id=unicode(self.subsection.location),

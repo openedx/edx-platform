@@ -96,6 +96,7 @@ class GradesService(object):
         # Signal will trigger subsection recalculation which will call PersistentSubsectionGrade.update_or_create_grade
         # which will use the above override to update the grade before writing to the table.
         SUBSECTION_OVERRIDE_CHANGED.send(
+            sender=None,
             user_id=user_id,
             course_id=unicode(course_key),
             usage_id=unicode(usage_key),
@@ -131,6 +132,7 @@ class GradesService(object):
         # which will no longer use the above deleted override, and instead return the grade to the original score from
         # the actual problem responses before writing to the table.
         SUBSECTION_OVERRIDE_CHANGED.send(
+            sender=None,
             user_id=user_id,
             course_id=unicode(course_key),
             usage_id=unicode(usage_key),
