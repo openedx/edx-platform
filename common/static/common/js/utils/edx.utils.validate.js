@@ -21,7 +21,7 @@
                 var _fn = {
                     validate: {
 
-                        template: _.template('<li id="<%- id %>-validation-error-container"><%- content %></li>'),
+                        template: _.template('<li><%- content %></li>'),
 
                         msg: {
                             email: gettext("The email address you've provided isn't formatted correctly."),
@@ -32,7 +32,6 @@
 
                         field: function(el) {
                             var $el = $(el),
-                                id = $el.attr('id'),
                                 required = true,
                                 min = true,
                                 max = true,
@@ -66,8 +65,6 @@
                                     email: email
                                 });
                             }
-
-                            response.id = id;
 
                             return response;
                         },
@@ -135,16 +132,21 @@
                                 label,
                                 context,
                                 content,
-                                customMsg;
+                                customMsg,
+                                liveValidationMsg;
 
                             _.each(tests, function(value, key) {
                                 if (!value) {
                                     label = _fn.validate.getLabel($el.attr('id'));
                                     customMsg = $el.data('errormsg-' + key) || false;
+                                    liveValidationMsg =
+                                        $('#' + $el.attr('id') + '-validation-error-msg').text() || false;
 
                                 // If the field has a custom error msg attached, use it
                                     if (customMsg) {
                                         content = customMsg;
+                                    } else if (liveValidationMsg) {
+                                        content = liveValidationMsg;
                                     } else {
                                         context = {field: label};
 
@@ -158,8 +160,7 @@
                                     }
 
                                     txt.push(_fn.validate.template({
-                                        content: content,
-                                        id: $el.attr('id')
+                                        content: content
                                     }));
                                 }
                             });
