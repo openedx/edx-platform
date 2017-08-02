@@ -23,18 +23,6 @@ from student.models import CourseEnrollmentAllowed
 from util.password_policy_validators import validate_password_strength
 
 
-USERNAME_TOO_SHORT_MSG = _("Username must be minimum of two characters long")
-USERNAME_TOO_LONG_MSG = _("Username cannot be more than %(limit_value)s characters long")
-
-# Translators: This message is shown when the Unicode usernames are NOT allowed
-USERNAME_INVALID_CHARS_ASCII = _("Usernames can only contain Roman letters, western numerals (0-9), "
-                                 "underscores (_), and hyphens (-).")
-
-# Translators: This message is shown only when the Unicode usernames are allowed
-USERNAME_INVALID_CHARS_UNICODE = _("Usernames can only contain letters, numerals, underscore (_), numbers "
-                                   "and @/./+/-/_ characters.")
-
-
 class PasswordResetFormNoActive(PasswordResetForm):
     error_messages = {
         'unknown': _("That e-mail address doesn't have an associated "
@@ -127,12 +115,12 @@ def validate_username(username):
 
     username_re = slug_re
     flags = None
-    message = USERNAME_INVALID_CHARS_ASCII
+    message = accounts_settings.USERNAME_INVALID_CHARS_ASCII
 
     if settings.FEATURES.get("ENABLE_UNICODE_USERNAME"):
         username_re = r"^{regex}$".format(regex=settings.USERNAME_REGEX_PARTIAL)
         flags = re.UNICODE
-        message = USERNAME_INVALID_CHARS_UNICODE
+        message = accounts_settings.USERNAME_INVALID_CHARS_UNICODE
 
     validator = RegexValidator(
         regex=username_re,
@@ -156,9 +144,9 @@ class UsernameField(forms.CharField):
             min_length=accounts_settings.USERNAME_MIN_LENGTH,
             max_length=accounts_settings.USERNAME_MAX_LENGTH,
             error_messages={
-                "required": USERNAME_TOO_SHORT_MSG,
-                "min_length": USERNAME_TOO_SHORT_MSG,
-                "max_length": USERNAME_TOO_LONG_MSG,
+                "required": accounts_settings.USERNAME_BAD_LENGTH_MSG,
+                "min_length": accounts_settings.USERNAME_BAD_LENGTH_MSG,
+                "max_length": accounts_settings.USERNAME_BAD_LENGTH_MSG,
             }
         )
 

@@ -2,6 +2,9 @@
 Account constants
 """
 
+from django.utils.translation import ugettext as _
+
+
 # The minimum and maximum length for the name ("full name") account field
 NAME_MIN_LENGTH = 2
 NAME_MAX_LENGTH = 255
@@ -25,3 +28,63 @@ ALL_USERS_VISIBILITY = 'all_users'
 
 # Indicates the user's preference that all their account information be private.
 PRIVATE_VISIBILITY = 'private'
+
+# Translators: This message is shown when the Unicode usernames are NOT allowed.
+# It is shown to users who attempt to create a new account using invalid characters
+# in the username.
+USERNAME_INVALID_CHARS_ASCII = _(
+    u"Usernames can only contain letters (A-Z, a-z), numerals (0-9), underscores (_), and hyphens (-)."
+)
+
+# Translators: This message is shown only when the Unicode usernames are allowed.
+# It is shown to users who attempt to create a new account using invalid characters
+# in the username.
+USERNAME_INVALID_CHARS_UNICODE = _(
+    u"Usernames can only contain letters, numerals, and @/./+/-/_ characters."
+)
+
+# Translators: This message is shown to users who attempt to create a new account using
+# an invalid email format.
+EMAIL_INVALID_MSG = _(u'"{email}" is not a valid email address.')
+
+# Translators: This message is shown to users who attempt to create a new
+# account using an username/email associated with an existing account.
+EMAIL_CONFLICT_MSG = _(
+    u"It looks like {email_address} belongs to an existing account. "
+    u"Try again with a different email address."
+)
+USERNAME_CONFLICT_MSG = _(
+    u"It looks like {username} belongs to an existing account. "
+    u"Try again with a different username."
+)
+
+# Translators: This message is shown to users who enter a username/email/password
+# with an inappropriate length (too short or too long).
+USERNAME_BAD_LENGTH_MSG = _(u"Username must be between {min} and {max} characters long.").format(
+    min=USERNAME_MIN_LENGTH, max=USERNAME_MAX_LENGTH
+)
+EMAIL_BAD_LENGTH_MSG = _(u"Enter a valid email address that contains at least {min} characters.").format(
+    min=EMAIL_MIN_LENGTH
+)
+PASSWORD_EMPTY_MSG = _(u"Please enter a password.")
+PASSWORD_BAD_MIN_LENGTH_MSG = _(u"Password is not long enough.")
+PASSWORD_BAD_MAX_LENGTH_MSG = _(u"Password cannot be longer than {max} character.").format(max=PASSWORD_MAX_LENGTH)
+
+# These strings are normally not user-facing.
+USERNAME_BAD_TYPE_MSG = u"Username must be a string."
+EMAIL_BAD_TYPE_MSG = u"Email must be a string."
+PASSWORD_BAD_TYPE_MSG = u"Password must be a string."
+
+# Translators: This message is shown to users who enter a password matching
+# the username they enter(ed).
+PASSWORD_CANT_EQUAL_USERNAME_MSG = _(u"Password cannot be the same as the username.")
+
+# Translators: These messages are shown to users who do not enter information
+# into the required field or enter it incorrectly.
+REQUIRED_FIELD_NAME_MSG = _(u"Please enter your Full Name.")
+REQUIRED_FIELD_CONFIRM_EMAIL_MSG = _(u"The email addresses do not match.")
+REQUIRED_FIELD_COUNTRY_MSG = _(u"Please select your Country.")
+REQUIRED_FIELD_CITY_MSG = _(u"Please enter your City.")
+REQUIRED_FIELD_GOALS_MSG = _(u"Please tell us your goals.")
+REQUIRED_FIELD_LEVEL_OF_EDUCATION_MSG = _(u"Please select your highest level of education completed.")
+REQUIRED_FIELD_MAILING_ADDRESS_MSG = _(u"Please enter your mailing address.")

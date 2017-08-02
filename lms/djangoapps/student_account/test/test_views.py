@@ -36,7 +36,6 @@ from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factor
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
-from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -62,24 +61,6 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
     NEW_EMAIL = u"walt@savewalterwhite.com"
 
     INVALID_ATTEMPTS = 100
-
-    INVALID_EMAILS = [
-        None,
-        u"",
-        u"a",
-        "no_domain",
-        "no+domain",
-        "@",
-        "@domain.com",
-        "test@no_extension",
-
-        # Long email -- subtract the length of the @domain
-        # except for one character (so we exceed the max length limit)
-        u"{user}@example.com".format(
-            user=(u'e' * (EMAIL_MAX_LENGTH - 11))
-        )
-    ]
-
     INVALID_KEY = u"123abc"
 
     URLCONF_MODULES = ['student_accounts.urls']

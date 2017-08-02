@@ -30,6 +30,17 @@
                         confirm_email: 'xsy@edx.org',
                         honor_code: true
                     },
+                    $email = null,
+                    $name = null,
+                    $username = null,
+                    $password = null,
+                    $levelOfEducation = null,
+                    $gender = null,
+                    $yearOfBirth = null,
+                    $mailingAddress = null,
+                    $goals = null,
+                    $confirmEmail = null,
+                    $honorCode = null,
                     THIRD_PARTY_AUTH = {
                         currentProvider: null,
                         providers: [
@@ -49,9 +60,26 @@
                             }
                         ]
                     },
+                    VALIDATION_DECISIONS_POSITIVE = {
+                        validation_decisions: {
+                            email: '',
+                            username: '',
+                            password: '',
+                            confirm_email: ''
+                        }
+                    },
+                    VALIDATION_DECISIONS_NEGATIVE = {
+                        validation_decisions: {
+                            email: 'Error.',
+                            username: 'Error.',
+                            password: 'Error.',
+                            confirm_email: 'Error'
+                        }
+                    },
                     FORM_DESCRIPTION = {
                         method: 'post',
                         submit_url: '/user_api/v1/account/registration/',
+                        validation_url: '/api/user/v1/validation/registration',
                         fields: [
                             {
                                 placeholder: 'username@domain.com',
@@ -110,10 +138,10 @@
                                 defaultValue: '',
                                 type: 'select',
                                 options: [
-                                {value: '', name: '--'},
-                                {value: 'p', name: 'Doctorate'},
-                                {value: 'm', name: "Master's or professional degree"},
-                                {value: 'b', name: "Bachelor's degree"}
+                                    {value: '', name: '--'},
+                                    {value: 'p', name: 'Doctorate'},
+                                    {value: 'm', name: "Master's or professional degree"},
+                                    {value: 'b', name: "Bachelor's degree"}
                                 ],
                                 required: false,
                                 instructions: 'Select your education level.',
@@ -126,10 +154,10 @@
                                 defaultValue: '',
                                 type: 'select',
                                 options: [
-                                {value: '', name: '--'},
-                                {value: 'm', name: 'Male'},
-                                {value: 'f', name: 'Female'},
-                                {value: 'o', name: 'Other'}
+                                    {value: '', name: '--'},
+                                    {value: 'm', name: 'Male'},
+                                    {value: 'f', name: 'Female'},
+                                    {value: 'o', name: 'Other'}
                                 ],
                                 required: false,
                                 instructions: 'Select your gender.',
@@ -142,10 +170,10 @@
                                 defaultValue: '',
                                 type: 'select',
                                 options: [
-                                {value: '', name: '--'},
-                                {value: 1900, name: '1900'},
-                                {value: 1950, name: '1950'},
-                                {value: 2014, name: '2014'}
+                                    {value: '', name: '--'},
+                                    {value: 1900, name: '1900'},
+                                    {value: 1950, name: '1950'},
+                                    {value: 2014, name: '2014'}
                                 ],
                                 required: false,
                                 instructions: 'Select your year of birth.',
@@ -185,7 +213,6 @@
                             }
                         ]
                     };
-
                 var createRegisterView = function(that) {
                 // Initialize the register model
                     model = new RegisterModel({}, {
@@ -209,6 +236,43 @@
                     view.on('auth-complete', function() {
                         authComplete = true;
                     });
+
+                // Target each form field.
+                    $email = $('#register-email');
+                    $confirmEmail = $('#register-confirm_email');
+                    $name = $('#register-name');
+                    $username = $('#register-username');
+                    $password = $('#register-password');
+                    $levelOfEducation = $('#register-level_of_education');
+                    $gender = $('#register-gender');
+                    $yearOfBirth = $('#register-year_of_birth');
+                    $mailingAddress = $('#register-mailing_address');
+                    $goals = $('#register-goals');
+                    $honorCode = $('#register-honor_code');
+                };
+
+                var fillData = function() {
+                    $email.val(USER_DATA.email);
+                    $confirmEmail.val(USER_DATA.email);
+                    $name.val(USER_DATA.name);
+                    $username.val(USER_DATA.username);
+                    $password.val(USER_DATA.password);
+                    $levelOfEducation.val(USER_DATA.level_of_education);
+                    $gender.val(USER_DATA.gender);
+                    $yearOfBirth.val(USER_DATA.year_of_birth);
+                    $mailingAddress.val(USER_DATA.mailing_address);
+                    $goals.val(USER_DATA.goals);
+                // Check the honor code checkbox
+                    $honorCode.prop('checked', USER_DATA.honor_code);
+                };
+
+                var liveValidate = function($el, validationSuccess) {
+                    $el.focus();
+                    if (!_.isUndefined(validationSuccess) && !validationSuccess) {
+                        model.trigger('validation', $el, VALIDATION_DECISIONS_NEGATIVE);
+                    } else {
+                        model.trigger('validation', $el, VALIDATION_DECISIONS_POSITIVE);
+                    }
                 };
 
                 var submitForm = function(validationSuccess) {
@@ -216,19 +280,7 @@
                     var clickEvent = $.Event('click');
 
                 // Simulate manual entry of registration form data
-                    $('#register-email').val(USER_DATA.email);
-                    $('#register-confirm_email').val(USER_DATA.email);
-                    $('#register-name').val(USER_DATA.name);
-                    $('#register-username').val(USER_DATA.username);
-                    $('#register-password').val(USER_DATA.password);
-                    $('#register-level_of_education').val(USER_DATA.level_of_education);
-                    $('#register-gender').val(USER_DATA.gender);
-                    $('#register-year_of_birth').val(USER_DATA.year_of_birth);
-                    $('#register-mailing_address').val(USER_DATA.mailing_address);
-                    $('#register-goals').val(USER_DATA.goals);
-
-                // Check the honor code checkbox
-                    $('#register-honor_code').prop('checked', USER_DATA.honor_code);
+                    fillData();
 
                 // If validationSuccess isn't passed, we avoid
                 // spying on `view.validate` twice
@@ -238,6 +290,10 @@
                             isValid: validationSuccess,
                             message: 'Submission was validated.'
                         });
+                    // Successful validation means there's no need to use AJAX calls from liveValidate,
+                        if (validationSuccess) {
+                            spyOn(view, 'liveValidate').and.callFake(function() {});
+                        }
                     }
 
                 // Submit the email address
@@ -284,6 +340,7 @@
                         if (param === '?course_id') {
                             return encodeURIComponent(COURSE_ID);
                         }
+                        return null;
                     });
 
                 // Attempt to register
@@ -308,17 +365,17 @@
                     expect($('.button-oa2-facebook')).toBeVisible();
                 });
 
-                it('validates registration form fields', function() {
+                it('validates registration form fields on form submission', function() {
                     createRegisterView(this);
 
                 // Submit the form, with successful validation
                     submitForm(true);
 
                 // Verify that validation of form fields occurred
-                    expect(view.validate).toHaveBeenCalledWith($('#register-email')[0]);
-                    expect(view.validate).toHaveBeenCalledWith($('#register-name')[0]);
-                    expect(view.validate).toHaveBeenCalledWith($('#register-username')[0]);
-                    expect(view.validate).toHaveBeenCalledWith($('#register-password')[0]);
+                    expect(view.validate).toHaveBeenCalledWith($email[0]);
+                    expect(view.validate).toHaveBeenCalledWith($name[0]);
+                    expect(view.validate).toHaveBeenCalledWith($username[0]);
+                    expect(view.validate).toHaveBeenCalledWith($password[0]);
 
                 // Verify that no submission errors are visible
                     expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
@@ -327,7 +384,34 @@
                     expect(view.$submitButton).toHaveAttr('disabled');
                 });
 
-                it('displays registration form validation errors', function() {
+                it('live validates registration form fields', function() {
+                    var requiredValidationFields = [$email, $confirmEmail, $username, $password],
+                        i,
+                        $el;
+                    createRegisterView(this);
+
+                    for (i = 0; i < requiredValidationFields.length; ++i) {
+                        $el = requiredValidationFields[i];
+
+                    // Perform successful live validations.
+                        liveValidate($el);
+
+                    // Confirm success.
+                        expect($el).toHaveClass('success');
+
+                    // Confirm that since we've blurred from each input, required text doesn't show.
+                        expect(view.getRequiredTextLabel($el)).toHaveClass('hidden');
+
+                    // Confirm fa-check shows.
+                        expect(view.getIcon($el)).toHaveClass('fa-check');
+                        expect(view.getIcon($el)).toBeVisible();
+
+                    // Confirm the error tip is empty.
+                        expect(view.getErrorTip($el).val().length).toBe(0);
+                    }
+                });
+
+                it('displays registration form validation errors on form submission', function() {
                     createRegisterView(this);
 
                 // Submit the form, with failed validation
@@ -343,7 +427,34 @@
                     expect(view.$submitButton).not.toHaveAttr('disabled');
                 });
 
-                it('displays an error if the server returns an error while registering', function() {
+                it('displays live registration form validation errors', function() {
+                    var requiredValidationFields = [$email, $confirmEmail, $username, $password],
+                        i,
+                        $el;
+                    createRegisterView(this);
+
+                    for (i = 0; i < requiredValidationFields.length; ++i) {
+                        $el = requiredValidationFields[i];
+
+                    // Perform invalid live validations.
+                        liveValidate($el, false);
+
+                    // Confirm error.
+                        expect($el).toHaveClass('error');
+
+                    // Confirm that since we've blurred from each input, required text still shows for errors.
+                        expect(view.getRequiredTextLabel($el)).not.toHaveClass('hidden');
+
+                    // Confirm fa-times shows.
+                        expect(view.getIcon($el)).toHaveClass('fa-exclamation');
+                        expect(view.getIcon($el)).toBeVisible();
+
+                    // Confirm the error tip shows an error message.
+                        expect(view.getErrorTip($el).val()).not.toBeEmpty();
+                    }
+                });
+
+                it('displays an error on form submission if the server returns an error', function() {
                     createRegisterView(this);
 
                 // Submit the form, with successful validation

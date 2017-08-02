@@ -296,10 +296,6 @@
                 display: inline;
             }
 
-            &.error {
-                color: $red;
-            }
-
             &[for="register-data_sharing_consent"],
             &[for="register-honor_code"],
             &[for="register-terms_of_service"] {
@@ -365,7 +361,22 @@
             }
 
             &.error {
-                border-color: $error-color;
+                border-color: $red;
+            }
+
+            &.success {
+                border-color: $success-color-hover;
+            }
+        }
+
+        textarea,
+        select {
+            &.error {
+                outline-color: $red;
+            }
+
+            &.success {
+                outline-color: $success-color-hover;
             }
         }
 
@@ -384,9 +395,16 @@
             &:active, &:focus {
                 outline: auto;
             }
+        }
 
+        span,
+        label {
             &.error {
-                outline-color: $error-color;
+                color: $red;
+            }
+
+            &.success {
+                color: $success-color-hover;
             }
         }
 
@@ -394,6 +412,7 @@
             @extend %t-copy-sub1;
             color: $uxpl-gray-base;
         }
+
         .tip {
             display: block;
         }
