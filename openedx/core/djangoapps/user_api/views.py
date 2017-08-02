@@ -23,6 +23,7 @@ import third_party_auth
 from django_comment_common.models import Role
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
@@ -328,7 +329,7 @@ class RegistrationView(APIView):
         username = data.get('username')
 
         # Handle duplicate email/username
-        conflicts = accounts.api.check_account_exists(email=email, username=username)
+        conflicts = check_account_exists(email=email, username=username)
         if conflicts:
             conflict_messages = {
                 "email": accounts.EMAIL_CONFLICT_MSG.format(email_address=email),
