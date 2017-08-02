@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-01 21:22+0000\n"
-"PO-Revision-Date: 2017-08-01 21:22:49.685108\n"
+"POT-Creation-Date: 2017-08-02 12:48+0000\n"
+"PO-Revision-Date: 2017-08-02 12:48:04.261143\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -328,31 +328,6 @@ msgstr ""
 
 #: common/djangoapps/student/admin.py
 msgid "User profile"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "Username must be minimum of two characters long"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-#, python-format
-msgid "Username cannot be more than %(limit_value)s characters long"
-msgstr ""
-
-#. Translators: This message is shown when the Unicode usernames are NOT
-#. allowed
-#: common/djangoapps/student/forms.py
-msgid ""
-"Usernames can only contain Roman letters, western numerals (0-9), "
-"underscores (_), and hyphens (-)."
-msgstr ""
-
-#. Translators: This message is shown only when the Unicode usernames are
-#. allowed
-#: common/djangoapps/student/forms.py
-msgid ""
-"Usernames can only contain letters, numerals, underscore (_), numbers and "
-"@/./+/-/_ characters."
 msgstr ""
 
 #: common/djangoapps/student/forms.py
@@ -9307,6 +9282,101 @@ msgstr ""
 msgid "Theming Administration"
 msgstr ""
 
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid ""
+"Usernames can only contain letters (A-Z, a-z), numerals (0-9), underscores "
+"(_), and hyphens (-)."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid ""
+"Usernames can only contain letters, numerals, and @/./+/-/_ characters."
+msgstr ""
+
+#. Translators: This message is shown to users who attempt to create a new
+#. account using
+#. an invalid email format.
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid "\"{email}\" is not a valid email address."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid ""
+"It looks like {email_address} belongs to an existing account. Try again with"
+" a different email address."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid ""
+"It looks like {username} belongs to an existing account. Try again with a "
+"different username."
+msgstr ""
+
+#. Translators: This message is shown to users who enter a
+#. username/email/password
+#. with an inappropriate length (too short or too long).
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid "Username must be between {min} and {max} characters long."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid "Enter a valid email address that contains at least {min} characters."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please enter a password."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Password is not long enough."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid "Password cannot be longer than {max} character."
+msgstr ""
+
+#. Translators: This message is shown to users who enter a password matching
+#. the username they enter(ed).
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Password cannot be the same as the username."
+msgstr ""
+
+#. Translators: These messages are shown to users who do not enter information
+#. into the required field or enter it incorrectly.
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please enter your Full Name."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "The email addresses do not match."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please select your Country."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please enter your City."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please tell us your goals."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please select your highest level of education completed."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please enter your mailing address."
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/accounts/api.py
 #, python-brace-format
 msgid "The '{field_name}' field cannot be edited."
@@ -9392,24 +9462,6 @@ msgstr ""
 msgid "Remember me"
 msgstr ""
 
-#. Translators: This message is shown to users who attempt to create a new
-#. account using an email address associated with an existing account.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid ""
-"It looks like {email_address} belongs to an existing account. Try again with"
-" a different email address."
-msgstr ""
-
-#. Translators: This message is shown to users who attempt to create a new
-#. account using a username associated with an existing account.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid ""
-"It looks like {username} belongs to an existing account. Try again with a "
-"different username."
-msgstr ""
-
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -9421,10 +9473,6 @@ msgstr ""
 #. meant to confirm the user's email address.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Confirm Email"
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/views.py
-msgid "The email addresses do not match."
 msgstr ""
 
 #. Translators: This example name is used as a placeholder in
@@ -9503,10 +9551,6 @@ msgstr ""
 #. which allows the user to input the Company
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Company"
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Please select your Country."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
@@ -19611,6 +19655,10 @@ msgid ""
 msgstr ""
 
 #: cms/templates/index.html
+msgid "Archived Courses"
+msgstr ""
+
+#: cms/templates/index.html
 msgid "Libraries"
 msgstr ""
 
@@ -21665,7 +21713,7 @@ msgid "Your changes were saved."
 msgstr ""
 
 #: wiki/views/article.py
-msgid "A new revision of the article was succesfully added."
+msgid "A new revision of the article was successfully added."
 msgstr ""
 
 #: wiki/views/article.py
