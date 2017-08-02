@@ -3,6 +3,7 @@
 from datetime import datetime, timedelta
 
 import ddt
+import waffle
 from django.core.urlresolvers import reverse
 from freezegun import freeze_time
 from nose.plugins.attrib import attr
@@ -34,6 +35,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 @attr(shard=1)
 @ddt.ddt
+@waffle.testutils.override_switch('schedules.enable-create-schedule-receiver', True)
 class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""
 
@@ -171,12 +173,12 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
     @ddt.data(
         # Course not started
-        ({}, (CourseStartDate, TodaysDate, CourseEndDate, VerifiedUpgradeDeadlineDate)),
+        ({}, (CourseStartDate, TodaysDate, CourseEndDate)),
         # Course active
-        ({'days_till_start': -1}, (TodaysDate, CourseEndDate, VerifiedUpgradeDeadlineDate)),
+        ({'days_till_start': -1}, (TodaysDate, CourseEndDate)),
         # Course ended
         ({'days_till_start': -10, 'days_till_end': -5},
-         (TodaysDate, CourseEndDate, VerifiedUpgradeDeadlineDate)),
+         (TodaysDate, CourseEndDate)),
     )
     @ddt.unpack
     def test_enabled_block_types_without_enrollment(self, course_kwargs, expected_blocks):

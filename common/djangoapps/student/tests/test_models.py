@@ -4,12 +4,15 @@ import datetime
 import hashlib
 
 import ddt
+import factory
 import pytz
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
+from django.db.models import signals
 from django.db.models.functions import Lower
 
 from course_modes.models import CourseMode
+from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import CourseEnrollment
@@ -112,14 +115,18 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
         self.assertListEqual([self.user, self.user_2], all_enrolled_users)
 
     @skip_unless_lms
+    # NOTE: We mute the post_save signal to prevent Schedules from being created for new enrollments
+    @factory.django.mute_signals(signals.post_save)
     def test_upgrade_deadline(self):
         """ The property should use either the CourseMode or related Schedule to determine the deadline. """
         course_mode = CourseModeFactory(
             course_id=self.course.id,
             mode_slug=CourseMode.VERIFIED,
-            expiration_datetime=datetime.datetime.now(pytz.UTC)
+            # This must be in the future to ensure it is returned by downstream code.
+            expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
         )
         enrollment = CourseEnrollmentFactory(course_id=self.course.id, mode=CourseMode.AUDIT)
+        self.assertEqual(Schedule.objects.all().count(), 0)
         self.assertEqual(enrollment.upgrade_deadline, course_mode.expiration_datetime)
 
         # The schedule's upgrade deadline should be used if a schedule exists
