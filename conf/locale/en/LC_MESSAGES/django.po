@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-01 21:22+0000\n"
-"PO-Revision-Date: 2017-08-01 21:22:49.685108\n"
+"POT-Creation-Date: 2017-08-02 12:48+0000\n"
+"PO-Revision-Date: 2017-08-02 12:48:04.261143\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -9263,6 +9263,25 @@ msgstr ""
 msgid "Enable course home page improvements."
 msgstr ""
 
+#: openedx/core/djangoapps/theming/views.py
+#, python-brace-format
+msgid "Site theme changed to {site_theme}"
+msgstr ""
+
+#: openedx/core/djangoapps/theming/views.py
+#, python-brace-format
+msgid "Theme {site_theme} does not exist"
+msgstr ""
+
+#: openedx/core/djangoapps/theming/views.py
+msgid "Site theme reverted to the default"
+msgstr ""
+
+#: openedx/core/djangoapps/theming/views.py
+#: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
+msgid "Theming Administration"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid ""
 "Usernames can only contain letters (A-Z, a-z), numerals (0-9), underscores "
@@ -9340,6 +9359,22 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Please select your Country."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please enter your City."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please tell us your goals."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please select your highest level of education completed."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please enter your mailing address."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
@@ -19620,6 +19655,10 @@ msgid ""
 msgstr ""
 
 #: cms/templates/index.html
+msgid "Archived Courses"
+msgstr ""
+
+#: cms/templates/index.html
 msgid "Libraries"
 msgstr ""
 
@@ -21674,7 +21713,7 @@ msgid "Your changes were saved."
 msgstr ""
 
 #: wiki/views/article.py
-msgid "A new revision of the article was succesfully added."
+msgid "A new revision of the article was successfully added."
 msgstr ""
 
 #: wiki/views/article.py
