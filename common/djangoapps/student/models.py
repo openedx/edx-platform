@@ -13,7 +13,6 @@ file and check it in at the same time as your model changes. To do that,
 import hashlib
 import json
 import logging
-from slumber.exceptions import HttpClientError
 import uuid
 from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, timedelta
@@ -37,11 +36,14 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
+from edx_rest_api_client.exceptions import SlumberBaseException
+from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pytz import UTC
 from simple_history.models import HistoricalRecords
+from slumber.exceptions import HttpClientError, HttpServerError
 
 import dogstats_wrapper as dog_stats_api
 import lms.lib.comment_client as cc
@@ -49,7 +51,6 @@ import request_cache
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from enrollment.api import _default_course_mode
-from eventtracking import tracker
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
@@ -1624,11 +1625,23 @@ class CourseEnrollment(models.Model):
         order_number = attribute.value
         try:
             order = ecommerce_api_client(self.user).orders(order_number).get()
+
         except HttpClientError:
             log.warning(
                 u"Encountered HttpClientError while getting order details from ecommerce. "
                 u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+            return None
 
+        except HttpServerError:
+            log.warning(
+                u"Encountered HttpServerError while getting order details from ecommerce. "
+                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+            return None
+
+        except SlumberBaseException:
+            log.warning(
+                u"Encountered an error while getting order details from ecommerce. "
+                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
             return None
 
         refund_window_start_date = max(
