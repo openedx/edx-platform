@@ -146,6 +146,8 @@ REGISTRATION_UTM_PARAMETERS = {
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
 # used to announce a registration
 REGISTER_USER = Signal(providing_args=["user", "profile"])
+# used to announce refund from dashboard unenroll
+REFUND_ORDER = Signal(providing_args=["course_enrollment", "skip_refund"])
 
 # Disable this warning because it doesn't make sense to completely refactor tests to appease Pylint
 # pylint: disable=logging-format-interpolation
@@ -1267,6 +1269,8 @@ def change_enrollment(request, check_access=True):
             return HttpResponseBadRequest(_("Your certificate prevents you from unenrolling from this course"))
 
         CourseEnrollment.unenroll(user, course_id)
+        REFUND_ORDER.send(sender=None, course_enrollment=enrollment, skip_refund=False)
+
         return HttpResponse()
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
