@@ -77,7 +77,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         """Now test the exception cases with of reset_password called with invalid email."""
 
         bad_email = self.user.email + "makeItFail"
-        bad_email_req = self.request_factory.post('/password_reset/', {'email': bad_email })
+        bad_email_req = self.request_factory.post('/password_reset/', {'email': bad_email})
         bad_email_resp = password_reset(bad_email_req)
         # Note: even if the email is bad, we return a successful response code
         # This prevents someone potentially trying to "brute-force" find out which

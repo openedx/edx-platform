@@ -1,6 +1,7 @@
 define(['js/utils/drag_and_drop', 'common/js/components/views/feedback_notification',
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'jquery', 'underscore', 'sinon'],
     function(ContentDragger, Notification, AjaxHelpers, $, _, sinon) {
+        'use strict';
         describe('Overview drag and drop functionality', function() {
             beforeEach(function() {
                 setFixtures(readFixtures('mock/mock-outline.underscore'));

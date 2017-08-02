@@ -18,12 +18,11 @@ SAFELINT_THRESHOLDS=`cat scripts/safelint_thresholds.json`
 export SAFELINT_THRESHOLDS=${SAFELINT_THRESHOLDS//[[:space:]]/}
 
 doCheckVars() {
+    SCRIPT_TO_RUN=scripts/generic-ci-tests.sh
     if [ -n "$CIRCLECI" ] ; then
         SCRIPT_TO_RUN=scripts/circle-ci-tests.sh
-
     elif [ -n "$JENKINS_HOME" ] ; then
         source scripts/jenkins-common.sh
-        SCRIPT_TO_RUN=scripts/generic-ci-tests.sh
     fi
 }
 

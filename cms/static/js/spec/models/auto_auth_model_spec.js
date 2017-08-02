@@ -62,11 +62,11 @@ define([
                 }
             };
 
-            it('should exist', function() {
+            xit('should exist', function() {
                 expect(model).toBeDefined();
             });
 
-            it('should intercept 401 errors and attempt auth', function() {
+            xit('should intercept 401 errors and attempt auth', function() {
                 var callParams;
 
                 spyOnBackboneSync(401);
@@ -88,7 +88,7 @@ define([
                 expect(callParams.options.headers.Authorization).toEqual('JWT test-id-token');
             });
 
-            it('should not intercept non-401 errors', function() {
+            xit('should not intercept non-401 errors', function() {
                 spyOnBackboneSync(403);
 
                 // invoke AutoAuthModel.sync

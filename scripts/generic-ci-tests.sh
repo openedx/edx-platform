@@ -54,6 +54,7 @@ set -e
 # or else no tests will be executed.
 SHARD=${SHARD:="all"}
 NUMBER_OF_BOKCHOY_THREADS=${NUMBER_OF_BOKCHOY_THREADS:=1}
+export LETTUCE_BROWSER='firefox'
 
 # Clean up previous builds
 git clean -qxfd
@@ -165,8 +166,8 @@ case "$TEST_SUITE" in
         # Back compatibility support for firefox upgrade:
         # Copy newer firefox version to project root,
         # set that as the path for bok-choy to use.
-        cp -R $HOME/firefox/ firefox/
-        export SELENIUM_FIREFOX_PATH=firefox/firefox
+#         cp -R $HOME/firefox/ firefox/
+#         export SELENIUM_FIREFOX_PATH=firefox/firefox
 
         PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS --with-flaky --with-xunit"
 

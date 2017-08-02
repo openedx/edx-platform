@@ -6,6 +6,7 @@ from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from microsite_configuration import microsite
 from django.contrib.sites.models import Site
 
+
 def get_current_site_configuration():
     """
     Return configuration for the current site.
@@ -230,7 +231,8 @@ def page_title_breadcrumbs(*crumbs, **kwargs):
         return u'{}{}{}'.format(separator.join(crumbs), separator, platform_name)
     else:
         return platform_name
-		
+
+
 def get_lms_base_values(org, default=None):
     """
     This function will return a dictionary of site's display name as key
@@ -243,11 +245,11 @@ def get_lms_base_values(org, default=None):
         except:
             return default
         course_org_filter = site_config.get_value('course_org_filter')
-        if course_org_filter:
-            if org in course_org_filter:        
-                lms_base_value = site_config.get_value('LMS_BASE')
-                if site.name not in site_dict:
-                    site_dict[site.name] = lms_base_value
+
+        if course_org_filter and org in course_org_filter:
+            lms_base_value = site_config.get_value('LMS_BASE')
+            if site.name not in site_dict:
+                site_dict[site.name] = lms_base_value
         else:
             return default
     return site_dict

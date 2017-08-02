@@ -304,8 +304,9 @@ class ImportManager(object):
         """
         Import the base module/block
         """
-        if self.verbose:
-            log.debug("Scanning %s for courselike module...", courselike_key)
+        # if self.verbose:
+        log.debug("Scanning %s for courselike module...", courselike_key)
+        log.debug("VARIABLES runtime: {}, key: {}, dest_id: {}, source_courselike: {}".format(str(runtime), str(courselike_key), str(dest_id), str(source_courselike)))
 
         # Quick scan to get course module as we need some info from there.
         # Also we need to make sure that the course module is committed
