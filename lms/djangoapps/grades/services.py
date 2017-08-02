@@ -9,6 +9,7 @@ from util.date_utils import to_timestamp
 from .config.waffle import waffle_flags, REJECTED_EXAM_OVERRIDES_GRADE
 from .constants import ScoreDatabaseTableEnum
 from .models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
+from .signals.signals import SUBSECTION_OVERRIDE_CHANGED
 
 
 def _get_key(key_or_id, key_cls):
@@ -70,8 +71,7 @@ class GradesService(object):
         override earned_all or earned_graded value if they are None. Both default to None.
         """
         # prevent circular imports:
-        from .signals.handlers import SUBSECTION_RESCORE_EVENT_TYPE
-        from .tasks import recalculate_subsection_grade_v3
+        from .signals.handlers import SUBSECTION_OVERRIDE_EVENT_TYPE
 
         course_key = _get_key(course_key_or_id, CourseKey)
         usage_key = _get_key(usage_key_or_id, UsageKey)
@@ -89,22 +89,20 @@ class GradesService(object):
             earned_graded_override=earned_graded
         )
 
-        # Recalculation will call PersistentSubsectionGrade.update_or_create_grade which will use the above override
-        # to update the grade before writing to the table.
-        event_transaction_id = create_new_event_transaction_id()
-        set_event_transaction_type(SUBSECTION_RESCORE_EVENT_TYPE)
-        recalculate_subsection_grade_v3.apply_async(
-            kwargs=dict(
-                user_id=user_id,
-                course_id=unicode(course_key),
-                usage_id=unicode(usage_key),
-                only_if_higher=False,
-                expected_modified_time=to_timestamp(override.modified),
-                score_deleted=False,
-                event_transaction_id=unicode(event_transaction_id),
-                event_transaction_type=SUBSECTION_RESCORE_EVENT_TYPE,
-                score_db_table=ScoreDatabaseTableEnum.overrides
-            )
+        # Cache a new event id and event type which the signal handler will use to emit a tracking log event.
+        create_new_event_transaction_id()
+        set_event_transaction_type(SUBSECTION_OVERRIDE_EVENT_TYPE)
+
+        # Signal will trigger subsection recalculation which will call PersistentSubsectionGrade.update_or_create_grade
+        # which will use the above override to update the grade before writing to the table.
+        SUBSECTION_OVERRIDE_CHANGED.send(
+            user_id=user_id,
+            course_id=unicode(course_key),
+            usage_id=unicode(usage_key),
+            only_if_higher=False,
+            modified=override.modified,
+            score_deleted=False,
+            score_db_table=ScoreDatabaseTableEnum.overrides
         )
 
     def undo_override_subsection_grade(self, user_id, course_key_or_id, usage_key_or_id):
@@ -115,8 +113,7 @@ class GradesService(object):
         override does not exist, no error is raised, it just triggers the recalculation.
         """
         # prevent circular imports:
-        from .signals.handlers import SUBSECTION_RESCORE_EVENT_TYPE
-        from .tasks import recalculate_subsection_grade_v3
+        from .signals.handlers import SUBSECTION_OVERRIDE_EVENT_TYPE
 
         course_key = _get_key(course_key_or_id, CourseKey)
         usage_key = _get_key(usage_key_or_id, UsageKey)
@@ -126,23 +123,24 @@ class GradesService(object):
         if override is not None:
             override.delete()
 
-        event_transaction_id = create_new_event_transaction_id()
-        set_event_transaction_type(SUBSECTION_RESCORE_EVENT_TYPE)
-        recalculate_subsection_grade_v3.apply_async(
-            kwargs=dict(
-                user_id=user_id,
-                course_id=unicode(course_key),
-                usage_id=unicode(usage_key),
-                only_if_higher=False,
-                # Not used when score_deleted=True:
-                expected_modified_time=to_timestamp(datetime.now().replace(tzinfo=pytz.UTC)),
-                score_deleted=True,
-                event_transaction_id=unicode(event_transaction_id),
-                event_transaction_type=SUBSECTION_RESCORE_EVENT_TYPE,
-                score_db_table=ScoreDatabaseTableEnum.overrides
-            )
+        # Cache a new event id and event type which the signal handler will use to emit a tracking log event.
+        create_new_event_transaction_id()
+        set_event_transaction_type(SUBSECTION_OVERRIDE_EVENT_TYPE)
+
+        # Signal will trigger subsection recalculation which will call PersistentSubsectionGrade.update_or_create_grade
+        # which will no longer use the above deleted override, and instead return the grade to the original score from
+        # the actual problem responses before writing to the table.
+        SUBSECTION_OVERRIDE_CHANGED.send(
+            user_id=user_id,
+            course_id=unicode(course_key),
+            usage_id=unicode(usage_key),
+            only_if_higher=False,
+            modified=datetime.now().replace(tzinfo=pytz.UTC),  # Not used when score_deleted=True
+            score_deleted=True,
+            score_db_table=ScoreDatabaseTableEnum.overrides
         )
 
-    def should_override_grade_on_rejected_exam(self, course_key):
+    def should_override_grade_on_rejected_exam(self, course_key_or_id):
         """Convienence function to return the state of the CourseWaffleFlag REJECTED_EXAM_OVERRIDES_GRADE"""
+        course_key = _get_key(course_key_or_id, CourseKey)
         return waffle_flags()[REJECTED_EXAM_OVERRIDES_GRADE].is_enabled(course_key)

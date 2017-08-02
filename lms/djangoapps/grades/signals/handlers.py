@@ -30,7 +30,8 @@ from .signals import (
     PROBLEM_RAW_SCORE_CHANGED,
     PROBLEM_WEIGHTED_SCORE_CHANGED,
     SCORE_PUBLISHED,
-    SUBSECTION_SCORE_CHANGED
+    SUBSECTION_SCORE_CHANGED,
+    SUBSECTION_OVERRIDE_CHANGED
 )
 
 log = getLogger(__name__)
@@ -38,7 +39,7 @@ log = getLogger(__name__)
 # define values to be used in grading events
 GRADES_RESCORE_EVENT_TYPE = 'edx.grades.problem.rescored'
 PROBLEM_SUBMITTED_EVENT_TYPE = 'edx.grades.problem.submitted'
-SUBSECTION_RESCORE_EVENT_TYPE = 'edx.grades.subsection.rescored'
+SUBSECTION_OVERRIDE_EVENT_TYPE = 'edx.grades.subsection.score_overridden'
 
 
 @receiver(score_set)
@@ -210,9 +211,10 @@ def problem_raw_score_changed_handler(sender, **kwargs):  # pylint: disable=unus
 
 
 @receiver(PROBLEM_WEIGHTED_SCORE_CHANGED)
+@receiver(SUBSECTION_OVERRIDE_CHANGED)
 def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argument
     """
-    Handles the PROBLEM_WEIGHTED_SCORE_CHANGED signal by
+    Handles the PROBLEM_WEIGHTED_SCORE_CHANGED or SUBSECTION_OVERRIDE_CHANGED signals by
     enqueueing a subsection update operation to occur asynchronously.
     """
     _emit_event(kwargs)
@@ -294,9 +296,9 @@ def _emit_event(kwargs):
             }
         )
 
-    if root_type in [SUBSECTION_RESCORE_EVENT_TYPE]:
+    if root_type in [SUBSECTION_OVERRIDE_EVENT_TYPE]:
         tracker.emit(
-            unicode(SUBSECTION_RESCORE_EVENT_TYPE),
+            unicode(SUBSECTION_OVERRIDE_EVENT_TYPE),
             {
                 'course_id': unicode(kwargs['course_id']),
                 'user_id': unicode(kwargs['user_id']),
