@@ -304,6 +304,7 @@ def _emit_event(kwargs):
                 'user_id': unicode(kwargs['user_id']),
                 'problem_id': unicode(kwargs['usage_id']),
                 'only_if_higher': kwargs.get('only_if_higher'),
+                'override_deleted': kwargs.get('score_deleted', False),
                 'event_transaction_id': unicode(get_event_transaction_id()),
                 'event_transaction_type': unicode(root_type),
             }
