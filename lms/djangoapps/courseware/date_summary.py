@@ -14,10 +14,8 @@ from lazy import lazy
 from pytz import timezone, utc
 
 from course_modes.models import CourseMode
-from courseware.models import CourseDynamicUpgradeDeadlineConfiguration, DynamicUpgradeDeadlineConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment
 
 
@@ -224,10 +222,6 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
     def enrollment(self):
         return CourseEnrollment.get_enrollment(self.user, self.course_id)
 
-    @cached_property
-    def course_overview(self):
-        return CourseOverview.get_from_id(self.course_id)
-
     @property
     def is_enabled(self):
         """
@@ -258,36 +252,8 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
     def date(self):
         deadline = None
 
-        try:
-            verified_mode = CourseMode.objects.get(course_id=self.course_id, mode_slug=CourseMode.VERIFIED)
-            deadline = verified_mode.expiration_datetime
-        except CourseMode.DoesNotExist:
-            pass
-
-        if self.course and self.course_overview.self_paced and self.enrollment:
-            global_config = DynamicUpgradeDeadlineConfiguration.current()
-            if global_config.enabled:
-                delta = global_config.deadline_days
-
-                # Check if the given course has opted out of the feature
-                course_config = CourseDynamicUpgradeDeadlineConfiguration.current(self.course.id)
-                if course_config.enabled:
-                    if course_config.opt_out:
-                        return deadline
-
-                    delta = course_config.deadline_days
-
-                # This represents the first date at which the learner can access the content. This will be the
-                # latter of either the enrollment date or the course's start date.
-                content_availability_date = max(self.enrollment.created, self.course_overview.start)
-                user_deadline = content_availability_date + datetime.timedelta(days=delta)
-
-                # If the deadline from above is None, make sure we have a value for comparison
-                deadline = deadline or datetime.date.max
-
-                # The user-specific deadline should never occur after the verified mode's expiration date,
-                # if one is set.
-                deadline = min(deadline, user_deadline)
+        if self.enrollment:
+            deadline = self.enrollment.upgrade_deadline
 
         return deadline
 
