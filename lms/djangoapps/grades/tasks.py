@@ -26,7 +26,7 @@ from track.event_transaction_utils import set_event_transaction_id, set_event_tr
 from util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
-from .config.waffle import ESTIMATE_FIRST_ATTEMPTED, waffle
+from .config.waffle import ESTIMATE_FIRST_ATTEMPTED, DISABLE_REGRADE_ON_POLICY_CHANGE, waffle
 from .constants import ScoreDatabaseTableEnum
 from .exceptions import DatabaseNotReadyError
 from .new.course_grade_factory import CourseGradeFactory
@@ -58,14 +58,19 @@ def compute_all_grades_for_course(**kwargs):
     Kicks off a series of compute_grades_for_course_v2 tasks
     to cover all of the students in the course.
     """
-    course_key = CourseKey.from_string(kwargs.pop('course_key'))
-    for course_key_string, offset, batch_size in _course_task_args(course_key=course_key, **kwargs):
-        kwargs.update({
-            'course_key': course_key_string,
-            'offset': offset,
-            'batch_size': batch_size,
-        })
-        compute_grades_for_course_v2.apply_async(kwargs=kwargs, routing_key=settings.POLICY_CHANGE_GRADES_ROUTING_KEY)
+    if waffle().is_enabled(DISABLE_REGRADE_ON_POLICY_CHANGE):
+        log.debug('Grades: ignoring policy change regrade due to waffle switch')
+    else:
+        course_key = CourseKey.from_string(kwargs.pop('course_key'))
+        for course_key_string, offset, batch_size in _course_task_args(course_key=course_key, **kwargs):
+            kwargs.update({
+                'course_key': course_key_string,
+                'offset': offset,
+                'batch_size': batch_size,
+            })
+            compute_grades_for_course_v2.apply_async(
+                kwargs=kwargs, routing_key=settings.POLICY_CHANGE_GRADES_ROUTING_KEY
+            )
 
 
 @task(base=_BaseTask, bind=True, default_retry_delay=30, max_retries=1)

@@ -727,10 +727,6 @@ class TestCourseGradeLogging(ProblemSubmissionTestMixin, SharedModuleStoreTestCa
             enabled_for_course=True
         ):
             with patch('lms.djangoapps.grades.new.course_grade_factory.log') as log_mock:
-                # returns Zero when no grade, with ASSUME_ZERO_GRADE_IF_ABSENT
-                with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=True):
-                    self._create_course_grade_and_check_logging(grade_factory.create, log_mock.info, u'CreateZero')
-
                 # read, but not persisted
                 self._create_course_grade_and_check_logging(grade_factory.create, log_mock.info, u'Update')
 
