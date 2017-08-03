@@ -1,76 +1,90 @@
-# based on https://github.com/alexkaratarakis/gitattributes
+# inspired by https://github.com/alexkaratarakis/gitattributes
 
-## Default
-* text=auto   eol=lf
+ ## Default
+* text=auto
 
-## Python Binary files
-*.db     binary
-*.p      binary
-*.pkl    binary
-*.pyc    binary
-*.pyd    binary
-*.pyo    binary
+## Repo configurations
+.*coveragerc*   text eol=lf
+.editorconfig   text eol=lf
+.gitattributes  text eol=lf
+.gitkeep        text eol=lf
+.*ignore*       text eol=lf
+.npmrc          text eol=lf
+*.tf            text eol=lf
+vim             text eol=lf
+gitconfig       text eol=lf
+inventory       text eol=lf
+pylintrc*       text eol=lf
 
-## GRAPHICS
-*.ai     binary
-*.bmp    binary
-*.eps    binary
-*.gif    binary
-*.ico    binary
-*.jng    binary
-*.jp2    binary
-*.jpg    binary
-*.jpeg   binary
-*.jpx    binary
-*.jxr    binary
-*.pdf    binary
-*.png    binary
-*.psb    binary
-*.psd    binary
-*.svg    binary
-*.svgz   binary
-*.tif    binary
-*.tiff   binary
-*.wbmp   binary
-*.webp   binary
+## Script
+*.bat           text eol=lf
+*.cmd           text eol=lf
+*.mk            text eol=lf
+*.patch         text eol=lf
+*.ps1           text eol=lf
+*.py            text eol=lf
+*.sh            text eol=lf
+Dockerfile      text eol=lf
+Makefile        text eol=lf
+makefile        text eol=lf
+Vagrantfile     text eol=lf
 
-## VIDEO
-*.3gpp   binary
-*.3gp    binary
-*.as     binary
-*.asf    binary
-*.asx    binary
-*.fla    binary
-*.flv    binary
-*.m4v    binary
-*.mng    binary
-*.mov    binary
-*.mp4    binary
-*.mpeg   binary
-*.mpg    binary
-*.ogv    binary
-*.swc    binary
-*.swf    binary
-*.webm   binary
+## Code
+*.c             text eol=lf
+*.groovy        text eol=lf
+*.php           text eol=lf
+*.sql           text eol=lf
 
-## ARCHIVES
-*.7z     binary
-*.gz     binary
-*.jar    binary
-*.rar    binary
-*.tar    binary
-*.zip    binary
+## Web
+*.coffee        text eol=lf
+*.css           text eol=lf
+*.html*         text eol=lf
+*.less          text eol=lf
+*.scss          text eol=lf
 
-## Localization
-*.mo     binary
+## Web Templates
+*.mustache      text eol=lf
+*.underscore    text eol=lf
 
-## FONTS
-*.bcmap  binary
-*.ttf    binary
-*.eot    binary
-*.otf    binary
-*.woff   binary
-*.woff2  binary
+## Settings, Data, and Declarative Scripts
+*.cfg           text eol=lf
+*.cnf           text eol=lf
+*.conf          text eol=lf
+*.csv           text eol=lf
+*.diff          text eol=lf
+*.ini           text eol=lf
+*.j2            text eol=lf
+*.json          text eol=lf
+*.sjson         text eol=lf
+*.xml           text eol=lf
+*.XML           text eol=lf
+*.yaml          text eol=lf
+*.yml           text eol=lf
+config          text eol=lf
 
-## Misc
-*.dat    binary
+## Documentation and Content
+*.example       text eol=lf
+*.feature       text eol=lf
+*.log           text eol=lf
+*.md            text eol=lf
+*.plain         text eol=lf
+*.po            text eol=lf
+*.properties    text eol=lf
+*.rst           text eol=lf
+*.srt           text eol=lf
+*.txt*          text eol=lf
+*.TXT           text eol=lf
+*.vtt           text eol=lf
+AUTHORS         text eol=lf
+COPYING         text eol=lf
+LICENSE         text eol=lf
+README          text eol=lf
+
+# list built using the following commands
+#
+# files WITH extensions
+#   find . -type f -printf '%f\n' | grep -i "\." | sed 's|.*\.||' | grep -v -i "^\(db\|pkl\|pyc\|pyd\|pyo\|ai\|bmp\|eps\|gif\|ico\|jng\|jp2\|jpg\|jpeg\|jpx\|jxr\|pdf\|png\|psb\|psd\|svg\|graphml\|svgz\|tif\|tiff\|wbmp\|webp\|3gpp\|3gp\|as\|asf\|asx\|fla\|flv\|m4v\|mng\|mov\|mp4\|mpeg\|mpg\|ogv\|swc\|swf\|webm\|7z\|gz\|jar\|rar\|tar\|zip\|mo\|bcmap\|ttf\|eot\|otf\|woff\|woff2\|dat\|dll\|exe\|wav\|cer\|config\|content\|crt\|cscfg\|csdef\|cur\|DS_Store\|fic\|idx\|key\|ogg\|lci\|lib\|man\|metagen\|mui\|snk\|winmd\|xsd\|csplugin\|exp\|nupkg\|pack\|pdb\|pem\|pfx\|pub\|ps1xml\|sample\|assemblylookupcache\|psd1\|notyaml\|mp99\|out\|noci\)$" | sort | uniq
+#
+# files with NO extensions
+#   find . -type f | grep -v "\.git" | sed 's|.*/||' | grep -v "\." | grep -v -i "font\|default_mdsd\|rsa\|10periodic\|20unattended-upgrade\|bash_profile\|browsermob-proxy\|go\-agent\-env\-vars\|ec2_\|mongodb_\|munin\-edx\|rds_local\|route53_2_1_1_0\|ssh_key_forward\|tag_environment_prod\|util_map\|vimrc\|vpc_lookup\|x11_display"  | sort | uniq
+#
