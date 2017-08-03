@@ -149,9 +149,9 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
         if not email_config.enabled:
             return
 
-        # perform update asynchronously, flag if activation
+        # perform update asynchronously
         update_user.delay(_create_sailthru_user_vars(user, user.profile), user.email, site=_get_current_site(),
-                          new_user=False, activation=(setting == 'is_active') and new_value is True)
+                          new_user=False)
 
     elif setting == 'email':
         # email update is special case
