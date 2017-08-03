@@ -119,7 +119,8 @@ from student.models import (
     UserStanding,
     anonymous_id_for_user,
     create_comments_service_user,
-    unique_id_for_user
+    unique_id_for_user,
+    REFUND_ORDER
 )
 from student.tasks import send_activation_email
 from third_party_auth import pipeline, provider
@@ -1267,6 +1268,7 @@ def change_enrollment(request, check_access=True):
             return HttpResponseBadRequest(_("Your certificate prevents you from unenrolling from this course"))
 
         CourseEnrollment.unenroll(user, course_id)
+        REFUND_ORDER.send(sender=None, course_enrollment=enrollment)
         return HttpResponse()
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
