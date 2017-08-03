@@ -5,12 +5,13 @@ define([
     'js/models/active_video_upload',
     'js/views/baseview',
     'js/views/active_video_upload',
+    'js/views/course_video_settings',
     'edx-ui-toolkit/js/utils/html-utils',
     'edx-ui-toolkit/js/utils/string-utils',
     'text!templates/active-video-upload-list.underscore',
     'jquery.fileupload'
 ],
-    function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView,
+    function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, CourseVideoSettingsView,
              HtmlUtils, StringUtils, activeVideoUploadListTemplate) {
         'use strict';
         var ActiveVideoUploadListView,
@@ -40,11 +41,13 @@ define([
                 this.listenTo(this.collection, 'add', this.addUpload);
                 this.concurrentUploadLimit = options.concurrentUploadLimit || 0;
                 this.postUrl = options.postUrl;
+                this.activeTranscriptPreferences = options.activeTranscriptPreferences;
+                this.videoTranscriptSettings = options.videoTranscriptSettings;
                 this.videoSupportedFileFormats = options.videoSupportedFileFormats;
                 this.videoUploadMaxFileSizeInGB = options.videoUploadMaxFileSizeInGB;
                 this.onFileUploadDone = options.onFileUploadDone;
-                if (options.uploadButton) {
-                    options.uploadButton.click(this.chooseFile.bind(this));
+                if (options.courseVideoSettingsButton) {
+                    options.courseVideoSettingsButton.click(this.showCourseVideoSettingsView.bind(this));
                 }
 
                 this.maxSizeText = StringUtils.interpolate(
@@ -59,6 +62,33 @@ define([
                         supportedVideoTypes: this.videoSupportedFileFormats.join(', ')
                     }
                 );
+                this.listenTo(
+                    Backbone,
+                    'coursevideosettings:syncActiveTranscriptPreferences',
+                    this.syncActiveTranscriptPreferences
+                );
+                this.listenTo(
+                    Backbone,
+                    'coursevideosettings:destroyCourseVideoSettingsView',
+                    this.destroyCourseVideoSettingsView
+                );
+            },
+
+            syncActiveTranscriptPreferences: function(activeTranscriptPreferences) {
+                this.activeTranscriptPreferences = activeTranscriptPreferences;
+            },
+
+            showCourseVideoSettingsView: function(event) {
+                this.courseVideoSettingsView = new CourseVideoSettingsView({
+                    activeTranscriptPreferences: this.activeTranscriptPreferences,
+                    videoTranscriptSettings: this.videoTranscriptSettings
+                });
+                this.courseVideoSettingsView.render();
+                event.stopPropagation();
+            },
+
+            destroyCourseVideoSettingsView: function() {
+                this.courseVideoSettingsView = null;
             },
 
             render: function() {
@@ -98,7 +128,6 @@ define([
                 $(window).on('drop', preventDefault);
                 $(window).on('beforeunload', this.onBeforeUnload.bind(this));
                 $(window).on('unload', this.onUnload.bind(this));
-
                 return this;
             },
 

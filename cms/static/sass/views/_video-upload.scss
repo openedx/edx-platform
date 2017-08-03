@@ -12,6 +12,172 @@
     }
   }
 
+  .fixed-container {
+    position: fixed !important;
+    top: 0 !important;
+  }
+
+  .course-video-settings-container {
+    position: absolute;
+    overflow: scroll;
+    top: 0;
+    right: -100%;
+    z-index: 1000;
+    width: 352px;
+    transition: all 0.3s ease;
+    background-color: $white;
+    -webkit-box-shadow: -3px 0px 3px 0px rgba(153,153,153,0.3);
+    -moz-box-shadow: -3px 0px 3px 0px rgba(153,153,153,0.3);
+    box-shadow: -3px 0px 3px 0px rgba(153,153,153,0.3);
+
+    .button-link {
+      background:none;
+      border:none;
+      padding:0;
+      color: $ui-link-color;
+      cursor:pointer
+    }
+
+    .action-close-wrapper {
+      .action-close-course-video-settings {
+        width: 100%;
+        padding: ($baseline/2) ($baseline*0.8);
+        background-color: $gray-u1;
+        border: transparent;
+        height: ($baseline*2.4);
+        color: $text-dark-black-blue;
+        @include font-size(16);
+        @include text-align(left);
+      }
+    }
+
+    .course-video-settings-wrapper {
+      margin-top: ($baseline*1.60);
+      padding: ($baseline) ($baseline*0.8);
+
+      .course-video-settings-title {
+        color: $black-t4;
+        margin: ($baseline*1.6) 0 ($baseline*0.8) 0;
+        font-weight: font-weight(semi-bold);
+        @include font-size(24);
+      }
+
+      .course-video-settings-message {
+        padding: ($baseline/2);
+        margin-bottom: ($baseline*0.8);
+        max-height: ($baseline*2.4);
+        color: $black;
+        @include font-size(16);
+        .icon {
+          @include margin-right($baseline/4);
+        }
+      }
+
+      .course-video-settings-message-wrapper.success .course-video-settings-message {
+        background-color: $state-success-bg;
+        border: solid 1px $state-success-border;
+      }
+
+      .course-video-settings-message-wrapper.error .course-video-settings-message {
+        background-color: $state-danger-bg;
+        border: solid 1px $state-danger-border;
+      }
+
+      .transcript-preferance-wrapper {
+        margin-top: ($baseline*1.6);
+        .icon.fa-info-circle {
+          @include margin-left($baseline*0.75);
+        }
+      }
+      .transcript-preferance-wrapper.error .transcript-preferance-label {
+        color: $color-error;
+      }
+
+      .error-info, .error-icon .fa-info-circle {
+        color: $color-error;
+      }
+
+      .error-info {
+        @include font-size(16);
+      }
+
+      .transcript-preferance-label {
+        color: $black-t4;
+        @include font-size(15);
+        font-weight: font-weight(semi-bold);
+      }
+
+      .transcript-provider-group, .transcript-turnaround, .transcript-fidelity  {
+        margin-top: ($baseline*0.8);
+      }
+
+
+      .transcript-provider-group {
+        input[type=radio]  {
+          margin: 0 ($baseline/2);
+        }
+        label {
+          font-weight: normal;
+          color: $black-t4;
+          @include font-size(15);
+        }
+      }
+
+      .transcript-turnaround-wrapper, .transcript-fidelity-wrapper, .transcript-languages-wrapper {
+        display: none;
+      }
+
+      .transcript-languages-container .languages-container {
+        margin-top: ($baseline*0.8);
+        .transcript-language-container {
+          padding: ($baseline/4);
+          background-color: $gray-l6;
+          border-top: solid 1px $gray-l4;
+          border-bottom: solid 1px $gray-l4;
+          .remove-language-action {
+            display: inline-block;
+            @include float(right);
+          }
+        }
+      }
+      .transcript-language-menu-container {
+        margin-top: ($baseline*0.8);
+        .transcript-language-menu {
+          width: 65%;
+        }
+        .add-language-action {
+          display: inline-block;
+          .action-add-language {
+            @include margin-left($baseline/4);
+          }
+        }
+      }
+    }
+
+    .course-video-settings-footer {
+      margin-top: ($baseline*1.6);
+      .last-updated-text {
+        @include font-size(12);
+        @include margin-left($baseline/4);
+      }
+    }
+
+    .button {
+      @extend %btn-primary-blue;
+      @extend %sizing;
+
+      .action-button-text {
+        display: inline-block;
+        vertical-align: baseline;
+      }
+
+      .icon {
+        display: inline-block;
+        vertical-align: baseline;
+      }
+    }
+  }
+
   .file-upload-form {
     @include clearfix();
 

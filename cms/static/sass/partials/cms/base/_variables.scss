@@ -83,6 +83,8 @@ $gray-d1: shade($gray, 20%) !default;
 $gray-d2: shade($gray, 40%) !default;
 $gray-d3: shade($gray, 60%) !default;
 $gray-d4: shade($gray, 80%) !default;
+$gray-u1: #ECF0F1;
+
 
 // These define button styles similar to LMS
 // The goal here is consistency (until we can overhaul all of this...)
@@ -302,3 +304,5 @@ $state-warning-border: darken($state-warning-bg, 5%) !default;
 $state-danger-text: $black !default;
 $state-danger-bg: #f2dede !default;
 $state-danger-border: darken($state-danger-bg, 5%) !default;
+
+$text-dark-black-blue: #2C3E50;
