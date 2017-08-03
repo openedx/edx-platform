@@ -288,23 +288,20 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(User.objects.get(pk=self.user.pk).is_active)
 
-    @override_settings(PASSWORD_MIN_LENGTH=2)
-    @override_settings(PASSWORD_MAX_LENGTH=10)
     @ddt.data(
         {
             'password': '1',
             'error_message': 'Password: Invalid Length (must be 2 characters or more)',
         },
         {
-            'password': '01234567891',
-            'error_message': 'Password: Invalid Length (must be 10 characters or fewer)'
+            'password': '01234567891' * 10,
+            'error_message': 'Password: Invalid Length (must be 75 characters or fewer)'
         }
     )
     def test_password_reset_with_invalid_length(self, password_dict):
         """Tests that if we provide password characters less then PASSWORD_MIN_LENGTH,
         or more than PASSWORD_MAX_LENGTH, password reset will fail with error message.
         """
-
         url = reverse(
             'password_reset_confirm',
             kwargs={'uidb36': self.uidb36, 'token': self.token}

@@ -14,6 +14,8 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
+from openedx.core.djangoapps.user_api.accounts import PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH
+
 
 def validate_password_strength(value):
     """
@@ -42,12 +44,12 @@ def validate_password_length(value):
     message = _("Invalid Length ({0})")
     code = "length"
 
-    min_length = getattr(settings, 'PASSWORD_MIN_LENGTH', None)
-    max_length = getattr(settings, 'PASSWORD_MAX_LENGTH', None)
+    min_length = PASSWORD_MIN_LENGTH
+    max_length = PASSWORD_MAX_LENGTH
 
-    if min_length and len(value) < min_length:
+    if len(value) < PASSWORD_MIN_LENGTH:
         raise ValidationError(message.format(_("must be {0} characters or more").format(min_length)), code=code)
-    elif max_length and len(value) > max_length:
+    elif len(value) > PASSWORD_MAX_LENGTH:
         raise ValidationError(message.format(_("must be {0} characters or fewer").format(max_length)), code=code)
 
 
