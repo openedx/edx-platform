@@ -59,6 +59,7 @@ class GradesServiceTests(ModuleStoreTestCase):
         }
 
     def tearDown(self):
+        PersistentSubsectionGradeOverride.objects.all().delete()  # clear out all previous overrides
         self.signal_patcher.stop()
         self.id_patcher.stop()
         self.type_patcher.stop()
@@ -157,8 +158,6 @@ class GradesServiceTests(ModuleStoreTestCase):
     )
     @ddt.unpack
     def test_override_subsection_grade(self, override, expected):
-        PersistentSubsectionGradeOverride.objects.all().delete()  # clear out all previous overrides
-
         self.service.override_subsection_grade(
             user_id=self.user.id,
             course_key_or_id=self.course.id,
