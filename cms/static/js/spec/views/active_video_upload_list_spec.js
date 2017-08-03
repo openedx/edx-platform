@@ -32,20 +32,29 @@ define(
         describe('ActiveVideoUploadListView', function() {
             beforeEach(function() {
                 setFixtures(
-                    '<div id="page-prompt"></div><div id="page-notification"></div><div id="reader-feedback"></div>'
+                    '<div id="page-prompt"></div>' +
+                    '<div id="page-notification"></div>' +
+                    '<div id="reader-feedback"></div>' +
+                    '<div class="video-transcript-settings-wrapper"></div>' +
+                    '<button class="button course-video-settings-button"></button>'
                 );
                 TemplateHelpers.installTemplate('active-video-upload');
                 TemplateHelpers.installTemplate('active-video-upload-list');
                 this.postUrl = POST_URL;
-                this.uploadButton = $('<button>');
+                this.courseVideoSettingsButton = $('.course-video-settings-button');
                 this.videoSupportedFileFormats = ['.mp4', '.mov'];
                 this.videoUploadMaxFileSizeInGB = 5;
                 this.view = new ActiveVideoUploadListView({
                     concurrentUploadLimit: concurrentUploadLimit,
                     postUrl: this.postUrl,
-                    uploadButton: this.uploadButton,
+                    courseVideoSettingsButton: this.courseVideoSettingsButton,
                     videoSupportedFileFormats: this.videoSupportedFileFormats,
-                    videoUploadMaxFileSizeInGB: this.videoUploadMaxFileSizeInGB
+                    videoUploadMaxFileSizeInGB: this.videoUploadMaxFileSizeInGB,
+                    activeTranscriptPreferences: {},
+                    videoTranscriptSettings: {
+                        transcript_preferences_handler_url: '',
+                        transcription_plans: {}
+                    }
                 });
                 this.view.render();
                 jasmine.Ajax.install();
@@ -55,6 +64,10 @@ define(
             afterEach(function() {
                 $(window).off('beforeunload');
                 jasmine.Ajax.uninstall();
+
+                if (this.view.courseVideoSettingsView) {
+                    this.view.courseVideoSettingsView = null;
+                }
             });
 
             it('renders correct text in file drag/drop area', function() {
@@ -71,15 +84,19 @@ define(
                 });
             });
 
-            it('should trigger file selection when either the upload button or the drop zone is clicked', function() {
+            it('should trigger file selection when the drop zone is clicked', function() {
                 var clickSpy = jasmine.createSpy();
                 clickSpy.and.callFake(function(event) { event.preventDefault(); });
                 this.view.$('.js-file-input').on('click', clickSpy);
                 this.view.$('.file-drop-area').click();
                 expect(clickSpy).toHaveBeenCalled();
                 clickSpy.calls.reset();
-                this.uploadButton.click();
-                expect(clickSpy).toHaveBeenCalled();
+            });
+
+            it('shows course video settings pane when course video settings button is clicked', function() {
+                expect($('.course-video-settings-container')).not.toExist();
+                this.courseVideoSettingsButton.click();
+                expect($('.course-video-settings-container')).toExist();
             });
 
             it('should not show a notification message if there are no active video uploads', function() {
