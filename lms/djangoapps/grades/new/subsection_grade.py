@@ -130,6 +130,7 @@ class SubsectionGrade(SubsectionGradeBase):
             graded=False,
             first_attempted=model.first_attempted,
         )
+        self.override = model.override if hasattr(model, 'override') else None
         self._log_event(log.debug, u"init_from_model", student)
         return self
 
