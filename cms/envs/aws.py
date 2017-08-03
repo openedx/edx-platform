@@ -513,10 +513,3 @@ HELP_TOKENS_BOOKS = ENV_TOKENS.get('HELP_TOKENS_BOOKS', HELP_TOKENS_BOOKS)
 
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', LOW_PRIORITY_QUEUE)
-
-############## Settings for Profile Image Size ######################
-
-PROFILE_IMAGE_SIZES_MAP = ENV_TOKENS.get(
-    'PROFILE_IMAGE_SIZES_MAP',
-    PROFILE_IMAGE_SIZES_MAP
-)
