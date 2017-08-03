@@ -112,6 +112,7 @@ from lms.envs.common import (
     DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH,
     # Video Image settings
     VIDEO_IMAGE_SETTINGS,
+    VIDEO_TRANSCRIPTS_SETTINGS,
 )
 from path import Path as path
 from warnings import simplefilter
