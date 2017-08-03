@@ -4,6 +4,7 @@ Views related to the video upload feature
 from contextlib import closing
 
 import csv
+import json
 import logging
 from datetime import datetime, timedelta
 from uuid import uuid4
@@ -340,6 +341,9 @@ def transcript_preferences_handler(request, course_key_string):
     data = request.json
     provider = data.get('provider', '')
 
+    # TODO: if provider == '': delete course preferences
+    # i.e call delete api end point like delete_transcript_preferences(course_key_string)
+
     error, preferences = validate_transcript_preferences(
         provider=provider,
         cielo24_fidelity=data.get('cielo24_fidelity', ''),
@@ -567,7 +571,7 @@ def videos_index_html(course):
     }
 
     context.update({
-        'third_party_transcript_settings': {
+        'video_transcript_settings': {
             'transcript_preferences_handler_url': reverse_course_url(
                 'transcript_preferences_handler',
                 unicode(course.id)
@@ -658,9 +662,9 @@ def videos_post(course, request):
             ('course_key', unicode(course.id)),
         ]
 
-        transcript_preferences = data.get('transcript_preferences', None)
+        transcript_preferences = get_transcript_preferences(unicode(course.id))
         if transcript_preferences is not None:
-            metadata_list.append(('transcript_preferences', transcript_preferences))
+            metadata_list.append(('transcript_preferences', json.dumps(transcript_preferences)))
 
         for metadata_name, value in metadata_list:
             key.set_metadata(metadata_name, value)
