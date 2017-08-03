@@ -982,7 +982,9 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
     @patch('boto.s3.connection.S3Connection')
-    def test_transcript_preferences_metadata(self, transcript_preferences, mock_conn, mock_key):
+    @patch('contentstore.views.videos.get_transcript_preferences')
+    def test_transcript_preferences_metadata(self, transcript_preferences, mock_transcript_preferences,
+                                             mock_conn, mock_key):
         """
         Tests that transcript preference metadata is only set if it is transcript
         preferences are present in request data.
@@ -990,8 +992,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         file_name = 'test-video.mp4'
         request_data = {'files': [{'file_name': file_name, 'content_type': 'video/mp4'}]}
 
-        if transcript_preferences:
-            request_data.update({'transcript_preferences': transcript_preferences})
+        mock_transcript_preferences.return_value = transcript_preferences
 
         bucket = Mock()
         mock_conn.return_value = Mock(get_bucket=Mock(return_value=bucket))
@@ -1009,10 +1010,12 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
 
         # Ensure `transcript_preferences` was set up in Key correctly if sent through request.
         if transcript_preferences:
-            mock_key_instance.set_metadata.assert_any_call('transcript_preferences', transcript_preferences)
+            mock_key_instance.set_metadata.assert_any_call('transcript_preferences', json.dumps(transcript_preferences))
         else:
             with self.assertRaises(AssertionError):
-                mock_key_instance.set_metadata.assert_any_call('transcript_preferences', transcript_preferences)
+                mock_key_instance.set_metadata.assert_any_call(
+                    'transcript_preferences', json.dumps(transcript_preferences)
+                )
 
 
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
