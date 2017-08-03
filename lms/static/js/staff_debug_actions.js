@@ -54,12 +54,12 @@ var StaffDebug = (function() {
                 try {
                     responseJSON = $.parseJSON(request.responseText);
                 } catch (e) {
-                    responseJSON = {error: gettext('Unknown Error Occurred.')};
+                    responseJSON = 'Unknown Error Occurred.';
                 }
                 var text = _.template('{error_msg} {error}', {interpolate: /\{(.+?)\}/g})(
                     {
                         error_msg: action.error_msg,
-                        error: responseJSON.error
+                        error: gettext(responseJSON)
                     }
             );
                 var html = _.template('<p id="idash_msg" class="error">{text}</p>', {interpolate: /\{(.+?)\}/g})(

@@ -52,7 +52,11 @@ from lms.djangoapps.instructor.views.api import (
     generate_unique_password,
     require_finance_admin
 )
-from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
+from lms.djangoapps.instructor_task.api_helper import (
+    AlreadyRunningError,
+    QueueConnectionError,
+    generate_already_running_error_message
+)
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
@@ -143,6 +147,7 @@ REPORTS_DATA = (
 EXECUTIVE_SUMMARY_DATA = (
     {
         'report_type': 'executive summary',
+        'task_type': 'exec_summary_report',
         'instructor_api_endpoint': 'get_exec_summary_report',
         'task_api_endpoint': 'lms.djangoapps.instructor_task.api.submit_executive_summary_report',
         'extra_instructor_api_kwargs': {}
@@ -244,7 +249,16 @@ def view_alreadyrunningerror(request):  # pylint: disable=unused-argument
     raise AlreadyRunningError()
 
 
+@common_exceptions_400
+def view_queue_connection_error(request):  # pylint: disable=unused-argument
+    """
+    A dummy view that raises a QueueConnectionError exception.
+    """
+    raise QueueConnectionError()
+
+
 @attr(shard=1)
+@ddt.ddt
 class TestCommonExceptions400(TestCase):
     """
     Testing the common_exceptions_400 decorator.
@@ -269,21 +283,29 @@ class TestCommonExceptions400(TestCase):
         self.request.is_ajax.return_value = True
         resp = view_user_doesnotexist(self.request)  # pylint: disable=assignment-from-no-return
         self.assertEqual(resp.status_code, 400)
-        result = json.loads(resp.content)
-        self.assertIn("User does not exist", result["error"])
+        self.assertIn("User does not exist", resp.content)
 
     def test_alreadyrunningerror(self):
         self.request.is_ajax.return_value = False
         resp = view_alreadyrunningerror(self.request)  # pylint: disable=assignment-from-no-return
         self.assertEqual(resp.status_code, 400)
-        self.assertIn("Task is already running", resp.content)
+        self.assertIn("Requested task is already running", resp.content)
 
     def test_alreadyrunningerror_ajax(self):
         self.request.is_ajax.return_value = True
         resp = view_alreadyrunningerror(self.request)  # pylint: disable=assignment-from-no-return
         self.assertEqual(resp.status_code, 400)
-        result = json.loads(resp.content)
-        self.assertIn("Task is already running", result["error"])
+        self.assertIn("Requested task is already running", resp.content)
+
+    @ddt.data(True, False)
+    def test_queue_connection_error(self, is_ajax):
+        """
+        Tests that QueueConnectionError exception is handled in common_exception_400.
+        """
+        self.request.is_ajax.return_value = is_ajax
+        resp = view_queue_connection_error(self.request)  # pylint: disable=assignment-from-no-return
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn('Error occured. Please try again later', resp.content)
 
 
 @attr(shard=1)
@@ -401,6 +423,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('get_proctored_exam_results', {}),
             ('get_problem_responses', {}),
             ('export_ora2_data', {}),
+
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
@@ -2680,14 +2703,15 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             'get_problem_responses',
             kwargs={'course_id': unicode(self.course.id)}
         )
-
+        task_type = 'problem_responses_csv'
+        already_running_status = generate_already_running_error_message(task_type)
         with patch('lms.djangoapps.instructor_task.api.submit_calculate_problem_responses_csv') as submit_task_function:
-            error = AlreadyRunningError()
+            error = AlreadyRunningError(already_running_status)
             submit_task_function.side_effect = error
             response = self.client.post(url, {})
-            res_json = json.loads(response.content)
-            self.assertIn('status', res_json)
-            self.assertIn('already in progress', res_json['status'])
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(already_running_status, response.content)
 
     def test_get_students_features(self):
         """
@@ -2757,17 +2781,16 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         )
         # Successful case:
         response = self.client.post(url, {})
-        res_json = json.loads(response.content)
-        self.assertIn('status', res_json)
-        self.assertNotIn('currently being created', res_json['status'])
+        self.assertEqual(response.status_code, 200)
         # CSV generation already in progress:
+        task_type = 'may_enroll_info_csv'
+        already_running_status = generate_already_running_error_message(task_type)
         with patch('lms.djangoapps.instructor_task.api.submit_calculate_may_enroll_csv') as submit_task_function:
-            error = AlreadyRunningError()
+            error = AlreadyRunningError(already_running_status)
             submit_task_function.side_effect = error
             response = self.client.post(url, {})
-            res_json = json.loads(response.content)
-            self.assertIn('status', res_json)
-            self.assertIn('currently being created', res_json['status'])
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(already_running_status, response.content)
 
     def test_get_student_exam_results(self):
         """
@@ -2778,19 +2801,19 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             'get_proctored_exam_results',
             kwargs={'course_id': unicode(self.course.id)}
         )
+
         # Successful case:
         response = self.client.post(url, {})
-        res_json = json.loads(response.content)
-        self.assertIn('status', res_json)
-        self.assertNotIn('currently being created', res_json['status'])
+        self.assertEqual(response.status_code, 200)
         # CSV generation already in progress:
+        task_type = 'proctored_exam_results_report'
+        already_running_status = generate_already_running_error_message(task_type)
         with patch('lms.djangoapps.instructor_task.api.submit_proctored_exam_results_report') as submit_task_function:
-            error = AlreadyRunningError()
+            error = AlreadyRunningError(already_running_status)
             submit_task_function.side_effect = error
             response = self.client.post(url, {})
-            res_json = json.loads(response.content)
-            self.assertIn('status', res_json)
-            self.assertIn('currently being created', res_json['status'])
+            self.assertEqual(response.status_code, 400)
+            self.assertIn(already_running_status, response.content)
 
     def test_access_course_finance_admin_with_invalid_course_key(self):
         """
@@ -3045,10 +3068,11 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
     def test_executive_summary_report_success(
             self,
             report_type,
+            task_type,
             instructor_api_endpoint,
             task_api_endpoint,
             extra_instructor_api_kwargs
-    ):
+    ):  # pylint: disable=unused-argument
         kwargs = {'course_id': unicode(self.course.id)}
         kwargs.update(extra_instructor_api_kwargs)
         url = reverse(instructor_api_endpoint, kwargs=kwargs)
@@ -3066,6 +3090,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
     def test_executive_summary_report_already_running(
             self,
             report_type,
+            task_type,
             instructor_api_endpoint,
             task_api_endpoint,
             extra_instructor_api_kwargs
@@ -3075,14 +3100,12 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         url = reverse(instructor_api_endpoint, kwargs=kwargs)
 
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+        already_running_status = generate_already_running_error_message(task_type)
         with patch(task_api_endpoint) as mock:
-            mock.side_effect = AlreadyRunningError()
+            mock.side_effect = AlreadyRunningError(already_running_status)
             response = self.client.post(url, {})
-        already_running_status = "The {report_type} report is currently being created." \
-                                 " To view the status of the report, see Pending Tasks below." \
-                                 " You will be able to download the report" \
-                                 " when it is" \
-                                 " complete.".format(report_type=report_type)
+
+        self.assertEqual(response.status_code, 400)
         self.assertIn(already_running_status, response.content)
 
     def test_get_ora2_responses_success(self):
@@ -3091,16 +3114,19 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         with patch('lms.djangoapps.instructor_task.api.submit_export_ora2_data') as mock_submit_ora2_task:
             mock_submit_ora2_task.return_value = True
             response = self.client.post(url, {})
-        success_status = "The ORA data report is being generated."
+        success_status = "The ORA data report is being created."
         self.assertIn(success_status, response.content)
 
     def test_get_ora2_responses_already_running(self):
         url = reverse('export_ora2_data', kwargs={'course_id': unicode(self.course.id)})
+        task_type = 'export_ora2_data'
+        already_running_status = generate_already_running_error_message(task_type)
 
         with patch('lms.djangoapps.instructor_task.api.submit_export_ora2_data') as mock_submit_ora2_task:
-            mock_submit_ora2_task.side_effect = AlreadyRunningError()
+            mock_submit_ora2_task.side_effect = AlreadyRunningError(already_running_status)
             response = self.client.post(url, {})
-        already_running_status = "An ORA data report generation task is already in progress."
+
+        self.assertEqual(response.status_code, 400)
         self.assertIn(already_running_status, response.content)
 
     def test_get_student_progress_url(self):
