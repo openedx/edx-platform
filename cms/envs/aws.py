@@ -513,3 +513,12 @@ HELP_TOKENS_BOOKS = ENV_TOKENS.get('HELP_TOKENS_BOOKS', HELP_TOKENS_BOOKS)
 
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', LOW_PRIORITY_QUEUE)
+
+########################## Parental controls config  #######################
+
+# The age at which a learner no longer requires parental consent, or None
+# if parental consent is never required.
+PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
+    'PARENTAL_CONSENT_AGE_LIMIT',
+    PARENTAL_CONSENT_AGE_LIMIT
+)
