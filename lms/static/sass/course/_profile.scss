@@ -294,9 +294,13 @@
 
             p {
               margin: lh(0.5) 0;
-              color: $gray-d1;;
+              color: $gray-d1;
               font-size: em(14);
               font-weight: 600;
+
+              &.override-notice {
+                color: $red-d1;
+              }
             }
 
             .scores {
