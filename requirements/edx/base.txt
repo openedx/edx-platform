@@ -55,7 +55,7 @@ edx-opaque-keys==0.4.0
 edx-organizations==0.4.5
 edx-rest-api-client==1.7.1
 edx-search==1.1.0
-edx-submissions==2.0.6
+edx-submissions==2.0.7
 edxval==0.1.1
 event-tracking==0.2.4
 facebook-sdk==0.4.0
