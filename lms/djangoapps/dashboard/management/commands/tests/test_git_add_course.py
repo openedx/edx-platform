@@ -14,7 +14,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 import dashboard.git_import as git_import
 from dashboard.git_import import (
@@ -57,7 +57,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
     TEST_REPO = 'https://github.com/mitocw/edx4edx_lite.git'
     TEST_COURSE = 'MITx/edx4edx/edx4edx'
     TEST_BRANCH = 'testing_do_not_delete'
-    TEST_BRANCH_COURSE = SlashSeparatedCourseKey('MITx', 'edx4edx_branch', 'edx4edx')
+    TEST_BRANCH_COURSE = CourseKey.from_string('MITx/edx4edx_branch/edx4edx')
 
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
@@ -183,7 +183,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
                             repo_dir / 'edx4edx_lite',
                             'master')
         self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
-        self.assertIsNotNone(def_ms.get_course(SlashSeparatedCourseKey.from_deprecated_string(self.TEST_COURSE)))
+        self.assertIsNotNone(def_ms.get_course(CourseKey.from_string(self.TEST_COURSE)))
 
     def test_branch_exceptions(self):
         """
