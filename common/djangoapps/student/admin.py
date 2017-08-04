@@ -174,7 +174,26 @@ class UserProfileInline(admin.StackedInline):
 class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
     inlines = (UserProfileInline,)
+    actions = ['delete_selected']
 
+    # Overriding default delete action from django admin to fix discussion forum issue !
+    def delete_selected(modeladmin, request, queryset):
+        # Forum user also would be deleted when LMS user would be deleted from admin.
+        from pymongo import MongoClient
+        client = MongoClient('localhost', 27017)
+        db = client['cs_comments_service_development']
+        user_collection = db['users']
+        for user in queryset :
+            try :
+                db.users.delete_many({"username" : user.username})
+            except Exception as e:
+                pass
+        # do something with the users in the queryset
+        try :
+            return django_delete_selected(modeladmin, request, queryset)
+        except :
+            return None
+    delete_selected.short_description = django_delete_selected.short_description
     def get_readonly_fields(self, *args, **kwargs):
         """
         Allows editing the users while skipping the username check, so we can have Unicode username with no problems.
