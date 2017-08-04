@@ -97,8 +97,26 @@ def _update_certificate_context(context, user_certificate, platform_name):
     )
 
     # Translators:  The format of the date includes the full name of the month
+    MONTHS={
+        'january': _('January'),
+        'february': _('February'),
+        'march': _('March'),
+        'april': _('April'),
+        'may': _('Mayy'),
+        'june': _('June'),
+        'july': _('July'),
+        'august': _('August'),
+        'september': _('September'),
+        'october': _('October'),
+        'november': _('November'),
+        'december': _('December')
+    }
+
+    def getTranslatedMonth(month):
+        return MONTHS[month.lower()]
+
     context['certificate_date_issued'] = _('{month} {day}, {year}').format(
-        month=_(user_certificate.modified_date.strftime("%B")),
+        month=getTranslatedMonth(user_certificate.modified_date.strftime("%B")),
         day=user_certificate.modified_date.day,
         year=user_certificate.modified_date.year
     )
