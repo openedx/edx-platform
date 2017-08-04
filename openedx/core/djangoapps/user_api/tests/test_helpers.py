@@ -60,7 +60,7 @@ class InterceptErrorsTest(TestCase):
             u"keyword arguments '{{'raise_error': <class '{}'>}}' "
             u"from File \"{}\", line XXX, in test_logs_errors\n"
             u"    intercepted_function(raise_error=FakeInputException): FakeInputException()"
-        ).format(exception, __file__)
+        ).format(exception, __file__.rstrip('c'))
 
         # Verify that the raised exception has the error message
         try:
