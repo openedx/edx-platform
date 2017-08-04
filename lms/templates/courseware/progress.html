@@ -183,11 +183,11 @@ from django.utils.http import urlquote_plus
                                                 <em class="localized-datetime" data-datetime="${section.due}" data-string="${_('due {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></em>
                                             %endif
                                         </p>
-                                        <p>
+                                        <p class="override-notice">
                                             %if section.override is not None:
                                                 %if section.format is not None and section.format == "Exam":
                                                     ${_("Exam grade has been overridden due to a failed proctoring review.")}
-                                                %else
+                                                %else:
                                                     ${_("Section grade has been overridden.")}
                                                 %endif
                                             %endif
