@@ -24,8 +24,10 @@ from contentstore.utils import reverse_course_url
 from contentstore.views.videos import (
     _get_default_video_image_url,
     validate_video_image,
+    validate_transcript_preferences,
     VIDEO_IMAGE_UPLOAD_ENABLED,
     WAFFLE_SWITCHES,
+    TranscriptProvider
 )
 from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -852,6 +854,165 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 self.verify_error_message(response, error_message)
             else:
                 self.verify_image_upload_reponse(self.course.id, edx_video_id, response)
+
+
+@ddt.ddt
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_VIDEO_UPLOAD_PIPELINE': True})
+class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
+    """
+    Tests for video transcripts preferences.
+    """
+
+    VIEW_NAME = 'transcript_preferences_handler'
+
+    @ddt.data(
+        # Error cases
+        (
+            {},
+            'Invalid provider.'
+        ),
+        (
+            {
+                'provider': TranscriptProvider.CIELO24
+            },
+            'Invalid cielo24 fidelity.'
+        ),
+        (
+            {
+                'provider': TranscriptProvider.CIELO24,
+                'cielo24_fidelity': 'PROFESSIONAL',
+            },
+            'Invalid cielo24 turnaround.'
+        ),
+        (
+            {
+                'provider': TranscriptProvider.CIELO24,
+                'cielo24_fidelity': 'PROFESSIONAL',
+                'cielo24_turnaround': 'STANDARD'
+            },
+            'Invalid languages.'
+        ),
+        (
+            {
+                'provider': TranscriptProvider.CIELO24,
+                'cielo24_fidelity': 'PROFESSIONAL',
+                'cielo24_turnaround': 'STANDARD',
+                'preferred_languages': ['es', 'ur']
+            },
+            'Invalid languages.'
+        ),
+        (
+            {
+                'provider': TranscriptProvider.THREE_PLAY_MEDIA
+            },
+            'Invalid 3play turnaround.'
+        ),
+        (
+            {
+                'provider': TranscriptProvider.THREE_PLAY_MEDIA,
+                'three_play_turnaround': 'default'
+            },
+            'Invalid languages.'
+        ),
+        (
+            {
+                'provider': TranscriptProvider.THREE_PLAY_MEDIA,
+                'three_play_turnaround': 'default',
+                'preferred_languages': ['es', 'ur']
+            },
+            'Invalid languages.'
+        ),
+        # Success
+        (
+            {
+                'provider': TranscriptProvider.CIELO24,
+                'cielo24_fidelity': 'PROFESSIONAL',
+                'cielo24_turnaround': 'STANDARD',
+                'preferred_languages': ['en']
+            },
+            ''
+        ),
+        (
+            {
+                'provider': TranscriptProvider.THREE_PLAY_MEDIA,
+                'three_play_turnaround': 'default',
+                'preferred_languages': ['en']
+            },
+            ''
+        )
+    )
+    @ddt.unpack
+    def test_video_transcript(self, preferences, error_message):
+        """
+        Tests that transcript handler works correctly.
+        """
+        video_transcript_url = self.get_url_for_course_key(self.course.id)
+        preferences_data = {
+            'provider': preferences.get('provider', ''),
+            'cielo24_fidelity': preferences.get('cielo24_fidelity', ''),
+            'cielo24_turnaround': preferences.get('cielo24_turnaround', ''),
+            'three_play_turnaround': preferences.get('three_play_turnaround', ''),
+            'preferred_languages': preferences.get('preferred_languages', []),
+        }
+
+        response = self.client.post(
+            video_transcript_url,
+            json.dumps(preferences_data),
+            content_type='application/json'
+        )
+        status_code = response.status_code
+        response = json.loads(response.content)
+
+        if error_message:
+            self.assertEqual(status_code, 400)
+            self.assertEqual(response['error'], error_message)
+        else:
+            self.assertEqual(status_code, 200)
+            self.assertTrue(response['transcript_preferences'], preferences_data)
+
+    @ddt.data(
+        None,
+        {
+            'provider': TranscriptProvider.CIELO24,
+            'cielo24_fidelity': 'PROFESSIONAL',
+            'cielo24_turnaround': 'STANDARD',
+            'preferred_languages': ['en']
+        }
+    )
+    @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
+    @patch('boto.s3.key.Key')
+    @patch('boto.s3.connection.S3Connection')
+    def test_transcript_preferences_metadata(self, transcript_preferences, mock_conn, mock_key):
+        """
+        Tests that transcript preference metadata is only set if it is transcript
+        preferences are present in request data.
+        """
+        file_name = 'test-video.mp4'
+        request_data = {'files': [{'file_name': file_name, 'content_type': 'video/mp4'}]}
+
+        if transcript_preferences:
+            request_data.update({'transcript_preferences': transcript_preferences})
+
+        bucket = Mock()
+        mock_conn.return_value = Mock(get_bucket=Mock(return_value=bucket))
+        mock_key_instance = Mock(
+            generate_url=Mock(
+                return_value='http://example.com/url_{file_name}'.format(file_name=file_name)
+            )
+        )
+        # If extra calls are made, return a dummy
+        mock_key.side_effect = [mock_key_instance] + [Mock()]
+
+        videos_handler_url = reverse_course_url('videos_handler', self.course.id)
+        response = self.client.post(videos_handler_url, json.dumps(request_data), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+        # Ensure `transcript_preferences` was set up in Key correctly if sent through request.
+        if transcript_preferences:
+            mock_key_instance.set_metadata.assert_any_call('transcript_preferences', transcript_preferences)
+        else:
+            with self.assertRaises(AssertionError):
+                mock_key_instance.set_metadata.assert_any_call('transcript_preferences', transcript_preferences)
 
 
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})

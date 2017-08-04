@@ -25,7 +25,10 @@ from edxval.api import (
     get_videos_for_course,
     remove_video_for_course,
     update_video_status,
-    update_video_image
+    update_video_image,
+    get_3rd_party_transcription_plans,
+    get_transcript_preferences,
+    create_or_update_transcript_preferences,
 )
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
@@ -38,7 +41,7 @@ from util.json_request import JsonResponse, expect_json
 from .course import get_course_and_check_access
 
 
-__all__ = ['videos_handler', 'video_encodings_download', 'video_images_handler']
+__all__ = ['videos_handler', 'video_encodings_download', 'video_images_handler', 'transcript_preferences_handler']
 
 LOGGER = logging.getLogger(__name__)
 
@@ -61,6 +64,14 @@ VIDEO_UPLOAD_MAX_FILE_SIZE_GB = 5
 
 # maximum time for video to remain in upload state
 MAX_UPLOAD_HOURS = 24
+
+
+class TranscriptProvider(object):
+    """
+    3rd Party Transcription Provider Enumeration
+    """
+    CIELO24 = 'Cielo24'
+    THREE_PLAY_MEDIA = '3PlayMedia'
 
 
 class StatusDisplayStrings(object):
@@ -93,6 +104,10 @@ class StatusDisplayStrings(object):
     _IMPORTED = ugettext_noop("Imported")
     # Translators: This is the status for a video that is in an unknown state
     _UNKNOWN = ugettext_noop("Unknown")
+    # Translators: This is the status for a video that is having its transcription in progress on servers
+    _TRANSCRIPTION_IN_PROGRESS = ugettext_noop("Transcription in Progress")
+    # Translators: This is the status for a video whose transcription is complete
+    _TRANSCRIPTION_READY = ugettext_noop("Transcription Ready")
 
     _STATUS_MAP = {
         "upload": _UPLOADING,
@@ -111,6 +126,8 @@ class StatusDisplayStrings(object):
         "youtube_duplicate": _YOUTUBE_DUPLICATE,
         "invalid_token": _INVALID_TOKEN,
         "imported": _IMPORTED,
+        "transcription_in_progress": _TRANSCRIPTION_IN_PROGRESS,
+        "transcription_ready": _TRANSCRIPTION_READY,
     }
 
     @staticmethod
@@ -234,6 +251,111 @@ def video_images_handler(request, course_key_string, edx_video_id=None):
         )
 
     return JsonResponse({'image_url': image_url})
+
+
+def validate_transcript_preferences(
+        provider, cielo24_fidelity, cielo24_turnaround, three_play_turnaround, preferred_languages
+):
+    """
+    Validate 3rd Party Transcription Preferences.
+
+    Arguments:
+        provider: Transcription provider
+        cielo24_fidelity:  Cielo24 transcription fidelity.
+        cielo24_turnaround: Cielo24 transcription turnaround.
+        three_play_turnaround: 3PlayMedia transcription turnaround.
+        preferred_languages: list of language codes.
+
+    Returns:
+        validated preferences or a validation error.
+    """
+    error, preferences = None, {}
+
+    # validate transcription providers
+    transcription_plans = get_3rd_party_transcription_plans()
+    if provider in transcription_plans.keys():
+
+        # Further validations for providers
+        if provider == TranscriptProvider.CIELO24:
+
+            # Validate transcription fidelity
+            if cielo24_fidelity in transcription_plans[provider]['fidelity']:
+
+                # Validate transcription turnaround
+                if cielo24_turnaround not in transcription_plans[provider]['turnaround']:
+                    error = _('Invalid cielo24 turnaround.')
+                    return error, preferences
+
+                # Validate transcription languages
+                supported_languages = transcription_plans[provider]['fidelity'][cielo24_fidelity]['languages']
+                if not len(preferred_languages) or not (set(preferred_languages) <= set(supported_languages.keys())):
+                    error = _('Invalid languages.')
+                    return error, preferences
+
+                # Validated Cielo24 preferences
+                preferences = {
+                    'cielo24_fidelity': cielo24_fidelity,
+                    'cielo24_turnaround': cielo24_turnaround,
+                    'preferred_languages': list(preferred_languages),
+                }
+            else:
+                error = _('Invalid cielo24 fidelity.')
+        elif provider == TranscriptProvider.THREE_PLAY_MEDIA:
+
+            # Validate transcription turnaround
+            if three_play_turnaround not in transcription_plans[provider]['turnaround']:
+                error = _('Invalid 3play turnaround.')
+                return error, preferences
+
+            # Validate transcription languages
+            supported_languages = transcription_plans[provider]['languages']
+            if not len(preferred_languages) or not (set(preferred_languages) <= set(supported_languages.keys())):
+                error = _('Invalid languages.')
+                return error, preferences
+
+            # Validated 3PlayMedia preferences
+            preferences = {
+                'three_play_turnaround': three_play_turnaround,
+                'preferred_languages': list(preferred_languages),
+            }
+    else:
+        error = _('Invalid provider.')
+
+    return error, preferences
+
+
+@expect_json
+@login_required
+@require_POST
+def transcript_preferences_handler(request, course_key_string):
+    """
+    JSON view handler to post the transcript preferences.
+
+    Arguments:
+        request: WSGI request object
+        course_key_string: string for course key
+
+    Returns: valid json response or 400 with error message
+    """
+    data = request.json
+    provider = data.get('provider', '')
+
+    error, preferences = validate_transcript_preferences(
+        provider=provider,
+        cielo24_fidelity=data.get('cielo24_fidelity', ''),
+        cielo24_turnaround=data.get('cielo24_turnaround', ''),
+        three_play_turnaround=data.get('three_play_turnaround', ''),
+        preferred_languages=data.get('preferred_languages', [])
+    )
+
+    if error:
+        response = JsonResponse({'error': error}, status=400)
+    else:
+        preferences.update({'provider': provider})
+        transcript_preferences = create_or_update_transcript_preferences(course_key_string, **preferences)
+        response = JsonResponse({'transcript_preferences': transcript_preferences}, status=200)
+
+    return response
 
 
 @login_required
@@ -424,28 +546,38 @@ def videos_index_html(course):
     """
     Returns an HTML page to display previous video uploads and allow new ones
     """
-    return render_to_response(
-        'videos_index.html',
-        {
-            'context_course': course,
-            'image_upload_url': reverse_course_url('video_images_handler', unicode(course.id)),
-            'video_handler_url': reverse_course_url('videos_handler', unicode(course.id)),
-            'encodings_download_url': reverse_course_url('video_encodings_download', unicode(course.id)),
-            'default_video_image_url': _get_default_video_image_url(),
-            'previous_uploads': _get_index_videos(course),
-            'concurrent_upload_limit': settings.VIDEO_UPLOAD_PIPELINE.get('CONCURRENT_UPLOAD_LIMIT', 0),
-            'video_supported_file_formats': VIDEO_SUPPORTED_FILE_FORMATS.keys(),
-            'video_upload_max_file_size': VIDEO_UPLOAD_MAX_FILE_SIZE_GB,
-            'video_image_settings': {
-                'video_image_upload_enabled': WAFFLE_SWITCHES.is_enabled(VIDEO_IMAGE_UPLOAD_ENABLED),
-                'max_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MAX_BYTES'],
-                'min_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES'],
-                'max_width': settings.VIDEO_IMAGE_MAX_WIDTH,
-                'max_height': settings.VIDEO_IMAGE_MAX_HEIGHT,
-                'supported_file_formats': settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS
-            }
+    context = {
+        'context_course': course,
+        'image_upload_url': reverse_course_url('video_images_handler', unicode(course.id)),
+        'video_handler_url': reverse_course_url('videos_handler', unicode(course.id)),
+        'encodings_download_url': reverse_course_url('video_encodings_download', unicode(course.id)),
+        'default_video_image_url': _get_default_video_image_url(),
+        'previous_uploads': _get_index_videos(course),
+        'concurrent_upload_limit': settings.VIDEO_UPLOAD_PIPELINE.get('CONCURRENT_UPLOAD_LIMIT', 0),
+        'video_supported_file_formats': VIDEO_SUPPORTED_FILE_FORMATS.keys(),
+        'video_upload_max_file_size': VIDEO_UPLOAD_MAX_FILE_SIZE_GB,
+        'video_image_settings': {
+            'video_image_upload_enabled': WAFFLE_SWITCHES.is_enabled(VIDEO_IMAGE_UPLOAD_ENABLED),
+            'max_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MAX_BYTES'],
+            'min_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES'],
+            'max_width': settings.VIDEO_IMAGE_MAX_WIDTH,
+            'max_height': settings.VIDEO_IMAGE_MAX_HEIGHT,
+            'supported_file_formats': settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS
         }
-    )
+    }
+
+    context.update({
+        'third_party_transcript_settings': {
+            'transcript_preferences_handler_url': reverse_course_url(
+                'transcript_preferences_handler',
+                unicode(course.id)
+            ),
+            'transcription_plans': get_3rd_party_transcription_plans(),
+        },
+        'active_transcript_preferences': get_transcript_preferences(unicode(course.id))
+    })
+
+    return render_to_response('videos_index.html', context)
 
 
 def videos_index_json(course):
@@ -486,16 +618,17 @@ def videos_post(course, request):
     The returned array corresponds exactly to the input array.
     """
     error = None
-    if 'files' not in request.json:
+    data = request.json
+    if 'files' not in data:
         error = "Request object is not JSON or does not contain 'files'"
     elif any(
             'file_name' not in file or 'content_type' not in file
-            for file in request.json['files']
+            for file in data['files']
     ):
         error = "Request 'files' entry does not contain 'file_name' and 'content_type'"
     elif any(
             file['content_type'] not in VIDEO_SUPPORTED_FILE_FORMATS.values()
-            for file in request.json['files']
+            for file in data['files']
     ):
         error = "Request 'files' entry contain unsupported content_type"
 
@@ -504,7 +637,7 @@ def videos_post(course, request):
 
     bucket = storage_service_bucket()
     course_video_upload_token = course.video_upload_pipeline['course_video_upload_token']
-    req_files = request.json['files']
+    req_files = data['files']
     resp_files = []
 
     for req_file in req_files:
@@ -518,11 +651,18 @@ def videos_post(course, request):
 
         edx_video_id = unicode(uuid4())
         key = storage_service_key(bucket, file_name=edx_video_id)
-        for metadata_name, value in [
-                ('course_video_upload_token', course_video_upload_token),
-                ('client_video_id', file_name),
-                ('course_key', unicode(course.id)),
-        ]:
+
+        metadata_list = [
+            ('course_video_upload_token', course_video_upload_token),
+            ('client_video_id', file_name),
+            ('course_key', unicode(course.id)),
+        ]
+
+        transcript_preferences = data.get('transcript_preferences', None)
+        if transcript_preferences is not None:
+            metadata_list.append(('transcript_preferences', transcript_preferences))
+
+        for metadata_name, value in metadata_list:
             key.set_metadata(metadata_name, value)
         upload_url = key.generate_url(
             KEY_EXPIRATION_IN_SECONDS,
