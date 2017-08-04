@@ -17,6 +17,8 @@ LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
 ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
 
+COMMENTS_SERVICE_URL = 'http://edx.devstack.forum:4567'
+
 ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_ROOT_URL)
 ENABLE_ENTERPRISE_INTEGRATION = False
 
