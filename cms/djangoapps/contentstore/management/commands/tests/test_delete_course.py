@@ -4,7 +4,7 @@ Unittests for deleting a course in an chosen modulestore
 
 import mock
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from django.core.management import call_command, CommandError
 from django.contrib.auth.models import User
 from contentstore.tests.utils import CourseTestCase
@@ -54,14 +54,14 @@ class DeleteCourseTest(CourseTestCase):
         """
         Testing if the entered course was deleted
         """
-
+        course_key = CourseKey.from_string('/'.join(["TestX", "TS01", "2015_Q1"]))
         #Test if the course that is about to be deleted exists
-        self.assertIsNotNone(modulestore().get_course(SlashSeparatedCourseKey("TestX", "TS01", "2015_Q1")))
+        self.assertIsNotNone(modulestore().get_course(course_key))
 
         with mock.patch(self.YESNO_PATCH_LOCATION) as patched_yes_no:
             patched_yes_no.return_value = True
             call_command('delete_course', 'TestX/TS01/2015_Q1')
-            self.assertIsNone(modulestore().get_course(SlashSeparatedCourseKey("TestX", "TS01", "2015_Q1")))
+            self.assertIsNone(modulestore().get_course(course_key))
 
     def test_course_deletion_with_keep_instructors(self):
         """
