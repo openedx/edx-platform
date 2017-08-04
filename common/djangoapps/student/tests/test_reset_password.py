@@ -175,7 +175,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @patch('django.core.mail.send_mail')
-    @ddt.data(('Crazy Awesome Site', 'Crazy Awesome Site'), (None, 'edX'))
+    @ddt.data(('Crazy Awesome Site', 'Crazy Awesome Site'), ('edX', 'edX'))
     @ddt.unpack
     def test_reset_password_email_site(self, site_name, platform_name, send_email):
         """
