@@ -102,7 +102,7 @@ def _update_certificate_context(context, user_certificate, platform_name):
         'february': _('February'),
         'march': _('March'),
         'april': _('April'),
-        'may': _('Mayy'),
+        'may': _('May'),
         'june': _('June'),
         'july': _('July'),
         'august': _('August'),
