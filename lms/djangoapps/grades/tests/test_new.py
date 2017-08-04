@@ -197,7 +197,7 @@ class TestCourseGradeFactory(GradeTestBase):
 
         self._update_grading_policy(passing=0.9)
 
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(8):
             _assert_create(expected_pass=False)
 
     @ddt.data(True, False)
@@ -310,7 +310,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
                 mock_get_bulk_cached_grade.reset_mock()
                 mock_create_grade.reset_mock()
 
-                with self.assertNumQueries(0):
+                with self.assertNumQueries(1):
                     grade_b = self.subsection_grade_factory.create(self.sequence)
                 self.assertTrue(mock_get_bulk_cached_grade.called)
                 self.assertFalse(mock_create_grade.called)
