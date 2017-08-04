@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
 from shoppingcart.models import (
     CourseRegCodeItem,
@@ -20,7 +21,7 @@ from shoppingcart.models import (
 )
 from student.models import CourseEnrollment
 from student.roles import CourseSalesAdminRole
-from student.tests.factories import CourseModeFactory, UserFactory
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

@@ -15,6 +15,7 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import UsageKey
 
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
 from instructor_analytics.basic import (
     AVAILABLE_FEATURES,
@@ -43,7 +44,7 @@ from shoppingcart.models import (
 )
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseSalesAdminRole
-from student.tests.factories import CourseModeFactory, UserFactory
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

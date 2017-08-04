@@ -25,7 +25,7 @@ from enrollment.api import get_enrollment
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
-from student.tests.factories import CourseModeFactory
+from course_modes.tests.factories import CourseModeFactory
 from student.tests.tests import EnrollmentEventTestMixin
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

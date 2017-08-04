@@ -12,6 +12,7 @@ from nose.tools import raises
 from pytz import UTC
 
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from enrollment import data
 from enrollment.errors import (
     CourseEnrollmentClosedError,
@@ -21,7 +22,7 @@ from enrollment.errors import (
 )
 from openedx.core.lib.exceptions import CourseNotFoundError
 from student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError
-from student.tests.factories import CourseModeFactory, UserFactory
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
