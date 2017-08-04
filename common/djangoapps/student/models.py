@@ -993,10 +993,24 @@ class CourseEnrollment(models.Model):
     checking course dates, user permissions, etc.) This logic is currently
     scattered across our views.
     """
-    MODEL_TAGS = ['course_id', 'is_active', 'mode']
+    MODEL_TAGS = ['course', 'is_active', 'mode']
 
     user = models.ForeignKey(User)
-    course_id = CourseKeyField(max_length=255, db_index=True)
+
+    course = models.ForeignKey(CourseOverview, db_constraint=False)
+
+    @property
+    def course_id(self):
+        return self._course_id
+
+    @course_id.setter
+    def course_id(self, value):
+        if isinstance(value, basestring):
+            self._course_id = CourseKey.from_string(value)
+        else:
+            self._course_id = value
+
+
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
     # If is_active is False, then the student is not considered to be enrolled
@@ -1018,8 +1032,8 @@ class CourseEnrollment(models.Model):
     MODE_CACHE_NAMESPACE = u'CourseEnrollment.mode_and_active'
 
     class Meta(object):
-        unique_together = (('user', 'course_id'),)
-        ordering = ('user', 'course_id')
+        unique_together = (('user', 'course'),)
+        ordering = ('user', 'course')
 
     def __init__(self, *args, **kwargs):
         super(CourseEnrollment, self).__init__(*args, **kwargs)
@@ -1182,7 +1196,7 @@ class CourseEnrollment(models.Model):
                                   cost=cost, currency=currency)
 
     @classmethod
-    def send_signal_full(cls, event, user=user, mode=mode, course_id=course_id, cost=None, currency=None):
+    def send_signal_full(cls, event, user=user, mode=mode, course_id=None, cost=None, currency=None):
         """
         Sends a signal announcing changes in course enrollment status.
         This version should be used if you don't already have a CourseEnrollment object
@@ -1434,7 +1448,7 @@ class CourseEnrollment(models.Model):
         try:
             return cls.objects.filter(
                 user=user,
-                course_id__startswith=querystring,
+                course__id__startswith=querystring,
                 is_active=1
             ).exists()
         except cls.DoesNotExist:
@@ -1654,11 +1668,6 @@ class CourseEnrollment(models.Model):
     @property
     def username(self):
         return self.user.username
-
-    @property
-    def course(self):
-        # Deprecated. Please use the `course_overview` property instead.
-        return self.course_overview
 
     @property
     def course_overview(self):

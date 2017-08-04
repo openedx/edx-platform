@@ -13,7 +13,9 @@ from django.db.models import Q
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from request_cache.middleware import RequestCache, ns_request_cached
 
@@ -39,8 +41,18 @@ class CourseMode(models.Model):
     class Meta(object):
         app_label = "course_modes"
 
-    # the course that this mode is attached to
-    course_id = CourseKeyField(max_length=255, db_index=True, verbose_name=_("Course"))
+    course = models.ForeignKey(CourseOverview, db_constraint=False, db_index=True, related_name='modes')
+
+    @property
+    def course_id(self):
+        return self._course_id
+
+    @course_id.setter
+    def course_id(self, value):
+        if isinstance(value, basestring):
+            self._course_id = CourseKey.from_string(value)
+        else:
+            self._course_id = value
 
     # the reference to this mode that can be used by Enrollments to generate
     # similar behavior for the same slug across courses
@@ -164,7 +176,7 @@ class CourseMode(models.Model):
     CACHE_NAMESPACE = u"course_modes.CourseMode.cache."
 
     class Meta(object):
-        unique_together = ('course_id', 'mode_slug', 'currency')
+        unique_together = ('course', 'mode_slug', 'currency')
 
     def clean(self):
         """
@@ -748,6 +760,15 @@ def get_course_prices(course, verified_only=False):
     else:
         price = None
 
+    return registration_price, format_course_price(price)
+
+
+def format_course_price(price):
+    """
+    Return a formatted price for a course (a string preceded by correct currency, or 'Free').
+    """
+    currency_symbol = settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
+
     if price:
         # Translators: This will look like '$50', where {currency_symbol} is a symbol such as '$' and {price} is a
         # numerical amount in that currency. Adjust this display as needed for your language.
@@ -756,7 +777,7 @@ def get_course_prices(course, verified_only=False):
         # Translators: This refers to the cost of the course. In this case, the course costs nothing so it is free.
         cosmetic_display_price = _('Free')
 
-    return registration_price, force_text(cosmetic_display_price)
+    return cosmetic_display_price
 
 
 class CourseModesArchive(models.Model):

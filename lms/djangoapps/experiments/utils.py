@@ -39,7 +39,7 @@ def get_experiment_user_metadata_context(request, course, user):
 
     return {
         'upgrade_link': upgrade_data and upgrade_data.link,
-        'upgrade_price': get_cosmetic_verified_display_price(course),
+        'upgrade_price': unicode(get_cosmetic_verified_display_price(course)),
         'enrollment_mode': enrollment_mode,
         'enrollment_time': enrollment_time,
         'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',
