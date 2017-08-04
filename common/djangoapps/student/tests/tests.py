@@ -27,6 +27,7 @@ from bulk_email.models import Optout  # pylint: disable=import-error
 from certificates.models import CertificateStatuses  # pylint: disable=import-error
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, generate_course_run_key
@@ -41,7 +42,7 @@ from student.models import (
     unique_id_for_user,
     user_by_anonymous_id
 )
-from student.tests.factories import CourseEnrollmentFactory, CourseModeFactory, UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from student.views import _cert_info, complete_course_mode_info, process_survey_link
 from util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
 from util.testing import EventTestMixin

@@ -34,6 +34,7 @@ from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from certificates.models import CertificateStatuses
 from certificates.tests.factories import GeneratedCertificateFactory
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from courseware.models import StudentFieldOverride, StudentModule
 from courseware.tests.factories import (
     BetaTesterFactory,
@@ -87,7 +88,7 @@ from student.models import (
     NonExistentCourseError
 )
 from student.roles import CourseBetaTesterRole, CourseFinanceAdminRole, CourseInstructorRole, CourseSalesAdminRole
-from student.tests.factories import AdminFactory, CourseModeFactory, UserFactory
+from student.tests.factories import AdminFactory, UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase

@@ -7,7 +7,8 @@ from django.core.management import call_command
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
-from student.tests.factories import UserFactory, CourseModeFactory
+from course_modes.tests.factories import CourseModeFactory
+from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 
 

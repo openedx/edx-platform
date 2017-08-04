@@ -12,11 +12,12 @@ from django.db.models import signals
 from django.db.models.functions import Lower
 
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import CourseEnrollment
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseModeFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

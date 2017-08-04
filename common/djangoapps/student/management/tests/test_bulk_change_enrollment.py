@@ -4,7 +4,8 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from mock import patch, call
 
-from student.tests.factories import UserFactory, CourseModeFactory, CourseEnrollmentFactory
+from course_modes.tests.factories import CourseModeFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment, EVENT_NAME_ENROLLMENT_MODE_CHANGED
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

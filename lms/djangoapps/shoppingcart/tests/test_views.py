@@ -26,6 +26,7 @@ from pytz import UTC
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
@@ -47,7 +48,7 @@ from shoppingcart.tests.payment_fake import PaymentFakeView
 from shoppingcart.views import _can_download_report, _get_date_from_str, initialize_report
 from student.models import CourseEnrollment
 from student.roles import CourseSalesAdminRole
-from student.tests.factories import AdminFactory, CourseModeFactory, UserFactory
+from student.tests.factories import AdminFactory, UserFactory
 from util.date_utils import get_default_time_display
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -178,13 +179,12 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         """
         Adds a course mode to the test course.
         """
-        mode = CourseModeFactory.create()
-        mode.course_id = self.course.id
-        mode.min_price = min_price
-        mode.mode_slug = mode_slug
-        mode.expiration_date = expiration_date
-        mode.save()
-        return mode
+        return CourseModeFactory(
+            course_id=self.course.id,
+            min_price=min_price,
+            mode_slug=mode_slug,
+            expiration_date=expiration_date,
+        )
 
     def add_course_to_user_cart(self, course_key):
         """
