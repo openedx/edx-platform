@@ -58,6 +58,23 @@ class TestGenerateCourseOverview(ModuleStoreTestCase):
         self._assert_courses_in_overview(self.course_key_1)
         self._assert_courses_not_in_overview(self.course_key_2)
 
+    def test_generate_force_update(self):
+        self.command.handle(all=True)
+
+        # update each course
+        updated_course_name = u'test_generate_course_overview.course_edit'
+        for course_key in (self.course_key_1, self.course_key_2):
+            course = self.store.get_course(course_key)
+            course.display_name = updated_course_name
+            self.store.update_item(course, self.user.id)
+
+        # force_update course_key_1, but not course_key_2
+        self.command.handle(unicode(self.course_key_1), all=False, force_update=True)
+        self.command.handle(unicode(self.course_key_2), all=False, force_update=False)
+
+        self.assertEquals(CourseOverview.get_from_id(self.course_key_1).display_name, updated_course_name)
+        self.assertNotEquals(CourseOverview.get_from_id(self.course_key_2).display_name, updated_course_name)
+
     def test_invalid_key(self):
         """
         Test that CommandError is raised for invalid key.
