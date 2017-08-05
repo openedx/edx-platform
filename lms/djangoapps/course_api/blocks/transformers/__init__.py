@@ -65,3 +65,11 @@ SUPPORTED_FIELDS = [
         requested_field_name='visible_to_staff_only',
     )
 ]
+
+
+def get_supported_field(requested_field_name):
+    """
+    Returns the SupportedFieldType with the given request_field_name.
+    If not found, returns None.
+    """
+    return next((field for field in SUPPORTED_FIELDS if field.requested_field_name == requested_field_name), None)

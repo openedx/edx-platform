@@ -51,6 +51,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
             'request': MagicMock(),
             'block_structure': self.block_structure,
             'requested_fields': ['type'],
+            'user': self.user,
         }
 
     def assert_basic_block(self, block_key_string, serialized_block):
@@ -133,6 +134,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
             'request': MagicMock(),
             'block_structure': block_structure,
             'requested_fields': ['type'],
+            'user': None,
         }
 
     def assert_staff_fields(self, serialized_block):

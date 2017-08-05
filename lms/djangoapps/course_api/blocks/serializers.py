@@ -5,14 +5,14 @@ from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from .transformers import SUPPORTED_FIELDS
+from .transformers import get_supported_field
 
 
 class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer for single course block
     """
-    def _get_field(self, block_key, transformer, field_name, default):
+    def _get_field(self, block_key, transformer=None, field_name=None, default=None):
         """
         Get the field value requested.  The field may be an XBlock field, a
         transformer block field, or an entire tranformer block data dict.
@@ -58,17 +58,26 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
             )
 
         # add additional requested fields that are supported by the various transformers
-        for supported_field in SUPPORTED_FIELDS:
-            if supported_field.requested_field_name in self.context['requested_fields']:
+        for requested_field_name in set(self.context['requested_fields']):
+            field_name, field_value = None, None
+            supported_field = get_supported_field(requested_field_name)
+            if supported_field:
+                field_name = supported_field.serializer_field_name
                 field_value = self._get_field(
                     block_key,
                     supported_field.transformer,
                     supported_field.block_field_name,
                     supported_field.default_value,
                 )
-                if field_value is not None:
-                    # only return fields that have data
-                    data[supported_field.serializer_field_name] = field_value
+            else:
+                # when accessing blocks for not a specific user, allow any requested field
+                if self.context['user'] is None:
+                    field_name = requested_field_name
+                    field_value = self._get_field(block_key, field_name=field_name)
+
+            if field_value is not None:
+                # only return fields that have data
+                data[field_name] = field_value
 
         if 'children' in self.context['requested_fields']:
             children = self.context['block_structure'].get_children(block_key)
