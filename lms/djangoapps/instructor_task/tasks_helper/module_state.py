@@ -81,7 +81,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
 
     # if problem_url is present make a usage key from it
     if problem_url:
-        usage_key = course_id.make_usage_key_from_deprecated_string(problem_url)
+        usage_key = UsageKey.from_string(problem_url).map_into_course(course_id)
         usage_keys.append(usage_key)
 
         # find the problem descriptor:

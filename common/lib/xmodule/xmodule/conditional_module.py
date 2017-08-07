@@ -8,6 +8,8 @@ import logging
 from lazy import lazy
 from lxml import etree
 from pkg_resources import resource_string
+
+from opaque_keys.edx.keys import UsageKey
 from xblock.fields import ReferenceList, Scope, String
 from xblock.fragment import Fragment
 
@@ -265,7 +267,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
         if not self.sources_list:
             if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], basestring):
                 self.sources_list = [
-                    self.location.course_key.make_usage_key_from_deprecated_string(item)
+                    UsageKey.from_string(item).map_into_course(self.location.course_key)
                     for item in ConditionalDescriptor.parse_sources(self.xml_attributes)
                 ]
 

@@ -20,7 +20,6 @@ from django.views.decorators.http import require_POST
 from mock import patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
@@ -411,7 +410,7 @@ def set_course_mode_price(request, course_id):
             status=400)  # status code 400: Bad Request
 
     currency = request.POST['currency']
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
 
     course_honor_mode = CourseMode.objects.filter(mode_slug='honor', course_id=course_key)
     if not course_honor_mode:

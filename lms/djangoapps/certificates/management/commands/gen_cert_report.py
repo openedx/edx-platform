@@ -7,9 +7,7 @@ from optparse import make_option
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from certificates.models import GeneratedCertificate
 
@@ -51,12 +49,7 @@ class Command(BaseCommand):
         # Find all courses that have ended
 
         if options['course']:
-            try:
-                course_id = CourseKey.from_string(options['course'])
-            except InvalidKeyError:
-                print ("Course id {} could not be parsed as a CourseKey; "
-                       "falling back to SSCK.from_dep_str").format(options['course'])
-                course_id = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
+            course_id = CourseKey.from_string(options['course'])
         else:
             raise CommandError("You must specify a course")
 

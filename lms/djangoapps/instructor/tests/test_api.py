@@ -25,7 +25,7 @@ from django.utils.translation import ugettext as _
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 from nose.tools import raises
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from opaque_keys.edx.locator import UsageKey
 
 import lms.djangoapps.instructor.views.api
@@ -4075,7 +4075,7 @@ class TestInstructorAPIHelpers(TestCase):
         self.assertEqual(_split_input_list(scary_unistuff), [scary_unistuff])
 
     def test_msk_from_problem_urlname(self):
-        course_id = SlashSeparatedCourseKey('MITx', '6.002x', '2013_Spring')
+        course_id = CourseLocator('MITx', '6.002x', '2013_Spring')
         name = 'L2Node1'
         output = 'i4x://MITx/6.002x/problem/L2Node1'
         self.assertEqual(msk_from_problem_urlname(course_id, name).to_deprecated_string(), output)

@@ -8,7 +8,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.client import Client
 from mock import Mock
-from opaque_keys.edx.locations import AssetLocation, SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locations import AssetLocation
 
 from contentstore.utils import reverse_url
 from student.models import Registration
@@ -121,7 +122,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
     SEQUENTIAL = 'vertical_sequential'
     DRAFT_HTML = 'draft_html'
     DRAFT_VIDEO = 'draft_video'
-    LOCKED_ASSET_KEY = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.html')
+    LOCKED_ASSET_KEY = AssetLocation.from_string('/c4x/edX/toy/asset/sample_static.html')
 
     def import_and_populate_course(self):
         """
@@ -129,7 +130,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         """
         content_store = contentstore()
         import_course_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], static_content_store=content_store)
-        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        course_id = CourseLocator('edX', 'toy', '2012_Fall')
 
         # create an Orphan
         # We had a bug where orphaned draft nodes caused export to fail. This is here to cover that case.

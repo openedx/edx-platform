@@ -7,7 +7,6 @@ from django import forms
 from django.core.exceptions import ValidationError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from bulk_email.models import COURSE_EMAIL_MESSAGE_BODY_TAG, CourseAuthorization, CourseEmailTemplate
 from xmodule.modulestore.django import modulestore
@@ -84,13 +83,10 @@ class CourseAuthorizationAdminForm(forms.ModelForm):
         try:
             course_key = CourseKey.from_string(cleaned_id)
         except InvalidKeyError:
-            try:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(cleaned_id)
-            except InvalidKeyError:
-                msg = u'Course id invalid.'
-                msg += u' --- Entered course id was: "{0}". '.format(cleaned_id)
-                msg += 'Please recheck that you have supplied a valid course id.'
-                raise forms.ValidationError(msg)
+            msg = u'Course id invalid.'
+            msg += u' --- Entered course id was: "{0}". '.format(cleaned_id)
+            msg += 'Please recheck that you have supplied a valid course id.'
+            raise forms.ValidationError(msg)
 
         if not modulestore().has_course(course_key):
             msg = u'COURSE NOT FOUND'

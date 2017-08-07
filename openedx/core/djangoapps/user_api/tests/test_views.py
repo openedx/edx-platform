@@ -14,7 +14,7 @@ from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from pytz import common_timezones_set, UTC
 from social_django.models import UserSocialAuth, Partial
 
@@ -99,7 +99,7 @@ class EmptyUserTestCase(UserAPITestCase):
 
 class EmptyRoleTestCase(UserAPITestCase):
     """Test that the endpoint supports empty result sets"""
-    course_id = SlashSeparatedCourseKey.from_deprecated_string("org/course/run")
+    course_id = CourseKey.from_string("org/course/run")
     LIST_URI = ROLE_LIST_URI + "?course_id=" + course_id.to_deprecated_string()
 
     def test_get_list_empty(self):
@@ -135,7 +135,7 @@ class RoleTestCase(UserApiTestCase):
     """
     Test cases covering Role-related views and their behaviors
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string("org/course/run")
+    course_id = CourseKey.from_string("org/course/run")
     LIST_URI = ROLE_LIST_URI + "?course_id=" + course_id.to_deprecated_string()
 
     def setUp(self):

@@ -5,7 +5,7 @@ from functools import partial
 
 import factory
 from factory.django import DjangoModelFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 
 from courseware.models import (
     StudentModule,
@@ -27,7 +27,7 @@ from student.tests.factories import UserFactory  # Imported to re-export
 
 # TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)
 # pylint: disable=invalid-name
-course_id = SlashSeparatedCourseKey(u'edX', u'test_course', u'test')
+course_id = CourseLocator(u'edX', u'test_course', u'test')
 location = partial(course_id.make_usage_key, u'problem')
 
 
@@ -128,7 +128,7 @@ class StudentModuleFactory(DjangoModelFactory):
 
     module_type = "problem"
     student = factory.SubFactory(UserFactory)
-    course_id = SlashSeparatedCourseKey("MITx", "999", "Robot_Super_Course")
+    course_id = CourseLocator("MITx", "999", "Robot_Super_Course")
     state = None
     grade = None
     max_grade = None

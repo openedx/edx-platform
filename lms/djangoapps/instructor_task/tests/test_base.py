@@ -14,7 +14,8 @@ from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from mock import Mock, patch
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locations import Location
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.model_data import StudentModule
@@ -34,7 +35,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'test_course'
 TEST_COURSE_NUMBER = '1.23x'
-TEST_COURSE_KEY = SlashSeparatedCourseKey(TEST_COURSE_ORG, TEST_COURSE_NUMBER, TEST_COURSE_NAME)
+TEST_COURSE_KEY = CourseLocator(TEST_COURSE_ORG, TEST_COURSE_NUMBER, TEST_COURSE_NAME)
 TEST_CHAPTER_NAME = "Section"
 TEST_SECTION_NAME = "Subsection"
 
@@ -206,7 +207,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         Create an internal location for a test problem.
         """
         if "i4x:" in problem_url_name:
-            return Location.from_deprecated_string(problem_url_name)
+            return Location.from_string(problem_url_name)
         elif course_key:
             return course_key.make_usage_key('problem', problem_url_name)
         else:

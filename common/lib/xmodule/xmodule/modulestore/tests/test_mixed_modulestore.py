@@ -40,7 +40,6 @@ from xblock.test.tools import TestRuntime
 if not settings.configured:
     settings.configure()
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
@@ -323,7 +322,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         )
         # try an unknown mapping, it should be the 'default' store
         self.assertEqual(self.store.get_modulestore_type(
-            SlashSeparatedCourseKey('foo', 'bar', '2012_Fall')), default_ms
+            CourseLocator('foo', 'bar', '2012_Fall')), default_ms
         )
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)

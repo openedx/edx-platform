@@ -13,7 +13,7 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.utils.timezone import UTC
 from mock import Mock, patch
-from opaque_keys.edx.locations import CourseLocator, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import CourseLocator
 
 import util.file
 from util.file import (
@@ -30,14 +30,14 @@ class FilenamePrefixGeneratorTestCase(TestCase):
     """
     Tests for course_filename_prefix_generator
     """
-    @ddt.data(CourseLocator, SlashSeparatedCourseKey)
+    @ddt.data(CourseLocator)
     def test_locators(self, course_key_class):
         self.assertEqual(
             course_filename_prefix_generator(course_key_class(org='foo', course='bar', run='baz')),
             u'foo_bar_baz'
         )
 
-    @ddt.data(CourseLocator, SlashSeparatedCourseKey)
+    @ddt.data(CourseLocator)
     def test_custom_separator(self, course_key_class):
         self.assertEqual(
             course_filename_prefix_generator(course_key_class(org='foo', course='bar', run='baz'), separator='-'),
@@ -62,7 +62,7 @@ class FilenameGeneratorTestCase(TestCase):
         mocked_datetime.now.return_value = self.NOW
         self.addCleanup(datetime_patcher.stop)
 
-    @ddt.data(CourseLocator, SlashSeparatedCourseKey)
+    @ddt.data(CourseLocator)
     def test_filename_generator(self, course_key_class):
         """
         Tests that the generator creates names based on course_id, base name, and date.

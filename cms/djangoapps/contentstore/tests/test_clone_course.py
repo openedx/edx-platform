@@ -31,7 +31,7 @@ class CloneCourseTest(CourseTestCase):
 
         # 2. clone course (mongo -> mongo)
         # TODO - This is currently failing since clone_course doesn't handle Private content - fails on Publish
-        # mongo_course2_id = SlashSeparatedCourseKey('edX2', 'toy2', '2013_Fall')
+        # mongo_course2_id = CourseLocator('edX2', 'toy2', '2013_Fall')
         # self.store.clone_course(mongo_course1_id, mongo_course2_id, self.user.id)
         # self.assertCoursesEqual(mongo_course1_id, mongo_course2_id)
         # self.check_populated_course(mongo_course2_id)

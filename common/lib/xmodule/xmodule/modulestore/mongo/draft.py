@@ -9,6 +9,7 @@ and otherwise returns i4x://org/course/cat/name).
 import pymongo
 import logging
 
+from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locations import Location
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 from xmodule.exceptions import InvalidVersionError
@@ -424,7 +425,7 @@ class DraftModuleStore(MongoModuleStore):
             # collect the children's ids for future processing
             next_tier = []
             for child in item.get('definition', {}).get('children', []):
-                child_loc = Location.from_deprecated_string(child)
+                child_loc = Location.from_string(child)
                 next_tier.append(child_loc.to_deprecated_son())
 
             # insert a new DRAFT version of the item
@@ -582,7 +583,7 @@ class DraftModuleStore(MongoModuleStore):
             to_be_deleted.append(self._id_dict_to_son(current_entry['_id']))
             next_tier = []
             for child_loc in current_entry.get('definition', {}).get('children', []):
-                child_loc = course_key.make_usage_key_from_deprecated_string(child_loc)
+                child_loc = UsageKey.from_string(child_loc).map_into_course(course_key)
 
                 # single parent can have 2 versions: draft and published
                 # get draft parents only while deleting draft module
@@ -813,7 +814,7 @@ class DraftModuleStore(MongoModuleStore):
                 item = versions_found[0]
                 assert item.get('_id').get('revision') != MongoRevisionKey.draft
                 for child in item.get('definition', {}).get('children', []):
-                    child_loc = Location.from_deprecated_string(child)
+                    child_loc = Location.from_string(child)
                     delete_draft_only(child_loc)
 
         delete_draft_only(location)
@@ -829,7 +830,7 @@ class DraftModuleStore(MongoModuleStore):
             user_id (int)   : User id
         """
         for child_location in published_version.get('definition', {}).get('children', []):
-            item_location = original_parent_location.course_key.make_usage_key_from_deprecated_string(child_location)
+            item_location = UsageKey.from_string(child_location).map_into_course(original_parent_location)
             try:
                 source_item = self.get_item(item_location)
             except ItemNotFoundError:
@@ -838,7 +839,7 @@ class DraftModuleStore(MongoModuleStore):
 
             if source_item.parent and source_item.parent.block_id != original_parent_location.block_id:
                 if self.update_item_parent(item_location, original_parent_location, source_item.parent, user_id):
-                    delete_draft_only(Location.from_deprecated_string(child_location))
+                    delete_draft_only(Location.from_string(child_location))
 
     def _query_children_for_cache_children(self, course_key, items):
         # first get non-draft in a round-trip
@@ -852,7 +853,7 @@ class DraftModuleStore(MongoModuleStore):
             # now query all draft content in another round-trip
             query = []
             for item in items:
-                item_usage_key = course_key.make_usage_key_from_deprecated_string(item)
+                item_usage_key = UsageKey.from_string(item).map_into_course(course_key)
                 if item_usage_key.category not in DIRECT_ONLY_CATEGORIES:
                     query.append(as_draft(item_usage_key).to_deprecated_son())
             if query:

@@ -8,7 +8,9 @@ from mock import Mock, patch
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xmodule.error_module import NonStaffErrorDescriptor
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+from opaque_keys.edx.locations import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationManager
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.tests import DATA_DIR, get_test_system, get_test_descriptor_system
@@ -29,7 +31,7 @@ class DummySystem(ImportSystem):
 
         super(DummySystem, self).__init__(
             xmlstore=xmlstore,
-            course_id=SlashSeparatedCourseKey(ORG, COURSE, 'test_run'),
+            course_id=CourseLocator(ORG, COURSE, 'test_run'),
             course_dir='test_dir',
             error_tracker=Mock(),
             load_error_modules=load_error_modules,
@@ -319,7 +321,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         )
         self.assertEqual(
             conditional.sources_list[0],
-            conditional.location.course_key.make_usage_key_from_deprecated_string(conditional.xml_attributes['sources'])
+            UsageKey.from_string(conditional.xml_attributes['sources']).map_into_course(conditional.location.course_key)
         )
 
     def test_conditional_module_parse_sources(self):

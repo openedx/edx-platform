@@ -40,7 +40,6 @@ from django.views.generic import TemplateView
 from ipware.ip import get_ip
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 from provider.oauth2.models import Client
 from pytz import UTC
@@ -1193,7 +1192,7 @@ def change_enrollment(request, check_access=True):
         return HttpResponseBadRequest(_("Course id not specified"))
 
     try:
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get("course_id"))
+        course_id = CourseKey.from_string(request.POST.get("course_id"))
     except InvalidKeyError:
         log.warning(
             u"User %s tried to %s with invalid course id: %s",
@@ -2820,7 +2819,7 @@ def change_email_settings(request):
     user = request.user
 
     course_id = request.POST.get("course_id")
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     receive_emails = request.POST.get("receive_emails")
     if receive_emails:
         optout_object = Optout.objects.filter(user=user, course_id=course_key)
