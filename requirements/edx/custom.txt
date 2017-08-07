@@ -5,7 +5,7 @@
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git@33699d481399c22db747cb4810330f5051540e21#egg=xblock-image-explorer
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@7b054467159fd2cbe2e0adccf9a0665d36a2a197#egg=xblock-drag-and-drop-v2
--e git+https://github.com/edx-solutions/xblock-ooyala.git@v2.0.8#egg=xblock-ooyala==2.0.8
+-e git+https://github.com/edx-solutions/xblock-ooyala.git@v2.0.9#egg=xblock-ooyala==2.0.9
 -e git+https://github.com/edx-solutions/xblock-group-project.git@6a68ea09478e49e796ee4c0a985018ec4257b7d7#egg=xblock-group-project
 -e git+https://github.com/edx-solutions/xblock-adventure.git@7bdeb62b1055377dc04a7b503f7eea8264f5847b#egg=xblock-adventure
 # This is currently using a custom branch: https://github.com/open-craft/xblock-poll/tree/copy-change-patch
