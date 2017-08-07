@@ -36,6 +36,8 @@ class SubsectionGradeBase(object):
         self.graded_total = None  # aggregated grade for all graded problems
         self.all_total = None  # aggregated grade for all problems, regardless of whether they are graded
 
+        self.override = None
+
     @property
     def attempted(self):
         """
@@ -108,7 +110,6 @@ class SubsectionGrade(SubsectionGradeBase):
             self._compute_block_score(descendant_key, course_structure, submissions_scores, csm_scores)
 
         self.all_total, self.graded_total = graders.aggregate_scores(self.problem_scores.values())
-        self.override = None
         self._log_event(log.debug, u"init_from_structure", student)
         return self
 
