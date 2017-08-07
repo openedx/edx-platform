@@ -245,7 +245,7 @@
         &>.u-field {
             &:not(:first-child) {
                 font-size: $body-font-size;
-                color: $body-color;
+                color: $base-font-color;
                 font-weight: $font-light;
                 margin-bottom: 0;
             }
@@ -353,7 +353,7 @@
                 font-size: 12px;
                 @include padding-right(5px);
                 vertical-align: middle;
-                color: $body-color;
+                color: $base-font-color;
             }
             .u-field-title {
                 width: 100%;
@@ -364,7 +364,7 @@
                 text-align: center;
                 line-height: 1.5em;
                 @extend %t-copy-sub1;
-                color: $body-color;
+                color: $base-font-color;
             }
         }
 
@@ -377,7 +377,7 @@
         }
 
         .wrapper-u-field {
-            color: $body-color;
+            color: $base-font-color;
             font-size: $body-font-size;
 
             .u-field-footer {
