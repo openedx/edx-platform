@@ -3,7 +3,7 @@ import collections
 from datetime import datetime, timedelta
 
 from django.test import TestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 
 from contentstore import utils
@@ -21,26 +21,26 @@ class LMSLinksTestCase(TestCase):
 
     def lms_link_test(self):
         """ Tests get_lms_link_for_item. """
-        course_key = SlashSeparatedCourseKey('mitX', '101', 'test')
+        course_key = CourseLocator('mitX', '101', 'test')
         location = course_key.make_usage_key('vertical', 'contacting_us')
         link = utils.get_lms_link_for_item(location, False)
-        self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us")
+        self.assertEquals(link, "//localhost:8000/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type@vertical+block@contacting_us")
 
         # test preview
         link = utils.get_lms_link_for_item(location, True)
         self.assertEquals(
             link,
-            "//preview.localhost/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us"
+            "//preview.localhost/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type@vertical+block@contacting_us"
         )
 
         # now test with the course' location
         location = course_key.make_usage_key('course', 'test')
         link = utils.get_lms_link_for_item(location)
-        self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/course/test")
+        self.assertEquals(link, "//localhost:8000/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type@course+block@test")
 
     def lms_link_for_certificate_web_view_test(self):
         """ Tests get_lms_link_for_certificate_web_view. """
-        course_key = SlashSeparatedCourseKey('mitX', '101', 'test')
+        course_key = CourseLocator('mitX', '101', 'test')
         dummy_user = ModuleStoreEnum.UserID.test
         mode = 'professional'
 

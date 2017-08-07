@@ -24,7 +24,6 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pyquery import PyQuery
 from xblock.core import XBlock, XBlockAside
 from xblock.field_data import FieldData
@@ -1645,14 +1644,14 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
             # This value is set by observation, so that later changes to the student
             # id computation don't break old data
             'e3b0b940318df9c14be59acb08e78af5',
-            self._get_anonymous_id(SlashSeparatedCourseKey('MITx', '6.00x', '2012_Fall'), descriptor_class)
+            self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2012_Fall'), descriptor_class)
         )
 
         self.assertEquals(
             # This value is set by observation, so that later changes to the student
             # id computation don't break old data
             'f82b5416c9f54b5ce33989511bb5ef2e',
-            self._get_anonymous_id(SlashSeparatedCourseKey('MITx', '6.00x', '2013_Spring'), descriptor_class)
+            self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2013_Spring'), descriptor_class)
         )
 
 

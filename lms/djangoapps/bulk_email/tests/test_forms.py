@@ -4,7 +4,7 @@ Unit tests for bulk-email-related forms.
 """
 
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 
 from bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
 from bulk_email.models import BulkEmailFlag, CourseEmailTemplate
@@ -70,7 +70,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
 
     def test_form_typo(self):
         # Munge course id
-        bad_id = SlashSeparatedCourseKey(u'Broken{}'.format(self.course.id.org), 'hello', self.course.id.run + '_typo')
+        bad_id = CourseLocator(u'Broken{}'.format(self.course.id.org), 'hello', self.course.id.run + '_typo')
 
         form_data = {'course_id': bad_id.to_deprecated_string(), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)

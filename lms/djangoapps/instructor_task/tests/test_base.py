@@ -14,7 +14,8 @@ from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from mock import Mock, patch
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import Location
+from opaque_keys.edx.keys import CourseKey
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.model_data import StudentModule
@@ -34,7 +35,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'test_course'
 TEST_COURSE_NUMBER = '1.23x'
-TEST_COURSE_KEY = SlashSeparatedCourseKey(TEST_COURSE_ORG, TEST_COURSE_NUMBER, TEST_COURSE_NAME)
+TEST_COURSE_KEY = CourseKey.from_string('/'.join([TEST_COURSE_ORG, TEST_COURSE_NUMBER, TEST_COURSE_NAME]))
 TEST_CHAPTER_NAME = "Section"
 TEST_SECTION_NAME = "Subsection"
 
