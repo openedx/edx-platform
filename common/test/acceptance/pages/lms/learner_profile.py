@@ -13,10 +13,6 @@ from common.test.acceptance.tests.helpers import select_option_by_value
 
 PROFILE_VISIBILITY_SELECTOR = '#u-field-select-account_privacy option[value="{}"]'
 PROFILE_VISIBILITY_INPUT = '#u-field-select-account_privacy'
-FIELD_ICONS = {
-    'country': 'fa-map-marker',
-    'language_proficiencies': 'fa-comment',
-}
 
 
 class Badge(PageObject):
