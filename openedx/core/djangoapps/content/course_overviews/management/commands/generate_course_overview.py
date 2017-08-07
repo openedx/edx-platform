@@ -33,7 +33,13 @@ class Command(BaseCommand):
             action='store_true',
             dest='all',
             default=False,
-            help='Generate course overview for all courses.',
+            help=u'Generate course overview for all courses.',
+        )
+        parser.add_argument(
+            '--force_update',
+            action='store_true',
+            default=False,
+            help=u'Force update course overviews for the requested courses.',
         )
 
     def handle(self, *args, **options):
@@ -48,4 +54,4 @@ class Command(BaseCommand):
             except InvalidKeyError:
                 raise CommandError('Invalid key specified.')
 
-        CourseOverview.get_select_courses(course_keys)
+        CourseOverview.get_select_courses(course_keys, force_update=options.get('force_update'))
