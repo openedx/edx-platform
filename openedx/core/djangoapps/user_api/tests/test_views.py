@@ -609,7 +609,6 @@ class LoginSessionViewTest(UserAPITestCase):
                 "placeholder": "",
                 "instructions": "",
                 "restrictions": {
-                    "min_length": PASSWORD_MIN_LENGTH,
                     "max_length": PASSWORD_MAX_LENGTH
                 },
                 "errorMessages": {},

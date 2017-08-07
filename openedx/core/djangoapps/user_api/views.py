@@ -98,7 +98,6 @@ class LoginSessionView(APIView):
             label=password_label,
             field_type="password",
             restrictions={
-                "min_length": accounts.PASSWORD_MIN_LENGTH,
                 "max_length": accounts.PASSWORD_MAX_LENGTH,
             }
         )
