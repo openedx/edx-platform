@@ -10,7 +10,8 @@ from ddt import data, ddt
 from django.conf import settings
 from django.test.utils import override_settings
 from mock import patch
-from opaque_keys.edx.locations import AssetLocation, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import AssetLocation
+from opaque_keys.edx.locator import CourseLocator
 from PIL import Image
 from pytz import UTC
 
@@ -80,7 +81,7 @@ class BasicAssetsTestCase(AssetsTestCase):
 
     def test_static_url_generation(self):
 
-        course_key = SlashSeparatedCourseKey('org', 'class', 'run')
+        course_key = CourseLocator('org', 'class', 'run')
         location = course_key.make_asset_key('asset', 'my_file_name.jpg')
         path = StaticContent.get_static_path_from_location(location)
         self.assertEquals(path, '/static/my_file_name.jpg')
@@ -348,7 +349,7 @@ class AssetToJsonTestCase(AssetsTestCase):
     def test_basic(self):
         upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
         content_type = 'image/jpg'
-        course_key = SlashSeparatedCourseKey('org', 'class', 'run')
+        course_key = CourseLocator('org', 'class', 'run')
         location = course_key.make_asset_key('asset', 'my_file_name.jpg')
         thumbnail_location = course_key.make_asset_key('thumbnail', 'my_file_name_thumb.jpg')
 
@@ -357,10 +358,10 @@ class AssetToJsonTestCase(AssetsTestCase):
 
         self.assertEquals(output["display_name"], "my_file")
         self.assertEquals(output["date_added"], "Jun 01, 2013 at 10:30 UTC")
-        self.assertEquals(output["url"], "/c4x/org/class/asset/my_file_name.jpg")
-        self.assertEquals(output["external_url"], "lms_base_url/c4x/org/class/asset/my_file_name.jpg")
+        self.assertEquals(output["url"], "/asset-v1:org+class+run+type@asset+block@my_file_name.jpg")
+        self.assertEquals(output["external_url"], "lms_base_url/asset-v1:org+class+run+type@asset+block@my_file_name.jpg")
         self.assertEquals(output["portable_url"], "/static/my_file_name.jpg")
-        self.assertEquals(output["thumbnail"], "/c4x/org/class/thumbnail/my_file_name_thumb.jpg")
+        self.assertEquals(output["thumbnail"], "/asset-v1:org+class+run+type@thumbnail+block@my_file_name_thumb.jpg")
         self.assertEquals(output["id"], unicode(location))
         self.assertEquals(output['locked'], True)
 
