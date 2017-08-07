@@ -43,13 +43,20 @@
                 <span class="u-field-message-help" id="u-field-message-help-<%- id %>"> <%- message %></span>
             </span>
         <% } %>
-        <% if (mode === 'edit') { %>
-          <div class="field-textarea-character-count">
-            <span class="current-char-count"><%- value.length %></span>
-            <span class="current-char-count-msg">
-                <%-charCountMessage %>
-            </span>
-          </div>
+        <% if (mode === 'edit' && maxCharacters) { %>
+            <div class="field-textarea-character-count">
+                <%=
+                    HtmlUtils.interpolateHtml(
+                        gettext('{currentCountOpeningTag}{currentCharacterCount}{currentCountClosingTag} of {maxCharacters}'),
+                        {
+                            currentCountOpeningTag: HtmlUtils.HTML('<span class="current-char-count">'),
+                            currentCountClosingTag: HtmlUtils.HTML('</span>'),
+                            currentCharacterCount: value.length,
+                            maxCharacters: maxCharacters
+                        }
+                    )
+                %>
+            </div>
         <% } %>
     </div>
 </div>

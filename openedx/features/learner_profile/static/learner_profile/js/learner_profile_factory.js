@@ -146,8 +146,7 @@
                     helpMessage: '',
                     persistChanges: true,
                     messagePosition: 'header',
-                    maxCharacters: 300,
-                    charCountMessage: gettext('of 300')
+                    maxCharacters: 300
                 })
             ];
 

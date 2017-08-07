@@ -543,8 +543,7 @@
                     message: this.helpMessage,
                     messagePosition: this.options.messagePosition || 'footer',
                     placeholderValue: this.options.placeholderValue,
-                    maxCharacters: this.options.maxCharacters || '',
-                    charCountMessage: this.options.charCountMessage || ''
+                    maxCharacters: this.options.maxCharacters || ''
                 }));
                 this.delegateEvents();
                 this.title((this.modelValue() || this.mode === 'edit') ?
