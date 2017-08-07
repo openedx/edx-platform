@@ -738,3 +738,48 @@ class TestCourseGradeLogging(ProblemSubmissionTestMixin, SharedModuleStoreTestCa
 
                 # read from persistence, using read
                 self._create_course_grade_and_check_logging(grade_factory.read, log_mock.debug, u'Read')
+
+
+class TestCourseGradeFactory(GradeTestBase):
+    def test_course_grade_summary(self):
+        with mock_get_score(1, 2):
+            self.subsection_grade_factory.update(self.course_structure[self.sequence.location])
+        course_grade = CourseGradeFactory().update(self.request.user, self.course)
+
+        actual_summary = course_grade.summary
+
+        # We should have had a zero subsection grade for sequential 2, since we never
+        # gave it a mock score above.
+        expected_summary = {
+            'grade': None,
+            'grade_breakdown': {
+                'Homework': {
+                    'category': 'Homework',
+                    'percent': 0.25,
+                    'detail': 'Homework = 25.00% of a possible 100.00%',
+                }
+            },
+            'percent': 0.25,
+            'section_breakdown': [
+                {
+                    'category': 'Homework',
+                    'detail': u'Homework 1 - Test Sequential 1 - 50% (1/2)',
+                    'label': u'HW 01',
+                    'percent': 0.5
+                },
+                {
+                    'category': 'Homework',
+                    'detail': u'Homework 2 - Test Sequential 2 - 0% (0/1)',
+                    'label': u'HW 02',
+                    'percent': 0.0
+                },
+                {
+                    'category': 'Homework',
+                    'detail': u'Homework Average = 25%',
+                    'label': u'HW Avg',
+                    'percent': 0.25,
+                    'prominent': True
+                },
+            ]
+        }
+        self.assertEqual(expected_summary, actual_summary)
