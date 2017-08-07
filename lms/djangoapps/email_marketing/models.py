@@ -47,11 +47,11 @@ class EmailMarketingConfiguration(ConfigurationModel):
         )
     )
 
-    sailthru_activation_template = models.fields.CharField(
+    sailthru_welcome_template = models.fields.CharField(
         max_length=20,
         blank=True,
         help_text=_(
-            "Sailthru template to use on activation send. "
+            "Sailthru template to use on welcome send. "
         )
     )
 
@@ -132,7 +132,7 @@ class EmailMarketingConfiguration(ConfigurationModel):
     welcome_email_send_delay = models.fields.IntegerField(
         default=600,
         help_text=_(
-            "Number of seconds to delay the sending of User Welcome email after user has been activated"
+            "Number of seconds to delay the sending of User Welcome email after user has been created"
         )
     )
 
@@ -145,5 +145,5 @@ class EmailMarketingConfiguration(ConfigurationModel):
     )
 
     def __unicode__(self):
-        return u"Email marketing configuration: New user list %s, Activation template: %s" % \
-               (self.sailthru_new_user_list, self.sailthru_activation_template)
+        return u"Email marketing configuration: New user list %s, Welcome template: %s" % \
+               (self.sailthru_new_user_list, self.sailthru_welcome_template)
