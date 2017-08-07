@@ -566,9 +566,7 @@
             },
 
             updateCharCount: function() {
-                var curCharCount,
-                    remainingCharCount,
-                    charCountMessage;
+                var curCharCount;
                 // Update character count for textarea
                 if (this.options.maxCharacters) {
                     curCharCount = $('#u-field-textarea-' + this.options.valueAttribute).val().length;

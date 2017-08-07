@@ -178,7 +178,7 @@
     }
 
     .profile-header {
-        @include padding(0, 0, $baseline, $baseline*3);
+        @include padding(0, $baseline*2, $baseline, $baseline*3);
 
         .header {
             @extend %t-title4;
