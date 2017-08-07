@@ -94,7 +94,7 @@
 
             .upload-button-input {
                 position: absolute;
-                top: -($profile-image-dimension * 4);
+                top: -($profile-image-dimension * 2);
                 @include left(0);
                 width: $profile-image-dimension;
                 height: 100%;
@@ -217,13 +217,13 @@
                 @extend %t-weight4;
                 width: calc(100% - 40px);
 
-                .u-field-value-display {
+                .u-field-value-readonly {
                     @extend %t-weight3;
                 }
             }
 
             .u-field-title {
-                color: $body-color;
+                color: $base-font-color;
                 font-size: $body-font-size;
                 display: block;
             }

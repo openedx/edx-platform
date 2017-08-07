@@ -189,7 +189,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         self.wait_for_field('username')
 
-        fields = ['username', 'country', 'language_proficiencies', 'bio']
+        fields = ['username', 'name', 'country', 'language_proficiencies', 'bio']
         return [field for field in fields if self.field_is_visible(field)]
 
     @property
