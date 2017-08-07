@@ -11,7 +11,7 @@ from boto.exception import NoAuthHandlerFound
 
 from student.models import CourseEnrollment
 from edx_notifications.lib.publisher import bulk_publish_notification_to_users, \
-    bulk_publish_notification_to_tag
+    publish_notification_to_tag
 
 log = logging.getLogger('edx.celery.task')
 
@@ -78,13 +78,14 @@ def publish_course_notifications_task(course_id, notification_msg, exclude_user_
 def publish_course_notifications_to_tag_task(course_id, notification_msg,
                                        exclude_user_ids=None):  # pylint: disable=invalid-name
     """
-    This function will call the edx_notifications api method "bulk_publish_notification_to_users"
+    This function will call the edx_notifications api method
+    "bulk_publish_notification_to_tag"
     and run as a new Celery task.
     """
 
     try:
-        bulk_publish_notification_to_tag(course_id, notification_msg,
-                                           exclude_user_ids=exclude_user_ids)
+        publish_notification_to_tag(notification_msg, 'enrolments', course_id,
+                                    exclude_user_ids=exclude_user_ids)
     except Exception, ex:
         # Notifications are never critical, so we don't want to disrupt any
         # other logic processing. So log and continue.
