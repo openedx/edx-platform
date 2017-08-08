@@ -83,10 +83,10 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                     user=self.user,
                     course_id=self.course.id
                 )
-                mock_generate_certificate_apply_async.assert_called_with(
-                    student=self.user,
-                    course_key=self.course.id,
-                )
+                mock_generate_certificate_apply_async.assert_called_with(kwargs={
+                    'student': self.user,
+                    'course_key': self.course.id,
+                })
 
     def test_cert_generation_on_whitelist_append_instructor_paced(self):
         """
@@ -108,10 +108,10 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                     user=self.user,
                     course_id=self.ip_course.id
                 )
-                mock_generate_certificate_apply_async.assert_called_with(
-                    student=self.user,
-                    course_key=self.ip_course.id
-                )
+                mock_generate_certificate_apply_async.assert_called_with(kwargs={
+                    'student': self.user,
+                    'course_key': self.ip_course.id,
+                })
 
 
 class PassingGradeCertsTest(ModuleStoreTestCase):
@@ -151,10 +151,10 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                 # Certs fired after passing
                 with mock_passing_grade():
                     grade_factory.update(self.user, self.course)
-                    mock_generate_certificate_apply_async.assert_called_with(
-                        student=self.user,
-                        course_key=self.course.id
-                    )
+                    mock_generate_certificate_apply_async.assert_called_with(kwargs={
+                        'student': self.user,
+                        'course_key': self.course.id,
+                    })
 
     def test_cert_generation_on_passing_instructor_paced(self):
         with mock.patch(
@@ -169,10 +169,10 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                 # Certs fired after passing
                 with mock_passing_grade():
                     grade_factory.update(self.user, self.ip_course)
-                    mock_generate_certificate_apply_async.assert_called_with(
-                        student=self.user,
-                        course_key=self.ip_course.id
-                    )
+                    mock_generate_certificate_apply_async.assert_called_with(kwargs={
+                        'student': self.user,
+                        'course_key': self.ip_course.id,
+                    })
 
     def test_cert_already_generated(self):
         with mock.patch(
@@ -231,10 +231,10 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                     status='submitted'
                 )
                 attempt.approve()
-                mock_generate_certificate_apply_async.assert_called_with(
-                    student=self.user_one,
-                    course_key=self.course_one.id
-                )
+                mock_generate_certificate_apply_async.assert_called_with(kwargs={
+                    'student': self.user_one,
+                    'course_key': self.course_one.id,
+                })
 
     def test_cert_generation_on_photo_verification_instructor_paced(self):
         with mock.patch(
@@ -252,7 +252,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                     status='submitted'
                 )
                 attempt.approve()
-                mock_generate_certificate_apply_async.assert_called_with(
-                    student=self.user_two,
-                    course_key=self.course_two.id
-                )
+                mock_generate_certificate_apply_async.assert_called_with(kwargs={
+                    'student': self.user_two,
+                    'course_key': self.course_two.id,
+                })
