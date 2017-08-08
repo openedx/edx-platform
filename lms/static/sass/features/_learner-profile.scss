@@ -89,6 +89,7 @@
                 line-height: 1.3em;
                 text-align: center;
                 z-index: 7;
+                color: $base-font-color;
             }
 
             .upload-button-input {
@@ -379,6 +380,7 @@
 
         .wrapper-u-field {
             font-size: $body-font-size;
+            color: $base-font-color;
 
             .u-field-header .u-field-title{
                 color: $base-font-color;
