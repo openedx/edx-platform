@@ -5,7 +5,6 @@ Tests for discussion pages
 import datetime
 from uuid import uuid4
 
-from flaky import flaky
 from nose.plugins.attrib import attr
 from nose.tools import nottest
 from pytz import UTC
@@ -792,7 +791,6 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         self.edit_response(page, "response_other_author")
 
     @attr(shard=2)
-    @flaky  # TODO fix this, see TNL-5453
     def test_vote_report_endorse_after_edit(self):
         """
         Scenario: Moderator should be able to vote, report or endorse after editing the response.

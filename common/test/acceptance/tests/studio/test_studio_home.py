@@ -3,7 +3,6 @@ Acceptance tests for Home Page (My Courses / My Libraries).
 """
 from uuid import uuid4
 
-from flaky import flaky
 from opaque_keys.edx.locator import LibraryLocator
 
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -70,7 +69,6 @@ class StudioLanguageTest(AcceptanceTest):
         self.account_settings = AccountSettingsPage(self.browser)
         AutoAuthPage(self.browser).visit()
 
-    @flaky  # TODO fix this, see WL-963
     def test_studio_language_change(self):
         """
         Scenario: Ensure that language selection is working fine.
