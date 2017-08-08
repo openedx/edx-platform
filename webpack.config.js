@@ -23,6 +23,7 @@ var wpconfig = {
         CourseSock: './openedx/features/course_experience/static/course_experience/js/CourseSock.js',
         CourseTalkReviews: './openedx/features/course_experience/static/course_experience/js/CourseTalkReviews.js',
         WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js',
+        Enrollment: './openedx/features/course_experience/static/course_experience/js/Enrollment.js',
         Import: './cms/static/js/features/import/factories/import.js'
     },
 
