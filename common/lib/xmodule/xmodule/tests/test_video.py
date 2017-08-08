@@ -24,7 +24,7 @@ import ddt
 from django.conf import settings
 from django.test.utils import override_settings
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -92,7 +92,7 @@ def instantiate_descriptor(**field_data):
     Instantiate descriptor with most properties.
     """
     system = get_test_descriptor_system()
-    course_key = SlashSeparatedCourseKey('org', 'course', 'run')
+    course_key = CourseLocator('org', 'course', 'run')
     usage_key = course_key.make_usage_key('video', 'SampleProblem')
     return system.construct_xblock_from_class(
         VideoDescriptor,

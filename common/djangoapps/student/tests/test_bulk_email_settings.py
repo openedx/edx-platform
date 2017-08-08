@@ -8,7 +8,7 @@ import unittest
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 # This import is for an lms djangoapp.
 # Its testcases are only run under lms.
@@ -101,7 +101,7 @@ class TestStudentDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
         student = UserFactory.create()
         CourseEnrollmentFactory.create(
             user=student,
-            course_id=SlashSeparatedCourseKey.from_deprecated_string(self.course_name)
+            course_id=CourseKey.from_string(self.course_name)
         )
         self.client.login(username=student.username, password="test")
 

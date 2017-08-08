@@ -2,14 +2,12 @@
 """
 Miscellaneous tests for the student app.
 """
-import json
 import logging
 import unittest
 from datetime import datetime, timedelta
 from urllib import quote
 
 import ddt
-import httpretty
 import pytz
 from config_models.models import cache
 from django.conf import settings
@@ -21,7 +19,6 @@ from markupsafe import escape
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import CourseLocator, SlashSeparatedCourseKey
-from provider.constants import CONFIDENTIAL
 from pyquery import PyQuery as pq
 
 import shoppingcart  # pylint: disable=import-error
@@ -753,6 +750,8 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
     def test_enrollment(self):
         user = User.objects.create_user("joe", "joe@joe.com", "password")
         course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
+        # Cannot be converted to CourseLocator or CourseKey.from_string because both do not support
+        # course keys without a run. The test specifically tests functionality when run is not specified.
         course_id_partial = SlashSeparatedCourseKey("edX", "Test101", None)
 
         # Test basic enrollment
@@ -799,7 +798,7 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
     def test_enrollment_non_existent_user(self):
         # Testing enrollment of newly unsaved user (i.e. no database entry)
         user = User(username="rusty", email="rusty@fake.edx.org")
-        course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
+        course_id = CourseLocator("edX", "Test101", "2013")
 
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
 
@@ -816,7 +815,7 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_enrollment_by_email(self):
         user = User.objects.create(username="jack", email="jack@fake.edx.org")
-        course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
+        course_id = CourseLocator("edX", "Test101", "2013")
 
         CourseEnrollment.enroll_by_email("jack@fake.edx.org", course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
@@ -854,8 +853,8 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_enrollment_multiple_classes(self):
         user = User(username="rusty", email="rusty@fake.edx.org")
-        course_id1 = SlashSeparatedCourseKey("edX", "Test101", "2013")
-        course_id2 = SlashSeparatedCourseKey("MITx", "6.003z", "2012")
+        course_id1 = CourseLocator("edX", "Test101", "2013")
+        course_id2 = CourseLocator("MITx", "6.003z", "2012")
 
         CourseEnrollment.enroll(user, course_id1)
         self.assert_enrollment_event_was_emitted(user, course_id1)
@@ -877,7 +876,7 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_activation(self):
         user = User.objects.create(username="jack", email="jack@fake.edx.org")
-        course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
+        course_id = CourseLocator("edX", "Test101", "2013")
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
 
         # Creating an enrollment doesn't actually enroll a student
@@ -914,7 +913,7 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
 
     def test_change_enrollment_modes(self):
         user = User.objects.create(username="justin", email="jh@fake.edx.org")
-        course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
+        course_id = CourseLocator("edX", "Test101", "2013")
 
         CourseEnrollment.enroll(user, course_id, "audit")
         self.assert_enrollment_event_was_emitted(user, course_id)

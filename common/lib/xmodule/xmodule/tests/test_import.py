@@ -19,6 +19,7 @@ from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date
 from xmodule.tests import DATA_DIR
 from xmodule.modulestore.inheritance import InheritanceMixin
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xblock.core import XBlock
@@ -576,7 +577,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['toy'])
 
-        toy_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        toy_id = CourseKey.from_string('edX/toy/2012_Fall')
 
         course = modulestore.get_course(toy_id)
         chapters = course.get_children()
@@ -654,7 +655,7 @@ class ImportTestCase(BaseCourseTestCase):
         """
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['toy'])
 
-        toy_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        toy_id = CourseKey.from_string('edX/toy/2012_Fall')
 
         course = modulestore.get_course(toy_id)
 
