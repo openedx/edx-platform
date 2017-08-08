@@ -79,7 +79,7 @@ site_status_msg = get_site_status_msg(course_id)
           % endif
           % if settings.LABSTER_FEATURES.get('ENABLE_VOUCHERS') and user.is_active:
             <li class="nav-global-01">
-              <a href="${reverse('enter_voucher')}">${_('Enter voucher')}</a>
+              <a href="${reverse('enter_voucher')}">${_('Enter access code')}</a>
             </li>
           % endif
           % if show_program_listing:

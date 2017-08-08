@@ -34,7 +34,7 @@ def activate_voucher(voucher, user_id, email, context_id):
         response.raise_for_status()
     except RequestException as ex:
         msg = (
-            "Issues with voucher activation: user_id='%s', email='%s', "
+            "Issues with access code activation: user_id='%s', email='%s', "
             "context_id='%s', voucher='%s',\nerror:\n%r"
         )
         log.exception(msg, user_id, email, context_id, voucher, ex)

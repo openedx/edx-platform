@@ -57,7 +57,7 @@ class VoucherError(Exception):
 @login_required
 def enter_voucher(request):
     """
-    Enter Voucher View.
+    Enter Access Code View.
     """
     if not getattr(settings, 'LABSTER_FEATURES', {}).get('ENABLE_VOUCHERS'):
         raise Http404
@@ -80,14 +80,14 @@ def activate_voucher(request):
 
     if not request.user.is_active:
         messages.error(request, _(
-            "Voucher cannot be applied, because your account has not been activated yet."
+            "Access Code cannot be applied, because your account has not been activated yet."
         ))
         return redirect(enter_voucher_url)
 
     form = forms.ValidationForm(request.POST)
 
     if not form.is_valid():
-        messages.error(request, _("Enter a valid voucher code."))
+        messages.error(request, _("Please enter a valid access code."))
         return redirect(enter_voucher_url)
 
     code = form.cleaned_data['code']
@@ -99,12 +99,12 @@ def activate_voucher(request):
         return redirect(enter_voucher_url)
     except ItemNotFoundError:
         messages.error(request, _(
-            "Cannot find a voucher '{}'. Please contact Labster support team."
+            "Cannot find an access code '{}'. Please contact Labster support team."
         ).format(code))
         return redirect(enter_voucher_url)
     except LabsterApiError:
         messages.error(request, _(
-            "There are some issues with applying your voucher. Please try again in a few minutes."
+            "There are some issues with applying your access code. Please try again in a few minutes."
         ))
         return redirect(enter_voucher_url)
 
@@ -113,7 +113,7 @@ def activate_voucher(request):
     if not course_licenses:
         messages.error(
             request,
-            _("Cannot find a course for the voucher '{}'. Please contact Labster support team.").format(code)
+            _("Cannot find a course for provided access code '{}'. Please contact Labster support team.").format(code)
         )
         return redirect(enter_voucher_url)
 
@@ -145,11 +145,11 @@ def activate_voucher(request):
     return redirect(reverse('info', args=[unicode(course_id)]))
 
 
-def get_license(voucher):
+def get_license(access_code):
     """
-    Returns a license for the given voucher code.
+    Returns a license for the given access code.
     """
-    url = settings.LABSTER_ENDPOINTS.get('voucher_license').format(voucher)
+    url = settings.LABSTER_ENDPOINTS.get('voucher_license').format(access_code)
 
     # Send voucher code to API and get license back
     headers = {
