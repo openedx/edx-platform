@@ -3,6 +3,8 @@ from logging import getLogger
 
 from celery_utils.logged_task import LoggedTask
 from celery_utils.persist_on_failure import PersistOnFailureTask
+from django.contrib.auth.models import User
+from opaque_keys.edx.keys import CourseKey
 
 from .api import generate_user_certificates
 
@@ -21,6 +23,6 @@ def generate_certificate(**kwargs):
     """
     Generates a certificate for a single user.
     """
-    student = kwargs.pop('student')
-    course_key = kwargs.pop('course_key')
+    student = User.objects.get(id=kwargs.pop('student'))
+    course_key = CourseKey.from_string(kwargs.pop('course_key'))
     generate_user_certificates(student=student, course_key=course_key, **kwargs)
