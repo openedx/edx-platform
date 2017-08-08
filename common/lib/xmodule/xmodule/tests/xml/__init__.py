@@ -9,7 +9,7 @@ from unittest import TestCase
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore.xml import CourseLocationManager
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.keys import CourseKey
 
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 
@@ -19,7 +19,7 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
     The simplest possible XMLParsingSystem
     """
     def __init__(self, xml_import_data):
-        self.course_id = SlashSeparatedCourseKey.from_deprecated_string(xml_import_data.course_id)
+        self.course_id = CourseKey.from_string(xml_import_data.course_id)
         self.default_class = xml_import_data.default_class
         self._descriptors = {}
 
