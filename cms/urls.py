@@ -2,10 +2,10 @@ from django.conf import settings
 from django.conf.urls import include, patterns, url
 from django.conf.urls.static import static
 from django.contrib import admin as django_admin
-
 from ratelimitbackend import admin
 
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
+
 
 django_admin.autodiscover()
 
