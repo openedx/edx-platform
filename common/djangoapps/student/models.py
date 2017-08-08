@@ -1009,7 +1009,6 @@ class CourseEnrollment(models.Model):
         else:
             self._course_id = value
 
-
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
     # If is_active is False, then the student is not considered to be enrolled
@@ -1678,7 +1677,7 @@ class CourseEnrollment(models.Model):
             If the course is re-published within the lifetime of this
             CourseEnrollment object, then the value of this property will
             become stale.
-       """
+        """
         if not self._course_overview:
             try:
                 self._course_overview = CourseOverview.get_from_id(self.course_id)
