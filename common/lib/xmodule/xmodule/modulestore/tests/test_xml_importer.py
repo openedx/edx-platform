@@ -11,7 +11,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml_importer import _update_and_import_module, _update_module_location
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from xmodule.tests import DATA_DIR
 from uuid import uuid4
 import unittest
@@ -143,7 +143,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
         self.xblock.save()
 
         # Move to different runtime w/ different course id
-        target_location_namespace = SlashSeparatedCourseKey("org", "course", "run")
+        target_location_namespace = CourseKey.from_string("org/course/run")
         new_version = _update_and_import_module(
             self.xblock,
             modulestore(),
