@@ -3,9 +3,7 @@ from optparse import make_option
 from textwrap import dedent
 
 from django.core.management import BaseCommand, CommandError
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import LibraryLocator
 
 from contentstore.courseware_index import LibrarySearchIndexer
@@ -42,10 +40,7 @@ class Command(BaseCommand):
 
     def _parse_library_key(self, raw_value):
         """ Parses library key from string """
-        try:
-            result = CourseKey.from_string(raw_value)
-        except InvalidKeyError:
-            result = SlashSeparatedCourseKey.from_deprecated_string(raw_value)
+        result = CourseKey.from_string(raw_value)
 
         if not isinstance(result, LibraryLocator):
             raise CommandError(u"Argument {0} is not a library key".format(raw_value))

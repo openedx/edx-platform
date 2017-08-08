@@ -19,7 +19,6 @@ from django.views.decorators.csrf import csrf_exempt
 from edx_proctoring.services import ProctoringService
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from requests.auth import HTTPBasicAuth
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
@@ -886,7 +885,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
     user = request.user
 
     try:
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_id = CourseKey.from_string(course_id)
         usage_key = course_id.make_usage_key_from_deprecated_string(unquote_slashes(usage_id))
     except InvalidKeyError:
         raise Http404("Invalid location")
@@ -1038,7 +1037,7 @@ def xblock_view(request, course_id, usage_id, view_name):
         raise PermissionDenied
 
     try:
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
         raise Http404("Invalid location")
 

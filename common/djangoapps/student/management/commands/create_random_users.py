@@ -5,9 +5,7 @@ import uuid
 
 from django.core.management.base import BaseCommand
 from student.models import CourseEnrollment
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.forms import AccountCreationForm
 from student.views import _do_create_account
 
@@ -55,10 +53,7 @@ Examples:
         num = int(args[0])
 
         if len(args) == 2:
-            try:
-                course_key = CourseKey.from_string(args[1])
-            except InvalidKeyError:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(args[1])
+            course_key = CourseKey.from_string(args[1])
         else:
             course_key = None
 

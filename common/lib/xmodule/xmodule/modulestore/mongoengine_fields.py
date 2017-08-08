@@ -2,7 +2,7 @@
 Custom field types for mongoengine
 """
 import mongoengine
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.locations import Location
 from types import NoneType
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
@@ -36,7 +36,7 @@ class CourseKeyField(mongoengine.StringField):
         if course_key == '':
             return None
         if isinstance(course_key, basestring):
-            return SlashSeparatedCourseKey.from_deprecated_string(course_key)
+            return CourseKey.from_string(course_key)
         else:
             return course_key
 

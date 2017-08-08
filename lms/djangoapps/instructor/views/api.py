@@ -32,7 +32,6 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 import instructor_analytics.basic
 import instructor_analytics.csvs
@@ -313,7 +312,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
     ):
         return HttpResponseForbidden()
 
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     warnings = []
     row_errors = []
     general_errors = []
@@ -620,7 +619,7 @@ def students_update_enrollment(request, course_id):
         ]
     }
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     action = request.POST.get('action')
     identifiers_raw = request.POST.get('identifiers')
     identifiers = _split_input_list(identifiers_raw)
@@ -761,7 +760,7 @@ def bulk_beta_modify_access(request, course_id):
       anything split_input_list can handle.
     - action is one of ['add', 'remove']
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     action = request.POST.get('action')
     identifiers_raw = request.POST.get('identifiers')
     identifiers = _split_input_list(identifiers_raw)
@@ -849,7 +848,7 @@ def modify_access(request, course_id):
     rolename is one of ['instructor', 'staff', 'beta', 'ccx_coach']
     action is one of ['allow', 'revoke']
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     course = get_course_with_access(
         request.user, 'instructor', course_id, depth=None
     )
@@ -932,7 +931,7 @@ def list_course_role_members(request, course_id):
         ]
     }
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     course = get_course_with_access(
         request.user, 'instructor', course_id, depth=None
     )
@@ -1008,7 +1007,7 @@ def get_grading_config(request, course_id):
     """
     Respond with json which contains a html formatted grade summary.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     course = get_course_with_access(
         request.user, 'staff', course_id, depth=None
     )
@@ -1028,7 +1027,7 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=unused-a
     """
     return the summary of all sales records for a particular course
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     query_features = [
         'company_name', 'company_contact_name', 'company_contact_email', 'total_codes', 'total_used_codes',
         'total_amount', 'created', 'customer_reference_number', 'recipient_name', 'recipient_email', 'created_by',
@@ -1059,7 +1058,7 @@ def get_sale_order_records(request, course_id):  # pylint: disable=unused-argume
     """
     return the summary of all sales records for a particular course
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     query_features = [
         ('id', 'Order Id'),
         ('company_name', 'Company Name'),
@@ -1117,7 +1116,7 @@ def sale_validation(request, course_id):
     except KeyError:
         return HttpResponseBadRequest("Missing required event_type parameter")
 
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     try:
         obj_invoice = CourseRegistrationCodeInvoiceItem.objects.select_related('invoice').get(
             invoice_id=invoice_number,
@@ -1328,7 +1327,7 @@ def add_users_to_cohorts(request, course_id):
     containing cohort assignments for users. This method spawns a celery task
     to do the assignments, and a CSV file with results is provided via data downloads.
     """
-    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course_key = CourseKey.from_string(course_id)
 
     try:
         def validator(file_storage, file_to_validate):
@@ -1370,7 +1369,7 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with csv which contains a summary of all Active Coupons.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     coupons = Coupon.objects.filter(course_id=course_id)
 
     query_features = [
@@ -1403,7 +1402,7 @@ def get_enrollment_report(request, course_id):
     """
     get the enrollment report for the particular course.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     report_type = _('detailed enrollment')
     lms.djangoapps.instructor_task.api.submit_detailed_enrollment_features_csv(request, course_key)
     success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
@@ -1422,7 +1421,7 @@ def get_exec_summary_report(request, course_id):
     """
     get the executive summary report for the particular course.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     report_type = _('executive summary')
     lms.djangoapps.instructor_task.api.submit_executive_summary_report(request, course_key)
     success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
@@ -1440,7 +1439,7 @@ def get_course_survey_results(request, course_id):
     """
     get the survey results report for the particular course.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     report_type = _('survey')
     lms.djangoapps.instructor_task.api.submit_course_survey_report(request, course_key)
     success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
@@ -1558,7 +1557,7 @@ def get_registration_codes(request, course_id):
     """
     Respond with csv which contains a summary of all Registration Codes.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
 
     #filter all the  course registration codes
     registration_codes = CourseRegistrationCode.objects.filter(
@@ -1764,7 +1763,7 @@ def active_registration_codes(request, course_id):
     """
     Respond with csv which contains a summary of all Active Registration Codes.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
 
     # find all the registration codes in this course
     registration_codes_list = CourseRegistrationCode.objects.filter(
@@ -1795,7 +1794,7 @@ def spent_registration_codes(request, course_id):
     """
     Respond with csv which contains a summary of all Spent(used) Registration Codes.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
 
     # find the redeemed registration codes if any exist in the db
     code_redemption_set = RegistrationCodeRedemption.objects.select_related('registration_code').filter(
@@ -1828,7 +1827,7 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
     # TODO: the User.objects query and CSV generation here could be
     # centralized into instructor_analytics. Currently instructor_analytics
     # has similar functionality but not quite what's needed.
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
 
     def csv_response(filename, header, rows):
         """Returns a CSV http response for the given header and rows (excel/utf-8)."""
@@ -1870,7 +1869,7 @@ def get_student_progress_url(request, course_id):
         'progress_url': '/../...'
     }
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
 
     progress_url = reverse('student_progress', kwargs={'course_id': course_id.to_deprecated_string(), 'student_id': user.id})
@@ -1909,7 +1908,7 @@ def reset_student_attempts(request, course_id):
             requires instructor access
             mutually exclusive with all_students
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     course = get_course_with_access(
         request.user, 'staff', course_id, depth=None
     )
@@ -1993,7 +1992,7 @@ def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: dis
             requires instructor access
             mutually exclusive with all_students
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     course = get_course_with_access(
         request.user, 'staff', course_id, depth=None
     )
@@ -2065,7 +2064,7 @@ def rescore_problem(request, course_id):
 
     all_students and unique_student_identifier cannot both be present.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
     student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
@@ -2192,7 +2191,7 @@ def rescore_entrance_exam(request, course_id):
 
     all_students and unique_student_identifier cannot both be present.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     course = get_course_with_access(
         request.user, 'staff', course_id, depth=None
     )
@@ -2241,7 +2240,7 @@ def list_background_email_tasks(request, course_id):  # pylint: disable=unused-a
     """
     List background email tasks.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     task_type = 'bulk_course_email'
     # Specifying for the history of a single task type
     tasks = lms.djangoapps.instructor_task.api.get_instructor_task_history(
@@ -2263,7 +2262,7 @@ def list_email_content(request, course_id):  # pylint: disable=unused-argument
     """
     List the content of bulk emails sent
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     task_type = 'bulk_course_email'
     # First get tasks list of bulk emails sent
     emails = lms.djangoapps.instructor_task.api.get_instructor_task_history(course_id, task_type=task_type)
@@ -2288,7 +2287,7 @@ def list_instructor_tasks(request, course_id):
         - `problem_location_str` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     problem_location_str = strip_if_string(request.POST.get('problem_location_str', False))
     student = request.POST.get('unique_student_identifier', None)
     if student is not None:
@@ -2332,7 +2331,7 @@ def list_entrance_exam_instructor_tasks(request, course_id):  # pylint: disable=
         - unique_student_identifier is an email or username
         - all_students is a boolean
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     course = get_course_by_id(course_id)
     student = request.POST.get('unique_student_identifier', None)
     if student is not None:
@@ -2370,7 +2369,7 @@ def list_report_downloads(_request, course_id):
     """
     List grade CSV files that are available for download for this course.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
     response_payload = {
@@ -2391,7 +2390,7 @@ def list_financial_report_downloads(_request, course_id):
     """
     List grade CSV files that are available for download for this course.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     report_store = ReportStore.from_config(config_name='FINANCIAL_REPORTS')
 
     response_payload = {
@@ -2413,7 +2412,7 @@ def export_ora2_data(request, course_id):
     """
     Pushes a Celery task which will aggregate ora2 responses for a course into a .csv
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     report_type = _('ORA data')
     lms.djangoapps.instructor_task.api.submit_export_ora2_data(request, course_key)
     success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
@@ -2432,7 +2431,7 @@ def calculate_grades_csv(request, course_id):
     AlreadyRunningError is raised if the course's grades are already being updated.
     """
     report_type = _('grade')
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     lms.djangoapps.instructor_task.api.submit_calculate_grades_csv(request, course_key)
     success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
 
@@ -2453,7 +2452,7 @@ def problem_grade_report(request, course_id):
     AlreadyRunningError is raised if the course's grades are already being
     updated.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     report_type = _('problem grade')
     lms.djangoapps.instructor_task.api.submit_problem_grade_report(request, course_key)
     success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
@@ -2477,7 +2476,7 @@ def list_forum_members(request, course_id):
 
     Takes query parameter `rolename`.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     course = get_course_by_id(course_id)
     has_instructor_access = has_access(request.user, 'instructor', course)
     has_forum_admin = has_forum_access(
@@ -2634,7 +2633,7 @@ def update_forum_role_membership(request, course_id):
         FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
     - `action` is one of ['allow', 'revoke']
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     course = get_course_by_id(course_id)
     has_instructor_access = has_access(request.user, 'instructor', course)
     has_forum_admin = has_forum_access(
@@ -2711,7 +2710,7 @@ def change_due_date(request, course_id):
     """
     Grants a due date extension to a student for a particular unit.
     """
-    course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
+    course = get_course_by_id(CourseKey.from_string(course_id))
     student = require_student_from_identifier(request.POST.get('student'))
     unit = find_unit(course, request.POST.get('url'))
     due_date = parse_datetime(request.POST.get('due_datetime'))
@@ -2733,7 +2732,7 @@ def reset_due_date(request, course_id):
     """
     Rescinds a due date extension for a student on a particular unit.
     """
-    course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
+    course = get_course_by_id(CourseKey.from_string(course_id))
     student = require_student_from_identifier(request.POST.get('student'))
     unit = find_unit(course, request.POST.get('url'))
     set_due_date_extension(course, unit, student, None)
@@ -2760,7 +2759,7 @@ def show_unit_extensions(request, course_id):
     """
     Shows all of the students which have due date extensions for the given unit.
     """
-    course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
+    course = get_course_by_id(CourseKey.from_string(course_id))
     unit = find_unit(course, request.POST.get('url'))
     return JsonResponse(dump_module_extensions(course, unit))
 
@@ -2777,7 +2776,7 @@ def show_student_extensions(request, course_id):
     particular course.
     """
     student = require_student_from_identifier(request.POST.get('student'))
-    course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
+    course = get_course_by_id(CourseKey.from_string(course_id))
     return JsonResponse(dump_student_extensions(course, student))
 
 
@@ -2863,7 +2862,7 @@ def mark_student_can_skip_entrance_exam(request, course_id):  # pylint: disable=
     Mark a student to skip entrance exam.
     Takes `unique_student_identifier` as required POST parameter.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     student_identifier = request.POST.get('unique_student_identifier')
     student = get_student_from_identifier(student_identifier)
 

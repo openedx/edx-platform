@@ -25,7 +25,7 @@ from django.utils.http import is_safe_url, urlquote
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django_openid_auth import auth as openid_auth
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from openid.consumer.consumer import SUCCESS
 from openid.extensions import ax, sreg
 from openid.server.server import ProtocolError, Server, UntrustedReturnURL
@@ -553,7 +553,7 @@ def course_specific_login(request, course_id):
        Dispatcher function for selecting the specific login method
        required by the course
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     course = modulestore().get_course(course_key)
     if not course:
         # couldn't find the course, will just return vanilla signin page
@@ -576,7 +576,7 @@ def course_specific_register(request, course_id):
         Dispatcher function for selecting the specific registration method
         required by the course
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     course = modulestore().get_course(course_key)
 
     if not course:

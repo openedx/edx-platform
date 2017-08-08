@@ -6,9 +6,7 @@ from optparse import make_option
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from badges.events.course_complete import get_completion_badge
 from certificates.api import regenerate_user_certificates
@@ -76,17 +74,7 @@ class Command(BaseCommand):
 
         if options['course']:
             # try to parse out the course from the serialized form
-            try:
-                course_id = CourseKey.from_string(options['course'])
-            except InvalidKeyError:
-                LOGGER.warning(
-                    (
-                        u"Course id %s could not be parsed as a CourseKey; "
-                        u"falling back to SlashSeparatedCourseKey.from_deprecated_string()"
-                    ),
-                    options['course']
-                )
-                course_id = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
+            course_id = CourseKey.from_string(options['course'])
         else:
             raise CommandError("You must specify a course")
 

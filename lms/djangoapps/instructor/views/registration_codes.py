@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_GET, require_POST
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseKey
 
 from courseware.courses import get_course_by_id
 from lms.djangoapps.instructor.enrollment import get_email_params, send_mail_to_student
@@ -27,7 +27,7 @@ def look_up_registration_code(request, course_id):
     Look for the registration_code in the database.
     and check if it is still valid, allowed to redeem or not.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     code = request.GET.get('registration_code')
     course = get_course_by_id(course_key, depth=0)
     try:
@@ -65,7 +65,7 @@ def registration_code_details(request, course_id):
         3) Unredeem.
 
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     code = request.POST.get('registration_code')
     action_type = request.POST.get('action_type')
     course = get_course_by_id(course_key, depth=0)

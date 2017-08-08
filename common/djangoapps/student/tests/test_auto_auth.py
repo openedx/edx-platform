@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import Client
 from mock import patch, Mock
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 
 from django_comment_common.models import (
@@ -32,8 +31,6 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
     COURSE_ID_MONGO = 'edX/Test101/2014_Spring'
     COURSE_ID_SPLIT = 'course-v1:edX+Test101+2014_Spring'
     COURSE_IDS_DDT = (
-        (COURSE_ID_MONGO, SlashSeparatedCourseKey.from_deprecated_string(COURSE_ID_MONGO)),
-        (COURSE_ID_SPLIT, SlashSeparatedCourseKey.from_deprecated_string(COURSE_ID_SPLIT)),
         (COURSE_ID_MONGO, CourseLocator.from_string(COURSE_ID_MONGO)),
         (COURSE_ID_SPLIT, CourseLocator.from_string(COURSE_ID_SPLIT)),
     )

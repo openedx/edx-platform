@@ -14,7 +14,6 @@ from contracts import contract, new_contract
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, AssetKey
 from opaque_keys.edx.locator import LibraryLocator
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.assetstore import AssetMetadata
 
 from . import ModuleStoreWriteBase, ModuleStoreEnum, XMODULE_FIELDS_WITH_USAGE_KEYS
@@ -161,11 +160,8 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             try:
                 self.mappings[CourseKey.from_string(course_id)] = store_name
             except InvalidKeyError:
-                try:
-                    self.mappings[SlashSeparatedCourseKey.from_deprecated_string(course_id)] = store_name
-                except InvalidKeyError:
-                    log.exception("Invalid MixedModuleStore configuration. Unable to parse course_id %r", course_id)
-                    continue
+                log.exception("Invalid MixedModuleStore configuration. Unable to parse course_id %r", course_id)
+                continue
 
         for store_settings in stores:
             key = store_settings['NAME']
