@@ -91,11 +91,11 @@ def _listen_for_track_change(sender, user, **kwargs):  # pylint: disable=unused-
     user_enrollments = CourseEnrollment.enrollments_for_user(user=user)
     grade_factory = CourseGradeFactory()
     for enrollment in user_enrollments:
-        if grade_factory.read(user=user, course=enrollment.course).passed:
-            if fire_ungenerated_certificate_task(user, enrollment.course.id):
+        if grade_factory.read(user=user, course=enrollment.course_overview).passed:
+            if fire_ungenerated_certificate_task(user, enrollment.course_id):
                 log.info(u'Certificate generation task initiated for {user} : {course} via track change'.format(
                     user=user.id,
-                    course=enrollment.course.id
+                    course=enrollment.course_id
                 ))
 
 
