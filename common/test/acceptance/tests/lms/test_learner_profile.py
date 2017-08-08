@@ -23,7 +23,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
     PRIVACY_PUBLIC = u'all_users'
     PRIVACY_PRIVATE = u'private'
 
-    PUBLIC_PROFILE_FIELDS = ['username', 'name', 'country', 'language_proficiencies', 'bio']
+    PUBLIC_PROFILE_FIELDS = ['username', 'country', 'language_proficiencies', 'bio']
     PRIVATE_PROFILE_FIELDS = ['username']
 
     PUBLIC_PROFILE_EDITABLE_FIELDS = ['country', 'language_proficiencies', 'bio']

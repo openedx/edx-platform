@@ -64,7 +64,6 @@
                 color: $link-color;
                 text-shadow: none;
                 @include transition(all $tmg-f1 ease-in-out 0s);
-                opacity: 0;
                 z-index: 6;
 
                 i {
@@ -94,13 +93,15 @@
 
             .upload-button-input {
                 position: absolute;
-                top: -($profile-image-dimension * 2);
+                top: 0;
                 @include left(0);
                 width: $profile-image-dimension;
+                border-radius: ($profile-image-dimension/2);
                 height: 100%;
                 cursor: pointer;
                 z-index: 5;
                 outline: 0;
+                opacity: 0;
             }
 
             .u-field-remove-button {
@@ -211,7 +212,7 @@
         .u-field {
             @extend %t-weight4;
             @include padding(0, 0, 0, 3px);
-            color: $gray-dark;
+            color: $base-font-color;
 
             .u-field-value {
                 @extend %t-weight4;
@@ -322,7 +323,7 @@
                 width: 100%;
                 background-color: transparent;
                 border-radius: 5px;
-                border-color: $body-color;
+                border-color: $gray-d1;
                 resize: none;
                 white-space: pre-line;
                 outline: 0;
@@ -377,8 +378,11 @@
         }
 
         .wrapper-u-field {
-            color: $base-font-color;
             font-size: $body-font-size;
+
+            .u-field-header .u-field-title{
+                color: $base-font-color;
+            }
 
             .u-field-footer {
                 .field-textarea-character-count {
