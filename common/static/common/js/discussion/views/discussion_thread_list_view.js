@@ -462,7 +462,7 @@
             DiscussionThreadListView.prototype.performSearch = function($searchInput) {
                 // trigger this event so the breadcrumbs can update as well
                 this.trigger('search:initiated');
-                this.searchFor($searchInput.val(), $searchInput);
+                this.searchForUser($searchInput.val(), $searchInput);
             };
 
             DiscussionThreadListView.prototype.searchFor = function(text, $searchInput) {
@@ -487,22 +487,6 @@
                     url: url,
                     type: 'GET',
                     dataType: 'json',
-                    $loading: $,
-                    loadingCallback: function() {
-                        var element = self.$('.forum-nav-thread-list');
-                        element.empty();
-                        edx.HtmlUtils.append(
-                            element,
-                            edx.HtmlUtils.joinHtml(
-                                edx.HtmlUtils.HTML("<li class='forum-nav-load-more'>"),
-                                    self.getLoadingContent(gettext('Loading posts list')),
-                                edx.HtmlUtils.HTML('</li>')
-                            )
-                        );
-                    },
-                    loadedCallback: function() {
-                        return self.$('.forum-nav-thread-list .forum-nav-load-more').remove();
-                    },
                     success: function(response, textStatus) {
                         var message, noResponseMsg;
                         if (textStatus === 'success') {
@@ -535,17 +519,16 @@
                                 self.addSearchAlert(gettext('No posts matched your query.'));
                             }
                             self.displayedCollection.reset(self.collection.models);
-                            if (text) {
-                                return self.searchForUser(text);
-                            }
                         }
                         return response;
                     }
                 });
             };
 
-            DiscussionThreadListView.prototype.searchForUser = function(text) {
+            DiscussionThreadListView.prototype.searchForUser = function(text, $searchInput) {
                 var self = this;
+                this.clearSearchAlerts();
+                this.clearFilters();
                 return DiscussionUtil.safeAjax({
                     data: {
                         username: text
@@ -553,6 +536,22 @@
                     url: DiscussionUtil.urlFor('users'),
                     type: 'GET',
                     dataType: 'json',
+                    $loading: $,
+                    loadingCallback: function() {
+                        var element = self.$('.forum-nav-thread-list');
+                        element.empty();
+                        edx.HtmlUtils.append(
+                            element,
+                            edx.HtmlUtils.joinHtml(
+                                edx.HtmlUtils.HTML("<li class='forum-nav-load-more'>"),
+                                    self.getLoadingContent(gettext('Loading posts list')),
+                                edx.HtmlUtils.HTML('</li>')
+                            )
+                        );
+                    },
+                    loadedCallback: function() {
+                        return self.$('.forum-nav-thread-list .forum-nav-load-more').remove();
+                    },
                     error: function() {},
                     success: function(response) {
                         var message, username;
@@ -570,6 +569,20 @@
                                 gettext('Show posts by {username}.'), {username: username}
                             );
                             self.addSearchAlert(message, 'search-by-user');
+                            DiscussionUtil.safeAjax({
+                                url: DiscussionUtil.urlFor('followed_threads', response.users[0].id),
+                                type: 'GET',
+                                dataType: 'json',
+                                error: function() {},
+                                success: function(resp) {
+                                    self.collection.reset(resp.discussion_data);
+                                    self.collection.current_page = resp.page;
+                                    self.collection.pages = resp.num_pages;
+                                    self.displayedCollection.reset(self.collection.models);
+                                }
+                            });
+                        } else {
+                            self.searchFor(text, $searchInput);
                         }
                     }
                 });
