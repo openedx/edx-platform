@@ -48,7 +48,6 @@ class PasswordResetFormNoActive(PasswordResetForm):
 
     def save(
             self,
-            domain_override=None,
             subject_template_name='registration/password_reset_subject.txt',
             email_template_name='registration/password_reset_email.html',
             use_https=False,
@@ -64,13 +63,10 @@ class PasswordResetFormNoActive(PasswordResetForm):
         # django.contrib.auth.forms.PasswordResetForm directly, which has this import in this place.
         from django.core.mail import send_mail
         for user in self.users_cache:
-            if not domain_override:
-                site_name = configuration_helpers.get_value(
-                    'SITE_NAME',
-                    settings.SITE_NAME
-                )
-            else:
-                site_name = domain_override
+            site_name = configuration_helpers.get_value(
+                'SITE_NAME',
+                settings.SITE_NAME
+            )
             context = {
                 'email': user.email,
                 'site_name': site_name,
