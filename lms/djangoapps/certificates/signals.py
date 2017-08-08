@@ -41,10 +41,10 @@ def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # pyl
         if courses.get_course_by_id(instance.course_id, depth=0).self_paced:
             return
 
-    generate_certificate.apply_async(
-        student=instance.user,
-        course_key=instance.course_id,
-    )
+    generate_certificate.apply_async(kwargs={
+        'student': instance.user,
+        'course_key': instance.course_id,
+    })
     log.info(u'Certificate generation task initiated for {user} : {course} via whitelist'.format(
         user=instance.user.id,
         course=instance.course_id
@@ -113,8 +113,8 @@ def fire_ungenerated_certificate_task(user, course_id):
     Helper function to fire un-generated certificate tasks
     """
     if GeneratedCertificate.certificate_for_student(user, course_id) is None:
-        generate_certificate.apply_async(
-            student=user,
-            course_key=course_id
-        )
+        generate_certificate.apply_async(kwargs={
+            'student': user,
+            'course_key': course_id,
+        })
         return True
