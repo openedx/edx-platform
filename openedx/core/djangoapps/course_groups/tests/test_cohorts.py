@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.http import Http404
 from django.test import TestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
@@ -32,7 +32,7 @@ class TestCohortSignals(TestCase):
 
     def setUp(self):
         super(TestCohortSignals, self).setUp()
-        self.course_key = SlashSeparatedCourseKey("dummy", "dummy", "dummy")
+        self.course_key = CourseLocator("dummy", "dummy", "dummy")
 
     def test_cohort_added(self, mock_tracker):
         # Add cohort
@@ -164,7 +164,7 @@ class TestCohorts(ModuleStoreTestCase):
         self.assertTrue(cohorts.is_course_cohorted(course.id))
 
         # Make sure we get a Http404 if there's no course
-        fake_key = SlashSeparatedCourseKey('a', 'b', 'c')
+        fake_key = CourseLocator('a', 'b', 'c')
         self.assertRaises(Http404, lambda: cohorts.is_course_cohorted(fake_key))
 
     def test_get_cohort_id(self):
@@ -184,7 +184,7 @@ class TestCohorts(ModuleStoreTestCase):
 
         self.assertRaises(
             Http404,
-            lambda: cohorts.get_cohort_id(user, SlashSeparatedCourseKey("course", "does_not", "exist"))
+            lambda: cohorts.get_cohort_id(user, CourseLocator("course", "does_not", "exist"))
         )
 
     def test_assignment_type(self):
@@ -545,7 +545,7 @@ class TestCohorts(ModuleStoreTestCase):
 
         self.assertRaises(
             CourseUserGroup.DoesNotExist,
-            lambda: cohorts.get_cohort_by_name(SlashSeparatedCourseKey("course", "does_not", "exist"), cohort)
+            lambda: cohorts.get_cohort_by_name(CourseLocator("course", "does_not", "exist"), cohort)
         )
 
     def test_get_cohort_by_id(self):
@@ -584,7 +584,7 @@ class TestCohorts(ModuleStoreTestCase):
             ValueError,
             lambda: cohorts.add_cohort(course.id, "My Cohort", assignment_type)
         )
-        does_not_exist_course_key = SlashSeparatedCourseKey("course", "does_not", "exist")
+        does_not_exist_course_key = CourseLocator("course", "does_not", "exist")
         self.assertRaises(
             ValueError,
             lambda: cohorts.add_cohort(does_not_exist_course_key, "My Cohort", assignment_type)

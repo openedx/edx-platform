@@ -8,7 +8,7 @@ from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from factory import lazy_attribute
 from factory.django import DjangoModelFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from course_modes.models import CourseMode
@@ -144,7 +144,7 @@ class CourseEnrollmentFactory(DjangoModelFactory):
         model = CourseEnrollment
 
     user = factory.SubFactory(UserFactory)
-    course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+    course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
 
 class CourseAccessRoleFactory(DjangoModelFactory):
@@ -152,7 +152,7 @@ class CourseAccessRoleFactory(DjangoModelFactory):
         model = CourseAccessRole
 
     user = factory.SubFactory(UserFactory)
-    course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+    course_id = CourseKey.from_string('edX/toy/2012_Fall')
     role = 'TestRole'
 
 
@@ -161,7 +161,7 @@ class CourseEnrollmentAllowedFactory(DjangoModelFactory):
         model = CourseEnrollmentAllowed
 
     email = 'test@edx.org'
-    course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+    course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
 
 class PendingEmailChangeFactory(DjangoModelFactory):
