@@ -285,6 +285,7 @@ class ProctoredExamTest(UniqueCourseTest):
         self.assertTrue(self.courseware_page.is_timer_bar_present)
 
         self.courseware_page.stop_timed_exam()
+        self.courseware_page.wait_for_page()
         self.assertTrue(self.courseware_page.has_submitted_exam_message())
 
         LogoutPage(self.browser).visit()

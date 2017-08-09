@@ -22,6 +22,7 @@ from web_fragments.fragment import Fragment
 
 from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.gating.api import get_entrance_exam_score_ratio, get_entrance_exam_usage_key
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
@@ -34,6 +35,7 @@ from openedx.features.course_experience.views.course_sock import CourseSockFragm
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.models import CourseRegistrationCode
 from student.views import is_course_blocked
+from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
@@ -52,8 +54,6 @@ from ..model_data import FieldDataCache
 from ..module_render import get_module_for_descriptor, toc_for_course
 from .views import (
     CourseTabView,
-    check_and_get_upgrade_link,
-    get_cosmetic_verified_display_price
 )
 
 log = logging.getLogger("edx.courseware.views.index")
@@ -325,6 +325,7 @@ class CoursewareIndex(View):
         """
         course_url_name = default_course_url_name(self.course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(self.course.id)})
+
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
             'course': self.course,
@@ -344,11 +345,14 @@ class CoursewareIndex(View):
             'section_title': None,
             'sequence_title': None,
             'disable_accordion': COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
-            # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
-            'upgrade_link': check_and_get_upgrade_link(request, self.effective_user, self.course.id),
-            'upgrade_price': get_cosmetic_verified_display_price(self.course),
-            # ENDTODO
         }
+        courseware_context.update(
+            get_experiment_user_metadata_context(
+                request,
+                self.course,
+                self.effective_user,
+            )
+        )
         table_of_contents = toc_for_course(
             self.effective_user,
             self.request,

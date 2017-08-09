@@ -7,7 +7,7 @@ that the view is conditionally available when Course Auth is turned on.
 
 from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 from bulk_email.models import BulkEmailFlag, CourseAuthorization
 from student.tests.factories import AdminFactory
@@ -119,10 +119,10 @@ class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestNewInstructorDashboardEmailViewXMLBacked, cls).setUpClass()
-        cls.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        cls.course_key = CourseKey.from_string('edX/toy/2012_Fall')
 
         # URL for instructor dash
-        cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course_key.to_deprecated_string()})
+        cls.url = reverse('instructor_dashboard', kwargs={'course_id': unicode(cls.course_key)})
         # URL for email view
         cls.email_link = '<button type="button" class="btn-link send_email" data-section="send_email">Email</button>'
 

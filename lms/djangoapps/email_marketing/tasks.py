@@ -59,14 +59,13 @@ def get_email_cookies_via_sailthru(self, user_email, post_parms):
 
 # pylint: disable=not-callable
 @task(bind=True, default_retry_delay=3600, max_retries=24)
-def update_user(self, sailthru_vars, email, site=None, new_user=False, activation=False):
+def update_user(self, sailthru_vars, email, site=None, new_user=False):
     """
     Adds/updates Sailthru profile information for a user.
      Args:
         sailthru_vars(dict): User profile information to pass as 'vars' to Sailthru
         email(str): User email address
         new_user(boolean): True if new registration
-        activation(boolean): True if activation request
     Returns:
         None
     """
@@ -95,15 +94,15 @@ def update_user(self, sailthru_vars, email, site=None, new_user=False, activatio
                              max_retries=email_config.sailthru_max_retries)
         return
 
-    # if activating user, send welcome email
-    if activation and email_config.sailthru_activation_template:
+    # if new user, send welcome email
+    if new_user and email_config.sailthru_welcome_template:
         scheduled_datetime = datetime.utcnow() + timedelta(seconds=email_config.welcome_email_send_delay)
         try:
             sailthru_response = sailthru_client.api_post(
                 "send",
                 {
                     "email": email,
-                    "template": email_config.sailthru_activation_template,
+                    "template": email_config.sailthru_welcome_template,
                     "schedule_time": scheduled_datetime.strftime('%Y-%m-%dT%H:%M:%SZ')
                 }
             )

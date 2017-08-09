@@ -39,6 +39,10 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
         self.assertIsNone(
             details.enrollment_end, "enrollment_end date somehow initialized " + str(details.enrollment_end)
         )
+        self.assertIsNone(
+            details.certificate_available_date,
+            "certificate_available_date date somehow initialized " + str(details.certificate_available_date)
+        )
         self.assertIsNone(details.syllabus, "syllabus somehow initialized" + str(details.syllabus))
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
@@ -89,6 +93,13 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
             self.assertEqual(
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).end_date,
                 jsondetails.end_date
+            )
+            jsondetails.certificate_available_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC())
+            self.assertEqual(
+                CourseDetails.update_from_json(
+                    self.course.id, jsondetails.__dict__, self.user
+                ).certificate_available_date,
+                jsondetails.certificate_available_date
             )
             jsondetails.course_image_name = "an_image.jpg"
             self.assertEqual(

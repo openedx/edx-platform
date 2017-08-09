@@ -11,13 +11,17 @@ from datetime import datetime, timedelta
 import ddt
 import pytz
 from django.core.exceptions import ValidationError
-from django.test import TestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from django.test import TestCase, override_settings
+from mock import patch
 from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.helpers import enrollment_mode_display
-from course_modes.models import CourseMode, Mode, invalidate_course_mode_cache
+from course_modes.models import CourseMode, Mode, invalidate_course_mode_cache, get_cosmetic_display_price
 from course_modes.tests.factories import CourseModeFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+)
 
 
 @ddt.ddt
@@ -28,7 +32,7 @@ class CourseModeModelTest(TestCase):
 
     def setUp(self):
         super(CourseModeModelTest, self).setUp()
-        self.course_key = SlashSeparatedCourseKey('Test', 'TestCourse', 'TestCourseRun')
+        self.course_key = CourseLocator('Test', 'TestCourse', 'TestCourseRun')
         CourseMode.objects.all().delete()
 
     def tearDown(self):
@@ -151,7 +155,7 @@ class CourseModeModelTest(TestCase):
         modes = CourseMode.modes_for_course(self.course_key)
         self.assertEqual([expired_mode_value, mode1], modes)
 
-        modes = CourseMode.modes_for_course(SlashSeparatedCourseKey('TestOrg', 'TestCourse', 'TestRun'))
+        modes = CourseMode.modes_for_course(CourseLocator('TestOrg', 'TestCourse', 'TestRun'))
         self.assertEqual([CourseMode.DEFAULT_MODE], modes)
 
     def test_verified_mode_for_course(self):
@@ -474,3 +478,26 @@ class CourseModeModelTest(TestCase):
             self.assertTrue(is_error_expected, "Did not expect a ValidationError to be thrown.")
         else:
             self.assertFalse(is_error_expected, "Expected a ValidationError to be thrown.")
+
+
+class TestDisplayPrices(ModuleStoreTestCase):
+    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=["USD", "$"])
+    def test_get_cosmetic_display_price(self):
+        """
+        Check that get_cosmetic_display_price() returns the correct price given its inputs.
+        """
+        course = CourseFactory.create()
+        registration_price = 99
+        course.cosmetic_display_price = 10
+        with patch('course_modes.models.CourseMode.min_course_price_for_currency', return_value=registration_price):
+            # Since registration_price is set, it overrides the cosmetic_display_price and should be returned
+            self.assertEqual(get_cosmetic_display_price(course), "$99")
+
+        registration_price = 0
+        with patch('course_modes.models.CourseMode.min_course_price_for_currency', return_value=registration_price):
+            # Since registration_price is not set, cosmetic_display_price should be returned
+            self.assertEqual(get_cosmetic_display_price(course), "$10")
+
+        course.cosmetic_display_price = 0
+        # Since both prices are not set, there is no price, thus "Free"
+        self.assertEqual(get_cosmetic_display_price(course), "Free")

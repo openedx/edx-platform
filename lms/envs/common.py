@@ -2241,8 +2241,8 @@ INSTALLED_APPS = (
     # Unusual migrations
     'database_fixups',
 
-    # Waffle related utilities
     'openedx.core.djangoapps.waffle_utils',
+    'openedx.core.djangoapps.schedules',
 
     # Features
     'openedx.features.course_bookmarks',
@@ -2251,7 +2251,6 @@ INSTALLED_APPS = (
     'openedx.features.enterprise_support',
     'openedx.features.learner_profile',
 
-    # Experiments
     'experiments',
 
     # DRF filters
@@ -3005,6 +3004,12 @@ PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
 PROFILE_IMAGE_SECRET_KEY = 'placeholder secret key'
 PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
+PROFILE_IMAGE_SIZES_MAP = {
+    'full': 500,
+    'large': 120,
+    'medium': 50,
+    'small': 30
+}
 
 # Sets the maximum number of courses listed on the homepage
 # If set to None, all courses will be listed on the homepage
@@ -3246,12 +3251,3 @@ COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
-
-############## Settings for Profile Image Size ######################
-
-PROFILE_IMAGE_SIZES_MAP = {
-    'full': 500,
-    'large': 120,
-    'medium': 50,
-    'small': 30
-}

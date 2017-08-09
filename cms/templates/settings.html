@@ -9,6 +9,7 @@
   import urllib
   from django.utils.translation import ugettext as _
   from contentstore import utils
+  from openedx.core.djangoapps.certificates.config import waffle
   from openedx.core.djangolib.js_utils import (
       dump_js_escaped_json, js_escaped_string
   )
@@ -212,6 +213,18 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
               </div>
             </li>
           </ol>
+
+          % if waffle.waffle().is_enabled(waffle.INSTRUCTOR_PACED_ONLY):
+          <ol class="list-input">
+            <li class="field-group field-group-certificate-available" id="certificate-available">
+              <div class="field date" id="field-certificate-available-date">
+                <label for="certificate-available-date">${_("Certificates Available Date")}</label>
+                <input type="text" class="certificate-available-date date start datepicker" id="certificate-available-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+                <span class="tip tip-stacked">${_("By default, 48 hours after course end date")}</span>
+              </div>
+            </li>
+          </ol>
+          % endif
 
           <ol class="list-input">
             <li class="field-group field-group-enrollment-start" id="enrollment-start">

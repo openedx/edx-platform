@@ -96,7 +96,7 @@ define([
                         error_msg: 'Failed to reset attempts for user.'
                     };
                     StaffDebug.doInstructorDashAction(action);
-                    AjaxHelpers.respondWithError(requests);
+                    AjaxHelpers.respondWithTextError(requests);
                     expect($('#idash_msg').text()).toBe('Failed to reset attempts for user. ');
                     $('#result_' + locationName).remove();
                 });

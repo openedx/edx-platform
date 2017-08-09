@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-07-20 11:47+0000\n"
-"PO-Revision-Date: 2017-07-20 11:48:32.711353\n"
+"POT-Creation-Date: 2017-08-02 12:47+0000\n"
+"PO-Revision-Date: 2017-08-02 12:48:04.567443\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4219,6 +4219,10 @@ msgid "We couldn't create your account."
 msgstr ""
 
 #: lms/static/js/student_account/views/RegisterView.js
+msgid "(required)"
+msgstr ""
+
+#: lms/static/js/student_account/views/RegisterView.js
 msgid "You've successfully signed into %(currentProvider)s."
 msgstr ""
 
@@ -4887,6 +4891,11 @@ msgid "The course start date must be later than the enrollment start date."
 msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
+msgid ""
+"The certificate available date must be later than the enrollment start date."
+msgstr ""
+
+#: cms/static/js/models/settings/course_details.js
 msgid "The enrollment start date cannot be after the enrollment end date."
 msgstr ""
 
@@ -4953,6 +4962,10 @@ msgstr ""
 #: lms/templates/student_account/institution_login.underscore
 #: lms/templates/student_account/institution_register.underscore
 msgid "or"
+msgstr ""
+
+#: cms/static/js/models/xblock_validation.js
+msgid "This unit has validation issues."
 msgstr ""
 
 #: cms/static/js/models/xblock_validation.js

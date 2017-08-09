@@ -12,6 +12,7 @@ from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_text
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from request_cache.middleware import RequestCache, ns_request_cached
@@ -132,6 +133,8 @@ class CourseMode(models.Model):
         settings.COURSE_MODE_DEFAULTS['bulk_sku'],
     )
     DEFAULT_MODE_SLUG = settings.COURSE_MODE_DEFAULTS['slug']
+
+    ALL_MODES = [AUDIT, CREDIT_MODE, HONOR, NO_ID_PROFESSIONAL_MODE, PROFESSIONAL, VERIFIED, ]
 
     # Modes utilized for audit/free enrollments
     AUDIT_MODES = [AUDIT, HONOR]
@@ -489,6 +492,16 @@ class CourseMode(models.Model):
         return slug in [cls.PROFESSIONAL, cls.NO_ID_PROFESSIONAL_MODE]
 
     @classmethod
+    def is_mode_upgradeable(cls, mode_slug):
+        """
+        Returns True if the given mode can be upgraded to another.
+
+        Note: Although, in practice, learners "upgrade" from verified to credit,
+        that particular upgrade path is excluded by this method.
+        """
+        return mode_slug in cls.AUDIT_MODES
+
+    @classmethod
     def is_verified_mode(cls, course_mode_tuple):
         """Check whether the given modes is_verified or not.
 
@@ -691,6 +704,59 @@ class CourseMode(models.Model):
 def invalidate_course_mode_cache(sender, **kwargs):   # pylint: disable=unused-argument
     """Invalidate the cache of course modes. """
     RequestCache.clear_request_cache(name=CourseMode.CACHE_NAMESPACE)
+
+
+def get_cosmetic_verified_display_price(course):
+    """
+    Returns the minimum verified cert course price as a string preceded by correct currency, or 'Free'.
+    """
+    return get_course_prices(course, verified_only=True)[1]
+
+
+def get_cosmetic_display_price(course):
+    """
+    Returns the course price as a string preceded by correct currency, or 'Free'.
+    """
+    return get_course_prices(course)[1]
+
+
+def get_course_prices(course, verified_only=False):
+    """
+    Return registration_price and cosmetic_display_prices.
+    registration_price is the minimum price for the course across all course modes.
+    cosmetic_display_prices is the course price as a string preceded by correct currency, or 'Free'.
+    """
+    # Find the
+    if verified_only:
+        registration_price = CourseMode.min_course_price_for_verified_for_currency(
+            course.id,
+            settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
+        )
+    else:
+        registration_price = CourseMode.min_course_price_for_currency(
+            course.id,
+            settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
+        )
+
+    currency_symbol = settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
+
+    if registration_price > 0:
+        price = registration_price
+    # Handle course overview objects which have no cosmetic_display_price
+    elif hasattr(course, 'cosmetic_display_price'):
+        price = course.cosmetic_display_price
+    else:
+        price = None
+
+    if price:
+        # Translators: This will look like '$50', where {currency_symbol} is a symbol such as '$' and {price} is a
+        # numerical amount in that currency. Adjust this display as needed for your language.
+        cosmetic_display_price = _("{currency_symbol}{price}").format(currency_symbol=currency_symbol, price=price)
+    else:
+        # Translators: This refers to the cost of the course. In this case, the course costs nothing so it is free.
+        cosmetic_display_price = _('Free')
+
+    return registration_price, force_text(cosmetic_display_price)
 
 
 class CourseModesArchive(models.Model):

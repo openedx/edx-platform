@@ -524,11 +524,13 @@ def course_listing(request):
             u'can_edit': has_studio_write_access(request.user, library.location.library_key),
         }
 
-    courses_iter = _remove_in_process_courses(courses_iter, in_process_course_actions)
+    split_archived = settings.FEATURES.get(u'ENABLE_SEPARATE_ARCHIVED_COURSES', False)
+    active_courses, archived_courses = _process_courses_list(courses_iter, in_process_course_actions, split_archived)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
 
     return render_to_response(u'index.html', {
-        u'courses': list(courses_iter),
+        u'courses': active_courses,
+        u'archived_courses': archived_courses,
         u'in_process_course_actions': in_process_course_actions,
         u'libraries_enabled': LIBRARIES_ENABLED,
         u'libraries': [format_library_for_view(lib) for lib in libraries],
@@ -645,7 +647,6 @@ def get_courses_accessible_to_user(request, org=None):
             the courses returned. A value of None will have no effect (all courses
             returned), an empty string will result in no courses, and otherwise only courses with the
             specified org will be returned. The default value is None.
-
     """
     if GlobalStaff().has_user(request.user):
         # user has global access so no need to get courses from django groups
@@ -660,10 +661,15 @@ def get_courses_accessible_to_user(request, org=None):
     return courses, in_process_course_actions
 
 
-def _remove_in_process_courses(courses_iter, in_process_course_actions):
+def _process_courses_list(courses_iter, in_process_course_actions, split_archived=False):
     """
-    removes any in-process courses in courses list. in-process actually refers to courses
-    that are in the process of being generated for re-run
+    Iterates over the list of courses to be displayed to the user, and:
+
+    * Removes any in-process courses from the courses list. "In-process" refers to courses
+      that are in the process of being generated for re-run.
+    * If split_archived=True, removes any archived courses and returns them in a separate list.
+      Archived courses have has_ended() == True.
+    * Formats the returned courses (in both lists) to prepare them for rendering to the view.
     """
     def format_course_for_view(course):
         """
@@ -681,11 +687,20 @@ def _remove_in_process_courses(courses_iter, in_process_course_actions):
         }
 
     in_process_action_course_keys = {uca.course_key for uca in in_process_course_actions}
-    return (
-        format_course_for_view(course)
-        for course in courses_iter
-        if not isinstance(course, ErrorDescriptor) and (course.id not in in_process_action_course_keys)
-    )
+    active_courses = []
+    archived_courses = []
+
+    for course in courses_iter:
+        if isinstance(course, ErrorDescriptor) or (course.id in in_process_action_course_keys):
+            continue
+
+        formatted_course = format_course_for_view(course)
+        if split_archived and course.has_ended():
+            archived_courses.append(formatted_course)
+        else:
+            active_courses.append(formatted_course)
+
+    return active_courses, archived_courses
 
 
 def course_outline_initial_state(locator_to_show, course_structure):
@@ -1041,7 +1056,7 @@ def settings_handler(request, course_key_string):
                 # exclude current course from the list of available courses
                 courses = (course for course in courses if course.id != course_key)
                 if courses:
-                    courses = _remove_in_process_courses(courses, in_process_course_actions)
+                    courses, __ = _process_courses_list(courses, in_process_course_actions)
                 settings_context.update({'possible_pre_requisite_courses': list(courses)})
 
             if credit_eligibility_enabled:

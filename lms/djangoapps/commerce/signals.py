@@ -19,21 +19,19 @@ from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_comm
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from request_cache.middleware import RequestCache
-from student.models import UNENROLL_DONE
+from student.models import REFUND_ORDER
 
 log = logging.getLogger(__name__)
 
 
 # pylint: disable=unused-argument
-@receiver(UNENROLL_DONE)
-def handle_unenroll_done(sender, course_enrollment=None, skip_refund=False, **kwargs):
+@receiver(REFUND_ORDER)
+def handle_refund_order(sender, course_enrollment=None, **kwargs):
     """
     Signal receiver for unenrollments, used to automatically initiate refunds
     when applicable.
-
-    N.B. this signal is also consumed by lms.djangoapps.shoppingcart.
     """
-    if not is_commerce_service_configured() or skip_refund:
+    if not is_commerce_service_configured():
         return
 
     if course_enrollment and course_enrollment.refundable():

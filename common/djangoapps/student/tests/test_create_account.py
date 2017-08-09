@@ -22,8 +22,10 @@ from notification_prefs import NOTIFICATION_PREF_KEY
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangoapps.user_api.accounts import (
+    USERNAME_BAD_LENGTH_MSG, USERNAME_INVALID_CHARS_ASCII, USERNAME_INVALID_CHARS_UNICODE
+)
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
-from student.forms import USERNAME_INVALID_CHARS_ASCII, USERNAME_INVALID_CHARS_UNICODE
 from student.models import UserAttribute
 from student.views import REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS
 
@@ -476,16 +478,16 @@ class TestCreateAccountValidation(TestCase):
 
         # Missing
         del params["username"]
-        assert_username_error("Username must be minimum of two characters long")
+        assert_username_error(USERNAME_BAD_LENGTH_MSG)
 
         # Empty, too short
         for username in ["", "a"]:
             params["username"] = username
-            assert_username_error("Username must be minimum of two characters long")
+            assert_username_error(USERNAME_BAD_LENGTH_MSG)
 
         # Too long
         params["username"] = "this_username_has_31_characters"
-        assert_username_error("Username cannot be more than 30 characters long")
+        assert_username_error(USERNAME_BAD_LENGTH_MSG)
 
         # Invalid
         params["username"] = "invalid username"
