@@ -65,7 +65,7 @@ define(
                 view.render();
                 var bio = view.$el.find('.u-field-bio');
                 expect(bio.length).toBe(0);
-                var msg = view.$el.find('span.profile-private--message');
+                var msg = view.$el.find('span.profile-private-message');
                 expect(msg.length).toBe(1);
                 expect(_.count(msg.html(), messageString)).toBeTruthy();
             };

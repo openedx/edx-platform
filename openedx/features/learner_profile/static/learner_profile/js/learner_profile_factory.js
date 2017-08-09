@@ -48,6 +48,7 @@
             var accountPrivacyFieldView,
                 profileImageFieldView,
                 usernameFieldView,
+                nameFieldView,
                 sectionOneFieldViews,
                 sectionTwoFieldViews,
                 BadgeCollection,
@@ -65,10 +66,7 @@
                 required: true,
                 editable: 'always',
                 showMessages: false,
-                title: StringUtils.interpolate(
-                    gettext('{platform_name} learners can see my:'),
-                    {platform_name: options.platform_name}
-                ),
+                title: gettext('Profile Visibility:'),
                 valueAttribute: 'account_privacy',
                 options: [
                     ['private', gettext('Limited Profile')],
@@ -97,29 +95,37 @@
                 helpMessage: ''
             });
 
+            nameFieldView = new FieldsView.ReadonlyFieldView({
+                model: accountSettingsModel,
+                screenReaderTitle: gettext('Full Name'),
+                valueAttribute: 'name',
+                helpMessage: ''
+            });
+
             sectionOneFieldViews = [
                 new FieldsView.DropdownFieldView({
+                    title: gettext('Location'),
+                    titleVisible: true,
                     model: accountSettingsModel,
                     screenReaderTitle: gettext('Country'),
-                    titleVisible: false,
                     required: true,
                     editable: editable,
                     showMessages: false,
-                    iconName: 'fa-map-marker',
                     placeholderValue: gettext('Add Country'),
                     valueAttribute: 'country',
                     options: options.country_options,
                     helpMessage: '',
                     persistChanges: true
                 }),
+
                 new AccountSettingsFieldViews.LanguageProficienciesFieldView({
+                    title: gettext('Language'),
+                    titleVisible: true,
                     model: accountSettingsModel,
                     screenReaderTitle: gettext('Preferred Language'),
-                    titleVisible: false,
                     required: false,
                     editable: editable,
                     showMessages: false,
-                    iconName: 'fa-comment',
                     placeholderValue: gettext('Add language'),
                     valueAttribute: 'language_proficiencies',
                     options: options.language_options,
@@ -139,7 +145,8 @@
                     valueAttribute: 'bio',
                     helpMessage: '',
                     persistChanges: true,
-                    messagePosition: 'header'
+                    messagePosition: 'header',
+                    maxCharacters: 300
                 })
             ];
 
@@ -172,9 +179,11 @@
                 accountPrivacyFieldView: accountPrivacyFieldView,
                 profileImageFieldView: profileImageFieldView,
                 usernameFieldView: usernameFieldView,
+                nameFieldView: nameFieldView,
                 sectionOneFieldViews: sectionOneFieldViews,
                 sectionTwoFieldViews: sectionTwoFieldViews,
-                badgeListContainer: badgeListContainer
+                badgeListContainer: badgeListContainer,
+                platformName: options.platform_name
             });
 
             getProfileVisibility = function() {
