@@ -1,17 +1,19 @@
 from django.conf import settings
 from django.conf.urls import include, patterns, url
 from django.conf.urls.static import static
-# There is a course creators admin table.
+from django.contrib.admin import autodiscover as django_autodiscover
 from ratelimitbackend import admin
 
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 
-admin.autodiscover()
+
+django_autodiscover()
 
 # Pattern to match a course key or a library key
 COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(
     r'[^/]+/[^/]+/[^/]+', r'[^/:]+:[^/+]+\+[^/+]+(\+[^/]+)?'
 )
+
 # Pattern to match a library key only
 LIBRARY_KEY_PATTERN = r'(?P<library_key_string>library-v1:[^/+]+\+[^/+]+)'
 
