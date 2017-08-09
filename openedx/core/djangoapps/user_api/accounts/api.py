@@ -383,7 +383,7 @@ def activate_account(activation_key):
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
-def request_password_change(email, orig_host, is_secure):
+def request_password_change(email, is_secure):
     """Email a single-use link for performing a password reset.
 
     Users must confirm the password change before we update their information.
@@ -411,7 +411,6 @@ def request_password_change(email, orig_host, is_secure):
         # and email it to the user.
         form.save(
             from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
-            domain_override=orig_host,
             use_https=is_secure
         )
     else:
