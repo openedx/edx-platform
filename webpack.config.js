@@ -24,7 +24,8 @@ var wpconfig = {
         CourseTalkReviews: './openedx/features/course_experience/static/course_experience/js/CourseTalkReviews.js',
         WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js',
         Enrollment: './openedx/features/course_experience/static/course_experience/js/Enrollment.js',
-        Import: './cms/static/js/features/import/factories/import.js'
+        Import: './cms/static/js/features/import/factories/import.js',
+        StudioIndex: './cms/static/js/features_jsx/studio/index.jsx'
     },
 
     output: {
@@ -68,7 +69,7 @@ var wpconfig = {
         // invoke this plugin until we can upgrade karma-webpack.
         new webpack.optimize.CommonsChunkPlugin({
             // If the value below changes, update the render_bundle call in
-            // common/djangoapps/pipeline_mako/templates/static_content.html 
+            // common/djangoapps/pipeline_mako/templates/static_content.html
             name: 'commons',
             filename: 'commons.js',
             minChunks: 2
