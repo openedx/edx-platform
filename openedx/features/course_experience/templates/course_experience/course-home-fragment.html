@@ -45,9 +45,9 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
                 % if resume_course_url:
                     <a class="btn btn-brand action-resume-course" href="${resume_course_url}">
                         % if has_visited_course:
-                            ${_("Resume Course")}
+                            <span data-action-type="resume">${_("Resume Course")}</span>
                         % else:
-                            ${_("Start Course")}
+                            <span data-action-type="start">${_("Start Course")}</span>
                         % endif
                     </a>
                 % endif
@@ -109,6 +109,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
 
 <%static:webpack entry="CourseHome">
     new CourseHome({
+        resumeCourseLink: ".action-resume-course",
         courseToolLink: ".course-tool-link",
     });
 </%static:webpack>
