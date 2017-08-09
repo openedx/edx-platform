@@ -515,15 +515,16 @@
                 'click .wrapper-u-field': 'startEditing',
                 'click .u-field-placeholder': 'startEditing',
                 'focusout textarea': 'finishEditing',
-                'change textarea': 'adjustTextareaHeight',
-                'keyup textarea': 'adjustTextareaHeight',
+                'change textarea': 'manageTextareaContentChange',
+                'keyup textarea': 'manageTextareaContentChange',
                 'keydown textarea': 'onKeyDown',
-                'paste textarea': 'adjustTextareaHeight',
-                'cut textarea': 'adjustTextareaHeight'
+                'paste textarea': 'manageTextareaContentChange',
+                'cut textarea': 'manageTextareaContentChange'
             },
 
             initialize: function(options) {
-                _.bindAll(this, 'render', 'onKeyDown', 'adjustTextareaHeight', 'fieldValue', 'saveValue', 'updateView');
+                _.bindAll(this, 'render', 'onKeyDown', 'adjustTextareaHeight', 'manageTextareaContentChange',
+                    'fieldValue', 'saveValue', 'updateView');
                 this._super(options);
                 this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateView);
             },
@@ -541,7 +542,8 @@
                     value: value,
                     message: this.helpMessage,
                     messagePosition: this.options.messagePosition || 'footer',
-                    placeholderValue: this.options.placeholderValue
+                    placeholderValue: this.options.placeholderValue,
+                    maxCharacters: this.options.maxCharacters || ''
                 }));
                 this.delegateEvents();
                 this.title((this.modelValue() || this.mode === 'edit') ?
@@ -562,10 +564,24 @@
                 }
             },
 
+            updateCharCount: function() {
+                var curCharCount;
+                // Update character count for textarea
+                if (this.options.maxCharacters) {
+                    curCharCount = $('#u-field-textarea-' + this.options.valueAttribute).val().length;
+                    $('.u-field-footer .current-char-count').text(curCharCount);
+                }
+            },
+
             adjustTextareaHeight: function() {
                 if (this.persistChanges === false) { return; }
                 var textarea = this.$('textarea');
                 textarea.css('height', 'auto').css('height', textarea.prop('scrollHeight') + 10);
+            },
+
+            manageTextareaContentChange: function() {
+                this.updateCharCount();
+                this.adjustTextareaHeight();
             },
 
             modelValue: function() {

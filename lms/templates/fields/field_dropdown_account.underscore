@@ -1,14 +1,12 @@
 <div class="u-field-value field">
-    <% if (editable !== 'never') { %>
-        <% if (title && titleVisible) { %>
-            <label class="u-field-title field-label" for="u-field-select-<%- id %>">
-                <%- title %>
-            </label>
-        <% } else { %>
-            <label class="sr" for="u-field-select-<%- id %>">
-                <%- screenReaderTitle %>
-            </label>
-        <% } %>
+    <% if (title && titleVisible) { %>
+        <label class="u-field-title field-label" for="u-field-select-<%- id %>">
+            <%- title %>
+        </label>
+    <% } else { %>
+        <label class="sr" for="u-field-select-<%- id %>">
+            <%- screenReaderTitle %>
+        </label>
     <% } %>
 
     <% if (iconName) { %>

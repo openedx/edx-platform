@@ -25,8 +25,6 @@
     }
 
     .profile-image-field {
-        @include float(left);
-
         button {
             background: transparent !important;
             border: none !important;
@@ -41,13 +39,18 @@
         .image-wrapper {
             width: $profile-image-dimension;
             position: relative;
+            margin: auto;
 
             .image-frame {
                 display: block;
                 position: relative;
                 width: $profile-image-dimension;
                 height: $profile-image-dimension;
-                border-radius: ($baseline/4);
+                border-radius: ($profile-image-dimension/2);
+                overflow: hidden;
+                border: 3px solid $gray-lightest;
+                margin-top: $baseline*-0.75;
+                background: $white;
             }
 
             .u-field-upload-button {
@@ -55,13 +58,12 @@
                 top: 0;
                 width: $profile-image-dimension;
                 height: $profile-image-dimension;
-                border-radius: ($baseline/4);
+                border-radius: ($profile-image-dimension/2);
                 border: 2px dashed transparent;
                 background: rgba(229,241,247, .8);
                 color: $link-color;
                 text-shadow: none;
                 @include transition(all $tmg-f1 ease-in-out 0s);
-                opacity: 0;
                 z-index: 6;
 
                 i {
@@ -87,17 +89,20 @@
                 line-height: 1.3em;
                 text-align: center;
                 z-index: 7;
+                color: $base-font-color;
             }
 
             .upload-button-input {
                 position: absolute;
-                top: -($profile-image-dimension * 2);
+                top: 0;
                 @include left(0);
                 width: $profile-image-dimension;
+                border-radius: ($profile-image-dimension/2);
                 height: 100%;
                 cursor: pointer;
                 z-index: 5;
                 outline: 0;
+                opacity: 0;
             }
 
             .u-field-remove-button {
@@ -113,6 +118,7 @@
 
     .wrapper-profile {
         min-height: 200px;
+        background-color: $gray-lightest;
 
         .ui-loading-indicator {
             margin-top: 100px;
@@ -133,7 +139,7 @@
                 @extend .container;
                 border: none;
                 box-shadow: none;
-                padding: 0 ($baseline*1.5);
+                padding: 0 ($baseline*3);
             }
 
             .u-field-title {
@@ -164,53 +170,93 @@
 
     .wrapper-profile-sections {
         @extend .container;
-        padding: 0 ($baseline*1.5);
+        @include padding($baseline*1.5, $baseline*1.5, $baseline*1.5, 0);
+        min-width: 0;
+
+        @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
+            @include margin-left(0);
+            @include padding($baseline*1.5, 0, $baseline*1.5, 0);
+        }
+    }
+
+    .profile-header {
+        @include padding(0, $baseline*2, $baseline, $baseline*3);
+
+        .header {
+            @extend %t-title4;
+            @extend %t-ultrastrong;
+            display: inline-block;
+        }
+
+        .subheader {
+            @extend %t-title6;
+        }
     }
 
     .wrapper-profile-section-one {
-        width: 100%;
-        display: inline-block;
-        margin-top: ($baseline*1.5);
-        @include margin-left($baseline/2);
+        @include float(left);
+        @include margin-left($baseline*3);
+        width: 300px;
+        background-color: $white;
+        border-top: 5px solid $blue;
+        padding-bottom: $baseline;
+
+        @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
+            @include margin-left(0);
+            width: 100%;
+        }
     }
 
     .profile-section-one-fields {
-        @include float(left);
-        width: flex-grid(4, 12);
-        @include margin-left($baseline);
+        margin: 0 $baseline/2;
 
         .u-field {
-            margin-bottom: ($baseline/4);
-            padding-top: 3px;
-            padding-bottom: 3px;
-            @include padding-left(3px);
-        }
-
-        .u-field-username {
-
-            input[type="text"] {
-                font-weight: 600;
-            }
+            @extend %t-weight4;
+            @include padding(0, 0, 0, 3px);
+            color: $base-font-color;
 
             .u-field-value {
-                width: 350px;
-                @extend %t-title4;
+                @extend %t-weight4;
+                width: calc(100% - 40px);
+
+                .u-field-value-readonly {
+                    @extend %t-weight3;
+                }
+            }
+
+            .u-field-title {
+                color: $base-font-color;
+                font-size: $body-font-size;
+                display: block;
+            }
+
+            &.u-field-dropdown {
+                margin-top: $baseline/5;
+
+                &:not(.editable-never) {
+                    cursor: pointer;
+                }
+
+                &:not(:last-child) {
+                    padding-bottom: $baseline/4;
+                    border-bottom: 1px solid $gray-lighter;
+                }
             }
         }
 
-        .u-field-icon {
-            display: inline-block;
-            vertical-align: baseline;
-        }
+        &>.u-field {
+            &:not(:first-child) {
+                font-size: $body-font-size;
+                color: $base-font-color;
+                font-weight: $font-light;
+                margin-bottom: 0;
+            }
 
-        .u-field-title {
-            width: 0;
-        }
-
-        .u-field-value {
-            width: 200px;
-            display: inline-block;
-            vertical-align: baseline;
+            &:first-child {
+                @extend %t-title4;
+                @extend %t-weight4;
+                font-size: em(24);
+            }
         }
 
         select {
@@ -230,16 +276,29 @@
         }
     }
 
-    .wrapper-profile-section-two {
-        padding-top: 1em;
-        width: flex-grid(8, 12);
-    }
+    .wrapper-profile-section-container-two {
+        @include float(left);
+        width: calc(100% - 380px);
+        max-width: $learner-profile-container-flex; // Switch to map-get($grid-breakpoints,md) for bootstrap
 
-    .profile-section-two-fields {
+        @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
+            width: 100%;
+            margin-top: $baseline;
+        }
 
         .u-field-textarea {
             margin-bottom: ($baseline/2);
-            padding: ($baseline/2) ($baseline*.75) ($baseline*.75) ($baseline*.75);
+            padding: 0 ($baseline*.75) ($baseline*.75) ($baseline*.75);
+
+            .u-field-header {
+                position: relative;
+
+                .u-field-message {
+                    @include right(0);
+                    top: $baseline/4;
+                    position: absolute;
+                }
+            }
 
             &.editable-toggle {
                 cursor: pointer;
@@ -247,22 +306,30 @@
         }
 
         .u-field-title {
-            @extend %t-title5;
-            @extend %t-weight4;
+            @extend %t-title6;
+            @extend %t-weight5;
             display: inline-block;
             margin-top: 0;
             margin-bottom: ($baseline/4);
-            color: inherit;
+            color: $gray-dark;
+            width: 100%;
         }
 
         .u-field-value {
             @extend %t-copy-base;
             width: 100%;
+            overflow: scroll;
 
             textarea {
                 width: 100%;
                 background-color: transparent;
+                border-radius: 5px;
+                border-color: $gray-d1;
+                resize: none;
                 white-space: pre-line;
+                outline: 0;
+                box-shadow: none;
+                -webkit-appearance: none;
             }
 
             a {
@@ -273,16 +340,22 @@
         .u-field-message {
             @include float(right);
             width: auto;
+
+            .message-can-edit {
+                position: absolute;
+            }
         }
 
         .u-field.mode-placeholder {
             padding: $baseline;
+            margin: $baseline * 0.75;
             border: 2px dashed $gray-l3;
+
             i {
                 font-size: 12px;
                 @include padding-right(5px);
                 vertical-align: middle;
-                color: $gray;
+                color: $base-font-color;
             }
             .u-field-title {
                 width: 100%;
@@ -293,7 +366,7 @@
                 text-align: center;
                 line-height: 1.5em;
                 @extend %t-copy-sub1;
-                color: $gray;
+                color: $base-font-color;
             }
         }
 
@@ -303,6 +376,28 @@
             i {
                 color: $link-color;
             }
+        }
+
+        .wrapper-u-field {
+            font-size: $body-font-size;
+            color: $base-font-color;
+
+            .u-field-header .u-field-title{
+                color: $base-font-color;
+            }
+
+            .u-field-footer {
+                .field-textarea-character-count {
+                    @extend %t-weight1;
+                    @include float(right);
+                    margin-top: $baseline/4;
+                }
+            }
+        }
+
+        .profile-private-message {
+            @include padding-left($baseline*0.75);
+            line-height: 3.0em;
         }
     }
 
