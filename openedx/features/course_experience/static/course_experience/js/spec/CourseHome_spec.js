@@ -9,9 +9,22 @@ describe('Course Home factory', () => {
     beforeEach(() => {
       loadFixtures('course_experience/fixtures/course-home-fragment.html');
       home = new CourseHome({
+        resumeCourseLink: '.action-resume-course',
         courseToolLink: '.course-tool-link',
       });
       spyOn(Logger, 'log');
+    });
+
+    it('sends an event when resume or start course is clicked', () => {
+      $('.action-resume-course').click();
+      expect(Logger.log).toHaveBeenCalledWith(
+        'edx.course.home.resume_course.clicked',
+        {
+          event_type: 'start',
+          url: `http://${window.location.host}/courses/course-v1:edX+DemoX+Demo_Course/courseware` +
+            '/19a30717eff543078a5d94ae9d6c18a5/',
+        },
+      );
     });
 
     it('sends an event when an course tool is clicked', () => {
