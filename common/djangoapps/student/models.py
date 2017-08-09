@@ -13,7 +13,6 @@ file and check it in at the same time as your model changes. To do that,
 import hashlib
 import json
 import logging
-from slumber.exceptions import HttpClientError
 import uuid
 from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, timedelta
@@ -37,11 +36,14 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
+from edx_rest_api_client.exceptions import SlumberBaseException
+from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pytz import UTC
 from simple_history.models import HistoricalRecords
+from slumber.exceptions import HttpClientError, HttpServerError
 
 import dogstats_wrapper as dog_stats_api
 import lms.lib.comment_client as cc
@@ -49,7 +51,6 @@ import request_cache
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from enrollment.api import _default_course_mode
-from eventtracking import tracker
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
@@ -60,6 +61,7 @@ from util.query import use_read_replica_if_available
 
 UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
 ENROLL_STATUS_CHANGE = Signal(providing_args=["event", "user", "course_id", "mode", "cost", "currency"])
+REFUND_ORDER = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
@@ -1623,11 +1625,23 @@ class CourseEnrollment(models.Model):
         order_number = attribute.value
         try:
             order = ecommerce_api_client(self.user).orders(order_number).get()
+
         except HttpClientError:
             log.warning(
                 u"Encountered HttpClientError while getting order details from ecommerce. "
                 u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+            return None
 
+        except HttpServerError:
+            log.warning(
+                u"Encountered HttpServerError while getting order details from ecommerce. "
+                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+            return None
+
+        except SlumberBaseException:
+            log.warning(
+                u"Encountered an error while getting order details from ecommerce. "
+                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
             return None
 
         refund_window_start_date = max(
@@ -1663,6 +1677,55 @@ class CourseEnrollment(models.Model):
             except (CourseOverview.DoesNotExist, IOError):
                 self._course_overview = None
         return self._course_overview
+
+    @property
+    def upgrade_deadline(self):
+        """
+        Returns the upgrade deadline for this enrollment, if it is upgradeable.
+
+        If the seat cannot be upgraded, None is returned.
+
+        Note:
+            When loading this model, use `select_related` to retrieve the associated schedule object.
+
+        Returns:
+            datetime|None
+        """
+        log.debug('Schedules: Determining upgrade deadline for CourseEnrollment %d...', self.id)
+        if not CourseMode.is_mode_upgradeable(self.mode):
+            log.debug(
+                'Schedules: %s mode of %s is not upgradeable. Returning None for upgrade deadline.',
+                self.mode, self.course_id
+            )
+            return None
+
+        try:
+            if self.schedule:
+                log.debug(
+                    'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
+                    self.id, self.schedule.id
+                )
+                return self.schedule.upgrade_deadline
+        except ObjectDoesNotExist:
+            # NOTE: Schedule has a one-to-one mapping with CourseEnrollment. If no schedule is associated
+            # with this enrollment, Django will raise an exception rather than return None.
+            log.debug('Schedules: No schedule exists for CourseEnrollment %d.', self.id)
+            pass
+
+        try:
+            verified_mode = CourseMode.verified_mode_for_course(self.course_id)
+
+            if verified_mode:
+                log.debug('Schedules: Defaulting to verified mode expiration date-time for %s.', self.course_id)
+                return verified_mode.expiration_datetime
+            else:
+                log.debug('Schedules: No verified mode located for %s.', self.course_id)
+        except CourseMode.DoesNotExist:
+            log.debug('Schedules: %s has no verified mode.', self.course_id)
+            pass
+
+        log.debug('Schedules: Returning default of `None`')
+        return None
 
     def is_verified_enrollment(self):
         """

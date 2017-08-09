@@ -624,7 +624,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         ]
         definition = {
             attr_name: json.loads(attr_value)
-            for attr_name, attr_value in xml_object.attrib
+            for attr_name, attr_value in xml_object.attrib.items()
         }
         return definition, children
 

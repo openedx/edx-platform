@@ -13,6 +13,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
 from django.utils.http import int_to_base36
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from mock import Mock, patch
@@ -174,40 +175,33 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @patch('django.core.mail.send_mail')
-    @ddt.data(('Crazy Awesome Site', 'Crazy Awesome Site'), (None, 'edX'))
+    @ddt.data(('Crazy Awesome Site', 'Crazy Awesome Site'), ('edX', 'edX'))
     @ddt.unpack
-    def test_reset_password_email_domain(self, domain_override, platform_name, send_email):
+    def test_reset_password_email_site(self, site_name, platform_name, send_email):
         """
         Tests that the right url domain and platform name is included in
         the reset password email
         """
         with patch("django.conf.settings.PLATFORM_NAME", platform_name):
-            req = self.request_factory.post(
-                '/password_reset/', {'email': self.user.email}
-            )
-            req.is_secure = Mock(return_value=True)
-            req.get_host = Mock(return_value=domain_override)
-            req.user = self.user
-            password_reset(req)
-            _, msg, _, _ = send_email.call_args[0]
+            with patch("django.conf.settings.SITE_NAME", site_name):
+                req = self.request_factory.post(
+                    '/password_reset/', {'email': self.user.email}
+                )
+                req.user = self.user
+                password_reset(req)
+                _, msg, _, _ = send_email.call_args[0]
 
-            reset_intro_msg = "you requested a password reset for your user account at {}".format(platform_name)
-            self.assertIn(reset_intro_msg, msg)
+                reset_msg = "you requested a password reset for your user account at {}"
+                reset_msg = reset_msg.format(site_name)
 
-            reset_link = "https://{}/"
-            if domain_override:
-                reset_link = reset_link.format(domain_override)
-            else:
-                reset_link = reset_link.format(settings.SITE_NAME)
+                self.assertIn(reset_msg, msg)
 
-            self.assertIn(reset_link, msg)
+                sign_off = "The {} Team".format(platform_name)
+                self.assertIn(sign_off, msg)
 
-            sign_off = "The {} Team".format(platform_name)
-            self.assertIn(sign_off, msg)
-
-            self.assert_event_emitted(
-                SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None
-            )
+                self.assert_event_emitted(
+                    SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None
+                )
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
@@ -286,6 +280,35 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         # the user is not marked as active.
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(User.objects.get(pk=self.user.pk).is_active)
+
+    @override_settings(PASSWORD_MIN_LENGTH=2)
+    @override_settings(PASSWORD_MAX_LENGTH=10)
+    @ddt.data(
+        {
+            'password': '1',
+            'error_message': 'Password: Invalid Length (must be 2 characters or more)',
+        },
+        {
+            'password': '01234567891',
+            'error_message': 'Password: Invalid Length (must be 10 characters or fewer)'
+        }
+    )
+    def test_password_reset_with_invalid_length(self, password_dict):
+        """Tests that if we provide password characters less then PASSWORD_MIN_LENGTH,
+        or more than PASSWORD_MAX_LENGTH, password reset will fail with error message.
+        """
+
+        url = reverse(
+            'password_reset_confirm',
+            kwargs={'uidb36': self.uidb36, 'token': self.token}
+        )
+        request_params = {'new_password1': password_dict['password'], 'new_password2': password_dict['password']}
+        confirm_request = self.request_factory.post(url, data=request_params)
+
+        # Make a password reset request with minimum/maximum passwords characters.
+        response = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
+
+        self.assertEqual(response.context_data['err_msg'], password_dict['error_message'])
 
     @patch('student.views.password_reset_confirm')
     @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)

@@ -106,6 +106,7 @@ class CourseDetails(object):
         course_details = cls(course_key.org, course_key.course, course_key.run)
         course_details.start_date = course_descriptor.start
         course_details.end_date = course_descriptor.end
+        course_details.certificate_available_date = course_descriptor.certificate_available_date
         course_details.enrollment_start = course_descriptor.enrollment_start
         course_details.enrollment_end = course_descriptor.enrollment_end
         course_details.pre_requisite_courses = course_descriptor.pre_requisite_courses
@@ -232,6 +233,15 @@ class CourseDetails(object):
         if converted != descriptor.enrollment_end:
             dirty = True
             descriptor.enrollment_end = converted
+
+        if 'certificate_available_date' in jsondict:
+            converted = date.from_json(jsondict['certificate_available_date'])
+        else:
+            converted = None
+
+        if converted != descriptor.certificate_available_date:
+            dirty = True
+            descriptor.certificate_available_date = converted
 
         if 'course_image_name' in jsondict and jsondict['course_image_name'] != descriptor.course_image:
             descriptor.course_image = jsondict['course_image_name']

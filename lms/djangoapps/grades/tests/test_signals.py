@@ -197,28 +197,6 @@ class ScoreChangedSignalRelayTest(TestCase):
         expected_set_kwargs['score_deleted'] = False
         self.signal_mock.assert_called_with(**expected_set_kwargs)
 
-    @patch('lms.djangoapps.grades.signals.handlers.log.info')
-    def test_subsection_update_logging(self, mocklog):
-        enqueue_subsection_update(
-            sender='test',
-            user_id=1,
-            course_id=u'course-v1:edX+Demo_Course+DemoX',
-            usage_id=u'block-v1:block-key',
-            modified=FROZEN_NOW_DATETIME,
-            score_db_table=ScoreDatabaseTableEnum.courseware_student_module,
-        )
-        log_statement = mocklog.call_args[0][0]
-        log_statement = UUID_REGEX.sub(u'*UUID*', log_statement)
-        self.assertEqual(
-            log_statement,
-            (
-                u'Grades: Request async calculation of subsection grades with args: '
-                u'course_id:course-v1:edX+Demo_Course+DemoX, modified:{time}, '
-                u'score_db_table:csm, '
-                u'usage_id:block-v1:block-key, user_id:1. Task [*UUID*]'
-            ).format(time=FROZEN_NOW_DATETIME)
-        )
-
     @ddt.data(
         [score_set, 'lms.djangoapps.grades.signals.handlers.submissions_score_set_handler', SUBMISSION_SET_KWARGS],
         [score_reset, 'lms.djangoapps.grades.signals.handlers.submissions_score_reset_handler', SUBMISSION_RESET_KWARGS]

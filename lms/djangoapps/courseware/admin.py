@@ -1,5 +1,6 @@
+from django.contrib import admin
+
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
-from ratelimitbackend import admin
 
 from courseware import models
 

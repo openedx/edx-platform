@@ -4,8 +4,10 @@ Tests for course access
 """
 import itertools
 
+import datetime
 import ddt
 import mock
+import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
@@ -13,6 +15,7 @@ from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 
 from courseware.courses import (
+    course_open_for_self_enrollment,
     get_cms_block_link,
     get_cms_course_link,
     get_course_about_section,
@@ -320,6 +323,52 @@ class CoursesRenderTest(ModuleStoreTestCase):
             )
             course_about = get_course_about_section(self.request, self.course, 'short_description')
             self.assertIn("this module is temporarily unavailable", course_about)
+
+
+class CourseEnrollmentOpenTests(ModuleStoreTestCase):
+    def setUp(self):
+        super(CourseEnrollmentOpenTests, self).setUp()
+        self.now = datetime.datetime.now().replace(tzinfo=pytz.UTC)
+
+    def test_course_enrollment_open(self):
+        start = self.now - datetime.timedelta(days=1)
+        end = self.now + datetime.timedelta(days=1)
+        course = CourseFactory(enrollment_start=start, enrollment_end=end)
+        self.assertTrue(course_open_for_self_enrollment(course.id))
+
+    def test_course_enrollment_closed_future(self):
+        start = self.now + datetime.timedelta(days=1)
+        end = self.now + datetime.timedelta(days=2)
+        course = CourseFactory(enrollment_start=start, enrollment_end=end)
+        self.assertFalse(course_open_for_self_enrollment(course.id))
+
+    def test_course_enrollment_closed_past(self):
+        start = self.now - datetime.timedelta(days=2)
+        end = self.now - datetime.timedelta(days=1)
+        course = CourseFactory(enrollment_start=start, enrollment_end=end)
+        self.assertFalse(course_open_for_self_enrollment(course.id))
+
+    def test_course_enrollment_dates_missing(self):
+        course = CourseFactory()
+        self.assertTrue(course_open_for_self_enrollment(course.id))
+
+    def test_course_enrollment_dates_missing_start(self):
+        end = self.now + datetime.timedelta(days=1)
+        course = CourseFactory(enrollment_end=end)
+        self.assertTrue(course_open_for_self_enrollment(course.id))
+
+        end = self.now - datetime.timedelta(days=1)
+        course = CourseFactory(enrollment_end=end)
+        self.assertFalse(course_open_for_self_enrollment(course.id))
+
+    def test_course_enrollment_dates_missing_end(self):
+        start = self.now - datetime.timedelta(days=1)
+        course = CourseFactory(enrollment_start=start)
+        self.assertTrue(course_open_for_self_enrollment(course.id))
+
+        start = self.now + datetime.timedelta(days=1)
+        course = CourseFactory(enrollment_start=start)
+        self.assertFalse(course_open_for_self_enrollment(course.id))
 
 
 @attr(shard=1)

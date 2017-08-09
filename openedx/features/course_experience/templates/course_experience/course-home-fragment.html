@@ -112,3 +112,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
         courseToolLink: ".course-tool-link",
     });
 </%static:webpack>
+
+<%static:webpack entry="Enrollment">
+    new CourseEnrollment('.enroll-btn', '${course_key | n, js_escaped_string}');
+</%static:webpack>

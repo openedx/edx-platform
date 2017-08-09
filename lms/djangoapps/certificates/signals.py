@@ -6,7 +6,6 @@ import logging
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from .config import waffle
 from certificates.models import \
     CertificateGenerationCourseSetting, \
     CertificateWhitelist, \
@@ -14,6 +13,7 @@ from certificates.models import \
 from certificates.tasks import generate_certificate
 from courseware import courses
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, LEARNER_NOW_VERIFIED
 from student.models import CourseEnrollment
 
@@ -41,10 +41,7 @@ def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # pyl
         if courses.get_course_by_id(instance.course_id, depth=0).self_paced:
             return
 
-    generate_certificate.apply_async(
-        student=instance.user,
-        course_key=instance.course_id,
-    )
+    fire_ungenerated_certificate_task(instance.user, instance.course_id)
     log.info(u'Certificate generation task initiated for {user} : {course} via whitelist'.format(
         user=instance.user.id,
         course=instance.course_id
@@ -73,10 +70,7 @@ def _listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: dis
     if waffle.waffle().is_enabled(waffle.INSTRUCTOR_PACED_ONLY):
         if courses.get_course_by_id(course_id, depth=0).self_paced:
             return
-    if fire_ungenerated_certificate_task(
-        user=user,
-        course_id=course_id
-    ):
+    if fire_ungenerated_certificate_task(user, course_id):
         log.info(u'Certificate generation task initiated for {user} : {course} via passing grade'.format(
             user=user.id,
             course=course_id
@@ -98,23 +92,22 @@ def _listen_for_track_change(sender, user, **kwargs):  # pylint: disable=unused-
     grade_factory = CourseGradeFactory()
     for enrollment in user_enrollments:
         if grade_factory.read(user=user, course=enrollment.course).passed:
-            if fire_ungenerated_certificate_task(
-                user=user,
-                course_id=enrollment.course.id
-            ):
+            if fire_ungenerated_certificate_task(user, enrollment.course.id):
                 log.info(u'Certificate generation task initiated for {user} : {course} via track change'.format(
                     user=user.id,
                     course=enrollment.course.id
                 ))
 
 
-def fire_ungenerated_certificate_task(user, course_id):
+def fire_ungenerated_certificate_task(user, course_key):
     """
     Helper function to fire un-generated certificate tasks
+    :param user: A User object.
+    :param course_id: A CourseKey object.
     """
-    if GeneratedCertificate.certificate_for_student(user, course_id) is None:
-        generate_certificate.apply_async(
-            student=user,
-            course_key=course_id
-        )
+    if GeneratedCertificate.certificate_for_student(user, course_key) is None:
+        generate_certificate.apply_async(kwargs={
+            'student': unicode(user.id),
+            'course_key': unicode(course_key),
+        })
         return True

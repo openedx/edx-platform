@@ -8,6 +8,7 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
                 language: '',
                 start_date: null,	// maps to 'start'
                 end_date: null,		// maps to 'end'
+                certificate_available_date: null,
                 enrollment_start: null,
                 enrollment_end: null,
                 syllabus: null,
@@ -38,7 +39,7 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
         // A bit funny in that the video key validation is asynchronous; so, it won't stop the validation.
                 var errors = {};
                 newattrs = DateUtils.convertDateStringsToObjects(
-            newattrs, ['start_date', 'end_date', 'enrollment_start', 'enrollment_end']
+            newattrs, ['start_date', 'end_date', 'certificate_available_date', 'enrollment_start', 'enrollment_end']
         );
 
                 if (newattrs.start_date === null) {

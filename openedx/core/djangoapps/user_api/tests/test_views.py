@@ -14,7 +14,7 @@ from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from pytz import common_timezones_set, UTC
 from social_django.models import UserSocialAuth, Partial
 
@@ -31,10 +31,9 @@ from third_party_auth.tests.utils import (
 from .test_helpers import TestCaseForm
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from ..helpers import FormDescription
 from ..accounts import (
     NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
-    USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
+    USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, USERNAME_BAD_LENGTH_MSG
 )
 from ..accounts.api import get_account_settings
 from ..models import UserOrgTag
@@ -100,8 +99,8 @@ class EmptyUserTestCase(UserAPITestCase):
 
 class EmptyRoleTestCase(UserAPITestCase):
     """Test that the endpoint supports empty result sets"""
-    course_id = SlashSeparatedCourseKey.from_deprecated_string("org/course/run")
-    LIST_URI = ROLE_LIST_URI + "?course_id=" + course_id.to_deprecated_string()
+    course_id = CourseKey.from_string("org/course/run")
+    LIST_URI = ROLE_LIST_URI + "?course_id=" + unicode(course_id)
 
     def test_get_list_empty(self):
         """Test that the endpoint properly returns empty result sets"""
@@ -136,8 +135,8 @@ class RoleTestCase(UserApiTestCase):
     """
     Test cases covering Role-related views and their behaviors
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string("org/course/run")
-    LIST_URI = ROLE_LIST_URI + "?course_id=" + course_id.to_deprecated_string()
+    course_id = CourseKey.from_string("org/course/run")
+    LIST_URI = ROLE_LIST_URI + "?course_id=" + unicode(course_id)
 
     def setUp(self):
         super(RoleTestCase, self).setUp()
@@ -610,7 +609,6 @@ class LoginSessionViewTest(UserAPITestCase):
                 "placeholder": "",
                 "instructions": "",
                 "restrictions": {
-                    "min_length": PASSWORD_MIN_LENGTH,
                     "max_length": PASSWORD_MAX_LENGTH
                 },
                 "errorMessages": {},
@@ -1199,6 +1197,9 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     {"value": "none", "name": "No formal education", "default": False},
                     {"value": "other", "name": "Other education", "default": False},
                 ],
+                "errorMessages": {
+                    "required": "Please select your highest level of education completed."
+                }
             }
         )
 
@@ -1225,6 +1226,9 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     {"value": "none", "name": "No formal education TRANSLATED", "default": False},
                     {"value": "other", "name": "Other education TRANSLATED", "default": False},
                 ],
+                "errorMessages": {
+                    "required": "Please select your highest level of education completed."
+                }
             }
         )
 
@@ -1302,6 +1306,9 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "textarea",
                 "required": False,
                 "label": "Mailing address",
+                "errorMessages": {
+                    "required": "Please enter your mailing address."
+                }
             }
         )
 
@@ -1314,7 +1321,10 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "required": False,
                 "label": u"Tell us why you're interested in {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
-                )
+                ),
+                "errorMessages": {
+                    "required": "Please tell us your goals."
+                }
             }
         )
 
@@ -1326,6 +1336,9 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "text",
                 "required": False,
                 "label": "City",
+                "errorMessages": {
+                    "required": "Please enter your City."
+                }
             }
         )
 
@@ -1993,8 +2006,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertEqual(
             response_json,
             {
-                "username": [{"user_message": "Username must be minimum of two characters long"}],
-                "password": [{"user_message": "A valid password is required"}],
+                u"username": [{u"user_message": USERNAME_BAD_LENGTH_MSG}],
+                u"password": [{u"user_message": u"A valid password is required"}],
             }
         )
 

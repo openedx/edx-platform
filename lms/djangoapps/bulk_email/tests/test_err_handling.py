@@ -14,7 +14,7 @@ from django.core.urlresolvers import reverse
 from django.db import DatabaseError
 from mock import Mock, patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 
 from bulk_email.models import SEND_TO_MYSELF, BulkEmailFlag, CourseEmail
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email
@@ -193,7 +193,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         Tests exception when the course in the email doesn't exist
         """
-        course_id = SlashSeparatedCourseKey("I", "DONT", "EXIST")
+        course_id = CourseLocator("I", "DONT", "EXIST")
         email = CourseEmail(course_id=course_id)
         email.save()
         entry = InstructorTask.create(course_id, "task_type", "task_key", "task_input", self.instructor)
@@ -250,7 +250,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         Tests exception when the course_id in CourseEmail is not the same as one explicitly passed in.
         """
         email = CourseEmail.create(
-            SlashSeparatedCourseKey("bogus", "course", "id"),
+            CourseLocator("bogus", "course", "id"),
             self.instructor,
             [SEND_TO_MYSELF],
             "re: subject",

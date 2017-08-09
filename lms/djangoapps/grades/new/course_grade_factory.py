@@ -154,7 +154,7 @@ class CourseGradeFactory(object):
         """
         Returns a ZeroCourseGrade object for the given user and course.
         """
-        log.info(u'Grades: CreateZero, %s, User: %s', unicode(course_data), user.id)
+        log.debug(u'Grades: CreateZero, %s, User: %s', unicode(course_data), user.id)
         return ZeroCourseGrade(user, course_data)
 
     @staticmethod

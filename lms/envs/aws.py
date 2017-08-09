@@ -842,6 +842,10 @@ PROFILE_IMAGE_SECRET_KEY = AUTH_TOKENS.get('PROFILE_IMAGE_SECRET_KEY', PROFILE_I
 PROFILE_IMAGE_MAX_BYTES = ENV_TOKENS.get('PROFILE_IMAGE_MAX_BYTES', PROFILE_IMAGE_MAX_BYTES)
 PROFILE_IMAGE_MIN_BYTES = ENV_TOKENS.get('PROFILE_IMAGE_MIN_BYTES', PROFILE_IMAGE_MIN_BYTES)
 PROFILE_IMAGE_DEFAULT_FILENAME = 'images/profiles/default'
+PROFILE_IMAGE_SIZES_MAP = ENV_TOKENS.get(
+    'PROFILE_IMAGE_SIZES_MAP',
+    PROFILE_IMAGE_SIZES_MAP
+)
 
 # EdxNotes config
 
@@ -1012,9 +1016,11 @@ ICP_LICENSE = ENV_TOKENS.get('ICP_LICENSE', None)
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', LOW_PRIORITY_QUEUE)
 
-############## Settings for Profile Image Size ######################
+########################## Parental controls config  #######################
 
-PROFILE_IMAGE_SIZES_MAP = ENV_TOKENS.get(
-    'PROFILE_IMAGE_SIZES_MAP',
-    PROFILE_IMAGE_SIZES_MAP
+# The age at which a learner no longer requires parental consent, or None
+# if parental consent is never required.
+PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
+    'PARENTAL_CONSENT_AGE_LIMIT',
+    PARENTAL_CONSENT_AGE_LIMIT
 )

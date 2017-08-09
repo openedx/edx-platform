@@ -22,6 +22,7 @@ from courseware.module_render import get_module
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404, QueryDict
+from enrollment.api import get_course_enrollment_details
 from edxmako.shortcuts import render_to_string
 from fs.errors import ResourceNotFoundError
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
@@ -170,6 +171,30 @@ def can_self_enroll_in_course(course_key):
     """
     if hasattr(course_key, 'ccx'):
         return False
+    return True
+
+
+def course_open_for_self_enrollment(course_key):
+    """
+    For a given course_key, determine if the course is available for enrollment
+    """
+    # Check to see if learners can enroll themselves.
+    if not can_self_enroll_in_course(course_key):
+        return False
+
+    # Check the enrollment start and end dates.
+    course_details = get_course_enrollment_details(unicode(course_key))
+    now = datetime.now().replace(tzinfo=pytz.UTC)
+    start = course_details['enrollment_start']
+    end = course_details['enrollment_end']
+
+    start = start if start is not None else now
+    end = end if end is not None else now
+
+    # If we are not within the start and end date for enrollment.
+    if now < start or end < now:
+        return False
+
     return True
 
 

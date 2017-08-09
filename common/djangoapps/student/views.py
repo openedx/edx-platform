@@ -119,7 +119,8 @@ from student.models import (
     UserStanding,
     anonymous_id_for_user,
     create_comments_service_user,
-    unique_id_for_user
+    unique_id_for_user,
+    REFUND_ORDER
 )
 from student.tasks import send_activation_email
 from third_party_auth import pipeline, provider
@@ -127,7 +128,7 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 from util.milestones_helpers import get_pre_requisite_courses_not_completed
-from util.password_policy_validators import validate_password_strength
+from util.password_policy_validators import validate_password_length, validate_password_strength
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
@@ -1267,6 +1268,7 @@ def change_enrollment(request, check_access=True):
             return HttpResponseBadRequest(_("Your certificate prevents you from unenrolling from this course"))
 
         CourseEnrollment.unenroll(user, course_id)
+        REFUND_ORDER.send(sender=None, course_enrollment=enrollment)
         return HttpResponse()
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
@@ -2434,8 +2436,7 @@ def password_reset(request):
     if form.is_valid():
         form.save(use_https=request.is_secure(),
                   from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
-                  request=request,
-                  domain_override=request.get_host())
+                  request=request)
         # When password change is complete, a "edx.user.settings.changed" event will be emitted.
         # But because changing the password is multi-step, we also emit an event here so that we can
         # track where the request was initiated.
@@ -2476,7 +2477,30 @@ def uidb36_to_uidb64(uidb36):
     return uidb64
 
 
-def validate_password(user, password):
+def validate_password(password):
+    """
+    Validate password overall strength if ENFORCE_PASSWORD_POLICY is enable
+    otherwise only validate the length of the password.
+
+    Args:
+        password: the user's proposed new password.
+
+    Returns:
+        err_msg: an error message if there's a violation of one of the password
+            checks. Otherwise, `None`.
+    """
+
+    try:
+        if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
+            validate_password_strength(password)
+        else:
+            validate_password_length(password)
+
+    except ValidationError as err:
+        return _('Password: ') + '; '.join(err.messages)
+
+
+def validate_password_security_policy(user, password):
     """
     Tie in password policy enforcement as an optional level of
     security protection
@@ -2486,19 +2510,11 @@ def validate_password(user, password):
         password: the user's proposed new password.
 
     Returns:
-        is_valid_password: a boolean indicating if the new password
-            passes the validation.
         err_msg: an error message if there's a violation of one of the password
             checks. Otherwise, `None`.
     """
+
     err_msg = None
-
-    if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
-        try:
-            validate_password_strength(password)
-        except ValidationError as err:
-            err_msg = _('Password: ') + '; '.join(err.messages)
-
     # also, check the password reuse policy
     if not PasswordHistory.is_allowable_password_reuse(user, password):
         if user.is_staff:
@@ -2524,9 +2540,7 @@ def validate_password(user, password):
             num_days
         ).format(num=num_days)
 
-    is_password_valid = err_msg is None
-
-    return is_password_valid, err_msg
+    return err_msg
 
 
 def password_reset_confirm_wrapper(request, uidb36=None, token=None):
@@ -2552,16 +2566,24 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
 
     if request.method == 'POST':
         password = request.POST['new_password1']
-        is_password_valid, password_err_msg = validate_password(user, password)
-        if not is_password_valid:
+        valid_link = False
+        error_message = validate_password_security_policy(user, password)
+        if not error_message:
+            # if security is not violated, we need to validate password
+            error_message = validate_password(password)
+            if error_message:
+                # password reset link will be valid if there is no security violation
+                valid_link = True
+
+        if error_message:
             # We have a password reset attempt which violates some security
-            # policy. Use the existing Django template to communicate that
+            # policy, or any other validation. Use the existing Django template to communicate that
             # back to the user.
             context = {
-                'validlink': False,
+                'validlink': valid_link,
                 'form': None,
                 'title': _('Password reset unsuccessful'),
-                'err_msg': password_err_msg,
+                'err_msg': error_message,
             }
             context.update(platform_name)
             return TemplateResponse(
