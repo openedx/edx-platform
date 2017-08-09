@@ -9,6 +9,7 @@ from views.course_outline import CourseOutlineFragmentView
 from views.course_reviews import CourseReviewsView
 from views.course_updates import CourseUpdatesFragmentView, CourseUpdatesView
 from views.course_sock import CourseSockFragmentView
+from views.latest_update import LatestUpdateFragmentView
 from views.welcome_message import WelcomeMessageFragmentView, dismiss_welcome_message
 
 urlpatterns = [
@@ -46,6 +47,11 @@ urlpatterns = [
         r'^welcome_message_fragment$',
         WelcomeMessageFragmentView.as_view(),
         name='openedx.course_experience.welcome_message_fragment_view',
+    ),
+    url(
+        r'^latest_update_fragment$',
+        LatestUpdateFragmentView.as_view(),
+        name='openedx.course_experience.latest_update_fragment_view',
     ),
     url(
         r'course_sock_fragment$',

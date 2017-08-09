@@ -61,9 +61,9 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
                     ${HTML(course_home_message_fragment.body_html())}
                 % endif
 
-                % if welcome_message_fragment and UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id):
-                    <div class="section section-dates">
-                        ${HTML(welcome_message_fragment.body_html())}
+                % if update_message_fragment and UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id):
+                    <div class="section section-update-message">
+                        ${HTML(update_message_fragment.body_html())}
                     </div>
                 % endif
 
