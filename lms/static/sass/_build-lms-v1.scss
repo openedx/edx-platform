@@ -55,7 +55,6 @@
 
 // base - specific views
 @import "views/account-settings";
-@import "views/learner-profile";
 @import 'views/login-register';
 @import 'views/verification';
 @import 'views/decoupled-verification';
@@ -69,6 +68,7 @@
 
 // features
 @import 'features/bookmarks-v1';
+@import 'features/learner-profile';
 
 // search
 @import 'search/search';

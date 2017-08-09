@@ -7,6 +7,7 @@ import requests
 from django.contrib.sites.models import Site
 from django.http import Http404
 from django.utils.functional import cached_property
+from django_countries import countries
 from social_core.backends.saml import OID_EDU_PERSON_ENTITLEMENT, SAMLAuth, SAMLIdentityProvider
 from social_core.exceptions import AuthForbidden
 
@@ -134,6 +135,77 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         'odata_client_id',
     )
 
+    # Define the relationships between SAPSF record fields and Open edX logistration fields.
+    default_field_mapping = {
+        'username': 'username',
+        'firstName': 'first_name',
+        'lastName': 'last_name',
+        'defaultFullName': 'fullname',
+        'email': 'email',
+        'country': 'country',
+        'city': 'city',
+    }
+
+    # Define a simple mapping to relate SAPSF values to Open edX-compatible values for
+    # any given field. By default, this only contains the Country field, as SAPSF supplies
+    # a country name, which has to be translated to a country code.
+    default_value_mapping = {
+        'country': {name: code for code, name in countries}
+    }
+
+    # Unfortunately, not everything has a 1:1 name mapping between Open edX and SAPSF, so
+    # we need some overrides. TODO: Fill in necessary mappings
+    default_value_mapping.update({
+        'United States': 'US',
+    })
+
+    def get_registration_fields(self, response):
+        """
+        Get a dictionary mapping registration field names to default values.
+        """
+        field_mapping = self.field_mappings
+        registration_fields = {edx_name: response['d'].get(odata_name, '') for odata_name, edx_name in field_mapping.items()}
+        value_mapping = self.value_mappings
+        for field, value in registration_fields.items():
+            if field in value_mapping and value in value_mapping[field]:
+                registration_fields[field] = value_mapping[field][value]
+        return registration_fields
+
+    @property
+    def field_mappings(self):
+        """
+        Get a dictionary mapping the field names returned in an SAP SuccessFactors
+        user entity to the field names with which those values should be used in
+        the Open edX registration form.
+        """
+        overrides = self.conf.get('sapsf_field_mappings', {})
+        base = self.default_field_mapping.copy()
+        base.update(overrides)
+        return base
+
+    @property
+    def value_mappings(self):
+        """
+        Get a dictionary mapping of field names to override objects which each
+        map values received from SAP SuccessFactors to values expected in the
+        Open edX platform registration form.
+        """
+        overrides = self.conf.get('sapsf_value_mappings', {})
+        base = self.default_value_mapping.copy()
+        for field, override in overrides.items():
+            if field in base:
+                base[field].update(override)
+            else:
+                base[field] = override[field]
+        return base
+
+    @property
+    def timeout(self):
+        """
+        The number of seconds OData API requests should wait for a response before failing.
+        """
+        return self.conf.get('odata_api_request_timeout', 10)
+
     @property
     def sapsf_idp_url(self):
         return self.conf['sapsf_oauth_root_url'] + 'idp'
@@ -187,7 +259,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
                 'token_url': self.sapsf_token_url,
                 'private_key': self.sapsf_private_key,
             },
-            timeout=10,
+            timeout=self.timeout,
         )
         assertion.raise_for_status()
         assertion = assertion.text
@@ -199,7 +271,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
                 'grant_type': 'urn:ietf:params:oauth:grant-type:saml2-bearer',
                 'assertion': assertion,
             },
-            timeout=10,
+            timeout=self.timeout,
         )
         token.raise_for_status()
         token = token.json()['access_token']
@@ -220,12 +292,14 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         username = details['username']
         try:
             client = self.get_odata_api_client(user_id=username)
+            fields = ','.join(self.field_mappings)
             response = client.get(
-                '{root_url}User(userId=\'{user_id}\')?$select=username,firstName,lastName,defaultFullName,email'.format(
+                '{root_url}User(userId=\'{user_id}\')?$select={fields}'.format(
                     root_url=self.odata_api_root_url,
-                    user_id=username
+                    user_id=username,
+                    fields=fields,
                 ),
-                timeout=10,
+                timeout=self.timeout,
             )
             response.raise_for_status()
             response = response.json()
@@ -237,13 +311,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
                 self.odata_company_id,
             )
             return details
-        return {
-            'username': response['d']['username'],
-            'first_name': response['d']['firstName'],
-            'last_name': response['d']['lastName'],
-            'fullname': response['d']['defaultFullName'],
-            'email': response['d']['email'],
-        }
+        return self.get_registration_fields(response)
 
 
 def get_saml_idp_choices():

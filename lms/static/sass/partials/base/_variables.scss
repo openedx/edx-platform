@@ -223,6 +223,9 @@ $success-color-hover: rgb(0, 129, 0) !default;
 // ----------------------------
 // #COLORS- Bootstrap-style
 // ----------------------------
+$gray-dark: #4e5455 !default;
+$gray-lighter: #eceeef !default;
+$gray-lightest: #f7f7f9 !default;
 
 $state-success-text: $black !default;
 $state-success-bg: #dff0d8 !default;
@@ -544,6 +547,9 @@ $palette-error-text: #b20610;
 $palette-success-border: #b9edb9;
 $palette-success-back: #ecfaec;
 $palette-success-text: #008100;
+
+// learner profile elements
+$learner-profile-container-flex: 768px;
 
 // course elements
 $content-wrapper-bg: $white !default;
