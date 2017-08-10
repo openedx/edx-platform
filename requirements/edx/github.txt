@@ -97,7 +97,6 @@ git+https://github.com/edx/edx-user-state-client.git@1.0.1#egg=edx-user-state-cl
 git+https://github.com/edx/xblock-lti-consumer.git@v1.1.5#egg=lti_consumer-xblock==1.1.5
 git+https://github.com/edx/edx-proctoring.git@1.1.0#egg=edx-proctoring==1.1.0
 
-
 # Third Party XBlocks
 git+https://github.com/open-craft/xblock-poll@v1.2.7#egg=xblock-poll==1.2.7
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.18#egg=xblock-drag-and-drop-v2==2.0.18
