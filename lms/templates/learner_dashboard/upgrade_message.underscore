@@ -4,7 +4,7 @@
     <span class="price">  <%- price %></span>
 </div>
 <div class="action col-12 md-col-4">
-    <a href="<%- upgrade_url %>" class="btn-brand btn cta-primary upgrade-button">
-        <%- gettext('Buy Certificate') %>
+    <a href="<%- upgrade_url %>" class="btn-brand btn cta-primary upgrade-button single-course-run">
+        <%- gettext('Upgrade to Verified') %>
     <a>
 </div>
