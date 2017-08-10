@@ -61,7 +61,19 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
         super(WhitelistGeneratedCertificatesTest, self).setUp()
         self.course = CourseFactory.create(self_paced=True)
         self.user = UserFactory.create()
+        CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course.id,
+            is_active=True,
+            mode="verified",
+        )
         self.ip_course = CourseFactory.create(self_paced=False)
+        CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.ip_course.id,
+            is_active=True,
+            mode="verified",
+        )
 
     def test_cert_generation_on_whitelist_append_self_paced(self):
         """
@@ -137,6 +149,11 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
             is_active=True,
             mode="verified",
         )
+        attempt = SoftwareSecurePhotoVerification.objects.create(
+            user=self.user,
+            status='submitted'
+        )
+        attempt.approve()
 
     def test_cert_generation_on_passing_self_paced(self):
         with mock.patch(
@@ -204,7 +221,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
             user=self.user_one,
             course_id=self.course_one.id,
             is_active=True,
-            mode='honor',
+            mode='verified',
         )
         self.user_two = UserFactory.create()
         self.course_two = CourseFactory.create(self_paced=False)
@@ -212,18 +229,18 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
             user=self.user_two,
             course_id=self.course_two.id,
             is_active=True,
-            mode='honor'
+            mode='verified'
         )
+        with mock_passing_grade():
+            grade_factory = CourseGradeFactory()
+            grade_factory.update(self.user_one, self.course_one)
+            grade_factory.update(self.user_two, self.course_two)
 
     def test_cert_generation_on_photo_verification_self_paced(self):
         with mock.patch(
             'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
             return_value=None
         ) as mock_generate_certificate_apply_async:
-            with mock_passing_grade():
-                grade_factory = CourseGradeFactory()
-                grade_factory.update(self.user_one, self.course_one)
-
             with waffle.waffle().override(waffle.SELF_PACED_ONLY, active=True):
                 mock_generate_certificate_apply_async.assert_not_called()
                 attempt = SoftwareSecurePhotoVerification.objects.create(
@@ -241,10 +258,6 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
             'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
             return_value=None
         ) as mock_generate_certificate_apply_async:
-            with mock_passing_grade():
-                grade_factory = CourseGradeFactory()
-                grade_factory.update(self.user_two, self.course_two)
-
             with waffle.waffle().override(waffle.INSTRUCTOR_PACED_ONLY, active=True):
                 mock_generate_certificate_apply_async.assert_not_called()
                 attempt = SoftwareSecurePhotoVerification.objects.create(

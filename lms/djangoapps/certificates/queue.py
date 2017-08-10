@@ -235,6 +235,7 @@ class XQueueCertInterface(object):
             status.auditing,
             status.audit_passing,
             status.audit_notpassing,
+            status.unverified,
         ]
 
         cert_status = certificate_status_for_student(student, course_id)['status']

@@ -520,8 +520,11 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
 
     def test_generate_user_certificates_with_unverified_cert_status(self):
         """
-        Generate user certificate will not raise exception in case of certificate is None.
+        Generate user certificate when the certificate is unverified
+        will trigger an update to the certificate if the user has since
+        verified.
         """
+        self._setup_course_certificate()
         # generate certificate with unverified status.
         GeneratedCertificateFactory.create(
             user=self.student,
@@ -531,9 +534,9 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         )
 
         with mock_passing_grade():
-            with self._mock_queue(is_successful=False):
+            with self._mock_queue():
                 status = certs_api.generate_user_certificates(self.student, self.course.id)
-                self.assertEqual(status, None)
+                self.assertEqual(status, 'generating')
 
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
     def test_new_cert_requests_returns_generating_for_html_certificate(self):
