@@ -190,7 +190,7 @@ def password_change_request_handler(request):
 
     if email:
         try:
-            request_password_change(email, request.get_host(), request.is_secure())
+            request_password_change(email, request.is_secure())
             user = user if user.is_authenticated() else User.objects.get(email=email)
             destroy_oauth_tokens(user)
         except UserNotFound:
