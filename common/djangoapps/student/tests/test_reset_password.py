@@ -176,36 +176,33 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @patch('django.core.mail.send_mail')
-    @ddt.data(('Crazy Awesome Site', 'Crazy Awesome Site'), (None, 'edX'))
+    @ddt.data(('Crazy Awesome Site', 'Crazy Awesome Site'), ('edX', 'edX'))
     @ddt.unpack
-    def test_reset_password_email_domain(self, domain_override, platform_name, send_email):
+    def test_reset_password_email_site(self, site_name, platform_name, send_email):
         """
         Tests that the right url domain and platform name is included in
         the reset password email
         """
         with patch("django.conf.settings.PLATFORM_NAME", platform_name):
-            req = self.request_factory.post(
-                '/password_reset/', {'email': self.user.email}
-            )
-            req.get_host = Mock(return_value=domain_override)
-            req.user = self.user
-            password_reset(req)
-            _, msg, _, _ = send_email.call_args[0]
+            with patch("django.conf.settings.SITE_NAME", site_name):
+                req = self.request_factory.post(
+                    '/password_reset/', {'email': self.user.email}
+                )
+                req.user = self.user
+                password_reset(req)
+                _, msg, _, _ = send_email.call_args[0]
 
-            reset_msg = "you requested a password reset for your user account at {}"
-            if domain_override:
-                reset_msg = reset_msg.format(domain_override)
-            else:
-                reset_msg = reset_msg.format(settings.SITE_NAME)
+                reset_msg = "you requested a password reset for your user account at {}"
+                reset_msg = reset_msg.format(site_name)
 
-            self.assertIn(reset_msg, msg)
+                self.assertIn(reset_msg, msg)
 
-            sign_off = "The {} Team".format(platform_name)
-            self.assertIn(sign_off, msg)
+                sign_off = "The {} Team".format(platform_name)
+                self.assertIn(sign_off, msg)
 
-            self.assert_event_emitted(
-                SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None
-            )
+                self.assert_event_emitted(
+                    SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None
+                )
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
