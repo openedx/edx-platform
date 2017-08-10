@@ -18,7 +18,8 @@ from courseware.date_summary import (
     CourseStartDate,
     TodaysDate,
     VerificationDeadlineDate,
-    VerifiedUpgradeDeadlineDate
+    VerifiedUpgradeDeadlineDate,
+    CertificateAvailableDate
 )
 from courseware.models import DynamicUpgradeDeadlineConfiguration, CourseDynamicUpgradeDeadlineConfiguration
 from lms.djangoapps.verify_student.models import VerificationDeadline
@@ -350,6 +351,31 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
         block = VerifiedUpgradeDeadlineDate(course, user)
         self.assertEqual(block.link, '{}?sku={}'.format(configuration.MULTIPLE_ITEMS_BASKET_PAGE_URL, sku))
+
+    ## CertificateAvailableDate
+    @waffle.testutils.override_switch('certificates.instructor_paced_only', True)
+    def test_no_certificate_available_date(self):
+        course = self.create_course_run(days_till_start=-1)
+        user = self.create_user()
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
+        block = CertificateAvailableDate(course, user)
+        self.assertEqual(block.date, None)
+        self.assertFalse(block.is_enabled)
+
+    @waffle.testutils.override_switch('certificates.instructor_paced_only', True)
+    def test_certificate_available_date_defined(self):
+        course = self.create_course_run()
+        audit_user = self.create_user()
+        CourseEnrollmentFactory(course_id=course.id, user=audit_user, mode=CourseMode.AUDIT)
+        verified_user = self.create_user()
+        CourseEnrollmentFactory(course_id=course.id, user=verified_user, mode=CourseMode.VERIFIED)
+        course.certificate_available_date = datetime.now(utc) + timedelta(days=7)
+        course.save()
+        CertificateAvailableDate(course, audit_user)
+        for block in (CertificateAvailableDate(course, audit_user), CertificateAvailableDate(course, verified_user)):
+            self.assertIsNotNone(course.certificate_available_date)
+            self.assertEqual(block.date, course.certificate_available_date)
+            self.assertTrue(block.is_enabled)
 
     ## VerificationDeadlineDate
     def test_no_verification_deadline(self):
