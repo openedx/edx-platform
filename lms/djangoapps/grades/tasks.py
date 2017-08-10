@@ -31,6 +31,7 @@ from .constants import ScoreDatabaseTableEnum
 from .exceptions import DatabaseNotReadyError
 from .new.course_grade_factory import CourseGradeFactory
 from .new.subsection_grade_factory import SubsectionGradeFactory
+from .services import GradesService
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .transformer import GradesTransformer
 
@@ -206,8 +207,7 @@ def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
         score = get_score(kwargs['user_id'], scored_block_usage_key)
         found_modified_time = score.modified if score is not None else None
 
-    else:
-        assert kwargs['score_db_table'] == ScoreDatabaseTableEnum.submissions
+    elif kwargs['score_db_table'] == ScoreDatabaseTableEnum.submissions:
         score = sub_api.get_score(
             {
                 "student_id": kwargs['anonymous_user_id'],
@@ -217,6 +217,14 @@ def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
             }
         )
         found_modified_time = score['created_at'] if score is not None else None
+    else:
+        assert kwargs['score_db_table'] == ScoreDatabaseTableEnum.overrides
+        score = GradesService().get_subsection_grade_override(
+            user_id=kwargs['user_id'],
+            course_key_or_id=kwargs['course_id'],
+            usage_key_or_id=kwargs['usage_id']
+        )
+        found_modified_time = score.modified if score is not None else None
 
     if score is None:
         # score should be None only if it was deleted.

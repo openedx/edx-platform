@@ -17,6 +17,7 @@ from mock import MagicMock, patch
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
+from lms.djangoapps.grades.services import GradesService
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lms.djangoapps.grades.tasks import (
     RECALCULATE_GRADE_DELAY,
@@ -34,6 +35,15 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+
+
+class MockGradesService(GradesService):
+    def __init__(self, mocked_return_value=None):
+        super(MockGradesService, self).__init__()
+        self.mocked_return_value = mocked_return_value
+
+    def get_subsection_grade_override(self, user_id, course_key_or_id, usage_key_or_id):
+        return self.mocked_return_value
 
 
 class HasCourseWithProblemsMixin(object):
@@ -153,10 +163,10 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self.assertEquals(mock_block_structure_create.call_count, 1)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 28, True),
-        (ModuleStoreEnum.Type.mongo, 1, 24, False),
-        (ModuleStoreEnum.Type.split, 3, 28, True),
-        (ModuleStoreEnum.Type.split, 3, 24, False),
+        (ModuleStoreEnum.Type.mongo, 1, 29, True),
+        (ModuleStoreEnum.Type.mongo, 1, 25, False),
+        (ModuleStoreEnum.Type.split, 3, 29, True),
+        (ModuleStoreEnum.Type.split, 3, 25, False),
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
@@ -168,8 +178,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                     self._apply_recalculate_subsection_grade()
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 28),
-        (ModuleStoreEnum.Type.split, 3, 28),
+        (ModuleStoreEnum.Type.mongo, 1, 29),
+        (ModuleStoreEnum.Type.split, 3, 29),
     )
     @ddt.unpack
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
@@ -229,8 +239,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self.assertEqual(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 25),
-        (ModuleStoreEnum.Type.split, 3, 25),
+        (ModuleStoreEnum.Type.mongo, 1, 26),
+        (ModuleStoreEnum.Type.split, 3, 26),
     )
     @ddt.unpack
     def test_persistent_grades_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
@@ -264,7 +274,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         self._apply_recalculate_subsection_grade()
         self._assert_retry_called(mock_retry)
 
-    @ddt.data(ScoreDatabaseTableEnum.courseware_student_module, ScoreDatabaseTableEnum.submissions)
+    @ddt.data(ScoreDatabaseTableEnum.courseware_student_module, ScoreDatabaseTableEnum.submissions,
+              ScoreDatabaseTableEnum.overrides)
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
     @patch('lms.djangoapps.grades.tasks.log')
     def test_retry_when_db_not_updated(self, score_db_table, mock_log, mock_retry):
@@ -279,10 +290,16 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                 self._apply_recalculate_subsection_grade(
                     mock_score=MagicMock(module_type='any_block_type')
                 )
-        else:
+        elif score_db_table == ScoreDatabaseTableEnum.courseware_student_module:
             self._apply_recalculate_subsection_grade(
                 mock_score=MagicMock(modified=modified_datetime)
             )
+        else:
+            with patch(
+                'lms.djangoapps.grades.tasks.GradesService',
+                return_value=MockGradesService(mocked_return_value=MagicMock(modified=modified_datetime))
+            ):
+                recalculate_subsection_grade_v3.apply(kwargs=self.recalculate_subsection_grade_kwargs)
 
         self._assert_retry_called(mock_retry)
         self.assertIn(
@@ -293,7 +310,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     @ddt.data(
         *itertools.product(
             (True, False),
-            (ScoreDatabaseTableEnum.courseware_student_module, ScoreDatabaseTableEnum.submissions),
+            (ScoreDatabaseTableEnum.courseware_student_module, ScoreDatabaseTableEnum.submissions,
+             ScoreDatabaseTableEnum.overrides),
         )
     )
     @ddt.unpack
@@ -310,6 +328,11 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                 self._apply_recalculate_subsection_grade(
                     mock_score=MagicMock(module_type='any_block_type')
                 )
+        elif score_db_table == ScoreDatabaseTableEnum.overrides:
+            with patch('lms.djangoapps.grades.tasks.GradesService',
+                       return_value=MockGradesService(mocked_return_value=None)) as mock_service:
+                mock_service.get_subsection_grade_override.return_value = None
+                recalculate_subsection_grade_v3.apply(kwargs=self.recalculate_subsection_grade_kwargs)
         else:
             self._apply_recalculate_subsection_grade(mock_score=None)
 
