@@ -20,6 +20,23 @@
                     <div><%- gettext('To complete the program, you must earn a verified certificate for each course.') %></div>
                 </div>
             <% } %>
+            <% if (is_learner_eligible_for_one_click_purchase) { %>
+            <a href="<%- completeProgramURL %>" class="btn-brand btn cta-primary upgrade-button complete-program">
+                <%- gettext('Upgrade All Remaining Courses (')%>
+                <% if (discount_data.is_discounted) { %>
+                    <span class='list-price'>
+                        <%- StringUtils.interpolate(
+                            gettext('${listPrice}'), {listPrice: discount_data.total_incl_tax_excl_discounts}
+                        )
+                        %>
+                    </span>
+                <% } %>
+                <%- StringUtils.interpolate(
+                        gettext(' ${price} {currency} )'), {price: full_program_price, currency: discount_data.currency}
+                    )
+                %>
+            </a>
+            <% } %>
     </div>
     <div class="course-list-headings">
         <% if (inProgressCount) { %>

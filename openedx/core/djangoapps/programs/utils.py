@@ -600,10 +600,17 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         skus = []
         if is_learner_eligible_for_one_click_purchase:
             for course in self.data['courses']:
-                is_learner_eligible_for_one_click_purchase = not any(
-                    course_run['is_enrolled'] for course_run in course['course_runs']
-                )
-                if is_learner_eligible_for_one_click_purchase:
+                add_course_sku = False
+                for course_run in course['course_runs']:
+                    (enrollment_mode, active) = CourseEnrollment.enrollment_mode_for_user(
+                        self.user,
+                        CourseKey.from_string(course_run['key'])
+                    )
+                    if enrollment_mode not in applicable_seat_types or not active:
+                        add_course_sku = True
+                        break
+
+                if add_course_sku:
                     published_course_runs = filter(lambda run: run['status'] == 'published', course['course_runs'])
                     if len(published_course_runs) == 1:
                         for seat in published_course_runs[0]['seats']:
@@ -615,15 +622,16 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
                         is_learner_eligible_for_one_click_purchase = False
                         skus = []
                         break
-                else:
-                    skus = []
-                    break
 
         if skus:
             try:
-                User = get_user_model()
-                service_user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
-                api = ecommerce_api_client(service_user)
+                api_user = self.user
+                if not self.user.is_authenticated():
+                    user = get_user_model()
+                    service_user = user.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
+                    api_user = service_user
+
+                api = ecommerce_api_client(api_user)
 
                 # Make an API call to calculate the discounted price
                 discount_data = api.baskets.calculate.get(sku=skus)
@@ -639,6 +647,8 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
                 })
             except (ConnectionError, SlumberBaseException, Timeout):
                 log.exception('Failed to get discount price for following product SKUs: %s ', ', '.join(skus))
+        else:
+            is_learner_eligible_for_one_click_purchase = False
 
         self.data.update({
             'is_learner_eligible_for_one_click_purchase': is_learner_eligible_for_one_click_purchase,
