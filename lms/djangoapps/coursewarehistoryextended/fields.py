@@ -3,6 +3,7 @@ Custom fields for use in the coursewarehistoryextended django app.
 """
 
 from django.db.models.fields import AutoField
+from django.db.models.fields.related import OneToOneField
 
 
 class UnsignedBigIntAutoField(AutoField):
@@ -20,6 +21,34 @@ class UnsignedBigIntAutoField(AutoField):
         elif connection.settings_dict['ENGINE'] == 'django.db.backends.postgresql_psycopg2':
             # Pg's bigserial is implicitly unsigned (doesn't allow negative numbers) and
             # goes 1-9.2x10^18
+            return "BIGSERIAL"
+        else:
+            return None
+
+    # rel_db_type was added in Django 1.10. For versions before, use UnsignedBigIntOneToOneField.
+    def rel_db_type(self, connection):
+        if connection.settings_dict['ENGINE'] == 'django.db.backends.mysql':
+            return "bigint UNSIGNED"
+        elif connection.settings_dict['ENGINE'] == 'django.db.backends.sqlite3':
+            return "integer"
+        elif connection.settings_dict['ENGINE'] == 'django.db.backends.postgresql_psycopg2':
+            return "BIGSERIAL"
+        else:
+            return None
+
+
+class UnsignedBigIntOneToOneField(OneToOneField):
+    """
+    An unsigned 8-byte integer one-to-one foreign key to a unsigned 8-byte integer id field.
+
+    Should only be necessary for versions of Django < 1.10.
+    """
+    def db_type(self, connection):
+        if connection.settings_dict['ENGINE'] == 'django.db.backends.mysql':
+            return "bigint UNSIGNED"
+        elif connection.settings_dict['ENGINE'] == 'django.db.backends.sqlite3':
+            return "integer"
+        elif connection.settings_dict['ENGINE'] == 'django.db.backends.postgresql_psycopg2':
             return "BIGSERIAL"
         else:
             return None

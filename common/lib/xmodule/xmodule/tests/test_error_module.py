@@ -5,7 +5,8 @@ import unittest
 from xmodule.tests import get_test_system
 from xmodule.error_module import ErrorDescriptor, ErrorModule, NonStaffErrorDescriptor
 from xmodule.modulestore.xml import CourseLocationManager
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locations import Location
 from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW
 from mock import MagicMock, Mock, patch
 from xblock.runtime import Runtime, IdReader
@@ -19,7 +20,7 @@ class SetupTestErrorModules(unittest.TestCase):
     def setUp(self):
         super(SetupTestErrorModules, self).setUp()
         self.system = get_test_system()
-        self.course_id = SlashSeparatedCourseKey('org', 'course', 'run')
+        self.course_id = CourseLocator('org', 'course', 'run')
         self.location = self.course_id.make_usage_key('foo', 'bar')
         self.valid_xml = u"<problem>ABC \N{SNOWMAN}</problem>"
         self.error_msg = "Error"

@@ -23,7 +23,7 @@ from commerce.signals import create_zendesk_ticket, generate_refund_notification
 from commerce.tests import JSON
 from commerce.tests.mocks import mock_create_refund, mock_process_refund
 from course_modes.models import CourseMode
-from student.models import UNENROLL_DONE
+from student.models import REFUND_ORDER
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 ZENDESK_URL = 'http://zendesk.example.com/'
@@ -35,7 +35,7 @@ ZENDESK_API_KEY = 'abc123'
 @override_settings(ZENDESK_URL=ZENDESK_URL, ZENDESK_USER=ZENDESK_USER, ZENDESK_API_KEY=ZENDESK_API_KEY)
 class TestRefundSignal(TestCase):
     """
-    Exercises logic triggered by the UNENROLL_DONE signal.
+    Exercises logic triggered by the REFUND_ORDER signal.
     """
 
     def setUp(self):
@@ -60,12 +60,12 @@ class TestRefundSignal(TestCase):
         self.config.enable_automatic_refund_approval = True
         self.config.save()
 
-    def send_signal(self, skip_refund=False):
+    def send_signal(self):
         """
-        DRY helper: emit the UNENROLL_DONE signal, as is done in
+        DRY helper: emit the REFUND_ORDER signal, as is done in
         common.djangoapps.student.models after a successful unenrollment.
         """
-        UNENROLL_DONE.send(sender=None, course_enrollment=self.course_enrollment, skip_refund=skip_refund)
+        REFUND_ORDER.send(sender=None, course_enrollment=self.course_enrollment)
 
     @override_settings(
         ECOMMERCE_PUBLIC_URL_ROOT=None,
@@ -83,7 +83,7 @@ class TestRefundSignal(TestCase):
     @mock.patch('commerce.signals.refund_seat')
     def test_receiver(self, mock_refund_seat):
         """
-        Ensure that the UNENROLL_DONE signal triggers correct calls to
+        Ensure that the REFUND_ORDER signal triggers correct calls to
         refund_seat(), when it is appropriate to do so.
 
         TODO (jsa): ideally we would assert that the signal receiver got wired
@@ -93,11 +93,6 @@ class TestRefundSignal(TestCase):
         self.send_signal()
         self.assertTrue(mock_refund_seat.called)
         self.assertEqual(mock_refund_seat.call_args[0], (self.course_enrollment,))
-
-        # if skip_refund is set to True in the signal, we should not try to initiate a refund.
-        mock_refund_seat.reset_mock()
-        self.send_signal(skip_refund=True)
-        self.assertFalse(mock_refund_seat.called)
 
         # if the course_enrollment is not refundable, we should not try to initiate a refund.
         mock_refund_seat.reset_mock()

@@ -41,7 +41,7 @@ TEST_EMAIL = "test@edx.org"
 
 
 def update_email_marketing_config(enabled=True, key='badkey', secret='badsecret', new_user_list='new list',
-                                  template='Activation', enroll_cost=100, lms_url_override='http://testserver'):
+                                  template='Welcome', enroll_cost=100, lms_url_override='http://testserver'):
     """
     Enable / Disable Sailthru integration
     """
@@ -50,7 +50,7 @@ def update_email_marketing_config(enabled=True, key='badkey', secret='badsecret'
         sailthru_key=key,
         sailthru_secret=secret,
         sailthru_new_user_list=new_user_list,
-        sailthru_activation_template=template,
+        sailthru_welcome_template=template,
         sailthru_enroll_template='enroll_template',
         sailthru_lms_url_override=lms_url_override,
         sailthru_get_tags_from_sailthru=False,
@@ -175,7 +175,7 @@ class EmailMarketingTests(TestCase):
     @patch('email_marketing.tasks.SailthruClient.api_get')
     def test_add_user(self, mock_sailthru_get, mock_sailthru_post, mock_log_error):
         """
-        test async method in tasks that actually updates Sailthru
+        test async method in tasks that actually updates Sailthru and send Welcome template.
         """
         site_dict = {'id': self.site.id, 'domain': self.site.domain, 'name': self.site.name}
         mock_sailthru_post.return_value = SailthruResponse(JsonResponse({'ok': True}))
@@ -183,15 +183,13 @@ class EmailMarketingTests(TestCase):
         update_user.delay(
             {'gender': 'm', 'username': 'test', 'activated': 1}, TEST_EMAIL, site_dict, new_user=True
         )
+        expected_schedule = datetime.datetime.utcnow() + datetime.timedelta(seconds=600)
         self.assertFalse(mock_log_error.called)
-        self.assertEquals(mock_sailthru_post.call_args[0][0], "user")
+        self.assertEquals(mock_sailthru_post.call_args[0][0], "send")
         userparms = mock_sailthru_post.call_args[0][1]
-        self.assertEquals(userparms['key'], "email")
-        self.assertEquals(userparms['id'], TEST_EMAIL)
-        self.assertEquals(userparms['vars']['gender'], "m")
-        self.assertEquals(userparms['vars']['username'], "test")
-        self.assertEquals(userparms['vars']['activated'], 1)
-        self.assertEquals(userparms['lists']['new list'], 1)
+        self.assertEquals(userparms['email'], TEST_EMAIL)
+        self.assertEquals(userparms['template'], "Welcome")
+        self.assertEquals(userparms['schedule_time'], expected_schedule.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
     @patch('email_marketing.tasks.SailthruClient.api_post')
     @patch('email_marketing.tasks.SailthruClient.api_get')
@@ -199,6 +197,8 @@ class EmailMarketingTests(TestCase):
         """
         test non existing domain name updates Sailthru user lists with default list
         """
+        # Set template to empty string to disable 2nd post call to Sailthru
+        update_email_marketing_config(template='')
         existing_site = Site.objects.create(domain='testing.com', name='testing.com')
         site_dict = {'id': existing_site.id, 'domain': existing_site.domain, 'name': existing_site.name}
         mock_sailthru_post.return_value = SailthruResponse(JsonResponse({'ok': True}))
@@ -216,18 +216,16 @@ class EmailMarketingTests(TestCase):
     @patch('email_marketing.tasks.SailthruClient.api_get')
     def test_user_activation(self, mock_sailthru_get, mock_sailthru_post):
         """
-        test send of activation template
+        Test that welcome template not sent if not new user.
         """
         mock_sailthru_post.return_value = SailthruResponse(JsonResponse({'ok': True}))
         mock_sailthru_get.return_value = SailthruResponse(JsonResponse({'lists': [{'name': 'new list'}], 'ok': True}))
-        expected_schedule = datetime.datetime.utcnow() + datetime.timedelta(seconds=600)
-        update_user.delay({}, self.user.email, new_user=True, activation=True)
+        update_user.delay({}, self.user.email, new_user=False)
         # look for call args for 2nd call
-        self.assertEquals(mock_sailthru_post.call_args[0][0], "send")
+        self.assertEquals(mock_sailthru_post.call_args[0][0], "user")
         userparms = mock_sailthru_post.call_args[0][1]
-        self.assertEquals(userparms['email'], TEST_EMAIL)
-        self.assertEquals(userparms['template'], "Activation")
-        self.assertEquals(userparms['schedule_time'], expected_schedule.strftime('%Y-%m-%dT%H:%M:%SZ'))
+        self.assertIsNone(userparms.get('email'))
+        self.assertIsNone(userparms.get('template'))
 
     @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.api_post')
@@ -248,14 +246,14 @@ class EmailMarketingTests(TestCase):
         # force Sailthru API exception on 2nd call
         mock_log_error.reset_mock()
         mock_sailthru.side_effect = [SailthruResponse(JsonResponse({'ok': True})), SailthruClientError]
-        update_user.delay({}, self.user.email, activation=True)
+        update_user.delay({}, self.user.email, new_user=True)
         self.assertTrue(mock_log_error.called)
 
         # force Sailthru API error return on 2nd call
         mock_log_error.reset_mock()
         mock_sailthru.side_effect = [SailthruResponse(JsonResponse({'ok': True})),
                                      SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))]
-        update_user.delay({}, self.user.email, activation=True)
+        update_user.delay({}, self.user.email, new_user=True)
         self.assertTrue(mock_log_error.called)
 
     @patch('email_marketing.tasks.update_user.retry')

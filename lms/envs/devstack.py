@@ -83,16 +83,12 @@ DEBUG_TOOLBAR_PANELS = (
 
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': 'lms.envs.devstack.should_show_debug_toolbar',
-    'JQUERY_URL': None,
 }
 
 
 def should_show_debug_toolbar(request):
     # We always want the toolbar on devstack unless running tests from another Docker container
     if request.get_host().startswith('edx.devstack.lms:'):
-        return False
-    # Only display for non-ajax requests.
-    if request.is_ajax():
         return False
     return True
 

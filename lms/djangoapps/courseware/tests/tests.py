@@ -7,7 +7,7 @@ from unittest import TestCase
 import mock
 from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
@@ -151,7 +151,7 @@ class TestDraftModuleStore(ModuleStoreTestCase):
         store = modulestore()
 
         # fix was to allow get_items() to take the course_id parameter
-        store.get_items(SlashSeparatedCourseKey('abc', 'def', 'ghi'), qualifiers={'category': 'vertical'})
+        store.get_items(CourseKey.from_string('abc/def/ghi'), qualifiers={'category': 'vertical'})
 
         # test success is just getting through the above statement.
         # The bug was that 'course_id' argument was

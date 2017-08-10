@@ -15,7 +15,7 @@ from django.test.client import RequestFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 
 import courseware.access as access
 import courseware.access_response as access_response
@@ -500,7 +500,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         user = UserFactory.create()
         course = Mock(
             enrollment_start=tomorrow, enrollment_end=tomorrow,
-            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'), enrollment_domain=''
+            id=CourseLocator('edX', 'test', '2012_Fall'), enrollment_domain=''
         )
         CourseEnrollmentAllowedFactory(email=user.email, course_id=course.id)
         self.assertTrue(access._has_access_course(user, 'enroll', course))
@@ -513,7 +513,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         # and not specifically allowed
         course = Mock(
             enrollment_start=yesterday, enrollment_end=tomorrow,
-            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'), enrollment_domain='',
+            id=CourseLocator('edX', 'test', '2012_Fall'), enrollment_domain='',
             invitation_only=True
         )
         user = UserFactory.create()
@@ -522,7 +522,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         # Non-staff can enroll if it is between the start and end dates and not invitation only
         course = Mock(
             enrollment_start=yesterday, enrollment_end=tomorrow,
-            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'), enrollment_domain='',
+            id=CourseLocator('edX', 'test', '2012_Fall'), enrollment_domain='',
             invitation_only=False
         )
         self.assertTrue(access._has_access_course(user, 'enroll', course))
@@ -530,7 +530,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         # Non-staff cannot enroll outside the open enrollment period if not specifically allowed
         course = Mock(
             enrollment_start=tomorrow, enrollment_end=tomorrow,
-            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'), enrollment_domain='',
+            id=CourseLocator('edX', 'test', '2012_Fall'), enrollment_domain='',
             invitation_only=False
         )
         self.assertFalse(access._has_access_course(user, 'enroll', course))
@@ -544,7 +544,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         Tests the catalog visibility tri-states
         """
         user = UserFactory.create()
-        course_id = SlashSeparatedCourseKey('edX', 'test', '2012_Fall')
+        course_id = CourseLocator('edX', 'test', '2012_Fall')
         staff = StaffFactory.create(course_key=course_id)
 
         course = Mock(
@@ -558,7 +558,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
 
         # Now set visibility to just about page
         course = Mock(
-            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'),
+            id=CourseLocator('edX', 'test', '2012_Fall'),
             catalog_visibility=CATALOG_VISIBILITY_ABOUT
         )
         self.assertFalse(access._has_access_course(user, 'see_in_catalog', course))
@@ -568,7 +568,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
 
         # Now set visibility to none, which means neither in catalog nor about pages
         course = Mock(
-            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'),
+            id=CourseLocator('edX', 'test', '2012_Fall'),
             catalog_visibility=CATALOG_VISIBILITY_NONE
         )
         self.assertFalse(access._has_access_course(user, 'see_in_catalog', course))
@@ -675,7 +675,7 @@ class UserRoleTestCase(TestCase):
 
     def setUp(self):
         super(UserRoleTestCase, self).setUp()
-        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        self.course_key = CourseLocator('edX', 'toy', '2012_Fall')
         self.anonymous_user = AnonymousUserFactory()
         self.student = UserFactory()
         self.global_staff = UserFactory(is_staff=True)

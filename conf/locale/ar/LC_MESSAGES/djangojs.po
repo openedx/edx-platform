@@ -124,8 +124,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-07-06 15:20+0000\n"
-"PO-Revision-Date: 2017-07-06 15:25+0000\n"
+"POT-Creation-Date: 2017-08-01 18:55+0000\n"
+"PO-Revision-Date: 2017-07-20 11:59+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -235,7 +235,7 @@ msgstr "جاري التحميل"
 #: common/static/common/templates/discussion/alert-popup.underscore
 #: common/static/common/templates/discussion/forum-action-close.underscore
 #: common/static/common/templates/discussion/search-alert.underscore
-#: lms/templates/student_profile/share_modal.underscore
+#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "إغلاق"
 
@@ -2755,7 +2755,6 @@ msgstr ""
 "اللغة الرئيسية التي يعتمدها أفراد الفريق بشكل أساسي للتواصل فيما بينهم"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
-#: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "Country"
 msgstr "البلد"
 
@@ -3855,7 +3854,6 @@ msgstr "وسم رمز التسجيل على أنّه غير مستخدم"
 
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/static/js/student_profile/views/learner_profile_factory.js
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Username"
 msgstr "اسم المستخدم"
@@ -3869,12 +3867,20 @@ msgid "Revoke access"
 msgstr "إلغاء صلاحيات الوصول"
 
 #: lms/static/js/instructor_dashboard/membership.js
+msgid "Group"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Enter username or email"
 msgstr "أدخل اسم المستخدم أو البريد الإلكتروني"
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
 msgstr "يُرجى إدخال اسم مستخدم او عنوان بريد إلكتروني."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "This role requires a divided discussions scheme."
+msgstr ""
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Error changing user's permissions."
@@ -4282,6 +4288,24 @@ msgstr ""
 "صحيح"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Please enter a score."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Started task to override the score for problem '<%- problem_id %>' and "
+"student '<%- student_id %>'. Click the 'Show Task Status' button to see the "
+"status of the task."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error starting a task to override score for problem '<%- problem_id %>' for "
+"student '<%- student_id %>'. Make sure that the the score and the problem "
+"and student identifiers are complete and correct."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Started entrance exam rescore task for student '{student_id}'. Click the "
 "'Show Task Status' button to see the status of the task."
@@ -4487,6 +4511,14 @@ msgstr "تمت بنجاح عملية إعادة تقييم المسألة لتح
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to rescore problem to improve score for user."
 msgstr "عذراً، لم تنجح عملية إعادة تقييم المسألة بهدف تحسين نتيجة المستخدم."
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully overrode problem score for {user}"
+msgstr ""
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Could not override problem score for {user}."
+msgstr ""
 
 #: lms/static/js/student_account/account.js
 msgid "The data could not be saved."
@@ -4728,7 +4760,6 @@ msgid "Year of Birth"
 msgstr "سنة الميلاد"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "Preferred Language"
 msgstr "اللغة المفضّلة"
 
@@ -4847,84 +4878,6 @@ msgstr "معلومات الحساب"
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
 msgstr "المشتريات السابقة"
-
-#: lms/static/js/student_profile/views/badge_list_container.js
-msgid "Accomplishments Pagination"
-msgstr "ترقيم صفحات الإنجازات"
-
-#: lms/static/js/student_profile/views/learner_profile_factory.js
-msgid "{platform_name} learners can see my:"
-msgstr "يمكن للمتعلّمين في منصّة {platform_name} رؤية:"
-
-#: lms/static/js/student_profile/views/learner_profile_factory.js
-msgid "Limited Profile"
-msgstr "ملفّي الشخصي المحدود"
-
-#: lms/static/js/student_profile/views/learner_profile_factory.js
-msgid "Full Profile"
-msgstr "كامل ملفّي الشخصي"
-
-#: lms/static/js/student_profile/views/learner_profile_factory.js
-msgid "Add Country"
-msgstr "إضافة البلد"
-
-#: lms/static/js/student_profile/views/learner_profile_factory.js
-msgid "Add language"
-msgstr "إضافة اللغة"
-
-#: lms/static/js/student_profile/views/learner_profile_factory.js
-msgid "About me"
-msgstr "نبذة عني"
-
-#: lms/static/js/student_profile/views/learner_profile_factory.js
-msgid ""
-"Tell other learners a little about yourself: where you live, what your "
-"interests are, why you're taking courses, or what you hope to learn."
-msgstr ""
-"تفضّل بإعطاء المتعلّمين الآخرين فكرة عامة عنك: مكان سكنك، اهتماماتك، سبب "
-"التحاقك بهذه المساقات، أو ما ترغب في تعلّمه."
-
-#: lms/static/js/student_profile/views/learner_profile_fields.js
-msgid "Account Settings page."
-msgstr "صفحة إعدادات الحساب"
-
-#: lms/static/js/student_profile/views/learner_profile_fields.js
-msgid ""
-"You must specify your birth year before you can share your full profile. To "
-"specify your birth year, go to the {account_settings_page_link}"
-msgstr ""
-"يجب أن تحدّد سنة ميلادك قبل أن تتمكّن من مشاركة صفحتك الشخصية بأكملها. "
-"ولتحدّد سنة ميلادك، يُرجى الانتقال إلى صفحة إعدادات الحساب "
-"{account_settings_page_link}."
-
-#: lms/static/js/student_profile/views/learner_profile_fields.js
-msgid ""
-"You must be over 13 to share a full profile. If you are over 13, make sure "
-"that you have specified a birth year on the {account_settings_page_link}"
-msgstr ""
-"يجب أن يكون عمرك ما فوق 13 سنة لتتمكّن من مشاركة صفحتك الشخصية بأكملها. فإذا"
-" كان عمرك ما فوق 13 سنة، يُرجى التأكّد من أنّك حدّدت سنة ميلادك في صفحة "
-"الإعدادات {account_settings_page_link}."
-
-#: lms/static/js/student_profile/views/learner_profile_fields.js
-msgid "Profile Image"
-msgstr "صورة الملف الشخصي"
-
-#: lms/static/js/student_profile/views/learner_profile_fields.js
-msgid "Profile image for {username}"
-msgstr "صورة الصفحة الشخصية للمستخدم {username}"
-
-#: lms/static/js/student_profile/views/learner_profile_view.js
-msgid "About Me"
-msgstr "نبذة عنّي"
-
-#: lms/static/js/student_profile/views/learner_profile_view.js
-msgid "Accomplishments"
-msgstr "الإنجازات"
-
-#: lms/static/js/student_profile/views/learner_profile_view.js
-msgid "Profile"
-msgstr "الملف الشخصي"
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
@@ -5395,6 +5348,11 @@ msgid "The course start date must be later than the enrollment start date."
 msgstr "يجب أن يأتي تاريخ بدء المساق بعد تاريخ التسجيل فيه."
 
 #: cms/static/js/models/settings/course_details.js
+msgid ""
+"The certificate available date must be later than the enrollment start date."
+msgstr ""
+
+#: cms/static/js/models/settings/course_details.js
 msgid "The enrollment start date cannot be after the enrollment end date."
 msgstr ""
 "لا يمكن لتاريخ بدء التسجيل في المساق أن يأتي بعد تاريخ انتهاء التسجيل فيه. "
@@ -5466,6 +5424,10 @@ msgstr ""
 #: lms/templates/student_account/institution_register.underscore
 msgid "or"
 msgstr "أو"
+
+#: cms/static/js/models/xblock_validation.js
+msgid "This unit has validation issues."
+msgstr ""
 
 #: cms/static/js/models/xblock_validation.js
 msgid "This component has validation issues."
@@ -5654,16 +5616,18 @@ msgstr "ليس قيد الاستخدام"
 
 #. Translators: 'count' is number of units that the group
 #. configuration is used in.
+#. Translators: 'count' is number of locations that the group
+#. configuration is used in.
 #: cms/static/js/views/group_configuration_details.js
 #: cms/static/js/views/partition_group_details.js
-msgid "Used in {count} unit"
-msgid_plural "Used in {count} units"
-msgstr[0] "مستخدم في {count} وحدة"
-msgstr[1] "مستخدم في {count} وحدة"
-msgstr[2] "مستخدم في {count} وحدة"
-msgstr[3] "مستخدم في {count} وحدة"
-msgstr[4] "مستخدم في {count} وحدة"
-msgstr[5] "مستخدم في {count} وحدة"
+msgid "Used in {count} location"
+msgid_plural "Used in {count} locations"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #. Translators: this refers to a collection of groups.
 #: cms/static/js/views/group_configuration_item.js
@@ -5825,10 +5789,6 @@ msgid "{display_name} Settings"
 msgstr "إعدادات {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
-msgid "Change the settings for {display_name}"
-msgstr "تغيير الإعدادات لـ  {display_name}"
-
-#: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish {display_name}"
 msgstr "نشر {display_name}"
 
@@ -5843,6 +5803,10 @@ msgid "Publish"
 msgstr "نشر"
 
 #: cms/static/js/views/modals/course_outline_modals.js
+msgid "All Learners and Staff"
+msgstr ""
+
+#: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
 msgstr "أساسي"
 
@@ -5854,6 +5818,10 @@ msgstr ""
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
 msgstr "تعديل: %(title)s"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Unit"
+msgstr "الوحدة"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Component"
@@ -5916,7 +5884,8 @@ msgstr "المخطّط الكلّي للمساق"
 msgid "Date added"
 msgstr "تاريخ الإضافة "
 
-#. Translators: "title" is the name of the current component being edited.
+#. Translators: "title" is the name of the current component or unit being
+#. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: %(title)s"
 msgstr ""
@@ -7114,10 +7083,6 @@ msgid "Collapse All"
 msgstr "طي جميع الأقسام"
 
 #: lms/templates/ccx/schedule.underscore
-msgid "Unit"
-msgstr "الوحدة"
-
-#: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "تاريخ البدء"
 
@@ -8017,76 +7982,6 @@ msgstr "أو أنشئ حساباً جديداً باستخدام"
 msgid "Create account"
 msgstr ""
 
-#: lms/templates/student_profile/badge.underscore
-#, python-format
-msgid "Share your \"%(display_name)s\" award"
-msgstr "شارك \"%(display_name)s\" جائزتك"
-
-#: lms/templates/student_profile/badge.underscore
-msgid "Share"
-msgstr "شارك"
-
-#: lms/templates/student_profile/badge.underscore
-#, python-format
-msgid "Earned %(created)s."
-msgstr "%(created)s التي حصلت عليها"
-
-#: lms/templates/student_profile/badge_placeholder.underscore
-msgid "What's Your Next Accomplishment?"
-msgstr "ماهو إنجازك القادم؟"
-
-#: lms/templates/student_profile/badge_placeholder.underscore
-msgid "Start working toward your next learning goal."
-msgstr "ابدآ العمل في اتجاه هدفك التالي."
-
-#: lms/templates/student_profile/badge_placeholder.underscore
-msgid "Find a course"
-msgstr "ابحث عن مادة"
-
-#: lms/templates/student_profile/learner_profile.underscore
-msgid "An error occurred. Try loading the page again."
-msgstr "حدث خطأ. حاول تحميل الصفحة مرة أخرى."
-
-#: lms/templates/student_profile/section_two.underscore
-msgid "You are currently sharing a limited profile."
-msgstr "إنّك حاليًّا تشارك ملفًّا شخصيًّا محدودًا."
-
-#: lms/templates/student_profile/section_two.underscore
-msgid "This learner is currently sharing a limited profile."
-msgstr "هذا المتعلم يشارك ملفاً شخصياً محدوداً."
-
-#: lms/templates/student_profile/share_modal.underscore
-msgid "Share on Mozilla Backpack"
-msgstr "شارك على Mozilla Backpack"
-
-#: lms/templates/student_profile/share_modal.underscore
-msgid ""
-"To share your certificate on Mozilla Backpack, you must first have a "
-"Backpack account. Complete the following steps to add your certificate to "
-"Backpack."
-msgstr ""
-"لمشاركة شهادتك على Mozilla Backpack، يجب عليك أولاً إنشاء حساب Backpack. "
-"أكمل الخطوات التالية لإضافة شهادتك إلى Backpack."
-
-#: lms/templates/student_profile/share_modal.underscore
-#, python-format
-msgid ""
-"Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to "
-"your existing account"
-msgstr ""
-"أنشئ  حساب  %(link_start)s Mozilla Backpack %(link_end)s، أو سجل دخولك إلى "
-"حسابك الموجود"
-
-#: lms/templates/student_profile/share_modal.underscore
-#, python-format
-msgid ""
-"%(download_link_start)sDownload this image (right-click or option-click, "
-"save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to "
-"your backpack.</li>"
-msgstr ""
-"%(download_link_start)s حمل الصورة (اضغط زر الفأرة الأيمن، حفظ باسم) "
-"%(link_end)s ومن ثم %(upload_link_start)sحمل%(link_end)s إلى Backpack.</li>"
-
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
 msgid "Congratulations! You are now verified on %(platformName)s!"
@@ -8671,6 +8566,76 @@ msgstr "عذرًا، لا توجد أي نتائج."
 msgid "Back to Dashboard"
 msgstr "العودة إلى لوحة المعلومات"
 
+#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
+#, python-format
+msgid "Share your \"%(display_name)s\" award"
+msgstr "شارك \"%(display_name)s\" جائزتك"
+
+#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
+msgid "Share"
+msgstr "شارك"
+
+#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
+#, python-format
+msgid "Earned %(created)s."
+msgstr "%(created)s التي حصلت عليها"
+
+#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
+msgid "What's Your Next Accomplishment?"
+msgstr "ماهو إنجازك القادم؟"
+
+#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
+msgid "Start working toward your next learning goal."
+msgstr "ابدآ العمل في اتجاه هدفك التالي."
+
+#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
+msgid "Find a course"
+msgstr "ابحث عن مادة"
+
+#: openedx/features/learner_profile/static/learner_profile/templates/learner_profile.underscore
+msgid "An error occurred. Try loading the page again."
+msgstr "حدث خطأ. حاول تحميل الصفحة مرة أخرى."
+
+#: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
+msgid "You are currently sharing a limited profile."
+msgstr "إنّك حاليًّا تشارك ملفًّا شخصيًّا محدودًا."
+
+#: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
+msgid "This learner is currently sharing a limited profile."
+msgstr "هذا المتعلم يشارك ملفاً شخصياً محدوداً."
+
+#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
+msgid "Share on Mozilla Backpack"
+msgstr "شارك على Mozilla Backpack"
+
+#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
+msgid ""
+"To share your certificate on Mozilla Backpack, you must first have a "
+"Backpack account. Complete the following steps to add your certificate to "
+"Backpack."
+msgstr ""
+"لمشاركة شهادتك على Mozilla Backpack، يجب عليك أولاً إنشاء حساب Backpack. "
+"أكمل الخطوات التالية لإضافة شهادتك إلى Backpack."
+
+#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
+#, python-format
+msgid ""
+"Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to "
+"your existing account"
+msgstr ""
+"أنشئ  حساب  %(link_start)s Mozilla Backpack %(link_end)s، أو سجل دخولك إلى "
+"حسابك الموجود"
+
+#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
+#, python-format
+msgid ""
+"%(download_link_start)sDownload this image (right-click or option-click, "
+"save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to "
+"your backpack.</li>"
+msgstr ""
+"%(download_link_start)s حمل الصورة (اضغط زر الفأرة الأيمن، حفظ باسم) "
+"%(link_end)s ومن ثم %(upload_link_start)sحمل%(link_end)s إلى Backpack.</li>"
+
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
 msgstr "الحدّ من صلاحية الوصول"
@@ -8919,6 +8884,20 @@ msgstr "تفعيل"
 msgid "Deactivate"
 msgstr "تعطيل"
 
+#: cms/templates/js/container-access.underscore
+msgid "component"
+msgstr ""
+
+#: cms/templates/js/container-access.underscore
+msgid "Access to this {blockType} is restricted to: {selectedGroupsLabel}"
+msgstr ""
+
+#: cms/templates/js/container-access.underscore
+msgid ""
+"Access to some content in this {blockType} is restricted to specific groups "
+"of learners."
+msgstr ""
+
 #: cms/templates/js/container-message.underscore
 msgid ""
 "Caution: The last published version of this unit is live. By publishing "
@@ -9088,6 +9067,10 @@ msgstr "لن يجري إصدار الوحدات غير المنشورة"
 #: cms/templates/js/course-outline.underscore
 msgid "Unpublished changes to content that will release in the future"
 msgstr "تغييرات غير منشورة جرى إدخالها على المحتوى وسيجري إصدارها مستقبليًّا"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Access to this unit is restricted to: {selectedGroupsLabel}"
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid ""
@@ -9635,12 +9618,6 @@ msgid "Staff and Learners"
 msgstr "الموظفون والمتعلمون"
 
 #: cms/templates/js/publish-xblock.underscore
-msgid ""
-"Access to some content in this unit is restricted to specific groups of "
-"learners."
-msgstr ""
-
-#: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Hide from learners"
 msgstr "إخفاء من المتعلمين"
@@ -9924,6 +9901,32 @@ msgstr ""
 "حدّد أي قواعد إضافية أو استنثاءات القواعد التي يجب أن تُطبّق عند مراجعة "
 "مقاطع الفيديو. مثال، يمكنك نحديد فيما إذا كانت الآلات الحاسبة مسموحة."
 
+#: cms/templates/js/unit-access-editor.underscore
+msgid "Unit Access"
+msgstr ""
+
+#: cms/templates/js/unit-access-editor.underscore
+msgid "Restrict access to:"
+msgstr ""
+
+#: cms/templates/js/unit-access-editor.underscore
+msgid "Select a group type"
+msgstr ""
+
+#: cms/templates/js/unit-access-editor.underscore
+msgid "Select one or more groups:"
+msgstr ""
+
+#: cms/templates/js/unit-access-editor.underscore
+msgid "Deleted Group"
+msgstr ""
+
+#: cms/templates/js/unit-access-editor.underscore
+msgid ""
+"This group no longer exists. Choose another group or do not restrict access "
+"to this unit."
+msgstr ""
+
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
 msgstr "جرى تحميل الملف بنجاح"
@@ -9964,9 +9967,9 @@ msgid ""
 "should be {maxFileSize} and format must be one of {supportedImageFormats}."
 msgstr ""
 
-#: cms/templates/js/xblock-string-field-editor.underscore
-msgid "Edit the name"
-msgstr "تعديل الاسم"
+#: cms/templates/js/xblock-access-editor.underscore
+msgid "Set Access"
+msgstr ""
 
 #: cms/templates/js/xblock-string-field-editor.underscore
 #, python-format

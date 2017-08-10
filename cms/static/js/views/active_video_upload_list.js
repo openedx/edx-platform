@@ -23,10 +23,18 @@ define([
                 'drop .file-drop-area': 'dragleave'
             },
 
+            uploadHeader: gettext('Upload Videos'),
+            uploadText: HtmlUtils.interpolateHtml(
+                gettext('Drag and drop or {spanStart}browse your computer{spanEnd}.'),
+                {
+                    spanStart: HtmlUtils.HTML('<span class="upload-text-link">'),
+                    spanEnd: HtmlUtils.HTML('</span>')
+                }
+            ),
             defaultFailureMessage: gettext('This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.'),  // eslint-disable-line max-len
 
             initialize: function(options) {
-                this.template = HtmlUtils.template(activeVideoUploadListTemplate)({});
+                this.template = HtmlUtils.template(activeVideoUploadListTemplate);
                 this.collection = new Backbone.Collection();
                 this.itemViews = [];
                 this.listenTo(this.collection, 'add', this.addUpload);
@@ -38,6 +46,19 @@ define([
                 if (options.uploadButton) {
                     options.uploadButton.click(this.chooseFile.bind(this));
                 }
+
+                this.maxSizeText = StringUtils.interpolate(
+                    gettext('Maximum file size: {maxFileSize} GB'),
+                    {
+                        maxFileSize: this.videoUploadMaxFileSizeInGB
+                    }
+                );
+                this.supportedVideosText = edx.StringUtils.interpolate(
+                    gettext('Supported file types: {supportedVideoTypes}'),
+                    {
+                        supportedVideoTypes: this.videoSupportedFileFormats.join(', ')
+                    }
+                );
             },
 
             render: function() {
@@ -45,7 +66,12 @@ define([
 
                 HtmlUtils.setHtml(
                     this.$el,
-                    this.template
+                    this.template({
+                        uploadHeader: this.uploadHeader,
+                        uploadText: this.uploadText,
+                        maxSizeText: this.maxSizeText,
+                        supportedVideosText: this.supportedVideosText
+                    })
                 );
                 _.each(this.itemViews, this.renderUploadView.bind(this));
                 this.$uploadForm = this.$('.file-upload-form');

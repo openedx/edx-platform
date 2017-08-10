@@ -367,8 +367,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.make_field_editable('country')
         self.assertEqual(profile_page.mode_for_field('country'), 'edit')
 
-        self.assertTrue(profile_page.field_icon_present('country'))
-
     def test_language_field(self):
         """
         Test behaviour of `Language` field.
@@ -395,8 +393,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
 
         profile_page.make_field_editable('language_proficiencies')
         self.assertTrue(profile_page.mode_for_field('language_proficiencies'), 'edit')
-
-        self.assertTrue(profile_page.field_icon_present('language_proficiencies'))
 
     def test_about_me_field(self):
         """

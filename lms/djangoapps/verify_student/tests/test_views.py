@@ -24,7 +24,7 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from mock import Mock, patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from waffle.testutils import override_switch
 
@@ -35,6 +35,7 @@ from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.views import PayAndVerifyView, checkout_with_ecommerce_service, render_to_response
+from commerce.utils import EcommerceService
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
@@ -141,12 +142,17 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         )
         configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
         checkout_page = configuration.MULTIPLE_ITEMS_BASKET_PAGE_URL
+        checkout_page += "?utm_source=test"
         httpretty.register_uri(httpretty.GET, "{}{}".format(TEST_PUBLIC_URL_ROOT, checkout_page))
 
         course = self._create_course('verified', sku=sku)
         self._enroll(course.id)
-        response = self._get_page('verify_student_start_flow', course.id, expected_status_code=302)
-        expected_page = '{}{}?sku={}'.format(TEST_PUBLIC_URL_ROOT, checkout_page, sku)
+
+        # Verify that utm params are included in the url used for redirect
+        url_with_utm = 'http://www.example.com/basket/add/?utm_source=test&sku=TESTSKU'
+        with mock.patch.object(EcommerceService, 'get_checkout_page_url', return_value=url_with_utm):
+            response = self._get_page('verify_student_start_flow', course.id, expected_status_code=302)
+        expected_page = '{}{}&sku={}'.format(TEST_PUBLIC_URL_ROOT, checkout_page, sku)
         self.assertRedirects(response, expected_page, fetch_redirect_response=False)
 
     @ddt.data(
@@ -1304,7 +1310,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
         self.course_id = 'Robot/999/Test_Course'
         self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         verified_mode = CourseMode(
-            course_id=SlashSeparatedCourseKey("Robot", "999", 'Test_Course'),
+            course_id=CourseKey.from_string("Robot/999/Test_Course"),
             mode_slug="verified",
             mode_display_name="Verified Certificate",
             min_price=50
