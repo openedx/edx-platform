@@ -155,7 +155,7 @@ class TestResetGrades(TestCase):
         self._update_or_create_grades()
         self._assert_grades_exist_for_courses(self.course_keys)
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(7):
             self.command.handle(delete=True, all_courses=True)
 
         self._assert_grades_absent_for_courses(self.course_keys)
@@ -174,7 +174,7 @@ class TestResetGrades(TestCase):
         self._update_or_create_grades()
         self._assert_grades_exist_for_courses(self.course_keys)
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(6):
             self.command.handle(
                 delete=True,
                 courses=[unicode(course_key) for course_key in self.course_keys[:num_courses_to_reset]]
@@ -199,7 +199,7 @@ class TestResetGrades(TestCase):
         with freeze_time(self._date_from_now(days=4)):
             self._update_or_create_grades(self.course_keys[:num_courses_with_updated_grades])
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(6):
             self.command.handle(delete=True, modified_start=self._date_str_from_now(days=2), all_courses=True)
 
         self._assert_grades_absent_for_courses(self.course_keys[:num_courses_with_updated_grades])
@@ -214,7 +214,7 @@ class TestResetGrades(TestCase):
         with freeze_time(self._date_from_now(days=5)):
             self._update_or_create_grades(self.course_keys[2:4])
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(6):
             self.command.handle(
                 delete=True,
                 modified_start=self._date_str_from_now(days=2),
