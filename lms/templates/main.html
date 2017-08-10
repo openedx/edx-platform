@@ -132,6 +132,9 @@ from pipeline_mako import render_require_js_path_overrides
     </script>
 % endif
 
+<!-- Used for adding course start dates to the calendar -->
+<script type="text/javascript" src="https://addevent.com/libs/atc/1.6.1/atc.min.js" async defer></script>
+
 </head>
 
 <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">

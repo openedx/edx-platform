@@ -66,6 +66,18 @@
       text-decoration: underline;
     }
   }
+
+  // Overrides to AddEvent implementation
+  .addeventatc {
+    color: $blue !important;
+    font-weight: 500 !important;
+    padding: 0 !important;
+    border: none !important;
+
+    .addeventatc_icon{
+      display: none !important;
+    }
+  }
 }
 
 // Welcome message / Latest Update message

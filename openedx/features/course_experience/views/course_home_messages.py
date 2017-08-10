@@ -113,8 +113,18 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         if user_access['is_enrolled'] and not course_start_data['already_started']:
             CourseHomeMessages.register_info_message(
                 request,
-                Text(_(
-                    "Don't forget to add a calendar reminder!"
+                HTML(_(
+                    '<div title="Add to Calendar" class="addeventatc">\
+                        Click to add a reminder to your calendar.\
+                        <span class="start">08/23/2017 09:00 AM</span>\
+                        <span class="end">08/23/2017 10:00 AM</span>\
+                        <span class="timezone">America/New_York</span>\
+                        <span class="title">Demo Course Begins!</span>\
+                        <span class="description">Please go to www.edx.org/Demo to start the course!/span>\
+                        <span class="organizer">Organizer</span>\
+                        <span class="date_format">MM/DD/YYYY</span>\
+                        <span class="client">aJwCTiEfmzUApJNQTmnT30293</span>\
+                    </div>'
                 )),
                 title=Text("Course starts in {days_until_start_string} on {course_start_date}.").format(
                     days_until_start_string=course_start_data['days_until_start_string'],
