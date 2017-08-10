@@ -30,7 +30,7 @@ LABSTER_API_AUTH_TOKEN = LABSTER_AUTH.get('LABSTER_API_AUTH_TOKEN', '')
 LABSTER_API_URL = LABSTER_SETTINGS.get('LABSTER_API_URL', '')
 LABSTER_ENDPOINTS = {
     'available_simulations': '',
-    'consumer_secret': '',
+    'license_validate': '',
     'voucher_license': '',
     'voucher_activate': '',
 }

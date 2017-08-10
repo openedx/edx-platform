@@ -66,13 +66,22 @@ from django.core.urlresolvers import reverse
           )}
         </p>
       %else:
-        <% license_code = license.license_code if license else '' %>
         <form action="${labster_license_url}" method="POST">
           <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
           <p>
+            <label for="labster-consumer">${_("Consumer key:")}</label>
+            <input type="text" id="labster-consumer" name="consumer_key" value="${consumer_key}"
+              placeholder="${_('Enter your Consumer Key')}" style="width:50%" required />
+          </p>
+          <p>
+            <label for="labster-secret">${_("Secret key:")}</label>
+            <input type="text" id="labster-secret" name="secret_key" value="${secret_key}"
+              placeholder="${_('Enter your Secret Key')}" style="width:50%" required />
+          </p>
+          <p>
             <label for="labster-license">${_("License:")}</label>
-            <input type="text" id="labster-license" name="license" value="${license_code}"
-              placeholder="${_('Enter your license')}" style="width:50%" />
+            <input type="text" id="labster-license" name="license" value="${license}"
+              placeholder="${_('Enter your license')}" style="width:50%" required />
           </p>
           <p><button type="submit">${_("Apply")}</button></p>
         </form>

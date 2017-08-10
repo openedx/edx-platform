@@ -16,7 +16,7 @@ from ccx_keys.locator import CCXLocator
 from student.roles import CourseCcxCoachRole
 from student.tests.factories import UserFactory, AdminFactory
 from lms.djangoapps.courseware.tests.test_field_overrides import inject_field_overrides
-from lms.djangoapps.ccx.tests.test_views import iter_blocks
+from lms.djangoapps.ccx.tests.utils import iter_blocks
 from request_cache.middleware import RequestCache
 from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 
@@ -82,7 +82,7 @@ class CCXCourseTestBase(ModuleStoreTestCase):
         Create lti passports.
         """
         return [
-            ':'.join(['TEST-' + str(i), k, '__secret_key__'])
+            ':'.join(['TEST-' + str(i), k, '__secret_key__','__license__'])
             for i, k in enumerate(consumer_keys)
         ]
 
