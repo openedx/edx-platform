@@ -101,6 +101,10 @@ FEATURES['ENABLE_VIDEO_BUMPER'] = True  # Enable video bumper in Studio settings
 
 FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 
+# Whether archived courses (courses with end dates in the past) should be
+# shown in Studio in a separate list.
+FEATURES['ENABLE_SEPARATE_ARCHIVED_COURSES'] = True
+
 # Enable support for OpenBadges accomplishments
 FEATURES['ENABLE_OPENBADGES'] = True
 
