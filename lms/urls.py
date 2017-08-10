@@ -655,6 +655,9 @@ urlpatterns += (
         r'^u/',
         include('openedx.features.learner_profile.urls'),
     ),
+    url(r'^shoppingcart/', include('shoppingcart.urls')),
+    url(r'^commerce/', include('commerce.urls', namespace='commerce')),
+    url(r'^survey/', include('survey.urls')),
 )
 
 if settings.FEATURES["ENABLE_TEAMS"]:
@@ -825,8 +828,7 @@ if configuration_helpers.get_value('ENABLE_BULK_ENROLLMENT_VIEW',
 
 # Shopping cart
 urlpatterns += (
-    url(r'^shoppingcart/', include('shoppingcart.urls')),
-    url(r'^commerce/', include('commerce.urls', namespace='commerce')),
+
 )
 
 # Course goals
@@ -840,11 +842,6 @@ if settings.FEATURES.get('EMBARGO'):
         url(r'^embargo/', include('openedx.core.djangoapps.embargo.urls', namespace='embargo')),
         url(r'^api/embargo/', include('openedx.core.djangoapps.embargo.urls', namespace='api_embargo')),
     )
-
-# Survey Djangoapp
-urlpatterns += (
-    url(r'^survey/', include('survey.urls')),
-)
 
 if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (
@@ -870,20 +867,20 @@ if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
         ),
     )
 
-if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
-    urlpatterns += (
-        # These URLs dispatch to django-oauth-toolkit or django-oauth2-provider as appropriate.
-        # Developers should use these routes, to maintain compatibility for existing client code
-        url(r'^oauth2/', include('openedx.core.djangoapps.oauth_dispatch.urls')),
-        # These URLs contain the django-oauth2-provider default behavior.  It exists to provide
-        # URLs for django-oauth2-provider to call using reverse() with the oauth2 namespace, and
-        # also to maintain support for views that have not yet been wrapped in dispatch views.
-        url(r'^oauth2/', include('edx_oauth2_provider.urls', namespace='oauth2')),
-        # The /_o/ prefix exists to provide a target for code in django-oauth-toolkit that
-        # uses reverse() with the 'oauth2_provider' namespace.  Developers should not access these
-        # views directly, but should rather use the wrapped views at /oauth2/
-        url(r'^_o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-    )
+urlpatterns += (
+    # These URLs dispatch to django-oauth-toolkit or django-oauth2-provider as appropriate.
+    # Developers should use these routes, to maintain compatibility for existing client code
+    url(r'^oauth2/', include('openedx.core.djangoapps.oauth_dispatch.urls')),
+    # These URLs contain the django-oauth2-provider default behavior.  It exists to provide
+    # URLs for django-oauth2-provider to call using reverse() with the oauth2 namespace, and
+    # also to maintain support for views that have not yet been wrapped in dispatch views.
+    url(r'^oauth2/', include('edx_oauth2_provider.urls', namespace='oauth2')),
+    # The /_o/ prefix exists to provide a target for code in django-oauth-toolkit that
+    # uses reverse() with the 'oauth2_provider' namespace.  Developers should not access these
+    # views directly, but should rather use the wrapped views at /oauth2/
+    url(r'^_o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    url(r'^oauth2/login/$', LoginWithAccessTokenView.as_view(), name='login_with_access_token'),
+)
 
 if settings.FEATURES.get('ENABLE_LMS_MIGRATION'):
     urlpatterns += (
@@ -946,16 +943,6 @@ if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
 if enterprise_enabled():
     urlpatterns += (
         url(r'', include('enterprise.urls')),
-    )
-
-# OAuth token exchange
-if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
-    urlpatterns += (
-        url(
-            r'^oauth2/login/$',
-            LoginWithAccessTokenView.as_view(),
-            name="login_with_access_token"
-        ),
     )
 
 # Certificates
