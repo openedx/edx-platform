@@ -50,6 +50,7 @@ import lms.lib.comment_client as cc
 import request_cache
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
+from courseware.models import CourseScheduleConfiguration
 from enrollment.api import _default_course_mode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -1707,8 +1708,9 @@ class CourseEnrollment(models.Model):
             )
             return None
 
+        schedule_config = CourseScheduleConfiguration.current(self.course_id)
         try:
-            if self.schedule:
+            if schedule_config.enabled and schedule_config.verified_upgrade_deadline_enabled and self.schedule:
                 log.debug(
                     'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
                     self.id, self.schedule.id
