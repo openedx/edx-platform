@@ -487,7 +487,11 @@ class SAMLProviderConfig(ProviderConfig):
         # Now get the data fetched automatically from the metadata.xml:
         data = SAMLProviderData.current(self.entity_id)
         if not data or not data.is_valid():
-            log.error("No SAMLProviderData found for %s. Run 'manage.py saml pull' to fix or debug.", self.entity_id)
+            log.error(
+                'No SAMLProviderData found for provider "%s" with entity id "%s" and IdP slug "%s". '
+                'Run "manage.py saml pull" to fix or debug.',
+                self.name, self.entity_id, self.idp_slug
+            )
             raise AuthNotConfigured(provider_name=self.name)
         conf['x509cert'] = data.public_key
         conf['url'] = data.sso_url
