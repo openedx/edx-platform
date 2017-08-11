@@ -120,7 +120,7 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
                         <span class="end">08/23/2017 10:00 AM</span>\
                         <span class="timezone">America/New_York</span>\
                         <span class="title">Demo Course Begins!</span>\
-                        <span class="description">Please go to www.edx.org/Demo to start the course!/span>\
+                        <span class="description">Please go to www.edx.org/Demo to start the course!</span>\
                         <span class="organizer">Organizer</span>\
                         <span class="date_format">MM/DD/YYYY</span>\
                         <span class="client">aJwCTiEfmzUApJNQTmnT30293</span>\

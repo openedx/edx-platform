@@ -30,6 +30,17 @@ export class CourseHome {  // eslint-disable-line import/prefer-default-export
       );
     });
 
+    // Use these settings to internationalize the strings
+    window.addeventasync = function() {
+      addeventatc.settings({
+          appleical: { show: true, text: 'Apple'},
+          google: { show: true, text: 'Google'},
+          outlook: { show: true, text: 'Outlook'},
+          outlookcom: {show: true, text: 'Outlook.com'},
+          yahoo: { show: true, text: 'Yahoo'},
+      });
+    };
+
     const $addToCalendarLinks = $('.addeventatc span');
     $addToCalendarLinks.on('click', () => {
       alert('clicked a calendar, send log!');
