@@ -93,7 +93,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         """
         Test that the list of newly created courses are properly sorted to show the most
         recent enrollments first.
-
+        Also test recent enrollment message rendered appropriately for more than two courses.
         """
         self._configure_message_timeout(600)
 
@@ -122,14 +122,61 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         self.assertEqual(recent_course_list[3].course.id, courses[2].id)
         self.assertEqual(recent_course_list[4].course.id, courses[3].id)
 
-    def test_dashboard_rendering(self):
+        self.client.login(username=self.student.username, password=self.PASSWORD)
+        response = self.client.get(reverse("dashboard"))
+
+        # verify recent enrollment message
+        self.assertContains(
+            response,
+            'Thank you for enrolling in:'.format(course_name=self.course.display_name)
+        )
+        self.assertContains(
+            response,
+            ', '.join(enrollment.course.display_name for enrollment in recent_course_list)
+        )
+
+    def test_dashboard_rendering_with_single_course(self):
         """
-        Tests that the dashboard renders the recent enrollment messages appropriately.
+        Tests that the dashboard renders the recent enrollment message appropriately for single course.
         """
         self._configure_message_timeout(600)
         self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(reverse("dashboard"))
-        self.assertContains(response, "Thank you for enrolling in")
+        self.assertContains(
+            response,
+            "Thank you for enrolling in {course_name}".format(course_name=self.course.display_name)
+        )
+
+    def test_dashboard_rendering_with_two_courses(self):
+        """
+        Tests that the dashboard renders the recent enrollment message appropriately for two courses.
+        """
+        self._configure_message_timeout(600)
+        course_location = locator.CourseLocator(
+            'Org2',
+            'Course2',
+            'Run2'
+        )
+        course, _ = self._create_course_and_enrollment(course_location)
+
+        self.client.login(username=self.student.username, password=self.PASSWORD)
+        response = self.client.get(reverse("dashboard"))
+
+        courses_enrollments = list(get_course_enrollments(self.student, None, []))
+        courses_enrollments.sort(key=lambda x: x.created, reverse=True)
+        self.assertEqual(len(courses_enrollments), 3)
+
+        recent_course_enrollments = _get_recently_enrolled_courses(courses_enrollments)
+        self.assertEqual(len(recent_course_enrollments), 2)
+
+        self.assertContains(
+            response,
+            "Thank you for enrolling in:".format(course_name=self.course.display_name)
+        )
+        self.assertContains(
+            response,
+            ' and '.join(enrollment.course.display_name for enrollment in recent_course_enrollments)
+        )
 
     def test_dashboard_escaped_rendering(self):
         """

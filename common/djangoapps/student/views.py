@@ -933,20 +933,32 @@ def _create_recent_enrollment_message(course_enrollments, course_modes):  # pyli
     recently_enrolled_courses = _get_recently_enrolled_courses(course_enrollments)
 
     if recently_enrolled_courses:
-        enroll_messages = [
-            {
-                "course_id": enrollment.course_overview.id,
-                "course_name": enrollment.course_overview.display_name,
-                "allow_donation": _allow_donation(course_modes, enrollment.course_overview.id, enrollment)
-            }
+        enrollments_count = len(recently_enrolled_courses)
+        course_name_separator = ', '
+        # If length of enrolled course 2, join names with 'and'
+        if enrollments_count == 2:
+            course_name_separator = _(' and ')
+
+        course_names = course_name_separator.join(
+            [enrollment.course_overview.display_name for enrollment in recently_enrolled_courses]
+        )
+
+        allow_donations = any(
+            _allow_donation(course_modes, enrollment.course_overview.id, enrollment)
             for enrollment in recently_enrolled_courses
-        ]
+        )
 
         platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
 
         return render_to_string(
             'enrollment/course_enrollment_message.html',
-            {'course_enrollment_messages': enroll_messages, 'platform_name': platform_name}
+            {
+                'course_names': course_names,
+                'enrollments_count': enrollments_count,
+                'allow_donations': allow_donations,
+                'platform_name': platform_name,
+                'course_id': recently_enrolled_courses[0].course_overview.id if enrollments_count == 1 else None
+            }
         )
 
 
