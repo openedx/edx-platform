@@ -247,7 +247,7 @@ description_max_length = 250
           </div>
 
           % try:
-            <%include file="_${program_type_slug}_faq.html" args="program_type=program_type" />
+            <%include file="_${program_type_slug}_faq.html" args="program_title=title" />
           % except exceptions.TemplateLookupException:
             ## pass
           % endtry
