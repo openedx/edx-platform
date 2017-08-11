@@ -59,7 +59,7 @@
                 required
                 aria-required="true" aria-describedby="code-tip"/>
               <span class="tip tip-input" id="code-tip">
-                ${_("In case you have any questions please write us at {support_link}").format(support_link='<a href="mailto:%s">%s</a>' % settings.CONTACT_EMAIL)}
+                ${_("In case you have any questions please write us at {support_link}").format(support_link='<a href="mailto:%s">%s</a>' % (settings.CONTACT_EMAIL, settings.CONTACT_EMAIL))}
               </span>
             </li>
           </ol>
