@@ -54,7 +54,7 @@ edx-opaque-keys==0.4.0
 edx-organizations==0.4.5
 edx-rest-api-client==1.7.1
 edx-search==1.1.0
-edx-submissions==2.0.9
+edx-submissions==2.0.11
 edxval==0.1.1
 event-tracking==0.2.4
 facebook-sdk==0.4.0
@@ -187,7 +187,7 @@ analytics-python==1.1.0
 
 # Needed for mailchimp(mailing djangoapp)
 mailsnake==1.6.2
-jsonfield==1.0.3
+jsonfield==2.0.2
 
 # Inlines CSS styles into HTML for email notifications.
 pynliner==0.5.2
