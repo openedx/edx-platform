@@ -884,7 +884,10 @@ VIDEO_UPLOAD_PIPELINE = {
 
 ############################ APPS #####################################
 
-INSTALLED_APPS = (
+# The order of INSTALLED_APPS is important, when adding new apps here
+# remember to check that you are not creating new
+# RemovedInDjango19Warnings in the test logs.
+INSTALLED_APPS = [
     # Standard apps
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -911,6 +914,12 @@ INSTALLED_APPS = (
 
     # Testing
     'django_nose',
+
+    # Bookmarks
+    'openedx.core.djangoapps.bookmarks',
+
+    # Video module configs (This will be moved to Video once it becomes an XBlock)
+    'openedx.core.djangoapps.video_config',
 
     # For CMS
     'contentstore.apps.ContentstoreConfig',
@@ -987,6 +996,12 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.content.course_structures.apps.CourseStructuresConfig',
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
 
+    # edx-milestones service
+    'milestones',
+
+    # Self-paced course configuration
+    'openedx.core.djangoapps.self_paced',
+
     # Coursegraph
     'openedx.core.djangoapps.coursegraph.apps.CoursegraphConfig',
 
@@ -998,17 +1013,8 @@ INSTALLED_APPS = (
     # edX Proctoring
     'edx_proctoring',
 
-    # Bookmarks
-    'openedx.core.djangoapps.bookmarks',
-
     # Catalog integration
     'openedx.core.djangoapps.catalog',
-
-    # Self-paced course configuration
-    'openedx.core.djangoapps.self_paced',
-
-    # Video module configs (This will be moved to Video once it becomes an XBlock)
-    'openedx.core.djangoapps.video_config',
 
     # django-oauth2-provider (deprecated)
     'provider',
@@ -1025,9 +1031,6 @@ INSTALLED_APPS = (
 
     # Microsite configuration application
     'microsite_configuration',
-
-    # edx-milestones service
-    'milestones',
 
     # Static i18n support
     'statici18n',
@@ -1062,7 +1065,7 @@ INSTALLED_APPS = (
 
     # DRF filters
     'django_filters',
-)
+]
 
 
 ################# EDX MARKETING SITE ##################################
@@ -1151,32 +1154,33 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
 
 
 ### Apps only installed in some instances
-
+# The order of INSTALLED_APPS matters, so this tuple is the app name and the item in INSTALLED_APPS
+# that this app should be inserted *before*. A None here means it should be appended to the list.
 OPTIONAL_APPS = (
-    'mentoring',
-    'problem_builder',
-    'edx_sga',
+    ('mentoring', None),
+    ('problem_builder', 'openedx.core.djangoapps.content.course_overviews'),
+    ('edx_sga', None),
 
     # edx-ora2
-    'submissions',
-    'openassessment',
-    'openassessment.assessment',
-    'openassessment.fileupload',
-    'openassessment.workflow',
-    'openassessment.xblock',
+    ('submissions', 'openedx.core.djangoapps.content.course_overviews'),
+    ('openassessment', 'openedx.core.djangoapps.content.course_overviews'),
+    ('openassessment.assessment', 'openedx.core.djangoapps.content.course_overviews'),
+    ('openassessment.fileupload', 'openedx.core.djangoapps.content.course_overviews'),
+    ('openassessment.workflow', 'openedx.core.djangoapps.content.course_overviews'),
+    ('openassessment.xblock', 'openedx.core.djangoapps.content.course_overviews'),
 
     # edxval
-    'edxval',
+    ('edxval', 'openedx.core.djangoapps.content.course_overviews'),
 
     # Organizations App (http://github.com/edx/edx-organizations)
-    'organizations',
+    ('organizations', None),
 
     # Enterprise App (http://github.com/edx/edx-enterprise)
-    'enterprise',
+    ('enterprise', None),
 )
 
 
-for app_name in OPTIONAL_APPS:
+for app_name, insert_before in OPTIONAL_APPS:
     # First attempt to only find the module rather than actually importing it,
     # to avoid circular references - only try to import if it can't be found
     # by find_module, which doesn't work with import hooks
@@ -1187,7 +1191,12 @@ for app_name in OPTIONAL_APPS:
             __import__(app_name)
         except ImportError:
             continue
-    INSTALLED_APPS += (app_name,)
+
+    try:
+        INSTALLED_APPS.insert(INSTALLED_APPS.index(insert_before), app_name)
+    except (IndexError, ValueError):
+        INSTALLED_APPS += (app_name,)
+
 
 ### ADVANCED_SECURITY_CONFIG
 # Empty by default

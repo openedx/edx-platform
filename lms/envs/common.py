@@ -1965,7 +1965,10 @@ YOUTUBE_API_KEY = None
 
 ################################### APPS ######################################
 
-INSTALLED_APPS = (
+# The order of INSTALLED_APPS is important, when adding new apps here
+# remember to check that you are not creating new
+# RemovedInDjango19Warnings in the test logs.
+INSTALLED_APPS = [
     # Standard ones that are always installed...
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -2011,6 +2014,12 @@ INSTALLED_APPS = (
 
     # Site configuration for theming and behavioral modification
     'openedx.core.djangoapps.site_configuration',
+
+    # Video module configs (This will be moved to Video once it becomes an XBlock)
+    'openedx.core.djangoapps.video_config',
+
+    # Bookmarks
+    'openedx.core.djangoapps.bookmarks',
 
     # Our courseware
     'courseware',
@@ -2158,6 +2167,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
     'lms.djangoapps.course_blocks',
 
+
     # Coursegraph
     'openedx.core.djangoapps.coursegraph.apps.CoursegraphConfig',
 
@@ -2180,9 +2190,6 @@ INSTALLED_APPS = (
     'lms.djangoapps.teams',
 
     'xblock_django',
-
-    # Bookmarks
-    'openedx.core.djangoapps.bookmarks',
 
     # programs support
     'openedx.core.djangoapps.programs',
@@ -2212,9 +2219,6 @@ INSTALLED_APPS = (
 
     # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
     'openedx.core.djangoapps.verified_track_content',
-
-    # Video module configs (This will be moved to Video once it becomes an XBlock)
-    'openedx.core.djangoapps.video_config',
 
     # Learner's dashboard
     'learner_dashboard',
@@ -2255,7 +2259,7 @@ INSTALLED_APPS = (
 
     # DRF filters
     'django_filters',
-)
+]
 
 ######################### CSRF #########################################
 
@@ -2792,37 +2796,40 @@ ALL_LANGUAGES = (
 
 
 ### Apps only installed in some instances
+# The order of INSTALLED_APPS matters, so this tuple is the app name and the item in INSTALLED_APPS
+# that this app should be inserted *before*. A None here means it should be appended to the list.
 OPTIONAL_APPS = (
-    'mentoring',
-    'problem_builder',
-    'edx_sga',
+    ('mentoring', None),
+    ('problem_builder', 'openedx.core.djangoapps.content.course_overviews'),
+    ('edx_sga', None),
 
     # edx-ora2
-    'submissions',
-    'openassessment',
-    'openassessment.assessment',
-    'openassessment.fileupload',
-    'openassessment.workflow',
-    'openassessment.xblock',
+    ('submissions', 'openedx.core.djangoapps.content.course_overviews'),
+    ('openassessment', 'openedx.core.djangoapps.content.course_overviews'),
+    ('openassessment.assessment', 'openedx.core.djangoapps.content.course_overviews'),
+    ('openassessment.fileupload', 'openedx.core.djangoapps.content.course_overviews'),
+    ('openassessment.workflow', 'openedx.core.djangoapps.content.course_overviews'),
+    ('openassessment.xblock', 'openedx.core.djangoapps.content.course_overviews'),
 
     # edxval
-    'edxval',
+    ('edxval', 'openedx.core.djangoapps.content.course_overviews'),
 
     # edX Proctoring
-    'edx_proctoring',
+    ('edx_proctoring', None),
 
     # Organizations App (http://github.com/edx/edx-organizations)
-    'organizations',
+    ('organizations', None),
 
     # Enterprise Apps (http://github.com/edx/edx-enterprise)
-    'enterprise',
-    'integrated_channels.integrated_channel',
-    'integrated_channels.sap_success_factors',
+    ('enterprise', None),
+    ('integrated_channels.integrated_channel', None),
+    ('integrated_channels.sap_success_factors', None),
+
     # Required by the Enterprise App
-    'django_object_actions',  # https://github.com/crccheck/django-object-actions
+    ('django_object_actions', None),  # https://github.com/crccheck/django-object-actions
 )
 
-for app_name in OPTIONAL_APPS:
+for app_name, insert_before in OPTIONAL_APPS:
     # First attempt to only find the module rather than actually importing it,
     # to avoid circular references - only try to import if it can't be found
     # by find_module, which doesn't work with import hooks
@@ -2833,7 +2840,11 @@ for app_name in OPTIONAL_APPS:
             __import__(app_name)
         except ImportError:
             continue
-    INSTALLED_APPS += (app_name,)
+
+    try:
+        INSTALLED_APPS.insert(INSTALLED_APPS.index(insert_before), app_name)
+    except (IndexError, ValueError):
+        INSTALLED_APPS += (app_name,)
 
 ### ADVANCED_SECURITY_CONFIG
 # Empty by default
