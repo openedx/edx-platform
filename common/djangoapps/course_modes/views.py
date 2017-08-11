@@ -154,7 +154,6 @@ class ChooseModeView(View):
         }
         context.update(
             get_experiment_user_metadata_context(
-                request,
                 course,
                 request.user,
             )

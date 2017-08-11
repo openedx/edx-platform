@@ -7,21 +7,20 @@ from courseware.date_summary import (
 )
 
 
-def check_and_get_upgrade_link(request, user, course_id):
+def check_and_get_upgrade_link(user, course_id):
     """
     For an authenticated user, return a link to allow them to upgrade
     in the specified course.
     """
-    if request.user.is_authenticated():
+    if user.is_authenticated():
         upgrade_data = VerifiedUpgradeDeadlineDate(None, user, course_id=course_id)
         if upgrade_data.is_enabled:
-            request.need_to_set_upgrade_cookie = True
             return upgrade_data
 
     return None
 
 
-def get_experiment_user_metadata_context(request, course, user):
+def get_experiment_user_metadata_context(course, user):
     """
     Return a context dictionary with the keys used by the user_metadata.html.
     """
@@ -35,7 +34,7 @@ def get_experiment_user_metadata_context(request, course, user):
     except CourseEnrollment.DoesNotExist:
         pass  # Not enrolled, used the default None values
 
-    upgrade_data = check_and_get_upgrade_link(request, user, course.id)
+    upgrade_data = check_and_get_upgrade_link(user, course.id)
 
     return {
         'upgrade_link': upgrade_data and upgrade_data.link,
