@@ -6,22 +6,21 @@ from dateutil.tz import tzutc, gettz
 from django.core.management.base import BaseCommand
 from django.test.utils import CaptureQueriesContext
 from django.db.models import Prefetch
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.db import DEFAULT_DB_ALIAS, connections
 
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.user_api.models import UserPreference
-
-from django.db import DEFAULT_DB_ALIAS, connections
 
 from edx_ace.message import MessageType
 from edx_ace.recipient_resolver import RecipientResolver
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 
-from django.conf import settings
-from django.core.urlresolvers import reverse
 
 from course_modes.models import CourseMode, format_course_price
-from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.experiments.utils import check_and_get_upgrade_link
 
 
 class VerifiedUpgradeDeadlineReminder(MessageType):
@@ -60,27 +59,6 @@ class Command(BaseCommand):
             VerifiedDeadlineResolver(target_date).send(msg_t)
 
 
-
-def get_upgrade_link(enrollment):
-    user = enrollment.user
-    course_id = enrollment.course_id
-
-    if not enrollment.is_active:
-        return None
-
-    if enrollment.mode not in CourseMode.UPSELL_TO_VERIFIED_MODES:
-        return None
-
-    ecommerce_service = EcommerceService()
-    if ecommerce_service.is_enabled(user):
-        course_mode = enrollment.course.verified_modes[0]
-        return ecommerce_service.get_checkout_page_url(course_mode.sku)
-    return reverse('verify_student_upgrade_and_verify', args=(course_id,))
-
-
-from django.db import connection
-
-
 def build_email_context(schedule_deadline):
     schedules = Schedule.objects.select_related(
         'enrollment__user__profile',
@@ -102,44 +80,36 @@ def build_email_context(schedule_deadline):
         upgrade_deadline__day=schedule_deadline.day,
     )
 
-    conn = connections[DEFAULT_DB_ALIAS]
-    capture = CaptureQueriesContext(conn)
-    with capture:
-        for schedule in schedules:
-            enrollment = schedule.enrollment
-            user = enrollment.user
+    for schedule in schedules:
+        enrollment = schedule.enrollment
+        user = enrollment.user
 
-            user_time_zone = tzutc()
-            for preference in user.tzprefs:
-                user_time_zone = gettz(preference.value)
+        user_time_zone = tzutc()
+        for preference in user.tzprefs:
+            user_time_zone = gettz(preference.value)
 
-            course_id_str = str(enrollment.course_id)
-            course = enrollment.course
+        course_id_str = str(enrollment.course_id)
+        course = enrollment.course
 
-            course_root = reverse('course_root', kwargs={'course_id': course_id_str})
+        course_root = reverse('course_root', kwargs={'course_id': course_id_str})
 
-            def absolute_url(relative_path):
-                return u'{}{}'.format(settings.LMS_ROOT_URL, relative_path)
+        def absolute_url(relative_path):
+            return u'{}{}'.format(settings.LMS_ROOT_URL, relative_path)
 
-            template_context = {
-                'user_full_name': user.profile.name,
-                'user_personal_address': user.profile.name if user.profile.name else user.username,
-                'user_username': user.username,
-                'user_time_zone': user_time_zone,
-                'user_schedule_start_time': schedule.start,
-                'user_schedule_verified_upgrade_deadline_time': schedule.upgrade_deadline,
-                'course_id': course_id_str,
-                'course_title': course.display_name,
-                'course_url': absolute_url(course_root),
-                'course_image_url': absolute_url(course.course_image_url),
-                'course_end_time': course.end,
-                'course_verified_upgrade_url': get_upgrade_link(enrollment),
-                'course_verified_upgrade_price': format_course_price(course.verified_modes[0].min_price),
-            }
+        template_context = {
+            'user_full_name': user.profile.name,
+            'user_personal_address': user.profile.name if user.profile.name else user.username,
+            'user_username': user.username,
+            'user_time_zone': user_time_zone,
+            'user_schedule_start_time': schedule.start,
+            'user_schedule_verified_upgrade_deadline_time': schedule.upgrade_deadline,
+            'course_id': course_id_str,
+            'course_title': course.display_name,
+            'course_url': absolute_url(course_root),
+            'course_image_url': absolute_url(course.course_image_url),
+            'course_end_time': course.end,
+            'course_verified_upgrade_url': check_and_get_upgrade_link(course, user),
+            'course_verified_upgrade_price': format_course_price(course.verified_modes[0].min_price),
+        }
 
-            yield (user, course.language, template_context)
-
-    if len(capture.captured_queries) > 4:
-        for query in capture.captured_queries:
-            print(query['sql'])
-        raise Exception()
+        yield (user, course.language, template_context)
