@@ -171,10 +171,28 @@ class GradesServiceTests(ModuleStoreTestCase):
             self.course.id,
             self.subsection.location
         )
-        self.assertIsNone(override_obj)
+        self.assertIsNotNone(override_obj)
+        self.assertEqual(override_obj.earned_all_override, override['earned_all'])
+        self.assertEqual(override_obj.earned_graded_override, override['earned_graded'])
+
+        self.assertEqual(
+            self.mock_signal.call_args,
+            call(
+                sender=None,
+                user_id=self.user.id,
+                course_id=unicode(self.course.id),
+                usage_id=unicode(self.subsection.location),
+                only_if_higher=False,
+                modified=override_obj.modified,
+                score_deleted=False,
+                score_db_table=ScoreDatabaseTableEnum.overrides
+            )
+        )
 
     @freeze_time('2017-01-01')
     def test_undo_override_subsection_grade(self):
+        override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(grade=self.grade)
+
         self.service.undo_override_subsection_grade(
             user_id=self.user.id,
             course_key_or_id=self.course.id,
@@ -183,6 +201,20 @@ class GradesServiceTests(ModuleStoreTestCase):
 
         override = self.service.get_subsection_grade_override(self.user.id, self.course.id, self.subsection.location)
         self.assertIsNone(override)
+
+        self.assertEqual(
+            self.mock_signal.call_args,
+            call(
+                sender=None,
+                user_id=self.user.id,
+                course_id=unicode(self.course.id),
+                usage_id=unicode(self.subsection.location),
+                only_if_higher=False,
+                modified=datetime.now().replace(tzinfo=pytz.UTC),
+                score_deleted=True,
+                score_db_table=ScoreDatabaseTableEnum.overrides
+            )
+        )
 
     @ddt.data(
         ['edX/DemoX/Demo_Course', CourseKey.from_string('edX/DemoX/Demo_Course'), CourseKey],
