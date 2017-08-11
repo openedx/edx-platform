@@ -486,7 +486,6 @@ def _create_discussion_board_context(request, base_context, thread=None):
     })
     context.update(
         get_experiment_user_metadata_context(
-            request,
             course,
             user,
         )

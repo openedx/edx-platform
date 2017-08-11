@@ -348,7 +348,6 @@ class CoursewareIndex(View):
         }
         courseware_context.update(
             get_experiment_user_metadata_context(
-                request,
                 self.course,
                 self.effective_user,
             )
