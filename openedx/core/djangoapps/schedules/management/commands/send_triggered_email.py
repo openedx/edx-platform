@@ -1,37 +1,27 @@
 from __future__ import print_function
 
 import datetime
-import textwrap
 
 from dateutil.tz import tzutc, gettz
 from django.core.management.base import BaseCommand
-from django.utils.translation import ugettext_lazy
-from django.utils.translation import override as override_language
-from jinja2 import Environment, contextfilter, Markup, escape
 from django.test.utils import CaptureQueriesContext
 from django.db.models import Prefetch
 
 from openedx.core.djangoapps.schedules.models import Schedule
-from openedx.core.djangoapps.schedules.tasks import send_email_batch
 from openedx.core.djangoapps.user_api.models import UserPreference
 
 from django.db import DEFAULT_DB_ALIAS, connections
-from django.template.loader import get_template
 
 from edx_ace.message import MessageType
 from edx_ace.recipient_resolver import RecipientResolver
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 
-from collections import namedtuple
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from course_modes.models import CourseMode, format_course_price
 from lms.djangoapps.commerce.utils import EcommerceService
-from util.date_utils import strftime_localized
 
 
 class VerifiedUpgradeDeadlineReminder(MessageType):
@@ -43,12 +33,13 @@ class VerifiedDeadlineResolver(RecipientResolver):
         self.target_deadline = target_deadline
 
     def send(self, msg_type):
-        for (user, context) in build_email_context(self.target_deadline):
+        for (user, language, context) in build_email_context(self.target_deadline):
             msg = msg_type.personalize(
                 Recipient(
                     user.username,
                     user.email,
                 ),
+                language,
                 context
             )
             ace.send(msg)
@@ -144,10 +135,9 @@ def build_email_context(schedule_deadline):
                 'course_end_time': course.end,
                 'course_verified_upgrade_url': get_upgrade_link(enrollment),
                 'course_verified_upgrade_price': format_course_price(course.verified_modes[0].min_price),
-                'course_language': course.language,
             }
 
-            yield (user, template_context)
+            yield (user, course.language, template_context)
 
     if len(capture.captured_queries) > 4:
         for query in capture.captured_queries:
