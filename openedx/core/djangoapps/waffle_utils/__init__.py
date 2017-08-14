@@ -208,7 +208,7 @@ class WaffleFlagNamespace(WaffleNamespace):
         """
         # validate arguments
         namespaced_flag_name = self._namespaced_name(flag_name)
-
+        value = None
         if check_before_waffle_callback:
             value = check_before_waffle_callback(namespaced_flag_name)
 
