@@ -162,7 +162,7 @@ case "$TEST_SUITE" in
 
     "bok-choy")
 
-        PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS --with-flaky --with-xunit"
+        PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS"
 
         case "$SHARD" in
 
@@ -171,11 +171,11 @@ case "$TEST_SUITE" in
                 ;;
 
             [1-9]|10)
-                paver test_bokchoy --attr="shard=$SHARD" $PAVER_ARGS
+                paver test_bokchoy --eval-attr="shard==$SHARD" $PAVER_ARGS
                 ;;
 
             11|"noshard")
-                paver test_bokchoy --attr='!shard,a11y=False' $PAVER_ARGS
+                paver test_bokchoy --eval-attr='not shard and not a11y' $PAVER_ARGS
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins
@@ -190,7 +190,7 @@ case "$TEST_SUITE" in
                 # May be unnecessary if we changed the "Skip if there are no test files"
                 # option to True in the jenkins job definitions.
                 mkdir -p reports/bok_choy
-                emptyxunit "bok_choy/nosetests"
+                emptyxunit "bok_choy/xunit"
                 ;;
         esac
         ;;
