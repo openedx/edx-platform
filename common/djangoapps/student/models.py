@@ -1010,7 +1010,6 @@ class CourseEnrollment(models.Model):
         else:
             self._course_id = value
 
-
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
     # If is_active is False, then the student is not considered to be enrolled
