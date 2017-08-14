@@ -414,7 +414,7 @@ def list_problem_responses(course_key, problem_location):
     # Are we dealing with an "old-style" problem location?
     run = problem_key.run
     if not run:
-        problem_key = course_key.make_usage_key_from_deprecated_string(problem_location)
+        problem_key = UsageKey.from_string(problem_location).map_into_course(course_key)
     if problem_key.course_key != course_key:
         return []
 

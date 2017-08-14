@@ -987,7 +987,7 @@ def get_problem_responses(request, course_id):
         # Are we dealing with an "old-style" problem location?
         run = problem_key.run
         if not run:
-            problem_key = course_key.make_usage_key_from_deprecated_string(problem_location)
+            problem_key = UsageKey.from_string(problem_location).map_into_course(course_key)
         if problem_key.course_key != course_key:
             raise InvalidKeyError(type(problem_key), problem_key)
     except InvalidKeyError:
@@ -1937,7 +1937,7 @@ def reset_student_attempts(request, course_id):
             return HttpResponseForbidden("Requires instructor access.")
 
     try:
-        module_state_key = course_id.make_usage_key_from_deprecated_string(problem_to_reset)
+        module_state_key = UsageKey.from_string(problem_to_reset).map_into_course(course_id)
     except InvalidKeyError:
         return HttpResponseBadRequest()
 
@@ -2025,7 +2025,7 @@ def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: dis
             return HttpResponseForbidden(_("Requires instructor access."))
 
     try:
-        entrance_exam_key = course_id.make_usage_key_from_deprecated_string(course.entrance_exam_id)
+        entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
         if delete_module:
             lms.djangoapps.instructor_task.api.submit_delete_entrance_exam_state_for_student(
                 request,
@@ -2083,7 +2083,7 @@ def rescore_problem(request, course_id):
         )
 
     try:
-        module_state_key = course_id.make_usage_key_from_deprecated_string(problem_to_reset)
+        module_state_key = UsageKey.from_string(problem_to_reset).map_into_course(course_id)
     except InvalidKeyError:
         return HttpResponseBadRequest("Unable to parse problem id")
 
@@ -2215,7 +2215,7 @@ def rescore_entrance_exam(request, course_id):
         )
 
     try:
-        entrance_exam_key = course_id.make_usage_key_from_deprecated_string(course.entrance_exam_id)
+        entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
     except InvalidKeyError:
         return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
 
@@ -2300,7 +2300,7 @@ def list_instructor_tasks(request, course_id):
 
     if problem_location_str:
         try:
-            module_state_key = course_id.make_usage_key_from_deprecated_string(problem_location_str)
+            module_state_key = UsageKey.from_string(problem_location_str).map_into_course(course_id)
         except InvalidKeyError:
             return HttpResponseBadRequest()
         if student:
@@ -2338,7 +2338,7 @@ def list_entrance_exam_instructor_tasks(request, course_id):  # pylint: disable=
         student = get_student_from_identifier(student)
 
     try:
-        entrance_exam_key = course_id.make_usage_key_from_deprecated_string(course.entrance_exam_id)
+        entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
     except InvalidKeyError:
         return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
     if student:

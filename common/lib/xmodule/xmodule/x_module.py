@@ -1632,7 +1632,8 @@ class XMLParsingSystem(DescriptorSystem):
         """
         if isinstance(value, UsageKey):
             return value
-        return course_key.make_usage_key_from_deprecated_string(value)
+        usage_key = UsageKey.from_string(value)
+        return usage_key.map_into_course(course_key)
 
     def _convert_reference_fields_to_keys(self, xblock):
         """

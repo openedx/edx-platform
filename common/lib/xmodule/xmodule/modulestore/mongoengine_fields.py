@@ -73,7 +73,7 @@ class UsageKeyField(mongoengine.StringField):
             return None
         if isinstance(location, basestring):
             location = super(UsageKeyField, self).to_python(location)
-            return Location.from_deprecated_string(location)
+            return Location.from_string(location)
         else:
             return location
 

@@ -886,7 +886,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
 
     try:
         course_id = CourseKey.from_string(course_id)
-        usage_key = course_id.make_usage_key_from_deprecated_string(unquote_slashes(usage_id))
+        usage_key = UsageKey.from_string(unquote_slashes(usage_id)).map_into_course(course_id)
     except InvalidKeyError:
         raise Http404("Invalid location")
 
