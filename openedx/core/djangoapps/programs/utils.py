@@ -647,6 +647,9 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
                 })
             except (ConnectionError, SlumberBaseException, Timeout):
                 log.exception('Failed to get discount price for following product SKUs: %s ', ', '.join(skus))
+                self.data.update({
+                    'discount_data': {'is_discounted': False}
+                })
         else:
             is_learner_eligible_for_one_click_purchase = False
 
