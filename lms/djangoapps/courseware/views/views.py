@@ -407,12 +407,14 @@ class CourseTabView(EdxFragmentView):
         with modulestore().bulk_operations(course_key):
             course = get_course_with_access(request.user, 'load', course_key)
             try:
-                # Show warnings if the user has limited access
-                self.register_user_access_warning_messages(request, course_key)
-
                 # Render the page
                 tab = CourseTabList.get_tab_by_type(course.tabs, tab_type)
                 page_context = self.create_page_context(request, course=course, tab=tab, **kwargs)
+
+                # Show warnings if the user has limited access
+                # Must come after masquerading on creation of page context
+                self.register_user_access_warning_messages(request, course_key)
+
                 set_custom_metrics_for_course_key(course_key)
                 return super(CourseTabView, self).get(request, course=course, page_context=page_context, **kwargs)
             except Exception as exception:  # pylint: disable=broad-except
@@ -434,7 +436,6 @@ class CourseTabView(EdxFragmentView):
         Register messages to be shown to the user if they have limited access.
         """
         is_enrolled = CourseEnrollment.is_enrolled(request.user, course_key)
-        is_staff = has_access(request.user, 'staff', course_key)
         if request.user.is_anonymous():
             PageLevelMessages.register_warning_message(
                 request,
@@ -449,7 +450,7 @@ class CourseTabView(EdxFragmentView):
                     ),
                 )
             )
-        elif not is_enrolled and not is_staff:
+        elif not is_enrolled:
             # Only show enroll button if course is open for enrollment.
             if course_open_for_self_enrollment(course_key):
                 enroll_message = _('You must be enrolled in the course to see course content. \

@@ -204,7 +204,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         [CourseUserType.ANONYMOUS, 'To see course content'],
         [CourseUserType.ENROLLED, None],
         [CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
-        [CourseUserType.UNENROLLED_STAFF, None],
+        [CourseUserType.UNENROLLED_STAFF, 'You must be enrolled in the course to see course content.'],
     )
     @ddt.unpack
     def test_home_page(self, user_type, expected_message):
@@ -239,7 +239,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         [CourseUserType.ANONYMOUS, 'To see course content'],
         [CourseUserType.ENROLLED, None],
         [CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
-        [CourseUserType.UNENROLLED_STAFF, None],
+        [CourseUserType.UNENROLLED_STAFF, 'You must be enrolled in the course to see course content.'],
     )
     @ddt.unpack
     def test_home_page_not_unified(self, user_type, expected_message):
