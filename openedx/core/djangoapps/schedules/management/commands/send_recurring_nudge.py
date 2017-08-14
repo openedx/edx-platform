@@ -33,26 +33,26 @@ class ScheduleStartResolver(RecipientResolver):
     def __init__(self, target_start_date):
         self.target_start_date = target_start_date
 
-    def send(self, msg_type):
-        schedule_day.delay(self.target_start_date)
-
-    def build_email_context(self):
+    def send(self, week):
+        schedule_day.delay(week, self.target_start_date)
 
 
 @task
-def schedule_day(target_date):
+def schedule_day(week, target_date):
     for hour in range(23):
-        schedule_hour.delay(target_date, hour)
+        schedule_hour.delay(week, target_date, hour)
 
 
 @task
-def schedule_hour(target_date, hour):
+def schedule_hour(week, target_date, hour):
     for minute in range(60):
-        schedule_minute.delay(target_date, hour, minute)
+        schedule_minute.delay(week, target_date, hour, minute)
 
 
 @task
-def schedule_minute(target_date, hour, minute):
+def schedule_minute(week, target_date, hour, minute):
+    msg_type = RecurringNudge(week)
+
     for (user, language, context) in schedules_for_minute(target_date, hour, minute):
         msg = msg_type.personalize(
             Recipient(
@@ -62,7 +62,12 @@ def schedule_minute(target_date, hour, minute):
             language,
             context
         )
-        ace.send.delay(msg)
+        schedule_send.delay(msg)
+
+
+@task
+def schedule_send(msg):
+    ace.send(msg)
 
 
 def schedules_for_minute(target_date, hour, minute):
@@ -118,6 +123,5 @@ class Command(BaseCommand):
         current_date = datetime.date(*[int(x) for x in options['date'].split('-')])
 
         for week in (1, 2, 3, 4):
-            msg_t = RecurringNudge(week)
             target_date = current_date + datetime.timedelta(days=week * 7)
-            ScheduleStartResolver(target_date).send(msg_t)
+            ScheduleStartResolver(target_date).send(week)
