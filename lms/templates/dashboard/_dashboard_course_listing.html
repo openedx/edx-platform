@@ -219,6 +219,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
               <div class="actions-dropdown" id="actions-dropdown-${dashboard_index}" tabindex="-1">
                 <ul class="actions-dropdown-list" id="actions-dropdown-list-${dashboard_index}" aria-label="${_('Available Actions')}" role="menu">
                   % if can_unenroll:
+                    <%include file='_reason_survey.html' args='course_overview=course_overview' />
                     <li class="actions-item" id="actions-item-unenroll-${dashboard_index}">
                     % if is_paid_course and show_refund_option:
                       % if not is_course_blocked:

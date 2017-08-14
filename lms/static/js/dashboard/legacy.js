@@ -104,35 +104,6 @@
              edx.dashboard.dropdown.toggleCourseActionsDropdownMenu(event);
          });
 
-         $('.action-unenroll').click(function(event) {
-             var element = $(event.target);
-             var track_info = element.data('track-info');
-             var course_number = element.data('course-number');
-             var course_name = element.data('course-name');
-             var cert_name_long = element.data('cert-name-long');
-             $('#track-info').html(interpolate(track_info, {
-                 course_number: "<span id='unenroll_course_number'>" + course_number + '</span>',
-                 course_name: "<span id='unenroll_course_name'>" + course_name + '</span>',
-                 cert_name_long: "<span id='unenroll_cert_name'>" + cert_name_long + '</span>'
-             }, true));
-             $('#refund-info').html(element.data('refund-info'));
-             $('#unenroll_course_id').val(element.data('course-id'));
-             edx.dashboard.dropdown.toggleCourseActionsDropdownMenu(event);
-         });
-
-         $('#unenroll_form').on('ajax:complete', function(event, xhr) {
-             if (xhr.status === 200) {
-                 location.href = urls.dashboard;
-             } else if (xhr.status === 403) {
-                 location.href = urls.signInUser + '?course_id=' +
-                encodeURIComponent($('#unenroll_course_id').val()) + '&enrollment_action=unenroll';
-             } else {
-                 $('#unenroll_error').html(
-                    xhr.responseText ? xhr.responseText : gettext('An error occurred. Please try again later.')
-                ).stop().css('display', 'block');
-             }
-         });
-
          $('#email_settings_form').submit(function() {
              $.ajax({
                  type: 'POST',
@@ -164,22 +135,5 @@
             );
          });
 
-         $('.action-unenroll').each(function(index) {
-             $(this).attr('id', 'unenroll-' + index);
-            // a bit of a hack, but gets the unique selector for the modal trigger
-             var trigger = '#' + $(this).attr('id');
-             accessibleModal(
-                trigger,
-                '#unenroll-modal .close-modal',
-                '#unenroll-modal',
-                '#dashboard-main'
-            );
-         });
-
-         $('#unregister_block_course').click(function(event) {
-             $('#unenroll_course_id').val($(event.target).data('course-id'));
-             $('#unenroll_course_number').text($(event.target).data('course-number'));
-             $('#unenroll_course_name').text($(event.target).data('course-name'));
-         });
      };
  })(jQuery, gettext, Logger, accessible_modal, interpolate);
