@@ -30,11 +30,11 @@ class RecurringNudge(MessageType):
 
 
 class ScheduleStartResolver(RecipientResolver):
-    def __init__(self, target_start_date):
-        self.target_start_date = target_start_date
+    def __init__(self, current_date):
+        self.current_date = current_date
 
     def send(self, week):
-        schedule_day.delay(week, self.target_start_date)
+        schedule_day.delay(week, self.current_date - datetime.timedelta(days=week * 7))
 
 
 @task
@@ -121,7 +121,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         current_date = datetime.date(*[int(x) for x in options['date'].split('-')])
-
+        resolver = ScheduleStartResolver(current_date)
         for week in (1, 2, 3, 4):
-            target_date = current_date + datetime.timedelta(days=week * 7)
-            ScheduleStartResolver(target_date).send(week)
+            resolver.send(week)
