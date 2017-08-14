@@ -90,7 +90,6 @@ class ScheduleStartResolver(RecipientResolver):
             yield (user, course.language, template_context)
 
 
-
 class Command(BaseCommand):
 
     def add_arguments(self, parser):
@@ -101,5 +100,5 @@ class Command(BaseCommand):
 
         for week in (1, 2, 3, 4):
             msg_t = RecurringNudge(week)
-            target_date = current_date + datetime.timedelta(days=offset)
+            target_date = current_date + datetime.timedelta(days=week * 7)
             ScheduleStartResolver(target_date).send(msg_t)
