@@ -447,6 +447,9 @@ class ProgramDataExtender(object):
         else:
             run_mode['upgrade_url'] = None
 
+    def _attach_course_run_may_certify(self, run_mode):
+        run_mode['may_certify'] = self.course_overview.may_certify()
+
 
 def get_certificates(user, extended_program):
     """
@@ -467,7 +470,7 @@ def get_certificates(user, extended_program):
     for course in extended_program['courses']:
         for course_run in course['course_runs']:
             url = course_run.get('certificate_url')
-            if url:
+            if url and course_run.get('may_certify'):
                 certificates.append({
                     'type': 'course',
                     'title': course_run['title'],
@@ -478,7 +481,8 @@ def get_certificates(user, extended_program):
                 break
 
     program_credentials = get_credentials(user, program_uuid=extended_program['uuid'])
-    if program_credentials:
+    # only include a program certificate if a certificate is available for every course
+    if program_credentials and (len(certificates) == len(extended_program['courses'])):
         certificates.append({
             'type': 'program',
             'title': extended_program['title'],
