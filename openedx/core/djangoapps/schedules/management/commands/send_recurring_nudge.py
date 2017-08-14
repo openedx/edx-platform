@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import datetime
 
+from celery import task
 from dateutil.tz import tzutc, gettz
 from django.core.management.base import BaseCommand
 from django.test.utils import CaptureQueriesContext
@@ -33,61 +34,79 @@ class ScheduleStartResolver(RecipientResolver):
         self.target_start_date = target_start_date
 
     def send(self, msg_type):
-        for (user, language, context) in self.build_email_context():
-            msg = msg_type.personalize(
-                Recipient(
-                    user.username,
-                    user.email,
-                ),
-                language,
-                context
-            )
-            ace.send(msg)
+        schedule_day.delay(self.target_start_date)
 
     def build_email_context(self):
-        schedules = Schedule.objects.select_related(
-            'enrollment__user__profile',
-            'enrollment__course',
-        ).prefetch_related(
-            Prefetch(
-                'enrollment__course__modes',
-                queryset=CourseMode.objects.filter(mode_slug=CourseMode.VERIFIED),
-                to_attr='verified_modes'
+
+
+@task
+def schedule_day(target_date):
+    for hour in range(23):
+        schedule_hour.delay(target_date, hour)
+
+
+@task
+def schedule_hour(target_date, hour):
+    for minute in range(60):
+        schedule_minute.delay(target_date, hour, minute)
+
+
+@task
+def schedule_minute(target_date, hour, minute):
+    for (user, language, context) in schedules_for_minute(target_date, hour, minute):
+        msg = msg_type.personalize(
+            Recipient(
+                user.username,
+                user.email,
             ),
-            Prefetch(
-                'enrollment__user__preferences',
-                queryset=UserPreference.objects.filter(key='time_zone'),
-                to_attr='tzprefs'
-            ),
-        ).filter(
-            start__year=self.target_start_date.year,
-            start__month=self.target_start_date.month,
-            start__day=self.target_start_date.day,
+            language,
+            context
         )
+        ace.send.delay(msg)
 
-        for schedule in schedules:
-            enrollment = schedule.enrollment
-            user = enrollment.user
 
-            user_time_zone = tzutc()
-            for preference in user.tzprefs:
-                user_time_zone = gettz(preference.value)
+def schedules_for_minute(target_date, hour, minute):
+    schedules = Schedule.objects.select_related(
+        'enrollment__user__profile',
+        'enrollment__course',
+    ).prefetch_related(
+        Prefetch(
+            'enrollment__course__modes',
+            queryset=CourseMode.objects.filter(mode_slug=CourseMode.VERIFIED),
+            to_attr='verified_modes'
+        ),
+        Prefetch(
+            'enrollment__user__preferences',
+            queryset=UserPreference.objects.filter(key='time_zone'),
+            to_attr='tzprefs'
+        ),
+    ).filter(
+        start__year=target_date.year,
+        start__month=target_date.month,
+        start__day=target_date.day,
+        start__hour=hour,
+        start__minute=minute,
+    )
 
-            course_id_str = str(enrollment.course_id)
-            course = enrollment.course
+    for schedule in schedules:
+        enrollment = schedule.enrollment
+        user = enrollment.user
 
-            course_root = reverse('course_root', kwargs={'course_id': course_id_str})
+        course_id_str = str(enrollment.course_id)
+        course = enrollment.course
 
-            def absolute_url(relative_path):
-                return u'{}{}'.format(settings.LMS_ROOT_URL, relative_path)
+        course_root = reverse('course_root', kwargs={'course_id': course_id_str})
 
-            template_context = {
-                'student_name': user.profile.name,
-                'course_name': course.display_name,
-                'course_url': absolute_url(course_root),
-            }
+        def absolute_url(relative_path):
+            return u'{}{}'.format(settings.LMS_ROOT_URL, relative_path)
 
-            yield (user, course.language, template_context)
+        template_context = {
+            'student_name': user.profile.name,
+            'course_name': course.display_name,
+            'course_url': absolute_url(course_root),
+        }
+
+        yield (user, course.language, template_context)
 
 
 class Command(BaseCommand):
