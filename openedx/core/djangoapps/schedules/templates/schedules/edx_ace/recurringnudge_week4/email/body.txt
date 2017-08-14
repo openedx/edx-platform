@@ -1,0 +1,5 @@
+Dear {{student_name}},
+
+Many successful edX learners in {{course_name}}
+are watching videos every week. What do you want
+to do to keep learning?

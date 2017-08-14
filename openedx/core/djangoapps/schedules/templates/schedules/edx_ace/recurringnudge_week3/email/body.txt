@@ -1,0 +1,6 @@
+Dear {{student_name}},
+
+Many edX.org learners use their commutes to engage with courses.
+Want to learn on the go? Learn on your preferred device. Remember,
+when you participate in {{course_name}}, you learn
+more things.

@@ -23,13 +23,14 @@ from course_modes.models import CourseMode, format_course_price
 from lms.djangoapps.experiments.utils import check_and_get_upgrade_link
 
 
-class VerifiedUpgradeDeadlineReminder(MessageType):
-    pass
+class RecurringNudge(MessageType):
+    def __init__(self, week):
+        self.name = "RecurringNudge_Week{}".format(week)
 
 
-class VerifiedDeadlineResolver(RecipientResolver):
-    def __init__(self, target_deadline):
-        self.target_deadline = target_deadline
+class ScheduleStartResolver(RecipientResolver):
+    def __init__(self, target_start_date):
+        self.target_start_date = target_start_date
 
     def send(self, msg_type):
         for (user, language, context) in self.build_email_context():
@@ -59,9 +60,9 @@ class VerifiedDeadlineResolver(RecipientResolver):
                 to_attr='tzprefs'
             ),
         ).filter(
-            upgrade_deadline__year=self.schedule_deadline.year,
-            upgrade_deadline__month=self.schedule_deadline.month,
-            upgrade_deadline__day=self.schedule_deadline.day,
+            start__year=self.target_start_date.year,
+            start__month=self.target_start_date.month,
+            start__day=self.target_start_date.day,
         )
 
         for schedule in schedules:
@@ -81,22 +82,13 @@ class VerifiedDeadlineResolver(RecipientResolver):
                 return u'{}{}'.format(settings.LMS_ROOT_URL, relative_path)
 
             template_context = {
-                'user_full_name': user.profile.name,
-                'user_personal_address': user.profile.name if user.profile.name else user.username,
-                'user_username': user.username,
-                'user_time_zone': user_time_zone,
-                'user_schedule_start_time': schedule.start,
-                'user_schedule_verified_upgrade_deadline_time': schedule.upgrade_deadline,
-                'course_id': course_id_str,
-                'course_title': course.display_name,
+                'student_name': user.profile.name,
+                'course_name': course.display_name,
                 'course_url': absolute_url(course_root),
-                'course_image_url': absolute_url(course.course_image_url),
-                'course_end_time': course.end,
-                'course_verified_upgrade_url': check_and_get_upgrade_link(course, user),
-                'course_verified_upgrade_price': format_course_price(course.verified_modes[0].min_price),
             }
 
             yield (user, course.language, template_context)
+
 
 
 class Command(BaseCommand):
@@ -107,8 +99,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         current_date = datetime.date(*[int(x) for x in options['date'].split('-')])
 
-        msg_t = VerifiedUpgradeDeadlineReminder()
-
-        for offset in (2, 9, 16):
+        for week in (1, 2, 3, 4):
+            msg_t = RecurringNudge(week)
             target_date = current_date + datetime.timedelta(days=offset)
-            VerifiedDeadlineResolver(target_date).send(msg_t)
+            ScheduleStartResolver(target_date).send(msg_t)

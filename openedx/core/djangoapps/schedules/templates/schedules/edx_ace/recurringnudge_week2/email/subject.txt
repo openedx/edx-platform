@@ -1,0 +1,1 @@
+Solve a few problems in {{course_name}}
