@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseKey
 
 from shoppingcart.models import Coupon, CourseRegistrationCode
 from util.json_request import JsonResponse
@@ -57,7 +57,7 @@ def add_coupon(request, course_id):
 
     # check if the code is already in the Coupons Table and active
     try:
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_id = CourseKey.from_string(course_id)
         coupon = Coupon.objects.get(is_active=True, code=code, course_id=course_id)
     except Coupon.DoesNotExist:
         # check if the coupon code is in the CourseRegistrationCode Table

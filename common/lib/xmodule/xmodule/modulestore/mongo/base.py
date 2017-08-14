@@ -26,7 +26,7 @@ from contracts import contract, new_contract
 from fs.osfs import OSFS
 from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import UsageKey, CourseKey, AssetKey
-from opaque_keys.edx.locations import Location, BlockUsageLocator, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import Location, BlockUsageLocator
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from path import Path as path
 from pytz import UTC
@@ -1021,7 +1021,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         courses_summaries = []
         for course in course_records:
             if not (course['_id']['org'] == 'edx' and course['_id']['course'] == 'templates'):
-                locator = SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name'])
+                locator = CourseKey.from_string('/'.join(
+                    [course['_id']['org'], course['_id']['course'], course['_id']['name']]
+                ))
                 course_summary = extract_course_summary(course)
                 courses_summaries.append(
                     CourseSummary(locator, **course_summary)
@@ -1045,7 +1047,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         base_list = sum(
             [
                 self._load_items(
-                    SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name']),
+                    CourseKey.from_string('/'.join(
+                        [course['_id']['org'], course['_id']['course'], course['_id']['name']]
+                    )),
                     [course]
                 )
                 for course
@@ -1136,7 +1140,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             course_query = {'_id': location.to_deprecated_son()}
         course = self.collection.find_one(course_query, projection={'_id': True})
         if course:
-            return SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name'])
+            return CourseKey.from_string('/'.join([
+                course['_id']['org'], course['_id']['course'], course['_id']['name']]
+            ))
         else:
             return None
 
@@ -1289,7 +1295,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Raises:
             InvalidLocationError: If a course with the same org, course, and run already exists
         """
-        course_id = SlashSeparatedCourseKey(org, course, run)
+        course_id = CourseKey.from_string('/'.join([org, course, run]))
 
         # Check if a course with this org/course has been defined before (case-insensitive)
         course_search_location = SON([

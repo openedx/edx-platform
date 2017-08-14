@@ -1,6 +1,6 @@
 from django.test import TestCase
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 
 from django_comment_common.models import Role
 from models import CourseDiscussionSettings
@@ -33,7 +33,7 @@ class RoleAssignmentTest(TestCase):
             "hacky",
             "hacky@fake.edx.org"
         )
-        self.course_key = SlashSeparatedCourseKey("edX", "Fake101", "2012")
+        self.course_key = CourseLocator("edX", "Fake101", "2012")
         CourseEnrollment.enroll(self.staff_user, self.course_key)
         CourseEnrollment.enroll(self.student_user, self.course_key)
 

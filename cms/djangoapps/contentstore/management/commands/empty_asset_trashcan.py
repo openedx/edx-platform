@@ -1,7 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.contentstore.utils import empty_asset_trashcan
 from xmodule.modulestore.django import modulestore
@@ -17,12 +15,7 @@ class Command(BaseCommand):
             raise CommandError("empty_asset_trashcan requires one or no arguments: |<course_id>|")
 
         if len(args) == 1:
-            try:
-                course_key = CourseKey.from_string(args[0])
-            except InvalidKeyError:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
-
-            course_ids = [course_key]
+            course_ids = [CourseKey.from_string(args[0])]
         else:
             course_ids = [course.id for course in modulestore().get_courses()]
 

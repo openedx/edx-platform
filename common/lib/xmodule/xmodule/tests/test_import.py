@@ -20,7 +20,6 @@ from xmodule.fields import Date
 from xmodule.tests import DATA_DIR
 from xmodule.modulestore.inheritance import InheritanceMixin
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xblock.core import XBlock
 from xblock.fields import Scope, String, Integer
@@ -40,7 +39,7 @@ class DummySystem(ImportSystem):
             xmlstore = LibraryXMLModuleStore("data_dir", source_dirs=[], load_error_modules=load_error_modules)
         else:
             xmlstore = XMLModuleStore("data_dir", source_dirs=[], load_error_modules=load_error_modules)
-        course_id = SlashSeparatedCourseKey(ORG, COURSE, 'test_run')
+        course_id = CourseKey.from_string('/'.join([ORG, COURSE, 'test_run']))
         course_dir = "test_dir"
         error_tracker = Mock()
 

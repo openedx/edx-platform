@@ -100,7 +100,7 @@ class CourseViewTestsMixin(object):
             start=datetime(2014, 6, 16, 14, 30),
             end=datetime(2015, 1, 16),
             org="MTD",
-            # Use mongo so that we can get a test with a SlashSeparatedCourseKey
+            # Use mongo so that we can get a test with the deprecated key format.
             default_store=ModuleStoreEnum.Type.mongo
         )
 

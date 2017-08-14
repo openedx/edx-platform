@@ -26,7 +26,8 @@ from xmodule.x_module import (
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.modulestore import ModuleStoreEnum, ModuleStoreReadBase, LIBRARY_ROOT, COURSE_ROOT
 from xmodule.tabs import CourseTabList
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import Location
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator, BlockUsageLocator
 
 from xblock.field_data import DictFieldData
@@ -357,7 +358,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         self.errored_courses = {}  # course_dir -> errorlog, for dirs that failed to load
 
         if course_ids is not None:
-            course_ids = [SlashSeparatedCourseKey.from_deprecated_string(course_id) for course_id in course_ids]
+            course_ids = [CourseKey.from_string(course_id) for course_id in course_ids]
 
         self.load_error_modules = load_error_modules
 
@@ -629,9 +630,9 @@ class XMLModuleStore(ModuleStoreReadBase):
         if not url_name:
             raise ValueError("Can't load a course without a 'url_name' "
                              "(or 'name') set.  Set url_name.")
-        # Have to use SlashSeparatedCourseKey here because it makes sure the same format is
+        # Have to use older key format here because it makes sure the same format is
         # always used, preventing duplicate keys.
-        return SlashSeparatedCourseKey(org, course, url_name)
+        return CourseKey.from_string('/'.join([org, course, url_name]))
 
     def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):
         self._load_extra_content(system, course_descriptor, category, base_dir, course_dir)

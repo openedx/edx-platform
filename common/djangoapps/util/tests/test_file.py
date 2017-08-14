@@ -13,7 +13,8 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.utils.timezone import UTC
 from mock import Mock, patch
-from opaque_keys.edx.locations import CourseLocator, SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import CourseLocator
 
 import util.file
 from util.file import (
@@ -30,19 +31,13 @@ class FilenamePrefixGeneratorTestCase(TestCase):
     """
     Tests for course_filename_prefix_generator
     """
-    @ddt.data(CourseLocator, SlashSeparatedCourseKey)
-    def test_locators(self, course_key_class):
-        self.assertEqual(
-            course_filename_prefix_generator(course_key_class(org='foo', course='bar', run='baz')),
-            u'foo_bar_baz'
-        )
+    @ddt.data(CourseLocator(org='foo', course='bar', run='baz'), CourseKey.from_string('foo/bar/baz'))
+    def test_locators(self, course_key):
+        self.assertEqual(course_filename_prefix_generator(course_key), u'foo_bar_baz')
 
-    @ddt.data(CourseLocator, SlashSeparatedCourseKey)
-    def test_custom_separator(self, course_key_class):
-        self.assertEqual(
-            course_filename_prefix_generator(course_key_class(org='foo', course='bar', run='baz'), separator='-'),
-            u'foo-bar-baz'
-        )
+    @ddt.data(CourseLocator(org='foo', course='bar', run='baz'), CourseKey.from_string('foo/bar/baz'))
+    def test_custom_separator(self, course_key):
+        self.assertEqual(course_filename_prefix_generator(course_key, separator='-'), u'foo-bar-baz')
 
 
 @ddt.ddt
@@ -62,21 +57,19 @@ class FilenameGeneratorTestCase(TestCase):
         mocked_datetime.now.return_value = self.NOW
         self.addCleanup(datetime_patcher.stop)
 
-    @ddt.data(CourseLocator, SlashSeparatedCourseKey)
-    def test_filename_generator(self, course_key_class):
+    @ddt.data(CourseLocator(org='foo', course='bar', run='baz'), CourseKey.from_string('foo/bar/baz'))
+    def test_filename_generator(self, course_key):
         """
         Tests that the generator creates names based on course_id, base name, and date.
         """
         self.assertEqual(
             u'foo_bar_baz_file_1974-06-22-010203',
-            course_and_time_based_filename_generator(course_key_class(org='foo', course='bar', run='baz'), 'file')
+            course_and_time_based_filename_generator(course_key, 'file')
         )
 
         self.assertEqual(
             u'foo_bar_baz_base_name_ø_1974-06-22-010203',
-            course_and_time_based_filename_generator(
-                course_key_class(org='foo', course='bar', run='baz'), ' base` name ø '
-            )
+            course_and_time_based_filename_generator(course_key, ' base` name ø ')
         )
 
 

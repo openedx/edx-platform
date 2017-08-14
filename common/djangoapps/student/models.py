@@ -40,7 +40,6 @@ from edx_rest_api_client.exceptions import SlumberBaseException
 from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pytz import UTC
 from simple_history.models import HistoricalRecords
 from slumber.exceptions import HttpClientError, HttpServerError
@@ -1429,8 +1428,8 @@ class CourseEnrollment(models.Model):
         """
         assert isinstance(course_id_partial, CourseKey)
         assert not course_id_partial.run  # None or empty string
-        course_key = SlashSeparatedCourseKey(course_id_partial.org, course_id_partial.course, '')
-        querystring = unicode(course_key.to_deprecated_string())
+        course_key = CourseKey.from_string('/'.join([course_id_partial.org, course_id_partial.course, '']))
+        querystring = unicode(course_key)
         try:
             return cls.objects.filter(
                 user=user,

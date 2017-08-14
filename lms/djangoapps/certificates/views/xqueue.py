@@ -9,7 +9,7 @@ from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 import dogstats_wrapper as dog_stats_api
 from capa.xqueue_interface import XQUEUE_METRIC_NAME
@@ -42,7 +42,7 @@ def request_certificate(request):
         if request.user.is_authenticated():
             username = request.user.username
             student = User.objects.get(username=username)
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get('course_id'))
+            course_key = CourseKey.from_string(request.POST.get('course_id'))
             course = modulestore().get_course(course_key, depth=2)
 
             status = certificate_status_for_student(student, course_key)['status']
@@ -72,7 +72,7 @@ def update_certificate(request):
         xqueue_header = json.loads(request.POST.get('xqueue_header'))
 
         try:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(xqueue_body['course_id'])
+            course_key = CourseKey.from_string(xqueue_body['course_id'])
 
             cert = GeneratedCertificate.eligible_certificates.get(
                 user__username=xqueue_body['username'],
