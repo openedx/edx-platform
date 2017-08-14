@@ -65,7 +65,7 @@
 # shevious <shevious@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
-# Chanseok Kang <kcsgoodboy@naver.com>, 2014
+# chans <kcsgoodboy@naver.com>, 2014
 # Gu Hong Min <placidmoon1@gmail.com>, 2015
 # JiyeonLee <leejiyeon00@gmail.com>, 2014
 # kmooc <shevious@gmail.com>, 2016
@@ -81,7 +81,7 @@
 # Gil <gedwarp@gmail.com>, 2014
 # kmooc <shevious@gmail.com>, 2015
 # shevious <shevious@yahoo.com>, 2015
-# Chanseok Kang <kcsgoodboy@naver.com>, 2014
+# chans <kcsgoodboy@naver.com>, 2014
 # Gu Hong Min <placidmoon1@gmail.com>, 2015
 # Nicole <dlruddk1112@gmail.com>, 2014
 # kmooc <shevious@gmail.com>, 2016
@@ -91,7 +91,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2017-08-01 18:56+0000\n"
-"PO-Revision-Date: 2017-03-16 12:39+0000\n"
+"PO-Revision-Date: 2017-08-03 16:03+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"

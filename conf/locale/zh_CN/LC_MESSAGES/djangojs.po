@@ -65,7 +65,7 @@
 # 周歆荷 <zhxh401@126.com>, 2015
 # 周歆荷 <zhxh401@126.com>, 2015
 # 张太红 <zth@xjau.edu.cn>, 2014
-# 汤和果 <hgtang93@163.com>, 2015
+# 汤和果 <hgtang93@163.com>, 2015,2017
 # 沈世奇 <vicapple22@gmail.com>, 2013
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # 竹轩 <fmyzjs@gmail.com>, 2014
@@ -188,7 +188,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2017-08-01 18:55+0000\n"
-"PO-Revision-Date: 2017-07-20 11:59+0000\n"
+"PO-Revision-Date: 2017-08-03 16:03+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -203,11 +203,11 @@ msgstr ""
 msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
-msgstr ""
+msgstr "此情况可能由于服务器错误或者您的网络连接错误导致。尝试刷新页面或者确保网络畅通。"
 
 #: cms/static/cms/js/main.js common/static/bundles/Import.js
 msgid "Studio's having trouble saving your work"
-msgstr ""
+msgstr "保存时遇到问题"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -519,7 +519,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You submitted {filename}; only {allowedFiles} are allowed."
-msgstr ""
+msgstr "您提交了 {filename}；仅支持提交 {allowedFiles} 格式的文件。"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Your file {filename} is too large (max size: {maxSize}MB)."
@@ -531,17 +531,17 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You did not select any files to submit."
-msgstr ""
+msgstr "您未选择任何要上传的文件。"
 
 #. Translators: This is only translated to allow for reordering of label and
 #. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{label}: {status}"
-msgstr ""
+msgstr "{label}: {status}"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "This problem has been reset."
-msgstr ""
+msgstr "此问题已重置。"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
@@ -2045,19 +2045,19 @@ msgstr "关闭字幕"
 
 #: common/static/bundles/Import.js
 msgid "There was an error during the upload process."
-msgstr ""
+msgstr "在文件上传过程中发生错误。"
 
 #: common/static/bundles/Import.js
 msgid "There was an error while unpacking the file."
-msgstr ""
+msgstr "解压过程中发生错误。"
 
 #: common/static/bundles/Import.js
 msgid "There was an error while verifying the file you submitted."
-msgstr ""
+msgstr "在验证您提交的文件时出现错误。"
 
 #: common/static/bundles/Import.js
 msgid "Choose new file"
-msgstr ""
+msgstr "选择文件"
 
 #: common/static/bundles/Import.js
 msgid ""

@@ -82,7 +82,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2017-08-01 18:56+0000\n"
-"PO-Revision-Date: 2017-03-29 06:21+0000\n"
+"PO-Revision-Date: 2017-08-03 16:03+0000\n"
 "Last-Translator: e2f_HE c1 <e2f_HE_c1@outlook.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
@@ -12252,7 +12252,7 @@ msgstr "כדי ליצור חשבון חדש, נא מלא את השדות הבא�
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Your legal name, used for any certificates you earn."
-msgstr "שמך החוקי ישמש בכל תעודה שתזכה."
+msgstr "שמך החוקי ישמש בכל תעודה שתונפק עבורך"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -12573,7 +12573,7 @@ msgstr "אפס את ניסיונות הלומד"
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Delete Learner's State"
-msgstr "מחק את מדינת הלומד"
+msgstr "מחק את תשובות הלומד ונתונים קשורים"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -16599,7 +16599,8 @@ msgstr "הורד את מידע הפרופיל כ-CSV"
 msgid ""
 "Click to generate a CSV file that lists learners who can enroll in the "
 "course but have not yet done so."
-msgstr "לחץ על צור קובץ CSV המציין מי מהתלמידים יירשם לקורס אך טרם עשה זאת."
+msgstr ""
+"לחץ על צור קובץ CSV המציין מי מהתלמידים יכול להרשם לקורס אך טרם עשה זאת."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download a CSV of learners who can enroll"

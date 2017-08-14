@@ -14,6 +14,7 @@
 # dzepeda <davitzepeda@hotmail.com>, 2014
 # diegobe <diegobe@iadb.org>, 2014
 # David Salazar <imdjsg@gmail.com>, 2014
+# Eduardo Zambrano <ezambrano@edx.org>, 2017
 # Elias Estay <eestay@u.uchile.cl>, 2015
 # Felix Antonio Valdez Noverola <felix@itesm.mx>, 2015
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
@@ -195,7 +196,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2017-08-01 18:56+0000\n"
-"PO-Revision-Date: 2017-07-03 19:43+0000\n"
+"PO-Revision-Date: 2017-08-03 16:03+0000\n"
 "Last-Translator: Eduardo Zambrano <ezambrano@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
@@ -10730,9 +10731,8 @@ msgid "Site theme reverted to the default"
 msgstr ""
 
 #: openedx/core/djangoapps/theming/views.py
-#: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 msgid "Theming Administration"
-msgstr ""
+msgstr "Perspectiva de trabajo"
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
 #, python-brace-format
