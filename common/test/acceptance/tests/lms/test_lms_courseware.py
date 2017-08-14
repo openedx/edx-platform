@@ -7,7 +7,6 @@ import json
 from datetime import datetime, timedelta
 
 import ddt
-from flaky import flaky
 from nose.plugins.attrib import attr
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -440,7 +439,6 @@ class CoursewareMultipleVerticalsTest(CoursewareMultipleVerticalsTestBase):
     Test courseware with multiple verticals
     """
 
-    @flaky  # PLAT-1198; should be fixed, but verify that failures stop before removing
     def test_navigation_buttons(self):
         self.courseware_page.visit()
 

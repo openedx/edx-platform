@@ -7,7 +7,6 @@ import os
 from unittest import skip, skipIf
 
 from ddt import data, ddt, unpack
-from flaky import flaky
 from mock import patch
 from nose.plugins.attrib import attr
 from selenium.webdriver.common.action_chains import ActionChains
@@ -944,7 +943,6 @@ class YouTubeVideoTest(VideoBaseTest):
 class YouTubeHtml5VideoTest(VideoBaseTest):
     """ Test YouTube HTML5 Video Player """
 
-    @flaky  # TODO fix this, see TNL-1642
     def test_youtube_video_rendering_with_unsupported_sources(self):
         """
         Scenario: Video component is rendered in the LMS in Youtube mode

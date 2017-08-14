@@ -3,7 +3,6 @@ Test courseware search
 """
 import json
 
-from flaky import flaky
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -199,7 +198,6 @@ class CoursewareSearchTest(UniqueCourseTest):
         # Do the search again in the legacy sidebar, this time we expect results.
         self.assertTrue(self._search_for_content_in_sidebar(self.SEARCH_STRING, False))
 
-    @flaky  # TNL-5771
     def test_reindex(self):
         """
         Make sure new content gets reindexed on button press.
