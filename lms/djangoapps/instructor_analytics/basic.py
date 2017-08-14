@@ -12,7 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import reverse
 from django.db.models import Count, Q
-from edx_proctoring.api import get_all_exam_attempts
+from edx_proctoring.api import get_exam_violation_report
 from opaque_keys.edx.keys import UsageKey
 
 import xmodule.graders as xmgraders
@@ -326,20 +326,30 @@ def get_proctored_exam_results(course_key, features):
     """
     Return info about proctored exam results in a course as a dict.
     """
-    def extract_student(exam_attempt, features):
+    comment_statuses = ['Rules Violation', 'Suspicious']
+
+    def extract_details(exam_attempt, features):
         """
         Build dict containing information about a single student exam_attempt.
         """
         proctored_exam = dict(
             (feature, exam_attempt.get(feature)) for feature in features if feature in exam_attempt
         )
-        proctored_exam.update({'exam_name': exam_attempt.get('proctored_exam').get('exam_name')})
-        proctored_exam.update({'user_email': exam_attempt.get('user').get('email')})
+
+        for status in comment_statuses:
+            comment_list = exam_attempt.get(
+                '{status} Comments'.format(status=status),
+                []
+            )
+            proctored_exam.update({
+                '{status} Count'.format(status=status): len(comment_list),
+                '{status} Comments'.format(status=status): '; '.join(comment_list),
+            })
 
         return proctored_exam
 
-    exam_attempts = get_all_exam_attempts(course_key)
-    return [extract_student(exam_attempt, features) for exam_attempt in exam_attempts]
+    exam_attempts = get_exam_violation_report(course_key)
+    return [extract_details(exam_attempt, features) for exam_attempt in exam_attempts]
 
 
 def coupon_codes_features(features, coupons_list, course_id):
