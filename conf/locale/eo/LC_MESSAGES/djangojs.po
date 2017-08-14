@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-01 21:22+0000\n"
-"PO-Revision-Date: 2017-08-01 21:22:50.339993\n"
+"POT-Creation-Date: 2017-08-14 15:08+0000\n"
+"PO-Revision-Date: 2017-08-14 15:09:44.012713\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4814,10 +4814,6 @@ msgid "Enrolled"
 msgstr "Énrölléd Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/static/js/staff_debug_actions.js
-msgid "Unknown Error Occurred."
-msgstr "Ûnknöwn Érrör Öççürréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/static/js/staff_debug_actions.js
 msgid "Successfully reset the attempts for user {user}"
 msgstr ""
 "Süççéssfüllý rését thé ättémpts för üsér {user} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
@@ -5007,6 +5003,15 @@ msgstr ""
 msgid "We couldn't create your account."
 msgstr ""
 "Wé çöüldn't çréäté ýöür äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/static/js/student_account/views/RegisterView.js
+#: lms/templates/student_account/register.underscore
+msgid "Create Account"
+msgstr "Çréäté Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/static/js/student_account/views/RegisterView.js
+msgid "(required)"
+msgstr "(réqüïréd) Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "You've successfully signed into %(currentProvider)s."
@@ -5829,13 +5834,6 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: cms/static/js/models/settings/course_details.js
-msgid ""
-"The certificate available date must be later than the enrollment start date."
-msgstr ""
-"Thé çértïfïçäté äväïläßlé däté müst ßé lätér thän thé énröllmént stärt däté."
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: cms/static/js/models/settings/course_details.js
 msgid "The enrollment start date cannot be after the enrollment end date."
 msgstr ""
 "Thé énröllmént stärt däté çännöt ßé äftér thé énröllmént énd däté. Ⱡ'σяєм "
@@ -5943,6 +5941,27 @@ msgstr ""
 #: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
 msgstr "Ýöür fïlé çöüld nöt ßé üplöädéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Upload Videos"
+msgstr "Ûplöäd Vïdéös Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Drag and drop or {spanStart}browse your computer{spanEnd}."
+msgstr ""
+"Dräg änd dröp ör {spanStart}ßröwsé ýöür çömpütér{spanEnd}. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Maximum file size: {maxFileSize} GB"
+msgstr ""
+"Mäxïmüm fïlé sïzé: {maxFileSize} GB Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Supported file types: {supportedVideoTypes}"
+msgstr ""
+"Süppörtéd fïlé týpés: {supportedVideoTypes} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕ#"
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
@@ -8015,6 +8034,14 @@ msgstr "för Ⱡ'σяєм#"
 msgid "Product Name"
 msgstr "Prödüçt Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
+#: lms/templates/fields/field_textarea.underscore
+msgid ""
+"{currentCountOpeningTag}{currentCharacterCount}{currentCountClosingTag} of "
+"{maxCharacters}"
+msgstr ""
+"{currentCountOpeningTag}{currentCharacterCount}{currentCountClosingTag} öf "
+"{maxCharacters} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid "Financial Assistance Application"
@@ -8540,6 +8567,18 @@ msgstr ""
 "çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Upgrade All Remaining Courses ("
+msgstr "Ûpgrädé Àll Rémäïnïng Çöürsés ( Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "${listPrice}"
+msgstr "${listPrice} Ⱡ'σяєм ι#"
+
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid " ${price} {currency} )"
+msgstr " ${price} {currency} ) Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "COURSES IN PROGRESS"
 msgstr "ÇÖÛRSÉS ÌN PRÖGRÉSS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
@@ -8573,8 +8612,8 @@ msgid "Needs verified certificate "
 msgstr "Nééds vérïfïéd çértïfïçäté  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
-msgid "Buy Certificate"
-msgstr "Büý Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+msgid "Upgrade to Verified"
+msgstr "Ûpgrädé tö Vérïfïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
@@ -8742,10 +8781,6 @@ msgstr ""
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr "ör çréäté ä néw öné héré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/student_account/register.underscore
-msgid "Create account"
-msgstr "Çréäté äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
@@ -9568,12 +9603,6 @@ msgid "Make this subsection available as a prerequisite to other content"
 msgstr ""
 "Mäké thïs süßséçtïön äväïläßlé äs ä préréqüïsïté tö öthér çöntént Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/templates/js/active-video-upload-list.underscore
-msgid "Drag and drop or click here to upload video files."
-msgstr ""
-"Dräg änd dröp ör çlïçk héré tö üplöäd vïdéö fïlés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Active Uploads"
@@ -10973,18 +11002,23 @@ msgstr "Révïéw Rülés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"Specify any additional rules or rule exceptions that the proctoring review "
-"team should enforce when reviewing the videos. For example, you could "
-"specify that calculators are allowed."
+"Specify any rules or rule exceptions that the proctoring review team should "
+"enforce when reviewing the videos. For example, you could specify that "
+"calculators are allowed. These specified rules are visible to learners "
+"before the learners start the exam, along with the {linkStart}general "
+"proctored exam rules{linkEnd}."
 msgstr ""
-"Spéçïfý äný äddïtïönäl rülés ör rülé éxçéptïöns thät thé pröçtörïng révïéw "
-"téäm shöüld énförçé whén révïéwïng thé vïdéös. För éxämplé, ýöü çöüld "
-"spéçïfý thät çälçülätörs äré ällöwéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
-"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
-"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
-" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυ#"
+"Spéçïfý äný rülés ör rülé éxçéptïöns thät thé pröçtörïng révïéw téäm shöüld "
+"énförçé whén révïéwïng thé vïdéös. För éxämplé, ýöü çöüld spéçïfý thät "
+"çälçülätörs äré ällöwéd. Thésé spéçïfïéd rülés äré vïsïßlé tö léärnérs "
+"ßéföré thé léärnérs stärt thé éxäm, älöng wïth thé {linkStart}généräl "
+"pröçtöréd éxäm rülés{linkEnd}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂#"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "General Proctored Exam Rules"
+msgstr "Généräl Pröçtöréd Éxäm Rülés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: cms/templates/js/unit-access-editor.underscore
 msgid "Unit Access"
