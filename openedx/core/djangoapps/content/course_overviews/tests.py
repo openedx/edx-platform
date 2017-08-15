@@ -450,13 +450,14 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             unmodified_overview = CourseOverview.get_from_id(course.id)
             self.assertEqual(unmodified_overview.version, 11)
 
-    def test_get_select_courses(self):
+    def test_update_select_courses(self):
         course_ids = [CourseFactory.create().id for __ in range(3)]
         select_course_ids = course_ids[:len(course_ids) - 1]  # all items except the last
-        self.assertEqual(
-            {course_overview.id for course_overview in CourseOverview.get_select_courses(select_course_ids)},
-            set(select_course_ids),
-        )
+        with mock.patch(
+            'openedx.core.djangoapps.content.course_overviews.models.CourseOverview.get_from_id'
+        ) as mock_get_from_id:
+            CourseOverview.update_select_courses(select_course_ids)
+            self.assertEquals(mock_get_from_id.call_count, len(select_course_ids))
 
     def test_get_all_courses(self):
         course_ids = [CourseFactory.create(emit_signals=True).id for __ in range(3)]
