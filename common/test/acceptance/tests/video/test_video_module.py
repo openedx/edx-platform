@@ -634,45 +634,6 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.click_transcript_line(line_no=1)
         self._verify_closed_caption_text(unicode_text)
 
-    def test_multiple_videos_in_sequentials_load_and_work(self):
-        """
-        Scenario: Multiple videos in sequentials all load and work, switching between sequentials
-        Given it has videos "A,B" in "Youtube" mode in position "1" of sequential
-        And videos "C,D" in "Youtube" mode in position "2" of sequential
-        """
-        self.contents_of_verticals = [
-            [{'display_name': 'A'}, {'display_name': 'B'}],
-            [{'display_name': 'C'}, {'display_name': 'D'}]
-        ]
-
-        tab1_video_names = ['A', 'B']
-        tab2_video_names = ['C', 'D']
-
-        def execute_video_steps(video_names):
-            """
-            Execute video steps
-            """
-            for video_name in video_names:
-                self.video.use_video(video_name)
-                self.video.click_player_button('play')
-                self.assertIn(self.video.state, ['playing', 'buffering'])
-                self.video.click_player_button('pause')
-
-        # go to video
-        self.navigate_to_video()
-        execute_video_steps(tab1_video_names)
-
-        # go to second sequential position
-        # import ipdb; ipdb.set_trace()
-        self.go_to_sequential_position(2)
-        execute_video_steps(tab2_video_names)
-
-        # go back to first sequential position
-        # we are again playing tab 1 videos to ensure that switching didn't broke some video functionality.
-        # import ipdb; ipdb.set_trace()
-        self.go_to_sequential_position(1)
-        execute_video_steps(tab1_video_names)
-
     def test_video_component_stores_speed_correctly_for_multiple_videos(self):
         """
         Scenario: Video component stores speed correctly when each video is in separate sequential
