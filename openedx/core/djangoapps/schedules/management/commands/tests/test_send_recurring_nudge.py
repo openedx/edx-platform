@@ -1,8 +1,10 @@
 import datetime
 from mock import patch, Mock
+from unittest import skipUnless
 import pytz
 
 import ddt
+from django.conf import settings
 
 from student.tests.factories import UserFactory
 from openedx.core.djangoapps.schedules.management.commands import send_recurring_nudge as nudge
@@ -11,6 +13,7 @@ from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 
 
 @ddt.ddt
+@skipUnless('schedules' in settings.INSTALLED_APPS, "Can't test schedules if the app isn't installed")
 class TestSendRecurringNudge(CacheIsolationTestCase):
 
     # pylint: disable=protected-access
