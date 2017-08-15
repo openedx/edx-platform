@@ -35,7 +35,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_mongo_calls_range
 
-from .models import CourseOverview, CourseOverviewImageSet, CourseOverviewImageConfig
+from ..models import CourseOverview, CourseOverviewImageSet, CourseOverviewImageConfig
 
 
 @attr(shard=3)

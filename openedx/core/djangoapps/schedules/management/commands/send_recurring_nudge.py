@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import datetime
+import pytz
 
 from celery import task
 from dateutil.tz import tzutc, gettz
@@ -25,72 +26,59 @@ from lms.djangoapps.experiments.utils import check_and_get_upgrade_link
 
 
 class RecurringNudge(MessageType):
-    def __init__(self, week):
+    def __init__(self, week, *args, **kwargs):
         self.name = "RecurringNudge_Week{}".format(week)
+        super(RecurringNudge, self).__init__(*args, **kwargs)
 
 
 class ScheduleStartResolver(RecipientResolver):
     def __init__(self, current_date):
-        self.current_date = current_date
+        self.current_date = current_date.replace(hour=0, minute=0, second=0)
 
     def send(self, week):
-        schedule_day.delay(week, self.current_date - datetime.timedelta(days=week * 7))
+        _schedule_day.delay(week, self.current_date - datetime.timedelta(days=week * 7))
 
 
 @task
-def schedule_day(week, target_date):
-    for hour in range(23):
-        schedule_hour.delay(week, target_date, hour)
+def _schedule_day(week, target_time):
+    for hour in range(24):
+        _schedule_hour.delay(week, target_time + datetime.timedelta(hours=hour))
 
 
 @task
-def schedule_hour(week, target_date, hour):
+def _schedule_hour(week, target_time):
     for minute in range(60):
-        schedule_minute.delay(week, target_date, hour, minute)
+        _schedule_minute.delay(week, target_time + datetime.timedelta(minutes=minute))
 
 
 @task
-def schedule_minute(week, target_date, hour, minute):
+def _schedule_minute(week, target_time):
     msg_type = RecurringNudge(week)
 
-    for (user, language, context) in schedules_for_minute(target_date, hour, minute):
+    for (user, language, context) in _schedules_for_minute(target_time):
         msg = msg_type.personalize(
             Recipient(
                 user.username,
                 user.email,
             ),
             language,
-            context
+            context,
         )
-        schedule_send.delay(msg)
+        _schedule_send.delay(msg)
 
 
 @task
-def schedule_send(msg):
+def _schedule_send(msg):
     ace.send(msg)
 
 
-def schedules_for_minute(target_date, hour, minute):
+def _schedules_for_minute(target_time):
     schedules = Schedule.objects.select_related(
         'enrollment__user__profile',
         'enrollment__course',
-    ).prefetch_related(
-        Prefetch(
-            'enrollment__course__modes',
-            queryset=CourseMode.objects.filter(mode_slug=CourseMode.VERIFIED),
-            to_attr='verified_modes'
-        ),
-        Prefetch(
-            'enrollment__user__preferences',
-            queryset=UserPreference.objects.filter(key='time_zone'),
-            to_attr='tzprefs'
-        ),
     ).filter(
-        start__year=target_date.year,
-        start__month=target_date.month,
-        start__day=target_date.day,
-        start__hour=hour,
-        start__minute=minute,
+        start__gte=target_time,
+        start__lt=target_time + datetime.timedelta(seconds=60),
     )
 
     for schedule in schedules:
@@ -120,7 +108,10 @@ class Command(BaseCommand):
         parser.add_argument('--date', default=datetime.datetime.utcnow().date().isoformat())
 
     def handle(self, *args, **options):
-        current_date = datetime.date(*[int(x) for x in options['date'].split('-')])
+        current_date = datetime.datetime(
+            *[int(x) for x in options['date'].split('-')],
+            tzinfo=pytz.UTC
+        )
         resolver = ScheduleStartResolver(current_date)
         for week in (1, 2, 3, 4):
             resolver.send(week)
