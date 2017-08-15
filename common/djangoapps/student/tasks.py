@@ -73,9 +73,11 @@ def publish_course_notifications_task(course_id, notification_msg, exclude_user_
         # other logic processing. So log and continue.
         log.exception(ex)
 
+
 @task()
-def publish_course_notifications_to_tag_task(course_id, notification_msg,
-                                       exclude_user_ids=None):  # pylint: disable=invalid-name
+def publish_course_notifications_to_tag_task(
+        course_id, notification_msg, exclude_user_ids=None
+):  # pylint: disable=invalid-name
     """
     This function will call the edx_notifications api method
     "bulk_publish_notification_to_tag"
