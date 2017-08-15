@@ -33,6 +33,8 @@ class SubsectionGradeBase(object):
         self.course_version = getattr(subsection, 'course_version', None)
         self.subtree_edited_timestamp = getattr(subsection, 'subtree_edited_on', None)
 
+        self.override = None
+
     @property
     def attempted(self):
         """
@@ -137,6 +139,7 @@ class SubsectionGrade(SubsectionGradeBase):
             graded=False,
             first_attempted=model.first_attempted,
         )
+        self.override = model.override if hasattr(model, 'override') else None
         self._log_event(log.debug, u"init_from_model", student)
         return self
 

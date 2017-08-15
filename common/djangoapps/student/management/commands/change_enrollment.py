@@ -4,9 +4,7 @@ import logging
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from optparse import make_option
 
 from student.models import CourseEnrollment, User
@@ -86,10 +84,7 @@ class Command(BaseCommand):
         if not options['from_mode'] or not options['to_mode']:
             raise CommandError('You must specify a "to" and "from" mode as parameters')
 
-        try:
-            course_key = CourseKey.from_string(options['course_id'])
-        except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(options['course_id'])
+        course_key = CourseKey.from_string(options['course_id'])
 
         enrollment_args = dict(
             course_id=course_key,

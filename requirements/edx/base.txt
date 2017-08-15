@@ -48,7 +48,7 @@ edx-lint==0.4.3
 astroid==1.3.8
 edx-django-oauth2-provider==1.1.4
 edx-django-sites-extensions==2.3.0
-edx-enterprise==0.39.9
+edx-enterprise==0.40.1
 edx-oauth2-provider==1.2.0
 edx-opaque-keys==0.4.0
 edx-organizations==0.4.5
@@ -187,7 +187,7 @@ analytics-python==1.1.0
 
 # Needed for mailchimp(mailing djangoapp)
 mailsnake==1.6.2
-jsonfield==1.0.3
+jsonfield==2.0.2
 
 # Inlines CSS styles into HTML for email notifications.
 pynliner==0.5.2

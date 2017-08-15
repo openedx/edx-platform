@@ -17,7 +17,6 @@ from django.utils.translation import get_language, to_locale
 from django.views.generic.base import View
 from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from course_modes.models import CourseMode
 from courseware.access import has_access
@@ -234,7 +233,7 @@ class ChooseModeView(View):
             below the minimum, otherwise redirects to the verification flow.
 
         """
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
         user = request.user
 
         # This is a bit redundant with logic in student.views.change_enrollment,

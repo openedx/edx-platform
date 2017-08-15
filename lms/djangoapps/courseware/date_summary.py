@@ -16,6 +16,7 @@ from pytz import timezone, utc
 from course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
+from openedx.core.djangoapps.certificates.config import waffle
 from student.models import CourseEnrollment
 
 
@@ -193,6 +194,28 @@ class CourseEndDate(DateSummary):
     @property
     def date(self):
         return self.course.end
+
+
+class CertificateAvailableDate(DateSummary):
+    """
+        Displays the end date of the course.
+        """
+    css_class = 'certificate-available-date'
+    title = ugettext_lazy('Certificate Available')
+
+    @property
+    def is_enabled(self):
+        return self.date is not None and datetime.datetime.now(utc) <= self.date and waffle.waffle().is_enabled(
+            waffle.INSTRUCTOR_PACED_ONLY
+        )
+
+    @property
+    def description(self):
+        return _('Day certificates will become available for passing verified learners.')
+
+    @property
+    def date(self):
+        return self.course.certificate_available_date
 
 
 class VerifiedUpgradeDeadlineDate(DateSummary):

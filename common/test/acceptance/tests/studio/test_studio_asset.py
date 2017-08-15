@@ -4,8 +4,6 @@ Acceptance tests for Studio related to the asset index page.
 
 from unittest import skip
 
-from flaky import flaky
-
 from common.test.acceptance.fixtures.base import StudioApiLoginError
 from common.test.acceptance.pages.studio.asset_index import AssetIndexPage
 from common.test.acceptance.tests.helpers import skip_if_browser
@@ -34,7 +32,6 @@ class AssetIndexTest(StudioCourseTest):
         self.course_fixture.add_asset(['image.jpg', 'textbook.pdf'])
 
     @skip_if_browser('chrome')  # TODO Need to fix test_page_existance for this for chrome browser
-    @flaky      # TODO fix this FEDX-88
     def test_type_filter_exists(self):
         """
         Make sure type filter is on the page.
@@ -43,7 +40,6 @@ class AssetIndexTest(StudioCourseTest):
         assert self.asset_page.type_filter_on_page() is True
 
     @skip_if_browser('chrome')  # TODO Need to fix test_page_existance for this for chrome browser
-    @flaky    # TODO FEDX-88
     def test_filter_results(self):
         """
         Make sure type filter actually filters the results.

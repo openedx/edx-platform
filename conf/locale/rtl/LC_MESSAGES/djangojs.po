@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-01 21:22+0000\n"
-"PO-Revision-Date: 2017-08-01 21:22:50.339993\n"
+"POT-Creation-Date: 2017-08-14 15:08+0000\n"
+"PO-Revision-Date: 2017-08-14 15:09:44.012713\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4292,10 +4292,6 @@ msgid "Enrolled"
 msgstr "ثرقخممثي"
 
 #: lms/static/js/staff_debug_actions.js
-msgid "Unknown Error Occurred."
-msgstr "عرنرخصر ثققخق خذذعققثي."
-
-#: lms/static/js/staff_debug_actions.js
 msgid "Successfully reset the attempts for user {user}"
 msgstr "سعذذثسسبعممغ قثسثف فاث شففثوحفس بخق عسثق {user}"
 
@@ -4448,6 +4444,15 @@ msgstr ""
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "We couldn't create your account."
 msgstr "صث ذخعمير'ف ذقثشفث غخعق شذذخعرف."
+
+#: lms/static/js/student_account/views/RegisterView.js
+#: lms/templates/student_account/register.underscore
+msgid "Create Account"
+msgstr "ذقثشفث شذذخعرف"
+
+#: lms/static/js/student_account/views/RegisterView.js
+msgid "(required)"
+msgstr "(قثضعهقثي)"
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "You've successfully signed into %(currentProvider)s."
@@ -5171,12 +5176,6 @@ msgid "The course start date must be later than the enrollment start date."
 msgstr "فاث ذخعقسث سفشقف يشفث وعسف زث مشفثق فاشر فاث ثرقخمموثرف سفشقف يشفث."
 
 #: cms/static/js/models/settings/course_details.js
-msgid ""
-"The certificate available date must be later than the enrollment start date."
-msgstr ""
-"فاث ذثقفهبهذشفث شدشهمشزمث يشفث وعسف زث مشفثق فاشر فاث ثرقخمموثرف سفشقف يشفث."
-
-#: cms/static/js/models/settings/course_details.js
 msgid "The enrollment start date cannot be after the enrollment end date."
 msgstr "فاث ثرقخمموثرف سفشقف يشفث ذشررخف زث شبفثق فاث ثرقخمموثرف ثري يشفث."
 
@@ -5258,6 +5257,22 @@ msgstr "فاهس ذخوحخرثرف اشس دشمهيشفهخر هسسعثس."
 #: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
 msgstr "غخعق بهمث ذخعمي رخف زث عحمخشيثي"
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Upload Videos"
+msgstr "عحمخشي دهيثخس"
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Drag and drop or {spanStart}browse your computer{spanEnd}."
+msgstr "يقشل شري يقخح خق {spanStart}زقخصسث غخعق ذخوحعفثق{spanEnd}."
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Maximum file size: {maxFileSize} GB"
+msgstr "وشطهوعو بهمث سهظث: {maxFileSize} لز"
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Supported file types: {supportedVideoTypes}"
+msgstr "سعححخقفثي بهمث فغحثس: {supportedVideoTypes}"
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
@@ -7157,6 +7172,14 @@ msgstr "بخق"
 msgid "Product Name"
 msgstr "حقخيعذف رشوث"
 
+#: lms/templates/fields/field_textarea.underscore
+msgid ""
+"{currentCountOpeningTag}{currentCharacterCount}{currentCountClosingTag} of "
+"{maxCharacters}"
+msgstr ""
+"{currentCountOpeningTag}{currentCharacterCount}{currentCountClosingTag} خب "
+"{maxCharacters}"
+
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid "Financial Assistance Application"
@@ -7640,6 +7663,18 @@ msgstr ""
 "ذخعقسث."
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Upgrade All Remaining Courses ("
+msgstr "عحلقشيث شمم قثوشهرهرل ذخعقسثس ("
+
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "${listPrice}"
+msgstr "${listPrice}"
+
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid " ${price} {currency} )"
+msgstr " ${price} {currency} )"
+
+#: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "COURSES IN PROGRESS"
 msgstr "ذخعقسثس هر حقخلقثسس"
 
@@ -7670,8 +7705,8 @@ msgid "Needs verified certificate "
 msgstr "رثثيس دثقهبهثي ذثقفهبهذشفث "
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
-msgid "Buy Certificate"
-msgstr "زعغ ذثقفهبهذشفث"
+msgid "Upgrade to Verified"
+msgstr "عحلقشيث فخ دثقهبهثي"
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
@@ -7819,10 +7854,6 @@ msgstr "ذقثشفث شذذخعرف عسهرل %(providerName)s."
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr "خق ذقثشفث ش رثص خرث اثقث"
-
-#: lms/templates/student_account/register.underscore
-msgid "Create account"
-msgstr "ذقثشفث شذذخعرف"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
@@ -8520,10 +8551,6 @@ msgstr "عسث شس ش حقثقثضعهسهفث"
 #: cms/templates/js/access-editor.underscore
 msgid "Make this subsection available as a prerequisite to other content"
 msgstr "وشنث فاهس سعزسثذفهخر شدشهمشزمث شس ش حقثقثضعهسهفث فخ خفاثق ذخرفثرف"
-
-#: cms/templates/js/active-video-upload-list.underscore
-msgid "Drag and drop or click here to upload video files."
-msgstr "يقشل شري يقخح خق ذمهذن اثقث فخ عحمخشي دهيثخ بهمثس."
 
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Active Uploads"
@@ -9777,13 +9804,21 @@ msgstr "قثدهثص قعمثس"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"Specify any additional rules or rule exceptions that the proctoring review "
-"team should enforce when reviewing the videos. For example, you could "
-"specify that calculators are allowed."
+"Specify any rules or rule exceptions that the proctoring review team should "
+"enforce when reviewing the videos. For example, you could specify that "
+"calculators are allowed. These specified rules are visible to learners "
+"before the learners start the exam, along with the {linkStart}general "
+"proctored exam rules{linkEnd}."
 msgstr ""
-"سحثذهبغ شرغ شييهفهخرشم قعمثس خق قعمث ثطذثحفهخرس فاشف فاث حقخذفخقهرل قثدهثص "
-"فثشو ساخعمي ثربخقذث صاثر قثدهثصهرل فاث دهيثخس. بخق ثطشوحمث, غخع ذخعمي "
-"سحثذهبغ فاشف ذشمذعمشفخقس شقث شممخصثي."
+"سحثذهبغ شرغ قعمثس خق قعمث ثطذثحفهخرس فاشف فاث حقخذفخقهرل قثدهثص فثشو ساخعمي "
+"ثربخقذث صاثر قثدهثصهرل فاث دهيثخس. بخق ثطشوحمث, غخع ذخعمي سحثذهبغ فاشف "
+"ذشمذعمشفخقس شقث شممخصثي. فاثسث سحثذهبهثي قعمثس شقث دهسهزمث فخ مثشقرثقس "
+"زثبخقث فاث مثشقرثقس سفشقف فاث ثطشو, شمخرل صهفا فاث {linkStart}لثرثقشم "
+"حقخذفخقثي ثطشو قعمثس{linkEnd}."
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "General Proctored Exam Rules"
+msgstr "لثرثقشم حقخذفخقثي ثطشو قعمثس"
 
 #: cms/templates/js/unit-access-editor.underscore
 msgid "Unit Access"

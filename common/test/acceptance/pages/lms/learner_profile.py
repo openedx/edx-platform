@@ -13,10 +13,6 @@ from common.test.acceptance.tests.helpers import select_option_by_value
 
 PROFILE_VISIBILITY_SELECTOR = '#u-field-select-account_privacy option[value="{}"]'
 PROFILE_VISIBILITY_INPUT = '#u-field-select-account_privacy'
-FIELD_ICONS = {
-    'country': 'fa-map-marker',
-    'language_proficiencies': 'fa-comment',
-}
 
 
 class Badge(PageObject):
@@ -213,18 +209,6 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         self.wait_for_ajax()
         return self.q(css='#u-field-select-account_privacy').visible
-
-    def field_icon_present(self, field_id):
-        """
-        Check if an icon is present for a field. Only dropdown fields have icons.
-
-        Arguments:
-            field_id (str): field id
-
-        Returns:
-            True/False
-        """
-        return self.icon_for_field(field_id, FIELD_ICONS[field_id])
 
     def wait_for_public_fields(self):
         """

@@ -20,7 +20,7 @@ from lazy import lazy
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from coursewarehistoryextended.fields import UnsignedBigIntAutoField
+from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
 from eventtracking import tracker
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 from request_cache import get_cache
@@ -411,6 +411,9 @@ class PersistentSubsectionGrade(DeleteGradesMixin, TimeStampedModel):
         user_id = params.pop('user_id')
         usage_key = params.pop('usage_key')
 
+        # apply grade override if one exists before saving model
+        # EDUCTATOR-1127: remove override until this behavior is verified in production
+
         grade, _ = cls.objects.update_or_create(
             user_id=user_id,
             course_id=usage_key.course_key,
@@ -666,3 +669,24 @@ class PersistentCourseGrade(DeleteGradesMixin, TimeStampedModel):
                     'grading_policy_hash': unicode(grade.grading_policy_hash),
                 }
             )
+
+
+class PersistentSubsectionGradeOverride(models.Model):
+    """
+    A django model tracking persistent grades overrides at the subsection level.
+    """
+    class Meta(object):
+        app_label = "grades"
+
+    grade = UnsignedBigIntOneToOneField(PersistentSubsectionGrade, related_name='override')
+
+    # Created/modified timestamps prevent race-conditions when using with async rescoring tasks
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified = models.DateTimeField(auto_now=True, db_index=True)
+
+    # earned/possible refers to the number of points achieved and available to achieve.
+    # graded refers to the subset of all problems that are marked as being graded.
+    earned_all_override = models.FloatField(null=True, blank=True)
+    possible_all_override = models.FloatField(null=True, blank=True)
+    earned_graded_override = models.FloatField(null=True, blank=True)
+    possible_graded_override = models.FloatField(null=True, blank=True)

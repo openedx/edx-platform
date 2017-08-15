@@ -1,6 +1,7 @@
 /* eslint-disable vars-on-top */
 define(
     [
+        'gettext',
         'backbone',
         'jquery',
         'underscore',
@@ -18,7 +19,7 @@ define(
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner'
     ],
-    function(Backbone, $, _, PagingCollection, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers,
+    function(gettext, Backbone, $, _, PagingCollection, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers,
               FieldViews, UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
               BadgeListContainer, AccountSettingsFieldViews, MessageBannerView) {
         'use strict';
@@ -73,13 +74,19 @@ define(
                     helpMessage: ''
                 });
 
+                var nameFieldView = new FieldViews.ReadonlyFieldView({
+                    model: accountSettingsModel,
+                    valueAttribute: 'name',
+                    helpMessage: ''
+                });
+
                 var sectionOneFieldViews = [
                     new FieldViews.DropdownFieldView({
+                        title: gettext('Location'),
                         model: accountSettingsModel,
                         required: false,
                         editable: editable,
                         showMessages: false,
-                        iconName: 'fa-map-marker',
                         placeholderValue: '',
                         valueAttribute: 'country',
                         options: Helpers.FIELD_OPTIONS,
@@ -87,11 +94,11 @@ define(
                     }),
 
                     new AccountSettingsFieldViews.LanguageProficienciesFieldView({
+                        title: gettext('Language'),
                         model: accountSettingsModel,
                         required: false,
                         editable: editable,
                         showMessages: false,
-                        iconName: 'fa-comment',
                         placeholderValue: 'Add language',
                         valueAttribute: 'language_proficiencies',
                         options: Helpers.FIELD_OPTIONS,
@@ -131,6 +138,7 @@ define(
                         preferencesModel: accountPreferencesModel,
                         accountPrivacyFieldView: accountPrivacyFieldView,
                         usernameFieldView: usernameFieldView,
+                        nameFieldView: nameFieldView,
                         profileImageFieldView: profileImageFieldView,
                         sectionOneFieldViews: sectionOneFieldViews,
                         sectionTwoFieldViews: sectionTwoFieldViews,

@@ -5,9 +5,7 @@ from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.utils import translation
 
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.forms import AccountCreationForm
 from student.models import CourseEnrollment, create_comments_service_user
 from student.views import _do_create_account, AccountValidationError
@@ -74,12 +72,7 @@ class Command(TrackedCommand):
 
         # parse out the course into a coursekey
         if options['course']:
-            try:
-                course = CourseKey.from_string(options['course'])
-            # if it's not a new-style course key, parse it from an old-style
-            # course key
-            except InvalidKeyError:
-                course = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
+            course = CourseKey.from_string(options['course'])
 
         form = AccountCreationForm(
             data={

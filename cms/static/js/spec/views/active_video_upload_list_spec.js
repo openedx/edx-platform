@@ -57,6 +57,20 @@ define(
                 jasmine.Ajax.uninstall();
             });
 
+            it('renders correct text in file drag/drop area', function() {
+                var messages = {
+                        '.video-uploads-header': this.view.uploadHeader,
+                        '.video-upload-text': this.view.uploadText.toString(),
+                        '.video-max-file-size-text': this.view.maxSizeText,
+                        '.video-allowed-extensions-text': this.view.supportedVideosText
+                    },
+                    self = this;
+
+                Object.keys(messages).forEach(function(messageClass) {
+                    expect(self.view.$(messageClass).html()).toEqual(messages[messageClass]);
+                });
+            });
+
             it('should trigger file selection when either the upload button or the drop zone is clicked', function() {
                 var clickSpy = jasmine.createSpy();
                 clickSpy.and.callFake(function(event) { event.preventDefault(); });

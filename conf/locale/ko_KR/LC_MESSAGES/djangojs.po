@@ -25,7 +25,7 @@
 # shevious <shevious@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
-# Chanseok Kang <kcsgoodboy@naver.com>, 2014
+# chans <kcsgoodboy@naver.com>, 2014
 # seungil <luck8778@gmail.com>, 2014
 # roidog <jimroid@gmail.com>, 2015
 # kmooc <shevious@gmail.com>, 2016
@@ -42,7 +42,7 @@
 # Jong-Dae Park <jdpark7@gmail.com>, 2015
 # Gu Hong Min <placidmoon1@gmail.com>, 2015
 # LEE SI HYEONG <super2451894@gmail.com>, 2014
-# Seo. Junmin <sof.midnight@live.co.kr>, 2015
+# Seo. Junmin <inactive+trans_alice@transifex.com>, 2015
 # kmooc <shevious@gmail.com>, 2016-2017
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -63,7 +63,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2017-08-01 18:55+0000\n"
-"PO-Revision-Date: 2017-07-20 11:59+0000\n"
+"PO-Revision-Date: 2017-08-03 16:03+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"

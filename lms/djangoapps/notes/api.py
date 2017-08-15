@@ -5,7 +5,7 @@ import logging
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.http import Http404, HttpResponse
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 from courseware.courses import get_course_with_access
 from notes.models import Note
@@ -51,7 +51,7 @@ def api_request(request, course_id, **kwargs):
         disabled for the course.
     '''
     assert isinstance(course_id, basestring)
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
 
     # Verify that the api should be accessible to this course
     if not api_enabled(request, course_key):

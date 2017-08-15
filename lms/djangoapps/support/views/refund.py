@@ -21,7 +21,6 @@ from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from student.models import CourseEnrollment
 from support.decorators import require_support_permission
@@ -57,7 +56,7 @@ class RefundForm(forms.Form):
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
             try:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+                course_key = CourseKey.from_string(course_id)
             except InvalidKeyError:
                 raise forms.ValidationError(_("Invalid course id"))
         return course_key

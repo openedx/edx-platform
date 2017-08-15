@@ -26,7 +26,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from path import Path as path
 
 import dashboard.git_import as git_import
@@ -472,7 +472,7 @@ class Courses(SysadminDashboardView):
 
         elif action == 'del_course':
             course_id = request.POST.get('course_id', '').strip()
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+            course_key = CourseKey.from_string(course_id)
             course_found = False
             if course_key in courses:
                 course_found = True
@@ -584,7 +584,7 @@ class GitLogs(TemplateView):
 
         course_id = kwargs.get('course_id')
         if course_id:
-            course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+            course_id = CourseKey.from_string(course_id)
 
         page_size = 10
 

@@ -609,7 +609,7 @@ class LoginSessionViewTest(UserAPITestCase):
                 "placeholder": "",
                 "instructions": "",
                 "restrictions": {
-                    "max_length": PASSWORD_MAX_LENGTH
+                    "max_length": PASSWORD_MAX_LENGTH,
                 },
                 "errorMessages": {},
                 "supplementalText": "",
@@ -1098,7 +1098,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         provider = self.configure_google_provider(enabled=True)
         with simulate_running_pipeline(
-            "openedx.core.djangoapps.user_api.views.third_party_auth.pipeline", "google-oauth2",
+            "openedx.core.djangoapps.user_api.api.third_party_auth.pipeline", "google-oauth2",
             email="bob@example.com",
             fullname="Bob",
             username="Bob123",
@@ -1203,7 +1203,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             }
         )
 
-    @mock.patch('openedx.core.djangoapps.user_api.views._')
+    @mock.patch('openedx.core.djangoapps.user_api.api._')
     def test_register_form_level_of_education_translations(self, fake_gettext):
         fake_gettext.side_effect = lambda text: text + ' TRANSLATED'
 
@@ -1249,7 +1249,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             }
         )
 
-    @mock.patch('openedx.core.djangoapps.user_api.views._')
+    @mock.patch('openedx.core.djangoapps.user_api.api._')
     def test_register_form_gender_translations(self, fake_gettext):
         fake_gettext.side_effect = lambda text: text + ' TRANSLATED'
 

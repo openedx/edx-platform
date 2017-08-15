@@ -54,7 +54,7 @@ class IntegrationTestMixin(object):
         self.addCleanup(patcher.stop)
         # Override this method in a subclass and enable at least one provider.
 
-    def test_register(self):
+    def test_register(self, **extra_defaults):
         # The user goes to the register page, and sees a button to register with the provider:
         provider_register_url = self._check_register_page()
         # The user clicks on the Dummy button:
@@ -76,6 +76,8 @@ class IntegrationTestMixin(object):
         self.assertEqual(form_fields['email']['defaultValue'], self.USER_EMAIL)
         self.assertEqual(form_fields['name']['defaultValue'], self.USER_NAME)
         self.assertEqual(form_fields['username']['defaultValue'], self.USER_USERNAME)
+        for field_name, value in extra_defaults.items():
+            self.assertEqual(form_fields[field_name]['defaultValue'], value)
         registration_values = {
             'email': 'email-edited@tpa-test.none',
             'name': 'My Customized Name',

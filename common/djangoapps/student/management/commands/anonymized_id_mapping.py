@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
 from student.models import anonymous_id_for_user
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 class Command(BaseCommand):
@@ -36,7 +36,7 @@ class Command(BaseCommand):
             raise CommandError("Usage: unique_id_mapping %s" %
                                " ".join(("<%s>" % arg for arg in Command.args)))
 
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
+        course_key = CourseKey.from_string(args[0])
 
         # Generate the output filename from the course ID.
         # Change slashes to dashes first, and then append .csv extension.

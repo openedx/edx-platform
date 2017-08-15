@@ -296,8 +296,8 @@
 # Wentao Han <wentao.han@gmail.com>, 2013
 # Wheathana <mr_wheat@sina.cn>, 2015
 # 熊冬升 <xdsnet@gmail.com>, 2013
-# yezhixin20 <yezhixin20@gmail.com>, 2014
-# yezhixin20 <yezhixin20@gmail.com>, 2014
+# yezhixin20 <inactive+yezhixin20@transifex.com>, 2014
+# yezhixin20 <inactive+yezhixin20@transifex.com>, 2014
 # YUAN Tian <Sweetyuantian@msn.cn>, 2014
 # YUAN Tian <Sweetyuantian@msn.cn>, 2014
 # Yufei Xue <cmouse@163.com>, 2013
@@ -352,8 +352,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2017-08-01 18:56+0000\n"
-"PO-Revision-Date: 2017-03-16 12:39+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"PO-Revision-Date: 2017-08-05 12:26+0000\n"
+"Last-Translator: 汤和果 <hgtang93@163.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21978,7 +21978,7 @@ msgstr "文章已解锁，可以编辑"
 
 #: wiki/forms.py
 msgid "Filter"
-msgstr ""
+msgstr "过滤"
 
 #: wiki/core/plugins/base.py
 msgid "Settings for plugin"

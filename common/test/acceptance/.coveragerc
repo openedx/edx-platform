@@ -10,20 +10,31 @@ source =
 omit =
     lms/envs/*
     cms/envs/*
+    cms/manage.py
+    cms/djangoapps/contentstore/views/dev.py
     common/djangoapps/terrain/*
     common/djangoapps/*/migrations/*
+    openedx/core/djangoapps/debug/*
     openedx/core/djangoapps/*/migrations/*
     */test*
     */management/*
     */urls*
     */wsgi*
+    lms/debug/*
+    lms/djangoapps/*/features/*
     lms/djangoapps/*/migrations/*
+    cms/djangoapps/*/features/*
     cms/djangoapps/*/migrations/*
 
+concurrency = multiprocessing
 parallel = True
 
 [report]
 ignore_errors = True
+
+exclude_lines =
+   pragma: no cover
+   raise NotImplementedError
 
 [html]
 title = Bok Choy Test Coverage Report

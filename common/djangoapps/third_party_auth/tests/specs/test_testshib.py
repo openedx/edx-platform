@@ -309,6 +309,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
                         'lastName': 'Smith',
                         'defaultFullName': 'John Smith',
                         'email': 'john@smith.com',
+                        'country': 'Australia',
                     }
                 })
             )
@@ -331,23 +332,119 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         self.USER_USERNAME = "myself"
         super(SuccessFactorsIntegrationTest, self).test_register()
 
+    @patch.dict('django.conf.settings.REGISTRATION_EXTRA_FIELDS', country='optional')
     def test_register_sapsf_metadata_present(self):
         """
         Configure the provider such that it can talk to a mocked-out version of the SAP SuccessFactors
         API, and ensure that the data it gets that way gets passed to the registration form.
+
+        Check that value mappings overrides work in cases where we override a value other than
+        what we're looking for, and when an empty override is provided (expected behavior is that
+        existing value maps will be left alone).
         """
+        expected_country = 'AU'
+        provider_settings = {
+            'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
+            'sapsf_private_key': 'fake_private_key_here',
+            'odata_api_root_url': 'http://api.successfactors.com/odata/v2/',
+            'odata_company_id': 'NCC1701D',
+            'odata_client_id': 'TatVotSEiCMteSNWtSOnLanCtBGwNhGB',
+        }
+
         self._configure_testshib_provider(
             identity_provider_type='sap_success_factors',
             metadata_source=TESTSHIB_METADATA_URL,
-            other_settings=json.dumps({
-                'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
-                'sapsf_private_key': 'fake_private_key_here',
-                'odata_api_root_url': 'http://api.successfactors.com/odata/v2/',
-                'odata_company_id': 'NCC1701D',
-                'odata_client_id': 'TatVotSEiCMteSNWtSOnLanCtBGwNhGB',
-            })
+            other_settings=json.dumps(provider_settings)
         )
-        super(SuccessFactorsIntegrationTest, self).test_register()
+        super(SuccessFactorsIntegrationTest, self).test_register(country=expected_country)
+
+    @patch.dict('django.conf.settings.REGISTRATION_EXTRA_FIELDS', country='optional')
+    def test_register_sapsf_metadata_present_override_relevant_value(self):
+        """
+        Configure the provider such that it can talk to a mocked-out version of the SAP SuccessFactors
+        API, and ensure that the data it gets that way gets passed to the registration form.
+
+        Check that value mappings overrides work in cases where we override a value other than
+        what we're looking for, and when an empty override is provided (expected behavior is that
+        existing value maps will be left alone).
+        """
+        value_map = {'country': {'Australia': 'NZ'}}
+        expected_country = 'NZ'
+        provider_settings = {
+            'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
+            'sapsf_private_key': 'fake_private_key_here',
+            'odata_api_root_url': 'http://api.successfactors.com/odata/v2/',
+            'odata_company_id': 'NCC1701D',
+            'odata_client_id': 'TatVotSEiCMteSNWtSOnLanCtBGwNhGB',
+        }
+        if value_map:
+            provider_settings['sapsf_value_mappings'] = value_map
+
+        self._configure_testshib_provider(
+            identity_provider_type='sap_success_factors',
+            metadata_source=TESTSHIB_METADATA_URL,
+            other_settings=json.dumps(provider_settings)
+        )
+        super(SuccessFactorsIntegrationTest, self).test_register(country=expected_country)
+
+    @patch.dict('django.conf.settings.REGISTRATION_EXTRA_FIELDS', country='optional')
+    def test_register_sapsf_metadata_present_override_other_value(self):
+        """
+        Configure the provider such that it can talk to a mocked-out version of the SAP SuccessFactors
+        API, and ensure that the data it gets that way gets passed to the registration form.
+
+        Check that value mappings overrides work in cases where we override a value other than
+        what we're looking for, and when an empty override is provided (expected behavior is that
+        existing value maps will be left alone).
+        """
+        value_map = {'country': {'United States': 'blahfake'}}
+        expected_country = 'AU'
+        provider_settings = {
+            'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
+            'sapsf_private_key': 'fake_private_key_here',
+            'odata_api_root_url': 'http://api.successfactors.com/odata/v2/',
+            'odata_company_id': 'NCC1701D',
+            'odata_client_id': 'TatVotSEiCMteSNWtSOnLanCtBGwNhGB',
+        }
+        if value_map:
+            provider_settings['sapsf_value_mappings'] = value_map
+
+        self._configure_testshib_provider(
+            identity_provider_type='sap_success_factors',
+            metadata_source=TESTSHIB_METADATA_URL,
+            other_settings=json.dumps(provider_settings)
+        )
+        super(SuccessFactorsIntegrationTest, self).test_register(country=expected_country)
+
+    @patch.dict('django.conf.settings.REGISTRATION_EXTRA_FIELDS', country='optional')
+    def test_register_sapsf_metadata_present_empty_value_override(self):
+        """
+        Configure the provider such that it can talk to a mocked-out version of the SAP SuccessFactors
+        API, and ensure that the data it gets that way gets passed to the registration form.
+
+        Check that value mappings overrides work in cases where we override a value other than
+        what we're looking for, and when an empty override is provided (expected behavior is that
+        existing value maps will be left alone).
+        """
+
+        value_map = {'country': {}}
+        expected_country = 'AU'
+        provider_settings = {
+            'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
+            'sapsf_private_key': 'fake_private_key_here',
+            'odata_api_root_url': 'http://api.successfactors.com/odata/v2/',
+            'odata_company_id': 'NCC1701D',
+            'odata_client_id': 'TatVotSEiCMteSNWtSOnLanCtBGwNhGB',
+        }
+        if value_map:
+            provider_settings['sapsf_value_mappings'] = value_map
+
+        self._configure_testshib_provider(
+            identity_provider_type='sap_success_factors',
+            metadata_source=TESTSHIB_METADATA_URL,
+            other_settings=json.dumps(provider_settings)
+        )
+        super(SuccessFactorsIntegrationTest, self).test_register(country=expected_country)
 
     def test_register_http_failure(self):
         """

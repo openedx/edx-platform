@@ -77,7 +77,7 @@
 # Evgeniya <eugenia000@gmail.com>, 2013
 # Elena Freundorfer <e_freundorfer@gmx.de>, 2014
 # Evgeniya <eugenia000@gmail.com>, 2013
-# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2016
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2017
 # Madina Kanlybaeva <madika.kanlybaeva@mail.ru>, 2016
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
@@ -154,7 +154,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2017-08-01 18:55+0000\n"
-"PO-Revision-Date: 2017-07-20 11:59+0000\n"
+"PO-Revision-Date: 2017-08-03 16:03+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -5247,7 +5247,7 @@ msgstr "Вы должны указать имя"
 
 #: cms/static/js/models/course_update.js
 msgid "Action required: Enter a valid date."
-msgstr "Требуемое действие: ввести правильную дату"
+msgstr "Необходимо ввести корректную дату."
 
 #: cms/static/js/models/group.js
 msgid "Group name is required"
@@ -6342,7 +6342,7 @@ msgstr "Настройки"
 
 #: cms/static/js/views/xblock_outline.js
 msgid "New {component_type}"
-msgstr ""
+msgstr "Новый {component_type}"
 
 #. Translators: This message will be added to the front of messages of type
 #. warning,

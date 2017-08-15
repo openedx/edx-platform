@@ -846,7 +846,8 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         self.course_price = 100
         self.number_of_courses = 2
         self.program = ProgramFactory(
-            courses=[self._create_course(self.course_price) for __ in range(self.number_of_courses)]
+            courses=[self._create_course(self.course_price) for __ in range(self.number_of_courses)],
+            applicable_seat_types=['verified']
         )
 
     def _create_course(self, course_price):
@@ -940,7 +941,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         """
         Learner should be eligible for one click purchase if:
             - program is eligible for one click purchase
-            - learner is not enrolled in any of the course runs associated with the program
+            - There are courses remaining that have not been purchased and enrolled in.
         """
         data = ProgramMarketingDataExtender(self.program, self.user).extend()
         self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
@@ -954,14 +955,17 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         data = ProgramMarketingDataExtender(program, self.user).extend()
         self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
 
-        course = self._create_course(self.course_price)
-        CourseEnrollmentFactory(user=self.user, course_id=course['course_runs'][0]['key'])
+        course1 = self._create_course(self.course_price)
+        course2 = self._create_course(self.course_price)
+        CourseEnrollmentFactory(user=self.user, course_id=course1['course_runs'][0]['key'], mode='verified')
+        CourseEnrollmentFactory(user=self.user, course_id=course2['course_runs'][0]['key'], mode='audit')
         program2 = ProgramFactory(
-            courses=[course],
-            is_program_eligible_for_one_click_purchase=True
+            courses=[course1, course2],
+            is_program_eligible_for_one_click_purchase=True,
+            applicable_seat_types=['verified'],
         )
         data = ProgramMarketingDataExtender(program2, self.user).extend()
-        self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
+        self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
 
     def test_multiple_published_course_runs(self):
         """
@@ -993,7 +997,8 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
                     )
                 ])
             ],
-            is_program_eligible_for_one_click_purchase=True
+            is_program_eligible_for_one_click_purchase=True,
+            applicable_seat_types=['verified']
         )
         data = ProgramMarketingDataExtender(program, self.user).extend()
 
@@ -1065,6 +1070,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         """
         User shouldn't be able to do a one click purchase of a program if a program has no applicable seat types.
         """
+        self.program['applicable_seat_types'] = []
         data = ProgramMarketingDataExtender(self.program, self.user).extend()
 
         self.assertEqual(len(data['skus']), 0)

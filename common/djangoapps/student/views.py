@@ -40,7 +40,6 @@ from django.views.generic import TemplateView
 from ipware.ip import get_ip
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 from provider.oauth2.models import Client
 from pytz import UTC
@@ -933,20 +932,32 @@ def _create_recent_enrollment_message(course_enrollments, course_modes):  # pyli
     recently_enrolled_courses = _get_recently_enrolled_courses(course_enrollments)
 
     if recently_enrolled_courses:
-        enroll_messages = [
-            {
-                "course_id": enrollment.course_overview.id,
-                "course_name": enrollment.course_overview.display_name,
-                "allow_donation": _allow_donation(course_modes, enrollment.course_overview.id, enrollment)
-            }
+        enrollments_count = len(recently_enrolled_courses)
+        course_name_separator = ', '
+        # If length of enrolled course 2, join names with 'and'
+        if enrollments_count == 2:
+            course_name_separator = _(' and ')
+
+        course_names = course_name_separator.join(
+            [enrollment.course_overview.display_name for enrollment in recently_enrolled_courses]
+        )
+
+        allow_donations = any(
+            _allow_donation(course_modes, enrollment.course_overview.id, enrollment)
             for enrollment in recently_enrolled_courses
-        ]
+        )
 
         platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
 
         return render_to_string(
             'enrollment/course_enrollment_message.html',
-            {'course_enrollment_messages': enroll_messages, 'platform_name': platform_name}
+            {
+                'course_names': course_names,
+                'enrollments_count': enrollments_count,
+                'allow_donations': allow_donations,
+                'platform_name': platform_name,
+                'course_id': recently_enrolled_courses[0].course_overview.id if enrollments_count == 1 else None
+            }
         )
 
 
@@ -1193,7 +1204,7 @@ def change_enrollment(request, check_access=True):
         return HttpResponseBadRequest(_("Course id not specified"))
 
     try:
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get("course_id"))
+        course_id = CourseKey.from_string(request.POST.get("course_id"))
     except InvalidKeyError:
         log.warning(
             u"User %s tried to %s with invalid course id: %s",
@@ -2819,7 +2830,7 @@ def change_email_settings(request):
     user = request.user
 
     course_id = request.POST.get("course_id")
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     receive_emails = request.POST.get("receive_emails")
     if receive_emails:
         optout_object = Optout.objects.filter(user=user, course_id=course_key)

@@ -52,55 +52,34 @@ class TestCourseIndex(CourseTestCase):
             display_name='dotted.course.name-2',
         )
 
-    def check_index_and_outline(self, authed_client):
+    def check_courses_on_index(self, authed_client):
         """
-        Test getting the list of courses and then pulling up their outlines
+        Test that the React course listing is present.
         """
         index_url = '/home/'
         index_response = authed_client.get(index_url, {}, HTTP_ACCEPT='text/html')
         parsed_html = lxml.html.fromstring(index_response.content)
-        course_link_eles = parsed_html.find_class('course-link')
-        self.assertGreaterEqual(len(course_link_eles), 2)
-        for link in course_link_eles:
-            self.assertRegexpMatches(
-                link.get("href"),
-                'course/{}'.format(settings.COURSE_KEY_PATTERN)
-            )
-            # now test that url
-            outline_response = authed_client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')
-            # ensure it has the expected 2 self referential links
-            outline_parsed = lxml.html.fromstring(outline_response.content)
-            outline_link = outline_parsed.find_class('course-link')[0]
-            self.assertEqual(outline_link.get("href"), link.get("href"))
-            course_menu_link = outline_parsed.find_class('nav-course-courseware-outline')[0]
-            self.assertEqual(course_menu_link.find("a").get("href"), link.get("href"))
+        courses_tab = parsed_html.find_class('react-course-listing')
+        self.assertEqual(len(courses_tab), 1)
 
-    def test_libraries_on_course_index(self):
+    def test_libraries_on_index(self):
         """
-        Test getting the list of libraries from the course listing page
+        Test that the library tab is present.
         """
-        def _assert_library_link_present(response, library):
+        def _assert_library_tab_present(response):
             """
-            Asserts there's a valid library link on libraries tab.
+            Asserts there's a library tab.
             """
             parsed_html = lxml.html.fromstring(response.content)
-            library_link_elements = parsed_html.find_class('library-link')
-            self.assertEqual(len(library_link_elements), 1)
-            link = library_link_elements[0]
-            self.assertEqual(
-                link.get("href"),
-                reverse_library_url('library_handler', library.location.library_key),
-            )
-            # now test that url
-            outline_response = self.client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')
-            self.assertEqual(outline_response.status_code, 200)
+            library_tab = parsed_html.find_class('react-library-listing')
+            self.assertEqual(len(library_tab), 1)
 
         # Add a library:
         lib1 = LibraryFactory.create()
 
         index_url = '/home/'
         index_response = self.client.get(index_url, {}, HTTP_ACCEPT='text/html')
-        _assert_library_link_present(index_response, lib1)
+        _assert_library_tab_present(index_response)
 
         # Make sure libraries are visible to non-staff users too
         self.client.logout()
@@ -109,13 +88,13 @@ class TestCourseIndex(CourseTestCase):
         LibraryUserRole(lib2.location.library_key).add_users(non_staff_user)
         self.client.login(username=non_staff_user.username, password=non_staff_userpassword)
         index_response = self.client.get(index_url, {}, HTTP_ACCEPT='text/html')
-        _assert_library_link_present(index_response, lib2)
+        _assert_library_tab_present(index_response)
 
     def test_is_staff_access(self):
         """
         Test that people with is_staff see the courses and can navigate into them
         """
-        self.check_index_and_outline(self.client)
+        self.check_courses_on_index(self.client)
 
     def test_negative_conditions(self):
         """
@@ -143,7 +122,7 @@ class TestCourseIndex(CourseTestCase):
             )
 
         # test access
-        self.check_index_and_outline(course_staff_client)
+        self.check_courses_on_index(course_staff_client)
 
     def test_json_responses(self):
         outline_url = reverse_course_url('course_handler', self.course.id)
@@ -402,31 +381,8 @@ class TestCourseIndexArchived(CourseTestCase):
         parsed_html = lxml.html.fromstring(index_response.content)
         course_tab = parsed_html.find_class('courses')
         self.assertEqual(len(course_tab), 1)
-        course_links = course_tab[0].find_class('course-link')
-        course_titles = course_tab[0].find_class('course-title')
         archived_course_tab = parsed_html.find_class('archived-courses')
-
-        if separate_archived_courses:
-            # Archived courses should be separated from the main course list
-            self.assertEqual(len(archived_course_tab), 1)
-            archived_course_links = archived_course_tab[0].find_class('course-link')
-            archived_course_titles = archived_course_tab[0].find_class('course-title')
-            self.assertEqual(len(archived_course_links), 1)
-            self.assertEqual(len(archived_course_titles), 1)
-            self.assertEqual(archived_course_titles[0].text, 'Archived Course')
-
-            self.assertEqual(len(course_links), 2)
-            self.assertEqual(len(course_titles), 2)
-            self.assertEqual(course_titles[0].text, 'Active Course 1')
-            self.assertEqual(course_titles[1].text, 'Active Course 2')
-        else:
-            # Archived courses should be included in the main course list
-            self.assertEqual(len(archived_course_tab), 0)
-            self.assertEqual(len(course_links), 3)
-            self.assertEqual(len(course_titles), 3)
-            self.assertEqual(course_titles[0].text, 'Active Course 1')
-            self.assertEqual(course_titles[1].text, 'Active Course 2')
-            self.assertEqual(course_titles[2].text, 'Archived Course')
+        self.assertEqual(len(archived_course_tab), 1 if separate_archived_courses else 0)
 
     @ddt.data(
         # Staff user has course staff access

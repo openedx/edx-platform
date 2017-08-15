@@ -2,6 +2,7 @@
 import ddt
 import unittest
 from datetime import datetime, timedelta
+from dateutil import parser
 
 import itertools
 from fs.memoryfs import MemoryFS
@@ -11,7 +12,7 @@ from xblock.runtime import KvsFieldData, DictKeyValueStore
 
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 ORG = 'test_org'
@@ -38,7 +39,7 @@ class DummySystem(ImportSystem):
 
         xmlstore = XMLModuleStore("data_dir", source_dirs=[],
                                   load_error_modules=load_error_modules)
-        course_id = SlashSeparatedCourseKey(ORG, COURSE, 'test_run')
+        course_id = CourseKey.from_string('/'.join([ORG, COURSE, 'test_run']))
         course_dir = "test_dir"
         error_tracker = Mock()
 
@@ -140,6 +141,16 @@ class HasEndedMayCertifyTestCase(unittest.TestCase):
         self.assertTrue(self.future_show_certs.may_certify())
         self.assertTrue(self.future_show_certs_no_info.may_certify())
         self.assertFalse(self.future_noshow_certs.may_certify())
+
+
+class CourseSummaryHasEnded(unittest.TestCase):
+    """ Test for has_ended method when end date is missing timezone information. """
+
+    def test_course_end(self):
+        test_course = get_dummy_course("2012-01-01T12:00")
+        bad_end_date = parser.parse("2012-02-21 10:28:45")
+        summary = xmodule.course_module.CourseSummary(test_course.id, end=bad_end_date)
+        self.assertTrue(summary.has_ended())
 
 
 @ddt.ddt
