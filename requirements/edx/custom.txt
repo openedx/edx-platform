@@ -11,7 +11,7 @@
 # This is currently using a custom branch: https://github.com/open-craft/xblock-poll/tree/copy-change-patch
 -e git+https://github.com/open-craft/xblock-poll.git@3a06ef4782f9f90d6a8594c4eb4a84a277182fb8#egg=xblock-poll
 -e git+https://github.com/edx/edx-notifications.git@0.6.0#egg=edx-notifications==0.6.0
--e git+https://github.com/open-craft/problem-builder.git@v2.7.0#egg=xblock-problem-builder==2.7.0
+-e git+https://github.com/open-craft/problem-builder.git@v2.7.1#egg=xblock-problem-builder==2.7.1
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/open-craft/xblock-chat.git@ad0b7627bfd2d135e1776e19ce208ecf517e50c5#egg=xblock-chat
 -e git+https://github.com/open-craft/xblock-eoc-journal.git@d63412e0956f1b77132e4c833c1ad8f0578b816f#egg=xblock-eoc-journal
