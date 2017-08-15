@@ -28,7 +28,8 @@
 #   * Don't use -e
 #
 #   * TAG-OR-SHA is the specific commit to install.  It must be a git tag,
-#     or a git SHA.  Don't use branch names here.
+#     or a git SHA commit hash.  Don't use branch names here.  If OWNER is
+#     not an edX organization, then it must be a SHA.
 #
 #   * DIST-NAME is the distribution name, the same name you'd use in a
 #     "pip install" command.  It might be different than REPO-NAME. It must
@@ -46,7 +47,7 @@
 # Python libraries to install directly from github
 
 # Third-party:
-git+https://github.com/cyberdelia/django-pipeline.git@1.5.3#egg=django-pipeline==1.5.3
+git+https://github.com/jazzband/django-pipeline.git@d068a019169c9de5ee20ece041a6dea236422852#egg=django-pipeline==1.5.3
 git+https://github.com/edx/django-wiki.git@v0.0.11#egg=django-wiki==0.0.11
 git+https://github.com/edx/django-openid-auth.git@0.8#egg=django-openid-auth==0.8
 git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
@@ -54,7 +55,7 @@ git+https://github.com/edx/nltk.git@2.0.6#egg=nltk==2.0.6
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
-git+https://github.com/mitodl/django-cas.git@v2.1.1#egg=django-cas==2.1.1
+git+https://github.com/mitodl/django-cas.git@47cfef16cbbf305f943cceb8c0b02514194eb9fa#egg=django-cas==2.1.1
 -e git+https://github.com/dgrtwo/ParsePy.git@7949b9f754d1445eff8e8f20d0e967b9a6420639#egg=parse_rest
 # Master pyfs has a bug working with VPC auth. This is a fix. We should switch
 # back to master when and if this fix is merged back.
@@ -98,5 +99,5 @@ git+https://github.com/edx/xblock-lti-consumer.git@v1.1.5#egg=lti_consumer-xbloc
 git+https://github.com/edx/edx-proctoring.git@1.1.0#egg=edx-proctoring==1.1.0
 
 # Third Party XBlocks
-git+https://github.com/open-craft/xblock-poll@v1.2.7#egg=xblock-poll==1.2.7
+git+https://github.com/open-craft/xblock-poll@7ba819b968fe8faddb78bb22e1fe7637005eb414#egg=xblock-poll==1.2.7
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.18#egg=xblock-drag-and-drop-v2==2.0.18
