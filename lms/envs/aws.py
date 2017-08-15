@@ -921,4 +921,6 @@ if ALL_LANGUAGES_OVERRIDE:
         elif code not in ALL_LANGUAGES_DICT:
             ALL_LANGUAGES_DUPLICATE = ALL_LANGUAGES_DUPLICATE + ([code, language],)
             ALL_LANGUAGES_DICT[code] = language
+        else:
+            ALL_LANGUAGES_DICT[code] = language
     ALL_LANGUAGES_DICT = OrderedDict(sorted(ALL_LANGUAGES_DICT.items(), key=itemgetter(1)))
