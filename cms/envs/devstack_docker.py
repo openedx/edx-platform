@@ -17,7 +17,7 @@ LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 FEATURES.update({
     'ENABLE_COURSEWARE_INDEX': False,
     'ENABLE_LIBRARY_INDEX': False,
-    'ENABLE_DISCUSSION_SERVICE': False,
+    'ENABLE_DISCUSSION_SERVICE': True,
 })
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
