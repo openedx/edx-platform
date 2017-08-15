@@ -721,11 +721,15 @@ def execute_webpack(prod, settings=None):
 
 
 def execute_webpack_watch(settings=None):
+    npm_bin_dir = sh("npm bin", capture=True).strip('\n')
+    static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings)
+    static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings)
     run_background_process(
-        "STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack --watch --watch-poll=200"
+        "STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} {npm_bin_dir}/webpack --watch --watch-poll=200"
         .format(
-            static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings),
-            static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings)
+            static_root_lms=static_root_lms,
+            static_root_cms=static_root_cms,
+            npm_bin_dir=npm_bin_dir
         )
     )
 

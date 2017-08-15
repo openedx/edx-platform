@@ -16,7 +16,6 @@ from .utils.timer import timed
 
 DEFAULT_PORT = {"lms": 8000, "studio": 8001}
 DEFAULT_SETTINGS = Env.DEVSTACK_SETTINGS
-DOCKER_SETTINGS = "devstack_docker"
 OPTIMIZED_SETTINGS = "devstack_optimized"
 OPTIMIZED_ASSETS_SETTINGS = "test_static_optimized"
 
@@ -53,8 +52,6 @@ def run_server(
         if settings == DEFAULT_SETTINGS:
             args.append('--skip-collect')
         call_task('pavelib.assets.update_assets', args=args)
-    elif settings == DOCKER_SETTINGS:
-        call_task('pavelib.assets.watch_assets', options={'background': True})
 
     if port is None:
         port = DEFAULT_PORT[system]
