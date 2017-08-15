@@ -509,10 +509,3 @@ AFFILIATE_COOKIE_NAME = ENV_TOKENS.get('AFFILIATE_COOKIE_NAME', AFFILIATE_COOKIE
 ############## Settings for Studio Context Sensitive Help ##############
 
 DOC_LINK_BASE_URL = ENV_TOKENS.get('DOC_LINK_BASE_URL', DOC_LINK_BASE_URL)
-
-############## Settings for Profile Image Size ######################
-
-PROFILE_IMAGE_SIZES_MAP = ENV_TOKENS.get(
-    'PROFILE_IMAGE_SIZES_MAP',
-    PROFILE_IMAGE_SIZES_MAP
-)
