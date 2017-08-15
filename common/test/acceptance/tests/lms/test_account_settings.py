@@ -124,6 +124,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         """
         super(AccountSettingsPageTest, self).setUp()
         self.full_name = XSS_INJECTION
+        self.social_link = ''
         self.username, self.user_id = self.log_in_as_unique_user(full_name=self.full_name)
         self.visit_account_settings_page()
 
@@ -176,6 +177,14 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
                     'Gender',
                     'Year of Birth',
                     'Preferred Language',
+                ]
+            },
+            {
+                'title': 'Social Media Links',
+                'fields': [
+                    'Twitter Link',
+                    'Facebook Link',
+                    'LinkedIn Link',
                 ]
             }
         ]
@@ -461,6 +470,18 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
                     'language_proficiencies', [{'code': 'ps'}], [], table='student_languageproficiency'),
             ],
             actual_events
+        )
+
+    def test_social_links_field(self):
+        """
+        Test behaviour of one of the social media links field.
+        """
+        self._test_text_field(
+            u'social_links',
+            u'Twitter Link',
+            self.social_link,
+            u'www.google.com/invalidlink',
+            [u'https://www.twitter.com/edX', self.social_link],
         )
 
     def test_linked_accounts(self):

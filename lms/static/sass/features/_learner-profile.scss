@@ -195,6 +195,10 @@
     .profile-header {
         @include padding(0, $baseline*2, $baseline, $baseline*3);
 
+        @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
+            @include padding(0, $baseline*2, $baseline, $baseline*0.75);
+        }
+
         .header {
             @extend %t-title4;
             @extend %t-ultrastrong;
@@ -221,11 +225,34 @@
     }
 
     .profile-section-one-fields {
-        margin: 0 $baseline/2;
+        @include margin(0, $baseline/2, 0, $baseline*0.75);
+
+        .social-links {
+            font-size: 2rem;
+            padding-top: $baseline/4;
+
+            & > span {
+                color: $gray-l4;
+            }
+
+            a {
+                .fa-facebook-square {
+                    color: $facebook-blue;
+                }
+
+                .fa-twitter-square {
+                    color: $twitter-blue;
+                }
+
+                .fa-linkedin-square {
+                    color: $linkedin-blue;
+                }
+            }
+        }
 
         .u-field {
             @extend %t-weight4;
-            @include padding(0, 0, 0, 3px);
+            padding: 0;
             color: $base-font-color;
             margin-top: $baseline/5;
 
@@ -297,18 +324,19 @@
 
     .wrapper-profile-section-container-two {
         @include float(left);
-        width: calc(100% - 360px);
+        @include padding-left($baseline);
+        width: calc(100% - 380px);
         max-width: $learner-profile-container-flex; // Switch to map-get($grid-breakpoints,md) for bootstrap
-        padding-left: $baseline;
 
         @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
+            @include padding-left(0);
             width: 100%;
             margin-top: $baseline;
         }
 
         .u-field-textarea {
             margin-bottom: ($baseline/2);
-            padding: 0 ($baseline*.75) ($baseline*.75) ($baseline/4);
+            @include padding(0, ($baseline*.75), ($baseline*.75), ($baseline/4));
 
             .u-field-header {
                 position: relative;

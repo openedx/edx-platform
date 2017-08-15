@@ -2931,6 +2931,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'date_joined',
         'language_proficiencies',
         'bio',
+        'social_links',
         'account_privacy',
         # Not an actual field, but used to signal whether badges should be public.
         'accomplishments_shared',
@@ -2953,6 +2954,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         "date_joined",
         "profile_image",
         "language_proficiencies",
+        "social_links",
         "name",
         "gender",
         "goals",
@@ -2963,6 +2965,32 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         "account_privacy",
         "accomplishments_shared",
     ]
+}
+
+# The current list of social platforms to be shown to the user.
+#
+# url_stub represents the host URL, it must end with a forward
+# slash and represent the profile at https://www.[url_stub][username]
+#
+# The example will be used as a placeholder in the social link
+# input field as well as in some messaging describing an example of a
+# valid link.
+SOCIAL_PLATFORMS = {
+    'facebook': {
+        'display_name': 'Facebook',
+        'url_stub': 'facebook.com/',
+        'example': 'https://www.facebook.com/username'
+    },
+    'twitter': {
+        'display_name': 'Twitter',
+        'url_stub': 'twitter.com/',
+        'example': 'https://www.twitter.com/username'
+    },
+    'linkedin': {
+        'display_name': 'LinkedIn',
+        'url_stub': 'linkedin.com/in/',
+        'example': 'www.linkedin.com/in/username'
+    }
 }
 
 # E-Commerce API Configuration

@@ -2,10 +2,17 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     'use strict';
 
     var expectProfileElementContainsField = function(element, view) {
+        var titleElement, fieldTitle;
         var $element = $(element);
-        var fieldTitle = $element.find('.u-field-title').text().trim();
 
-        if (!_.isUndefined(view.options.title)) {
+        // Avoid testing for elements without titles
+        titleElement = $element.find('.u-field-title');
+        if (titleElement.length === 0) {
+            return;
+        }
+
+        fieldTitle = titleElement.text().trim();
+        if (!_.isUndefined(view.options.title) && !_.isUndefined(fieldTitle)) {
             expect(fieldTitle).toBe(view.options.title);
         }
 
@@ -41,9 +48,10 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     var expectSectionOneTobeRendered = function(learnerProfileView) {
-        var sectionOneFieldElements = $(learnerProfileView.$('.wrapper-profile-section-one')).find('.u-field');
+        var sectionOneFieldElements = $(learnerProfileView.$('.wrapper-profile-section-one'))
+            .find('.u-field, .social-links');
 
-        expect(sectionOneFieldElements.length).toBe(6);
+        expect(sectionOneFieldElements.length).toBe(7);
         expectProfileElementContainsField(sectionOneFieldElements[0], learnerProfileView.options.profileImageFieldView);
         expectProfileElementContainsField(sectionOneFieldElements[1], learnerProfileView.options.usernameFieldView);
         expectProfileElementContainsField(sectionOneFieldElements[2], learnerProfileView.options.nameFieldView);

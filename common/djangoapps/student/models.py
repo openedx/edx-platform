@@ -2374,6 +2374,21 @@ class LanguageProficiency(models.Model):
     )
 
 
+class SocialLink(models.Model):  # pylint: disable=model-missing-unicode
+    """
+    Represents a URL connecting a particular social platform to a user's social profile.
+
+    The platforms are listed in the lms/common.py file under SOCIAL_PLATFORMS.
+    Each entry has a display name, a url_stub that describes a required
+    component of the stored URL and an example of a valid URL.
+
+    The stored social_link value must adhere to the form 'https://www.[url_stub][username]'.
+    """
+    user_profile = models.ForeignKey(UserProfile, db_index=True, related_name='social_links')
+    platform = models.CharField(max_length=30)
+    social_link = models.CharField(max_length=100, blank=True)
+
+
 class CourseEnrollmentAttribute(models.Model):
     """
     Provide additional information about the user's enrollment.

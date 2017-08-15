@@ -93,6 +93,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'badges_icon': staticfiles_storage.url('certificates/images/ico-mozillaopenbadges.png'),
             'backpack_ui_img': staticfiles_storage.url('certificates/images/backpack-ui.png'),
             'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
+            'social_platforms': settings.SOCIAL_PLATFORMS,
         },
         'disable_courseware_js': True,
     }

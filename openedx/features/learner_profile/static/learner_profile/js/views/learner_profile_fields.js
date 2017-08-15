@@ -3,9 +3,17 @@
     'use strict';
 
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/string-utils',
-        'edx-ui-toolkit/js/utils/html-utils', 'js/views/fields', 'js/views/image_field', 'backbone-super'
-    ], function(gettext, $, _, Backbone, StringUtils, HtmlUtils, FieldViews, ImageFieldView) {
+        'gettext',
+        'jquery',
+        'underscore',
+        'backbone',
+        'edx-ui-toolkit/js/utils/string-utils',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'js/views/fields',
+        'js/views/image_field',
+        'text!learner_profile/templates/social_icons.underscore',
+        'backbone-super'
+    ], function(gettext, $, _, Backbone, StringUtils, HtmlUtils, FieldViews, ImageFieldView, socialIconsTemplate) {
         var LearnerProfileFieldViews = {};
 
         LearnerProfileFieldViews.AccountPrivacyFieldView = FieldViews.DropdownFieldView.extend({
@@ -119,6 +127,31 @@
             fileSelected: function(e, data) {
                 this.options.messageView.hideMessage();
                 this._super(e, data);
+            }
+        });
+
+        LearnerProfileFieldViews.SocialLinkIconsView = Backbone.View.extend({
+
+            initialize: function(options) {
+                this.options = _.extend({}, options);
+            },
+
+            render: function() {
+                var socialLinks = {};
+                for (var platformName in this.options.socialPlatforms) { // eslint-disable-line no-restricted-syntax, guard-for-in, vars-on-top, max-len
+                    socialLinks[platformName] = null;
+                    for (var link in this.model.get('social_links')) { // eslint-disable-line no-restricted-syntax, vars-on-top, max-len
+                        if (platformName === this.model.get('social_links')[link].platform) {
+                            socialLinks[platformName] = this.model.get('social_links')[link].social_link;
+                        }
+                    }
+                }
+
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(socialIconsTemplate)({
+                    socialLinks: socialLinks,
+                    ownProfile: this.options.ownProfile
+                }));
+                return this;
             }
         });
 
