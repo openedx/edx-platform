@@ -68,9 +68,19 @@ class ApiKeyPermissionMixIn(object):
 
 class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
     """Limit the number of requests users can make to the enrollment API."""
-    rate = '40/minute'
+    THROTTLE_RATES = {
+        'user': '40/minute',
+        'staff': '200/minute',
+    }
 
     def allow_request(self, request, view):
+        # Use a special scope for staff to allow for a separate throttle rate
+        user = request.user
+        if user.is_authenticated() and (user.is_staff or user.is_superuser):
+            self.scope = 'staff'
+            self.rate = self.get_rate()
+            self.num_requests, self.duration = self.parse_rate(self.rate)
+
         return self.has_api_key_permissions(request) or super(EnrollmentUserThrottle, self).allow_request(request, view)
 
 
