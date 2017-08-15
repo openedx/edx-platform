@@ -1312,27 +1312,6 @@ class HLSVideoTest(VideoBaseTest):
         self.video.seek('0:05')
         self.assertEqual(self.video.position, '0:05')
 
-    def test_video_position_save_state(self):
-        """
-        Scenario: Video position save state functionality is working as expected for hls video
-
-        Given the course has a Video component with only HLS source available.
-        When I view the Video component
-        Then I can see video save state is working as expected
-        """
-        self.metadata = self.metadata_for_mode('hls')
-        self.navigate_to_video()
-
-        self.video.click_player_button('play')
-        self.video.wait_for_position('0:04')
-        self.video.click_player_button('pause')
-        self.assertEqual(self.video.position, '0:04')
-        self.video.reload_page()
-        self.assertEqual(self.video.duration, '0:09')
-        self.assertEqual(self.video.position, '0:04')
-        self.video.click_player_button('play')
-        self.assertGreaterEqual(self.video.seconds, 4)
-
     def test_video_download_link(self):
         """
         Scenario: Correct video url is selected for download
