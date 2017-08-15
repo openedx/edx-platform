@@ -2,18 +2,20 @@ import datetime
 from mock import patch, Mock
 import pytz
 
+import ddt
+
 from student.tests.factories import UserFactory
 from openedx.core.djangoapps.schedules.management.commands import send_recurring_nudge as nudge
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 
 
+@ddt.ddt
 class TestSendRecurringNudge(CacheIsolationTestCase):
 
     # pylint: disable=protected-access
 
     def setUp(self):
-        ScheduleFactory.create(start=datetime.datetime(2017, 8, 1, 15, 34, 30, tzinfo=pytz.UTC))
         ScheduleFactory.create(start=datetime.datetime(2017, 8, 1, 15, 44, 30, tzinfo=pytz.UTC))
         ScheduleFactory.create(start=datetime.datetime(2017, 8, 1, 17, 34, 30, tzinfo=pytz.UTC))
         ScheduleFactory.create(start=datetime.datetime(2017, 8, 2, 15, 34, 30, tzinfo=pytz.UTC))
@@ -58,13 +60,18 @@ class TestSendRecurringNudge(CacheIsolationTestCase):
         mock_schedule_minute.delay.assert_any_call(3, test_time + datetime.timedelta(minutes=59))
         self.assertFalse(mock_ace.send.called)
 
+    @ddt.data(1, 10, 100)
     @patch.object(nudge, 'ace')
     @patch.object(nudge, '_schedule_send')
-    def test_schedule_minute(self, mock_schedule_send, mock_ace):
+    def test_schedule_minute(self, schedule_count, mock_schedule_send, mock_ace):
+
+        for _ in range(schedule_count):
+            ScheduleFactory.create(start=datetime.datetime(2017, 8, 1, 15, 34, 30, tzinfo=pytz.UTC))
+
         test_time = datetime.datetime(2017, 8, 1, 15, 34, tzinfo=pytz.UTC)
         with self.assertNumQueries(1):
             nudge._schedule_minute(3, test_time)
-        self.assertEqual(mock_schedule_send.delay.call_count, 1)
+        self.assertEqual(mock_schedule_send.delay.call_count, schedule_count)
         self.assertFalse(mock_ace.send.called)
 
     @patch.object(nudge, 'ace')
