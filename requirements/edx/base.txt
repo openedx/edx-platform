@@ -21,7 +21,7 @@ django-countries==4.0
 django-extensions==1.5.9
 django-filter==1.0.4
 django-ipware==1.1.0
-django-model-utils==2.3.1
+django-model-utils==3.0.0
 django-mptt>=0.8.6,<0.9
 django-oauth-plus==2.2.8
 django-oauth-toolkit==0.12.0
@@ -54,7 +54,7 @@ edx-opaque-keys==0.4.0
 edx-organizations==0.4.5
 edx-rest-api-client==1.7.1
 edx-search==1.1.0
-edx-submissions==2.0.11
+edx-submissions==2.0.12
 edxval==0.1.1
 event-tracking==0.2.4
 facebook-sdk==0.4.0
