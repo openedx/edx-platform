@@ -837,7 +837,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # first get non-draft in a round-trip
         query = {
             '_id': {'$in': [
-                course_key.make_usage_key_from_deprecated_string(item).to_deprecated_son() for item in items
+                UsageKey.from_string(item).map_into_course(course_key).to_deprecated_son() for item in items
             ]}
         }
         return list(self.collection.find(query))
@@ -1741,7 +1741,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 )
             all_reachable = all_reachable.union(item.get('definition', {}).get('children', []))
         item_locs -= all_reachable
-        return [course_key.make_usage_key_from_deprecated_string(item_loc) for item_loc in item_locs]
+        return [UsageKey.from_string(item_loc).map_into_course(course_key) for item_loc in item_locs]
 
     def get_courses_for_wiki(self, wiki_slug, **kwargs):
         """

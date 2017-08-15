@@ -829,7 +829,7 @@ def _import_course_draft(
         # filtered out from the non-draft store export.
         if parent_url is not None and index is not None:
             course_key = descriptor.location.course_key
-            parent_location = course_key.make_usage_key_from_deprecated_string(parent_url)
+            parent_location = UsageKey.from_string(parent_url).map_into_course(course_key)
 
             # IMPORTANT: Be sure to update the parent in the NEW namespace
             parent_location = parent_location.map_into_course(target_id)

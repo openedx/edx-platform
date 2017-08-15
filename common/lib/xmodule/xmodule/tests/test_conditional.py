@@ -10,6 +10,7 @@ from xblock.fields import ScopeIds
 from xmodule.error_module import NonStaffErrorDescriptor
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationManager
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.tests import DATA_DIR, get_test_system, get_test_descriptor_system
@@ -318,9 +319,11 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             dummy_field_data,
             dummy_scope_ids,
         )
+        new_run = conditional.location.course_key.run
         self.assertEqual(
             conditional.sources_list[0],
-            conditional.location.course_key.make_usage_key_from_deprecated_string(conditional.xml_attributes['sources'])
+            # Matching what is in ConditionalDescriptor.__init__.
+            BlockUsageLocator.from_string(conditional.xml_attributes['sources']).replace(run=new_run)
         )
 
     def test_conditional_module_parse_sources(self):
