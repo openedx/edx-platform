@@ -487,9 +487,10 @@ class CourseOverview(TimeStampedModel):
         return json.loads(self._pre_requisite_courses_json)
 
     @classmethod
-    def get_select_courses(cls, course_keys, force_update=False):
+    def update_select_courses(cls, course_keys, force_update=False):
         """
-        Returns CourseOverview objects for the given course_keys.
+        A side-effecting method that updates CourseOverview objects for
+        the given course_keys.
 
         Arguments:
             course_keys (list[CourseKey]): Identifies for which courses to
@@ -498,8 +499,6 @@ class CourseOverview(TimeStampedModel):
                 whether the requested CourseOverview objects should be
                 forcefully updated (i.e., re-synched with the modulestore).
         """
-        course_overviews = []
-
         log.info('Generating course overview for %d courses.', len(course_keys))
         log.debug('Generating course overview(s) for the following courses: %s', course_keys)
 
@@ -507,7 +506,7 @@ class CourseOverview(TimeStampedModel):
 
         for course_key in course_keys:
             try:
-                course_overviews.append(action(course_key))
+                action(course_key)
             except Exception as ex:  # pylint: disable=broad-except
                 log.exception(
                     'An error occurred while generating course overview for %s: %s',
@@ -516,8 +515,6 @@ class CourseOverview(TimeStampedModel):
                 )
 
         log.info('Finished generating course overviews.')
-
-        return course_overviews
 
     @classmethod
     def get_all_courses(cls, orgs=None, filter_=None):
