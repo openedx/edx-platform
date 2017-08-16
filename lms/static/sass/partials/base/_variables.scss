@@ -407,10 +407,12 @@ $form-bg-color: $white !default;
 $body-font-size: em(14) !default;
 $body-line-height: golden-ratio(.875em, 1) !default;
 
+// font colors
 $base-font-color: rgb(60,60,60) !default;
-$baseFontColor: $base-font-color;
-
+$baseFontColor: $base-font-color !default;
+$darkest-base-font-color: $black !default;
 $lighter-base-font-color: rgb(100,100,100) !default;
+$lightest-base-font-color: $gray; // Lightest font that can be used on a white background
 $very-light-text: rgb(255,255,255) !default;
 $text-color: rgb(51, 51, 51) !default;
 

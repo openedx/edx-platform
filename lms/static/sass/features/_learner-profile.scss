@@ -56,6 +56,7 @@
             .u-field-upload-button {
                 position: absolute;
                 top: 0;
+                opacity: 0;
                 width: $profile-image-dimension;
                 height: $profile-image-dimension;
                 border-radius: ($profile-image-dimension/2);
@@ -74,6 +75,10 @@
                 &:hover {
                     @include show-hover-state();
                     border-color: $link-color;
+                }
+
+                &.in-progress {
+                    opacity: 1;
                 }
             }
 
@@ -110,8 +115,16 @@
                 display: block;
                 width: $profile-image-dimension;
                 margin-top: ($baseline / 4);
-                padding: ($baseline / 5);
+                padding: ($baseline / 5) 0 0;
                 text-align: center;
+                opacity: 0;
+                transition: opacity 0.5s;
+            }
+
+            &:hover, &:active {
+                .u-field-remove-button {
+                    opacity: 1;
+                }
             }
         }
     }
@@ -214,24 +227,26 @@
             @extend %t-weight4;
             @include padding(0, 0, 0, 3px);
             color: $base-font-color;
+            margin-top: $baseline/5;
 
-            .u-field-value {
+            .u-field-value, .u-field-title {
                 @extend %t-weight4;
                 width: calc(100% - 40px);
+            }
 
-                .u-field-value-readonly {
-                    @extend %t-weight3;
-                }
+            .u-field-value-readonly {
+                @extend %t-weight3;
+                font-family: $sans-serif;
+                color: $darkest-base-font-color;
             }
 
             .u-field-title {
-                color: $base-font-color;
-                font-size: $body-font-size;
+                color: $lightest-base-font-color;
                 display: block;
             }
 
             &.u-field-dropdown {
-                margin-top: $baseline/5;
+                position: relative;
 
                 &:not(.editable-never) {
                     cursor: pointer;
@@ -240,6 +255,11 @@
                 &:not(:last-child) {
                     padding-bottom: $baseline/4;
                     border-bottom: 1px solid $gray-lighter;
+
+                    &:hover.mode-placeholder {
+                        padding-bottom: $baseline/5;
+                        border-bottom: 2px dashed $link-color;
+                    }
                 }
             }
         }
@@ -264,11 +284,10 @@
         }
 
         .u-field-message {
-            @include float(right);
+            @include right(0);
+            position: absolute;
+            top: 0;
             width: 20px;
-            display: inline-block;
-            vertical-align: baseline;
-            margin-top: 0;
 
             .icon {
                 vertical-align: baseline;
@@ -278,8 +297,9 @@
 
     .wrapper-profile-section-container-two {
         @include float(left);
-        width: calc(100% - 380px);
+        width: calc(100% - 360px);
         max-width: $learner-profile-container-flex; // Switch to map-get($grid-breakpoints,md) for bootstrap
+        padding-left: $baseline;
 
         @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
             width: 100%;
@@ -288,7 +308,7 @@
 
         .u-field-textarea {
             margin-bottom: ($baseline/2);
-            padding: 0 ($baseline*.75) ($baseline*.75) ($baseline*.75);
+            padding: 0 ($baseline*.75) ($baseline*.75) ($baseline/4);
 
             .u-field-header {
                 position: relative;
@@ -318,7 +338,7 @@
         .u-field-value {
             @extend %t-copy-base;
             width: 100%;
-            overflow: scroll;
+            overflow: auto;
 
             textarea {
                 width: 100%;
@@ -368,13 +388,13 @@
                 @extend %t-copy-sub1;
                 color: $base-font-color;
             }
-        }
 
-        .u-field.mode-placeholder:hover {
-            border: 2px dashed $link-color;
-            .u-field-title,
-            i {
-                color: $link-color;
+            &:hover {
+                border: 2px dashed $link-color;
+
+                .u-field-title, i {
+                    color: $link-color;
+                }
             }
         }
 
