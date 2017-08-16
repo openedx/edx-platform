@@ -1498,3 +1498,42 @@ a.fade-cover{
     }
   }
 }
+
+.reasons_survey {
+  padding: 20px;
+
+  .option {
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  input {
+    margin-right: 10px;
+  }
+
+  .unenroll-header {
+    background-image: none;
+  }
+
+  .other_text {
+    margin-top: 10px;
+    margin-top: 0;
+  }
+
+  .other_radio {
+    margin-top: 10px;
+  }
+
+  .submit_reasons {
+    margin-top: 10px;
+  }
+
+  .survey_button {
+    width: 30%;
+    margin-top: 10px;
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+    color: white;
+  }
+
+}
