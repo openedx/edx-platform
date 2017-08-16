@@ -68,7 +68,7 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 
 # Used for testing
-git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
+git+https://github.com/edx/lettuce.git@31b0dfd865766243e9b563ec65fae9122edf7975#egg=lettuce==0.2.23+edx.1
 
 # Why a DRF fork? See: https://openedx.atlassian.net/browse/PLAT-1581
 git+https://github.com/edx/django-rest-framework.git@1ceda7c086fddffd1c440cc86856441bbf0bd9cb#egg=djangorestframework==3.6.3
