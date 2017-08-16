@@ -21,7 +21,7 @@ from courseware.date_summary import (
     VerifiedUpgradeDeadlineDate,
     CertificateAvailableDate
 )
-from courseware.models import DynamicUpgradeDeadlineConfiguration, CourseDynamicUpgradeDeadlineConfiguration
+from courseware.models import CourseScheduleConfiguration
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -36,7 +36,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 @attr(shard=1)
 @ddt.ddt
-@waffle.testutils.override_switch('schedules.enable-create-schedule-receiver', True)
 class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""
 
@@ -480,46 +479,37 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_date_with_self_paced_with_enrollment_before_course_start(self):
         """ Enrolling before a course begins should result in the upgrade deadline being set relative to the
         course start date. """
-        global_config = DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         course = self.create_self_paced_course_run(days_till_start=3)
+        schedule_config = CourseScheduleConfiguration.objects.create(course_id=course.id, enabled=True)
         overview = CourseOverview.get_from_id(course.id)
-        expected = overview.start + timedelta(days=global_config.deadline_days)
+        expected = overview.start + timedelta(days=schedule_config.verified_upgrade_deadline_days)
         self.assert_upgrade_deadline(course, expected)
 
     def test_date_with_self_paced_with_enrollment_after_course_start(self):
         """ Enrolling after a course begins should result in the upgrade deadline being set relative to the
         enrollment date. """
-        global_config = DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         course = self.create_self_paced_course_run(days_till_start=-1)
+        schedule_config = CourseScheduleConfiguration.objects.create(course_id=course.id, enabled=True)
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
-        expected = enrollment.created + timedelta(days=global_config.deadline_days)
+        expected = enrollment.created + timedelta(days=schedule_config.verified_upgrade_deadline_days)
         self.assertEqual(block.date, expected)
 
+    def test_date_with_self_paced_with_enrollment_after_course_start_days_configured(self):
         # Courses should be able to override the deadline
-        course_config = CourseDynamicUpgradeDeadlineConfiguration.objects.create(
-            enabled=True, course_id=course.id, opt_out=False, deadline_days=3
+        course = self.create_self_paced_course_run(days_till_start=-1)
+        schedule_config = CourseScheduleConfiguration.objects.create(
+            course_id=course.id, enabled=True, verified_upgrade_deadline_days=3
         )
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
-        expected = enrollment.created + timedelta(days=course_config.deadline_days)
+        expected = enrollment.created + timedelta(days=schedule_config.verified_upgrade_deadline_days)
         self.assertEqual(block.date, expected)
 
     def test_date_with_self_paced_without_dynamic_upgrade_deadline(self):
         """ Disabling the dynamic upgrade deadline functionality should result in the verified mode's
         expiration date being returned. """
-        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=False)
         course = self.create_self_paced_course_run()
+        CourseScheduleConfiguration.objects.create(course_id=course.id, enabled=False)
         expected = CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.VERIFIED).expiration_datetime
         self.assert_upgrade_deadline(course, expected)
-
-    def test_date_with_self_paced_with_course_opt_out(self):
-        """ If the course run has opted out of the dynamic deadline, the course mode's deadline should be used. """
-        course = self.create_self_paced_course_run(days_till_start=-1)
-        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
-        CourseDynamicUpgradeDeadlineConfiguration.objects.create(enabled=True, course_id=course.id, opt_out=True)
-        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-
-        block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
-        expected = CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.VERIFIED).expiration_datetime
-        self.assertEqual(block.date, expected)
