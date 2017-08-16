@@ -1,7 +1,8 @@
 # inspired by https://github.com/alexkaratarakis/gitattributes
 
  ## Default
-* text=auto
+*       text=auto
+*.svg   binary
 
 ## Repo configurations
 .*coveragerc*   text eol=lf
@@ -39,6 +40,7 @@ Vagrantfile     text eol=lf
 *.coffee        text eol=lf
 *.css           text eol=lf
 *.html*         text eol=lf
+*.js            text eol=lf
 *.less          text eol=lf
 *.scss          text eol=lf
 

@@ -51,6 +51,7 @@ branches:
   only:
   - master
   - oxa/master.fic
+  - oxa/release.fic
   - oxa/dev.fic
   - oxa/dev.fic-hotfix
   - oxa/dev.fic-quality
