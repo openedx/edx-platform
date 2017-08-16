@@ -26,10 +26,12 @@ from django.utils.translation import ugettext as _
   ${_('Thank you for sharing your reasons for unenrolling.')}<br>
   ${_('You are unenrolled from')} ${course_overview.display_name_with_default}.
 
-  <a class="button survey_button return_to_dashboard">
-    ${_('Return To Dashboard')}
-  </a>
-  <a class="button survey_button browse_courses">
-    ${_('Browse Courses')}
-  </a>
+  <div>
+    <a class="button survey_button return_to_dashboard">
+      ${_('Return To Dashboard')}
+    </a>
+    <a class="button survey_button browse_courses">
+      ${_('Browse Courses')}
+    </a>
+  </div>
 </div>

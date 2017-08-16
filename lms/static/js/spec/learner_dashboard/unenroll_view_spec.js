@@ -10,7 +10,8 @@ define([
                 urls: {
                     dashboard: '/dashboard',
                     browseCourses: '/courses'
-                }
+                },
+                isEdx: true
             },
             initView;
 
