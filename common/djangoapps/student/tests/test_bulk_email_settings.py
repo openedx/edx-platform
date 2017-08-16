@@ -101,7 +101,7 @@ class TestStudentDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
         student = UserFactory.create()
         CourseEnrollmentFactory.create(
             user=student,
-            course_id=CourseKey.from_string(self.course_name)
+            course__id=CourseKey.from_string(self.course_name)
         )
         self.client.login(username=student.username, password="test")
 
