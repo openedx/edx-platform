@@ -13,6 +13,7 @@ Test utilities for mobile API tests:
 from datetime import timedelta
 
 import ddt
+import datetime
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -39,7 +40,10 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
     """
     def setUp(self):
         super(MobileAPITestCase, self).setUp()
-        self.course = CourseFactory.create(mobile_available=True, static_asset_path="needed_for_split")
+        self.course = CourseFactory.create(
+            mobile_available=True,
+            static_asset_path="needed_for_split",
+            end=datetime.datetime.now())
         self.user = UserFactory.create()
         self.password = 'test'
         self.username = self.user.username

@@ -1216,6 +1216,8 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
         self.course = CourseFactory.create(
             start=datetime(2013, 9, 16, 7, 17, 28),
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
+            end=datetime.now(),
+            certificate_available_date=datetime.now(),
             **options
         )
 
@@ -2052,6 +2054,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.course = CourseFactory.create(
             org='edx',
             number='verified',
+            end=datetime.now(),
             display_name='Verified Course',
             grade_cutoffs={'cutoff': 0.75, 'Pass': 0.5}
         )

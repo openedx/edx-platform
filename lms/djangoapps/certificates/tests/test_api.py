@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from functools import wraps
 
 import ddt
+from datetime import datetime
 from config_models.models import cache
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -92,7 +93,8 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         self.course = CourseFactory.create(
             org='edx',
             number='verified',
-            display_name='Verified Course'
+            display_name='Verified Course',
+            end=datetime.now()
         )
 
         self.request_factory = RequestFactory()
