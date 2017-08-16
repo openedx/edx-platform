@@ -30,6 +30,10 @@
 
                  tpl: HtmlUtils.template(pageTpl),
 
+                 events: {
+                     'click .complete-program': 'trackPurchase'
+                 },
+
                  initialize: function(options) {
                      this.options = options;
 
@@ -115,6 +119,15 @@
                          model: this.programModel,
                          courseModel: this.courseData,
                          certificateCollection: this.certificateCollection
+                     });
+                 },
+
+                 trackPurchase: function() {
+                     var data = this.options.programData;
+                     window.analytics.track('edx.bi.user.dashboard.program.purchase', {
+                         category: data.variant + ' bundle',
+                         label: data.title,
+                         uuid: data.uuid
                      });
                  }
              });

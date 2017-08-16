@@ -602,6 +602,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         applicable_seat_types = self.data['applicable_seat_types']
         is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
         skus = []
+        bundle_variant = 'full'
         if is_learner_eligible_for_one_click_purchase:
             for course in self.data['courses']:
                 add_course_sku = False
@@ -626,6 +627,8 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
                         is_learner_eligible_for_one_click_purchase = False
                         skus = []
                         break
+                else:
+                    bundle_variant = 'partial'
 
         if skus:
             try:
@@ -647,7 +650,8 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
 
                 self.data.update({
                     'discount_data': discount_data,
-                    'full_program_price': discount_data['total_incl_tax']
+                    'full_program_price': discount_data['total_incl_tax'],
+                    'variant': bundle_variant
                 })
             except (ConnectionError, SlumberBaseException, Timeout):
                 log.exception('Failed to get discount price for following product SKUs: %s ', ', '.join(skus))

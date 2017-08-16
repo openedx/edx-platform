@@ -603,6 +603,27 @@ define([
             expect($(view.$('.select-choice')[0]).attr('for')).toEqual($(view.$('.run-select')[0]).attr('id'));
             expect($(view.$('.enroll-button button')[0]).text().trim()).toEqual('Enroll Now');
         });
+
+        it('should send analytic event when purchase button clicked', function() {
+            var properties = {
+                category: 'partial bundle',
+                label: 'Test Course Title',
+                uuid: '0ffff5d6-0177-4690-9a48-aa2fecf94610'
+            };
+            view = initView({
+                programData: $.extend({}, options.programData, {
+                    is_learner_eligible_for_one_click_purchase: true,
+                    variant: 'partial'
+                })
+            });
+            view.render();
+            $('.complete-program').click();
+            // Verify that analytics event fires when the purchase button is clicked.
+            expect(window.analytics.track).toHaveBeenCalledWith(
+                'edx.bi.user.dashboard.program.purchase',
+                properties
+            );
+        });
     });
 }
 );
