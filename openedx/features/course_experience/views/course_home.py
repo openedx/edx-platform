@@ -24,11 +24,13 @@ from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
 from web_fragments.fragment import Fragment
 
+from .. import LATEST_UPDATE_FLAG
 from ..utils import get_course_outline_block_tree
 from .course_dates import CourseDatesFragmentView
 from .course_home_messages import CourseHomeMessageFragmentView
 from .course_outline import CourseOutlineFragmentView
 from .course_sock import CourseSockFragmentView
+from .latest_update import LatestUpdateFragmentView
 from .welcome_message import WelcomeMessageFragmentView
 
 EMPTY_HANDOUTS_HTML = u'<ol></ol>'
@@ -121,9 +123,14 @@ class CourseHomeFragmentView(EdxFragmentView):
         }
         if user_access['is_enrolled'] or user_access['is_staff']:
             outline_fragment = CourseOutlineFragmentView().render_to_fragment(request, course_id=course_id, **kwargs)
-            welcome_message_fragment = WelcomeMessageFragmentView().render_to_fragment(
-                request, course_id=course_id, **kwargs
-            )
+            if LATEST_UPDATE_FLAG.is_enabled(course_key):
+                update_message_fragment = LatestUpdateFragmentView().render_to_fragment(
+                    request, course_id=course_id, **kwargs
+                )
+            else:
+                update_message_fragment = WelcomeMessageFragmentView().render_to_fragment(
+                    request, course_id=course_id, **kwargs
+                )
             course_sock_fragment = CourseSockFragmentView().render_to_fragment(request, course=course, **kwargs)
             has_visited_course, resume_course_url = self._get_resume_course_info(request, course_id)
         else:
@@ -134,7 +141,7 @@ class CourseHomeFragmentView(EdxFragmentView):
 
             # Set all the fragments
             outline_fragment = None
-            welcome_message_fragment = None
+            update_message_fragment = None
             course_sock_fragment = None
             has_visited_course = None
             resume_course_url = None
@@ -163,7 +170,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             'resume_course_url': resume_course_url,
             'course_tools': course_tools,
             'dates_fragment': dates_fragment,
-            'welcome_message_fragment': welcome_message_fragment,
+            'update_message_fragment': update_message_fragment,
             'course_sock_fragment': course_sock_fragment,
             'disable_courseware_js': True,
             'uses_pattern_library': True,

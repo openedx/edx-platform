@@ -25,6 +25,12 @@ COURSE_PRE_START_ACCESS_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'pre_star
 # Waffle flag to enable a review page link from the unified home page
 SHOW_REVIEWS_TOOL_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_reviews_tool')
 
+# Waffle flag to switch between the 'welcome message' and 'latest update' on the course home page.
+# Important Admin Note: This is meant to be configured using waffle_utils course
+#   override only.  Either do not create the actual waffle flag, or be sure to unset the
+#   flag even for Superusers.
+LATEST_UPDATE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'latest_update')
+
 
 def course_home_page_title(course):  # pylint: disable=unused-argument
     """

@@ -64,8 +64,8 @@
   }
 }
 
-// Welcome message
-.welcome-message {
+// Welcome message / Latest Update message
+.welcome-message, .update-message{
   border: solid 1px $lms-border-color;
   @include border-left(solid 4px $black);
   margin-bottom: $baseline;
