@@ -578,6 +578,7 @@ class TestMakoTemplateLinter(TestLinter):
     @data(
         {'template': '{% extends "wiki/base.html" %}'},
         {'template': '{{ message }}'},
+        {'template': '{# comment #}'},
     )
     def test_check_mako_on_django_template(self, data):
         """
