@@ -116,7 +116,7 @@ def get_program_types(name=None):
                                 cache_key=cache_key if catalog_integration.is_cache_enabled else None)
 
 
-        logger.error('type data -asdf')
+        logger.error('type data -asdf ')
         logger.error(data)
         # Filter by name if a name was provided
         if name:
