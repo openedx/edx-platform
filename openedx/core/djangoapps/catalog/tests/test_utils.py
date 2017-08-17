@@ -9,7 +9,7 @@ from django.core.cache import cache
 from django.test import TestCase, override_settings
 from student.tests.factories import UserFactory
 
-from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, PROGRAM_UUIDS_CACHE_KEY
+from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, ProgramTypeFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
@@ -53,7 +53,7 @@ class TestGetPrograms(CacheIsolationTestCase):
 
         # Cache UUIDs for all 3 programs.
         cache.set(
-            PROGRAM_UUIDS_CACHE_KEY,
+            SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site.domain),
             [program['uuid'] for program in programs],
             None
         )
