@@ -170,6 +170,7 @@ class Command(BaseCommand):
                     )
                     if (audit_partition_group_access
                             and audit_course_user_group_partition_group.group_id in audit_partition_group_access):
+                        print "Queueing XBlock at location: '%s' for Audit Content Group update " % item.location
                         set_audit_enrollment_track = True
 
                 # Check the partition and group IDs for the verified course group, if it exists in
@@ -180,6 +181,7 @@ class Command(BaseCommand):
                 )
                 if (verified_partition_group_access
                         and verified_course_user_group_partition_group.group_id in verified_partition_group_access):
+                    print "Queueing XBlock at location: '%s' for Verified Content Group update " % item.location
                     set_verified_enrollment_track = True
 
                 # If the item has group_access that is not the
@@ -221,6 +223,7 @@ class Command(BaseCommand):
             for item in items_to_update:
                 module_store.update_item(item, ModuleStoreEnum.UserID.mgmt_command)
                 module_store.publish(item.location, ModuleStoreEnum.UserID.mgmt_command)
+                print "Updated and published XBlock at location: '%s'" % item.location
 
         # Check if we should delete any partition groups if there are no errors.
         # If there are errors, none of the xblock items will have been updated,
