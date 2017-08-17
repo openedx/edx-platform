@@ -90,7 +90,7 @@ def add_email_marketing_cookies(sender, response=None, user=None,
 
 
 @receiver(REGISTER_USER)
-def email_marketing_register_user(sender, user=None, profile=None,
+def email_marketing_register_user(sender, user, registration,
                                   **kwargs):  # pylint: disable=unused-argument
     """
     Called after user created and saved
@@ -98,7 +98,7 @@ def email_marketing_register_user(sender, user=None, profile=None,
     Args:
         sender: Not used
         user: The user object for the user being changed
-        profile: The user profile for the user being changed
+        registration: The user registration profile to activate user account
         kwargs: Not used
     """
     email_config = EmailMarketingConfiguration.current()
@@ -110,9 +110,8 @@ def email_marketing_register_user(sender, user=None, profile=None,
         return
 
     # perform update asynchronously
-    update_user.delay(
-        _create_sailthru_user_vars(user, user.profile), user.email, site=_get_current_site(), new_user=True
-    )
+    update_user.delay(_create_sailthru_user_vars(user, user.profile, registration=registration), user.email,
+                      site=_get_current_site(), new_user=True)
 
 
 @receiver(USER_FIELD_CHANGED)
@@ -161,7 +160,7 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
         update_user_email.delay(user.email, old_value)
 
 
-def _create_sailthru_user_vars(user, profile):
+def _create_sailthru_user_vars(user, profile, registration=None):
     """
     Create sailthru user create/update vars from user + profile.
     """
@@ -180,6 +179,9 @@ def _create_sailthru_user_vars(user, profile):
         if profile.year_of_birth:
             sailthru_vars['year_of_birth'] = profile.year_of_birth
         sailthru_vars['country'] = unicode(profile.country.code)
+
+    if registration:
+        sailthru_vars['activation_key'] = registration.activation_key
 
     return sailthru_vars
 

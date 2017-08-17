@@ -145,7 +145,7 @@ REGISTRATION_UTM_PARAMETERS = {
 }
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
 # used to announce a registration
-REGISTER_USER = Signal(providing_args=["user", "profile"])
+REGISTER_USER = Signal(providing_args=["user", "registration"])
 
 # Disable this warning because it doesn't make sense to completely refactor tests to appease Pylint
 # pylint: disable=logging-format-interpolation
@@ -2022,7 +2022,7 @@ def create_account_with_params(request, params):
         )
 
     # Announce registration
-    REGISTER_USER.send(sender=None, user=user, profile=profile)
+    REGISTER_USER.send(sender=None, user=user, registration=registration)
 
     create_comments_service_user(user)
 

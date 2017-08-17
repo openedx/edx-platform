@@ -30,6 +30,7 @@ from email_marketing.tasks import (
     get_email_cookies_via_sailthru
 )
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from student.models import Registration
 from student.tests.factories import UserFactory, UserProfileFactory
 from util.json_request import JsonResponse
 
@@ -70,9 +71,8 @@ class EmailMarketingTests(TestCase):
         update_email_marketing_config(enabled=False)
         self.request_factory = RequestFactory()
         self.user = UserFactory.create(username='test', email=TEST_EMAIL)
-        self.profile = self.user.profile
-        self.profile.year_of_birth = 1980
-        self.profile.save()
+        self.registration = Registration()
+        self.registration.register(self.user)
 
         self.request = self.request_factory.get("foo")
         update_email_marketing_config(enabled=True)
@@ -308,14 +308,14 @@ class EmailMarketingTests(TestCase):
         add_email_marketing_cookies(None)
         self.assertFalse(mock_log_error.called)
 
-        email_marketing_register_user(None)
+        email_marketing_register_user(None, None, None)
         self.assertFalse(mock_log_error.called)
 
         update_email_marketing_config(enabled=True)
 
         # test anonymous users
         anon = AnonymousUser()
-        email_marketing_register_user(None, user=anon)
+        email_marketing_register_user(None, anon, None)
         self.assertFalse(mock_log_error.called)
 
         email_marketing_user_field_changed(None, user=anon)
@@ -443,19 +443,21 @@ class EmailMarketingTests(TestCase):
     @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
     def test_register_user(self, mock_update_user, mock_get_current_request):
         """
-        make sure register user call invokes update_user
+        make sure register user call invokes update_user and includes activation_key
         """
         mock_get_current_request.return_value = self.request
-        email_marketing_register_user(None, user=self.user, profile=self.profile)
+        email_marketing_register_user(None, user=self.user, registration=self.registration)
         self.assertTrue(mock_update_user.called)
+        self.assertEqual(mock_update_user.call_args[0][0]['activation_key'], self.registration.activation_key)
 
     @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
     def test_register_user_no_request(self, mock_update_user):
         """
-        make sure register user call invokes update_user
+        make sure register user call invokes update_user and includes activation_key
         """
-        email_marketing_register_user(None, user=self.user, profile=self.profile)
+        email_marketing_register_user(None, user=self.user, registration=self.registration)
         self.assertTrue(mock_update_user.called)
+        self.assertEqual(mock_update_user.call_args[0][0]['activation_key'], self.registration.activation_key)
 
     @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
     def test_register_user_language_preference(self, mock_update_user):
@@ -464,12 +466,12 @@ class EmailMarketingTests(TestCase):
         """
         # If the user hasn't set an explicit language preference, we should send the application's default.
         self.assertIsNone(self.user.preferences.model.get_value(self.user, LANGUAGE_KEY))
-        email_marketing_register_user(None, user=self.user, profile=self.profile)
+        email_marketing_register_user(None, user=self.user, registration=self.registration)
         self.assertEqual(mock_update_user.call_args[0][0]['ui_lang'], settings.LANGUAGE_CODE)
 
         # If the user has set an explicit language preference, we should send it.
         self.user.preferences.create(key=LANGUAGE_KEY, value='es-419')
-        email_marketing_register_user(None, user=self.user, profile=self.profile)
+        email_marketing_register_user(None, user=self.user, registration=self.registration)
         self.assertEqual(mock_update_user.call_args[0][0]['ui_lang'], 'es-419')
 
     @patch('email_marketing.signals.crum.get_current_request')
