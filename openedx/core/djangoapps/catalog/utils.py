@@ -136,6 +136,9 @@ def get_programs_with_type(site, include_hidden=True):
         list of dict, representing the active programs.
     """
     programs_with_type = []
+    logger.error('----site -asdf')
+    logger.error(site.domain)
+    logger.error(site.name)
     programs = get_programs(site)
     logger.error('in get_programs_with_type -asdf')
     logger.error(programs)
