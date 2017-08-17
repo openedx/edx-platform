@@ -24,7 +24,7 @@
                 <b>
                 </b>
             </span>
-            <button id="toggle_timer" title="<%- gettext("Hide Timer") %>" aria-label="<%- gettext("Hide Timer") %>">
+            <button role="button" id="toggle_timer" aria-label="<%- gettext("Hide Timer") %>" aria-pressed="false">
                 <i class="fa fa-eye-slash" aria-hidden="true"></i>
             </button>
         </span>
