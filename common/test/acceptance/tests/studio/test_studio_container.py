@@ -4,7 +4,6 @@ The container page is used both for displaying units, and
 for displaying containers within units.
 """
 import datetime
-from unittest import skip
 
 import ddt
 from nose.plugins.attrib import attr
@@ -73,7 +72,6 @@ class NestedVerticalTest(ContainerBase):
         )
 
 
-@skip("Flaky: 01/16/2015")
 @attr(shard=1)
 class DragAndDropTest(NestedVerticalTest):
     """
@@ -105,53 +103,6 @@ class DragAndDropTest(NestedVerticalTest):
                              {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
                              {self.group_empty: []}]
         self.drag_and_verify(self.group_a_item_1_handle, self.group_a_handle, expected_ordering)
-
-    def test_drag_into_different_group(self):
-        """
-        Drag Group B Item 1 into Group A (first element).
-        """
-        expected_ordering = [{self.container_title: [self.group_a, self.group_empty, self.group_b]},
-                             {self.group_a: [self.group_b_item_1, self.group_a_item_1, self.group_a_item_2]},
-                             {self.group_b: [self.group_b_item_2]},
-                             {self.group_empty: []}]
-        self.drag_and_verify(self.group_b_item_1_handle, self.group_a_item_1_handle, expected_ordering)
-
-    def test_drag_group_into_group(self):
-        """
-        Drag Group B into Group A (first element).
-        """
-        expected_ordering = [{self.container_title: [self.group_a, self.group_empty]},
-                             {self.group_a: [self.group_b, self.group_a_item_1, self.group_a_item_2]},
-                             {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
-                             {self.group_empty: []}]
-        self.drag_and_verify(self.group_b_handle, self.group_a_item_1_handle, expected_ordering)
-
-    def test_drag_after_addition(self):
-        """
-        Add some components and then verify that drag and drop still works.
-        """
-        group_a_menu = 0
-
-        def add_new_components_and_rearrange(container):
-            # Add a video component to Group 1
-            add_discussion(container, group_a_menu)
-            # Duplicate the first item in Group A
-            container.duplicate(self.group_a_item_1_action_index)
-
-            first_handle = self.group_a_item_1_handle
-            # Drag newly added video component to top.
-            drag(container, first_handle + 3, first_handle, 40)
-            # Drag duplicated component to top.
-            drag(container, first_handle + 2, first_handle, 40)
-
-        duplicate_label = self.duplicate_label.format(self.group_a_item_1)
-
-        expected_ordering = [{self.container_title: [self.group_a, self.group_empty, self.group_b]},
-                             {self.group_a: [duplicate_label, self.discussion_label, self.group_a_item_1, self.group_a_item_2]},
-                             {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
-                             {self.group_empty: []}]
-
-        self.do_action_and_verify(add_new_components_and_rearrange, expected_ordering)
 
 
 @attr(shard=1)

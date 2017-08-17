@@ -2,7 +2,6 @@
 Acceptance tests for Studio's Settings Details pages
 """
 from datetime import datetime, timedelta
-from unittest import skip
 
 from nose.plugins.attrib import attr
 
@@ -48,7 +47,6 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
 
         self.assertTrue(self.settings_detail.pre_requisite_course_options)
 
-    @skip("Too flaky for the flaky decorator  SOL-1811")  # SOL-1811
     def test_prerequisite_course_save_successfully(self):
         """
          Scenario: Selecting course from Pre-Requisite course drop down save the selected course as pre-requisite
@@ -140,7 +138,6 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
         """
         self.assertTrue(self.settings_detail.entrance_exam_field)
 
-    @skip('Passes in devstack, passes individually in Jenkins, fails in suite in Jenkins.')
     def test_enable_entrance_exam_for_course(self):
         """
         Test that entrance exam should be created after checking the 'enable entrance exam' checkbox.
