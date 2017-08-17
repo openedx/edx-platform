@@ -514,6 +514,7 @@ class DashboardTest(ModuleStoreTestCase):
             expiration_datetime=datetime.now(pytz.UTC) - timedelta(days=1)
         )
 
+        self.course.certificate_available_date = datetime.now(pytz.UTC) - timedelta(days=1)
         CourseEnrollment.enroll(self.user, self.course.id, mode='honor')
 
         self.course.start = datetime.now(pytz.UTC) - timedelta(days=2)

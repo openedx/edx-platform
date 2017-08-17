@@ -75,6 +75,7 @@ class CourseOverview(TimeStampedModel):
     has_any_active_web_certificate = BooleanField(default=False)
     cert_name_short = TextField()
     cert_name_long = TextField()
+    certificate_available_date = DateTimeField(default=None, null=True)
 
     # Grading
     lowest_passing_grade = DecimalField(max_digits=5, decimal_places=2, null=True)
@@ -172,6 +173,7 @@ class CourseOverview(TimeStampedModel):
         course_overview.has_any_active_web_certificate = (get_active_web_certificate(course) is not None)
         course_overview.cert_name_short = course.cert_name_short
         course_overview.cert_name_long = course.cert_name_long
+        course_overview.certificate_available_date = course.certificate_available_date
         course_overview.lowest_passing_grade = lowest_passing_grade
         course_overview.end_of_course_survey_url = course.end_of_course_survey_url
 
@@ -476,7 +478,8 @@ class CourseOverview(TimeStampedModel):
         return course_metadata_utils.may_certify_for_course(
             self.certificates_display_behavior,
             self.certificates_show_before_end,
-            self.has_ended()
+            self.has_ended(),
+            self.certificate_available_date
         )
 
     @property
@@ -487,9 +490,10 @@ class CourseOverview(TimeStampedModel):
         return json.loads(self._pre_requisite_courses_json)
 
     @classmethod
-    def get_select_courses(cls, course_keys, force_update=False):
+    def update_select_courses(cls, course_keys, force_update=False):
         """
-        Returns CourseOverview objects for the given course_keys.
+        A side-effecting method that updates CourseOverview objects for
+        the given course_keys.
 
         Arguments:
             course_keys (list[CourseKey]): Identifies for which courses to
@@ -498,8 +502,6 @@ class CourseOverview(TimeStampedModel):
                 whether the requested CourseOverview objects should be
                 forcefully updated (i.e., re-synched with the modulestore).
         """
-        course_overviews = []
-
         log.info('Generating course overview for %d courses.', len(course_keys))
         log.debug('Generating course overview(s) for the following courses: %s', course_keys)
 
@@ -507,7 +509,7 @@ class CourseOverview(TimeStampedModel):
 
         for course_key in course_keys:
             try:
-                course_overviews.append(action(course_key))
+                action(course_key)
             except Exception as ex:  # pylint: disable=broad-except
                 log.exception(
                     'An error occurred while generating course overview for %s: %s',
@@ -516,8 +518,6 @@ class CourseOverview(TimeStampedModel):
                 )
 
         log.info('Finished generating course overviews.')
-
-        return course_overviews
 
     @classmethod
     def get_all_courses(cls, orgs=None, filter_=None):

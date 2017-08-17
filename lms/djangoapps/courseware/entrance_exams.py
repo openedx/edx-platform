@@ -3,6 +3,7 @@ This file contains all entrance exam related utils/logic.
 """
 
 from courseware.access import has_access
+from opaque_keys.edx.keys import UsageKey
 from student.models import EntranceExamConfiguration
 from util.milestones_helpers import get_required_content, is_entrance_exams_enabled
 from xmodule.modulestore.django import modulestore
@@ -59,7 +60,7 @@ def get_entrance_exam_content(user, course):
 
     exam_module = None
     for content in required_content:
-        usage_key = course.id.make_usage_key_from_deprecated_string(content)
+        usage_key = UsageKey.from_string(content).map_into_course(course.id)
         module_item = modulestore().get_item(usage_key)
         if not module_item.hide_from_toc and module_item.is_entrance_exam:
             exam_module = module_item

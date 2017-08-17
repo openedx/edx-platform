@@ -54,4 +54,4 @@ class Command(BaseCommand):
             except InvalidKeyError:
                 raise CommandError('Invalid key specified.')
 
-        CourseOverview.get_select_courses(course_keys, force_update=options.get('force_update'))
+        CourseOverview.update_select_courses(course_keys, force_update=options.get('force_update'))

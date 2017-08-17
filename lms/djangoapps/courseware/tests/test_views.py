@@ -212,8 +212,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 146),
-        (ModuleStoreEnum.Type.split, 4, 146),
+        (ModuleStoreEnum.Type.mongo, 10, 145),
+        (ModuleStoreEnum.Type.split, 4, 145),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -1216,6 +1216,8 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
         self.course = CourseFactory.create(
             start=datetime(2013, 9, 16, 7, 17, 28),
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
+            end=datetime.now(),
+            certificate_available_date=datetime.now(),
             **options
         )
 
@@ -2052,6 +2054,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.course = CourseFactory.create(
             org='edx',
             number='verified',
+            end=datetime.now(),
             display_name='Verified Course',
             grade_cutoffs={'cutoff': 0.75, 'Pass': 0.5}
         )

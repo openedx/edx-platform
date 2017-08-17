@@ -15,6 +15,7 @@ from courseware.tests.factories import (
     StaffFactory
 )
 from courseware.tests.helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
+from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -22,7 +23,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @attr(shard=1)
-class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that view authentication works properly.
     """
@@ -201,28 +202,18 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
             )
         )
 
-    @patch('openedx.features.enterprise_support.api.get_enterprise_consent_url')
-    def test_redirection_missing_enterprise_consent(self, mock_get_url):
+    def test_redirection_missing_enterprise_consent(self):
         """
         Verify that enrolled students are redirected to the Enterprise consent
         URL if a linked Enterprise Customer requires data sharing consent
         and it has not yet been provided.
         """
-        mock_get_url.return_value = reverse('dashboard')
         self.login(self.enrolled_user)
         url = reverse(
             'courseware',
             kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
-        response = self.client.get(url)
-        self.assertRedirects(
-            response,
-            reverse('dashboard')
-        )
-        mock_get_url.assert_called_once()
-        mock_get_url.return_value = None
-        response = self.client.get(url)
-        self.assertNotIn("You are not currently enrolled in this course", response.content)
+        self.verify_consent_required(self.client, url, status_code=302)
 
     def test_instructor_page_access_nonstaff(self):
         """

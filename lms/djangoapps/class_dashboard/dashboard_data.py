@@ -5,6 +5,8 @@ import json
 
 from django.db.models import Count
 from django.utils.translation import ugettext as _
+
+from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locations import Location
 
 from courseware import models
@@ -43,7 +45,7 @@ def get_problem_grade_distribution(course_id):
 
     # Loop through resultset building data for each problem
     for row in db_query:
-        curr_problem = course_id.make_usage_key_from_deprecated_string(row['module_state_key'])
+        curr_problem = UsageKey.from_string(row['module_state_key']).map_into_course(course_id)
 
         # Build set of grade distributions for each problem that has student responses
         if curr_problem in prob_grade_distrib:
@@ -83,7 +85,7 @@ def get_sequential_open_distrib(course_id):
     # Build set of "opened" data for each subsection that has "opened" data
     sequential_open_distrib = {}
     for row in db_query:
-        row_loc = course_id.make_usage_key_from_deprecated_string(row['module_state_key'])
+        row_loc = UsageKey.from_string(row['module_state_key']).map_into_course(course_id)
         sequential_open_distrib[row_loc] = row['count_sequential']
 
     return sequential_open_distrib
@@ -120,7 +122,7 @@ def get_problem_set_grade_distrib(course_id, problem_set):
 
     # Loop through resultset building data for each problem
     for row in db_query:
-        row_loc = course_id.make_usage_key_from_deprecated_string(row['module_state_key'])
+        row_loc = UsageKey.from_string(row['module_state_key']).map_into_course(course_id)
         if row_loc not in prob_grade_distrib:
             prob_grade_distrib[row_loc] = {
                 'max_grade': 0,
@@ -433,7 +435,7 @@ def get_students_opened_subsection(request, csv=False):
     If 'csv' is True, returns a header array, and an array of arrays in the format:
     student names, usernames for CSV download.
     """
-    module_state_key = Location.from_deprecated_string(request.GET.get('module_id'))
+    module_state_key = Location.from_string(request.GET.get('module_id'))
     csv = request.GET.get('csv')
 
     # Query for "opened a subsection" students
@@ -485,7 +487,7 @@ def get_students_problem_grades(request, csv=False):
     If 'csv' is True, returns a header array, and an array of arrays in the format:
     student names, usernames, grades, percents for CSV download.
     """
-    module_state_key = Location.from_deprecated_string(request.GET.get('module_id'))
+    module_state_key = Location.from_string(request.GET.get('module_id'))
     csv = request.GET.get('csv')
 
     # Query for "problem grades" students

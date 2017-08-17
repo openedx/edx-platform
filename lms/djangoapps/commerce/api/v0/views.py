@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from commerce.constants import Messages
 from commerce.exceptions import InvalidResponseError
 from commerce.http import DetailResponse, InternalRequestErrorResponse
+from commerce.utils import COMMERCE_API_WAFFLE_FLAG_NAMESPACE
 from course_modes.models import CourseMode
 from courseware import courses
 from enrollment.api import add_enrollment
@@ -20,6 +21,7 @@ from enrollment.views import EnrollmentCrossDomainSessionAuth
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
+from openedx.core.djangoapps.waffle_utils import WaffleFlag
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.log_utils import audit_log
 from student.models import CourseEnrollment, RegistrationCookieConfiguration
@@ -27,6 +29,7 @@ from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 SAILTHRU_CAMPAIGN_COOKIE = 'sailthru_bid'
+STOP_BASKET_CREATION_FLAG = WaffleFlag(COMMERCE_API_WAFFLE_FLAG_NAMESPACE, 'stop_basket_creation')
 
 
 class BasketsView(APIView):
@@ -82,7 +85,7 @@ class BasketsView(APIView):
 
     def post(self, request, *args, **kwargs):
         """
-        Attempt to create the basket and enroll the user.
+        Attempt to enroll the user, and if needed, create the basket.
         """
         user = request.user
         valid, course_key, error = self._is_data_valid(request)
@@ -121,26 +124,49 @@ class BasketsView(APIView):
         if not default_enrollment_mode:
             msg = Messages.NO_DEFAULT_ENROLLMENT_MODE.format(course_id=course_id)
             return DetailResponse(msg, status=HTTP_406_NOT_ACCEPTABLE)
-        elif default_enrollment_mode and not default_enrollment_mode.sku:
-            # If there are no course modes with SKUs, enroll the user without contacting the external API.
-            msg = Messages.NO_SKU_ENROLLED.format(
-                enrollment_mode=default_enrollment_mode.slug,
-                course_id=course_id,
-                username=user.username
+        elif not default_enrollment_mode.sku or STOP_BASKET_CREATION_FLAG.is_enabled():
+            msg = Messages.ENROLL_DIRECTLY.format(
+                username=user.username,
+                course_id=course_id
             )
+            if not default_enrollment_mode.sku:
+                # If there are no course modes with SKUs, return a different message.
+                msg = Messages.NO_SKU_ENROLLED.format(
+                    enrollment_mode=default_enrollment_mode.slug,
+                    course_id=course_id,
+                    username=user.username
+                )
             log.info(msg)
             self._enroll(course_key, user, default_enrollment_mode.slug)
             self._handle_marketing_opt_in(request, course_key, user)
             return DetailResponse(msg)
+        else:
+            return self._create_basket_to_order(request, user, course_key, default_enrollment_mode)
 
+    def _add_request_cookie_to_api_session(self, server_session, request, cookie_name):
+        """ Add cookie from user request into server session """
+        user_cookie = None
+        if cookie_name:
+            user_cookie = request.COOKIES.get(cookie_name)
+            if user_cookie:
+                server_cookie = {cookie_name: user_cookie}
+                if server_session.cookies:
+                    requests.utils.add_dict_to_cookiejar(server_session.cookies, server_cookie)
+                else:
+                    server_session.cookies = requests.utils.cookiejar_from_dict(server_cookie)
+
+    def _create_basket_to_order(self, request, user, course_key, default_enrollment_mode):
+        """
+        Connect to the ecommerce service to create the basket and the order to do the enrollment
+        """
         # Setup the API
-
+        course_id = unicode(course_key)
         try:
             api_session = requests.Session()
             api = ecommerce_api_client(user, session=api_session)
         except ValueError:
             self._enroll(course_key, user)
-            msg = Messages.NO_ECOM_API.format(username=user.username, course_id=unicode(course_key))
+            msg = Messages.NO_ECOM_API.format(username=user.username, course_id=course_id)
             log.debug(msg)
             return DetailResponse(msg)
 
@@ -190,18 +216,6 @@ class BasketsView(APIView):
 
         self._handle_marketing_opt_in(request, course_key, user)
         return response
-
-    def _add_request_cookie_to_api_session(self, server_session, request, cookie_name):
-        """ Add cookie from user request into server session """
-        user_cookie = None
-        if cookie_name:
-            user_cookie = request.COOKIES.get(cookie_name)
-            if user_cookie:
-                server_cookie = {cookie_name: user_cookie}
-                if server_session.cookies:
-                    requests.utils.add_dict_to_cookiejar(server_session.cookies, server_cookie)
-                else:
-                    server_session.cookies = requests.utils.cookiejar_from_dict(server_cookie)
 
 
 class BasketOrderView(APIView):

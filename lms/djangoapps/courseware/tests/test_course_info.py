@@ -12,6 +12,7 @@ from lms.djangoapps.ccx.tests.factories import CcxFactory
 from nose.plugins.attrib import attr
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from pyquery import PyQuery as pq
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
@@ -32,7 +33,7 @@ QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 
 @attr(shard=1)
-class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
+class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Tests for the Course Info page
     """
@@ -61,8 +62,7 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         self.assertNotIn("You are not currently enrolled in this course", resp.content)
 
     # TODO: LEARNER-611: If this is only tested under Course Info, does this need to move?
-    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_consent_url')
-    def test_redirection_missing_enterprise_consent(self, mock_get_url):
+    def test_redirection_missing_enterprise_consent(self):
         """
         Verify that users viewing the course info who are enrolled, but have not provided
         data sharing consent, are first redirected to a consent page, and then, once they've
@@ -70,19 +70,10 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         """
         self.setup_user()
         self.enroll(self.course)
-        mock_get_url.return_value = reverse('dashboard')
+
         url = reverse('info', args=[self.course.id.to_deprecated_string()])
 
-        response = self.client.get(url)
-
-        self.assertRedirects(
-            response,
-            reverse('dashboard')
-        )
-        mock_get_url.assert_called_once()
-        mock_get_url.return_value = None
-        response = self.client.get(url)
-        self.assertNotIn("You are not currently enrolled in this course", response.content)
+        self.verify_consent_required(self.client, url)
 
     def test_anonymous_user(self):
         url = reverse('info', args=[self.course.id.to_deprecated_string()])

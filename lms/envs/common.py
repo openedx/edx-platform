@@ -591,11 +591,6 @@ AUTHENTICATION_BACKENDS = (
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
-# Dev machines shouldn't need the book
-# BOOK_URL = '/static/book/'
-BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'  # For AWS deploys
-RSS_TIMEOUT = 600
-
 # Configuration option for when we want to grab server error pages
 STATIC_GRAB = False
 DEV_CONTENT = True
@@ -3221,6 +3216,7 @@ ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ['audit', 'honor']
 # and are overridden by the configuration parameter accessors defined in aws.py
 
 ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
+ENTERPRISE_CONSENT_API_URL = LMS_ROOT_URL + '/consent/api/v1/'
 ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit in KB's

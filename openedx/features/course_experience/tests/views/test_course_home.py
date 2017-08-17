@@ -160,7 +160,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         course_home_url(self.course)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(42, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(41, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -204,7 +204,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         [CourseUserType.ANONYMOUS, 'To see course content'],
         [CourseUserType.ENROLLED, None],
         [CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
-        [CourseUserType.UNENROLLED_STAFF, None],
+        [CourseUserType.UNENROLLED_STAFF, 'You must be enrolled in the course to see course content.'],
     )
     @ddt.unpack
     def test_home_page(self, user_type, expected_message):
@@ -239,7 +239,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         [CourseUserType.ANONYMOUS, 'To see course content'],
         [CourseUserType.ENROLLED, None],
         [CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
-        [CourseUserType.UNENROLLED_STAFF, None],
+        [CourseUserType.UNENROLLED_STAFF, 'You must be enrolled in the course to see course content.'],
     )
     @ddt.unpack
     def test_home_page_not_unified(self, user_type, expected_message):

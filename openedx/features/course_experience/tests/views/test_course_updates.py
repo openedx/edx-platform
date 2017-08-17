@@ -4,7 +4,7 @@ Tests for the course updates page.
 from courseware.courses import get_course_info_usage_key
 from django.core.urlresolvers import reverse
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from openedx.features.course_experience.views.course_updates import CourseUpdatesFragmentView
+from openedx.features.course_experience.views.course_updates import STATUS_VISIBLE
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
@@ -43,7 +43,7 @@ def create_course_update(course, user, content, date='December 31, 1999'):
         "id": len(course_updates.items) + 1,
         "date": date,
         "content": content,
-        "status": CourseUpdatesFragmentView.STATUS_VISIBLE
+        "status": STATUS_VISIBLE
     })
     modulestore().update_item(course_updates, user.id)
 
@@ -127,7 +127,7 @@ class TestCourseUpdatesPage(SharedModuleStoreTestCase):
         course_updates_url(self.course)
 
         # Fetch the view and verify that the query counts haven't changed
-        with self.assertNumQueries(33, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(32, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_updates_url(self.course)
                 self.client.get(url)
