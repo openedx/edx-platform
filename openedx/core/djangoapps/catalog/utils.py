@@ -10,7 +10,6 @@ from edx_rest_api_client.client import EdxRestApiClient
 
 from openedx.core.djangoapps.catalog.cache import (
     PROGRAM_CACHE_KEY_TPL,
-    PROGRAM_UUIDS_CACHE_KEY,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -57,10 +56,7 @@ def get_programs(site, uuid=None):
             logger.warning(missing_details_msg_tpl.format(uuid=uuid))
 
         return program
-    if waffle.switch_is_active('get-multitenant-programs'):
-        uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
-    else:
-        uuids = cache.get(PROGRAM_UUIDS_CACHE_KEY, [])
+    uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
     if not uuids:
         logger.warning('Failed to get program UUIDs from the cache.')
 
@@ -101,11 +97,16 @@ def get_program_types(name=None):
         list of dict, representing program types.
         dict, if a specific program type is requested.
     """
+    logger.error('in function get_program_types -asdf')
     catalog_integration = CatalogIntegration.current()
     if catalog_integration.enabled:
+        logger.error('catalog enabled -asdf')
         try:
             user = catalog_integration.get_service_user()
+            logger.error('user -asdf')
+            logger.error(user)
         except ObjectDoesNotExist:
+            logger.error('user does not exist -asdf')
             return []
 
         api = create_catalog_api_client(user)
@@ -114,10 +115,16 @@ def get_program_types(name=None):
         data = get_edx_api_data(catalog_integration, 'program_types', api=api,
                                 cache_key=cache_key if catalog_integration.is_cache_enabled else None)
 
+
+        logger.error('type data -asdf ')
+        logger.error(data)
         # Filter by name if a name was provided
         if name:
             data = next(program_type for program_type in data if program_type['name'] == name)
 
+        return data
+    else:
+        return []
         return data
     else:
         return []
@@ -140,12 +147,19 @@ def get_programs_with_type(site, include_hidden=True):
         list of dict, representing the active programs.
     """
     programs_with_type = []
+    logger.error('----site -asdf')
+    logger.error(site)
     programs = get_programs(site)
-
+    logger.error('in get_programs_with_type -asdf')
+    logger.error(programs)
     if programs:
         program_types = {program_type['name']: program_type for program_type in get_program_types()}
+        logger.error('programstypes -asdf')
+        logger.error(program_types)
+        logger.error(len(program_types))
         for program in programs:
             if program['type'] not in program_types:
+                logger.error("in continue -asdf")
                 continue
 
             if program['hidden'] and not include_hidden:
@@ -156,7 +170,8 @@ def get_programs_with_type(site, include_hidden=True):
             program_with_type = copy.deepcopy(program)
             program_with_type['type'] = program_types[program['type']]
             programs_with_type.append(program_with_type)
-
+    logger.error("ending function -asdf")
+    logger.error(programs_with_type)
     return programs_with_type
 
 
