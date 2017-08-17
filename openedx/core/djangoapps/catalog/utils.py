@@ -97,11 +97,16 @@ def get_program_types(name=None):
         list of dict, representing program types.
         dict, if a specific program type is requested.
     """
+    logger.error('in function get_program_types -asdf')
     catalog_integration = CatalogIntegration.current()
     if catalog_integration.enabled:
+        logger.error('catalog enabled -asdf')
         try:
             user = catalog_integration.get_service_user()
+            logger.error('user -asdf')
+            logger.error(user)
         except ObjectDoesNotExist:
+            logger.error('user does not exist -asdf')
             return []
 
         api = create_catalog_api_client(user)
@@ -110,10 +115,16 @@ def get_program_types(name=None):
         data = get_edx_api_data(catalog_integration, 'program_types', api=api,
                                 cache_key=cache_key if catalog_integration.is_cache_enabled else None)
 
+
+        logger.error('type data -asdf ')
+        logger.error(data)
         # Filter by name if a name was provided
         if name:
             data = next(program_type for program_type in data if program_type['name'] == name)
 
+        return data
+    else:
+        return []
         return data
     else:
         return []
