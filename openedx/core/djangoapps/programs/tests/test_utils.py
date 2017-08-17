@@ -747,26 +747,33 @@ class TestGetCertificates(TestCase):
         self.course_certificate_url = 'fake-course-certificate-url'
         self.program_certificate_url = 'fake-program-certificate-url'
 
-    def test_get_certificates(self, mock_get_credentials):
-        """
-        Verify course and program certificates are found when present. Only one
-        course run certificate should be returned for each course when the user
-        has earned certificates in multiple runs of the same course.
-        """
-        expected = []
         for course in self.program['courses']:
             # Give all course runs a certificate URL, but only expect one to come
             # back. This verifies the break in the function under test that ensures
             # only one certificate per course comes back.
             for index, course_run in enumerate(course['course_runs']):
                 course_run['certificate_url'] = self.course_certificate_url
+                course_run['may_certify'] = True
 
+    def _first_course_runs(self):
+        for course in self.program['courses']:
+            for index, course_run in enumerate(course['course_runs']):
                 if index == 0:
-                    expected.append({
-                        'type': 'course',
-                        'title': course_run['title'],
-                        'url': self.course_certificate_url,
-                    })
+                    yield course_run
+
+    def test_get_certificates(self, mock_get_credentials):
+        """
+        Verify course and program certificates are found when present. Only one
+        course run certificate should be returned for each course when the user
+        has earned certificates in multiple runs of the same course.
+        """
+        expected = [
+            {
+                'type': 'course',
+                'title': course_run['title'],
+                'url': course_run['certificate_url'],
+            } for course_run in self._first_course_runs()
+        ]
 
         expected.append({
             'type': 'program',
@@ -783,13 +790,23 @@ class TestGetCertificates(TestCase):
 
     def test_course_run_certificates_missing(self, mock_get_credentials):
         """
-        Verify program certificates are retrieved even if the learner has not earned any course certificates.
+        Verify program certificates are not included when the learner has not earned all course certificates.
         """
+        # make the first course have no certification, the second have no url...
+        for course_index, course in enumerate(self.program['courses']):
+            for index, course_run in enumerate(course['course_runs']):
+                if course_index == 0:
+                    course_run['may_certify'] = False
+                elif course_index == 1:
+                    course_run['certificate_url'] = False
+
+        # ...but the third course should still be included
         expected = [{
-            'type': 'program',
-            'title': self.program['title'],
-            'url': self.program_certificate_url,
+            'type': 'course',
+            'title': self.program['courses'][2]['course_runs'][0]['title'],
+            'url': self.program['courses'][2]['course_runs'][0]['certificate_url'],
         }]
+
         mock_get_credentials.return_value = [{'certificate_url': self.program_certificate_url}]
 
         certificates = get_certificates(self.user, self.program)
@@ -800,17 +817,13 @@ class TestGetCertificates(TestCase):
         """
         Verify that the function can handle a missing program certificate.
         """
-        expected = []
-        for course in self.program['courses']:
-            for index, course_run in enumerate(course['course_runs']):
-                course_run['certificate_url'] = self.course_certificate_url
-
-                if index == 0:
-                    expected.append({
-                        'type': 'course',
-                        'title': course_run['title'],
-                        'url': self.course_certificate_url,
-                    })
+        expected = [
+            {
+                'type': 'course',
+                'title': course_run['title'],
+                'url': course_run['certificate_url'],
+            } for course_run in self._first_course_runs()
+        ]
 
         mock_get_credentials.return_value = []
 
