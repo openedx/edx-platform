@@ -44,15 +44,28 @@ class Command(BaseCommand):
 
         programs = {}
         for site in Site.objects.all():
+            logger.error('in loop-asdf')
             site_config = getattr(site, 'configuration', None)
+            logger.error('configuration-asdf')
+            logger.error(site_config)
             if site_config is None or not site_config.get_value('COURSE_CATALOG_API_URL'):
                 logger.info('Skipping site {domain}. No configuration.'.format(domain=site.domain))
                 cache.set(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [], None)
                 continue
 
             client = create_catalog_api_client(user, site=site)
+            logger.error('site-asdf')
+            logger.error(site)
             uuids, program_uuids_failed = self.get_site_program_uuids(client, site)
+            logger.error('uuids-asdf')
+            logger.error(uuids)
+            logger.error('failed-asdf')
+            logger.error(program_uuids_failed)
             new_programs, program_details_failed = self.fetch_program_details(client, uuids)
+            logger.error('new-program-asdf')
+            logger.error(new_programs)
+            logger.error('program-detail-failed-asdf')
+            logger.error(program_details_failed)
 
             if program_uuids_failed or program_details_failed:
                 failure = True
@@ -67,6 +80,8 @@ class Command(BaseCommand):
 
         successful = len(programs)
         logger.info('Caching details for {successful} programs.'.format(successful=successful))
+        logger.error('programssssssss-asdf')
+        logger.error(programs)
         cache.set_many(programs, None)
 
         if failure:

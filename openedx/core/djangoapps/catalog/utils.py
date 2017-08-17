@@ -137,11 +137,16 @@ def get_programs_with_type(site, include_hidden=True):
     """
     programs_with_type = []
     programs = get_programs(site)
-
+    logger.error('in get_programs_with_type -asdf')
+    logger.error(programs)
     if programs:
         program_types = {program_type['name']: program_type for program_type in get_program_types()}
+        logger.error('programstypes -asdf')
+        logger.error(program_types)
+        logger.error(len(program_types))
         for program in programs:
             if program['type'] not in program_types:
+                logger.error("in continue -asdf")
                 continue
 
             if program['hidden'] and not include_hidden:
@@ -152,7 +157,8 @@ def get_programs_with_type(site, include_hidden=True):
             program_with_type = copy.deepcopy(program)
             program_with_type['type'] = program_types[program['type']]
             programs_with_type.append(program_with_type)
-
+    logger.error("ending function -asdf")
+    logger.error(programs_with_type)
     return programs_with_type
 
 
