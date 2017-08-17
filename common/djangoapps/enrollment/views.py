@@ -29,7 +29,12 @@ from openedx.core.lib.api.authentication import (
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.exceptions import CourseNotFoundError
 from openedx.core.lib.log_utils import audit_log
-from openedx.features.enterprise_support.api import EnterpriseApiClient, EnterpriseApiException, enterprise_enabled
+from openedx.features.enterprise_support.api import (
+    ConsentApiClient,
+    EnterpriseApiClient,
+    EnterpriseApiException,
+    enterprise_enabled
+)
 from student.auth import user_has_role
 from student.models import User
 from student.roles import CourseStaffRole, GlobalStaff
@@ -591,27 +596,42 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 )
 
             enterprise_course_consent = request.data.get('enterprise_course_consent')
-            # Check if the enterprise_course_enrollment is a boolean
-            if has_api_key_permissions and enterprise_enabled() and enterprise_course_consent is not None:
-                if not isinstance(enterprise_course_consent, bool):
-                    return Response(
-                        status=status.HTTP_400_BAD_REQUEST,
-                        data={
-                            'message': (u"'{value}' is an invalid enterprise course consent value.").format(
-                                value=enterprise_course_consent
-                            )
-                        }
-                    )
-                try:
-                    EnterpriseApiClient().post_enterprise_course_enrollment(
-                        username,
-                        unicode(course_id),
-                        enterprise_course_consent
-                    )
-                except EnterpriseApiException as error:
-                    log.exception("An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
-                                  "for user [%s] in course run [%s]", username, course_id)
-                    raise CourseEnrollmentError(error.message)
+            explicit_linked_enterprise = request.data.get('linked_enterprise_customer')
+            if has_api_key_permissions and enterprise_enabled():
+                # We received an explicitly-linked EnterpriseCustomer for the enrollment
+                if explicit_linked_enterprise is not None:
+                    kwargs = {
+                        'username': username,
+                        'course_id': unicode(course_id),
+                        'enterprise_customer_uuid': explicit_linked_enterprise,
+                    }
+                    consent_client = ConsentApiClient()
+                    consent_client.provide_consent(**kwargs)
+
+                # We received an implicit "consent granted" parameter from ecommerce
+                # TODO: Once ecommerce has been deployed with explicit enterprise support, remove this
+                # entire chunk of logic, related tests, and any supporting methods no longer required.
+                elif enterprise_course_consent is not None:
+                    # Check if the enterprise_course_enrollment is a boolean
+                    if not isinstance(enterprise_course_consent, bool):
+                        return Response(
+                            status=status.HTTP_400_BAD_REQUEST,
+                            data={
+                                'message': (u"'{value}' is an invalid enterprise course consent value.").format(
+                                    value=enterprise_course_consent
+                                )
+                            }
+                        )
+                    try:
+                        EnterpriseApiClient().post_enterprise_course_enrollment(
+                            username,
+                            unicode(course_id),
+                            enterprise_course_consent
+                        )
+                    except EnterpriseApiException as error:
+                        log.exception("An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
+                                      "for user [%s] in course run [%s]", username, course_id)
+                        raise CourseEnrollmentError(error.message)
 
             enrollment_attributes = request.data.get('enrollment_attributes')
             enrollment = api.get_enrollment(username, unicode(course_id))

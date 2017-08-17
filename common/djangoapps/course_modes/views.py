@@ -24,7 +24,6 @@ from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.embargo import api as embargo_api
-from openedx.features.enterprise_support import api as enterprise_api
 from student.models import CourseEnrollment
 from third_party_auth.decorators import tpa_hint_ends_existing_session
 from util import organizations_helpers as organization_api
@@ -162,36 +161,6 @@ class ChooseModeView(View):
         title_content = _("Congratulations!  You are now enrolled in {course_name}").format(
             course_name=course.display_name_with_default_escaped
         )
-        enterprise_learner_data = enterprise_api.get_enterprise_learner_data(site=request.site, user=request.user)
-        if enterprise_learner_data:
-            enterprise_learner = enterprise_learner_data[0]
-            is_course_in_enterprise_catalog = enterprise_api.is_course_in_enterprise_catalog(
-                site=request.site,
-                course_id=course_id,
-                enterprise_catalog_id=enterprise_learner['enterprise_customer']['catalog']
-            )
-
-            if is_course_in_enterprise_catalog:
-                partner_names = partner_name = course.display_organization \
-                    if course.display_organization else course.org
-                enterprise_name = enterprise_learner['enterprise_customer']['name']
-                organizations = organization_api.get_course_organizations(course_id=course.id)
-                if organizations:
-                    partner_names = ' and '.join([org.get('name', partner_name) for org in organizations])
-
-                title_content = _("Welcome, {username}! You are about to enroll in {course_name},"
-                                  " from {partner_names}, sponsored by {enterprise_name}. Please select your enrollment"
-                                  " information below.").format(
-                    username=request.user.username,
-                    course_name=course.display_name_with_default_escaped,
-                    partner_names=partner_names,
-                    enterprise_name=enterprise_name
-                )
-
-                # Hide the audit modes for this enterprise customer, if necessary
-                if not enterprise_learner['enterprise_customer'].get('enable_audit_enrollment'):
-                    for audit_mode in CourseMode.AUDIT_MODES:
-                        modes.pop(audit_mode, None)
 
         context["title_content"] = title_content
 

@@ -263,23 +263,17 @@ def enterprise_sidebar_context(request):
 
     platform_name = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
 
-    if enterprise_customer.branding_configuration.logo:
-        enterprise_logo_url = enterprise_customer.branding_configuration.logo.url
-    else:
-        enterprise_logo_url = ''
+    logo_url = enterprise_customer.get('branding_configuration', {}).get('logo', '')
 
-    if getattr(enterprise_customer.branding_configuration, 'welcome_message', None):
-        branded_welcome_template = enterprise_customer.branding_configuration.welcome_message
-    else:
-        branded_welcome_template = configuration_helpers.get_value(
-            'ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE',
-            settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
-        )
+    branded_welcome_template = configuration_helpers.get_value(
+        'ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE',
+        settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
+    )
 
     branded_welcome_string = branded_welcome_template.format(
         start_bold=u'<b>',
         end_bold=u'</b>',
-        enterprise_name=enterprise_customer.name,
+        enterprise_name=enterprise_customer['name'],
         platform_name=platform_name
     )
 
@@ -290,8 +284,8 @@ def enterprise_sidebar_context(request):
     platform_welcome_string = platform_welcome_template.format(platform_name=platform_name)
 
     context = {
-        'enterprise_name': enterprise_customer.name,
-        'enterprise_logo_url': enterprise_logo_url,
+        'enterprise_name': enterprise_customer['name'],
+        'enterprise_logo_url': logo_url,
         'enterprise_branded_welcome_string': branded_welcome_string,
         'platform_welcome_string': platform_welcome_string,
     }

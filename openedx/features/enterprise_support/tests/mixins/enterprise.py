@@ -7,12 +7,16 @@ import mock
 import httpretty
 from django.conf import settings
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
+from django.test import SimpleTestCase
 
 
 class EnterpriseServiceMockMixin(object):
     """
     Mocks for the Enterprise service responses.
     """
+
+    consent_url = '{}{}'.format(settings.ENTERPRISE_CONSENT_API_URL, 'data_sharing_consent')
 
     def setUp(self):
         super(EnterpriseServiceMockMixin, self).setUp()
@@ -22,6 +26,19 @@ class EnterpriseServiceMockMixin(object):
     def get_enterprise_url(path):
         """Return a URL to the configured Enterprise API. """
         return '{}{}/'.format(settings.ENTERPRISE_API_URL, path)
+
+    def mock_get_enterprise_customer(self, uuid, response, status):
+        """
+        Helper to mock the HTTP call to the /enterprise-customer/uuid endpoint
+        """
+        body = json.dumps(response)
+        httpretty.register_uri(
+            method=httpretty.GET,
+            uri=(self.get_enterprise_url('enterprise-customer') + uuid + '/'),
+            body=body,
+            content_type='application/json',
+            status=status,
+        )
 
     def mock_enterprise_course_enrollment_post_api(  # pylint: disable=invalid-name
             self,
@@ -55,6 +72,70 @@ class EnterpriseServiceMockMixin(object):
             body='{}',
             content_type='application/json',
             status=500
+        )
+
+    def mock_consent_response(
+            self,
+            username,
+            course_id,
+            ec_uuid,
+            method=httpretty.GET,
+            granted=True,
+            required=False,
+            exists=True,
+            response_code=None
+    ):
+        response_body = {
+            'username': username,
+            'course_id': course_id,
+            'enterprise_customer_uuid': ec_uuid,
+            'consent_provided': granted,
+            'consent_required': required,
+            'exists': exists,
+        }
+        httpretty.register_uri(
+            method=method,
+            uri=self.consent_url,
+            content_type='application/json',
+            body=json.dumps(response_body),
+            status=response_code or 200,
+        )
+
+    def mock_consent_post(self, username, course_id, ec_uuid):
+        self.mock_consent_response(
+            username,
+            course_id,
+            ec_uuid,
+            method=httpretty.POST,
+            granted=True,
+            exists=True,
+        )
+
+    def mock_consent_get(self, username, course_id, ec_uuid):
+        self.mock_consent_response(
+            username,
+            course_id,
+            ec_uuid
+        )
+
+    def mock_consent_missing(self, username, course_id, ec_uuid):
+        self.mock_consent_response(
+            username,
+            course_id,
+            ec_uuid,
+            exists=False,
+            granted=False,
+            required=True,
+        )
+
+    def mock_consent_not_required(self, username, course_id, ec_uuid):
+        self.mock_consent_response(
+            username,
+            course_id,
+            ec_uuid,
+            exists=False,
+            granted=False,
+            required=False,
         )
 
     def mock_enterprise_learner_api(
@@ -134,7 +215,7 @@ class EnterpriseServiceMockMixin(object):
         )
 
 
-class EnterpriseTestConsentRequired(object):
+class EnterpriseTestConsentRequired(SimpleTestCase):
     """
     Mixin to help test the data_sharing_consent_required decorator.
     """
@@ -149,20 +230,30 @@ class EnterpriseTestConsentRequired(object):
         * url: URL to test
         * status_code: expected status code of URL when no data sharing consent is required.
         """
-        with mock.patch('openedx.features.enterprise_support.api.enterprise_enabled', return_value=True):
-            with mock.patch('openedx.features.enterprise_support.api.consent_necessary_for_course') as mock_consent_necessary:  # pylint: disable=line-too-long
-                # Ensure that when consent is necessary, the user is redirected to the consent page.
-                mock_consent_necessary.return_value = True
-                response = client.get(url)
-                assert response.status_code == 302
-                assert 'grant_data_sharing_permissions' in response.url  # pylint: disable=no-member
+        def mock_consent_reverse(*args, **kwargs):
+            if args[0] == 'grant_data_sharing_permissions':
+                return '/enterprise/grant_data_sharing_permissions'
+            return reverse(*args, **kwargs)
 
-                # Ensure that when consent is not necessary, the user continues through to the requested page.
-                mock_consent_necessary.return_value = False
-                response = client.get(url)
-                assert response.status_code == status_code
+        with mock.patch('openedx.features.enterprise_support.api.reverse', side_effect=mock_consent_reverse):
+            with mock.patch('openedx.features.enterprise_support.api.enterprise_enabled', return_value=True):
+                with mock.patch(
+                    'openedx.features.enterprise_support.api.consent_needed_for_course'
+                ) as mock_consent_necessary:
+                    # Ensure that when consent is necessary, the user is redirected to the consent page.
+                    mock_consent_necessary.return_value = True
+                    response = client.get(url)
+                    while(response.status_code == 302 and 'grant_data_sharing_permissions' not in response.url):
+                        response = client.get(response.url)
+                    self.assertEqual(response.status_code, 302)
+                    self.assertIn('grant_data_sharing_permissions', response.url)  # pylint: disable=no-member
 
-                # If we were expecting a redirect, ensure it's not to the data sharing permission page
-                if status_code == 302:
-                    assert 'grant_data_sharing_permissions' not in response.url  # pylint: disable=no-member
-                return response
+                    # Ensure that when consent is not necessary, the user continues through to the requested page.
+                    mock_consent_necessary.return_value = False
+                    response = client.get(url)
+                    self.assertEqual(response.status_code, status_code)
+
+                    # If we were expecting a redirect, ensure it's not to the data sharing permission page
+                    if status_code == 302:
+                        self.assertNotIn('grant_data_sharing_permissions', response.url)  # pylint: disable=no-member
+                    return response
