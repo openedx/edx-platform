@@ -137,8 +137,14 @@ def get_programs_with_type(site, include_hidden=True):
     """
     programs_with_type = []
     programs = get_programs(site)
+    logger.error('site -asdf')
+    logger.error(site.domain)
+    logger.error(site.name)
     logger.error('in get_programs_with_type -asdf')
     logger.error(programs)
+    program_types = {program_type['name']: program_type for program_type in get_program_types()}
+    logger.error('program_types -asdf')
+    logger.error(program_types)
     if programs:
         program_types = {program_type['name']: program_type for program_type in get_program_types()}
         logger.error('programstypes -asdf')
