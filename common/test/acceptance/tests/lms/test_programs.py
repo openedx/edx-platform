@@ -1,5 +1,6 @@
 """Acceptance tests for LMS-hosted Programs pages"""
 from nose.plugins.attrib import attr
+from django.core.cache import cache
 
 from common.test.acceptance.fixtures.catalog import CatalogFixture, CatalogIntegrationMixin
 from common.test.acceptance.fixtures.course import CourseFixture
@@ -100,6 +101,7 @@ class ProgramListingPageTest(ProgramPageBase):
         which are included in at least one active program.
         """
         self.auth()
+        cache.set("hasnain.bokchoy", ['hasnain', 'naveed'], None)
 
         program = self.create_program()
         self.stub_catalog_api(programs=[program])

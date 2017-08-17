@@ -4,11 +4,16 @@ Stub implementation of catalog service for acceptance tests
 # pylint: disable=invalid-name, missing-docstring
 import re
 import urlparse
+from django.core.cache import cache
 
 from .http import StubHttpRequestHandler, StubHttpService
 
 
 class StubCatalogServiceHandler(StubHttpRequestHandler):
+
+    def do_PUT(self):
+        cache.set("hasnain.stub", ['hasnain2', 'naveed2'], None)
+        super(StubCatalogServiceHandler, self).do_PUT()
 
     def do_GET(self):
         pattern_handlers = {

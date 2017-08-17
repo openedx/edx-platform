@@ -2,6 +2,7 @@
 Tools to create catalog-related data for use in bok choy tests.
 """
 import json
+from django.core.cache import cache
 
 import requests
 
@@ -24,6 +25,7 @@ class CatalogFixture(object):
         key = 'catalog.programs'
 
         uuids = []
+        cache.set("hasnain.fixture", ['hasnain1', 'naveed1'], None)
         for program in programs:
             uuid = program['uuid']
             uuids.append(uuid)

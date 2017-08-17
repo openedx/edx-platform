@@ -138,8 +138,18 @@ def get_programs_with_type(site, include_hidden=True):
     programs_with_type = []
     logger.error("in function get_programs_with_type --asdf")
     logger.error(site)
-    logger.error(site.domain)
-    logger.error(site.name)
+    test1 = cache.get("hasnain.bokchoy", [])
+    logger.error("hasnain.bokchoy --asdf")
+    logger.error(test1)
+
+    test2 = cache.get("hasnain.fixture", [])
+    logger.error("hasnain.fixture --asdf")
+    logger.error(test2)
+
+    test3 = cache.get("hasnain.stub", [])
+    logger.error("hasnain.stub --asdf")
+    logger.error(test3)
+
     programs = get_programs(site)
 
     if programs:
