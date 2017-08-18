@@ -1,221 +1,252 @@
-define ["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "squire"],
-($, AjaxHelpers, Squire) ->
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "squire"],
+function($, AjaxHelpers, Squire) {
 
-    assetLibraryTpl = readFixtures('asset-library.underscore')
-    assetTpl = readFixtures('asset.underscore')
+    const assetLibraryTpl = readFixtures('asset-library.underscore');
+    const assetTpl = readFixtures('asset.underscore');
 
-    describe "Asset view", ->
-        beforeEach (done) ->
-            setFixtures($("<script>", {id: "asset-tpl", type: "text/template"}).text(assetTpl))
-            appendSetFixtures(sandbox({id: "page-prompt"}))
+    describe("Asset view", function() {
+        beforeEach(function(done) {
+            setFixtures($("<script>", {id: "asset-tpl", type: "text/template"}).text(assetTpl));
+            appendSetFixtures(sandbox({id: "page-prompt"}));
 
-            @promptSpies = jasmine.createSpyObj('Prompt.Warning', ["constructor", "show", "hide"])
-            @promptSpies.constructor.and.returnValue(@promptSpies)
-            @promptSpies.show.and.returnValue(@promptSpies)
+            this.promptSpies = jasmine.createSpyObj('Prompt.Warning', ["constructor", "show", "hide"]);
+            this.promptSpies.constructor.and.returnValue(this.promptSpies);
+            this.promptSpies.show.and.returnValue(this.promptSpies);
 
-            @confirmationSpies = jasmine.createSpyObj('Notification.Confirmation', ["constructor", "show"])
-            @confirmationSpies.constructor.and.returnValue(@confirmationSpies)
-            @confirmationSpies.show.and.returnValue(@confirmationSpies)
+            this.confirmationSpies = jasmine.createSpyObj('Notification.Confirmation', ["constructor", "show"]);
+            this.confirmationSpies.constructor.and.returnValue(this.confirmationSpies);
+            this.confirmationSpies.show.and.returnValue(this.confirmationSpies);
 
-            @savingSpies = jasmine.createSpyObj('Notification.Mini', ["constructor", "show", "hide"])
-            @savingSpies.constructor.and.returnValue(@savingSpies)
-            @savingSpies.show.and.returnValue(@savingSpies)
+            this.savingSpies = jasmine.createSpyObj('Notification.Mini', ["constructor", "show", "hide"]);
+            this.savingSpies.constructor.and.returnValue(this.savingSpies);
+            this.savingSpies.show.and.returnValue(this.savingSpies);
 
-            @injector = new Squire()
-            @injector.mock("common/js/components/views/feedback_prompt", {
-                "Warning": @promptSpies.constructor
-            })
-            @injector.mock("common/js/components/views/feedback_notification", {
-                "Confirmation": @confirmationSpies.constructor,
-                "Mini": @savingSpies.constructor
-            })
+            this.injector = new Squire();
+            this.injector.mock("common/js/components/views/feedback_prompt", {
+                "Warning": this.promptSpies.constructor
+            });
+            this.injector.mock("common/js/components/views/feedback_notification", {
+                "Confirmation": this.confirmationSpies.constructor,
+                "Mini": this.savingSpies.constructor
+            });
 
-            @injector.require ["js/models/asset", "js/collections/asset", "js/views/asset"],
-                (AssetModel, AssetCollection, AssetView) =>
-                    @model = new AssetModel
-                        display_name: "test asset"
-                        url: 'actual_asset_url'
-                        portable_url: 'portable_url'
-                        date_added: 'date'
-                        thumbnail: null
+            return this.injector.require(["js/models/asset", "js/collections/asset", "js/views/asset"],
+                (AssetModel, AssetCollection, AssetView) => {
+                    this.model = new AssetModel({
+                        display_name: "test asset",
+                        url: 'actual_asset_url',
+                        portable_url: 'portable_url',
+                        date_added: 'date',
+                        thumbnail: null,
                         id: 'id'
-                    spyOn(@model, "destroy").and.callThrough()
-                    spyOn(@model, "save").and.callThrough()
+                    });
+                    spyOn(this.model, "destroy").and.callThrough();
+                    spyOn(this.model, "save").and.callThrough();
 
-                    @collection = new AssetCollection([@model])
-                    @collection.url = "assets-url"
-                    @createAssetView = (test) =>
-                        view = new AssetView({model: @model})
-                        requests = if test then AjaxHelpers["requests"](test) else null
-                        return {view: view, requests: requests}
-                    done()
+                    this.collection = new AssetCollection([this.model]);
+                    this.collection.url = "assets-url";
+                    this.createAssetView = test => {
+                        const view = new AssetView({model: this.model});
+                        const requests = test ? AjaxHelpers["requests"](test) : null;
+                        return {view, requests};
+                    };
+                    return done();
+            });
+        });
 
-        afterEach ->
-            @injector.clean()
-            @injector.remove()
+        afterEach(function() {
+            this.injector.clean();
+            return this.injector.remove();
+        });
 
-        describe "Basic", ->
-            it "should render properly", ->
-                {view: @view, requests: requests} = @createAssetView()
-                @view.render()
-                expect(@view.$el).toContainText("test asset")
+        describe("Basic", function() {
+            it("should render properly", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetView());
+                this.view.render();
+                return expect(this.view.$el).toContainText("test asset");
+            });
 
-            it "should pop a delete confirmation when the delete button is clicked", ->
-                {view: @view, requests: requests} = @createAssetView()
-                @view.render().$(".remove-asset-button").click()
-                expect(@promptSpies.constructor).toHaveBeenCalled()
-                ctorOptions = @promptSpies.constructor.calls.mostRecent().args[0]
-                expect(ctorOptions.title).toMatch('Delete File Confirmation')
-                # hasn't actually been removed
-                expect(@model.destroy).not.toHaveBeenCalled()
-                expect(@collection).toContain(@model)
+            return it("should pop a delete confirmation when the delete button is clicked", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetView());
+                this.view.render().$(".remove-asset-button").click();
+                expect(this.promptSpies.constructor).toHaveBeenCalled();
+                const ctorOptions = this.promptSpies.constructor.calls.mostRecent().args[0];
+                expect(ctorOptions.title).toMatch('Delete File Confirmation');
+                // hasn't actually been removed
+                expect(this.model.destroy).not.toHaveBeenCalled();
+                return expect(this.collection).toContain(this.model);
+            });
+        });
 
-        describe "AJAX", ->
-            it "should destroy itself on confirmation", ->
-                {view: @view, requests: requests} = @createAssetView(this)
+        return describe("AJAX", function() {
+            it("should destroy itself on confirmation", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetView(this));
 
-                @view.render().$(".remove-asset-button").click()
-                ctorOptions = @promptSpies.constructor.calls.mostRecent().args[0]
-                # run the primary function to indicate confirmation
-                ctorOptions.actions.primary.click(@promptSpies)
-                # AJAX request has been sent, but not yet returned
-                expect(@model.destroy).toHaveBeenCalled()
-                expect(requests.length).toEqual(1)
-                expect(@confirmationSpies.constructor).not.toHaveBeenCalled()
-                expect(@collection.contains(@model)).toBeTruthy()
-                # return a success response
-                requests[0].respond(204)
-                expect(@confirmationSpies.constructor).toHaveBeenCalled()
-                expect(@confirmationSpies.show).toHaveBeenCalled()
-                savingOptions = @confirmationSpies.constructor.calls.mostRecent().args[0]
-                expect(savingOptions.title).toMatch("Your file has been deleted.")
-                expect(@collection.contains(@model)).toBeFalsy()
+                this.view.render().$(".remove-asset-button").click();
+                const ctorOptions = this.promptSpies.constructor.calls.mostRecent().args[0];
+                // run the primary function to indicate confirmation
+                ctorOptions.actions.primary.click(this.promptSpies);
+                // AJAX request has been sent, but not yet returned
+                expect(this.model.destroy).toHaveBeenCalled();
+                expect(requests.length).toEqual(1);
+                expect(this.confirmationSpies.constructor).not.toHaveBeenCalled();
+                expect(this.collection.contains(this.model)).toBeTruthy();
+                // return a success response
+                requests[0].respond(204);
+                expect(this.confirmationSpies.constructor).toHaveBeenCalled();
+                expect(this.confirmationSpies.show).toHaveBeenCalled();
+                const savingOptions = this.confirmationSpies.constructor.calls.mostRecent().args[0];
+                expect(savingOptions.title).toMatch("Your file has been deleted.");
+                return expect(this.collection.contains(this.model)).toBeFalsy();
+            });
 
-            it "should not destroy itself if server errors", ->
-                {view: @view, requests: requests} = @createAssetView(this)
+            it("should not destroy itself if server errors", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetView(this));
 
-                @view.render().$(".remove-asset-button").click()
-                ctorOptions = @promptSpies.constructor.calls.mostRecent().args[0]
-                # run the primary function to indicate confirmation
-                ctorOptions.actions.primary.click(@promptSpies)
-                # AJAX request has been sent, but not yet returned
-                expect(@model.destroy).toHaveBeenCalled()
-                # return an error response
-                requests[0].respond(404)
-                expect(@confirmationSpies.constructor).not.toHaveBeenCalled()
-                expect(@collection.contains(@model)).toBeTruthy()
+                this.view.render().$(".remove-asset-button").click();
+                const ctorOptions = this.promptSpies.constructor.calls.mostRecent().args[0];
+                // run the primary function to indicate confirmation
+                ctorOptions.actions.primary.click(this.promptSpies);
+                // AJAX request has been sent, but not yet returned
+                expect(this.model.destroy).toHaveBeenCalled();
+                // return an error response
+                requests[0].respond(404);
+                expect(this.confirmationSpies.constructor).not.toHaveBeenCalled();
+                return expect(this.collection.contains(this.model)).toBeTruthy();
+            });
 
-            it "should lock the asset on confirmation", ->
-                {view: @view, requests: requests} = @createAssetView(this)
+            it("should lock the asset on confirmation", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetView(this));
 
-                @view.render().$(".lock-checkbox").click()
-                # AJAX request has been sent, but not yet returned
-                expect(@model.save).toHaveBeenCalled()
-                expect(requests.length).toEqual(1)
-                expect(@savingSpies.constructor).toHaveBeenCalled()
-                expect(@savingSpies.show).toHaveBeenCalled()
-                savingOptions = @savingSpies.constructor.calls.mostRecent().args[0]
-                expect(savingOptions.title).toMatch("Saving")
-                expect(@model.get("locked")).toBeFalsy()
-                # return a success response
-                requests[0].respond(204)
-                expect(@savingSpies.hide).toHaveBeenCalled()
-                expect(@model.get("locked")).toBeTruthy()
+                this.view.render().$(".lock-checkbox").click();
+                // AJAX request has been sent, but not yet returned
+                expect(this.model.save).toHaveBeenCalled();
+                expect(requests.length).toEqual(1);
+                expect(this.savingSpies.constructor).toHaveBeenCalled();
+                expect(this.savingSpies.show).toHaveBeenCalled();
+                const savingOptions = this.savingSpies.constructor.calls.mostRecent().args[0];
+                expect(savingOptions.title).toMatch("Saving");
+                expect(this.model.get("locked")).toBeFalsy();
+                // return a success response
+                requests[0].respond(204);
+                expect(this.savingSpies.hide).toHaveBeenCalled();
+                return expect(this.model.get("locked")).toBeTruthy();
+            });
 
-            it "should not lock the asset if server errors", ->
-                {view: @view, requests: requests} = @createAssetView(this)
+            return it("should not lock the asset if server errors", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetView(this));
 
-                @view.render().$(".lock-checkbox").click()
-                # return an error response
-                requests[0].respond(404)
-                # Don't call hide because that closes the notification showing the server error.
-                expect(@savingSpies.hide).not.toHaveBeenCalled()
-                expect(@model.get("locked")).toBeFalsy()
+                this.view.render().$(".lock-checkbox").click();
+                // return an error response
+                requests[0].respond(404);
+                // Don't call hide because that closes the notification showing the server error.
+                expect(this.savingSpies.hide).not.toHaveBeenCalled();
+                return expect(this.model.get("locked")).toBeFalsy();
+            });
+        });
+    });
 
-    describe "Assets view", ->
-        beforeEach (done) ->
-            setFixtures($("<script>", {id: "asset-library-tpl", type: "text/template"}).text(assetLibraryTpl))
-            appendSetFixtures($("<script>", {id: "asset-tpl", type: "text/template"}).text(assetTpl))
-            window.analytics = jasmine.createSpyObj('analytics', ['track'])
-            window.course_location_analytics = jasmine.createSpy()
-            appendSetFixtures(sandbox({id: "asset_table_body"}))
+    return describe("Assets view", function() {
+        beforeEach(function(done) {
+            setFixtures($("<script>", {id: "asset-library-tpl", type: "text/template"}).text(assetLibraryTpl));
+            appendSetFixtures($("<script>", {id: "asset-tpl", type: "text/template"}).text(assetTpl));
+            window.analytics = jasmine.createSpyObj('analytics', ['track']);
+            window.course_location_analytics = jasmine.createSpy();
+            appendSetFixtures(sandbox({id: "asset_table_body"}));
 
-            @promptSpies = jasmine.createSpyObj('Prompt.Warning', ["constructor", "show", "hide"])
-            @promptSpies.constructor.and.returnValue(@promptSpies)
-            @promptSpies.show.and.returnValue(@promptSpies)
+            this.promptSpies = jasmine.createSpyObj('Prompt.Warning', ["constructor", "show", "hide"]);
+            this.promptSpies.constructor.and.returnValue(this.promptSpies);
+            this.promptSpies.show.and.returnValue(this.promptSpies);
 
-            @injector = new Squire()
-            @injector.mock("common/js/components/views/feedback_prompt", {
-                "Warning": @promptSpies.constructor
-            })
+            this.injector = new Squire();
+            this.injector.mock("common/js/components/views/feedback_prompt", {
+                "Warning": this.promptSpies.constructor
+            });
 
-            @mockAsset1 = {
-                display_name: "test asset 1"
-                url: 'actual_asset_url_1'
-                portable_url: 'portable_url_1'
-                date_added: 'date_1'
-                thumbnail: null
+            this.mockAsset1 = {
+                display_name: "test asset 1",
+                url: 'actual_asset_url_1',
+                portable_url: 'portable_url_1',
+                date_added: 'date_1',
+                thumbnail: null,
                 id: 'id_1'
-            }
-            @mockAsset2 = {
-                display_name: "test asset 2"
-                url: 'actual_asset_url_2'
-                portable_url: 'portable_url_2'
-                date_added: 'date_2'
-                thumbnail: null
+            };
+            this.mockAsset2 = {
+                display_name: "test asset 2",
+                url: 'actual_asset_url_2',
+                portable_url: 'portable_url_2',
+                date_added: 'date_2',
+                thumbnail: null,
                 id: 'id_2'
-            }
-            @mockAssetsResponse = {
-                assets: [ @mockAsset1, @mockAsset2 ],
+            };
+            this.mockAssetsResponse = {
+                assets: [ this.mockAsset1, this.mockAsset2 ],
                 start: 0,
                 end: 1,
                 page: 0,
                 pageSize: 5,
                 totalCount: 2
-            }
+            };
 
-            @injector.require ["js/models/asset", "js/collections/asset", "js/views/assets"],
-                (AssetModel, AssetCollection, AssetsView) =>
-                    @AssetModel = AssetModel
-                    @collection = new AssetCollection();
-                    @collection.url = "assets-url"
-                    @createAssetsView = (test) =>
-                        requests = AjaxHelpers.requests(test)
-                        view = new AssetsView
-                            collection: @collection
+            this.injector.require(["js/models/asset", "js/collections/asset", "js/views/assets"],
+                (AssetModel, AssetCollection, AssetsView) => {
+                    this.AssetModel = AssetModel;
+                    this.collection = new AssetCollection();
+                    this.collection.url = "assets-url";
+                    this.createAssetsView = test => {
+                        const requests = AjaxHelpers.requests(test);
+                        const view = new AssetsView({
+                            collection: this.collection,
                             el: $('#asset_table_body')
-                        view.render()
-                        return {view: view, requests: requests}
-                    done()
+                        });
+                        view.render();
+                        return {view, requests};
+                    };
+                    return done();
+            });
 
-            $.ajax()
+            return $.ajax();
+        });
 
-        afterEach ->
-            delete window.analytics
-            delete window.course_location_analytics
+        afterEach(function() {
+            delete window.analytics;
+            delete window.course_location_analytics;
 
-            @injector.clean()
-            @injector.remove()
+            this.injector.clean();
+            return this.injector.remove();
+        });
 
-        addMockAsset = (requests) ->
-            model = new @AssetModel
-                display_name: "new asset"
-                url: 'new_actual_asset_url'
-                portable_url: 'portable_url'
-                date_added: 'date'
-                thumbnail: null
+        const addMockAsset = function(requests) {
+            const model = new this.AssetModel({
+                display_name: "new asset",
+                url: 'new_actual_asset_url',
+                portable_url: 'portable_url',
+                date_added: 'date',
+                thumbnail: null,
                 id: 'idx'
-            @view.addAsset(model)
-            AjaxHelpers.respondWithJson(requests,
+            });
+            this.view.addAsset(model);
+            return AjaxHelpers.respondWithJson(requests,
                 {
                     assets: [
-                        @mockAsset1, @mockAsset2,
+                        this.mockAsset1, this.mockAsset2,
                         {
-                            display_name: "new asset"
-                            url: 'new_actual_asset_url'
-                            portable_url: 'portable_url'
-                            date_added: 'date'
-                            thumbnail: null
+                            display_name: "new asset",
+                            url: 'new_actual_asset_url',
+                            portable_url: 'portable_url',
+                            date_added: 'date',
+                            thumbnail: null,
                             id: 'idx'
                         }
                     ],
@@ -224,146 +255,179 @@ define ["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "squire"]
                     page: 0,
                     pageSize: 5,
                     totalCount: 3
-                })
+                });
+        };
 
 
-        describe "Basic", ->
-            # Separate setup method to work-around mis-parenting of beforeEach methods
-            setup = (requests) ->
-                @view.pagingView.setPage(1)
-                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
+        describe("Basic", function() {
+            // Separate setup method to work-around mis-parenting of beforeEach methods
+            const setup = function(requests) {
+                this.view.pagingView.setPage(1);
+                return AjaxHelpers.respondWithJson(requests, this.mockAssetsResponse);
+            };
 
-            $.fn.fileupload = ->
-                return ''
+            $.fn.fileupload = () => '';
 
-            clickEvent = (html_selector) ->
-                $(html_selector).click()
+            const clickEvent = html_selector => $(html_selector).click();
 
-            it "should show upload modal on clicking upload asset button", ->
-                {view: @view, requests: requests} = @createAssetsView(this)
-                spyOn(@view, "showUploadModal")
-                setup.call(this, requests)
-                expect(@view.showUploadModal).not.toHaveBeenCalled()
-                @view.showUploadModal(clickEvent(".upload-button"))
-                expect(@view.showUploadModal).toHaveBeenCalled()
+            it("should show upload modal on clicking upload asset button", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetsView(this));
+                spyOn(this.view, "showUploadModal");
+                setup.call(this, requests);
+                expect(this.view.showUploadModal).not.toHaveBeenCalled();
+                this.view.showUploadModal(clickEvent(".upload-button"));
+                return expect(this.view.showUploadModal).toHaveBeenCalled();
+            });
 
-            it "should show file selection menu on choose file button", ->
-                {view: @view, requests: requests} = @createAssetsView(this)
-                spyOn(@view, "showFileSelectionMenu")
-                setup.call(this, requests)
-                expect(@view.showFileSelectionMenu).not.toHaveBeenCalled()
-                @view.showFileSelectionMenu(clickEvent(".choose-file-button"))
-                expect(@view.showFileSelectionMenu).toHaveBeenCalled()
+            it("should show file selection menu on choose file button", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetsView(this));
+                spyOn(this.view, "showFileSelectionMenu");
+                setup.call(this, requests);
+                expect(this.view.showFileSelectionMenu).not.toHaveBeenCalled();
+                this.view.showFileSelectionMenu(clickEvent(".choose-file-button"));
+                return expect(this.view.showFileSelectionMenu).toHaveBeenCalled();
+            });
 
-            it "should hide upload modal on clicking close button", ->
-                {view: @view, requests: requests} = @createAssetsView(this)
-                spyOn(@view, "hideModal")
-                setup.call(this, requests)
-                expect(@view.hideModal).not.toHaveBeenCalled()
-                @view.hideModal(clickEvent(".close-button"))
-                expect(@view.hideModal).toHaveBeenCalled()
+            it("should hide upload modal on clicking close button", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetsView(this));
+                spyOn(this.view, "hideModal");
+                setup.call(this, requests);
+                expect(this.view.hideModal).not.toHaveBeenCalled();
+                this.view.hideModal(clickEvent(".close-button"));
+                return expect(this.view.hideModal).toHaveBeenCalled();
+            });
 
-            it "should show a status indicator while loading", ->
-                {view: @view, requests: requests} = @createAssetsView(this)
-                appendSetFixtures('<div class="ui-loading"/>')
-                expect($('.ui-loading').is(':visible')).toBe(true)
-                setup.call(this, requests)
-                expect($('.ui-loading').is(':visible')).toBe(false)
+            it("should show a status indicator while loading", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetsView(this));
+                appendSetFixtures('<div class="ui-loading"/>');
+                expect($('.ui-loading').is(':visible')).toBe(true);
+                setup.call(this, requests);
+                return expect($('.ui-loading').is(':visible')).toBe(false);
+            });
 
-            it "should hide the status indicator if an error occurs while loading", ->
-                {view: @view, requests: requests} = @createAssetsView(this)
-                appendSetFixtures('<div class="ui-loading"/>')
-                expect($('.ui-loading').is(':visible')).toBe(true)
-                @view.pagingView.setPage(1)
-                AjaxHelpers.respondWithError(requests)
-                expect($('.ui-loading').is(':visible')).toBe(false)
+            it("should hide the status indicator if an error occurs while loading", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetsView(this));
+                appendSetFixtures('<div class="ui-loading"/>');
+                expect($('.ui-loading').is(':visible')).toBe(true);
+                this.view.pagingView.setPage(1);
+                AjaxHelpers.respondWithError(requests);
+                return expect($('.ui-loading').is(':visible')).toBe(false);
+            });
 
-            it "should render both assets", ->
-                {view: @view, requests: requests} = @createAssetsView(this)
-                setup.call(this, requests)
-                expect(@view.$el).toContainText("test asset 1")
-                expect(@view.$el).toContainText("test asset 2")
+            it("should render both assets", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetsView(this));
+                setup.call(this, requests);
+                expect(this.view.$el).toContainText("test asset 1");
+                return expect(this.view.$el).toContainText("test asset 2");
+            });
 
-            it "should remove the deleted asset from the view", ->
-                {view: @view, requests: requests} = @createAssetsView(this)
-                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
-                setup.call(this, requests)
-                # Delete the 2nd asset with success from server.
-                @view.$(".remove-asset-button")[1].click()
-                @promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(@promptSpies)
-                AjaxHelpers.respondWithNoContent(requests)
-                expect(@view.$el).toContainText("test asset 1")
-                expect(@view.$el).not.toContainText("test asset 2")
+            it("should remove the deleted asset from the view", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetsView(this));
+                AjaxHelpers.respondWithJson(requests, this.mockAssetsResponse);
+                setup.call(this, requests);
+                // Delete the 2nd asset with success from server.
+                this.view.$(".remove-asset-button")[1].click();
+                this.promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(this.promptSpies);
+                AjaxHelpers.respondWithNoContent(requests);
+                expect(this.view.$el).toContainText("test asset 1");
+                return expect(this.view.$el).not.toContainText("test asset 2");
+            });
 
-            it "does not remove asset if deletion failed", ->
-                {view: @view, requests: requests} = @createAssetsView(this)
-                setup.call(this, requests)
-                # Delete the 2nd asset, but mimic a failure from the server.
-                @view.$(".remove-asset-button")[1].click()
-                @promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(@promptSpies)
-                AjaxHelpers.respondWithError(requests)
-                expect(@view.$el).toContainText("test asset 1")
-                expect(@view.$el).toContainText("test asset 2")
+            it("does not remove asset if deletion failed", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetsView(this));
+                setup.call(this, requests);
+                // Delete the 2nd asset, but mimic a failure from the server.
+                this.view.$(".remove-asset-button")[1].click();
+                this.promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(this.promptSpies);
+                AjaxHelpers.respondWithError(requests);
+                expect(this.view.$el).toContainText("test asset 1");
+                return expect(this.view.$el).toContainText("test asset 2");
+            });
 
-            it "adds an asset if asset does not already exist", ->
-                {view: @view, requests: requests} = @createAssetsView(this)
-                setup.call(this, requests)
-                addMockAsset.call(this, requests)
-                expect(@view.$el).toContainText("new asset")
-                expect(@collection.models.length).toBe(3)
+            it("adds an asset if asset does not already exist", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetsView(this));
+                setup.call(this, requests);
+                addMockAsset.call(this, requests);
+                expect(this.view.$el).toContainText("new asset");
+                return expect(this.collection.models.length).toBe(3);
+            });
 
-            it "does not add an asset if asset already exists", ->
-                {view: @view, requests: requests} = @createAssetsView(this)
-                setup.call(this, requests)
-                spyOn(@collection, "add").and.callThrough()
-                model = @collection.models[1]
-                @view.addAsset(model)
-                expect(@collection.add).not.toHaveBeenCalled()
+            return it("does not add an asset if asset already exists", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetsView(this));
+                setup.call(this, requests);
+                spyOn(this.collection, "add").and.callThrough();
+                const model = this.collection.models[1];
+                this.view.addAsset(model);
+                return expect(this.collection.add).not.toHaveBeenCalled();
+            });
+        });
 
-        describe "Sorting", ->
-            # Separate setup method to work-around mis-parenting of beforeEach methods
-            setup = (requests) ->
-                @view.pagingView.setPage(1)
-                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
+        return describe("Sorting", function() {
+            // Separate setup method to work-around mis-parenting of beforeEach methods
+            const setup = function(requests) {
+                this.view.pagingView.setPage(1);
+                return AjaxHelpers.respondWithJson(requests, this.mockAssetsResponse);
+            };
 
-            it "should have the correct default sort order", ->
-                {view: @view, requests: requests} = @createAssetsView(this)
-                setup.call(this, requests)
-                expect(@view.pagingView.sortDisplayName()).toBe("Date Added")
-                expect(@view.collection.sortDirection).toBe("desc")
+            it("should have the correct default sort order", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetsView(this));
+                setup.call(this, requests);
+                expect(this.view.pagingView.sortDisplayName()).toBe("Date Added");
+                return expect(this.view.collection.sortDirection).toBe("desc");
+            });
 
-            it "should toggle the sort order when clicking on the currently sorted column", ->
-                {view: @view, requests: requests} = @createAssetsView(this)
-                setup.call(this, requests)
-                expect(@view.pagingView.sortDisplayName()).toBe("Date Added")
-                expect(@view.collection.sortDirection).toBe("desc")
-                @view.$("#js-asset-date-col").click()
-                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
-                expect(@view.pagingView.sortDisplayName()).toBe("Date Added")
-                expect(@view.collection.sortDirection).toBe("asc")
-                @view.$("#js-asset-date-col").click()
-                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
-                expect(@view.pagingView.sortDisplayName()).toBe("Date Added")
-                expect(@view.collection.sortDirection).toBe("desc")
+            it("should toggle the sort order when clicking on the currently sorted column", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetsView(this));
+                setup.call(this, requests);
+                expect(this.view.pagingView.sortDisplayName()).toBe("Date Added");
+                expect(this.view.collection.sortDirection).toBe("desc");
+                this.view.$("#js-asset-date-col").click();
+                AjaxHelpers.respondWithJson(requests, this.mockAssetsResponse);
+                expect(this.view.pagingView.sortDisplayName()).toBe("Date Added");
+                expect(this.view.collection.sortDirection).toBe("asc");
+                this.view.$("#js-asset-date-col").click();
+                AjaxHelpers.respondWithJson(requests, this.mockAssetsResponse);
+                expect(this.view.pagingView.sortDisplayName()).toBe("Date Added");
+                return expect(this.view.collection.sortDirection).toBe("desc");
+            });
 
-            it "should switch the sort order when clicking on a different column", ->
-                {view: @view, requests: requests} = @createAssetsView(this)
-                setup.call(this, requests)
-                @view.$("#js-asset-name-col").click()
-                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
-                expect(@view.pagingView.sortDisplayName()).toBe("Name")
-                expect(@view.collection.sortDirection).toBe("asc")
-                @view.$("#js-asset-name-col").click()
-                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
-                expect(@view.pagingView.sortDisplayName()).toBe("Name")
-                expect(@view.collection.sortDirection).toBe("desc")
+            it("should switch the sort order when clicking on a different column", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetsView(this));
+                setup.call(this, requests);
+                this.view.$("#js-asset-name-col").click();
+                AjaxHelpers.respondWithJson(requests, this.mockAssetsResponse);
+                expect(this.view.pagingView.sortDisplayName()).toBe("Name");
+                expect(this.view.collection.sortDirection).toBe("asc");
+                this.view.$("#js-asset-name-col").click();
+                AjaxHelpers.respondWithJson(requests, this.mockAssetsResponse);
+                expect(this.view.pagingView.sortDisplayName()).toBe("Name");
+                return expect(this.view.collection.sortDirection).toBe("desc");
+            });
 
-            it "should switch sort to most recent date added when a new asset is added", ->
-                {view: @view, requests: requests} = @createAssetsView(this)
-                setup.call(this, requests)
-                @view.$("#js-asset-name-col").click()
-                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
-                addMockAsset.call(this, requests)
-                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
-                expect(@view.pagingView.sortDisplayName()).toBe("Date Added")
-                expect(@view.collection.sortDirection).toBe("desc")
+            return it("should switch sort to most recent date added when a new asset is added", function() {
+                let requests;
+                ({view: this.view, requests} = this.createAssetsView(this));
+                setup.call(this, requests);
+                this.view.$("#js-asset-name-col").click();
+                AjaxHelpers.respondWithJson(requests, this.mockAssetsResponse);
+                addMockAsset.call(this, requests);
+                AjaxHelpers.respondWithJson(requests, this.mockAssetsResponse);
+                expect(this.view.pagingView.sortDisplayName()).toBe("Date Added");
+                return expect(this.view.collection.sortDirection).toBe("desc");
+            });
+        });
+    });
+});

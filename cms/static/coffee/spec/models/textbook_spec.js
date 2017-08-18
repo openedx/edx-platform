@@ -1,78 +1,98 @@
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS203: Remove `|| {}` from converted for-own loops
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
 
-define ["backbone", "js/models/textbook", "js/collections/textbook", "js/models/chapter", "js/collections/chapter", "cms/js/main"],
-(Backbone, Textbook, TextbookSet, Chapter, ChapterSet, main) ->
+define(["backbone", "js/models/textbook", "js/collections/textbook", "js/models/chapter", "js/collections/chapter", "cms/js/main"],
+function(Backbone, Textbook, TextbookSet, Chapter, ChapterSet, main) {
 
-    describe "Textbook model", ->
-        beforeEach ->
-            main()
-            @model = new Textbook()
-            CMS.URL.TEXTBOOKS = "/textbooks"
+    describe("Textbook model", function() {
+        beforeEach(function() {
+            main();
+            this.model = new Textbook();
+            return CMS.URL.TEXTBOOKS = "/textbooks";
+        });
 
-        afterEach ->
-            delete CMS.URL.TEXTBOOKS
+        afterEach(() => delete CMS.URL.TEXTBOOKS);
 
-        describe "Basic", ->
-            it "should have an empty name by default", ->
-                expect(@model.get("name")).toEqual("")
+        describe("Basic", function() {
+            it("should have an empty name by default", function() {
+                return expect(this.model.get("name")).toEqual("");
+            });
 
-            it "should not show chapters by default", ->
-                expect(@model.get("showChapters")).toBeFalsy()
+            it("should not show chapters by default", function() {
+                return expect(this.model.get("showChapters")).toBeFalsy();
+            });
 
-            it "should have a ChapterSet with one chapter by default", ->
-                chapters = @model.get("chapters")
-                expect(chapters).toBeInstanceOf(ChapterSet)
-                expect(chapters.length).toEqual(1)
-                expect(chapters.at(0).isEmpty()).toBeTruthy()
+            it("should have a ChapterSet with one chapter by default", function() {
+                const chapters = this.model.get("chapters");
+                expect(chapters).toBeInstanceOf(ChapterSet);
+                expect(chapters.length).toEqual(1);
+                return expect(chapters.at(0).isEmpty()).toBeTruthy();
+            });
 
-            it "should be empty by default", ->
-                expect(@model.isEmpty()).toBeTruthy()
+            it("should be empty by default", function() {
+                return expect(this.model.isEmpty()).toBeTruthy();
+            });
 
-            it "should have a URL root", ->
-                urlRoot = _.result(@model, 'urlRoot')
-                expect(urlRoot).toBeTruthy()
+            it("should have a URL root", function() {
+                const urlRoot = _.result(this.model, 'urlRoot');
+                return expect(urlRoot).toBeTruthy();
+            });
 
-            it "should be able to reset itself", ->
-                @model.set("name", "foobar")
-                @model.reset()
-                expect(@model.get("name")).toEqual("")
+            it("should be able to reset itself", function() {
+                this.model.set("name", "foobar");
+                this.model.reset();
+                return expect(this.model.get("name")).toEqual("");
+            });
 
-            it "should not be dirty by default", ->
-                expect(@model.isDirty()).toBeFalsy()
+            it("should not be dirty by default", function() {
+                return expect(this.model.isDirty()).toBeFalsy();
+            });
 
-            it "should be dirty after it's been changed", ->
-                @model.set("name", "foobar")
-                expect(@model.isDirty()).toBeTruthy()
+            it("should be dirty after it's been changed", function() {
+                this.model.set("name", "foobar");
+                return expect(this.model.isDirty()).toBeTruthy();
+            });
 
-            it "should not be dirty after calling setOriginalAttributes", ->
-                @model.set("name", "foobar")
-                @model.setOriginalAttributes()
-                expect(@model.isDirty()).toBeFalsy()
+            return it("should not be dirty after calling setOriginalAttributes", function() {
+                this.model.set("name", "foobar");
+                this.model.setOriginalAttributes();
+                return expect(this.model.isDirty()).toBeFalsy();
+            });
+        });
 
-        describe "Input/Output", ->
-            deepAttributes = (obj) ->
-                if obj instanceof Backbone.Model
-                    deepAttributes(obj.attributes)
-                else if obj instanceof Backbone.Collection
-                    obj.map(deepAttributes);
-                else if _.isArray(obj)
-                    _.map(obj, deepAttributes);
-                else if _.isObject(obj)
-                    attributes = {};
-                    for own prop, val of obj
-                        attributes[prop] = deepAttributes(val)
-                    attributes
-                else
-                    obj
+        describe("Input/Output", function() {
+            var deepAttributes = function(obj) {
+                if (obj instanceof Backbone.Model) {
+                    return deepAttributes(obj.attributes);
+                } else if (obj instanceof Backbone.Collection) {
+                    return obj.map(deepAttributes);
+                } else if (_.isArray(obj)) {
+                    return _.map(obj, deepAttributes);
+                } else if (_.isObject(obj)) {
+                    const attributes = {};
+                    for (let prop of Object.keys(obj || {})) {
+                        const val = obj[prop];
+                        attributes[prop] = deepAttributes(val);
+                    }
+                    return attributes;
+                } else {
+                    return obj;
+                }
+            };
 
-            it "should match server model to client model", ->
-                serverModelSpec = {
+            return it("should match server model to client model", function() {
+                const serverModelSpec = {
                     "tab_title": "My Textbook",
                     "chapters": [
                         {"title": "Chapter 1", "url": "/ch1.pdf"},
                         {"title": "Chapter 2", "url": "/ch2.pdf"},
                     ]
-                }
-                clientModelSpec = {
+                };
+                const clientModelSpec = {
                     "name": "My Textbook",
                     "showChapters": false,
                     "editing": false,
@@ -86,113 +106,142 @@ define ["backbone", "js/models/textbook", "js/collections/textbook", "js/models/
                             "order": 2
                         }
                     ]
-                }
+                };
 
-                model = new Textbook(serverModelSpec, {parse: true})
-                expect(deepAttributes(model)).toEqual(clientModelSpec)
-                expect(model.toJSON()).toEqual(serverModelSpec)
+                const model = new Textbook(serverModelSpec, {parse: true});
+                expect(deepAttributes(model)).toEqual(clientModelSpec);
+                return expect(model.toJSON()).toEqual(serverModelSpec);
+            });
+        });
 
-        describe "Validation", ->
-            it "requires a name", ->
-                model = new Textbook({name: ""})
-                expect(model.isValid()).toBeFalsy()
+        return describe("Validation", function() {
+            it("requires a name", function() {
+                const model = new Textbook({name: ""});
+                return expect(model.isValid()).toBeFalsy();
+            });
 
-            it "requires at least one chapter", ->
-                model = new Textbook({name: "foo"})
-                model.get("chapters").reset()
-                expect(model.isValid()).toBeFalsy()
+            it("requires at least one chapter", function() {
+                const model = new Textbook({name: "foo"});
+                model.get("chapters").reset();
+                return expect(model.isValid()).toBeFalsy();
+            });
 
-            it "requires a valid chapter", ->
-                chapter = new Chapter()
-                chapter.isValid = -> false
-                model = new Textbook({name: "foo"})
-                model.get("chapters").reset([chapter])
-                expect(model.isValid()).toBeFalsy()
+            it("requires a valid chapter", function() {
+                const chapter = new Chapter();
+                chapter.isValid = () => false;
+                const model = new Textbook({name: "foo"});
+                model.get("chapters").reset([chapter]);
+                return expect(model.isValid()).toBeFalsy();
+            });
 
-            it "requires all chapters to be valid", ->
-                chapter1 = new Chapter()
-                chapter1.isValid = -> true
-                chapter2 = new Chapter()
-                chapter2.isValid = -> false
-                model = new Textbook({name: "foo"})
-                model.get("chapters").reset([chapter1, chapter2])
-                expect(model.isValid()).toBeFalsy()
+            it("requires all chapters to be valid", function() {
+                const chapter1 = new Chapter();
+                chapter1.isValid = () => true;
+                const chapter2 = new Chapter();
+                chapter2.isValid = () => false;
+                const model = new Textbook({name: "foo"});
+                model.get("chapters").reset([chapter1, chapter2]);
+                return expect(model.isValid()).toBeFalsy();
+            });
 
-            it "can pass validation", ->
-                chapter = new Chapter()
-                chapter.isValid = -> true
-                model = new Textbook({name: "foo"})
-                model.get("chapters").reset([chapter])
-                expect(model.isValid()).toBeTruthy()
-
-
-    describe "Textbook collection", ->
-        beforeEach ->
-            CMS.URL.TEXTBOOKS = "/textbooks"
-            @collection = new TextbookSet()
-
-        afterEach ->
-            delete CMS.URL.TEXTBOOKS
-
-        it "should have a url set", ->
-            url = _.result(@collection, 'url')
-            expect(url).toEqual("/textbooks")
+            return it("can pass validation", function() {
+                const chapter = new Chapter();
+                chapter.isValid = () => true;
+                const model = new Textbook({name: "foo"});
+                model.get("chapters").reset([chapter]);
+                return expect(model.isValid()).toBeTruthy();
+            });
+        });
+    });
 
 
-    describe "Chapter model", ->
-        beforeEach ->
-            @model = new Chapter()
+    describe("Textbook collection", function() {
+        beforeEach(function() {
+            CMS.URL.TEXTBOOKS = "/textbooks";
+            return this.collection = new TextbookSet();
+        });
 
-        describe "Basic", ->
-            it "should have a name by default", ->
-                expect(@model.get("name")).toEqual("")
+        afterEach(() => delete CMS.URL.TEXTBOOKS);
 
-            it "should have an asset_path by default", ->
-                expect(@model.get("asset_path")).toEqual("")
-
-            it "should have an order by default", ->
-                expect(@model.get("order")).toEqual(1)
-
-            it "should be empty by default", ->
-                expect(@model.isEmpty()).toBeTruthy()
-
-        describe "Validation", ->
-            it "requires a name", ->
-                model = new Chapter({name: "", asset_path: "a.pdf"})
-                expect(model.isValid()).toBeFalsy()
-
-            it "requires an asset_path", ->
-                model = new Chapter({name: "a", asset_path: ""})
-                expect(model.isValid()).toBeFalsy()
-
-            it "can pass validation", ->
-                model = new Chapter({name: "a", asset_path: "a.pdf"})
-                expect(model.isValid()).toBeTruthy()
+        return it("should have a url set", function() {
+            const url = _.result(this.collection, 'url');
+            return expect(url).toEqual("/textbooks");
+        });
+    });
 
 
-    describe "Chapter collection", ->
-        beforeEach ->
-            @collection = new ChapterSet()
+    describe("Chapter model", function() {
+        beforeEach(function() {
+            return this.model = new Chapter();
+        });
 
-        it "is empty by default", ->
-            expect(@collection.isEmpty()).toBeTruthy()
+        describe("Basic", function() {
+            it("should have a name by default", function() {
+                return expect(this.model.get("name")).toEqual("");
+            });
 
-        it "is empty if all chapters are empty", ->
-            @collection.add([{}, {}, {}])
-            expect(@collection.isEmpty()).toBeTruthy()
+            it("should have an asset_path by default", function() {
+                return expect(this.model.get("asset_path")).toEqual("");
+            });
 
-        it "is not empty if a chapter is not empty", ->
-            @collection.add([{}, {name: "full"}, {}])
-            expect(@collection.isEmpty()).toBeFalsy()
+            it("should have an order by default", function() {
+                return expect(this.model.get("order")).toEqual(1);
+            });
 
-        it "should have a nextOrder function", ->
-            expect(@collection.nextOrder()).toEqual(1)
-            @collection.add([{}])
-            expect(@collection.nextOrder()).toEqual(2)
-            @collection.add([{}])
-            expect(@collection.nextOrder()).toEqual(3)
-            # verify that it doesn't just return an incrementing value each time
-            expect(@collection.nextOrder()).toEqual(3)
-            # try going back one
-            @collection.remove(@collection.last())
-            expect(@collection.nextOrder()).toEqual(2)
+            return it("should be empty by default", function() {
+                return expect(this.model.isEmpty()).toBeTruthy();
+            });
+        });
+
+        return describe("Validation", function() {
+            it("requires a name", function() {
+                const model = new Chapter({name: "", asset_path: "a.pdf"});
+                return expect(model.isValid()).toBeFalsy();
+            });
+
+            it("requires an asset_path", function() {
+                const model = new Chapter({name: "a", asset_path: ""});
+                return expect(model.isValid()).toBeFalsy();
+            });
+
+            return it("can pass validation", function() {
+                const model = new Chapter({name: "a", asset_path: "a.pdf"});
+                return expect(model.isValid()).toBeTruthy();
+            });
+        });
+    });
+
+
+    return describe("Chapter collection", function() {
+        beforeEach(function() {
+            return this.collection = new ChapterSet();
+        });
+
+        it("is empty by default", function() {
+            return expect(this.collection.isEmpty()).toBeTruthy();
+        });
+
+        it("is empty if all chapters are empty", function() {
+            this.collection.add([{}, {}, {}]);
+            return expect(this.collection.isEmpty()).toBeTruthy();
+        });
+
+        it("is not empty if a chapter is not empty", function() {
+            this.collection.add([{}, {name: "full"}, {}]);
+            return expect(this.collection.isEmpty()).toBeFalsy();
+        });
+
+        return it("should have a nextOrder function", function() {
+            expect(this.collection.nextOrder()).toEqual(1);
+            this.collection.add([{}]);
+            expect(this.collection.nextOrder()).toEqual(2);
+            this.collection.add([{}]);
+            expect(this.collection.nextOrder()).toEqual(3);
+            // verify that it doesn't just return an incrementing value each time
+            expect(this.collection.nextOrder()).toEqual(3);
+            // try going back one
+            this.collection.remove(this.collection.last());
+            return expect(this.collection.nextOrder()).toEqual(2);
+        });
+    });
+});

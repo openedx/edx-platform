@@ -1,353 +1,435 @@
-describe 'Calculator', ->
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+describe('Calculator', function() {
 
-  KEY =
-    TAB   : 9
-    ENTER : 13
-    ALT   : 18
-    ESC   : 27
-    SPACE : 32
-    LEFT  : 37
-    UP    : 38
-    RIGHT : 39
+  const KEY = {
+    TAB   : 9,
+    ENTER : 13,
+    ALT   : 18,
+    ESC   : 27,
+    SPACE : 32,
+    LEFT  : 37,
+    UP    : 38,
+    RIGHT : 39,
     DOWN  : 40
+  };
 
-  beforeEach ->
-    loadFixtures 'coffee/fixtures/calculator.html'
-    @calculator = new Calculator
+  beforeEach(function() {
+    loadFixtures('coffee/fixtures/calculator.html');
+    return this.calculator = new Calculator;
+  });
 
-  describe 'bind', ->
-    it 'bind the calculator button', ->
-      expect($('.calc')).toHandleWith 'click', @calculator.toggle
+  describe('bind', function() {
+    it('bind the calculator button', function() {
+      return expect($('.calc')).toHandleWith('click', this.calculator.toggle);
+    });
 
-    it 'bind key up on calculator', ->
-      expect($('#calculator_wrapper')).toHandle 'keyup', @calculator.handleKeyUpOnHint
+    it('bind key up on calculator', function() {
+      return expect($('#calculator_wrapper')).toHandle('keyup', this.calculator.handleKeyUpOnHint);
+    });
 
-    it 'bind the help button', ->
-      # This events is bind by $.click()
-      expect($('#calculator_hint')).toHandle 'click'
+    it('bind the help button', () =>
+      // This events is bind by $.click()
+      expect($('#calculator_hint')).toHandle('click')
+    );
 
-    it 'bind the calculator submit', ->
-      expect($('form#calculator')).toHandleWith 'submit', @calculator.calculate
+    it('bind the calculator submit', function() {
+      return expect($('form#calculator')).toHandleWith('submit', this.calculator.calculate);
+    });
 
-    xit 'prevent default behavior on form submit', ->
-      jasmine.stubRequests()
-      $('form#calculator').submit (e) ->
-        expect(e.isDefaultPrevented()).toBeTruthy()
-        e.preventDefault()
-      $('form#calculator').submit()
+    return xit('prevent default behavior on form submit', function() {
+      jasmine.stubRequests();
+      $('form#calculator').submit(function(e) {
+        expect(e.isDefaultPrevented()).toBeTruthy();
+        return e.preventDefault();
+      });
+      return $('form#calculator').submit();
+    });
+  });
 
-  describe 'toggle', ->
-    it 'focuses the input when toggled', (done)->
+  describe('toggle', function() {
+    it('focuses the input when toggled', function(done){
 
-      self = this
-      focus = ()->
-        deferred = $.Deferred()
+      const self = this;
+      const focus = function(){
+        const deferred = $.Deferred();
 
-        # Since the focus is called asynchronously, we need to
-        # wait until focus() is called.
-        spyOn($.fn, 'focus').and.callFake (elementName) ->
-          deferred.resolve()
+        // Since the focus is called asynchronously, we need to
+        // wait until focus() is called.
+        spyOn($.fn, 'focus').and.callFake(elementName => deferred.resolve());
 
-        self.calculator.toggle(jQuery.Event("click"))
+        self.calculator.toggle(jQuery.Event("click"));
 
-      	 deferred.promise()
+      	 return deferred.promise();
+      };
 
-      focus().then(
-        ->
-        	expect($('#calculator_wrapper #calculator_input').focus).toHaveBeenCalled()
-      ).always(done)
+      return focus().then(
+        () => expect($('#calculator_wrapper #calculator_input').focus).toHaveBeenCalled()).always(done);
+    });
 
-    it 'toggle the close button on the calculator button', ->
-      @calculator.toggle(jQuery.Event("click"))
-      expect($('.calc')).toHaveClass('closed')
+    return it('toggle the close button on the calculator button', function() {
+      this.calculator.toggle(jQuery.Event("click"));
+      expect($('.calc')).toHaveClass('closed');
 
-      @calculator.toggle(jQuery.Event("click"))
-      expect($('.calc')).not.toHaveClass('closed')
+      this.calculator.toggle(jQuery.Event("click"));
+      return expect($('.calc')).not.toHaveClass('closed');
+    });
+  });
 
-  describe 'showHint', ->
-    it 'show the help overlay', ->
-      @calculator.showHint()
-      expect($('.help')).toHaveClass('shown')
-      expect($('.help')).toHaveAttr('aria-hidden', 'false')
+  describe('showHint', () =>
+    it('show the help overlay', function() {
+      this.calculator.showHint();
+      expect($('.help')).toHaveClass('shown');
+      return expect($('.help')).toHaveAttr('aria-hidden', 'false');
+    })
+  );
 
 
-  describe 'hideHint', ->
-    it 'show the help overlay', ->
-      @calculator.hideHint()
-      expect($('.help')).not.toHaveClass('shown')
-      expect($('.help')).toHaveAttr('aria-hidden', 'true')
+  describe('hideHint', () =>
+    it('show the help overlay', function() {
+      this.calculator.hideHint();
+      expect($('.help')).not.toHaveClass('shown');
+      return expect($('.help')).toHaveAttr('aria-hidden', 'true');
+    })
+  );
 
-  describe 'handleClickOnHintButton', ->
-    it 'on click hint button hint popup becomes visible ', ->
-      e = jQuery.Event('click');
+  describe('handleClickOnHintButton', () =>
+    it('on click hint button hint popup becomes visible ', function() {
+      const e = jQuery.Event('click');
       $('#calculator_hint').trigger(e);
-      expect($('.help')).toHaveClass 'shown'
+      return expect($('.help')).toHaveClass('shown');
+    })
+  );
 
-  describe 'handleClickOnDocument', ->
-    it 'on click out of the hint popup it becomes hidden', ->
-      @calculator.showHint()
-      e = jQuery.Event('click');
+  describe('handleClickOnDocument', () =>
+    it('on click out of the hint popup it becomes hidden', function() {
+      this.calculator.showHint();
+      const e = jQuery.Event('click');
       $(document).trigger(e);
-      expect($('.help')).not.toHaveClass 'shown'
+      return expect($('.help')).not.toHaveClass('shown');
+    })
+  );
 
-  describe 'handleClickOnHintPopup', ->
-    it 'on click of hint popup it remains visible', ->
-      @calculator.showHint()
-      e = jQuery.Event('click');
+  describe('handleClickOnHintPopup', () =>
+    it('on click of hint popup it remains visible', function() {
+      this.calculator.showHint();
+      const e = jQuery.Event('click');
       $('#calculator_input_help').trigger(e);
-      expect($('.help')).toHaveClass 'shown'
+      return expect($('.help')).toHaveClass('shown');
+    })
+  );
 
-  describe 'selectHint', ->
-    it 'select correct hint item', ->
-      spyOn($.fn, 'focus')
-      element = $('.hint-item').eq(1)
-      @calculator.selectHint(element)
+  describe('selectHint', function() {
+    it('select correct hint item', function() {
+      spyOn($.fn, 'focus');
+      const element = $('.hint-item').eq(1);
+      this.calculator.selectHint(element);
 
-      expect(element.focus).toHaveBeenCalled()
-      expect(@calculator.activeHint).toEqual(element)
-      expect(@calculator.hintPopup).toHaveAttr('data-calculator-hint', element.attr('id'))
+      expect(element.focus).toHaveBeenCalled();
+      expect(this.calculator.activeHint).toEqual(element);
+      return expect(this.calculator.hintPopup).toHaveAttr('data-calculator-hint', element.attr('id'));
+    });
 
-    it 'select the first hint if argument element is not passed', ->
-          @calculator.selectHint()
-          expect(@calculator.activeHint.attr('id')).toEqual($('.hint-item').first().attr('id'))
+    it('select the first hint if argument element is not passed', function() {
+          this.calculator.selectHint();
+          return expect(this.calculator.activeHint.attr('id')).toEqual($('.hint-item').first().attr('id'));
+    });
 
-    it 'select the first hint if argument element is empty', ->
-          @calculator.selectHint([])
-          expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').first().attr('id'))
+    return it('select the first hint if argument element is empty', function() {
+          this.calculator.selectHint([]);
+          return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').first().attr('id'));
+    });
+  });
 
-  describe 'prevHint', ->
+  describe('prevHint', function() {
 
-    it 'Prev hint item is selected', ->
-      @calculator.activeHint = $('.hint-item').eq(1)
-      @calculator.prevHint()
+    it('Prev hint item is selected', function() {
+      this.calculator.activeHint = $('.hint-item').eq(1);
+      this.calculator.prevHint();
 
-      expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'))
+      return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'));
+    });
 
-    it 'if this was the second item, select the first one', ->
-      @calculator.activeHint = $('.hint-item').eq(1)
-      @calculator.prevHint()
+    it('if this was the second item, select the first one', function() {
+      this.calculator.activeHint = $('.hint-item').eq(1);
+      this.calculator.prevHint();
 
-      expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'))
+      return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'));
+    });
 
-    it 'if this was the first item, select the last one', ->
-      @calculator.activeHint = $('.hint-item').eq(0)
-      @calculator.prevHint()
+    it('if this was the first item, select the last one', function() {
+      this.calculator.activeHint = $('.hint-item').eq(0);
+      this.calculator.prevHint();
 
-      expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(2).attr('id'))
+      return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(2).attr('id'));
+    });
 
-    it 'if this was the last item, select the second last', ->
-      @calculator.activeHint = $('.hint-item').eq(2)
-      @calculator.prevHint()
+    return it('if this was the last item, select the second last', function() {
+      this.calculator.activeHint = $('.hint-item').eq(2);
+      this.calculator.prevHint();
 
-      expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(1).attr('id'))
+      return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(1).attr('id'));
+    });
+  });
 
-  describe 'nextHint', ->
+  describe('nextHint', function() {
 
-    it 'if this was the first item, select the second one', ->
-      @calculator.activeHint = $('.hint-item').eq(0)
-      @calculator.nextHint()
+    it('if this was the first item, select the second one', function() {
+      this.calculator.activeHint = $('.hint-item').eq(0);
+      this.calculator.nextHint();
 
-      expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(1).attr('id'))
+      return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(1).attr('id'));
+    });
 
-    it 'If this was the second item, select the last one', ->
-      @calculator.activeHint = $('.hint-item').eq(1)
-      @calculator.nextHint()
+    it('If this was the second item, select the last one', function() {
+      this.calculator.activeHint = $('.hint-item').eq(1);
+      this.calculator.nextHint();
 
-      expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(2).attr('id'))
+      return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(2).attr('id'));
+    });
 
-    it 'If this was the last item, select the first one', ->
-      @calculator.activeHint = $('.hint-item').eq(2)
-      @calculator.nextHint()
+    return it('If this was the last item, select the first one', function() {
+      this.calculator.activeHint = $('.hint-item').eq(2);
+      this.calculator.nextHint();
 
-      expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'))
+      return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'));
+    });
+  });
 
-  describe 'handleKeyDown', ->
-    assertHintIsHidden = (calc, key) ->
-      spyOn(calc, 'hideHint')
-      calc.showHint()
-      e = jQuery.Event('keydown', { keyCode: key });
-      value = calc.handleKeyDown(e)
+  describe('handleKeyDown', function() {
+    const assertHintIsHidden = function(calc, key) {
+      spyOn(calc, 'hideHint');
+      calc.showHint();
+      const e = jQuery.Event('keydown', { keyCode: key });
+      const value = calc.handleKeyDown(e);
 
-      expect(calc.hideHint).toHaveBeenCalled
-      expect(value).toBeFalsy()
-      expect(e.isDefaultPrevented()).toBeTruthy()
+      expect(calc.hideHint).toHaveBeenCalled;
+      expect(value).toBeFalsy();
+      return expect(e.isDefaultPrevented()).toBeTruthy();
+    };
 
-    assertHintIsVisible = (calc, key) ->
-      spyOn(calc, 'showHint')
-      spyOn($.fn, 'focus')
-      e = jQuery.Event('keydown', { keyCode: key });
-      value = calc.handleKeyDown(e)
+    const assertHintIsVisible = function(calc, key) {
+      spyOn(calc, 'showHint');
+      spyOn($.fn, 'focus');
+      const e = jQuery.Event('keydown', { keyCode: key });
+      const value = calc.handleKeyDown(e);
 
-      expect(calc.showHint).toHaveBeenCalled
-      expect(value).toBeFalsy()
-      expect(e.isDefaultPrevented()).toBeTruthy()
-      expect(calc.activeHint.focus).toHaveBeenCalled()
+      expect(calc.showHint).toHaveBeenCalled;
+      expect(value).toBeFalsy();
+      expect(e.isDefaultPrevented()).toBeTruthy();
+      return expect(calc.activeHint.focus).toHaveBeenCalled();
+    };
 
-    assertNothingHappens = (calc, key) ->
-      spyOn(calc, 'showHint')
-      e = jQuery.Event('keydown', { keyCode: key });
-      value = calc.handleKeyDown(e)
+    const assertNothingHappens = function(calc, key) {
+      spyOn(calc, 'showHint');
+      const e = jQuery.Event('keydown', { keyCode: key });
+      const value = calc.handleKeyDown(e);
 
-      expect(calc.showHint).not.toHaveBeenCalled
-      expect(value).toBeTruthy()
-      expect(e.isDefaultPrevented()).toBeFalsy()
+      expect(calc.showHint).not.toHaveBeenCalled;
+      expect(value).toBeTruthy();
+      return expect(e.isDefaultPrevented()).toBeFalsy();
+    };
 
-    it 'hint popup becomes hidden on press ENTER', ->
-      assertHintIsHidden(@calculator, KEY.ENTER)
+    it('hint popup becomes hidden on press ENTER', function() {
+      return assertHintIsHidden(this.calculator, KEY.ENTER);
+    });
 
-    it 'hint popup becomes visible on press ENTER', ->
-      assertHintIsVisible(@calculator, KEY.ENTER)
+    it('hint popup becomes visible on press ENTER', function() {
+      return assertHintIsVisible(this.calculator, KEY.ENTER);
+    });
 
-    it 'hint popup becomes hidden on press SPACE', ->
-      assertHintIsHidden(@calculator, KEY.SPACE)
+    it('hint popup becomes hidden on press SPACE', function() {
+      return assertHintIsHidden(this.calculator, KEY.SPACE);
+    });
 
-    it 'hint popup becomes visible on press SPACE', ->
-      assertHintIsVisible(@calculator, KEY.SPACE)
+    it('hint popup becomes visible on press SPACE', function() {
+      return assertHintIsVisible(this.calculator, KEY.SPACE);
+    });
 
-    it 'Nothing happens on press ALT', ->
-      assertNothingHappens(@calculator, KEY.ALT)
+    it('Nothing happens on press ALT', function() {
+      return assertNothingHappens(this.calculator, KEY.ALT);
+    });
 
-    it 'Nothing happens on press any other button', ->
-      assertNothingHappens(@calculator, KEY.DOWN)
+    return it('Nothing happens on press any other button', function() {
+      return assertNothingHappens(this.calculator, KEY.DOWN);
+    });
+  });
 
-  describe 'handleKeyDownOnHint', ->
-    it 'Navigation works in proper way', ->
-      calc = @calculator
+  describe('handleKeyDownOnHint', () =>
+    it('Navigation works in proper way', function() {
+      const calc = this.calculator;
 
-      eventToShowHint = jQuery.Event('keydown', { keyCode: KEY.ENTER } );
+      const eventToShowHint = jQuery.Event('keydown', { keyCode: KEY.ENTER } );
       $('#calculator_hint').trigger(eventToShowHint);
 
-      spyOn(calc, 'hideHint')
-      spyOn(calc, 'prevHint')
-      spyOn(calc, 'nextHint')
-      spyOn($.fn, 'focus')
+      spyOn(calc, 'hideHint');
+      spyOn(calc, 'prevHint');
+      spyOn(calc, 'nextHint');
+      spyOn($.fn, 'focus');
 
-      cases =
-        left:
-          event:
-            keyCode: KEY.LEFT
+      const cases = {
+        left: {
+          event: {
+            keyCode: KEY.LEFT,
             shiftKey: false
-          returnedValue: false
-          called:
+          },
+          returnedValue: false,
+          called: {
             'prevHint': calc
+          },
           isPropagationStopped: true
+        },
 
-        leftWithShift:
-          returnedValue: true
-          event:
-            keyCode: KEY.LEFT
+        leftWithShift: {
+          returnedValue: true,
+          event: {
+            keyCode: KEY.LEFT,
             shiftKey: true
-          not_called:
+          },
+          not_called: {
             'prevHint': calc
+          }
+        },
 
-        up:
-          event:
-            keyCode: KEY.UP
+        up: {
+          event: {
+            keyCode: KEY.UP,
             shiftKey: false
-          returnedValue: false
-          called:
+          },
+          returnedValue: false,
+          called: {
             'prevHint': calc
+          },
           isPropagationStopped: true
+        },
 
-        upWithShift:
-          returnedValue: true
-          event:
-            keyCode: KEY.UP
+        upWithShift: {
+          returnedValue: true,
+          event: {
+            keyCode: KEY.UP,
             shiftKey: true
-          not_called:
+          },
+          not_called: {
             'prevHint': calc
+          }
+        },
 
-        right:
-          event:
-            keyCode: KEY.RIGHT
+        right: {
+          event: {
+            keyCode: KEY.RIGHT,
             shiftKey: false
-          returnedValue: false
-          called:
+          },
+          returnedValue: false,
+          called: {
             'nextHint': calc
+          },
           isPropagationStopped: true
+        },
 
-        rightWithShift:
-          returnedValue: true
-          event:
-            keyCode: KEY.RIGHT
+        rightWithShift: {
+          returnedValue: true,
+          event: {
+            keyCode: KEY.RIGHT,
             shiftKey: true
-          not_called:
+          },
+          not_called: {
             'nextHint': calc
+          }
+        },
 
-        down:
-          event:
-            keyCode: KEY.DOWN
+        down: {
+          event: {
+            keyCode: KEY.DOWN,
             shiftKey: false
-          returnedValue: false
-          called:
+          },
+          returnedValue: false,
+          called: {
             'nextHint': calc
+          },
           isPropagationStopped: true
+        },
 
-        downWithShift:
-          returnedValue: true
-          event:
-            keyCode: KEY.DOWN
+        downWithShift: {
+          returnedValue: true,
+          event: {
+            keyCode: KEY.DOWN,
             shiftKey: true
-          not_called:
+          },
+          not_called: {
             'nextHint': calc
+          }
+        },
 
-        esc:
-          returnedValue: false
-          event:
-            keyCode: KEY.ESC
+        esc: {
+          returnedValue: false,
+          event: {
+            keyCode: KEY.ESC,
             shiftKey: false
-          called:
-            'hideHint': calc
+          },
+          called: {
+            'hideHint': calc,
             'focus': $.fn
+          },
           isPropagationStopped: true
+        },
 
-        alt:
-          returnedValue: true
-          event:
+        alt: {
+          returnedValue: true,
+          event: {
             which: KEY.ALT
-          not_called:
-            'hideHint': calc
-            'nextHint': calc
+          },
+          not_called: {
+            'hideHint': calc,
+            'nextHint': calc,
             'prevHint': calc
+          }
+        }
+      };
 
-      $.each(cases, (key, data) ->
-        calc.hideHint.calls.reset()
-        calc.prevHint.calls.reset()
-        calc.nextHint.calls.reset()
-        $.fn.focus.calls.reset()
+      return $.each(cases, function(key, data) {
+        calc.hideHint.calls.reset();
+        calc.prevHint.calls.reset();
+        calc.nextHint.calls.reset();
+        $.fn.focus.calls.reset();
 
-        e = jQuery.Event('keydown', data.event or {});
-        value = calc.handleKeyDownOnHint(e)
+        const e = jQuery.Event('keydown', data.event || {});
+        const value = calc.handleKeyDownOnHint(e);
 
-        if data.called
-          $.each(data.called, (method, obj) ->
-            expect(obj[method]).toHaveBeenCalled()
-          )
+        if (data.called) {
+          $.each(data.called, (method, obj) => expect(obj[method]).toHaveBeenCalled());
+        }
 
-        if data.not_called
-          $.each(data.not_called, (method, obj) ->
-            expect(obj[method]).not.toHaveBeenCalled()
-          )
+        if (data.not_called) {
+          $.each(data.not_called, (method, obj) => expect(obj[method]).not.toHaveBeenCalled());
+        }
 
-        if data.isPropagationStopped
-          expect(e.isPropagationStopped()).toBeTruthy()
-        else
-          expect(e.isPropagationStopped()).toBeFalsy()
+        if (data.isPropagationStopped) {
+          expect(e.isPropagationStopped()).toBeTruthy();
+        } else {
+          expect(e.isPropagationStopped()).toBeFalsy();
+        }
 
-        expect(value).toBe(data.returnedValue)
-      )
+        return expect(value).toBe(data.returnedValue);
+      });
+    })
+  );
 
-  describe 'calculate', ->
-    beforeEach ->
-      $('#calculator_input').val '1+2'
-      spyOn($, 'getWithPrefix').and.callFake (url, data, callback) ->
-        callback({ result: 3 })
-      @calculator.calculate()
+  return describe('calculate', function() {
+    beforeEach(function() {
+      $('#calculator_input').val('1+2');
+      spyOn($, 'getWithPrefix').and.callFake((url, data, callback) => callback({ result: 3 }));
+      return this.calculator.calculate();
+    });
 
-    it 'send data to /calculate', ->
-      expect($.getWithPrefix).toHaveBeenCalledWith '/calculate',
-        equation: '1+2'
-      , jasmine.any(Function)
+    it('send data to /calculate', () =>
+      expect($.getWithPrefix).toHaveBeenCalledWith('/calculate',
+        {equation: '1+2'}
+      , jasmine.any(Function))
+    );
 
-    it 'update the calculator output', ->
-      expect($('#calculator_output').val()).toEqual('3')
+    return it('update the calculator output', () => expect($('#calculator_output').val()).toEqual('3'));
+  });
+});

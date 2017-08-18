@@ -1,90 +1,111 @@
-describe "TabsEditingDescriptor", ->
-  beforeEach ->
-    @isInactiveClass = "is-inactive"
-    @isCurrent = "current"
-    loadFixtures 'tabs-edit.html'
-    @descriptor = new TabsEditingDescriptor($('.xblock'))
-    @html_id = 'test_id'
-    @tab_0_switch = jasmine.createSpy('tab_0_switch');
-    @tab_0_modelUpdate = jasmine.createSpy('tab_0_modelUpdate');
-    @tab_1_switch = jasmine.createSpy('tab_1_switch');
-    @tab_1_modelUpdate = jasmine.createSpy('tab_1_modelUpdate');
-    TabsEditingDescriptor.Model.addModelUpdate(@html_id, 'Tab 0 Editor', @tab_0_modelUpdate)
-    TabsEditingDescriptor.Model.addOnSwitch(@html_id, 'Tab 0 Editor', @tab_0_switch)
-    TabsEditingDescriptor.Model.addModelUpdate(@html_id, 'Tab 1 Transcripts', @tab_1_modelUpdate)
-    TabsEditingDescriptor.Model.addOnSwitch(@html_id, 'Tab 1 Transcripts', @tab_1_switch)
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+describe("TabsEditingDescriptor", function() {
+  beforeEach(function() {
+    this.isInactiveClass = "is-inactive";
+    this.isCurrent = "current";
+    loadFixtures('tabs-edit.html');
+    this.descriptor = new TabsEditingDescriptor($('.xblock'));
+    this.html_id = 'test_id';
+    this.tab_0_switch = jasmine.createSpy('tab_0_switch');
+    this.tab_0_modelUpdate = jasmine.createSpy('tab_0_modelUpdate');
+    this.tab_1_switch = jasmine.createSpy('tab_1_switch');
+    this.tab_1_modelUpdate = jasmine.createSpy('tab_1_modelUpdate');
+    TabsEditingDescriptor.Model.addModelUpdate(this.html_id, 'Tab 0 Editor', this.tab_0_modelUpdate);
+    TabsEditingDescriptor.Model.addOnSwitch(this.html_id, 'Tab 0 Editor', this.tab_0_switch);
+    TabsEditingDescriptor.Model.addModelUpdate(this.html_id, 'Tab 1 Transcripts', this.tab_1_modelUpdate);
+    TabsEditingDescriptor.Model.addOnSwitch(this.html_id, 'Tab 1 Transcripts', this.tab_1_switch);
 
-    spyOn($.fn, 'hide').and.callThrough()
-    spyOn($.fn, 'show').and.callThrough()
-    spyOn(TabsEditingDescriptor.Model, 'initialize')
-    spyOn(TabsEditingDescriptor.Model, 'updateValue')
+    spyOn($.fn, 'hide').and.callThrough();
+    spyOn($.fn, 'show').and.callThrough();
+    spyOn(TabsEditingDescriptor.Model, 'initialize');
+    return spyOn(TabsEditingDescriptor.Model, 'updateValue');
+  });
 
-  afterEach ->
-    TabsEditingDescriptor.Model.modules= {}
+  afterEach(() => TabsEditingDescriptor.Model.modules= {});
 
-  describe "constructor", ->
-    it "first tab should be visible", ->
-      expect(@descriptor.$tabs.first()).toHaveClass(@isCurrent)
-      expect(@descriptor.$content.first()).not.toHaveClass(@isInactiveClass)
+  describe("constructor", () =>
+    it("first tab should be visible", function() {
+      expect(this.descriptor.$tabs.first()).toHaveClass(this.isCurrent);
+      return expect(this.descriptor.$content.first()).not.toHaveClass(this.isInactiveClass);
+    })
+  );
 
-  describe "onSwitchEditor", ->
-    it "switching tabs changes styles", ->
-      @descriptor.$tabs.eq(1).trigger("click")
-      expect(@descriptor.$tabs.eq(0)).not.toHaveClass(@isCurrent)
-      expect(@descriptor.$content.eq(0)).toHaveClass(@isInactiveClass)
-      expect(@descriptor.$tabs.eq(1)).toHaveClass(@isCurrent)
-      expect(@descriptor.$content.eq(1)).not.toHaveClass(@isInactiveClass)
-      expect(@tab_1_switch).toHaveBeenCalled()
+  describe("onSwitchEditor", function() {
+    it("switching tabs changes styles", function() {
+      this.descriptor.$tabs.eq(1).trigger("click");
+      expect(this.descriptor.$tabs.eq(0)).not.toHaveClass(this.isCurrent);
+      expect(this.descriptor.$content.eq(0)).toHaveClass(this.isInactiveClass);
+      expect(this.descriptor.$tabs.eq(1)).toHaveClass(this.isCurrent);
+      expect(this.descriptor.$content.eq(1)).not.toHaveClass(this.isInactiveClass);
+      return expect(this.tab_1_switch).toHaveBeenCalled();
+    });
 
-    it "if click on current tab, nothing should happen", ->
-      spyOn($.fn, 'trigger').and.callThrough()
-      currentTab = @descriptor.$tabs.filter('.' + @isCurrent)
-      @descriptor.$tabs.eq(0).trigger("click")
-      expect(@descriptor.$tabs.filter('.' + @isCurrent)).toEqual(currentTab)
-      expect($.fn.trigger.calls.count()).toEqual(1)
+    it("if click on current tab, nothing should happen", function() {
+      spyOn($.fn, 'trigger').and.callThrough();
+      const currentTab = this.descriptor.$tabs.filter(`.${this.isCurrent}`);
+      this.descriptor.$tabs.eq(0).trigger("click");
+      expect(this.descriptor.$tabs.filter(`.${this.isCurrent}`)).toEqual(currentTab);
+      return expect($.fn.trigger.calls.count()).toEqual(1);
+    });
 
-    it "onSwitch function call", ->
-      @descriptor.$tabs.eq(1).trigger("click")
-      expect(TabsEditingDescriptor.Model.updateValue).toHaveBeenCalled()
-      expect(@tab_1_switch).toHaveBeenCalled()
+    return it("onSwitch function call", function() {
+      this.descriptor.$tabs.eq(1).trigger("click");
+      expect(TabsEditingDescriptor.Model.updateValue).toHaveBeenCalled();
+      return expect(this.tab_1_switch).toHaveBeenCalled();
+    });
+  });
 
-  describe "save", ->
-    it "function for current tab should be called", ->
-      @descriptor.$tabs.eq(1).trigger("click")
-      data = @descriptor.save().data
-      expect(@tab_1_modelUpdate).toHaveBeenCalled()
+  return describe("save", function() {
+    it("function for current tab should be called", function() {
+      this.descriptor.$tabs.eq(1).trigger("click");
+      const { data } = this.descriptor.save();
+      return expect(this.tab_1_modelUpdate).toHaveBeenCalled();
+    });
 
-    it "detach click event", ->
-      spyOn($.fn, "off")
-      @descriptor.save()
-      expect($.fn.off).toHaveBeenCalledWith(
+    return it("detach click event", function() {
+      spyOn($.fn, "off");
+      this.descriptor.save();
+      return expect($.fn.off).toHaveBeenCalledWith(
         'click',
         '.editor-tabs .tab',
-        @descriptor.onSwitchEditor
-      )
+        this.descriptor.onSwitchEditor
+      );
+    });
+  });
+});
 
-describe "TabsEditingDescriptor special save cases", ->
-  beforeEach ->
-    @isInactiveClass = "is-inactive"
-    @isCurrent = "current"
-    loadFixtures 'tabs-edit.html'
-    @descriptor = new window.TabsEditingDescriptor($('.xblock'))
-    @html_id = 'test_id'
+describe("TabsEditingDescriptor special save cases", function() {
+  beforeEach(function() {
+    this.isInactiveClass = "is-inactive";
+    this.isCurrent = "current";
+    loadFixtures('tabs-edit.html');
+    this.descriptor = new window.TabsEditingDescriptor($('.xblock'));
+    return this.html_id = 'test_id';
+  });
 
-  describe "save", ->
-    it "case: no init", ->
-      data = @descriptor.save().data
-      expect(data).toEqual(null)
+  return describe("save", function() {
+    it("case: no init", function() {
+      const { data } = this.descriptor.save();
+      return expect(data).toEqual(null);
+    });
 
-    it "case: no function in model update", ->
-      TabsEditingDescriptor.Model.initialize(@html_id)
-      data = @descriptor.save().data
-      expect(data).toEqual(null)
+    it("case: no function in model update", function() {
+      TabsEditingDescriptor.Model.initialize(this.html_id);
+      const { data } = this.descriptor.save();
+      return expect(data).toEqual(null);
+    });
 
-    it "case: no function in model update, but value presented", ->
-      @tab_0_modelUpdate = jasmine.createSpy('tab_0_modelUpdate').and.returnValue(1)
-      TabsEditingDescriptor.Model.addModelUpdate(@html_id, 'Tab 0 Editor', @tab_0_modelUpdate)
-      @descriptor.$tabs.eq(1).trigger("click")
-      expect(@tab_0_modelUpdate).toHaveBeenCalled()
-      data = @descriptor.save().data
-      expect(data).toEqual(1)
+    return it("case: no function in model update, but value presented", function() {
+      this.tab_0_modelUpdate = jasmine.createSpy('tab_0_modelUpdate').and.returnValue(1);
+      TabsEditingDescriptor.Model.addModelUpdate(this.html_id, 'Tab 0 Editor', this.tab_0_modelUpdate);
+      this.descriptor.$tabs.eq(1).trigger("click");
+      expect(this.tab_0_modelUpdate).toHaveBeenCalled();
+      const { data } = this.descriptor.save();
+      return expect(data).toEqual(1);
+    });
+  });
+});
