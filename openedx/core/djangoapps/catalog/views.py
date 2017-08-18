@@ -41,11 +41,13 @@ def cache_programs_test(request):
     except Exception as e:
         logger.error("view exception -asdf")
         logger.error(e)
-    SiteConfiguration.objects.create(
-        site=request.site,
-        enabled=True,
-        values={"COURSE_CATALOG_API_URL": COURSE_CATALOG_API_URL}
-    )
+    site_config = getattr(site, 'configuration', None)
+    if not site_config:
+        SiteConfiguration.objects.create(
+            site=request.site,
+            enabled=True,
+            values={"COURSE_CATALOG_API_URL": COURSE_CATALOG_API_URL}
+        )
     if settings.FEATURES.get('EXPOSE_CACHE_PROGRAMS_ENDPOINT'):
         call_command('cache_programs')
 
