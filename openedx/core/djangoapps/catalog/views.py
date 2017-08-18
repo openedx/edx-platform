@@ -15,11 +15,15 @@ def cache_programs(request):
     COURSE_CATALOG_API_URL = "{catalog_url}/api/v1/".format(catalog_url=CATALOG_STUB_URL)
     site = request.site
     logger.error(site)
-    SiteConfiguration.objects.create(
-        site=request.site,
-        enabled=True,
-        values={"COURSE_CATALOG_API_URL": COURSE_CATALOG_API_URL}
-    )
+    logger.error(COURSE_CATALOG_API_URL)
+    site_config = getattr(site, 'configuration', None)
+
+    if site_config is None:
+        SiteConfiguration.objects.create(
+            site=request.site,
+            enabled=True,
+            values={"COURSE_CATALOG_API_URL": COURSE_CATALOG_API_URL}
+        )
     if settings.FEATURES.get('EXPOSE_CACHE_PROGRAMS_ENDPOINT'):
         call_command('cache_programs')
 
