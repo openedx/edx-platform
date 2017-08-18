@@ -9,14 +9,12 @@ logger = logging.getLogger(__name__)
 
 @require_GET
 def cache_programs(request):
-    try:
-        from common.test.acceptance.fixtures import CATALOG_STUB_URL
-        COURSE_CATALOG_API_URL = "{catalog_url}/api/v1/".format(catalog_url=CATALOG_STUB_URL)
-        site = request.site
-        logger.error(site)
-    except Exception as e:
-        logger.error("view exception -asdf")
-        logger.error(e)
+
+    logger.error("cache ----------------")
+    from common.test.acceptance.fixtures import CATALOG_STUB_URL
+    COURSE_CATALOG_API_URL = "{catalog_url}/api/v1/".format(catalog_url=CATALOG_STUB_URL)
+    site = request.site
+    logger.error(site)
     SiteConfiguration.objects.create(
         site=request.site,
         enabled=True,
