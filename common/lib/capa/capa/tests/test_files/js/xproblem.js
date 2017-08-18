@@ -1,47 +1,79 @@
-class XProblemGenerator
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * DS208: Avoid top-level this
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+class XProblemGenerator {
   
-  constructor: (seed, @parameters={}) ->
+  constructor(seed, parameters) {
 
-    @random = new MersenneTwister(seed)
+    if (parameters == null) { parameters = {}; }
+    this.parameters = parameters;
+    this.random = new MersenneTwister(seed);
 
-    @problemState = {}
+    this.problemState = {};
+  }
 
-  generate: () ->
+  generate() {
 
-    console.error("Abstract method called: XProblemGenerator.generate")
+    return console.error("Abstract method called: XProblemGenerator.generate");
+  }
+}
 
-class XProblemDisplay
+class XProblemDisplay {
 
-  constructor: (@state, @submission, @evaluation, @container, @submissionField, @parameters={}) ->
+  constructor(state, submission, evaluation, container, submissionField, parameters) {
+    this.state = state;
+    this.submission = submission;
+    this.evaluation = evaluation;
+    this.container = container;
+    this.submissionField = submissionField;
+    if (parameters == null) { parameters = {}; }
+    this.parameters = parameters;
+  }
 
-  render: () ->
+  render() {
 
-    console.error("Abstract method called: XProblemDisplay.render")
+    return console.error("Abstract method called: XProblemDisplay.render");
+  }
 
-  updateSubmission: () ->
+  updateSubmission() {
 
-    @submissionField.val(JSON.stringify(@getCurrentSubmission()))
+    return this.submissionField.val(JSON.stringify(this.getCurrentSubmission()));
+  }
 
-  getCurrentSubmission: () ->
-    console.error("Abstract method called: XProblemDisplay.getCurrentSubmission")
+  getCurrentSubmission() {
+    return console.error("Abstract method called: XProblemDisplay.getCurrentSubmission");
+  }
+}
 
-class XProblemGrader
+class XProblemGrader {
 
-  constructor: (@submission, @problemState, @parameters={}) ->
+  constructor(submission, problemState, parameters) {
 
-    @solution   = null
-    @evaluation = {}
+    this.submission = submission;
+    this.problemState = problemState;
+    if (parameters == null) { parameters = {}; }
+    this.parameters = parameters;
+    this.solution   = null;
+    this.evaluation = {};
+  }
 
-  solve: () ->
+  solve() {
 
-    console.error("Abstract method called: XProblemGrader.solve")
+    return console.error("Abstract method called: XProblemGrader.solve");
+  }
 
-  grade: () ->
+  grade() {
 
-    console.error("Abstract method called: XProblemGrader.grade")
+    return console.error("Abstract method called: XProblemGrader.grade");
+  }
+}
 
-root = exports ? this
+const root = typeof exports !== 'undefined' && exports !== null ? exports : this;
 
-root.XProblemGenerator = XProblemGenerator
-root.XProblemDisplay   = XProblemDisplay
-root.XProblemGrader    = XProblemGrader
+root.XProblemGenerator = XProblemGenerator;
+root.XProblemDisplay   = XProblemDisplay;
+root.XProblemGrader    = XProblemGrader;
