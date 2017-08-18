@@ -148,6 +148,8 @@ class RegistrationFormFactory(object):
         "goals",
         "honor_code",
         "terms_of_service",
+        "profession",
+        "specialty",
     ]
 
     def _is_field_visible(self, field_name):
@@ -471,6 +473,80 @@ class RegistrationFormFactory(object):
             include_default_option=True,
             required=required
         )
+
+    def _add_field_with_configurable_select_options(self, field_name, field_label, form_desc, required=False):
+        """Add a field to a form description.
+            If select options are given for this field, it will be a select type
+            otherwise it will be a text type.
+
+        Arguments:
+            field_name: name of field
+            field_label: label for the field
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+
+        extra_field_options = configuration_helpers.get_value('EXTRA_FIELD_OPTIONS')
+        if extra_field_options is None or extra_field_options.get(field_name) is None:
+            field_type = "text"
+            include_default_option = False
+            options = None
+            error_msg = ''
+            exec("error_msg = accounts.REQUIRED_FIELD_%s_TEXT_MSG" % (field_name.upper()))
+        else:
+            field_type = "select"
+            include_default_option = True
+            field_options = extra_field_options.get(field_name)
+            options = [(unicode(option.lower()), option) for option in field_options]
+            error_msg = ''
+            exec("error_msg = accounts.REQUIRED_FIELD_%s_SELECT_MSG" % (field_name.upper()))
+
+        form_desc.add_field(
+            field_name,
+            label=field_label,
+            field_type=field_type,
+            options=options,
+            include_default_option=include_default_option,
+            required=required,
+            error_messages={
+                "required": error_msg
+            }
+        )
+
+    def _add_profession_field(self, form_desc, required=False):
+        """Add a profession field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's profession
+        profession_label = _("Profession")
+
+        self._add_field_with_configurable_select_options('profession', profession_label, form_desc, required=required)
+
+    def _add_specialty_field(self, form_desc, required=False):
+        """Add a specialty field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's specialty
+        specialty_label = _("Specialty")
+
+        self._add_field_with_configurable_select_options('specialty', specialty_label, form_desc, required=required)
 
     def _add_mailing_address_field(self, form_desc, required=True):
         """Add a mailing address field to a form description.
