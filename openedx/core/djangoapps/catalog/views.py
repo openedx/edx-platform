@@ -33,13 +33,14 @@ def cache_programs_test(request):
     API the management command attempts to call should be stubbed out first.
     """
 
-    from common.test.acceptance.fixtures import CATALOG_STUB_URL
-    COURSE_CATALOG_API_URL = "{catalog_url}/api/v1/".format(catalog_url=CATALOG_STUB_URL)
     try:
+        from common.test.acceptance.fixtures import CATALOG_STUB_URL
+        COURSE_CATALOG_API_URL = "{catalog_url}/api/v1/".format(catalog_url=CATALOG_STUB_URL)
         site = request.site
         logger.error(site)
-    except:
+    except Exception as e:
         logger.error("view exception -asdf")
+        logger.error(e)
     SiteConfiguration.objects.create(
         site=request.site,
         enabled=True,
