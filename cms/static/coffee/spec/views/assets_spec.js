@@ -1,8 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "squire"],
 function($, AjaxHelpers, Squire) {
 
@@ -35,7 +30,7 @@ function($, AjaxHelpers, Squire) {
                 "Mini": this.savingSpies.constructor
             });
 
-            return this.injector.require(["js/models/asset", "js/collections/asset", "js/views/asset"],
+            this.injector.require(["js/models/asset", "js/collections/asset", "js/views/asset"],
                 (AssetModel, AssetCollection, AssetView) => {
                     this.model = new AssetModel({
                         display_name: "test asset",
@@ -61,7 +56,7 @@ function($, AjaxHelpers, Squire) {
 
         afterEach(function() {
             this.injector.clean();
-            return this.injector.remove();
+            this.injector.remove();
         });
 
         describe("Basic", function() {
@@ -69,10 +64,10 @@ function($, AjaxHelpers, Squire) {
                 let requests;
                 ({view: this.view, requests} = this.createAssetView());
                 this.view.render();
-                return expect(this.view.$el).toContainText("test asset");
+                expect(this.view.$el).toContainText("test asset");
             });
 
-            return it("should pop a delete confirmation when the delete button is clicked", function() {
+            it("should pop a delete confirmation when the delete button is clicked", function() {
                 let requests;
                 ({view: this.view, requests} = this.createAssetView());
                 this.view.render().$(".remove-asset-button").click();
@@ -81,11 +76,11 @@ function($, AjaxHelpers, Squire) {
                 expect(ctorOptions.title).toMatch('Delete File Confirmation');
                 // hasn't actually been removed
                 expect(this.model.destroy).not.toHaveBeenCalled();
-                return expect(this.collection).toContain(this.model);
+                expect(this.collection).toContain(this.model);
             });
         });
 
-        return describe("AJAX", function() {
+        describe("AJAX", function() {
             it("should destroy itself on confirmation", function() {
                 let requests;
                 ({view: this.view, requests} = this.createAssetView(this));
@@ -105,7 +100,7 @@ function($, AjaxHelpers, Squire) {
                 expect(this.confirmationSpies.show).toHaveBeenCalled();
                 const savingOptions = this.confirmationSpies.constructor.calls.mostRecent().args[0];
                 expect(savingOptions.title).toMatch("Your file has been deleted.");
-                return expect(this.collection.contains(this.model)).toBeFalsy();
+                expect(this.collection.contains(this.model)).toBeFalsy();
             });
 
             it("should not destroy itself if server errors", function() {
@@ -121,7 +116,7 @@ function($, AjaxHelpers, Squire) {
                 // return an error response
                 requests[0].respond(404);
                 expect(this.confirmationSpies.constructor).not.toHaveBeenCalled();
-                return expect(this.collection.contains(this.model)).toBeTruthy();
+                expect(this.collection.contains(this.model)).toBeTruthy();
             });
 
             it("should lock the asset on confirmation", function() {
@@ -140,10 +135,10 @@ function($, AjaxHelpers, Squire) {
                 // return a success response
                 requests[0].respond(204);
                 expect(this.savingSpies.hide).toHaveBeenCalled();
-                return expect(this.model.get("locked")).toBeTruthy();
+                expect(this.model.get("locked")).toBeTruthy();
             });
 
-            return it("should not lock the asset if server errors", function() {
+            it("should not lock the asset if server errors", function() {
                 let requests;
                 ({view: this.view, requests} = this.createAssetView(this));
 
@@ -152,12 +147,12 @@ function($, AjaxHelpers, Squire) {
                 requests[0].respond(404);
                 // Don't call hide because that closes the notification showing the server error.
                 expect(this.savingSpies.hide).not.toHaveBeenCalled();
-                return expect(this.model.get("locked")).toBeFalsy();
+                expect(this.model.get("locked")).toBeFalsy();
             });
         });
     });
 
-    return describe("Assets view", function() {
+    describe("Assets view", function() {
         beforeEach(function(done) {
             setFixtures($("<script>", {id: "asset-library-tpl", type: "text/template"}).text(assetLibraryTpl));
             appendSetFixtures($("<script>", {id: "asset-tpl", type: "text/template"}).text(assetTpl));
@@ -224,7 +219,7 @@ function($, AjaxHelpers, Squire) {
             delete window.course_location_analytics;
 
             this.injector.clean();
-            return this.injector.remove();
+            this.injector.remove();
         });
 
         const addMockAsset = function(requests) {
@@ -277,7 +272,7 @@ function($, AjaxHelpers, Squire) {
                 setup.call(this, requests);
                 expect(this.view.showUploadModal).not.toHaveBeenCalled();
                 this.view.showUploadModal(clickEvent(".upload-button"));
-                return expect(this.view.showUploadModal).toHaveBeenCalled();
+                expect(this.view.showUploadModal).toHaveBeenCalled();
             });
 
             it("should show file selection menu on choose file button", function() {
@@ -287,7 +282,7 @@ function($, AjaxHelpers, Squire) {
                 setup.call(this, requests);
                 expect(this.view.showFileSelectionMenu).not.toHaveBeenCalled();
                 this.view.showFileSelectionMenu(clickEvent(".choose-file-button"));
-                return expect(this.view.showFileSelectionMenu).toHaveBeenCalled();
+                expect(this.view.showFileSelectionMenu).toHaveBeenCalled();
             });
 
             it("should hide upload modal on clicking close button", function() {
@@ -297,7 +292,7 @@ function($, AjaxHelpers, Squire) {
                 setup.call(this, requests);
                 expect(this.view.hideModal).not.toHaveBeenCalled();
                 this.view.hideModal(clickEvent(".close-button"));
-                return expect(this.view.hideModal).toHaveBeenCalled();
+                expect(this.view.hideModal).toHaveBeenCalled();
             });
 
             it("should show a status indicator while loading", function() {
@@ -306,7 +301,7 @@ function($, AjaxHelpers, Squire) {
                 appendSetFixtures('<div class="ui-loading"/>');
                 expect($('.ui-loading').is(':visible')).toBe(true);
                 setup.call(this, requests);
-                return expect($('.ui-loading').is(':visible')).toBe(false);
+                expect($('.ui-loading').is(':visible')).toBe(false);
             });
 
             it("should hide the status indicator if an error occurs while loading", function() {
@@ -316,7 +311,7 @@ function($, AjaxHelpers, Squire) {
                 expect($('.ui-loading').is(':visible')).toBe(true);
                 this.view.pagingView.setPage(1);
                 AjaxHelpers.respondWithError(requests);
-                return expect($('.ui-loading').is(':visible')).toBe(false);
+                expect($('.ui-loading').is(':visible')).toBe(false);
             });
 
             it("should render both assets", function() {
@@ -324,7 +319,7 @@ function($, AjaxHelpers, Squire) {
                 ({view: this.view, requests} = this.createAssetsView(this));
                 setup.call(this, requests);
                 expect(this.view.$el).toContainText("test asset 1");
-                return expect(this.view.$el).toContainText("test asset 2");
+                expect(this.view.$el).toContainText("test asset 2");
             });
 
             it("should remove the deleted asset from the view", function() {
@@ -337,7 +332,7 @@ function($, AjaxHelpers, Squire) {
                 this.promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(this.promptSpies);
                 AjaxHelpers.respondWithNoContent(requests);
                 expect(this.view.$el).toContainText("test asset 1");
-                return expect(this.view.$el).not.toContainText("test asset 2");
+                expect(this.view.$el).not.toContainText("test asset 2");
             });
 
             it("does not remove asset if deletion failed", function() {
@@ -349,7 +344,7 @@ function($, AjaxHelpers, Squire) {
                 this.promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(this.promptSpies);
                 AjaxHelpers.respondWithError(requests);
                 expect(this.view.$el).toContainText("test asset 1");
-                return expect(this.view.$el).toContainText("test asset 2");
+                expect(this.view.$el).toContainText("test asset 2");
             });
 
             it("adds an asset if asset does not already exist", function() {
@@ -358,21 +353,21 @@ function($, AjaxHelpers, Squire) {
                 setup.call(this, requests);
                 addMockAsset.call(this, requests);
                 expect(this.view.$el).toContainText("new asset");
-                return expect(this.collection.models.length).toBe(3);
+                expect(this.collection.models.length).toBe(3);
             });
 
-            return it("does not add an asset if asset already exists", function() {
+            it("does not add an asset if asset already exists", function() {
                 let requests;
                 ({view: this.view, requests} = this.createAssetsView(this));
                 setup.call(this, requests);
                 spyOn(this.collection, "add").and.callThrough();
                 const model = this.collection.models[1];
                 this.view.addAsset(model);
-                return expect(this.collection.add).not.toHaveBeenCalled();
+                expect(this.collection.add).not.toHaveBeenCalled();
             });
         });
 
-        return describe("Sorting", function() {
+        describe("Sorting", function() {
             // Separate setup method to work-around mis-parenting of beforeEach methods
             const setup = function(requests) {
                 this.view.pagingView.setPage(1);
@@ -384,7 +379,7 @@ function($, AjaxHelpers, Squire) {
                 ({view: this.view, requests} = this.createAssetsView(this));
                 setup.call(this, requests);
                 expect(this.view.pagingView.sortDisplayName()).toBe("Date Added");
-                return expect(this.view.collection.sortDirection).toBe("desc");
+                expect(this.view.collection.sortDirection).toBe("desc");
             });
 
             it("should toggle the sort order when clicking on the currently sorted column", function() {
@@ -400,7 +395,7 @@ function($, AjaxHelpers, Squire) {
                 this.view.$("#js-asset-date-col").click();
                 AjaxHelpers.respondWithJson(requests, this.mockAssetsResponse);
                 expect(this.view.pagingView.sortDisplayName()).toBe("Date Added");
-                return expect(this.view.collection.sortDirection).toBe("desc");
+                expect(this.view.collection.sortDirection).toBe("desc");
             });
 
             it("should switch the sort order when clicking on a different column", function() {
@@ -414,10 +409,10 @@ function($, AjaxHelpers, Squire) {
                 this.view.$("#js-asset-name-col").click();
                 AjaxHelpers.respondWithJson(requests, this.mockAssetsResponse);
                 expect(this.view.pagingView.sortDisplayName()).toBe("Name");
-                return expect(this.view.collection.sortDirection).toBe("desc");
+                expect(this.view.collection.sortDirection).toBe("desc");
             });
 
-            return it("should switch sort to most recent date added when a new asset is added", function() {
+            it("should switch sort to most recent date added when a new asset is added", function() {
                 let requests;
                 ({view: this.view, requests} = this.createAssetsView(this));
                 setup.call(this, requests);
@@ -426,7 +421,7 @@ function($, AjaxHelpers, Squire) {
                 addMockAsset.call(this, requests);
                 AjaxHelpers.respondWithJson(requests, this.mockAssetsResponse);
                 expect(this.view.pagingView.sortDisplayName()).toBe("Date Added");
-                return expect(this.view.collection.sortDirection).toBe("desc");
+                expect(this.view.collection.sortDirection).toBe("desc");
             });
         });
     });

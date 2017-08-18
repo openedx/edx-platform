@@ -1,8 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 describe('Histogram', function() {
   beforeEach(() => spyOn($, 'plot'));
 
@@ -11,29 +6,29 @@ describe('Histogram', function() {
       const histogram = new Histogram(1, []);
       expect(histogram.xTicks).toEqual([]);
       expect(histogram.yTicks).toEqual([]);
-      return expect(histogram.data).toEqual([]);
+      expect(histogram.data).toEqual([]);
   })
 );
 
   describe('calculate', function() {
     beforeEach(function() {
-      return this.histogram = new Histogram(1, [[null, 1], [1, 1], [2, 2], [3, 3]]);
+      this.histogram = new Histogram(1, [[null, 1], [1, 1], [2, 2], [3, 3]]);
     });
 
     it('store the correct value for data', function() {
-      return expect(this.histogram.data).toEqual([[1, Math.log(2)], [2, Math.log(3)], [3, Math.log(4)]]);
+      expect(this.histogram.data).toEqual([[1, Math.log(2)], [2, Math.log(3)], [3, Math.log(4)]]);
   });
 
     it('store the correct value for x ticks', function() {
-      return expect(this.histogram.xTicks).toEqual([[1, '1'], [2, '2'], [3, '3']]);
+      expect(this.histogram.xTicks).toEqual([[1, '1'], [2, '2'], [3, '3']]);
   });
 
-    return it('store the correct value for y ticks', function() {
-      return expect(this.histogram.yTicks).toEqual;
+    it('store the correct value for y ticks', function() {
+      expect(this.histogram.yTicks).toEqual;
     });
   });
 
-  return describe('render', () =>
+  describe('render', () =>
     it('call flot with correct option', function() {
       new Histogram(1, [[1, 1], [2, 2], [3, 3]]);
 
@@ -53,7 +48,7 @@ describe('Histogram', function() {
         color: "#b72121"
       }
       ]);
-      return expect(thirdArg).toEqual({
+      expect(thirdArg).toEqual({
         xaxis: {
           min: -1,
           max: 4,

@@ -1,7 +1,6 @@
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
@@ -29,7 +28,7 @@ describe('Problem', function() {
     loadFixtures('problem.html');
 
     spyOn(Logger, 'log');
-    return spyOn($.fn, 'load').and.callFake(function(url, callback) {
+    spyOn($.fn, 'load').and.callFake(function(url, callback) {
       $(this).html(readFixtures('problem_content.html'));
       return callback();
     });
@@ -48,12 +47,12 @@ data-url='/problem/quiz/'> \
 </section>\
 `)
       );
-      return expect(this.problem999.element_id).toBe('problem_999');
+      expect(this.problem999.element_id).toBe('problem_999');
     });
 
-    return it('set the element from loadFixtures', function() {
+    it('set the element from loadFixtures', function() {
       this.problem1 = new Problem($('.xblock-student_view'));
-      return expect(this.problem1.element_id).toBe('problem_1');
+      expect(this.problem1.element_id).toBe('problem_1');
     });
   });
 
@@ -61,7 +60,7 @@ data-url='/problem/quiz/'> \
     beforeEach(function() {
       spyOn(window, 'update_schematics');
       MathJax.Hub.getAllJax.and.returnValue([this.stubbedJax]);
-      return this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'));
     });
 
     it('set mathjax typeset', () => expect(MathJax.Hub.Queue).toHaveBeenCalled());
@@ -69,27 +68,27 @@ data-url='/problem/quiz/'> \
     it('update schematics', () => expect(window.update_schematics).toHaveBeenCalled());
 
     it('bind answer refresh on button click', function() {
-      return expect($('div.action button')).toHandleWith('click', this.problem.refreshAnswers);
+      expect($('div.action button')).toHandleWith('click', this.problem.refreshAnswers);
     });
 
     it('bind the submit button', function() {
-      return expect($('.action .submit')).toHandleWith('click', this.problem.submit_fd);
+      expect($('.action .submit')).toHandleWith('click', this.problem.submit_fd);
     });
 
     it('bind the reset button', function() {
-      return expect($('div.action button.reset')).toHandleWith('click', this.problem.reset);
+      expect($('div.action button.reset')).toHandleWith('click', this.problem.reset);
     });
 
     it('bind the show button', function() {
-      return expect($('.action .show')).toHandleWith('click', this.problem.show);
+      expect($('.action .show')).toHandleWith('click', this.problem.show);
     });
 
     it('bind the save button', function() {
-      return expect($('div.action button.save')).toHandleWith('click', this.problem.save);
+      expect($('div.action button.save')).toHandleWith('click', this.problem.save);
     });
 
-    return it('bind the math input', function() {
-      return expect($('input.math')).toHandleWith('keyup', this.problem.refreshMath);
+    it('bind the math input', function() {
+      expect($('input.math')).toHandleWith('keyup', this.problem.refreshMath);
     });
   });
 
@@ -102,18 +101,18 @@ data-url='/problem/quiz/'> \
     });
 
     it('bind the submit button', function() {
-      return expect($('.action .submit')).toHandleWith('click', this.problem.submit_fd);
+      expect($('.action .submit')).toHandleWith('click', this.problem.submit_fd);
     });
 
-    return it('bind the show button', function() {
-      return expect($('div.action button.show')).toHandleWith('click', this.problem.show);
+    it('bind the show button', function() {
+      expect($('div.action button.show')).toHandleWith('click', this.problem.show);
     });
   });
 
 
   describe('renderProgressState', function() {
     beforeEach(function() {
-      return this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'));
     });
 
     const testProgessData = function(problem, score, total_possible, attempts, graded, expected_progress_after_render) {
@@ -123,88 +122,88 @@ data-url='/problem/quiz/'> \
       problem.el.data('graded', graded);
       expect(problem.$('.problem-progress').html()).toEqual("");
       problem.renderProgressState();
-      return expect(problem.$('.problem-progress').html()).toEqual(expected_progress_after_render);
+      expect(problem.$('.problem-progress').html()).toEqual(expected_progress_after_render);
     };
 
     describe('with a status of "none"', function() {
       it('reports the number of points possible and graded', function() {
-        return testProgessData(this.problem, 0, 1, 0, "True", "1 point possible (graded)");
+        testProgessData(this.problem, 0, 1, 0, "True", "1 point possible (graded)");
       });
 
       it('displays the number of points possible when rendering happens with the content', function() {
-        return testProgessData(this.problem, 0, 2, 0, "True", "2 points possible (graded)");
+        testProgessData(this.problem, 0, 2, 0, "True", "2 points possible (graded)");
       });
 
       it('reports the number of points possible and ungraded', function() {
-        return testProgessData(this.problem, 0, 1, 0, "False", "1 point possible (ungraded)");
+        testProgessData(this.problem, 0, 1, 0, "False", "1 point possible (ungraded)");
       });
 
       it('displays ungraded if number of points possible is 0', function() {
-        return testProgessData(this.problem, 0, 0, 0, "False", "0 points possible (ungraded)");
+        testProgessData(this.problem, 0, 0, 0, "False", "0 points possible (ungraded)");
       });
 
       it('displays ungraded if number of points possible is 0, even if graded value is True', function() {
-        return testProgessData(this.problem, 0, 0, 0, "True", "0 points possible (ungraded)");
+        testProgessData(this.problem, 0, 0, 0, "True", "0 points possible (ungraded)");
       });
 
       it('reports the correct score with status none and >0 attempts', function() {
-        return testProgessData(this.problem, 0, 1, 1, "True", "0/1 point (graded)");
+        testProgessData(this.problem, 0, 1, 1, "True", "0/1 point (graded)");
       });
 
-      return it('reports the correct score with >1 weight, status none, and >0 attempts', function() {
-        return testProgessData(this.problem, 0, 2, 2, "True", "0/2 points (graded)");
+      it('reports the correct score with >1 weight, status none, and >0 attempts', function() {
+        testProgessData(this.problem, 0, 2, 2, "True", "0/2 points (graded)");
       });
     });
 
     describe('with any other valid status', function() {
 
       it('reports the current score', function() {
-        return testProgessData(this.problem, 1, 1, 1, "True", "1/1 point (graded)");
+        testProgessData(this.problem, 1, 1, 1, "True", "1/1 point (graded)");
       });
 
       it('shows current score when rendering happens with the content', function() {
-        return testProgessData(this.problem, 2, 2, 1, "True", "2/2 points (graded)");
+        testProgessData(this.problem, 2, 2, 1, "True", "2/2 points (graded)");
       });
 
-      return it('reports the current score even if problem is ungraded', function() {
-        return testProgessData(this.problem, 1, 1, 1, "False", "1/1 point (ungraded)");
+      it('reports the current score even if problem is ungraded', function() {
+        testProgessData(this.problem, 1, 1, 1, "False", "1/1 point (ungraded)");
       });
     });
 
     describe('with valid status and string containing an integer like "0" for detail', () =>
       // These tests are to address a failure specific to Chrome 51 and 52 +
       it('shows 0 points possible for the detail', function() {
-        return testProgessData(this.problem, 0, 0, 1, "False", "0 points possible (ungraded)");
+        testProgessData(this.problem, 0, 0, 1, "False", "0 points possible (ungraded)");
       })
     );
 
-    return describe('with a score of null (show_correctness == false)', function() {
+    describe('with a score of null (show_correctness == false)', function() {
       it('reports the number of points possible and graded, results hidden', function() {
-        return testProgessData(this.problem, null, 1, 0, "True", "1 point possible (graded, results hidden)");
+        testProgessData(this.problem, null, 1, 0, "True", "1 point possible (graded, results hidden)");
       });
 
       it('reports the number of points possible (plural) and graded, results hidden', function() {
-        return testProgessData(this.problem, null, 2, 0, "True", "2 points possible (graded, results hidden)");
+        testProgessData(this.problem, null, 2, 0, "True", "2 points possible (graded, results hidden)");
       });
 
       it('reports the number of points possible and ungraded, results hidden', function() {
-        return testProgessData(this.problem, null, 1, 0, "False", "1 point possible (ungraded, results hidden)");
+        testProgessData(this.problem, null, 1, 0, "False", "1 point possible (ungraded, results hidden)");
       });
 
       it('displays ungraded if number of points possible is 0, results hidden', function() {
-        return testProgessData(this.problem, null, 0, 0, "False", "0 points possible (ungraded, results hidden)");
+        testProgessData(this.problem, null, 0, 0, "False", "0 points possible (ungraded, results hidden)");
       });
 
       it('displays ungraded if number of points possible is 0, even if graded value is True, results hidden', function() {
-        return testProgessData(this.problem, null, 0, 0, "True", "0 points possible (ungraded, results hidden)");
+        testProgessData(this.problem, null, 0, 0, "True", "0 points possible (ungraded, results hidden)");
       });
 
       it('reports the correct score with status none and >0 attempts, results hidden', function() {
-        return testProgessData(this.problem, null, 1, 1, "True", "1 point possible (graded, results hidden)");
+        testProgessData(this.problem, null, 1, 1, "True", "1 point possible (graded, results hidden)");
       });
 
-      return it('reports the correct score with >1 weight, status none, and >0 attempts, results hidden', function() {
-        return testProgessData(this.problem, null, 2, 2, "True", "2 points possible (graded, results hidden)");
+      it('reports the correct score with >1 weight, status none, and >0 attempts, results hidden', function() {
+        testProgessData(this.problem, null, 2, 2, "True", "2 points possible (graded, results hidden)");
       });
     });
   });
@@ -213,35 +212,35 @@ data-url='/problem/quiz/'> \
     beforeEach(function() {
       this.problem = new Problem($('.xblock-student_view'));
       this.bind = this.problem.bind;
-      return spyOn(this.problem, 'bind');
+      spyOn(this.problem, 'bind');
     });
 
     describe('with content given', function() {
       beforeEach(function() {
-        return this.problem.render('Hello World');
+        this.problem.render('Hello World');
       });
 
       it('render the content', function() {
-        return expect(this.problem.el.html()).toEqual('Hello World');
+        expect(this.problem.el.html()).toEqual('Hello World');
       });
 
-      return it('re-bind the content', function() {
-        return expect(this.problem.bind).toHaveBeenCalled();
+      it('re-bind the content', function() {
+        expect(this.problem.bind).toHaveBeenCalled();
       });
     });
 
-    return describe('with no content given', function() {
+    describe('with no content given', function() {
       beforeEach(function() {
         spyOn($, 'postWithPrefix').and.callFake((url, callback) => callback({html: "Hello World"}));
-        return this.problem.render();
+        this.problem.render();
       });
 
       it('load the content via ajax', function() {
-        return expect(this.problem.el.html()).toEqual('Hello World');
+        expect(this.problem.el.html()).toEqual('Hello World');
       });
 
-      return it('re-bind the content', function() {
-        return expect(this.problem.bind).toHaveBeenCalled();
+      it('re-bind the content', function() {
+        expect(this.problem.bind).toHaveBeenCalled();
       });
     });
   });
@@ -251,31 +250,32 @@ data-url='/problem/quiz/'> \
       // Insert an input of type file outside of the problem.
       $('.xblock-student_view').after('<input type="file" />');
       this.problem = new Problem($('.xblock-student_view'));
-      return spyOn(this.problem, 'submit');
+      spyOn(this.problem, 'submit');
     });
 
-    return it('submit method is called if input of type file is not in problem', function() {
+    it('submit method is called if input of type file is not in problem', function() {
       this.problem.submit_fd();
-      return expect(this.problem.submit).toHaveBeenCalled();
+      expect(this.problem.submit).toHaveBeenCalled();
     });
   });
 
   describe('submit', function() {
     beforeEach(function() {
       this.problem = new Problem($('.xblock-student_view'));
-      return this.problem.answers = 'foo=1&bar=2';
+      this.problem.answers = 'foo=1&bar=2';
     });
 
     it('log the problem_check event', function() {
       spyOn($, 'postWithPrefix').and.callFake(function(url, answers, callback) {
         let promise;
-        return promise = {
+        promise = {
           always(callable) { return callable(); },
           done(callable) { return callable(); }
         };
+        return promise;
       });
       this.problem.submit();
-      return expect(Logger.log).toHaveBeenCalledWith('problem_check', 'foo=1&bar=2');
+      expect(Logger.log).toHaveBeenCalledWith('problem_check', 'foo=1&bar=2');
     });
 
     it('log the problem_graded event, after the problem is done grading.', function() {
@@ -286,25 +286,27 @@ data-url='/problem/quiz/'> \
           contents: 'mock grader response'
         };
         callback(response);
-        return promise = {
+        promise = {
           always(callable) { return callable(); },
           done(callable) { return callable(); }
         };
+        return promise;
       });
       this.problem.submit();
-      return expect(Logger.log).toHaveBeenCalledWith('problem_graded', ['foo=1&bar=2', 'mock grader response'], this.problem.id);
+      expect(Logger.log).toHaveBeenCalledWith('problem_graded', ['foo=1&bar=2', 'mock grader response'], this.problem.id);
     });
 
     it('submit the answer for submit', function() {
       spyOn($, 'postWithPrefix').and.callFake(function(url, answers, callback) {
         let promise;
-        return promise = {
+        promise = {
           always(callable) { return callable(); },
           done(callable) { return callable(); }
         };
+        return promise;
       });
       this.problem.submit();
-      return expect($.postWithPrefix).toHaveBeenCalledWith('/problem/Problem1/problem_check',
+      expect($.postWithPrefix).toHaveBeenCalledWith('/problem/Problem1/problem_check',
           'foo=1&bar=2', jasmine.any(Function));
     });
 
@@ -315,14 +317,15 @@ data-url='/problem/quiz/'> \
         spyOn($, 'postWithPrefix').and.callFake(function(url, answers, callback) {
           let promise;
           callback({success: 'correct', contents});
-          return promise = {
+          promise = {
             always(callable) { return callable(); },
             done(callable) { return callable(); }
           };
+          return promise;
         });
         this.problem.submit();
         expect(this.problem.el).toHaveHtml(contents);
-        return expect(window.SR.readTexts).toHaveBeenCalledWith(['Question 1: excellent', 'Question 2: correct']);
+        expect(window.SR.readTexts).toHaveBeenCalledWith(['Question 1: excellent', 'Question 2: correct']);
     })
   );
 
@@ -332,18 +335,19 @@ data-url='/problem/quiz/'> \
         spyOn($, 'postWithPrefix').and.callFake(function(url, answers, callback) {
           let promise;
           callback({success: 'incorrect', contents});
-          return promise = {
+          promise = {
             always(callable) { return callable(); },
             done(callable) { return callable(); }
           };
+          return promise;
         });
         this.problem.submit();
         expect(this.problem.el).toHaveHtml(contents);
-        return expect(window.SR.readTexts).toHaveBeenCalledWith(['no, try again']);
+        expect(window.SR.readTexts).toHaveBeenCalledWith(['no, try again']);
     })
   );
 
-    return it('tests if the submit button is disabled while submitting and the text changes on the button', function() {
+    it('tests if the submit button is disabled while submitting and the text changes on the button', function() {
       const self = this;
       const curr_html = this.problem.el.html();
       spyOn($, 'postWithPrefix').and.callFake(function(url, answers, callback) {
@@ -355,10 +359,11 @@ data-url='/problem/quiz/'> \
           success: 'incorrect', // does not matter if correct or incorrect here
           contents: curr_html
         });
-        return promise = {
+        promise = {
           always(callable) { return callable(); },
           done(callable) { return callable(); }
         };
+        return promise;
       });
       // Make sure the submit button is enabled before submitting
       $('#input_example_1').val('test').trigger('input');
@@ -366,7 +371,7 @@ data-url='/problem/quiz/'> \
       this.problem.submit();
       // After submit, the button should not be disabled and should have text as 'Submit'
       expect(this.problem.submitButtonLabel.text()).toBe('Submit');
-      return expect(this.problem.submitButton).not.toHaveAttr('disabled');
+      expect(this.problem.submitButton).not.toHaveAttr('disabled');
     });
   });
 
@@ -374,11 +379,11 @@ data-url='/problem/quiz/'> \
 
     beforeEach(function() {
       this.problem = new Problem($('.xblock-student_view'));
-      return this.submitDisabled = disabled => {
+      this.submitDisabled = disabled => {
         if (disabled) {
-          return expect(this.problem.submitButton).toHaveAttr('disabled');
+          expect(this.problem.submitButton).toHaveAttr('disabled');
         } else {
-          return expect(this.problem.submitButton).not.toHaveAttr('disabled');
+          expect(this.problem.submitButton).not.toHaveAttr('disabled');
         }
       };
     });
@@ -388,11 +393,11 @@ data-url='/problem/quiz/'> \
         $('#input_example_1').val('test').trigger('input');
         this.submitDisabled(false);
         $('#input_example_1').val('').trigger('input');
-        return this.submitDisabled(true);
+        this.submitDisabled(true);
       })
     );
 
-    return describe('some advanced tests for submit button', function() {
+    describe('some advanced tests for submit button', function() {
       const radioButtonProblemHtml = readFixtures('radiobutton_problem.html');
       const checkboxProblemHtml = readFixtures('checkbox_problem.html');
 
@@ -403,7 +408,7 @@ data-url='/problem/quiz/'> \
         $('#input_1_1_1').click();
         this.submitDisabled(false);
         $('#input_1_1_1').click();
-        return this.submitDisabled(true);
+        this.submitDisabled(true);
       });
 
       it('should become enabled after a radiobutton is checked', function() {
@@ -413,7 +418,7 @@ data-url='/problem/quiz/'> \
         $('#input_1_1_1').attr('checked', true).trigger('click');
         this.submitDisabled(false);
         $('#input_1_1_1').attr('checked', false).trigger('click');
-        return this.submitDisabled(true);
+        this.submitDisabled(true);
       });
 
       it('should become enabled after a value is selected in a selector', function() {
@@ -432,7 +437,7 @@ data-url='/problem/quiz/'> \
         $("#problem_sel select").val("val2").trigger('change');
         this.submitDisabled(false);
         $("#problem_sel select").val("val0").trigger('change');
-        return this.submitDisabled(true);
+        this.submitDisabled(true);
       });
 
       it('should become enabled after a radiobutton is checked and a value is entered into the text box', function() {
@@ -444,44 +449,46 @@ data-url='/problem/quiz/'> \
         $('#input_example_1').val('111').trigger('input');
         this.submitDisabled(false);
         $('#input_1_1_1').attr('checked', false).trigger('click');
-        return this.submitDisabled(true);
+        this.submitDisabled(true);
       });
 
-      return it('should become enabled if there are only hidden input fields', function() {
+      it('should become enabled if there are only hidden input fields', function() {
         const html = `\
 <input type="text" name="test" id="test" aria-describedby="answer_test" value="" style="display:none;">\
 `;
         $('#input_example_1').replaceWith(html);
         this.problem.submitAnswersAndSubmitButton(true);
-        return this.submitDisabled(false);
+        this.submitDisabled(false);
       });
     });
   });
 
   describe('reset', function() {
     beforeEach(function() {
-      return this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'));
     });
 
     it('log the problem_reset event', function() {
       spyOn($, 'postWithPrefix').and.callFake(function(url, answers, callback) {
         let promise;
-        return promise =
+        promise =
           {always(callable) { return callable(); }};
+        return promise;
       });
       this.problem.answers = 'foo=1&bar=2';
       this.problem.reset();
-      return expect(Logger.log).toHaveBeenCalledWith('problem_reset', 'foo=1&bar=2');
+      expect(Logger.log).toHaveBeenCalledWith('problem_reset', 'foo=1&bar=2');
     });
 
     it('POST to the problem reset page', function() {
       spyOn($, 'postWithPrefix').and.callFake(function(url, answers, callback) {
         let promise;
-        return promise =
+        promise =
           {always(callable) { return callable(); }};
+        return promise;
       });
       this.problem.reset();
-      return expect($.postWithPrefix).toHaveBeenCalledWith('/problem/Problem1/problem_reset',
+      expect($.postWithPrefix).toHaveBeenCalledWith('/problem/Problem1/problem_reset',
           { id: 'i4x://edX/101/problem/Problem1' }, jasmine.any(Function));
     });
 
@@ -489,36 +496,39 @@ data-url='/problem/quiz/'> \
       spyOn($, 'postWithPrefix').and.callFake(function(url, answers, callback) {
         let promise;
         callback({html: "Reset", success: true});
-        return promise =
+        promise =
             {always(callable) { return callable(); }};
+        return promise;
       });
       this.problem.reset();
-      return expect(this.problem.el.html()).toEqual('Reset');
+      expect(this.problem.el.html()).toEqual('Reset');
     });
 
     it('sends a message to the window SR element', function() {
       spyOn($, 'postWithPrefix').and.callFake(function(url, answers, callback) {
         let promise;
         callback({html: "Reset", success: true});
-        return promise =
+        promise =
           {always(callable) { return callable(); }};
+        return promise;
       });
       this.problem.reset();
-      return expect(window.SR.readText).toHaveBeenCalledWith('This problem has been reset.');
+      expect(window.SR.readText).toHaveBeenCalledWith('This problem has been reset.');
     });
 
     it('shows a notification on error', function() {
       spyOn($, 'postWithPrefix').and.callFake(function(url, answers, callback) {
         let promise;
         callback({msg: "Error on reset.", success: false});
-        return promise =
+        promise =
           {always(callable) { return callable(); }};
+        return promise;
       });
       this.problem.reset();
-      return expect($('.notification-gentle-alert .notification-message').text()).toEqual("Error on reset.");
+      expect($('.notification-gentle-alert .notification-message').text()).toEqual("Error on reset.");
     });
 
-    return it('tests that reset does not enable submit or modify the text while resetting', function() {
+    it('tests that reset does not enable submit or modify the text while resetting', function() {
       const self = this;
       const curr_html = this.problem.el.html();
       spyOn($, 'postWithPrefix').and.callFake(function(url, answers, callback) {
@@ -527,39 +537,40 @@ data-url='/problem/quiz/'> \
         expect(self.problem.submitButton).toHaveAttr('disabled');
         expect(self.problem.submitButtonLabel.text()).toBe('Submit');
         callback({success: 'correct', html: curr_html});
-        return promise =
+        promise =
           {always(callable) { return callable(); }};
+        return promise;
       });
       // Submit should be disabled
       expect(this.problem.submitButton).toHaveAttr('disabled');
       this.problem.reset();
       // Submit should remain disabled
       expect(self.problem.submitButton).toHaveAttr('disabled');
-      return expect(self.problem.submitButtonLabel.text()).toBe('Submit');
+      expect(self.problem.submitButtonLabel.text()).toBe('Submit');
     });
   });
 
   describe('show', function() {
     beforeEach(function() {
       this.problem = new Problem($('.xblock-student_view'));
-      return this.problem.el.prepend('<div id="answer_1_1" /><div id="answer_1_2" />');
+      this.problem.el.prepend('<div id="answer_1_1" /><div id="answer_1_2" />');
     });
 
-    return describe('when the answer has not yet shown', function() {
+    describe('when the answer has not yet shown', function() {
       beforeEach(function() {
-        return expect(this.problem.el.find('.show').attr('disabled')).not.toEqual('disabled');
+        expect(this.problem.el.find('.show').attr('disabled')).not.toEqual('disabled');
       });
 
       it('log the problem_show event', function() {
         this.problem.show();
-        return expect(Logger.log).toHaveBeenCalledWith('problem_show',
+        expect(Logger.log).toHaveBeenCalledWith('problem_show',
             {problem: 'i4x://edX/101/problem/Problem1'});
       });
 
       it('fetch the answers', function() {
         spyOn($, 'postWithPrefix');
         this.problem.show();
-        return expect($.postWithPrefix).toHaveBeenCalledWith('/problem/Problem1/problem_show',
+        expect($.postWithPrefix).toHaveBeenCalledWith('/problem/Problem1/problem_show',
             jasmine.any(Function));
       });
 
@@ -567,13 +578,13 @@ data-url='/problem/quiz/'> \
         spyOn($, 'postWithPrefix').and.callFake((url, callback) => callback({answers: {'1_1': 'One', '1_2': 'Two'}}));
         this.problem.show();
         expect($('#answer_1_1')).toHaveHtml('One');
-        return expect($('#answer_1_2')).toHaveHtml('Two');
+        expect($('#answer_1_2')).toHaveHtml('Two');
       });
 
       it('disables the show answer button', function() {
         spyOn($, 'postWithPrefix').and.callFake((url, callback) => callback({answers: {}}));
         this.problem.show();
-        return expect(this.problem.el.find('.show').attr('disabled')).toEqual('disabled');
+        expect(this.problem.el.find('.show').attr('disabled')).toEqual('disabled');
       });
 
       describe('radio text question', function() {
@@ -606,7 +617,7 @@ data-url='/problem/quiz/'> \
 `;
         beforeEach(function() {
           // Append a radiotextresponse problem to the problem, so we can check it's javascript functionality
-          return this.problem.el.prepend(radio_text_xml);
+          this.problem.el.prepend(radio_text_xml);
         });
 
         it('sets the correct class on the section for the correct choice', function() {
@@ -617,20 +628,20 @@ data-url='/problem/quiz/'> \
             'choicetextgroup_show_correct');
           expect($('#answer_1_2_1_choiceinput_0bc').text()).toEqual('3');
           expect($('#answer_1_2_1_choiceinput_1bc').text()).toEqual('');
-          return expect($('#answer_1_2_1_choiceinput_2bc').text()).toEqual('');
+          expect($('#answer_1_2_1_choiceinput_2bc').text()).toEqual('');
         });
 
-        return it('Should not disable input fields', function() {
+        it('Should not disable input fields', function() {
           spyOn($, 'postWithPrefix').and.callFake((url, callback) => callback({answers: {"1_2_1": ["1_2_1_choiceinput_0bc"], "1_2_1_choiceinput_0bc": "3"}}));
           this.problem.show();
           expect($('input#1_2_1_choiceinput_0bc').attr('disabled')).not.toEqual('disabled');
           expect($('input#1_2_1_choiceinput_1bc').attr('disabled')).not.toEqual('disabled');
           expect($('input#1_2_1_choiceinput_2bc').attr('disabled')).not.toEqual('disabled');
-          return expect($('input#1_2_1').attr('disabled')).not.toEqual('disabled');
+          expect($('input#1_2_1').attr('disabled')).not.toEqual('disabled');
         });
       });
 
-      return describe('imageinput', function() {
+      describe('imageinput', function() {
         let el, height, width;
         const imageinput_html = readFixtures('imageinput.underscore');
 
@@ -642,22 +653,22 @@ data-url='/problem/quiz/'> \
 
         beforeEach(function() {
           this.problem = new Problem($('.xblock-student_view'));
-          return this.problem.el.prepend(_.template(imageinput_html)(DEFAULTS));
+          this.problem.el.prepend(_.template(imageinput_html)(DEFAULTS));
         });
 
         const assertAnswer = (problem, data) => {
           stubRequest(data);
           problem.show();
 
-          return $.each(data['answers'], (id, answer) => {
+          $.each(data['answers'], (id, answer) => {
             const img = getImage(answer);
             el = $(`#inputtype_${id}`);
-            return expect(img).toImageDiffEqual(el.find('canvas')[0]);
+            expect(img).toImageDiffEqual(el.find('canvas')[0]);
           });
         };
 
         var stubRequest = data => {
-          return spyOn($, 'postWithPrefix').and.callFake((url, callback) => callback(data));
+          spyOn($, 'postWithPrefix').and.callFake((url, callback) => callback(data));
         };
 
         var getImage = (coords, c_width, c_height) => {
@@ -679,7 +690,7 @@ data-url='/problem/quiz/'> \
               });
 
               ctx.stroke();
-              return ctx.fill();
+              ctx.fill();
             },
 
             regions: coords => {
@@ -705,7 +716,7 @@ data-url='/problem/quiz/'> \
 
                 ctx.closePath();
                 ctx.stroke();
-                return ctx.fill();
+                ctx.fill();
               });
             }
           };
@@ -717,7 +728,7 @@ data-url='/problem/quiz/'> \
           if (canvas.getContext) {
             ctx = canvas.getContext('2d');
           } else {
-            return console.log('Canvas is not supported.');
+            console.log('Canvas is not supported.');
           }
 
           ctx.fillStyle = 'rgba(255,255,255,.3)';
@@ -732,7 +743,7 @@ data-url='/problem/quiz/'> \
         };
 
         it('rectangle is drawn correctly', function() {
-          return assertAnswer(this.problem, {
+          assertAnswer(this.problem, {
             'answers': {
               '12345': {
                 'rectangle': '(10,10)-(30,30)',
@@ -743,7 +754,7 @@ data-url='/problem/quiz/'> \
         });
 
         it('region is drawn correctly', function() {
-          return assertAnswer(this.problem, {
+          assertAnswer(this.problem, {
             'answers': {
               '12345': {
                 'rectangle': null,
@@ -754,7 +765,7 @@ data-url='/problem/quiz/'> \
         });
 
         it('mixed shapes are drawn correctly', function() {
-          return assertAnswer(this.problem, {
+          assertAnswer(this.problem, {
             'answers': {'12345': {
               'rectangle': '(10,10)-(30,30);(5,5)-(20,20)',
               'regions': `[
@@ -774,7 +785,7 @@ data-url='/problem/quiz/'> \
           };
 
           this.problem.el.prepend(_.template(imageinput_html)(data));
-          return assertAnswer(this.problem, {
+          assertAnswer(this.problem, {
             'answers': {
               '12345': {
                 'rectangle': null,
@@ -788,13 +799,13 @@ data-url='/problem/quiz/'> \
           });
         });
 
-        return it('dictionary with answers doesn\'t contain answer for current id', function() {
+        it('dictionary with answers doesn\'t contain answer for current id', function() {
           spyOn(console, 'log');
           stubRequest({'answers':{}});
           this.problem.show();
           el = $('#inputtype_12345');
           expect(el.find('canvas')).not.toExist();
-          return expect(console.log).toHaveBeenCalledWith('Answer is absent for image input with id=12345');
+          expect(console.log).toHaveBeenCalledWith('Answer is absent for image input with id=12345');
         });
       });
     });
@@ -803,27 +814,29 @@ data-url='/problem/quiz/'> \
   describe('save', function() {
     beforeEach(function() {
       this.problem = new Problem($('.xblock-student_view'));
-      return this.problem.answers = 'foo=1&bar=2';
+      this.problem.answers = 'foo=1&bar=2';
     });
 
     it('log the problem_save event', function() {
       spyOn($, 'postWithPrefix').and.callFake(function(url, answers, callback) {
         let promise;
-        return promise =
+        promise =
           {always(callable) { return callable(); }};
+        return promise;
       });
       this.problem.save();
-      return expect(Logger.log).toHaveBeenCalledWith('problem_save', 'foo=1&bar=2');
+      expect(Logger.log).toHaveBeenCalledWith('problem_save', 'foo=1&bar=2');
     });
 
     it('POST to save problem', function() {
       spyOn($, 'postWithPrefix').and.callFake(function(url, answers, callback) {
         let promise;
-        return promise =
+        promise =
           {always(callable) { return callable(); }};
+        return promise;
       });
       this.problem.save();
-      return expect($.postWithPrefix).toHaveBeenCalledWith('/problem/Problem1/problem_save',
+      expect($.postWithPrefix).toHaveBeenCalledWith('/problem/Problem1/problem_save',
           'foo=1&bar=2', jasmine.any(Function));
     });
 
@@ -836,8 +849,9 @@ data-url='/problem/quiz/'> \
         expect(self.problem.submitButton).toHaveAttr('disabled');
         expect(self.problem.submitButtonLabel.text()).toBe('Submit');
         callback({success: 'correct', html: curr_html});
-        return promise =
+        promise =
           {always(callable) { return callable(); }};
+        return promise;
       });
       // Expect submit to be disabled and labeled properly at the start
       expect(this.problem.submitButton).toHaveAttr('disabled');
@@ -845,10 +859,10 @@ data-url='/problem/quiz/'> \
       this.problem.save();
       // Submit button should have the same state after save has completed
       expect(this.problem.submitButton).toHaveAttr('disabled');
-      return expect(this.problem.submitButtonLabel.text()).toBe('Submit');
+      expect(this.problem.submitButtonLabel.text()).toBe('Submit');
     });
 
-    return it('tests that save does not disable the submit button or change the text when submit is originally enabled', function() {
+    it('tests that save does not disable the submit button or change the text when submit is originally enabled', function() {
       const self = this;
       const curr_html = this.problem.el.html();
       spyOn($, 'postWithPrefix').and.callFake(function(url, answers, callback) {
@@ -857,8 +871,9 @@ data-url='/problem/quiz/'> \
         expect(self.problem.submitButton).toHaveAttr('disabled');
         expect(self.problem.submitButtonLabel.text()).toBe('Submit');
         callback({success: 'correct', html: curr_html});
-        return promise =
+        promise =
           {always(callable) { return callable(); }};
+        return promise;
       });
       // Expect submit to be enabled and labeled properly at the start after adding an input
       $('#input_example_1').val('test').trigger('input');
@@ -867,7 +882,7 @@ data-url='/problem/quiz/'> \
       this.problem.save();
       // Submit button should have the same state after save has completed
       expect(this.problem.submitButton).not.toHaveAttr('disabled');
-      return expect(this.problem.submitButtonLabel.text()).toBe('Submit');
+      expect(this.problem.submitButtonLabel.text()).toBe('Submit');
     });
   });
 
@@ -875,11 +890,11 @@ data-url='/problem/quiz/'> \
     beforeEach(function() {
       this.problem = new Problem($('.xblock-student_view'));
       $('#input_example_1').val('E=mc^2');
-      return this.problem.refreshMath({target: $('#input_example_1').get(0)});
+      this.problem.refreshMath({target: $('#input_example_1').get(0)});
     });
 
-    return it('should queue the conversion and MathML element update', function() {
-      return expect(MathJax.Hub.Queue).toHaveBeenCalledWith(['Text', this.stubbedJax, 'E=mc^2'],
+    it('should queue the conversion and MathML element update', function() {
+      expect(MathJax.Hub.Queue).toHaveBeenCalledWith(['Text', this.stubbedJax, 'E=mc^2'],
         [this.problem.updateMathML, this.stubbedJax, $('#input_example_1').get(0)]);
   });
 });
@@ -887,27 +902,27 @@ data-url='/problem/quiz/'> \
   describe('updateMathML', function() {
     beforeEach(function() {
       this.problem = new Problem($('.xblock-student_view'));
-      return this.stubbedJax.root.toMathML.and.returnValue('<MathML>');
+      this.stubbedJax.root.toMathML.and.returnValue('<MathML>');
     });
 
     describe('when there is no exception', function() {
       beforeEach(function() {
-        return this.problem.updateMathML(this.stubbedJax, $('#input_example_1').get(0));
+        this.problem.updateMathML(this.stubbedJax, $('#input_example_1').get(0));
       });
 
-      return it('convert jax to MathML', () => expect($('#input_example_1_dynamath')).toHaveValue('<MathML>'));
+      it('convert jax to MathML', () => expect($('#input_example_1_dynamath')).toHaveValue('<MathML>'));
     });
 
-    return describe('when there is an exception', function() {
+    describe('when there is an exception', function() {
       beforeEach(function() {
         const error = new Error();
         error.restart = true;
         this.stubbedJax.root.toMathML.and.throwError(error);
-        return this.problem.updateMathML(this.stubbedJax, $('#input_example_1').get(0));
+        this.problem.updateMathML(this.stubbedJax, $('#input_example_1').get(0));
       });
 
-      return it('should queue up the exception', function() {
-        return expect(MathJax.Callback.After).toHaveBeenCalledWith([this.problem.refreshMath, this.stubbedJax], true);
+      it('should queue up the exception', function() {
+        expect(MathJax.Callback.After).toHaveBeenCalledWith([this.problem.refreshMath, this.stubbedJax], true);
       });
     });
   });
@@ -925,17 +940,17 @@ data-url='/problem/quiz/'> \
       this.stubSchematic = { update_value: jasmine.createSpy('schematic') };
       this.stubCodeMirror = { save: jasmine.createSpy('CodeMirror') };
       $('input.schematic').get(0).schematic = this.stubSchematic;
-      return $('textarea.CodeMirror').get(0).CodeMirror = this.stubCodeMirror;
+      $('textarea.CodeMirror').get(0).CodeMirror = this.stubCodeMirror;
     });
 
     it('update each schematic', function() {
       this.problem.refreshAnswers();
-      return expect(this.stubSchematic.update_value).toHaveBeenCalled();
+      expect(this.stubSchematic.update_value).toHaveBeenCalled();
     });
 
-    return it('update each code block', function() {
+    it('update each code block', function() {
       this.problem.refreshAnswers();
-      return expect(this.stubCodeMirror.save).toHaveBeenCalled();
+      expect(this.stubCodeMirror.save).toHaveBeenCalled();
     });
   });
 
@@ -944,12 +959,12 @@ data-url='/problem/quiz/'> \
 
     beforeEach(function() {
       this.problem = new Problem($('.xblock-student_view'));
-      return this.problem.render(jsinput_html);
+      this.problem.render(jsinput_html);
     });
 
-    return it('submit_save_waitfor should return false', function() {
+    it('submit_save_waitfor should return false', function() {
       $(this.problem.inputs[0]).data('waitfor', function() {});
-      return expect(this.problem.submit_save_waitfor()).toEqual(false);
+      expect(this.problem.submit_save_waitfor()).toEqual(false);
     });
   });
 
@@ -961,12 +976,12 @@ data-url='/problem/quiz/'> \
       jasmine.clock().install();
       this.problem = new Problem($('.xblock-student_view'));
       spyOn(this.problem, 'poll').and.callThrough();
-      return this.problem.render(matlabinput_html);
+      this.problem.render(matlabinput_html);
     });
 
     afterEach(() => jasmine.clock().uninstall());
 
-    return it('check that we stop polling after a fixed amount of time', function() {
+    it('check that we stop polling after a fixed amount of time', function() {
       expect(this.problem.poll).not.toHaveBeenCalled();
       jasmine.clock().tick(1);
       const time_steps = [1000, 2000, 4000, 8000, 16000, 32000];
@@ -975,7 +990,7 @@ data-url='/problem/quiz/'> \
         (time_step => {
           jasmine.clock().tick(time_step);
           expect(this.problem.poll.calls.count()).toEqual(num_calls);
-          return num_calls += 1;
+          num_calls += 1;
         })(time_step);
       }
 
@@ -983,7 +998,7 @@ data-url='/problem/quiz/'> \
       jasmine.clock().tick(64000);
       expect(this.problem.poll.calls.count()).toEqual(6);
 
-      return expect($('.notification-gentle-alert .notification-message').text()).toEqual("The grading process is still running. Refresh the page to see updates.");
+      expect($('.notification-gentle-alert .notification-message').text()).toEqual("The grading process is still running. Refresh the page to see updates.");
     });
   });
 
@@ -993,10 +1008,10 @@ data-url='/problem/quiz/'> \
     beforeEach(function() {
       spyOn($, 'postWithPrefix').and.callFake((url, callback) => callback({html: codeinputProblemHtml}));
       this.problem = new Problem($('.xblock-student_view'));
-      return this.problem.render(codeinputProblemHtml);
+      this.problem.render(codeinputProblemHtml);
     });
 
-    return it('has rendered with correct a11y info', function() {
+    it('has rendered with correct a11y info', function() {
       const CodeMirrorTextArea = $('textarea')[1];
       const CodeMirrorTextAreaId = 'cm-textarea-101';
 
@@ -1007,12 +1022,12 @@ data-url='/problem/quiz/'> \
       expect($(CodeMirrorTextArea).attr('id')).toEqual(CodeMirrorTextAreaId);
 
       // verify that codemirror textarea has correct `aria-describedby` attribute value
-      return expect($(CodeMirrorTextArea).attr('aria-describedby')).toEqual('cm-editor-exit-message-101 status_101');
+      expect($(CodeMirrorTextArea).attr('aria-describedby')).toEqual('cm-editor-exit-message-101 status_101');
     });
   });
 
 
-  return describe('show answer button', function() {
+  describe('show answer button', function() {
 
     const radioButtonProblemHtml = readFixtures('radiobutton_problem.html');
     const checkboxProblemHtml = readFixtures('checkbox_problem.html');
@@ -1020,7 +1035,7 @@ data-url='/problem/quiz/'> \
     beforeEach(function() {
       this.problem = new Problem($('.xblock-student_view'));
 
-      return this.checkAssertionsAfterClickingAnotherOption = () => {
+      this.checkAssertionsAfterClickingAnotherOption = () => {
         // verify that 'show answer button is no longer disabled'
         expect(this.problem.el.find('.show').attr('disabled')).not.toEqual('disabled');
 
@@ -1028,7 +1043,7 @@ data-url='/problem/quiz/'> \
         expect(this.problem.el.find('div.choicegroup')).not.toHaveClass('choicegroup_correct');
 
         // verify that radio/checkbox label has no span having class '.status.correct'
-        return expect(this.problem.el.find('div.choicegroup')).not.toHaveAttr('span.status.correct');
+        expect(this.problem.el.find('div.choicegroup')).not.toHaveAttr('span.status.correct');
       };
     });
 
@@ -1041,15 +1056,15 @@ data-url='/problem/quiz/'> \
       this.problem.submitAnswersAndSubmitButton(true);
       // selects option 2
       $('#input_1_1_2').attr('checked', true).trigger('click');
-      return this.checkAssertionsAfterClickingAnotherOption();
+      this.checkAssertionsAfterClickingAnotherOption();
     });
 
-    return it('should become enabled after a checkbox is selected', function() {
+    it('should become enabled after a checkbox is selected', function() {
       $('#input_example_1').replaceWith(checkboxProblemHtml);
       this.problem.el.find('.show').attr('disabled', 'disabled');
       this.problem.submitAnswersAndSubmitButton(true);
       $('#input_1_1_2').click();
-      return this.checkAssertionsAfterClickingAnotherOption();
+      this.checkAssertionsAfterClickingAnotherOption();
     });
   });
 });

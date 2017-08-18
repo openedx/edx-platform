@@ -1,8 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 describe('MarkdownEditingDescriptor', function() {
   describe('save stores the correct data', function() {
     it('saves markdown from markdown editor', function() {
@@ -10,7 +5,7 @@ describe('MarkdownEditingDescriptor', function() {
       this.descriptor = new MarkdownEditingDescriptor($('.problem-editor'));
       const saveResult = this.descriptor.save();
       expect(saveResult.metadata.markdown).toEqual('markdown');
-      return expect(saveResult.data).toXMLEqual('<problem>\n  <p>markdown</p>\n</problem>');
+      expect(saveResult.data).toXMLEqual('<problem>\n  <p>markdown</p>\n</problem>');
     });
     it('clears markdown when xml editor is selected', function() {
       loadFixtures('problem-with-markdown.html');
@@ -18,14 +13,14 @@ describe('MarkdownEditingDescriptor', function() {
       this.descriptor.createXMLEditor('replace with markdown');
       const saveResult = this.descriptor.save();
       expect(saveResult.nullout).toEqual(['markdown']);
-      return expect(saveResult.data).toEqual('replace with markdown');
+      expect(saveResult.data).toEqual('replace with markdown');
     });
-    return it('saves xml from the xml editor', function() {
+    it('saves xml from the xml editor', function() {
       loadFixtures('problem-without-markdown.html');
       this.descriptor = new MarkdownEditingDescriptor($('.problem-editor'));
       const saveResult = this.descriptor.save();
       expect(saveResult.nullout).toEqual(['markdown']);
-      return expect(saveResult.data).toEqual('xml only');
+      expect(saveResult.data).toEqual('xml only');
     });
   });
 
@@ -39,30 +34,30 @@ describe('MarkdownEditingDescriptor', function() {
       this.descriptor.onShowXMLButton(e);
       expect(e.preventDefault).toHaveBeenCalled();
       expect(this.descriptor.confirmConversionToXml).toHaveBeenCalled();
-      return expect($('.editor-bar').length).toEqual(0);
+      expect($('.editor-bar').length).toEqual(0);
     })
   );
 
   describe('insertMultipleChoice', function() {
     it('inserts the template if selection is empty', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice('');
-      return expect(revisedSelection).toEqual(MarkdownEditingDescriptor.multipleChoiceTemplate);
+      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.multipleChoiceTemplate);
     });
     it('wraps existing text', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice('foo\nbar');
-      return expect(revisedSelection).toEqual('( ) foo\n( ) bar\n');
+      expect(revisedSelection).toEqual('( ) foo\n( ) bar\n');
     });
     it('recognizes x as a selection if there is non-whitespace after x', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice('a\nx b\nc\nx \nd\n x e');
-      return expect(revisedSelection).toEqual('( ) a\n(x) b\n( ) c\n( ) x \n( ) d\n(x) e\n');
+      expect(revisedSelection).toEqual('( ) a\n(x) b\n( ) c\n( ) x \n( ) d\n(x) e\n');
     });
     it('recognizes x as a selection if it is first non whitespace and has whitespace with other non-whitespace', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice(' x correct\n x \nex post facto\nb x c\nx c\nxxp');
-      return expect(revisedSelection).toEqual('(x) correct\n( )  x \n( ) ex post facto\n( ) b x c\n(x) c\n( ) xxp\n');
+      expect(revisedSelection).toEqual('(x) correct\n( )  x \n( ) ex post facto\n( ) b x c\n(x) c\n( ) xxp\n');
     });
-    return it('removes multiple newlines but not last one', function() {
+    it('removes multiple newlines but not last one', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice('a\nx b\n\n\nc\n');
-      return expect(revisedSelection).toEqual('( ) a\n(x) b\n( ) c\n');
+      expect(revisedSelection).toEqual('( ) a\n(x) b\n( ) c\n');
     });
   });
 
@@ -70,73 +65,73 @@ describe('MarkdownEditingDescriptor', function() {
     // Note, shares code with insertMultipleChoice. Therefore only doing smoke test.
     it('inserts the template if selection is empty', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertCheckboxChoice('');
-      return expect(revisedSelection).toEqual(MarkdownEditingDescriptor.checkboxChoiceTemplate);
+      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.checkboxChoiceTemplate);
     });
-    return it('wraps existing text', function() {
+    it('wraps existing text', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertCheckboxChoice('foo\nbar');
-      return expect(revisedSelection).toEqual('[ ] foo\n[ ] bar\n');
+      expect(revisedSelection).toEqual('[ ] foo\n[ ] bar\n');
     });
   });
 
   describe('insertStringInput', function() {
     it('inserts the template if selection is empty', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertStringInput('');
-      return expect(revisedSelection).toEqual(MarkdownEditingDescriptor.stringInputTemplate);
+      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.stringInputTemplate);
     });
-    return it('wraps existing text', function() {
+    it('wraps existing text', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertStringInput('my text');
-      return expect(revisedSelection).toEqual('= my text');
+      expect(revisedSelection).toEqual('= my text');
     });
   });
 
   describe('insertNumberInput', function() {
     it('inserts the template if selection is empty', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertNumberInput('');
-      return expect(revisedSelection).toEqual(MarkdownEditingDescriptor.numberInputTemplate);
+      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.numberInputTemplate);
     });
-    return it('wraps existing text', function() {
+    it('wraps existing text', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertNumberInput('my text');
-      return expect(revisedSelection).toEqual('= my text');
+      expect(revisedSelection).toEqual('= my text');
     });
   });
 
   describe('insertSelect', function() {
     it('inserts the template if selection is empty', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertSelect('');
-      return expect(revisedSelection).toEqual(MarkdownEditingDescriptor.selectTemplate);
+      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.selectTemplate);
     });
-    return it('wraps existing text', function() {
+    it('wraps existing text', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertSelect('my text');
-      return expect(revisedSelection).toEqual('[[my text]]');
+      expect(revisedSelection).toEqual('[[my text]]');
     });
   });
 
   describe('insertHeader', function() {
     it('inserts the template if selection is empty', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertHeader('');
-      return expect(revisedSelection).toEqual(MarkdownEditingDescriptor.headerTemplate);
+      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.headerTemplate);
     });
-    return it('wraps existing text', function() {
+    it('wraps existing text', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertHeader('my text');
-      return expect(revisedSelection).toEqual('my text\n====\n');
+      expect(revisedSelection).toEqual('my text\n====\n');
     });
   });
 
   describe('insertExplanation', function() {
     it('inserts the template if selection is empty', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertExplanation('');
-      return expect(revisedSelection).toEqual(MarkdownEditingDescriptor.explanationTemplate);
+      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.explanationTemplate);
     });
-    return it('wraps existing text', function() {
+    it('wraps existing text', function() {
       const revisedSelection = MarkdownEditingDescriptor.insertExplanation('my text');
-      return expect(revisedSelection).toEqual('[explanation]\nmy text\n[explanation]');
+      expect(revisedSelection).toEqual('[explanation]\nmy text\n[explanation]');
     });
   });
 
-  return describe('markdownToXml', function() {
+  describe('markdownToXml', function() {
     it('converts raw text to paragraph', function() {
       const data = MarkdownEditingDescriptor.markdownToXml('foo');
-      return expect(data).toXMLEqual('<problem>\n  <p>foo</p>\n</problem>');
+      expect(data).toXMLEqual('<problem>\n  <p>foo</p>\n</problem>');
     });
     // test default templates
     it('converts numerical response to xml', function() {
@@ -169,7 +164,7 @@ Although you can get an exact value by typing 502*9 into a calculator, the resul
 If you look at your hand, you can count that you have five fingers.
 [Explanation]\
 `);
-      return expect(data).toXMLEqual(`<problem>
+      expect(data).toXMLEqual(`<problem>
   <p>A numerical response problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.</p>
   <p>The answer is correct if it is within a specified numerical tolerance of the expected answer.</p>
   <p>Enter the numerical value of Pi:</p>
@@ -215,7 +210,7 @@ If you look at your hand, you can count that you have five fingers.
 Enter 0 with a tolerance:
 = 0 +- .02\
 `);
-      return expect(data).toXMLEqual(`<problem>
+      expect(data).toXMLEqual(`<problem>
 <numericalresponse answer="0">
   <p>Enter 0 with a tolerance:</p>
   <responseparam type="tolerance" default=".02"/>
@@ -231,7 +226,7 @@ Enter 1 with a tolerance:
 = 1 +- .02
 or= 2\
 `);
-      return expect(data).toXMLEqual(`<problem>
+      expect(data).toXMLEqual(`<problem>
 <numericalresponse answer="1">
   <p>Enter 1 with a tolerance:</p>
   <responseparam type="tolerance" default=".02"/>
@@ -249,7 +244,7 @@ Enter 1 with a tolerance:
 or= 2
 or= 3\
 `);
-      return expect(data).toXMLEqual(`<problem>
+      expect(data).toXMLEqual(`<problem>
 <numericalresponse answer="1">
   <p>Enter 1 with a tolerance:</p>
   <responseparam type="tolerance" default=".02"/>
@@ -271,7 +266,7 @@ or= [4,6]
 or= ABC
 or= 7\
 `);
-      return expect(data).toXMLEqual(`<problem>
+      expect(data).toXMLEqual(`<problem>
 <numericalresponse answer="1">
   <p>Enter 1 with a tolerance:</p>
   <responseparam type="tolerance" default=".02"/>
@@ -289,7 +284,7 @@ Enter 1 with a tolerance:
 = 100 +- .02 {{ main feedback }}
 or= 10 {{ additional feedback }}\
 `);
-      return expect(data).toXMLEqual(`<problem>
+      expect(data).toXMLEqual(`<problem>
 <numericalresponse answer="100">
   <p>Enter 1 with a tolerance:</p>
   <responseparam type="tolerance" default=".02"/>
@@ -320,7 +315,7 @@ One of the main elements that goes into a good multiple choice question is the e
 The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks.
 [Explanation]\
 `);
-      return expect(data).toXMLEqual(`<problem>
+      expect(data).toXMLEqual(`<problem>
     <multiplechoiceresponse>
         <p>A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
         <p>One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.</p>
@@ -359,7 +354,7 @@ What Apple device competed with the portable CD player?
 The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks.
 [Explanation]\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <multiplechoiceresponse>
         <p>A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
@@ -400,7 +395,7 @@ testa
 When the student is ready, the explanation appears.
 [Explanation]\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
   <p>bleh</p>
   <multiplechoiceresponse>
@@ -447,7 +442,7 @@ Translation between Option Response and __________ is extremely straightforward:
 Multiple Choice also allows students to select from a variety of pre-written responses, although the format makes it easier for students to read very long response options. Optionresponse also differs slightly because students are more likely to think of an answer and then search for it rather than relying purely on recognition to answer the question.
 [Explanation]\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <optionresponse>
         <p>OptionResponse gives a limited set of options for students to respond with, and presents those options in a format that encourages them to search for a specific answer rather than being immediately presented with options from which to recognize the correct answer.</p>
@@ -475,7 +470,7 @@ Which US state has Lansing as its capital?
 Lansing is the capital of Michigan, although it is not Michgan's largest city, or even the seat of the county in which it resides.
 [Explanation]\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <stringresponse answer="Michigan" type="ci">
         <p>A string response problem accepts a line of text input from the student, and evaluates the input for correctness based on an expected answer within each input box.</p>
@@ -499,7 +494,7 @@ Lansing is the capital of Michigan, although it is not Michgan's largest city, o
 Test Explanation.
 [Explanation]\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <stringresponse answer="w*.?s*Luther Kings*.*" type="ci regexp">
         <p>Who lead the civil right movement in the United States of America?</p>
@@ -524,7 +519,7 @@ or= Martin Luther King Junior
 Test Explanation.
 [Explanation]\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <stringresponse answer="Dr. Martin Luther King Jr." type="ci">
         <p>Who lead the civil right movement in the United States of America?</p>
@@ -552,7 +547,7 @@ or= ^4|Four$
 Test Explanation.
 [Explanation]\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <stringresponse answer="^One$" type="ci regexp">
         <p>Write a number from 1 to 4.</p>
@@ -578,7 +573,7 @@ Test Explanation.
 Test Explanation.
 [Explanation]\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <stringresponse answer="w*.?s*Luther Kings*.*" type="ci regexp">
         <label>Who lead the civil right movement in the United States of America?</label>
@@ -607,7 +602,7 @@ Germany is a country in Europe, too.
 (x) Berlin
 ( ) Donut\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <p>France is a country in Europe.</p>
 
@@ -644,7 +639,7 @@ What is the capital of Germany?
 (x) Berlin
 ( ) Donut\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <p>France is a country in Europe.</p>
 
@@ -672,7 +667,7 @@ What is the capital of Germany?
 >>Enter the numerical value of Pi:<<
 = 3.14159 +- .02\
 `);
-      return expect(data).toXMLEqual(`<problem>
+      expect(data).toXMLEqual(`<problem>
 <numericalresponse answer="3.14159">
   <label>Enter the numerical value of Pi:</label>
 <responseparam type="tolerance" default=".02"/>
@@ -734,7 +729,7 @@ bad tests require drivel
 Code should be nicely monospaced.
 [/code]\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
   <p>Not a header</p>
   <h3 class="hd hd-2 problem-header">A header</h3>
@@ -831,7 +826,7 @@ Urdu, Marathi, and French are all Indo-European languages, while Finnish and Hun
 [explanation]
 \
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <multiplechoiceresponse>
         <p>Multiple choice problems allow learners to select only one option. Learners can see all the options along with the problem text.</p>
@@ -897,7 +892,7 @@ The population of Russia is approximately 146 million.
 The population of Germany is approximately 81 million.
 [explanation]\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <p>Multiple choice problems allow learners to select only one option. Learners can see all the options along with the problem text.</p>
 
@@ -942,7 +937,7 @@ The population of Germany is approximately 81 million.
 (x) Indonesia
 ( ) Russia\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <choiceresponse>
         <label>The following languages are in the Indo-European family:</label>
@@ -981,7 +976,7 @@ The population of Germany is approximately 81 million.
 [x] French
 [ ] Hungarian\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <choiceresponse>
         <label>The following languages are in the Indo-European family:</label>
@@ -1011,7 +1006,7 @@ third
 [ ] Finnish
 [x] Marathi\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <choiceresponse>
         <label>The following languages are in the Indo-European family:</label>
@@ -1026,13 +1021,13 @@ third
 `);
     });
 
-    return it('will not add empty description', function() {
+    it('will not add empty description', function() {
       const data = MarkdownEditingDescriptor.markdownToXml(`\
 >>The following languages are in the Indo-European family:||<<
 [x] Urdu
 [ ] Finnish\
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <choiceresponse>
         <label>The following languages are in the Indo-European family:</label>

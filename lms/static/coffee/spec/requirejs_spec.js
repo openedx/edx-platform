@@ -42,10 +42,10 @@ describe("RequireJS namespacing", function() {
 
     it("check that the RequireJS object is present in the global namespace", function() {
         expect(RequireJS).toEqual(jasmine.any(Object));
-        return expect(window.RequireJS).toEqual(jasmine.any(Object));
+        expect(window.RequireJS).toEqual(jasmine.any(Object));
     });
 
-    return it("check that requirejs(), require(), and define() are not in the global namespace", function() {
+    it("check that requirejs(), require(), and define() are not in the global namespace", function() {
 
         // The custom matchers that we defined in the beforeEach() function do
         // not operate on an object. We pass a dummy empty object {} not to
@@ -55,7 +55,7 @@ describe("RequireJS namespacing", function() {
         expect({}).defineTobeUndefined();
         expect(window.requirejs).not.toBeDefined();
         expect(window.require).not.toBeDefined();
-        return expect(window.define).not.toBeDefined();
+        expect(window.define).not.toBeDefined();
     });
 });
 
@@ -63,7 +63,7 @@ describe("RequireJS namespacing", function() {
 describe("RequireJS module creation", function() {
     let inDefineCallback = undefined;
     let inRequireCallback = undefined;
-    return it("check that we can use RequireJS to define() and require() a module", function(done) {
+    it("check that we can use RequireJS to define() and require() a module", function(done) {
         const d1 = $.Deferred();
         const d2 = $.Deferred();
         // Because Require JS works asynchronously when defining and requiring
@@ -105,10 +105,10 @@ describe("RequireJS module creation", function() {
 
         func();
         // We will wait before checking if our module was defined and that we were able to require() the module.
-        return $.when(d1, d2).done(function() {
+        $.when(d1, d2).done(function() {
             // The final test behavior
             expect(inDefineCallback).toBeTruthy();
-            return expect(inRequireCallback).toBeTruthy();
+            expect(inRequireCallback).toBeTruthy();
         }).always(done);
     });
 });

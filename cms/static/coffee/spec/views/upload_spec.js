@@ -1,8 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 define(["sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
         "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "js/spec_helpers/modal_helpers"],
     (sinon, FileUpload, UploadDialog, Chapter, AjaxHelpers, modal_helpers) =>
@@ -19,11 +14,11 @@ define(["sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
                     mimeTypes: ['application/pdf']
                 });
                 this.dialogResponse = (dialogResponse = []);
-                return this.mockFiles = [];});
+                this.mockFiles = [];});
 
             afterEach(function() {
                 delete CMS.URL.UPLOAD_ASSET;
-                return modal_helpers.cancelModalIfShowing();
+                modal_helpers.cancelModalIfShowing();
             });
 
             const createTestView = function(test) {
@@ -49,7 +44,8 @@ define(["sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
                         return originalView$.apply(this, arguments);
                     }
                 });
-                return this.lastView = view;
+                this.lastView = view;
+                return view;
             };
 
             describe("Basic", function() {
@@ -57,7 +53,7 @@ define(["sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
                     const view = createTestView(this);
                     view.render();
                     expect(view.$el).toContainElement("input[type=file]");
-                    return expect(view.$(".action-upload")).toHaveClass("disabled");
+                    expect(view.$(".action-upload")).toHaveClass("disabled");
                 });
 
                 it("should render with a PDF selected", function() {
@@ -68,7 +64,7 @@ define(["sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
                     view.render();
                     expect(view.$el).toContainElement("input[type=file]");
                     expect(view.$el).not.toContainElement("#upload_error");
-                    return expect(view.$(".action-upload")).not.toHaveClass("disabled");
+                    expect(view.$(".action-upload")).not.toHaveClass("disabled");
                 });
 
                 it("should render an error with an invalid file type selected", function() {
@@ -79,10 +75,10 @@ define(["sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
                     view.render();
                     expect(view.$el).toContainElement("input[type=file]");
                     expect(view.$el).toContainElement("#upload_error");
-                    return expect(view.$(".action-upload")).toHaveClass("disabled");
+                    expect(view.$(".action-upload")).toHaveClass("disabled");
                 });
 
-                return it("should render an error with an invalid file type after a correct file type selected", function() {
+                it("should render an error with an invalid file type after a correct file type selected", function() {
                     const view = createTestView(this);
                     const correctFile = {name: "fake.pdf", "type": "application/pdf"};
                     const inCorrectFile = {name: "fake.png", "type": "image/png"};
@@ -109,18 +105,18 @@ define(["sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
                     view.selectFile(event);
                     expect(view.$el).toContainElement("input[type=file]");
                     expect(view.$el).toContainElement("#upload_error");
-                    return expect(view.$(".action-upload")).toHaveClass("disabled");
+                    expect(view.$(".action-upload")).toHaveClass("disabled");
                 });
             });
 
-            return describe("Uploads", function() {
+            describe("Uploads", function() {
                 beforeEach(function() {
-                    return this.clock = sinon.useFakeTimers();
+                    this.clock = sinon.useFakeTimers();
                 });
 
                 afterEach(function() {
                     modal_helpers.cancelModalIfShowing();
-                    return this.clock.restore();
+                    this.clock.restore();
                 });
 
                 it("can upload correctly", function() {
@@ -133,7 +129,7 @@ define(["sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
                     AjaxHelpers.respondWithJson(requests, { response: "dummy_response"});
                     expect(this.model.get("uploading")).toBeFalsy();
                     expect(this.model.get("finished")).toBeTruthy();
-                    return expect(this.dialogResponse.pop()).toEqual("dummy_response");
+                    expect(this.dialogResponse.pop()).toEqual("dummy_response");
                 });
 
                 it("can handle upload errors", function() {
@@ -143,10 +139,10 @@ define(["sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
                     view.upload();
                     AjaxHelpers.respondWithError(requests);
                     expect(this.model.get("title")).toMatch(/error/);
-                    return expect(view.remove).not.toHaveBeenCalled();
+                    expect(view.remove).not.toHaveBeenCalled();
                 });
 
-                return it("removes itself after two seconds on successful upload", function() {
+                it("removes itself after two seconds on successful upload", function() {
                     const requests = AjaxHelpers.requests(this);
                     const view = createTestView(this);
                     view.render();
@@ -154,7 +150,7 @@ define(["sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
                     AjaxHelpers.respondWithJson(requests, { response: "dummy_response"});
                     expect(modal_helpers.isShowingModal(view)).toBeTruthy();
                     this.clock.tick(2001);
-                    return expect(modal_helpers.isShowingModal(view)).toBeFalsy();
+                    expect(modal_helpers.isShowingModal(view)).toBeFalsy();
                 });
             });
         })

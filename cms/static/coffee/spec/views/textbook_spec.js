@@ -1,8 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js/models/course",
     "js/collections/textbook", "js/views/show_textbook", "js/views/edit_textbook", "js/views/list_textbooks",
     "js/views/edit_chapter", "common/js/components/views/feedback_prompt",
@@ -26,7 +21,7 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
 
                 this.promptSpies = jasmine.stealth.spyOnConstructor(Prompt, "Warning", ["show", "hide"]);
                 this.promptSpies.show.and.returnValue(this.promptSpies);
-                return window.course = new Course({
+                window.course = new Course({
                     id: "5",
                     name: "Course Name",
                     url_name: "course_name",
@@ -41,12 +36,12 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
             describe("Basic", function() {
                 it("should render properly", function() {
                     this.view.render();
-                    return expect(this.view.$el).toContainText("Life Sciences");
+                    expect(this.view.$el).toContainText("Life Sciences");
                 });
 
                 it("should set the 'editing' property on the model when the edit button is clicked", function() {
                     this.view.render().$(".edit").click();
-                    return expect(this.model.get("editing")).toBeTruthy();
+                    expect(this.model.get("editing")).toBeTruthy();
                 });
 
                 it("should pop a delete confirmation when the delete button is clicked", function() {
@@ -56,35 +51,35 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                     expect(ctorOptions.title).toMatch(/Life Sciences/);
                     // hasn't actually been removed
                     expect(this.model.destroy).not.toHaveBeenCalled();
-                    return expect(this.collection).toContain(this.model);
+                    expect(this.collection).toContain(this.model);
                 });
 
                 it("should show chapters appropriately", function() {
                     this.model.get("chapters").add([{}, {}, {}]);
                     this.model.set('showChapters', false);
                     this.view.render().$(".show-chapters").click();
-                    return expect(this.model.get('showChapters')).toBeTruthy();
+                    expect(this.model.get('showChapters')).toBeTruthy();
                 });
 
-                return it("should hide chapters appropriately", function() {
+                it("should hide chapters appropriately", function() {
                     this.model.get("chapters").add([{}, {}, {}]);
                     this.model.set('showChapters', true);
                     this.view.render().$(".hide-chapters").click();
-                    return expect(this.model.get('showChapters')).toBeFalsy();
+                    expect(this.model.get('showChapters')).toBeFalsy();
                 });
             });
 
-            return describe("AJAX", function() {
+            describe("AJAX", function() {
                 beforeEach(function() {
                     this.savingSpies = jasmine.stealth.spyOnConstructor(Notification, "Mini",
                         ["show", "hide"]);
                     this.savingSpies.show.and.returnValue(this.savingSpies);
-                    return CMS.URL.TEXTBOOKS = "/textbooks";
+                    CMS.URL.TEXTBOOKS = "/textbooks";
                 });
 
                 afterEach(() => delete CMS.URL.TEXTBOOKS);
 
-                return it("should destroy itself on confirmation", function() {
+                it("should destroy itself on confirmation", function() {
                     const requests = AjaxHelpers["requests"](this);
 
                     this.view.render().$(".delete").click();
@@ -102,7 +97,7 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                     // return a success response
                     requests[0].respond(204);
                     expect(this.savingSpies.hide).toHaveBeenCalled();
-                    return expect(this.collection.contains(this.model)).toBeFalsy();
+                    expect(this.collection.contains(this.model)).toBeFalsy();
                 });
             });
         });
@@ -120,12 +115,12 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                     this.collection = new TextbookSet();
                     this.collection.add(this.model);
                     this.view = new EditTextbook({model: this.model});
-                    return spyOn(this.view, 'render').and.callThrough();
+                    spyOn(this.view, 'render').and.callThrough();
                 });
 
                 it("should render properly", function() {
                     this.view.render();
-                    return expect(this.view.$("input[name=textbook-name]").val()).toEqual("Life Sciences");
+                    expect(this.view.$("input[name=textbook-name]").val()).toEqual("Life Sciences");
                 });
 
                 it("should allow you to create new empty chapters", function() {
@@ -133,7 +128,7 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                     const numChapters = this.model.get("chapters").length;
                     this.view.$(".action-add-chapter").click();
                     expect(this.model.get("chapters").length).toEqual(numChapters+1);
-                    return expect(this.model.get("chapters").last().isEmpty()).toBeTruthy();
+                    expect(this.model.get("chapters").last().isEmpty()).toBeTruthy();
                 });
 
                 it("should save properly", function() {
@@ -146,7 +141,7 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                     const chapter = this.model.get("chapters").first();
                     expect(chapter.get("name")).toEqual("wallflower");
                     expect(chapter.get("asset_path")).toEqual("foobar");
-                    return expect(this.model.save).toHaveBeenCalled();
+                    expect(this.model.save).toHaveBeenCalled();
                 });
 
                 it("should not save on invalid", function() {
@@ -155,7 +150,7 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                     this.view.$("input[name=chapter1-asset-path]").val("foobar.pdf");
                     this.view.$("form").submit();
                     expect(this.model.validationError).toBeTruthy();
-                    return expect(this.model.save).not.toHaveBeenCalled();
+                    expect(this.model.save).not.toHaveBeenCalled();
                 });
 
                 it("does not save on cancel", function() {
@@ -167,7 +162,7 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                     expect(this.model.get("name")).not.toEqual("starfish");
                     const chapter = this.model.get("chapters").first();
                     expect(chapter.get("asset_path")).not.toEqual("foobar");
-                    return expect(this.model.save).not.toHaveBeenCalled();
+                    expect(this.model.save).not.toHaveBeenCalled();
                 });
 
                 it("should be possible to correct validation errors", function() {
@@ -181,7 +176,7 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                     this.view.$("input[name=chapter1-name]").val("foobar");
                     this.view.$("form").submit();
                     expect(this.model.validationError).toBeFalsy();
-                    return expect(this.model.save).toHaveBeenCalled();
+                    expect(this.model.save).toHaveBeenCalled();
                 });
 
                 it("removes all empty chapters on cancel if the model has a non-empty chapter", function() {
@@ -193,16 +188,16 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                     expect(chapters.length).toEqual(4);
                     this.view.$(".action-cancel").click();
                     expect(chapters.length).toEqual(1);
-                    return expect(chapters.first().get('name')).toEqual("non-empty");
+                    expect(chapters.first().get('name')).toEqual("non-empty");
                 });
 
-                return it("removes all empty chapters on cancel except one if the model has no non-empty chapters", function() {
+                it("removes all empty chapters on cancel except one if the model has no non-empty chapters", function() {
                     const chapters = this.model.get("chapters");
                     this.view.render();
                     chapters.add([{}, {}, {}]); // add three empty chapters
                     expect(chapters.length).toEqual(4);
                     this.view.$(".action-cancel").click();
-                    return expect(chapters.length).toEqual(1);
+                    expect(chapters.length).toEqual(1);
                 });
             })
         );
@@ -216,7 +211,7 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                 appendSetFixtures($("<script>", {id: "edit-textbook-tpl", type: "text/template"}).text(editTextbooktpl));
                 this.collection = new TextbookSet;
                 this.view = new ListTextbooks({collection: this.collection});
-                return this.view.render();
+                this.view.render();
             });
 
             it("should scroll to newly added textbook", function() {
@@ -224,10 +219,10 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                 this.view.$(".new-button").click();
                 const $sectionEl = this.view.$el.find('section:last');
                 expect($sectionEl.length).toEqual(1);
-                return expect(ViewUtils.setScrollOffset).toHaveBeenCalledWith($sectionEl, 0);
+                expect(ViewUtils.setScrollOffset).toHaveBeenCalledWith($sectionEl, 0);
             });
 
-            return it("should focus first input element of newly added textbook", function() {
+            it("should focus first input element of newly added textbook", function() {
                 spyOn(jQuery.fn, 'focus').and.callThrough();
                 jasmine.addMatchers({
                     toHaveBeenCalledOnJQueryObject() {
@@ -248,7 +243,7 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                 // and the following doesn't seem to work
                 //           expect($inputEl).toBeFocused()
                 //           expect($inputEl.find(':focus').length).toEqual(1)
-                return expect(jQuery.fn.focus).toHaveBeenCalledOnJQueryObject($inputEl);
+                expect(jQuery.fn.focus).toHaveBeenCalledOnJQueryObject($inputEl);
             });
         });
 
@@ -324,7 +319,7 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
         //            expect(@view.$el).not.toContain(@showSpies.$el)
 
 
-        return describe("EditChapter", function() {
+        describe("EditChapter", function() {
             beforeEach(function() {
                 modal_helpers.installModalTemplates();
                 this.model = new Chapter({
@@ -336,24 +331,24 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                 this.view = new EditChapter({model: this.model});
                 spyOn(this.view, "remove").and.callThrough();
                 CMS.URL.UPLOAD_ASSET = "/upload";
-                return window.course = new Course({name: "abcde"});
+                window.course = new Course({name: "abcde"});
             });
 
             afterEach(function() {
                 delete CMS.URL.UPLOAD_ASSET;
-                return delete window.course;
+                delete window.course;
             });
 
             it("can render", function() {
                 this.view.render();
                 expect(this.view.$("input.chapter-name").val()).toEqual("Chapter 1");
-                return expect(this.view.$("input.chapter-asset-path").val()).toEqual("/ch1.pdf");
+                expect(this.view.$("input.chapter-asset-path").val()).toEqual("/ch1.pdf");
             });
 
             it("can delete itself", function() {
                 this.view.render().$(".action-close").click();
                 expect(this.collection.length).toEqual(0);
-                return expect(this.view.remove).toHaveBeenCalled();
+                expect(this.view.remove).toHaveBeenCalled();
             });
 
             //        it "can open an upload dialog", ->
@@ -368,13 +363,13 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
 
             // Disabling because this test does not close the modal dialog. This can cause
             // tests that run after it to fail (see STUD-1963).
-            return xit("saves content when opening upload dialog", function() {
+            xit("saves content when opening upload dialog", function() {
                 this.view.render();
                 this.view.$("input.chapter-name").val("rainbows");
                 this.view.$("input.chapter-asset-path").val("unicorns");
                 this.view.$(".action-upload").click();
                 expect(this.model.get("name")).toEqual("rainbows");
-                return expect(this.model.get("asset_path")).toEqual("unicorns");
+                expect(this.model.get("asset_path")).toEqual("unicorns");
             });
         });
 });

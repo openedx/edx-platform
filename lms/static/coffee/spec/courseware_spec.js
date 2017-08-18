@@ -1,18 +1,13 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 describe('Courseware', function() {
   describe('start', () =>
     it('binds the Logger', function() {
       spyOn(Logger, 'bind');
       Courseware.start();
-      return expect(Logger.bind).toHaveBeenCalled();
+      expect(Logger.bind).toHaveBeenCalled();
     })
   );
 
-  return describe('render', function() {
+  describe('render', function() {
     beforeEach(function() {
       jasmine.stubRequests();
       this.courseware = new Courseware;
@@ -30,11 +25,11 @@ describe('Courseware', function() {
 </div>\
 `
       );
-      return this.courseware.render();
+      this.courseware.render();
     });
 
     it('ensure that the XModules have been loaded', () => expect(XBlock.initializeBlocks).toHaveBeenCalled());
 
-    return it('detect the histrogram element and convert it', () => expect(window.Histogram).toHaveBeenCalledWith('3', [[0, 1]]));
+    it('detect the histrogram element and convert it', () => expect(window.Histogram).toHaveBeenCalledWith('3', [[0, 1]]));
   });
 });

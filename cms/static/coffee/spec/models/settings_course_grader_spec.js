@@ -1,8 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 define(["js/models/settings/course_grader"], CourseGrader =>
     describe("CourseGraderModel", () =>
         describe("parseWeight", function() {
@@ -10,29 +5,29 @@ define(["js/models/settings/course_grader"], CourseGrader =>
                 const model = new CourseGrader({weight: 7.0001, min_count: 3.67, drop_count: 1.88}, {parse:true});
                 expect(model.get('weight')).toBe(7);
                 expect(model.get('min_count')).toBe(4);
-                return expect(model.get('drop_count')).toBe(2);
+                expect(model.get('drop_count')).toBe(2);
             });
 
             it("converts float value of weight to an integer with rounding", function() {
                 const model = new CourseGrader({weight:  28.999999999999996}, {parse:true});
-                return expect(model.get('weight')).toBe(29);
+                expect(model.get('weight')).toBe(29);
             });
 
             it("converts a string to an integer", function() {
                 const model = new CourseGrader({weight: '7.0001', min_count: '3.67', drop_count: '1.88'}, {parse:true});
                 expect(model.get('weight')).toBe(7);
                 expect(model.get('min_count')).toBe(4);
-                return expect(model.get('drop_count')).toBe(2);
+                expect(model.get('drop_count')).toBe(2);
             });
 
             it("does a no-op for integers", function() {
                 const model = new CourseGrader({weight: 7, min_count: 3, drop_count: 1}, {parse:true});
                 expect(model.get('weight')).toBe(7);
                 expect(model.get('min_count')).toBe(3);
-                return expect(model.get('drop_count')).toBe(1);
+                expect(model.get('drop_count')).toBe(1);
             });
 
-            return it("gives validation error if min_count is less than 1 or drop_count is NaN", function() {
+            it("gives validation error if min_count is less than 1 or drop_count is NaN", function() {
                 const model = new CourseGrader();
                 let errors = model.validate({min_count: 0, drop_count: ''}, {validate:true});
                 expect(errors.min_count).toBe('Please enter an integer greater than 0.');
@@ -44,7 +39,7 @@ define(["js/models/settings/course_grader"], CourseGrader =>
                 // don't allow floats
                 errors = model.validate({min_count: 12.2, drop_count: 1.5}, {validate:true});
                 expect(errors.min_count).toBe('Please enter an integer greater than 0.');
-                return expect(errors.drop_count).toBe('Please enter non-negative integer.');
+                expect(errors.drop_count).toBe('Please enter non-negative integer.');
             });
         })
     )

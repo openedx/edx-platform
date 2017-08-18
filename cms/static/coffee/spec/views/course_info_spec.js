@@ -1,9 +1,4 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-define(["js/views/course_info_handout", "js/views/course_info_update", "js/models/module_info", 
+define(["js/views/course_info_handout", "js/views/course_info_update", "js/models/module_info",
         "js/collections/course_update", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers"],
 (CourseInfoHandoutsView, CourseInfoUpdateView, ModuleInfo, CourseUpdateCollection, AjaxHelpers) =>
 
@@ -22,12 +17,12 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
 
         beforeEach(function() {
             window.analytics = jasmine.createSpyObj('analytics', ['track']);
-            return window.course_location_analytics = jasmine.createSpy();
+            window.course_location_analytics = jasmine.createSpy();
         });
 
         afterEach(function() {
             delete window.analytics;
-            return delete window.course_location_analytics;
+            delete window.course_location_analytics;
         });
 
         describe("Course Updates without Push notification", function() {
@@ -73,7 +68,7 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
                     expect(this.courseInfoEdit.$modalCover.hide).toHaveBeenCalled();
                     expect(model.save).not.toHaveBeenCalled();
                     const previewContents = this.courseInfoEdit.$el.find('.update-contents').html();
-                    return expect(previewContents).not.toEqual('unsaved changes');
+                    expect(previewContents).not.toEqual('unsaved changes');
                 };
 
                 this.doNotCloseNewCourseInfo = function() {
@@ -87,7 +82,7 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
                     cancelEditingUpdate(this.courseInfoEdit, this.courseInfoEdit.$modalCover, false);
 
                     expect(model.save).not.toHaveBeenCalled();
-                    return expect(this.courseInfoEdit.$modalCover.hide).not.toHaveBeenCalled();
+                    expect(this.courseInfoEdit.$modalCover.hide).not.toHaveBeenCalled();
                 };
 
                 this.cancelExistingCourseInfo = function(useCancelButton) {
@@ -104,7 +99,7 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
                     expect(this.courseInfoEdit.$modalCover.hide).toHaveBeenCalled();
                     expect(model.save).not.toHaveBeenCalled();
                     const previewContents = this.courseInfoEdit.$el.find('.update-contents').html();
-                    return expect(previewContents).toEqual('existing update');
+                    expect(previewContents).toEqual('existing update');
                 };
 
                 this.testInvalidDateValue = function(value) {
@@ -113,7 +108,7 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
                     this.courseInfoEdit.$el.find('input.date').val(value).trigger("change");
                     expect(this.courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(true);
                     this.courseInfoEdit.$el.find('input.date').val("01/01/16").trigger("change");
-                    return expect(this.courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(false);
+                    expect(this.courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(false);
                 };
 
                 return cancelEditingUpdate = function(update, modalCover, useCancelButton) {
@@ -149,7 +144,7 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 expect(requestSent.content).toEqual('/static/image.jpg');
 
                 // Verify that analytics are sent
-                return expect(window.analytics.track).toHaveBeenCalled();
+                expect(window.analytics.track).toHaveBeenCalled();
             });
 
             it("does rewrite links for preview", function() {
@@ -158,7 +153,7 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
 
                 // Verify the link is rewritten for preview purposes.
                 const previewContents = this.courseInfoEdit.$el.find('.update-contents').html();
-                return expect(previewContents).toEqual('base-asset-url/image.jpg');
+                expect(previewContents).toEqual('base-asset-url/image.jpg');
             });
 
             it("shows static links in edit mode", function() {
@@ -166,31 +161,31 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
 
                 // Click edit and verify CodeMirror contents.
                 this.courseInfoEdit.$el.find('.edit-button').click();
-                return expect(this.courseInfoEdit.$codeMirror.getValue()).toEqual('/static/image.jpg');
+                expect(this.courseInfoEdit.$codeMirror.getValue()).toEqual('/static/image.jpg');
             });
 
             it("removes newly created course info on cancel", function() {
-                return this.cancelNewCourseInfo(true);
+                this.cancelNewCourseInfo(true);
             });
 
             it("do not close new course info on click outside modal", function() {
-                return this.doNotCloseNewCourseInfo();
+                this.doNotCloseNewCourseInfo();
             });
 
             it("does not remove existing course info on cancel", function() {
-                return this.cancelExistingCourseInfo(true);
+                this.cancelExistingCourseInfo(true);
             });
 
             it("does not remove existing course info on click outside modal", function() {
-                return this.cancelExistingCourseInfo(false);
+                this.cancelExistingCourseInfo(false);
             });
 
             it("does not allow updates to be saved with an invalid date", function() {
-                return this.testInvalidDateValue("Marchtober 40, 2048");
+                this.testInvalidDateValue("Marchtober 40, 2048");
             });
 
-            return it("does not allow updates to be saved with a blank date", function() {
-                return this.testInvalidDateValue("");
+            it("does not allow updates to be saved with a blank date", function() {
+                this.testInvalidDateValue("");
             });
         });
 
@@ -211,11 +206,11 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 });
                 this.courseInfoEdit.render();
                 this.event = {preventDefault() { return 'no op'; }};
-                return this.courseInfoEdit.onNew(this.event);
+                this.courseInfoEdit.onNew(this.event);
             });
 
             it("shows push notification checkbox as selected by default", function() {
-                return expect(this.courseInfoEdit.$el.find('.toggle-checkbox')).toBeChecked();
+                expect(this.courseInfoEdit.$el.find('.toggle-checkbox')).toBeChecked();
             });
 
             it("sends correct default value for push_notification_selected", function() {
@@ -226,10 +221,10 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
 
 		// Check that analytics send push_notification info
                 const analytics_payload = window.analytics.track.calls.first().args[1];
-                return expect(analytics_payload).toEqual(jasmine.objectContaining({'push_notification_selected': true}));
+                expect(analytics_payload).toEqual(jasmine.objectContaining({'push_notification_selected': true}));
             });
 
-            return it("sends correct value for push_notification_selected when it is unselected", function() {
+            it("sends correct value for push_notification_selected when it is unselected", function() {
                 const requests = AjaxHelpers.requests(this);
                 // unselect push notification
                 this.courseInfoEdit.$el.find('.toggle-checkbox').attr('checked', false);
@@ -239,11 +234,11 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
 
 		// Check that analytics send push_notification info
                 const analytics_payload = window.analytics.track.calls.first().args[1];
-                return expect(analytics_payload).toEqual(jasmine.objectContaining({'push_notification_selected': false}));
+                expect(analytics_payload).toEqual(jasmine.objectContaining({'push_notification_selected': false}));
             });
         });
 
-        return describe("Course Handouts", function() {
+        describe("Course Handouts", function() {
             const handoutsTemplate = readFixtures('course_info_handouts.underscore');
 
             beforeEach(function() {
@@ -261,7 +256,7 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
                     base_asset_url: 'base-asset-url/'
                 });
 
-                return this.handoutsEdit.render();
+                this.handoutsEdit.render();
             });
 
             it("saves <ol></ol> when content left empty", function() {
@@ -276,7 +271,7 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 expect(this.model.save).toHaveBeenCalled();
 
                 const contentSaved = JSON.parse(requests[requests.length - 1].requestBody).data;
-                return expect(contentSaved).toEqual('<ol></ol>');
+                expect(contentSaved).toEqual('<ol></ol>');
             });
 
             it("does not rewrite links on save", function() {
@@ -291,11 +286,11 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 expect(this.model.save).toHaveBeenCalled();
 
                 const contentSaved = JSON.parse(requests[requests.length - 1].requestBody).data;
-                return expect(contentSaved).toEqual('/static/image.jpg');
+                expect(contentSaved).toEqual('/static/image.jpg');
             });
 
             it("does rewrite links in initial content", function() {
-                return expect(this.handoutsEdit.$preview.html().trim()).toBe('base-asset-url/fromServer.jpg');
+                expect(this.handoutsEdit.$preview.html().trim()).toBe('base-asset-url/fromServer.jpg');
             });
 
             it("does rewrite links after edit", function() {
@@ -305,16 +300,16 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 this.handoutsEdit.$el.find('.save-button').click();
 
                 // Verify preview text.
-                return expect(this.handoutsEdit.$preview.html().trim()).toBe('base-asset-url/image.jpg');
+                expect(this.handoutsEdit.$preview.html().trim()).toBe('base-asset-url/image.jpg');
             });
 
             it("shows static links in edit mode", function() {
                 // Click edit and verify CodeMirror contents.
                 this.handoutsEdit.$el.find('.edit-button').click();
-                return expect(this.handoutsEdit.$codeMirror.getValue().trim()).toEqual('/static/fromServer.jpg');
+                expect(this.handoutsEdit.$codeMirror.getValue().trim()).toEqual('/static/fromServer.jpg');
             });
 
-            return it("can open course handouts with bad html on edit", function() {
+            it("can open course handouts with bad html on edit", function() {
                 // Enter some bad html in handouts section, verifying that the
                 // model/handoutform opens when "Edit" is clicked
 
@@ -332,7 +327,7 @@ define(["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 expect($('.edit-handouts-form').is(':hidden')).toEqual(true);
                 this.handoutsEdit.$el.find('.edit-button').click();
                 expect(this.handoutsEdit.$codeMirror.getValue()).toEqual('<p><a href="[URL OF FILE]>[LINK TEXT]</a></p>');
-                return expect($('.edit-handouts-form').is(':hidden')).toEqual(false);
+                expect($('.edit-handouts-form').is(':hidden')).toEqual(false);
             });
         });
     })
