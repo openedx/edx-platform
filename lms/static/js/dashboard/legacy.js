@@ -188,6 +188,7 @@
 
                  edx.dashboard.dropdown.toggleCourseActionsDropdownMenu(event);
              });
+             $('#unenroll-modal').css('position', 'fixed');
          });
 
          $('#unenroll_form').on('ajax:complete', function(event, xhr) {
