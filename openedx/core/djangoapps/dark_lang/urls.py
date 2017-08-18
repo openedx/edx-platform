@@ -8,5 +8,5 @@ from openedx.core.djangoapps.dark_lang import views
 
 urlpatterns = patterns(
     '',
-    url(r'^$', views.DarkLangView.as_view(), name='preview_lang'),
+    url(r'^$', views.PreviewLanguageFragmentView.as_view(), name='preview_lang'),
 )

@@ -128,7 +128,7 @@ class I18nRegressionTests(BaseI18nTestCase):
         self.assert_tag_has_attr(response.content, "html", "lang", "fa")
 
         # Now try to access with dark lang
-        self.client.post(self.preview_language_url, {'preview_lang': 'fa-ir', 'set_language': 'set_language'})
+        self.client.post(self.preview_language_url, {'preview_language': 'fa-ir', 'action': 'set_preview_language'})
         response = self.client.get(self.url)
         self.assert_tag_has_attr(response.content, "html", "lang", "fa-ir")
 
@@ -144,17 +144,17 @@ class I18nRegressionTests(BaseI18nTestCase):
 
         # Verify we can switch language using the preview-lang query param
         # Set the language
-        self.client.post(self.preview_language_url, {'preview_lang': 'eo', 'set_language': 'set_language'})
+        self.client.post(self.preview_language_url, {'preview_language': 'eo', 'action': 'set_preview_language'})
 
         response = self.client.get(self.url)
         self.assert_tag_has_attr(response.content, "html", "lang", "eo")
         # We should be able to see released languages using preview-lang, too
-        self.client.post(self.preview_language_url, {'preview_lang': 'es-419', 'set_language': 'set_language'})
+        self.client.post(self.preview_language_url, {'preview_language': 'es-419', 'action': 'set_preview_language'})
         response = self.client.get(self.url)
         self.assert_tag_has_attr(response.content, "html", "lang", "es-419")
 
         # Clearing the language should go back to site default
-        self.client.post(self.preview_language_url, {'reset': 'reset'})
+        self.client.post(self.preview_language_url, {'action': 'reset_preview_language'})
         response = self.client.get(self.url)
         self.assert_tag_has_attr(response.content, "html", "lang", site_lang)
 
@@ -205,7 +205,7 @@ class I18nLangPrefTests(BaseI18nTestCase):
         # Set user language preference
         self.set_lang_preference('ar')
         # Verify preview-lang takes precedence
-        self.client.post(self.preview_language_url, {'preview_lang': 'eo', 'set_language': 'set_language'})
+        self.client.post(self.preview_language_url, {'preview_language': 'eo', 'action': 'set_preview_language'})
         response = self.client.get(self.url)
 
         self.assert_tag_has_attr(response.content, "html", "lang", 'eo')
@@ -214,7 +214,7 @@ class I18nLangPrefTests(BaseI18nTestCase):
         self.assert_tag_has_attr(response.content, "html", "lang", "eo")
 
         # Clearing language must set language back to preference language
-        self.client.post(self.preview_language_url, {'reset': 'reset'})
+        self.client.post(self.preview_language_url, {'action': 'reset_preview_language'})
         response = self.client.get(self.url)
 
         self.assert_tag_has_attr(response.content, "html", "lang", 'ar')
