@@ -1,10 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS203: Remove `|| {}` from converted for-own loops
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-
 define(["backbone", "js/models/textbook", "js/collections/textbook", "js/models/chapter", "js/collections/chapter", "cms/js/main"],
 function(Backbone, Textbook, TextbookSet, Chapter, ChapterSet, main) {
 
@@ -12,55 +5,55 @@ function(Backbone, Textbook, TextbookSet, Chapter, ChapterSet, main) {
         beforeEach(function() {
             main();
             this.model = new Textbook();
-            return CMS.URL.TEXTBOOKS = "/textbooks";
+            CMS.URL.TEXTBOOKS = "/textbooks";
         });
 
         afterEach(() => delete CMS.URL.TEXTBOOKS);
 
         describe("Basic", function() {
             it("should have an empty name by default", function() {
-                return expect(this.model.get("name")).toEqual("");
+                expect(this.model.get("name")).toEqual("");
             });
 
             it("should not show chapters by default", function() {
-                return expect(this.model.get("showChapters")).toBeFalsy();
+                expect(this.model.get("showChapters")).toBeFalsy();
             });
 
             it("should have a ChapterSet with one chapter by default", function() {
                 const chapters = this.model.get("chapters");
                 expect(chapters).toBeInstanceOf(ChapterSet);
                 expect(chapters.length).toEqual(1);
-                return expect(chapters.at(0).isEmpty()).toBeTruthy();
+                expect(chapters.at(0).isEmpty()).toBeTruthy();
             });
 
             it("should be empty by default", function() {
-                return expect(this.model.isEmpty()).toBeTruthy();
+                expect(this.model.isEmpty()).toBeTruthy();
             });
 
             it("should have a URL root", function() {
                 const urlRoot = _.result(this.model, 'urlRoot');
-                return expect(urlRoot).toBeTruthy();
+                expect(urlRoot).toBeTruthy();
             });
 
             it("should be able to reset itself", function() {
                 this.model.set("name", "foobar");
                 this.model.reset();
-                return expect(this.model.get("name")).toEqual("");
+                expect(this.model.get("name")).toEqual("");
             });
 
             it("should not be dirty by default", function() {
-                return expect(this.model.isDirty()).toBeFalsy();
+                expect(this.model.isDirty()).toBeFalsy();
             });
 
             it("should be dirty after it's been changed", function() {
                 this.model.set("name", "foobar");
-                return expect(this.model.isDirty()).toBeTruthy();
+                expect(this.model.isDirty()).toBeTruthy();
             });
 
-            return it("should not be dirty after calling setOriginalAttributes", function() {
+            it("should not be dirty after calling setOriginalAttributes", function() {
                 this.model.set("name", "foobar");
                 this.model.setOriginalAttributes();
-                return expect(this.model.isDirty()).toBeFalsy();
+                expect(this.model.isDirty()).toBeFalsy();
             });
         });
 
@@ -74,7 +67,7 @@ function(Backbone, Textbook, TextbookSet, Chapter, ChapterSet, main) {
                     return _.map(obj, deepAttributes);
                 } else if (_.isObject(obj)) {
                     const attributes = {};
-                    for (let prop of Object.keys(obj || {})) {
+                    for (let prop of Object.keys(obj)) {
                         const val = obj[prop];
                         attributes[prop] = deepAttributes(val);
                     }
@@ -84,7 +77,7 @@ function(Backbone, Textbook, TextbookSet, Chapter, ChapterSet, main) {
                 }
             };
 
-            return it("should match server model to client model", function() {
+            it("should match server model to client model", function() {
                 const serverModelSpec = {
                     "tab_title": "My Textbook",
                     "chapters": [
@@ -110,20 +103,20 @@ function(Backbone, Textbook, TextbookSet, Chapter, ChapterSet, main) {
 
                 const model = new Textbook(serverModelSpec, {parse: true});
                 expect(deepAttributes(model)).toEqual(clientModelSpec);
-                return expect(model.toJSON()).toEqual(serverModelSpec);
+                expect(model.toJSON()).toEqual(serverModelSpec);
             });
         });
 
-        return describe("Validation", function() {
+        describe("Validation", function() {
             it("requires a name", function() {
                 const model = new Textbook({name: ""});
-                return expect(model.isValid()).toBeFalsy();
+                expect(model.isValid()).toBeFalsy();
             });
 
             it("requires at least one chapter", function() {
                 const model = new Textbook({name: "foo"});
                 model.get("chapters").reset();
-                return expect(model.isValid()).toBeFalsy();
+                expect(model.isValid()).toBeFalsy();
             });
 
             it("requires a valid chapter", function() {
@@ -131,7 +124,7 @@ function(Backbone, Textbook, TextbookSet, Chapter, ChapterSet, main) {
                 chapter.isValid = () => false;
                 const model = new Textbook({name: "foo"});
                 model.get("chapters").reset([chapter]);
-                return expect(model.isValid()).toBeFalsy();
+                expect(model.isValid()).toBeFalsy();
             });
 
             it("requires all chapters to be valid", function() {
@@ -141,15 +134,15 @@ function(Backbone, Textbook, TextbookSet, Chapter, ChapterSet, main) {
                 chapter2.isValid = () => false;
                 const model = new Textbook({name: "foo"});
                 model.get("chapters").reset([chapter1, chapter2]);
-                return expect(model.isValid()).toBeFalsy();
+                expect(model.isValid()).toBeFalsy();
             });
 
-            return it("can pass validation", function() {
+            it("can pass validation", function() {
                 const chapter = new Chapter();
                 chapter.isValid = () => true;
                 const model = new Textbook({name: "foo"});
                 model.get("chapters").reset([chapter]);
-                return expect(model.isValid()).toBeTruthy();
+                expect(model.isValid()).toBeTruthy();
             });
         });
     });
@@ -158,80 +151,80 @@ function(Backbone, Textbook, TextbookSet, Chapter, ChapterSet, main) {
     describe("Textbook collection", function() {
         beforeEach(function() {
             CMS.URL.TEXTBOOKS = "/textbooks";
-            return this.collection = new TextbookSet();
+            this.collection = new TextbookSet();
         });
 
         afterEach(() => delete CMS.URL.TEXTBOOKS);
 
-        return it("should have a url set", function() {
+        it("should have a url set", function() {
             const url = _.result(this.collection, 'url');
-            return expect(url).toEqual("/textbooks");
+            expect(url).toEqual("/textbooks");
         });
     });
 
 
     describe("Chapter model", function() {
         beforeEach(function() {
-            return this.model = new Chapter();
+            this.model = new Chapter();
         });
 
         describe("Basic", function() {
             it("should have a name by default", function() {
-                return expect(this.model.get("name")).toEqual("");
+                expect(this.model.get("name")).toEqual("");
             });
 
             it("should have an asset_path by default", function() {
-                return expect(this.model.get("asset_path")).toEqual("");
+                expect(this.model.get("asset_path")).toEqual("");
             });
 
             it("should have an order by default", function() {
-                return expect(this.model.get("order")).toEqual(1);
+                expect(this.model.get("order")).toEqual(1);
             });
 
-            return it("should be empty by default", function() {
-                return expect(this.model.isEmpty()).toBeTruthy();
+            it("should be empty by default", function() {
+                expect(this.model.isEmpty()).toBeTruthy();
             });
         });
 
-        return describe("Validation", function() {
+        describe("Validation", function() {
             it("requires a name", function() {
                 const model = new Chapter({name: "", asset_path: "a.pdf"});
-                return expect(model.isValid()).toBeFalsy();
+                expect(model.isValid()).toBeFalsy();
             });
 
             it("requires an asset_path", function() {
                 const model = new Chapter({name: "a", asset_path: ""});
-                return expect(model.isValid()).toBeFalsy();
+                expect(model.isValid()).toBeFalsy();
             });
 
-            return it("can pass validation", function() {
+            it("can pass validation", function() {
                 const model = new Chapter({name: "a", asset_path: "a.pdf"});
-                return expect(model.isValid()).toBeTruthy();
+                expect(model.isValid()).toBeTruthy();
             });
         });
     });
 
 
-    return describe("Chapter collection", function() {
+    describe("Chapter collection", function() {
         beforeEach(function() {
-            return this.collection = new ChapterSet();
+            this.collection = new ChapterSet();
         });
 
         it("is empty by default", function() {
-            return expect(this.collection.isEmpty()).toBeTruthy();
+            expect(this.collection.isEmpty()).toBeTruthy();
         });
 
         it("is empty if all chapters are empty", function() {
             this.collection.add([{}, {}, {}]);
-            return expect(this.collection.isEmpty()).toBeTruthy();
+            expect(this.collection.isEmpty()).toBeTruthy();
         });
 
         it("is not empty if a chapter is not empty", function() {
             this.collection.add([{}, {name: "full"}, {}]);
-            return expect(this.collection.isEmpty()).toBeFalsy();
+            expect(this.collection.isEmpty()).toBeFalsy();
         });
 
-        return it("should have a nextOrder function", function() {
+        it("should have a nextOrder function", function() {
             expect(this.collection.nextOrder()).toEqual(1);
             this.collection.add([{}]);
             expect(this.collection.nextOrder()).toEqual(2);
@@ -241,7 +234,7 @@ function(Backbone, Textbook, TextbookSet, Chapter, ChapterSet, main) {
             expect(this.collection.nextOrder()).toEqual(3);
             // try going back one
             this.collection.remove(this.collection.last());
-            return expect(this.collection.nextOrder()).toEqual(2);
+            expect(this.collection.nextOrder()).toEqual(2);
         });
     });
 });

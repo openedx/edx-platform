@@ -1,12 +1,11 @@
 /*
  * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
  * DS207: Consider shorter variations of null checks
  * DS208: Avoid top-level this
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 class XProblemGenerator {
-  
+
   constructor(seed, parameters) {
 
     if (parameters == null) { parameters = {}; }
@@ -18,7 +17,7 @@ class XProblemGenerator {
 
   generate() {
 
-    return console.error("Abstract method called: XProblemGenerator.generate");
+    console.error("Abstract method called: XProblemGenerator.generate");
   }
 }
 
@@ -36,16 +35,16 @@ class XProblemDisplay {
 
   render() {
 
-    return console.error("Abstract method called: XProblemDisplay.render");
+    console.error("Abstract method called: XProblemDisplay.render");
   }
 
   updateSubmission() {
 
-    return this.submissionField.val(JSON.stringify(this.getCurrentSubmission()));
+    this.submissionField.val(JSON.stringify(this.getCurrentSubmission()));
   }
 
   getCurrentSubmission() {
-    return console.error("Abstract method called: XProblemDisplay.getCurrentSubmission");
+    console.error("Abstract method called: XProblemDisplay.getCurrentSubmission");
   }
 }
 
@@ -63,12 +62,12 @@ class XProblemGrader {
 
   solve() {
 
-    return console.error("Abstract method called: XProblemGrader.solve");
+    console.error("Abstract method called: XProblemGrader.solve");
   }
 
   grade() {
 
-    return console.error("Abstract method called: XProblemGrader.grade");
+    console.error("Abstract method called: XProblemGrader.grade");
   }
 }
 

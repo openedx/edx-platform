@@ -1,8 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 // This file tests the parsing of  extended-hints, double bracket sections {{ .. }}
 // for all sorts of markdown.
 describe('Markdown to xml extended hint dropdown', function() {
@@ -30,18 +25,18 @@ Clowns have funny _________ to make people laugh.
 ]]
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
   <p>Translation between Dropdown and ________ is straightforward.</p>
   <optionresponse>
     <optioninput>
-      <option correct="True">Multiple Choice 
+      <option correct="True">Multiple Choice
         <optionhint label="Good Job">Yes, multiple choice is the right answer.</optionhint>
       </option>
-      <option correct="False">Text Input 
+      <option correct="False">Text Input
         <optionhint>No, text input problems don't present options.</optionhint>
       </option>
-      <option correct="False">Numerical Input 
+      <option correct="False">Numerical Input
         <optionhint>No, numerical input problems don't present options.</optionhint>
       </option>
     </optioninput>
@@ -49,16 +44,16 @@ Clowns have funny _________ to make people laugh.
   <p>Clowns have funny _________ to make people laugh.</p>
   <optionresponse>
     <optioninput>
-      <option correct="False">dogs 
+      <option correct="False">dogs
         <optionhint label="NOPE">Not dogs, not cats, not toads</optionhint>
       </option>
-      <option correct="True">FACES 
+      <option correct="True">FACES
         <optionhint>With lots of makeup, doncha know?</optionhint>
       </option>
-      <option correct="False">money 
+      <option correct="False">money
         <optionhint>Clowns don't have any money, of course</optionhint>
       </option>
-      <option correct="False">donkeys 
+      <option correct="False">donkeys
         <optionhint>don't be an ass.</optionhint>
       </option>
       <option correct="False">-no hint-</option>
@@ -82,7 +77,7 @@ Translation between Dropdown and ________ is straightforward.
 || 1) one ||
 || 2) two ||\
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
 <optionresponse>
   <p>Translation between Dropdown and ________ is straightforward.</p>
@@ -113,7 +108,7 @@ A Question ________ is answered.
 || 0) zero ||
 || 1) one ||\
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
 <optionresponse>
   <p>A Question ________ is answered.</p>
@@ -135,7 +130,7 @@ A Question ________ is answered.
    bb
    cc	 {{ hint2 }} ]]\
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
 <optionresponse>
   <label>q1</label>
@@ -153,7 +148,7 @@ A Question ________ is answered.
 `);
   });
 
-  return it('produces xml even with lots of whitespace', function() {
+  it('produces xml even with lots of whitespace', function() {
     const data = MarkdownEditingDescriptor.markdownToXml(`\
 >>q1<<
 [[
@@ -166,7 +161,7 @@ A Question ________ is answered.
 
         ]]\
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
 <optionresponse>
   <label>q1</label>
@@ -212,7 +207,7 @@ describe('Markdown to xml extended hint checkbox', function() {
 {{ ((A*B)) Making a banana split? }}
 {{ ((B*D)) That will make a horrible dessert: a brussel sprout split? }}\
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
     <label>Select all the fruits from the list</label>
     <choiceresponse>
@@ -263,7 +258,7 @@ describe('Markdown to xml extended hint checkbox', function() {
 `);
   });
 
-  return it('produces xml also with demand hints', function() {
+  it('produces xml also with demand hints', function() {
     const data = MarkdownEditingDescriptor.markdownToXml(`\
 >>Select all the fruits from the list<<
 
@@ -290,7 +285,7 @@ describe('Markdown to xml extended hint checkbox', function() {
 || Hint two. ||
 || Hint three. ||\
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
     <label>Select all the fruits from the list</label>
     <choiceresponse>
@@ -364,7 +359,7 @@ describe('Markdown to xml extended hint multiple choice', function() {
 (x) Potato	                 {{ Potato is a root vegetable. }}
 () Apple     	 	 {{ OOPS::Apple is a fruit.}}\
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
     <label>Select the fruit from the list</label>
     <multiplechoiceresponse>
@@ -397,7 +392,7 @@ describe('Markdown to xml extended hint multiple choice', function() {
 `);
   });
 
-  return it('produces xml with demand hints', function() {
+  it('produces xml with demand hints', function() {
       const data = MarkdownEditingDescriptor.markdownToXml(`\
 >>Select the fruit from the list<<
 
@@ -417,7 +412,7 @@ describe('Markdown to xml extended hint multiple choice', function() {
 || 2) where are the lions? ||
 \
 `);
-      return expect(data).toXMLEqual(`\
+      expect(data).toXMLEqual(`\
 <problem>
     <label>Select the fruit from the list</label>
     <multiplechoiceresponse>
@@ -464,7 +459,7 @@ describe('Markdown to xml extended hint text input', function() {
 = France		{{ BRAVO::Viva la France! }}
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
 <stringresponse answer="France" type="ci">
   <label>In which country would you find the city of Paris?</label>
@@ -483,7 +478,7 @@ describe('Markdown to xml extended hint text input', function() {
 or= USA			{{   meh::hint2  }}
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
 <stringresponse answer="France" type="ci">
   <label>Where Paris?</label>
@@ -504,7 +499,7 @@ or= USA			{{   meh::hint2  }}
 not= warm {{feedback2}}
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
 <stringresponse answer="cold" type="ci">
   <label>Revenge is a dish best served</label>
@@ -523,7 +518,7 @@ not= warm {{feedback2}}
 s= 2 {{feedback1}}
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
 <stringresponse answer="2" type="ci">
   <label>q</label>
@@ -544,7 +539,7 @@ not= no {{feedback2}}
 or= ccc
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
 <stringresponse answer="aaa" type="ci">
   <label>q</label>
@@ -567,7 +562,7 @@ or= bbb {{feedback2}}
 or= ccc
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
 <stringresponse answer="2" type="ci">
   <label>q</label>
@@ -590,7 +585,7 @@ or= ccc
 or= bbb
 s= ccc\
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
     <label>q</label>
     <stringresponse answer="aaa" type="ci">
@@ -616,7 +611,7 @@ s= ccc
 paragraph 2
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
     <p>paragraph</p>
     <label>q</label>
@@ -640,7 +635,7 @@ or= aaa
 paragraph 2
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
     <p>paragraph</p>
     <label>q</label>
@@ -658,7 +653,7 @@ or= bbb {{feedback1}}
 = ccc {{feedback2}}
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
     <label>q</label>
     <stringresponse answer="aaa" type="ci">
@@ -675,7 +670,7 @@ or= bbb {{feedback1}}
 `);
   });
 
-  return it('produces xml with demand hints', function() {
+  it('produces xml with demand hints', function() {
     const data = MarkdownEditingDescriptor.markdownToXml(`>>Where Paris?<<
 = France		{{ BRAVO::hint1 }}
 
@@ -683,7 +678,7 @@ or= bbb {{feedback1}}
 || Paris is the capital of one of those countries. ||
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
 <stringresponse answer="France" type="ci">
   <label>Where Paris?</label>
@@ -713,7 +708,7 @@ describe('Markdown to xml extended hint numeric input', function() {
 = 5
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
     <label>Enter the numerical value of Pi:</label>
     <numericalresponse answer="3.14159">
@@ -739,7 +734,7 @@ describe('Markdown to xml extended hint numeric input', function() {
 
   // The output xml here shows some of the quirks of how historical markdown parsing does or does not put
   // in blank lines.
-  return it('numeric input with hints and demand hints', function() {
+  it('numeric input with hints and demand hints', function() {
     const data = MarkdownEditingDescriptor.markdownToXml(`\
 >>text1<<
 = 1   {{ hint1  }}
@@ -750,7 +745,7 @@ describe('Markdown to xml extended hint numeric input', function() {
 || hintB ||
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
     <label>text1</label>
     <numericalresponse answer="1">
@@ -820,7 +815,7 @@ hint
 ||       ccc      ||
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
     <label>Checkboxes</label>
     <choiceresponse>
@@ -902,7 +897,7 @@ describe('Markdown to xml extended hint with tricky syntax cases', function() {
 || Ø ||
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
     <multiplechoiceresponse>
         <label>á and Ø</label>
@@ -928,7 +923,7 @@ describe('Markdown to xml extended hint with tricky syntax cases', function() {
 (x) "isn't"  {{ "hello" }}
 \
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
     <multiplechoiceresponse>
         <label>"quotes" aren't \`fun\`</label>
@@ -953,7 +948,7 @@ this (x)
 (x) b
 that (y)\
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
 <multiplechoiceresponse>
   <label>q1</label>
@@ -980,7 +975,7 @@ this [x]
 [x] b {{ this hint passes through }}
 that []\
 `);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
 <choiceresponse>
   <label>q1</label>
@@ -999,7 +994,7 @@ that []\
 
   // It's sort of a pain to edit DOS line endings without some editor or other "fixing" them
   // for you. Therefore, we construct DOS line endings on the fly just for the test.
-  return it('produces xml with DOS \r\n line endings', function() {
+  it('produces xml with DOS \r\n line endings', function() {
     let markdown = `\
 >>q22<<
 
@@ -1015,7 +1010,7 @@ that []\
 `;
     markdown = markdown.replace(/\n/g, '\r\n');  // make DOS line endings
     const data = MarkdownEditingDescriptor.markdownToXml(markdown);
-    return expect(data).toXMLEqual(`\
+    expect(data).toXMLEqual(`\
 <problem>
 <optionresponse>
   <label>q22</label>

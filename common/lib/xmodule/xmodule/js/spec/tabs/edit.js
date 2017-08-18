@@ -1,8 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 describe("TabsEditingDescriptor", function() {
   beforeEach(function() {
     this.isInactiveClass = "is-inactive";
@@ -22,7 +17,7 @@ describe("TabsEditingDescriptor", function() {
     spyOn($.fn, 'hide').and.callThrough();
     spyOn($.fn, 'show').and.callThrough();
     spyOn(TabsEditingDescriptor.Model, 'initialize');
-    return spyOn(TabsEditingDescriptor.Model, 'updateValue');
+    spyOn(TabsEditingDescriptor.Model, 'updateValue');
   });
 
   afterEach(() => TabsEditingDescriptor.Model.modules= {});
@@ -30,7 +25,7 @@ describe("TabsEditingDescriptor", function() {
   describe("constructor", () =>
     it("first tab should be visible", function() {
       expect(this.descriptor.$tabs.first()).toHaveClass(this.isCurrent);
-      return expect(this.descriptor.$content.first()).not.toHaveClass(this.isInactiveClass);
+      expect(this.descriptor.$content.first()).not.toHaveClass(this.isInactiveClass);
     })
   );
 
@@ -41,7 +36,7 @@ describe("TabsEditingDescriptor", function() {
       expect(this.descriptor.$content.eq(0)).toHaveClass(this.isInactiveClass);
       expect(this.descriptor.$tabs.eq(1)).toHaveClass(this.isCurrent);
       expect(this.descriptor.$content.eq(1)).not.toHaveClass(this.isInactiveClass);
-      return expect(this.tab_1_switch).toHaveBeenCalled();
+      expect(this.tab_1_switch).toHaveBeenCalled();
     });
 
     it("if click on current tab, nothing should happen", function() {
@@ -49,27 +44,27 @@ describe("TabsEditingDescriptor", function() {
       const currentTab = this.descriptor.$tabs.filter(`.${this.isCurrent}`);
       this.descriptor.$tabs.eq(0).trigger("click");
       expect(this.descriptor.$tabs.filter(`.${this.isCurrent}`)).toEqual(currentTab);
-      return expect($.fn.trigger.calls.count()).toEqual(1);
+      expect($.fn.trigger.calls.count()).toEqual(1);
     });
 
-    return it("onSwitch function call", function() {
+    it("onSwitch function call", function() {
       this.descriptor.$tabs.eq(1).trigger("click");
       expect(TabsEditingDescriptor.Model.updateValue).toHaveBeenCalled();
-      return expect(this.tab_1_switch).toHaveBeenCalled();
+      expect(this.tab_1_switch).toHaveBeenCalled();
     });
   });
 
-  return describe("save", function() {
+  describe("save", function() {
     it("function for current tab should be called", function() {
       this.descriptor.$tabs.eq(1).trigger("click");
       const { data } = this.descriptor.save();
-      return expect(this.tab_1_modelUpdate).toHaveBeenCalled();
+      expect(this.tab_1_modelUpdate).toHaveBeenCalled();
     });
 
-    return it("detach click event", function() {
+    it("detach click event", function() {
       spyOn($.fn, "off");
       this.descriptor.save();
-      return expect($.fn.off).toHaveBeenCalledWith(
+      expect($.fn.off).toHaveBeenCalledWith(
         'click',
         '.editor-tabs .tab',
         this.descriptor.onSwitchEditor
@@ -84,28 +79,28 @@ describe("TabsEditingDescriptor special save cases", function() {
     this.isCurrent = "current";
     loadFixtures('tabs-edit.html');
     this.descriptor = new window.TabsEditingDescriptor($('.xblock'));
-    return this.html_id = 'test_id';
+    this.html_id = 'test_id';
   });
 
-  return describe("save", function() {
+  describe("save", function() {
     it("case: no init", function() {
       const { data } = this.descriptor.save();
-      return expect(data).toEqual(null);
+      expect(data).toEqual(null);
     });
 
     it("case: no function in model update", function() {
       TabsEditingDescriptor.Model.initialize(this.html_id);
       const { data } = this.descriptor.save();
-      return expect(data).toEqual(null);
+      expect(data).toEqual(null);
     });
 
-    return it("case: no function in model update, but value presented", function() {
+    it("case: no function in model update, but value presented", function() {
       this.tab_0_modelUpdate = jasmine.createSpy('tab_0_modelUpdate').and.returnValue(1);
       TabsEditingDescriptor.Model.addModelUpdate(this.html_id, 'Tab 0 Editor', this.tab_0_modelUpdate);
       this.descriptor.$tabs.eq(1).trigger("click");
       expect(this.tab_0_modelUpdate).toHaveBeenCalled();
       const { data } = this.descriptor.save();
-      return expect(data).toEqual(1);
+      expect(data).toEqual(1);
     });
   });
 });

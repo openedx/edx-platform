@@ -1,8 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 describe('Calculator', function() {
 
   const KEY = {
@@ -19,16 +14,16 @@ describe('Calculator', function() {
 
   beforeEach(function() {
     loadFixtures('coffee/fixtures/calculator.html');
-    return this.calculator = new Calculator;
+    this.calculator = new Calculator;
   });
 
   describe('bind', function() {
     it('bind the calculator button', function() {
-      return expect($('.calc')).toHandleWith('click', this.calculator.toggle);
+      expect($('.calc')).toHandleWith('click', this.calculator.toggle);
     });
 
     it('bind key up on calculator', function() {
-      return expect($('#calculator_wrapper')).toHandle('keyup', this.calculator.handleKeyUpOnHint);
+      expect($('#calculator_wrapper')).toHandle('keyup', this.calculator.handleKeyUpOnHint);
     });
 
     it('bind the help button', () =>
@@ -37,10 +32,10 @@ describe('Calculator', function() {
     );
 
     it('bind the calculator submit', function() {
-      return expect($('form#calculator')).toHandleWith('submit', this.calculator.calculate);
+      expect($('form#calculator')).toHandleWith('submit', this.calculator.calculate);
     });
 
-    return xit('prevent default behavior on form submit', function() {
+    xit('prevent default behavior on form submit', function() {
       jasmine.stubRequests();
       $('form#calculator').submit(function(e) {
         expect(e.isDefaultPrevented()).toBeTruthy();
@@ -63,19 +58,19 @@ describe('Calculator', function() {
 
         self.calculator.toggle(jQuery.Event("click"));
 
-      	 return deferred.promise();
+      	return deferred.promise();
       };
 
-      return focus().then(
+      focus().then(
         () => expect($('#calculator_wrapper #calculator_input').focus).toHaveBeenCalled()).always(done);
     });
 
-    return it('toggle the close button on the calculator button', function() {
+    it('toggle the close button on the calculator button', function() {
       this.calculator.toggle(jQuery.Event("click"));
       expect($('.calc')).toHaveClass('closed');
 
       this.calculator.toggle(jQuery.Event("click"));
-      return expect($('.calc')).not.toHaveClass('closed');
+      expect($('.calc')).not.toHaveClass('closed');
     });
   });
 
@@ -83,7 +78,7 @@ describe('Calculator', function() {
     it('show the help overlay', function() {
       this.calculator.showHint();
       expect($('.help')).toHaveClass('shown');
-      return expect($('.help')).toHaveAttr('aria-hidden', 'false');
+      expect($('.help')).toHaveAttr('aria-hidden', 'false');
     })
   );
 
@@ -92,7 +87,7 @@ describe('Calculator', function() {
     it('show the help overlay', function() {
       this.calculator.hideHint();
       expect($('.help')).not.toHaveClass('shown');
-      return expect($('.help')).toHaveAttr('aria-hidden', 'true');
+      expect($('.help')).toHaveAttr('aria-hidden', 'true');
     })
   );
 
@@ -100,7 +95,7 @@ describe('Calculator', function() {
     it('on click hint button hint popup becomes visible ', function() {
       const e = jQuery.Event('click');
       $('#calculator_hint').trigger(e);
-      return expect($('.help')).toHaveClass('shown');
+      expect($('.help')).toHaveClass('shown');
     })
   );
 
@@ -109,7 +104,7 @@ describe('Calculator', function() {
       this.calculator.showHint();
       const e = jQuery.Event('click');
       $(document).trigger(e);
-      return expect($('.help')).not.toHaveClass('shown');
+      expect($('.help')).not.toHaveClass('shown');
     })
   );
 
@@ -118,7 +113,7 @@ describe('Calculator', function() {
       this.calculator.showHint();
       const e = jQuery.Event('click');
       $('#calculator_input_help').trigger(e);
-      return expect($('.help')).toHaveClass('shown');
+      expect($('.help')).toHaveClass('shown');
     })
   );
 
@@ -130,17 +125,17 @@ describe('Calculator', function() {
 
       expect(element.focus).toHaveBeenCalled();
       expect(this.calculator.activeHint).toEqual(element);
-      return expect(this.calculator.hintPopup).toHaveAttr('data-calculator-hint', element.attr('id'));
+      expect(this.calculator.hintPopup).toHaveAttr('data-calculator-hint', element.attr('id'));
     });
 
     it('select the first hint if argument element is not passed', function() {
           this.calculator.selectHint();
-          return expect(this.calculator.activeHint.attr('id')).toEqual($('.hint-item').first().attr('id'));
+          expect(this.calculator.activeHint.attr('id')).toEqual($('.hint-item').first().attr('id'));
     });
 
-    return it('select the first hint if argument element is empty', function() {
+    it('select the first hint if argument element is empty', function() {
           this.calculator.selectHint([]);
-          return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').first().attr('id'));
+          expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').first().attr('id'));
     });
   });
 
@@ -150,28 +145,28 @@ describe('Calculator', function() {
       this.calculator.activeHint = $('.hint-item').eq(1);
       this.calculator.prevHint();
 
-      return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'));
+      expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'));
     });
 
     it('if this was the second item, select the first one', function() {
       this.calculator.activeHint = $('.hint-item').eq(1);
       this.calculator.prevHint();
 
-      return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'));
+      expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'));
     });
 
     it('if this was the first item, select the last one', function() {
       this.calculator.activeHint = $('.hint-item').eq(0);
       this.calculator.prevHint();
 
-      return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(2).attr('id'));
+      expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(2).attr('id'));
     });
 
-    return it('if this was the last item, select the second last', function() {
+    it('if this was the last item, select the second last', function() {
       this.calculator.activeHint = $('.hint-item').eq(2);
       this.calculator.prevHint();
 
-      return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(1).attr('id'));
+      expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(1).attr('id'));
     });
   });
 
@@ -181,21 +176,21 @@ describe('Calculator', function() {
       this.calculator.activeHint = $('.hint-item').eq(0);
       this.calculator.nextHint();
 
-      return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(1).attr('id'));
+      expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(1).attr('id'));
     });
 
     it('If this was the second item, select the last one', function() {
       this.calculator.activeHint = $('.hint-item').eq(1);
       this.calculator.nextHint();
 
-      return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(2).attr('id'));
+      expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(2).attr('id'));
     });
 
-    return it('If this was the last item, select the first one', function() {
+    it('If this was the last item, select the first one', function() {
       this.calculator.activeHint = $('.hint-item').eq(2);
       this.calculator.nextHint();
 
-      return expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'));
+      expect(this.calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'));
     });
   });
 
@@ -208,7 +203,7 @@ describe('Calculator', function() {
 
       expect(calc.hideHint).toHaveBeenCalled;
       expect(value).toBeFalsy();
-      return expect(e.isDefaultPrevented()).toBeTruthy();
+      expect(e.isDefaultPrevented()).toBeTruthy();
     };
 
     const assertHintIsVisible = function(calc, key) {
@@ -220,7 +215,7 @@ describe('Calculator', function() {
       expect(calc.showHint).toHaveBeenCalled;
       expect(value).toBeFalsy();
       expect(e.isDefaultPrevented()).toBeTruthy();
-      return expect(calc.activeHint.focus).toHaveBeenCalled();
+      expect(calc.activeHint.focus).toHaveBeenCalled();
     };
 
     const assertNothingHappens = function(calc, key) {
@@ -230,31 +225,31 @@ describe('Calculator', function() {
 
       expect(calc.showHint).not.toHaveBeenCalled;
       expect(value).toBeTruthy();
-      return expect(e.isDefaultPrevented()).toBeFalsy();
+      expect(e.isDefaultPrevented()).toBeFalsy();
     };
 
     it('hint popup becomes hidden on press ENTER', function() {
-      return assertHintIsHidden(this.calculator, KEY.ENTER);
+      assertHintIsHidden(this.calculator, KEY.ENTER);
     });
 
     it('hint popup becomes visible on press ENTER', function() {
-      return assertHintIsVisible(this.calculator, KEY.ENTER);
+      assertHintIsVisible(this.calculator, KEY.ENTER);
     });
 
     it('hint popup becomes hidden on press SPACE', function() {
-      return assertHintIsHidden(this.calculator, KEY.SPACE);
+      assertHintIsHidden(this.calculator, KEY.SPACE);
     });
 
     it('hint popup becomes visible on press SPACE', function() {
-      return assertHintIsVisible(this.calculator, KEY.SPACE);
+      assertHintIsVisible(this.calculator, KEY.SPACE);
     });
 
     it('Nothing happens on press ALT', function() {
-      return assertNothingHappens(this.calculator, KEY.ALT);
+      assertNothingHappens(this.calculator, KEY.ALT);
     });
 
-    return it('Nothing happens on press any other button', function() {
-      return assertNothingHappens(this.calculator, KEY.DOWN);
+    it('Nothing happens on press any other button', function() {
+      assertNothingHappens(this.calculator, KEY.DOWN);
     });
   });
 
@@ -389,7 +384,7 @@ describe('Calculator', function() {
         }
       };
 
-      return $.each(cases, function(key, data) {
+      $.each(cases, function(key, data) {
         calc.hideHint.calls.reset();
         calc.prevHint.calls.reset();
         calc.nextHint.calls.reset();
@@ -412,16 +407,16 @@ describe('Calculator', function() {
           expect(e.isPropagationStopped()).toBeFalsy();
         }
 
-        return expect(value).toBe(data.returnedValue);
+        expect(value).toBe(data.returnedValue);
       });
     })
   );
 
-  return describe('calculate', function() {
+  describe('calculate', function() {
     beforeEach(function() {
       $('#calculator_input').val('1+2');
       spyOn($, 'getWithPrefix').and.callFake((url, data, callback) => callback({ result: 3 }));
-      return this.calculator.calculate();
+      this.calculator.calculate();
     });
 
     it('send data to /calculate', () =>
@@ -430,6 +425,6 @@ describe('Calculator', function() {
       , jasmine.any(Function))
     );
 
-    return it('update the calculator output', () => expect($('#calculator_output').val()).toEqual('3'));
+    it('update the calculator output', () => expect($('#calculator_output').val()).toEqual('3'));
   });
 });

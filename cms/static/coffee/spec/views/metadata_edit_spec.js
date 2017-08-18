@@ -1,6 +1,5 @@
 /*
  * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
@@ -13,10 +12,10 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
       if ((expectedType === 'number') && (input.type !== 'number')) {
           expectedType = 'text';
       }
-      return expect(input.type).toBe(expectedType);
+      expect(input.type).toBe(expectedType);
   };
 
-  return describe("Test Metadata Editor", function() {
+  describe("Test Metadata Editor", function() {
       const editorTemplate = readFixtures('metadata-editor.underscore');
       const numberEntryTemplate = readFixtures('metadata-number-entry.underscore');
       const stringEntryTemplate = readFixtures('metadata-string-entry.underscore');
@@ -30,7 +29,7 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
           appendSetFixtures($("<script>", {id: "metadata-string-entry", type: "text/template"}).text(stringEntryTemplate));
           appendSetFixtures($("<script>", {id: "metadata-option-entry", type: "text/template"}).text(optionEntryTemplate));
           appendSetFixtures($("<script>", {id: "metadata-list-entry", type: "text/template"}).text(listEntryTemplate));
-          return appendSetFixtures($("<script>", {id: "metadata-dict-entry", type: "text/template"}).text(dictEntryTemplate));
+          appendSetFixtures($("<script>", {id: "metadata-dict-entry", type: "text/template"}).text(dictEntryTemplate));
       });
 
       const genericEntry = {
@@ -125,7 +124,7 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
       // Test for the editor that creates the individual views.
       describe("MetadataView.Editor creates editors for each field", function() {
           beforeEach(function() {
-              return this.model = new MetadataCollection(
+              this.model = new MetadataCollection(
                   [
                       integerEntry,
                       floatEntry,
@@ -161,7 +160,7 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
 
               const verifyEntry = function(index, display_name, type) {
                   expect(childModels[index].get('display_name')).toBe(display_name);
-                  return verifyInputType(childViews[index], type);
+                  verifyInputType(childViews[index], type);
               };
 
               verifyEntry(0, 'Display Name', 'text');
@@ -171,12 +170,12 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
               verifyEntry(4, 'Show Answer', 'select-one');
               verifyEntry(5, 'Time', 'text');
               verifyEntry(6, 'Unknown', 'text');
-              return verifyEntry(7, 'Weight', 'number');
+              verifyEntry(7, 'Weight', 'number');
           });
 
           it("returns its display name", function() {
               const view = new MetadataView.Editor({collection: this.model});
-              return expect(view.getDisplayName()).toBe("Word cloud");
+              expect(view.getDisplayName()).toBe("Word cloud");
           });
 
           it("returns an empty string if there is no display name property with a valid value", function() {
@@ -196,20 +195,20 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
 
                   }])
               });
-              return expect(view.getDisplayName()).toBe("");
+              expect(view.getDisplayName()).toBe("");
           });
 
           it("has no modified values by default", function() {
               const view = new MetadataView.Editor({collection: this.model});
-              return expect(view.getModifiedMetadataValues()).toEqual({});
+              expect(view.getModifiedMetadataValues()).toEqual({});
           });
 
-          return it("returns modified values only", function() {
+          it("returns modified values only", function() {
               const view = new MetadataView.Editor({collection: this.model});
               const childModels = view.collection.models;
               childModels[0].setValue('updated display name');
               childModels[1].setValue(20);
-              return expect(view.getModifiedMetadataValues()).toEqual({
+              expect(view.getModifiedMetadataValues()).toEqual({
                   display_name : 'updated display name',
                   num_inputs: 20
               });
@@ -220,14 +219,14 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
       const assertInputType = function(view, expectedType) {
           const input = view.$el.find('.setting-input');
           expect(input.length).toEqual(1);
-          return verifyInputType(input[0], expectedType);
+          verifyInputType(input[0], expectedType);
       };
 
       const assertValueInView = (view, expectedValue) => expect(view.getValueFromEditor()).toEqual(expectedValue);
 
       const assertCanUpdateView = function(view, newValue) {
           view.setValueInEditor(newValue);
-          return expect(view.getValueFromEditor()).toEqual(newValue);
+          expect(view.getValueFromEditor()).toEqual(newValue);
       };
 
       const assertClear = function(view, modelValue, editorValue) {
@@ -235,72 +234,72 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
           view.clear();
           expect(view.model.getValue()).toBe(null);
           expect(view.model.getDisplayValue()).toEqual(modelValue);
-          return expect(view.getValueFromEditor()).toEqual(editorValue);
+          expect(view.getValueFromEditor()).toEqual(editorValue);
       };
 
       const assertUpdateModel = function(view, originalValue, newValue) {
           view.setValueInEditor(newValue);
           expect(view.model.getValue()).toEqual(originalValue);
           view.updateModel();
-          return expect(view.model.getValue()).toEqual(newValue);
+          expect(view.model.getValue()).toEqual(newValue);
       };
 
       describe("MetadataView.String is a basic string input with clear functionality", function() {
           beforeEach(function() {
               const model = new MetadataModel(genericEntry);
-              return this.view = new MetadataView.String({model});
+              this.view = new MetadataView.String({model});
           });
 
           it("uses a text input type", function() {
-              return assertInputType(this.view, 'text');
+              assertInputType(this.view, 'text');
           });
 
           it("returns the intial value upon initialization", function() {
-              return assertValueInView(this.view, 'Word cloud');
+              assertValueInView(this.view, 'Word cloud');
           });
 
           it("can update its value in the view", function() {
-              return assertCanUpdateView(this.view, "updated ' \" &");
+              assertCanUpdateView(this.view, "updated ' \" &");
           });
 
           it("has a clear method to revert to the model default", function() {
-              return assertClear(this.view, 'default value');
+              assertClear(this.view, 'default value');
           });
 
-          return it("has an update model method", function() {
-              return assertUpdateModel(this.view, 'Word cloud', 'updated');
+          it("has an update model method", function() {
+              assertUpdateModel(this.view, 'Word cloud', 'updated');
           });
       });
 
       describe("MetadataView.Option is an option input type with clear functionality", function() {
           beforeEach(function() {
               const model = new MetadataModel(selectEntry);
-              return this.view = new MetadataView.Option({model});
+              this.view = new MetadataView.Option({model});
           });
 
           it("uses a select input type", function() {
-              return assertInputType(this.view, 'select-one');
+              assertInputType(this.view, 'select-one');
           });
 
           it("returns the intial value upon initialization", function() {
-              return assertValueInView(this.view, 'always');
+              assertValueInView(this.view, 'always');
           });
 
           it("can update its value in the view", function() {
-              return assertCanUpdateView(this.view, "never");
+              assertCanUpdateView(this.view, "never");
           });
 
           it("has a clear method to revert to the model default", function() {
-              return assertClear(this.view, 'answered');
+              assertClear(this.view, 'answered');
           });
 
           it("has an update model method", function() {
-              return assertUpdateModel(this.view, null, 'never');
+              assertUpdateModel(this.view, null, 'never');
           });
 
-          return it("does not update to a value that is not an option", function() {
+          it("does not update to a value that is not an option", function() {
               this.view.setValueInEditor("not an option");
-              return expect(this.view.getValueFromEditor()).toBe('always');
+              expect(this.view.getValueFromEditor()).toBe('always');
           });
       });
 
@@ -308,7 +307,7 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
           const verifyValueAfterChanged = function(view, value, expectedResult) {
               view.setValueInEditor(value);
               view.changed();
-              return expect(view.getValueFromEditor()).toBe(expectedResult);
+              expect(view.getValueFromEditor()).toBe(expectedResult);
           };
 
           beforeEach(function() {
@@ -316,37 +315,37 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
               this.integerView = new MetadataView.Number({model: integerModel});
 
               const floatModel = new MetadataModel(floatEntry);
-              return this.floatView = new MetadataView.Number({model: floatModel});
+              this.floatView = new MetadataView.Number({model: floatModel});
           });
 
           it("uses a number input type", function() {
               assertInputType(this.integerView, 'number');
-              return assertInputType(this.floatView, 'number');
+              assertInputType(this.floatView, 'number');
           });
 
           it("returns the intial value upon initialization", function() {
               assertValueInView(this.integerView, '5');
-              return assertValueInView(this.floatView, '10.2');
+              assertValueInView(this.floatView, '10.2');
           });
 
           it("can update its value in the view", function() {
               assertCanUpdateView(this.integerView, "12");
-              return assertCanUpdateView(this.floatView, "-2.4");
+              assertCanUpdateView(this.floatView, "-2.4");
           });
 
           it("has a clear method to revert to the model default", function() {
               assertClear(this.integerView, 6, '6');
-              return assertClear(this.floatView, 2.7, '2.7');
+              assertClear(this.floatView, 2.7, '2.7');
           });
 
           it("has an update model method", function() {
               assertUpdateModel(this.integerView, null, '90');
-              return assertUpdateModel(this.floatView, 10.2, '-9.5');
+              assertUpdateModel(this.floatView, 10.2, '-9.5');
           });
 
           it("knows the difference between integer and float", function() {
               expect(this.integerView.isIntegerField()).toBeTruthy();
-              return expect(this.floatView.isIntegerField()).toBeFalsy();
+              expect(this.floatView.isIntegerField()).toBeFalsy();
           });
 
           it("sets attribtues related to min, max, and step", function() {
@@ -355,12 +354,12 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
                   expect(Number(inputEntry.attr('min'))).toEqual(min);
                   expect(Number(inputEntry.attr('step'))).toEqual(step);
                   if (max === !null) {
-                      return expect(Number(inputEntry.attr('max'))).toEqual(max);
+                      expect(Number(inputEntry.attr('max'))).toEqual(max);
                   }
               };
 
               verifyAttributes(this.integerView, 1, 1);
-              return verifyAttributes(this.floatView, 1.3, .1, 100.2);
+              verifyAttributes(this.floatView, 1.3, .1, 100.2);
           });
 
           it("corrects values that are out of range", function() {
@@ -373,15 +372,15 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
               verifyValueAfterChanged(this.floatView, '1.3', '1.3');
               verifyValueAfterChanged(this.floatView, '1.2', '1.3');
               verifyValueAfterChanged(this.floatView, '100.2', '100.2');
-              return verifyValueAfterChanged(this.floatView, '100.3', '100.2');
+              verifyValueAfterChanged(this.floatView, '100.3', '100.2');
           });
 
           it("sets default values for integer and float fields that are empty", function() {
               verifyValueAfterChanged(this.integerView, '', '6');
-              return verifyValueAfterChanged(this.floatView, '', '2.7');
+              verifyValueAfterChanged(this.floatView, '', '2.7');
           });
 
-          return it("disallows invalid characters", function() {
+          it("disallows invalid characters", function() {
               const verifyValueAfterKeyPressed = function(view, character, reject) {
                   const event = {
                       type : 'keypress',
@@ -392,9 +391,9 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
                   spyOn(event, 'preventDefault');
                   view.$el.find('input').trigger(event);
                   if (reject) {
-                      return expect(event.preventDefault).toHaveBeenCalled();
+                      expect(event.preventDefault).toHaveBeenCalled();
                   } else {
-                      return expect(event.preventDefault).not.toHaveBeenCalled();
+                      expect(event.preventDefault).not.toHaveBeenCalled();
                   }
               };
 
@@ -404,12 +403,12 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
                   verifyValueAfterKeyPressed(view, '[', true);
                   verifyValueAfterKeyPressed(view, '@', true);
 
-                  return [0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) =>
+                  [0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) =>
                       verifyValueAfterKeyPressed(view, String(i), false));
               };
 
               verifyDisallowedChars(this.integerView);
-              return verifyDisallowedChars(this.floatView);
+              verifyDisallowedChars(this.floatView);
           });
       });
 
@@ -418,68 +417,68 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
           const listModel = new MetadataModel(listEntry);
           this.listView = new MetadataView.List({model: listModel});
           this.el = this.listView.$el;
-          return main();
+          main();
         });
 
         it("returns the initial value upon initialization", function() {
-          return assertValueInView(this.listView, ['the first display value', 'the second']);
+          assertValueInView(this.listView, ['the first display value', 'the second']);
         });
 
         it("updates its value correctly", function() {
-          return assertCanUpdateView(this.listView, ['a new item', 'another new item', 'a third']);
+          assertCanUpdateView(this.listView, ['a new item', 'another new item', 'a third']);
         });
 
         it("has a clear method to revert to the model default", function() {
           this.el.find('.create-setting').click();
           assertClear(this.listView, ['a thing', 'another thing']);
-          return expect(this.el.find('.create-setting')).not.toHaveClass('is-disabled');
+          expect(this.el.find('.create-setting')).not.toHaveClass('is-disabled');
         });
 
         it("has an update model method", function() {
-          return assertUpdateModel(this.listView, null, ['a new value']);
+          assertUpdateModel(this.listView, null, ['a new value']);
         });
 
         it("can add an entry", function() {
           expect(this.listView.model.get('value').length).toEqual(2);
           this.el.find('.create-setting').click();
-          return expect(this.el.find('input.input').length).toEqual(3);
+          expect(this.el.find('input.input').length).toEqual(3);
         });
 
         it("can remove an entry", function() {
           expect(this.listView.model.get('value').length).toEqual(2);
           this.el.find('.remove-setting').first().click();
-          return expect(this.listView.model.get('value').length).toEqual(1);
+          expect(this.listView.model.get('value').length).toEqual(1);
         });
 
         it("only allows one blank entry at a time", function() {
           expect(this.el.find('input').length).toEqual(2);
           this.el.find('.create-setting').click();
           this.el.find('.create-setting').click();
-          return expect(this.el.find('input').length).toEqual(3);
+          expect(this.el.find('input').length).toEqual(3);
         });
 
-        return it("re-enables the add setting button after entering a new value", function() {
+        it("re-enables the add setting button after entering a new value", function() {
           expect(this.el.find('input').length).toEqual(2);
           this.el.find('.create-setting').click();
           expect(this.el.find('.create-setting')).toHaveClass('is-disabled');
           this.el.find('input').last().val('third setting');
           this.el.find('input').last().trigger('input');
-          return expect(this.el.find('.create-setting')).not.toHaveClass('is-disabled');
+          expect(this.el.find('.create-setting')).not.toHaveClass('is-disabled');
         });
       });
 
       describe("MetadataView.RelativeTime allows the user to enter time string in HH:mm:ss format", function() {
           beforeEach(function() {
               const model = new MetadataModel(timeEntry);
-              return this.view = new MetadataView.RelativeTime({model});
+              this.view = new MetadataView.RelativeTime({model});
           });
 
           it("uses a text input type", function() {
-              return assertInputType(this.view, 'text');
+              assertInputType(this.view, 'text');
           });
 
           it("returns the intial value upon initialization", function() {
-              return assertValueInView(this.view, '12:12:12');
+              assertValueInView(this.view, '12:12:12');
           });
 
           it("value is converted correctly", function() {
@@ -563,35 +562,35 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
               }
             ];
 
-            return $.each(cases, (index, data) => expect(view.parseRelativeTime(data.input)).toBe(data.output));
+            $.each(cases, (index, data) => expect(view.parseRelativeTime(data.input)).toBe(data.output));
           });
 
           it("can update its value in the view", function() {
               assertCanUpdateView(this.view, "23:59:59");
               this.view.setValueInEditor("33:59:59");
               this.view.updateModel();
-              return assertValueInView(this.view, "23:59:59");
+              assertValueInView(this.view, "23:59:59");
           });
 
           it("has a clear method to revert to the model default", function() {
-              return assertClear(this.view, '00:00:00');
+              assertClear(this.view, '00:00:00');
           });
 
-          return it("has an update model method", function() {
-              return assertUpdateModel(this.view, '12:12:12', '23:59:59');
+          it("has an update model method", function() {
+              assertUpdateModel(this.view, '12:12:12', '23:59:59');
           });
       });
 
-      return describe("MetadataView.Dict allows the user to enter key-value pairs of strings", function() {
+      describe("MetadataView.Dict allows the user to enter key-value pairs of strings", function() {
         beforeEach(function() {
           const dictModel = new MetadataModel($.extend(true, {}, dictEntry));
           this.dictView = new MetadataView.Dict({model: dictModel});
           this.el = this.dictView.$el;
-          return main();
+          main();
         });
 
         it("returns the initial value upon initialization", function() {
-          return assertValueInView(this.dictView, {
+          assertValueInView(this.dictView, {
             'en': 'English',
             'ru': 'Русский',
             'ua': 'Українська',
@@ -600,7 +599,7 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
         });
 
         it("updates its value correctly", function() {
-          return assertCanUpdateView(this.dictView, {
+          assertCanUpdateView(this.dictView, {
             'ru': 'Русский',
             'ua': 'Українська',
             'fr': 'Français'
@@ -613,30 +612,30 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
             'en': 'English',
             'ru': 'Русский'
           });
-          return expect(this.el.find('.create-setting')).not.toHaveClass('is-disabled');
+          expect(this.el.find('.create-setting')).not.toHaveClass('is-disabled');
         });
 
         it("has an update model method", function() {
-          return assertUpdateModel(this.dictView, null, {'fr': 'Français'});
+          assertUpdateModel(this.dictView, null, {'fr': 'Français'});
         });
 
         it("can add an entry", function() {
           expect(_.keys(this.dictView.model.get('value')).length).toEqual(4);
           this.el.find('.create-setting').click();
-          return expect(this.el.find('input.input-key').length).toEqual(5);
+          expect(this.el.find('input.input-key').length).toEqual(5);
         });
 
         it("can remove an entry", function() {
           expect(_.keys(this.dictView.model.get('value')).length).toEqual(4);
           this.el.find('.remove-setting').first().click();
-          return expect(_.keys(this.dictView.model.get('value')).length).toEqual(3);
+          expect(_.keys(this.dictView.model.get('value')).length).toEqual(3);
         });
 
         it("only allows one blank entry at a time", function() {
           expect(this.el.find('input.input-key').length).toEqual(4);
           this.el.find('.create-setting').click();
           this.el.find('.create-setting').click();
-          return expect(this.el.find('input.input-key').length).toEqual(5);
+          expect(this.el.find('input.input-key').length).toEqual(5);
         });
 
         it("only allows unique keys", function() {
@@ -667,7 +666,7 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
             }
           ];
 
-          return _.each(data, ((d, index) => {
+          _.each(data, ((d, index) => {
             this.dictView.setValueInEditor(d.initialValue);
             this.dictView.updateModel();
             this.el.find('.create-setting').click();
@@ -675,18 +674,18 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
             item.find('.input-key').val(d.testValue.key);
             item.find('.input-value').val(d.testValue.value);
 
-            return expect(this.dictView.getValueFromEditor()).toEqual(d.expectedValue);
+            expect(this.dictView.getValueFromEditor()).toEqual(d.expectedValue);
           })
           );
         });
 
-        return it("re-enables the add setting button after entering a new value", function() {
+        it("re-enables the add setting button after entering a new value", function() {
           expect(this.el.find('input.input-key').length).toEqual(4);
           this.el.find('.create-setting').click();
           expect(this.el.find('.create-setting')).toHaveClass('is-disabled');
           this.el.find('input.input-key').last().val('third setting');
           this.el.find('input.input-key').last().trigger('input');
-          return expect(this.el.find('.create-setting')).not.toHaveClass('is-disabled');
+          expect(this.el.find('.create-setting')).not.toHaveClass('is-disabled');
         });
       });
   });
