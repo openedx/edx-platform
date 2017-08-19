@@ -24,21 +24,18 @@ log = logging.getLogger(__name__)
 @receiver(post_save, sender=CertificateWhitelist, dispatch_uid="append_certificate_whitelist")
 def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # pylint: disable=unused-argument
     switches = waffle.waffle()
-    # All flags enabled
+    # No flags enabled
     if (
         not switches.is_enabled(waffle.SELF_PACED_ONLY) and
         not switches.is_enabled(waffle.INSTRUCTOR_PACED_ONLY)
     ):
         return
 
-    # Only SELF_PACED_ONLY flag enabled
-    if not switches.is_enabled(waffle.INSTRUCTOR_PACED_ONLY):
-        if not courses.get_course_by_id(instance.course_id, depth=0).self_paced:
+    if courses.get_course_by_id(instance.course_id, depth=0).self_paced:
+        if not switches.is_enabled(waffle.SELF_PACED_ONLY):
             return
-
-    # Only INSTRUCTOR_PACED_ONLY flag enabled
-    if not switches.is_enabled(waffle.SELF_PACED_ONLY):
-        if courses.get_course_by_id(instance.course_id, depth=0).self_paced:
+    else:
+        if not switches.is_enabled(waffle.INSTRUCTOR_PACED_ONLY):
             return
 
     fire_ungenerated_certificate_task(instance.user, instance.course_id)
@@ -61,15 +58,13 @@ def _listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: dis
     ):
         return
 
-    # Only SELF_PACED_ONLY flag enabled
-    if waffle.waffle().is_enabled(waffle.SELF_PACED_ONLY):
-        if not courses.get_course_by_id(course_id, depth=0).self_paced:
+    if courses.get_course_by_id(course_id, depth=0).self_paced:
+        if not waffle.waffle().is_enabled(waffle.SELF_PACED_ONLY):
+            return
+    else:
+        if not waffle.waffle().is_enabled(waffle.INSTRUCTOR_PACED_ONLY):
             return
 
-    # Only INSTRUCTOR_PACED_ONLY flag enabled
-    if waffle.waffle().is_enabled(waffle.INSTRUCTOR_PACED_ONLY):
-        if courses.get_course_by_id(course_id, depth=0).self_paced:
-            return
     if fire_ungenerated_certificate_task(user, course_id):
         log.info(u'Certificate generation task initiated for {user} : {course} via passing grade'.format(
             user=user.id,
