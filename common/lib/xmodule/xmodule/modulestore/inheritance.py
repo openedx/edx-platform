@@ -178,7 +178,8 @@ class InheritanceMixin(XBlockMixin):
             "Identify a video, 5-10 seconds in length, to play before course videos. Enter the video ID from "
             "the Video Uploads page and one or more transcript files in the following format: {format}. "
             "For example, an entry for a video with two transcripts looks like this: {example}"
-        ).format(
+        ),
+        help_format_args=dict(
             format='{"video_id": "ID", "transcripts": {"language": "/static/filename.srt"}}',
             example=(
                 '{'
