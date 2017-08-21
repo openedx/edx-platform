@@ -33,6 +33,8 @@ from django_comment_common.signals import (
     thread_edited,
     thread_voted,
     thread_deleted,
+    thread_followed,
+    thread_unfollowed,
     comment_created,
     comment_edited,
     comment_voted,
@@ -58,7 +60,7 @@ from eventtracking import tracker
 from util.html import strip_tags
 import lms.lib.comment_client as cc
 
-from social_engagement.engagement import update_user_engagement_score
+from social_engagement.tasks import task_update_user_engagement_score
 
 log = logging.getLogger(__name__)
 
@@ -288,6 +290,7 @@ def create_thread(request, course_id, commentable_id):
     if follow:
         cc_user = cc.User.from_django_user(user)
         cc_user.follow(thread)
+        thread_followed.send(sender=None, user=user, post=thread)
 
     data = thread.to_dict()
 
@@ -723,6 +726,7 @@ def _vote_or_unvote(request, course_id, obj, value='up', undo_vote=False):
         # (People could theoretically downvote by handcrafting AJAX requests.)
     else:
         user.vote(obj, value)
+    thread_voted.send(sender=None, user=request.user, post=obj)
     track_voted_event(request, course, obj, value, undo_vote)
     return JsonResponse(prepare_content(obj.to_dict(), course_key))
 
@@ -794,7 +798,6 @@ def vote_for_thread(request, course_id, thread_id, value):
     """
     thread = cc.Thread.find(thread_id)
     result = _vote_or_unvote(request, course_id, thread, value)
-    thread_voted.send(sender=None, user=request.user, post=thread)
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     # call into the social_engagement django app to
@@ -950,10 +953,11 @@ def follow_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.follow(thread)
+    thread_followed.send(sender=None, user=request.user, post=thread)
 
     # call into the social_engagement django app to
     # rescore this user
-    _update_user_engagement_score(course_key, request.user.id)
+    _update_user_engagement_score(course_key, getattr(thread, 'user_id', None))
 
     # Feature Flag to check that notifications are enabled or not.
     if settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
@@ -1011,6 +1015,7 @@ def unfollow_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.unfollow(thread)
+    thread_unfollowed.send(sender=None, user=request.user, post=thread)
     return JsonResponse({})
 
 
@@ -1133,5 +1138,5 @@ def _update_user_engagement_score(course_key, user_id):
     Social Engagement score
     """
 
-    if settings.FEATURES.get('ENABLE_SOCIAL_ENGAGEMENT', False):
-        update_user_engagement_score(course_key, user_id)
+    if settings.FEATURES.get('ENABLE_SOCIAL_ENGAGEMENT', False) and course_key and user_id:
+        task_update_user_engagement_score.delay(unicode(course_key), user_id)
