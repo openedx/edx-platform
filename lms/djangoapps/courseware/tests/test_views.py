@@ -1398,7 +1398,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         resp = self._get_progress_page()
         self.assertContains(resp, u"View Certificate")
 
-        self.assertContains(resp, u"You can keep working for a higher grade")
+        self.assertContains(resp, u"earned a certificate for this course")
         cert_url = certs_api.get_certificate_url(course_id=self.course.id, uuid=certificate.verify_uuid)
         self.assertContains(resp, cert_url)
 
@@ -1447,7 +1447,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(42, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
+        with self.assertNumQueries(42, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(2):
             self._get_progress_page()
 
     @ddt.data(
@@ -1460,14 +1460,14 @@ class ProgressPageTests(ProgressPageBaseTests):
         with grades_waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
             with self.assertNumQueries(
                 initial, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST
-            ), check_mongo_calls(1):
+            ), check_mongo_calls(2):
                 self._get_progress_page()
 
             # subsequent accesses to the progress page require fewer queries.
             for _ in range(2):
                 with self.assertNumQueries(
                     subsequent, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST
-                ), check_mongo_calls(1):
+                ), check_mongo_calls(2):
                     self._get_progress_page()
 
     @patch(
