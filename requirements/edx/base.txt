@@ -35,7 +35,7 @@ django-sekizai==0.8.2
 django-ses==0.7.1
 django-simple-history==1.6.3
 django-statici18n==1.1.5
-django-storages==1.4.1
+django-storages==1.5.2
 django-method-override==0.1.0
 django-user-tasks==0.1.2
 # We need a fix to DRF 3.2.x, for now use it from our own cherry-picked repo

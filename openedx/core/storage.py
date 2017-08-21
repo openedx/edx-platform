@@ -25,6 +25,7 @@ from storages.backends.s3boto import S3BotoStorage
 from storages.backends.azure_storage import AzureStorage
 from azure.storage import AccessPolicy, SharedAccessPolicy
 
+
 class ProductionStorage(
         PipelineForgivingStorage,
         OptimizedFilesMixin,

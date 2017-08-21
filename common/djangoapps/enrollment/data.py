@@ -133,6 +133,7 @@ def create_course_enrollment(username, course_id, mode, is_active):
     else:
         return NonExistentCourseError
 
+
 def update_course_enrollment(username, course_id, mode=None, is_active=None):
     """Modify a course enrollment for a user.
 

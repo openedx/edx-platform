@@ -29,6 +29,19 @@ require([
 {
         var $body;
 
+        function selectSite() {
+            // Get selected hostname
+            var $selectedSite = $(this);
+            var siteName = $selectedSite.find('option:selected').val();
+
+            // Update button target
+            var buttonElement = $selectedSite.parent().parent().find('.view-button');
+            var currentUrl = buttonElement.attr('href');
+            // todo: replace with a URL builder
+            var newUrl = currentUrl.replace(currentUrl.split('/')[2], siteName);
+            buttonElement.attr('href', newUrl);
+        }
+
         domReady(function() {
             var dropdownMenuView;
 

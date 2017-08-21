@@ -1610,8 +1610,8 @@ def _do_create_account(form, custom_form=None):
     except Exception:  # pylint: disable=broad-except
         log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
         raise
-    #added to create the record in languageProficiency table
-    if form.cleaned_data.get("language") != None:
+    # added to create the record in languageProficiency table
+    if form.cleaned_data.get("language"):
         profile.language_proficiencies.create(code=form.cleaned_data.get("language"))
         profile.save()
 
@@ -2227,7 +2227,7 @@ def password_reset(request):
     from_email = request.POST.get('email')
     return JsonResponse({
         'success': True,
-        'value': render_to_string('registration/password_reset_done.html', {'email':  from_email}),
+        'value': render_to_string('registration/password_reset_done.html', {'email': from_email}),
     })
 
 
@@ -2266,7 +2266,7 @@ def validate_password(user, password):
 
     enforce_password_policy = configuration_helpers.get_value(
         "ENFORCE_PASSWORD_POLICY", settings.FEATURES.get("ENFORCE_PASSWORD_POLICY", False)
-    ) 
+    )
 
     if enforce_password_policy:
         try:

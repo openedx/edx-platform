@@ -437,7 +437,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self.assertIn(
             'course_title_0',
             response.content
-        )        
+        )
         # Test an item from social info
         self.assertIn(
             "Post on Facebook",

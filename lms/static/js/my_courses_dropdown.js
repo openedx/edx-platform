@@ -91,12 +91,12 @@ $(document).ready(function() {
         catchKeyPress($(this), event);
     });
     $(this).on('click', function() {
-        if($dropdownMenu.hasClass('expanded')) {
+        if ($dropdownMenu.hasClass('expanded')) {
             $dropdownMenu.removeClass('expanded');
             $dropdownMenuToggle.removeClass('active').attr('aria-expanded', 'false').focus();
         }
     });
-    $dropdownMenu.on('click',function(event) {
+    $dropdownMenu.on('click', function(event) {
         event.stopPropagation();
     });
 });

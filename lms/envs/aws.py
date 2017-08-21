@@ -911,7 +911,7 @@ if _COUNTRIES_OVERRIDE:
     COUNTRIES_OVERRIDE = _COUNTRIES_OVERRIDE
 
 # all-languages overrides, here if the language is null we remove the language from the language dictionary
-#otherwise if we are adding the new language code or existing code ,it should be added to the ALL_LANGUAGE_DUPLICATE which will be 
+#otherwise if we are adding the new language code or existing code ,it should be added to the ALL_LANGUAGE_DUPLICATE which will be
 #validated, when adding into the language proficiency table and then adding the language to ALL_LANGUAGES_DICT dictionary.
 ALL_LANGUAGES_OVERRIDE = ENV_TOKENS.get('ALL_LANGUAGES_OVERRIDE', None)
 if ALL_LANGUAGES_OVERRIDE:
@@ -920,5 +920,7 @@ if ALL_LANGUAGES_OVERRIDE:
             ALL_LANGUAGES_DICT.pop(code, None)
         elif code not in ALL_LANGUAGES_DICT:
             ALL_LANGUAGES_DUPLICATE = ALL_LANGUAGES_DUPLICATE + ([code, language],)
+            ALL_LANGUAGES_DICT[code] = language
+        else:
             ALL_LANGUAGES_DICT[code] = language
     ALL_LANGUAGES_DICT = OrderedDict(sorted(ALL_LANGUAGES_DICT.items(), key=itemgetter(1)))
