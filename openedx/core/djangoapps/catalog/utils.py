@@ -10,7 +10,6 @@ from edx_rest_api_client.client import EdxRestApiClient
 
 from openedx.core.djangoapps.catalog.cache import (
     PROGRAM_CACHE_KEY_TPL,
-    PROGRAM_UUIDS_CACHE_KEY,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -57,10 +56,7 @@ def get_programs(site, uuid=None):
             logger.warning(missing_details_msg_tpl.format(uuid=uuid))
 
         return program
-    if waffle.switch_is_active('get-multitenant-programs'):
-        uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
-    else:
-        uuids = cache.get(PROGRAM_UUIDS_CACHE_KEY, [])
+    uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
     if not uuids:
         logger.warning('Failed to get program UUIDs from the cache.')
 
@@ -140,7 +136,17 @@ def get_programs_with_type(site, include_hidden=True):
         list of dict, representing the active programs.
     """
     programs_with_type = []
+    logger.error("in function get_programs_with_type --asdf")
+    logger.error(site)
+    try:
+        logger.error(site.domain)
+        logger.error(site.name)
+    except:
+        logger.error("asdf----exception")
     programs = get_programs(site)
+
+    program_types = {program_type['name']: program_type for program_type in get_program_types()}
+    logger.error(program_types)
 
     if programs:
         program_types = {program_type['name']: program_type for program_type in get_program_types()}
