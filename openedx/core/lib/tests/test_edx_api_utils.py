@@ -4,17 +4,12 @@ import json
 
 import httpretty
 import mock
-import waffle
 from django.core.cache import cache
-from django.test.utils import override_settings
-from edx_oauth2_provider.tests.factories import ClientFactory
 from nose.plugins.attrib import attr
-from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import create_catalog_api_client
-from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.edx_api_utils import get_edx_api_data
@@ -74,7 +69,6 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
         # Verify the API was actually hit (not the cache)
         self._assert_num_requests(1)
 
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_get_paginated_data(self):
         """Verify that paginated data can be retrieved."""
         catalog_integration = self.create_catalog_integration()
@@ -102,7 +96,6 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
 
         self._assert_num_requests(len(expected_collection))
 
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_get_paginated_data_do_not_traverse_pagination(self):
         """
         Verify that pagination is not traversed if traverse_pagination=False is passed as argument.
@@ -131,7 +124,6 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
         self.assertEqual(actual_collection, expected_response)
         self._assert_num_requests(1)
 
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_get_specific_resource(self):
         """Verify that a specific resource can be retrieved."""
         catalog_integration = self.create_catalog_integration()
@@ -155,7 +147,6 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
 
         self._assert_num_requests(1)
 
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_get_specific_resource_with_falsey_id(self):
         """
         Verify that a specific resource can be retrieved, and pagination parsing is
@@ -185,7 +176,6 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
 
         self._assert_num_requests(1)
 
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_cache_utilization(self):
         """Verify that when enabled, the cache is used."""
         catalog_integration = self.create_catalog_integration(cache_ttl=5)

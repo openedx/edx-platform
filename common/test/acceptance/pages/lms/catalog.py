@@ -13,7 +13,7 @@ class CacheProgramsPage(PageObject):
     testing contexts where the LMS can only be reached over HTTP. Stub the
     discovery service before visiting this page.
     """
-    url = BASE_URL + '/catalog/management/cache_programs/'
+    url = BASE_URL + '/catalog/management/cache_programs_test/'
 
     def is_browser_on_page(self):
         body = self.q(css='body').text[0]
