@@ -14,7 +14,7 @@ cryptography==1.5.3
 cssselect==0.9.1
 dealer==2.0.4
 defusedxml==0.4.1
-django-babel-underscore==0.5.1
+django-babel-underscore==0.5.2
 markey==0.8  # From django-babel-underscore
 django-config-models==0.1.8
 django-countries==4.0
