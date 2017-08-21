@@ -1,7 +1,6 @@
 import logging
 import sys
 
-import waffle
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -9,7 +8,6 @@ from django.core.management import BaseCommand
 
 from openedx.core.djangoapps.catalog.cache import (
     PROGRAM_CACHE_KEY_TPL,
-    PROGRAM_UUIDS_CACHE_KEY,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -30,108 +28,51 @@ class Command(BaseCommand):
     help = "Rebuild the LMS' cache of program data."
 
     def handle(self, *args, **options):
-        if waffle.switch_is_active('populate-multitenant-programs'):
-            failure = False
-            logger.info('populate-multitenant-programs switch is ON')
+        failure = False
+        logger.info('populate-multitenant-programs switch is ON')
 
-            catalog_integration = CatalogIntegration.current()
-            username = catalog_integration.service_username
+        catalog_integration = CatalogIntegration.current()
+        username = catalog_integration.service_username
 
-            try:
-                user = User.objects.get(username=username)
-            except User.DoesNotExist:
-                logger.error(
-                    'Failed to create API client. Service user {username} does not exist.'.format(username=username)
-                )
-                raise
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            logger.error(
+                'Failed to create API client. Service user {username} does not exist.'.format(username=username)
+            )
+            raise
 
-            programs = {}
-            for site in Site.objects.all():
-                site_config = getattr(site, 'configuration', None)
-                if site_config is None or not site_config.get_value('COURSE_CATALOG_API_URL'):
-                    logger.info('Skipping site {domain}. No configuration.'.format(domain=site.domain))
-                    cache.set(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [], None)
-                    continue
+        programs = {}
+        for site in Site.objects.all():
+            site_config = getattr(site, 'configuration', None)
+            if site_config is None or not site_config.get_value('COURSE_CATALOG_API_URL'):
+                logger.info('Skipping site {domain}. No configuration.'.format(domain=site.domain))
+                cache.set(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [], None)
+                continue
 
-                client = create_catalog_api_client(user, site=site)
-                uuids, program_uuids_failed = self.get_site_program_uuids(client, site)
-                new_programs, program_details_failed = self.fetch_program_details(client, uuids)
+            client = create_catalog_api_client(user, site=site)
+            uuids, program_uuids_failed = self.get_site_program_uuids(client, site)
+            new_programs, program_details_failed = self.fetch_program_details(client, uuids)
 
-                if program_uuids_failed or program_details_failed:
-                    failure = True
+            if program_uuids_failed or program_details_failed:
+                failure = True
 
-                programs.update(new_programs)
+            programs.update(new_programs)
 
-                logger.info('Caching UUIDs for {total} programs for site {site_name}.'.format(
-                    total=len(uuids),
-                    site_name=site.domain,
-                ))
-                cache.set(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), uuids, None)
+            logger.info('Caching UUIDs for {total} programs for site {site_name}.'.format(
+                total=len(uuids),
+                site_name=site.domain,
+            ))
+            cache.set(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), uuids, None)
 
-            successful = len(programs)
-            logger.info('Caching details for {successful} programs.'.format(successful=successful))
-            cache.set_many(programs, None)
+        successful = len(programs)
+        logger.info('Caching details for {successful} programs.'.format(successful=successful))
+        cache.set_many(programs, None)
 
-            if failure:
-                # This will fail a Jenkins job running this command, letting site
-                # operators know that there was a problem.
-                sys.exit(1)
-
-        else:
-            catalog_integration = CatalogIntegration.current()
-            username = catalog_integration.service_username
-
-            try:
-                user = User.objects.get(username=username)
-                client = create_catalog_api_client(user)
-            except User.DoesNotExist:
-                logger.error(
-                    'Failed to create API client. Service user {username} does not exist.'.format(username=username)
-                )
-                raise
-
-            try:
-                querystring = {
-                    'exclude_utm': 1,
-                    'status': ('active', 'retired'),
-                    'uuids_only': 1,
-                }
-
-                logger.info('Requesting program UUIDs.')
-                uuids = client.programs.get(**querystring)
-            except:  # pylint: disable=bare-except
-                logger.error('Failed to retrieve program UUIDs.')
-                raise
-
-            total = len(uuids)
-            logger.info('Received {total} UUIDs.'.format(total=total))
-
-            programs = {}
-            failure = False
-            for uuid in uuids:
-                try:
-                    logger.info('Requesting details for program {uuid}.'.format(uuid=uuid))
-                    program = client.programs(uuid).get(exclude_utm=1)
-
-                    cache_key = PROGRAM_CACHE_KEY_TPL.format(uuid=uuid)
-                    programs[cache_key] = program
-                except:  # pylint: disable=bare-except
-                    logger.exception('Failed to retrieve details for program {uuid}.'.format(uuid=uuid))
-                    failure = True
-
-                    continue
-
-            successful = len(programs)
-            logger.info('Caching details for {successful} programs.'.format(successful=successful))
-            cache.set_many(programs, None)
-
-            logger.info('Caching UUIDs for {total} programs.'.format(total=total))
-            cache.set(PROGRAM_UUIDS_CACHE_KEY, uuids, None)
-
-            if failure:
-                # This will fail a Jenkins job running this command, letting site
-                # operators know that there was a problem.
-                sys.exit(1)
+        if failure:
+            # This will fail a Jenkins job running this command, letting site
+            # operators know that there was a problem.
+            sys.exit(1)
 
     def get_site_program_uuids(self, client, site):
         failure = False

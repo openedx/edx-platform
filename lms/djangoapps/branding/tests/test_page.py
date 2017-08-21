@@ -292,25 +292,18 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
 
-@ddt.ddt
 @attr(shard=1)
 class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
     """
     Tests for Programs List in Marketing Pages.
     """
-    @ddt.data(True, False)
-    def test_get_programs_with_type_called(self, multitenant_programs_enabled):
+    def test_get_programs_with_type_called(self):
         views = [
             (reverse('root'), 'student.views.get_programs_with_type'),
             (reverse('branding.views.courses'), 'courseware.views.views.get_programs_with_type'),
         ]
         for url, dotted_path in views:
             with patch(dotted_path) as mock_get_programs_with_type:
-                with override_switch('get-multitenant-programs', multitenant_programs_enabled):
-                    response = self.client.get(url)
-                    self.assertEqual(response.status_code, 200)
-
-                    if multitenant_programs_enabled:
-                        mock_get_programs_with_type.assert_called_once()
-                    else:
-                        mock_get_programs_with_type.assert_not_called()
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                mock_get_programs_with_type.assert_called_once()
