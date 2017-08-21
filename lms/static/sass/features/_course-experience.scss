@@ -86,6 +86,9 @@
 
   .dismiss-message {
     @include float(right);
+    .btn-link {
+        color: palette(grayscale, base);
+    }
   }
 }
 
