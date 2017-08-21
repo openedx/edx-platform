@@ -128,7 +128,8 @@ class CertificateProgressPageTest(UniqueCourseTest):
         )
 
         self.course_fixture.add_advanced_settings({
-            "cert_html_view_enabled": {"value": "true"}
+            "cert_html_view_enabled": {"value": "true"},
+            "certificates_show_before_end": {"value": "true"}
         })
 
         self.course_fixture.add_update(
@@ -176,7 +177,7 @@ class CertificateProgressPageTest(UniqueCourseTest):
         """
         Scenario: View Certificate option should be present on Course Progress menu if the user is
         awarded a certificate.
-        And their should be no padding around the box containing certificate info. (See SOL-1196 for details on this)
+        And there should be no padding around the box containing certificate info. (See SOL-1196 for details on this)
 
         As a Student
         Given there is a course with certificate configuration
