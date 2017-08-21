@@ -477,15 +477,63 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
         self.assertNotIn(response.content, tpa_hint)
 
-    def test_hinted_login_dialog_disabled(self):
+    @ddt.data(
+        ('signin_user', 'login'),
+        ('register_user', 'register'),
+    )
+    @ddt.unpack
+    def test_hinted_login_dialog_disabled(self, url_name, auth_entry):
         """Test that the dialog doesn't show up for hinted logins when disabled. """
         self.google_provider.skip_hinted_login_dialog = True
         self.google_provider.save()
         params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
-        response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
+        response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
         self.assertRedirects(
             response,
-            'auth/login/google-oauth2/?auth_entry=login&next=%2Fcourses%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2',
+            'auth/login/google-oauth2/?auth_entry={}&next=%2Fcourses%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2'.format(auth_entry),
+            target_status_code=302
+        )
+
+    @override_settings(FEATURES=dict(settings.FEATURES, THIRD_PARTY_AUTH_HINT='oa2-google-oauth2'))
+    @ddt.data(
+        'signin_user',
+        'register_user',
+    )
+    def test_settings_tpa_hinted_login(self, url_name):
+        """
+        Ensure that settings.FEATURES['THIRD_PARTY_AUTH_HINT'] can set third_party_auth_hint.
+        """
+        params = [("next", "/courses/something/")]
+        response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
+        self.assertContains(response, '"third_party_auth_hint": "oa2-google-oauth2"')
+
+        # THIRD_PARTY_AUTH_HINT can be overridden via the query string
+        tpa_hint = self.hidden_enabled_provider.provider_id
+        params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
+        response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
+        self.assertContains(response, '"third_party_auth_hint": "{0}"'.format(tpa_hint))
+
+        # Even disabled providers in the query string will override THIRD_PARTY_AUTH_HINT
+        tpa_hint = self.hidden_disabled_provider.provider_id
+        params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
+        response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
+        self.assertNotIn(response.content, tpa_hint)
+
+    @override_settings(FEATURES=dict(settings.FEATURES, THIRD_PARTY_AUTH_HINT='oa2-google-oauth2'))
+    @ddt.data(
+        ('signin_user', 'login'),
+        ('register_user', 'register'),
+    )
+    @ddt.unpack
+    def test_settings_tpa_hinted_login_dialog_disabled(self, url_name, auth_entry):
+        """Test that the dialog doesn't show up for hinted logins when disabled via settings.THIRD_PARTY_AUTH_HINT. """
+        self.google_provider.skip_hinted_login_dialog = True
+        self.google_provider.save()
+        params = [("next", "/courses/something/")]
+        response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
+        self.assertRedirects(
+            response,
+            'auth/login/google-oauth2/?auth_entry={}&next=%2Fcourses%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2'.format(auth_entry),
             target_status_code=302
         )
 
