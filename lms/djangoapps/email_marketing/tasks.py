@@ -95,7 +95,7 @@ def update_user(self, sailthru_vars, email, site=None, new_user=False):
         return
 
     # if new user, send welcome email
-    if new_user and email_config.sailthru_welcome_template:
+    if new_user and email_config.sailthru_welcome_template and is_default_site(site):
         scheduled_datetime = datetime.utcnow() + timedelta(seconds=email_config.welcome_email_send_delay)
         try:
             sailthru_response = sailthru_client.api_post(
@@ -118,6 +118,17 @@ def update_user(self, sailthru_vars, email, site=None, new_user=False):
             if _retryable_sailthru_error(error):
                 raise self.retry(countdown=email_config.sailthru_retry_interval,
                                  max_retries=email_config.sailthru_max_retries)
+
+
+def is_default_site(site):
+    """
+    Checks whether the site is a default site or a white-label
+    Args:
+        site: A dict containing the site info
+    Returns:
+         Boolean
+    """
+    return not site or site.get('id') == settings.SITE_ID
 
 
 # pylint: disable=not-callable
@@ -184,7 +195,7 @@ def _get_or_create_user_list_for_site(sailthru_client, site=None, default_list_n
     :param: default_list_name
     :return: list name if exists or created else return None
     """
-    if site and site.get('id') != settings.SITE_ID:
+    if not is_default_site(site):
         list_name = site.get('domain', '').replace(".", "_") + "_user_list"
     else:
         list_name = default_list_name
