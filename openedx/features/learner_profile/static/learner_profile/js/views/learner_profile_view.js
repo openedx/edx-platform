@@ -5,11 +5,9 @@
         [
             'gettext', 'jquery', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/html-utils',
             'common/js/components/views/tabbed_view',
-            'learner_profile/js/views/section_two_tab',
-            'text!learner_profile/templates/learner_profile.underscore',
-            'edx-ui-toolkit/js/utils/string-utils'
+            'learner_profile/js/views/section_two_tab'
         ],
-        function(gettext, $, _, Backbone, HtmlUtils, TabbedView, SectionTwoTab, learnerProfileTemplate, StringUtils) {
+        function(gettext, $, _, Backbone, HtmlUtils, TabbedView, SectionTwoTab) {
             var LearnerProfileView = Backbone.View.extend({
 
                 initialize: function(options) {
@@ -24,8 +22,6 @@
                     this.router = new Router();
                     this.firstRender = true;
                 },
-
-                template: _.template(learnerProfileTemplate),
 
                 showFullProfile: function() {
                     var isAboveMinimumAge = this.options.accountSettingsModel.isAboveMinimumAge();
@@ -54,21 +50,12 @@
                         ownProfile: this.options.ownProfile
                     });
 
-
-                    HtmlUtils.setHtml(this.$el, HtmlUtils.template(learnerProfileTemplate)({
-                        username: self.options.accountSettingsModel.get('username'),
-                        name: self.options.accountSettingsModel.get('name'),
-                        ownProfile: self.options.ownProfile,
-                        showFullProfile: self.showFullProfile(),
-                        profile_header: gettext('My Profile'),
-                        profile_subheader:
-                            StringUtils.interpolate(
-                                gettext('Build out your profile to personalize your identity on {platform_name}.'), {
-                                    platform_name: self.options.platformName
-                                }
-                            )
-                    }));
                     this.renderFields();
+
+                    // Reveal the profile and hide the loading indicator
+                    $('.ui-loading-indicator').addClass('is-hidden');
+                    $('.wrapper-profile-section-container-one').removeClass('is-hidden');
+                    $('.wrapper-profile-section-container-two').removeClass('is-hidden');
 
                     if (this.showFullProfile() && (this.options.accountSettingsModel.get('accomplishments_shared'))) {
                         tabs = [
@@ -108,7 +95,8 @@
                             Backbone.history.start();
                         }
                     } else {
-                        this.$el.find('.wrapper-profile-section-container-two').append(this.sectionTwoView.render().el);
+                        // xss-lint: disable=javascript-jquery-html
+                        this.$el.find('.wrapper-profile-bio').html(this.sectionTwoView.render().el);
                     }
                     return this;
                 },

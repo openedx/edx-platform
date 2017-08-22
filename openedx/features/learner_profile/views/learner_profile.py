@@ -17,6 +17,10 @@ from openedx.core.djangoapps.user_api.errors import UserNotAuthorized, UserNotFo
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from student.models import User
 
+from .. import SHOW_ACHIEVEMENTS_FLAG
+
+from learner_achievements import LearnerAchievementsFragmentView
+
 
 @login_required
 @require_http_methods(['GET'])
@@ -70,7 +74,19 @@ def learner_profile_context(request, profile_username, user_is_staff):
 
     preferences_data = get_user_preferences(profile_user, profile_username)
 
+    if SHOW_ACHIEVEMENTS_FLAG.is_enabled():
+        achievements_fragment = LearnerAchievementsFragmentView().render_to_fragment(
+            request,
+            username=profile_user.username,
+            own_profile=own_profile,
+        )
+    else:
+        achievements_fragment = None
+
     context = {
+        'own_profile': own_profile,
+        'achievements_fragment': achievements_fragment,
+        'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
         'data': {
             'profile_user_id': profile_user.id,
             'default_public_account_fields': settings.ACCOUNT_VISIBILITY_CONFIGURATION['public_fields'],

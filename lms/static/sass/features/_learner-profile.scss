@@ -1,10 +1,102 @@
 // lms - application - learner profile
 // ====================
 
-// Table of Contents
-// * +Container - Learner Profile
-// * +Main - Header
-// * +Settings Section
+.learner-achievements {
+    .learner-message {
+        @extend %no-content;
+        margin: $baseline*0.75 0;
+
+        .message-header, .message-actions {
+            text-align: center;
+        }
+
+        .message-actions {
+            margin-top: $baseline/2;
+
+            .btn-brand {
+                color: $white;
+            }
+        }
+    }
+}
+
+.certificate-card {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: $baseline;
+    padding: $baseline/2;
+    border: 1px;
+    border-style: solid;
+    background-color: $white;
+    cursor: pointer;
+
+    &:hover {
+        box-shadow: 0 0 1px 1px $gray-l2;
+    }
+
+    .card-logo {
+        @include margin-right($baseline);
+        width: 100px;
+        height: 100px;
+
+        @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
+            display: none;
+        }
+    }
+
+    .card-content {
+        color: $base-font-color;
+        margin-top: $baseline/2;
+    }
+
+    .card-supertitle {
+        @extend %t-title6;
+        color: $lightest-base-font-color;
+    }
+
+    .card-title {
+        @extend %t-title5;
+        @extend %t-strong;
+        margin-bottom: $baseline/2;
+    }
+
+    .card-text {
+        @extend %t-title8;
+        color: $lightest-base-font-color;
+    }
+
+    &.mode-audit {
+        border-color: $audit-mode-color;
+
+        .card-logo {
+            background-image: url('#{$static-path}/images/certificates/audit.png');
+        }
+    }
+
+    &.mode-honor {
+        border-color: $honor-mode-color;
+
+        .card-logo {
+            background-image: url('#{$static-path}/images/certificates/honor.png');
+        }
+    }
+
+    &.mode-verified {
+        border-color: $verified-mode-color;
+
+        .card-logo {
+            background-image: url('#{$static-path}/images/certificates/verified.png');
+        }
+    }
+
+    &.mode-professional {
+        border-color: $professional-certificate-color;
+
+        .card-logo {
+            background-image: url('#{$static-path}/images/certificates/professional.png');
+        }
+    }
+}
 
 .view-profile {
     $profile-image-dimension: 120px;
@@ -210,133 +302,146 @@
         }
     }
 
-    .wrapper-profile-section-one {
-        @include float(left);
-        @include margin-left($baseline*3);
-        width: 300px;
-        background-color: $white;
-        border-top: 5px solid $blue;
-        padding-bottom: $baseline;
-
+    .wrapper-profile-section-container-one {
         @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
-            @include margin-left(0);
-            width: 100%;
+            width: 90%;
+            padding: 0 5%;
+        }
+
+        .wrapper-profile-section-one {
+            @include float(left);
+            @include margin-left($baseline*3);
+            width: 300px;
+            background-color: $white;
+            border-top: 5px solid $blue;
+            padding-bottom: $baseline;
+
+            @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
+                @include margin-left(0);
+                width: 100%;
+            }
+
+            .profile-section-one-fields {
+                margin: 0 $baseline/2;
+
+                .social-links {
+                    font-size: 2rem;
+                    padding-top: $baseline/4;
+
+                    & > span {
+                        color: $gray-l4;
+                    }
+
+                    a {
+                        .fa-facebook-square {
+                            color: $facebook-blue;
+                        }
+
+                        .fa-twitter-square {
+                            color: $twitter-blue;
+                        }
+
+                        .fa-linkedin-square {
+                            color: $linkedin-blue;
+                        }
+                    }
+                }
+
+                .u-field {
+                    @extend %t-weight4;
+                    @include padding(0, 0, 0, 3px);
+                    color: $base-font-color;
+                    margin-top: $baseline/5;
+
+                    .u-field-value, .u-field-title {
+                        @extend %t-weight4;
+                        width: calc(100% - 40px);
+                    }
+
+                    .u-field-value-readonly {
+                        @extend %t-weight3;
+                        font-family: $sans-serif;
+                        color: $darkest-base-font-color;
+                    }
+
+                    .u-field-title {
+                        color: $lightest-base-font-color;
+                        display: block;
+                    }
+
+                    &.u-field-dropdown {
+                        position: relative;
+
+                        &:not(.editable-never) {
+                            cursor: pointer;
+                        }
+
+                        &:not(:last-child) {
+                            padding-bottom: $baseline/4;
+                            border-bottom: 1px solid $gray-lighter;
+
+                            &:hover.mode-placeholder {
+                                padding-bottom: $baseline/5;
+                                border-bottom: 2px dashed $link-color;
+                            }
+                        }
+                    }
+                }
+
+                &>.u-field {
+                    &:not(:first-child) {
+                        font-size: $body-font-size;
+                        color: $base-font-color;
+                        font-weight: $font-light;
+                        margin-bottom: 0;
+                    }
+
+                    &:first-child {
+                        @extend %t-title4;
+                        @extend %t-weight4;
+                        font-size: em(24);
+                    }
+                }
+
+                select {
+                    width: 85%
+                }
+
+                .u-field-message {
+                    @include right(0);
+                    position: absolute;
+                    top: 0;
+                    width: 20px;
+
+                    .icon {
+                        vertical-align: baseline;
+                    }
+                }
+            }
         }
     }
 
-    .profile-section-one-fields {
-        @include margin(0, $baseline/2, 0, $baseline*0.75);
-
-        .social-links {
-            font-size: 2rem;
-            padding-top: $baseline/4;
-
-            & > span {
-                color: $gray-l4;
-            }
-
-            a {
-                .fa-facebook-square {
-                    color: $facebook-blue;
-                }
-
-                .fa-twitter-square {
-                    color: $twitter-blue;
-                }
-
-                .fa-linkedin-square {
-                    color: $linkedin-blue;
-                }
-            }
-        }
-
-        .u-field {
-            @extend %t-weight4;
-            padding: 0;
-            color: $base-font-color;
-            margin-top: $baseline/5;
-
-            .u-field-value, .u-field-title {
-                @extend %t-weight4;
-                width: calc(100% - 40px);
-            }
-
-            .u-field-value-readonly {
-                font-weight: 500;
-                font-family: $sans-serif;
-                color: $darkest-base-font-color;
-            }
-
-            .u-field-title {
-                color: $lightest-base-font-color;
-                display: block;
-            }
-
-            &:not(.u-field-readonly):not(:last-child) {
-                padding-bottom: $baseline/4;
-                border-bottom: 1px solid $gray-lighter;
-
-                &:hover.mode-placeholder {
-                    padding-bottom: $baseline/5;
-                    border-bottom: 2px dashed $link-color;
-                }
-            }
-            &.u-field-dropdown {
-                position: relative;
-
-                &:not(.editable-never) {
-                    cursor: pointer;
-                }
-
-            }
-        }
-
-        &>.u-field {
-            &:not(:first-child) {
-                font-size: $body-font-size;
-                color: $base-font-color;
-                font-weight: $font-light;
-                margin-bottom: 0;
-            }
-
-            &:first-child {
-                @extend %t-title4;
-                @extend %t-weight4;
-                font-size: em(24);
-            }
-        }
-
-        select {
-            width: 85%
-        }
-
-        .u-field-message {
-            @include right(0);
-            position: absolute;
-            top: 0;
-            width: 20px;
-
-            .icon {
-                vertical-align: baseline;
-            }
-        }
-    }
 
     .wrapper-profile-section-container-two {
         @include float(left);
         @include padding-left($baseline);
         width: calc(100% - 380px);
         max-width: $learner-profile-container-flex; // Switch to map-get($grid-breakpoints,md) for bootstrap
+        font-family: $sans-serif;
 
         @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
-            @include padding-left(0);
-            width: 100%;
+            width: 90%;
             margin-top: $baseline;
+            padding: 0 5%;
         }
 
         .u-field-textarea {
+            @include padding(0, ($baseline*.75), ($baseline*.75), 0);
             margin-bottom: ($baseline/2);
-            @include padding(0, ($baseline*.75), ($baseline*.75), ($baseline/4));
+
+            @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
+                @include padding-left($baseline/4);
+            }
 
             .u-field-header {
                 position: relative;
@@ -355,12 +460,11 @@
 
         .u-field-title {
             @extend %t-title6;
-            @extend %t-weight5;
             display: inline-block;
             margin-top: 0;
             margin-bottom: ($baseline/4);
-            color: $gray-dark;
             width: 100%;
+            font: $font-semibold 1.4em/1.4em $sans-serif;
         }
 
         .u-field-value {
@@ -396,7 +500,7 @@
 
         .u-field.mode-placeholder {
             padding: $baseline;
-            margin: $baseline * 0.75;
+            margin: $baseline*0.75 0;
             border: 2px dashed $gray-l3;
 
             i {
