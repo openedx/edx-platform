@@ -9,10 +9,10 @@
                 });
             });
             $('.date-summary-verified-upgrade-deadline .date-summary-link').on('click', function() {
-                Logger.log('edx.course.home.upgrade_verified.clicked', {location: 'sidebar'});
+                Logger.log('edx.course.enrollment.upgrade.clicked', {location: 'sidebar'});
             });
             $('.upgrade-banner-button').on('click', function() {
-                Logger.log('edx.course.home.upgrade_verified.clicked', {location: 'notification'});
+                Logger.log('edx.course.enrollment.upgrade.clicked', {location: 'notification'});
             });
             $('.view-verified-info').on('click', function() {
                 Logger.log('edx.course.home.learn_about_verified.clicked', {location: 'notification'});
