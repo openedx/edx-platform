@@ -6,10 +6,12 @@ import logging
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from certificates.models import \
-    CertificateGenerationCourseSetting, \
-    CertificateWhitelist, \
+from certificates.models import (
+    CertificateGenerationCourseSetting,
+    CertificateWhitelist,
+    CertificateStatuses,
     GeneratedCertificate
+)
 from certificates.tasks import generate_certificate
 from courseware import courses
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
@@ -97,10 +99,16 @@ def _listen_for_track_change(sender, user, **kwargs):  # pylint: disable=unused-
 def fire_ungenerated_certificate_task(user, course_key):
     """
     Helper function to fire un-generated certificate tasks
-    :param user: A User object.
-    :param course_id: A CourseKey object.
+
+    The 'mode_is_verified' query is copied from the GeneratedCertificate model,
+    but is done here in an attempt to reduce traffic to the workers.
+    If the learner is verified and their cert has the 'unverified' status,
+    we regenerate the cert.
     """
-    if GeneratedCertificate.certificate_for_student(user, course_key) is None:
+    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+    mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
+    cert = GeneratedCertificate.certificate_for_student(user, course_key)
+    if mode_is_verified and (cert is None or cert.status == 'unverified'):
         generate_certificate.apply_async(kwargs={
             'student': unicode(user.id),
             'course_key': unicode(course_key),

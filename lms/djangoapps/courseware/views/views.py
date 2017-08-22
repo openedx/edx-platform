@@ -1007,8 +1007,9 @@ def _get_cert_data(student, course, course_key, is_active, enrollment_mode):
 
     # If the learner is in verified modes and the student did not have
     # their ID verified, we need to show message to ask learner to verify their ID first
-    missing_required_verification = enrollment_mode in CourseMode.VERIFIED_MODES and \
-        not SoftwareSecurePhotoVerification.user_is_verified(student)
+    missing_required_verification = (
+        enrollment_mode in CourseMode.VERIFIED_MODES and not SoftwareSecurePhotoVerification.user_is_verified(student)
+    )
 
     if missing_required_verification or cert_downloadable_status['is_unverified']:
         platform_name = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
