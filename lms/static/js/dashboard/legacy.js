@@ -191,6 +191,20 @@
              $('#unenroll-modal').css('position', 'fixed');
          });
 
+         $('#unenroll_form').on('ajax:complete', function(event, xhr) {
+             if (xhr.status === 200) {
+                 location.href = urls.dashboard;
+             } else if (xhr.status === 403) {
+                 location.href = urls.signInUser + '?course_id=' +
+                encodeURIComponent($('#unenroll_course_id').val()) + '&enrollment_action=unenroll';
+             } else {
+                 $('#unenroll_error').text(
+                    xhr.responseText ? xhr.responseText : gettext('An error occurred. Please try again later.')
+                ).stop()
+                     .css('display', 'block');
+             }
+         });
+
          $('#email_settings_form').submit(function() {
              $.ajax({
                  type: 'POST',
