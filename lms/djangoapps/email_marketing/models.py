@@ -47,14 +47,6 @@ class EmailMarketingConfiguration(ConfigurationModel):
         )
     )
 
-    sailthru_activation_template = models.fields.CharField(
-        max_length=20,
-        blank=True,
-        help_text=_(
-            "DEPRECATED: use sailthru_welcome_template instead."
-        )
-    )
-
     sailthru_welcome_template = models.fields.CharField(
         max_length=20,
         blank=True,
