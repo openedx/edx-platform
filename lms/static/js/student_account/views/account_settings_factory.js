@@ -124,10 +124,11 @@
                             view: new AccountSettingsFieldViews.DropdownFieldView({
                                 model: userAccountModel,
                                 required: true,
-                                title: gettext('Country or Region'),
+                                title: gettext('Country or Region of Residence'),
                                 valueAttribute: 'country',
                                 options: fieldsData.country.options,
-                                persistChanges: true
+                                persistChanges: true,
+                                helpMessage: gettext('The country or region where you live.')
                             })
                         },
                         {

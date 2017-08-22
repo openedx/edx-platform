@@ -165,7 +165,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
                     'Email Address',
                     'Password',
                     'Language',
-                    'Country or Region',
+                    'Country or Region of Residence',
                     'Time Zone',
                 ]
             },
@@ -410,7 +410,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         """
         self._test_dropdown_field(
             u'country',
-            u'Country or Region',
+            u'Country or Region of Residence',
             u'',
             [u'Pakistan', u'Palau'],
         )

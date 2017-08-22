@@ -633,7 +633,14 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the country in which the user lives.
-        country_label = _(u"Country")
+        country_label = _(u"Country or Region of Residence")
+
+        country_instructions = _(
+            # Translators: These instructions appear on the registration form, immediately
+            # below a field meant to hold the user's country.
+            u"The country or region where you live."
+        )
+
         error_msg = accounts.REQUIRED_FIELD_COUNTRY_MSG
 
         # If we set a country code, make sure it's uppercase for the sake of the form.
@@ -647,6 +654,7 @@ class RegistrationFormFactory(object):
         form_desc.add_field(
             "country",
             label=country_label,
+            instructions=country_instructions,
             field_type="select",
             options=list(countries),
             include_default_option=True,

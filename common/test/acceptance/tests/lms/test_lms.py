@@ -345,7 +345,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         errors = self.register_page.wait_for_errors()
         self.assertIn(u'Please enter your Public Username.', errors)
         self.assertIn(u'You must agree to the édX Terms of Service and Honor Code', errors)
-        self.assertIn(u'Please select your Country.', errors)
+        self.assertIn(u'Select your country or region of residence.', errors)
         self.assertIn(u'Please tell us your favorite movie.', errors)
 
     def test_toggle_to_login_form(self):
