@@ -43,6 +43,17 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
       });
     });
   </script>
+  <%static:require_module module_name="js/learner_dashboard/unenrollment_factory" class_name="UnenrollmentFactory">
+    UnenrollmentFactory({
+      urls: {
+        dashboard: "${reverse('dashboard') | n, js_escaped_string}",
+        signInUser: "${reverse('signin_user') | n, js_escaped_string}",
+        changeEmailSettings: "${reverse('change_email_settings') | n, js_escaped_string}",
+        browseCourses: "${marketing_link('COURSES') | n, js_escaped_string}"
+      },
+      isEdx: true
+    });
+  </%static:require_module>
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <%static:require_module module_name="course_search/js/dashboard_search_factory" class_name="DashboardSearchFactory">
         DashboardSearchFactory();
@@ -258,7 +269,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
       </span>
     </button>
 
-    <header>
+    <header class="unenroll-header">
       <h2 id="unenrollment-modal-title">
         <span id='track-info'></span>
         <span id='refund-info'></span>
