@@ -3,36 +3,33 @@
     define(['backbone',
         'jquery',
         'underscore',
-        'gettext',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'gettext'
     ],
          function(
              Backbone,
              $,
              _,
-             gettext,
-             HtmlUtils
+             gettext
          ) {
              return Backbone.View.extend({
                  el: '.unenroll-modal',
 
                  switchToSlideOne: function() {
-                     var survey, i,
-                         reasonsSurvey = HtmlUtils.HTML($('.reasons_survey'));
+                     var survey, i;
                      // Randomize survey option order
                      survey = document.querySelector('.options');
                      for (i = survey.children.length - 1; i >= 0; i--) {
                          survey.appendChild(survey.children[Math.random() * i | 0]);
                      }
-                     $('.inner-wrapper header').hide();
-                     $('#unenroll_form').after(HtmlUtils.ensureHtml(reasonsSurvey).toString()).hide();
-                     $('.reasons_survey .slide1').removeClass('hidden');
+                     this.$('.inner-wrapper header').hide();
+                     this.$('#unenroll_form').hide();
+                     this.$('.slide1').removeClass('hidden');
                  },
 
                  switchToSlideTwo: function() {
-                     var reason = $(".reasons_survey input[name='reason']:checked").attr('val');
+                     var reason = this.$(".reasons_survey input[name='reason']:checked").attr('val');
                      if (reason === 'Other') {
-                         reason = $('.other_text').val();
+                         reason = this.$('.other_text').val();
                      }
                      if (reason) {
                          window.analytics.track('unenrollment_reason.selected', {
@@ -41,9 +38,11 @@
                              displayName: 'v1'
                          });
                      }
-                     HtmlUtils.setHtml($('.reasons_survey'), HtmlUtils.HTML($('.slide2').html()));
-                     $('.reasons_survey .return_to_dashboard').attr('href', this.urls.dashboard);
-                     $('.reasons_survey .browse_courses').attr('href', this.urls.browseCourses);
+                     this.$('.slide1').addClass('hidden');
+                     this.$('.survey_course_name').text(this.$('#unenroll_course_name').text());
+                     this.$('.slide2').removeClass('hidden');
+                     this.$('.reasons_survey .return_to_dashboard').attr('href', this.urls.dashboard);
+                     this.$('.reasons_survey .browse_courses').attr('href', this.urls.browseCourses);
                  },
 
                  unenrollComplete: function(event, xhr) {
@@ -52,7 +51,7 @@
                              location.href = this.urls.dashboard;
                          } else {
                              this.switchToSlideOne();
-                             $('.submit_reasons').click(this.switchToSlideTwo.bind(this));
+                             this.$('.reasons_survey:first .submit_reasons').click(this.switchToSlideTwo.bind(this));
                          }
                      } else if (xhr.status === 403) {
                          location.href = this.urls.signInUser + '?course_id=' +
