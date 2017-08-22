@@ -3,13 +3,14 @@
     define([
         'gettext', 'jquery', 'underscore', 'backbone',
         'edx-ui-toolkit/js/utils/html-utils',
+        'edx-ui-toolkit/js/utils/date-utils',
         'text!templates/fields/field_readonly.underscore',
         'text!templates/fields/field_dropdown.underscore',
         'text!templates/fields/field_link.underscore',
         'text!templates/fields/field_text.underscore',
         'text!templates/fields/field_textarea.underscore',
         'backbone-super'
-    ], function(gettext, $, _, Backbone, HtmlUtils,
+    ], function(gettext, $, _, Backbone, HtmlUtils, DateUtils,
                  field_readonly_template,
                  field_dropdown_template,
                  field_link_template,
@@ -310,6 +311,38 @@
 
             updateValueInField: function() {
                 this.$('.u-field-value ').text(this.modelValue());
+            }
+        });
+
+        FieldViews.DateFieldView = FieldViews.ReadonlyFieldView.extend({
+
+            fieldType: 'date',
+
+            timezoneFormattedDate: function() {
+                var context;
+                context = {
+                    datetime: new Date(this.modelValue()),
+                    language: this.options.userLanguage,
+                    timezone: this.options.userTimezone,
+                    format: this.options.dateFormat
+                };
+                return DateUtils.localize(context);
+            },
+
+            render: function() {
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
+                    id: this.options.valueAttribute,
+                    title: this.options.title,
+                    screenReaderTitle: this.options.screenReaderTitle || this.options.title,
+                    value: this.timezoneFormattedDate(),
+                    message: this.helpMessage
+                }));
+                this.delegateEvents();
+                return this;
+            },
+
+            updateValueInField: function() {
+                this.$('.u-field-value ').text(this.timezoneFormattedDate());
             }
         });
 

@@ -235,7 +235,7 @@
             }
 
             .u-field-value-readonly {
-                @extend %t-weight3;
+                font-weight: 500;
                 font-family: $sans-serif;
                 color: $darkest-base-font-color;
             }
@@ -245,6 +245,15 @@
                 display: block;
             }
 
+            &:not(.u-field-readonly):not(:last-child) {
+                padding-bottom: $baseline/4;
+                border-bottom: 1px solid $gray-lighter;
+
+                &:hover.mode-placeholder {
+                    padding-bottom: $baseline/5;
+                    border-bottom: 2px dashed $link-color;
+                }
+            }
             &.u-field-dropdown {
                 position: relative;
 
@@ -252,15 +261,6 @@
                     cursor: pointer;
                 }
 
-                &:not(:last-child) {
-                    padding-bottom: $baseline/4;
-                    border-bottom: 1px solid $gray-lighter;
-
-                    &:hover.mode-placeholder {
-                        padding-bottom: $baseline/5;
-                        border-bottom: 2px dashed $link-color;
-                    }
-                }
             }
         }
 

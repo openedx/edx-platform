@@ -103,6 +103,12 @@ define(
                         valueAttribute: 'language_proficiencies',
                         options: Helpers.FIELD_OPTIONS,
                         helpMessage: ''
+                    }),
+
+                    new FieldViews.DateFieldView({
+                        model: accountSettingsModel,
+                        valueAttribute: 'date_joined',
+                        helpMessage: ''
                     })
                 ];
 
