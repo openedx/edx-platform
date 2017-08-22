@@ -96,21 +96,23 @@ def update_user(self, sailthru_vars, email, site=None, new_user=False):
 
     # if new user, send welcome email
     if new_user and email_config.sailthru_welcome_template:
-        scheduled_datetime = datetime.utcnow() + timedelta(seconds=email_config.welcome_email_send_delay)
-        try:
-            sailthru_response = sailthru_client.api_post(
-                "send",
-                {
-                    "email": email,
-                    "template": email_config.sailthru_welcome_template,
-                    "schedule_time": scheduled_datetime.strftime('%Y-%m-%dT%H:%M:%SZ')
-                }
-            )
-        except SailthruClientError as exc:
-            log.error("Exception attempting to send welcome email to user %s in Sailthru - %s", email, unicode(exc))
-            raise self.retry(exc=exc,
-                             countdown=email_config.sailthru_retry_interval,
-                             max_retries=email_config.sailthru_max_retries)
+        log.info("settings.SITE_ID: %s", settings.SITE_ID)
+        if site and site.get('id') == settings.SITE_ID:
+            scheduled_datetime = datetime.utcnow() + timedelta(seconds=email_config.welcome_email_send_delay)
+            try:
+                sailthru_response = sailthru_client.api_post(
+                    "send",
+                    {
+                        "email": email,
+                        "template": email_config.sailthru_welcome_template,
+                        "schedule_time": scheduled_datetime.strftime('%Y-%m-%dT%H:%M:%SZ')
+                    }
+                )
+            except SailthruClientError as exc:
+                log.error("Exception attempting to send welcome email to user %s in Sailthru - %s", email, unicode(exc))
+                raise self.retry(exc=exc,
+                                 countdown=email_config.sailthru_retry_interval,
+                                 max_retries=email_config.sailthru_max_retries)
 
         if not sailthru_response.is_ok():
             error = sailthru_response.get_error()
