@@ -66,7 +66,7 @@ USERNAME_BAD_LENGTH_MSG = _(u"Username must be between {min} and {max} character
 EMAIL_BAD_LENGTH_MSG = _(u"Enter a valid email address that contains at least {min} characters.").format(
     min=EMAIL_MIN_LENGTH
 )
-PASSWORD_EMPTY_MSG = _(u"Please enter a password.")
+PASSWORD_EMPTY_MSG = _(u"Enter a password.")
 PASSWORD_BAD_MIN_LENGTH_MSG = _(u"Password is not long enough.")
 PASSWORD_BAD_MAX_LENGTH_MSG = _(u"Password cannot be longer than {max} character.").format(max=PASSWORD_MAX_LENGTH)
 
@@ -81,10 +81,10 @@ PASSWORD_CANT_EQUAL_USERNAME_MSG = _(u"Password cannot be the same as the userna
 
 # Translators: These messages are shown to users who do not enter information
 # into the required field or enter it incorrectly.
-REQUIRED_FIELD_NAME_MSG = _(u"Please enter your Full Name.")
+REQUIRED_FIELD_NAME_MSG = _(u"Enter your full name.")
 REQUIRED_FIELD_CONFIRM_EMAIL_MSG = _(u"The email addresses do not match.")
-REQUIRED_FIELD_COUNTRY_MSG = _(u"Please select your Country.")
-REQUIRED_FIELD_CITY_MSG = _(u"Please enter your City.")
-REQUIRED_FIELD_GOALS_MSG = _(u"Please tell us your goals.")
-REQUIRED_FIELD_LEVEL_OF_EDUCATION_MSG = _(u"Please select your highest level of education completed.")
-REQUIRED_FIELD_MAILING_ADDRESS_MSG = _(u"Please enter your mailing address.")
+REQUIRED_FIELD_COUNTRY_MSG = _(u"Select your country or region of residence.")
+REQUIRED_FIELD_CITY_MSG = _(u"Enter your city.")
+REQUIRED_FIELD_GOALS_MSG = _(u"Tell us your goals.")
+REQUIRED_FIELD_LEVEL_OF_EDUCATION_MSG = _(u"Select the highest level of education you have completed.")
+REQUIRED_FIELD_MAILING_ADDRESS_MSG = _(u"Enter your mailing address.")

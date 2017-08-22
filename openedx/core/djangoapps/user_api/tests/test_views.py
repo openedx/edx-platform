@@ -1165,14 +1165,15 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             self._assert_reg_field(
                 {u"country": u"required"},
                 {
-                    u"label": u"Country",
+                    u"label": u"Country or Region of Residence",
                     u"name": u"country",
                     u"defaultValue": expected_country_code,
                     u"type": u"select",
                     u"required": True,
                     u"options": country_options,
+                    u"instructions": u"The country or region where you live.",
                     u"errorMessages": {
-                        u"required": u"Please select your Country."
+                        u"required": u"Select your country or region of residence."
                     },
                 }
             )
@@ -1198,7 +1199,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     {"value": "other", "name": "Other education", "default": False},
                 ],
                 "errorMessages": {
-                    "required": "Please select your highest level of education completed."
+                    "required": "Select the highest level of education you have completed."
                 }
             }
         )
@@ -1227,7 +1228,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     {"value": "other", "name": "Other education TRANSLATED", "default": False},
                 ],
                 "errorMessages": {
-                    "required": "Please select your highest level of education completed."
+                    "required": "Select the highest level of education you have completed."
                 }
             }
         )
@@ -1307,7 +1308,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "required": False,
                 "label": "Mailing address",
                 "errorMessages": {
-                    "required": "Please enter your mailing address."
+                    "required": "Enter your mailing address."
                 }
             }
         )
@@ -1323,7 +1324,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "errorMessages": {
-                    "required": "Please tell us your goals."
+                    "required": "Tell us your goals."
                 }
             }
         )
@@ -1337,7 +1338,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "required": False,
                 "label": "City",
                 "errorMessages": {
-                    "required": "Please enter your City."
+                    "required": "Enter your city."
                 }
             }
         )
@@ -1373,13 +1374,14 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"country": "required"},
             {
-                "label": "Country",
+                "label": "Country or Region of Residence",
                 "name": "country",
                 "type": "select",
+                "instructions": "The country or region where you live.",
                 "required": True,
                 "options": country_options,
                 "errorMessages": {
-                    "required": "Please select your Country."
+                    "required": "Select your country or region of residence."
                 },
             }
         )
