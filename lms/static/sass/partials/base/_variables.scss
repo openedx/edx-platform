@@ -248,11 +248,13 @@ $state-danger-border: darken($state-danger-bg, 5%) !default;
 // ----------------------------
 
 // logo colors
-$micromasters-color: #005585;
-$xseries-color: #424242;
-$professional-certificate-color: #9a1f60;
-$zebra-stripe-color: rgb(249, 250, 252);
-$divider-color: rgb(226,231,236);
+$honor-mode-color: $uxpl-blue-base !default;
+$verified-mode-color: $uxpl-green-base !default;
+$micromasters-color: #005585 !default;
+$xseries-color: #424242 !default;
+$professional-certificate-color: #9a1f60 !default;
+$zebra-stripe-color: rgb(249, 250, 252) !default;
+$divider-color: rgb(226,231,236) !default;
 
 // old color variables
 // DEPRECATED: Do not continue to use these colors, instead use pattern libary and base colors above.

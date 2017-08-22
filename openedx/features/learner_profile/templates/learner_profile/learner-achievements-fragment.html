@@ -1,0 +1,48 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='/static_content.html'/>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<div class="learner-achievements">
+    <h3>Course Certificates</h3>
+    % if course_certificates:
+        % for course_key in course_certificates.keys():
+            <%
+            certificate = course_certificates[course_key]
+            course = course_overviews[course_key]
+            %>
+            <a href="/cert">
+                <div class="card certificate-card mode-${certificate['mode']}">
+                    <div class="card-logo">
+                        <h4 class="sr-only">
+                            ${Text(_('{course_mode} Certificate')).format(
+                                course_mode=certificate['mode'],
+                            )}
+                        </h4>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-supertitle">${course.display_org_with_default}</div>
+                        <div class="card-title">${course.display_name_with_default}</div>
+                        <p class="card-text">Completed ??/??/????</p>
+                    </div>
+                </div>
+            </a>
+        % endfor
+    % elif own_profile:
+        <div class="learner-message">
+            <h4 class="message-header">${_("You haven't earned any certificates yet.")}</h4>
+            <p class="message-actions">
+                <a class="btn btn-brand" href="${marketing_link('COURSES')}">
+                    <span class="icon fa fa-search" aria-hidden="true"></span>
+                    ${_('Explore New Courses')}
+                </a>
+            </p>
+        </div>
+    % endif
+</div>

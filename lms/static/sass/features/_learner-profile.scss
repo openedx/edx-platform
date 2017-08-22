@@ -1,10 +1,64 @@
 // lms - application - learner profile
 // ====================
 
-// Table of Contents
-// * +Container - Learner Profile
-// * +Main - Header
-// * +Settings Section
+.learner-message {
+    @extend %no-content;
+    margin: $baseline*0.75 0;
+
+    .message-header, .message-actions {
+        text-align: center;
+    }
+
+    .message-actions {
+        margin-top: $baseline/2;
+    }
+}
+
+.certificate-card {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: $baseline;
+    padding: $baseline/2;
+    border-width: 2px;
+    border-style: solid;
+
+    .card-logo {
+        @include margin-right($baseline);
+        width: 100px;
+        height: 100px;
+    }
+
+    .card-content {
+        color: $base-font-color;
+    }
+
+    .card-title {
+        @extend %t-title5;
+        @extend %t-strong;
+        margin-bottom: $baseline/2;
+    }
+
+    .card-supertitle {
+        color: $lightest-base-font-color;
+        margin-bottom: $baseline/2;
+    }
+
+    &.mode-honor {
+        border-color: $honor-mode-color;
+
+        .card-logo {
+            background-image: url('#{$static-path}/images/certificates/honor.png');
+        }
+    }
+
+    &.mode-verified {
+        border-color: $verified-mode-color;
+
+        .card-logo {
+            background-image: url('#{$static-path}/images/certificates/verified.png');
+        }
+    }
+}
 
 .view-profile {
     $profile-image-dimension: 120px;
@@ -368,7 +422,7 @@
 
         .u-field.mode-placeholder {
             padding: $baseline;
-            margin: $baseline * 0.75;
+            margin: $baseline*0.75 0;
             border: 2px dashed $gray-l3;
 
             i {

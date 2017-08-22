@@ -8,7 +8,7 @@ from django.test.client import RequestFactory
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
 
-from ..views import learner_profile_context
+from openedx.features.learner_profile.views.learner_profile import learner_profile_context
 
 
 class LearnerProfileViewTest(UrlResetMixin, TestCase):

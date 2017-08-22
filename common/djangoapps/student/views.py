@@ -318,6 +318,30 @@ def get_course_enrollments(user, orgs_to_include, orgs_to_exclude):
             yield enrollment
 
 
+def get_course_certificates(user):
+    """
+    Returns information about a user's course certificates.
+    """
+    # Let's filter out any courses in an "org" that has been declared to be
+    # in a configuration
+    org_filter_out_set = configuration_helpers.get_all_orgs()
+
+    # Remove current site orgs from the "filter out" list, if applicable.
+    # We want to filter and only show enrollments for courses within
+    # the organizations defined in configuration for the current site.
+    course_org_filter = configuration_helpers.get_current_site_orgs()
+    if course_org_filter:
+        org_filter_out_set = org_filter_out_set - set(course_org_filter)
+
+    course_enrollments = list(get_course_enrollments(user, course_org_filter, org_filter_out_set))
+    certificates = {}
+    for enrollment in course_enrollments:
+        certificate_info = cert_info(user, enrollment.course_overview, enrollment.mode)
+        if certificate_info:
+            certificates[enrollment.course_id] = certificate_info
+    return certificates
+
+
 def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disable=unused-argument
     """
     Implements the logic for cert_info -- split out for testing.
@@ -767,10 +791,7 @@ def dashboard(request):
     # If a course is not included in this dictionary,
     # there is no verification messaging to display.
     verify_status_by_course = check_verify_status_by_course(user, course_enrollments)
-    cert_statuses = {
-        enrollment.course_id: cert_info(request.user, enrollment.course_overview, enrollment.mode)
-        for enrollment in course_enrollments
-    }
+    cert_statuses = get_course_certificates(user)
 
     # only show email settings for Mongo course and when bulk email is turned on
     show_email_settings_for = frozenset(

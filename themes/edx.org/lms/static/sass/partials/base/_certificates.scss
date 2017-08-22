@@ -1,0 +1,19 @@
+// Certificate overrides for edx.org
+
+.certificate-card {
+    &.mode-honor {
+        border-color: $honor-mode-color;
+
+        .card-logo {
+            background-image: url('#{$static-path}/images/certificates/honor.png');
+        }
+    }
+
+    &.mode-verified {
+        border-color: $verified-mode-color;
+
+        .card-logo {
+            background-image: url('#{$static-path}/images/certificates/verified.png');
+        }
+    }
+}
