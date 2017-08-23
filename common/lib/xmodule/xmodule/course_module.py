@@ -1453,13 +1453,4 @@ class CourseSummary(object):
         """
         Returns whether the course has ended.
         """
-        try:
-            return course_metadata_utils.has_course_ended(self.end)
-        except TypeError as e:
-            log.warning(
-                "Course '{course_id}' has an improperly formatted end date '{end_date}'. Error: '{err}'.".format(
-                    course_id=unicode(self.id), end_date=self.end, err=e
-                )
-            )
-            modified_end = self.end.replace(tzinfo=utc)
-            return course_metadata_utils.has_course_ended(modified_end)
+        return course_metadata_utils.has_course_ended(self.end)
