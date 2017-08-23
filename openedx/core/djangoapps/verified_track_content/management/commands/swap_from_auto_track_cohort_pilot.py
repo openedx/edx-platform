@@ -179,20 +179,20 @@ class Command(BaseCommand):
                     verified_course_user_group_partition_group.partition_id,
                     None
                 )
-                if (verified_partition_group_access
-                        and verified_course_user_group_partition_group.group_id in verified_partition_group_access):
-                    print "Queueing XBlock at location: '%s' for Verified Content Group update " % item.location
-                    set_verified_enrollment_track = True
-
-                # If the item has group_access that is not the
-                # verified or audit group IDs then raise an error
-                # This only needs to be checked for this partition_group once
-                non_verified_track_access_groups = set(verified_partition_group_access) - all_cohorted_track_group_ids
-                if non_verified_track_access_groups:
-                    errors.append(
-                        "Non audit/verified cohorted content group set for xblock, location '%s' with IDs '%s'"
-                        % (item.location, non_verified_track_access_groups)
-                    )
+                if verified_partition_group_access:
+                    non_verified_track_access_groups = (set(verified_partition_group_access) -
+                                                        all_cohorted_track_group_ids)
+                    # If the item has group_access that is not the
+                    # verified or audit group IDs then raise an error
+                    # This only needs to be checked for this partition_group once
+                    if non_verified_track_access_groups:
+                        errors.append(
+                            "Non audit/verified cohorted content group set for xblock, location '%s' with IDs '%s'"
+                            % (item.location, non_verified_track_access_groups)
+                        )
+                    if verified_course_user_group_partition_group.group_id in verified_partition_group_access:
+                        print "Queueing XBlock at location: '%s' for Verified Content Group update " % item.location
+                        set_verified_enrollment_track = True
 
                 # Add the enrollment track ids to a group access array
                 enrollment_track_group_access = []
