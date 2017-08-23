@@ -205,8 +205,9 @@ class CertificateAvailableDate(DateSummary):
 
     @property
     def is_enabled(self):
-        return self.date is not None and datetime.datetime.now(utc) <= self.date and waffle.waffle().is_enabled(
-            waffle.INSTRUCTOR_PACED_ONLY
+        return (
+            self.date is not None and datetime.datetime.now(utc) <= self.date and not self.course.self_paced and
+            waffle.waffle().is_enabled(waffle.INSTRUCTOR_PACED_ONLY)
         )
 
     @property

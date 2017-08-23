@@ -362,6 +362,18 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.assertEqual(block.date, None)
         self.assertFalse(block.is_enabled)
 
+    ## CertificateAvailableDate
+    @waffle.testutils.override_switch('certificates.instructor_paced_only', True)
+    def test_no_certificate_available_date_for_self_paced(self):
+        course = self.create_self_paced_course_run()
+        verified_user = self.create_user()
+        CourseEnrollmentFactory(course_id=course.id, user=verified_user, mode=CourseMode.VERIFIED)
+        course.certificate_available_date = datetime.now(utc) + timedelta(days=7)
+        course.save()
+        block = CertificateAvailableDate(course, verified_user)
+        self.assertNotEqual(block.date, None)
+        self.assertFalse(block.is_enabled)
+
     @waffle.testutils.override_switch('certificates.instructor_paced_only', True)
     def test_certificate_available_date_defined(self):
         course = self.create_course_run()
