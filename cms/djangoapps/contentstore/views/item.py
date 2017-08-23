@@ -1192,9 +1192,10 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                     'enable_timed_exams': xblock.enable_timed_exams
                 })
             elif xblock.category == 'sequential':
+                rules_url = settings.PROCTORING_SETTINGS.get('LINK_URLS', {}).get('online_proctoring_rules', ""),
                 xblock_info.update({
                     'is_proctored_exam': xblock.is_proctored_exam,
-                    'online_proctoring_rules': settings.PROCTORING_SETTINGS.get('LINK_URLS', {}).get('online_proctoring_rules', {}),
+                    'online_proctoring_rules': rules_url,
                     'is_practice_exam': xblock.is_practice_exam,
                     'is_time_limited': xblock.is_time_limited,
                     'exam_review_rules': xblock.exam_review_rules,
