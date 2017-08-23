@@ -68,7 +68,7 @@ function emptyxunit {
 END
 
 }
-PAVER_ARGS="--with-flaky --cov-args='-p' --with-xunitmp -v"
+PAVER_ARGS="--cov-args='-p' --with-xunitmp -v"
 PARALLEL="--processes=-1"
 case "$TEST_SUITE" in
 
@@ -109,7 +109,7 @@ case "$TEST_SUITE" in
                 paver test_system -s lms --attr="shard=$SHARD" $PAVER_ARGS $PARALLEL 2> lms-tests.$SHARD.log
                 ;;
             4|"noshard")
-                paver test_system -s lms --attr='!shard' $PAVER_ARGS $PARALLEL 2> lms-tests.REST.log
+                paver test_system -s lms --attr='!shard' $PAVER_ARGS $PARALLEL 2> lms-tests.4.log
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
