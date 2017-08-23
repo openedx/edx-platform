@@ -14,6 +14,8 @@
 
 import logging
 
+from urlparse import urljoin
+
 from django.http import HttpResponse
 from django.template import Context
 
@@ -47,7 +49,7 @@ def marketing_link(name):
         # special case for when we only want the root marketing URL
         if name == 'ROOT':
             return settings.MKTG_URLS.get('ROOT')
-        return settings.MKTG_URLS.get('ROOT') + settings.MKTG_URLS.get(name)
+        return urljoin(settings.MKTG_URLS.get('ROOT'), settings.MKTG_URLS.get(name))
     # only link to the old pages when the marketing site isn't on
     elif not enable_mktg_site and name in link_map:
         # don't try to reverse disabled marketing links
