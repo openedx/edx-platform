@@ -58,6 +58,12 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
                 if (newattrs.end_date && newattrs.enrollment_end && newattrs.end_date < newattrs.enrollment_end) {
                     errors.enrollment_end = gettext('The enrollment end date cannot be after the course end date.');
                 }
+                if (newattrs.end_date && newattrs.certificate_available_date &&
+                    newattrs.certificate_available_date < newattrs.end_date) {
+                    errors.certificate_available_date = gettext(
+                        'The certificate available date must be later than the course end date.'
+                    );
+                }
                 if (newattrs.intro_video && newattrs.intro_video !== this.get('intro_video')) {
                     if (this._videokey_illegal_chars.exec(newattrs.intro_video)) {
                         errors.intro_video = gettext('Key should only contain letters, numbers, _, or -');
