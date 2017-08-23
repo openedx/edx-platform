@@ -68,6 +68,8 @@ function emptyxunit {
 END
 
 }
+PAVER_ARGS="--cov-args='-p' --with-xunitmp -v"
+PARALLEL="--processes=-1"
 case "$TEST_SUITE" in
 
     "quality")
@@ -99,16 +101,15 @@ case "$TEST_SUITE" in
         ;;
 
     "lms-unit")
-        PAVER_ARGS="--with-flaky --processes=-1 --cov-args='-p' --with-xunitmp"
         case "$SHARD" in
             "all")
-                paver test_system -s lms $PAVER_ARGS
+                paver test_system -s lms $PAVER_ARGS $PARALLEL 2> lms-tests.log
                 ;;
             [1-3])
-                paver test_system -s lms --attr="shard=$SHARD" $PAVER_ARGS
+                paver test_system -s lms --attr="shard=$SHARD" $PAVER_ARGS $PARALLEL 2> lms-tests.$SHARD.log
                 ;;
             4|"noshard")
-                paver test_system -s lms --attr='!shard' $PAVER_ARGS
+                paver test_system -s lms --attr='!shard' $PAVER_ARGS $PARALLEL 2> lms-tests.4.log
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
@@ -122,11 +123,11 @@ case "$TEST_SUITE" in
         ;;
 
     "cms-unit")
-        paver test_system -s cms --with-flaky --cov-args="-p" -v --with-xunitmp
+        paver test_system -s cms $PAVER_ARGS 2> cms-tests.log
         ;;
 
     "commonlib-unit")
-        paver test_lib --with-flaky --cov-args="-p" -v --with-xunit
+        paver test_lib $PAVER_ARGS 2> common-tests.log
         ;;
 
     "js-unit")
@@ -136,7 +137,7 @@ case "$TEST_SUITE" in
 
     "commonlib-js-unit")
         paver test_js --coverage --skip-clean || { EXIT=1; }
-        paver test_lib --skip-clean --with-flaky --cov-args="-p" --with-xunitmp || { EXIT=1; }
+        paver test_lib --skip-clean $PAVER_ARGS || { EXIT=1; }
 
         # This is to ensure that the build status of the shard is properly set.
         # Because we are running two paver commands in a row, we need to capture
