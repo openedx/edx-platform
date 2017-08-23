@@ -1498,3 +1498,55 @@ a.fade-cover{
     }
   }
 }
+
+#unenroll-modal {
+  margin-top: -60px;
+}
+
+.reasons_survey {
+  margin: 20px;
+
+  .options {
+    list-style: none;
+    padding: 0;
+  }
+
+  .option {
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  input {
+    margin-right: 10px;
+  }
+
+  .unenroll-header {
+    background-image: none;
+  }
+
+  .other_text {
+    margin-top: 0;
+  }
+
+  .other_radio {
+    margin-top: 10px;
+  }
+
+  .submit_reasons {
+    margin-top: 10px;
+  }
+
+  .survey_button {
+    width: 30%;
+    margin-top: 10px;
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+    color: $white;
+  }
+
+  .survey_button:visited, .survey_button:hover, .survey_button:focus {
+    color: $white;
+    text-decoration: none;
+  }
+
+}
