@@ -214,7 +214,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             </li>
           </ol>
 
-          % if waffle.waffle().is_enabled(waffle.INSTRUCTOR_PACED_ONLY):
+          % if waffle.waffle().is_enabled(waffle.INSTRUCTOR_PACED_ONLY) and not context_course.self_paced:
           <ol class="list-input">
             <li class="field-group field-group-certificate-available" id="certificate-available">
               <div class="field date" id="field-certificate-available-date">
