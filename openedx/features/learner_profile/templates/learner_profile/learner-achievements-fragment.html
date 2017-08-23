@@ -10,7 +10,7 @@ from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <div class="learner-achievements">
-    <h3>Course Certificates</h3>
+    <h3 class="u-field-title">Course Certificates</h3>
     % if course_certificates:
         % for course_key in course_certificates.keys():
             <%

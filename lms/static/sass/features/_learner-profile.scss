@@ -1,19 +1,21 @@
 // lms - application - learner profile
 // ====================
 
-.learner-message {
-    @extend %no-content;
-    margin: $baseline*0.75 0;
+.learner-achievements {
+    .learner-message {
+        @extend %no-content;
+        margin: $baseline*0.75 0;
 
-    .message-header, .message-actions {
-        text-align: center;
-    }
+        .message-header, .message-actions {
+            text-align: center;
+        }
 
-    .message-actions {
-        margin-top: $baseline/2;
+        .message-actions {
+            margin-top: $baseline/2;
 
-        .btn-brand {
-            color: $white;
+            .btn-brand {
+                color: $white;
+            }
         }
     }
 }
@@ -23,17 +25,33 @@
     flex-direction: row;
     margin-bottom: $baseline;
     padding: $baseline/2;
-    border-width: 2px;
+    border: 1px;
     border-style: solid;
+    background-color: $white;
+    cursor: pointer;
+
+    &:hover {
+        box-shadow: inset 0px 0px 1px 1px $gray-l2;
+    }
 
     .card-logo {
         @include margin-right($baseline);
         width: 100px;
         height: 100px;
+
+        @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
+            display: none;
+        }
     }
 
     .card-content {
         color: $base-font-color;
+        margin-top: $baseline/2;
+    }
+
+    .card-supertitle {
+        @extend %t-title6;
+        color: $lightest-base-font-color;
     }
 
     .card-title {
@@ -42,9 +60,9 @@
         margin-bottom: $baseline/2;
     }
 
-    .card-supertitle {
+    .card-text {
+        @extend %t-title8;
         color: $lightest-base-font-color;
-        margin-bottom: $baseline/2;
     }
 
     &.mode-honor {
@@ -264,109 +282,123 @@
         }
     }
 
-    .wrapper-profile-section-one {
-        @include float(left);
-        @include margin-left($baseline*3);
-        width: 300px;
-        background-color: $white;
-        border-top: 5px solid $blue;
-        padding-bottom: $baseline;
-
+    .wrapper-profile-section-container-one {
         @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
-            @include margin-left(0);
-            width: 100%;
+            width: 90%;
+            padding: 0 5%;
         }
-    }
 
-    .profile-section-one-fields {
-        margin: 0 $baseline/2;
+        .wrapper-profile-section-one {
+            @include float(left);
+            @include margin-left($baseline*3);
+            width: 300px;
+            background-color: $white;
+            border-top: 5px solid $blue;
+            padding-bottom: $baseline;
 
-        .u-field {
-            @extend %t-weight4;
-            @include padding(0, 0, 0, 3px);
-            color: $base-font-color;
-            margin-top: $baseline/5;
-
-            .u-field-value, .u-field-title {
-                @extend %t-weight4;
-                width: calc(100% - 40px);
+            @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
+                @include margin-left(0);
+                width: 100%;
             }
 
-            .u-field-value-readonly {
-                @extend %t-weight3;
-                font-family: $sans-serif;
-                color: $darkest-base-font-color;
-            }
+            .profile-section-one-fields {
+                margin: 0 $baseline/2;
 
-            .u-field-title {
-                color: $lightest-base-font-color;
-                display: block;
-            }
+                .u-field {
+                    @extend %t-weight4;
+                    @include padding(0, 0, 0, 3px);
+                    color: $base-font-color;
+                    margin-top: $baseline/5;
 
-            &.u-field-dropdown {
-                position: relative;
+                    .u-field-value, .u-field-title {
+                        @extend %t-weight4;
+                        width: calc(100% - 40px);
+                    }
 
-                &:not(.editable-never) {
-                    cursor: pointer;
+                    .u-field-value-readonly {
+                        @extend %t-weight3;
+                        font-family: $sans-serif;
+                        color: $darkest-base-font-color;
+                    }
+
+                    .u-field-title {
+                        color: $lightest-base-font-color;
+                        display: block;
+                    }
+
+                    &.u-field-dropdown {
+                        position: relative;
+
+                        &:not(.editable-never) {
+                            cursor: pointer;
+                        }
+
+                        &:not(:last-child) {
+                            padding-bottom: $baseline/4;
+                            border-bottom: 1px solid $gray-lighter;
+
+                            &:hover.mode-placeholder {
+                                padding-bottom: $baseline/5;
+                                border-bottom: 2px dashed $link-color;
+                            }
+                        }
+                    }
                 }
 
-                &:not(:last-child) {
-                    padding-bottom: $baseline/4;
-                    border-bottom: 1px solid $gray-lighter;
+                &>.u-field {
+                    &:not(:first-child) {
+                        font-size: $body-font-size;
+                        color: $base-font-color;
+                        font-weight: $font-light;
+                        margin-bottom: 0;
+                    }
 
-                    &:hover.mode-placeholder {
-                        padding-bottom: $baseline/5;
-                        border-bottom: 2px dashed $link-color;
+                    &:first-child {
+                        @extend %t-title4;
+                        @extend %t-weight4;
+                        font-size: em(24);
+                    }
+                }
+
+                select {
+                    width: 85%
+                }
+
+                .u-field-message {
+                    @include right(0);
+                    position: absolute;
+                    top: 0;
+                    width: 20px;
+
+                    .icon {
+                        vertical-align: baseline;
                     }
                 }
             }
         }
-
-        &>.u-field {
-            &:not(:first-child) {
-                font-size: $body-font-size;
-                color: $base-font-color;
-                font-weight: $font-light;
-                margin-bottom: 0;
-            }
-
-            &:first-child {
-                @extend %t-title4;
-                @extend %t-weight4;
-                font-size: em(24);
-            }
-        }
-
-        select {
-            width: 85%
-        }
-
-        .u-field-message {
-            @include right(0);
-            position: absolute;
-            top: 0;
-            width: 20px;
-
-            .icon {
-                vertical-align: baseline;
-            }
-        }
     }
+
 
     .wrapper-profile-section-container-two {
         @include float(left);
         width: calc(100% - 360px);
         max-width: $learner-profile-container-flex; // Switch to map-get($grid-breakpoints,md) for bootstrap
         padding-left: $baseline;
+        font-family: $sans-serif;
 
         @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
-            width: 100%;
+            width: 90%;
             margin-top: $baseline;
+            padding: 0 5%;
         }
 
         .u-field-textarea {
+            @include padding(0, ($baseline*.75), ($baseline*.75), 0);
             margin-bottom: ($baseline/2);
-            padding: 0 ($baseline*.75) ($baseline*.75) ($baseline/4);
+
+            @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
+                @include padding-left($baseline/4);
+            }
 
             .u-field-header {
                 position: relative;
@@ -385,12 +417,11 @@
 
         .u-field-title {
             @extend %t-title6;
-            @extend %t-weight5;
             display: inline-block;
             margin-top: 0;
             margin-bottom: ($baseline/4);
-            color: $gray-dark;
             width: 100%;
+            font: $font-semibold 1.4em/1.4em $sans-serif;
         }
 
         .u-field-value {
