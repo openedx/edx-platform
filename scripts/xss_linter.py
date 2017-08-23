@@ -2003,7 +2003,7 @@ class MakoTemplateLinter(BaseLinter):
             True if this is really a Django template, and False otherwise.
 
         """
-        if re.search('({%.*%})|({{.*}})', mako_template) is not None:
+        if re.search('({%.*%})|({{.*}})|({#.*#})', mako_template) is not None:
             return True
         return False
 
