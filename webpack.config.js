@@ -168,9 +168,7 @@ var wpconfig = {
         alias: {
             'edx-ui-toolkit': 'edx-ui-toolkit/src/',  // @TODO: some paths in toolkit are not valid relative paths
             'jquery.ui': 'jQuery-File-Upload/js/vendor/jquery.ui.widget.js',
-            jquery: 'jquery/src/jquery',  // Use the non-dist form of jQuery for better debugging + optimization
-            react: 'preact-compat',
-            'react-dom': 'preact-compat'
+            jquery: 'jquery/src/jquery'  // Use the non-dist form of jQuery for better debugging + optimization
         },
         modules: [
             'node_modules',

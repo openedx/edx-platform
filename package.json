@@ -27,8 +27,6 @@
     "node-sass": "^4.5.3",
     "paragon": "edx/paragon",
     "picturefill": "~3.0.2",
-    "preact": "^8.2.1",
-    "preact-compat": "^3.16.0",
     "prop-types": "^15.5.10",
     "raw-loader": "^0.5.1",
     "react": "^15.5.4",
