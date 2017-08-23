@@ -23,6 +23,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError
 from enrollment.views import EnrollmentUserThrottle
@@ -34,7 +35,7 @@ from openedx.core.lib.django_test_client_utils import get_absolute_url
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
-from student.tests.factories import AdminFactory, CourseModeFactory, UserFactory
+from student.tests.factories import AdminFactory, UserFactory
 from util.models import RateLimitConfiguration
 from util.testing import UrlResetMixin
 

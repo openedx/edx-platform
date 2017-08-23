@@ -17,7 +17,7 @@ class CourseModeFactory(DjangoModelFactory):
         model = CourseMode
 
     course_id = CourseLocator('MITx', '999', 'Robot_Super_Course')
-    mode_slug = 'audit'
+    mode_slug = CourseMode.DEFAULT_MODE_SLUG
     currency = 'usd'
     expiration_datetime = None
     suggested_prices = ''

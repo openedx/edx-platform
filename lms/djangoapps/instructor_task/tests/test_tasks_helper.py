@@ -29,6 +29,7 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from certificates.models import CertificateStatuses, GeneratedCertificate
 from certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
 from instructor_analytics.basic import UNAVAILABLE
 from lms.djangoapps.grades.models import PersistentCourseGrade
@@ -75,7 +76,7 @@ from shoppingcart.models import (
     PaidCourseRegistration
 )
 from student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit
-from student.tests.factories import CourseEnrollmentFactory, CourseModeFactory, UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
