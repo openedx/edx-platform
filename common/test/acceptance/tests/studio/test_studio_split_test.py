@@ -3,7 +3,6 @@ Acceptance tests for Studio related to the split_test module.
 """
 
 import math
-from unittest import skip
 
 from bok_choy.promise import Promise
 from nose.plugins.attrib import attr
@@ -166,24 +165,6 @@ class SplitTest(ContainerBase, SplitTestMixin):
         # Reload the page to make sure the groups were persisted.
         container = self.go_to_nested_container_page()
         self.verify_groups(container, ['Group 0', 'Group 1', 'Group 2'], ['Group ID 0', 'Group ID 1'])
-
-    @skip("This fails periodically where it fails to trigger the add missing groups action.Dis")
-    def test_missing_group(self):
-        """
-        The case of a split test with invalid configuration (missing group).
-        """
-        container = self.create_poorly_configured_split_instance()
-
-        # Wait for the xblock to be fully initialized so that the add button is rendered
-        wait_for_xblock_initialization(self, '.xblock[data-block-type="split_test"]')
-
-        # Click the add button and verify that the groups were added on the page
-        container.add_missing_groups()
-        self.verify_groups(container, ['alpha', 'gamma'], ['beta'])
-
-        # Reload the page to make sure the groups were persisted.
-        container = self.go_to_nested_container_page()
-        self.verify_groups(container, ['alpha', 'gamma'], ['beta'])
 
     def test_delete_inactive_group(self):
         """

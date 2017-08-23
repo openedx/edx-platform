@@ -4,7 +4,7 @@
 Acceptance tests for Video.
 """
 import os
-from unittest import skip, skipIf
+from unittest import skipIf
 
 from ddt import data, ddt, unpack
 from mock import patch
@@ -760,36 +760,6 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.click_player_button('pause')
 
         self.assertGreaterEqual(self.video.seconds, 3)
-
-    @skip("Intermittently fails 03 June 2014")
-    def test_video_position_stored_correctly_with_seek(self):
-        """
-        Scenario: Video component stores position correctly when page is reloaded
-        Given the course has a Video component in "Youtube" mode
-        Then the video has rendered in "Youtube" mode
-        And I click video button "play""
-        And I click video button "pause"
-        Then I seek video to "0:10" position
-        And I click video button "play""
-        And I click video button "pause"
-        And I reload the page with video
-        Then video slider should be Equal or Greater than "0:10"
-
-        """
-        self.navigate_to_video()
-
-        self.video.click_player_button('play')
-
-        self.video.seek('0:10')
-
-        self.video.click_player_button('pause')
-
-        self.video.reload_page()
-
-        self.video.click_player_button('play')
-        self.video.click_player_button('pause')
-
-        self.assertGreaterEqual(self.video.seconds, 10)
 
     def test_simplified_and_traditional_chinese_transcripts(self):
         """

@@ -2,15 +2,12 @@
 Acceptance tests for Studio related to the asset index page.
 """
 
-from unittest import skip
-
 from common.test.acceptance.fixtures.base import StudioApiLoginError
 from common.test.acceptance.pages.studio.asset_index import AssetIndexPage
 from common.test.acceptance.tests.helpers import skip_if_browser
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
 
-@skip('FEDX-88')
 class AssetIndexTest(StudioCourseTest):
 
     """
