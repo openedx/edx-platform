@@ -5,12 +5,14 @@ import time
 import unittest
 
 import ddt
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.db import IntegrityError, connection
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
+from django.utils.six import StringIO
 
 from util.db import NoOpMigrationModules, commit_on_success, enable_named_outer_atomic, generate_int_id, outer_atomic
 
@@ -221,5 +223,14 @@ class MigrationTests(TestCase):
         The test is set up to override MIGRATION_MODULES to ensure migrations are
         enabled for purposes of this test regardless of the overall test settings.
         """
-        with self.assertRaises(SystemExit):
-            call_command('makemigrations', '-e')
+        out = StringIO()
+        call_command('makemigrations', dry_run=True, verbosity=3, stdout=out)
+        output = out.getvalue()
+
+        # Temporary check, remove it once migration is created and use the else part.
+        if settings.ROOT_URLCONF == 'lms.urls':
+            migrations_count = output.count('Migrations for')
+            self.assertIn('Remove field sailthru_activation_template', output)
+            self.assertEqual(migrations_count, 1)
+        else:
+            self.assertIn('No changes detected', output)
