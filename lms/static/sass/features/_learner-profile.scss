@@ -11,6 +11,10 @@
 
     .message-actions {
         margin-top: $baseline/2;
+
+        .btn-brand {
+            color: $white;
+        }
     }
 }
 
