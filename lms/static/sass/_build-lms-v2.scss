@@ -21,6 +21,7 @@
 
 // Elements
 @import 'notifications';
+@import 'elements/controls';
 @import 'elements-v2/pagination';
 
 // Features
@@ -28,6 +29,7 @@
 @import 'features/course-experience';
 @import 'features/course-search';
 @import 'features/course-sock';
+@import 'features/course-upgrade-message';
 
 // Views
 @import "views/program-marketing-page";
