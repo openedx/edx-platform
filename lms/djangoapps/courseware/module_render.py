@@ -879,36 +879,32 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
-def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
+class XblockCallbackView(APIView):
     """
-    Generic view for extensions. This is where AJAX calls go.
-
-    Arguments:
-
-      - request -- the django request.
-      - location -- the module location. Used to look up the XModule instance
-      - course_id -- defines the course context for this request.
+    Class-based view for extensions. This is where AJAX calls go.
 
     Return 403 error if the user is not logged in. Raises Http404 if
     the location and course_id do not identify a valid module, the module is
     not accessible by the user, or the module raises NotFoundError. If the
     module raises any other error, it will escape this function.
     """
-    if not request.user.is_authenticated():
-        return HttpResponse('Unauthenticated', status=403)
+    authentication_classes = (SessionAuthentication, OAuth2Authentication,)
+    permission_classes = (IsAuthenticated,)
 
-    try:
-        course_key = CourseKey.from_string(course_id)
-    except InvalidKeyError:
-        raise Http404("Invalid location")
+    def get(self, request, course_id, usage_id, handler, suffix=None):
+        return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
 
-    with modulestore().bulk_operations(course_key):
-        try:
-            course = modulestore().get_course(course_key)
-        except ItemNotFoundError:
-            raise Http404("invalid location")
+    def post(self, request, course_id, usage_id, handler, suffix=None):
+        return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
 
-        return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
+    def put(self, request, course_id, usage_id, handler, suffix=None):
+        return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
+
+    def patch(self, request, course_id, usage_id, handler, suffix=None):
+        return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
+
+    def delete(self, request, course_id, usage_id, handler, suffix=None):
+        return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
 
 
 def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argument
@@ -1004,10 +1000,11 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     """
 
     # Check submitted files
-    files = request.FILES or {}
-    error_msg = _check_files_limits(files)
-    if error_msg:
-        return JsonResponse(object={'success': error_msg}, status=413)
+    if request.method == 'POST' and request.META.get('CONTENT_TYPE', '').startswith('multipart/form-data'):
+        files = request.FILES
+        error_msg = _check_files_limits(files)
+        if error_msg:
+            return JsonResponse({'success': error_msg}, status=413)
 
     # Make a CourseKey from the course_id, raising a 404 upon parse error.
     try:
@@ -1027,6 +1024,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
 
         tracking_context_name = 'module_callback_handler'
         req = django_to_webob_request(request)
+
         try:
             with tracker.get_tracker().context(tracking_context_name, tracking_context):
                 resp = instance.handle(handler, req, suffix)
@@ -1052,6 +1050,22 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
             raise
 
     return webob_to_django_response(resp)
+
+
+def _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix):
+    """ Gets the course object to pass as an additional argument to invoke the xblock handler. """
+    try:
+        course_key = CourseKey.from_string(course_id)
+    except InvalidKeyError:
+        raise Http404("Invalid location")
+
+    with modulestore().bulk_operations(course_key):
+        try:
+            course = modulestore().get_course(course_key)
+        except ItemNotFoundError:
+            raise Http404("invalid location")
+
+        return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
 def hash_resource(resource):

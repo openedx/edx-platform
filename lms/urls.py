@@ -12,6 +12,7 @@ from ratelimitbackend import admin
 from courseware.views.index import CoursewareIndex
 from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from django_comment_common.models import ForumsConfig
+from courseware.module_render import XblockCallbackView
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -252,7 +253,7 @@ urlpatterns += (
             course_key=settings.COURSE_ID_PATTERN,
             usage_key=settings.USAGE_ID_PATTERN,
         ),
-        'courseware.module_render.handle_xblock_callback',
+        XblockCallbackView.as_view(),
         name='xblock_handler',
     ),
     url(
