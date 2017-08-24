@@ -9,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 
+from commerce.utils import EcommerceService
 from courseware.access import has_access
 from courseware.courses import (
     can_self_enroll_in_course,
@@ -24,7 +25,7 @@ from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
 from web_fragments.fragment import Fragment
 
-from .. import LATEST_UPDATE_FLAG
+from .. import LATEST_UPDATE_FLAG, SHOW_UPGRADE_MSG_ON_COURSE_HOME
 from ..utils import get_course_outline_block_tree
 from .course_dates import CourseDatesFragmentView
 from .course_home_messages import CourseHomeMessageFragmentView
@@ -116,9 +117,10 @@ class CourseHomeFragmentView(EdxFragmentView):
 
         # Render the full content to enrolled users, as well as to course and global staff.
         # Unenrolled users who are not course or global staff are given only a subset.
+        enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
         user_access = {
             'is_anonymous': request.user.is_anonymous(),
-            'is_enrolled': CourseEnrollment.is_enrolled(request.user, course_key),
+            'is_enrolled': enrollment is not None,
             'is_staff': has_access(request.user, 'staff', course_key),
         }
         if user_access['is_enrolled'] or user_access['is_staff']:
@@ -157,6 +159,22 @@ class CourseHomeFragmentView(EdxFragmentView):
             request, course_id=course_id, user_access=user_access, **kwargs
         )
 
+        # Get info for upgrade messaging
+        upgrade_price = None
+        upgrade_url = None
+
+        # TODO Add switch to control deployment
+        if SHOW_UPGRADE_MSG_ON_COURSE_HOME.is_enabled(course_key) and enrollment and enrollment.upgrade_deadline:
+            verified_mode = enrollment.verified_mode
+            if verified_mode:
+                upgrade_price = verified_mode.min_price
+
+                ecommerce_service = EcommerceService()
+                if ecommerce_service.is_enabled(request.user):
+                    upgrade_url = ecommerce_service.get_checkout_page_url(verified_mode.sku)
+                else:
+                    upgrade_url = reverse('verify_student_upgrade_and_verify', args=(course_key,))
+
         # Render the course home fragment
         context = {
             'request': request,
@@ -174,6 +192,8 @@ class CourseHomeFragmentView(EdxFragmentView):
             'course_sock_fragment': course_sock_fragment,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
+            'upgrade_price': upgrade_price,
+            'upgrade_url': upgrade_url,
         }
         html = render_to_string('course_experience/course-home-fragment.html', context)
         return Fragment(html)

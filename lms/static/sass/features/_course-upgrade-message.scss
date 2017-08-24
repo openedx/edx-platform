@@ -1,0 +1,126 @@
+/*
+  NOTE: If you make significant changes to the design, remember to update the Segment event properties and change
+  the creative property. This will allow us to better track individual performance of each style of the message.
+  Search for the courseware_verified_certificate_upsell promotion ID.
+ */
+$upgrade-message-background-color: $blue-d1;
+
+// Expanded upgrade message
+.vc-message {
+  background: $blue-d1;
+  color: $white;
+  padding: $baseline;
+  position: relative;
+  margin: 0 0 $baseline;
+
+  // CSS animation for smooth height transition
+  -webkit-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  // Message copy
+  .vc-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    @include float(left);
+  }
+
+  .vc-selling-points {
+    @include clear(left);
+    @include padding-left(0);
+    font-size: 0.825rem;
+    margin: 1rem 0;
+    display: table;
+
+    > .vc-selling-point {
+      list-style: none;
+      display: table-row;
+
+      &:before {
+        content: "\2022";
+        display: table-cell;
+        @include padding-right($baseline/2);
+      }
+
+      &:after {
+        content: "";
+        display: table-row;
+        height: 0.25rem;
+      }
+    }
+  }
+  img {
+    max-width: 100%;
+  }
+
+  // Show/hide button
+  .vc-toggle {
+    @include float(right);
+    color: $white;
+  }
+
+  // Upgrade Button
+  .btn-upgrade {
+    @extend %btn-primary-green;
+    background: $uxpl-green-base;
+  }
+
+  // Cert image
+  .vc-hero {
+    @include float(right);
+    @include padding-left(1rem);
+    clear: both;
+    width: 35%;
+
+    img {
+      max-width: 100%;
+    }
+  }
+}
+
+// Collapsed upgrade message
+.vc-message.polite {
+  padding-top: $baseline/2;
+  padding-bottom: $baseline/2;
+  min-height: 46px;
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+
+  .vc-title {
+    margin: 0;
+    @include margin-right(auto);
+  }
+
+  .vc-cta {
+    @include margin-right(1rem);
+  }
+
+  .vc-toggle {
+    order: 99;
+  }
+
+  .vc-fade:not(.vc-polite-only) {
+    display: none;
+  }
+}
+
+@media (max-width: $bp-screen-md) {
+  .vc-message.polite .vc-title {
+    clear: both;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: $bp-screen-sm) {
+  .vc-message .vc-hero {
+    display: none !important;
+  }
+}

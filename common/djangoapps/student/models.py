@@ -33,6 +33,7 @@ from django.db.models import Count
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import Signal, receiver
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
@@ -1688,6 +1689,10 @@ class CourseEnrollment(models.Model):
                 self._course_overview = None
         return self._course_overview
 
+    @cached_property
+    def verified_mode(self):
+        return CourseMode.verified_mode_for_course(self.course_id)
+
     @property
     def upgrade_deadline(self):
         """
@@ -1723,11 +1728,9 @@ class CourseEnrollment(models.Model):
             pass
 
         try:
-            verified_mode = CourseMode.verified_mode_for_course(self.course_id)
-
-            if verified_mode:
+            if self.verified_mode:
                 log.debug('Schedules: Defaulting to verified mode expiration date-time for %s.', self.course_id)
-                return verified_mode.expiration_datetime
+                return self.verified_mode.expiration_datetime
             else:
                 log.debug('Schedules: No verified mode located for %s.', self.course_id)
         except CourseMode.DoesNotExist:

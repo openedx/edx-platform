@@ -57,6 +57,37 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
     <div class="page-content">
         <div class="layout layout-1t2t">
             <main class="layout-col layout-col-b">
+
+                % if upgrade_url and upgrade_price:
+                    <div class="section">
+                        <div class="vc-message tex2jax_ignore" role="group" aria-labelledby="vc-title" tabindex="-1" style="display: none;">
+
+                            <h3 class="vc-title vc-fade vc-polite-only">Pursue a verified certificate</h3>
+
+                            <button class="vc-toggle vc-fade vc-polite-only btn-link" type="button" aria-controls="moreinfo"
+                                    aria-expanded="true" aria-label="${_("Show/Hide")}">
+                                ${_("Show less")}
+                            </button>
+
+                            <div class="vc-hero vc-fade">
+                                <img src="${static.url('course_experience/images/verified-cert.png')}"
+                                     alt="${_("Sample verified certificate with your name, the course title, the logo of the institution and the signatures of the instructors for this course.")}"/>
+                            </div>
+
+                            <ul class="vc-selling-points vc-fade">
+                                <li class="vc-selling-point">${_("Official proof of completion")}</li>
+                                <li class="vc-selling-point">${_("Easily shareable certificate")}</li>
+                                <li class="vc-selling-point">${_("Proven motivator to complete the course")}</li>
+                                <li class="vc-selling-point">${_("Certificate purchases help us continue to offer free courses")}</li>
+                            </ul>
+
+                            <div class="vc-cta vc-fade vc-polite-only">
+                                <a class="btn-upgrade" href="${ upgrade_url }">${_("Upgrade ({price})").format(price='$' + str(upgrade_price))}</a>
+                            </div>
+                        </div>
+                    </div>
+                % endif
+
                 % if course_home_message_fragment:
                     ${HTML(course_home_message_fragment.body_html())}
                 % endif
@@ -109,6 +140,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
 
 <%static:webpack entry="CourseHome">
     new CourseHome({
+        courseRunKey: "${course_key | n, js_escaped_string}",
         resumeCourseLink: ".action-resume-course",
         courseToolLink: ".course-tool-link",
     });

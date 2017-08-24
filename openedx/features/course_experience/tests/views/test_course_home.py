@@ -3,28 +3,36 @@
 Tests for the course home page.
 """
 from datetime import datetime, timedelta
+
 import ddt
 import mock
-from pytz import UTC
-from waffle.testutils import override_flag
-
-from courseware.tests.factories import StaffFactory
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
 from django.utils.http import urlquote_plus
+from pytz import UTC
+from waffle.models import Flag
+from waffle.testutils import override_flag
+
+from commerce.models import CommerceConfiguration
+from commerce.utils import EcommerceService
+from course_modes.models import CourseMode
+from courseware.tests.factories import StaffFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
-from openedx.features.course_experience import SHOW_REVIEWS_TOOL_FLAG, UNIFIED_COURSE_TAB_FLAG
+from openedx.features.course_experience import (
+    SHOW_REVIEWS_TOOL_FLAG,
+    SHOW_UPGRADE_MSG_ON_COURSE_HOME,
+    UNIFIED_COURSE_TAB_FLAG
+)
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.date_utils import strftime_localized
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import CourseUserType, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-
-from ... import COURSE_PRE_START_ACCESS_FLAG
 from .helpers import add_course_mode
 from .test_course_updates import create_course_update
+from ... import COURSE_PRE_START_ACCESS_FLAG
 
 TEST_PASSWORD = 'test'
 TEST_CHAPTER_NAME = 'Test Chapter'
@@ -68,6 +76,7 @@ class CourseHomePageTestCase(SharedModuleStoreTestCase):
     """
     Base class for testing the course home page.
     """
+
     @classmethod
     def setUpClass(cls):
         """
@@ -113,9 +122,6 @@ class CourseHomePageTestCase(SharedModuleStoreTestCase):
 
 class TestCourseHomePage(CourseHomePageTestCase):
     def setUp(self):
-        """
-        Set up for the tests.
-        """
         super(TestCourseHomePage, self).setUp()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
@@ -160,7 +166,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         course_home_url(self.course)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(41, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(42, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -374,3 +380,75 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(url)
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE_PRE_START)
+
+
+class CourseHomeFragmentViewTests(ModuleStoreTestCase):
+    CREATE_USER = False
+
+    def setUp(self):
+        super(CourseHomeFragmentViewTests, self).setUp()
+        CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
+
+        end = datetime.now(UTC) + timedelta(days=30)
+        self.course = CourseFactory(
+            start=datetime.now(UTC) - timedelta(days=30),
+            end=end,
+        )
+        self.url = course_home_url(self.course)
+
+        CourseMode.objects.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
+        self.verified_mode = CourseMode.objects.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.VERIFIED,
+            min_price=100,
+            expiration_datetime=end,
+            sku='test'
+        )
+
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
+        name = SHOW_UPGRADE_MSG_ON_COURSE_HOME.waffle_namespace._namespaced_name(
+            SHOW_UPGRADE_MSG_ON_COURSE_HOME.flag_name)
+        self.flag, __ = Flag.objects.update_or_create(name=name, defaults={'everyone': True})
+
+    def assert_upgrade_message_not_displayed(self):
+        response = self.client.get(self.url)
+        self.assertNotIn('vc-message', response.content)
+
+    def assert_upgrade_message_displayed(self):
+        response = self.client.get(self.url)
+        self.assertIn('vc-message', response.content)
+        url = EcommerceService().get_checkout_page_url(self.verified_mode.sku)
+        expected = '<a class="btn-upgrade" href="{url}">Upgrade (${price})</a>'.format(
+            url=url,
+            price=self.verified_mode.min_price
+        )
+        self.assertIn(expected, response.content)
+
+    def test_no_upgrade_message_if_logged_out(self):
+        self.client.logout()
+        self.assert_upgrade_message_not_displayed()
+
+    def test_no_upgrade_message_if_not_enrolled(self):
+        self.assertEqual(len(CourseEnrollment.enrollments_for_user(self.user)), 0)
+        self.assert_upgrade_message_not_displayed()
+
+    def test_no_upgrade_message_if_verified_track(self):
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
+        self.assert_upgrade_message_not_displayed()
+
+    def test_no_upgrade_message_if_upgrade_deadline_passed(self):
+        self.verified_mode.expiration_datetime = datetime.now(UTC) - timedelta(days=20)
+        self.verified_mode.save()
+        self.assert_upgrade_message_not_displayed()
+
+    def test_no_upgrade_message_if_flag_disabled(self):
+        self.flag.everyone = False
+        self.flag.save()
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
+        self.assert_upgrade_message_not_displayed()
+
+    def test_display_upgrade_message_if_audit_and_deadline_not_passed(self):
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
+        self.assert_upgrade_message_displayed()
