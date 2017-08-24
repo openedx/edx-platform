@@ -5,15 +5,16 @@ Certificate HTML webview.
 import logging
 import urllib
 from datetime import datetime
-import pytz
 from uuid import uuid4
 
+import pytz
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponse
 from django.template import RequestContext
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
+from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
@@ -35,15 +36,15 @@ from certificates.models import (
     GeneratedCertificate
 )
 from courseware.access import has_access
+from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
-from eventtracking import tracker
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
 from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
-from util.views import handle_500
 from util.date_utils import strftime_localized
+from util.views import handle_500
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -98,10 +99,16 @@ def _update_certificate_context(context, user_certificate, platform_name):
     )
 
     # Translators:  The format of the date includes the full name of the month
+    course = get_course_by_id(user_certificate.course_id) if user_certificate.course_id else None
+
+    if course and not course.self_paced and course.certificate_available_date:
+        date = course.certificate_available_date
+    else:
+        date = user_certificate.modified_date
     context['certificate_date_issued'] = _('{month} {day}, {year}').format(
-        month=strftime_localized(user_certificate.modified_date, "%B"),
-        day=user_certificate.modified_date.day,
-        year=user_certificate.modified_date.year
+        month=strftime_localized(date, "%B"),
+        day=date.day,
+        year=date.year
     )
 
     # Translators:  This text represents the verification of the certificate
@@ -333,10 +340,14 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
     if preview_mode:
         # certificate is being previewed from studio
         if has_access(request.user, 'instructor', course) or has_access(request.user, 'staff', course):
+            if course.certificate_available_date and not course.self_paced:
+                modified_date = course.certificate_available_date
+            else:
+                modified_date = datetime.now().date()
             user_certificate = GeneratedCertificate(
                 mode=preview_mode,
                 verify_uuid=unicode(uuid4().hex),
-                modified_date=datetime.now().date()
+                modified_date=modified_date
             )
     else:
         # certificate is being viewed by learner or public
