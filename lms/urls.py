@@ -10,6 +10,7 @@ from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
 
 from courseware.views.index import CoursewareIndex
+from courseware.module_render import XblockCallbackView
 from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
@@ -238,7 +239,7 @@ urlpatterns += (
             course_key=settings.COURSE_ID_PATTERN,
             usage_key=settings.USAGE_ID_PATTERN,
         ),
-        'courseware.module_render.handle_xblock_callback',
+        XblockCallbackView.as_view(),
         name='xblock_handler',
     ),
     url(
