@@ -37,6 +37,8 @@ class TestLoginHelper(TestCase):
     @ddt.data(
         ("https://www.amazon.com", "text/html", None,
          "Unsafe redirect parameter detected after login page: u'https://www.amazon.com'"),
+        ("testserver/edx.org/images/logo", "text/html", None,
+         "Redirect to theme content detected after login page: u'testserver/edx.org/images/logo'"),
         ("favicon.ico", "image/*", "test/agent",
          "Redirect to non html content 'image/*' detected from 'test/agent' after login page: u'favicon.ico'"),
         ("https://www.test.com/test.jpg", "image/*", None,
@@ -61,12 +63,18 @@ class TestLoginHelper(TestCase):
                 (LOGGER_NAME, "WARNING", expected_log)
             )
 
-    def test_safe_next(self):
+    @ddt.data(
+        ('/dashboard', 'testserver', '/dashboard'),
+        ('http://testserver/courses', 'testserver', 'http://testserver/courses'),
+        ('https://edx.org/courses', 'edx.org', 'https://edx.org/courses'),
+    )
+    @ddt.unpack
+    def test_safe_next(self, url, host, expected_url):
         """ Test safe next parameter """
-        req = self.request.get(reverse("login") + "?next={url}".format(url="/dashboard"))
+        req = self.request.get(reverse("login") + "?next={url}".format(url=url), HTTP_HOST=host)
         req.META["HTTP_ACCEPT"] = "text/html"  # pylint: disable=no-member
         next_page = get_next_url_for_login_page(req)
-        self.assertEqual(next_page, u'/dashboard')
+        self.assertEqual(next_page, expected_url)
 
     @patch('student.helpers.third_party_auth.pipeline.get')
     @ddt.data(
