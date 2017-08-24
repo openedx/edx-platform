@@ -56,6 +56,9 @@ def get_branding_labels_from_file(custom_branding=None):
     css_rules = cssutils.parseString(css_output, validate=False).cssRules
     labels = []
     for rule in css_rules:
+        # we don't want comments in the final output
+        if rule.typeString == "COMMENT":
+            continue
         var_name = rule.selectorText.replace('.', '$')
         value = rule.style.content
         labels.append((var_name, value))
