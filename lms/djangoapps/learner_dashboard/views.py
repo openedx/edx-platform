@@ -10,7 +10,7 @@ from commerce.utils import EcommerceService
 from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import (
-    ProgramMarketingDataExtender,
+    ProgramDataExtender,
     ProgramProgressMeter,
     get_certificates,
     get_program_marketing_url
@@ -55,7 +55,7 @@ def program_details(request, program_uuid):
     if not program_data:
         raise Http404
 
-    program_data = ProgramMarketingDataExtender(program_data, request.user).extend()
+    program_data = ProgramDataExtender(program_data, request.user).extend()
     course_data = meter.progress(programs=[program_data], count_only=False)[0]
     certificate_data = get_certificates(request.user, program_data)
 

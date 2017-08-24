@@ -371,6 +371,7 @@ class ProgramDataExtender(object):
     def extend(self):
         """Execute extension handlers, returning the extended data."""
         self._execute('_extend')
+        self._collect_one_click_purchase_eligibility_data()
         return self.data
 
     def _execute(self, prefix, *args):
@@ -449,6 +450,78 @@ class ProgramDataExtender(object):
 
     def _attach_course_run_may_certify(self, run_mode):
         run_mode['may_certify'] = self.course_overview.may_certify()
+
+    def _collect_one_click_purchase_eligibility_data(self):
+        """
+        Extend the program data with data about learner's eligibility for one click purchase,
+        discount data of the program and SKUs of seats that should be added to basket.
+        """
+        applicable_seat_types = self.data['applicable_seat_types']
+        is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
+        skus = []
+        bundle_variant = 'full'
+        if is_learner_eligible_for_one_click_purchase:
+            for course in self.data['courses']:
+                add_course_sku = False
+                for course_run in course['course_runs']:
+                    (enrollment_mode, active) = CourseEnrollment.enrollment_mode_for_user(
+                        self.user,
+                        CourseKey.from_string(course_run['key'])
+                    )
+                    if enrollment_mode not in applicable_seat_types or not active:
+                        add_course_sku = True
+                        break
+
+                if add_course_sku:
+                    published_course_runs = filter(lambda run: run['status'] == 'published', course['course_runs'])
+                    if len(published_course_runs) == 1:
+                        for seat in published_course_runs[0]['seats']:
+                            if seat['type'] in applicable_seat_types and seat['sku']:
+                                skus.append(seat['sku'])
+                    else:
+                        # If a course in the program has more than 1 published course run
+                        # learner won't be eligible for a one click purchase.
+                        is_learner_eligible_for_one_click_purchase = False
+                        skus = []
+                        break
+                else:
+                    bundle_variant = 'partial'
+
+        if skus:
+            try:
+                api_user = self.user
+                if not self.user.is_authenticated():
+                    user = get_user_model()
+                    service_user = user.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
+                    api_user = service_user
+
+                api = ecommerce_api_client(api_user)
+
+                # Make an API call to calculate the discounted price
+                discount_data = api.baskets.calculate.get(sku=skus)
+
+                program_discounted_price = discount_data['total_incl_tax']
+                program_full_price = discount_data['total_incl_tax_excl_discounts']
+                discount_data['is_discounted'] = program_discounted_price < program_full_price
+                discount_data['discount_value'] = program_full_price - program_discounted_price
+
+                self.data.update({
+                    'discount_data': discount_data,
+                    'full_program_price': discount_data['total_incl_tax'],
+                    'variant': bundle_variant
+                })
+            except (ConnectionError, SlumberBaseException, Timeout):
+                log.exception('Failed to get discount price for following product SKUs: %s ', ', '.join(skus))
+                self.data.update({
+                    'discount_data': {'is_discounted': False}
+                })
+        else:
+            is_learner_eligible_for_one_click_purchase = False
+
+        self.data.update({
+            'is_learner_eligible_for_one_click_purchase': is_learner_eligible_for_one_click_purchase,
+            'skus': skus,
+        })
 
 
 def get_certificates(user, extended_program):
@@ -537,7 +610,6 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
     def extend(self):
         """Execute extension handlers, returning the extended data."""
         self.data.update(super(ProgramMarketingDataExtender, self).extend())
-        self._collect_one_click_purchase_eligibility_data()
         return self.data
 
     @classmethod
@@ -593,75 +665,3 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             self.instructors.update(
                 {instructor.get('name'): instructor for instructor in course_instructors.get('instructors', [])}
             )
-
-    def _collect_one_click_purchase_eligibility_data(self):
-        """
-        Extend the program data with data about learner's eligibility for one click purchase,
-        discount data of the program and SKUs of seats that should be added to basket.
-        """
-        applicable_seat_types = self.data['applicable_seat_types']
-        is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
-        skus = []
-        bundle_variant = 'full'
-        if is_learner_eligible_for_one_click_purchase:
-            for course in self.data['courses']:
-                add_course_sku = False
-                for course_run in course['course_runs']:
-                    (enrollment_mode, active) = CourseEnrollment.enrollment_mode_for_user(
-                        self.user,
-                        CourseKey.from_string(course_run['key'])
-                    )
-                    if enrollment_mode not in applicable_seat_types or not active:
-                        add_course_sku = True
-                        break
-
-                if add_course_sku:
-                    published_course_runs = filter(lambda run: run['status'] == 'published', course['course_runs'])
-                    if len(published_course_runs) == 1:
-                        for seat in published_course_runs[0]['seats']:
-                            if seat['type'] in applicable_seat_types and seat['sku']:
-                                skus.append(seat['sku'])
-                    else:
-                        # If a course in the program has more than 1 published course run
-                        # learner won't be eligible for a one click purchase.
-                        is_learner_eligible_for_one_click_purchase = False
-                        skus = []
-                        break
-                else:
-                    bundle_variant = 'partial'
-
-        if skus:
-            try:
-                api_user = self.user
-                if not self.user.is_authenticated():
-                    user = get_user_model()
-                    service_user = user.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
-                    api_user = service_user
-
-                api = ecommerce_api_client(api_user)
-
-                # Make an API call to calculate the discounted price
-                discount_data = api.baskets.calculate.get(sku=skus)
-
-                program_discounted_price = discount_data['total_incl_tax']
-                program_full_price = discount_data['total_incl_tax_excl_discounts']
-                discount_data['is_discounted'] = program_discounted_price < program_full_price
-                discount_data['discount_value'] = program_full_price - program_discounted_price
-
-                self.data.update({
-                    'discount_data': discount_data,
-                    'full_program_price': discount_data['total_incl_tax'],
-                    'variant': bundle_variant
-                })
-            except (ConnectionError, SlumberBaseException, Timeout):
-                log.exception('Failed to get discount price for following product SKUs: %s ', ', '.join(skus))
-                self.data.update({
-                    'discount_data': {'is_discounted': False}
-                })
-        else:
-            is_learner_eligible_for_one_click_purchase = False
-
-        self.data.update({
-            'is_learner_eligible_for_one_click_purchase': is_learner_eligible_for_one_click_purchase,
-            'skus': skus,
-        })
