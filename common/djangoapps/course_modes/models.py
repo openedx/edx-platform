@@ -41,7 +41,12 @@ class CourseMode(models.Model):
     class Meta(object):
         app_label = "course_modes"
 
-    course = models.ForeignKey(CourseOverview, db_constraint=False, db_index=True, related_name='modes')
+    course = models.ForeignKey(
+        CourseOverview,
+        db_constraint=False,
+        db_index=True,
+        related_name='modes',
+    )
 
     # Django sets the `course_id` property in __init__ with the value from the database
     # This pair of properties converts that into a proper CourseKey

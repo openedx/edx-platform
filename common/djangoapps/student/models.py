@@ -996,7 +996,10 @@ class CourseEnrollment(models.Model):
 
     user = models.ForeignKey(User)
 
-    course = models.ForeignKey(CourseOverview, db_constraint=False)
+    course = models.ForeignKey(
+        CourseOverview,
+        db_constraint=False,
+    )
 
     @property
     def course_id(self):
