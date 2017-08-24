@@ -412,7 +412,22 @@ class PersistentSubsectionGrade(DeleteGradesMixin, TimeStampedModel):
         usage_key = params.pop('usage_key')
 
         # apply grade override if one exists before saving model
-        # EDUCTATOR-1127: remove override until this behavior is verified in production
+        try:
+            override = PersistentSubsectionGradeOverride.objects.get(
+                grade__user_id=user_id,
+                grade__course_id=usage_key.course_key,
+                grade__usage_key=usage_key,
+            )
+            if override.earned_all_override is not None:
+                params['earned_all'] = override.earned_all_override
+            if override.possible_all_override is not None:
+                params['possible_all'] = override.possible_all_override
+            if override.earned_graded_override is not None:
+                params['earned_graded'] = override.earned_graded_override
+            if override.possible_graded_override is not None:
+                params['possible_graded'] = override.possible_graded_override
+        except PersistentSubsectionGradeOverride.DoesNotExist:
+            pass
 
         grade, _ = cls.objects.update_or_create(
             user_id=user_id,
