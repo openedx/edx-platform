@@ -6,6 +6,7 @@ import json
 import logging
 import random
 import string  # pylint: disable=deprecated-module
+import dateutil.parser
 from bs4 import BeautifulSoup
 
 from django.conf import settings
@@ -1006,6 +1007,11 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
                     max_len = getattr(settings, 'NOTIFICATIONS_MAX_EXCERPT_LEN', 65)
                     if len(excerpt) > max_len:
                         excerpt = "{}...".format(excerpt[:max_len])
+                    announcement_open_url = "https://{site_name}/courses/{course_id}/announcements/{date}/".format(
+                        site_name=settings.SITE_NAME,
+                        course_id=unicode(course_key),
+                        date=dateutil.parser.parse(announcement_date).strftime('%m/%d/%Y'),
+                    )
 
                     notification_msg = NotificationMessage(
                         msg_type=notification_type,
@@ -1014,6 +1020,8 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
                             '_schema_version': '1',
                             'course_name': course.display_name,
                             'excerpt': excerpt,
+                            'tag_group': 'enrollments',
+                            'open_url': announcement_open_url,
                             'announcement_date': announcement_date,
                             'title': title,
                         }
