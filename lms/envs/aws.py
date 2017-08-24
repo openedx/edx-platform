@@ -343,7 +343,6 @@ for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
 
 WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 
-
 LOGGING = ENV_TOKENS.get('LOGGING', {
     'version': 1,
     'disable_existing_loggers': False,
