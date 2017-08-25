@@ -80,24 +80,6 @@ class mock_ecommerce_api_endpoint(object):
             httpretty.reset()
 
 
-class mock_create_basket(mock_ecommerce_api_endpoint):
-    """ Mocks calls to E-Commerce API client basket creation method. """
-
-    default_response = {
-        'id': 7,
-        'order': {'number': '100004'},  # never both None.
-        'payment_data': {
-            'payment_processor_name': 'test-processor',
-            'payment_form_data': {},
-            'payment_page_url': 'http://example.com/pay',
-        },
-    }
-    method = httpretty.POST
-
-    def get_path(self):
-        return '/baskets/'
-
-
 class mock_basket_order(mock_ecommerce_api_endpoint):
     """ Mocks calls to E-Commerce API client basket order method. """
 
