@@ -206,7 +206,8 @@ def run_all_servers(options):
         args = [
             'lms', 'studio',
             '--settings={}'.format(asset_settings),
-            '--skip-collect'
+            '--skip-collect',
+            'skip_webpack',
         ]
         call_task('pavelib.assets.update_assets', args=args)
 
