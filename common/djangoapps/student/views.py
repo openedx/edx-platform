@@ -279,15 +279,14 @@ def reverification_info(statuses):
     return reverifications
 
 
-def get_course_enrollments(user, orgs_to_include, orgs_to_exclude):
+def get_course_enrollments(user, org_whitelist, org_blacklist):
     """
     Given a user, return a filtered set of his or her course enrollments.
 
     Arguments:
         user (User): the user in question.
-        orgs_to_include (list[str]): If not None, ONLY courses of these orgs will be returned.
-        orgs_to_exclude (list[str]): If orgs_to_include is not None, this
-            argument is ignored. Else, courses of this org will be excluded.
+        org_whitelist (list[str]): If not None, ONLY courses of these orgs will be returned.
+        org_blacklist (list[str]): Courses of these orgs will be excluded.
 
     Returns:
         generator[CourseEnrollment]: a sequence of enrollments to be displayed
@@ -305,12 +304,12 @@ def get_course_enrollments(user, orgs_to_include, orgs_to_exclude):
             )
             continue
 
-        # Filter out anything that is not attributed to the orgs to include.
-        if orgs_to_include and course_overview.location.org not in orgs_to_include:
+        # Filter out anything that is not in the whitelist.
+        if org_whitelist and course_overview.location.org not in org_whitelist:
             continue
 
-        # Conversely, filter out any enrollments with courses attributed to current ORG.
-        elif course_overview.location.org in orgs_to_exclude:
+        # Conversely, filter out any enrollments in the blacklist.
+        elif org_blacklist and course_overview.location.org in org_blacklist:
             continue
 
         # Else, include the enrollment.
@@ -318,22 +317,28 @@ def get_course_enrollments(user, orgs_to_include, orgs_to_exclude):
             yield enrollment
 
 
+def get_site_course_enrollments(user):
+    """
+    Returns a user's enrollments filtered by the orgs of the current site.
+    """
+    # Default blacklist is empty.
+    org_blacklist = None
+    # Whitelist the orgs configured for the current site.
+    org_whitelist = configuration_helpers.get_current_site_orgs()
+
+    if not org_whitelist:
+        # If there is no whitelist, the blacklist will include all orgs that
+        # have been configured for any other sites.
+        org_blacklist = configuration_helpers.get_all_orgs()
+
+    return list(get_course_enrollments(user, org_whitelist, org_blacklist))
+
+
 def get_course_certificates(user):
     """
     Returns information about a user's course certificates.
     """
-    # Let's filter out any courses in an "org" that has been declared to be
-    # in a configuration
-    org_filter_out_set = configuration_helpers.get_all_orgs()
-
-    # Remove current site orgs from the "filter out" list, if applicable.
-    # We want to filter and only show enrollments for courses within
-    # the organizations defined in configuration for the current site.
-    course_org_filter = configuration_helpers.get_current_site_orgs()
-    if course_org_filter:
-        org_filter_out_set = org_filter_out_set - set(course_org_filter)
-
-    course_enrollments = list(get_course_enrollments(user, course_org_filter, org_filter_out_set))
+    course_enrollments = get_site_course_enrollments(user)
     certificates = {}
     for enrollment in course_enrollments:
         certificate_info = cert_info(user, enrollment.course_overview, enrollment.mode)
@@ -673,21 +678,7 @@ def dashboard(request):
         'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
     ) or settings.SUPPORT_SITE_LINK
 
-    # Let's filter out any courses in an "org" that has been declared to be
-    # in a configuration
-    org_filter_out_set = configuration_helpers.get_all_orgs()
-
-    # Remove current site orgs from the "filter out" list, if applicable.
-    # We want to filter and only show enrollments for courses within
-    # the organizations defined in configuration for the current site.
-    course_org_filter = configuration_helpers.get_current_site_orgs()
-    if course_org_filter:
-        org_filter_out_set = org_filter_out_set - set(course_org_filter)
-
-    # Build our (course, enrollment) list for the user, but ignore any courses that no
-    # longer exist (because the course IDs have changed). Still, we don't delete those
-    # enrollments, because it could have been a data push snafu.
-    course_enrollments = list(get_course_enrollments(user, course_org_filter, org_filter_out_set))
+    course_enrollments = get_site_course_enrollments(user)
 
     # Record how many courses there are so that we can get a better
     # understanding of usage patterns on prod.
