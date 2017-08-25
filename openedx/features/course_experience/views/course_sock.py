@@ -2,6 +2,7 @@
 Fragment for rendering the course's sock and associated toggle button.
 """
 from django.template.loader import render_to_string
+from django.utils.translation import get_language
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
@@ -37,7 +38,11 @@ class CourseSockFragmentView(EdxFragmentView):
         verification_deadline = VerifiedUpgradeDeadlineDate(course, request.user)
         deadline_has_passed = verification_deadline.deadline_has_passed()
 
-        show_course_sock = has_verified_mode and not is_already_verified and not deadline_has_passed
+        # If this proves its worth, we can internationalize and display for more than English speakers.
+        show_course_sock = (
+            has_verified_mode and not is_already_verified and
+            not deadline_has_passed and get_language() == 'en'
+        )
 
         # Get the price of the course and format correctly
         course_price = get_cosmetic_verified_display_price(course)

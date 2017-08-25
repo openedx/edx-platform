@@ -19,13 +19,13 @@ define(['jquery', 'logger', 'js/courseware/course_home_events'], function($, Log
 
         it('sends an event when "Upgrade to Verified" is clicked from the sidebar', function() {
             $('.date-summary-link').click();
-            expect(Logger.log).toHaveBeenCalledWith('edx.course.home.upgrade_verified.clicked', {location: 'sidebar'});
+            expect(Logger.log).toHaveBeenCalledWith('edx.course.enrollment.upgrade.clicked', {location: 'sidebar'});
         });
 
         it('sends an event when "Upgrade Now" is clicked from the upsell notification', function() {
             $('.upgrade-banner-button').click();
             expect(Logger.log).toHaveBeenCalledWith(
-                'edx.course.home.upgrade_verified.clicked', {location: 'notification'}
+                'edx.course.enrollment.upgrade.clicked', {location: 'notification'}
             );
         });
 

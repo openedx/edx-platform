@@ -57,9 +57,9 @@ export class CourseSock {  // eslint-disable-line import/prefer-default-export
 
       // Log open and close events
       const isOpening = $toggleActionButton.hasClass('active');
-      const logMessage = isOpening ? 'User opened the verification sock.'
-          : 'User closed the verification sock.';
-      Logger.log(
+      const logMessage = isOpening ? 'edx.bi.course.sock.toggle_opened'
+          : 'edx.bi.course.sock.toggle_closed';
+      window.analytics.track(
         logMessage,
         {
           from_page: pageLocation,
@@ -69,9 +69,9 @@ export class CourseSock {  // eslint-disable-line import/prefer-default-export
 
     $upgradeToVerifiedButton.on('click', () => {
       Logger.log(
-        'User clicked the upgrade button in the verification sock.',
+        'edx.course.enrollment.upgrade.clicked',
         {
-          from_page: pageLocation,
+          location: 'sock',
         },
       );
     });

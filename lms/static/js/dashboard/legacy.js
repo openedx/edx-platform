@@ -120,7 +120,7 @@
              var user = $(event.target).closest('.action-upgrade').data('user'),
                  course = $(event.target).closest('.action-upgrade').data('course-id');
 
-             Logger.log('edx.course.enrollment.upgrade.clicked', [user, course], null);
+             Logger.log('edx.course.enrollment.upgrade.clicked', [user, course], {location: 'learner_dashboard'});
          });
 
          $('.action-email-settings').click(function(event) {
