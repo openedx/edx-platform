@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-14 15:09+0000\n"
-"PO-Revision-Date: 2017-08-14 15:09:43.522944\n"
+"POT-Creation-Date: 2017-08-25 21:08+0000\n"
+"PO-Revision-Date: 2017-08-25 21:08:22.750395\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -181,8 +181,10 @@ msgstr ""
 
 #: common/djangoapps/course_modes/models.py common/lib/xmodule/xmodule/tabs.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
-#: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
-#: lms/templates/help_modal.html lms/templates/courseware/courseware.html
+#: lms/djangoapps/shoppingcart/reports.py
+#: openedx/features/course_experience/__init__.py
+#: cms/templates/widgets/header.html lms/templates/help_modal.html
+#: lms/templates/courseware/courseware.html
 msgid "Course"
 msgstr ""
 
@@ -278,14 +280,6 @@ msgstr ""
 #: common/djangoapps/course_modes/views.py
 #, python-brace-format
 msgid "Congratulations!  You are now enrolled in {course_name}"
-msgstr ""
-
-#: common/djangoapps/course_modes/views.py
-#, python-brace-format
-msgid ""
-"Welcome, {username}! You are about to enroll in {course_name}, from "
-"{partner_names}, sponsored by {enterprise_name}. Please select your "
-"enrollment information below."
 msgstr ""
 
 #: common/djangoapps/course_modes/views.py
@@ -2113,9 +2107,10 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py cms/templates/index.html
 #: lms/templates/help_modal.html lms/templates/manage_user_standing.html
 #: lms/templates/register-shib.html
+#: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Submit"
@@ -4741,7 +4736,6 @@ msgid ""
 "program of study, and includes verification of the student's identity."
 msgstr ""
 
-#. Translators:  The format of the date includes the full name of the month
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
 msgid "{month} {day}, {year}"
@@ -5267,6 +5261,7 @@ msgid "sign in"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
+#: openedx/features/course_experience/views/course_home_messages.py
 msgid "register"
 msgstr ""
 
@@ -5304,8 +5299,7 @@ msgid "Your certificate is available"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-msgid ""
-"You can keep working for a higher grade, or request your certificate now."
+msgid "You've earned a certificate for this course."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
@@ -5723,10 +5717,6 @@ msgid "Sailthru maximum retries."
 msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
-msgid "DEPRECATED: use sailthru_welcome_template instead."
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru template to use on welcome send."
 msgstr ""
 
@@ -6032,12 +6022,9 @@ msgstr ""
 msgid "City"
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the country in which the user lives.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
+#: lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -9080,25 +9067,20 @@ msgid "Deadline for purchasing and requesting credit."
 msgstr ""
 
 #: openedx/core/djangoapps/dark_lang/views.py
-msgid "Preview Language is currently disabled"
+msgid "Preview Language Administration"
 msgstr ""
 
 #: openedx/core/djangoapps/dark_lang/views.py
-msgid "Language code not provided"
-msgstr ""
-
-#: openedx/core/djangoapps/dark_lang/views.py
-#, python-brace-format
-msgid "Language set to language code: {preview_language_code}"
-msgstr ""
-
-#: openedx/core/djangoapps/dark_lang/views.py
-msgid "Language reset to the default language code"
+msgid "Language not provided"
 msgstr ""
 
 #: openedx/core/djangoapps/dark_lang/views.py
 #, python-brace-format
-msgid "Language reset to user's preference: {preview_language_code}"
+msgid "Language set to {preview_language}"
+msgstr ""
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language reset to the default"
 msgstr ""
 
 #: openedx/core/djangoapps/debug/views.py
@@ -9324,7 +9306,7 @@ msgid "Enter a valid email address that contains at least {min} characters."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Please enter a password."
+msgid "Enter a password."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
@@ -9345,7 +9327,7 @@ msgstr ""
 #. Translators: These messages are shown to users who do not enter information
 #. into the required field or enter it incorrectly.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Please enter your Full Name."
+msgid "Enter your full name."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
@@ -9353,23 +9335,23 @@ msgid "The email addresses do not match."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Please select your Country."
+msgid "Select your country or region of residence."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Please enter your City."
+msgid "Enter your city."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Please tell us your goals."
+msgid "Tell us your goals."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Please select your highest level of education completed."
+msgid "Select the highest level of education you have completed."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Please enter your mailing address."
+msgid "Enter your mailing address."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
@@ -9503,6 +9485,19 @@ msgstr ""
 #. which allows the user to input the Company
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Company"
+msgstr ""
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the country in which the user lives.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Country or Region of Residence"
+msgstr ""
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's country.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "The country or region where you live."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/api.py
@@ -9650,6 +9645,58 @@ msgstr ""
 msgid ""
 "A subcategory name for the discussion. This name appears in the left pane of"
 " the discussion forum for the course."
+msgstr ""
+
+#: openedx/features/course_bookmarks/plugins.py
+#: openedx/features/course_bookmarks/views/course_bookmarks.py
+#: lms/templates/courseware/courseware.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "Bookmarks"
+msgstr ""
+
+#: openedx/features/course_experience/plugins.py
+#: cms/templates/widgets/header.html
+#: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
+msgid "Updates"
+msgstr ""
+
+#: openedx/features/course_experience/plugins.py
+#: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
+msgid "Reviews"
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid " {sign_in_link} or {register_link} and then enroll in this course."
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header.html
+msgid "Sign in"
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid ""
+"{open_enroll_link} Enroll now{close_enroll_link} to access the full course."
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+msgid "Don't forget to add a calendar reminder!"
+msgstr ""
+
+#: openedx/features/enterprise_support/api.py
+#, python-brace-format
+msgid ""
+"If you have concerns about sharing your data, please contact your "
+"administrator at {enterprise_customer_name}."
+msgstr ""
+
+#: openedx/features/enterprise_support/api.py
+#, python-brace-format
+msgid "Enrollment in {course_name} was not complete."
 msgstr ""
 
 #: cms/djangoapps/contentstore/course_group_config.py
@@ -10323,6 +10370,7 @@ msgid "Course Outline"
 msgstr ""
 
 #: cms/templates/course_outline.html cms/templates/index.html
+#: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 #: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
 msgid "Dismiss"
 msgstr ""
@@ -10442,15 +10490,9 @@ msgstr ""
 msgid "View"
 msgstr ""
 
-#: cms/templates/darklang/preview_lang.html
-#: lms/templates/darklang/preview_lang.html
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
-msgid "Preview Language Setting"
-msgstr ""
-
 #: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 msgid "Reset"
 msgstr ""
@@ -10459,11 +10501,6 @@ msgstr ""
 #: themes/edx.org/lms/templates/footer.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-#: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
-msgid "Updates"
 msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/navigation/navigation.html
@@ -13359,11 +13396,6 @@ msgid "Courseware"
 msgstr ""
 
 #: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "Bookmarks"
-msgstr ""
-
-#: lms/templates/courseware/courseware.html
 msgid "Course Search"
 msgstr ""
 
@@ -13665,6 +13697,15 @@ msgid "{earned} of {total} possible points"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
+msgid ""
+"Suspicious activity detected during proctored exam review. Exam score 0."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Section grade has been overridden."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
 msgid "Problem Scores: "
 msgstr ""
 
@@ -13930,40 +13971,6 @@ msgid "Available Actions"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#, python-format
-msgid ""
-"Are you sure you want to unenroll from the purchased course %(course_name)s "
-"(%(course_number)s)?"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You will be refunded the amount you paid."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You will not be refunded the amount you paid."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#, python-format
-msgid ""
-"Are you sure you want to unenroll from %(course_name)s (%(course_number)s)?"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#, python-format
-msgid ""
-"Are you sure you want to unenroll from the verified %(cert_name_long)s track"
-" of %(course_name)s (%(course_number)s)?"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"The refund deadline for this course has passed, so you will not receive a "
-"refund."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
 msgstr ""
 
@@ -14190,6 +14197,67 @@ msgstr ""
 msgid ""
 "The {provider_name} account you selected is already linked to another "
 "{platform_name} account."
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid ""
+"We're sorry to see you go! Please share your main reason for unenrolling."
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I just wanted to browse the material"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "This won't help me reach my goals"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I don't have the time"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I don't have the academic or language prerequisites"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I don't have enough support"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I am not happy with the quality of the content"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "The course material was too hard"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "The course material was too easy"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Something was broken"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Other"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Thank you for sharing your reasons for unenrolling."
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "You are unenrolled from"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Return To Dashboard"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Browse Courses"
 msgstr ""
 
 #: lms/templates/debug/run_python_form.html
@@ -16644,12 +16712,6 @@ msgstr ""
 msgid "Explore Courses"
 msgstr ""
 
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header.html
-msgid "Sign in"
-msgstr ""
-
 #: lms/templates/navigation/navigation.html
 msgid "Global"
 msgstr ""
@@ -17622,16 +17684,16 @@ msgstr ""
 msgid "Add article"
 msgstr ""
 
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
+msgid "Preview Language Setting"
+msgstr ""
+
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 msgid "Language Code"
 msgstr ""
 
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
-msgid "For example use en for English"
-msgstr ""
-
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
-msgid "Please refresh the page to see the changes applied."
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
+msgid "e.g. en for English"
 msgstr ""
 
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
@@ -17704,12 +17766,12 @@ msgid ""
 "This course has not started yet, and will launch on {launch_date_html}."
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
-msgid "Reviews"
-msgstr ""
-
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
+msgid "Latest Update"
 msgstr ""
 
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
@@ -18506,11 +18568,11 @@ msgstr ""
 msgid "Course Pacing:"
 msgstr ""
 
-#: cms/templates/course_outline.html
+#: cms/templates/course_outline.html cms/templates/settings.html
 msgid "Self-Paced"
 msgstr ""
 
-#: cms/templates/course_outline.html
+#: cms/templates/course_outline.html cms/templates/settings.html
 msgid "Instructor-Paced"
 msgstr ""
 

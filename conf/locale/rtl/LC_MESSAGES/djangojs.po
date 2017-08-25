@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-14 15:08+0000\n"
-"PO-Revision-Date: 2017-08-14 15:09:44.012713\n"
+"POT-Creation-Date: 2017-08-25 21:07+0000\n"
+"PO-Revision-Date: 2017-08-25 21:08:23.237836\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -121,6 +121,63 @@ msgstr "يثمثفث"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cancel"
 msgstr "ذشرذثم"
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error during the upload process."
+msgstr "فاثقث صشس شر ثققخق يعقهرل فاث عحمخشي حقخذثسس."
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while unpacking the file."
+msgstr "فاثقث صشس شر ثققخق صاهمث عرحشذنهرل فاث بهمث."
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while verifying the file you submitted."
+msgstr "فاثقث صشس شر ثققخق صاهمث دثقهبغهرل فاث بهمث غخع سعزوهففثي."
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "Choose new file"
+msgstr "ذاخخسث رثص بهمث"
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid ""
+"File format not supported. Please upload a file with a {ext} extension."
+msgstr ""
+"بهمث بخقوشف رخف سعححخقفثي. حمثشسث عحمخشي ش بهمث صهفا ش {ext} ثطفثرسهخر."
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while importing the new library to our database."
+msgstr "فاثقث صشس شر ثققخق صاهمث هوحخقفهرل فاث رثص مهزقشقغ فخ خعق يشفشزشسث."
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while importing the new course to our database."
+msgstr "فاثقث صشس شر ثققخق صاهمث هوحخقفهرل فاث رثص ذخعقسث فخ خعق يشفشزشسث."
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "Your import has failed."
+msgstr "غخعق هوحخقف اشس بشهمثي."
+
+#: cms/static/js/features/import/views/import.js
+#: common/static/bundles/Import.js
+msgid "Your import is in progress; navigating away will abort it."
+msgstr "غخعق هوحخقف هس هر حقخلقثسس; رشدهلشفهرل شصشغ صهمم شزخقف هف."
+
+#: cms/static/js/features/import/views/import.js
+#: common/static/bundles/Import.js
+msgid "Error importing course"
+msgstr "ثققخق هوحخقفهرل ذخعقسث"
+
+#: cms/static/js/features/import/views/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error with the upload"
+msgstr "فاثقث صشس شر ثققخق صهفا فاث عحمخشي"
 
 #. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
@@ -1709,6 +1766,7 @@ msgstr ""
 "سثضعثرذثوخيعمث. حمثشسث ذخرفشذف فاث ذخعقسث سفشبب."
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
 msgid "Bookmarked"
 msgstr "زخخنوشقنثي"
 
@@ -1936,51 +1994,30 @@ msgstr "فعقر خر فقشرسذقهحفس"
 msgid "Turn off transcripts"
 msgstr "فعقر خبب فقشرسذقهحفس"
 
-#: common/static/bundles/Import.js
-msgid "There was an error during the upload process."
-msgstr "فاثقث صشس شر ثققخق يعقهرل فاث عحمخشي حقخذثسس."
+#: common/static/bundles/StudioIndex.js
+msgid "Organization:"
+msgstr "خقلشرهظشفهخر:"
 
-#: common/static/bundles/Import.js
-msgid "There was an error while unpacking the file."
-msgstr "فاثقث صشس شر ثققخق صاهمث عرحشذنهرل فاث بهمث."
+#: common/static/bundles/StudioIndex.js
+msgid "Course Number:"
+msgstr "ذخعقسث رعوزثق:"
 
-#: common/static/bundles/Import.js
-msgid "There was an error while verifying the file you submitted."
-msgstr "فاثقث صشس شر ثققخق صاهمث دثقهبغهرل فاث بهمث غخع سعزوهففثي."
+#: common/static/bundles/StudioIndex.js
+msgid "Course Run:"
+msgstr "ذخعقسث قعر:"
 
-#: common/static/bundles/Import.js
-msgid "Choose new file"
-msgstr "ذاخخسث رثص بهمث"
+#: common/static/bundles/StudioIndex.js
+msgid "(Read-only)"
+msgstr "(قثشي-خرمغ)"
 
-#: common/static/bundles/Import.js
-msgid ""
-"File format not supported. Please upload a file with a {ext} extension."
-msgstr ""
-"بهمث بخقوشف رخف سعححخقفثي. حمثشسث عحمخشي ش بهمث صهفا ش {ext} ثطفثرسهخر."
+#: common/static/bundles/StudioIndex.js
+msgid "Re-run Course"
+msgstr "قث-قعر ذخعقسث"
 
-#: common/static/bundles/Import.js
-msgid "There was an error while importing the new library to our database."
-msgstr "فاثقث صشس شر ثققخق صاهمث هوحخقفهرل فاث رثص مهزقشقغ فخ خعق يشفشزشسث."
-
-#: common/static/bundles/Import.js
-msgid "There was an error while importing the new course to our database."
-msgstr "فاثقث صشس شر ثققخق صاهمث هوحخقفهرل فاث رثص ذخعقسث فخ خعق يشفشزشسث."
-
-#: common/static/bundles/Import.js
-msgid "Your import has failed."
-msgstr "غخعق هوحخقف اشس بشهمثي."
-
-#: common/static/bundles/Import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr "غخعق هوحخقف هس هر حقخلقثسس; رشدهلشفهرل شصشغ صهمم شزخقف هف."
-
-#: common/static/bundles/Import.js
-msgid "Error importing course"
-msgstr "ثققخق هوحخقفهرل ذخعقسث"
-
-#: common/static/bundles/Import.js
-msgid "There was an error with the upload"
-msgstr "فاثقث صشس شر ثققخق صهفا فاث عحمخشي"
+#: common/static/bundles/StudioIndex.js
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
+msgstr "دهثص مهدث"
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -2569,6 +2606,7 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Language"
 msgstr "مشرلعشلث"
 
@@ -2580,6 +2618,7 @@ msgstr ""
 "فاث مشرلعشلث فاشف فثشو وثوزثقس حقهوشقهمغ عسث فخ ذخووعرهذشفث صهفا ثشذا خفاثق."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Country"
 msgstr "ذخعرفقغ"
 
@@ -3232,8 +3271,59 @@ msgid "Your donation could not be submitted."
 msgstr "غخعق يخرشفهخر ذخعمي رخف زث سعزوهففثي."
 
 #: lms/static/js/dashboard/legacy.js
-msgid "An error occurred. Please try again later."
-msgstr "شر ثققخق خذذعققثي. حمثشسث فقغ شلشهر مشفثق."
+msgid "You will be refunded the amount you paid."
+msgstr "غخع صهمم زث قثبعريثي فاث شوخعرف غخع حشهي."
+
+#: lms/static/js/dashboard/legacy.js
+msgid "You will not be refunded the amount you paid."
+msgstr "غخع صهمم رخف زث قثبعريثي فاث شوخعرف غخع حشهي."
+
+#: lms/static/js/dashboard/legacy.js
+msgid ""
+"Are you sure you want to unenroll from the purchased course %(courseName)s "
+"(%(courseNumber)s)?"
+msgstr ""
+"شقث غخع سعقث غخع صشرف فخ عرثرقخمم بقخو فاث حعقذاشسثي ذخعقسث %(courseName)s "
+"(%(courseNumber)s)?"
+
+#: lms/static/js/dashboard/legacy.js
+msgid ""
+"Are you sure you want to unenroll from %(courseName)s (%(courseNumber)s)?"
+msgstr ""
+"شقث غخع سعقث غخع صشرف فخ عرثرقخمم بقخو %(courseName)s (%(courseNumber)s)?"
+
+#: lms/static/js/dashboard/legacy.js
+msgid ""
+"Are you sure you want to unenroll from the verified %(certNameLong)s  track "
+"of %(courseName)s  (%(courseNumber)s)?"
+msgstr ""
+"شقث غخع سعقث غخع صشرف فخ عرثرقخمم بقخو فاث دثقهبهثي %(certNameLong)s  فقشذن "
+"خب %(courseName)s  (%(courseNumber)s)?"
+
+#: lms/static/js/dashboard/legacy.js
+msgid ""
+"Are you sure you want to unenroll from the verified %(certNameLong)s track "
+"of %(courseName)s (%(courseNumber)s)?"
+msgstr ""
+"شقث غخع سعقث غخع صشرف فخ عرثرقخمم بقخو فاث دثقهبهثي %(certNameLong)s فقشذن "
+"خب %(courseName)s (%(courseNumber)s)?"
+
+#: lms/static/js/dashboard/legacy.js
+msgid ""
+"The refund deadline for this course has passed,so you will not receive a "
+"refund."
+msgstr ""
+"فاث قثبعري يثشيمهرث بخق فاهس ذخعقسث اشس حشسسثي,سخ غخع صهمم رخف قثذثهدث ش "
+"قثبعري."
+
+#: lms/static/js/dashboard/legacy.js
+#: lms/static/js/learner_dashboard/views/unenroll_view.js
+msgid ""
+"Unable to determine whether we should give you a refund because of System "
+"Error. Please try again later."
+msgstr ""
+"عرشزمث فخ يثفثقوهرث صاثفاثق صث ساخعمي لهدث غخع ش قثبعري زثذشعسث خب سغسفثو "
+"ثققخق. حمثشسث فقغ شلشهر مشفثق."
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -3608,6 +3698,7 @@ msgid "Error generating student profile information. Please try again."
 msgstr "ثققخق لثرثقشفهرل سفعيثرف حقخبهمث هربخقوشفهخر. حمثشسث فقغ شلشهر."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmarks_list.js
 #: cms/templates/js/move-xblock-modal.underscore
 #: openedx/features/course_search/static/course_search/templates/search_loading.underscore
 msgid "Loading"
@@ -3663,6 +3754,7 @@ msgstr "وشقن ثرقخمموثرف ذخيث شس عرعسثي"
 
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Username"
 msgstr "عسثقرشوث"
@@ -4511,6 +4603,7 @@ msgstr ""
 "غخعق عسثقرشوث."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Full Name"
 msgstr "بعمم رشوث"
 
@@ -4554,8 +4647,12 @@ msgstr ""
 "ش مهوهفثي رعوزثق خب مشرلعشلثس."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Country or Region"
-msgstr "ذخعرفقغ خق قثلهخر"
+msgid "Country or Region of Residence"
+msgstr "ذخعرفقغ خق قثلهخر خب قثسهيثرذث"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "The country or region where you live."
+msgstr "فاث ذخعرفقغ خق قثلهخر صاثقث غخع مهدث."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Time Zone"
@@ -4596,6 +4693,7 @@ msgid "Year of Birth"
 msgstr "غثشق خب زهقفا"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Preferred Language"
 msgstr "حقثبثققثي مشرلعشلث"
 
@@ -4773,6 +4871,8 @@ msgid "Try the transaction again in a few minutes."
 msgstr "فقغ فاث فقشرسشذفهخر شلشهر هر ش بثص وهرعفثس."
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmarks_list.js
 msgid "An error has occurred. Please try again."
 msgstr "شر ثققخق اشس خذذعققثي. حمثشسث فقغ شلشهر."
 
@@ -4946,6 +5046,114 @@ msgstr "رعوزثق خب سفعيثرفس"
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"
 msgstr "خدثقشمم سذخقث"
+
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
+msgid "Bookmark this page"
+msgstr "زخخنوشقن فاهس حشلث"
+
+#: openedx/features/course_search/static/course_search/js/views/search_results_view.js
+msgid "{total_results} result"
+msgid_plural "{total_results} results"
+msgstr[0] "{total_results} قثسعمف"
+msgstr[1] "{total_results} قثسعمفس"
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Profile Visibility:"
+msgstr "حقخبهمث دهسهزهمهفغ:"
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Limited Profile"
+msgstr "مهوهفثي حقخبهمث"
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Full Profile"
+msgstr "بعمم حقخبهمث"
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Joined"
+msgstr "تخهرثي"
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Joined Date"
+msgstr "تخهرثي يشفث"
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Location"
+msgstr "مخذشفهخر"
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Add Country"
+msgstr "شيي ذخعرفقغ"
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Add language"
+msgstr "شيي مشرلعشلث"
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "About me"
+msgstr "شزخعف وث"
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid ""
+"Tell other learners a little about yourself: where you live, what your "
+"interests are, why you're taking courses, or what you hope to learn."
+msgstr ""
+"فثمم خفاثق مثشقرثقس ش مهففمث شزخعف غخعقسثمب: صاثقث غخع مهدث, صاشف غخعق "
+"هرفثقثسفس شقث, صاغ غخع'قث فشنهرل ذخعقسثس, خق صاشف غخع اخحث فخ مثشقر."
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/badge_list_container.js
+msgid "Accomplishments Pagination"
+msgstr "شذذخوحمهساوثرفس حشلهرشفهخر"
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
+msgid "Account Settings page."
+msgstr "شذذخعرف سثففهرلس حشلث."
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
+msgid ""
+"You must specify your birth year before you can share your full profile. To "
+"specify your birth year, go to the {account_settings_page_link}"
+msgstr ""
+"غخع وعسف سحثذهبغ غخعق زهقفا غثشق زثبخقث غخع ذشر ساشقث غخعق بعمم حقخبهمث. فخ "
+"سحثذهبغ غخعق زهقفا غثشق, لخ فخ فاث {account_settings_page_link}"
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
+msgid ""
+"You must be over 13 to share a full profile. If you are over 13, make sure "
+"that you have specified a birth year on the {account_settings_page_link}"
+msgstr ""
+"غخع وعسف زث خدثق 13 فخ ساشقث ش بعمم حقخبهمث. هب غخع شقث خدثق 13, وشنث سعقث "
+"فاشف غخع اشدث سحثذهبهثي ش زهقفا غثشق خر فاث {account_settings_page_link}"
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
+msgid "Profile Image"
+msgstr "حقخبهمث هوشلث"
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
+msgid "Profile image for {username}"
+msgstr "حقخبهمث هوشلث بخق {username}"
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
+msgid "My Profile"
+msgstr "وغ حقخبهمث"
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
+msgid ""
+"Build out your profile to personalize your identity on {platform_name}."
+msgstr ""
+"زعهمي خعف غخعق حقخبهمث فخ حثقسخرشمهظث غخعق هيثرفهفغ خر {platform_name}."
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
+msgid "About Me"
+msgstr "شزخعف وث"
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
+msgid "Accomplishments"
+msgstr "شذذخوحمهساوثرفس"
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
+msgid "Profile"
+msgstr "حقخبهمث"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
@@ -5182,6 +5390,11 @@ msgstr "فاث ثرقخمموثرف سفشقف يشفث ذشررخف زث شبف
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment end date cannot be after the course end date."
 msgstr "فاث ثرقخمموثرف ثري يشفث ذشررخف زث شبفثق فاث ذخعقسث ثري يشفث."
+
+#: cms/static/js/models/settings/course_details.js
+msgid "The certificate available date must be later than the course end date."
+msgstr ""
+"فاث ذثقفهبهذشفث شدشهمشزمث يشفث وعسف زث مشفثق فاشر فاث ذخعقسث ثري يشفث."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
@@ -9603,10 +9816,6 @@ msgstr ""
 "هب فاث سعزسثذفهخر يخثس رخف اشدث ش يعث يشفث, مثشقرثقس شمصشغس سثث فاثهق سذخقثس"
 " صاثر فاثغ سعزوهف شرسصثقس فخ شسسثسسوثرفس."
 
-#: cms/templates/js/show-textbook.underscore
-msgid "View Live"
-msgstr "دهثص مهدث"
-
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore
 msgid "Signatory"
@@ -9819,6 +10028,18 @@ msgstr ""
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "General Proctored Exam Rules"
 msgstr "لثرثقشم حقخذفخقثي ثطشو قعمثس"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Specify any rules or rule exceptions that the proctoring review team should "
+"enforce when reviewing the videos. For example, you could specify that "
+"calculators are allowed. These specified rules are visible to learners "
+"before the learners start the exam."
+msgstr ""
+"سحثذهبغ شرغ قعمثس خق قعمث ثطذثحفهخرس فاشف فاث حقخذفخقهرل قثدهثص فثشو ساخعمي "
+"ثربخقذث صاثر قثدهثصهرل فاث دهيثخس. بخق ثطشوحمث, غخع ذخعمي سحثذهبغ فاشف "
+"ذشمذعمشفخقس شقث شممخصثي. فاثسث سحثذهبهثي قعمثس شقث دهسهزمث فخ مثشقرثقس "
+"زثبخقث فاث مثشقرثقس سفشقف فاث ثطشو."
 
 #: cms/templates/js/unit-access-editor.underscore
 msgid "Unit Access"

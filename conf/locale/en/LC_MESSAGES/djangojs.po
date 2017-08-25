@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-14 15:08+0000\n"
-"PO-Revision-Date: 2017-08-14 15:09:44.012713\n"
+"POT-Creation-Date: 2017-08-25 21:07+0000\n"
+"PO-Revision-Date: 2017-08-25 21:08:23.237836\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -117,6 +117,62 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cancel"
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error during the upload process."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while unpacking the file."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while verifying the file you submitted."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "Choose new file"
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid ""
+"File format not supported. Please upload a file with a {ext} extension."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while importing the new library to our database."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while importing the new course to our database."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "Your import has failed."
+msgstr ""
+
+#: cms/static/js/features/import/views/import.js
+#: common/static/bundles/Import.js
+msgid "Your import is in progress; navigating away will abort it."
+msgstr ""
+
+#: cms/static/js/features/import/views/import.js
+#: common/static/bundles/Import.js
+msgid "Error importing course"
+msgstr ""
+
+#: cms/static/js/features/import/views/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error with the upload"
 msgstr ""
 
 #. Translators: This is the status of an active video upload
@@ -1678,6 +1734,7 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
 msgid "Bookmarked"
 msgstr ""
 
@@ -1895,49 +1952,29 @@ msgstr ""
 msgid "Turn off transcripts"
 msgstr ""
 
-#: common/static/bundles/Import.js
-msgid "There was an error during the upload process."
+#: common/static/bundles/StudioIndex.js
+msgid "Organization:"
 msgstr ""
 
-#: common/static/bundles/Import.js
-msgid "There was an error while unpacking the file."
+#: common/static/bundles/StudioIndex.js
+msgid "Course Number:"
 msgstr ""
 
-#: common/static/bundles/Import.js
-msgid "There was an error while verifying the file you submitted."
+#: common/static/bundles/StudioIndex.js
+msgid "Course Run:"
 msgstr ""
 
-#: common/static/bundles/Import.js
-msgid "Choose new file"
+#: common/static/bundles/StudioIndex.js
+msgid "(Read-only)"
 msgstr ""
 
-#: common/static/bundles/Import.js
-msgid ""
-"File format not supported. Please upload a file with a {ext} extension."
+#: common/static/bundles/StudioIndex.js
+msgid "Re-run Course"
 msgstr ""
 
-#: common/static/bundles/Import.js
-msgid "There was an error while importing the new library to our database."
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "There was an error while importing the new course to our database."
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "Your import has failed."
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "Error importing course"
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "There was an error with the upload"
+#: common/static/bundles/StudioIndex.js
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
 msgstr ""
 
 #: common/static/common/js/components/utils/view_utils.js
@@ -2508,6 +2545,7 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Language"
 msgstr ""
 
@@ -2518,6 +2556,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Country"
 msgstr ""
 
@@ -3120,7 +3159,47 @@ msgid "Your donation could not be submitted."
 msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
-msgid "An error occurred. Please try again later."
+msgid "You will be refunded the amount you paid."
+msgstr ""
+
+#: lms/static/js/dashboard/legacy.js
+msgid "You will not be refunded the amount you paid."
+msgstr ""
+
+#: lms/static/js/dashboard/legacy.js
+msgid ""
+"Are you sure you want to unenroll from the purchased course %(courseName)s "
+"(%(courseNumber)s)?"
+msgstr ""
+
+#: lms/static/js/dashboard/legacy.js
+msgid ""
+"Are you sure you want to unenroll from %(courseName)s (%(courseNumber)s)?"
+msgstr ""
+
+#: lms/static/js/dashboard/legacy.js
+msgid ""
+"Are you sure you want to unenroll from the verified %(certNameLong)s  track "
+"of %(courseName)s  (%(courseNumber)s)?"
+msgstr ""
+
+#: lms/static/js/dashboard/legacy.js
+msgid ""
+"Are you sure you want to unenroll from the verified %(certNameLong)s track "
+"of %(courseName)s (%(courseNumber)s)?"
+msgstr ""
+
+#: lms/static/js/dashboard/legacy.js
+msgid ""
+"The refund deadline for this course has passed,so you will not receive a "
+"refund."
+msgstr ""
+
+#: lms/static/js/dashboard/legacy.js
+#: lms/static/js/learner_dashboard/views/unenroll_view.js
+msgid ""
+"Unable to determine whether we should give you a refund because of System "
+"Error. Please try again later."
 msgstr ""
 
 #: lms/static/js/discovery/views/search_form.js
@@ -3468,6 +3547,7 @@ msgid "Error generating student profile information. Please try again."
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmarks_list.js
 #: cms/templates/js/move-xblock-modal.underscore
 #: openedx/features/course_search/static/course_search/templates/search_loading.underscore
 msgid "Loading"
@@ -3521,6 +3601,7 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Username"
 msgstr ""
@@ -4268,6 +4349,7 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Full Name"
 msgstr ""
 
@@ -4302,7 +4384,11 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Country or Region"
+msgid "Country or Region of Residence"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "The country or region where you live."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4341,6 +4427,7 @@ msgid "Year of Birth"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Preferred Language"
 msgstr ""
 
@@ -4504,6 +4591,8 @@ msgid "Try the transaction again in a few minutes."
 msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmarks_list.js
 msgid "An error has occurred. Please try again."
 msgstr ""
 
@@ -4666,6 +4755,107 @@ msgstr ""
 
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"
+msgstr ""
+
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
+msgid "Bookmark this page"
+msgstr ""
+
+#: openedx/features/course_search/static/course_search/js/views/search_results_view.js
+msgid "{total_results} result"
+msgid_plural "{total_results} results"
+msgstr[0] ""
+msgstr[1] ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Profile Visibility:"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Limited Profile"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Full Profile"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Joined"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Joined Date"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Location"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Add Country"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Add language"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "About me"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid ""
+"Tell other learners a little about yourself: where you live, what your "
+"interests are, why you're taking courses, or what you hope to learn."
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/badge_list_container.js
+msgid "Accomplishments Pagination"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
+msgid "Account Settings page."
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
+msgid ""
+"You must specify your birth year before you can share your full profile. To "
+"specify your birth year, go to the {account_settings_page_link}"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
+msgid ""
+"You must be over 13 to share a full profile. If you are over 13, make sure "
+"that you have specified a birth year on the {account_settings_page_link}"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
+msgid "Profile Image"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
+msgid "Profile image for {username}"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
+msgid "My Profile"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
+msgid ""
+"Build out your profile to personalize your identity on {platform_name}."
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
+msgid "About Me"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
+msgid "Accomplishments"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
+msgid "Profile"
 msgstr ""
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
@@ -4897,6 +5087,10 @@ msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment end date cannot be after the course end date."
+msgstr ""
+
+#: cms/static/js/models/settings/course_details.js
+msgid "The certificate available date must be later than the course end date."
 msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
@@ -9036,10 +9230,6 @@ msgid ""
 " when they submit answers to assessments."
 msgstr ""
 
-#: cms/templates/js/show-textbook.underscore
-msgid "View Live"
-msgstr ""
-
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore
 msgid "Signatory"
@@ -9224,6 +9414,14 @@ msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "General Proctored Exam Rules"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Specify any rules or rule exceptions that the proctoring review team should "
+"enforce when reviewing the videos. For example, you could specify that "
+"calculators are allowed. These specified rules are visible to learners "
+"before the learners start the exam."
 msgstr ""
 
 #: cms/templates/js/unit-access-editor.underscore
