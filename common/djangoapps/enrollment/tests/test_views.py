@@ -966,9 +966,15 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         self.assertTrue(is_active)
         self.assertEqual(course_mode, updated_mode)
 
+    @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker')
     @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
     def test_enterprise_course_enrollment_invalid_consent(self):
         """Verify that the enterprise_course_consent must be a boolean. """
+        UserFactory.create(
+            username='enterprise_worker',
+            email=self.EMAIL,
+            password=self.PASSWORD,
+        )
         CourseModeFactory.create(
             course_id=self.course.id,
             mode_slug=CourseMode.DEFAULT_MODE_SLUG,
@@ -1056,6 +1062,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             'course_id': unicode(self.course.id),
             'ec_uuid': 'this-is-a-real-uuid'
         }
+        self.mock_enterprise_course_enrollment_post_api()
         self.mock_consent_missing(**consent_kwargs)
         self.mock_consent_post(**consent_kwargs)
         self.assert_enrollment_status(
