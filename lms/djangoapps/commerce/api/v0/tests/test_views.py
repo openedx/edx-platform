@@ -15,7 +15,7 @@ from django.test.utils import override_settings
 from edx_rest_api_client import exceptions
 from nose.plugins.attrib import attr
 
-from commerce.api.v0.views import SAILTHRU_CAMPAIGN_COOKIE, STOP_BASKET_CREATION_FLAG
+from commerce.api.v0.views import SAILTHRU_CAMPAIGN_COOKIE
 from commerce.constants import Messages
 from commerce.tests import TEST_BASKET_ID, TEST_ORDER_NUMBER, TEST_PAYMENT_DATA
 from commerce.tests.mocks import mock_basket_order, mock_create_basket
@@ -23,7 +23,6 @@ from commerce.tests.test_views import UserMixin
 from course_modes.models import CourseMode
 from enrollment.api import get_enrollment
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
 from course_modes.tests.factories import CourseModeFactory
@@ -193,30 +192,6 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
                 cookie_name=UTM_COOKIE_NAME, cookie_contents=json.dumps(UTM_COOKIE_CONTENTS))
             self.assertIn(cookie_string, httpretty.last_request().headers['cookie'])
 
-    @override_waffle_flag(STOP_BASKET_CREATION_FLAG, active=False)
-    @ddt.data(True, False)
-    def test_course_with_honor_seat_sku(self, user_is_active):
-        """
-        If the course has a SKU, the view should get authorization from the E-Commerce API before enrolling
-        the user in the course. If authorization is approved, the user should be redirected to the user dashboard.
-        """
-
-        # Set user's active flag
-        self.user.is_active = user_is_active
-        self.user.save()  # pylint: disable=no-member
-
-        return_value = {'id': TEST_BASKET_ID, 'payment_data': None, 'order': {'number': TEST_ORDER_NUMBER}}
-        with mock_create_basket(response=return_value):
-            # Test that call without utm tracking works
-            self._test_successful_ecommerce_api_call()
-            with mock.patch('student.models.RegistrationCookieConfiguration.current') as config:
-                instance = config.return_value
-                instance.utm_cookie_name = UTM_COOKIE_NAME
-
-                # Test that call with cookie passes cookie along
-                self._test_successful_ecommerce_api_call(utm_tracking_present=True)
-
-    @override_waffle_flag(STOP_BASKET_CREATION_FLAG, active=False)
     @ddt.data(True, False)
     def test_course_with_paid_seat_sku(self, user_is_active):
         """
@@ -231,12 +206,11 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         with mock_create_basket(response=return_value):
             self._test_successful_ecommerce_api_call(is_completed=False)
 
-    @override_waffle_flag(STOP_BASKET_CREATION_FLAG, active=True)
     @ddt.data(True, False)
     def test_course_without_creating_order(self, user_is_active):
         """
-        If the course has a SKU, and the STOP_BASKET_CREATION waffle flag is on,
-        the enrollment should happen without contacting ecommerce api
+        If the course has a SKU, the enrollment should happen without
+        contacting ecommerce api
         """
         # Set user's active flag
         self.user.is_active = user_is_active
