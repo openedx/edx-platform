@@ -125,6 +125,8 @@ class SubsectionGrade(SubsectionGradeBase):
         Load the subsection grade from the persisted model.
         """
         for block in model.visible_blocks.blocks:
+            if block.locator not in set(course_structure.post_order_traversal(start_node=self.location)):
+                continue
             self._compute_block_score(block.locator, course_structure, submissions_scores, csm_scores, block)
 
         self.graded_total = AggregatedScore(
