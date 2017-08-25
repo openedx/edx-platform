@@ -27,14 +27,14 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     var expectProfilePrivacyFieldTobeRendered = function(learnerProfileView, othersProfile) {
-        var accountPrivacyElement = $('.wrapper-profile-field-account-privacy');
-        var privacyFieldElement = $(accountPrivacyElement).find('.u-field');
+        var $accountPrivacyElement = $('.wrapper-profile-field-account-privacy');
+        var $privacyFieldElement = $($accountPrivacyElement).find('.u-field');
 
         if (othersProfile) {
-            expect(privacyFieldElement.length).toBe(0);
+            expect($privacyFieldElement.length).toBe(0);
         } else {
-            expect(privacyFieldElement.length).toBe(1);
-            expectProfileElementContainsField(privacyFieldElement, learnerProfileView.options.accountPrivacyFieldView);
+            expect($privacyFieldElement.length).toBe(1);
+            expectProfileElementContainsField($privacyFieldElement, learnerProfileView.options.accountPrivacyFieldView);
         }
     };
 
@@ -55,12 +55,12 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     var expectSectionTwoTobeRendered = function(learnerProfileView) {
-        var sectionTwoElement = $('.wrapper-profile-section-two');
-        var sectionTwoFieldElements = $(sectionTwoElement).find('.u-field');
+        var $sectionTwoElement = $('.wrapper-profile-section-two');
+        var $sectionTwoFieldElements = $($sectionTwoElement).find('.u-field');
 
-        expect(sectionTwoFieldElements.length).toBe(learnerProfileView.options.sectionTwoFieldViews.length);
+        expect($sectionTwoFieldElements.length).toBe(learnerProfileView.options.sectionTwoFieldViews.length);
 
-        _.each(sectionTwoFieldElements, function(sectionFieldElement, fieldIndex) {
+        _.each($sectionTwoFieldElements, function(sectionFieldElement, fieldIndex) {
             expectProfileElementContainsField(
                 sectionFieldElement,
                 learnerProfileView.options.sectionTwoFieldViews[fieldIndex]
@@ -114,23 +114,23 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     var expectBadgesDisplayed = function(learnerProfileView, length, lastPage) {
-        var badgeListingView = $('#tabpanel-accomplishments'),
+        var $badgeListingView = $('#tabpanel-accomplishments'),
             updatedLength = length,
             placeholder;
         expect($('#tabpanel-about_me').hasClass('is-hidden')).toBe(true);
-        expect(badgeListingView.hasClass('is-hidden')).toBe(false);
+        expect($badgeListingView.hasClass('is-hidden')).toBe(false);
         if (lastPage) {
             updatedLength += 1;
-            placeholder = badgeListingView.find('.find-course');
+            placeholder = $badgeListingView.find('.find-course');
             expect(placeholder.length).toBe(1);
             expect(placeholder.attr('href')).toBe('/courses/');
         }
-        expect(badgeListingView.find('.badge-display').length).toBe(updatedLength);
+        expect($badgeListingView.find('.badge-display').length).toBe(updatedLength);
     };
 
     var expectBadgesHidden = function(learnerProfileView) {
-        var accomplishmentsTab = $('#tabpanel-accomplishments');
-        if (accomplishmentsTab.length) {
+        var $accomplishmentsTab = $('#tabpanel-accomplishments');
+        if ($accomplishmentsTab.length) {
             // Nonexistence counts as hidden.
             expect($('#tabpanel-accomplishments').hasClass('is-hidden')).toBe(true);
         }
@@ -138,11 +138,11 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     var expectPage = function(learnerProfileView, pageData) {
-        var badgeListContainer = $('#tabpanel-accomplishments');
-        var index = badgeListContainer.find('span.search-count').text().trim();
+        var $badgeListContainer = $('#tabpanel-accomplishments');
+        var index = $badgeListContainer.find('span.search-count').text().trim();
         expect(index).toBe('Showing ' + (pageData.start + 1) + '-' + (pageData.start + pageData.results.length) +
             ' out of ' + pageData.count + ' total');
-        expect(badgeListContainer.find('.current-page').text()).toBe('' + pageData.current_page);
+        expect($badgeListContainer.find('.current-page').text()).toBe('' + pageData.current_page);
         _.each(pageData.results, function(badge) {
             expect($('.badge-display:contains(' + badge.badge_class.display_name + ')').length).toBe(1);
         });
