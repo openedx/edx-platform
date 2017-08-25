@@ -180,7 +180,7 @@ class _CourseGradeBulkContext(object):
         self.enrollments = _EnrollmentBulkContext(context, users)
         bulk_cache_cohorts(context.course_id, users)
         BulkRoleCache.prefetch(users)
-        PersistentCourseGrade.prefetch(context.course_id, users)
+        # PersistentCourseGrade.prefetch(context.course_id, users)
         BulkCourseTags.prefetch(context.course_id, users)
 
 
