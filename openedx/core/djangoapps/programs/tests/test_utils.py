@@ -732,6 +732,20 @@ class TestProgramDataExtender(ModuleStoreTestCase):
 
         self._assert_supplemented(data, certificate_url=expected_url)
 
+    @ddt.data(True, False)
+    def test_may_certify_attached(self, may_certify):
+        """
+        Verify that the `may_certify` is included during data extension.
+        """
+        self.course.certificates_show_before_end = may_certify
+        self.course = self.update_course(self.course, self.user.id)
+
+        data = ProgramDataExtender(self.program, self.user).extend()
+
+        self.assertEqual(may_certify, data['courses'][0]['course_runs'][0]['may_certify'])
+
+        self._assert_supplemented(data)
+
 
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_credentials')

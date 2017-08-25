@@ -930,12 +930,8 @@ def _get_cert_data(student, course, course_key, is_active, enrollment_mode):
         )
 
     may_view_certificate = False
-    # https://openedx.atlassian.net/browse/EDUCATOR-1204: historically,
-    # certificates for self-paced courses are displayed no matter the
-    # state of advanced course settings regarding certificates.
     if course_key:
-        course = get_course_by_id(course_key)
-        may_view_certificate = course.self_paced or course.may_certify()
+        may_view_certificate = get_course_by_id(course_key).may_certify()
 
     show_message = all([
         is_active,
