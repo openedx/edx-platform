@@ -1067,7 +1067,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             self.certificates_display_behavior,
             self.certificates_show_before_end,
             self.has_ended(),
-            self.certificate_available_date
+            self.certificate_available_date,
+            self.self_paced
         )
 
     def has_started(self):

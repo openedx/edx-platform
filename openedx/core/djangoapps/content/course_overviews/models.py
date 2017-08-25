@@ -479,7 +479,8 @@ class CourseOverview(TimeStampedModel):
             self.certificates_display_behavior,
             self.certificates_show_before_end,
             self.has_ended(),
-            self.certificate_available_date
+            self.certificate_available_date,
+            self.self_paced
         )
 
     @property
