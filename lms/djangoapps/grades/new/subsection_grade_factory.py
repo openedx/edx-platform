@@ -63,7 +63,7 @@ class SubsectionGradeFactory(object):
         )
         self._unsaved_subsection_grades.clear()
 
-    def update(self, subsection, only_if_higher=None):
+    def update(self, subsection, only_if_higher=None, score_deleted=None):
         """
         Updates the SubsectionGrade object for the student and subsection.
         """
@@ -92,6 +92,10 @@ class SubsectionGradeFactory(object):
                             calculated_grade.graded_total.possible,
                     ):
                         return orig_subsection_grade
+
+            # EDU-656, deleted scores ought to persist regardless of write_only_if_engaged
+            if score_deleted and not calculated_grade.all_total.first_attempted:
+                calculated_grade.all_total.first_attempted = True
 
             grade_model = calculated_grade.update_or_create_model(self.student)
             self._update_saved_subsection_grade(subsection.location, grade_model)

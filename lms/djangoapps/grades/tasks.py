@@ -187,6 +187,7 @@ def _recalculate_subsection_grade(self, **kwargs):
             scored_block_usage_key,
             kwargs['only_if_higher'],
             kwargs['user_id'],
+            kwargs['score_deleted']
         )
     except Exception as exc:   # pylint: disable=broad-except
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
@@ -246,7 +247,7 @@ def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
     return db_is_updated
 
 
-def _update_subsection_grades(course_key, scored_block_usage_key, only_if_higher, user_id):
+def _update_subsection_grades(course_key, scored_block_usage_key, only_if_higher, user_id, score_deleted):
     """
     A helper function to update subsection grades in the database
     for each subsection containing the given block, and to signal
@@ -271,6 +272,7 @@ def _update_subsection_grades(course_key, scored_block_usage_key, only_if_higher
                 subsection_grade = subsection_grade_factory.update(
                     course_structure[subsection_usage_key],
                     only_if_higher,
+                    score_deleted,
                 )
                 SUBSECTION_SCORE_CHANGED.send(
                     sender=None,
