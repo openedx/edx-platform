@@ -16,7 +16,7 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from pytz import UTC
 from nose.plugins.attrib import attr
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import CourseLocator
 
 from dashboard.git_import import GitImportErrorNoDir
 from dashboard.models import CourseImportLog
@@ -46,7 +46,11 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
 
     TEST_REPO = 'https://github.com/mitocw/edx4edx_lite.git'
     TEST_BRANCH = 'testing_do_not_delete'
-    TEST_BRANCH_COURSE = CourseKey.from_string('MITx/edx4edx_branch/edx4edx')
+    TEST_BRANCH_COURSE = CourseLocator(
+        org="MITx",
+        course="edx4edx_branch",
+        run="edx4edx"
+    )
 
     def setUp(self):
         """Setup test case by adding primary user."""
@@ -78,7 +82,13 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
             course = def_ms.courses.get(course_path, None)
         except AttributeError:
             # Using mongo store
-            course = def_ms.get_course(CourseKey.from_string('MITx/edx4edx/edx4edx'))
+            course = def_ms.get_course(
+                CourseLocator(
+                    org="MITx",
+                    course="edx4edx",
+                    run="edx4edx"
+                )
+            )
 
         # Delete git loaded course
         response = self.client.post(
@@ -155,6 +165,8 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self.assertIn(GitImportErrorNoDir(settings.GIT_REPO_DIR).message,
                       response.content.decode('UTF-8'))
 
+        self._rm_edx4edx()
+
     def test_mongo_course_add_delete(self):
         """
         This is the same as TestSysadmin.test_xml_course_add_delete,
@@ -168,11 +180,23 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self.assertNotEqual('xml', def_ms.get_modulestore_type(None))
 
         self._add_edx4edx()
-        course = def_ms.get_course(CourseKey.from_string('MITx/edx4edx/edx4edx'))
+        course = def_ms.get_course(
+            CourseLocator(
+                org="MITx",
+                course="edx4edx",
+                run="edx4edx"
+            )
+        )
         self.assertIsNotNone(course)
 
         self._rm_edx4edx()
-        course = def_ms.get_course(CourseKey.from_string('MITx/edx4edx/edx4edx'))
+        course = def_ms.get_course(
+            CourseLocator(
+                org="MITx",
+                course="edx4edx",
+                run="edx4edx"
+            )
+        )
         self.assertIsNone(course)
 
     def test_course_info(self):
@@ -199,6 +223,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         # Now add the course and make sure it does match
         response = self._add_edx4edx()
         self.assertRegexpMatches(response.content, table_re)
+        self._rm_edx4edx()
 
     def test_gitlogs(self):
         """
@@ -301,7 +326,11 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         for _ in xrange(15):
             CourseImportLog(
-                course_id=CourseKey.from_string("test/test/test"),
+                course_id=CourseLocator(
+                    org="test",
+                    course="test",
+                    run="test"
+                ),
                 location="location",
                 import_log="import_log",
                 git_log="git_log",
@@ -347,7 +376,13 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Add user as staff in course team
         def_ms = modulestore()
-        course = def_ms.get_course(CourseKey.from_string('MITx/edx4edx/edx4edx'))
+        course = def_ms.get_course(
+            CourseLocator(
+                org="MITx",
+                course="edx4edx",
+                run="edx4edx"
+            )
+        )
         CourseStaffRole(course.id).add_users(self.user)
 
         self.assertTrue(CourseStaffRole(course.id).has_user(self.user))
