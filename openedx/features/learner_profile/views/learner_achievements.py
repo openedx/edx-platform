@@ -17,14 +17,19 @@ class LearnerAchievementsFragmentView(EdxFragmentView):
         """
         Renders the current learner's achievements.
         """
-        course_certificates = get_course_certificates(user)
-        course_overviews = {}
-        for course_key in course_certificates.keys():
+        raw_course_certificates = get_course_certificates(user)
+        course_certificates = {}
+        for course_key in raw_course_certificates.keys():
+            course_certificate = raw_course_certificates[course_key].copy()
+            certificate_url = course_certificate.get('cert_web_view_url', None)
+            if not certificate_url:
+                certificate_url = course_certificate.get('linked_in_url', None)
             course_overview = get_course_overview_with_access(request.user, 'load', course_key)
-            course_overviews[course_key] = course_overview
+            course_certificate['url'] = certificate_url
+            course_certificate['course'] = course_overview
+            course_certificates[course_key] = course_certificate
         context = {
             'course_certificates': course_certificates,
-            'course_overviews': course_overviews,
             'own_profile': own_profile,
             'disable_courseware_js': True,
         }

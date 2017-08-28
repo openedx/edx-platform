@@ -1,11 +1,11 @@
-// Certificate overrides for edge.edx.org
+// Certificate overrides for the red theme
 
 .certificate-card {
     &.mode-honor {
         border-color: $honor-mode-color;
 
         .card-logo {
-            background-image: url('#{$static-path}/images/certificates/honor.png');
+            background-image: url('#{$static-path}/images/certificates/red-certificate.png');
         }
     }
 
@@ -13,7 +13,7 @@
         border-color: $verified-mode-color;
 
         .card-logo {
-            background-image: url('#{$static-path}/images/certificates/verified.png');
+            background-image: url('#{$static-path}/images/certificates/red-certificate.png');
         }
     }
 
@@ -21,7 +21,7 @@
         border-color: $professional-certificate-color;
 
         .card-logo {
-            background-image: url('#{$static-path}/images/certificates/professional-education.png');
+            background-image: url('#{$static-path}/images/certificates/red-certificate.png');
         }
     }
 }

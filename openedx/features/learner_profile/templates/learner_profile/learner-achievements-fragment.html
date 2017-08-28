@@ -15,9 +15,26 @@ from openedx.core.djangolib.markup import HTML, Text
         % for course_key in course_certificates.keys():
             <%
             certificate = course_certificates[course_key]
-            course = course_overviews[course_key]
+            certificate_url = certificate['url']
+            course = certificate['course']
             %>
-            <a href="/cert">
+            % if certificate_url:
+                <a href="${certificate['url']}" target="_blank">
+                    <div class="card certificate-card mode-${certificate['mode']}">
+                        <div class="card-logo">
+                            <h4 class="sr-only">
+                                ${Text(_('{course_mode} Certificate')).format(
+                                    course_mode=certificate['mode'],
+                                )}
+                            </h4>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-supertitle">${course.display_org_with_default}</div>
+                            <div class="card-title">${course.display_name_with_default}</div>
+                        </div>
+                    </div>
+                </a>
+            % else:
                 <div class="card certificate-card mode-${certificate['mode']}">
                     <div class="card-logo">
                         <h4 class="sr-only">
@@ -29,10 +46,9 @@ from openedx.core.djangolib.markup import HTML, Text
                     <div class="card-content">
                         <div class="card-supertitle">${course.display_org_with_default}</div>
                         <div class="card-title">${course.display_name_with_default}</div>
-                        <p class="card-text">Completed ??/??/????</p>
                     </div>
                 </div>
-            </a>
+            % endif
         % endfor
     % elif own_profile:
         <div class="learner-message">
