@@ -12,11 +12,17 @@ from pysrt import SubRipTime, SubRipItem, SubRipFile
 from lxml import etree
 from HTMLParser import HTMLParser
 
+from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 
 from .bumper_utils import get_bumper_settings
+
+try:
+    from edxval import api as edxval_api
+except ImportError:
+    edxval_api = None
 
 
 log = logging.getLogger(__name__)
@@ -474,8 +480,8 @@ def get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources):
     Returns list internal or external video ids.
 
     Arguments:
-        edx_video_id (str): edx_video_id
-        youtube_id_1_0 (str): youtube id
+        edx_video_id (unicode): edx_video_id
+        youtube_id_1_0 (unicode): youtube id
         html5_sources (list): html5 video ids
 
     Returns:
@@ -490,6 +496,28 @@ def get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources):
     video_ids = filter(lambda item: bool(clean(item)), video_ids)
 
     return external, video_ids
+
+
+def get_video_transcript_content(course_id, language_code, edx_video_id, youtube_id_1_0, html5_sources):
+    """
+    Gets video transcript content, only if the corresponding feature flag is enabled for the given `course_id`.
+
+    Arguments:
+        course_id(CourseKey): Course key identifying a course
+        language_code(unicode): Language code of the requested transcript
+        edx_video_id(unicode): edx-val's video identifier
+        youtube_id_1_0(unicode): A youtube source identifier
+        html5_sources(list): A list containing html5 sources
+
+    Returns:
+        A dict containing transcript's file name and its sjson content.
+    """
+    transcript = None
+    if VideoTranscriptEnabledFlag.feature_enabled(course_id=course_id) and edxval_api:
+        __, video_candidate_ids = get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources)
+        transcript = edxval_api.get_video_transcript_data(video_candidate_ids, language_code)
+
+    return transcript
 
 
 class Transcript(object):

@@ -24,7 +24,7 @@ from pkg_resources import resource_string
 from django.conf import settings
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
-from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
+from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, VideoTranscriptEnabledFlag
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 from openedx.core.lib.license import LicenseMixin
 from xblock.core import XBlock
@@ -42,7 +42,11 @@ from xmodule.xml_module import deserialize_field, is_pointer_tag, name_to_pathna
 
 from .bumper_utils import bumperize
 from .transcripts_utils import (
-    Transcript, VideoTranscriptsMixin, get_html5_ids, get_video_ids_info
+    get_html5_ids,
+    get_video_ids_info,
+    get_video_transcript_content,
+    Transcript,
+    VideoTranscriptsMixin,
 )
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
@@ -181,6 +185,18 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 track_url = self.track
             elif sub or other_lang:
                 track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
+
+            if not track_url:
+                # Check transcript's availability in edx-val
+                transcript = get_video_transcript_content(
+                    course_id=self.course_id,
+                    language_code=self.transcript_language,
+                    edx_video_id=self.edx_video_id,
+                    youtube_id_1_0=self.youtube_id_1_0,
+                    html5_sources=self.html5_sources,
+                )
+                if transcript:
+                    track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
 
         transcript_language = self.get_default_transcript_language(transcripts)
 
