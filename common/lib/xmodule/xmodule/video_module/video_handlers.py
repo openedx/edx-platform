@@ -7,6 +7,8 @@ StudioViewHandlers are handlers for video descriptor instance.
 
 import json
 import logging
+import os
+
 from datetime import datetime
 from webob import Response
 
@@ -21,6 +23,7 @@ from .transcripts_utils import (
     TranscriptException,
     TranscriptsGenerationException,
     generate_sjson_for_all_speeds,
+    get_video_transcript_content,
     youtube_speed_dict,
     Transcript,
     save_to_store,
@@ -242,7 +245,24 @@ class VideoStudentViewHandlers(object):
                 log.debug(ex.message)
                 # Try to return static URL redirection as last resort
                 # if no translation is required
-                return self.get_static_transcript(request, transcripts)
+                response = self.get_static_transcript(request, transcripts)
+                if response.status_code == 404:
+                    transcript = get_video_transcript_content(
+                        course_id=self.course_id,
+                        language_code=language,
+                        edx_video_id=self.edx_video_id,
+                        youtube_id_1_0=self.youtube_id_1_0,
+                        html5_sources=self.html5_sources,
+                    )
+                    if transcript:
+                        response = Response(
+                            transcript['content'],
+                            headerlist=[('Content-Language', language)],
+                            charset='utf8',
+                        )
+                        response.content_type = Transcript.mime_types['sjson']
+
+                return response
             except (
                 TranscriptException,
                 UnicodeDecodeError,
@@ -260,8 +280,44 @@ class VideoStudentViewHandlers(object):
                 transcript_content, transcript_filename, transcript_mime_type = self.get_transcript(
                     transcripts, transcript_format=self.transcript_download_format, lang=lang
                 )
-            except (NotFoundError, ValueError, KeyError, UnicodeDecodeError):
-                log.debug("Video@download exception")
+            except NotFoundError:
+                response = Response(status=404)
+                # Make sure the language is set.
+                if lang is None:
+                    lang = self.get_default_transcript_language(transcripts)
+
+                transcript = get_video_transcript_content(
+                    course_id=self.course_id,
+                    language_code=lang,
+                    edx_video_id=self.edx_video_id,
+                    youtube_id_1_0=self.youtube_id_1_0,
+                    html5_sources=self.html5_sources,
+                )
+                if transcript:
+                    transcript_content = Transcript.convert(
+                        transcript['content'],
+                        input_format='sjson',
+                        output_format=self.transcript_download_format
+                    )
+
+                    # Construct the response
+                    base_name, __ = os.path.splitext(os.path.basename(transcript['file_name']))
+                    filename = '{base_name}.{ext}'.format(
+                        base_name=base_name.encode('utf8'),
+                        ext=self.transcript_download_format
+                    )
+                    response = Response(
+                        transcript_content,
+                        headerlist=[
+                            ('Content-Disposition', 'attachment; filename="{filename}"'.format(filename=filename)),
+                            ('Content-Language', lang),
+                        ],
+                        charset='utf8',
+                    )
+                    response.content_type = Transcript.mime_types[self.transcript_download_format]
+
+                return response
+            except (ValueError, KeyError, UnicodeDecodeError):
                 return Response(status=404)
             else:
                 response = Response(
