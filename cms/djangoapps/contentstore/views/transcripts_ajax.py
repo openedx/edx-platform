@@ -27,16 +27,18 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.video_module.transcripts_utils import (
-    GetTranscriptsFromYouTubeException,
-    TranscriptsRequestValidationException,
     copy_or_rename_transcript,
     download_youtube_subs,
+    GetTranscriptsFromYouTubeException,
+    get_video_transcript_content,
     generate_srt_from_sjson,
     generate_subs_from_source,
     get_transcripts_from_youtube,
     manage_video_subtitles_save,
     remove_subs_from_store,
-    youtube_video_transcript_name
+    Transcript,
+    TranscriptsRequestValidationException,
+    youtube_video_transcript_name,
 )
 
 __all__ = [
@@ -144,6 +146,7 @@ def download_transcripts(request):
     Raises Http404 if unsuccessful.
     """
     locator = request.GET.get('locator')
+    subs_id = request.GET.get('subs_id')
     if not locator:
         log.debug('GET data without "locator" property.')
         raise Http404
@@ -154,30 +157,44 @@ def download_transcripts(request):
         log.debug("Can't find item by locator.")
         raise Http404
 
-    subs_id = request.GET.get('subs_id')
-    if not subs_id:
-        log.debug('GET data without "subs_id" property.')
-        raise Http404
-
     if item.category != 'video':
         log.debug('transcripts are supported only for video" modules.')
         raise Http404
 
-    filename = 'subs_{0}.srt.sjson'.format(subs_id)
-    content_location = StaticContent.compute_location(item.location.course_key, filename)
     try:
-        sjson_transcripts = contentstore().find(content_location)
-        log.debug("Downloading subs for %s id", subs_id)
-        str_subs = generate_srt_from_sjson(json.loads(sjson_transcripts.data), speed=1.0)
-        if not str_subs:
-            log.debug('generate_srt_from_sjson produces no subtitles')
-            raise Http404
-        response = HttpResponse(str_subs, content_type='application/x-subrip')
-        response['Content-Disposition'] = 'attachment; filename="{0}.srt"'.format(subs_id)
-        return response
+        if not subs_id:
+            raise NotFoundError
+
+        filename = subs_id
+        content_location = StaticContent.compute_location(
+            item.location.course_key,
+            'subs_{filename}.srt.sjson'.format(filename=filename),
+        )
+        sjson_transcript = contentstore().find(content_location).data
     except NotFoundError:
-        log.debug("Can't find content in storage for %s subs", subs_id)
+        # Try searching in VAL for the transcript as a last resort
+        transcript = get_video_transcript_content(
+            course_id=item.location.course_key,
+            language_code=u'en',
+            edx_video_id=item.edx_video_id,
+            youtube_id_1_0=item.youtube_id_1_0,
+            html5_sources=item.html5_sources,
+        )
+        if not transcript:
+            raise Http404
+
+        filename = os.path.splitext(os.path.basename(transcript['file_name']))[0].encode('utf8')
+        sjson_transcript = transcript['content']
+
+    # convert sjson content into srt format.
+    transcript_content = Transcript.convert(sjson_transcript, input_format='sjson', output_format='srt')
+    if not transcript_content:
         raise Http404
+
+    # Construct an HTTP response
+    response = HttpResponse(transcript_content, content_type='application/x-subrip; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="{filename}.srt"'.format(filename=filename)
+    return response
 
 
 @login_required
@@ -284,6 +301,17 @@ def check_transcripts(request):
             transcripts_presence['html5_equal'] = json.loads(html5_subs[0]) == json.loads(html5_subs[1])
 
     command, subs_to_use = _transcripts_logic(transcripts_presence, videos)
+    if command == 'not_found':
+        # Try searching in VAL for the transcript as a last resort
+        video_transcript = get_video_transcript_content(
+            course_id=item.location.course_key,
+            language_code=u'en',
+            edx_video_id=item.edx_video_id,
+            youtube_id_1_0=item.youtube_id_1_0,
+            html5_sources=item.html5_sources,
+        )
+        command = 'found' if video_transcript else command
+
     transcripts_presence.update({
         'command': command,
         'subs': subs_to_use,
