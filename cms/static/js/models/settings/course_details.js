@@ -31,7 +31,8 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
                 entrance_exam_enabled: '',
                 entrance_exam_minimum_score_pct: '50',
                 learning_info: [],
-                instructor_info: {}
+                instructor_info: {},
+                self_paced: null
             },
 
             validate: function(newattrs) {
@@ -39,8 +40,9 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
         // A bit funny in that the video key validation is asynchronous; so, it won't stop the validation.
                 var errors = {};
                 newattrs = DateUtils.convertDateStringsToObjects(
-            newattrs, ['start_date', 'end_date', 'certificate_available_date', 'enrollment_start', 'enrollment_end']
-        );
+                    newattrs,
+                    ['start_date', 'end_date', 'certificate_available_date', 'enrollment_start', 'enrollment_end']
+                );
 
                 if (newattrs.start_date === null) {
                     errors.start_date = gettext('The course must have an assigned start date.');
@@ -58,7 +60,7 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
                 if (newattrs.end_date && newattrs.enrollment_end && newattrs.end_date < newattrs.enrollment_end) {
                     errors.enrollment_end = gettext('The enrollment end date cannot be after the course end date.');
                 }
-                if (newattrs.end_date && newattrs.certificate_available_date &&
+                if (!this.get('self_paced') && newattrs.end_date && newattrs.certificate_available_date &&
                     newattrs.certificate_available_date < newattrs.end_date) {
                     errors.certificate_available_date = gettext(
                         'The certificate available date must be later than the course end date.'
