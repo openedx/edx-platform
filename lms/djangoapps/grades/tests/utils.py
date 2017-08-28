@@ -24,7 +24,7 @@ def mock_passing_grade(grade_pass='Pass', percent=0.75, ):
 
 
 @contextmanager
-def mock_get_score(earned=0, possible=1):
+def mock_get_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0, 0, 0)):
     """
     Mocks the get_score function to return a valid grade.
     """
@@ -36,7 +36,7 @@ def mock_get_score(earned=0, possible=1):
             weighted_possible=possible,
             weight=1,
             graded=True,
-            first_attempted=datetime(2000, 1, 1, 0, 0, 0)
+            first_attempted=first_attempted
         )
         yield mock_score
 

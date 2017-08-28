@@ -40,6 +40,7 @@ log = getLogger(__name__)
 GRADES_RESCORE_EVENT_TYPE = 'edx.grades.problem.rescored'
 PROBLEM_SUBMITTED_EVENT_TYPE = 'edx.grades.problem.submitted'
 SUBSECTION_OVERRIDE_EVENT_TYPE = 'edx.grades.subsection.score_overridden'
+STATE_DELETED_EVENT_TYPE = 'edx.grades.problem.state_deleted'
 
 
 @receiver(score_set)
