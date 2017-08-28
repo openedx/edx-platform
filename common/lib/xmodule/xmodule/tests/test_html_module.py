@@ -1,5 +1,5 @@
 import unittest
-
+import ddt
 from mock import Mock
 
 from xblock.field_data import DictFieldData
@@ -22,6 +22,30 @@ def instantiate_descriptor(**field_data):
         scope_ids=ScopeIds(None, None, usage_key, usage_key),
         field_data=DictFieldData(field_data),
     )
+
+
+@ddt.ddt
+class HtmlModuleCourseApiTestCase(unittest.TestCase):
+    """
+    Ensure that student_view_data can handle likely input,
+    and doesn't modify the HTML in any way.
+    This means that it does NOT protect against XSS, escape HTML tags, etc.
+    """
+    @ddt.data(
+        '<h1>Some content</h1>',  # Valid HTML
+        '',
+        None,
+        '<h1>Some content</h',  # Invalid HTML
+        '<script>alert()</script>',  # Does not escape tags
+        '<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">',  # Images allowed
+        'short string ' * 100,  # May contain long strings
+    )
+    def test_common_values(self, html):
+        descriptor = Mock()
+        field_data = DictFieldData({'data': html})
+        module_system = get_test_system()
+        module = HtmlModule(descriptor, module_system, field_data, Mock())
+        self.assertEqual(module.student_view_data(), {'html': html})
 
 
 class HtmlModuleSubstitutionTestCase(unittest.TestCase):

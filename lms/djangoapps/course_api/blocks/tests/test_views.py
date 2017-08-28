@@ -22,7 +22,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
     Test class for BlocksView
     """
     requested_fields = ['graded', 'format', 'student_view_multi_device', 'children', 'not_a_field', 'due']
-    BLOCK_TYPES_WITH_STUDENT_VIEW_DATA = ['video', 'discussion']
+    BLOCK_TYPES_WITH_STUDENT_VIEW_DATA = ['video', 'discussion', 'html']
 
     @classmethod
     def setUpClass(cls):
