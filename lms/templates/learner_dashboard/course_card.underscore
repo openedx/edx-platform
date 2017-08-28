@@ -1,5 +1,5 @@
 <div class="section">
-    <div class="course-meta-container col-12 md-col-8 sm-col-12">
+    <div class="course-meta-container">
         <div class="course-details">
             <h5 class="course-title">
                 <% if ( marketing_url || course_url ) { %>
@@ -19,7 +19,7 @@
                 <% } %>
             </div>
         </div>
-        <div class="course-actions col-12 md-col-4 sm-col-12"></div>
+        <div class="course-actions"></div>
         <div class="course-certificate certificate-status"></div>
     </div>
 </div>

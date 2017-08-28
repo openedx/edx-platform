@@ -463,25 +463,30 @@
         }
 
         .course-meta-container {
-            display: flex;
-            flex-direction: column;
-            flex-wrap: wrap;
-
             @media(min-width: $bp-screen-md) {
+                display: table;
                 width: 100%;
-                flex-direction: row;
-                justify-content: space-between;
+            }
+        }
+
+        .course-details {
+            @media(min-width: $bp-screen-md) {
+                display: table-cell;
+                vertical-align: top;
+                padding: 0 10px 0 0;
             }
         }
 
         .course-actions {
-            display: flex;
-            flex-direction: column;
+            @media(min-width: $bp-screen-md) {
+                width: 200px;
+                text-align: right;
+            }
 
             .course-enroll-view {
-                display: flex;
-                justify-content: space-between;
-                flex-wrap: wrap;
+                @media(min-width: $bp-screen-md) {
+                    text-align: right;
+                }
             }
         }
 
@@ -645,6 +650,13 @@
         display: flex;
         flex-direction: row;
         padding: 5px 0 10px;
+
+        .image-link {
+            flex: 0 0 100px;
+            @media(min-width: $bp-screen-md) {
+                flex: 0 0 120px;
+            }
+        }
     }
 
     .certificate-link {
