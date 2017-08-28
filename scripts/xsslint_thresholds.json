@@ -1,10 +1,10 @@
 {
     "rules": {
-        "javascript-concat-html": 166,
+        "javascript-concat-html": 160,
         "javascript-escape": 7,
         "javascript-interpolate": 29,
         "javascript-jquery-append": 77,
-        "javascript-jquery-html": 192,
+        "javascript-jquery-html": 189,
         "javascript-jquery-insert-into-target": 23,
         "javascript-jquery-insertion": 19,
         "javascript-jquery-prepend": 7,
@@ -21,12 +21,12 @@
         "python-close-before-format": 0,
         "python-concat-html": 25,
         "python-custom-escape": 13,
-        "python-deprecated-display-name": 43,
+        "python-deprecated-display-name": 41,
         "python-interpolate-html": 66,
         "python-parse-error": 0,
         "python-requires-html-or-text": 0,
-        "python-wrap-html": 239,
-        "underscore-not-escaped": 558
+        "python-wrap-html": 235,
+        "underscore-not-escaped": 507
     },
-    "total": 1852
+    "total": 1783
 }
