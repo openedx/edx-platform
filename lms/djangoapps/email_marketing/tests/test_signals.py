@@ -191,6 +191,23 @@ class EmailMarketingTests(TestCase):
         self.assertEquals(userparms['template'], "Welcome")
         self.assertEquals(userparms['schedule_time'], expected_schedule.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
+    @patch('email_marketing.tasks.log.error')
+    @patch('email_marketing.tasks.SailthruClient.api_post')
+    @patch('email_marketing.tasks.SailthruClient.api_get')
+    def test_email_not_sent_to_white_label(self, mock_sailthru_get, mock_sailthru_post, mock_log_error):
+        """
+        tests that welcome email is not sent to the white-label site learner
+        """
+        white_label_site = Site.objects.create(domain='testwhitelabel.com', name='White Label')
+        site_dict = {'id': white_label_site.id, 'domain': white_label_site.domain, 'name': white_label_site.name}
+        mock_sailthru_post.return_value = SailthruResponse(JsonResponse({'ok': True}))
+        mock_sailthru_get.return_value = SailthruResponse(JsonResponse({'lists': [{'name': 'new list'}], 'ok': True}))
+        update_user.delay(
+            {'gender': 'm', 'username': 'test', 'activated': 1}, TEST_EMAIL, site_dict, new_user=True
+        )
+        self.assertFalse(mock_log_error.called)
+        self.assertNotEqual(mock_sailthru_post.call_args[0][0], "send")
+
     @patch('email_marketing.tasks.SailthruClient.api_post')
     @patch('email_marketing.tasks.SailthruClient.api_get')
     def test_add_user_list_existing_domain(self, mock_sailthru_get, mock_sailthru_post):
