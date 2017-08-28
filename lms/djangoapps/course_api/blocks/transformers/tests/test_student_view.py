@@ -44,7 +44,7 @@ class TestStudentViewTransformer(ModuleStoreTestCase):
 
         # verify html data
         html_block_key = self.course_key.make_usage_key('html', 'toyhtml')
-        self.assertIsNone(
+        self.assertIsNotNone(
             self.block_structure.get_transformer_block_field(
                 html_block_key, StudentViewTransformer, StudentViewTransformer.STUDENT_VIEW_DATA,
             )
