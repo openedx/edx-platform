@@ -48,7 +48,8 @@ define([
                 learning_info: [''],
                 instructor_info: {
                     'instructors': [{'name': '', 'title': '', 'organization': '', 'image': '', 'bio': ''}]
-                }
+                },
+                self_paced: false
             },
 
             mockSettingsPage = readFixtures('mock/mock-settings-page.underscore'),
@@ -347,6 +348,16 @@ define([
                 requests, 'POST', urlRoot, expectedJson
             );
             AjaxHelpers.respondWithJson(requests, expectedJson);
+        });
+        it('should disallow save with a certificate available date before end date', function() {
+            $('#course-end-date').val('01/01/2030').trigger('change');
+            expect(this.view.$('.message-error')).toExist();
+        });
+        it('should allow save with a certificate available date before end date for self-paced course', function() {
+            this.model.set('self_paced', true);
+            $('#course-end-date').val('01/01/2030').trigger('change');
+            expect(this.view.$('.message-error')).not.toExist();
+            this.model.set('self_paced', false);
         });
     });
 });
