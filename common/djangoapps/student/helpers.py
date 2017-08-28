@@ -297,7 +297,7 @@ def get_redirect_to(request):
     # get information about a user on edx.org. In any such case drop the parameter.
     if redirect_to:
         mime_type, _ = mimetypes.guess_type(redirect_to, strict=False)
-        if not http.is_safe_url(redirect_to):
+        if not http.is_safe_url(redirect_to, host=request.get_host()):
             log.warning(
                 u'Unsafe redirect parameter detected after login page: %(redirect_to)r',
                 {"redirect_to": redirect_to}
@@ -327,8 +327,9 @@ def get_redirect_to(request):
             redirect_to = None
         else:
             themes = get_themes()
+            next_path = urlparse.urlparse(redirect_to).path
             for theme in themes:
-                if theme.theme_dir_name in redirect_to:
+                if theme.theme_dir_name in next_path:
                     log.warning(
                         u'Redirect to theme content detected after login page: %(redirect_to)r',
                         {"redirect_to": redirect_to}
