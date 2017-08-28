@@ -74,7 +74,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
 
     preferences_data = get_user_preferences(profile_user, profile_username)
 
-    if SHOW_ACHIEVEMENTS_FLAG:
+    if SHOW_ACHIEVEMENTS_FLAG.is_enabled():
         achievements_fragment = LearnerAchievementsFragmentView().render_to_fragment(
             request,
             user=profile_user,
