@@ -75,13 +75,12 @@
                         });
 
                         this.tabbedView = new TabbedView({
+                            el: this.$el.find('.account-settings-container'),
                             tabs: tabs,
                             router: this.router,
                             viewLabel: gettext('Profile')
                         });
-
                         this.tabbedView.render();
-                        this.$el.find('.account-settings-container').append(this.tabbedView.el);
 
                         if (this.firstRender) {
                             this.router.on('route:loadTab', _.bind(this.setActiveTab, this));
@@ -95,8 +94,7 @@
                             Backbone.history.start();
                         }
                     } else {
-                        this.$el.find('.wrapper-profile-section-container-two')
-                            .prepend(this.sectionTwoView.render().el);
+                        this.$el.find('.wrapper-profile-section-container-two').html(this.sectionTwoView.render().el);
                     }
                     return this;
                 },
