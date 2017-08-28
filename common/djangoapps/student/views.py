@@ -366,6 +366,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
     default_status = 'processing'
 
     default_info = {
+        'mode': course_mode,
         'status': default_status,
         'show_disabled_download_button': False,
         'show_download_url': False,
