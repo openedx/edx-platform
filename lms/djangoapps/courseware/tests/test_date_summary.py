@@ -382,6 +382,13 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         verified_user = self.create_user()
         CourseEnrollmentFactory(course_id=course.id, user=verified_user, mode=CourseMode.VERIFIED)
         course.certificate_available_date = datetime.now(utc) + timedelta(days=7)
+        course.certificates = {
+            u'certificates': [{
+                u'course_title': u'Test',
+                u'name': u'',
+                u'is_active': True,
+            }]
+        }
         course.save()
         CertificateAvailableDate(course, audit_user)
         for block in (CertificateAvailableDate(course, audit_user), CertificateAvailableDate(course, verified_user)):
