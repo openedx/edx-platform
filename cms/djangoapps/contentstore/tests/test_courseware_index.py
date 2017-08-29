@@ -740,6 +740,12 @@ class TestTaskExecution(SharedModuleStoreTestCase):
             publish_item=False,
         )
 
+    @classmethod
+    def tearDownClass(cls):
+        SignalHandler.course_published.connect(listen_for_course_publish)
+        SignalHandler.library_updated.connect(listen_for_library_update)
+        super(TestTaskExecution, cls).tearDownClass()
+
     def test_task_indexing_course(self):
         """ Making sure that the receiver correctly fires off the task when invoked by signal """
         searcher = SearchEngine.get_search_engine(CoursewareSearchIndexer.INDEX_NAME)

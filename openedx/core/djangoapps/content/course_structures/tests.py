@@ -22,6 +22,10 @@ class SignalDisconnectTestMixin(object):
         super(SignalDisconnectTestMixin, self).setUp()
         SignalHandler.course_published.disconnect(listen_for_course_publish)
 
+    def tearDown(self):
+        SignalHandler.course_published.connect(listen_for_course_publish)
+        super(SignalDisconnectTestMixin, self).tearDown()
+
 
 @attr(shard=2)
 class CourseStructureTaskTests(ModuleStoreTestCase):

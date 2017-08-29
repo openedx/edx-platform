@@ -7,6 +7,8 @@ import unittest
 import ddt
 import mock
 import os
+# Changes formatting of empty elements; import here to avoid test order dependence
+import xmodule.modulestore.xml  # pylint: disable=unused-import
 from capa.tests.helpers import test_capa_system, new_loncapa_problem
 from lxml import etree
 from openedx.core.djangolib.markup import HTML
@@ -303,7 +305,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Render the HTML
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>\s+</div>")
+        self.assertRegexpMatches(the_html, r"<div/>")
 
     def _create_test_file(self, path, content_str):
         test_fp = self.capa_system.filestore.open(path, "w")

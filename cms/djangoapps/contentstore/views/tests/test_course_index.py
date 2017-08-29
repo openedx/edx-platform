@@ -23,9 +23,11 @@ from contentstore.views.course import (
     course_outline_initial_state,
     reindex_course_and_check_access
 )
+from contentstore.views.course import WAFFLE_NAMESPACE as COURSE_WAFFLE_NAMESPACE
 from contentstore.views.item import VisibilityState, create_xblock_info
 from course_action_state.managers import CourseRerunUIStateManager
 from course_action_state.models import CourseRerunState
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from student.auth import has_course_author_access
 from student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole
 from student.tests.factories import UserFactory
@@ -358,6 +360,10 @@ class TestCourseIndexArchived(CourseTestCase):
         self.staff, self.staff_password = self.create_non_staff_user()
         for course in (self.course, self.active_course, self.archived_course):
             CourseStaffRole(course.id).add_users(self.staff)
+
+        # Make sure we've cached data which could change the query counts
+        # depending on test execution order
+        WaffleSwitchNamespace(name=COURSE_WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
 
     def check_index_page_with_query_count(self, separate_archived_courses, org, mongo_queries, sql_queries):
         """
