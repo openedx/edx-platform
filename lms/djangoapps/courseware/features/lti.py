@@ -153,9 +153,10 @@ def set_incorrect_lti_passport(_step):
 @step(r'the course has an LTI component with (.*) fields(?:\:)?$')  # , new_page is(.*), graded is(.*)
 def add_correct_lti_to_course(_step, fields):
     category = 'lti'
+    host = getattr(settings, 'LETTUCE_HOST', '127.0.0.1')
     metadata = {
         'lti_id': 'correct_lti_id',
-        'launch_url': 'http://127.0.0.1:{}/correct_lti_endpoint'.format(settings.LTI_PORT),
+        'launch_url': 'http://{}:{}/correct_lti_endpoint'.format(host, settings.LTI_PORT),
     }
 
     if fields.strip() == 'incorrect_lti_id':  # incorrect fields

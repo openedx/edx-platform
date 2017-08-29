@@ -18,6 +18,7 @@ from uuid import uuid4
 import mock
 import oauthlib.oauth1
 import requests
+from django.conf import settings
 from http import StubHttpRequestHandler, StubHttpService
 from oauthlib.oauth1.rfc5849 import parameters, signature
 
@@ -29,7 +30,7 @@ class StubLtiHandler(StubHttpRequestHandler):
     DEFAULT_CLIENT_KEY = 'test_client_key'
     DEFAULT_CLIENT_SECRET = 'test_client_secret'
     DEFAULT_LTI_ENDPOINT = 'correct_lti_endpoint'
-    DEFAULT_LTI_ADDRESS = 'http://127.0.0.1:{port}/'
+    DEFAULT_LTI_ADDRESS = 'http://{host}:{port}/'
 
     def do_GET(self):
         """
@@ -71,7 +72,8 @@ class StubLtiHandler(StubHttpRequestHandler):
                         'sourcedId': self.post_dict.get('lis_result_sourcedid')
                     }
 
-                submit_url = '//{}:{}'.format(*self.server.server_address)
+                host = getattr(settings, 'LETTUCE_HOST', self.server.server_address[0])
+                submit_url = '//{}:{}'.format(host, self.server.server_address[1])
                 content = self._create_content(status_message, submit_url)
                 self.send_response(200, content)
 
@@ -290,8 +292,9 @@ class StubLtiHandler(StubHttpRequestHandler):
         """
         client_secret = unicode(self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET))
 
+        host = getattr(settings, 'LETTUCE_HOST', '127.0.0.1')
         port = self.server.server_address[1]
-        lti_base = self.DEFAULT_LTI_ADDRESS.format(port=port)
+        lti_base = self.DEFAULT_LTI_ADDRESS.format(host=host, port=port)
         lti_endpoint = self.server.config.get('lti_endpoint', self.DEFAULT_LTI_ENDPOINT)
         url = lti_base + lti_endpoint
 
