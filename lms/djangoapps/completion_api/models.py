@@ -5,13 +5,17 @@ wrapping progress extension models.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+
+from django.conf import settings
+from django.test import RequestFactory
+from edx_solutions_api_integration.courses.views import CoursesMetricsCompletionsLeadersList
 from lazy import lazy
 from opaque_keys.edx.keys import UsageKey
+from progress.models import CourseModuleCompletion
+import six
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-
-from progress.models import CourseModuleCompletion
 
 
 AGGREGATE_CATEGORIES = {
@@ -213,6 +217,26 @@ class CourseCompletionFacade(CompletionDataMixin, object):
         Return a list of BlockCompletions for each vertical in the course.
         """
         return self.get_completions_in_category('vertical')
+
+    @property
+    def mean(self):
+        """
+        Return the mean completion ratio for all enrolled users.
+        """
+        url = '/api/server/courses/{course_id}/metrics/completions/leaders/'
+        course_key_text = six.text_type(self.course_key)
+        request = RequestFactory().get(
+            url.format(course_id=course_key_text),
+            data={'skipleaders': True, 'user_id': self.user.id},
+            HTTP_X_EDX_API_KEY=settings.EDX_API_KEY,
+            HTTP_ACCEPT='application/json',
+        )
+        request.user = self.user
+        response = CoursesMetricsCompletionsLeadersList().dispatch(request, course_id=course_key_text)
+        mean = None
+        if response.status_code == 200:
+            mean = response.data['course_avg']
+        return mean / 100.0
 
 
 class BlockCompletion(CompletionDataMixin, object):

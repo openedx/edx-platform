@@ -6,8 +6,11 @@ Serializers for the completion api
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+
 from rest_framework import serializers
 import six
+
+from .models import AGGREGATE_CATEGORIES
 
 
 class _CompletionSerializer(serializers.Serializer):
@@ -25,6 +28,14 @@ class CourseCompletionSerializer(serializers.Serializer):
     """
     course_key = serializers.CharField()
     completion = _CompletionSerializer(source='*')
+    mean = serializers.FloatField()
+
+    optional_fields = {'mean'}
+
+    def __init__(self, instance, requested_fields=frozenset(), *args, **kwargs):
+        super(CourseCompletionSerializer, self).__init__(instance, *args, **kwargs)
+        for field in self.optional_fields - requested_fields:
+            del self.fields[field]
 
 
 class BlockCompletionSerializer(serializers.Serializer):
@@ -61,6 +72,7 @@ def course_completion_serializer_factory(requested_fields):
     """
     dunder_dict = {
         field: BlockCompletionSerializer(many=True) for field in requested_fields
+        if field in AGGREGATE_CATEGORIES
     }
     return type(
         native_identifier('CourseCompletionSerializerWithAggregates'),

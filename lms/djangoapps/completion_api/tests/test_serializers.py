@@ -7,20 +7,18 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from operator import itemgetter
 
 import ddt
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.test.utils import override_settings
 
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from progress import models
 
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 from ..serializers import course_completion_serializer_factory
 from ..models import CourseCompletionFacade
-
-
-User = get_user_model()  # pylint: disable=invalid-name
 
 
 class MockCourseCompletion(CourseCompletionFacade):
@@ -59,10 +57,7 @@ class CourseCompletionSerializerTestCase(TestCase):
 
     def setUp(self):
         super(CourseCompletionSerializerTestCase, self).setUp()
-        self.test_user = User.objects.create(
-            username='test_user',
-            email='test_user@example.com',
-        )
+        self.test_user = UserFactory.create()
 
     @ddt.data(
         [course_completion_serializer_factory([]), {}],
@@ -126,6 +121,7 @@ class CourseCompletionSerializerTestCase(TestCase):
         )
 
 
+@ddt.ddt
 @override_settings(STUDENT_GRADEBOOK=True)
 class ToyCourseCompletionTestCase(SharedModuleStoreTestCase):
     """
@@ -140,10 +136,8 @@ class ToyCourseCompletionTestCase(SharedModuleStoreTestCase):
 
     def setUp(self):
         super(ToyCourseCompletionTestCase, self).setUp()
-        self.test_user = User.objects.create(
-            username='test_user',
-            email='test_user@example.com'
-        )
+        self.test_user = UserFactory.create()
+        CourseEnrollment.enroll(self.test_user, self.course.id)
 
     def test_no_completions(self):
         progress = models.StudentProgress.objects.create(
@@ -225,7 +219,14 @@ class ToyCourseCompletionTestCase(SharedModuleStoreTestCase):
             }
         )
 
-    def test_with_all_requested_fields(self):
+    @ddt.data(0, 1, 2, 3, 4, 5)
+    def test_with_mean(self, extra_users):
+        # Base mean should be 1/12, but we're using legacy calculations.
+        base_mean = 0.25
+        mean = base_mean / (1 + extra_users)
+        for _ in xrange(extra_users):
+            user = UserFactory.create()
+            CourseEnrollment.enroll(user=user, course_key=self.course.id)
         block_key = UsageKey.from_string("i4x://edX/toy/video/sample_video")
         block_key = block_key.map_into_course(self.course.id)
         models.CourseModuleCompletion.objects.create(
@@ -239,7 +240,40 @@ class ToyCourseCompletionTestCase(SharedModuleStoreTestCase):
             completions=1,
         )
         completion = CourseCompletionFacade(progress)
-        serial = course_completion_serializer_factory(['chapter', 'sequential', 'vertical'])(completion)
+        # Float rounding errors get introduced, so we use assertAlmostEqual.
+        self.assertAlmostEqual(completion.mean, mean)
+        serial = course_completion_serializer_factory({'mean'})(completion, {'mean'})
+        self.assertEqual(
+            serial.data,
+            {
+                'course_key': 'edX/toy/2012_Fall',
+                'completion': {
+                    'earned': 1.0,
+                    'possible': 12.0,
+                    'ratio': 1 / 12,
+                },
+                'mean': completion.mean,
+            }
+        )
+
+    def test_with_all_requested_fields(self):
+        # Mean should be 1/12, but we're using legacy calculations.
+        mean = 0.25
+        block_key = UsageKey.from_string("i4x://edX/toy/video/sample_video")
+        block_key = block_key.map_into_course(self.course.id)
+        models.CourseModuleCompletion.objects.create(
+            user=self.test_user,
+            course_id=self.course.id,
+            content_id=block_key,
+        )
+        progress = models.StudentProgress.objects.create(
+            user=self.test_user,
+            course_id=self.course.id,
+            completions=1,
+        )
+        completion = CourseCompletionFacade(progress)
+        serializer_cls = course_completion_serializer_factory({'chapter', 'mean', 'sequential', 'vertical'})
+        serial = serializer_cls(completion, {'chapter', 'mean', 'sequential', 'vertical'})
         data = serial.data
         # Modulestore returns the blocks in non-deterministic order.
         # Don't require a particular ordering here.
@@ -277,8 +311,8 @@ class ToyCourseCompletionTestCase(SharedModuleStoreTestCase):
         self.assertEqual(
             data,
             {
-                'course_key': u'edX/toy/2012_Fall',
-                'completion': {'earned': 1.0, 'possible': 12.0, 'ratio': 1 / 12},
+                u'course_key': u'edX/toy/2012_Fall',
+                u'completion': {'earned': 1.0, 'possible': 12.0, 'ratio': 1 / 12},
                 u'sequential': [
                     {
                         'course_key': u'edX/toy/2012_Fall',
@@ -292,6 +326,8 @@ class ToyCourseCompletionTestCase(SharedModuleStoreTestCase):
                         'block_key': u'i4x://edX/toy/vertical/vertical_test',
                         'completion': {'earned': 1.0, 'possible': 4.0, 'ratio': 0.25}
                     }
-                ]
+                ],
+                u'mean': mean,
+
             }
         )
