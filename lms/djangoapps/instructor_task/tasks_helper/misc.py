@@ -100,7 +100,23 @@ def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, cour
     task_progress.update_task_state(extra_meta=current_step)
 
     # Compute result table and format it
-    query_features = _task_input.get('features')
+    query_features = [
+        'course_id',
+        'exam_name',
+        'username',
+        'email',
+        'attempt_code',
+        'allowed_time_limit_mins',
+        'is_sample_attempt',
+        'started_at',
+        'completed_at',
+        'status',
+        'review_status',
+        'Suspicious Count',
+        'Suspicious Comments',
+        'Rules Violation Count',
+        'Rules Violation Comments'
+    ]
     student_data = get_proctored_exam_results(course_id, query_features)
     header, rows = format_dictlist(student_data, query_features)
 
