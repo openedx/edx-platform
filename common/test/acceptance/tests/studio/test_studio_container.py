@@ -73,39 +73,6 @@ class NestedVerticalTest(ContainerBase):
 
 
 @attr(shard=1)
-class DragAndDropTest(NestedVerticalTest):
-    """
-    Tests of reordering within the container page.
-    """
-
-    def drag_and_verify(self, source, target, expected_ordering):
-        self.do_action_and_verify(
-            lambda (container): drag(container, source, target, 40),
-            expected_ordering
-        )
-
-    def test_reorder_in_group(self):
-        """
-        Drag Group A Item 2 before Group A Item 1.
-        """
-        expected_ordering = [{self.container_title: [self.group_a, self.group_empty, self.group_b]},
-                             {self.group_a: [self.group_a_item_2, self.group_a_item_1]},
-                             {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
-                             {self.group_empty: []}]
-        self.drag_and_verify(self.group_a_item_2_handle, self.group_a_item_1_handle, expected_ordering)
-
-    def test_drag_to_top(self):
-        """
-        Drag Group A Item 1 to top level (outside of Group A).
-        """
-        expected_ordering = [{self.container_title: [self.group_a_item_1, self.group_a, self.group_empty, self.group_b]},
-                             {self.group_a: [self.group_a_item_2]},
-                             {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
-                             {self.group_empty: []}]
-        self.drag_and_verify(self.group_a_item_1_handle, self.group_a_handle, expected_ordering)
-
-
-@attr(shard=1)
 class AddComponentTest(NestedVerticalTest):
     """
     Tests of adding a component to the container page.
