@@ -226,11 +226,4 @@ class MigrationTests(TestCase):
         out = StringIO()
         call_command('makemigrations', dry_run=True, verbosity=3, stdout=out)
         output = out.getvalue()
-
-        # Temporary check, remove it once migration is created and use the else part.
-        if settings.ROOT_URLCONF == 'lms.urls':
-            migrations_count = output.count('Migrations for')
-            self.assertIn('Remove field sailthru_activation_template', output)
-            self.assertEqual(migrations_count, 1)
-        else:
-            self.assertIn('No changes detected', output)
+        self.assertIn('No changes detected', output)
