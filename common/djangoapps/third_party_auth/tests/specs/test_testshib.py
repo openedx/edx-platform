@@ -6,12 +6,14 @@ import ddt
 import unittest
 import httpretty
 import json
+import logging
 from mock import patch
 from freezegun import freeze_time
 from social_django.models import UserSocialAuth
+from testfixtures import LogCapture
 from unittest import skip
 
-from third_party_auth.saml import log as saml_log
+from third_party_auth.saml import log as saml_log, SapSuccessFactorsIdentityProvider
 from third_party_auth.tasks import fetch_saml_metadata
 from third_party_auth.tests import testutil
 
@@ -316,6 +318,26 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
 
         httpretty.register_uri(httpretty.GET, ODATA_USER_URL, content_type='application/json', body=user_callback)
 
+    def _mock_odata_api_for_error(self, odata_api_root_url, username):
+        """
+        Mock an error response when calling the OData API for user details.
+        """
+
+        def callback(request, uri, headers):  # pylint: disable=unused-argument
+            """
+            Return a 500 error when someone tries to call the URL.
+            """
+            return 500, headers, 'Failure!'
+
+        fields = ','.join(SapSuccessFactorsIdentityProvider.default_field_mapping.copy())
+        url = '{root_url}User(userId=\'{user_id}\')?$select={fields}'.format(
+            root_url=odata_api_root_url,
+            user_id=username,
+            fields=fields,
+        )
+        httpretty.register_uri(httpretty.GET, url, body=callback, content_type='application/json')
+        return url
+
     def test_register_insufficient_sapsf_metadata(self):
         """
         Configure the provider such that it doesn't have enough details to contact the SAP
@@ -467,6 +489,42 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         self.USER_NAME = "Me Myself And I"
         self.USER_USERNAME = "myself"
         super(SuccessFactorsIntegrationTest, self).test_register()
+
+    def test_register_http_failure_in_odata(self):
+        """
+        Ensure that if there's an HTTP failure while fetching user details from
+        SAP SuccessFactors OData API.
+        """
+        # Because we're getting details from the assertion, fall back to the initial set of details.
+        self.USER_EMAIL = "myself@testshib.org"
+        self.USER_NAME = "Me Myself And I"
+        self.USER_USERNAME = "myself"
+
+        odata_company_id = 'NCC1701D'
+        odata_api_root_url = 'http://api.successfactors.com/odata/v2/'
+        mocked_odata_ai_url = self._mock_odata_api_for_error(odata_api_root_url, self.USER_USERNAME)
+        self._configure_testshib_provider(
+            identity_provider_type='sap_success_factors',
+            metadata_source=TESTSHIB_METADATA_URL,
+            other_settings=json.dumps({
+                'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
+                'sapsf_private_key': 'fake_private_key_here',
+                'odata_api_root_url': odata_api_root_url,
+                'odata_company_id': odata_company_id,
+                'odata_client_id': 'TatVotSEiCMteSNWtSOnLanCtBGwNhGB',
+            })
+        )
+        with LogCapture(level=logging.WARNING) as log_capture:
+            super(SuccessFactorsIntegrationTest, self).test_register()
+            expected_message = 'Unable to retrieve user details with username {username} from SAPSuccessFactors ' \
+                               'for company ID {company_id} with url "{odata_api_url}" and error message: ' \
+                               '500 Server Error: Internal Server Error for url: {odata_api_url}'.format(
+                                   username=self.USER_USERNAME,
+                                   company_id=odata_company_id,
+                                   odata_api_url=mocked_odata_ai_url,
+                               )
+            logging_messages = [log_msg.getMessage() for log_msg in log_capture.records]
+            self.assertTrue(expected_message in logging_messages)
 
     @skip('Test not necessary for this subclass')
     def test_get_saml_idp_class_with_fake_identifier(self):
