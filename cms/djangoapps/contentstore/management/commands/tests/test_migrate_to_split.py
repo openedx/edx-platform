@@ -1,9 +1,8 @@
 """
 Unittests for migrating a course to split mongo
 """
-import unittest
-
 from django.core.management import CommandError, call_command
+from django.test import TestCase
 from contentstore.management.commands.migrate_to_split import Command
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -12,7 +11,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
-class TestArgParsing(unittest.TestCase):
+class TestArgParsing(TestCase):
     """
     Tests for parsing arguments for the `migrate_to_split` management command
     """

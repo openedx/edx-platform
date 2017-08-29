@@ -1,9 +1,9 @@
 """
 Unittests for creating a course in an chosen modulestore
 """
-import unittest
 import ddt
 from django.core.management import CommandError, call_command
+from django.test import TestCase
 
 from contentstore.management.commands.create_course import Command
 from xmodule.modulestore import ModuleStoreEnum
@@ -11,7 +11,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
 
 
-class TestArgParsing(unittest.TestCase):
+class TestArgParsing(TestCase):
     """
     Tests for parsing arguments for the `create_course` management command
     """
