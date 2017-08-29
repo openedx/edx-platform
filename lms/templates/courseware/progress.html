@@ -56,10 +56,9 @@ from django.utils.http import urlquote_plus
                     ${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}
                 </h2>
 
-                %if certificate_data:
                 <div class="wrapper-msg wrapper-auto-cert">
                     <div id="errors-info" class="errors-info"></div>
-                    %if passed:
+                    %if certificate_data:
                     <div class="auto-cert-message" id="course-success">
                         <div class="has-actions">
                             <% post_url = reverse('generate_user_cert', args=[unicode(course.id)]) %>
@@ -80,7 +79,6 @@ from django.utils.http import urlquote_plus
                     </div>
                     %endif
                 </div>
-                %endif
 
                 %if not course.disable_progress_graph:
                 <div class="grade-detail-graph" id="grade-detail-graph"></div>
