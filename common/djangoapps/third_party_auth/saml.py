@@ -290,27 +290,33 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
             # from the SAML assertion.
             return details
         username = details['username']
+        fields = ','.join(self.field_mappings)
+        odata_api_url = '{root_url}User(userId=\'{user_id}\')?$select={fields}'.format(
+            root_url=self.odata_api_root_url,
+            user_id=username,
+            fields=fields,
+        )
         try:
             client = self.get_odata_api_client(user_id=username)
-            fields = ','.join(self.field_mappings)
             response = client.get(
-                '{root_url}User(userId=\'{user_id}\')?$select={fields}'.format(
-                    root_url=self.odata_api_root_url,
-                    user_id=username,
-                    fields=fields,
-                ),
+                odata_api_url,
                 timeout=self.timeout,
             )
             response.raise_for_status()
             response = response.json()
-        except requests.RequestException:
+        except requests.RequestException as err:
             # If there was an HTTP level error, log the error and return the details from the SAML assertion.
             log.warning(
-                'Unable to retrieve user details with username %s from SAPSuccessFactors with company ID %s.',
+                'Unable to retrieve user details with username %s from SAPSuccessFactors for company ID %s '
+                'with url "%s" and error message: %s',
                 username,
                 self.odata_company_id,
+                odata_api_url,
+                err.message,
+                exc_info=True,
             )
             return details
+
         return self.get_registration_fields(response)
 
 
