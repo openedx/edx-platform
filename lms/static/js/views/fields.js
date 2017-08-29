@@ -367,7 +367,8 @@
                     id: this.options.valueAttribute,
                     title: this.options.title,
                     value: this.modelValue(),
-                    message: this.helpMessage
+                    message: this.helpMessage,
+                    placeholder: this.options.placeholder || ''
                 }));
                 this.delegateEvents();
                 return this;

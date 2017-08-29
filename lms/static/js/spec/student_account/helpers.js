@@ -65,6 +65,23 @@ define(['underscore'], function(_) {
     };
     var IMAGE_MAX_BYTES = 1024 * 1024;
     var IMAGE_MIN_BYTES = 100;
+    var SOCIAL_PLATFORMS = {
+        facebook: {
+            display_name: 'Facebook',
+            url_stub: 'facebook.com/',
+            example: 'https://www.facebook.com/username'
+        },
+        twitter: {
+            display_name: 'Twitter',
+            url_stub: 'twitter.com/',
+            example: 'https://www.twitter.com/username'
+        },
+        linkedin: {
+            display_name: 'LinkedIn',
+            url_stub: 'linkedin.com/in/',
+            example: 'https://www.linkedin.com/in/username'
+        }
+    };
     var DEFAULT_ACCOUNT_SETTINGS_DATA = {
         username: 'student',
         name: 'Student',
@@ -77,6 +94,7 @@ define(['underscore'], function(_) {
         language: 'en-US',
         date_joined: 'December 17, 1995 03:24:00',
         bio: 'About the student',
+        social_links: [{platform: 'facebook', social_link: 'https://www.facebook.com/edX'}],
         language_proficiencies: [{code: '1'}],
         profile_image: PROFILE_IMAGE,
         accomplishments_shared: false
@@ -170,6 +188,7 @@ define(['underscore'], function(_) {
         AUTH_DATA: AUTH_DATA,
         IMAGE_MAX_BYTES: IMAGE_MAX_BYTES,
         IMAGE_MIN_BYTES: IMAGE_MIN_BYTES,
+        SOCIAL_PLATFORMS: SOCIAL_PLATFORMS,
         createAccountSettingsData: createAccountSettingsData,
         createUserPreferencesData: createUserPreferencesData,
         expectLoadingIndicatorIsVisible: expectLoadingIndicatorIsVisible,

@@ -53,6 +53,17 @@ define(
                 });
             };
 
+            var createSocialLinksView = function(ownProfile, socialPlatformLinks) {
+                var accountSettingsModel = new UserAccountModel();
+                accountSettingsModel.set({social_platforms: socialPlatformLinks});
+
+                return new LearnerProfileFields.SocialLinkIconsView({
+                    model: accountSettingsModel,
+                    socialPlatforms: ['twitter', 'facebook', 'linkedin'],
+                    ownProfile: ownProfile
+                });
+            };
+
             var createFakeImageFile = function(size) {
                 var fileFakeData = 'i63ljc6giwoskyb9x5sw0169bdcmcxr3cdz8boqv0lik971972cmd6yknvcxr5sw0nvc169bdcmcxsdf';
                 return new Blob(
@@ -75,6 +86,7 @@ define(
                 loadFixtures('learner_profile/fixtures/learner_profile.html');
                 TemplateHelpers.installTemplate('templates/fields/field_image');
                 TemplateHelpers.installTemplate('templates/fields/message_banner');
+                TemplateHelpers.installTemplate('learner_profile/templates/social_icons');
             });
 
             afterEach(function() {
@@ -289,6 +301,77 @@ define(
                     AjaxHelpers.respondWithError(requests);
 
                     expect($('.message-banner').text().trim()).toBe(imageView.errorMessage);
+                });
+            });
+
+            describe('SocialLinkIconsView', function() {
+                var socialPlatformLinks,
+                    socialLinkData,
+                    socialLinksView,
+                    socialPlatform,
+                    $icon;
+
+                it('icons are visible and links to social profile if added in account settings', function() {
+                    socialPlatformLinks = {
+                        twitter: {
+                            platform: 'twitter',
+                            social_link: 'https://www.twitter.com/edX'
+                        },
+                        facebook: {
+                            platform: 'facebook',
+                            social_link: 'https://www.facebook.com/edX'
+                        },
+                        linkedin: {
+                            platform: 'linkedin',
+                            social_link: ''
+                        }
+                    };
+
+                    socialLinksView = createSocialLinksView(true, socialPlatformLinks);
+
+                    // Icons should be present and contain links if defined
+                    for (var i = 0; i < Object.keys(socialPlatformLinks); i++) { // eslint-disable-line vars-on-top
+                        socialPlatform = Object.keys(socialPlatformLinks)[i];
+                        socialLinkData = socialPlatformLinks[socialPlatform];
+                        if (socialLinkData.social_link) {
+                            // Icons with a social_link value should be displayed with a surrounding link
+                            $icon = socialLinksView.$('span.fa-' + socialPlatform + '-square');
+                            expect($icon).toExist();
+                            expect($icon.parent().is('a'));
+                        } else {
+                            // Icons without a social_link value should be displayed without a surrounding link
+                            $icon = socialLinksView.$('span.fa-' + socialPlatform + '-square');
+                            expect($icon).toExist();
+                            expect(!$icon.parent().is('a'));
+                        }
+                    }
+                });
+
+                it('icons are not visible on a profile with no links', function() {
+                    socialPlatformLinks = {
+                        twitter: {
+                            platform: 'twitter',
+                            social_link: ''
+                        },
+                        facebook: {
+                            platform: 'facebook',
+                            social_link: ''
+                        },
+                        linkedin: {
+                            platform: 'linkedin',
+                            social_link: ''
+                        }
+                    };
+
+                    socialLinksView = createSocialLinksView(false, socialPlatformLinks);
+
+                    // Icons should not be present if not defined on another user's profile
+                    for (var i = 0; i < Object.keys(socialPlatformLinks); i++) { // eslint-disable-line vars-on-top
+                        socialPlatform = Object.keys(socialPlatformLinks)[i];
+                        socialLinkData = socialPlatformLinks[socialPlatform];
+                        $icon = socialLinksView.$('span.fa-' + socialPlatform + '-square');
+                        expect($icon).toBe(null);
+                    }
                 });
             });
         });

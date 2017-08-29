@@ -19,6 +19,7 @@
                 mailing_address: '',
                 year_of_birth: null,
                 bio: null,
+                social_links: [],
                 language_proficiencies: [],
                 requires_parental_consent: true,
                 profile_image: null,

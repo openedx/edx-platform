@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.validators import validate_email, ValidationError
 from django.http import HttpResponseForbidden
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
-from openedx.core.djangoapps.user_api.errors import PreferenceValidationError
+from openedx.core.djangoapps.user_api.errors import PreferenceValidationError, AccountValidationError
 
 from student.models import User, UserProfile, Registration
 from student import forms as student_forms
@@ -216,7 +216,9 @@ def update_account_settings(requesting_user, update, username=None):
             existing_user_profile.save()
 
     except PreferenceValidationError as err:
-        raise errors.AccountValidationError(err.preference_errors)
+        raise AccountValidationError(err.preference_errors)
+    except AccountValidationError as err:
+        raise err
     except Exception as err:
         raise errors.AccountUpdateError(
             u"Error thrown when saving account updates: '{}'".format(err.message)

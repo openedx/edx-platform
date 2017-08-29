@@ -94,7 +94,7 @@
 .account-settings-sections {
 
     .section-header {
-        @extend %t-title6;
+        @extend %t-title5;
         @extend %t-strong;
         padding-top: ($baseline/2)*3;
         color: $dark-gray1;
@@ -102,14 +102,13 @@
 
     .section {
         background-color: $white;
-        margin-top: $baseline;
+        margin: $baseline 5% 0;
         border-bottom: 4px solid $m-gray-l4;
 
         .account-settings-header-subtitle {
-            font-size: em(18);
+            font-size: em(14);
             line-height: normal;
             color: $dark-gray;
-            padding-top: 20px;
             padding-bottom: 10px;
         }
 
@@ -117,6 +116,7 @@
 
             .u-field {
                 border-bottom: 2px solid $m-gray-l4;
+                padding: $baseline*0.75 0;
 
                 .field {
                     width: 30%;
@@ -301,7 +301,8 @@
 
                 .u-field-message {
                     position: relative;
-                    padding: 24px 0 0 ($baseline*5);
+                    padding: $baseline*0.75 0 0 ($baseline*4);
+                    width: 60%;
 
                     .u-field-message-notification {
                         position: absolute;
