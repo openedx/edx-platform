@@ -54,8 +54,8 @@ import openedx.core.djangoapps.external_auth.views
 import third_party_auth
 import track.views
 from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-error
-from certificates.api import get_certificate_url, has_html_certificates_enabled  # pylint: disable=import-error
-from certificates.models import (  # pylint: disable=import-error
+from openedx.features.certificates.api import get_certificate_url, has_html_certificates_enabled  # pylint: disable=import-error
+from openedx.features.certificates.models import (  # pylint: disable=import-error
     CertificateStatuses,
     GeneratedCertificate,
     certificate_status_for_student

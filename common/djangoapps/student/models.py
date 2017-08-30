@@ -47,7 +47,7 @@ from slumber.exceptions import HttpClientError, HttpServerError
 import dogstats_wrapper as dog_stats_api
 import lms.lib.comment_client as cc
 import request_cache
-from certificates.models import GeneratedCertificate
+from openedx.features.certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from enrollment.api import _default_course_mode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

@@ -11,7 +11,7 @@ from time import time
 from lazy import lazy
 from pytz import UTC
 
-from certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
+from openedx.features.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
 from courseware.courses import get_course_by_id
 from instructor_analytics.basic import list_problem_responses
 from instructor_analytics.csvs import format_dictlist

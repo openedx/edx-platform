@@ -26,8 +26,8 @@ from pytz import UTC
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from certificates.models import CertificateStatuses, GeneratedCertificate
-from certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
+from openedx.features.certificates.models import CertificateStatuses, GeneratedCertificate
+from openedx.features.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory

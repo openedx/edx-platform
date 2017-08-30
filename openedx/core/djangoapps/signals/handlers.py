@@ -6,7 +6,7 @@ import logging
 from celery.task import task
 from django.dispatch import receiver
 
-from certificates.models import CertificateGenerationCourseSetting
+from openedx.features.certificates.models import CertificateGenerationCourseSetting
 from opaque_keys.edx.keys import CourseKey
 from signals import COURSE_PACING_CHANGE
 

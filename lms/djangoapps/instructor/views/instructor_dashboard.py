@@ -24,8 +24,8 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from bulk_email.models import BulkEmailFlag
-from certificates import api as certs_api
-from certificates.models import (
+from openedx.features.certificates import api as certs_api
+from openedx.features.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationHistory,
     CertificateInvalidation,

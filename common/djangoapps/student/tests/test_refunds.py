@@ -21,8 +21,8 @@ from slumber.exceptions import HttpClientError, HttpServerError
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
 from course_modes.tests.factories import CourseModeFactory
-from certificates.models import CertificateStatuses, GeneratedCertificate  # pylint: disable=import-error
-from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+from openedx.features.certificates.models import CertificateStatuses, GeneratedCertificate  # pylint: disable=import-error
+from openedx.features.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
 from student.models import CourseEnrollment, CourseEnrollmentAttribute
 from student.tests.factories import UserFactory

@@ -14,9 +14,9 @@ import courseware.views.views as views
 import ddt
 import shoppingcart
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from certificates import api as certs_api
-from certificates.models import CertificateGenerationConfiguration, CertificateStatuses
-from certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
+from openedx.features.certificates import api as certs_api
+from openedx.features.certificates.models import CertificateGenerationConfiguration, CertificateStatuses
+from openedx.features.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory

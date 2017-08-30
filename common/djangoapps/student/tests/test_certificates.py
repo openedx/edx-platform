@@ -9,9 +9,9 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from mock import patch
 
-from certificates.api import get_certificate_url  # pylint: disable=import-error
-from certificates.models import CertificateStatuses  # pylint: disable=import-error
-from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+from openedx.features.certificates.api import get_certificate_url  # pylint: disable=import-error
+from openedx.features.certificates.models import CertificateStatuses  # pylint: disable=import-error
+from openedx.features.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from course_modes.models import CourseMode
 from student.models import LinkedInAddToProfileConfiguration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

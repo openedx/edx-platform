@@ -16,7 +16,7 @@ from edx_proctoring.api import get_exam_violation_report
 from opaque_keys.edx.keys import UsageKey
 
 import xmodule.graders as xmgraders
-from certificates.models import CertificateStatuses, GeneratedCertificate
+from openedx.features.certificates.models import CertificateStatuses, GeneratedCertificate
 from courseware.models import StudentModule
 from lms.djangoapps.grades.context import grading_context_for_course
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
