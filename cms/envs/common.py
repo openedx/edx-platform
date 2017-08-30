@@ -1329,6 +1329,9 @@ OAUTH_OIDC_ISSUER = 'https://www.example.com/oauth2'
 # 5 minute expiration time for JWT id tokens issued for external API requests.
 OAUTH_ID_TOKEN_EXPIRATION = 5 * 60
 
+# Remove grants, access tokens, refresh tokens as they are used
+OAUTH_DELETE_EXPIRED = True
+
 # Partner support link for CMS footer
 PARTNER_SUPPORT_EMAIL = ''
 
