@@ -128,6 +128,7 @@ if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
 if settings.FEATURES.get('EDX_SOLUTIONS_API'):
     urlpatterns += (
         url(r'^api/server/', include('edx_solutions_api_integration.urls')),
+        url(r'^api/completion/v0/', include('lms.djangoapps.completion_api.urls')),
     )
 
 # OPEN EDX USER API
