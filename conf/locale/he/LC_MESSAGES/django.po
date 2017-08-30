@@ -81,9 +81,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-01 18:56+0000\n"
-"PO-Revision-Date: 2017-08-03 16:03+0000\n"
-"Last-Translator: e2f_HE c1 <e2f_HE_c1@outlook.com>\n"
+"POT-Creation-Date: 2017-08-30 16:35+0000\n"
+"PO-Revision-Date: 2017-08-14 16:01+0000\n"
+"Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -216,7 +216,7 @@ msgid "You're enrolled as an honor code student"
 msgstr "אתה רשום במסלול קוד אתי"
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
-#: openedx/core/djangoapps/user_api/views.py
+#: openedx/core/djangoapps/user_api/api.py
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -230,13 +230,6 @@ msgstr "אתה רשום כסטודנט בהכשרה מקצועית"
 #: common/djangoapps/course_modes/helpers.py
 msgid "Professional Ed"
 msgstr "חינוך מקצועי"
-
-#: common/djangoapps/course_modes/models.py common/lib/xmodule/xmodule/tabs.py
-#: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
-#: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
-#: lms/templates/help_modal.html lms/templates/courseware/courseware.html
-msgid "Course"
-msgstr "קורס"
 
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
@@ -338,17 +331,6 @@ msgid "Congratulations!  You are now enrolled in {course_name}"
 msgstr "ברכות!  אתה רשום כעת ב-{course_name}"
 
 #: common/djangoapps/course_modes/views.py
-#, python-brace-format
-msgid ""
-"Welcome, {username}! You are about to enroll in {course_name}, from "
-"{partner_names}, sponsored by {enterprise_name}. Please select your "
-"enrollment information below."
-msgstr ""
-"ברוכ/ה הבאה {username}! את/ה עומד/ת להרשם לקורס {course_name}, מ "
-"{partner_names}, ממומן על ידי {enterprise_name}. בבקשה בחר/י למטה את המידע "
-"שלך עבור הרישום."
-
-#: common/djangoapps/course_modes/views.py
 msgid "Enrollment is closed"
 msgstr "ההרשמה סגורה"
 
@@ -389,34 +371,6 @@ msgstr "סטודנט"
 #: common/djangoapps/student/admin.py
 msgid "User profile"
 msgstr "פרופיל משתמש"
-
-#: common/djangoapps/student/forms.py
-msgid "Username must be minimum of two characters long"
-msgstr "שם משתמש חייב להיות באורך העולה על שני תווים"
-
-#: common/djangoapps/student/forms.py
-#, python-format
-msgid "Username cannot be more than %(limit_value)s characters long"
-msgstr "שם משתמש יכול להיות באורך מירבי של %(limit_value)s characters תווים"
-
-#. Translators: This message is shown when the Unicode usernames are NOT
-#. allowed
-#: common/djangoapps/student/forms.py
-msgid ""
-"Usernames can only contain Roman letters, western numerals (0-9), "
-"underscores (_), and hyphens (-)."
-msgstr ""
-"שמות המשתמשים יכולים לכלול רק אותיות באנגלית, מספרים (0-9), קווים תחתונים "
-"(_) ומקפים (-)."
-
-#. Translators: This message is shown only when the Unicode usernames are
-#. allowed
-#: common/djangoapps/student/forms.py
-msgid ""
-"Usernames can only contain letters, numerals, underscore (_), numbers and "
-"@/./+/-/_ characters."
-msgstr ""
-"שמות משתמשים יכולים להכיל רק אותיות,קו תחתון (_) מספרים ותווים @/./+/-/_"
 
 #: common/djangoapps/student/forms.py
 msgid ""
@@ -788,6 +742,10 @@ msgid "ID photo is blurry"
 msgstr "תמונה מזהה מטושטשת"
 
 #: common/djangoapps/student/views.py
+msgid " and "
+msgstr ""
+
+#: common/djangoapps/student/views.py
 msgid "Course id not specified"
 msgstr "מזהה קורס לא מפורט"
 
@@ -1123,6 +1081,10 @@ msgstr ""
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this SAML configuration belongs to."
 msgstr "האתר שתצורת SAML זו שייכת אליו."
+
+#: lms/templates/help_modal.html
+msgid "{platform_name} Support"
+msgstr "תמיכה ב{platform_name}"
 
 #: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
 #: lms/templates/student_account/finish_auth.html
@@ -1899,9 +1861,10 @@ msgstr "חלה בעיה בתשובת הצוות עבור בעיה זו: גבול
 msgid "or"
 msgstr "או"
 
+#: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html
 msgid "Text Input"
-msgstr "שדה הכנסת הטקסט"
+msgstr "שדה הכנסת הט"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "error"
@@ -2288,9 +2251,10 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py cms/templates/index.html
 #: lms/templates/help_modal.html lms/templates/manage_user_standing.html
 #: lms/templates/register-shib.html
+#: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Submit"
@@ -4364,6 +4328,15 @@ msgstr "דיון חיצוני"
 msgid "Home"
 msgstr "בית"
 
+#: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
+#: lms/djangoapps/courseware/views/views.py
+#: lms/djangoapps/shoppingcart/reports.py
+#: openedx/features/course_experience/__init__.py
+#: cms/templates/widgets/header.html lms/templates/help_modal.html
+#: lms/templates/courseware/courseware.html
+msgid "Course"
+msgstr "קורס"
+
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Text Annotation"
 msgstr "טקסט הסבר"
@@ -4970,7 +4943,7 @@ msgstr "ערכת מדיה"
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
-#: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/views.py
+#: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/api.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -5224,7 +5197,6 @@ msgstr ""
 "תעודת {cert_type} מדגימה רמת הישגים גבוהה בתכנית הלימודים וכוללת אימות זהות "
 "הסטודנט."
 
-#. Translators:  The format of the date includes the full name of the month
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
 msgid "{month} {day}, {year}"
@@ -5443,6 +5415,7 @@ msgstr "מידע נוסף אודות ההישג של {fullname}"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: openedx/core/djangoapps/schedules/admin.py
 #: lms/templates/staff_problem_info.html
 #: lms/templates/api_admin/catalogs/search.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -5668,6 +5641,14 @@ msgstr ""
 "יותר."
 
 #: lms/djangoapps/courseware/date_summary.py
+msgid "Certificate Available"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Day certificates will become available for passing verified learners."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
 msgid "Verification Upgrade Deadline"
 msgstr "תאריך יעד לשדרוג האימות"
 
@@ -5764,17 +5745,19 @@ msgid "sign in"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
+#: openedx/features/course_experience/views/course_home_messages.py
 msgid "register"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"You must be enrolled in the course to see course content. {enroll_link}."
+"You must be enrolled in the course to see course content."
+"                         {enroll_link_start}Enroll now{enroll_link_end}."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Enroll now"
+msgid "You must be enrolled in the course to see course content."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
@@ -5800,10 +5783,8 @@ msgid "Your certificate is available"
 msgstr "התעודה שלך זמינה"
 
 #: lms/djangoapps/courseware/views/views.py
-msgid ""
-"You can keep working for a higher grade, or request your certificate now."
+msgid "You've earned a certificate for this course."
 msgstr ""
-"תוכל להמשיך לעבוד ולנסות לקבל ציון גבוה יותר או לבקש את התעודה שלך כעת."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "We're working on it..."
@@ -6238,8 +6219,8 @@ msgid "Sailthru maximum retries."
 msgstr "מספר ניסיונות חוזרים מרבי ל-Sailthru."
 
 #: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru template to use on activation send. "
-msgstr "תבנית Sailthru לשימוש בשליחת הפעלה."
+msgid "Sailthru template to use on welcome send."
+msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru template to use on abandoned cart reminder. Deprecated."
@@ -6285,10 +6266,8 @@ msgstr ""
 #: lms/djangoapps/email_marketing/models.py
 msgid ""
 "Number of seconds to delay the sending of User Welcome email after user has "
-"been activated"
+"been created"
 msgstr ""
-"מספר שניות להשהיית המשלוח של הודעת 'ברוכים הבאים' לאחר ההפעלה של חשבון "
-"המשתמש"
 
 #: lms/djangoapps/email_marketing/models.py
 msgid ""
@@ -6352,12 +6331,15 @@ msgstr ""
 "{student_username} נסקר כ{review_status} על ידי ספק סקירת מבחן תחת פיקוח."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "User does not exist."
-msgstr "משתמש אינו קיים."
+#, python-brace-format
+msgid ""
+"The {report_type} report is being created. To view the status of the report,"
+" see Pending Tasks below."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "Task is already running."
-msgstr "המשימה רצה כבר."
+msgid "User does not exist."
+msgstr "משתמש אינו קיים."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6413,24 +6395,13 @@ msgstr ""
 " צור קשר עם התמיכה לקבלת מידע נוסף."
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "problem responses"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Could not find problem with this location."
 msgstr "לא ניתן למצוא את הבעיה במיקום זה."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The problem responses report is being created. To view the status of the "
-"report, see Pending Tasks below."
-msgstr ""
-"דוח התשובות לבעיה נוצר כעת. כדי להציג את מצב הדוח, ראה 'משימות בהמתנה' להלן."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"A problem responses report generation task is already in progress. Check the"
-" 'Pending Tasks' table for the status of the task. When completed, the "
-"report will be available for download in the table below."
-msgstr ""
-"משימת יצירת דוח תשובות לבעיה כבר בתהליך. בדוק את טבלת 'משימות בהמתנה' לקבלת "
-"הסטטוס של המשימה. לאחר השלמתו, הדוח יהיה זמין להורדה בטבלה להלן."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -6472,20 +6443,25 @@ msgid "Date Report Run"
 msgstr "תאריך הרצת הדוח"
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "enrolled learner profile"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "User ID"
 msgstr "מזהה משתמש"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
 #. Translators: This label appears above a field on the login form
 #. meant to hold the user's email address.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's email address.
-#. Translators: This label appears above a field on the password reset
-#. form meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: openedx/core/djangoapps/user_api/views.py
+#: openedx/core/djangoapps/user_api/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
 msgstr "דואר אלקטרוני"
@@ -6508,7 +6484,7 @@ msgstr "שנת לידה"
 #. form used to select the user's gender.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
 #: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Gender"
@@ -6552,19 +6528,16 @@ msgstr "צוות"
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "City"
 msgstr "עיר"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the country in which the user lives.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -6572,30 +6545,9 @@ msgid "Country"
 msgstr "מדינה"
 
 #: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The enrolled learner profile report is being created. To view the status of "
-"the report, see Pending Tasks below."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "enrollment"
 msgstr ""
-"דוח פרופיל הלומד שנרשם נוצר. כדי להציג את מצב הדוח, ראה 'משימות בהמתנה' "
-"להלן."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"This enrollment report is currently being created. To view the status of the"
-" report, see Pending Tasks below. You will be able to download the report "
-"when it is complete."
-msgstr ""
-"דוח הרשמה זה נוצר כרגע. כדי להציג את מצב הדוח, ראה 'משימות בהמתנה' להלן. "
-"לאחר השלמתו, תוכל להוריד את הדוח."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The enrollment report is being created. This report contains information "
-"about learners who can enroll in the course. To view the status of the "
-"report, see Pending Tasks below."
-msgstr ""
-"דוח ההרשמה נוצר. דוח זה כולל מידע על לומדים היכולים להירשם לקורס. כדי להציג "
-"את מצב הדוח, ראה 'משימות בהמתנה' להלן."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'cohort' column containing cohort names."
@@ -6652,71 +6604,24 @@ msgid "Total Discounted Amount"
 msgstr "סך כל הסכום שהנחה"
 
 #: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The detailed enrollment report is being created. To view the status of the "
-"report, see Pending Tasks below."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "detailed enrollment"
 msgstr ""
-"דוח ההרשמה המפורט נוצר כעת. על מנת להציג את מצב הדוח, ראה 'משימות בהמתנה' "
-"להלן."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The detailed enrollment report is being created. To view the status of the "
-"report, see Pending Tasks below. You will be able to download the report "
-"when it is complete."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "executive summary"
 msgstr ""
-"דוח ההרשמה המפורט נוצר כעת. על מנת להציג את מצב הדוח, ראה 'משימות בהמתנה' "
-"להלן. לאחר השלמתו, תוכל להוריד את הדוח."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The executive summary report is being created. To view the status of the "
-"report, see Pending Tasks below."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "survey"
 msgstr ""
-"דוח תקציר המנהלים נוצר כעת. על מנת להציג את מצב הדוח, ראה 'משימות בהמתנה' "
-"להלן."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The executive summary report is currently being created. To view the status "
-"of the report, see Pending Tasks below. You will be able to download the "
-"report when it is complete."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "proctored exam results"
 msgstr ""
-"דוח תקציר המנהלים נוצר כעת. על מנת להציג את מצב הדוח, ראה 'משימות בהמתנה' "
-"להלן. לאחר השלמתו, תוכל להוריד את הדוח."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The survey report is being created. To view the status of the report, see "
-"Pending Tasks below."
-msgstr ""
-"דוח הסקר נוצר כעת. על מנת להציג את מצב הדוח, ראה 'משימות בהמתנה' להלן."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The survey report is currently being created. To view the status of the "
-"report, see Pending Tasks below. You will be able to download the report "
-"when it is complete."
-msgstr ""
-"דוח הסקר נוצר כעת. על מנת להציג את מצב הדוח, ראה 'משימות בהמתנה' להלן. לאחר "
-"השלמתו, תוכל להוריד את הדוח."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The proctored exam results report is being created. To view the status of "
-"the report, see Pending Tasks below."
-msgstr ""
-"דוח תוצאות מבחן תחת פיקוח נוצר. על מנת להציג את מצב הדוח, ראה 'משימות "
-"בהמתנה' להלן."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The proctored exam results report is currently being created. To view the "
-"status of the report, see Pending Tasks below. You will be able to download "
-"the report when it is complete."
-msgstr ""
-"דוח תוצאות מבחן תחת פיקוח נוצר כעת. על מנת להציג את מצב הדוח, ראה 'משימות "
-"בהמתנה' להלן. לאחר השלמתו, תוכל להוריד את הדוח."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not parse amount as a decimal"
@@ -6768,50 +6673,19 @@ msgid "Cannot rescore with all_students and unique_student_identifier."
 msgstr "לא ניתן לדרג מחדש עם all_students ועם unique_student_identifier."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "The ORA data report is being generated."
-msgstr "דוח נתוני ORA נוצר כעת."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "ORA data"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-msgid ""
-"An ORA data report generation task is already in progress. Check the "
-"'Pending Tasks' table for the status of the task. When completed, the report"
-" will be available for download in the table below."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "grade"
 msgstr ""
-"משימת יצירת דוח נתוני ORA נמצאת כבר בתהליך. בדוק את טבלת 'משימות בהמתנה' "
-"לקבלת סטטוס המשימה. לאחר השלמתו, הדוח יהיה זמין להורדה בטבלה להלן."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The grade report is being created. To view the status of the report, see "
-"Pending Tasks below."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "problem grade"
 msgstr ""
-"דוח הדירוג נוצר כעת. על מנת להציג את סטטוס הדוח, ראה 'משימות בהמתנה' להלן."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The grade report is currently being created. To view the status of the "
-"report, see Pending Tasks below. You will be able to download the report "
-"when it is complete."
-msgstr ""
-"דוח הדירוג נוצר כעת. על מנת להציג את סטטוס הדוח, ראה 'משימות בהמתנה' להלן. "
-"לאחר השלמתו, תוכל להוריד את הדוח."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The problem grade report is being created. To view the status of the report,"
-" see Pending Tasks below."
-msgstr ""
-"דוח דירוג הבעיה נוצר כעת. על מנת להציג את סטטוס הדוח, ראה 'משימות בהמתנה' "
-"להלן."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"A problem grade report is already being generated. To view the status of the"
-" report, see Pending Tasks below. You will be able to download the report "
-"when it is complete."
-msgstr ""
-"דוח דירוג הבעיה נוצר כעת. על מנת להציג את סטטוס הדוח, ראה 'משימות בהמתנה' "
-"להלן. לאחר השלמתו, תוכל להוריד את הדוח."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -7192,7 +7066,7 @@ msgstr "לא נקבעה הארכה לתאריך היעד להגשה עבור ס�
 #. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/views.py cms/templates/register.html
+#: openedx/core/djangoapps/user_api/api.py cms/templates/register.html
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -7213,6 +7087,22 @@ msgstr "משתמשים בעלי הארכות תאריך יעד עבור {0}"
 #, python-brace-format
 msgid "Due date extensions for {0} {1} ({2})"
 msgstr "הארכות תאריך יעד עבור {0} {1} ({2})"
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "Requested task is already running"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "Error occured. Please try again later."
+msgstr ""
+
+#: lms/djangoapps/instructor_task/api_helper.py
+#, python-brace-format
+msgid ""
+"The {report_type} report is being created. To view the status of the report,"
+" see Pending Tasks below. You will be able to download the report when it is"
+" complete."
+msgstr ""
 
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "This component cannot be rescored."
@@ -7297,14 +7187,14 @@ msgstr "להיאסף כקבוצת לימוד"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/views.py
+#: openedx/core/djangoapps/user_api/api.py
 msgid "First Name"
 msgstr "שם פרטי"
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/views.py
+#: openedx/core/djangoapps/user_api/api.py
 msgid "Last Name"
 msgstr "שם משפחה"
 
@@ -7318,7 +7208,7 @@ msgstr "שם החברה"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Title
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/views.py wiki/forms.py
+#: openedx/core/djangoapps/user_api/api.py wiki/forms.py
 msgid "Title"
 msgstr "כותרת"
 
@@ -8752,6 +8642,14 @@ msgstr "אין לך הרשאה לצפות בעמוד זה."
 msgid "No email address provided."
 msgstr "לא סופקה כתובת דואר אלקטרוני."
 
+#: lms/djangoapps/student_account/views.py
+msgid "Create Account"
+msgstr ""
+
+#: lms/templates/peer_grading/peer_grading_problem.html
+msgid "Continue"
+msgstr "המשך"
+
 #: lms/djangoapps/support/views/index.py
 msgid "View and regenerate certificates."
 msgstr "הצג תעודות וצור אותן מחדש."
@@ -8780,6 +8678,7 @@ msgid "Email Address"
 msgstr "כתובת דואר אלקטרוני"
 
 #: lms/djangoapps/support/views/refund.py
+#: openedx/core/djangoapps/schedules/admin.py
 #: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
@@ -8974,14 +8873,17 @@ msgid "Verification photos received"
 msgstr "התקבלו תמונות אימות"
 
 #: lms/envs/common.py
+msgid "Your Platform Name Here"
+msgstr ""
+
+#: lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr "שומע חופשי"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the website name of www.facebook.com.  Please
 #. translate this the way that Facebook advertises in your language.
-#: lms/envs/common.py lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/envs/common.py
 msgid "Facebook"
 msgstr "פייסבוק"
 
@@ -8990,10 +8892,9 @@ msgstr "פייסבוק"
 msgid "Like {platform_name} on Facebook"
 msgstr "לחץ 'אהבתי' בפייסבוק ל-{platform_name} "
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the website name of www.twitter.com.  Please
 #. translate this the way that Twitter advertises in your language.
-#: lms/envs/common.py lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/envs/common.py
 msgid "Twitter"
 msgstr "טוויטר"
 
@@ -9069,6 +8970,10 @@ msgstr "יוטיוב"
 #, python-brace-format
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr "הירשם כמנוי של {platform_name} בערוץ יוטיוב"
+
+#: lms/envs/common.py
+msgid "Your Platform Insights"
+msgstr ""
 
 #: lms/envs/common.py
 msgid "Kosovo"
@@ -9940,26 +9845,21 @@ msgid "Deadline for purchasing and requesting credit."
 msgstr "תאריך היעד לרכישה ולבקשת נקודות זכות."
 
 #: openedx/core/djangoapps/dark_lang/views.py
-msgid "Preview Language is currently disabled"
-msgstr "תצוגה מקדימה של הגדרות שפה מושבתת כרגע"
+msgid "Preview Language Administration"
+msgstr ""
 
 #: openedx/core/djangoapps/dark_lang/views.py
-msgid "Language code not provided"
-msgstr "קוד השפה לא סופק"
-
-#: openedx/core/djangoapps/dark_lang/views.py
-#, python-brace-format
-msgid "Language set to language code: {preview_language_code}"
-msgstr "הגדרת השפה לקוד השפה: {preview_language_code}"
-
-#: openedx/core/djangoapps/dark_lang/views.py
-msgid "Language reset to the default language code"
-msgstr "איפוס השפה לקוד השפה המוגדר כברירת מחדל"
+msgid "Language not provided"
+msgstr ""
 
 #: openedx/core/djangoapps/dark_lang/views.py
 #, python-brace-format
-msgid "Language reset to user's preference: {preview_language_code}"
-msgstr "איפוס השפה להעדפת המשתמש: {preview_language_code}"
+msgid "Language set to {preview_language}"
+msgstr ""
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language reset to the default"
+msgstr ""
 
 #: openedx/core/djangoapps/debug/views.py
 msgid "This is a test message"
@@ -10102,6 +10002,27 @@ msgstr "לא סופק קובץ עבור תמונת פרופיל"
 msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\")."
 msgstr "נתיב המשמש לבניית כתובות URL לדפי שיווק תכניות (לדוגמה,  \"/foo\")."
 
+#: openedx/core/djangoapps/schedules/apps.py
+#: openedx/core/djangoapps/schedules/models.py
+msgid "Schedules"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/models.py
+msgid "Indicates if this schedule is actively used"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/models.py
+msgid "Date this schedule went into effect"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/models.py
+msgid "Deadline by which the learner must upgrade to a verified seat"
+msgstr ""
+
+#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/schedule.html
+msgid "Schedule"
+msgstr "קבע תאריך"
+
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
 msgstr "אפשר שיפורים בעמוד הבית של הקורס."
@@ -10125,10 +10046,291 @@ msgstr ""
 msgid "Theming Administration"
 msgstr ""
 
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid ""
+"Usernames can only contain letters (A-Z, a-z), numerals (0-9), underscores "
+"(_), and hyphens (-)."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid ""
+"Usernames can only contain letters, numerals, and @/./+/-/_ characters."
+msgstr ""
+
+#. Translators: This message is shown to users who attempt to create a new
+#. account using
+#. an invalid email format.
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid "\"{email}\" is not a valid email address."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid ""
+"It looks like {email_address} belongs to an existing account. Try again with"
+" a different email address."
+msgstr ""
+"נראה כי {email_address} שייך לחשבון קיים. נסה שוב עם כתובת דואר אלקטרוני "
+"אחרת."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid ""
+"It looks like {username} belongs to an existing account. Try again with a "
+"different username."
+msgstr "נראה כי {username} שייך לחשבון קיים. נסה שוב עם שם משתמש אחר."
+
+#. Translators: This message is shown to users who enter a
+#. username/email/password
+#. with an inappropriate length (too short or too long).
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid "Username must be between {min} and {max} characters long."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid "Enter a valid email address that contains at least {min} characters."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter a password."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Password is not long enough."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid "Password cannot be longer than {max} character."
+msgstr ""
+
+#. Translators: This message is shown to users who enter a password matching
+#. the username they enter(ed).
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Password cannot be the same as the username."
+msgstr ""
+
+#. Translators: These messages are shown to users who do not enter information
+#. into the required field or enter it incorrectly.
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your full name."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "The email addresses do not match."
+msgstr "כתובת הדוא\"ל אינה תואמת."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Select your country or region of residence."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your city."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Tell us your goals."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Select the highest level of education you have completed."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your mailing address."
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/accounts/api.py
 #, python-brace-format
 msgid "The '{field_name}' field cannot be edited."
 msgstr "לא ניתן לערוך שדה '{field_name}'"
+
+#: openedx/core/djangoapps/user_api/accounts/utils.py
+msgid ""
+" Make sure that you are providing a valid username or a URL that contains \""
+msgstr ""
+
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
+#. Translators: This example email address is used as a placeholder in
+#. a field on the login form meant to hold the user's email address.
+#. Translators: This example email address is used as a placeholder in
+#. a field on the registration form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "username@domain.com"
+msgstr "username@domain.com"
+
+#. Translators: These instructions appear on the password reset form,
+#. immediately below a field meant to hold the user's email address.
+#. Translators: These instructions appear on the login form, immediately
+#. below a field meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "The email address you used to register with {platform_name}"
+msgstr "כתובת דואר אלקטרוני שהשתמשת בזמן רישום ל{platform_name}"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the login form
+#. meant to hold the user's password.
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's password.
+#: openedx/core/djangoapps/user_api/api.py cms/templates/login.html
+#: cms/templates/register.html lms/templates/login.html
+#: lms/templates/provider_login.html lms/templates/register-form.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: themes/red-theme/cms/templates/login.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Password"
+msgstr "סיסמה"
+
+#: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
+msgid "Remember me"
+msgstr "זכור אותי"
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "This is what you will use to login."
+msgstr "זה מה שתשתמש/י בו על מנת להתחבר."
+
+#. Translators: This label appears above a field on the registration form
+#. meant to confirm the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Confirm Email"
+msgstr "אשר/י דוא\"ל"
+
+#. Translators: This example name is used as a placeholder in
+#. a field on the registration form meant to hold the user's name.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Jane Q. Learner"
+msgstr "ג'יין קיו. לרנר"
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's full name.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "This name will be used on any certificates that you earn."
+msgstr "השם הזה ישמש עבור כל תעודה שתקבל/י."
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's public username.
+#: openedx/core/djangoapps/user_api/api.py cms/templates/register.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Public Username"
+msgstr "שם משתמש"
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's public username.
+#: openedx/core/djangoapps/user_api/api.py
+msgid ""
+"The name that will identify you in your courses. It cannot be changed later."
+msgstr ""
+"שם משתמש באנגלית וללא רווחים, שיזהה אותך בקורסים. אינו ניתן לשינוי מאוחר "
+"יותר."
+
+#. Translators: This example username is used as a placeholder in
+#. a field on the registration form meant to hold the user's username.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Jane_Q_Learner"
+msgstr "ג'יין_קיו_לרנר"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's highest completed level of education.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Highest level of education completed"
+msgstr "רמת ההשכלה"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's year of birth.
+#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
+msgid "Year of birth"
+msgstr "שנת לידה"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's mailing address.
+#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
+msgid "Mailing address"
+msgstr "כתובת למשלוח דואר"
+
+#. Translators: This phrase appears above a field on the registration form
+#. meant to hold the user's reasons for registering with edX.
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "Tell us why you're interested in {platform_name}"
+msgstr "ספר לנו מדוע אתה מתעניין ב{platform_name}"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "State/Province/Region"
+msgstr "ארץ/מחוז/אזור"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Company"
+msgstr "חברה"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the country in which the user lives.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Country or Region of Residence"
+msgstr ""
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's country.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "The country or region where you live."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Review the Honor Code"
+msgstr "סקור את הקוד האתי"
+
+#. Translators: This is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Terms of Service and Honor Code"
+msgstr "תנאי שימוש וקוד אתי"
+
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Review the Terms of Service and Honor Code"
+msgstr "סקור את תנאי השימוש והקוד האתי"
+
+#. Translators: "Terms of Service" is a legal document users must agree to
+#. in order to register a new account.
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "I agree to the {platform_name} {terms_of_service}"
+msgstr "אני מסכים ל{terms_of_service} של {platform_name}"
+
+#. Translators: "Terms of Service" is a legal document users must agree to
+#. in order to register a new account.
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "You must agree to the {platform_name} {terms_of_service}"
+msgstr "עליך להסכים ל{terms_of_service} של {platform_name}"
+
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Review the Terms of Service"
+msgstr "סקור את תנאי השימוש"
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -10175,200 +10377,6 @@ msgstr "השמירה נכשלה עבור העדפת משתמש '{key}' בערך 
 #: openedx/core/djangoapps/user_api/preferences/views.py
 msgid "No data provided for user preference update"
 msgstr "אין נתונים הניתנים לעדכון העדפות משתמש"
-
-#. Translators: This example email address is used as a placeholder in
-#. a field on the login form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the registration form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the password reset form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "username@domain.com"
-msgstr "username@domain.com"
-
-#. Translators: These instructions appear on the login form, immediately
-#. below a field meant to hold the user's email address.
-#. Translators: These instructions appear on the password reset form,
-#. immediately below a field meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid "The email address you used to register with {platform_name}"
-msgstr "כתובת דואר אלקטרוני שהשתמשת בזמן רישום ל{platform_name}"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the login form
-#. meant to hold the user's password.
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's password.
-#: openedx/core/djangoapps/user_api/views.py cms/templates/login.html
-#: cms/templates/register.html lms/templates/login.html
-#: lms/templates/provider_login.html lms/templates/register-form.html
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Password"
-msgstr "סיסמה"
-
-#: openedx/core/djangoapps/user_api/views.py lms/templates/login.html
-msgid "Remember me"
-msgstr "זכור אותי"
-
-#. Translators: This message is shown to users who attempt to create a new
-#. account using an email address associated with an existing account.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid ""
-"It looks like {email_address} belongs to an existing account. Try again with"
-" a different email address."
-msgstr ""
-"נראה כי {email_address} שייך לחשבון קיים. נסה שוב עם כתובת דואר אלקטרוני "
-"אחרת."
-
-#. Translators: This message is shown to users who attempt to create a new
-#. account using a username associated with an existing account.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid ""
-"It looks like {username} belongs to an existing account. Try again with a "
-"different username."
-msgstr "נראה כי {username} שייך לחשבון קיים. נסה שוב עם שם משתמש אחר."
-
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "This is what you will use to login."
-msgstr "זה מה שתשתמש/י בו על מנת להתחבר."
-
-#. Translators: This label appears above a field on the registration form
-#. meant to confirm the user's email address.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Confirm Email"
-msgstr "אשר/י דוא\"ל"
-
-#: openedx/core/djangoapps/user_api/views.py
-msgid "The email addresses do not match."
-msgstr "כתובת הדוא\"ל אינה תואמת."
-
-#. Translators: This example name is used as a placeholder in
-#. a field on the registration form meant to hold the user's name.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Jane Q. Learner"
-msgstr "ג'יין קיו. לרנר"
-
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's full name.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "This name will be used on any certificates that you earn."
-msgstr "השם הזה ישמש עבור כל תעודה שתקבל/י."
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's public username.
-#: openedx/core/djangoapps/user_api/views.py cms/templates/register.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Public Username"
-msgstr "שם משתמש"
-
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's public username.
-#: openedx/core/djangoapps/user_api/views.py
-msgid ""
-"The name that will identify you in your courses. It cannot be changed later."
-msgstr ""
-"שם משתמש באנגלית וללא רווחים, שיזהה אותך בקורסים. אינו ניתן לשינוי מאוחר "
-"יותר."
-
-#. Translators: This example username is used as a placeholder in
-#. a field on the registration form meant to hold the user's username.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Jane_Q_Learner"
-msgstr "ג'יין_קיו_לרנר"
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's highest completed level of education.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Highest level of education completed"
-msgstr "רמת ההשכלה"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's year of birth.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/signup_modal.html
-msgid "Year of birth"
-msgstr "שנת לידה"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's mailing address.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/signup_modal.html
-msgid "Mailing address"
-msgstr "כתובת למשלוח דואר"
-
-#. Translators: This phrase appears above a field on the registration form
-#. meant to hold the user's reasons for registering with edX.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid "Tell us why you're interested in {platform_name}"
-msgstr "ספר לנו מדוע אתה מתעניין ב{platform_name}"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the State/Province/Region in which they
-#. live.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "State/Province/Region"
-msgstr "ארץ/מחוז/אזור"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Company
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Company"
-msgstr "חברה"
-
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Please select your Country."
-msgstr "אנא בחר את מדינתך."
-
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Review the Honor Code"
-msgstr "סקור את הקוד האתי"
-
-#. Translators: This is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Terms of Service and Honor Code"
-msgstr "תנאי שימוש וקוד אתי"
-
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Review the Terms of Service and Honor Code"
-msgstr "סקור את תנאי השימוש והקוד האתי"
-
-#. Translators: "Terms of Service" is a legal document users must agree to
-#. in order to register a new account.
-#. Translators: "Terms of service" is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid "I agree to the {platform_name} {terms_of_service}"
-msgstr "אני מסכים ל{terms_of_service} של {platform_name}"
-
-#. Translators: "Terms of Service" is a legal document users must agree to
-#. in order to register a new account.
-#. Translators: "Terms of service" is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid "You must agree to the {platform_name} {terms_of_service}"
-msgstr "עליך להסכים ל{terms_of_service} של {platform_name}"
-
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Review the Terms of Service"
-msgstr "סקור את תנאי השימוש"
 
 #: openedx/core/djangoapps/util/user_messages.py
 #, python-brace-format
@@ -10441,6 +10449,55 @@ msgid ""
 msgstr ""
 "שם תת קטגוריה עבור הדיון. השם הזה מופיע בחלונית השמאלית של פורום הדיונים של "
 "הקורס. "
+
+#: lms/templates/courseware/courseware.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "Bookmarks"
+msgstr "סימניות"
+
+#: openedx/features/course_experience/plugins.py
+#: cms/templates/widgets/header.html
+#: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
+msgid "Updates"
+msgstr ""
+
+#: openedx/features/course_experience/plugins.py
+#: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
+msgid "Reviews"
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid " {sign_in_link} or {register_link} and then enroll in this course."
+msgstr ""
+
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header.html
+msgid "Sign in"
+msgstr "כניסה"
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid ""
+"{open_enroll_link} Enroll now{close_enroll_link} to access the full course."
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+msgid "Don't forget to add a calendar reminder!"
+msgstr ""
+
+#: openedx/features/enterprise_support/api.py
+#, python-brace-format
+msgid ""
+"If you have concerns about sharing your data, please contact your "
+"administrator at {enterprise_customer_name}."
+msgstr ""
+
+#: openedx/features/enterprise_support/api.py
+#, python-brace-format
+msgid "Enrollment in {course_name} was not complete."
+msgstr ""
 
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
@@ -11091,6 +11148,14 @@ msgstr "הקורס נמצא כבר בשלב הפרסום."
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr "פורמט לא תקין עבור שדה  '{name}'. {detailed_message}"
 
+#: cms/envs/common.py
+msgid "Your Platform Studio"
+msgstr ""
+
+#: cms/envs/common.py
+msgid "Studio"
+msgstr ""
+
 #: cms/lib/xblock/tagging/tagging.py
 msgid "Dictionary with the available tags"
 msgstr "מילון עם התגיות הזמינות"
@@ -11142,6 +11207,7 @@ msgid "Course Outline"
 msgstr ""
 
 #: cms/templates/course_outline.html cms/templates/index.html
+#: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 #: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
 msgid "Dismiss"
 msgstr ""
@@ -11261,15 +11327,9 @@ msgstr "פרטים"
 msgid "View"
 msgstr "הצג"
 
-#: cms/templates/darklang/preview_lang.html
-#: lms/templates/darklang/preview_lang.html
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
-msgid "Preview Language Setting"
-msgstr "תצוגה מקדימה של הגדרות שפה"
-
 #: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 msgid "Reset"
 msgstr "אתחל"
@@ -11279,11 +11339,6 @@ msgstr "אתחל"
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "משפטי"
-
-#: cms/templates/widgets/header.html
-#: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
-msgid "Updates"
-msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/navigation/navigation.html
 #: lms/templates/widgets/footer-language-selector.html
@@ -11668,10 +11723,6 @@ msgstr "כתובת הדואר האלקטרוני שגויה"
 #: lms/templates/help_modal.html
 msgid "Support"
 msgstr "תמיכה"
-
-#: lms/templates/help_modal.html
-msgid "{platform_name} Support"
-msgstr "תמיכה ב{platform_name}"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -13845,10 +13896,6 @@ msgstr "קרא בשם את ה-CCX שלך"
 msgid "Create a new Custom Course for edX"
 msgstr "צור קורס מותאם אישית חדש עבור edX"
 
-#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/schedule.html
-msgid "Schedule"
-msgstr "קבע תאריך"
-
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/ccx/grading_policy.html
 msgid "Grading Policy"
@@ -14490,11 +14537,6 @@ msgid "Courseware"
 msgstr "לומדה"
 
 #: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "Bookmarks"
-msgstr "סימניות"
-
-#: lms/templates/courseware/courseware.html
 msgid "Course Search"
 msgstr "חיפוש קורסים"
 
@@ -14800,6 +14842,15 @@ msgid "{earned} of {total} possible points"
 msgstr "{earned} מתוך {total} נקודות אפשריות"
 
 #: lms/templates/courseware/progress.html
+msgid ""
+"Suspicious activity detected during proctored exam review. Exam score 0."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Section grade has been overridden."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
 msgid "Problem Scores: "
 msgstr "ציוני בעיות:"
 
@@ -15068,11 +15119,19 @@ msgid "I'm taking {course_name} online with edX.org. Check it out!"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share {course_name} on Facebook"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share on Facebook"
 msgstr "שתף בפייסבוק"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with @edxonline. Check it out!"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share {course_name} on Twitter"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -15082,46 +15141,6 @@ msgstr "אפשרויות הקורס עבור"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Available Actions"
 msgstr "פעולות זמינות"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#, python-format
-msgid ""
-"Are you sure you want to unenroll from the purchased course %(course_name)s "
-"(%(course_number)s)?"
-msgstr ""
-"האם אתה בטוח שברצונך לבטל את הרשמתך לקורס שרכשת %(course_name)s "
-"(%(course_number)s)?"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You will be refunded the amount you paid."
-msgstr "הסכומים ששילמת יוחזרו לך."
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You will not be refunded the amount you paid."
-msgstr "הסכומים ששילמת לא יוחזרו לך."
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#, python-format
-msgid ""
-"Are you sure you want to unenroll from %(course_name)s (%(course_number)s)?"
-msgstr ""
-"האם אתה בטוח שברצונך לבטל את הרשמתך ל-%(course_name)s (%(course_number)s)?"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#, python-format
-msgid ""
-"Are you sure you want to unenroll from the verified %(cert_name_long)s track"
-" of %(course_name)s (%(course_number)s)?"
-msgstr ""
-"האם אתה בטוח שברצונך לבטל את הרשמתך %(cert_name_long)s מהמסלול המאומת של "
-"%(course_name)s (%(course_number)s)?"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"The refund deadline for this course has passed, so you will not receive a "
-"refund."
-msgstr ""
-"המועד האחרון להגשת ההחזר כספי עבור קורס זה עבר, לכן אינך זכאי לקבל החזר."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
@@ -15379,6 +15398,67 @@ msgid ""
 "The {provider_name} account you selected is already linked to another "
 "{platform_name} account."
 msgstr "חשבון ה{provider_name} שבחרת מקושר כבר לחשבון {platform_name} אחר. "
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid ""
+"We're sorry to see you go! Please share your main reason for unenrolling."
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I just wanted to browse the material"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "This won't help me reach my goals"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I don't have the time"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I don't have the academic or language prerequisites"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I don't have enough support"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I am not happy with the quality of the content"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "The course material was too hard"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "The course material was too easy"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Something was broken"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Other"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Thank you for sharing your reasons for unenrolling."
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "You are unenrolled from"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Return To Dashboard"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Browse Courses"
+msgstr ""
 
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
@@ -16209,8 +16289,16 @@ msgstr "ההרשמה עברה בהצלחה"
 
 #: lms/templates/enrollment/course_enrollment_message.html
 msgid ""
-"Thank you for enrolling in {enrolled_course}. We hope you enjoy the course."
-msgstr "תודה על ההרשמה ל{enrolled_course}. אנו מקווים כי תהנה מהקורס."
+"Thank you for enrolling in {course_names}. We hope you enjoy the course."
+msgstr ""
+
+#: lms/templates/enrollment/course_enrollment_message.html
+msgid "Thank you for enrolling in:"
+msgstr ""
+
+#: lms/templates/enrollment/course_enrollment_message.html
+msgid "We hope you enjoy the course."
+msgstr ""
 
 #: lms/templates/enrollment/course_enrollment_message.html
 msgid ""
@@ -18010,12 +18098,6 @@ msgstr "בתי ספר"
 msgid "Explore Courses"
 msgstr "גלה קורסים"
 
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header.html
-msgid "Sign in"
-msgstr "כניסה"
-
 #: lms/templates/navigation/navigation.html
 msgid "Global"
 msgstr "גלובלי"
@@ -18125,10 +18207,6 @@ msgstr "(אני חושש ש)הגשה זו כוללת תוכן בעל אופי מ
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "How did I do?"
 msgstr "איך הייתי?"
-
-#: lms/templates/peer_grading/peer_grading_problem.html
-msgid "Continue"
-msgstr "המשך"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Ready to grade!"
@@ -19062,16 +19140,16 @@ msgstr "קורס Wiki"
 msgid "Add article"
 msgstr "הוסף מאמר"
 
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
+msgid "Preview Language Setting"
+msgstr "תצוגה מקדימה של הגדרות שפה"
+
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 msgid "Language Code"
 msgstr ""
 
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
-msgid "For example use en for English"
-msgstr ""
-
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
-msgid "Please refresh the page to see the changes applied."
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
+msgid "e.g. en for English"
 msgstr ""
 
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
@@ -19144,12 +19222,12 @@ msgid ""
 "This course has not started yet, and will launch on {launch_date_html}."
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
-msgid "Reviews"
-msgstr ""
-
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
+msgid "Latest Update"
 msgstr ""
 
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
@@ -20028,7 +20106,6 @@ msgid "Click to open the courseware in the LMS in a new tab"
 msgstr "לחץ לפתוח את הלומדה בחלונית חדשה במערכת ניהול הלמידה. "
 
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
-#: cms/templates/index.html
 msgid "View Live"
 msgstr "תצוגה בזמן אמת"
 
@@ -20040,11 +20117,11 @@ msgstr "ערוך תאריך התחלה"
 msgid "Course Pacing:"
 msgstr "קצב קורס:"
 
-#: cms/templates/course_outline.html
+#: cms/templates/course_outline.html cms/templates/settings.html
 msgid "Self-Paced"
 msgstr "קצב אישי"
 
-#: cms/templates/course_outline.html
+#: cms/templates/course_outline.html cms/templates/settings.html
 msgid "Instructor-Paced"
 msgstr "מלווה במרצה"
 
@@ -21342,12 +21419,12 @@ msgstr ""
 " לימודים חדש או צור קשר עם מנהל הפרויקט שלך על מנת לקבל עזרה. "
 
 #: cms/templates/index.html
-msgid "Libraries"
-msgstr "ספריות"
+msgid "Archived Courses"
+msgstr ""
 
 #: cms/templates/index.html
-msgid "Re-run Course"
-msgstr "מחזור לימודים חדש"
+msgid "Libraries"
+msgstr "ספריות"
 
 #: cms/templates/index.html
 msgid "Are you staff on an existing {studio_name} course?"
@@ -21435,10 +21512,6 @@ msgid ""
 "Your request is currently being reviewed by {platform_name} staff and should"
 " be updated shortly."
 msgstr "בקשתך נבחנת כרגע על-ידי צוות {platform_name} ותעודכן בקרוב."
-
-#: cms/templates/index.html
-msgid "(Read-only)"
-msgstr "(קריאה בלבד)"
 
 #: cms/templates/index.html
 msgid "Were you expecting to see a particular library here?"
@@ -22547,94 +22620,6 @@ msgstr "למידע נוסף על הספרי לימוד"
 msgid "Video Uploads"
 msgstr "העלאות סרטונים"
 
-#: cms/templates/videos_index.html
-msgid "Why upload video files?"
-msgstr "מדוע להעלות קבצי וידאו?"
-
-#: cms/templates/videos_index.html
-msgid ""
-"For a video to play on different devices, it needs to be available in "
-"multiple formats. After you upload an original video file in {file_formats} "
-"format on this page, an automated process creates those additional formats "
-"and stores them for you."
-msgstr ""
-"על מנת שסרטון וידאו יוכל להתנגן במכשירים שונים, עליו להיות זמין במספר "
-"פורמטים. לאחר העלאת קובץ הווידאו המקורי בפורמט {file_formats} שבעמוד זה, "
-"תהליך אוטומטי ייצור פורמטים נוספים ויאחסן אותם עבורך."
-
-#: cms/templates/videos_index.html
-msgid "Maximum Video File Size"
-msgstr "גודל סרטון הווידאו המרבי שניתן להעלות"
-
-#: cms/templates/videos_index.html
-msgid ""
-"The maximum size for each video file that you upload is {em_start}5 "
-"GB{em_end}. The upload process fails for larger files."
-msgstr ""
-"הגודל המקסימלי לכל קובץ וידאו שניתן להעלות הוא {em_start} 5 GB {em_end}. "
-"תהליך ההעלאה ייכשל עבור קבצים גדולים יותר."
-
-#: cms/templates/videos_index.html
-msgid "Monitoring files as they upload"
-msgstr "ניטור הקבצים בעת העלאתם"
-
-#: cms/templates/videos_index.html
-msgid ""
-"Each video file that you upload needs to reach the video processing servers "
-"successfully before additional work can begin. You can monitor the progress "
-"of files as they upload, and try again if the upload fails."
-msgstr ""
-"כל קובץ וידאו שתעלה, צריך להגיע בהצלחה לשרתי עיבוד הווידאו בטרם ניתן יהיה "
-"להתחיל בעבודה נוספת. ניתן לנטר את התקדמות הקבצים בעת העלאתם ולנסות שוב אם "
-"נכשלה ההעלאה."
-
-#: cms/templates/videos_index.html
-msgid "Managing uploaded files"
-msgstr "ניהול קבצים שהועלו"
-
-#: cms/templates/videos_index.html
-msgid ""
-"After a file uploads successfully, automated processing begins. The file is "
-"then listed under Previous Uploads as {em_start}In Progress{em_end}. You can"
-" add the video to your course as soon as it has a unique video ID and the "
-"status is {em_start}Ready{em_end}. Allow 24 hours for file processing at the"
-" external video hosting sites to complete."
-msgstr ""
-"לאחר שקובץ עלה בהצלחה, העיבוד האוטומטי מתחיל. הקובץ נרשם ב'העלאות קודמות' "
-"כ{em_start}בתהליך{em_end}. באפשרותך להוסיף את סרטון הווידאו לקורס ברגע שמזהה"
-" סרטון הווידאו הייחודי והסטטוס שלו {em_start}מוכנים{em_end}. אַפשר 24 שעות "
-"להשלמת עיבוד הקובץ באתרי אירוע של קבצי וידאו חיצוניים."
-
-#: cms/templates/videos_index.html
-msgid ""
-"If something goes wrong, the {em_start}Failed{em_end} status message "
-"appears. Check for problems in your original file and upload a replacement."
-msgstr ""
-"אם דבר כלשהו משתבש, מופיעה הודעת סטטוס {em_start}'נכשל'{em_end}. בדוק אם "
-"קיימות בעיות בקובץ המקורי והעלה קובץ חלופי."
-
-#: cms/templates/videos_index.html
-msgid "How do I get the videos into my course?"
-msgstr "כיצד אני מציב את הסרטונים בקורס שלי? "
-
-#: cms/templates/videos_index.html
-msgid ""
-"When the status for a file is {em_start}Ready{em_end}, you can add that "
-"video to a component in your course. Copy the unique video ID. In another "
-"browser window, on the Course Outline page, create or locate a video "
-"component to play this video. Edit the video component to paste the ID into "
-"the Advanced {em_start}Video ID{em_end} field. The video can play in the LMS"
-" as soon as its status is {em_start}Ready{em_end}, although processing may "
-"not be complete for all encodings and all video hosting sites."
-msgstr ""
-"כאשר סטטוס הקובץ הוא {em_start}מוכן{em_end}, תוכל להוסיף את קובץ הווידאו "
-"לרכיב שבקורס שלך. העתק מזהה סרטון וידאו ייחודי. בחלון דפדפן אחר, בדף 'תרשים "
-"הקורס', צור או אתר רכיב וידאו כדי להפעיל את סרטון הווידאו הזה. ערוך את רכיב "
-"הווידאו כדי להדביק את המזהה בשדה ההגדרה המתקדמת {em_start}מזהה סרטון "
-"וידאו{em_end}. סרטון הווידאו יכול להיות מופעל במערכת ניהול הלמידה ברגע "
-"שהסטטוס שלו הוא {em_start}מוכן{em_end}, אף על פי שהעיבוד לא הושלם עבור כל "
-"הקידודים וכל אתרי האירוח של הווידאו."
-
 #: cms/templates/visibility_editor.html
 msgid "Access is not restricted"
 msgstr ""
@@ -23598,8 +23583,8 @@ msgid "Your changes were saved."
 msgstr "השינויים שביצעתם נשמרו."
 
 #: wiki/views/article.py
-msgid "A new revision of the article was succesfully added."
-msgstr "עדכון חדש למאמר זה הוסף בהצלחה.  "
+msgid "A new revision of the article was successfully added."
+msgstr ""
 
 #: wiki/views/article.py
 msgid "Restoring article"

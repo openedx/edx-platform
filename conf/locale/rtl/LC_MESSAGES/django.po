@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-25 21:08+0000\n"
-"PO-Revision-Date: 2017-08-25 21:08:22.750395\n"
+"POT-Creation-Date: 2017-08-30 17:58+0000\n"
+"PO-Revision-Date: 2017-08-30 17:58:10.630971\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -182,15 +182,6 @@ msgstr "غخع'قث ثرقخممثي شس ش حقخبثسسهخرشم ثيعذش
 #: common/djangoapps/course_modes/helpers.py
 msgid "Professional Ed"
 msgstr "حقخبثسسهخرشم ثي"
-
-#: common/djangoapps/course_modes/models.py common/lib/xmodule/xmodule/tabs.py
-#: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
-#: lms/djangoapps/shoppingcart/reports.py
-#: openedx/features/course_experience/__init__.py
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
-#: lms/templates/courseware/courseware.html
-msgid "Course"
-msgstr "ذخعقسث"
 
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
@@ -1062,6 +1053,11 @@ msgstr ""
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this SAML configuration belongs to."
 msgstr "فاث سهفث فاشف فاهس سشوم ذخربهلعقشفهخر زثمخرلس فخ."
+
+#: common/djangoapps/third_party_auth/models.py lms/templates/help_modal.html
+#, python-brace-format
+msgid "{platform_name} Support"
+msgstr "{platform_name} سعححخقف"
 
 #: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
 #: lms/templates/student_account/finish_auth.html
@@ -4410,6 +4406,15 @@ msgstr "ثطفثقرشم يهسذعسسهخر"
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
 msgid "Home"
 msgstr "اخوث"
+
+#: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
+#: lms/djangoapps/courseware/views/views.py
+#: lms/djangoapps/shoppingcart/reports.py
+#: openedx/features/course_experience/__init__.py
+#: cms/templates/widgets/header.html lms/templates/help_modal.html
+#: lms/templates/courseware/courseware.html
+msgid "Course"
+msgstr "ذخعقسث"
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Text Annotation"
@@ -9091,6 +9096,10 @@ msgid "Verification photos received"
 msgstr "دثقهبهذشفهخر حاخفخس قثذثهدثي"
 
 #: lms/envs/common.py
+msgid "Your Platform Name Here"
+msgstr "غخعق حمشفبخقو رشوث اثقث"
+
+#: lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr "شعيهف"
@@ -9184,6 +9193,10 @@ msgstr "غخعفعزث"
 #, python-brace-format
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr "سعزسذقهزث فخ فاث {platform_name} غخعفعزث ذاشررثم"
+
+#: lms/envs/common.py
+msgid "Your Platform Insights"
+msgstr "غخعق حمشفبخقو هرسهلافس"
 
 #: lms/envs/common.py
 msgid "Kosovo"
@@ -10386,6 +10399,12 @@ msgstr "ثرفثق غخعق وشهمهرل شييقثسس."
 msgid "The '{field_name}' field cannot be edited."
 msgstr "فاث '{field_name}' بهثمي ذشررخف زث ثيهفثي."
 
+#: openedx/core/djangoapps/user_api/accounts/utils.py
+msgid ""
+" Make sure that you are providing a valid username or a URL that contains \""
+msgstr ""
+" وشنث سعقث فاشف غخع شقث حقخدهيهرل ش دشمهي عسثقرشوث خق ش عقم فاشف ذخرفشهرس \""
+
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
 #. Translators: This example email address is used as a placeholder in
@@ -11412,6 +11431,14 @@ msgstr "ذخعقسث هس شمقثشيغ هر حعزمهساثي سفشفث."
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr "هرذخققثذف بخقوشف بخق بهثمي '{name}'. {detailed_message}"
 
+#: cms/envs/common.py
+msgid "Your Platform Studio"
+msgstr "غخعق حمشفبخقو سفعيهخ"
+
+#: cms/envs/common.py
+msgid "Studio"
+msgstr "سفعيهخ"
+
 #: cms/lib/xblock/tagging/tagging.py
 msgid "Dictionary with the available tags"
 msgstr "يهذفهخرشقغ صهفا فاث شدشهمشزمث فشلس"
@@ -11980,10 +12007,6 @@ msgstr "ثوشهم هس هرذخققثذف."
 #: lms/templates/help_modal.html
 msgid "Support"
 msgstr "سعححخقف"
-
-#: lms/templates/help_modal.html
-msgid "{platform_name} Support"
-msgstr "{platform_name} سعححخقف"
 
 #: lms/templates/help_modal.html
 msgid ""

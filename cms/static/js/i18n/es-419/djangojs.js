@@ -256,7 +256,6 @@
     "An error occurred.": "Ha ocurrido un error.", 
     "An error occurred. Make sure that the student's username or email address is correct and try again.": "Un error ha ocurrido. Aseg\u00farate que el nombre de usuario o email del estudiante es correcto e intenta de nuevo.", 
     "An error occurred. Please reload the page.": "Ocurri\u00f3 un error. Por favor recargue la p\u00e1gina.", 
-    "An error occurred. Please try again later.": "Ocurri\u00f3 un error. Por favor intenta nuevamente m\u00e1s tarde.", 
     "An error occurred. Please try again.": "Ocurri\u00f3 un error. Por favor, intenta nuevamente.", 
     "An error occurred. Try again.": "Ocurri\u00f3 un error. Intenta nuevamente.", 
     "An error occurred. Try loading the page again.": "Ocurri\u00f3 un error. Intenta cargar la p\u00e1gina nuevamente.", 
@@ -467,7 +466,6 @@
     "Could not upload the video image file": "No pudo ser subido el archivo de v\u00eddeo", 
     "Country": "Pa\u00eds", 
     "Country of residence": "Pa\u00eds de residencia", 
-    "Country or Region": "Pa\u00eds o regi\u00f3n", 
     "Course": [
       "Curso", 
       "Cursos"
@@ -1556,7 +1554,6 @@
     "There was an error, try searching again.": "Hubo un error, intenta buscar de nuevo.", 
     "There were errors reindexing course.": "Hubo errores al reindexar el curso.", 
     "There's already another assignment type with this name.": "Ya existe otro tipo de tarea con este nombre.", 
-    "These settings include basic information about your account. You can also specify additional information and see your linked social accounts on this page.": "Esta configuraci\u00f3n incluye informaci\u00f3n b\u00e1sica de tu cuenta. Tambi\u00e9n puedes a\u00f1adir informaci\u00f3n adicional y ver los perfiles de redes sociales asociados a tu cuenta.", 
     "These users could not be added as beta testers because their accounts are not yet activated:": "No se ha podido agregar a estos usuarios como usuarios de prueba porque sus cuentas no han sido activadas:", 
     "These users were not added as beta testers:": "Los siguientes usuarios no fueron a\u00f1adidos como usuarios de prueba:", 
     "These users were not affiliated with the course so could not be unenrolled:": "Estos usuarios no estaban vinculados con el curso, por lo que no pudieron ser retirados:", 

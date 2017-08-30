@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-25 21:07+0000\n"
-"PO-Revision-Date: 2017-08-25 21:08:23.237836\n"
+"POT-Creation-Date: 2017-08-30 17:57+0000\n"
+"PO-Revision-Date: 2017-08-30 17:58:11.356308\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4336,10 +4336,7 @@ msgid "Basic Account Information"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid ""
-"These settings include basic information about your account. You can also "
-"specify additional information and see your linked social accounts on this "
-"page."
+msgid "These settings include basic information about your account."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4429,6 +4426,24 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Preferred Language"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Social Media Links"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"Optionally, link your personal accounts to the social media icons on your "
+"edX profile."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid " Link"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Enter your "
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -6907,6 +6922,10 @@ msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
 msgstr ""
 
 #: lms/templates/discovery/course_card.underscore
