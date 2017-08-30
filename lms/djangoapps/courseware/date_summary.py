@@ -222,7 +222,7 @@ class CertificateAvailableDate(DateSummary):
 
     @property
     def description(self):
-        return _('Day certificates will become available for passing verified learners.' + str(self.active_certificates))
+        return _('Day certificates will become available for passing verified learners.')
 
     @property
     def date(self):
