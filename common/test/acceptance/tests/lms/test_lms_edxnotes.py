@@ -450,6 +450,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         # the view name passed in.
         if view == 'Recent Activity':
             view = None
+
         actual_events = self.wait_for_events(
             event_filter={'event_type': 'edx.course.student_notes.notes_page_viewed'},
             number_of_matches=1 if view is None else 2

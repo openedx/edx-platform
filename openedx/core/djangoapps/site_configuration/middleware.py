@@ -79,11 +79,10 @@ class LoginRequiredMiddleware:
         ]
 
     def process_view(self, request, view_func, view_args, view_kwargs):
-
-        '''
+        """
         If the site is configured to restrict not logged in users to the LOGIN_EXEMPT_URLS
         from accessing pages, wrap the next view with the django login_required middleware
-        '''
+        """
 
         if request.user.is_authenticated():
             return None
