@@ -8,7 +8,7 @@ import django_extensions.db.fields
 import django_extensions.db.fields.json
 import django.db.models.deletion
 import django.utils.timezone
-from badges.models import validate_badge_image
+from lms.djangoapps.badges.models import validate_badge_image
 from django.conf import settings
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 

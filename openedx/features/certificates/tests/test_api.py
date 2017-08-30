@@ -16,19 +16,19 @@ from mock import patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
-from certificates import api as certs_api
-from certificates.models import (
+import api as certs_api
+from models import (
     CertificateGenerationConfiguration,
     CertificateStatuses,
     ExampleCertificate,
     GeneratedCertificate,
     certificate_status_for_student
 )
-from certificates.queue import XQueueAddToQueueError, XQueueCertInterface
-from certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from courseware.tests.factories import GlobalStaffFactory
+from queue import XQueueAddToQueueError, XQueueCertInterface
+from tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
+from lms.djangoapps.course_modes.models import CourseMode
+from lms.djangoapps.course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from microsite_configuration import microsite
 from student.models import CourseEnrollment

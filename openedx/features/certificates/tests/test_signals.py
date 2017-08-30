@@ -4,8 +4,8 @@ and disabling for instructor-paced courses.
 """
 import mock
 
-from certificates import api as certs_api
-from certificates.models import \
+import api as certs_api
+from models import \
     CertificateGenerationConfiguration, \
     CertificateWhitelist, \
     GeneratedCertificate, \

@@ -5,7 +5,7 @@ URLs for the certificates app.
 from django.conf import settings
 from django.conf.urls import patterns, url
 
-from certificates import views
+import views
 
 urlpatterns = patterns(
     '',

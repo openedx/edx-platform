@@ -18,9 +18,9 @@ from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from badges.events.course_complete import get_completion_badge
-from badges.utils import badges_enabled
-from certificates.api import (
+from lms.djangoapps.badges.events.course_complete import get_completion_badge
+from lms.djangoapps.badges.utils import badges_enabled
+from api import (
     emit_certificate_event,
     get_active_web_certificate,
     get_certificate_footer_context,
@@ -29,14 +29,14 @@ from certificates.api import (
     get_certificate_url,
     has_html_certificates_enabled
 )
-from certificates.models import (
+from models import (
     CertificateHtmlViewConfiguration,
     CertificateSocialNetworks,
     CertificateStatuses,
     GeneratedCertificate
 )
-from courseware.access import has_access
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

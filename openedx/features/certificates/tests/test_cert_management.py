@@ -6,11 +6,11 @@ from mock import patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
-from badges.events.course_complete import get_completion_badge
-from badges.models import BadgeAssertion
-from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
-from certificates.management.commands import regenerate_user, resubmit_error_certificates, ungenerated_certs
-from certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.badges.events.course_complete import get_completion_badge
+from lms.djangoapps.badges.models import BadgeAssertion
+from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
+from management.commands import regenerate_user, resubmit_error_certificates, ungenerated_certs
+from models import CertificateStatuses, GeneratedCertificate
 from course_modes.models import CourseMode
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

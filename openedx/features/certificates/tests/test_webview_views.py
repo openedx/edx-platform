@@ -17,8 +17,8 @@ from django.utils.translation import ugettext as _
 from mock import patch
 from nose.plugins.attrib import attr
 
-from certificates.api import get_certificate_url
-from certificates.models import (
+from api import get_certificate_url
+from models import (
     CertificateHtmlViewConfiguration,
     CertificateSocialNetworks,
     CertificateStatuses,
@@ -26,7 +26,7 @@ from certificates.models import (
     CertificateTemplateAsset,
     GeneratedCertificate
 )
-from certificates.tests.factories import (
+from tests.factories import (
     CertificateHtmlViewConfigurationFactory,
     GeneratedCertificateFactory,
     LinkedInAddToProfileConfigurationFactory

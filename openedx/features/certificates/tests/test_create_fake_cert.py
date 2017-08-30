@@ -4,8 +4,8 @@ from django.test import TestCase
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
-from certificates.management.commands import create_fake_cert
-from certificates.models import GeneratedCertificate
+from management.commands import create_fake_cert
+from models import GeneratedCertificate
 from student.tests.factories import UserFactory
 
 
