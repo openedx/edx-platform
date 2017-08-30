@@ -463,29 +463,39 @@ class ProgramDataExtender(object):
         if is_learner_eligible_for_one_click_purchase:
             for course in self.data['courses']:
                 add_course_sku = False
-                for course_run in course['course_runs']:
+                published_course_runs = filter(lambda run: run['status'] == 'published', course['course_runs'])
+                if len(published_course_runs) == 1:
+                    # Look at the course runs for a course and determine if the course SKU should be added.
+                    course_run = published_course_runs[0]
                     (enrollment_mode, active) = CourseEnrollment.enrollment_mode_for_user(
                         self.user,
                         CourseKey.from_string(course_run['key'])
                     )
-                    if enrollment_mode not in applicable_seat_types or not active:
-                        add_course_sku = True
-                        break
 
-                if add_course_sku:
-                    published_course_runs = filter(lambda run: run['status'] == 'published', course['course_runs'])
-                    if len(published_course_runs) == 1:
+                    if enrollment_mode is not None and active is not None:
+                        # Check all the applicable seat types
+                        # this will also check for no-id-professional as professional
+                        applicable_seat = any(seat_type in enrollment_mode for seat_type in applicable_seat_types)
+
+                        # If no applicable seat is found add the course SKU to the list
+                        if not applicable_seat or not active:
+                            add_course_sku = True
+                    else:
+                        # There is no enrollment information for the course add the course SKU
+                        add_course_sku = True
+
+                    if add_course_sku:
                         for seat in published_course_runs[0]['seats']:
                             if seat['type'] in applicable_seat_types and seat['sku']:
                                 skus.append(seat['sku'])
                     else:
-                        # If a course in the program has more than 1 published course run
-                        # learner won't be eligible for a one click purchase.
-                        is_learner_eligible_for_one_click_purchase = False
-                        skus = []
-                        break
+                        bundle_variant = 'partial'
                 else:
-                    bundle_variant = 'partial'
+                    # If a course in the program has more than 1 published course run
+                    # learner won't be eligible for a one click purchase.
+                    is_learner_eligible_for_one_click_purchase = False
+                    skus = []
+                    break
 
         if skus:
             try:

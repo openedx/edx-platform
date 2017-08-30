@@ -550,6 +550,27 @@ class TestProgramProgressMeter(TestCase):
         self.assertEqual(meter._is_course_complete(course), True)
 
 
+def _create_course(self, course_price):
+    """
+    Creates the course in mongo and update it with the instructor data.
+    Also creates catalog course with respect to course run.
+
+    Returns:
+        Catalog course dict.
+    """
+    course = ModuleStoreCourseFactory()
+    course.start = datetime.datetime.now(utc) - datetime.timedelta(days=1)
+    course.end = datetime.datetime.now(utc) + datetime.timedelta(days=1)
+    course.instructor_info = self.instructors
+    course = self.update_course(course, self.user.id)
+
+    course_run = CourseRunFactory(
+        key=unicode(course.id),
+        seats=[SeatFactory(price=course_price)]
+    )
+    return CourseFactory(course_runs=[course_run])
+
+
 @ddt.ddt
 @override_settings(ECOMMERCE_PUBLIC_URL_ROOT=ECOMMERCE_URL_ROOT)
 @skip_unless_lms
@@ -558,6 +579,18 @@ class TestProgramDataExtender(ModuleStoreTestCase):
     maxDiff = None
     sku = 'abc123'
     checkout_path = '/basket'
+    instructors = {
+        'instructors': [
+            {
+                'name': 'test-instructor1',
+                'organization': 'TextX',
+            },
+            {
+                'name': 'test-instructor2',
+                'organization': 'TextX',
+            }
+        ]
+    }
 
     def setUp(self):
         super(TestProgramDataExtender, self).setUp()
@@ -570,6 +603,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         self.course_run = CourseRunFactory(key=unicode(self.course.id))
         self.catalog_course = CourseFactory(course_runs=[self.course_run])
         self.program = ProgramFactory(courses=[self.catalog_course])
+        self.course_price = 100
 
     def _assert_supplemented(self, actual, **kwargs):
         """DRY helper used to verify that program data is extended correctly."""
@@ -746,6 +780,95 @@ class TestProgramDataExtender(ModuleStoreTestCase):
 
         self._assert_supplemented(data)
 
+    def test_learner_eligibility_for_one_click_purchase(self):
+        """
+        Learner should be eligible for one click purchase if:
+            - program is eligible for one click purchase
+            - There are courses remaining that have not been purchased and enrolled in.
+        """
+        data = ProgramDataExtender(self.program, self.user).extend()
+        self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
+
+        courses = [_create_course(self, self.course_price)]
+
+        program = ProgramFactory(
+            courses=courses,
+            is_program_eligible_for_one_click_purchase=False
+        )
+        data = ProgramDataExtender(program, self.user).extend()
+        self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
+
+        course1 = _create_course(self, self.course_price)
+        course2 = _create_course(self, self.course_price)
+        CourseEnrollmentFactory(user=self.user, course_id=course1['course_runs'][0]['key'], mode='verified')
+        CourseEnrollmentFactory(user=self.user, course_id=course2['course_runs'][0]['key'], mode='audit')
+        program2 = ProgramFactory(
+            courses=[course1, course2],
+            is_program_eligible_for_one_click_purchase=True,
+            applicable_seat_types=['verified'],
+        )
+        data = ProgramDataExtender(program2, self.user).extend()
+        self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
+
+    def test_learner_eligibility_for_one_click_purchase_professional_no_id(self):
+        """
+        Learner should not be eligible for one click purchase if:
+            - There are no courses remaining that have not been purchased and enrolled in.
+        This test is primarily for the case of no-id-professional enrollment modes
+        """
+        course1 = _create_course(self, self.course_price)
+        CourseEnrollmentFactory(user=self.user, course_id=course1['course_runs'][0]['key'], mode='no-id-professional')
+        program2 = ProgramFactory(
+            courses=[course1],
+            is_program_eligible_for_one_click_purchase=True,
+            applicable_seat_types=['professional'],  # There is no seat type for no-id-professional, it
+                                                     # instead uses professional
+        )
+        data = ProgramDataExtender(program2, self.user).extend()
+        self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
+
+    def test_multiple_published_course_runs(self):
+        """
+        Learner should not be eligible for one click purchase if:
+            - program has a course with more than one published course run
+        """
+        course_run_1 = CourseRunFactory(
+            key=str(ModuleStoreCourseFactory().id),
+            status='published'
+        )
+        course_run_2 = CourseRunFactory(
+            key=str(ModuleStoreCourseFactory().id),
+            status='published'
+        )
+        course = CourseFactory(course_runs=[course_run_1, course_run_2])
+        program = ProgramFactory(
+            courses=[
+                CourseFactory(course_runs=[
+                    CourseRunFactory(
+                        key=str(ModuleStoreCourseFactory().id),
+                        status='published'
+                    )
+                ]),
+                course,
+                CourseFactory(course_runs=[
+                    CourseRunFactory(
+                        key=str(ModuleStoreCourseFactory().id),
+                        status='published'
+                    )
+                ])
+            ],
+            is_program_eligible_for_one_click_purchase=True,
+            applicable_seat_types=['verified']
+        )
+        data = ProgramDataExtender(program, self.user).extend()
+
+        self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
+
+        course_run_2['status'] = 'unpublished'
+        data = ProgramDataExtender(program, self.user).extend()
+
+        self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
+
 
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_credentials')
@@ -873,29 +996,9 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         self.course_price = 100
         self.number_of_courses = 2
         self.program = ProgramFactory(
-            courses=[self._create_course(self.course_price) for __ in range(self.number_of_courses)],
+            courses=[_create_course(self, self.course_price) for __ in range(self.number_of_courses)],
             applicable_seat_types=['verified']
         )
-
-    def _create_course(self, course_price):
-        """
-        Creates the course in mongo and update it with the instructor data.
-        Also creates catalog course with respect to course run.
-
-        Returns:
-            Catalog course dict.
-        """
-        course = ModuleStoreCourseFactory()
-        course.start = datetime.datetime.now(utc) - datetime.timedelta(days=1)
-        course.end = datetime.datetime.now(utc) + datetime.timedelta(days=1)
-        course.instructor_info = self.instructors
-        course = self.update_course(course, self.user.id)
-
-        course_run = CourseRunFactory(
-            key=unicode(course.id),
-            seats=[SeatFactory(price=course_price)]
-        )
-        return CourseFactory(course_runs=[course_run])
 
     def _prepare_program_for_discounted_price_calculation_endpoint(self):
         """
@@ -963,78 +1066,6 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         data = ProgramMarketingDataExtender(self.program, self.user).extend()
 
         self.assertEqual(data['courses'][0]['course_runs'][0]['can_enroll'], can_enroll)
-
-    def test_learner_eligibility_for_one_click_purchase(self):
-        """
-        Learner should be eligible for one click purchase if:
-            - program is eligible for one click purchase
-            - There are courses remaining that have not been purchased and enrolled in.
-        """
-        data = ProgramMarketingDataExtender(self.program, self.user).extend()
-        self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
-
-        courses = [self._create_course(self.course_price)]
-
-        program = ProgramFactory(
-            courses=courses,
-            is_program_eligible_for_one_click_purchase=False
-        )
-        data = ProgramMarketingDataExtender(program, self.user).extend()
-        self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
-
-        course1 = self._create_course(self.course_price)
-        course2 = self._create_course(self.course_price)
-        CourseEnrollmentFactory(user=self.user, course_id=course1['course_runs'][0]['key'], mode='verified')
-        CourseEnrollmentFactory(user=self.user, course_id=course2['course_runs'][0]['key'], mode='audit')
-        program2 = ProgramFactory(
-            courses=[course1, course2],
-            is_program_eligible_for_one_click_purchase=True,
-            applicable_seat_types=['verified'],
-        )
-        data = ProgramMarketingDataExtender(program2, self.user).extend()
-        self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
-
-    def test_multiple_published_course_runs(self):
-        """
-        Learner should not be eligible for one click purchase if:
-            - program has a course with more than one published course run
-        """
-        course_run_1 = CourseRunFactory(
-            key=str(ModuleStoreCourseFactory().id),
-            status='published'
-        )
-        course_run_2 = CourseRunFactory(
-            key=str(ModuleStoreCourseFactory().id),
-            status='published'
-        )
-        course = CourseFactory(course_runs=[course_run_1, course_run_2])
-        program = ProgramFactory(
-            courses=[
-                CourseFactory(course_runs=[
-                    CourseRunFactory(
-                        key=str(ModuleStoreCourseFactory().id),
-                        status='published'
-                    )
-                ]),
-                course,
-                CourseFactory(course_runs=[
-                    CourseRunFactory(
-                        key=str(ModuleStoreCourseFactory().id),
-                        status='published'
-                    )
-                ])
-            ],
-            is_program_eligible_for_one_click_purchase=True,
-            applicable_seat_types=['verified']
-        )
-        data = ProgramMarketingDataExtender(program, self.user).extend()
-
-        self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
-
-        course_run_2['status'] = 'unpublished'
-        data = ProgramMarketingDataExtender(program, self.user).extend()
-
-        self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
 
     @httpretty.activate
     def test_fetching_program_discounted_price(self):
