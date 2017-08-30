@@ -606,6 +606,7 @@ INSTALLED_APPS += (
     'social_engagement',
     'gradebook',
     'progress',
+    'completion_api',
     'edx_solutions_projects',
     'edx_solutions_organizations',
 )
