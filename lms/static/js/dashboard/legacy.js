@@ -175,7 +175,6 @@
 
                      $('#unenroll_form input[type="submit"]').prop('disabled', true);
                  }
-                 edx.dashboard.dropdown.toggleCourseActionsDropdownMenu(event);
              });
              request.fail(function() {
                  $('#unenroll_error').text(
@@ -185,9 +184,9 @@
                   .css('display', 'block');
 
                  $('#unenroll_form input[type="submit"]').prop('disabled', true);
-
-                 edx.dashboard.dropdown.toggleCourseActionsDropdownMenu(event);
              });
+
+             edx.dashboard.dropdown.toggleCourseActionsDropdownMenu(event);
              $('#unenroll-modal').css('position', 'fixed');
          });
 
@@ -223,7 +222,8 @@
          });
 
          $('.action-unenroll').each(function(index) {
-            // a bit of a hack, but gets the unique selector for the modal trigger
+             $(this).attr('id', 'unenroll-' + index);
+             // a bit of a hack, but gets the unique selector for the modal trigger
              var trigger = '#' + $(this).attr('id');
              accessibleModal(
                 trigger,
@@ -231,7 +231,6 @@
                 '#unenroll-modal',
                 '#dashboard-main'
              );
-             $(this).attr('id', 'unenroll-' + index);
          });
 
          $('#unregister_block_course').click(function(event) {
