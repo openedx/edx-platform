@@ -22,6 +22,7 @@ from django_comment_common import models
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
 from openedx.core.lib.time_zone_utils import get_display_time_zone
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
@@ -923,6 +924,52 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     CITY = "Springfield"
     COUNTRY = "us"
     GOALS = "Learn all the things!"
+    PROFESSION_OPTIONS = [
+        {
+            "name": u'--',
+            "value": u'',
+            "default": True
+
+        },
+        {
+            "value": u'software engineer',
+            "name": u'Software Engineer',
+            "default": False
+        },
+        {
+            "value": u'teacher',
+            "name": u'Teacher',
+            "default": False
+        },
+        {
+            "value": u'other',
+            "name": u'Other',
+            "default": False
+        }
+    ]
+    SPECIALTY_OPTIONS = [
+        {
+            "name": u'--',
+            "value": u'',
+            "default": True
+
+        },
+        {
+            "value": "aerospace",
+            "name": "Aerospace",
+            "default": False
+        },
+        {
+            "value": u'early education',
+            "name": u'Early Education',
+            "default": False
+        },
+        {
+            "value": u'n/a',
+            "name": u'N/A',
+            "default": False
+        }
+    ]
 
     def setUp(self):
         super(RegistrationViewTest, self).setUp()
@@ -1299,6 +1346,66 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             }
         )
 
+    def test_register_form_profession_without_profession_options(self):
+        self._assert_reg_field(
+            {"profession": "required"},
+            {
+                "name": "profession",
+                "type": "text",
+                "required": True,
+                "label": "Profession",
+                "errorMessages": {
+                    "required": "Enter your profession."
+                }
+            }
+        )
+
+    @with_site_configuration(configuration={"EXTRA_FIELD_OPTIONS": {"profession": ["Software Engineer", "Teacher", "Other"]}})
+    def test_register_form_profession_with_profession_options(self):
+        self._assert_reg_field(
+            {"profession": "required"},
+            {
+                "name": "profession",
+                "type": "select",
+                "required": True,
+                "label": "Profession",
+                "options": self.PROFESSION_OPTIONS,
+                "errorMessages": {
+                    "required": "Select your profession."
+                },
+            }
+        )
+
+    def test_register_form_specialty_without_specialty_options(self):
+        self._assert_reg_field(
+            {"specialty": "required"},
+            {
+                "name": "specialty",
+                "type": "text",
+                "required": True,
+                "label": "Specialty",
+                "errorMessages": {
+                    "required": "Enter your specialty."
+                }
+            }
+        )
+
+    @with_site_configuration(configuration={"EXTRA_FIELD_OPTIONS": {"specialty": ["Aerospace", "Early Education", "N/A"]}})
+    def test_register_form_specialty_with_specialty_options(self):
+        self._assert_reg_field(
+            {"specialty": "required"},
+            {
+                "name": "specialty",
+                "type": "select",
+                "required": True,
+                "label": "Specialty",
+                "options": self.SPECIALTY_OPTIONS,
+                "errorMessages": {
+                    "required": "Select your specialty."
+                },
+            }
+        )
+
     def test_registration_form_mailing_address(self):
         self._assert_reg_field(
             {"mailing_address": "optional"},
@@ -1618,6 +1725,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "goals",
             "honor_code",
             "terms_of_service",
+            "specialty",
+            "profession",
         ],
     )
     def test_field_order_override(self):
