@@ -328,6 +328,24 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
             grade = self.subsection_grade_factory.update(self.sequence)
         self.assert_grade(grade, 1, 2)
 
+    def test_write_only_if_engaged(self):
+        """
+        Test that scores are not persisted when a learner has
+        never attempted a problem, but are persisted if the
+        learner's state has been deleted.
+        """
+        with waffle().override(WRITE_ONLY_IF_ENGAGED):
+            with mock_get_score(0, 0, None):
+                self.subsection_grade_factory.update(self.sequence)
+        # ensure no grades have been persisted
+        self.assertEqual(0, len(PersistentSubsectionGrade.objects.all()))
+
+        with waffle().override(WRITE_ONLY_IF_ENGAGED):
+            with mock_get_score(0, 0, None):
+                self.subsection_grade_factory.update(self.sequence, score_deleted=True)
+        # ensure a grade has been persisted
+        self.assertEqual(1, len(PersistentSubsectionGrade.objects.all()))
+
     def test_update_if_higher(self):
         def verify_update_if_higher(mock_score, expected_grade):
             """

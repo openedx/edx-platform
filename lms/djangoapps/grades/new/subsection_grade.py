@@ -148,35 +148,41 @@ class SubsectionGrade(SubsectionGradeBase):
         """
         Saves the subsection grade in a persisted model.
         """
-        subsection_grades = filter(lambda subs_grade: subs_grade._should_persist_per_attempted, subsection_grades)
-        return PersistentSubsectionGrade.bulk_create_grades(
-            [subsection_grade._persisted_model_params(student) for subsection_grade in subsection_grades],  # pylint: disable=protected-access
-            course_key,
-        )
+        params = [
+            subsection_grade._persisted_model_params(student) for subsection_grade in subsection_grades  # pylint: disable=protected-access
+            if subsection_grade._should_persist_per_attempted()  # pylint: disable=protected-access
+        ]
+        return PersistentSubsectionGrade.bulk_create_grades(params, course_key)
 
     def create_model(self, student):
         """
         Saves the subsection grade in a persisted model.
         """
-        if self._should_persist_per_attempted:
+        if self._should_persist_per_attempted():
             self._log_event(log.debug, u"create_model", student)
             return PersistentSubsectionGrade.create_grade(**self._persisted_model_params(student))
 
-    def update_or_create_model(self, student):
+    def update_or_create_model(self, student, score_deleted):
         """
         Saves or updates the subsection grade in a persisted model.
         """
-        if self._should_persist_per_attempted:
+        if self._should_persist_per_attempted(score_deleted):
             self._log_event(log.debug, u"update_or_create_model", student)
             return PersistentSubsectionGrade.update_or_create_grade(**self._persisted_model_params(student))
 
-    @property
-    def _should_persist_per_attempted(self):
+    def _should_persist_per_attempted(self, score_deleted=False):
         """
         Returns whether the SubsectionGrade's model should be
         persisted based on settings and attempted status.
+
+        If the learner's score was just deleted, they will have
+        no attempts but the grade should still be persisted.
         """
-        return not waffle().is_enabled(WRITE_ONLY_IF_ENGAGED) or self.all_total.first_attempted is not None
+        return (
+            not waffle().is_enabled(WRITE_ONLY_IF_ENGAGED) or
+            self.all_total.first_attempted is not None or
+            score_deleted
+        )
 
     def _compute_block_score(
             self,

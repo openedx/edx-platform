@@ -20,7 +20,7 @@ from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
-from lms.djangoapps.grades.signals.handlers import disconnect_submissions_signal_receiver
+from lms.djangoapps.grades.signals.handlers import disconnect_submissions_signal_receiver, STATE_DELETED_EVENT_TYPE
 from lms.djangoapps.grades.signals.signals import PROBLEM_RAW_SCORE_CHANGED
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -274,17 +274,16 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
     if delete_module:
         module_to_reset.delete()
         create_new_event_transaction_id()
-        grade_update_root_type = 'edx.grades.problem.state_deleted'
-        set_event_transaction_type(grade_update_root_type)
+        set_event_transaction_type(STATE_DELETED_EVENT_TYPE)
         tracker.emit(
-            unicode(grade_update_root_type),
+            unicode(STATE_DELETED_EVENT_TYPE),
             {
                 'user_id': unicode(student.id),
                 'course_id': unicode(course_id),
                 'problem_id': unicode(module_state_key),
                 'instructor_id': unicode(requesting_user.id),
                 'event_transaction_id': unicode(get_event_transaction_id()),
-                'event_transaction_type': unicode(grade_update_root_type),
+                'event_transaction_type': unicode(STATE_DELETED_EVENT_TYPE),
             }
         )
         if not submission_cleared:
