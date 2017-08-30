@@ -803,7 +803,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         """
         self.course.self_paced = is_self_paced
         self.course.save()
-        self._add_course_certificates(count=1, signatory_count=1)
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         test_url = get_certificate_url(
             user_id=self.user.id,
             course_id=unicode(self.course.id)

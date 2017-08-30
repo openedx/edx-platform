@@ -204,15 +204,25 @@ class CertificateAvailableDate(DateSummary):
     title = ugettext_lazy('Certificate Available')
 
     @property
+    def active_certificates(self):
+        return [
+            certificate for certificate in self.course.certificates.get('certificates', [])
+            if certificate.get('is_active', False)
+        ]
+
+    @property
     def is_enabled(self):
         return (
-            self.date is not None and datetime.datetime.now(utc) <= self.date and not self.course.self_paced and
-            waffle.waffle().is_enabled(waffle.INSTRUCTOR_PACED_ONLY)
+            self.date is not None and
+            datetime.datetime.now(utc) <= self.date and
+            not self.course.self_paced and
+            waffle.waffle().is_enabled(waffle.INSTRUCTOR_PACED_ONLY) and
+            len(self.active_certificates) > 0
         )
 
     @property
     def description(self):
-        return _('Day certificates will become available for passing verified learners.')
+        return _('Day certificates will become available for passing verified learners.' + str(self.active_certificates))
 
     @property
     def date(self):
