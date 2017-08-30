@@ -7,9 +7,6 @@ from django.conf import settings
 
 from commerce.models import CommerceConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.waffle_utils import WaffleFlagNamespace
-
-COMMERCE_API_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='commerce_api')
 
 
 def is_account_activation_requirement_disabled():
