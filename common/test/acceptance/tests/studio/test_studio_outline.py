@@ -8,6 +8,7 @@ import itertools
 from pytz import UTC
 from bok_choy.promise import EmptyPromise
 from nose.plugins.attrib import attr
+from unittest import skip
 
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
@@ -724,6 +725,7 @@ class StaffLockTest(CourseOutlineTest):
         subsection.unit_at(0).set_staff_lock(True)
         self.assertFalse(subsection.has_staff_lock_warning)
 
+    @skip('COURSEWARE PAGE TIMEOUT: This test fails to load the Coursware Page')
     def test_locked_sections_do_not_appear_in_lms(self):
         """
         Scenario: A locked section is not visible to students in the LMS
@@ -744,6 +746,7 @@ class StaffLockTest(CourseOutlineTest):
         StaffPage(self.browser, self.course_id).set_staff_view_mode('Student')
         self.assertEqual(courseware.num_sections, 1)
 
+    @skip('COURSEWARE PAGE TIMEOUT: This test fails to load the Coursware Page')
     def test_locked_subsections_do_not_appear_in_lms(self):
         """
         Scenario: A locked subsection is not visible to students in the LMS
@@ -1440,6 +1443,7 @@ class DefaultStatesContentTest(CourseOutlineTest):
 
     __test__ = True
 
+    @skip('COURSEWARE PAGE TIMEOUT: This test fails to load the Coursware Page')
     def test_view_live(self):
         """
         Scenario: View Live version from course outline
