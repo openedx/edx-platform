@@ -8,7 +8,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from lms.djangoapps.certificates.api import get_certificate_for_user
+from openedx.features.certificates.api import get_certificate_for_user
 from openedx.core.lib.api import authentication, permissions
 
 log = logging.getLogger(__name__)

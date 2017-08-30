@@ -5,7 +5,7 @@ from config_models.admin import ConfigurationModelAdmin
 from django import forms
 from django.contrib import admin
 
-from certificates.models import (
+from models import (
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
     CertificateHtmlViewConfiguration,

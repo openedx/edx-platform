@@ -2025,7 +2025,6 @@ INSTALLED_APPS = [
     'track',
     'eventtracking.django.apps.EventTrackingConfig',
     'util',
-    'certificates.apps.CertificatesConfig',
     'dashboard',
     'lms.djangoapps.instructor',
     'lms.djangoapps.instructor_task',
@@ -2244,6 +2243,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.schedules',
 
     # Features
+    'openedx.features.certificates.apps.CertificatesConfig',
     'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
     'openedx.features.course_search',

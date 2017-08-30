@@ -6,7 +6,7 @@ from celery_utils.persist_on_failure import PersistOnFailureTask
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
 
-from .api import generate_user_certificates
+from openedx.features.certificates.api import generate_user_certificates
 
 logger = getLogger(__name__)
 

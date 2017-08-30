@@ -16,7 +16,7 @@ from pytz import timezone, utc
 from course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
-from openedx.core.djangoapps.certificates.config import waffle
+from openedx.features.certificates.config import waffle
 from student.models import CourseEnrollment
 
 

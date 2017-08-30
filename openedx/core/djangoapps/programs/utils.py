@@ -19,7 +19,7 @@ from pytz import utc
 from requests.exceptions import ConnectionError, Timeout
 
 from course_modes.models import CourseMode
-from lms.djangoapps.certificates import api as certificate_api
+from openedx.features.certificates import api as certificate_api
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.catalog.utils import get_programs

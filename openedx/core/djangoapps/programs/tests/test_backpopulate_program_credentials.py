@@ -6,8 +6,8 @@ from django.test import TestCase
 
 from openedx.features.certificates.models import CertificateStatuses  # pylint: disable=import-error
 from course_modes.models import CourseMode
-from lms.djangoapps.certificates.api import MODES
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from openedx.features.certificates.api import MODES
+from openedx.features.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.factories import (
     generate_course_run_key,
     ProgramFactory,

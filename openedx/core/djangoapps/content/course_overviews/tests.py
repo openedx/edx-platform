@@ -16,7 +16,7 @@ from django.test.utils import override_settings
 from django.utils import timezone
 from PIL import Image
 
-from lms.djangoapps.certificates.api import get_active_web_certificate
+from openedx.features.certificates.api import get_active_web_certificate
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.courses import course_image_url
 from static_replace.models import AssetBaseUrlConfig

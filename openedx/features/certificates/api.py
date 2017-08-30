@@ -11,8 +11,8 @@ from django.core.urlresolvers import reverse
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from branding import api as branding_api
-from certificates.models import (
+from lms.djangoapps.branding import api as branding_api
+from models import (
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
     CertificateInvalidation,
@@ -23,7 +23,7 @@ from certificates.models import (
     GeneratedCertificate,
     certificate_status_for_student
 )
-from certificates.queue import XQueueCertInterface
+from queue import XQueueCertInterface
 from eventtracking import tracker
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField

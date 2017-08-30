@@ -81,7 +81,7 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
         based on 'SELF_PACED_ONLY' flag
         """
         with mock.patch(
-            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+            'openedx.features.certificates.signals.generate_certificate.apply_async',
             return_value=None
         ) as mock_generate_certificate_apply_async:
             with waffle.waffle().override(waffle.SELF_PACED_ONLY, active=False):
@@ -106,7 +106,7 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
         based on 'INSTRUCTOR_PACED_ONLY' flag
         """
         with mock.patch(
-                'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+                'openedx.features.certificates.signals.generate_certificate.apply_async',
                 return_value=None
         ) as mock_generate_certificate_apply_async:
             with waffle.waffle().override(waffle.INSTRUCTOR_PACED_ONLY, active=False):
@@ -157,7 +157,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
 
     def test_cert_generation_on_passing_self_paced(self):
         with mock.patch(
-            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+            'openedx.features.certificates.signals.generate_certificate.apply_async',
             return_value=None
         ) as mock_generate_certificate_apply_async:
             with waffle.waffle().override(waffle.SELF_PACED_ONLY, active=True):
@@ -175,7 +175,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
 
     def test_cert_generation_on_passing_instructor_paced(self):
         with mock.patch(
-            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+            'openedx.features.certificates.signals.generate_certificate.apply_async',
             return_value=None
         ) as mock_generate_certificate_apply_async:
             with waffle.waffle().override(waffle.INSTRUCTOR_PACED_ONLY, active=True):
@@ -193,7 +193,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
 
     def test_cert_already_generated(self):
         with mock.patch(
-                'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+                'openedx.features.certificates.signals.generate_certificate.apply_async',
                 return_value=None
         ) as mock_generate_certificate_apply_async:
             grade_factory = CourseGradeFactory()
@@ -238,7 +238,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
 
     def test_cert_generation_on_photo_verification_self_paced(self):
         with mock.patch(
-            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+            'openedx.features.certificates.signals.generate_certificate.apply_async',
             return_value=None
         ) as mock_generate_certificate_apply_async:
             with waffle.waffle().override(waffle.SELF_PACED_ONLY, active=True):
@@ -255,7 +255,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
 
     def test_cert_generation_on_photo_verification_instructor_paced(self):
         with mock.patch(
-            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+            'openedx.features.certificates.signals.generate_certificate.apply_async',
             return_value=None
         ) as mock_generate_certificate_apply_async:
             with waffle.waffle().override(waffle.INSTRUCTOR_PACED_ONLY, active=True):

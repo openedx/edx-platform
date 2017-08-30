@@ -15,7 +15,7 @@ from nose.plugins.attrib import attr
 from pytz import utc
 
 from course_modes.models import CourseMode
-from lms.djangoapps.certificates.api import MODES
+from openedx.features.certificates.api import MODES
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.tests.factories import (
@@ -41,7 +41,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
 
-CERTIFICATES_API_MODULE = 'lms.djangoapps.certificates.api'
+CERTIFICATES_API_MODULE = 'openedx.features.certificates.api'
 ECOMMERCE_URL_ROOT = 'https://ecommerce.example.com'
 UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 

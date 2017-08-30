@@ -12,8 +12,8 @@ from lxml.etree import ParserError, XMLSyntaxError
 from requests.auth import HTTPBasicAuth
 
 from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
-from certificates.models import CertificateStatuses as status
-from certificates.models import (
+from models import CertificateStatuses as status
+from models import (
     CertificateStatuses,
     CertificateWhitelist,
     ExampleCertificate,

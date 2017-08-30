@@ -6,16 +6,16 @@ import logging
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from certificates.models import (
+from models import (
     CertificateGenerationCourseSetting,
     CertificateWhitelist,
     CertificateStatuses,
     GeneratedCertificate
 )
-from certificates.tasks import generate_certificate
-from courseware import courses
+from lms.djangoapps.certificates.tasks import generate_certificate
+from lms.djangoapps.courseware import courses
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
-from openedx.core.djangoapps.certificates.config import waffle
+from openedx.features.certificates.config import waffle
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, LEARNER_NOW_VERIFIED
 from student.models import CourseEnrollment
 
