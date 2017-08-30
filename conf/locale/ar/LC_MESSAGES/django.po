@@ -168,8 +168,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-01 18:56+0000\n"
-"PO-Revision-Date: 2017-08-03 16:03+0000\n"
+"POT-Creation-Date: 2017-08-18 20:01+0000\n"
+"PO-Revision-Date: 2017-08-14 16:01+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -303,7 +303,7 @@ msgid "You're enrolled as an honor code student"
 msgstr "إنّك مسجَّل كطالب يحمل شهادة ميثاق الشرف الأكاديمي"
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
-#: openedx/core/djangoapps/user_api/views.py
+#: openedx/core/djangoapps/user_api/api.py
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -320,8 +320,10 @@ msgstr "التعليم المهني"
 
 #: common/djangoapps/course_modes/models.py common/lib/xmodule/xmodule/tabs.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
-#: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
-#: lms/templates/help_modal.html lms/templates/courseware/courseware.html
+#: lms/djangoapps/shoppingcart/reports.py
+#: openedx/features/course_experience/__init__.py
+#: cms/templates/widgets/header.html lms/templates/help_modal.html
+#: lms/templates/courseware/courseware.html
 msgid "Course"
 msgstr "المساق "
 
@@ -430,14 +432,6 @@ msgid "Congratulations!  You are now enrolled in {course_name}"
 msgstr ""
 
 #: common/djangoapps/course_modes/views.py
-#, python-brace-format
-msgid ""
-"Welcome, {username}! You are about to enroll in {course_name}, from "
-"{partner_names}, sponsored by {enterprise_name}. Please select your "
-"enrollment information below."
-msgstr ""
-
-#: common/djangoapps/course_modes/views.py
 msgid "Enrollment is closed"
 msgstr "عذرًا، باب التسجيل مغلق"
 
@@ -477,33 +471,6 @@ msgstr "الطالب"
 #: common/djangoapps/student/admin.py
 msgid "User profile"
 msgstr "الملف التعريفي للمستخدم"
-
-#: common/djangoapps/student/forms.py
-msgid "Username must be minimum of two characters long"
-msgstr "يجب أن يتألّف اسم المستخدم من حرفين على الأقلّ"
-
-#: common/djangoapps/student/forms.py
-#, python-format
-msgid "Username cannot be more than %(limit_value)s characters long"
-msgstr "لا يمكن أن يزيد عدد أحرف اسم المستخدم عن %(limit_value)s"
-
-#. Translators: This message is shown when the Unicode usernames are NOT
-#. allowed
-#: common/djangoapps/student/forms.py
-msgid ""
-"Usernames can only contain Roman letters, western numerals (0-9), "
-"underscores (_), and hyphens (-)."
-msgstr ""
-"يجب أن يحتوي اسم المستخدم على حروف انجليزية وأرقام غربية (0-9) وخطوط سفلية "
-"(_) والوصلات (-) فقط."
-
-#. Translators: This message is shown only when the Unicode usernames are
-#. allowed
-#: common/djangoapps/student/forms.py
-msgid ""
-"Usernames can only contain letters, numerals, underscore (_), numbers and "
-"@/./+/-/_ characters."
-msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid ""
@@ -879,6 +846,10 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "ID photo is blurry"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid " and "
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -5220,7 +5191,7 @@ msgstr "الأدوات الخاصة بالوسائط المتعدّدة"
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
-#: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/views.py
+#: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/api.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -5700,6 +5671,7 @@ msgstr "المزيد من التفاصيل عن إنجازات {fullname}"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: openedx/core/djangoapps/schedules/admin.py
 #: lms/templates/staff_problem_info.html
 #: lms/templates/api_admin/catalogs/search.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -5934,6 +5906,14 @@ msgstr ""
 "الوقت الحاضر."
 
 #: lms/djangoapps/courseware/date_summary.py
+msgid "Certificate Available"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Day certificates will become available for passing verified learners."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
 msgid "Verification Upgrade Deadline"
 msgstr "الموعد النهائي للترقية والحصول على شهادة موثّقة."
 
@@ -6033,17 +6013,19 @@ msgid "sign in"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
+#: openedx/features/course_experience/views/course_home_messages.py
 msgid "register"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"You must be enrolled in the course to see course content. {enroll_link}."
+"You must be enrolled in the course to see course content."
+"                         {enroll_link_start}Enroll now{enroll_link_end}."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Enroll now"
+msgid "You must be enrolled in the course to see course content."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
@@ -6516,8 +6498,12 @@ msgid "Sailthru maximum retries."
 msgstr "الحد الأقصى لعمليات إعادة محاولة Sailthru."
 
 #: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru template to use on activation send. "
-msgstr "قالب Sailthru لاستخدامه في إرسال التفعيل."
+msgid "DEPRECATED: use sailthru_welcome_template instead."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru template to use on welcome send."
+msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru template to use on abandoned cart reminder. Deprecated."
@@ -6564,7 +6550,7 @@ msgstr ""
 #: lms/djangoapps/email_marketing/models.py
 msgid ""
 "Number of seconds to delay the sending of User Welcome email after user has "
-"been activated"
+"been created"
 msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
@@ -6627,12 +6613,15 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "User does not exist."
-msgstr "المستخدم غير موجود."
+#, python-brace-format
+msgid ""
+"The {report_type} report is being created. To view the status of the report,"
+" see Pending Tasks below."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "Task is already running."
-msgstr "سبق تشغيل المهمّة ."
+msgid "User does not exist."
+msgstr "المستخدم غير موجود."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6688,26 +6677,13 @@ msgstr ""
 "يُرجى الاتصال بفريق الدعم للحصول على مزيد من المعلومات."
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "problem responses"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Could not find problem with this location."
 msgstr "تعذّر إيجاد مسألة في هذا الموقع."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The problem responses report is being created. To view the status of the "
-"report, see Pending Tasks below."
-msgstr ""
-"يجري حاليًّا إعداد تقرير إجابات المسائل. يمكنك متابعة حالة هذا التقرير في "
-"قسم ’المهام القيد الانتظار‘ أدناه."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"A problem responses report generation task is already in progress. Check the"
-" 'Pending Tasks' table for the status of the task. When completed, the "
-"report will be available for download in the table below."
-msgstr ""
-"مهمّة إعداد تقرير إجابات المسائل قيد المعالجة. يُرجى تفقّد قسم ’المهام القيد"
-" الانتظار‘ لمتابعة حالة تلك المهمّة. سيتوفّر التقرير  للتنزيل في الجدول "
-"أدناه ما أن تكتمل المهمّة."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -6749,20 +6725,25 @@ msgid "Date Report Run"
 msgstr "تاريخ تشغيل عملية إعداد التقرير"
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "enrolled learner profile"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "User ID"
 msgstr "رقم المستخدم"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
 #. Translators: This label appears above a field on the login form
 #. meant to hold the user's email address.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's email address.
-#. Translators: This label appears above a field on the password reset
-#. form meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: openedx/core/djangoapps/user_api/views.py
+#: openedx/core/djangoapps/user_api/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
 msgstr "البريد الإلكتروني"
@@ -6785,7 +6766,7 @@ msgstr "سنة الميلاد"
 #. form used to select the user's gender.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
 #: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Gender"
@@ -6829,7 +6810,7 @@ msgstr "الفريق"
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -6841,7 +6822,7 @@ msgstr "المدينة"
 #. form used to select the country in which the user lives.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -6849,30 +6830,9 @@ msgid "Country"
 msgstr "البلد"
 
 #: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The enrolled learner profile report is being created. To view the status of "
-"the report, see Pending Tasks below."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "enrollment"
 msgstr ""
-"يُعدُّ الآن تقرير ملف المتعلم. لمتابعة سير العملية انظر ’’المهام القيد "
-"الانتظار‘‘ أدناه."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"This enrollment report is currently being created. To view the status of the"
-" report, see Pending Tasks below. You will be able to download the report "
-"when it is complete."
-msgstr ""
-"يُعدُّ الآن تقرير التسجيل. لمتابعة سير العملية انظر ’’المهام القيد "
-"الانتظار‘‘ أدناه. ويمكنك أن تحمِّل التقرير حالما يَكتمل."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The enrollment report is being created. This report contains information "
-"about learners who can enroll in the course. To view the status of the "
-"report, see Pending Tasks below."
-msgstr ""
-"يُعدُّ الآن تقرير التسجيل. وفيه معلومات عن المتعلِّمين الذين يمكنهم التسجيل "
-"في المساق. لمتابعة سير العملية انظر ’’المهام القيد الانتظار‘‘ أدناه."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'cohort' column containing cohort names."
@@ -6931,72 +6891,24 @@ msgid "Total Discounted Amount"
 msgstr "إجمالي المبلغ المخصوم"
 
 #: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The detailed enrollment report is being created. To view the status of the "
-"report, see Pending Tasks below."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "detailed enrollment"
 msgstr ""
-"يُعدُّ الآن تقرير مفصَّل حول التسجيل. لمتابعة سير العملية انظر ’’المهام "
-"القيد الانتظار‘‘ أدناه."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The detailed enrollment report is being created. To view the status of the "
-"report, see Pending Tasks below. You will be able to download the report "
-"when it is complete."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "executive summary"
 msgstr ""
-"يُعدُّ الآن تقرير مفصَّل حول التسجيل. لمتابعة سير العملية انظر ’’المهام "
-"القيد الانتظار‘‘ أدناه. ويمكنك أن تحمِّل التقرير حالما يَكتمل."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The executive summary report is being created. To view the status of the "
-"report, see Pending Tasks below."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "survey"
 msgstr ""
-"يُعدُّ الآن تقرير الملخَّص التنفيذي. لمتابعة سير العملية انظر ’’المهام القيد"
-" الانتظار‘‘ أدناه."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The executive summary report is currently being created. To view the status "
-"of the report, see Pending Tasks below. You will be able to download the "
-"report when it is complete."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "proctored exam results"
 msgstr ""
-"يُعدُّ الآن تقرير الملخَّص التنفيذي. لمتابعة سير العملية انظر ’’المهام القيد"
-" الانتظار‘‘ أدناه. ويمكنك أن تحمِّل التقرير حالما يَكتمل."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The survey report is being created. To view the status of the report, see "
-"Pending Tasks below."
-msgstr ""
-"يُعدُّ الآن تقرير الاستبيان. يمكنك متابعة حالة هذا التقرير في قسم ’’المهام "
-"القيد الانتظار‘‘ أدناه."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The survey report is currently being created. To view the status of the "
-"report, see Pending Tasks below. You will be able to download the report "
-"when it is complete."
-msgstr ""
-"يُعدُّ الآن تقرير الاستبيان. لمتابعة سير العملية انظر ’’المهام القيد "
-"الانتظار‘‘ أدناه. ويمكنك أن تحمِّل التقرير حالما يَكتمل."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The proctored exam results report is being created. To view the status of "
-"the report, see Pending Tasks below."
-msgstr ""
-"يُعدُّ الآن تقرير نتائج الامتحان المراقَب. لمتابعة سير العملية انظر ’’المهام"
-" القيد الانتظار‘‘ أدناه. "
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The proctored exam results report is currently being created. To view the "
-"status of the report, see Pending Tasks below. You will be able to download "
-"the report when it is complete."
-msgstr ""
-"يُعدُّ الآن تقرير نتائج الامتحان المراقب. لمتابعة سير العملية انظر ’’المهام "
-"القيد الانتظار‘‘ أدناه. ويمكنك أن تحمِّل التقرير حالما يَكتمل."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not parse amount as a decimal"
@@ -7053,52 +6965,19 @@ msgstr ""
 "تعذّرت إعادة التقييم باستخدام all_students و unique_student_identifier."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "The ORA data report is being generated."
-msgstr "جاري إنشاء تقرير بيانات ’ORA‘."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "ORA data"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-msgid ""
-"An ORA data report generation task is already in progress. Check the "
-"'Pending Tasks' table for the status of the task. When completed, the report"
-" will be available for download in the table below."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "grade"
 msgstr ""
-"سبق أن بدأت معالجة مهمّة إعداد تقرير حول بيانات ’ORA‘. يُرجى التحقق من جدول "
-"’المهام القيد الانتظار‘ لمتابعة حالة المهمة. وعندما تكتمل، سيصبح التقرير "
-"متاحًا للتنزيل في الجدول أدناه."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The grade report is being created. To view the status of the report, see "
-"Pending Tasks below."
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "problem grade"
 msgstr ""
-"يُعدُّ الآن تقرير الدرجات. لمتابعة سير العملية انظر ’’المهام القيد "
-"الانتظار‘‘ أدناه."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The grade report is currently being created. To view the status of the "
-"report, see Pending Tasks below. You will be able to download the report "
-"when it is complete."
-msgstr ""
-"يُعدُّ الآن تقرير الدرجات. لمتابعة سير العملية انظر ’’المهام القيد "
-"الانتظار‘‘ أدناه. ويمكنك أن تحمِّل التقرير حالما يَكتمل."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"The problem grade report is being created. To view the status of the report,"
-" see Pending Tasks below."
-msgstr ""
-"يجري حاليًّا إعداد تقرير درجات المسائل. يمكنك متابعة حالة هذا التقرير في قسم"
-" ’المهام القيد الانتظار‘ أدناه."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"A problem grade report is already being generated. To view the status of the"
-" report, see Pending Tasks below. You will be able to download the report "
-"when it is complete."
-msgstr ""
-"سبق أن بدأ إعداد تقرير درجات المسائل. يمكنك متابعة حالة هذا التقرير في قسم "
-"’المهام القيد الانتظار‘ أدناه. ويمكنك تنزيل التقرير حالما يَكتمل."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -7500,7 +7379,7 @@ msgstr "لم يجرِ تمديد تاريخ الاستحقاق لذلك الطا
 #. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/views.py cms/templates/register.html
+#: openedx/core/djangoapps/user_api/api.py cms/templates/register.html
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -7521,6 +7400,22 @@ msgstr "مستخدمون ممن لديهم عمليات تمديد تاريخ ا
 #, python-brace-format
 msgid "Due date extensions for {0} {1} ({2})"
 msgstr "عمليات تمديد تاريخ الاستحقاق لـ {0} {1} ({2})"
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "Requested task is already running"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "Error occured. Please try again later."
+msgstr ""
+
+#: lms/djangoapps/instructor_task/api_helper.py
+#, python-brace-format
+msgid ""
+"The {report_type} report is being created. To view the status of the report,"
+" see Pending Tasks below. You will be able to download the report when it is"
+" complete."
+msgstr ""
 
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "This component cannot be rescored."
@@ -7605,14 +7500,14 @@ msgstr "جرى التوزيع إلى شُعب"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/views.py
+#: openedx/core/djangoapps/user_api/api.py
 msgid "First Name"
 msgstr "الاسم الأول"
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/views.py
+#: openedx/core/djangoapps/user_api/api.py
 msgid "Last Name"
 msgstr "الاسم الأخير"
 
@@ -7626,7 +7521,7 @@ msgstr "اسم الشركة"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Title
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/views.py wiki/forms.py
+#: openedx/core/djangoapps/user_api/api.py wiki/forms.py
 msgid "Title"
 msgstr "العنوان"
 
@@ -9099,6 +8994,14 @@ msgstr "ليست لديك صلاحية الاطّلاع على محتوى هذه
 msgid "No email address provided."
 msgstr "لم يُحدَّد عنوان بريد إلكتروني."
 
+#: lms/djangoapps/student_account/views.py
+msgid "Create Account"
+msgstr ""
+
+#: lms/templates/peer_grading/peer_grading_problem.html
+msgid "Continue"
+msgstr "استمر "
+
 #: lms/djangoapps/support/views/index.py
 msgid "View and regenerate certificates."
 msgstr "عرض وإعادة إعداد الشهادات."
@@ -9127,6 +9030,7 @@ msgid "Email Address"
 msgstr "عنوان البريد الإلكتروني"
 
 #: lms/djangoapps/support/views/refund.py
+#: openedx/core/djangoapps/schedules/admin.py
 #: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
@@ -9332,10 +9236,9 @@ msgstr "استُلمت الصور الخاصّة بعملية التحقّق  "
 msgid "Audit"
 msgstr "مستمع"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the website name of www.facebook.com.  Please
 #. translate this the way that Facebook advertises in your language.
-#: lms/envs/common.py lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/envs/common.py
 msgid "Facebook"
 msgstr "فيسبوك"
 
@@ -9344,10 +9247,9 @@ msgstr "فيسبوك"
 msgid "Like {platform_name} on Facebook"
 msgstr "متابعة {platform_name} على فيسبوك"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the website name of www.twitter.com.  Please
 #. translate this the way that Twitter advertises in your language.
-#: lms/envs/common.py lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/envs/common.py
 msgid "Twitter"
 msgstr "تويتر"
 
@@ -10465,6 +10367,27 @@ msgstr ""
 "المسار المستخدم لإنشاء عناوين URL إلى صفحات تسويق البرامج (على سبيل المثال، "
 "\"/foo\")."
 
+#: openedx/core/djangoapps/schedules/apps.py
+#: openedx/core/djangoapps/schedules/models.py
+msgid "Schedules"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/models.py
+msgid "Indicates if this schedule is actively used"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/models.py
+msgid "Date this schedule went into effect"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/models.py
+msgid "Deadline by which the learner must upgrade to a verified seat"
+msgstr ""
+
+#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/schedule.html
+msgid "Schedule"
+msgstr "وضع الجدول"
+
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
 msgstr "فعّل ميزة تحسين الصفحة الرئيسية للمساق."
@@ -10488,10 +10411,269 @@ msgstr ""
 msgid "Theming Administration"
 msgstr ""
 
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid ""
+"Usernames can only contain letters (A-Z, a-z), numerals (0-9), underscores "
+"(_), and hyphens (-)."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid ""
+"Usernames can only contain letters, numerals, and @/./+/-/_ characters."
+msgstr ""
+
+#. Translators: This message is shown to users who attempt to create a new
+#. account using
+#. an invalid email format.
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid "\"{email}\" is not a valid email address."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid ""
+"It looks like {email_address} belongs to an existing account. Try again with"
+" a different email address."
+msgstr ""
+"يبدو أنّ عنوان البريد الإلكتروني {email_address} يخصّ حسابًا موجودًا. يُرجى "
+"إعادة المحاولة باستخدام عنوان بريد إلكتروني مختلف."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid ""
+"It looks like {username} belongs to an existing account. Try again with a "
+"different username."
+msgstr ""
+"يبدو أنّ اسم المستخدم {username} يخصّ حسابًا موجودًا. يُرجى إعادة المحاولة "
+"باستخدام اسم مستخدم مختلف."
+
+#. Translators: This message is shown to users who enter a
+#. username/email/password
+#. with an inappropriate length (too short or too long).
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid "Username must be between {min} and {max} characters long."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid "Enter a valid email address that contains at least {min} characters."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please enter a password."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Password is not long enough."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+#, python-brace-format
+msgid "Password cannot be longer than {max} character."
+msgstr ""
+
+#. Translators: This message is shown to users who enter a password matching
+#. the username they enter(ed).
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Password cannot be the same as the username."
+msgstr ""
+
+#. Translators: These messages are shown to users who do not enter information
+#. into the required field or enter it incorrectly.
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please enter your Full Name."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "The email addresses do not match."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please select your Country."
+msgstr "يُرجى تحديد بلدك."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please enter your City."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please tell us your goals."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please select your highest level of education completed."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Please enter your mailing address."
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/accounts/api.py
 #, python-brace-format
 msgid "The '{field_name}' field cannot be edited."
 msgstr "لا يمكن تعديل الحقل '{field_name}'."
+
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
+#. Translators: This example email address is used as a placeholder in
+#. a field on the login form meant to hold the user's email address.
+#. Translators: This example email address is used as a placeholder in
+#. a field on the registration form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "username@domain.com"
+msgstr "username@domain.com"
+
+#. Translators: These instructions appear on the password reset form,
+#. immediately below a field meant to hold the user's email address.
+#. Translators: These instructions appear on the login form, immediately
+#. below a field meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "The email address you used to register with {platform_name}"
+msgstr "عنوان البريد الإلكتروني الذي استخدمته للتسجيل في {platform_name}"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the login form
+#. meant to hold the user's password.
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's password.
+#: openedx/core/djangoapps/user_api/api.py cms/templates/login.html
+#: cms/templates/register.html lms/templates/login.html
+#: lms/templates/provider_login.html lms/templates/register-form.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: themes/red-theme/cms/templates/login.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Password"
+msgstr "كلمة المرور"
+
+#: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
+msgid "Remember me"
+msgstr "تذكُّر بياناتي"
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "This is what you will use to login."
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. meant to confirm the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Confirm Email"
+msgstr ""
+
+#. Translators: This example name is used as a placeholder in
+#. a field on the registration form meant to hold the user's name.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Jane Q. Learner"
+msgstr ""
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's full name.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "This name will be used on any certificates that you earn."
+msgstr ""
+
+#: cms/templates/register.html lms/templates/register-form.html
+#: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Public Username"
+msgstr "اسم المستخدم"
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's public username.
+#: openedx/core/djangoapps/user_api/api.py
+msgid ""
+"The name that will identify you in your courses. It cannot be changed later."
+msgstr ""
+
+#. Translators: This example username is used as a placeholder in
+#. a field on the registration form meant to hold the user's username.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Jane_Q_Learner"
+msgstr ""
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's highest completed level of education.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Highest level of education completed"
+msgstr "أعلى مستوى تعليمي وصلت إليه "
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's year of birth.
+#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
+msgid "Year of birth"
+msgstr "سنة الميلاد"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's mailing address.
+#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
+msgid "Mailing address"
+msgstr "العنوان البريدي"
+
+#. Translators: This phrase appears above a field on the registration form
+#. meant to hold the user's reasons for registering with edX.
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "Tell us why you're interested in {platform_name}"
+msgstr "أخبرنا بالأسباب التي دفعتك للانضمام إلى {platform_name}"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "State/Province/Region"
+msgstr "الولاية/المقاطعة/المنطقة"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Company"
+msgstr "الشركة"
+
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Review the Honor Code"
+msgstr "استعراض ميثاق الشرف"
+
+#. Translators: This is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Terms of Service and Honor Code"
+msgstr "شروط الخدمة وميثاق الشرف الأكاديمي"
+
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Review the Terms of Service and Honor Code"
+msgstr "استعراض شروط الخدمة وميثاق الشرف"
+
+#. Translators: "Terms of Service" is a legal document users must agree to
+#. in order to register a new account.
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "I agree to the {platform_name} {terms_of_service}"
+msgstr "أوافق على {terms_of_service} الخاصة بمنصة {platform_name}"
+
+#. Translators: "Terms of Service" is a legal document users must agree to
+#. in order to register a new account.
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "You must agree to the {platform_name} {terms_of_service}"
+msgstr "يجب الموافقة على {terms_of_service} الخاصة بمنصة {platform_name}. "
+
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Review the Terms of Service"
+msgstr "استعراض شروط الخدمة"
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -10539,196 +10721,6 @@ msgstr "تعذّر حفظ القيمة '{value}' كتفضيل '{key}' للمست
 #: openedx/core/djangoapps/user_api/preferences/views.py
 msgid "No data provided for user preference update"
 msgstr "لم تتوفّر أيّة بيانات لتحديث تفضيل المستخدم"
-
-#. Translators: This example email address is used as a placeholder in
-#. a field on the login form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the registration form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the password reset form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "username@domain.com"
-msgstr "username@domain.com"
-
-#. Translators: These instructions appear on the login form, immediately
-#. below a field meant to hold the user's email address.
-#. Translators: These instructions appear on the password reset form,
-#. immediately below a field meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid "The email address you used to register with {platform_name}"
-msgstr "عنوان البريد الإلكتروني الذي استخدمته للتسجيل في {platform_name}"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the login form
-#. meant to hold the user's password.
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's password.
-#: openedx/core/djangoapps/user_api/views.py cms/templates/login.html
-#: cms/templates/register.html lms/templates/login.html
-#: lms/templates/provider_login.html lms/templates/register-form.html
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Password"
-msgstr "كلمة المرور"
-
-#: openedx/core/djangoapps/user_api/views.py lms/templates/login.html
-msgid "Remember me"
-msgstr "تذكُّر بياناتي"
-
-#. Translators: This message is shown to users who attempt to create a new
-#. account using an email address associated with an existing account.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid ""
-"It looks like {email_address} belongs to an existing account. Try again with"
-" a different email address."
-msgstr ""
-"يبدو أنّ عنوان البريد الإلكتروني {email_address} يخصّ حسابًا موجودًا. يُرجى "
-"إعادة المحاولة باستخدام عنوان بريد إلكتروني مختلف."
-
-#. Translators: This message is shown to users who attempt to create a new
-#. account using a username associated with an existing account.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid ""
-"It looks like {username} belongs to an existing account. Try again with a "
-"different username."
-msgstr ""
-"يبدو أنّ اسم المستخدم {username} يخصّ حسابًا موجودًا. يُرجى إعادة المحاولة "
-"باستخدام اسم مستخدم مختلف."
-
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "This is what you will use to login."
-msgstr ""
-
-#. Translators: This label appears above a field on the registration form
-#. meant to confirm the user's email address.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Confirm Email"
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/views.py
-msgid "The email addresses do not match."
-msgstr ""
-
-#. Translators: This example name is used as a placeholder in
-#. a field on the registration form meant to hold the user's name.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Jane Q. Learner"
-msgstr ""
-
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's full name.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "This name will be used on any certificates that you earn."
-msgstr ""
-
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Public Username"
-msgstr "اسم المستخدم"
-
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's public username.
-#: openedx/core/djangoapps/user_api/views.py
-msgid ""
-"The name that will identify you in your courses. It cannot be changed later."
-msgstr ""
-
-#. Translators: This example username is used as a placeholder in
-#. a field on the registration form meant to hold the user's username.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Jane_Q_Learner"
-msgstr ""
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's highest completed level of education.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Highest level of education completed"
-msgstr "أعلى مستوى تعليمي وصلت إليه "
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's year of birth.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/signup_modal.html
-msgid "Year of birth"
-msgstr "سنة الميلاد"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's mailing address.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/signup_modal.html
-msgid "Mailing address"
-msgstr "العنوان البريدي"
-
-#. Translators: This phrase appears above a field on the registration form
-#. meant to hold the user's reasons for registering with edX.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid "Tell us why you're interested in {platform_name}"
-msgstr "أخبرنا بالأسباب التي دفعتك للانضمام إلى {platform_name}"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the State/Province/Region in which they
-#. live.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "State/Province/Region"
-msgstr "الولاية/المقاطعة/المنطقة"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Company
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Company"
-msgstr "الشركة"
-
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Please select your Country."
-msgstr "يُرجى تحديد بلدك."
-
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Review the Honor Code"
-msgstr "استعراض ميثاق الشرف"
-
-#. Translators: This is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Terms of Service and Honor Code"
-msgstr "شروط الخدمة وميثاق الشرف الأكاديمي"
-
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Review the Terms of Service and Honor Code"
-msgstr "استعراض شروط الخدمة وميثاق الشرف"
-
-#. Translators: "Terms of Service" is a legal document users must agree to
-#. in order to register a new account.
-#. Translators: "Terms of service" is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid "I agree to the {platform_name} {terms_of_service}"
-msgstr "أوافق على {terms_of_service} الخاصة بمنصة {platform_name}"
-
-#. Translators: "Terms of Service" is a legal document users must agree to
-#. in order to register a new account.
-#. Translators: "Terms of service" is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/views.py
-#, python-brace-format
-msgid "You must agree to the {platform_name} {terms_of_service}"
-msgstr "يجب الموافقة على {terms_of_service} الخاصة بمنصة {platform_name}. "
-
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Review the Terms of Service"
-msgstr "استعراض شروط الخدمة"
 
 #: openedx/core/djangoapps/util/user_messages.py
 #, python-brace-format
@@ -10801,6 +10793,55 @@ msgid ""
 msgstr ""
 "اسم الفئة الفرعية في النقاشات. يظهر هذا الاسم في الجانب الأيسر من منتدى "
 "النقاشات الخاص بالمساق."
+
+#: lms/templates/courseware/courseware.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "Bookmarks"
+msgstr "العلامات"
+
+#: openedx/features/course_experience/plugins.py
+#: cms/templates/widgets/header.html
+#: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
+msgid "Updates"
+msgstr ""
+
+#: openedx/features/course_experience/plugins.py
+#: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
+msgid "Reviews"
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid " {sign_in_link} or {register_link} and then enroll in this course."
+msgstr ""
+
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header.html
+msgid "Sign in"
+msgstr "تسجيل الدخول"
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid ""
+"{open_enroll_link} Enroll now{close_enroll_link} to access the full course."
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+msgid "Don't forget to add a calendar reminder!"
+msgstr ""
+
+#: openedx/features/enterprise_support/api.py
+#, python-brace-format
+msgid ""
+"If you have concerns about sharing your data, please contact your "
+"administrator at {enterprise_customer_name}."
+msgstr ""
+
+#: openedx/features/enterprise_support/api.py
+#, python-brace-format
+msgid "Enrollment in {course_name} was not complete."
+msgstr ""
 
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
@@ -11506,6 +11547,7 @@ msgid "Course Outline"
 msgstr ""
 
 #: cms/templates/course_outline.html cms/templates/index.html
+#: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 #: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
 msgid "Dismiss"
 msgstr ""
@@ -11643,11 +11685,6 @@ msgstr "إعادة الضبط"
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "القانوني"
-
-#: cms/templates/widgets/header.html
-#: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
-msgid "Updates"
-msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/navigation/navigation.html
 #: lms/templates/widgets/footer-language-selector.html
@@ -14289,10 +14326,6 @@ msgstr "سمِّ CCX الخاصة بك."
 msgid "Create a new Custom Course for edX"
 msgstr "إنشاء مقرّر مخصّص جديد لمنصّة edX"
 
-#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/schedule.html
-msgid "Schedule"
-msgstr "وضع الجدول"
-
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/ccx/grading_policy.html
 msgid "Grading Policy"
@@ -14947,11 +14980,6 @@ msgid "Courseware"
 msgstr "محتويات المساق"
 
 #: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "Bookmarks"
-msgstr "العلامات"
-
-#: lms/templates/courseware/courseware.html
 msgid "Course Search"
 msgstr "البحث في المساق"
 
@@ -15529,11 +15557,19 @@ msgid "I'm taking {course_name} online with edX.org. Check it out!"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share {course_name} on Facebook"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share on Facebook"
 msgstr "شارك على فيسبوك"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with @edxonline. Check it out!"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share {course_name} on Twitter"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -15543,48 +15579,6 @@ msgstr "خيارات المساق ل"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Available Actions"
 msgstr "الإجراءات المتاحة"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#, python-format
-msgid ""
-"Are you sure you want to unenroll from the purchased course %(course_name)s "
-"(%(course_number)s)?"
-msgstr ""
-"هل أنت متأكّد من رغبتك في إلغاء تسجيلك في المساق %(course_name)s "
-"(%(course_number)s) الذي اشتريته؟"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You will be refunded the amount you paid."
-msgstr "سوف يعاد لك المبلغ الذي دفعته."
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You will not be refunded the amount you paid."
-msgstr "لن يعاد لك المبلغ الذي دفعته."
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#, python-format
-msgid ""
-"Are you sure you want to unenroll from %(course_name)s (%(course_number)s)?"
-msgstr ""
-"هل أنت متأكّد من رغبتك في إلغاء تسجيلك في مساق %(course_name)s "
-"(%(course_number)s)؟"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#, python-format
-msgid ""
-"Are you sure you want to unenroll from the verified %(cert_name_long)s track"
-" of %(course_name)s (%(course_number)s)?"
-msgstr ""
-"هل أنت متأكّد من رغبتك بإلغاء تسجيلك من مسار %(cert_name_long)s الموثق "
-"لـ%(course_name)s (%(course_number)s)؟"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"The refund deadline for this course has passed, so you will not receive a "
-"refund."
-msgstr ""
-"لقد انتهت الفترة القصوى لإعادة المبلغ لهذا المساق، لذا لن تتمكن من استعادة "
-"المبلغ الذي دفعته."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
@@ -16716,8 +16710,16 @@ msgstr "تم التسجيل بنجاح"
 
 #: lms/templates/enrollment/course_enrollment_message.html
 msgid ""
-"Thank you for enrolling in {enrolled_course}. We hope you enjoy the course."
-msgstr "شكرًا لتسجيلك في {enrolled_course}، نرجو أن تستمتع بالمساق."
+"Thank you for enrolling in {course_names}. We hope you enjoy the course."
+msgstr ""
+
+#: lms/templates/enrollment/course_enrollment_message.html
+msgid "Thank you for enrolling in:"
+msgstr ""
+
+#: lms/templates/enrollment/course_enrollment_message.html
+msgid "We hope you enjoy the course."
+msgstr ""
 
 #: lms/templates/enrollment/course_enrollment_message.html
 msgid ""
@@ -18548,12 +18550,6 @@ msgstr "المدارس"
 msgid "Explore Courses"
 msgstr "استكشاف الدورات التدريبية"
 
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header.html
-msgid "Sign in"
-msgstr "تسجيل الدخول"
-
 #: lms/templates/navigation/navigation.html
 msgid "Global"
 msgstr "عالمي"
@@ -18665,10 +18661,6 @@ msgstr ""
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "How did I do?"
 msgstr "كيف كان أدائي؟ "
-
-#: lms/templates/peer_grading/peer_grading_problem.html
-msgid "Continue"
-msgstr "استمر "
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Ready to grade!"
@@ -19711,12 +19703,12 @@ msgid ""
 "This course has not started yet, and will launch on {launch_date_html}."
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
-msgid "Reviews"
-msgstr ""
-
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
+msgid "Latest Update"
 msgstr ""
 
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
@@ -20597,7 +20589,6 @@ msgstr ""
 "انقر لفتح محتويات المساق في نظام إدارة التعلّم LMS من خلال تبويبة جديدة"
 
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
-#: cms/templates/index.html
 msgid "View Live"
 msgstr "شاهد النسخة الحالية"
 
@@ -20609,11 +20600,11 @@ msgstr "تعديل تاريخ البداية"
 msgid "Course Pacing:"
 msgstr "أسلوب التعلّم المتّبع في المساق:"
 
-#: cms/templates/course_outline.html
+#: cms/templates/course_outline.html cms/templates/settings.html
 msgid "Self-Paced"
 msgstr "مساق دائم"
 
-#: cms/templates/course_outline.html
+#: cms/templates/course_outline.html cms/templates/settings.html
 msgid "Instructor-Paced"
 msgstr "حسب خطى المُدرس"
 
@@ -21941,12 +21932,12 @@ msgstr ""
 " لإعادة تجريب التشغيل الثاني، أو الاتصال بمدير مشروعك للحصول على المساعدة."
 
 #: cms/templates/index.html
-msgid "Libraries"
-msgstr "المكتبات"
+msgid "Archived Courses"
+msgstr ""
 
 #: cms/templates/index.html
-msgid "Re-run Course"
-msgstr "مساق مشغَّل مرّة أخرى"
+msgid "Libraries"
+msgstr "المكتبات"
 
 #: cms/templates/index.html
 msgid "Are you staff on an existing {studio_name} course?"
@@ -22040,10 +22031,6 @@ msgid ""
 msgstr ""
 "يقوم طاقم منصّة {platform_name} بمراجعة طلبك حاليًّا، وسيتولّون تحديثه في "
 "وقت قصير. "
-
-#: cms/templates/index.html
-msgid "(Read-only)"
-msgstr "(للقراءة فقط)"
 
 #: cms/templates/index.html
 msgid "Were you expecting to see a particular library here?"
@@ -23178,95 +23165,6 @@ msgstr "تعلّم المزيد عن الكتب."
 msgid "Video Uploads"
 msgstr "تحميلات الفيديو"
 
-#: cms/templates/videos_index.html
-msgid "Why upload video files?"
-msgstr "ما الهدف من تحميل الفيديو هنا؟"
-
-#: cms/templates/videos_index.html
-msgid ""
-"For a video to play on different devices, it needs to be available in "
-"multiple formats. After you upload an original video file in {file_formats} "
-"format on this page, an automated process creates those additional formats "
-"and stores them for you."
-msgstr ""
-"من أجل تشغيل فيديو على أجهزة مختلفة، يجب أن يكون متوفر بصيغ متعددة. بعد "
-"تحميل ملف الفيديو الأصلي في صيغة {file_formats} في هذه الصفحة، سوف تقوم "
-"عملية مؤتمتة بخلق تلك الصيغ الإضافية وتخزينها من أجلك."
-
-#: cms/templates/videos_index.html
-msgid "Maximum Video File Size"
-msgstr "الحجم الأقصى لملف الفيديو"
-
-#: cms/templates/videos_index.html
-msgid ""
-"The maximum size for each video file that you upload is {em_start}5 "
-"GB{em_end}. The upload process fails for larger files."
-msgstr ""
-"الحد الأقصى لحجم كل ملف فيديو تحمله هو {em_start}5 GB{em_end}. لن تنجح عملية"
-" تحميل أي ملفات أكبر."
-
-#: cms/templates/videos_index.html
-msgid "Monitoring files as they upload"
-msgstr "مراقبة الملفّات أثناء تحميلها"
-
-#: cms/templates/videos_index.html
-msgid ""
-"Each video file that you upload needs to reach the video processing servers "
-"successfully before additional work can begin. You can monitor the progress "
-"of files as they upload, and try again if the upload fails."
-msgstr ""
-"يحتاج كل ملف فيديو تحمّله إلى النجاح بالاتّصال بالخوادم المسؤولة عن معالجة "
-"الفيديوهات، وذلك قبل أن يمكن البدء بأي عمل إضافي. ويمكنك مراقبة سير عمل "
-"الملفّات أثناء تحميلها، وإعادة المحاولة إذا فشلت عملية التحميل.  "
-
-#: cms/templates/videos_index.html
-msgid "Managing uploaded files"
-msgstr "إدارة الملفّات التي جرى تحميلها"
-
-#: cms/templates/videos_index.html
-msgid ""
-"After a file uploads successfully, automated processing begins. The file is "
-"then listed under Previous Uploads as {em_start}In Progress{em_end}. You can"
-" add the video to your course as soon as it has a unique video ID and the "
-"status is {em_start}Ready{em_end}. Allow 24 hours for file processing at the"
-" external video hosting sites to complete."
-msgstr ""
-"بعد تحميل الملف بنجاح، تبدأ عملية معالجة أوتوماتيكية لهذا الملفّ. وبعد بدء "
-"هذه العملية، يجري إدراج الملفّ ضمن \"التحميلات السابقة\" بحالة {em_start}قيد"
-" المعالجة{em_end}، ويمكنك إضافة الفيديو إلى مساقك حالما يصبح لديه رقم تعريفي"
-" فريد ويظهر بحالة {em_start}جاهز{em_end}. يُرجى الانتظار لمدّة  24 ساعة "
-"ريثما تُستكمَل معالجة الملفّ في مواقع استضافة الفيديو الخارجية."
-
-#: cms/templates/videos_index.html
-msgid ""
-"If something goes wrong, the {em_start}Failed{em_end} status message "
-"appears. Check for problems in your original file and upload a replacement."
-msgstr ""
-"إذا وقعت مشكلة ما، تظهر لك رسالة {em_start}فشلت العملية{em_end}. ويُرجى "
-"مراجعة المشاكل في ملفّك الأصلي وتحميل الملفّ البديل. "
-
-#: cms/templates/videos_index.html
-msgid "How do I get the videos into my course?"
-msgstr "كيف أجلب الفيديوهات إلى مساقي؟"
-
-#: cms/templates/videos_index.html
-msgid ""
-"When the status for a file is {em_start}Ready{em_end}, you can add that "
-"video to a component in your course. Copy the unique video ID. In another "
-"browser window, on the Course Outline page, create or locate a video "
-"component to play this video. Edit the video component to paste the ID into "
-"the Advanced {em_start}Video ID{em_end} field. The video can play in the LMS"
-" as soon as its status is {em_start}Ready{em_end}, although processing may "
-"not be complete for all encodings and all video hosting sites."
-msgstr ""
-"عندما تكون حالة الملف {em_start}Ready{em_end}، يمكنك إضافة هذا الفيديو إلى "
-"مكون في دراستك. قم بنسخ معرف الفيديو الخاص. في نافذة في متصفح آخر، وعلى صفحة"
-" الخطوط العامة للدورة التعليمية، قم بإنشاء أو تحديد موقع عنصر الفيديو من اجل"
-" تشغيل هذا الفيديو. ومن ثم قم بتحرير مكون الفيديو من أجل لصق المعرف في حقل "
-"الرقم في حقل Advanced {em_start}Video ID{em_end}. يمكن تشغيل الفيديو في LMS "
-"بمجرد أن يصبح وضعه {em_start}Ready{em_end}، على الرغم من أن المعالجة قد لا "
-"تكون كاملة لجميع ترميزات وجميع مواقع استضافة الفيديو."
-
 #: cms/templates/visibility_editor.html
 msgid "Access is not restricted"
 msgstr ""
@@ -24230,8 +24128,8 @@ msgid "Your changes were saved."
 msgstr "حُفّظت التغييرات التي أجريتها. "
 
 #: wiki/views/article.py
-msgid "A new revision of the article was succesfully added."
-msgstr "نجحت إضافة مراجعة جديدة للمقال."
+msgid "A new revision of the article was successfully added."
+msgstr ""
 
 #: wiki/views/article.py
 msgid "Restoring article"

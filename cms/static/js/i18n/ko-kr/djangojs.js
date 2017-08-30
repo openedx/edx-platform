@@ -544,7 +544,6 @@
     "Undo": "\ucde8\uc18c", 
     "Undo (Ctrl+Z)": "\ub418\ub3cc\ub9ac\uae30 (Ctrl+Z)", 
     "Unknown": "\uc54c \uc218 \uc5c6\uc74c", 
-    "Unknown Error Occurred.": "\uc54c \uc218 \uc5c6\ub294 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4.", 
     "Unlinking": "\uc5f0\uacb0 \ud574\uc81c\ud558\uae30", 
     "Unmute": "\uc74c\uc18c\uac70 \ud574\uc81c", 
     "Updating with latest library content": "\ucd5c\uc2e0 \ucf58\ud150\uce20 \ubcf4\uad00\ud568\uc73c\ub85c \uc5c5\ub370\uc774\ud2b8", 

@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-25 21:07+0000\n"
-"PO-Revision-Date: 2017-08-25 21:08:23.237836\n"
+"POT-Creation-Date: 2017-08-30 16:07+0000\n"
+"PO-Revision-Date: 2017-08-30 16:08:50.931455\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4585,14 +4585,8 @@ msgid "Basic Account Information"
 msgstr "زشسهذ شذذخعرف هربخقوشفهخر"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid ""
-"These settings include basic information about your account. You can also "
-"specify additional information and see your linked social accounts on this "
-"page."
-msgstr ""
-"فاثسث سثففهرلس هرذمعيث زشسهذ هربخقوشفهخر شزخعف غخعق شذذخعرف. غخع ذشر شمسخ "
-"سحثذهبغ شييهفهخرشم هربخقوشفهخر شري سثث غخعق مهرنثي سخذهشم شذذخعرفس خر فاهس "
-"حشلث."
+msgid "These settings include basic information about your account."
+msgstr "فاثسث سثففهرلس هرذمعيث زشسهذ هربخقوشفهخر شزخعف غخعق شذذخعرف."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4696,6 +4690,26 @@ msgstr "غثشق خب زهقفا"
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Preferred Language"
 msgstr "حقثبثققثي مشرلعشلث"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Social Media Links"
+msgstr "سخذهشم وثيهش مهرنس"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"Optionally, link your personal accounts to the social media icons on your "
+"edX profile."
+msgstr ""
+"خحفهخرشممغ, مهرن غخعق حثقسخرشم شذذخعرفس فخ فاث سخذهشم وثيهش هذخرس خر غخعق "
+"ثيط حقخبهمث."
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid " Link"
+msgstr " مهرن"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Enter your "
+msgstr "ثرفثق غخعق "
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
@@ -7313,6 +7327,10 @@ msgstr ""
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
 msgstr "ثري وغ ثطشو"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
+msgstr "اهيث فهوثق"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"

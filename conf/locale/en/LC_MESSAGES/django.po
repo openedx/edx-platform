@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-25 21:08+0000\n"
-"PO-Revision-Date: 2017-08-25 21:08:22.750395\n"
+"POT-Creation-Date: 2017-08-30 16:08+0000\n"
+"PO-Revision-Date: 2017-08-30 16:08:50.438343\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -177,15 +177,6 @@ msgstr ""
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "Professional Ed"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py common/lib/xmodule/xmodule/tabs.py
-#: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
-#: lms/djangoapps/shoppingcart/reports.py
-#: openedx/features/course_experience/__init__.py
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
-#: lms/templates/courseware/courseware.html
-msgid "Course"
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
@@ -971,6 +962,11 @@ msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this SAML configuration belongs to."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py lms/templates/help_modal.html
+#, python-brace-format
+msgid "{platform_name} Support"
 msgstr ""
 
 #: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
@@ -3961,6 +3957,15 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
 msgid "Home"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
+#: lms/djangoapps/courseware/views/views.py
+#: lms/djangoapps/shoppingcart/reports.py
+#: openedx/features/course_experience/__init__.py
+#: cms/templates/widgets/header.html lms/templates/help_modal.html
+#: lms/templates/courseware/courseware.html
+msgid "Course"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
@@ -8162,6 +8167,10 @@ msgid "Verification photos received"
 msgstr ""
 
 #: lms/envs/common.py
+msgid "Your Platform Name Here"
+msgstr ""
+
+#: lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr ""
@@ -8254,6 +8263,10 @@ msgstr ""
 #: lms/envs/common.py
 #, python-brace-format
 msgid "Subscribe to the {platform_name} YouTube channel"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Your Platform Insights"
 msgstr ""
 
 #: lms/envs/common.py
@@ -9359,6 +9372,11 @@ msgstr ""
 msgid "The '{field_name}' field cannot be edited."
 msgstr ""
 
+#: openedx/core/djangoapps/user_api/accounts/utils.py
+msgid ""
+" Make sure that you are providing a valid username or a URL that contains \""
+msgstr ""
+
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
 #. Translators: This example email address is used as a placeholder in
@@ -10319,6 +10337,14 @@ msgstr ""
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr ""
 
+#: cms/envs/common.py
+msgid "Your Platform Studio"
+msgstr ""
+
+#: cms/envs/common.py
+msgid "Studio"
+msgstr ""
+
 #: cms/lib/xblock/tagging/tagging.py
 msgid "Dictionary with the available tags"
 msgstr ""
@@ -10881,10 +10907,6 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Support"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "{platform_name} Support"
 msgstr ""
 
 #: lms/templates/help_modal.html
