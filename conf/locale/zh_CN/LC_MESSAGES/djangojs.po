@@ -187,8 +187,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-18 20:00+0000\n"
-"PO-Revision-Date: 2017-08-14 16:01+0000\n"
+"POT-Creation-Date: 2017-08-30 16:34+0000\n"
+"PO-Revision-Date: 2017-08-30 16:43+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -2100,6 +2100,31 @@ msgstr "打开字幕"
 msgid "Turn off transcripts"
 msgstr "关闭字幕"
 
+#: common/static/bundles/StudioIndex.js
+msgid "Organization:"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.js
+msgid "Course Number:"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.js
+msgid "Course Run:"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.js
+msgid "(Read-only)"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.js
+msgid "Re-run Course"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.js
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
+msgstr ""
+
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
 msgstr "必填字段。"
@@ -3294,14 +3319,11 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
+#: lms/static/js/learner_dashboard/views/unenroll_view.js
 msgid ""
 "Unable to determine whether we should give you a refund because of System "
 "Error. Please try again later."
 msgstr ""
-
-#: lms/static/js/dashboard/legacy.js
-msgid "An error occurred. Please try again later."
-msgstr "出现了一个错误，请稍后重试。"
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -4433,11 +4455,8 @@ msgid "Basic Account Information"
 msgstr "基本账户信息"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid ""
-"These settings include basic information about your account. You can also "
-"specify additional information and see your linked social accounts on this "
-"page."
-msgstr "这些设置包含了关于你账户的基本信息，你也可以在本页中给出额外的信息并查看已连接的社交网络账户。"
+msgid "These settings include basic information about your account."
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4481,8 +4500,12 @@ msgid ""
 msgstr "整个网站显示的语言。目前仅限于几种语言。"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Country or Region"
-msgstr "国家或地区"
+msgid "Country or Region of Residence"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "The country or region where you live."
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Time Zone"
@@ -4523,6 +4546,24 @@ msgstr "出生年份"
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Preferred Language"
 msgstr "首选语言"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Social Media Links"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"Optionally, link your personal accounts to the social media icons on your "
+"edX profile."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid " Link"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Enter your "
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
@@ -4868,6 +4909,14 @@ msgid "Full Profile"
 msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Joined"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+msgid "Joined Date"
+msgstr ""
+
+#: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Location"
 msgstr ""
 
@@ -5168,6 +5217,10 @@ msgstr "选课开始日期应该早于选课截止日期。"
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment end date cannot be after the course end date."
 msgstr "选课截止日期应在课程结束日期之前。"
+
+#: cms/static/js/models/settings/course_details.js
+msgid "The certificate available date must be later than the course end date."
+msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
@@ -6978,6 +7031,10 @@ msgstr ""
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
 msgstr "结束我的考试"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
+msgstr ""
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -9307,10 +9364,6 @@ msgid ""
 " when they submit answers to assessments."
 msgstr ""
 
-#: cms/templates/js/show-textbook.underscore
-msgid "View Live"
-msgstr ""
-
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore
 msgid "Signatory"
@@ -9495,6 +9548,14 @@ msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "General Proctored Exam Rules"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Specify any rules or rule exceptions that the proctoring review team should "
+"enforce when reviewing the videos. For example, you could specify that "
+"calculators are allowed. These specified rules are visible to learners "
+"before the learners start the exam."
 msgstr ""
 
 #: cms/templates/js/unit-access-editor.underscore

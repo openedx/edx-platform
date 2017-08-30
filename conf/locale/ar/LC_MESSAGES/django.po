@@ -168,7 +168,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-18 20:01+0000\n"
+"POT-Creation-Date: 2017-08-30 16:35+0000\n"
 "PO-Revision-Date: 2017-08-14 16:01+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -317,15 +317,6 @@ msgstr "إنّك مسجَّل كطالب تعليم مهني."
 #: common/djangoapps/course_modes/helpers.py
 msgid "Professional Ed"
 msgstr "التعليم المهني"
-
-#: common/djangoapps/course_modes/models.py common/lib/xmodule/xmodule/tabs.py
-#: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
-#: lms/djangoapps/shoppingcart/reports.py
-#: openedx/features/course_experience/__init__.py
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
-#: lms/templates/courseware/courseware.html
-msgid "Course"
-msgstr "المساق "
 
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
@@ -1200,6 +1191,10 @@ msgstr ""
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this SAML configuration belongs to."
 msgstr "الموقع الذي تنتمي إليه إعدادات لغة ترميز التأكيدات الأمنية SAML."
+
+#: lms/templates/help_modal.html
+msgid "{platform_name} Support"
+msgstr "دعم {platform_name}"
 
 #: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
 #: lms/templates/student_account/finish_auth.html
@@ -2387,9 +2382,10 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py cms/templates/index.html
 #: lms/templates/help_modal.html lms/templates/manage_user_standing.html
 #: lms/templates/register-shib.html
+#: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Submit"
@@ -4568,6 +4564,15 @@ msgstr "مناقشة خارجية"
 msgid "Home"
 msgstr "الصفحة الرئيسية"
 
+#: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
+#: lms/djangoapps/courseware/views/views.py
+#: lms/djangoapps/shoppingcart/reports.py
+#: openedx/features/course_experience/__init__.py
+#: cms/templates/widgets/header.html lms/templates/help_modal.html
+#: lms/templates/courseware/courseware.html
+msgid "Course"
+msgstr "المساق "
+
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Text Annotation"
 msgstr "ملاحظات توضيحية نصّيّة"
@@ -5450,7 +5455,6 @@ msgstr ""
 "تُعرِب شهادة {cert_type} عن مستوى عالٍ من الإنجازات في برنامج دراسي ما، "
 "وتتضمّن عملية التحقّق من هوية الطالب."
 
-#. Translators:  The format of the date includes the full name of the month
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
 msgid "{month} {day}, {year}"
@@ -6052,11 +6056,8 @@ msgid "Your certificate is available"
 msgstr "شهادتك جاهزة"
 
 #: lms/djangoapps/courseware/views/views.py
-msgid ""
-"You can keep working for a higher grade, or request your certificate now."
+msgid "You've earned a certificate for this course."
 msgstr ""
-"يمكنك الاستمرار في العمل من أجل الحصول على علامة أعلى أو يمكنك طلب شهادتك "
-"الآن."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "We're working on it..."
@@ -6498,10 +6499,6 @@ msgid "Sailthru maximum retries."
 msgstr "الحد الأقصى لعمليات إعادة محاولة Sailthru."
 
 #: lms/djangoapps/email_marketing/models.py
-msgid "DEPRECATED: use sailthru_welcome_template instead."
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru template to use on welcome send."
 msgstr ""
 
@@ -6817,12 +6814,9 @@ msgstr "الفريق"
 msgid "City"
 msgstr "المدينة"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the country in which the user lives.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
+#: lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -9232,6 +9226,10 @@ msgid "Verification photos received"
 msgstr "استُلمت الصور الخاصّة بعملية التحقّق  "
 
 #: lms/envs/common.py
+msgid "Your Platform Name Here"
+msgstr ""
+
+#: lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr "مستمع"
@@ -9325,6 +9323,10 @@ msgstr "يوتيوب"
 #, python-brace-format
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr "اشترك في قناة منصّة {platform_name} على موقع يوتيوب."
+
+#: lms/envs/common.py
+msgid "Your Platform Insights"
+msgstr ""
 
 #: lms/envs/common.py
 msgid "Kosovo"
@@ -10198,26 +10200,21 @@ msgid "Deadline for purchasing and requesting credit."
 msgstr "الموعد النهائي لشراء الوحدات الدراسية وطلبها."
 
 #: openedx/core/djangoapps/dark_lang/views.py
-msgid "Preview Language is currently disabled"
-msgstr "معاينة اللغة معطلة حاليًا"
+msgid "Preview Language Administration"
+msgstr ""
 
 #: openedx/core/djangoapps/dark_lang/views.py
-msgid "Language code not provided"
-msgstr "رمز اللغة غير مقدم"
-
-#: openedx/core/djangoapps/dark_lang/views.py
-#, python-brace-format
-msgid "Language set to language code: {preview_language_code}"
-msgstr "اللغة مضبوطة على رمز اللغة:  {preview_language_code} "
-
-#: openedx/core/djangoapps/dark_lang/views.py
-msgid "Language reset to the default language code"
-msgstr "إعادة تعيين اللغة على رمز اللغة الافتراضي"
+msgid "Language not provided"
+msgstr ""
 
 #: openedx/core/djangoapps/dark_lang/views.py
 #, python-brace-format
-msgid "Language reset to user's preference: {preview_language_code}"
-msgstr "إعادة تعيين اللغة على تفضيل المستخدم: {preview_language_code}"
+msgid "Language set to {preview_language}"
+msgstr ""
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language reset to the default"
+msgstr ""
 
 #: openedx/core/djangoapps/debug/views.py
 msgid "This is a test message"
@@ -10462,7 +10459,7 @@ msgid "Enter a valid email address that contains at least {min} characters."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Please enter a password."
+msgid "Enter a password."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
@@ -10483,7 +10480,7 @@ msgstr ""
 #. Translators: These messages are shown to users who do not enter information
 #. into the required field or enter it incorrectly.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Please enter your Full Name."
+msgid "Enter your full name."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
@@ -10491,29 +10488,34 @@ msgid "The email addresses do not match."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Please select your Country."
-msgstr "يُرجى تحديد بلدك."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Please enter your City."
+msgid "Select your country or region of residence."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Please tell us your goals."
+msgid "Enter your city."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Please select your highest level of education completed."
+msgid "Tell us your goals."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Please enter your mailing address."
+msgid "Select the highest level of education you have completed."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your mailing address."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
 #, python-brace-format
 msgid "The '{field_name}' field cannot be edited."
 msgstr "لا يمكن تعديل الحقل '{field_name}'."
+
+#: openedx/core/djangoapps/user_api/accounts/utils.py
+msgid ""
+" Make sure that you are providing a valid username or a URL that contains \""
+msgstr ""
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
@@ -10638,6 +10640,19 @@ msgstr "الولاية/المقاطعة/المنطقة"
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Company"
 msgstr "الشركة"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the country in which the user lives.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Country or Region of Residence"
+msgstr ""
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's country.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "The country or region where you live."
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Review the Honor Code"
@@ -11496,6 +11511,14 @@ msgstr "الدورة التدريبية في حالة نشر بالفعل."
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr "تنسيق غير صحيح لحقل ’{name}‘. {detailed_message}"
 
+#: cms/envs/common.py
+msgid "Your Platform Studio"
+msgstr ""
+
+#: cms/envs/common.py
+msgid "Studio"
+msgstr ""
+
 #: cms/lib/xblock/tagging/tagging.py
 msgid "Dictionary with the available tags"
 msgstr "قاموس بالشارات المتوفرة"
@@ -11667,15 +11690,9 @@ msgstr "التفاصيل"
 msgid "View"
 msgstr "عرض"
 
-#: cms/templates/darklang/preview_lang.html
-#: lms/templates/darklang/preview_lang.html
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
-msgid "Preview Language Setting"
-msgstr "معاينة إعداد اللغة"
-
 #: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 msgid "Reset"
 msgstr "إعادة الضبط"
@@ -12077,10 +12094,6 @@ msgstr "عنوان البريد الإلكتروني غير صحيح"
 #: lms/templates/help_modal.html
 msgid "Support"
 msgstr "الدعم"
-
-#: lms/templates/help_modal.html
-msgid "{platform_name} Support"
-msgstr "دعم {platform_name}"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -15283,6 +15296,15 @@ msgid "{earned} of {total} possible points"
 msgstr "حصلت على {earned} من أصل {total}  نقاط محتملة."
 
 #: lms/templates/courseware/progress.html
+msgid ""
+"Suspicious activity detected during proctored exam review. Exam score 0."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Section grade has been overridden."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
 msgid "Problem Scores: "
 msgstr "درجات المسألة:"
 
@@ -15848,6 +15870,67 @@ msgid ""
 msgstr ""
 "إنّ حساب {provider_name} الذي اخترتَه مرتبط مسبقًا بحساب آخر في "
 "{platform_name}. "
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid ""
+"We're sorry to see you go! Please share your main reason for unenrolling."
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I just wanted to browse the material"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "This won't help me reach my goals"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I don't have the time"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I don't have the academic or language prerequisites"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I don't have enough support"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I am not happy with the quality of the content"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "The course material was too hard"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "The course material was too easy"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Something was broken"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Other"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Thank you for sharing your reasons for unenrolling."
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "You are unenrolled from"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Return To Dashboard"
+msgstr ""
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Browse Courses"
+msgstr ""
 
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
@@ -19621,16 +19704,16 @@ msgstr ""
 msgid "Add article"
 msgstr "إضافة مقال"
 
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
+msgid "Preview Language Setting"
+msgstr "معاينة إعداد اللغة"
+
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 msgid "Language Code"
 msgstr ""
 
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
-msgid "For example use en for English"
-msgstr ""
-
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview_lang_include.html
-msgid "Please refresh the page to see the changes applied."
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
+msgid "e.g. en for English"
 msgstr ""
 
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
