@@ -1,25 +1,27 @@
 <div class="section">
     <div class="course-meta-container">
-        <div class="course-details">
-            <h5 class="course-title">
-                <% if ( marketing_url || course_url ) { %>
-                    <a href="<%- marketing_url || course_url %>" class="course-title-link">
+        <div class="course-content">
+            <div class="course-details">
+                <h5 class="course-title">
+                    <% if ( marketing_url || course_url ) { %>
+                        <a href="<%- marketing_url || course_url %>" class="course-title-link">
+                            <%- title %>
+                        </a>
+                    <% } else { %>
                         <%- title %>
-                    </a>
-                <% } else { %>
-                    <%- title %>
-                <% } %>
-            </h5>
-            <div class="course-text">
-                <% if (enrolled) { %>
-                    <span class="enrolled"><%- enrolled %>: </span>
-                <% } %>
-                <% if (dateString) { %>
-                    <span class="run-period"><%- dateString %></span>
-                <% } %>
+                    <% } %>
+                </h5>
+                <div class="course-text">
+                    <% if (enrolled) { %>
+                        <span class="enrolled"><%- enrolled %>: </span>
+                    <% } %>
+                    <% if (dateString) { %>
+                        <span class="run-period"><%- dateString %></span>
+                    <% } %>
+                </div>
             </div>
+            <div class="course-actions"></div>
         </div>
-        <div class="course-actions"></div>
         <div class="course-certificate certificate-status"></div>
     </div>
 </div>

@@ -442,7 +442,7 @@
         }
 
         .course-details {
-            float: none;
+            float: left;
 
             .course-title { 
                 font-size: 1em;
@@ -467,13 +467,20 @@
                 display: table;
                 width: 100%;
             }
+            .course-content {
+                overflow: hidden;
+            }
         }
 
         .course-details {
+            width: 100%;
+            float: none;
             @media(min-width: $bp-screen-md) {
                 display: table-cell;
                 vertical-align: top;
                 padding: 0 10px 0 0;
+                float: left;
+                width: calc(100% - 205px);
             }
         }
 
@@ -481,6 +488,7 @@
             @media(min-width: $bp-screen-md) {
                 width: 200px;
                 text-align: right;
+                float: right;
             }
 
             .course-enroll-view {
