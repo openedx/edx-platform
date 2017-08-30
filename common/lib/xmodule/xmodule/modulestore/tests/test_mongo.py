@@ -78,7 +78,7 @@ class TestMongoModuleStoreBase(unittest.TestCase):
     courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
 
     @classmethod
-    def setupClass(cls):
+    def setUpClass(cls):
         cls.connection = pymongo.MongoClient(
             host=HOST,
             port=PORT,
@@ -93,7 +93,7 @@ class TestMongoModuleStoreBase(unittest.TestCase):
         cls.content_store, cls.draft_store = cls.initdb()
 
     @classmethod
-    def teardownClass(cls):
+    def tearDownClass(cls):
         if cls.connection:
             cls.connection.drop_database(DB)
             cls.connection.close()
@@ -186,12 +186,12 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         pass
 
     @classmethod
-    def setupClass(cls):
-        super(TestMongoModuleStore, cls).setupClass()
+    def setUpClass(cls):
+        super(TestMongoModuleStore, cls).setUpClass()
 
     @classmethod
-    def teardownClass(cls):
-        super(TestMongoModuleStore, cls).teardownClass()
+    def tearDownClass(cls):
+        super(TestMongoModuleStore, cls).tearDownClass()
 
     def test_init(self):
         '''Make sure the db loads'''
@@ -728,12 +728,12 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
         pass
 
     @classmethod
-    def setupClass(cls):
-        super(TestMongoModuleStoreWithNoAssetCollection, cls).setupClass()
+    def setUpClass(cls):
+        super(TestMongoModuleStoreWithNoAssetCollection, cls).setUpClass()
 
     @classmethod
-    def teardownClass(cls):
-        super(TestMongoModuleStoreWithNoAssetCollection, cls).teardownClass()
+    def tearDownClass(cls):
+        super(TestMongoModuleStoreWithNoAssetCollection, cls).tearDownClass()
 
     def test_no_asset_collection(self):
         courses = self.draft_store.get_courses()

@@ -3,10 +3,9 @@ Unit tests for user messages.
 """
 
 import ddt
-from unittest import TestCase
 
 from django.contrib.messages.middleware import MessageMiddleware
-from django.test import RequestFactory
+from django.test import RequestFactory, TestCase
 from openedx.core.djangolib.markup import HTML, Text
 from student.tests.factories import UserFactory
 
