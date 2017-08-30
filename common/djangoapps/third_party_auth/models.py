@@ -7,6 +7,7 @@ from __future__ import absolute_import
 
 import json
 import logging
+import re
 
 from config_models.models import ConfigurationModel, cache
 from django.conf import settings
@@ -63,6 +64,11 @@ def clean_json(value, of_type):
     if not isinstance(value_python, of_type):
         raise ValidationError("Expected a JSON {}".format(of_type))
     return json.dumps(value_python, indent=4)
+
+
+def clean_username(username=''):
+    """ Simple helper method to ensure a username is compatible with our system requirements. """
+    return re.sub(r'[^-\w]+', '_', username)[:30]
 
 
 class AuthNotConfigured(SocialAuthBaseException):
@@ -259,7 +265,7 @@ class ProviderConfig(ConfigurationModel):
         # technically a data race between the creation of this value and the
         # creation of the user object, so it is still possible for users to get
         # an error on submit.
-        registration_form_data['username'] = pipeline_kwargs.get('username')
+        registration_form_data['username'] = clean_username(pipeline_kwargs.get('username') or '')
 
         # Any other values that are present in the details dict should be copied
         # into the registration form details. This may include details that do
