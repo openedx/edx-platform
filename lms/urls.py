@@ -577,6 +577,12 @@ urlpatterns += (
         include('student_account.urls')
     ),
 
+   # Get_Cookies
+    url(
+        r'^cookies/',
+        include('student_account.urls')
+    ),
+
     # Student profile
     url(
         r'^u/(?P<username>[\w.@+-]+)$',
