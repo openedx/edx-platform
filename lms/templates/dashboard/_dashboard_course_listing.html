@@ -220,7 +220,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
               <div class="actions-dropdown" id="actions-dropdown-${dashboard_index}" tabindex="-1">
                 <ul class="actions-dropdown-list" id="actions-dropdown-list-${dashboard_index}" aria-label="${_('Available Actions')}" role="menu">
                   % if can_unenroll:
-                    <li class="actions-item" id="actions-item-unenroll-${dashboard_index}">
+                    <li class="actions-item" id="actions-item-unenroll-${dashboard_index}" role="menuitem">
                       <% course_refund_url = reverse('course_run_refund_status', args=[unicode(course_overview.id)]) %>
                           % if not is_course_blocked:
                           <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal"
@@ -249,7 +249,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                         % endif
                     </li>
                 % endif
-                  <li class="actions-item" id="actions-item-email-settings-${dashboard_index}">
+                  <li class="actions-item" id="actions-item-email-settings-${dashboard_index}" role="menuitem">
                     % if show_email_settings:
                       % if not is_course_blocked:
                         <a href="#email-settings-modal" class="action action-email-settings" rel="leanModal" data-course-id="${course_overview.id}" data-course-number="${course_overview.number}" data-dashboard-index="${dashboard_index}" data-optout="${unicode(course_overview.id) in course_optouts}">${_('Email Settings')}</a>
