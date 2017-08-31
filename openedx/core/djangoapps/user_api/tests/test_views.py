@@ -1117,14 +1117,19 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         )
 
     @ddt.data(
-        ('pk', 'PK'),
-        ('Pk', 'PK'),
-        ('pK', 'PK'),
-        ('PK', 'PK'),
-        ('us', 'US'),
+        ('pk', 'PK', 'Bob123', 'Bob123'),
+        ('Pk', 'PK', None, ''),
+        ('pK', 'PK', 'Bob123@edx.org', 'Bob123_edx_org'),
+        ('PK', 'PK', 'Bob123123123123123123123123123123123123', 'Bob123123123123123123123123123'),
+        ('us', 'US', 'Bob-1231231&23123+1231(2312312312@3123123123', 'Bob-1231231_23123_1231_2312312'),
     )
     @ddt.unpack
-    def test_register_form_third_party_auth_running_google(self, input_country_code, expected_country_code):
+    def test_register_form_third_party_auth_running_google(
+            self,
+            input_country_code,
+            expected_country_code,
+            input_username,
+            expected_username):
         no_extra_fields_setting = {}
         country_options = (
             [
@@ -1148,7 +1153,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "openedx.core.djangoapps.user_api.api.third_party_auth.pipeline", "google-oauth2",
             email="bob@example.com",
             fullname="Bob",
-            username="Bob123",
+            username=input_username,
             country=input_country_code
         ):
             self._assert_password_field_hidden(no_extra_fields_setting)
@@ -1194,7 +1199,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 no_extra_fields_setting,
                 {
                     u"name": u"username",
-                    u"defaultValue": u"Bob123",
+                    u"defaultValue": expected_username,
                     u"type": u"text",
                     u"required": True,
                     u"label": u"Public Username",
