@@ -453,12 +453,12 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         request.user = self.mock_user
         view = XblockCallbackView.as_view()
         resp = view(
-                request,
-                self.course_key.to_deprecated_string(),
-                'invalid Location',
-                'dummy_handler'
-                'dummy_dispatch'
-            )
+            request,
+            self.course_key.to_deprecated_string(),
+            'invalid Location',
+            'dummy_handler'
+            'dummy_dispatch'
+        )
         self.assertEquals(resp.status_code, 404)
 
     def test_too_many_files(self):
@@ -541,18 +541,17 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         )
         self.assertEquals(resp.status_code, 404)
 
-
     def test_bad_xmodule_dispatch(self):
         request = self.drf_request_factory.post('dummy_url')
         request.user = self.mock_user
         view = XblockCallbackView.as_view()
         resp = view(
-                request,
-                self.course_key.to_deprecated_string(),
-                quote_slashes(self.location.to_deprecated_string()),
-                'xmodule_handler',
-                'bad_dispatch',
-            )
+            request,
+            self.course_key.to_deprecated_string(),
+            quote_slashes(self.location.to_deprecated_string()),
+            'xmodule_handler',
+            'bad_dispatch',
+        )
         self.assertEquals(resp.status_code, 404)
 
     def test_missing_handler(self):
@@ -560,12 +559,12 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         request.user = self.mock_user
         view = XblockCallbackView.as_view()
         resp = view(
-                request,
-                self.course_key.to_deprecated_string(),
-                quote_slashes(self.location.to_deprecated_string()),
-                'bad_handler',
-                'bad_dispatch',
-            )
+            request,
+            self.course_key.to_deprecated_string(),
+            quote_slashes(self.location.to_deprecated_string()),
+            'bad_handler',
+            'bad_dispatch',
+        )
         self.assertEquals(resp.status_code, 404)
 
     def test_xblock_view_handler(self):
