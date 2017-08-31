@@ -597,15 +597,22 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
             enterprise_course_consent = request.data.get('enterprise_course_consent')
             explicit_linked_enterprise = request.data.get('linked_enterprise_customer')
-            if has_api_key_permissions and enterprise_enabled():
+            if (enterprise_course_consent or explicit_linked_enterprise) and has_api_key_permissions and enterprise_enabled():
+                enterprise_api_client = EnterpriseApiClient()
+                consent_client = ConsentApiClient()
                 # We received an explicitly-linked EnterpriseCustomer for the enrollment
                 if explicit_linked_enterprise is not None:
+                    try:
+                        enterprise_api_client.post_enterprise_course_enrollment(username, unicode(course_id), True)
+                    except EnterpriseApiException as error:
+                        log.exception("An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
+                                      "for user [%s] in course run [%s]", username, course_id)
+                        raise CourseEnrollmentError(error.message)
                     kwargs = {
                         'username': username,
                         'course_id': unicode(course_id),
                         'enterprise_customer_uuid': explicit_linked_enterprise,
                     }
-                    consent_client = ConsentApiClient()
                     consent_client.provide_consent(**kwargs)
 
                 # We received an implicit "consent granted" parameter from ecommerce
@@ -623,7 +630,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                             }
                         )
                     try:
-                        EnterpriseApiClient().post_enterprise_course_enrollment(
+                        enterprise_api_client.post_enterprise_course_enrollment(
                             username,
                             unicode(course_id),
                             enterprise_course_consent
