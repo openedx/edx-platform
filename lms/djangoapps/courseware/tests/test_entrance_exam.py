@@ -4,6 +4,7 @@ Tests use cases related to LMS Entrance Exam behavior, such as gated content acc
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from mock import Mock, patch
+from rest_framework.test import APIRequestFactory
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.entrance_exams import (
@@ -13,7 +14,7 @@ from courseware.entrance_exams import (
     user_has_passed_entrance_exam
 )
 from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module, handle_xblock_callback, toc_for_course
+from courseware.module_render import get_module, XblockCallbackView, toc_for_course
 from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -534,14 +535,15 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         Tests entrance exam xblock has `entrance_exam_passed` key in json response.
         """
-        request_factory = RequestFactory()
+        request_factory = APIRequestFactory()
         data = {'input_{}_2_1'.format(unicode(self.problem_1.location.html_id())): 'choice_2'}
         request = request_factory.post(
             'problem_check',
             data=data
         )
         request.user = self.user
-        response = handle_xblock_callback(
+        view = XblockCallbackView.as_view()
+        response = view(
             request,
             unicode(self.course.id),
             unicode(self.problem_1.location),
