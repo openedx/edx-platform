@@ -1,4 +1,7 @@
 {% load i18n %}
-{% blocktrans %} Remember when you enrolled in {{course_name}} on edX.org? We do! Come see what everyone is learning.  {% endblocktrans %}
+{% blocktrans trimmed %}
+    Keep learning today. Remember when you enrolled in {{course_name}} on edX.org? We do, and we’re glad
+    to have you! Come see what everyone is learning.
+{% endblocktrans %}
 
-{% blocktrans %} Start learning now {% endblocktrans %} <{{course_url}}>
+{% trans "Keep learning" %} <{{course_url}}>

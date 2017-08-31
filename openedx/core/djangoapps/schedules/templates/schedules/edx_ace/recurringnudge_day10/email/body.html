@@ -2,19 +2,23 @@
 {% load i18n %}
 
 {% block preview_text %}
-    {% blocktrans %} Learning isn't easy - but it's worth it! Complete some problems and learn something new in {{course_name}}. {% endblocktrans %}
+    {% blocktrans trimmed %}
+        Keep up the momentum! Many edX learners in {{course_name}} are completing more problems every week, and
+        participating in the discussion forums. What do you want to do to keep learning?
+    {% endblocktrans %}
 {% endblock %}
 
 {% block content %}
 <table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
     <tr>
         <td>
-            <h1>{% blocktrans %} Keep up the momentum! {% endblocktrans %}</h1>
+            <h1>{% trans "Keep up the momentum!" %}</h1>
 
             <p>
-                {% blocktrans %} Many edX learners in <strong>{{course_name}}</strong> are
-                completing more problems every week, and participating in the discussion forums. What do you want to do
-                to keep learning?  {% endblocktrans %}
+                {% blocktrans trimmed %}
+                    Many edX learners in <strong>{{course_name}}</strong> are completing more problems every week, and
+                    participating in the discussion forums. What do you want to do to keep learning?
+                {% endblocktrans %}
             </p>
             <p>
                 <!-- email client support for style sheets is pretty spotty, so we have to inline all of these styles -->
@@ -31,7 +35,8 @@
                     border-left: 16px solid #005686;
                     display: inline-block;
                 ">
-                        <font color="#ffffff"><b>{% blocktrans %} Keep learning {% endblocktrans %}</b></font>
+                    <!-- old email clients require the use of the font tag :( -->
+                    <font color="#ffffff"><b>{% trans "Keep learning" %}</b></font>
                 </a>
             </p>
         </td>
