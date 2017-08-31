@@ -8,8 +8,7 @@
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@v2.0.9#egg=xblock-ooyala==2.0.9
 -e git+https://github.com/edx-solutions/xblock-group-project.git@6a68ea09478e49e796ee4c0a985018ec4257b7d7#egg=xblock-group-project
 -e git+https://github.com/edx-solutions/xblock-adventure.git@7bdeb62b1055377dc04a7b503f7eea8264f5847b#egg=xblock-adventure
-# This is currently using a custom branch: https://github.com/open-craft/xblock-poll/tree/copy-change-patch
--e git+https://github.com/open-craft/xblock-poll.git@3a06ef4782f9f90d6a8594c4eb4a84a277182fb8#egg=xblock-poll
+-e git+https://github.com/open-craft/xblock-poll.git@v1.3.1#egg=xblock-poll
 -e git+https://github.com/edx/edx-notifications.git@0.6.1#egg=edx-notifications==0.6.1
 -e git+https://github.com/open-craft/problem-builder.git@v2.7.2#egg=xblock-problem-builder==2.7.2
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
