@@ -19,9 +19,9 @@ from opaque_keys.edx.locator import CourseLocator
 # and verify that items are being correctly added to the queue
 # in our `XQueueCertInterface` implementation.
 from capa.xqueue_interface import XQueueInterface
-from models import CertificateStatuses, ExampleCertificate, ExampleCertificateSet, GeneratedCertificate
-from queue import XQueueCertInterface
-from tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
+from openedx.features.certificates.models import CertificateStatuses, ExampleCertificate, ExampleCertificateSet, GeneratedCertificate
+from openedx.features.certificates.queue import XQueueCertInterface
+from factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from course_modes.models import CourseMode
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory

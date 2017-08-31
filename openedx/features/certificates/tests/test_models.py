@@ -12,7 +12,7 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 from path import Path as path
 
-from models import (
+from openedx.features.certificates.models import (
     CertificateGenerationHistory,
     CertificateHtmlViewConfiguration,
     CertificateInvalidation,

@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from factory.django import DjangoModelFactory
 
-from models import (
+from openedx.features.certificates.models import (
     CertificateHtmlViewConfiguration,
     CertificateInvalidation,
     CertificateStatuses,

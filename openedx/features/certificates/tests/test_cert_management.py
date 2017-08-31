@@ -9,8 +9,8 @@ from opaque_keys.edx.locator import CourseLocator
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.models import BadgeAssertion
 from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
-from management.commands import regenerate_user, resubmit_error_certificates, ungenerated_certs
-from models import CertificateStatuses, GeneratedCertificate
+from openedx.features.certificates.management.commands import regenerate_user, resubmit_error_certificates, ungenerated_certs
+from openedx.features.certificates.models import CertificateStatuses, GeneratedCertificate
 from course_modes.models import CourseMode
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

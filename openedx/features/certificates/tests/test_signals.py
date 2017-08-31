@@ -5,11 +5,12 @@ and disabling for instructor-paced courses.
 import mock
 
 import api as certs_api
-from models import \
-    CertificateGenerationConfiguration, \
-    CertificateWhitelist, \
-    GeneratedCertificate, \
-    CertificateStatuses
+from openedx.features.certificates.models import (
+    CertificateGenerationConfiguration,
+    CertificateWhitelist,
+    GeneratedCertificate,
+    CertificateStatuses,
+)
 from openedx.core.djangoapps.signals.handlers import _listen_for_course_pacing_changed
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade

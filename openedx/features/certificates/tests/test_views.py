@@ -13,8 +13,8 @@ from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
-from api import get_certificate_url
-from models import (
+from openedx.features.certificates.api import get_certificate_url
+from openedx.features.certificates.models import (
     CertificateHtmlViewConfiguration,
     ExampleCertificate,
     ExampleCertificateSet,
