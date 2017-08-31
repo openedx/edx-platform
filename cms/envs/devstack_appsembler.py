@@ -36,6 +36,7 @@ INSTALLED_APPS += (
     'hijack',
     'compat',
     'hijack_admin',
+    'openedx.core.djangoapps.appsembler.msft_lp',
 )
 MIDDLEWARE_CLASSES += (
     'organizations.middleware.OrganizationMiddleware',

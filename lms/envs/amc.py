@@ -9,6 +9,7 @@ LMS_BASE = ENV_TOKENS.get('LMS_BASE')
 
 INSTALLED_APPS += (
     'openedx.core.djangoapps.appsembler.sites',
+    'openedx.core.djangoapps.appsembler.msft_lp',
 )
 
 GOOGLE_ANALYTICS_APP_ID = AUTH_TOKENS.get('GOOGLE_ANALYTICS_APP_ID')

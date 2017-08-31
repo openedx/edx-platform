@@ -7,6 +7,7 @@ from xmodule.modulestore.django import modulestore
 
 from django.utils.translation import ugettext as _
 from django.conf import settings
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 class CourseMetadata(object):
@@ -99,6 +100,16 @@ class CourseMetadata(object):
         # display the "Allow Unsupported XBlocks" setting.
         if not XBlockStudioConfigurationFlag.is_enabled():
             filtered_list.append('allow_unsupported_xblocks')
+
+        # Appsembler specfic, we don't display the field if the site doesn't
+        # belong to a MSFT LP
+        if not configuration_helpers.get_value(
+            "CUSTOMER_IS_MICROSOFT_LEARNING_PARTNER",
+            settings.APPSEMBLER_FEATURES.get(
+               "CUSTOMER_IS_MICROSOFT_LEARNING_PARTNER"
+           )
+        ):
+            filtered_list.append('is_microsoft_course')
 
         return filtered_list
 
