@@ -2,7 +2,8 @@
 Test Help links in LMS
 """
 import json
-
+from nose.plugins.attrib import attr
+from unittest import skip
 
 from common.test.acceptance.tests.lms.test_lms_instructor_dashboard import BaseInstructorDashboardTest
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
@@ -16,6 +17,7 @@ from common.test.acceptance.tests.helpers import (
 )
 
 
+@attr(shard=10)
 class TestCohortHelp(ContainerBase):
     """
     Tests help links in Cohort page
@@ -52,6 +54,7 @@ class TestCohortHelp(ContainerBase):
         assert_link(self, expected_link, actual_link)
         assert_opened_help_link_is_correct(self, self.get_url_with_changed_domain(href))
 
+    @skip("Disabled as openedx.microsoft.com doesn't use the default Open edX help links.")
     def test_manual_cohort_help(self):
         """
         Scenario: Help in 'What does it mean?' is correct when we create cohort manually.
@@ -71,6 +74,7 @@ class TestCohortHelp(ContainerBase):
 
         self.verify_help_link(href)
 
+    @skip("Disabled as openedx.microsoft.com doesn't use the default Open edX help links.")
     def test_automatic_cohort_help(self):
         """
         Scenario: Help in 'What does it mean?' is correct when we create cohort automatically.
@@ -101,6 +105,7 @@ class TestCohortHelp(ContainerBase):
         self.assertTrue(response.ok, "Failed to enable cohorts")
 
 
+@attr(shard=10)
 class InstructorDashboardHelp(BaseInstructorDashboardTest):
     """
     Tests opening help from the general Help button in the instructor dashboard.
@@ -112,6 +117,7 @@ class InstructorDashboardHelp(BaseInstructorDashboardTest):
         self.log_in_as_instructor()
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
 
+    @skip("Disabled as openedx.microsoft.com doesn't use the default Open edX help links.")
     def test_instructor_dashboard_help(self):
         """
         Scenario: Help button opens staff help

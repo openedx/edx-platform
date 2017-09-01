@@ -58,3 +58,9 @@ common/lib/xmodule/xmodule/js/src/vertical/edit.js
 
 # This file is responsible for almost half of the repo's total issues.
 common/lib/xmodule/xmodule/js/src/capa/schematic.js
+
+# Markdown files with many style errors
+lms/static/js/Markdown.*.js
+
+# Has a lot of unchecked quality errors
+lms/static/js/split.js 

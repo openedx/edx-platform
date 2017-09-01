@@ -404,10 +404,6 @@ class TestCreateAccount(TestCase):
                 UserAttribute.get_user_attribute(user, REGISTRATION_UTM_CREATED_AT)
             )
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    def test_created_on_site_user_attribute_set(self):
-        profile = self.create_account_and_fetch_profile(host=self.site.domain)
-        self.assertEqual(UserAttribute.get_user_attribute(profile.user, 'created_on_site'), self.site.domain)
 
 @ddt.ddt
 class TestCreateAccountValidation(TestCase):

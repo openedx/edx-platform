@@ -131,6 +131,9 @@ class SessionCookieDomainSiteConfigurationOverrideTests(TestCase):
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class LoginRequiredMiddlewareTests(TestCase):
+    """
+    Tests regarding restriction of django sites to logged in users
+    """
 
     def setUp(self):
         super(LoginRequiredMiddlewareTests, self).setUp()
