@@ -19,10 +19,10 @@ from openedx.core.djangolib.markup import HTML, Text
                 course = certificate['course']
 
                 completion_date_message_html = Text(_('Completed {completion_date_html}')).format(
-                    completion_date=HTML(
+                    completion_date_html=HTML(
                         '<span'
                         '    class="localized-datetime start-date"'
-                        '    data-datetime="{completion_date_html}"'
+                        '    data-datetime="{completion_date}"'
                         '    data-format="shortDate"'
                         '    data-timezone="{user_timezone}"'
                         '    data-language="{user_language}"'
