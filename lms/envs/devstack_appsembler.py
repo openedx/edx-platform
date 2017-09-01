@@ -15,6 +15,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 INSTALLED_APPS += (
     'django_extensions',
     'openedx.core.djangoapps.appsembler.sites',
+    'openedx.core.djangoapps.appsembler.msft_lp',
 )
 
 LMS_BASE = ENV_TOKENS.get('LMS_BASE')

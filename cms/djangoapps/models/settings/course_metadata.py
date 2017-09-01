@@ -7,6 +7,7 @@ from xmodule.modulestore.django import modulestore
 
 from django.utils.translation import ugettext as _
 from django.conf import settings
+from openedx.core.djangoapps.site_configuration.helpers import get_value_for_org
 
 
 class CourseMetadata(object):
@@ -59,7 +60,7 @@ class CourseMetadata(object):
     ]
 
     @classmethod
-    def filtered_list(cls):
+    def filtered_list(cls, org=None):
         """
         Filter fields based on feature flag, i.e. enabled, disabled.
         """
@@ -100,6 +101,17 @@ class CourseMetadata(object):
         if not XBlockStudioConfigurationFlag.is_enabled():
             filtered_list.append('allow_unsupported_xblocks')
 
+        # Appsembler specfic, we don't display the field if the site doesn't
+        # belong to a MSFT LP
+        if org and not get_value_for_org(
+            org,
+            "CUSTOMER_IS_MICROSOFT_LEARNING_PARTNER",
+            settings.APPSEMBLER_FEATURES.get(
+               "CUSTOMER_IS_MICROSOFT_LEARNING_PARTNER"
+           )
+        ):
+            filtered_list.append('is_microsoft_course')
+
         return filtered_list
 
     @classmethod
@@ -111,7 +123,7 @@ class CourseMetadata(object):
         result = {}
         metadata = cls.fetch_all(descriptor)
         for key, value in metadata.iteritems():
-            if key in cls.filtered_list():
+            if key in cls.filtered_list(org=descriptor.org):
                 continue
             result[key] = value
         return result
@@ -140,7 +152,7 @@ class CourseMetadata(object):
 
         Ensures none of the fields are in the blacklist.
         """
-        filtered_list = cls.filtered_list()
+        filtered_list = cls.filtered_list(org=descriptor.org)
         # Don't filter on the tab attribute if filter_tabs is False.
         if not filter_tabs:
             filtered_list.remove("tabs")
@@ -176,7 +188,7 @@ class CourseMetadata(object):
             errors: list of error objects
             result: the updated course metadata or None if error
         """
-        filtered_list = cls.filtered_list()
+        filtered_list = cls.filtered_list(org=descriptor.org)
         if not filter_tabs:
             filtered_list.remove("tabs")
 
