@@ -4,19 +4,19 @@
 import datetime
 import ddt
 
+from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+from course_modes.models import CourseMode
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
-from util.testing import UrlResetMixin
-
-from course_modes.models import CourseMode
-
-from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from ... import SHOW_ACHIEVEMENTS_FLAG
 
 
 @ddt.ddt
@@ -130,6 +130,7 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
         )
 
     @ddt.data(CourseMode.HONOR, CourseMode.PROFESSIONAL, CourseMode.VERIFIED)
+    @override_waffle_flag(SHOW_ACHIEVEMENTS_FLAG, active=True)
     def test_certificate_visibility(self, cert_mode):
         """
         Verify that certificates are displayed with the correct card mode.
@@ -138,27 +139,22 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
         cert = self._create_certificate(cert_mode)
         cert.save()
 
-        request = RequestFactory().get('/url')
-        request.user = self.user
-        context = learner_profile_context(request, self.user.username, self.user.is_staff)
+        response = self.client.get('/u/{username}'.format(username=self.user.username))
 
-        self.assertTrue('card certificate-card mode-' + cert_mode in str(context['achievements_fragment'].content))
+        self.assertContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert_mode))
 
     @ddt.data(True, False)
+    @override_waffle_flag(SHOW_ACHIEVEMENTS_FLAG, active=True)
     def test_no_certificate_visibility(self, own_profile):
         """
         Verify that the 'You haven't earned any certificates yet.' well appears on the user's
         own profile when they do not have certificates and does not appear when viewing
         another user that does not have any certificates.
         """
-        request = RequestFactory().get('/url')
-        request.user = self.user
         profile_username = self.user.username if own_profile else self.other_user.username
-        context = learner_profile_context(request, profile_username, self.user.is_staff)
+        response = self.client.get('/u/{username}'.format(username=profile_username))
 
         if own_profile:
-            content = str(context['achievements_fragment'].content)
-            self.assertIn('icon fa fa-search', content)
-            self.assertIn("You haven't earned any certificates yet", content)
+            self.assertContains(response, 'You haven&#39;t earned any certificates yet.')
         else:
-            self.assertIsNone(context['achievements_fragment'])
+            self.assertNotContains(response, 'You haven&#39;t earned any certificates yet.')
