@@ -12,7 +12,7 @@ import six
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect
@@ -785,8 +785,14 @@ def _create_or_rerun_course(request):
         if 'source_course_key' in request.json:
             return _rerun_course(request, org, course, run, fields)
         else:
-            return _create_new_course(request, org, course, run, fields)
-
+            try:
+                new_course = create_new_course(request.user, org, course, run, fields)
+                return JsonResponse({
+                    'url': reverse_course_url('course_handler', new_course.id),
+                    'course_key': unicode(new_course.id),
+                })
+            except ValidationError as ex:
+                return JsonResponse({'error': ex.message}, status=400)
     except DuplicateCourseError:
         return JsonResponse({
             'ErrMsg': _(
@@ -807,27 +813,21 @@ def _create_or_rerun_course(request):
         )
 
 
-def _create_new_course(request, org, number, run, fields):
+def create_new_course(user, org, number, run, fields):
     """
-    Create a new course.
-    Returns the URL for the course overview page.
-    Raises DuplicateCourseError if the course already exists
+    Create a new course run.
+
+    Raises:
+        DuplicateCourseError: Course run already exists.
     """
     org_data = get_organization_by_short_name(org)
     if not org_data and organizations_enabled():
-        return JsonResponse(
-            {'error': _('You must link this course to an organization in order to continue. '
-                        'Organization you selected does not exist in the system, '
-                        'you will need to add it to the system')},
-            status=400
-        )
+        raise ValidationError(_('You must link this course to an organization in order to continue. Organization '
+                                'you selected does not exist in the system, you will need to add it to the system'))
     store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
-    new_course = create_new_course_in_store(store_for_new_course, request.user, org, number, run, fields)
+    new_course = create_new_course_in_store(store_for_new_course, user, org, number, run, fields)
     add_organization_course(org_data, new_course.id)
-    return JsonResponse({
-        'url': reverse_course_url('course_handler', new_course.id),
-        'course_key': unicode(new_course.id),
-    })
+    return new_course
 
 
 def create_new_course_in_store(store, user, org, number, run, fields):

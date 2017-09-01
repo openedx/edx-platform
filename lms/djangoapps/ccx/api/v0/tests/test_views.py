@@ -72,6 +72,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         instructor = UserFactory()
         allow_access(self.course, instructor, 'instructor')
 
+        # FIXME: Testing for multiple authentication types in multiple test cases is overkill. Stop it!
         self.auth, self.auth_header_oauth2_provider = self.prepare_auth_token(app_user)
 
         self.course.enable_ccx = True
@@ -89,7 +90,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
             'client_id': app_client.client_id,
             'client_secret': app_client.client_secret
         }
-        token_resp = self.client.post('/oauth2/access_token/', data=token_data)
+        token_resp = self.client.post(reverse('oauth2:access_token'), data=token_data, format='multipart')
         self.assertEqual(token_resp.status_code, status.HTTP_200_OK)
         token_resp_json = json.loads(token_resp.content)
         return '{token_type} {token}'.format(
