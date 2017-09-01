@@ -3,7 +3,7 @@ import re
 from django.utils.decorators import method_decorator
 from rest_framework import status
 from rest_framework.response import Response
-from cors_csrf.decorators import ensure_csrf_cookie_cross_domain
+from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from enrollment import api
 from enrollment.errors import (
     CourseEnrollmentError,
