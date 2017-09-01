@@ -18,7 +18,7 @@
     max-width: $studio-max-width;
     width: flex-grid(12);
     margin: 0 auto;
-    color: $gray-light;
+    color: $gray-500;
 
     .footer-content-primary {
       @include clearfix();

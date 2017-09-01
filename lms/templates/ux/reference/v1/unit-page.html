@@ -1,0 +1,43 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='/static_content.html'/>
+<%inherit file="/main.html" />
+
+<%block name="pagetitle">Course Skeleton</%block>
+
+<%block name="bodyclass">view-in-course view-courseware courseware</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+</%block>
+
+<%block name="content">
+<nav class="wrapper-course-material">
+    <div class="course-material">
+        <ol class="tabs course-tabs">
+            <li class="tab">
+                <a href="index.html">
+                    Home
+                </a>
+            </li>
+
+            <li class="tab">
+                <a href="#">
+                    Course
+                </a>
+            </li>
+
+            <li class="tab">
+                <a href="#" class="active">
+                    Skeleton
+                    <span class="sr-only">, current location</span>
+                </a>
+            </li>
+        </ol>
+    </div>
+</nav>
+<%include file="../fragments/unit-fragment.html"/>
+</%block>

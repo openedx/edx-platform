@@ -223,10 +223,6 @@ $success-color-hover: rgb(0, 129, 0) !default;
 // ----------------------------
 // #COLORS- Bootstrap-style
 // ----------------------------
-$gray-dark: #4e5455 !default;
-$gray-lighter: #eceeef !default;
-$gray-lightest: #f7f7f9 !default;
-
 $state-success-text: $black !default;
 $state-success-bg: #dff0d8 !default;
 $state-success-border: darken($state-success-bg, 5%) !default;
@@ -248,7 +244,7 @@ $state-danger-border: darken($state-danger-bg, 5%) !default;
 // ----------------------------
 
 // logo colors
-$audit-mode-color: $gray-dark !default;
+$audit-mode-color: rgb(74,74,74) !default;
 $honor-mode-color: $uxpl-blue-base !default;
 $verified-mode-color: $uxpl-green-base !default;
 $micromasters-color: #005585 !default;

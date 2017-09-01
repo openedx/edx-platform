@@ -4,7 +4,7 @@
 // Skip nav
 .nav-skip,
 .transcript-skip {
-  font-size: 14px;
+  font-size: $font-size-base;
   line-height: 14px;
   display: inline-block;
   position: absolute;
@@ -12,7 +12,7 @@
   top: -($baseline*30);
   overflow: hidden;
   background: $white;
-  border-bottom: 1px solid $gray-lightest;
+  border-bottom: 1px solid $gray-500;
   padding: ($baseline*0.75) ($baseline/2);
 
   &:focus,
@@ -47,7 +47,7 @@
   @include clearfix();
   position: relative;
   margin: ($baseline*2) 0 0 0;
-  border-top: 1px solid $gray-light;
+  border-top: 1px solid $gray-500;
   width: 100%;
 
   .wrapper-inner {
@@ -70,17 +70,17 @@
     .cta-show-sock {
       @extend %ui-btn-pill;
       @extend %t-action4;
-      background: $gray-lightest;
+      background: theme-color("light");
       padding: ($baseline/2) $baseline;
-      color: $gray-light;
+      color: theme-color("dark");
 
       .icon {
         margin-right: $baseline/4;
       }
 
       &:hover {
-        background: $brand-primary;
-        color: $white;
+        background: theme-color("primary");
+        color: theme-color("inverse");
       }
     }
   }
@@ -93,7 +93,7 @@
     width: flex-grid(12);
     margin: 0 auto;
     padding: ($baseline*2) 0;
-    color: $gray-light;
+    color: $gray-500;
 
     // support body
     header {
@@ -184,11 +184,11 @@
 
   // case: sock content is shown
   &.is-shown {
-    border-color: $gray-dark;
+    border-color: theme-color("primary");
 
     .list-cta .cta-show-sock {
-      background: $gray-dark;
-      border-color: $gray-dark;
+      background: theme-color("primary");
+      border-color: theme-color("primary");
       color: $white;
     }
   }

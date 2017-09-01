@@ -722,7 +722,7 @@ base_vendor_js = [
     'edx-ui-toolkit/js/utils/html-utils.js',
 
     # Load Bootstrap and supporting libraries
-    'common/js/vendor/tether.js',
+    'common/js/vendor/popper.js',
     'common/js/vendor/bootstrap.js',
 
     # Finally load RequireJS

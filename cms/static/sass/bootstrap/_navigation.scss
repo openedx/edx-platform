@@ -1,11 +1,11 @@
 // Local overrides for bootstrap navigation bar theming
 .navigation-container {
-  border-bottom: 2px solid $brand-primary;
+  border-bottom: 2px solid theme-color("primary");
   text-decoration: none;
   background-color: $header-bg;
 
   &.slim {
-    border-bottom: 1px solid $inverse-color;
+    border-bottom: 1px solid $border-color;
     box-shadow: 0 1px 5px 0 $black-t0;
   }
 
@@ -35,7 +35,7 @@
       list-style: none;
 
       .nav-link {
-        color: $brand-primary;
+        color: theme-color("primary");
       }
 
       .user-image-frame {
@@ -48,13 +48,13 @@
         display: none;
       }
 
-      @media (max-width: map-get($grid-breakpoints,md)) {
+      @include media-breakpoint-down(md) {
         &.nav-item-open-collapsed, &.nav-item-open-collapsed-only {
           display: initial;
           margin: $baseline/4 $baseline/2;
 
           a {
-            color: $brand-primary;
+            color: theme-color("primary");
             padding: 0;
             text-decoration: none;
 
@@ -74,10 +74,10 @@
     }
 
     .navbar-right .nav-item {
-      @media (min-width: map-get($grid-breakpoints,md)) {
+      @include media-breakpoint-down(md) {
         .nav-link {
           text-transform: none;
-          color: $brand-inverse;
+          color: $gray-900;
           font-weight: $font-weight-bold;
           cursor: pointer;
         }

@@ -2,15 +2,15 @@
 // ====================
 
 .wrapper-footer {
-  box-shadow: 0 -1px 5px 0 $black-t0;
+  box-shadow: 0 -1px 5px 0 $gray-900;
   border-top: 1px solid $navbar-light-disabled-color;
-  background-color: $footer-bg;
+  background-color: $body-bg;
   margin-top: $baseline/2;
   padding: $baseline;
   font-family: $font-family-sans-serif;
 
   footer {
-    max-width: $lms-max-width;
+    max-width: map-get($container-max-widths, xl);
     margin: 0 auto;
 
     .site-nav {
@@ -22,10 +22,10 @@
         .nav-link {
           text-decoration: none;
           padding: 0;
-          color: $brand-inverse;
+          color: $gray-900;
 
           &:hover {
-            color: $brand-primary;
+            color: theme-color("primary");
           }
         }
       }
@@ -54,8 +54,8 @@
 
     .copyright {
       margin-top: $baseline;
-      font-size: $font-size-xs;
-      color: $gray-dark;
+      font-size: $font-size-sm;
+      color: theme-color("primary");
     }
 
     .footer-about-openedx {

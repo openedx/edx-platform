@@ -28,7 +28,6 @@ def show_reference_template(request, template):
         uses_bootstrap = not uses_pattern_library and not is_v1
         context = {
             'request': request,
-            'disable_courseware_js': not is_v1,
             'uses_pattern_library': uses_pattern_library,
             'uses_bootstrap': uses_bootstrap,
         }

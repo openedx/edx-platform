@@ -46,6 +46,7 @@
   .branding, .info-course, .nav-course, .nav-account, .nav-pitch {
     display: inline-block;
     vertical-align: middle;
+    margin-bottom: 0;
   }
 
   .user-language-selector {
@@ -78,7 +79,7 @@
     }
 
     .nav-item a {
-      color: $gray;
+      color: color("gray");
 
       &:hover {
         color: $link-hover-color;
@@ -90,16 +91,8 @@
   .nav-dd {
 
     .title {
-      @extend %t-action2;
-      @extend %ui-btn-dd-nav-primary;
-
-      .label, .fa-caret-down {
-
-      }
-
-      .label {
-
-      }
+      padding: $baseline/2 $baseline/2;
+      font-size: $font-size-lg;
 
       .fa-caret-down {
         opacity: 0.25;
@@ -144,11 +137,11 @@
   // specific elements - course name/info
   .info-course {
     margin-right: flex-gutter();
-    border-right: 1px solid $gray-lighter;
+    border-right: 1px solid $gray-300;
     padding: ($baseline*0.75) flex-gutter() ($baseline*0.75) 0;
 
     .course-org, .course-number {
-      font-size: 12px;
+      font-size: $font-size-sm;
       line-height: 12px;
       display: inline-block;
       vertical-align: middle;
@@ -157,7 +150,7 @@
       white-space: nowrap;
       text-overflow: ellipsis;
       opacity: 1.0;
-      color: $gray-dark;
+      color: theme-color("primary");
     }
 
     .course-org {
@@ -177,7 +170,7 @@
     // entire link
     .course-link {
       display: block;
-      color: $gray-dark;
+      color: theme-color("primary");
 
       &:hover {
         color: $link-hover-color;
@@ -406,7 +399,7 @@
     box-shadow: 0 1px 1px $shadow-l1;
     position: relative;
     width: 100%;
-    border: 1px solid $gray-light;
+    border: 1px solid $gray-500;
     padding: ($baseline/2) ($baseline*0.75);
     background: $white;
 
@@ -429,7 +422,7 @@
 
     &:before {
       border-color: rgba(178, 178, 178, 0);
-      border-bottom-color: $gray-light;
+      border-bottom-color: $gray-500;
       border-width: 11px;
     }
 
@@ -438,7 +431,7 @@
       @extend %t-regular;
       display: block;
       margin: 0 0 ($baseline/4) 0;
-      border-bottom: 1px solid $gray-lighter;
+      border-bottom: 1px solid $gray-300;
       padding: 0 0($baseline/4) 0;
 
       &:last-child {
@@ -447,11 +440,18 @@
         padding-bottom: 0;
       }
 
+      h3 {
+        font-size: $font-size-lg;
+      }
+
       a {
         display: block;
+        color: $body-color;
+        font-size: $font-size-lg;
+        font-weight: 600;
 
         &:hover, &:active {
-          color: $brand-primary;
+          color: theme-color("primary");
         }
       }
     }
@@ -483,6 +483,10 @@
   // CASE: right-hand side arrow/dd
   &.ui-right {
 
+    > ol {
+      margin-bottom: 0;
+    }
+
     .wrapper-nav-sub {
       left: none;
       right: 0;
@@ -501,68 +505,5 @@
         margin-right: -11px;
       }
     }
-  }
-}
-
-// ====================
-
-// STATE: active/current nav states
-
-.nav-item.is-current,
-body.howitworks .nav-not-signedin-hiw,
-
-// dashboard
-body.dashboard .nav-account-dashboard,
-
-// course content
-body.course.view-outline .nav-course-courseware .title,
-body.course.view-updates .nav-course-courseware .title,
-body.course.view-static-pages .nav-course-courseware .title,
-body.course.view-uploads .nav-course-courseware .title,
-body.course.view-textbooks .nav-course-courseware .title,
-body.course.view-video-uploads .nav-course-courseware .title,
-
-body.course.view-outline .nav-course-courseware-outline,
-body.course.view-updates .nav-course-courseware-updates,
-body.course.view-static-pages .nav-course-courseware-pages,
-body.course.view-uploads .nav-course-courseware-uploads,
-body.course.view-textbooks .nav-course-courseware-textbooks,
-body.course.view-video-uploads .nav-course-courseware-videos,
-
-// course settings
-body.course.schedule .nav-course-settings .title,
-body.course.grading .nav-course-settings .title,
-body.course.view-team .nav-course-settings .title,
-body.course.view-group-configurations .nav-course-settings .title,
-body.course.advanced .nav-course-settings .title,
-body.course.view-certificates .nav-course-settings .title,
-
-body.course.schedule .nav-course-settings-schedule,
-body.course.grading .nav-course-settings-grading,
-body.course.view-team .nav-course-settings-team,
-body.course.view-group-configurations .nav-course-settings-group-configurations,
-body.course.advanced .nav-course-settings-advanced,
-body.course.view-certificates .nav-course-settings-certificates,
-
-// course tools
-body.course.view-import .nav-course-tools .title,
-body.course.view-export .nav-course-tools .title,
-body.course.view-export-git .nav-course-tools .title,
-
-body.course.view-import .nav-course-tools-import,
-body.course.view-export .nav-course-tools-export,
-body.course.view-export-git .nav-course-tools-export-git,
-
-// content library settings
-body.course.view-team .nav-library-settings .title,
-
-body.course.view-team .nav-library-settings-team
-
-{
-  color: $brand-primary;
-
-  a {
-    color: $brand-primary;
-    pointer-events: none;
   }
 }

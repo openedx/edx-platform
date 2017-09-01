@@ -18,15 +18,18 @@ var wpconfig = {
     context: __dirname,
 
     entry: {
+        // Studio
+        Import: './cms/static/js/features/import/factories/import.js',
+        StudioIndex: './cms/static/js/features_jsx/studio/index.jsx',
+
+        // Features
         CourseHome: './openedx/features/course_experience/static/course_experience/js/CourseHome.js',
         CourseOutline: './openedx/features/course_experience/static/course_experience/js/CourseOutline.js',
         CourseSock: './openedx/features/course_experience/static/course_experience/js/CourseSock.js',
         CourseTalkReviews: './openedx/features/course_experience/static/course_experience/js/CourseTalkReviews.js',
-        LatestUpdate: './openedx/features/course_experience/static/course_experience/js/LatestUpdate.js',
-        WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js',
         Enrollment: './openedx/features/course_experience/static/course_experience/js/Enrollment.js',
-        Import: './cms/static/js/features/import/factories/import.js',
-        StudioIndex: './cms/static/js/features_jsx/studio/index.jsx'
+        LatestUpdate: './openedx/features/course_experience/static/course_experience/js/LatestUpdate.js',
+        WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js'
     },
 
     output: {

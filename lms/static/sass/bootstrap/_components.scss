@@ -3,7 +3,7 @@
 
 // Page banner
 .page-banner {
-  max-width: $lms-max-width;
+  max-width: map-get($container-max-widths, xl);
   margin: 0 auto;
 
   .user-messages {
