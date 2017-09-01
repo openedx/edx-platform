@@ -36,14 +36,14 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     var expectProfilePrivacyFieldTobeRendered = function(learnerProfileView, othersProfile) {
-        var accountPrivacyElement = learnerProfileView.$('.wrapper-profile-field-account-privacy');
-        var privacyFieldElement = $(accountPrivacyElement).find('.u-field');
+        var $accountPrivacyElement = $('.wrapper-profile-field-account-privacy');
+        var $privacyFieldElement = $($accountPrivacyElement).find('.u-field');
 
         if (othersProfile) {
-            expect(privacyFieldElement.length).toBe(0);
+            expect($privacyFieldElement.length).toBe(0);
         } else {
-            expect(privacyFieldElement.length).toBe(1);
-            expectProfileElementContainsField(privacyFieldElement, learnerProfileView.options.accountPrivacyFieldView);
+            expect($privacyFieldElement.length).toBe(1);
+            expectProfileElementContainsField($privacyFieldElement, learnerProfileView.options.accountPrivacyFieldView);
         }
     };
 
@@ -65,12 +65,12 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     var expectSectionTwoTobeRendered = function(learnerProfileView) {
-        var sectionTwoElement = learnerProfileView.$('.wrapper-profile-section-two');
-        var sectionTwoFieldElements = $(sectionTwoElement).find('.u-field');
+        var $sectionTwoElement = $('.wrapper-profile-section-two');
+        var $sectionTwoFieldElements = $($sectionTwoElement).find('.u-field');
 
-        expect(sectionTwoFieldElements.length).toBe(learnerProfileView.options.sectionTwoFieldViews.length);
+        expect($sectionTwoFieldElements.length).toBe(learnerProfileView.options.sectionTwoFieldViews.length);
 
-        _.each(sectionTwoFieldElements, function(sectionFieldElement, fieldIndex) {
+        _.each($sectionTwoFieldElements, function(sectionFieldElement, fieldIndex) {
             expectProfileElementContainsField(
                 sectionFieldElement,
                 learnerProfileView.options.sectionTwoFieldViews[fieldIndex]
@@ -85,7 +85,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     var expectLimitedProfileSectionsAndFieldsToBeRendered = function(learnerProfileView, othersProfile) {
-        var sectionOneFieldElements = $(learnerProfileView.$('.wrapper-profile-section-one')).find('.u-field');
+        var sectionOneFieldElements = $('.wrapper-profile-section-one').find('.u-field');
 
         expectProfilePrivacyFieldTobeRendered(learnerProfileView, othersProfile);
 
@@ -108,9 +108,9 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     var expectProfileSectionsNotToBeRendered = function(learnerProfileView) {
-        expect(learnerProfileView.$('.wrapper-profile-field-account-privacy').length).toBe(0);
-        expect(learnerProfileView.$('.wrapper-profile-section-one').length).toBe(0);
-        expect(learnerProfileView.$('.wrapper-profile-section-two').length).toBe(0);
+        expect($('.wrapper-profile-field-account-privacy').length).toBe(0);
+        expect($('.wrapper-profile-section-one').length).toBe(0);
+        expect($('.wrapper-profile-section-two').length).toBe(0);
     };
 
     var expectTabbedViewToBeUndefined = function(requests, tabbedViewView) {
@@ -124,42 +124,42 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     var expectBadgesDisplayed = function(learnerProfileView, length, lastPage) {
-        var badgeListingView = learnerProfileView.$el.find('#tabpanel-accomplishments'),
+        var $badgeListingView = $('#tabpanel-accomplishments'),
             updatedLength = length,
             placeholder;
-        expect(learnerProfileView.$el.find('#tabpanel-about_me').hasClass('is-hidden')).toBe(true);
-        expect(badgeListingView.hasClass('is-hidden')).toBe(false);
+        expect($('#tabpanel-about_me').hasClass('is-hidden')).toBe(true);
+        expect($badgeListingView.hasClass('is-hidden')).toBe(false);
         if (lastPage) {
             updatedLength += 1;
-            placeholder = badgeListingView.find('.find-course');
+            placeholder = $badgeListingView.find('.find-course');
             expect(placeholder.length).toBe(1);
             expect(placeholder.attr('href')).toBe('/courses/');
         }
-        expect(badgeListingView.find('.badge-display').length).toBe(updatedLength);
+        expect($badgeListingView.find('.badge-display').length).toBe(updatedLength);
     };
 
     var expectBadgesHidden = function(learnerProfileView) {
-        var accomplishmentsTab = learnerProfileView.$el.find('#tabpanel-accomplishments');
-        if (accomplishmentsTab.length) {
+        var $accomplishmentsTab = $('#tabpanel-accomplishments');
+        if ($accomplishmentsTab.length) {
             // Nonexistence counts as hidden.
-            expect(learnerProfileView.$el.find('#tabpanel-accomplishments').hasClass('is-hidden')).toBe(true);
+            expect($('#tabpanel-accomplishments').hasClass('is-hidden')).toBe(true);
         }
-        expect(learnerProfileView.$el.find('#tabpanel-about_me').hasClass('is-hidden')).toBe(false);
+        expect($('#tabpanel-about_me').hasClass('is-hidden')).toBe(false);
     };
 
     var expectPage = function(learnerProfileView, pageData) {
-        var badgeListContainer = learnerProfileView.$el.find('#tabpanel-accomplishments');
-        var index = badgeListContainer.find('span.search-count').text().trim();
+        var $badgeListContainer = $('#tabpanel-accomplishments');
+        var index = $badgeListContainer.find('span.search-count').text().trim();
         expect(index).toBe('Showing ' + (pageData.start + 1) + '-' + (pageData.start + pageData.results.length) +
             ' out of ' + pageData.count + ' total');
-        expect(badgeListContainer.find('.current-page').text()).toBe('' + pageData.current_page);
+        expect($badgeListContainer.find('.current-page').text()).toBe('' + pageData.current_page);
         _.each(pageData.results, function(badge) {
             expect($('.badge-display:contains(' + badge.badge_class.display_name + ')').length).toBe(1);
         });
     };
 
     var expectBadgeLoadingErrorIsRendered = function(learnerProfileView) {
-        var errorMessage = learnerProfileView.$el.find('.badge-set-display').text();
+        var errorMessage = $('.badge-set-display').text();
         expect(errorMessage).toBe(
             'Your request could not be completed. Reload the page and try again. If the issue persists, click the ' +
             'Help tab to report the problem.'

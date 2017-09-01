@@ -245,6 +245,7 @@ def cert_info(user, course_overview, course_mode):
     """
     if not course_overview.may_certify():
         return {}
+    # Note: this should be rewritten to use the certificates API
     return _cert_info(
         user,
         course_overview,

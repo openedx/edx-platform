@@ -107,8 +107,7 @@ cms/static/css/
 cms/static/sass/*.css
 cms/static/sass/*.css.map
 cms/static/themed_sass/
-themes/**/css/*.css
-themes/**/css/discussion/*.css
+themes/**/css
 
 ### Logging artifacts
 log/
