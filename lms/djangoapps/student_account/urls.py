@@ -13,4 +13,5 @@ urlpatterns += patterns(
     'student_account.views',
     url(r'^finish_auth$', 'finish_auth', name='finish_auth'),
     url(r'^settings$', 'account_settings', name='account_settings'),
+    url(r'^get_cookies$', 'cookies_api', name='cookies_api'),
 )

@@ -924,3 +924,5 @@ if ALL_LANGUAGES_OVERRIDE:
         else:
             ALL_LANGUAGES_DICT[code] = language
     ALL_LANGUAGES_DICT = OrderedDict(sorted(ALL_LANGUAGES_DICT.items(), key=itemgetter(1)))
+
+API_COOKIE_URL = ENV_TOKENS.get('API_COOKIE_URL', None)
