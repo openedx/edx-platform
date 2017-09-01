@@ -75,7 +75,7 @@ class HtmlBlock(object):
         """
         return Fragment(self.get_html())
 
-    def student_view_data(self):
+    def student_view_data(self, context=None):  # pylint: disable=unused-argument
         """
         Returns a JSON representation of the student_view of this XBlock,
         retrievable from the Course Block API.
