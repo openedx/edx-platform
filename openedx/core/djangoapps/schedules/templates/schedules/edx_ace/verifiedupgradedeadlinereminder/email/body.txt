@@ -1,0 +1,6 @@
+Dear {{ user_personal_address }},
+
+We hope you are enjoying {{ course_title }}.
+Upgrade by {{ user_schedule_verified_upgrade_deadline_time|date:"l, F dS, Y" }} to get a shareable certificate!
+
+Upgrade now at {{course_verified_upgrade_url}}

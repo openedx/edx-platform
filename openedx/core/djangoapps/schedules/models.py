@@ -1,6 +1,11 @@
+from collections import namedtuple
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
+from django.contrib.sites.models import Site
+
+from config_models.models import ConfigurationModel
 
 
 class Schedule(TimeStampedModel):
@@ -23,3 +28,12 @@ class Schedule(TimeStampedModel):
     class Meta(object):
         verbose_name = _('Schedule')
         verbose_name_plural = _('Schedules')
+
+
+class ScheduleConfig(ConfigurationModel):
+    KEY_FIELDS = ('site',)
+
+    site = models.ForeignKey(Site)
+    create_schedules = models.BooleanField(default=False)
+    enqueue_recurring_nudge = models.BooleanField(default=False)
+    deliver_recurring_nudge = models.BooleanField(default=False)

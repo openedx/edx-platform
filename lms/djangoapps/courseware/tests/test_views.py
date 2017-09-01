@@ -1447,12 +1447,12 @@ class ProgressPageTests(ProgressPageBaseTests):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(42, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(2):
+        with self.assertNumQueries(43, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(2):
             self._get_progress_page()
 
     @ddt.data(
-        (False, 42, 28),
-        (True, 35, 24)
+        (False, 43, 27),
+        (True, 36, 23)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):

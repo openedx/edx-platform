@@ -2241,7 +2241,7 @@ INSTALLED_APPS = [
     'database_fixups',
 
     'openedx.core.djangoapps.waffle_utils',
-    'openedx.core.djangoapps.schedules',
+    'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
 
     # Features
     'openedx.features.course_bookmarks',
@@ -3288,3 +3288,18 @@ COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
+
+
+############## Settings for ACE ####################################
+ACE_ENABLED_CHANNELS = [
+    'sailthru_email'
+]
+ACE_ENABLED_POLICIES = [
+    'bulk_email_optout'
+]
+ACE_CHANNEL_SAILTHRU_DEBUG = True
+ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = 'Automated Communication Engine Email'
+ACE_CHANNEL_SAILTHRU_API_KEY = None
+ACE_CHANNEL_SAILTHRU_API_SECRET = None
+
+ACE_ROUTING_KEY = LOW_PRIORITY_QUEUE

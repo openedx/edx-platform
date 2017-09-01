@@ -1,0 +1,4 @@
+{% load i18n %}
+{% blocktrans %} Keep up the momentum! Many edX learners in {{course_name}} are completing more problems every week, and participating in the discussion forums. What do you want to do to keep learning?  {% endblocktrans %}
+
+{% blocktrans %} Keep learning {% endblocktrans %} <{{course_url}}>

@@ -13,6 +13,7 @@ from django.db.models.functions import Lower
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -131,6 +132,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
         self.assertEqual(enrollment.upgrade_deadline, course_mode.expiration_datetime)
 
         # The schedule's upgrade deadline should be used if a schedule exists
+        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         schedule = ScheduleFactory(enrollment=enrollment)
         self.assertEqual(enrollment.upgrade_deadline, schedule.upgrade_deadline)
 
