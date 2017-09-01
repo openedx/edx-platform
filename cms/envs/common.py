@@ -368,7 +368,7 @@ ENTERPRISE_CONSENT_API_URL = LMS_ROOT_URL + '/consent/api/v1/'
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.
 from lms.envs.common import (
-    COURSE_KEY_PATTERN, COURSE_ID_PATTERN, USAGE_KEY_PATTERN, ASSET_KEY_PATTERN
+    COURSE_KEY_PATTERN, COURSE_KEY_REGEX, COURSE_ID_PATTERN, USAGE_KEY_PATTERN, ASSET_KEY_PATTERN
 )
 
 ######################### CSRF #########################################
@@ -1077,6 +1077,7 @@ INSTALLED_APPS = [
 
     # DRF filters
     'django_filters',
+    'cms.djangoapps.api',
 ]
 
 
