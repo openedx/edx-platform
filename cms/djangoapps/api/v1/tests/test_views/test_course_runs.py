@@ -9,7 +9,7 @@ from student.models import CourseAccessRole
 from student.tests.factories import AdminFactory, TEST_PASSWORD, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory
 from ..utils import serialize_datetime
 from ...serializers.course_runs import CourseRunSerializer
 
@@ -28,6 +28,11 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         assert course_run.end == end
         assert course_run.enrollment_start == enrollment_start
         assert course_run.enrollment_end == enrollment_end
+
+    def assert_access_role(self, course_run, user, role):
+        # An error will be raised if the endpoint doesn't create the role
+        CourseAccessRole.objects.get(course_id=course_run.id, user=user, role=role)
+        assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 1
 
     def test_without_authentication(self):
         self.client.logout()
@@ -96,10 +101,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         }
         response = self.client.put(url, data, format='json')
         assert response.status_code == 200
-
-        # An error will be raised if the endpoint doesn't create the role
-        CourseAccessRole.objects.get(course_id=course_run.id, user=user, role=role)
-        assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 1
+        self.assert_access_role(course_run, user, role)
 
         course_run = modulestore().get_course(course_run.id)
         assert response.data == CourseRunSerializer(course_run).data
@@ -141,10 +143,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         url = reverse('api:v1:course_run-detail', kwargs={'pk': str(course_run.id)})
         response = self.client.patch(url, data, format='json')
         assert response.status_code == 200
-
-        # An error will be raised if the endpoint doesn't create the role
-        CourseAccessRole.objects.get(course_id=course_run.id, user=user, role=role)
-        assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 1
+        self.assert_access_role(course_run, user, role)
 
         course_run = modulestore().get_course(course_run.id)
         self.assert_course_run_schedule(course_run, start, None, None, None)
@@ -184,7 +183,48 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         assert course_run.id.course == data['number']
         assert course_run.id.run == data['run']
         self.assert_course_run_schedule(course_run, start, end, enrollment_start, enrollment_end)
+        self.assert_access_role(course_run, user, role)
 
-        # An error will be raised if the endpoint doesn't create the role
-        CourseAccessRole.objects.get(course_id=course_run.id, user=user, role=role)
-        assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 1
+    def test_rerun(self):
+        course_run = ToyCourseFactory()
+        start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
+        end = start + datetime.timedelta(days=30)
+        enrollment_start = start - datetime.timedelta(days=7)
+        enrollment_end = end - datetime.timedelta(days=14)
+        user = UserFactory()
+        role = 'instructor'
+        run = '3T2017'
+        url = reverse('api:v1:course_run-rerun', kwargs={'pk': str(course_run.id)})
+        data = {
+            'run': run,
+            'schedule': {
+                'start': serialize_datetime(start),
+                'end': serialize_datetime(end),
+                'enrollment_start': serialize_datetime(enrollment_start),
+                'enrollment_end': serialize_datetime(enrollment_end),
+            },
+            'team': [
+                {
+                    'user': user.username,
+                    'role': role,
+                }
+            ],
+        }
+        response = self.client.post(url, data, format='json')
+        assert response.status_code == 201
+
+        course_run_key = CourseKey.from_string(response.data['id'])
+        course_run = modulestore().get_course(course_run_key)
+        assert course_run.id.run == run
+        self.assert_course_run_schedule(course_run, start, end, enrollment_start, enrollment_end)
+        self.assert_access_role(course_run, user, role)
+
+    def test_rerun_duplicate_run(self):
+        course_run = ToyCourseFactory()
+        url = reverse('api:v1:course_run-rerun', kwargs={'pk': str(course_run.id)})
+        data = {
+            'run': course_run.id.run,
+        }
+        response = self.client.post(url, data, format='json')
+        assert response.status_code == 400
+        assert response.data == {'run': ['Course run {key} already exists'.format(key=course_run.id)]}

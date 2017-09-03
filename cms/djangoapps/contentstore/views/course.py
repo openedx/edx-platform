@@ -35,7 +35,7 @@ from contentstore.course_group_config import (
 from contentstore.course_info_model import delete_course_update, get_course_updates, update_course_updates
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.push_notification import push_notification_enabled
-from contentstore.tasks import rerun_course
+from contentstore.tasks import rerun_course as rerun_course_task
 from contentstore.utils import (
     add_instructor,
     get_lms_link_for_item,
@@ -782,8 +782,14 @@ def _create_or_rerun_course(request):
         definition_data = {'wiki_slug': wiki_slug}
         fields.update(definition_data)
 
-        if 'source_course_key' in request.json:
-            return _rerun_course(request, org, course, run, fields)
+        source_course_key = request.json.get('source_course_key')
+        if source_course_key:
+            source_course_key = CourseKey.from_string(source_course_key)
+            destination_course_key = rerun_course(request.user, source_course_key, org, course, run, fields)
+            return JsonResponse({
+                'url': reverse_url('course_handler'),
+                'destination_course_key': unicode(destination_course_key)
+            })
         else:
             try:
                 new_course = create_new_course(request.user, org, course, run, fields)
@@ -860,15 +866,12 @@ def create_new_course_in_store(store, user, org, number, run, fields):
     return new_course
 
 
-def _rerun_course(request, org, number, run, fields):
+def rerun_course(user, source_course_key, org, number, run, fields, async=True):
     """
-    Reruns an existing course.
-    Returns the URL for the course listing page.
+    Rerun an existing course.
     """
-    source_course_key = CourseKey.from_string(request.json.get('source_course_key'))
-
     # verify user has access to the original course
-    if not has_studio_write_access(request.user, source_course_key):
+    if not has_studio_write_access(user, source_course_key):
         raise PermissionDenied()
 
     # create destination course key
@@ -882,23 +885,23 @@ def _rerun_course(request, org, number, run, fields):
 
     # Make sure user has instructor and staff access to the destination course
     # so the user can see the updated status for that course
-    add_instructor(destination_course_key, request.user, request.user)
+    add_instructor(destination_course_key, user, user)
 
     # Mark the action as initiated
-    CourseRerunState.objects.initiated(source_course_key, destination_course_key, request.user, fields['display_name'])
+    CourseRerunState.objects.initiated(source_course_key, destination_course_key, user, fields['display_name'])
 
     # Clear the fields that must be reset for the rerun
     fields['advertised_start'] = None
 
-    # Rerun the course as a new celery task
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
-    rerun_course.delay(unicode(source_course_key), unicode(destination_course_key), request.user.id, json_fields)
+    args = [unicode(source_course_key), unicode(destination_course_key), user.id, json_fields]
 
-    # Return course listing page
-    return JsonResponse({
-        'url': reverse_url('course_handler'),
-        'destination_course_key': unicode(destination_course_key)
-    })
+    if async:
+        rerun_course_task.delay(*args)
+    else:
+        rerun_course_task(*args)
+
+    return destination_course_key
 
 
 # pylint: disable=unused-argument
