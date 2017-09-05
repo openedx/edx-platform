@@ -35,6 +35,7 @@ class UserAccountSettingsTest(TestCase):
         ('twitter', 'https://www.twitter.com/edX/123s', None, False),
         ('twitter', 'twitter.com/edX', 'https://www.twitter.com/edX', True),
         ('twitter', 'twitter.com/edX?foo=bar', 'https://www.twitter.com/edX', True),
+        ('twitter', 'twitter.com/test.user', 'https://www.twitter.com/test.user', True),
         ('linkedin', 'www.linkedin.com/harryrein', None, False),
         ('linkedin', 'www.linkedin.com/in/harryrein-1234', 'https://www.linkedin.com/in/harryrein-1234', True),
         ('linkedin', 'www.evilwebsite.com/123?www.linkedin.com/edX', None, False),
