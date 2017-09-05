@@ -603,7 +603,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 # We received an explicitly-linked EnterpriseCustomer for the enrollment
                 if explicit_linked_enterprise is not None:
                     try:
-                        enterprise_api_client.post_enterprise_course_enrollment(username, unicode(course_id), True)
+                        enterprise_api_client.post_enterprise_course_enrollment(username, unicode(course_id), None)
                     except EnterpriseApiException as error:
                         log.exception("An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
                                       "for user [%s] in course run [%s]", username, course_id)
