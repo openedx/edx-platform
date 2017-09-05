@@ -3,6 +3,7 @@
 End-to-end tests for the main LMS Dashboard (aka, Student Dashboard).
 """
 import datetime
+import pytz
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.tests.helpers import UniqueCourseTest, generate_course_key
@@ -139,7 +140,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         super(LmsDashboardPageTest, self).setUp()
 
         # now datetime for usage in tests
-        self.now = datetime.datetime.now()
+        self.now = datetime.datetime.utcnow()
 
     def test_dashboard_course_listings(self):
         """
@@ -184,7 +185,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         When I visit dashboard page
         Then the course date should have the following format "Ended - %b %d, %Y" e.g. "Ended - Sep 23, 2015"
         """
-        course_start_date = datetime.datetime(1970, 1, 1)
+        course_start_date = self.now - datetime.timedelta(days=365)
         course_end_date = self.now - datetime.timedelta(days=90)
 
         self.course_fixture.add_course_details({
@@ -217,7 +218,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         When I visit dashboard page
         Then the course date should have the following format "Started - %b %d, %Y" e.g. "Started - Sep 23, 2015"
         """
-        course_start_date = datetime.datetime(1970, 1, 1)
+        course_start_date = self.now - datetime.timedelta(days=90)
         course_end_date = self.now + datetime.timedelta(days=90)
 
         self.course_fixture.add_course_details({
@@ -294,7 +295,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.course_fixture.configure_course()
 
         start_date = TEST_DATE_FORMAT.format(dt=course_start_date)
-        expected_course_date = "Starts - {start_date} GMT".format(start_date=start_date)
+        expected_course_date = "Starts - {start_date} PDT".format(start_date=start_date, timezone=timezone)
 
         # reload the page for changes to course date changes to appear in dashboard
         self.dashboard_page.visit()

@@ -111,16 +111,19 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         """
         self.wait_for_ajax()
         self._find_within(ancestor_selector + " .action-more").click()
-        EmptyPromise(
+        opened_promise = EmptyPromise(
             lambda: self.is_element_visible(ancestor_selector + " .actions-dropdown"),
-            "Secondary action menu opened"
-        ).fulfill()
+            "Secondary action menu opened",
+            timeout=360
+        )
+        opened_promise.fulfill()
         yield
         if self.is_element_visible(ancestor_selector + " .actions-dropdown"):
             self._find_within(ancestor_selector + " .action-more").click()
             promise = EmptyPromise(
                 lambda: not self.is_element_visible(ancestor_selector + " .actions-dropdown"),
-                "Secondary action menu closed"
+                "Secondary action menu closed",
+                timeout=60
             )
             promise.fulfill()
 
