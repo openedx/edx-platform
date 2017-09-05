@@ -6,11 +6,13 @@ from django.conf import settings
 from django.conf.urls import patterns, url
 
 from student.views import LogoutView
+from student.views import get_organizations
 
 urlpatterns = (
     'student.views',
 
     url(r'^logout$', LogoutView.as_view(), name='logout'),
+    url(r'^organizations$', get_organizations, name='get_organizations'),
 
     # TODO: standardize login
 

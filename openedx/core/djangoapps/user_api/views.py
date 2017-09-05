@@ -158,9 +158,11 @@ class LoginSessionView(APIView):
 class RegistrationView(APIView):
     """HTTP end-points for creating a new user. """
 
-    DEFAULT_FIELDS = ["email", "name", "username", "password"]
+    from nose.tools import set_trace; set_trace()
+    DEFAULT_FIELDS = ["email", "username", "password"]
 
     EXTRA_FIELDS = [
+        "confirm_password",
         "first_name",
         "last_name",
         "city",
@@ -175,6 +177,9 @@ class RegistrationView(APIView):
         "goals",
         "honor_code",
         "terms_of_service",
+        "organization",
+        "point_of_contact",
+        "admin_email"
     ]
 
     # This end-point is available to anonymous users,
@@ -473,6 +478,31 @@ class RegistrationView(APIView):
 
         form_desc.add_field(
             "password",
+            label=password_label,
+            field_type="password",
+            restrictions={
+                "min_length": PASSWORD_MIN_LENGTH,
+                "max_length": PASSWORD_MAX_LENGTH,
+            },
+            required=required
+        )
+
+    def _add_confirm_password_field(self, form_desc, required=True):
+        """Add a confirm password field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # meant to hold the user's password.
+        password_label = _(u"Confirm Password")
+
+        form_desc.add_field(
+            "confirm_password",
             label=password_label,
             field_type="password",
             restrictions={
@@ -888,6 +918,81 @@ class RegistrationView(APIView):
                         instructions="",
                         restrictions={}
                     )
+
+    def _add_organization_field(self, form_desc, required=True):
+        """
+        Add a Organization field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+        """
+        organization_label = _(u"Organization")
+        error_msg = _(u"Please select your Organization.")
+        organization_placeholder = _(u"Organization you belong to.")
+
+        form_desc.add_field(
+            "organization",
+            label=organization_label,
+            required=required,
+            placeholder=organization_placeholder,
+            error_messages={
+                "required": error_msg
+            },
+            field_type="text",
+        )
+
+    def _add_point_of_contact_field(self, form_desc, required=False):
+        """
+        Add a point of contact radio button to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+        """
+        point_of_contact_label = _(u"Are you the Admin of your organization?")
+
+        form_desc.add_field(
+            "point_of_contact",
+            label=point_of_contact_label,
+            required=required,
+            field_type="select",
+            options=[(True, 'Yes'), (False, 'No')]
+        )
+
+    def _add_admin_email_field(self, form_desc, required=False):
+        """
+        Add a field to allow users to enter email for the admin of organization.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+        """
+        admin_email_label = _(u"If you know who should be the Admin, please provide their email address bellow. We'll "
+                              u"send them an email inviting them to join the platform as the organization admin.")
+        error_msg = _(u"Please provide admin email for the organization.")
+        admin_email_placeholder = _(u"Organization Admin Email")
+
+        form_desc.add_field(
+            "admin_email",
+            label=admin_email_label,
+            required=required,
+            placeholder=admin_email_placeholder,
+            error_messages={
+                "required": error_msg
+            },
+            field_type="email",
+            restrictions={
+                "min_length": EMAIL_MIN_LENGTH,
+                "max_length": EMAIL_MAX_LENGTH,
+            }
+            )
 
 
 class PasswordResetView(APIView):

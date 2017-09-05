@@ -55,7 +55,7 @@ from student.models import (
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED,
-    LogoutViewConfiguration, RegistrationCookieConfiguration)
+    LogoutViewConfiguration, RegistrationCookieConfiguration, Organization)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from student.tasks import send_activation_email
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
@@ -470,6 +470,7 @@ def signin_user(request):
 def register_user(request, extra_context=None):
     """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
     # Determine the URL to redirect to following login:
+
     redirect_to = get_next_url_for_login_page(request)
     if request.user.is_authenticated():
         return redirect(redirect_to)
@@ -1695,6 +1696,7 @@ def create_account_with_params(request, params):
         not eamap.external_domain.startswith(openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX)
     )
 
+    params['name'] = "{} {}".format(params['first_name'], params['last_name'])
     form = AccountCreationForm(
         data=params,
         extra_fields=extra_fields,
@@ -1709,6 +1711,28 @@ def create_account_with_params(request, params):
     with transaction.atomic():
         # first, create the account
         (user, profile, registration) = _do_create_account(form, custom_form)
+
+        is_point_of_contact = True if params['point_of_contact'] == 'true' else False
+
+        from nose.tools import set_trace; set_trace()
+
+        organization_to_assign = None
+        if not Organization.objects.filter(name=params['organization']).exists():
+            organization_to_assign = Organization(
+                name=params['organization'],
+                point_of_contact_exist=is_point_of_contact
+            )
+            organization_to_assign.save()
+
+        else:
+            organization_to_assign = Organization.objects.filter(name=params['organization']).first()
+            if is_point_of_contact and not organization_to_assign.point_of_contact_exist:
+                organization_to_assign.point_of_contact_exist = True
+                organization_to_assign.save()
+
+        profile.organization = organization_to_assign
+        profile.is_point_of_contact = is_point_of_contact
+        profile.save()
 
         # next, link the account with social auth, if provided via the API.
         # (If the user is using the normal register page, the social auth pipeline does the linking, not this code)
@@ -2654,3 +2678,23 @@ class LogoutView(TemplateView):
         })
 
         return context
+
+@csrf_exempt
+def get_organizations(request):
+
+    if request.is_ajax():
+        q = request.GET.get('term', '')
+
+        all_organizations = Organization.objects.all()
+
+        final_result = {}
+
+        for organization in all_organizations:
+            final_result[organization.name] = organization.point_of_contact_exist
+
+        data = json.dumps(final_result)
+    else:
+        data = 'fail'
+    mimetype = 'application/json'
+
+    return HttpResponse(data, mimetype)
