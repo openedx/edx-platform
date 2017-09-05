@@ -1050,6 +1050,12 @@ class CertificateTemplate(TimeStampedModel):
         help_text=_(u'On/Off switch.'),
         default=False,
     )
+    language = models.CharField(
+        max_length=2,
+        blank=True,
+        null=True,
+        help_text=u'Only certificates for courses in the selected language will be rendered using this template. Course language is determined by the first two letters of the language code.'
+    )
 
     def __unicode__(self):
         return u'%s' % (self.name, )

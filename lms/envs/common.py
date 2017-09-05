@@ -996,6 +996,9 @@ LANGUAGES = (
 
 LANGUAGE_DICT = dict(LANGUAGES)
 
+# Languages supported for custom course certificate templates
+CERTIFICATE_TEMPLATE_LANGUAGES = {}
+
 USE_I18N = True
 USE_L10N = True
 
