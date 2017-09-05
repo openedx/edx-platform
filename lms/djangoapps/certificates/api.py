@@ -234,8 +234,9 @@ def certificate_downloadable_status(student, course_key):
         'download_url': None,
         'uuid': None,
     }
+    may_view_certificate = CourseOverview.get_from_id(course_key).may_certify()
 
-    if current_status['status'] == CertificateStatuses.downloadable:
+    if current_status['status'] == CertificateStatuses.downloadable and may_view_certificate:
         response_data['is_downloadable'] = True
         response_data['download_url'] = current_status['download_url'] or get_certificate_url(student.id, course_key)
         response_data['uuid'] = current_status['uuid']

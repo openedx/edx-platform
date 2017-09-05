@@ -2075,7 +2075,8 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             number='verified',
             end=datetime.now(),
             display_name='Verified Course',
-            grade_cutoffs={'cutoff': 0.75, 'Pass': 0.5}
+            grade_cutoffs={'cutoff': 0.75, 'Pass': 0.5},
+            self_paced=True
         )
         self.enrollment = CourseEnrollment.enroll(self.student, self.course.id, mode='honor')
         self.assertTrue(self.client.login(username=self.student, password='123456'))

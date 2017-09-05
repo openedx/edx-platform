@@ -10,7 +10,6 @@ Test utilities for mobile API tests:
      MobileCourseAccessTestMixin - tests for APIs with mobile_course_access.
 """
 # pylint: disable=no-member
-from datetime import timedelta
 
 import ddt
 import datetime
@@ -19,6 +18,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
+import pytz
 from rest_framework.test import APITestCase
 
 from courseware.access_response import MobileAvailabilityError, StartDateError, VisibilityError
@@ -43,7 +43,9 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         self.course = CourseFactory.create(
             mobile_available=True,
             static_asset_path="needed_for_split",
-            end=datetime.datetime.now())
+            end=datetime.datetime.now(pytz.UTC),
+            certificate_available_date=datetime.datetime.now(pytz.UTC)
+        )
         self.user = UserFactory.create()
         self.password = 'test'
         self.username = self.user.username
@@ -176,7 +178,7 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         # pylint: disable=attribute-defined-outside-init
         self.course = CourseFactory.create(mobile_available=True, static_asset_path="needed_for_split")
         # pylint: disable=attribute-defined-outside-init
-        self.course.start = timezone.now() + timedelta(days=365)
+        self.course.start = timezone.now() + datetime.timedelta(days=365)
         self.init_course_access()
         self._verify_response(self.ALLOW_ACCESS_TO_UNRELEASED_COURSE, StartDateError(self.course.start))
 
