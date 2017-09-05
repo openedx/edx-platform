@@ -3,12 +3,17 @@ API for the gating djangoapp
 """
 import logging
 
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from lms.djangoapps.courseware.access import _has_access_to_course
+from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactory
 from milestones import api as milestones_api
 from opaque_keys.edx.keys import UsageKey
-
-from lms.djangoapps.courseware.access import _has_access_to_course
+from opaque_keys.edx.locator import BlockUsageLocator
 from openedx.core.lib.gating.exceptions import GatingValidationError
+from util import milestones_helpers
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -299,3 +304,105 @@ def get_gated_content(course, user):
                 {'id': user.id}
             )
         ]
+
+
+def is_prereq_met(content_id, user_id, recalc_on_unmet=False):
+    """
+    Returns true if the prequiste has been met for a given milestone
+
+    Arguments:
+        content_id (BlockUsageLocator): BlockUsageLocator for the content
+        user_id: The id of the user
+        recalc_on_unmet: Recalculate the grade if prereq has not yet been met
+
+    Returns:
+        tuple: True|False,
+        prereq_meta_info = { 'url': prereq_url, 'display_name': prereq_name}
+    """
+    course_id = content_id.course_key
+
+    # if unfullfilled milestones exist it means prereq has not been met
+    unfulfilled_milestones = milestones_helpers.get_course_content_milestones(
+        course_id,
+        content_id,
+        'requires',
+        user_id
+    )
+    prereq_met = not unfulfilled_milestones
+
+    if prereq_met or not recalc_on_unmet:
+        return prereq_met, {}
+
+    milestone = unfulfilled_milestones[0]
+    student = User.objects.get(id=user_id)
+    store = modulestore()
+
+    with store.bulk_operations(course_id):
+        course_structure = get_course_blocks(student, store.make_course_usage_key(course_id))
+        course = store.get_course(course_id, depth=0)
+        subsection_grade_factory = SubsectionGradeFactory(student, course, course_structure)
+        subsection_usage_key = UsageKey.from_string(milestone['namespace'].replace(GATING_NAMESPACE_QUALIFIER, ''))
+
+        if subsection_usage_key in course_structure:
+            # this will force a recalcuation of the subsection grade
+            subsection_grade = subsection_grade_factory.update(course_structure[subsection_usage_key])
+            prereq_met = update_milestone(milestone, subsection_grade, milestone, user_id)
+            prereq_meta_info = {
+                'url': reverse('jump_to', kwargs={'course_id': course_id, 'location': subsection_usage_key}),
+                'display_name': store.get_item(subsection_usage_key).display_name
+            }
+
+    return prereq_met, prereq_meta_info
+
+def update_milestone(milestone, subsection_grade, prereq_milestone, user_id):
+    """
+    Updates the milestone record based on evaluation of prerequiste met.
+
+    Arguments:
+        milestone: The gated milestone being evaluated
+        subsection_grade: The grade of the prerequiste subsection
+        prerequiste_milestone: The gating milestone
+        user_id: The id of the user
+
+    Returns:
+        True if prerequiste has been met, False if not
+    """
+    min_percentage = _get_minimum_required_percentage(milestone)
+    subsection_percentage = _get_subsection_percentage(subsection_grade)
+    if subsection_percentage >= min_percentage:
+        milestones_helpers.add_user_milestone({'id': user_id}, prereq_milestone)
+        return True
+    else:
+        milestones_helpers.remove_user_milestone({'id': user_id}, prereq_milestone)
+        return False
+
+def _get_minimum_required_percentage(milestone):
+    """
+    Returns the minimum percentage requirement for the given milestone.
+    """
+    # Default minimum score to 100
+    min_score = 100
+    requirements = milestone.get('requirements')
+    if requirements:
+        try:
+            min_score = int(requirements.get('min_score'))
+        except (ValueError, TypeError):
+            log.warning(
+                u'Gating: Failed to find minimum score for gating milestone %s, defaulting to 100',
+                json.dumps(milestone)
+            )
+    return min_score
+
+
+def _get_subsection_percentage(subsection_grade):
+    """
+    Returns the percentage value of the given subsection_grade.
+    """
+    return _calculate_ratio(subsection_grade.graded_total.earned, subsection_grade.graded_total.possible) * 100.0
+
+
+def _calculate_ratio(earned, possible):
+    """
+    Returns the percentage of the given earned and possible values.
+    """
+    return float(earned) / float(possible) if possible else 0.0

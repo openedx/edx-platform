@@ -66,8 +66,6 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
 
             if usage_info.has_staff_access:
                 return False
-            elif self.has_pending_milestones_for_user(block_key, usage_info):
-                return True
             elif self.gated_by_required_content(block_key, block_structure, required_content):
                 return True
             elif (settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
