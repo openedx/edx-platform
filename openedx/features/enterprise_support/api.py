@@ -324,7 +324,13 @@ def enterprise_enabled():
     """
     Determines whether the Enterprise app is installed
     """
+<<<<<<< HEAD
     return 'enterprise' in settings.INSTALLED_APPS and settings.FEATURES.get('ENABLE_ENTERPRISE_INTEGRATION', False)
+=======
+    is_enabled = 'enterprise' in settings.INSTALLED_APPS and getattr(settings, 'ENABLE_ENTERPRISE_INTEGRATION', True)
+    LOGGER.warning("BF!! enterprise enabled=%s", is_enabled)
+    return 'enterprise' in settings.INSTALLED_APPS and getattr(settings, 'ENABLE_ENTERPRISE_INTEGRATION', True)
+>>>>>>> add debugger and enterprise integration
 
 
 def enterprise_customer_uuid_for_request(request):
