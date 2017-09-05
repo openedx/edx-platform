@@ -297,19 +297,18 @@ class StudentDashboardTests(SharedModuleStoreTestCase):
     @patch.multiple('django.conf.settings', **MOCK_SETTINGS)
     @ddt.data(
         *itertools.product(
-            [TOMORROW],
             [True, False],
             [True, False],
             [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split],
         )
     )
     @ddt.unpack
-    def test_sharing_icons_for_future_course(self, start_date, set_marketing, set_social_sharing, modulestore_type):
+    def test_sharing_icons_for_future_course(self, set_marketing, set_social_sharing, modulestore_type):
         """
         Verify that the course sharing icons show up if course is starting in future and
         any of marketing or social sharing urls are set.
         """
-        self.course = CourseFactory.create(start=start_date, emit_signals=True, default_store=modulestore_type)
+        self.course = CourseFactory.create(start=self.TOMORROW, emit_signals=True, default_store=modulestore_type)
         self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
         self.set_course_sharing_urls(set_marketing, set_social_sharing)
 

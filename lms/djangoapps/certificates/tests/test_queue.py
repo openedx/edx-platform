@@ -207,42 +207,42 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         # Eligible and should stay that way
         (
             CertificateStatuses.downloadable,
-            datetime.now(pytz.UTC) - timedelta(days=2),
+            timedelta(days=-2),
             'Pass',
             CertificateStatuses.generating
         ),
         # Ensure that certs in the wrong state can be fixed by regeneration
         (
             CertificateStatuses.downloadable,
-            datetime.now(pytz.UTC) - timedelta(hours=1),
+            timedelta(hours=-1),
             'Pass',
             CertificateStatuses.audit_passing
         ),
         # Ineligible and should stay that way
         (
             CertificateStatuses.audit_passing,
-            datetime.now(pytz.UTC) - timedelta(hours=1),
+            timedelta(hours=-1),
             'Pass',
             CertificateStatuses.audit_passing
         ),
         # As above
         (
             CertificateStatuses.audit_notpassing,
-            datetime.now(pytz.UTC) - timedelta(hours=1),
+            timedelta(hours=-1),
             'Pass',
             CertificateStatuses.audit_passing
         ),
         # As above
         (
             CertificateStatuses.audit_notpassing,
-            datetime.now(pytz.UTC) - timedelta(hours=1),
+            timedelta(hours=-1),
             None,
             CertificateStatuses.audit_notpassing
         ),
     )
     @ddt.unpack
     @override_settings(AUDIT_CERT_CUTOFF_DATE=datetime.now(pytz.UTC) - timedelta(days=1))
-    def test_regen_audit_certs_eligibility(self, status, created_date, grade, expected_status):
+    def test_regen_audit_certs_eligibility(self, status, created_delta, grade, expected_status):
         """
         Test that existing audit certificates remain eligible even if cert
         generation is re-run.
@@ -254,6 +254,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             is_active=True,
             mode=CourseMode.AUDIT,
         )
+        created_date = datetime.now(pytz.UTC) + created_delta
         with freezegun.freeze_time(created_date):
             GeneratedCertificateFactory(
                 user=self.user_2,

@@ -6,6 +6,8 @@ import ddt
 
 from django.contrib.messages.middleware import MessageMiddleware
 from django.test import RequestFactory, TestCase
+
+from common.test.utils import normalize_repr
 from openedx.core.djangolib.markup import HTML, Text
 from student.tests.factories import UserFactory
 
@@ -60,10 +62,10 @@ class UserMessagesTestCase(TestCase):
         self.assertEquals(messages[0].icon_class, expected_icon_class)
 
     @ddt.data(
-        (PageLevelMessages.register_error_message, UserMessageType.ERROR),
-        (PageLevelMessages.register_info_message, UserMessageType.INFO),
-        (PageLevelMessages.register_success_message, UserMessageType.SUCCESS),
-        (PageLevelMessages.register_warning_message, UserMessageType.WARNING),
+        (normalize_repr(PageLevelMessages.register_error_message), UserMessageType.ERROR),
+        (normalize_repr(PageLevelMessages.register_info_message), UserMessageType.INFO),
+        (normalize_repr(PageLevelMessages.register_success_message), UserMessageType.SUCCESS),
+        (normalize_repr(PageLevelMessages.register_warning_message), UserMessageType.WARNING),
     )
     @ddt.unpack
     def test_message_type(self, register_message_function, expected_message_type):

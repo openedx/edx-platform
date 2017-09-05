@@ -19,6 +19,35 @@ from xmodule.graders import ProblemScore
 NOW = now()
 
 
+def submission_value_repr(self):
+    """
+    String representation for the SubmissionValue namedtuple which excludes
+    the "created_at" attribute that changes with each execution.  Needed for
+    consistency of ddt-generated test methods across pytest-xdist workers.
+    """
+    return '<SubmissionValue exists={}>'.format(self.exists)
+
+
+def csm_value_repr(self):
+    """
+    String representation for the CSMValue namedtuple which excludes
+    the "created" attribute that changes with each execution.  Needed for
+    consistency of ddt-generated test methods across pytest-xdist workers.
+    """
+    return '<CSMValue exists={} raw_earned={}>'.format(self.exists, self.raw_earned)
+
+
+def expected_result_repr(self):
+    """
+    String representation for the ExpectedResult namedtuple which excludes
+    the "first_attempted" attribute that changes with each execution.  Needed
+    for consistency of ddt-generated test methods across pytest-xdist workers.
+    """
+    included = ('raw_earned', 'raw_possible', 'weighted_earned', 'weighted_possible', 'weight', 'graded')
+    attributes = ['{}={}'.format(name, getattr(self, name)) for name in included]
+    return '<ExpectedResult {}>'.format(' '.join(attributes))
+
+
 class TestScoredBlockTypes(TestCase):
     """
     Tests for the possibly_scored function.
@@ -52,13 +81,16 @@ class TestGetScore(TestCase):
     location = 'test_location'
 
     SubmissionValue = namedtuple('SubmissionValue', 'exists, points_earned, points_possible, created_at')
+    SubmissionValue.__repr__ = submission_value_repr
     CSMValue = namedtuple('CSMValue', 'exists, raw_earned, raw_possible, created')
+    CSMValue.__repr__ = csm_value_repr
     PersistedBlockValue = namedtuple('PersistedBlockValue', 'exists, raw_possible, weight, graded')
     ContentBlockValue = namedtuple('ContentBlockValue', 'raw_possible, weight, explicit_graded')
     ExpectedResult = namedtuple(
         'ExpectedResult',
         'raw_earned, raw_possible, weighted_earned, weighted_possible, weight, graded, first_attempted'
     )
+    ExpectedResult.__repr__ = expected_result_repr
 
     def _create_submissions_scores(self, submission_value):
         """

@@ -89,8 +89,15 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     PASSWORD = "test_password"
 
     NOW = datetime.now(pytz.UTC)
-    YESTERDAY = NOW - timedelta(days=1)
-    TOMORROW = NOW + timedelta(days=1)
+    YESTERDAY = 'yesterday'
+    TOMORROW = 'tomorrow'
+    NEXT_YEAR = 'next_year'
+    DATES = {
+        YESTERDAY: NOW - timedelta(days=1),
+        TOMORROW: NOW + timedelta(days=1),
+        NEXT_YEAR: NOW + timedelta(days=360),
+        None: None,
+    }
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
@@ -492,7 +499,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     )
     @ddt.unpack
     def test_payment_confirmation_course_details(self, course_start, show_courseware_url):
-        course = self._create_course("verified", course_start=course_start)
+        course = self._create_course("verified", course_start=self.DATES[course_start])
         self._enroll(course.id, "verified")
         response = self._get_page('verify_student_payment_confirmation', course.id)
 
@@ -753,9 +760,10 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertContains(response, "verification deadline")
         self.assertContains(response, deadline)
 
-    @ddt.data(datetime.now(tz=pytz.UTC) + timedelta(days=360), None)
+    @ddt.data(NEXT_YEAR, None)
     def test_course_mode_expired_verification_deadline_in_future(self, verification_deadline):
         """Verify that student can not upgrade in expired course mode."""
+        verification_deadline = self.DATES[verification_deadline]
         course_modes = ("verified", "credit")
         course = self._create_course(*course_modes)
 

@@ -162,9 +162,14 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
     """
     Tests for the various access controls on the student dashboard
     """
-    TOMORROW = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
-    YESTERDAY = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
+    TOMORROW = 'tomorrow'
+    YESTERDAY = 'yesterday'
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+    DATES = {
+        TOMORROW: datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1),
+        YESTERDAY: datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1),
+        None: None,
+    }
 
     def setUp(self):
         super(AccessTestCase, self).setUp()
@@ -439,7 +444,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         mock_unit = Mock(location=self.course.location, user_partitions=[])
         mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
         mock_unit.visible_to_staff_only = visible_to_staff_only
-        mock_unit.start = start
+        mock_unit.start = self.DATES[start]
         mock_unit.merged_group_access = {}
 
         self.verify_access(mock_unit, expected_access, expected_error_type)
@@ -448,7 +453,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         mock_unit = Mock(user_partitions=[])
         mock_unit._class_tags = {}
         mock_unit.days_early_for_beta = 2
-        mock_unit.start = self.TOMORROW
+        mock_unit.start = self.DATES[self.TOMORROW]
         mock_unit.visible_to_staff_only = False
         mock_unit.merged_group_access = {}
 
@@ -465,7 +470,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         mock_unit = Mock(location=self.course.location, user_partitions=[])
         mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
         mock_unit.visible_to_staff_only = False
-        mock_unit.start = start
+        mock_unit.start = self.DATES[start]
         mock_unit.merged_group_access = {}
 
         self.verify_access(mock_unit, True)
@@ -486,7 +491,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         mock_unit = Mock(location=self.course.location, user_partitions=[])
         mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
         mock_unit.visible_to_staff_only = False
-        mock_unit.start = start
+        mock_unit.start = self.DATES[start]
         mock_unit.merged_group_access = {}
 
         self.verify_access(mock_unit, expected_access, expected_error_type)

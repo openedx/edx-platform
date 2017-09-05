@@ -13,6 +13,7 @@ from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 from webob import Request
 
+from common.test.utils import normalize_repr
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -105,6 +106,7 @@ def _upload_file(subs_file, location, filename):
     del_cached_content(content.location)
 
 
+@normalize_repr
 def attach_sub(item, filename):
     """
     Attach `en` transcript.
@@ -112,6 +114,7 @@ def attach_sub(item, filename):
     item.sub = filename
 
 
+@normalize_repr
 def attach_bumper_transcript(item, filename, lang="en"):
     """
     Attach bumper transcript.

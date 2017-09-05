@@ -1,6 +1,7 @@
 """
 General testing utilities.
 """
+import functools
 import sys
 from contextlib import contextmanager
 
@@ -124,3 +125,29 @@ class MockS3Mixin(object):
     def tearDown(self):
         self._mock_s3.stop()
         super(MockS3Mixin, self).tearDown()
+
+
+class reprwrapper(object):
+    """
+    Wrapper class for functions that need a normalized string representation.
+    """
+    def __init__(self, func):
+        self._func = func
+        self.repr = 'Func: {}'.format(func.__name__)
+        functools.update_wrapper(self, func)
+
+    def __call__(self, *args, **kw):
+        return self._func(*args, **kw)
+
+    def __repr__(self):
+        return self.repr
+
+
+def normalize_repr(func):
+    """
+    Function decorator used to normalize its string representation.
+    Used to wrap functions used as ddt parameters, so pytest-xdist
+    doesn't complain about the sequence of discovered tests differing
+    between worker processes.
+    """
+    return reprwrapper(func)

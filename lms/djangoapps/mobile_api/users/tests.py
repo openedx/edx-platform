@@ -84,6 +84,11 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
     LAST_WEEK = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=7)
     ADVERTISED_START = "Spring 2016"
     ENABLED_SIGNALS = ['course_published']
+    DATES = {
+        'next_week': NEXT_WEEK,
+        'last_week': LAST_WEEK,
+        'default_start_date': DEFAULT_START_DATE,
+    }
 
     @patch.dict(settings.FEATURES, {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self, *args, **kwargs):
@@ -175,12 +180,12 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 self.assertFalse(result['has_access'])
 
     @ddt.data(
-        (NEXT_WEEK, ADVERTISED_START, ADVERTISED_START, "string"),
-        (NEXT_WEEK, None, defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp"),
-        (NEXT_WEEK, '', defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp"),
-        (DEFAULT_START_DATE, ADVERTISED_START, ADVERTISED_START, "string"),
-        (DEFAULT_START_DATE, '', None, "empty"),
-        (DEFAULT_START_DATE, None, None, "empty"),
+        ('next_week', ADVERTISED_START, ADVERTISED_START, "string"),
+        ('next_week', None, defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp"),
+        ('next_week', '', defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp"),
+        ('default_start_date', ADVERTISED_START, ADVERTISED_START, "string"),
+        ('default_start_date', '', None, "empty"),
+        ('default_start_date', None, None, "empty"),
     )
     @ddt.unpack
     @patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False, 'ENABLE_MKTG_SITE': True})
@@ -190,7 +195,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         case the course has not started
         """
         self.login()
-        course = CourseFactory.create(start=start, advertised_start=advertised_start, mobile_available=True)
+        course = CourseFactory.create(start=self.DATES[start], advertised_start=advertised_start, mobile_available=True)
         self.enroll(course.id)
 
         response = self.api_response()

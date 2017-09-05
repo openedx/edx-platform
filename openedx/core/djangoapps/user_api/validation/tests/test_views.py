@@ -53,11 +53,11 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         )
 
     @ddt.data(
-        ['name', (name for name in testutils.VALID_NAMES)],
-        ['email', (email for email in testutils.VALID_EMAILS)],
-        ['password', (password for password in testutils.VALID_PASSWORDS)],
-        ['username', (username for username in testutils.VALID_USERNAMES)],
-        ['country', (country for country in testutils.VALID_COUNTRIES)]
+        ['name', [name for name in testutils.VALID_NAMES]],
+        ['email', [email for email in testutils.VALID_EMAILS]],
+        ['password', [password for password in testutils.VALID_PASSWORDS]],
+        ['username', [username for username in testutils.VALID_USERNAMES]],
+        ['country', [country for country in testutils.VALID_COUNTRIES]]
     )
     @ddt.unpack
     def test_positive_validation_decision(self, form_field_name, user_data):
@@ -71,11 +71,11 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
 
     @ddt.data(
         # Skip None type for invalidity checks.
-        ['name', (name for name in testutils.INVALID_NAMES[1:])],
-        ['email', (email for email in testutils.INVALID_EMAILS[1:])],
-        ['password', (password for password in testutils.INVALID_PASSWORDS[1:])],
-        ['username', (username for username in testutils.INVALID_USERNAMES[1:])],
-        ['country', (country for country in testutils.INVALID_COUNTRIES[1:])]
+        ['name', [name for name in testutils.INVALID_NAMES[1:]]],
+        ['email', [email for email in testutils.INVALID_EMAILS[1:]]],
+        ['password', [password for password in testutils.INVALID_PASSWORDS[1:]]],
+        ['username', [username for username in testutils.INVALID_USERNAMES[1:]]],
+        ['country', [country for country in testutils.INVALID_COUNTRIES[1:]]]
     )
     @ddt.unpack
     def test_negative_validation_decision(self, form_field_name, user_data):
