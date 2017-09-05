@@ -118,6 +118,9 @@
                         fieldView.delegateEvents();
                     }
 
+                    // Clear existing content in user profile card
+                    this.$('.profile-section-one-fields').html('');
+
                     // Do not show name when in limited mode or no name has been set
                     if (this.showFullProfile() && this.options.accountSettingsModel.get('name')) {
                         this.$('.profile-section-one-fields').append(this.options.nameFieldView.render().el);

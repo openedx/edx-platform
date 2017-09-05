@@ -325,8 +325,8 @@
                 margin: 0 $baseline/2;
 
                 .social-links {
+                    @include padding($baseline/4, 0, 0, $baseline/4);
                     font-size: 2rem;
-                    padding-top: $baseline/4;
 
                     & > span {
                         color: $gray-l4;
@@ -348,25 +348,20 @@
                 }
 
                 .u-field {
-                    @extend %t-weight4;
+                    font-weight: $font-semibold;
                     @include padding(0, 0, 0, 3px);
                     color: $base-font-color;
                     margin-top: $baseline/5;
 
                     .u-field-value, .u-field-title {
-                        @extend %t-weight4;
+                        font-weight: 500;
                         width: calc(100% - 40px);
+                        color: $lightest-base-font-color;
                     }
 
                     .u-field-value-readonly {
-                        @extend %t-weight3;
                         font-family: $sans-serif;
                         color: $darkest-base-font-color;
-                    }
-
-                    .u-field-title {
-                        color: $lightest-base-font-color;
-                        display: block;
                     }
 
                     &.u-field-dropdown {
@@ -374,6 +369,12 @@
 
                         &:not(.editable-never) {
                             cursor: pointer;
+                        }
+                    }
+
+                    &:not(.u-field-readonly) {
+                        &.u-field-value {
+                            @extend %t-weight3;
                         }
 
                         &:not(:last-child) {

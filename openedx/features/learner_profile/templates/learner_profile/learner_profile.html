@@ -53,11 +53,10 @@ from openedx.core.djangolib.markup import HTML
                     </div>
                 </div>
                 <div class="wrapper-profile-section-container-two is-hidden">
+                    <div class="wrapper-profile-bio"></div>
                     % if achievements_fragment:
                         ${HTML(achievements_fragment.body_html())}
                     % endif
-                    <div class="wrapper-profile-bio">
-                    </div>
                 </div>
             </div>
         </div>
