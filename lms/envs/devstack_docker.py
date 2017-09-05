@@ -21,6 +21,7 @@ ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
 COMMENTS_SERVICE_URL = 'http://edx.devstack.forum:4567'
 
 ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_INTERNAL_ROOT_URL)
+ENABLE_ENTERPRISE_INTEGRATION = True
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
