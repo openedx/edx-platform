@@ -513,8 +513,6 @@ def certificate_status(generated_certificate):
                    certificate generation yet.
     generating   - A request has been made to generate a certificate,
                    but it has not been generated yet.
-    regenerating - A request has been made to regenerate a certificate,
-                   but it has not been generated yet.
     deleting     - A request has been made to delete a certificate.
 
     deleted      - The certificate has been deleted.
