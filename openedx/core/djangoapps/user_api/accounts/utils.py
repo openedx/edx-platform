@@ -85,6 +85,7 @@ def _get_username_from_social_link(platform_name, new_social_link):
 def _is_valid_social_username(value):
     """
     Given a particular string, returns whether the string can be considered a safe username.
-    A safe username contains only hyphens, underscores or other alphanumerical characters.
+    This is a very liberal validation step, simply assuring forward slashes do not exist
+    in the username.
     """
-    return bool(re.match('^[a-zA-Z0-9_-]*$', value))
+    return '/' not in value
