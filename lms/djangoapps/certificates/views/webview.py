@@ -100,8 +100,12 @@ def _update_certificate_context(context, user_certificate, platform_name):
 
     # Translators:  The format of the date includes the full name of the month
     course = get_course_by_id(user_certificate.course_id) if user_certificate.course_id else None
-
-    if course and not course.self_paced and course.certificate_available_date:
+    if (
+        course and
+        not course.self_paced and
+        course.certificate_available_date and
+        course.certificate_available_date < datetime.now(pytz.UTC)
+    ):
         date = course.certificate_available_date
     else:
         date = user_certificate.modified_date
