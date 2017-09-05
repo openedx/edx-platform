@@ -120,7 +120,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         gating_api.set_required_content(self.course.id, str(self.seq2.location), str(self.seq1.location), min_score)
         self.prereq_milestone = gating_api.get_gating_milestone(self.course.id, self.seq1.location, 'fulfills')
 
-    def assert_access_to_gated_content(self, user, expected_access):
+    def assert_access_to_gated_content(self, user):
         """
         Verifies access to gated content for the given user is as expected.
         """
@@ -130,8 +130,8 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         # access to gating content (seq1) remains constant
         self.assertTrue(bool(has_access(user, 'load', self.seq1, self.course.id)))
 
-        # access to gated content (seq2) is as expected
-        self.assertEquals(bool(has_access(user, 'load', self.seq2, self.course.id)), expected_access)
+        # access to gated content (seq2) remains constant, access is prevented in SeqModule loading
+        self.assertTrue(bool(has_access(user, 'load', self.seq2, self.course.id)))
 
     def assert_user_has_prereq_milestone(self, user, expected_has_milestone):
         """
@@ -157,11 +157,11 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
 
     def test_gated_for_nonstaff(self):
         self.assert_user_has_prereq_milestone(self.non_staff_user, expected_has_milestone=False)
-        self.assert_access_to_gated_content(self.non_staff_user, expected_access=False)
+        self.assert_access_to_gated_content(self.non_staff_user)
 
     def test_not_gated_for_staff(self):
         self.assert_user_has_prereq_milestone(self.staff_user, expected_has_milestone=False)
-        self.assert_access_to_gated_content(self.staff_user, expected_access=True)
+        self.assert_access_to_gated_content(self.staff_user)
 
     def test_gated_content_always_in_grades(self):
         # start with a grade from a non-gated subsection
@@ -169,7 +169,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
 
         # verify gated status and overall course grade percentage
         self.assert_user_has_prereq_milestone(self.non_staff_user, expected_has_milestone=False)
-        self.assert_access_to_gated_content(self.non_staff_user, expected_access=False)
+        self.assert_access_to_gated_content(self.non_staff_user)
         self.assert_course_grade(self.non_staff_user, .33)
 
         # fulfill the gated requirements
@@ -177,16 +177,16 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
 
         # verify gated status and overall course grade percentage
         self.assert_user_has_prereq_milestone(self.non_staff_user, expected_has_milestone=True)
-        self.assert_access_to_gated_content(self.non_staff_user, expected_access=True)
+        self.assert_access_to_gated_content(self.non_staff_user)
         self.assert_course_grade(self.non_staff_user, .67)
 
     @ddt.data((1, 1, True), (1, 2, True), (1, 3, False), (0, 1, False))
     @ddt.unpack
     def test_ungating_when_fulfilled(self, earned, max_possible, result):
         self.assert_user_has_prereq_milestone(self.non_staff_user, expected_has_milestone=False)
-        self.assert_access_to_gated_content(self.non_staff_user, expected_access=False)
+        self.assert_access_to_gated_content(self.non_staff_user)
 
         answer_problem(self.course, self.request, self.gating_prob1, earned, max_possible)
 
         self.assert_user_has_prereq_milestone(self.non_staff_user, expected_has_milestone=result)
-        self.assert_access_to_gated_content(self.non_staff_user, expected_access=result)
+        self.assert_access_to_gated_content(self.non_staff_user)

@@ -10,6 +10,8 @@ from courseware.courses import get_course_overview_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 
 from ..utils import get_course_outline_block_tree
+from util.milestones_helpers import get_course_content_milestones
+from xmodule.modulestore.django import modulestore
 
 
 class CourseOutlineFragmentView(EdxFragmentView):
@@ -28,10 +30,34 @@ class CourseOutlineFragmentView(EdxFragmentView):
         if not course_block_tree:
             return None
 
+        content_milestones = self.get_content_milestones(request, course_key)
+
         context = {
             'csrf': csrf(request)['csrf_token'],
             'course': course_overview,
             'blocks': course_block_tree,
+            'gated_content': content_milestones
         }
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)
+
+    def get_content_milestones(self, request, course_key):
+        """
+        Returns dict of subsections with prerequisites and whether the prerequisite has been completed or not
+        """
+
+        all_course_prereqs = get_course_content_milestones(course_key)
+
+        content_ids_of_unfulfilled_prereqs = [
+            milestone['content_id']
+            for milestone in get_course_content_milestones(course_key, user_id=request.user.id)
+        ]
+
+        course_content_milestones = {
+            milestone['content_id']: {
+                'completed_prereqs': milestone['content_id'] not in content_ids_of_unfulfilled_prereqs
+            }
+            for milestone in all_course_prereqs
+        }
+
+        return course_content_milestones

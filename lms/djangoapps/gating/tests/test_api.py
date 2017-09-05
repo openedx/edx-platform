@@ -78,7 +78,7 @@ class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
         gating_api.set_required_content(self.course.id, self.seq2.location, self.seq1.location, min_score)
         self.prereq_milestone = gating_api.get_gating_milestone(self.course.id, self.seq1.location, 'fulfills')
 
-    @patch('gating.api._get_subsection_percentage')
+    @patch('openedx.core.lib.gating.api._get_subsection_percentage')
     @data((50, True), (100, True), (0, False))
     @unpack
     def test_min_score_achieved(self, module_score, result, mock_score):
@@ -88,24 +88,24 @@ class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
         evaluate_prerequisite(self.course, self.subsection_grade, self.user)
         self.assertEqual(milestones_api.user_has_milestone(self.user_dict, self.prereq_milestone), result)
 
-    @patch('gating.api.log.warning')
-    @patch('gating.api._get_subsection_percentage')
+    @patch('openedx.core.lib.gating.api._get_subsection_percentage')
+    @patch('openedx.core.lib.gating.api._get_minimum_required_percentage')
     @data((50, False), (100, True))
     @unpack
-    def test_invalid_min_score(self, module_score, result, mock_score, mock_log):
+    def test_invalid_min_score(self, module_score, result, mock_min_score, mock_score):
         self._setup_gating_milestone(None)
         mock_score.return_value = module_score
+        mock_min_score.return_value = 100
 
         evaluate_prerequisite(self.course, self.subsection_grade, self.user)
         self.assertEqual(milestones_api.user_has_milestone(self.user_dict, self.prereq_milestone), result)
-        self.assertTrue(mock_log.called)
 
-    @patch('gating.api._get_subsection_percentage')
+    @patch('openedx.core.lib.gating.api._get_subsection_percentage')
     def test_no_prerequisites(self, mock_score):
         evaluate_prerequisite(self.course, self.subsection_grade, self.user)
         self.assertFalse(mock_score.called)
 
-    @patch('gating.api._get_subsection_percentage')
+    @patch('openedx.core.lib.gating.api._get_subsection_percentage')
     def test_no_gated_content(self, mock_score):
         gating_api.add_prerequisite(self.course.id, self.seq1.location)
 

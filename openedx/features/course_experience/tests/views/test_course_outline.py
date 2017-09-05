@@ -7,17 +7,23 @@ import json
 from django.core.urlresolvers import reverse
 from pyquery import PyQuery as pq
 from six import text_type
+from gating import api as lms_gating_api
+from mock import patch, Mock
 
 from courseware.tests.factories import StaffFactory
+from openedx.core.lib.gating import api as gating_api
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from milestones.tests.utils import MilestonesTestCaseMixin
+from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
 
 from .test_course_home import course_home_url
 
 TEST_PASSWORD = 'test'
+GATING_NAMESPACE_QUALIFIER = '.gating'
 
 
 class TestCourseOutlinePage(SharedModuleStoreTestCase):
@@ -106,6 +112,138 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
                     self.assertTrue(sequential.children)
                     for vertical in sequential.children:
                         self.assertNotIn(vertical.display_name, response_content)
+
+
+class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
+    """
+    Test the course outline view with prerequisites.
+    """
+    TRANSFORMER_CLASS_TO_TEST = MilestonesAndSpecialExamsTransformer
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Creates a test course that can be used for non-destructive tests
+        """
+
+        cls.PREREQ_REQUIRED = '(Prerequisite required)'
+        cls.UNLOCKED = 'Unlocked'
+
+        with super(TestCourseOutlinePageWithPrerequisites, cls).setUpClassAndTestData():
+            cls.course, cls.course_blocks = cls.create_test_course()
+
+    @classmethod
+    def setUpTestData(cls):
+        """Set up and enroll our fake user in the course."""
+        cls.user = UserFactory(password=TEST_PASSWORD)
+        CourseEnrollment.enroll(cls.user, cls.course.id)
+
+    @classmethod
+    def create_test_course(cls):
+        """Creates a test course."""
+
+        course = CourseFactory.create()
+        course.enable_subsection_gating = True
+        course_blocks = {}
+        with cls.store.bulk_operations(course.id):
+            course_blocks['chapter'] = ItemFactory.create(category='chapter', parent_location=course.location)
+            course_blocks['prerequisite'] = ItemFactory.create(category='sequential', parent_location=course_blocks['chapter'].location, display_name='Prerequisite Exam')
+            course_blocks['gated_content'] = ItemFactory.create(category='sequential', parent_location=course_blocks['chapter'].location, display_name='Gated Content')
+            course_blocks['prerequisite_vertical'] = ItemFactory.create(category='vertical', parent_location=course_blocks['prerequisite'].location)
+            course_blocks['gated_content_vertical'] = ItemFactory.create(category='vertical', parent_location=course_blocks['gated_content'].location)
+        course.children = [course_blocks['chapter']]
+        course_blocks['chapter'].children = [course_blocks['prerequisite'], course_blocks['gated_content']]
+        course_blocks['prerequisite'].children = [course_blocks['prerequisite_vertical']]
+        course_blocks['gated_content'].children = [course_blocks['gated_content_vertical']]
+        if hasattr(cls, 'user'):
+            CourseEnrollment.enroll(cls.user, course.id)
+        return course, course_blocks
+
+    def setUp(self):
+        """
+        Set up for the tests.
+        """
+        super(TestCourseOutlinePageWithPrerequisites, self).setUp()
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
+    def setup_gated_section(self, gated_block, gating_block):
+        """
+        Test helper to create a gating requirement
+        Args:
+            gated_block: The block the that learner will not have access to until they complete the gating block
+            gating_block: (The prerequisite) The block that must be completed to get access to the gated block
+        """
+
+        gating_api.add_prerequisite(self.course.id, unicode(gating_block.location))
+        gating_api.set_required_content(self.course.id, gated_block.location, gating_block.location, 100)
+
+    def test_content_locked(self):
+        """
+        Test that a sequential/subsection with unmet prereqs correctly indicated that its content is locked
+        """
+        course = self.course
+        self.setup_gated_section(self.course_blocks['gated_content'], self.course_blocks['prerequisite'])
+
+        response = self.client.get(course_home_url(course))
+        self.assertEqual(response.status_code, 200)
+
+        response_content = pq(response.content)
+
+        # check lock icon is present
+        lock_icon = response_content('.fa-lock')
+        self.assertTrue(lock_icon, "lock icon is not present, but should be")
+
+        subsection = lock_icon.parents('.subsection-title')
+
+        # check that subsection-title-name is the display name
+        gated_subsection_title = self.course_blocks['gated_content'].display_name
+        self.assertIn(gated_subsection_title, subsection.children('.subsection-title-name').html())
+
+        # check that it says prerequisite required
+        self.assertIn(self.PREREQ_REQUIRED, subsection.children('.details').html())
+
+        # check that there is not a screen reader message
+        self.assertFalse(subsection.children('.sr'))
+
+    def test_content_unlocked(self):
+        """
+        Test that a sequential/subsection with unmet prereqs correctly indicated that its content is locked
+        """
+        course = self.course
+        self.setup_gated_section(self.course_blocks['gated_content'], self.course_blocks['prerequisite'])
+
+        # complete the prerequisite to unlock the gated content
+        # this call triggers reevaluation of prerequisites fulfilled by the gating block.
+        with patch('openedx.core.lib.gating.api._get_subsection_percentage', Mock(return_value=100)):
+            lms_gating_api.evaluate_prerequisite(
+                self.course,
+                Mock(location=self.course_blocks['prerequisite'].location),
+                self.user,
+            )
+
+        response = self.client.get(course_home_url(course))
+        self.assertEqual(response.status_code, 200)
+
+        response_content = pq(response.content)
+
+        # check unlock icon is present
+        unlock_icon = response_content('.fa-unlock')
+        self.assertTrue(unlock_icon, "unlock icon is not present, but should be")
+
+        subsection = unlock_icon.parents('.subsection-title')
+
+        # check that subsection-title-name is the display name of gated content section
+        gated_subsection_title = self.course_blocks['gated_content'].display_name
+        self.assertIn(gated_subsection_title, subsection.children('.subsection-title-name').html())
+
+        # check that it doesn't say prerequisite required
+        self.assertNotIn(self.PREREQ_REQUIRED, subsection.children('.subsection-title-name').html())
+
+        # check that there is a screen reader message
+        self.assertTrue(subsection.children('.sr'))
+
+        # check that the screen reader message is correct
+        self.assertIn(self.UNLOCKED, subsection.children('.sr').html())
 
 
 class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase):
