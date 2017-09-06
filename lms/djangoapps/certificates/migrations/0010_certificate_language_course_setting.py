@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('certificates', '0009_certificatetemplate_language'),
+        ('certificates', '0008_schema__remove_badges'),
     ]
 
     operations = [

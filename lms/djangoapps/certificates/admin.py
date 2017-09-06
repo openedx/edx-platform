@@ -67,7 +67,7 @@ class CertificateGenerationCourseSettingAdmin(admin.ModelAdmin):
     list_display = ('course_key', 'enabled', 'language_specific_templates')
     search_fields = ('course_key',)
     show_full_result_count = False
-    
+
 
 admin.site.register(CertificateGenerationConfiguration)
 admin.site.register(CertificateGenerationCourseSetting, CertificateGenerationCourseSettingAdmin)
