@@ -12,3 +12,7 @@ clean:
 	-git clean -fdX
 	tar xf $(PRIVATE_FILES)
 	rm $(PRIVATE_FILES)
+
+migrations:
+	# When run in Docker container, generates migrations for db model updates
+	./manage.py lms makemigrations --settings=devstack_docker
