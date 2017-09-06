@@ -1,5 +1,4 @@
 """
-
 Model code for completion API, including django models and facade classes
 wrapping progress extension models.
 """
@@ -10,7 +9,6 @@ from lazy import lazy
 from opaque_keys.edx.keys import UsageKey
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from progress.models import CourseModuleCompletion
@@ -37,13 +35,21 @@ IGNORE_CATEGORIES = {
 
 class CompletionDataMixin(object):
     """
-    Common calculations for completion values of courses or blocks within courses.
+    Common calculations for completion values of courses or blocks within
+    courses.
 
     Classes using this mixin must implement:
 
-        * self.earned (float)
-        * self.blocks (BlockStructureBlockData)
+        * self.stats (_Stats): An object representing the earned and possible
+          values.
     """
+
+    @lazy
+    def earned(self):
+        """
+        The number of earned completions within self.block.
+        """
+        return float(self.stats.earned)
 
     @lazy
     def possible(self):
@@ -51,7 +57,7 @@ class CompletionDataMixin(object):
         Return the maximum number of completions the user could earn in the
         course.
         """
-        return float(self.all_stats[self.block_key].possible)
+        return float(self.stats.possible)
 
     @lazy
     def ratio(self):
@@ -79,18 +85,18 @@ class CourseCompletionFacade(CompletionDataMixin, object):
         self._completions_in_category = {}
 
     @lazy
+    def stats(self):
+        """
+        Completion statistics for the current block
+        """
+        return self.all_stats[self.block_key]
+
+    @lazy
     def block_key(self):
         """
         The block key for the course.
         """
         return CourseOverview.load_from_module_store(self.course_key).location
-
-    @lazy
-    def collected(self):
-        """
-        Return the collected block structure for this course
-        """
-        return get_course_in_cache(self.course_key)
 
     @lazy
     def blocks(self):
@@ -105,7 +111,6 @@ class CourseCompletionFacade(CompletionDataMixin, object):
         return get_course_blocks(
             self.user,
             self.block_key,
-            collected_block_structure=self.collected,
         )
 
     def _recurse_all_stats(self, block):
@@ -137,27 +142,6 @@ class CourseCompletionFacade(CompletionDataMixin, object):
             self._recurse_all_stats(self.block_key)
         return self._all_stats
 
-    @lazy
-    def user(self):
-        """
-        Return the StudentProgress user
-        """
-        return self._inner.user
-
-    @lazy
-    def course_key(self):
-        """
-        Return the StudentProgress course_key
-        """
-        return self._inner.course_id
-
-    @lazy
-    def earned(self):
-        """
-        Return the number of completions earned by the user.
-        """
-        return self._inner.completions
-
     def iter_block_keys_in_category(self, category):
         """
         Yields the UsageKey for all blocks of the specified category.
@@ -185,6 +169,29 @@ class CourseCompletionFacade(CompletionDataMixin, object):
             course_id=self.course_key
         )
         return {UsageKey.from_string(mod.content_id).map_into_course(self.course_key) for mod in modules}
+
+    # Serialization properties
+
+    @lazy
+    def user(self):
+        """
+        Return the StudentProgress user
+        """
+        return self._inner.user
+
+    @lazy
+    def course_key(self):
+        """
+        Return the StudentProgress course_key
+        """
+        return self._inner.course_id
+
+    @lazy
+    def earned(self):
+        """
+        Return the number of completions earned by the user.
+        """
+        return self._inner.completions
 
     @lazy
     def chapter(self):
@@ -221,19 +228,12 @@ class BlockCompletion(CompletionDataMixin, object):
         self._completed_blocks = None
 
     @lazy
-    def all_stats(self):
+    def stats(self):
         """
         Return a dictionary mapping all aggregate nodes to their
         completion statistics.
         """
-        return self.course_completion.all_stats
-
-    @lazy
-    def earned(self):
-        """
-        The number of earned completions within self.block.
-        """
-        return float(self.all_stats[self.block_key].earned)
+        return self.course_completion.all_stats[self.block_key]
 
 
 class _Stats(object):
