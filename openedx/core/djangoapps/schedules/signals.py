@@ -41,17 +41,20 @@ def create_schedule(sender, **kwargs):
         log.debug('Schedules: Creation not enabled for this course or for this site')
         return
 
-    delta = None
-    if enrollment.course_overview.self_paced:
-        global_config = DynamicUpgradeDeadlineConfiguration.current()
-        if global_config.enabled:
-            # Use the default from this model whether or not the feature is enabled
-            delta = global_config.deadline_days
+    if not enrollment.course_overview.self_paced:
+        log.debug('Schedules: Creation only enabled for self-paced courses')
+        return
 
-        # Check if the course has a deadline override
-        course_config = CourseDynamicUpgradeDeadlineConfiguration.current(enrollment.course_id)
-        if course_config.enabled:
-            delta = course_config.deadline_days
+    delta = None
+    global_config = DynamicUpgradeDeadlineConfiguration.current()
+    if global_config.enabled:
+        # Use the default from this model whether or not the feature is enabled
+        delta = global_config.deadline_days
+
+    # Check if the course has a deadline override
+    course_config = CourseDynamicUpgradeDeadlineConfiguration.current(enrollment.course_id)
+    if course_config.enabled:
+        delta = course_config.deadline_days
 
     upgrade_deadline = None
 
