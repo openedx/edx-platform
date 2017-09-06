@@ -855,6 +855,8 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
     """
     course_key = CourseKeyField(max_length=255, db_index=True)
     enabled = models.BooleanField(default=False)
+    language_specific_templates = models.BooleanField(default=False)
+    
 
     class Meta(object):
         get_latest_by = 'created'
@@ -890,6 +892,38 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         CertificateGenerationCourseSetting.objects.create(
             course_key=course_key,
             enabled=is_enabled
+        )
+
+    @classmethod
+    def is_language_specific_templates_enabled_for_course(cls, course_key):
+        """Check whether self-generated certificates are enabled for a course.
+
+        Arguments:
+            course_key (CourseKey): The identifier for the course.
+
+        Returns:
+            boolean
+
+        """
+        try:
+            latest = cls.objects.filter(course_key=course_key).latest()
+        except cls.DoesNotExist:
+            return False
+        else:
+            return latest.language_specific_templates
+
+    @classmethod
+    def set_language_specific_templates_enabled_for_course(cls, course_key, is_enabled):
+        """Enable or disable self-generated certificates for a course.
+
+        Arguments:
+            course_key (CourseKey): The identifier for the course.
+            is_enabled (boolean): Whether to enable or disable language specific certificates.
+
+        """
+        CertificateGenerationCourseSetting.objects.create(
+            course_key=course_key,
+            language_specific_templates=is_enabled
         )
 
 

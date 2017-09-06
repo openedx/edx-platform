@@ -28,6 +28,10 @@ class CertificateTemplateForm(forms.ModelForm):
         self.fields['organization_id'] = forms.TypedChoiceField(
             choices=org_choices, required=False, coerce=int, empty_value=None
         )
+<<<<<<< HEAD
+=======
+        self.fields['language'] = _get_all_language_form_choice_field()
+>>>>>>> b4ac004630... Added Language specific template toggle for courses
 
     class Meta(object):
         model = CertificateTemplate
@@ -64,9 +68,15 @@ class CertificateGenerationCourseSettingAdmin(admin.ModelAdmin):
     """
     Django admin customizations for CertificateGenerationCourseSetting model
     """
-    list_display = ('course_key', 'enabled')
+    list_display = ('course_key', 'enabled', 'language_specific_templates')
     search_fields = ('course_key',)
     show_full_result_count = False
+    
+
+def _get_all_language_form_choice_field():
+    lang_choices = all_languages()
+    lang_choices.insert(0, ('', '------------'))
+    return forms.ChoiceField(choices=lang_choices, required=False)
 
 
 admin.site.register(CertificateGenerationConfiguration)
