@@ -69,12 +69,6 @@ class CertificateGenerationCourseSettingAdmin(admin.ModelAdmin):
     show_full_result_count = False
     
 
-def _get_all_language_form_choice_field():
-    lang_choices = all_languages()
-    lang_choices.insert(0, ('', '------------'))
-    return forms.ChoiceField(choices=lang_choices, required=False)
-
-
 admin.site.register(CertificateGenerationConfiguration)
 admin.site.register(CertificateGenerationCourseSetting, CertificateGenerationCourseSettingAdmin)
 admin.site.register(CertificateHtmlViewConfiguration, ConfigurationModelAdmin)
