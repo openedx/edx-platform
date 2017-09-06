@@ -77,6 +77,7 @@ from openedx.core.djangoapps.credit.api import (
     is_credit_course,
     is_user_eligible_for_credit
 )
+from openedx.core.djangoapps.certificates.config import waffle as certificates_waffle
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
@@ -886,9 +887,8 @@ def _progress(request, course_key, student_id):
         'masquerade': masquerade,
         'supports_preview_menu': True,
         'student': student,
-        'passed': is_course_passed(course, grade_summary),
         'credit_course_requirements': _credit_course_requirements(course_key, student),
-        'certificate_data': _get_cert_data(student, course, course_key, is_active, enrollment_mode),
+        'certificate_data': _get_cert_data(student, course, course_key, is_active, enrollment_mode, grade_summary),
     }
     context.update(
         get_experiment_user_metadata_context(
@@ -903,7 +903,7 @@ def _progress(request, course_key, student_id):
     return response
 
 
-def _get_cert_data(student, course, course_key, is_active, enrollment_mode):
+def _get_cert_data(student, course, course_key, is_active, enrollment_mode, grade_summary=None):
     """Returns students course certificate related data.
 
     Arguments:
@@ -912,13 +912,14 @@ def _get_cert_data(student, course, course_key, is_active, enrollment_mode):
         course_key (CourseKey): Course identifier for course.
         is_active (Bool): Boolean value to check if course is active.
         enrollment_mode (String): Course mode in which student is enrolled.
+        grade_summary (dict): Student grade details.
 
     Returns:
         returns dict if course certificate is available else None.
     """
     from lms.djangoapps.courseware.courses import get_course_by_id
 
-    if enrollment_mode == CourseMode.AUDIT:
+    if not CourseMode.is_eligible_for_certificate(enrollment_mode):
         return CertData(
             CertificateStatuses.audit_passing,
             _('Your enrollment: Audit track'),
@@ -931,14 +932,22 @@ def _get_cert_data(student, course, course_key, is_active, enrollment_mode):
     if course_key:
         may_view_certificate = get_course_by_id(course_key).may_certify()
 
-    show_message = all([
-        is_active,
-        CourseMode.is_eligible_for_certificate(enrollment_mode),
-        certs_api.cert_generation_enabled(course_key),
-        may_view_certificate
-    ])
+    switches = certificates_waffle.waffle()
+    switches_enabled = (switches.is_enabled(certificates_waffle.SELF_PACED_ONLY) and
+                        switches.is_enabled(certificates_waffle.INSTRUCTOR_PACED_ONLY))
+    student_cert_generation_enabled = certs_api.cert_generation_enabled(course_key) if not switches_enabled else True
 
-    if not show_message:
+    # Don't show certificate information if:
+    # 1) the learner has not passed the course
+    # 2) the course is not active
+    # 3) auto-generated certs flags are not enabled, but student cert generation is not enabled either
+    # 4) the learner may not view the certificate, based on the course's advanced course settings.
+    if not all([
+        is_course_passed(course, grade_summary),
+        is_active,
+        student_cert_generation_enabled,
+        may_view_certificate
+    ]):
         return None
 
     if certs_api.is_certificate_invalid(student, course_key):
@@ -952,53 +961,44 @@ def _get_cert_data(student, course, course_key, is_active, enrollment_mode):
 
     cert_downloadable_status = certs_api.certificate_downloadable_status(student, course_key)
 
+    generating_certificate_message = CertData(
+        CertificateStatuses.generating,
+        _("We're working on it..."),
+        _(
+            "We're creating your certificate. You can keep working in your courses and a link "
+            "to it will appear here and on your Dashboard when it is ready."
+        ),
+        download_url=None,
+        cert_web_view_url=None
+    )
+
     if cert_downloadable_status['is_downloadable']:
-        cert_status = CertificateStatuses.downloadable
-        title = _('Your certificate is available')
-        msg = _("You've earned a certificate for this course.")
         if certs_api.has_html_certificates_enabled(course_key, course):
             if certs_api.get_active_web_certificate(course) is not None:
-                cert_web_view_url = certs_api.get_certificate_url(
-                    course_id=course_key, uuid=cert_downloadable_status['uuid']
-                )
                 return CertData(
-                    cert_status,
-                    title,
-                    msg,
+                    CertificateStatuses.downloadable,
+                    _('Your certificate is available'),
+                    _("You've earned a certificate for this course."),
                     download_url=None,
-                    cert_web_view_url=cert_web_view_url
+                    cert_web_view_url=certs_api.get_certificate_url(
+                        course_id=course_key, uuid=cert_downloadable_status['uuid']
+                    )
                 )
             else:
-                return CertData(
-                    CertificateStatuses.generating,
-                    _("We're working on it..."),
-                    _(
-                        "We're creating your certificate. You can keep working in your courses and a link "
-                        "to it will appear here and on your Dashboard when it is ready."
-                    ),
-                    download_url=None,
-                    cert_web_view_url=None
-                )
+                # If there is an error, the user should see the generating certificate message
+                # until a new certificate is generated.
+                return generating_certificate_message
 
         return CertData(
-            cert_status,
-            title,
-            msg,
+            CertificateStatuses.downloadable,
+            _('Your certificate is available'),
+            _("You've earned a certificate for this course."),
             download_url=cert_downloadable_status['download_url'],
             cert_web_view_url=None
         )
 
     if cert_downloadable_status['is_generating']:
-        return CertData(
-            CertificateStatuses.generating,
-            _("We're working on it..."),
-            _(
-                "We're creating your certificate. You can keep working in your courses and a link to "
-                "it will appear here and on your Dashboard when it is ready."
-            ),
-            download_url=None,
-            cert_web_view_url=None
-        )
+        return generating_certificate_message
 
     # If the learner is in verified modes and the student did not have
     # their ID verified, we need to show message to ask learner to verify their ID first
