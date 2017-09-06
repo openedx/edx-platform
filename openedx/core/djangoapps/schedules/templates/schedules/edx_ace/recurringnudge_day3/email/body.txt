@@ -1,7 +1,17 @@
 {% load i18n %}
+
+{% if courses|length > 1 %}
 {% blocktrans trimmed %}
-    Keep learning today. Remember when you enrolled in {{course_name}} on edX.org? We do, and we’re glad
+    Remember when you enrolled in {{ course_name }}, and other courses on edX.org? We do, and we’re glad
     to have you! Come see what everyone is learning.
 {% endblocktrans %}
 
-{% trans "Keep learning" %} <{{course_url}}>
+{% trans "Start learning now" %} <{{ dashboard_url }}>
+{% else %}
+{% blocktrans trimmed %}
+    Remember when you enrolled in {{ course_name }} on edX.org? We do, and we’re glad
+    to have you! Come see what everyone is learning.
+{% endblocktrans %}
+
+{% trans "Start learning now" %} <{{ course_url }}>
+{% endif %}

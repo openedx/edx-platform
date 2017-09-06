@@ -2,10 +2,17 @@
 {% load i18n %}
 
 {% block preview_text %}
-    {% blocktrans trimmed %}
-        Keep up the momentum! Many edX learners in {{course_name}} are completing more problems every week, and
-        participating in the discussion forums. What do you want to do to keep learning?
-    {% endblocktrans %}
+    {% if courses|length > 1 %}
+        {% blocktrans trimmed %}
+            Many {{ platform_name }} learners are completing more problems every week, and
+            participating in the discussion forums. What do you want to do to keep learning?
+        {% endblocktrans %}
+    {% else %}
+        {% blocktrans trimmed %}
+            Many {{ platform_name }} learners in {{course_name}} are completing more problems every week, and
+            participating in the discussion forums. What do you want to do to keep learning?
+        {% endblocktrans %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -15,14 +22,27 @@
             <h1>{% trans "Keep up the momentum!" %}</h1>
 
             <p>
-                {% blocktrans trimmed %}
-                    Many edX learners in <strong>{{course_name}}</strong> are completing more problems every week, and
-                    participating in the discussion forums. What do you want to do to keep learning?
-                {% endblocktrans %}
+                {% if courses|length > 1 %}
+                    {% blocktrans trimmed %}
+                        Many edX learners are completing more problems every week, and
+                        participating in the discussion forums. What do you want to do to keep learning?
+                    {% endblocktrans %}
+                {% else %}
+                    {% blocktrans trimmed %}
+                        Many edX learners in <strong>{{course_name}}</strong> are completing more problems every week, and
+                        participating in the discussion forums. What do you want to do to keep learning?
+                    {% endblocktrans %}
+                {% endif %}
             </p>
             <p>
                 <!-- email client support for style sheets is pretty spotty, so we have to inline all of these styles -->
-                <a href="{{ course_url }}" style="
+                <a
+                {% if courses|length > 1 %}
+                    href="{{ dashboard_url }}"
+                {% else %}
+                    href="{{ course_url }}"
+                {% endif %}
+                style="
                     color: #ffffff;
                     text-decoration: none;
                     border-radius: 4px;
