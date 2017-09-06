@@ -9,6 +9,8 @@ from course_modes.models import CourseMode
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
+from lms.djangoapps.certificates.api import is_passing_status
+from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -118,15 +120,15 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.get(path=profile_path)
         self.assertEqual(404, response.status_code)
 
-    def _create_certificate(self, enrollment_mode):
+    def _create_certificate(self, course_key=None, enrollment_mode=CourseMode.HONOR, status='downloadable'):
         """Simulate that the user has a generated certificate. """
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, mode=enrollment_mode)
         return GeneratedCertificateFactory(
             user=self.user,
-            course_id=self.course.id,
+            course_id=course_key or self.course.id,
             mode=enrollment_mode,
             download_url=self.DOWNLOAD_URL,
-            status="downloadable"
+            status=status,
         )
 
     @ddt.data(CourseMode.HONOR, CourseMode.PROFESSIONAL, CourseMode.VERIFIED)
@@ -136,12 +138,49 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
         Verify that certificates are displayed with the correct card mode.
         """
         # Add new certificate
-        cert = self._create_certificate(cert_mode)
+        cert = self._create_certificate(enrollment_mode=cert_mode)
         cert.save()
 
         response = self.client.get('/u/{username}'.format(username=self.user.username))
 
         self.assertContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert_mode))
+
+    @ddt.data(
+        ['downloadable', True],
+        ['notpassing', False],
+    )
+    @ddt.unpack
+    @override_waffle_flag(SHOW_ACHIEVEMENTS_FLAG, active=True)
+    def test_certificate_status_visibility(self, status, is_passed_status):
+        """
+        Verify that certificates are only displayed for passing status.
+        """
+        # Add new certificate
+        cert = self._create_certificate(status=status)
+        cert.save()
+
+        # Ensure that this test is actually using both passing and non-passing certs.
+        self.assertEqual(is_passing_status(cert.status), is_passed_status)
+
+        response = self.client.get('/u/{username}'.format(username=self.user.username))
+
+        if is_passed_status:
+            self.assertContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
+        else:
+            self.assertNotContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
+
+    @override_waffle_flag(SHOW_ACHIEVEMENTS_FLAG, active=True)
+    def test_certificate_for_missing_course(self):
+        """
+        Verify that a certificate is not shown for a missing course.
+        """
+        # Add new certificate
+        cert = self._create_certificate(course_key=CourseLocator.from_string('course-v1:edX+INVALID+1'))
+        cert.save()
+
+        response = self.client.get('/u/{username}'.format(username=self.user.username))
+
+        self.assertNotContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
 
     @ddt.data(True, False)
     @override_waffle_flag(SHOW_ACHIEVEMENTS_FLAG, active=True)
