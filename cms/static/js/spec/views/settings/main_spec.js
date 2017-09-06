@@ -350,10 +350,12 @@ define([
             AjaxHelpers.respondWithJson(requests, expectedJson);
         });
         it('should disallow save with a certificate available date before end date', function() {
+            this.model.showCertificateAvailableDate = true;
             $('#course-end-date').val('01/01/2030').trigger('change');
             expect(this.view.$('.message-error')).toExist();
         });
         it('should allow save with a certificate available date before end date for self-paced course', function() {
+            this.model.showCertificateAvailableDate = false;
             this.model.set('self_paced', true);
             $('#course-end-date').val('01/01/2030').trigger('change');
             expect(this.view.$('.message-error')).not.toExist();

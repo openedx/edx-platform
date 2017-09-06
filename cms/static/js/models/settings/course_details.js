@@ -60,7 +60,7 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
                 if (newattrs.end_date && newattrs.enrollment_end && newattrs.end_date < newattrs.enrollment_end) {
                     errors.enrollment_end = gettext('The enrollment end date cannot be after the course end date.');
                 }
-                if (!this.get('self_paced') && newattrs.end_date && newattrs.certificate_available_date &&
+                if (this.showCertificateAvailableDate && newattrs.end_date && newattrs.certificate_available_date &&
                     newattrs.certificate_available_date < newattrs.end_date) {
                     errors.certificate_available_date = gettext(
                         'The certificate available date must be later than the course end date.'
