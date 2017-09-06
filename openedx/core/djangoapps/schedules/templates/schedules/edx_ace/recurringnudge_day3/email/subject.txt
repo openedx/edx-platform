@@ -1,3 +1,7 @@
 {% load i18n %}
 
-{% blocktrans %}Keep learning in {{course_name}}!{% endblocktrans %}
+{% if courses|length > 1 %}
+{% blocktrans %}Keep learning on {{ platform_name }}!{% endblocktrans %}
+{% else %}
+{% blocktrans %}Keep learning in {{course_name}} !{% endblocktrans %}
+{% endif %}

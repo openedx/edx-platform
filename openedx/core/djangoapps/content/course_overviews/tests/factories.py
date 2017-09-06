@@ -28,3 +28,7 @@ class CourseOverviewFactory(DjangoModelFactory):
     @factory.lazy_attribute
     def id(self):
         return CourseLocator(self.org, 'toy', '2012_Fall')
+
+    @factory.lazy_attribute
+    def display_name(self):
+        return "{} Course".format(self.id)

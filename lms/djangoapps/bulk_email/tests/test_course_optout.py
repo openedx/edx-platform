@@ -166,7 +166,7 @@ class TestACEOptoutCourseEmails(ModuleStoreTestCase):
                 email_address=self.student.email,
             ),
             context={
-                'course_id': str(self.course.id)
+                'course_ids': [str(self.course.id)]
             },
         )
 
