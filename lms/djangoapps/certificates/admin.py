@@ -28,10 +28,6 @@ class CertificateTemplateForm(forms.ModelForm):
         self.fields['organization_id'] = forms.TypedChoiceField(
             choices=org_choices, required=False, coerce=int, empty_value=None
         )
-<<<<<<< HEAD
-=======
-        self.fields['language'] = _get_all_language_form_choice_field()
->>>>>>> b4ac004630... Added Language specific template toggle for courses
 
     class Meta(object):
         model = CertificateTemplate
