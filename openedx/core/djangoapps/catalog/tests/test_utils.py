@@ -15,6 +15,7 @@ from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, Pr
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
     get_course_runs,
+    get_course_run_details,
     get_program_types,
     get_programs,
     get_programs_with_type
@@ -304,3 +305,31 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
         self.assertTrue(mock_get_edx_api_data.called)
         self.assert_contract(mock_get_edx_api_data.call_args)
         self.assertEqual(data, catalog_course_runs)
+
+
+@skip_unless_lms
+@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+class TestGetCourseRunDetails(CatalogIntegrationMixin, TestCase):
+    """
+    Tests covering retrieval of information about a specific course run from the catalog service.
+    """
+    def setUp(self):
+        super(TestGetCourseRunDetails, self).setUp()
+        self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
+        self.user = UserFactory(username=self.catalog_integration.service_username)
+
+    def test_get_course_run_details(self, mock_get_edx_api_data):
+        """
+        Test retrieval of details about a specific course run
+        """
+        course_run = CourseRunFactory()
+        course_run_details = {
+            'language': course_run['language'],
+            'start': course_run['start'],
+            'end': course_run['end'],
+            'max_effort': course_run['max_effort']
+        }
+        mock_get_edx_api_data.return_value = course_run_details
+        data = get_course_run_details(course_run['key'], ['language', 'start', 'end', 'max_effort'])
+        self.assertTrue(mock_get_edx_api_data.called)
+        self.assertEqual(data, course_run_details)
