@@ -152,9 +152,9 @@ class TestCreateAccount(SiteMixin, TestCase):
             'country': self.params['country'],
         }
 
-        self.create_account_and_fetch_profile()
+        profile = self.create_account_and_fetch_profile()
 
-        mock_segment_identify.assert_called_with(1, expected_payload)
+        mock_segment_identify.assert_called_with(profile.user.id, expected_payload)
 
     @unittest.skipUnless(
         "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE_CLASSES,

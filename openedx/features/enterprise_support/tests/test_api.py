@@ -10,7 +10,7 @@ import mock
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.test import SimpleTestCase
+from django.test import TestCase
 from django.test.utils import override_settings
 
 from openedx.features.enterprise_support.api import (
@@ -26,20 +26,30 @@ from openedx.features.enterprise_support.tests.mixins.enterprise import Enterpri
 from student.tests.factories import UserFactory
 
 
+class MockEnrollment(mock.MagicMock):
+    """
+    Mock object for an enrollment which has a consistent string representation
+    suitable for use in ddt parameters.
+    """
+    def __repr__(self):
+        return '<MockEnrollment course_id={}>'.format(getattr(self, 'course_id', None))
+
+
 @ddt.ddt
 @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestEnterpriseApi(EnterpriseServiceMockMixin, SimpleTestCase):
+class TestEnterpriseApi(EnterpriseServiceMockMixin, TestCase):
     """
     Test enterprise support APIs.
     """
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         UserFactory.create(
             username='enterprise_worker',
             email='ent_worker@example.com',
             password='password123',
         )
-        super(TestEnterpriseApi, self).setUp()
+        super(TestEnterpriseApi, cls).setUpTestData()
 
     @httpretty.activate
     @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker')
@@ -239,13 +249,13 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, SimpleTestCase):
         (True, {}, 'course', [], []),
         (True, {'real': 'enterprise'}, None, [], []),
         (True, {'name': 'GriffCo', 'uuid': ''}, 'real-course', [], []),
-        (True, {'name': 'GriffCo', 'uuid': ''}, 'real-course', [mock.MagicMock(course_id='other-id')], []),
+        (True, {'name': 'GriffCo', 'uuid': ''}, 'real-course', [MockEnrollment(course_id='other-id')], []),
         (
             True,
             {'name': 'GriffCo', 'uuid': 'real-uuid'},
             'real-course',
             [
-                mock.MagicMock(
+                MockEnrollment(
                     course_id='real-course',
                     course_overview=mock.MagicMock(
                         display_name='My Cool Course'

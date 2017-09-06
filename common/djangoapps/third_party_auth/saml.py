@@ -2,6 +2,7 @@
 Slightly customized python-social-auth backend for SAML 2.0 support
 """
 import logging
+from copy import deepcopy
 
 import requests
 from django.contrib.sites.models import Site
@@ -191,7 +192,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         Open edX platform registration form.
         """
         overrides = self.conf.get('sapsf_value_mappings', {})
-        base = self.default_value_mapping.copy()
+        base = deepcopy(self.default_value_mapping)
         for field, override in overrides.items():
             if field in base:
                 base[field].update(override)

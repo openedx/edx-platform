@@ -31,7 +31,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from .helpers import add_course_mode
-from .test_course_updates import create_course_update
+from .test_course_updates import create_course_update, remove_course_updates
 from ... import COURSE_PRE_START_ACCESS_FLAG
 
 TEST_PASSWORD = 'test'
@@ -125,6 +125,10 @@ class TestCourseHomePage(CourseHomePageTestCase):
         super(TestCourseHomePage, self).setUp()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
+    def tearDown(self):
+        remove_course_updates(self.user, self.course)
+        super(TestCourseHomePage, self).tearDown()
+
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_welcome_message_when_unified(self):
         # Create a welcome message
@@ -204,6 +208,10 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         # Add a welcome message
         create_course_update(self.course, self.staff_user, TEST_WELCOME_MESSAGE)
 
+    def tearDown(self):
+        remove_course_updates(self.staff_user, self.course)
+        super(TestCourseHomePageAccess, self).tearDown()
+
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
     @ddt.data(
@@ -214,7 +222,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
     )
     @ddt.unpack
     def test_home_page(self, user_type, expected_message):
-        self.user = self.create_user_for_course(self.course, user_type)
+        self.create_user_for_course(self.course, user_type)
 
         # Render the course home page
         url = course_home_url(self.course)
@@ -252,7 +260,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         """
         Verifies the course home tab when not unified.
         """
-        self.user = self.create_user_for_course(self.course, user_type)
+        self.create_user_for_course(self.course, user_type)
 
         # Render the course home page
         url = course_home_url(self.course)
@@ -294,7 +302,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         the student dashboard, not a 404.
         """
         future_course = self.create_future_course()
-        self.user = self.create_user_for_course(future_course, CourseUserType.ENROLLED)
+        self.create_user_for_course(future_course, CourseUserType.ENROLLED)
 
         url = course_home_url(future_course)
         response = self.client.get(url)
@@ -315,7 +323,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         the student dashboard, not a 404, even if the localized date is unicode
         """
         future_course = self.create_future_course()
-        self.user = self.create_user_for_course(future_course, CourseUserType.ENROLLED)
+        self.create_user_for_course(future_course, CourseUserType.ENROLLED)
 
         fake_unicode_start_time = u"üñîçø∂é_ßtå®t_tîµé"
         mock_strftime_localized.return_value = fake_unicode_start_time
@@ -334,7 +342,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         """
         Ensure a non-existent course results in a 404.
         """
-        self.user = self.create_user_for_course(self.course, CourseUserType.ANONYMOUS)
+        self.create_user_for_course(self.course, CourseUserType.ANONYMOUS)
 
         url = course_home_url_from_string('not/a/course')
         response = self.client.get(url)
@@ -361,21 +369,21 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE_ANONYMOUS)
 
         # Verify that unenrolled users are shown an enroll call to action message
-        self.user = self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
+        user = self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
         url = course_home_url(self.course)
         response = self.client.get(url)
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE_UNENROLLED)
 
         # Verify that enrolled users are not shown a message when enrolled and course has begun
-        CourseEnrollment.enroll(self.user, self.course.id)
+        CourseEnrollment.enroll(user, self.course.id)
         url = course_home_url(self.course)
         response = self.client.get(url)
         self.assertNotContains(response, TEST_COURSE_HOME_MESSAGE)
 
         # Verify that enrolled users are shown 'days until start' message before start date
         future_course = self.create_future_course()
-        CourseEnrollment.enroll(self.user, future_course.id)
+        CourseEnrollment.enroll(user, future_course.id)
         url = course_home_url(future_course)
         response = self.client.get(url)
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
