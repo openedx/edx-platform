@@ -1,6 +1,5 @@
 """Tests covering time zone utilities."""
-from unittest import TestCase
-
+from django.test import TestCase
 from freezegun import freeze_time
 from pytz import timezone, utc
 

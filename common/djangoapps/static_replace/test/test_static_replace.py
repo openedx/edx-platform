@@ -6,6 +6,7 @@ from cStringIO import StringIO
 from urlparse import parse_qsl, urlparse, urlunparse
 
 import ddt
+import pytest
 from django.test import override_settings
 from django.utils.http import urlencode, urlquote
 from mock import Mock, patch
@@ -162,6 +163,7 @@ def test_raw_static_check():
     assert_equals(path, replace_static_urls(path, text))
 
 
+@pytest.mark.django_db
 @patch('static_replace.staticfiles_storage', autospec=True)
 @patch('static_replace.modulestore', autospec=True)
 def test_static_url_with_query(mock_modulestore, mock_storage):

@@ -7,6 +7,7 @@ import json
 import unittest
 
 import mock
+from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import utc
 from nose.plugins.attrib import attr
@@ -65,7 +66,7 @@ class TestHandleDashboardError(unittest.TestCase):
 
 
 @attr(shard=1)
-class TestRequireStudentIdentifier(unittest.TestCase):
+class TestRequireStudentIdentifier(TestCase):
     """
     Test require_student_from_identifier()
     """
