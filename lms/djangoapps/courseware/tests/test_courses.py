@@ -49,6 +49,12 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 class CoursesTest(ModuleStoreTestCase):
     """Test methods related to fetching courses."""
     ENABLED_SIGNALS = ['course_published']
+    GET_COURSE_WITH_ACCESS = 'get_course_with_access'
+    GET_COURSE_OVERVIEW_WITH_ACCESS = 'get_course_overview_with_access'
+    COURSE_ACCESS_FUNCS = {
+        GET_COURSE_WITH_ACCESS: get_course_with_access,
+        GET_COURSE_OVERVIEW_WITH_ACCESS: get_course_overview_with_access,
+    }
 
     @override_settings(CMS_BASE=CMS_BASE_TEST)
     def test_get_cms_course_block_link(self):
@@ -64,8 +70,9 @@ class CoursesTest(ModuleStoreTestCase):
         cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, unicode(self.course.location))
         self.assertEqual(cms_url, get_cms_block_link(self.course, 'course'))
 
-    @ddt.data(get_course_with_access, get_course_overview_with_access)
-    def test_get_course_func_with_access_error(self, course_access_func):
+    @ddt.data(GET_COURSE_WITH_ACCESS, GET_COURSE_OVERVIEW_WITH_ACCESS)
+    def test_get_course_func_with_access_error(self, course_access_func_name):
+        course_access_func = self.COURSE_ACCESS_FUNCS[course_access_func_name]
         user = UserFactory.create()
         course = CourseFactory.create(visible_to_staff_only=True)
 
@@ -76,11 +83,12 @@ class CoursesTest(ModuleStoreTestCase):
         self.assertFalse(error.exception.access_response.has_access)
 
     @ddt.data(
-        (get_course_with_access, 1),
-        (get_course_overview_with_access, 0),
+        (GET_COURSE_WITH_ACCESS, 1),
+        (GET_COURSE_OVERVIEW_WITH_ACCESS, 0),
     )
     @ddt.unpack
-    def test_get_course_func_with_access(self, course_access_func, num_mongo_calls):
+    def test_get_course_func_with_access(self, course_access_func_name, num_mongo_calls):
+        course_access_func = self.COURSE_ACCESS_FUNCS[course_access_func_name]
         user = UserFactory.create()
         course = CourseFactory.create(emit_signals=True)
         with check_mongo_calls(num_mongo_calls):

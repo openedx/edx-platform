@@ -234,12 +234,16 @@ class CourseRole(RoleBase):
     def course_group_already_exists(self, course_key):
         return CourseAccessRole.objects.filter(org=course_key.org, course_id=course_key).exists()
 
+    def __repr__(self):
+        return '<{}: course_key={}>'.format(self.__class__.__name__, self.course_key)
+
 
 class OrgRole(RoleBase):
     """
     A named role in a particular org independent of course
     """
-    pass
+    def __repr__(self):
+        return '<{}>'.format(self.__class__.__name__)
 
 
 @register_access_role

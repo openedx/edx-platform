@@ -1570,11 +1570,11 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
 
 PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
 
-# The "set" here is to work around the bug that load_classes returns duplicates for multiply-delcared classes.
-PER_STUDENT_ANONYMIZED_DESCRIPTORS = set(
+# The "set" here is to work around the bug that load_classes returns duplicates for multiply-declared classes.
+PER_STUDENT_ANONYMIZED_DESCRIPTORS = sorted(set(
     class_ for (name, class_) in XModuleDescriptor.load_classes()
     if not issubclass(class_, PER_COURSE_ANONYMIZED_DESCRIPTORS)
-)
+), key=str)
 
 
 @attr(shard=1)

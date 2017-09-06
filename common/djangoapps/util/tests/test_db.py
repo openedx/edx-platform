@@ -31,20 +31,26 @@ class TransactionManagersTestCase(TransactionTestCase):
 
     To test do: "./manage.py lms --settings=test_with_mysql test util.tests.test_db"
     """
+    DECORATORS = {
+        'outer_atomic': outer_atomic(),
+        'outer_atomic_read_committed': outer_atomic(read_committed=True),
+        'commit_on_success': commit_on_success(),
+        'commit_on_success_read_committed': commit_on_success(read_committed=True),
+    }
 
     @ddt.data(
-        (outer_atomic(), IntegrityError, None, True),
-        (outer_atomic(read_committed=True), type(None), False, True),
-        (commit_on_success(), IntegrityError, None, True),
-        (commit_on_success(read_committed=True), type(None), False, True),
+        ('outer_atomic', IntegrityError, None, True),
+        ('outer_atomic_read_committed', type(None), False, True),
+        ('commit_on_success', IntegrityError, None, True),
+        ('commit_on_success_read_committed', type(None), False, True),
     )
     @ddt.unpack
-    def test_concurrent_requests(self, transaction_decorator, exception_class, created_in_1, created_in_2):
+    def test_concurrent_requests(self, transaction_decorator_name, exception_class, created_in_1, created_in_2):
         """
         Test that when isolation level is set to READ COMMITTED get_or_create()
         for the same row in concurrent requests does not raise an IntegrityError.
         """
-
+        transaction_decorator = self.DECORATORS[transaction_decorator_name]
         if connection.vendor != 'mysql':
             raise unittest.SkipTest('Only works on MySQL.')
 

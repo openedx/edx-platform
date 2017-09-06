@@ -46,10 +46,18 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
     """
 
     TODAY = timezone.now()
-    LAST_MONTH = TODAY - datetime.timedelta(days=30)
-    LAST_WEEK = TODAY - datetime.timedelta(days=7)
-    NEXT_WEEK = TODAY + datetime.timedelta(days=7)
-    NEXT_MONTH = TODAY + datetime.timedelta(days=30)
+    LAST_MONTH = 'last_month'
+    LAST_WEEK = 'last_week'
+    NEXT_WEEK = 'next_week'
+    NEXT_MONTH = 'next_month'
+    DATES = {
+        'default_start_date': DEFAULT_START_DATE,
+        LAST_MONTH: TODAY - datetime.timedelta(days=30),
+        LAST_WEEK: TODAY - datetime.timedelta(days=7),
+        NEXT_WEEK: TODAY + datetime.timedelta(days=7),
+        NEXT_MONTH: TODAY + datetime.timedelta(days=30),
+        None: None,
+    }
 
     COURSE_OVERVIEW_TABS = {'courseware', 'info', 'textbooks', 'discussion', 'wiki', 'progress'}
 
@@ -229,7 +237,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             },
             {
                 #                                           # Don't set display name
-                "start": DEFAULT_START_DATE,                # Default start and end dates
+                "start": 'default_start_date',              # Default start and end dates
                 "end": None,
                 "advertised_start": None,                   # No advertised start
                 "pre_requisite_courses": [],                # No pre-requisites
@@ -251,10 +259,15 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             modulestore_type (ModuleStoreEnum.Type): type of store to create the
                 course in.
         """
+        kwargs = course_kwargs.copy()
+        kwargs['start'] = self.DATES[course_kwargs['start']]
+        kwargs['end'] = self.DATES[course_kwargs['end']]
+        if 'announcement' in course_kwargs:
+            kwargs['announcement'] = self.DATES[course_kwargs['announcement']]
         # Note: We specify a value for 'run' here because, for some reason,
         # .create raises an InvalidKeyError if we don't (even though my
         # other test functions don't specify a run but work fine).
-        course = CourseFactory.create(default_store=modulestore_type, run="TestRun", **course_kwargs)
+        course = CourseFactory.create(default_store=modulestore_type, run="TestRun", **kwargs)
         self.check_course_overview_against_course(course)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)

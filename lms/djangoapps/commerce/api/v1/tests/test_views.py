@@ -106,6 +106,11 @@ class CourseListViewTests(CourseApiViewTestMixin, ModuleStoreTestCase):
 @ddt.ddt
 class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase):
     """ Tests for CourseRetrieveUpdateView. """
+    NOW = 'now'
+    DATES = {
+        NOW: datetime.now(),
+        None: None,
+    }
 
     def setUp(self):
         super(CourseRetrieveUpdateViewTests, self).setUp()
@@ -276,12 +281,13 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
     @ddt.data(*itertools.product(
         ('honor', 'audit', 'verified', 'professional', 'no-id-professional'),
-        (datetime.now(), None),
+        (NOW, None),
     ))
     @ddt.unpack
-    def test_update_professional_expiration(self, mode_slug, expiration_datetime):
+    def test_update_professional_expiration(self, mode_slug, expiration_datetime_name):
         """ Verify that pushing a mode with a professional certificate and an expiration datetime
         will be rejected (this is not allowed). """
+        expiration_datetime = self.DATES[expiration_datetime_name]
         mode = self._serialize_course_mode(
             CourseMode(
                 mode_slug=mode_slug,

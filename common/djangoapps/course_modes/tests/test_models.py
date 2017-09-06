@@ -29,6 +29,11 @@ class CourseModeModelTest(TestCase):
     """
     Tests for the CourseMode model
     """
+    NOW = 'now'
+    DATES = {
+        NOW: datetime.now(),
+        None: None,
+    }
 
     def setUp(self):
         super(CourseModeModelTest, self).setUp()
@@ -317,10 +322,11 @@ class CourseModeModelTest(TestCase):
             CourseMode.PROFESSIONAL,
             CourseMode.NO_ID_PROFESSIONAL_MODE
         ),
-        (datetime.now(), None),
+        (NOW, None),
     ))
     @ddt.unpack
-    def test_invalid_mode_expiration(self, mode_slug, exp_dt):
+    def test_invalid_mode_expiration(self, mode_slug, exp_dt_name):
+        exp_dt = self.DATES[exp_dt_name]
         is_error_expected = CourseMode.is_professional_slug(mode_slug) and exp_dt is not None
         try:
             self.create_mode(mode_slug=mode_slug, mode_name=mode_slug.title(), expiration_datetime=exp_dt, min_price=10)

@@ -251,6 +251,11 @@ class ViewsTestCase(ModuleStoreTestCase):
     """
     Tests for views.py methods.
     """
+    YESTERDAY = 'yesterday'
+    DATES = {
+        YESTERDAY: datetime.now(UTC) - timedelta(days=1),
+        None: None,
+    }
 
     def setUp(self):
         super(ViewsTestCase, self).setUp()
@@ -751,7 +756,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('Financial Assistance Application', response.content)
 
-    @ddt.data(([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, True, datetime.now(UTC) - timedelta(days=1)),
+    @ddt.data(([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, True, YESTERDAY),
               ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, True, None),
               ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, False, None),
               ([CourseMode.AUDIT], CourseMode.AUDIT, False, None))
@@ -770,7 +775,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         # Create Course Modes
         for mode in course_modes:
-            CourseModeFactory.create(mode_slug=mode, course_id=course.id, expiration_datetime=expiration)
+            CourseModeFactory.create(mode_slug=mode, course_id=course.id, expiration_datetime=self.DATES[expiration])
 
         # Enroll user in the course
         CourseEnrollmentFactory(course_id=course.id, user=self.user, mode=enrollment_mode)
@@ -1705,10 +1710,16 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
     # Constants used in the test data
     NOW = datetime.now(UTC)
     DAY_DELTA = timedelta(days=1)
-    YESTERDAY = NOW - DAY_DELTA
-    TODAY = NOW
-    TOMORROW = NOW + DAY_DELTA
+    YESTERDAY = 'yesterday'
+    TODAY = 'today'
+    TOMORROW = 'tomorrow'
     GRADER_TYPE = 'Homework'
+    DATES = {
+        YESTERDAY: NOW - DAY_DELTA,
+        TODAY: NOW,
+        TOMORROW: NOW + DAY_DELTA,
+        None: None,
+    }
 
     def setUp(self):
         super(ProgressPageShowCorrectnessTests, self).setUp()
@@ -1853,12 +1864,12 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         (ShowCorrectness.PAST_DUE, TOMORROW, True),
     )
     @ddt.unpack
-    def test_progress_page_no_problem_scores(self, show_correctness, due_date, graded):
+    def test_progress_page_no_problem_scores(self, show_correctness, due_date_name, graded):
         """
         Test that "no problem scores are present" for a course with no problems,
         regardless of the various show correctness settings.
         """
-        self.setup_course(show_correctness=show_correctness, due_date=due_date, graded=graded)
+        self.setup_course(show_correctness=show_correctness, due_date=self.DATES[due_date_name], graded=graded)
         resp = self._get_progress_page()
 
         # Test that no problem scores are present
@@ -1893,11 +1904,12 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         (ShowCorrectness.PAST_DUE, TOMORROW, True, False),
     )
     @ddt.unpack
-    def test_progress_page_hide_scores_from_learner(self, show_correctness, due_date, graded, show_grades):
+    def test_progress_page_hide_scores_from_learner(self, show_correctness, due_date_name, graded, show_grades):
         """
         Test that problem scores are hidden on progress page when correctness is not available to the learner, and that
         they are visible when it is.
         """
+        due_date = self.DATES[due_date_name]
         self.setup_course(show_correctness=show_correctness, due_date=due_date, graded=graded)
         self.add_problem()
 
@@ -1944,10 +1956,11 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         (ShowCorrectness.PAST_DUE, TOMORROW, True, True),
     )
     @ddt.unpack
-    def test_progress_page_hide_scores_from_staff(self, show_correctness, due_date, graded, show_grades):
+    def test_progress_page_hide_scores_from_staff(self, show_correctness, due_date_name, graded, show_grades):
         """
         Test that problem scores are hidden from staff viewing a learner's progress page only if show_correctness=never.
         """
+        due_date = self.DATES[due_date_name]
         self.setup_course(show_correctness=show_correctness, due_date=due_date, graded=graded)
         self.add_problem()
 

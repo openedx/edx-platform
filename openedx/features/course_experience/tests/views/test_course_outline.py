@@ -20,8 +20,6 @@ from xmodule.course_module import DEFAULT_START_DATE
 from .test_course_home import course_home_url
 
 TEST_PASSWORD = 'test'
-FUTURE_DAY = datetime.datetime.now() + datetime.timedelta(days=30)
-PAST_DAY = datetime.datetime.now() - datetime.timedelta(days=30)
 
 
 class TestCourseOutlinePage(SharedModuleStoreTestCase):
@@ -343,14 +341,22 @@ class TestEmptyCourseOutlinePage(SharedModuleStoreTestCase):
     """
     Test the new course outline view.
     """
+    FUTURE_DAY = 'future_day'
+    PAST_DAY = 'past_day'
+    DATES = {
+        'default_start_date': DEFAULT_START_DATE,
+        FUTURE_DAY: datetime.datetime.now() + datetime.timedelta(days=30),
+        PAST_DAY: datetime.datetime.now() - datetime.timedelta(days=30),
+    }
+
     @ddt.data(
         (FUTURE_DAY, 'This course has not started yet, and will launch on'),
         (PAST_DAY, "We're still working on course content."),
-        (DEFAULT_START_DATE, 'This course has not started yet.'),
+        ('default_start_date', 'This course has not started yet.'),
     )
     @ddt.unpack
-    def test_empty_course_rendering(self, start_date, expected_text):
-        course = CourseFactory.create(start=start_date)
+    def test_empty_course_rendering(self, start_date_name, expected_text):
+        course = CourseFactory.create(start=self.DATES[start_date_name])
         test_user = UserFactory(password=TEST_PASSWORD)
         CourseEnrollment.enroll(test_user, course.id)
         self.client.login(username=test_user.username, password=TEST_PASSWORD)

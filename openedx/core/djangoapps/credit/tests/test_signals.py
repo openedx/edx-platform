@@ -35,6 +35,12 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
     VALID_DUE_DATE = datetime.now(pytz.UTC) + timedelta(days=20)
     EXPIRED_DUE_DATE = datetime.now(pytz.UTC) - timedelta(days=20)
 
+    DATES = {
+        'valid': VALID_DUE_DATE,
+        'expired': EXPIRED_DUE_DATE,
+        None: None,
+    }
+
     def setUp(self):
         super(TestMinGradedRequirementStatus, self).setUp()
         self.course = CourseFactory.create(
@@ -85,13 +91,13 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
             self.assertEqual(req_status[0]['reason'], expected_reason)
 
     @ddt.data(
-        (0.6, VALID_DUE_DATE),
+        (0.6, 'valid'),
         (0.52, None),
     )
     @ddt.unpack
-    def test_min_grade_requirement_with_valid_grade(self, grade, due_date):
+    def test_min_grade_requirement_with_valid_grade(self, grade, due_date_name):
         """Test with valid grades submitted before deadline"""
-        self.assert_requirement_status(grade, due_date, 'satisfied')
+        self.assert_requirement_status(grade, self.DATES[due_date_name], 'satisfied')
 
     def test_grade_changed(self):
         """ Verify successive calls to update a satisfied grade requirement are recorded. """
@@ -106,12 +112,12 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
     @ddt.data(
         (0.50, None),
         (0.51, None),
-        (0.40, VALID_DUE_DATE),
+        (0.40, 'valid'),
     )
     @ddt.unpack
-    def test_min_grade_requirement_failed_grade_valid_deadline(self, grade, due_date):
+    def test_min_grade_requirement_failed_grade_valid_deadline(self, grade, due_date_name):
         """Test with failed grades and deadline is still open or not defined."""
-        self.assert_requirement_status(grade, due_date, None)
+        self.assert_requirement_status(grade, self.DATES[due_date_name], None)
 
     def test_min_grade_requirement_failed_grade_expired_deadline(self):
         """Test with failed grades and deadline expire"""
