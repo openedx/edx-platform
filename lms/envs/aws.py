@@ -959,6 +959,13 @@ ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ENV_TOKENS.get(
     ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES
 )
 
+# A support URL used on Enterprise landing pages for when a warning
+# message goes off.
+ENTERPRISE_SUPPORT_URL = ENV_TOKENS.get(
+    'ENTERPRISE_SUPPORT_URL',
+    ENTERPRISE_SUPPORT_URL
+)
+
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class
 # The below environmental settings are utilized by the LMS when interacting with
