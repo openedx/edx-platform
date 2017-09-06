@@ -56,7 +56,7 @@ site_status_msg = get_site_status_msg(course_id)
   <nav class="navbar navbar-expand-lg navbar-light" aria-label="${_('Main')}">
     <h1 class="hd logo-header">
       <div class="logo">
-        <a class="navbar-brand" href="${marketing_link('ROOT')}" itemprop="url">
+        <a class="navbar-brand" href="${reverse('dashboard')}" itemprop="url">
           <img src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}" itemprop="logo" />
         </a>
       </div>
