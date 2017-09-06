@@ -841,7 +841,7 @@ class ExampleCertificate(TimeStampedModel):
 
 class CertificateGenerationCourseSetting(TimeStampedModel):
     """Enable or disable certificate settings for a particular course.
-    
+
     'enabled' controls whether students are allowed to "self-generate"
     certificates for a course.  It does NOT prevent us from
     batch-generating certificates for a course using management
@@ -852,14 +852,13 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
     for the course.  This is enforced in the UI layer, but
     not in the data layer.
 
-    'language_specific_templates' controls whether certificates for the 
+    'language_specific_templates' controls whether certificates for the
     course should be generated using specific language templates.
 
     """
     course_key = CourseKeyField(max_length=255, db_index=True)
     enabled = models.BooleanField(default=False)
     language_specific_templates = models.BooleanField(default=False)
-
 
     class Meta(object):
         get_latest_by = 'created'
