@@ -70,9 +70,8 @@ def remove_course_updates(user, course):
     updates_usage_key = get_course_info_usage_key(course, 'updates')
     try:
         course_updates = modulestore().get_item(updates_usage_key)
-        course_updates.items = []
-        modulestore().update_item(course_updates, user.id)
-    except ItemNotFoundError:
+        modulestore().delete_item(course_updates.location, user.id)
+    except (ItemNotFoundError, ValueError):
         pass
 
 
