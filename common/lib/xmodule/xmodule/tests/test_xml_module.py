@@ -393,7 +393,7 @@ class TestDeserialize(unittest.TestCase):
         """
         Asserts the result of deserialize_field.
         """
-        assert_equals(expected, deserialize_field(self.test_field(), arg))
+        assert_equals(expected, deserialize_field(self.field_type(), arg))
 
     def assertDeserializeNonString(self):
         """
@@ -412,7 +412,7 @@ class TestDeserialize(unittest.TestCase):
 class TestDeserializeInteger(TestDeserialize):
     """ Tests deserialize as related to Integer type. """
 
-    test_field = Integer
+    field_type = Integer
 
     def test_deserialize(self):
         self.assertDeserializeEqual(-2, '-2')
@@ -437,7 +437,7 @@ class TestDeserializeInteger(TestDeserialize):
 class TestDeserializeFloat(TestDeserialize):
     """ Tests deserialize as related to Float type. """
 
-    test_field = Float
+    field_type = Float
 
     def test_deserialize(self):
         self.assertDeserializeEqual(-2, '-2')
@@ -460,7 +460,7 @@ class TestDeserializeFloat(TestDeserialize):
 class TestDeserializeBoolean(TestDeserialize):
     """ Tests deserialize as related to Boolean type. """
 
-    test_field = Boolean
+    field_type = Boolean
 
     def test_deserialize(self):
         # json.loads converts the value to Python bool
@@ -485,7 +485,7 @@ class TestDeserializeBoolean(TestDeserialize):
 class TestDeserializeString(TestDeserialize):
     """ Tests deserialize as related to String type. """
 
-    test_field = String
+    field_type = String
 
     def test_deserialize(self):
         self.assertDeserializeEqual('hAlf', '"hAlf"')
@@ -503,7 +503,7 @@ class TestDeserializeString(TestDeserialize):
 class TestDeserializeAny(TestDeserialize):
     """ Tests deserialize as related to Any type. """
 
-    test_field = Any
+    field_type = Any
 
     def test_deserialize(self):
         self.assertDeserializeEqual('hAlf', '"hAlf"')
@@ -519,7 +519,7 @@ class TestDeserializeAny(TestDeserialize):
 class TestDeserializeList(TestDeserialize):
     """ Tests deserialize as related to List type. """
 
-    test_field = List
+    field_type = List
 
     def test_deserialize(self):
         self.assertDeserializeEqual(['foo', 'bar'], '["foo", "bar"]')
@@ -536,7 +536,7 @@ class TestDeserializeList(TestDeserialize):
 class TestDeserializeDate(TestDeserialize):
     """ Tests deserialize as related to Date type. """
 
-    test_field = Date
+    field_type = Date
 
     def test_deserialize(self):
         self.assertDeserializeEqual('2012-12-31T23:59:59Z', "2012-12-31T23:59:59Z")
@@ -547,7 +547,7 @@ class TestDeserializeDate(TestDeserialize):
 class TestDeserializeTimedelta(TestDeserialize):
     """ Tests deserialize as related to Timedelta type. """
 
-    test_field = Timedelta
+    field_type = Timedelta
 
     def test_deserialize(self):
         self.assertDeserializeEqual(
@@ -564,7 +564,7 @@ class TestDeserializeTimedelta(TestDeserialize):
 class TestDeserializeRelativeTime(TestDeserialize):
     """ Tests deserialize as related to Timedelta type. """
 
-    test_field = RelativeTime
+    field_type = RelativeTime
 
     def test_deserialize(self):
         """

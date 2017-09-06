@@ -794,7 +794,7 @@ class ViewsTestCase(
             )
         ]
 
-        assert_equal(call_list, mock_request.call_args_list)
+        assert mock_request.call_args_list == call_list
 
         assert_equal(response.status_code, 200)
 
@@ -872,7 +872,7 @@ class ViewsTestCase(
             )
         ]
 
-        assert_equal(call_list, mock_request.call_args_list)
+        assert mock_request.call_args_list == call_list
 
         assert_equal(response.status_code, 200)
 
@@ -944,7 +944,7 @@ class ViewsTestCase(
             )
         ]
 
-        assert_equal(call_list, mock_request.call_args_list)
+        assert mock_request.call_args_list == call_list
 
         assert_equal(response.status_code, 200)
 
@@ -1016,7 +1016,7 @@ class ViewsTestCase(
             )
         ]
 
-        assert_equal(call_list, mock_request.call_args_list)
+        assert mock_request.call_args_list == call_list
 
         assert_equal(response.status_code, 200)
 

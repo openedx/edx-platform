@@ -171,8 +171,21 @@ class TestSaveSubsToStore(SharedModuleStoreTestCase):
             contentstore().find(self.content_location_unjsonable)
 
 
+class TestYoutubeSubsBase(SharedModuleStoreTestCase):
+    """
+    Base class for tests of Youtube subs.  Using override_settings and
+    a setUpClass() override in a test class which is inherited by another
+    test class doesn't work well with pytest-django.
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestYoutubeSubsBase, cls).setUpClass()
+        cls.course = CourseFactory.create(
+            org=cls.org, number=cls.number, display_name=cls.display_name)
+
+
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
-class TestDownloadYoutubeSubs(SharedModuleStoreTestCase):
+class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
     """Tests for `download_youtube_subs` function."""
 
     org = 'MITx'
@@ -199,12 +212,6 @@ class TestDownloadYoutubeSubs(SharedModuleStoreTestCase):
         """
         for subs_id in youtube_subs.values():
             self.clear_sub_content(subs_id)
-
-    @classmethod
-    def setUpClass(cls):
-        super(TestDownloadYoutubeSubs, cls).setUpClass()
-        cls.course = CourseFactory.create(
-            org=cls.org, number=cls.number, display_name=cls.display_name)
 
     def test_success_downloading_subs(self):
 

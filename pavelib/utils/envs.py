@@ -98,7 +98,7 @@ class Env(object):
     USING_DOCKER = SERVER_HOST != '0.0.0.0'
     SETTINGS = 'bok_choy_docker' if USING_DOCKER else 'bok_choy'
     DEVSTACK_SETTINGS = 'devstack_docker' if USING_DOCKER else 'devstack'
-    TEST_SETTINGS = 'test_docker' if USING_DOCKER else 'test'
+    TEST_SETTINGS = 'test'
 
     BOK_CHOY_SERVERS = {
         'lms': {

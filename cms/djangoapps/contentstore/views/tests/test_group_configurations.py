@@ -6,6 +6,7 @@ Group Configuration Tests.
 import json
 import ddt
 from mock import patch
+from operator import itemgetter
 
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from contentstore.course_group_config import GroupConfiguration, CONTENT_GROUP_CONFIGURATION_NAME
@@ -857,6 +858,8 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         )
 
         actual = self._get_user_partition('cohort')
+        # order of usage list is arbitrary, sort for reliable comparison
+        actual['groups'][0]['usage'].sort(key=itemgetter('label'))
         expected = {
             'id': 0,
             'name': 'User Partition',
@@ -881,7 +884,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
 
         self.maxDiff = None
 
-        self.assertEqual(actual, expected)
+        assert actual == expected
 
     def test_can_get_correct_usage_info(self):
         """
