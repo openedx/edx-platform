@@ -840,9 +840,9 @@ class ExampleCertificate(TimeStampedModel):
 
 
 class CertificateGenerationCourseSetting(TimeStampedModel):
-    """Enable or disable certificate generation for a particular course.
-
-    This controls whether students are allowed to "self-generate"
+    """Enable or disable certificate settings for a particular course.
+    
+    'enabled' controls whether students are allowed to "self-generate"
     certificates for a course.  It does NOT prevent us from
     batch-generating certificates for a course using management
     commands.
@@ -852,11 +852,14 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
     for the course.  This is enforced in the UI layer, but
     not in the data layer.
 
+    'language_specific_templates' controls whether certificates for the 
+    course should be generated using specific language templates.
+
     """
     course_key = CourseKeyField(max_length=255, db_index=True)
     enabled = models.BooleanField(default=False)
     language_specific_templates = models.BooleanField(default=False)
-    
+
 
     class Meta(object):
         get_latest_by = 'created'
@@ -896,7 +899,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
 
     @classmethod
     def is_language_specific_templates_enabled_for_course(cls, course_key):
-        """Check whether self-generated certificates are enabled for a course.
+        """Check whether certificates generated for a course should use language specific templates.
 
         Arguments:
             course_key (CourseKey): The identifier for the course.
@@ -914,7 +917,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
 
     @classmethod
     def set_language_specific_templates_enabled_for_course(cls, course_key, is_enabled):
-        """Enable or disable self-generated certificates for a course.
+        """Enable or disable language specific certificates for a course.
 
         Arguments:
             course_key (CourseKey): The identifier for the course.
