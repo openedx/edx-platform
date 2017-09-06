@@ -217,11 +217,18 @@ class DashboardPage(PageObject):
         """
         return self.q(css='.user-dropdown-menu li a').text
 
+    @property
+    def tabs_link_text(self):
+        """
+        Return the text of all the tabs on the dashboard.
+        """
+        return self.q(css='.tab-nav-item a').text
+
     def click_my_profile_link(self):
         """
         Click on `Profile` link.
         """
-        self.q(css='.user-dropdown-menu li a').nth(1).click()
+        self.q(css='.tab-nav-item a').nth(1).click()
 
     def click_account_settings_link(self):
         """

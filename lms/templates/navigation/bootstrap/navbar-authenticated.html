@@ -33,15 +33,26 @@ from django.utils.translation import ugettext as _
       </li>
     % endif
 
-    % if show_program_listing:
+    % if show_dashboard_tabs:
       <li class="nav-item mt-2 nav-item-open-collapsed">
         <a class="nav-link ${'active' if reverse('dashboard') == request.path else ''}" href="${reverse('dashboard')}">
           ${_("Courses")}
         </a>
       </li>
+      % if show_program_listing:
+        <li class="nav-item mt-2 nav-item-open-collapsed">
+          <a class="nav-link ${'active' if reverse('program_listing_view') in request.path else ''}" href="${reverse('program_listing_view')}">
+            ${_("Programs")}
+          </a>
+        </li>
+      % endif
+      <%
+        self.real_user = getattr(user, 'real_user', user)
+        is_on_profile_page = data and data.get('profile_user_id') is not None
+      %>
       <li class="nav-item mt-2 nav-item-open-collapsed">
-        <a class="nav-link ${'active' if reverse('program_listing_view') in request.path else ''}" href="${reverse('program_listing_view')}">
-          ${_("Programs")}
+        <a class="${'active ' if is_on_profile_page else ''}tab-nav-link" href="${reverse('learner_profile', args=[self.real_user.username])}">
+          ${_("Profile")}
         </a>
       </li>
     % endif

@@ -26,13 +26,11 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
         <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${username}</a>
         <ul class="dropdown-menu dropdown-menu-right" id="${_("Usermenu")}" aria-labelledby="dropdownMenuLink" tabindex="-1">
             <a class="dropdown-item" href="${reverse('dashboard')}">${_("Dashboard")}</a>
-            <a class="dropdown-item" href="${reverse('learner_profile', kwargs={'username': self.real_user.username})}">${_("Profile")}</a>
             <a class="dropdown-item" href="${reverse('account_settings')}">${_("Account")}</a>
             <a class="dropdown-item" href="${reverse('logout')}">${_("Sign Out")}</a>
         </ul>
     </li>
     <li class="nav-item nav-item-open-collapsed-only collapse"><a href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
-    <li class="nav-item nav-item-open-collapsed-only"><a href="${reverse('learner_profile', kwargs={'username': self.real_user.username})}">${_("Profile")}</a></li>
     <li class="nav-item nav-item-open-collapsed-only"><a href="${reverse('account_settings')}">${_("Account")}</a></li>
     <li class="nav-item nav-item-open-collapsed-only"><a href="${reverse('logout')}">${_("Sign Out")}</a></li>
 % elif uses_pattern_library:
@@ -54,7 +52,6 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
             <ul class="dropdown-menu list-divided is-hidden" id="${_("Usermenu")}" tabindex="-1">
                 <%block name="navigation_dropdown_menu_links" >
                     <li class="dropdown-item item has-block-link"><a href="${reverse('dashboard')}" role="menuitem" class="action dropdown-menuitem">${_("Dashboard")}</a></li>
-                    <li class="dropdown-item item has-block-link"><a href="${reverse('learner_profile', kwargs={'username': self.real_user.username})}" role="menuitem" class="action dropdown-menuitem">${_("Profile")}</a></li>
                     <li class="dropdown-item item has-block-link"><a href="${reverse('account_settings')}" role="menuitem" class="action dropdown-menuitem">${_("Account")}</a></li>
                 </%block>
                 <li class="dropdown-item item has-block-link"><a href="${reverse('logout')}" role="menuitem" class="action dropdown-menuitem">${_("Sign Out")}</a></li>
