@@ -795,13 +795,19 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self.assertIn('Signatory_Title 0', response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    @ddt.data(True, False)
-    def test_html_view_certificate_availability_date_for_instructor_paced_courses(self, is_self_paced):
+    @ddt.data(
+        (datetime.datetime.now() - datetime.timedelta(days=1), True),
+        (datetime.datetime.today() - datetime.timedelta(days=1), False),
+        (datetime.datetime.today() + datetime.timedelta(days=10), False)
+    )
+    @ddt.unpack
+    def test_html_view_certificate_availability_date_for_instructor_paced_courses(self, cert_avail_date, is_self_paced):
         """
         test certificate web view should display the certificate availability date
         as the issued date for instructor-paced courses
         """
         self.course.self_paced = is_self_paced
+        self.course.certificate_available_date = cert_avail_date
         self.course.save()
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         test_url = get_certificate_url(
@@ -809,11 +815,10 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             course_id=unicode(self.course.id)
         )
 
-        if is_self_paced:
+        if is_self_paced or cert_avail_date > datetime.datetime.today():
             expected_date = datetime.datetime.today()
         else:
             expected_date = self.course.certificate_available_date
-
         response = self.client.get(test_url)
         date = '{month} {day}, {year}'.format(
             month=strftime_localized(expected_date, "%B"),
