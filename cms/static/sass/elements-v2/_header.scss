@@ -56,43 +56,6 @@
     width: auto;
   }
 
-  // basic layout - nav items
-  .nav-dd {
-    .nav-item {
-      display: inline-block;
-      vertical-align: middle;
-
-      &:last-child {
-        margin-right: 0;
-      }
-
-      .title{
-        @extend %ui-btn-dd-nav-primary;
-        @include transition(all $tmg-f2 ease-in-out 0s);
-        line-height: 16px;
-        margin-top: 6px;
-        font-size: font-size(base);
-        font-weight: font-weight(semi-bold);
-        .nav-sub .nav-item {
-          .icon {
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: ($baseline/4);
-          }
-        }
-      }
-    }
-
-    .nav-item a {
-      color: $gray-d1;
-
-      &:hover,
-      &:focus {
-        color: $blue-s1;
-      }
-    }
-  }
-
   // ====================
 
   // specific elements - branding
