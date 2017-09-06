@@ -20,10 +20,15 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
 
         &:hover {
             border-color: palette(primary, base);
+            text-decoration: none;
 
             .list-item-breadcrumbtrail {
                 color: palette(primary, base);
             }
+        }
+        &:focus,
+        &:active {
+            text-decoration: none;
         }
     }
 

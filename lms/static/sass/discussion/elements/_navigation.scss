@@ -306,6 +306,7 @@
       // 125 is the width we need to save for the "X new" comments indicator - and we want to clip the preview
       // at the same length whether there are unread comments for this story or not.
     max-width: calc(100% - 125px);
+    width: 100%;
     flex-grow: 1;  // This column should consume all the available space
 }
 
