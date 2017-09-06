@@ -1,0 +1,36 @@
+.poc-dashboard-message {
+	padding: 30px 20px;
+	margin-bottom: 30px;
+	border: 2px solid #e4e4e4;
+    background: #f8f8f8;
+    text-align: center;
+
+	h3 {
+		font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+    	font-size: 24px;
+    	margin-bottom: 20px;
+	}
+
+	p {
+		font-size: 16px;
+    	line-height: 1.6;
+	}
+
+	a {
+	    background-color: #0079bc;
+    	border: 1px solid #0079bc;
+    	box-shadow: 0 1px 8px 0 rgba(0,0,0,0.1);
+    	box-sizing: border-box;
+    	color: #fff;
+    	font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+    	display: inline-block;
+    	letter-spacing: 1px;
+    	margin-top: 15px;
+    	padding: 15px 20px;
+
+    	&:hover {
+ 		   	background: #66afd7;
+    		text-decoration: none;
+    	}
+	}
+}
