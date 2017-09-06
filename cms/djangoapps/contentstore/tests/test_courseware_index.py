@@ -8,6 +8,7 @@ from unittest import skip
 from uuid import uuid4
 
 import ddt
+import pytest
 from dateutil.tz import tzutc
 from django.conf import settings
 from lazy.lazy import lazy
@@ -181,6 +182,7 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
             store.update_item(item, ModuleStoreEnum.UserID.test)
 
 
+@pytest.mark.django_db
 @ddt.ddt
 class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     """ Tests the operation of the CoursewareSearchIndexer """
