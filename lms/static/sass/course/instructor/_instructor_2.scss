@@ -526,16 +526,19 @@
         background-color: $light-gray3
       }
 
+      .email-targets-secondary,
       .email-targets-primary {
         display: table-cell;
+        vertical-align: top;
         margin: 0;
+      }
+
+      .email-targets-primary {
         width: 20%;
       }
 
       .email-targets-secondary {
-        display: table-cell;
-        margin: 0;
-        @include columns(2);
+        @include columns(1);
 
         .subheading {
           font-size: .9em;

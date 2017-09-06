@@ -11,7 +11,7 @@ from branding import api as branding_api
 %>
 
 <a class="navbar-brand" href="${marketing_link('ROOT')}">
-  <div class="logo ${"slim" if course else ""}">
+  <div class="logo">
     <img src="${branding_api.get_logo_url(is_secure)}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
   </div>
 </a>
