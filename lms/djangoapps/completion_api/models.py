@@ -5,12 +5,10 @@ wrapping progress extension models.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import itertools
-
+from lazy import lazy
 from opaque_keys.edx.keys import UsageKey
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from progress.models import CourseModuleCompletion
@@ -37,62 +35,38 @@ IGNORE_CATEGORIES = {
 
 class CompletionDataMixin(object):
     """
-    Common calculations for completion values of courses or blocks within courses.
+    Common calculations for completion values of courses or blocks within
+    courses.
 
     Classes using this mixin must implement:
 
-        * self.earned (float)
-        * self.blocks (BlockStructureBlockData)
+        * self.stats (_Stats): An object representing the earned and possible
+          values.
     """
 
-    _completable_blocks = None
-
-    def _recurse_completable_blocks(self, block):
+    @lazy
+    def earned(self):
         """
-        Return a list of all completable blocks within the subtree under `block`.
+        The number of earned completions within self.block.
         """
-        if block.block_type in IGNORE_CATEGORIES:
-            return []
-        elif block.block_type in AGGREGATE_CATEGORIES:
-            return list(itertools.chain(
-                *[self._recurse_completable_blocks(child)
-                  for child in self.blocks.get_children(block)]
-            ))
-        else:
-            return [block]
+        return float(self.stats.earned)
 
-    @property
-    def completable_blocks(self):
-        """
-        Return a list of UsageKeys for all blocks that can be completed that are
-        visible to self.user.
-
-        This method encapsulates the facade's access to the modulestore, making
-        it a useful candidate for mocking.
-
-        In case the course structure is a DAG, nodes with multiple parents will
-        be represented multiple times in the list.
-        """
-        if self._completable_blocks is None:
-            self._completable_blocks = self._recurse_completable_blocks(self.blocks.root_block_usage_key)
-        return self._completable_blocks
-
-    @property
+    @lazy
     def possible(self):
         """
         Return the maximum number of completions the user could earn in the
         course.
         """
-        return float(len(self.completable_blocks))
+        return float(self.stats.possible)
 
-    @property
+    @lazy
     def ratio(self):
         """
         Return the fraction of the course completed by the user.
 
         Ratio is returned as a float in the range [0.0, 1.0].
         """
-        if self.possible == 0:
+        if self.possible == 0.0:
             ratio = 1.0
         else:
             ratio = self.earned / self.possible
@@ -104,24 +78,27 @@ class CourseCompletionFacade(CompletionDataMixin, object):
     Facade wrapping progress.models.StudentProgress model.
     """
 
-    _blocks = None
-    _collected = None
-    _completed_modules = None
+    _all_stats = None
 
     def __init__(self, inner):
         self._inner = inner
         self._completions_in_category = {}
 
-    @property
-    def collected(self):
+    @lazy
+    def stats(self):
         """
-        Return the collected block structure for this course
+        Completion statistics for the current block
         """
-        if self._collected is None:
-            self._collected = get_course_in_cache(self.course_key)
-        return self._collected
+        return self.all_stats[self.block_key]
 
-    @property
+    @lazy
+    def block_key(self):
+        """
+        The block key for the course.
+        """
+        return CourseOverview.load_from_module_store(self.course_key).location
+
+    @lazy
     def blocks(self):
         """
         Return an
@@ -131,35 +108,39 @@ class CourseCompletionFacade(CompletionDataMixin, object):
         `openedx.core.lib.block_structure.block_structure.BlockData` objects
         for all blocks in the course.
         """
-        if self._blocks is None:
-            course_location = CourseOverview.load_from_module_store(self.course_key).location
-            self._blocks = get_course_blocks(
-                self.user,
-                course_location,
-                collected_block_structure=self.collected,
-            )
-        return self._blocks
+        return get_course_blocks(
+            self.user,
+            self.block_key,
+        )
+
+    def _recurse_all_stats(self, block):
+        """
+        Descend through the course graph, collecting completion data for
+        aggregate nodes.
+        """
+        if block.block_type in IGNORE_CATEGORIES:
+            stats = _Stats.empty()
+        elif block.block_type in AGGREGATE_CATEGORIES:
+            stats = sum((self._recurse_all_stats(child) for child in self.blocks.get_children(block)), _Stats.empty())
+            self._all_stats[block] = stats
+        else:
+            if block in self.completed_modules:
+                earned = 1
+            else:
+                earned = 0
+            stats = _Stats(earned=earned, possible=1)
+        return stats
 
     @property
-    def user(self):
+    def all_stats(self):
         """
-        Return the StudentProgress user
+        Return a dictionary mapping all aggregate nodes to their contained
+        completion statics.
         """
-        return self._inner.user
-
-    @property
-    def course_key(self):
-        """
-        Return the StudentProgress course_key
-        """
-        return self._inner.course_id
-
-    @property
-    def earned(self):
-        """
-        Return the number of completions earned by the user.
-        """
-        return self._inner.completions
+        if self._all_stats is None:
+            self._all_stats = {}
+            self._recurse_all_stats(self.block_key)
+        return self._all_stats
 
     def iter_block_keys_in_category(self, category):
         """
@@ -178,37 +159,55 @@ class CourseCompletionFacade(CompletionDataMixin, object):
             self._completions_in_category[category] = completions
         return self._completions_in_category[category]
 
-    @property
+    @lazy
     def completed_modules(self):
         """
-        Returns a list of usage keys for modules that have been completed.
+        Returns a set of usage keys for modules that have been completed.
         """
-        if self._completed_modules is None:
-            modules = CourseModuleCompletion.objects.filter(
-                user=self.user,
-                course_id=self.course_key
-            )
-            self._completed_modules = {
-                UsageKey.from_string(mod.content_id).map_into_course(self.course_key)
-                for mod in modules
-            }
-        return self._completed_modules
+        modules = CourseModuleCompletion.objects.filter(
+            user=self.user,
+            course_id=self.course_key
+        )
+        return {UsageKey.from_string(mod.content_id).map_into_course(self.course_key) for mod in modules}
 
-    @property
+    # Serialization properties
+
+    @lazy
+    def user(self):
+        """
+        Return the StudentProgress user
+        """
+        return self._inner.user
+
+    @lazy
+    def course_key(self):
+        """
+        Return the StudentProgress course_key
+        """
+        return self._inner.course_id
+
+    @lazy
+    def earned(self):
+        """
+        Return the number of completions earned by the user.
+        """
+        return self._inner.completions
+
+    @lazy
     def chapter(self):
         """
         Return a list of BlockCompletions for each chapter in the course.
         """
         return self.get_completions_in_category('chapter')
 
-    @property
+    @lazy
     def sequential(self):
         """
         Return a list of BlockCompletions for each sequential in the course.
         """
         return self.get_completions_in_category('sequential')
 
-    @property
+    @lazy
     def vertical(self):
         """
         Return a list of BlockCompletions for each vertical in the course.
@@ -226,41 +225,37 @@ class BlockCompletion(CompletionDataMixin, object):
         self.block_key = block_key
         self.course_key = block_key.course_key
         self.course_completion = course_completion
-        self._blocks = None
-        self._completable_blocks = None
         self._completed_blocks = None
 
-    @property
-    def blocks(self):
+    @lazy
+    def stats(self):
         """
-        Return an `openedx.core.lib.block_structure.block_structure.BlockStructureBlockData`
-        object which behaves as dict that maps `opaque_keys.edx.locator.BlockUsageLocator`s
-        to `openedx.core.lib.block_structure.block_structure.BlockData` objects
-        for all blocks in the sub-tree (or DAG) under self.block_key.
+        Return a dictionary mapping all aggregate nodes to their
+        completion statistics.
         """
-        if self._blocks is None:
+        return self.course_completion.all_stats[self.block_key]
 
-            self._blocks = get_course_blocks(
-                self.user,
-                self.block_key,
-                collected_block_structure=self.course_completion.collected,
-            )
-        return self._blocks
 
-    @property
-    def completed_blocks(self):
-        """
-        Return the list of UsageKeys of all blocks within self.block that have been
-        completed by self.user.
-        """
-        if self._completed_blocks is None:
-            modules = self.course_completion.completed_modules
-            self._completed_blocks = [blk for blk in self.completable_blocks if blk in modules]
-        return self._completed_blocks
+class _Stats(object):
+    """
+    A data object to track completion at a given block level.
 
-    @property
-    def earned(self):
+    _Stats objects can be combined through simple addition.
+    """
+
+    @classmethod
+    def empty(cls):
         """
-        The number of earned completions within self.block.
+        Create and return an empty _Stats object
         """
-        return float(len(self.completed_blocks))
+        return cls(0, 0)
+
+    def __init__(self, earned, possible):
+        self.earned = earned
+        self.possible = possible
+
+    def __add__(self, other):
+        return _Stats(
+            earned=self.earned + other.earned,
+            possible=self.possible + other.possible,
+        )
