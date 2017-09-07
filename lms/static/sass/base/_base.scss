@@ -10,7 +10,7 @@ html, body {
   font-size: 1em;
   font-style: normal;
   line-height: 1em;
-  background: #fff;
+  background: $white;
 }
 
 // removing the outline on any element that we make programmatically focusable
@@ -107,7 +107,7 @@ a, a:visited {
 .content-wrapper {
   width: flex-grid(12);
   margin: 0 auto;
-  background-color: #fff;
+  background-color: $white;
 
   @media print {
     padding-bottom: 0;
