@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <link href="style/interface.css?v=20170315.1" rel="stylesheet" type="text/css">
+    <script src="config_override.js?v=20170315.1" type="text/javascript"></script>
+    <script src="js/3rd.js?v=20170315.1" type="text/javascript"></script>
+    <script src="js/ssla.min.js?v=20170315.1" type="text/javascript"></script>
+</head>
+
+<body onload="ssla.start()" onbeforeunload="ssla.finish()" class="hide-menu hide-toc">
+<div class="jca-navigation-menu">
+    <img id="logo" src="images/logo2.png" />
+    <div id="sco_navigation">
+        <button class="myButton" id="exit" onClick="ssla.navigate('exit')">Exit</button>
+        <button class="myButton" id="prev" onClick="ssla.navigate('previous')">Previous</button>
+        <button class="myButton" id="next" onClick="ssla.navigate('next')">Next</button>
+    </div>
+</div>
+<div class="jca-toc-holder">
+    <div id="title">
+        <!-- Placeholder Title -->
+    </div>
+    <div id="toc">
+    </div>
+</div>
+
+<div id="frame-here">
+</div>
+
+</body>
+</html>

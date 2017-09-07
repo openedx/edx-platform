@@ -1,0 +1,15 @@
+Standard development:
+
+  gulp
+
+Run unit tests:
+
+  gulp jasmine
+
+How to make new release bundles:
+
+  gulp release-bundle-all -v=x.y.z
+
+How to make new release bundles for beta testing:
+
+  gulp release-bundle-all -v=x.y.z-betaN

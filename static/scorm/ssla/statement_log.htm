@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <script src="../src/js/3rd/json.js" type="text/javascript"></script>
+    <script src="../src/js/statement_logger.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        function init() {
+            window.opener.statementLogger.listeners.push(addStatement);
+            displayStatements();
+        }
+
+        function displayStatements() {
+            var i, statementLogger = window.opener.statementLogger, s = "", statements;
+            statements = statementLogger.statements;
+            s = '<table id="table">';
+            for (i=0; i < statements.length; i++) {
+                s += getStatementString(statements[i]);
+            }
+            s += '</table>';
+            document.getElementById("tableholder").innerHTML = s;
+        }
+
+        function getStatementString(statement) {
+            var s = "";
+            s += '<tr>';
+            s += '<td>';
+            s += statement.getDisplayWhen();
+            s += '</td>';
+            s += '<td>';
+            s += statement.statement;
+            s += '</td>';
+            s += '</tr>';
+            return s;
+        }
+
+        function addStatement(statement) {
+            document.getElementById("table").innerHTML += getStatementString(statement);
+        }
+    </script>
+</head>
+<body onload="init()">
+    <div id="tableholder">
+
+    </div>
+</body>
+</html>
