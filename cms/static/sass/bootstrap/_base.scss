@@ -9,3 +9,7 @@
 .is-hidden {
   display: none;
 }
+
+.sr {
+  @include sr-only();
+}

@@ -1,3 +1,5 @@
+## xss-lint: disable=mako-missing-default
+
 ## coding=utf-8
 
 ## Pages currently use v1 styling by default. Once the Pattern Library
@@ -102,7 +104,7 @@ from openedx.core.djangolib.markup import HTML
       </div>
 
       <main id="main" aria-label="Content" tabindex="-1">
-        <div id="content" class="content">
+        <div id="content">
         <%block name="content"></%block>
         </div>
       </main>

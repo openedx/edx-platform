@@ -53,10 +53,7 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 
 % if uses_bootstrap:
-  <nav class="navbar navbar-toggleable-md navbar-light" aria-label="${_('Main')}">
-    <button class="navbar-toggler navbar-toggler-right mt-2" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+  <nav class="navbar navbar-expand-lg navbar-light" aria-label="${_('Main')}">
     <h1 class="hd logo-header">
       <div class="logo">
         <a class="navbar-brand" href="${marketing_link('ROOT')}" itemprop="url">
@@ -71,6 +68,9 @@ site_status_msg = get_site_status_msg(course_id)
         </div>
       % endif
     </h1>
+    <button class="navbar-toggler navbar-toggler-right mt-2" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
     % if user.is_authenticated():
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         % if not course or disable_courseware_header:

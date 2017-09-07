@@ -59,8 +59,8 @@ NPM_INSTALLED_LIBRARIES = [
     'moment-timezone/builds/moment-timezone-with-data.js',
     'moment/min/moment-with-locales.js',
     'picturefill/dist/picturefill.js',
+    'popper.js/dist/umd/popper.js',
     'requirejs/require.js',
-    'tether/dist/js/tether.js',
     'underscore.string/dist/underscore.string.js',
     'underscore/underscore.js',
 ]
@@ -73,7 +73,7 @@ NPM_INSTALLED_DEVELOPER_LIBRARIES = [
 ]
 
 # Directory to install static vendor files
-NPM_VENDOR_DIRECTORY = path("common/static/common/js/vendor")
+NPM_VENDOR_DIRECTORY = path('common/static/common/js/vendor')
 
 # system specific lookup path additions, add sass dirs if one system depends on the sass files for other systems
 SASS_LOOKUP_DEPENDENCIES = {
@@ -81,7 +81,10 @@ SASS_LOOKUP_DEPENDENCIES = {
 }
 
 # Collectstatic log directory setting
-COLLECTSTATIC_LOG_DIR_ARG = "collect_log_dir"
+COLLECTSTATIC_LOG_DIR_ARG = 'collect_log_dir'
+
+# Webpack command
+WEBPACK_COMMAND = 'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack {options}'
 
 
 def get_sass_directories(system, theme_dir=None):
@@ -707,25 +710,37 @@ def execute_compile_sass(args):
         )
 
 
-def execute_webpack(prod, settings=None):
-    sh(
-        cmd(
-            "NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack"
-            .format(
-                node_env="production" if prod else "development",
-                static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings),
-                static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings)
-            )
-        )
+@task
+@cmdopts([
+    ('settings=', 's', "Django settings (defaults to devstack)"),
+    ('watch', 'w', "Watch file system and rebuild on change (defaults to off)"),
+])
+@timed
+def webpack(options):
+    """
+    Run a Webpack build.
+    """
+    settings = getattr(options, 'settings', Env.DEVSTACK_SETTINGS)
+    environment = 'NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms}'.format(
+        node_env="production" if settings != Env.DEVSTACK_SETTINGS else "development",
+        static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings),
+        static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings),
     )
+    sh(cmd('{environment} $(npm bin)/webpack'.format(environment=environment)))
 
 
 def execute_webpack_watch(settings=None):
+    """
+    Run the Webpack file system watcher.
+    """
+    # We only want Webpack to re-run on changes to its own entry points,
+    # not all JS files, so we use its own watcher instead of subclassing
+    # from Watchdog like the other watchers do.
     run_background_process(
-        "STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack --watch --watch-poll=200"
-        .format(
+        'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack {options}'.format(
+            options='--watch --watch-poll=200',
             static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings),
-            static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings)
+            static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings),
         )
     )
 
@@ -797,13 +812,12 @@ def watch_assets(options):
     print("Starting asset watcher...")
     observer.start()
 
-    # We only want Webpack to re-run on changes to its own entry points, not all JS files, so we use its own watcher
-    # instead of subclassing from Watchdog like the other watchers do
+    # Run the Webpack file system watcher too
     execute_webpack_watch(settings=Env.DEVSTACK_SETTINGS)
 
     if not getattr(options, 'background', False):
         # when running as a separate process, the main thread needs to loop
-        # in order to allow for shutdown by contrl-c
+        # in order to allow for shutdown by control-c
         try:
             while True:
                 observer.join(2)
@@ -861,7 +875,9 @@ def update_assets(args):
     process_xmodule_assets()
     process_npm_assets()
     compile_coffeescript()
-    execute_webpack(prod=(args.settings != Env.DEVSTACK_SETTINGS), settings=args.settings)
+
+    # Build Webpack
+    call_task('pavelib.assets.webpack', options={'settings': args.settings})
 
     # Compile sass for themes and system
     execute_compile_sass(args)
