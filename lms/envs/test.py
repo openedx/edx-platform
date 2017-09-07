@@ -611,3 +611,5 @@ ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = 'http://enterprise.example.com/consent/api/v1/'
 
 ACTIVATION_EMAIL_FROM_ADDRESS = 'test_activate@edx.org'
+
+TEMPLATES[0]['OPTIONS']['debug'] = True
