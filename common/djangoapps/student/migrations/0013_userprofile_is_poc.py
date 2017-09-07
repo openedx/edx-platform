@@ -7,13 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('student', '0008_auto_20161117_1209'),
+        ('student', '0012_userprofile_organization'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='userprofile',
             name='is_poc',
-            field=models.BooleanField(default=0),
+            field=models.BooleanField(default=False),
         ),
     ]

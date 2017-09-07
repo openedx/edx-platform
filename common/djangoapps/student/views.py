@@ -641,9 +641,9 @@ def dashboard(request):
     if not user.is_active:
         if user.profile.is_poc:
             msg = ("Success! You have registered as Admin for %s, %s"
-             % (user.profile.org, user.first_name))
+             % (user.profile.organization.name, user.profile.name))
         else:
-            msg = "Success! You have registered, %s" % (user.first_name)
+            msg = "Success! You have registered, %s" % (user.profile.name)
         message = render_to_string(
             'registration/activate_account_notice.html',
             {'msg': msg, 'email': user.email, 'platform_name': platform_name}
@@ -1721,26 +1721,24 @@ def create_account_with_params(request, params):
         # first, create the account
         (user, profile, registration) = _do_create_account(form, custom_form)
 
-        is_point_of_contact = True if params['point_of_contact'] == 'true' else False
-
-        from nose.tools import set_trace; set_trace()
+        is_poc = True if params['point_of_contact'] == 'true' else False
 
         organization_to_assign = None
         if not Organization.objects.filter(name=params['organization']).exists():
             organization_to_assign = Organization(
                 name=params['organization'],
-                point_of_contact_exist=is_point_of_contact
+                point_of_contact_exist=is_poc
             )
             organization_to_assign.save()
 
         else:
             organization_to_assign = Organization.objects.filter(name=params['organization']).first()
-            if is_point_of_contact and not organization_to_assign.point_of_contact_exist:
+            if is_poc and not organization_to_assign.point_of_contact_exist:
                 organization_to_assign.point_of_contact_exist = True
                 organization_to_assign.save()
 
         profile.organization = organization_to_assign
-        profile.is_point_of_contact = is_point_of_contact
+        profile.is_poc = is_poc
         profile.save()
 
         # next, link the account with social auth, if provided via the API.
@@ -2700,7 +2698,8 @@ def get_organizations(request):
         final_result = {}
 
         for organization in all_organizations:
-            final_result[organization.name] = organization.point_of_contact_exist
+            if organization.name.startswith(q):
+                final_result[organization.name] = organization.point_of_contact_exist
 
         data = json.dumps(final_result)
     else:

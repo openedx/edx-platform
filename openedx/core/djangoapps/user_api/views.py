@@ -158,7 +158,6 @@ class LoginSessionView(APIView):
 class RegistrationView(APIView):
     """HTTP end-points for creating a new user. """
 
-    from nose.tools import set_trace; set_trace()
     DEFAULT_FIELDS = ["email", "username", "password"]
 
     EXTRA_FIELDS = [
@@ -175,11 +174,11 @@ class RegistrationView(APIView):
         "title",
         "mailing_address",
         "goals",
-        "honor_code",
         "terms_of_service",
         "organization",
         "point_of_contact",
-        "admin_email"
+        "admin_email",
+        "honor_code"
     ]
 
     # This end-point is available to anonymous users,

@@ -68,7 +68,6 @@ def login_and_registration_form(request, initial_mode="login"):
 
     """
     # Determine the URL to redirect to following login/registration/third_party_auth
-    from nose.tools import set_trace; set_trace()
     # _local_server_get('/user_api/v1/account/registration/', request.session)
     redirect_to = get_next_url_for_login_page(request)
     # If we're already logged in, redirect to the dashboard

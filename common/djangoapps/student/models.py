@@ -306,7 +306,6 @@ class UserProfile(models.Model):
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
     organization = models.ForeignKey(Organization, related_name='user_profile', blank=True, null=True)
-    is_point_of_contact = models.BooleanField(default=False)
 
     @property
     def has_profile_image(self):
