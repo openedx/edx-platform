@@ -30,6 +30,7 @@ from edxval.api import (
     get_3rd_party_transcription_plans,
     get_transcript_preferences,
     create_or_update_transcript_preferences,
+    remove_transcript_preferences,
 )
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
@@ -327,7 +328,7 @@ def validate_transcript_preferences(
 
 @expect_json
 @login_required
-@require_POST
+@require_http_methods(('POST', 'DELETE'))
 def transcript_preferences_handler(request, course_key_string):
     """
     JSON view handler to post the transcript preferences.
@@ -338,26 +339,25 @@ def transcript_preferences_handler(request, course_key_string):
 
     Returns: valid json response or 400 with error message
     """
-    data = request.json
-    provider = data.get('provider', '')
-
-    # TODO: if provider == '': delete course preferences
-    # i.e call delete api end point like delete_transcript_preferences(course_key_string)
-
-    error, preferences = validate_transcript_preferences(
-        provider=provider,
-        cielo24_fidelity=data.get('cielo24_fidelity', ''),
-        cielo24_turnaround=data.get('cielo24_turnaround', ''),
-        three_play_turnaround=data.get('three_play_turnaround', ''),
-        preferred_languages=data.get('preferred_languages', [])
-    )
-
-    if error:
-        response = JsonResponse({'error': error}, status=400)
-    else:
-        preferences.update({'provider': provider})
-        transcript_preferences = create_or_update_transcript_preferences(course_key_string, **preferences)
-        response = JsonResponse({'transcript_preferences': transcript_preferences}, status=200)
+    if request.method == 'POST':
+        data = request.json
+        provider = data.get('provider')
+        error, preferences = validate_transcript_preferences(
+            provider=provider,
+            cielo24_fidelity=data.get('cielo24_fidelity', ''),
+            cielo24_turnaround=data.get('cielo24_turnaround', ''),
+            three_play_turnaround=data.get('three_play_turnaround', ''),
+            preferred_languages=data.get('preferred_languages', [])
+        )
+        if error:
+            response = JsonResponse({'error': error}, status=400)
+        else:
+            preferences.update({'provider': provider})
+            transcript_preferences = create_or_update_transcript_preferences(course_key_string, **preferences)
+            response = JsonResponse({'transcript_preferences': transcript_preferences}, status=200)
+    elif request.method == 'DELETE':
+        remove_transcript_preferences(course_key_string)
+        response = JsonResponse()
 
     return response
 

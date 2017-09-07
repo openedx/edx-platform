@@ -186,10 +186,35 @@ define(
                     })
                 );
 
-                // Send successful upload response.
+                // Send successful response.
                 AjaxHelpers.respondWithJson(requests, {
                     transcript_preferences: activeTranscriptPreferences
                 });
+
+                // Verify that success message is shown.
+                expect($courseVideoSettingsEl.find('.course-video-settings-message-wrapper.success').html()).toEqual(
+                    '<div class="course-video-settings-message">' +
+                    '<span class="icon fa fa-check-circle" aria-hidden="true"></span>' +
+                    '<span>Settings updated</span>' +
+                    '</div>'
+                );
+            });
+
+            it('removes transcript settings on update settings button click when no provider is selected', function() {
+                var requests = AjaxHelpers.requests(this);
+
+                // Set no provider selected
+                courseVideoSettingsView.selectedProvider = null;
+                $courseVideoSettingsEl.find('.action-update-course-video-settings').click();
+
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'DELETE',
+                    transcriptPreferencesUrl
+                );
+
+                // Send successful empty content response.
+                AjaxHelpers.respondWithJson(requests, {});
 
                 // Verify that success message is shown.
                 expect($courseVideoSettingsEl.find('.course-video-settings-message-wrapper.success').html()).toEqual(
