@@ -6,13 +6,17 @@
 {% block body %}
     <h1>{% trans "You have signed out." %}</h1>
 
-    <form action="." method="post">
-         {{ form.as_p }}
-         {% csrf_token %}
-        <p><input type="submit" value="Next"></p>
-    </form>
-    <style>
+    <div class="container">
+        <form action="." method="post" class="survey-form">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <div class="submit-survey">
+                <input type="submit" value="Next"/>
+            </div>
+        </form>
+    </div>
 
+    <style>
         #content > form > p:nth-child(9) > label {
             display: none; !important;
         }
@@ -22,9 +26,8 @@
         #id_country_of_employment, #id_city_of_employment {
             display: none;
         }
-
-
     </style>
+
     <script type="text/javascript" src="{% static 'js/jquery.allLoaded.js' %}"></script>
 
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" media="all" />

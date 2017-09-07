@@ -1,0 +1,55 @@
+.survey-form {
+    width: 800px;
+    margin: auto;
+    margin-bottom: 30px;
+    
+    > p {
+        width: 50%;
+        float: left;
+        padding: 0 15px;
+        margin: 0 0 20px;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        
+        label {
+            display: none;
+            
+            &[for='id_is_city_or_country_of_employment_diff'] {
+                display: block;
+                float: right;
+                width: calc(100% - 30px);
+                
+                + input {
+                    overflow: hidden;
+                    display: block;
+                    width: auto;
+                    height: 26px;
+                }
+            }
+        }
+        
+        input,
+        select {
+            width: 100%;
+            height: 50px;
+        }
+        
+        &:nth-child(7) {
+            width: 100%;
+        }
+    }
+    
+    .submit-survey {
+        width: 100%;
+        clear: both;
+        float: none;
+        text-align: center;
+        
+        input {
+            width: 770px;
+            margin: 0 auto;
+            height: 50px;
+        }
+    }
+}
