@@ -21,12 +21,14 @@ from ..tests.factories import ScheduleConfigFactory
 class CreateScheduleTests(SharedModuleStoreTestCase):
 
     def assert_schedule_created(self):
-        enrollment = CourseEnrollmentFactory()
+        course = create_course_run(self_paced=True)
+        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         self.assertIsNotNone(enrollment.schedule)
         self.assertIsNone(enrollment.schedule.upgrade_deadline)
 
     def assert_schedule_not_created(self):
-        enrollment = CourseEnrollmentFactory()
+        course = create_course_run(self_paced=True)
+        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         with self.assertRaises(Schedule.DoesNotExist):
             enrollment.schedule
 
@@ -68,34 +70,19 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         site = SiteFactory.create()
         mock_get_current_site.return_value = site
         ScheduleConfigFactory.create(site=site, enabled=True, create_schedules=True)
-        course = create_self_paced_course_run()
-        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=False)
+        course = create_course_run(self_paced=False)
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-
-        self.assertEqual(enrollment.schedule.start, enrollment.created)
-        self.assertIsNone(enrollment.schedule.upgrade_deadline)
-
-    @override_waffle_flag(SCHEDULE_WAFFLE_FLAG, True)
-    def test_schedule_config_creation_enabled_instructor_paced_with_deadline(self, mock_get_current_site):
-        site = SiteFactory.create()
-        mock_get_current_site.return_value = site
-        ScheduleConfigFactory.create(site=site, enabled=True, create_schedules=True)
-        course = create_self_paced_course_run()
-        global_config = DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
-        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-        expected_deadline = enrollment.created + datetime.timedelta(days=global_config.deadline_days)
-
-        self.assertEqual(enrollment.schedule.start, enrollment.created)
-        self.assertEqual(enrollment.schedule.upgrade_deadline, expected_deadline)
+        with self.assertRaises(Schedule.DoesNotExist):
+            enrollment.schedule
 
 
-def create_self_paced_course_run():
+def create_course_run(self_paced=True):
     """ Create a new course run and course modes.
 
     Both audit and verified `CourseMode` objects will be created for the course run.
     """
     now = datetime.datetime.now(utc)
-    course = CourseFactory.create(start=now + datetime.timedelta(days=-1), self_paced=True)
+    course = CourseFactory.create(start=now + datetime.timedelta(days=-1), self_paced=self_paced)
 
     CourseModeFactory(
         course_id=course.id,
