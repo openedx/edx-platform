@@ -24,3 +24,4 @@ git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.0.9
 git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.1.1#egg=discussion-edx-platform-extensions==1.1.1
 git+https://github.com/edx-solutions/course-edx-platform-extensions.git@v1.0.3#egg=course-edx-platform-extensions==1.0.3
 git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@1.0.4#egg=progress-edx-platform-extensions==1.0.4
+git+https://github.com/appsembler/edx_xblock_scorm@use_ssla_player#egg=scormxblock
