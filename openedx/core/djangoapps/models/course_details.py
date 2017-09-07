@@ -9,7 +9,6 @@ from django.conf import settings
 from xmodule.fields import Date
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from openedx.core.djangoapps.signals.signals import COURSE_PACING_CHANGE
 from openedx.core.lib.courses import course_image_url
 from xmodule.modulestore.django import modulestore
 
@@ -190,7 +189,6 @@ class CourseDetails(object):
         descriptor = module_store.get_course(course_key)
 
         dirty = False
-        is_pacing_changed = False
 
         # In the descriptor's setter, the date is converted to JSON
         # using Date's to_json method. Calling to_json on something that
@@ -283,14 +281,9 @@ class CourseDetails(object):
                 and jsondict['self_paced'] != descriptor.self_paced):
             descriptor.self_paced = jsondict['self_paced']
             dirty = True
-            is_pacing_changed = True
 
         if dirty:
             module_store.update_item(descriptor, user.id)
-
-        # fires a signal indicating that the course pacing has changed
-        if is_pacing_changed:
-            COURSE_PACING_CHANGE.send(sender=None, course_key=course_key, course_self_paced=descriptor.self_paced)
 
         # NOTE: below auto writes to the db w/o verifying that any of
         # the fields actually changed to make faster, could compare
