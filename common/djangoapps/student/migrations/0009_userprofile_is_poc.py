@@ -14,7 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userprofile',
             name='is_poc',
-            field=models.BooleanField(default=False),
-            preserve_default=False
-        )
+            field=models.BooleanField(default=0),
+        ),
     ]
