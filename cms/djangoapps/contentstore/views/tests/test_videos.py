@@ -33,6 +33,7 @@ from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplaySt
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+from edxval.api import create_or_update_transcript_preferences, get_transcript_preferences
 
 
 def override_switch(switch, active):
@@ -873,6 +874,18 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         ),
         (
             {
+                'provider': ''
+            },
+            'Invalid provider.'
+        ),
+        (
+            {
+                'provider': 'dummy-provider'
+            },
+            'Invalid provider.'
+        ),
+        (
+            {
                 'provider': TranscriptProvider.CIELO24
             },
             'Invalid cielo24 fidelity.'
@@ -969,6 +982,46 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         else:
             self.assertEqual(status_code, 200)
             self.assertTrue(response['transcript_preferences'], preferences_data)
+
+    def test_remove_transcript_preferences(self):
+        """
+        Test that transcript handler removes transcript preferences correctly.
+        """
+        # First add course wide transcript preferences.
+        preferences = create_or_update_transcript_preferences(unicode(self.course.id))
+
+        # Verify transcript preferences exist
+        self.assertIsNotNone(preferences)
+
+        response = self.client.delete(
+            self.get_url_for_course_key(self.course.id),
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, 204)
+
+        # Verify transcript preferences no loger exist
+        preferences = get_transcript_preferences(unicode(self.course.id))
+        self.assertIsNone(preferences)
+
+    def test_remove_transcript_preferences_not_found(self):
+        """
+        Test that transcript handler works correctly even when no preferences are found.
+        """
+        course_id = 'dummy+course+id'
+        # Verify transcript preferences do not exist
+        preferences = get_transcript_preferences(course_id)
+        self.assertIsNone(preferences)
+
+        response = self.client.delete(
+            self.get_url_for_course_key(course_id),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 204)
+
+        # Verify transcript preferences do not exist
+        preferences = get_transcript_preferences(course_id)
+        self.assertIsNone(preferences)
 
     @ddt.data(
         None,

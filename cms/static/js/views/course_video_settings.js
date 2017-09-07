@@ -336,6 +336,43 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             );
         },
 
+        updateSuccessResponseStatus: function(data) {
+            this.renderResponseStatus(gettext('Settings updated'), 'success');
+            // Sync ActiveUploadListView with latest active plan.
+            this.activeTranscriptionPlan = data;
+            Backbone.trigger('coursevideosettings:syncActiveTranscriptPreferences', this.activeTranscriptionPlan);
+        },
+
+        updateFailResponseStatus: function(data) {
+            var errorMessage;
+            // Enclose inside try-catch so that if we get erroneous data, we could still
+            // show some error to user
+            try {
+                errorMessage = $.parseJSON(data).error;
+            } catch (e) {}  // eslint-disable-line no-empty
+            errorMessage = errorMessage || gettext('Error saving data');
+            this.renderResponseStatus(errorMessage, 'error');
+        },
+
+        renderResponseStatus: function(responseText, type) {
+            var addClass = type === 'error' ? 'error' : 'success',
+                removeClass = type === 'error' ? 'success' : 'error',
+                iconClass = type === 'error' ? 'fa-info-circle' : 'fa-check-circle',
+                $messageWrapperEl = this.$el.find('.course-video-settings-message-wrapper');
+            $messageWrapperEl.removeClass(removeClass);
+            $messageWrapperEl.addClass(addClass);
+            HtmlUtils.setHtml(
+                $messageWrapperEl,
+                HtmlUtils.interpolateHtml(
+                    HtmlUtils.HTML('<div class="course-video-settings-message"><span class="icon fa {iconClass}" aria-hidden="true"></span><span>{text}</span></div>'), // eslint-disable-line max-len
+                    {
+                        text: responseText,
+                        iconClass: iconClass
+                    }
+                )
+            );
+        },
+
         clearResponseStatus: function() {
             // Remove parent level state.
             var $messageWrapperEl = this.$el.find('.course-video-settings-message-wrapper');
@@ -407,59 +444,38 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
         saveTranscriptPreferences: function() {
             var self = this,
-                $messageWrapperEl = self.$el.find('.course-video-settings-message-wrapper');
-
+                responseTranscriptPreferences;
             // First clear response status if present already
             this.clearResponseStatus();
 
-            $.postJSON(this.transcriptHandlerUrl, {
-                provider: self.selectedProvider,
-                cielo24_fidelity: self.selectedFidelityPlan,
-                cielo24_turnaround: self.selectedProvider === CIELO24 ? self.selectedTurnaroundPlan : '',
-                three_play_turnaround: self.selectedProvider === THREE_PLAY_MEDIA ? self.selectedTurnaroundPlan : '',
-                preferred_languages: self.selectedLanguages,
-                global: false   // Do not trigger global AJAX error handler
-            }, function(data) {
-                if (data.transcript_preferences) {
-                    $messageWrapperEl.removeClass('error');
-                    $messageWrapperEl.addClass('success');
-                    HtmlUtils.setHtml(
-                        $messageWrapperEl,
-                        HtmlUtils.interpolateHtml(
-                            HtmlUtils.HTML('<div class="course-video-settings-message"><span class="icon fa fa-check-circle" aria-hidden="true"></span><span>{text}</span></div>'), // eslint-disable-line max-len
-                            {
-                                text: gettext('Settings updated')
-                            }
-                        )
-                    );
-                    self.activeTranscriptionPlan = data.transcript_preferences;
-
-                    // Sync ActiveUploadListView with latest active plan.
-                    Backbone.trigger(
-                        'coursevideosettings:syncActiveTranscriptPreferences',
-                        self.activeTranscriptionPlan
-                    );
-                }
-            }).fail(function(jqXHR) {
-                var errorMessage;
-                if (jqXHR.responseText) {
-                    // Enclose inside try-catch so that if we get erroneous data, we could still show some error to user
-                    try {
-                        errorMessage = $.parseJSON(jqXHR.responseText).error;
-                    } catch (e) {}  // eslint-disable-line no-empty
-                    $messageWrapperEl.removeClass('success');
-                    $messageWrapperEl.addClass('error');
-                    HtmlUtils.setHtml(
-                        $messageWrapperEl,
-                        HtmlUtils.interpolateHtml(
-                            HtmlUtils.HTML('<div class="course-video-settings-message"><span class="icon fa fa-info-circle" aria-hidden="true"></span><span>{text}</span></div>'),    // eslint-disable-line max-len
-                            {
-                                text: errorMessage || gettext('Error saving data')
-                            }
-                        )
-                    );
-                }
-            });
+            if (self.selectedProvider) {
+                $.postJSON(self.transcriptHandlerUrl, {
+                    provider: self.selectedProvider,
+                    cielo24_fidelity: self.selectedFidelityPlan,
+                    cielo24_turnaround: self.selectedProvider === CIELO24 ? self.selectedTurnaroundPlan : '',
+                    three_play_turnaround: self.selectedProvider === THREE_PLAY_MEDIA ? self.selectedTurnaroundPlan : '',   // eslint-disable-line max-len
+                    preferred_languages: self.selectedLanguages,
+                    global: false   // Do not trigger global AJAX error handler
+                }, function(data) {
+                    responseTranscriptPreferences = data ? data.transcript_preferences : null;
+                    self.updateSuccessResponseStatus(responseTranscriptPreferences);
+                }).fail(function(jqXHR) {
+                    if (jqXHR.responseText) {
+                        self.updateFailResponseStatus(jqXHR.responseText);
+                    }
+                });
+            } else {
+                $.ajax({
+                    type: 'DELETE',
+                    url: self.transcriptHandlerUrl
+                }).done(function() {
+                    self.updateSuccessResponseStatus(null);
+                }).fail(function(jqXHR) {
+                    if (jqXHR.responseText) {
+                        self.updateFailResponseStatus(jqXHR.responseText);
+                    }
+                });
+            }
         },
 
         updateCourseVideoSettings: function() {
@@ -489,35 +505,29 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         },
 
         setFixedCourseVideoSettingsPane: function() {
-            var windowWidth = $(window).width(),
-                windowHeight = $(window).height(),
-                $courseVideoSettingsButton = $('.course-video-settings-button'),
+            var $courseVideoSettingsButton = $('.course-video-settings-button'),
                 $courseVideoSettingsContainer = this.$el.find('.course-video-settings-container'),
                 initialPositionTop = $courseVideoSettingsContainer.offset().top,
-                courseVideoSettingsButtonLeft = $courseVideoSettingsButton.offset().left,
-                fixedOffsetRight = windowWidth -
-                    courseVideoSettingsButtonLeft - $courseVideoSettingsButton.width() - 25;
+                // Button right position =  width of window - button left position - button width - paddings - border.
+                $courseVideoSettingsButtonRight = $(window).width() -
+                    $courseVideoSettingsButton.offset().left -
+                    $courseVideoSettingsButton.width() -
+                    $courseVideoSettingsButton.css('padding-left').replace('px', '') -
+                    $courseVideoSettingsButton.css('padding-right').replace('px', '') -
+                    $courseVideoSettingsButton.css('border-width').replace('px', '') - 5;   // Extra pixles for slack;
 
-            // set windows total height
-            $courseVideoSettingsContainer.css('height', windowHeight);
-            $courseVideoSettingsContainer.css('right', 20);
+            // Set to windows total height
+            $courseVideoSettingsContainer.css('height', $(window).height());
 
+            // Start settings pane adjascent to 'course video settings' button.
+            $courseVideoSettingsContainer.css('right', $courseVideoSettingsButtonRight);
 
             // Make sticky when scroll reaches top.
             $(window).scroll(function() {
-                // Remove transition when we start scrolling.
-                // Why we do this? The settings pane come back and forth when it is switched between
-                // position:fixed and position:absolute, it's right and top position are then being changed wrt to their
-                // position layout.
-                $courseVideoSettingsContainer.css('transition', 'none');
-
                 if ($(window).scrollTop() >= initialPositionTop) {
                     $courseVideoSettingsContainer.addClass('fixed-container');
-                    // TODO: Removes these js calculations and try to do through CSS way.
-                    $courseVideoSettingsContainer.css('right', fixedOffsetRight);
                 } else {
                     $courseVideoSettingsContainer.removeClass('fixed-container');
-                    $courseVideoSettingsContainer.css('right', 20);
                 }
             });
         },
