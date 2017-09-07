@@ -4,7 +4,7 @@
 .wrapper-footer {
     @include clearfix();
     @extend %ui-print-excluded;
-    box-shadow: 0 -1px 5px 0 $shadow-l1;
+    box-shadow: 0 -1px 1px 0 $shadow-l1;
     border-top: 1px solid palette(grayscale, x-back);
     padding: 25px ($baseline/2) ($baseline*1.5);
     background: $footer-bg;
@@ -24,7 +24,7 @@
         }
 
         a {
-            @extend %link-text;
+
             border-bottom: none;
 
             &:hover,

@@ -10,9 +10,7 @@
     box-shadow: 0 1px 80px 0 rgba(0,0,0, 0.5);
     border-bottom: 1px solid $border-color-3;
     box-shadow: inset 0 1px 5px 0 $shadow-l1;
-    height: 280px;
-    margin-top: $header_image_margin;
-    padding-top: 150px;
+    padding: 15px 0;
     overflow: hidden;
     position: relative;
     width: 100%;
@@ -526,7 +524,7 @@
         .icon {
             @include float(left);
             padding: 1px;
-            @include margin(($baseline/5), ($baseline/2), 0, 0);
+            @include margin(0, ($baseline/2), 0, 0);
             opacity: .6;
         }
 
