@@ -842,7 +842,13 @@ class ExampleCertificate(TimeStampedModel):
 class CertificateGenerationCourseSetting(TimeStampedModel):
     """Enable or disable certificate settings for a particular course.
 
-    'enabled' controls whether students are allowed to "self-generate"
+    DEPRECATED: 'enabled' controls whether students are allowed to "self-generate"
+    certificates for a course.  It does NOT prevent us from
+    batch-generating certificates for a course using management
+    commands.
+    INSTEAD USE: can_self_generate
+
+    'can_self_generate' controls whether students are allowed to "self-generate"
     certificates for a course.  It does NOT prevent us from
     batch-generating certificates for a course using management
     commands.
@@ -857,7 +863,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
 
     """
     course_key = CourseKeyField(max_length=255, db_index=True)
-    enabled = models.BooleanField(default=False) #Deprecated
+    enabled = models.BooleanField(default=False)  # Deprecated
     can_self_generate = models.BooleanField(default=False)
     language_specific_templates = models.BooleanField(default=False)
 
@@ -894,11 +900,11 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         """
         defaults = {
             'enabled': enable,
-            'can_self_generate' : enable
+            'can_self_generate': enable
         }
         CertificateGenerationCourseSetting.objects.update_or_create(
             course_key=course_key,
-            defaults = defaults
+            defaults=defaults
         )
 
     @classmethod
@@ -930,7 +936,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         """
         CertificateGenerationCourseSetting.objects.update_or_create(
             course_key=course_key,
-            defaults = {'language_specific_templates':enable}
+            defaults={'language_specific_templates': enable}
         )
 
 
