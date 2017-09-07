@@ -41,6 +41,7 @@ from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
+from openedx.core.djangoapps.certificates.api import display_date_for_certificate
 from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.date_utils import strftime_localized
@@ -100,15 +101,7 @@ def _update_certificate_context(context, user_certificate, platform_name):
 
     # Translators:  The format of the date includes the full name of the month
     course = get_course_by_id(user_certificate.course_id) if user_certificate.course_id else None
-    if (
-        course and
-        not course.self_paced and
-        course.certificate_available_date and
-        course.certificate_available_date < datetime.now(pytz.UTC)
-    ):
-        date = course.certificate_available_date
-    else:
-        date = user_certificate.modified_date
+    date = display_date_for_certificate(course, user_certificate)
     context['certificate_date_issued'] = _('{month} {day}, {year}').format(
         month=strftime_localized(date, "%B"),
         day=date.day,
