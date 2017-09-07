@@ -639,9 +639,14 @@ def dashboard(request):
 
     message = ""
     if not user.is_active:
+        if user.profile.is_poc:
+            msg = ("Success! You have registered as Admin for %s, %s"
+             % (user.profile.org, user.first_name))
+        else:
+            msg = "Success! You have registered, %s" % (user.first_name)
         message = render_to_string(
             'registration/activate_account_notice.html',
-            {'email': user.email, 'platform_name': platform_name}
+            {'msg': msg, 'email': user.email, 'platform_name': platform_name}
         )
 
     # Global staff can see what courses errored on their dashboard
@@ -757,10 +762,14 @@ def dashboard(request):
     else:
         redirect_message = ''
 
+    courses = get_courses(user)
+
     context = {
+        'is_poc': user.profile.is_poc,
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
         'course_enrollments': course_enrollments,
+        'courses_list': courses,
         'course_optouts': course_optouts,
         'message': message,
         'staff_access': staff_access,
@@ -2052,6 +2061,7 @@ def auto_auth(request):
     full_name = request.GET.get('full_name', username)
     is_staff = request.GET.get('staff', None)
     is_superuser = request.GET.get('superuser', None)
+    is_poc = request.GET.get('is_poc', False)
     course_id = request.GET.get('course_id', None)
     redirect_to = request.GET.get('redirect_to', None)
     active_status = request.GET.get('is_active')
