@@ -95,6 +95,16 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
 
         return auth_inst
 
+    def auth_complete(self, *args, **kwargs):
+        """
+        The user has been redirected back from the IdP and we should
+        now log them in, if everything checks out.
+        """
+        try:
+            return super(SAMLAuthBackend, self).auth_complete(*args, **kwargs)
+        except Exception as ex:
+            log.exception('auth_complete failed: An exception occured. Message "%s"', ex.message)
+
     @cached_property
     def _config(self):
         from .models import SAMLConfiguration
