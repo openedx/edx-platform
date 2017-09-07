@@ -397,7 +397,7 @@ $facet-background-color: #007db8;
     @include box-sizing(border-box);
     @extend %ui-depth1;
     position: relative;
-    margin: ($baseline*2) 0 ($baseline*3.5) 0;
+    margin: 52px 0 ($baseline*3.5) 0;
     box-shadow: 1px 2px 5px $black-t0;
     border-top: 1px solid $black;
     border-bottom: 2px solid $black;
@@ -550,7 +550,7 @@ $facet-background-color: #007db8;
 // +All Other Styles
 // ====================
 .find-courses, .university-profile {
-  background: $gray-l5;
+  background: $white;
   padding-bottom: ($baseline*3);
 
 

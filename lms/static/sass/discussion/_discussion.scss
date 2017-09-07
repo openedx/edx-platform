@@ -1,7 +1,9 @@
 // forums - main app styling
 // ====================
 // NOTE: this file is deprecated, and we should not continue to add to this file. Use other partials as appropriate.
-
+body {
+  background: $white;
+}
 .discussion-body {
   @include clearfix();
   border: none;

@@ -1,0 +1,17 @@
+a:hover, 
+.link:hover, 
+.btn-link:hover, 
+.table-sortable .sortable .action-sort:hover, 
+a:active, 
+.link:active, 
+.btn-link:active, 
+.table-sortable .sortable .action-sort:active, 
+a:focus, 
+.link:focus, 
+.btn-link:focus,
+.dropdown-menu-container .dropdown-menu .dropdown-item a:hover, 
+.dropdown-menu-container .dropdown-menu .dropdown-item a:active, 
+.dropdown-menu-container .dropdown-menu .dropdown-item a:focus,
+.table-sortable .sortable .action-sort:focus {
+    text-decoration: none;
+}

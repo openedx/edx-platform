@@ -19,6 +19,7 @@ $static-path: '../..' !default;
 @import '../shared-v2/components';
 @import '../shared-v2/modal';
 @import '../shared-v2/help-tab';
+@import '../shared-v2/link-reset';
 
 // Compatibility support for non-Pattern Library mixins and extensions
 @import 'utilities/variables-v2';
