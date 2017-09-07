@@ -2157,6 +2157,8 @@ INSTALLED_APPS = (
 
     # Unusual migrations
     'database_fixups',
+
+    'lms.djangoapps.onboarding_survey',
 )
 
 ######################### CSRF #########################################

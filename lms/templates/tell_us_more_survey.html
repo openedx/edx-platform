@@ -1,0 +1,55 @@
+{% extends "main_django.html" %}
+{% load i18n staticfiles %}
+
+{% block title %}{% trans "Tell us more about you." %} | {{ block.super }}{% endblock %}
+
+{% block body %}
+    <h1>{% trans "You have signed out." %}</h1>
+
+    <form action="." method="post">
+         {{ form.as_p }}
+         {% csrf_token %}
+        <p><input type="submit" value="Next"></p>
+    </form>
+    <style>
+
+        #content > form > p:nth-child(9) > label {
+            display: none; !important;
+        }
+        #content > form > p:nth-child(8) > label {
+            display: none !important;
+        }
+        #id_country_of_employment, #id_city_of_employment {
+            display: none;
+        }
+
+
+    </style>
+    <script type="text/javascript" src="{% static 'js/jquery.allLoaded.js' %}"></script>
+
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" media="all" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript">
+    </script> <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
+    <script>
+        $(document).ready(function () {
+            $("#id_birth_date").datepicker({dateFormat: 'mm/dd/yy'});
+
+            $("#id_language").autocomplete({
+                source: "/onboarding_survey/get_languages/",
+                minLength: 2
+              });
+
+            $('#id_is_city_or_country_of_employment_diff').change(function() {
+                if($(this).is(":checked")) {
+                    $('#id_country_of_employment').show()
+                    $('#id_city_of_employment').show()
+                }
+                else {
+                    $('#id_country_of_employment').hide()
+                    $('#id_city_of_employment').hide()
+                }
+            });
+        });
+
+    </script>
+{% endblock body %}

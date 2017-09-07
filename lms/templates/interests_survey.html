@@ -1,0 +1,19 @@
+{% extends "main_django.html" %}
+{% load i18n staticfiles %}
+
+{% block title %}{% trans "Tell us more about you." %} | {{ block.super }}{% endblock %}
+
+{% block body %}
+    <h1>{% trans "You have signed out." %}</h1>
+
+    <h2>Tell us about what you care about so we can recommend the right course and communities</h2>
+
+    <form action="." method="post">
+         {{ form.as_p }}
+         {% csrf_token %}
+        <p><input type="submit" value="Next"></p>
+
+    </form>
+
+    <script type="text/javascript" src="{% static 'js/jquery.allLoaded.js' %}"></script>
+{% endblock body %}
