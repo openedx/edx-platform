@@ -3,6 +3,7 @@ A custom Strategy for python-social-auth that allows us to fetch configuration f
 ConfigurationModels rather than django.settings
 """
 
+import logging
 from social_core.backends.oauth import OAuthAuth
 from social_django.strategy import DjangoStrategy
 
@@ -10,6 +11,8 @@ from .models import OAuth2ProviderConfig
 from .pipeline import get as get_pipeline_from_request
 from .pipeline import AUTH_ENTRY_CUSTOM
 from .provider import Registry
+
+log = logging.getLogger(__name__)
 
 
 class ConfigurationModelStrategy(DjangoStrategy):
@@ -57,3 +60,11 @@ class ConfigurationModelStrategy(DjangoStrategy):
         # At this point, we know 'name' is not set in a [OAuth2|LTI|SAML]ProviderConfig row.
         # It's probably a global Django setting like 'FIELDS_STORED_IN_SESSION':
         return super(ConfigurationModelStrategy, self).setting(name, default, backend)
+
+    def request_data(self, merge=True):
+        """
+        process the request data. Overriding it to log the data values.
+        """
+        data = super(ConfigurationModelStrategy, self).request_data(merge=merge)
+        log.info('ConfigurationModelStrategy: processed request data "%s" ', data)
+        return data
