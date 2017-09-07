@@ -79,7 +79,7 @@ from openedx.core.djangolib.markup import HTML, Text
     <div class="container dashboard" id="dashboard-main">
 
       % if is_poc:
-        <div id="my-courses">
+        <div class="my-courses" id="my-courses">
           <header class="wrapper-header-courses">
             <h2 class="header-courses">${_("As an organization admin, there are a few next steps your are"
               " responsible for:")}</h2>
@@ -87,8 +87,8 @@ from openedx.core.djangolib.markup import HTML, Text
           <div class="poc-dashboard-message">
               <h3>${_("Fill up the Organizational Effectiveness Framework")}</h3>
               <p>${_("We ask all organization point of contacts to fill up our Organizational Effectiveness Framework"
-                     "(OEF). It's a way to help you track your organization. You will be able"
-                     "to start, save your progress at any time")}</p>
+                     " (OEF). It's a way to help you track your organization. You will be able"
+                     " to start, save your progress at any time")}</p>
 
               <a>
                 ${_("Start OEF")}
@@ -107,7 +107,7 @@ from openedx.core.djangolib.markup import HTML, Text
       % if not is_poc:
         <div class="my-courses" id="my-courses">
           <header class="wrapper-header-courses">
-            <h2 class="header-courses">${_("My Courses")}</h2>
+            <h2 class="header-courses">${_("Check out recommened courses for you")}</h2>
           </header>
 
         <%doc>
@@ -159,13 +159,9 @@ from openedx.core.djangolib.markup import HTML, Text
           <div class="poc-dashboard-message">
               <h3>${_("Not sure how to start using the platform?"
                       "Take our onboarding tutorial")}</h3>
-
-              % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-                <a>
-                  ${_("Start Tutorial")}
-                </a>
-
-              %endif
+              <a>
+                ${_("Start Tutorial")}
+              </a>
           </div>
 
           % if staff_access and len(errored_courses) > 0:
