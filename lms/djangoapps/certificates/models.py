@@ -863,7 +863,10 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
 
     """
     course_key = CourseKeyField(max_length=255, db_index=True)
+
     enabled = models.BooleanField(default=False)  # Deprecated
+    # Note: the method 'can_self_generate_for_course' should be modified when 'enabled' field is removed.
+
     can_self_generate = models.BooleanField()
     can_use_language_specific_templates = models.BooleanField(default=False)
 
@@ -887,7 +890,8 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         except cls.DoesNotExist:
             return False
         else:
-            return latest.can_self_generate
+            return latest.can_self_generate or latest.enabled  
+            # Note: the 'or latest.enabled' should be removed during deletion of 'enabled' field
 
     @classmethod
     def set_can_self_generate_for_course(cls, course_key, enable_self_generation):
