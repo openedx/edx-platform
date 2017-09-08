@@ -8,7 +8,6 @@ import logging
 import os
 import re
 import shutil
-import socket
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -161,16 +160,6 @@ def _write_chunk(request, courselike_key):
             # This shouldn't happen, even if different instances are handling
             # the same session, but it's always better to catch errors earlier.
             if size < int(content_range['start']):
-                log.warning(
-                    u"Course uploading failed. "
-                    u"course_id: {}, file_path: {}, range: {}, server: {}, session_key: {} ".format(
-                        courselike_key,
-                        temp_filepath if temp_filepath.exists() else 'EMPTY',
-                        content_range['start'],
-                        socket.gethostname(),
-                        request.session.session_key,
-                    )
-                )
                 _save_request_status(request, courselike_string, -1)
                 log.warning(
                     "Reported range %s does not match size downloaded so far %s",
@@ -188,16 +177,7 @@ def _write_chunk(request, courselike_key):
             # nginx sends a 499 error code when the response takes too long.
             elif size > int(content_range['stop']) and size == int(content_range['end']):
                 return JsonResponse({'ImportStatus': 1})
-        log.info(
-            u"Uploading course :"
-            u"course_id: {}, file_path: {}, range: {}, server: {}, session_key: {} ".format(
-                courselike_key,
-                temp_filepath,
-                content_range['start'],
-                socket.gethostname(),
-                request.session.session_key,
-            )
-        )
+
         with open(temp_filepath, mode) as temp_file:
             for chunk in request.FILES['course-data'].chunks():
                 temp_file.write(chunk)
@@ -233,17 +213,6 @@ def _write_chunk(request, courselike_key):
 
         log.exception(
             "error importing course"
-        )
-
-        log.warning(
-            u"Course uploading failed. "
-            u"course_id: {}, file_path: {}, range: {}, server: {}, session_key: {} ".format(
-                courselike_key,
-                temp_filepath,
-                content_range['start'],
-                socket.gethostname(),
-                request.session.session_key,
-            )
         )
         return JsonResponse(
             {
