@@ -1,25 +1,35 @@
 {% load i18n %}
+
+<!-- This is preview text that is visible in the inbox view of many email clients but not visible in the actual
+email itself. -->
+<div style="
+    display:none;
+    font-size:1px;
+    line-height:1px;
+    max-height:0px;
+    max-width:0px;
+    opacity:0;
+    overflow:hidden;
+    visibility:hidden;
+">
+    {% block preview_text %}{% endblock %}
+</div>
+
+{# This "View on Web" link must appear in the document before any layout tables so that accessible email clients can #}
+{# send the user to a proper web browser which can parse the email correctly. #}
+
+{# Note {view_url} is not a template variable that is evaluated by the Django template engine. It is evaluated by #}
+{# Sailthru when the email is sent. Other email providers would need to replace this variable in the HTML as well. #}
+<a href="{view_url}">{% trans "View on Web" %}</a>
+{# Note this is another late-bound variable #}
+<img src="{beacon_src}" alt="" role="presentation" aria-hidden="true" />
+
 {% get_current_language as LANGUAGE_CODE %}
 <div bgcolor="#f5f5f5" lang="{{ LANGUAGE_CODE|default:"en" }}" style="
     margin: 0;
     padding: 0;
     min-width: 100%;
 ">
-    <!-- This is preview text that is visible in the inbox view of many email clients but not visible in the actual
-    email itself. -->
-    <div style="
-        display:none;
-        font-size:1px;
-        line-height:1px;
-        max-height:0px;
-        max-width:0px;
-        opacity:0;
-        overflow:hidden;
-        visibility:hidden;
-    ">
-        {% block preview_text %}{% endblock %}
-    </div>
-
     <!-- Hack for outlook 2010, which wants to render everything in Times New Roman -->
     <!--[if mso]>
     <style type="text/css">
@@ -49,12 +59,12 @@
                 <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
                     <tr>
                         <td width="70">
-                            <a href="http://www.edx.org"><img
+                            <a href="{{ homepage_url }}"><img
                                     src="https://media.sailthru.com/595/1k1/8/o/599f355101b3f.png" width="70"
-                                    height="30" alt="edX Home Page"/></a>
+                                    height="30" alt="{% blocktrans %}{{ platform_name }} Home Page{% endblocktrans %}"/></a>
                         </td>
                         <td align="right" style="text-align: right;">
-                            <a class="login" href="https://courses.edx.org/dashboard" style="color: #005686;">Sign In</a>
+                            <a class="login" href="{{ dashboard_url }}" style="color: #005686;">{%  trans "Sign In" %}</a>
                         </td>
                     </tr>
                 </table>
@@ -80,46 +90,50 @@
                             <!-- LOGO / SOCIAL -->
                             <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
                                 <tr>
-                                    <td width="70">
-                                        <!-- LOGO -->
-                                        <a href="http://www.edx.org"><img
-                                                src="https://media.sailthru.com/595/1k1/8/o/599f355101b3f.png"
-                                                width="70" height="30" alt="edX Home Page"/></a>
-                                    </td>
                                     <td align="right">
                                         <!-- SOCIAL -->
                                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="210">
                                             <tr>
-                                                <td height="32" width="42" align="right">
-                                                    <a href="https://www.linkedin.com/company/edx">
-                                                        <img src="https://media.sailthru.com/595/1k1/8/o/599f354ec70cb.png"
-                                                             width="32" height="32" alt="edX on LinkedIn"/>
-                                                    </a>
-                                                </td>
-                                                <td height="32" width="42" align="right">
-                                                    <a href="https://www.twitter.com/edXOnline/">
-                                                        <img src="https://media.sailthru.com/595/1k1/8/o/599f354d9c26e.png"
-                                                             width="32" height="32" alt="edX on Twitter"/>
-                                                    </a>
-                                                </td>
-                                                <td height="32" width="42" align="right">
-                                                    <a href="http://www.facebook.com/edX">
-                                                        <img src="https://media.sailthru.com/595/1k1/8/o/599f355052c8e.png"
-                                                             width="32" height="32" alt="edX on Facebook"/>
-                                                    </a>
-                                                </td>
-                                                <td height="32" width="42" align="right">
-                                                    <a href="https://plus.google.com/%2BedXOnline">
-                                                        <img src="https://media.sailthru.com/595/1k1/8/o/599f354fc554a.png"
-                                                             width="32" height="32" alt="edX on Google Plus"/>
-                                                    </a>
-                                                </td>
-                                                <td height="32" width="42" align="right">
-                                                    <a href="https://www.reddit.com/r/edX/">
-                                                        <img src="https://media.sailthru.com/595/1k1/8/o/599f354e326b9.png"
-                                                             width="32" height="32" alt="edX on Reddit"/>
-                                                    </a>
-                                                </td>
+                                                {% if social_media_urls.linkedin %}
+                                                    <td height="32" width="42" align="right">
+                                                        <a href="{{ social_media_urls.linkedin }}">
+                                                            <img src="https://media.sailthru.com/595/1k1/8/o/599f354ec70cb.png"
+                                                                 width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on LinkedIn{% endblocktrans %}"/>
+                                                        </a>
+                                                    </td>
+                                                {% endif %}
+                                                {% if social_media_urls.twitter %}
+                                                    <td height="32" width="42" align="right">
+                                                        <a href="{{ social_media_urls.twitter }}">
+                                                            <img src="https://media.sailthru.com/595/1k1/8/o/599f354d9c26e.png"
+                                                                 width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Twitter{% endblocktrans %}"/>
+                                                        </a>
+                                                    </td>
+                                                {% endif %}
+                                                {% if social_media_urls.facebook %}
+                                                    <td height="32" width="42" align="right">
+                                                        <a href="{{ social_media_urls.facebook }}">
+                                                            <img src="https://media.sailthru.com/595/1k1/8/o/599f355052c8e.png"
+                                                                 width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Facebook{% endblocktrans %}"/>
+                                                        </a>
+                                                    </td>
+                                                {% endif %}
+                                                {% if social_media_urls.google_plus %}
+                                                    <td height="32" width="42" align="right">
+                                                        <a href="{{ social_media_urls.google_plus }}">
+                                                            <img src="https://media.sailthru.com/595/1k1/8/o/599f354fc554a.png"
+                                                                 width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Google Plus{% endblocktrans %}"/>
+                                                        </a>
+                                                    </td>
+                                                {% endif %}
+                                                {% if social_media_urls.reddit %}
+                                                    <td height="32" width="42" align="right">
+                                                        <a href="{{ social_media_urls.reddit }}">
+                                                            <img src="https://media.sailthru.com/595/1k1/8/o/599f354e326b9.png"
+                                                                 width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Reddit{% endblocktrans %}"/>
+                                                        </a>
+                                                    </td>
+                                                {% endif %}
                                             </tr>
                                         </table>
                                     </td>
@@ -132,17 +146,33 @@
                         <td>
                             <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
                                 <tr>
+                                    <td class="col" width="100%" align="center" valign="top">
+                                        <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td style="padding-bottom: 10px;">
+                                                    {# Note that this variable is evaluated by Sailthru, not the Django template engine #}
+                                                    <a href="{optout_confirm_url}" style="color: #005686">
+                                                        <font color="#005686"><b>{% trans "Unsubscribe from this list" %}</b></font>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
                                     <!-- APP BUTTONS -->
                                     <td class="col" width="148" valign="top" align="right" style="padding-bottom: 20px;">
-                                        <a href="https://itunes.apple.com/us/app/edx/id945480667?mt=8" style="text-decoration: none">
-                                            <img src="https://media.sailthru.com/595/1k1/6/2/5931cfbba391b.png"
-                                                 alt="Download the iOS app on the Apple Store" width="136" height="50"/>
-                                        </a>
-                                        <a href="https://play.google.com/store/apps/details?id=org.edx.mobile" style="text-decoration: none">
-                                            <img src="https://media.sailthru.com/595/1k1/6/2/5931cf879a033.png"
-                                                 alt="Download the Android app on the Google Play Store"
-                                                 width="136" height="50" style="margin: 10px 0 0 5px"/>
-                                        </a>
+                                        {% if mobile_store_urls.apple %}
+                                            <a href="{{ mobile_store_urls.apple }}" style="text-decoration: none">
+                                                <img src="https://media.sailthru.com/595/1k1/6/2/5931cfbba391b.png"
+                                                     alt="{% trans "Download the iOS app on the Apple Store" %}" width="136" height="50"/>
+                                            </a>
+                                        {% endif %}
+                                        {% if mobile_store_urls.google %}
+                                            <a href="{{ mobile_store_urls.google }}" style="text-decoration: none">
+                                                <img src="https://media.sailthru.com/595/1k1/6/2/5931cf879a033.png"
+                                                     alt="{% trans "Download the Android app on the Google Play Store" %}"
+                                                     width="136" height="50" style="margin: 10px 0 0 5px"/>
+                                            </a>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             </table>
@@ -154,11 +184,12 @@
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                 <tr>
                                     <td>
-                                        <p><small>Copyright &copy; 2017 edX, All rights
-                                            reserved.</small></p>
                                         <p>
-                                            Our mailing address is:<br/>
-                                            141 Portland St. 9th Floor, Cambridge, MA 02139
+                                            &copy; {% now "Y" %} {{ platform_name }}, {% trans "All rights reserved" %}.
+                                        </p>
+                                        <p>
+                                            {% trans "Our mailing address is" %}:<br/>
+                                            {{ contact_mailing_address }}
                                         </p>
                                     </td>
                                 </tr>
@@ -177,3 +208,7 @@
     <![endif]-->
 
 </div>
+
+{# Debug info that is not user-visible #}
+<span id="ace-message-id" style="display:none;">{{ message.log_id }}</span>
+<span id="template-revision" style="display:none;">{{ template_revision }}</span>
