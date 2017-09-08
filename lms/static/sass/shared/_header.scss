@@ -121,6 +121,8 @@
     @extend %ui-print-excluded;
     padding-left: 0;
     margin: 0;
+    display: flex;
+    align-items: center;
 
     .settings-language-form {
       margin: 4px;
@@ -191,6 +193,8 @@
       background: $white;
       box-shadow: none;
       text-shadow: none;
+      line-height: 1;
+      vertical-align: super;
     }
 
     .user-dropdown-menu {
