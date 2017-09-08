@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Check code quality using pep8, pylint, and diff_quality.
 """
@@ -6,7 +8,7 @@ import os
 import re
 from string import join
 
-from paver.easy import BuildFailure, cmdopts, needs, sh, task
+from paver.easy import BuildFailure, call_task, cmdopts, needs, sh, task
 
 from openedx.core.djangolib.markup import HTML
 
@@ -189,7 +191,7 @@ def _get_pep8_violations():
         "{report_dir}/pep8.report".format(report_dir=report_dir)
     )
 
-    return (count, violations_list)
+    return count, violations_list
 
 
 def _pep8_violations(report_file):
@@ -313,6 +315,64 @@ def run_eslint(options):
                 count=num_violations, violations_limit=violations_limit
             )
         )
+
+
+def _get_stylelint_violations():
+    """
+    Returns the number of Stylelint violations.
+    """
+    stylelint_report_dir = (Env.REPORT_DIR / "stylelint")
+    stylelint_report = stylelint_report_dir / "stylelint.report"
+    _prepare_report_dir(stylelint_report_dir)
+    formatter = 'node_modules/stylelint-formatter-pretty'
+
+    sh(
+        "stylelint **/*.scss --custom-formatter={formatter} | tee {stylelint_report}".format(
+            formatter=formatter,
+            stylelint_report=stylelint_report,
+        ),
+        ignore_error=True
+    )
+
+    try:
+        return int(_get_count_from_last_line(stylelint_report, "eslint"))
+    except TypeError:
+        raise BuildFailure(
+            "Error. Number of eslint violations could not be found in {eslint_report}".format(
+                eslint_report=stylelint_report
+            )
+        )
+
+
+@task
+@needs('pavelib.prereqs.install_node_prereqs')
+@cmdopts([
+    ("limit=", "l", "limit for number of acceptable violations"),
+])
+@timed
+def run_stylelint(options):
+    """
+    Runs stylelint on Sass files.
+    If limit option is passed, fails build if more violations than the limit are found.
+    """
+    violations_limit = int(getattr(options, 'limit', -1))
+    num_violations = _get_stylelint_violations()
+
+    # Record the metric
+    _write_metric(num_violations, (Env.METRICS_DIR / "stylelint"))
+
+    # Fail if number of violations is greater than the limit
+    if num_violations > violations_limit > -1:
+        raise BuildFailure(
+            "Stylelint failed with too many violations: ({count}).\nThe limit is {violations_limit}.".format(
+                count=num_violations,
+                violations_limit=violations_limit,
+            )
+        )
+    if num_violations > 0:
+        print("Stylelint succeeded with no more violations than {violations_limit}".format(
+            violations_limit=violations_limit,
+        ))
 
 
 @task
@@ -518,7 +578,7 @@ def _get_count_from_last_line(filename, file_type):
     This will return the number in the last line of a file.
     It is returning only the value (as a floating number).
     """
-    last_line = _get_report_contents(filename, last_line_only=True)
+    last_line = _get_report_contents(filename, last_line_only=True).strip()
     if file_type is "python_complexity":
         # Example of the last line of a complexity report: "Average complexity: A (1.93953443446)"
         regex = r'\d+.\d+'
