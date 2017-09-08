@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='certificategenerationcoursesetting',
             name='can_self_generate',
-            field=models.BooleanField(default=False),
+            field=models.BooleanField(),
         ),
         migrations.RunPython(copy_field)
     ]

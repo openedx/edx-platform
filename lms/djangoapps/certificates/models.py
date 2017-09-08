@@ -864,7 +864,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
     """
     course_key = CourseKeyField(max_length=255, db_index=True)
     enabled = models.BooleanField(default=False)  # Deprecated
-    can_self_generate = models.BooleanField(default=False)
+    can_self_generate = models.BooleanField()
     can_use_language_specific_templates = models.BooleanField(default=False)
 
     class Meta(object):
