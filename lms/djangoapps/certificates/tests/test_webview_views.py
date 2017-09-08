@@ -39,6 +39,7 @@ from lms.djangoapps.badges.tests.factories import (
     CourseCompleteImageConfigurationFactory
 )
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from student.roles import CourseStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -819,7 +820,9 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             expected_date = datetime.datetime.today()
         else:
             expected_date = self.course.certificate_available_date
-        response = self.client.get(test_url)
+        with waffle.waffle().override(waffle.SELF_PACED_ONLY, active=True):
+            with waffle.waffle().override(waffle.INSTRUCTOR_PACED_ONLY, active=True):
+                response = self.client.get(test_url)
         date = '{month} {day}, {year}'.format(
             month=strftime_localized(expected_date, "%B"),
             day=expected_date.day,

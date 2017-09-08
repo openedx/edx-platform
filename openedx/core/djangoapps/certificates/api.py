@@ -1,7 +1,8 @@
 """
 The public API for certificates.
 """
-
+from datetime import datetime
+from pytz import UTC
 from openedx.core.djangoapps.certificates.config import waffle
 
 
@@ -37,3 +38,15 @@ def _enabled_and_self_paced(course):
 
 def can_show_certificate_available_date_field(course):
     return _enabled_and_self_paced(course)
+
+
+def display_date_for_certificate(course, certificate):
+    if (
+        auto_certificate_generation_enabled_for_course(course) and
+        not course.self_paced and
+        course.certificate_available_date and
+        course.certificate_available_date < datetime.now(UTC)
+    ):
+        return course.certificate_available_date
+
+    return certificate.modified_date
