@@ -858,21 +858,21 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
     for the course.  This is enforced in the UI layer, but
     not in the data layer.
 
-    'language_specific_templates' controls whether certificates for the
-    course should be generated using specific language templates.
+    'can_use_language_specific_templates' controls whether certificates for the
+    course can be generated using language-specific templates.
 
     """
     course_key = CourseKeyField(max_length=255, db_index=True)
     enabled = models.BooleanField(default=False)  # Deprecated
     can_self_generate = models.BooleanField(default=False)
-    language_specific_templates = models.BooleanField(default=False)
+    can_use_language_specific_templates = models.BooleanField(default=False)
 
     class Meta(object):
         get_latest_by = 'created'
         app_label = "certificates"
 
     @classmethod
-    def is_self_generation_enabled_for_course(cls, course_key):
+    def can_self_generate_for_course(cls, course_key):
         """Check whether self-generated certificates are enabled for a course.
 
         Arguments:
@@ -883,14 +883,14 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
 
         """
         try:
-            latest = cls.objects.filter(course_key=course_key).latest()
+            latest = cls.objects.get(course_key=course_key)
         except cls.DoesNotExist:
             return False
         else:
             return latest.can_self_generate
 
     @classmethod
-    def set_self_generation_for_course(cls, course_key, enable):
+    def set_can_self_generate_for_course(cls, course_key, enable_self_generation):
         """Enable or disable self-generated certificates for a course.
 
         Arguments:
@@ -899,8 +899,8 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
 
         """
         defaults = {
-            'enabled': enable,
-            'can_self_generate': enable
+            'enabled': enable_self_generation,
+            'can_self_generate': enable_self_generation
         }
         CertificateGenerationCourseSetting.objects.update_or_create(
             course_key=course_key,
@@ -908,7 +908,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         )
 
     @classmethod
-    def is_language_specific_templates_enabled_for_course(cls, course_key):
+    def can_use_language_specific_templates_for_course(cls, course_key):
         """Check whether certificates generated for a course should use language specific templates.
 
         Arguments:
@@ -919,14 +919,14 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
 
         """
         try:
-            latest = cls.objects.filter(course_key=course_key).latest()
+            latest = cls.objects.get(course_key=course_key)
         except cls.DoesNotExist:
             return False
         else:
-            return latest.language_specific_templates
+            return latest.can_use_language_specific_templates
 
     @classmethod
-    def set_language_specific_templates_enabled_for_course(cls, course_key, enable):
+    def set_can_use_language_specific_templates_for_course(cls, course_key, enable):
         """Enable or disable language specific certificates for a course.
 
         Arguments:
@@ -936,7 +936,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         """
         CertificateGenerationCourseSetting.objects.update_or_create(
             course_key=course_key,
-            defaults={'language_specific_templates': enable}
+            defaults={'can_use_language_specific_templates': enable}
         )
 
 

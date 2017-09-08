@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='certificategenerationcoursesetting',
-            name='language_specific_templates',
+            name='can_use_language_specific_templates',
             field=models.BooleanField(default=False)
         ),
     ]

@@ -10,7 +10,7 @@ def copy_field(apps, schema_editor):
     MyModel.objects.all().update(can_self_generate=F('enabled'))
 
 class Migration(migrations.Migration):
-    
+
     dependencies = [
         ('certificates', '0010_certificate_language_course_setting'),
     ]
