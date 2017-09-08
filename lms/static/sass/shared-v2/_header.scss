@@ -74,10 +74,13 @@
                 font-weight: font-weight(semi-bold);
                 text-transform: uppercase;
 
+                a {
+                    color: $palette-info-text;
+                }
                 &.active {
                     a {
                         text-decoration: none;
-                        color: $link-color;
+                        color: $palette-info-text;
                     }
                 }
             }
