@@ -16,7 +16,7 @@ PersonalGoal,
 InterestsSurvey,
 EducationLevel,
 EnglishProficiency,
-LearnerSurvey
+UserInfoSurvey
 )
 
 
@@ -40,5 +40,5 @@ admin.site.register(InterestsSurvey)
 admin.site.register(EducationLevel)
 admin.site.register(EnglishProficiency)
 
-admin.site.register(LearnerSurvey)
+admin.site.register(UserInfoSurvey)
 

@@ -4,9 +4,16 @@
 {% block title %}{% trans "Tell us more about you." %} | {{ block.super }}{% endblock %}
 
 {% block body %}
-    <h1>{% trans "You have signed out." %}</h1>
+
+    <div>
+        <p><h1>You are three steps away from completing your registration</h1></p>
+        <p>The bar should come here</p>
+    </div>
 
     <div class="container">
+
+        <p> Start by telling us a little bit about you</p>
+
         <form action="." method="post" class="survey-form">
             {{ form.as_p }}
             {% csrf_token %}
@@ -17,12 +24,10 @@
     </div>
 
     <style>
-        #content > form > p:nth-child(9) > label {
+        label[for="id_country_of_employment"], label[for="id_city_of_employment"] {
             display: none; !important;
         }
-        #content > form > p:nth-child(8) > label {
-            display: none !important;
-        }
+
         #id_country_of_employment, #id_city_of_employment {
             display: none;
         }
@@ -39,7 +44,7 @@
 
     <script>
         $(document).ready(function () {
-            $("#id_birth_date").datepicker({dateFormat: 'mm/dd/yy'});
+            $("#id_dob").datepicker({dateFormat: 'mm/dd/yy'});
 
             /*$.ajax({
                  url: "/onboarding_survey/get_languages/", success: function (result) {
@@ -47,17 +52,17 @@
                 }
             });*/
 
-            $("#id_native_language").autocomplete({
+            $("#id_language").autocomplete({
                 source: "/onboarding_survey/get_languages/",
                 minLength: 2
               });
 
-            $("#id_country").autocomplete({
+            $("#id_country_of_residence").autocomplete({
                 source: "/onboarding_survey/get_country_names/",
                 minLength: 2
               });
 
-            $('#id_is_city_or_country_of_employment_diff').change(function() {
+            $('#id_is_country_or_city_different').change(function() {
                 if($(this).is(":checked")) {
                     $('#id_country_of_employment').show()
                     $('#id_city_of_employment').show()

@@ -1,249 +1,144 @@
+from itertools import chain
+
 from django import forms
+from django.utils.encoding import force_unicode
 
+from lms.djangoapps.onboarding_survey.models import (
+    OrganizationSurvey,
+    InterestsSurvey,
+    UserInfoSurvey
+)
 
-# Autocomplete is not working
-class TellUsMoreForm(forms.Form):
-
-    EDUCATION_CHOICE = [
-        (1, "Doctoral or professional degree"),
-        (2, "Master's degree"),
-        (3, "Bachelor's degree"),
-        (4, "Associate's degree"),
-        (5, "Postsecondary nondegree award"),
-        (6, "Some college, no degree"),
-        (7, "High school diploma or equivalent"),
-        (8, "No formal educational credential"),
-    ]
-
-    ENGLISH_PROFICIENCY_CHOICE = [
-        (1, "No proficiency"),
-        (2, "Elementary proficiency"),
-        (3, "Limited working proficiency"),
-        (4, "Professional working proficiency"),
-        (5, "Full professional proficiency"),
-        (6, "Native or bilingual proficiency"),
-        (7, "High school diploma or equivalent"),
-        (8, "No formal educational credential"),
-    ]
-
-    birth_date = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Date of Birth'}))
-
-    level_of_education = forms.ChoiceField(
-        choices=[(0, "Level of Education")] + EDUCATION_CHOICE,
-        initial='',
-        widget=forms.Select(),
-        required=True
-    )
-
-    native_language = forms.CharField(max_length=25)
-
-    english_language_proficiency = forms.ChoiceField(
-        choices=[(0, "English Language Proficiency")] + ENGLISH_PROFICIENCY_CHOICE,
-        initial='',
-        widget=forms.Select(),
-        required=True
-    )
-
-    country = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Country of Residence'}), required=True)
-    city = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'City of Residence'}), required=True)
-    is_city_or_country_of_employment_diff = forms.BooleanField(
-        label='My country or city of employment is different than my country or city of residence.',
-        widget=forms.CheckboxInput(),
-        required=False
-    )
-
-    country_of_employment = forms.CharField(
-        widget=forms.TextInput(attrs={'placeholder': 'Country of Employment'}), required=False
-    )
-    city_of_employment = forms.CharField(
-        widget=forms.TextInput(attrs={'placeholder': 'City of Employment'}), required=False
-    )
 
 # Complete
-class InterestForm(forms.Form):
-    ORG_CAPACITY_AREA_CHOICE = (
-        ("1", "Leadership"),
-        ("2", "Finance"),
-        ("3", "Programs"),
-        ("4", "Administration"),
-        ("5", "External Relations"),
-        ("6", "Logistics")
-    )
+class UserInfoModelForm(forms.ModelForm):
 
-    COMMUNITY_TYPES_CHOICE = (
-        ("1", "Contribute to my organization's capacity."),
-        ("2", "Improve my job prospects.."),
-        ("3", "Develop my leadership abilities."),
-        ("4", "Build relationship with other nonprofit practitioners."),
-        ("5", "Gain new skills.")
-    )
+    def clean(self):
+        cleaned_data = super(UserInfoModelForm, self).clean()
 
-    PERSONAL_GOALS_CHOICE = (
-        ("1", "A community of learners from my region or country."),
-        ("2", "A community of learners interested in the same organizational capacity areas."),
-        ("3", "A community learners working for similar organizations."),
-    )
+        if cleaned_data['is_country_or_city_different']:
 
-    ADD_TO_COMMUNITY_OPTIONS = (
-        ("1", "Yes"),
-        ("2", "No"),
-        ("3", "Ask me later"),
-    )
+            if cleaned_data['country_of_employment'] == cleaned_data['country_of_residence']:
+                raise forms.ValidationError(
+                    "Please provide Country of Employment"
+                )
 
-    organizational_capacity_areas = forms.MultipleChoiceField(
-        label='Which of these organizational capacity areas are interested to you? (Check all that apply)',
-        widget=forms.CheckboxSelectMultiple, choices=ORG_CAPACITY_AREA_CHOICE
-    )
-    community_types = forms.MultipleChoiceField(
-        label='Which of these community types are interested to you? (Check all that apply)',
-        widget=forms.CheckboxSelectMultiple, choices=COMMUNITY_TYPES_CHOICE
-    )
-    permission_to_add_to_communities = forms.ChoiceField(
-        label="Would you be automatically added to these kind of communities,"
-              " based on the information you provided in your profile.",
-        choices=ADD_TO_COMMUNITY_OPTIONS,
-        widget=forms.RadioSelect(),
-    )
+            if not cleaned_data['country_of_employment']:
+                raise forms.ValidationError(
+                    "Please provide Country of Employment"
+                )
 
-    personal_goals = forms.MultipleChoiceField(
-        label='Which is your most important personal goal in using the Philanthropy University platform.',
-        widget=forms.CheckboxSelectMultiple, choices=PERSONAL_GOALS_CHOICE
-    )
+            if not cleaned_data['city_of_employment']:
+                raise forms.ValidationError(
+                    "Please provide City of Employment"
+                )
 
+    class Meta:
+        model = UserInfoSurvey
+        fields = [
+            'dob', 'level_of_education', 'language',
+            'english_prof', 'country_of_residence',
+            'city_of_residence', 'is_country_or_city_different', 'country_of_employment',
+            'city_of_employment'
+        ]
 
-class OrganizationInfoForm(forms.Form):
-    ROLE_IN_ORG_CHOICE = [
-        (1, "Volunteer"),
-        (2, "Entry level"),
-        (3, "Associate"),
-        (4, "Internship"),
-        (5, "Mid-Senior level"),
-        (6, "Director"),
-        (7, "Executive"),
-    ]
+        labels = {
+            'is_country_or_city_different': 'My country or city of employment is different'
+                                            ' than my country or city of residence.'
+        }
+        widgets = {
+            'dob': forms.TextInput(attrs={'placeholder': 'Date of Birth'}),
+            'country_of_employment': forms.TextInput(attrs={'placeholder': 'Country of Employment'}),
+            'city_of_employment': forms.TextInput(attrs={'placeholder': 'City of Employment'}),
+            'country_of_residence': forms.TextInput(attrs={'placeholder': 'Country of Residence'}),
+            'city_of_residence': forms.TextInput(attrs={'placeholder': 'City of Residence'}),
+            'language': forms.TextInput(attrs={'placeholder': 'Native Language'})
+        }
 
-    SECTOR_CHOICE = [
-        (1, "Academic Institution"),
-        (2, "For-Profit Company"),
-        (3, "Government Agency"),
-        (4, "Grantmaking Foundation"),
-        (5, "Non-Profit Organization"),
-        (6, "Self-Employed"),
-        (7, "Social Enterprise"),
-        (8, "Student"),
-        (9, "Unemployed"),
-        (10, "Other")
-    ]
+        required_error = 'Please select an option for {}'
 
-    LEVEL_OF_OPR_CHOICE = [
-        (1, "International"),
-        (2, "Regional including multiple countries"),
-        (3, "National"),
-        (4, "Regional including multiple localities within one country"),
-        (5, "Local")
-    ]
-
-    FOCUS_AREA_CHOICE = [
-        (1, "Arts, Culture, Humanities"),
-        (2, "Community Development"),
-        (3, "Education"),
-        (4, "Environment"),
-        (5, "Health"),
-        (6, "Human and Civil Rights"),
-        (7, "Human Services"),
-        (8, "International"),
-        (9, "Religion"),
-        (10, "Research and Public Policy"),
-    ]
-
-    TOTAL_EMPLOYEE_AND_VOLUNTEER_CHOICE = [
-        (1, "1-10"),
-        (2, "11-50"),
-        (3, "51-100"),
-        (4, "101-500"),
-        (5, "501-1,000"),
-        (6, "1,000+"),
-        (7, "Not applicable")
-    ]
-
-    PARTNER_NETWORK_CHOICE = [
-        (1, "Mercy Corps"),
-        (2, "FHI 360 / FHI Foundation"),
-        (3, "+Acumen")
-    ]
-
-    role_in_org = forms.ChoiceField(
-        choices=[(0, 'Role in the Organization')] + ROLE_IN_ORG_CHOICE,
-        initial='',
-        widget=forms.Select(),
-        required=True
-    )
-
-    start_month_and_year = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Start Month and Year'}))
-
-    country = forms.CharField(max_length=25, label='Country of Organization Headquarters')
-
-    city = forms.CharField(max_length=25)
-
-    organization_website = forms.URLField(
-        label='Organization Website', required=True, widget=forms.URLInput(
-            attrs={
-                'placeholder': 'Organization Website'
+        error_messages = {
+            'level_of_education': {
+                'required': required_error.format('Level of Education'),
+            },
+            'english_prof': {
+                'required': required_error.format('English Language Proficiency'),
             }
-        )
-    )
-
-    sector = forms.ChoiceField(
-        choices=[(0, 'Sector')] + SECTOR_CHOICE,
-        initial='',
-        widget=forms.Select(),
-        required=True
-    )
-
-    level_of_operation = forms.ChoiceField(
-        choices=[(0, 'Level of Operation')] + LEVEL_OF_OPR_CHOICE,
-        initial='',
-        widget=forms.Select(),
-        required=True
-    )
-
-    focus_area = forms.ChoiceField(
-        choices=[(0, 'Focus Area')] + FOCUS_AREA_CHOICE,
-        initial='',
-        widget=forms.Select(),
-        required=True
-    )
-
-    founding_year = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Founding year'}))
-
-    total_employees = forms.ChoiceField(
-        choices=[(0, 'Total Employees')] + TOTAL_EMPLOYEE_AND_VOLUNTEER_CHOICE,
-        initial='',
-        widget=forms.Select(),
-        required=True
-    )
-
-    total_volunteers = forms.ChoiceField(
-        choices=[(0, 'Total Volunteers')] + TOTAL_EMPLOYEE_AND_VOLUNTEER_CHOICE,
-        initial='',
-        widget=forms.Select(),
-        required=True
-    )
-
-    total_annual_clients_or_beneficiaries = forms.CharField(
-        widget=forms.TextInput(attrs={'placeholder': 'Total annual clients or beneficiaries'})
-    )
-
-    total_annual_revenue_for_last_fiscal_year = forms.CharField(
-        widget=forms.TextInput(attrs={'placeholder': 'Total annual revenue for last fiscal year '})
-    )
-
-    partner_network = forms.ChoiceField(
-        choices=[(0, 'Partner Networks')] + PARTNER_NETWORK_CHOICE,
-        initial='',
-        widget=forms.Select(),
-        required=True
-    )
+        }
 
 
+class RadioSelectNotNull(forms.RadioSelect):
+    def get_renderer(self, name, value, attrs=None, choices=()):
+        """Returns an instance of the renderer."""
+        if value is None: value = ''
+        str_value = force_unicode(value) # Normalize to string.
+        final_attrs = self.build_attrs(attrs)
+        choices = list(chain(self.choices, choices))
+        if choices[0][0] == '':
+            choices.pop(0)
+        return self.renderer(name, str_value, final_attrs, choices)
 
+
+# Complete
+class InterestModelForm(forms.ModelForm):
+    class Meta:
+        model = InterestsSurvey
+        fields = ['capacity_areas', 'reason_of_interest', 'interested_communities', 'personal_goal']
+
+        widgets = {
+            'capacity_areas': forms.CheckboxSelectMultiple(),
+            'interested_communities': forms.CheckboxSelectMultiple(),
+            'personal_goal': forms.CheckboxSelectMultiple()
+        }
+
+        labels = {
+            'capacity_areas': 'Which of these organizational capacity areas are'
+                              ' interested to you? (Check all that apply)',
+            'interested_communities': 'Which of these community types are interested to you? (Check all that apply)',
+            'reason_of_interest': 'Why are these areas of organizational effectiveness interesting to you?',
+            'personal_goal': 'Which is your most important personal goal in using the Philanthropy University platform.'
+        }
+
+        required_error = 'Please select an option for {}'
+
+        error_messages = {
+            'capacity_areas': {
+                'required': required_error.format('Organization capacity area you are interested in.'),
+            },
+            'interested_communities': {
+                'required': required_error.format('Community type you are interested in.'),
+            },
+            'personal_goal': {
+                'required': required_error.format('Personal goal.'),
+            },
+
+        }
+
+
+# Complete
+class OrganizationInfoModelForm(forms.ModelForm):
+    class Meta:
+        model = OrganizationSurvey
+        fields = ['role_in_org', 'state_mon_year', 'country', 'city', 'url', 'sector', 'level_of_op', 'focus_area',
+                  'founding_year', 'total_employees', 'total_volunteers', 'total_annual_clients_or_beneficiary',
+                  'total_annual_revenue_for_last_fiscal', 'partner_network']
+
+        widgets = {
+            'state_mon_year': forms.TextInput(attrs={'placeholder': 'Start Month and Year'}),
+            'country': forms.TextInput(attrs={'placeholder': 'Country of Organization Headquarters'}),
+            'city': forms.TextInput(attrs={'placeholder': 'City of Organization Headquarters'}),
+            'url': forms.URLInput(attrs={'placeholder': 'Organization Website'}),
+            'founding_year': forms.NumberInput(attrs={'placeholder': 'Founding year'}),
+            'total_annual_clients_or_beneficiary': forms.NumberInput(
+                attrs={'placeholder': 'Total annual clients or beneficiaries'}),
+            'total_annual_revenue_for_last_fiscal': forms.NumberInput(
+                attrs={'placeholder': 'Total annual revenue for last fiscal year '})
+        }
+
+    def clean(self):
+        cleaned_data = super(OrganizationInfoModelForm, self).clean()
+
+        year = cleaned_data['founding_year']
+
+        if len("{}".format(year)) < 4 or year < 0:
+            raise forms.ValidationError("You entered an invalid year format. Please enter a valid year with 4 digits.")

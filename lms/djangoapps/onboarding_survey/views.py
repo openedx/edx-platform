@@ -1,79 +1,71 @@
 import json
 import os
-import datetime
 
 from path import Path as path
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
-from django_countries import countries
 from django.http import HttpResponse
 
 from onboarding_survey import forms
-from lms.djangoapps.onboarding_survey.models import (
-    RoleInsideOrg,
-    OrgSector,
-    OperationLevel,
-    FocusArea,
-    TotalEmployee,
-    TotalVolunteer,
-    PartnerNetwork,
-    OrganizationSurvey,
-    OrganizationalCapacityArea,
-    CommunityTypeInterest,
-    InclusionInCommunityChoice,
-    PersonalGoal,
-    InterestsSurvey,
-    EducationLevel,
-    EnglishProficiency,
-    LearnerSurvey
-)
 
 
-def tell_us_more(request):
-
+# @login_required
+def user_info(request):
     if request.method == 'POST':
-        form = forms.TellUsMoreForm(request.POST)
+        form = forms.UserInfoModelForm(request.POST)
         if form.is_valid():
-            cleaned_data = form.cleaned_data
-            english_proficiency = cleaned_data['english_language_proficiency']
-            english_proficiency = dict(form.fields['english_language_proficiency'].choices)[int(english_proficiency)]
+            user_info_survey = form.save(commit=False)
+            user_info_survey.user = request.user
+            user_info_survey.save()
 
-            education_level = cleaned_data['level_of_education']
-            education_level = dict(form.fields['level_of_education'].choices)[int(education_level)]
-
-            user_info = LearnerSurvey()
-
-            user_info.dob = datetime.datetime.strptime(cleaned_data['birth_date'], "%m/%d/%Y")
-
-            user_info.level_of_education = EducationLevel.objects.filter(level=education_level).first()
-
-            user_info.language = cleaned_data['native_language']
-            user_info.english_prof = EnglishProficiency.objects.filter(proficiency=english_proficiency).first()
-
-            user_info.country_of_residence = cleaned_data['country']
-            user_info.city_of_residence = cleaned_data['city']
-
-            user_info.is_country_or_city_different = bool(cleaned_data['is_city_or_country_of_employment_diff'])
-
-            user_info.country_of_employment = cleaned_data['country_of_employment']
-            user_info.city_of_employment = cleaned_data['city_of_employment']
-
-            user_info.save()
+            return redirect(reverse('interests'))
 
     else:
-        form = forms.TellUsMoreForm()
+        form = forms.UserInfoModelForm()
 
     return render(request, 'tell_us_more_survey.html', {'form': form})
 
 
+# @login_required
 def interests(request):
-    form = forms.InterestForm()
+
+    if request.method == 'POST':
+        form = forms.InterestModelForm(request.POST)
+        if form.is_valid():
+            user_interests_survey = form.save(commit=False)
+            user_interests_survey.user = request.user
+            user_interests_survey.save()
+
+            return redirect(reverse('organization'))
+    else:
+        form = forms.InterestModelForm()
+
     return render(request, 'interests_survey.html', {'form': form})
 
 
+# @login_required
 def organization(request):
-    form = forms.OrganizationInfoForm()
+
+    if request.method == 'POST':
+        form = forms.OrganizationInfoModelForm(request.POST)
+        if form.is_valid():
+            organization_survey = form.save(commit=False)
+            partner_network = organization_survey.partner_network
+
+            if not partner_network.is_partner_affiliated:
+                partner_network.is_partner_affiliated = True
+                partner_network.save()
+
+            organization_survey.user = request.user
+            organization_survey.save()
+            return redirect(reverse('dashboard'))
+    else:
+        form = forms.OrganizationInfoModelForm()
+
     return render(request, 'organization_survey.html', {'form': form})
 
 

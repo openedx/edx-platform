@@ -4,7 +4,13 @@
 {% block title %}{% trans "Tell us more about you." %} | {{ block.super }}{% endblock %}
 
 {% block body %}
-    <h1>{% trans "You have signed out." %}</h1>
+
+    <div>
+        <p><h1>Just a few questions about Exygy</h1></p>
+        <p>The bar should come here</p>
+    </div>
+
+    <h2>Specific information about your role and your organization will help us understand how we can be more relevant to you.</h2>
 
     <form action="." method="post">
          {{ form.as_p }}
@@ -17,22 +23,21 @@
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" media="all" />
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript">
     </script> <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" type="text/javascript">
+    </script>
     <script>
         $(document).ready(function () {
 
-            $("#id_start_month_and_year").datepicker({dateFormat: 'mm/yy', changeMonth: true,
+            $("#id_state_mon_year").datepicker({dateFormat: 'mm/yy', changeMonth: true,
                 changeYear: true,
                 showButtonPanel: true, onClose: function(dateText, inst) {
                     $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
                 }});
 
-            /*$.ajax({
-                url: "/organizations", success: function (result) {
-                    full_result = result
-                    orgs = Object.keys(result)
-                }
-            });*/
-
+            $("#id_country").autocomplete({
+                source: "/onboarding_survey/get_country_names/",
+                minLength: 2
+              });
         });
 
     </script>
