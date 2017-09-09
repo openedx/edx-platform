@@ -1,11 +1,13 @@
 import datetime
 
 import pytz
-
-from student.roles import CourseInstructorRole, CourseStaffRole
-from student.tests.factories import UserFactory
+from django.test import RequestFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from openedx.core.lib.courses import course_image_url
+from student.roles import CourseInstructorRole, CourseStaffRole
+from student.tests.factories import UserFactory
 from ..utils import serialize_datetime
 from ...serializers.course_runs import CourseRunSerializer
 
@@ -23,7 +25,8 @@ class CourseRunSerializerTests(ModuleStoreTestCase):
         staff = UserFactory()
         CourseStaffRole(course.id).add_users(staff)
 
-        serializer = CourseRunSerializer(course)
+        request = RequestFactory().get('')
+        serializer = CourseRunSerializer(course, context={'request': request})
         expected = {
             'id': str(course.id),
             'title': course.display_name,
@@ -43,5 +46,8 @@ class CourseRunSerializerTests(ModuleStoreTestCase):
                     'role': 'staff',
                 },
             ],
+            'images': {
+                'card_image': request.build_absolute_uri(course_image_url(course)),
+            }
         }
         assert serializer.data == expected

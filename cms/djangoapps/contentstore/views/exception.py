@@ -8,3 +8,10 @@ class AssetNotFoundException(Exception):
     Raised when asset not found
     """
     pass
+
+
+class AssetSizeTooLargeException(Exception):
+    """
+    Raised when the size of an uploaded asset exceeds the maximum size limit.
+    """
+    pass

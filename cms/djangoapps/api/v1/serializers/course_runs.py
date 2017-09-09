@@ -2,12 +2,18 @@ import six
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from rest_framework import serializers
-from rest_framework.fields import get_attribute
+from rest_framework.fields import empty
 
 from cms.djangoapps.contentstore.views.course import create_new_course, get_course_and_check_access, rerun_course
+from contentstore.views.assets import update_course_run_asset
+from openedx.core.lib.courses import course_image_url
 from student.models import CourseAccessRole
 from xmodule.modulestore.django import modulestore
 
+IMAGE_TYPES = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+}
 User = get_user_model()
 
 
@@ -53,10 +59,45 @@ class CourseRunTeamSerializerMixin(serializers.Serializer):
         ])
 
 
+def image_is_jpeg_or_png(value):
+    content_type = value.content_type
+    if content_type not in IMAGE_TYPES.keys():
+        raise serializers.ValidationError(
+            'Only JPEG and PNG image types are supported. {} is not valid'.format(content_type))
+
+
+class CourseRunImageField(serializers.ImageField):
+    default_validators = [image_is_jpeg_or_png]
+
+    def get_attribute(self, instance):
+        return course_image_url(instance)
+
+    def to_representation(self, value):
+        # Value will always be the URL path of the image.
+        request = self.context['request']
+        return request.build_absolute_uri(value)
+
+
+class CourseRunImageSerializer(serializers.Serializer):
+    # We set an empty default to prevent the parent serializer from attempting
+    # to save this value to the Course object.
+    card_image = CourseRunImageField(source='course_image', default=empty)
+
+    def update(self, instance, validated_data):
+        course_image = validated_data['course_image']
+        course_image.name = 'course_image.' + IMAGE_TYPES[course_image.content_type]
+        update_course_run_asset(instance.id, course_image)
+
+        instance.course_image = course_image.name
+        modulestore().update_item(instance, self.context['request'].user.id)
+        return instance
+
+
 class CourseRunSerializer(CourseRunTeamSerializerMixin, serializers.Serializer):
     id = serializers.CharField(read_only=True)
     title = serializers.CharField(source='display_name')
     schedule = CourseRunScheduleSerializer(source='*', required=False)
+    images = CourseRunImageSerializer(source='*', required=False)
 
     def update(self, instance, validated_data):
         team = validated_data.pop('team', [])

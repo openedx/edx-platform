@@ -2,13 +2,18 @@ from django.conf import settings
 from django.http import Http404
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import permissions, status, viewsets
+from rest_framework import parsers, permissions, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 
 from contentstore.views.course import _accessible_courses_iter, get_course_and_check_access
-from ..serializers.course_runs import CourseRunCreateSerializer, CourseRunRerunSerializer, CourseRunSerializer
+from ..serializers.course_runs import (
+    CourseRunCreateSerializer,
+    CourseRunImageSerializer,
+    CourseRunRerunSerializer,
+    CourseRunSerializer
+)
 
 
 class CourseRunViewSet(viewsets.ViewSet):
@@ -65,6 +70,19 @@ class CourseRunViewSet(viewsets.ViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @detail_route(
+        methods=['post', 'put'],
+        parser_classes=(parsers.FormParser, parsers.MultiPartParser,),
+        serializer_class=CourseRunImageSerializer)
+    def images(self, request, pk=None):
+        course_run_key = CourseKey.from_string(pk)
+        user = request.user
+        course_run = self.get_course_run_or_raise_404(course_run_key, user)
+        serializer = CourseRunImageSerializer(course_run, data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
     @detail_route(methods=['post'])
     def rerun(self, request, pk=None):
