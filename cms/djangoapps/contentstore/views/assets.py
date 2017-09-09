@@ -9,24 +9,25 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_http_methods, require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from pymongo import ASCENDING, DESCENDING
-
-from contentstore.utils import reverse_course_url
-from contentstore.views.exception import AssetNotFoundException
-from edxmako.shortcuts import render_to_response
-from openedx.core.djangoapps.contentserver.caching import del_cached_content
-from student.auth import has_course_author_access
-from util.date_utils import get_default_time_display
-from util.json_request import JsonResponse
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
+from contentstore.utils import reverse_course_url
+from contentstore.views.exception import AssetNotFoundException, AssetSizeTooLargeException
+from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.contentserver.caching import del_cached_content
+from student.auth import has_course_author_access
+from util.date_utils import get_default_time_display
+from util.json_request import JsonResponse
+
 __all__ = ['assets_handler']
+
 
 # pylint: disable=unused-argument
 
@@ -204,14 +205,56 @@ def get_file_size(upload_file):
     return upload_file.size
 
 
+def update_course_run_asset(course_key, upload_file):
+    filename = upload_file.name
+    mime_type = upload_file.content_type
+    size = get_file_size(upload_file)
+
+    max_size_in_mb = settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB
+    max_file_size_in_bytes = max_size_in_mb * 1000 ** 2
+    if size > max_file_size_in_bytes:
+        msg = 'File {filename} exceeds the maximum size of {max_size_in_mb} MB.'.format(
+            filename=filename,
+            max_size_in_mb=max_size_in_mb
+        )
+        raise AssetSizeTooLargeException(msg)
+
+    content_loc = StaticContent.compute_location(course_key, filename)
+
+    chunked = upload_file.multiple_chunks()
+    sc_partial = partial(StaticContent, content_loc, filename, mime_type)
+    if chunked:
+        content = sc_partial(upload_file.chunks())
+        tempfile_path = upload_file.temporary_file_path()
+    else:
+        content = sc_partial(upload_file.read())
+        tempfile_path = None
+
+    # Verify a thumbnail can be created
+    (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(content, tempfile_path=tempfile_path)
+
+    # delete cached thumbnail even if one couldn't be created this time (else the old thumbnail will continue to show)
+    del_cached_content(thumbnail_location)
+
+    # now store thumbnail location only if we could create it
+    if thumbnail_content is not None:
+        content.thumbnail_location = thumbnail_location
+
+    # then commit the content
+    contentstore().save(content)
+    del_cached_content(content.location)
+
+    return content
+
+
 @require_POST
 @ensure_csrf_cookie
 @login_required
 def _upload_asset(request, course_key):
-    '''
+    """
     This method allows for POST uploading of files into the course asset
     library, which will be supported by GridFS in MongoDB.
-    '''
+    """
     # Does the course actually exist?!? Get anything from it to prove its
     # existence
     try:
@@ -226,62 +269,16 @@ def _upload_asset(request, course_key):
     # here. We're just imposing the Location string formatting expectations to
     # keep things a bit more consistent
     upload_file = request.FILES['file']
-    filename = upload_file.name
-    mime_type = upload_file.content_type
-    size = get_file_size(upload_file)
 
-    # If file is greater than a specified size, reject the upload
-    # request and send a message to the user. Note that since
-    # the front-end may batch large file uploads in smaller chunks,
-    # we validate the file-size on the front-end in addition to
-    # validating on the backend. (see cms/static/js/views/assets.js)
-    max_file_size_in_bytes = settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB * 1000 ** 2
-    if size > max_file_size_in_bytes:
-        return JsonResponse({
-            'error': _(
-                'File {filename} exceeds maximum size of '
-                '{size_mb} MB. Please follow the instructions here '
-                'to upload a file elsewhere and link to it instead: '
-                '{faq_url}'
-            ).format(
-                filename=filename,
-                size_mb=settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
-                faq_url=settings.MAX_ASSET_UPLOAD_FILE_SIZE_URL,
-            )
-        }, status=413)
-
-    content_loc = StaticContent.compute_location(course_key, filename)
-
-    chunked = upload_file.multiple_chunks()
-    sc_partial = partial(StaticContent, content_loc, filename, mime_type)
-    if chunked:
-        content = sc_partial(upload_file.chunks())
-        tempfile_path = upload_file.temporary_file_path()
-    else:
-        content = sc_partial(upload_file.read())
-        tempfile_path = None
-
-    # first let's see if a thumbnail can be created
-    (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(
-        content,
-        tempfile_path=tempfile_path,
-    )
-
-    # delete cached thumbnail even if one couldn't be created this time (else
-    # the old thumbnail will continue to show)
-    del_cached_content(thumbnail_location)
-    # now store thumbnail location only if we could create it
-    if thumbnail_content is not None:
-        content.thumbnail_location = thumbnail_location
-
-    # then commit the content
-    contentstore().save(content)
-    del_cached_content(content.location)
+    try:
+        content = update_course_run_asset(course_key, upload_file)
+    except AssetSizeTooLargeException as ex:
+        return JsonResponse({'error': ex.message}, status=413)
 
     # readback the saved content - we need the database timestamp
     readback = contentstore().find(content.location)
     locked = getattr(content, 'locked', False)
-    response_payload = {
+    return JsonResponse({
         'asset': _get_asset_json(
             content.name,
             content.content_type,
@@ -291,9 +288,7 @@ def _upload_asset(request, course_key):
             locked
         ),
         'msg': _('Upload completed')
-    }
-
-    return JsonResponse(response_payload)
+    })
 
 
 @require_http_methods(("DELETE", "POST", "PUT"))

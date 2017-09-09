@@ -1,15 +1,21 @@
 import datetime
 
 import pytz
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
+from django.test import RequestFactory
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APIClient
-
-from student.models import CourseAccessRole
-from student.tests.factories import AdminFactory, TEST_PASSWORD, UserFactory
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory
+
+from openedx.core.lib.courses import course_image_url
+from student.models import CourseAccessRole
+from student.tests.factories import AdminFactory, TEST_PASSWORD, UserFactory
 from ..utils import serialize_datetime
 from ...serializers.course_runs import CourseRunSerializer
 
@@ -34,6 +40,9 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         CourseAccessRole.objects.get(course_id=course_run.id, user=user, role=role)
         assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 1
 
+    def get_serializer_context(self):
+        return {'request': RequestFactory().get('')}
+
     def test_without_authentication(self):
         self.client.logout()
         response = self.client.get(self.list_url)
@@ -53,14 +62,14 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         # Order matters for the assertion
         course_runs = sorted(course_runs, key=lambda course_run: str(course_run.id))
         actual = sorted(response.data, key=lambda course_run: course_run['id'])
-        assert actual == CourseRunSerializer(course_runs, many=True).data
+        assert actual == CourseRunSerializer(course_runs, many=True, context=self.get_serializer_context()).data
 
     def test_retrieve(self):
         course_run = CourseFactory()
         url = reverse('api:v1:course_run-detail', kwargs={'pk': str(course_run.id)})
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.data == CourseRunSerializer(course_run).data
+        assert response.data == CourseRunSerializer(course_run, context=self.get_serializer_context()).data
 
     def test_retrieve_not_found(self):
         url = reverse('api:v1:course_run-detail', kwargs={'pk': 'course-v1:TestX+Test101x+1T2017'})
@@ -104,7 +113,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         self.assert_access_role(course_run, user, role)
 
         course_run = modulestore().get_course(course_run.id)
-        assert response.data == CourseRunSerializer(course_run).data
+        assert response.data == CourseRunSerializer(course_run, context=self.get_serializer_context()).data
         assert course_run.display_name == title
         self.assert_course_run_schedule(course_run, start, end, enrollment_start, enrollment_end)
 
@@ -184,6 +193,39 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         assert course_run.id.run == data['run']
         self.assert_course_run_schedule(course_run, start, end, enrollment_start, enrollment_end)
         self.assert_access_role(course_run, user, role)
+
+    def test_images_upload(self):
+        # http://www.django-rest-framework.org/api-guide/parsers/#fileuploadparser
+        course_run = CourseFactory()
+        expected_filename = 'course_image.png'
+        content_key = StaticContent.compute_location(course_run.id, expected_filename)
+
+        assert course_run.course_image != expected_filename
+
+        try:
+            contentstore().find(content_key)
+            self.fail('No image should be associated with a new course run.')
+        except NotFoundError:
+            pass
+
+        url = reverse('api:v1:course_run-images', kwargs={'pk': str(course_run.id)})
+        # PNG. Single black pixel
+        content = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS' \
+                  b'\xde\x00\x00\x00\x0cIDATx\x9cc```\x00\x00\x00\x04\x00\x01\xf6\x178U\x00\x00\x00\x00IEND\xaeB`\x82'
+
+        # We are intentionally passing the incorrect JPEG extension here
+        upload = SimpleUploadedFile('card_image.jpg', content, content_type='image/png')
+        response = self.client.post(url, {'card_image': upload}, format='multipart')
+        assert response.status_code == 200
+
+        course_run = modulestore().get_course(course_run.id)
+        assert course_run.course_image == expected_filename
+
+        expected = {'card_image': RequestFactory().get('').build_absolute_uri(course_image_url(course_run))}
+        assert response.data == expected
+
+        # There should now be an image stored
+        contentstore().find(content_key)
 
     def test_rerun(self):
         course_run = ToyCourseFactory()
