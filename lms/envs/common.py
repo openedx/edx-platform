@@ -1185,7 +1185,7 @@ MIDDLEWARE_CLASSES = (
     'course_wiki.middleware.WikiAccessMiddleware',
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
-    # 'lms.djangoapps.onboarding_survey.middleware.RedirectMiddleware',
+    'lms.djangoapps.onboarding_survey.middleware.RedirectMiddleware',
 
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
