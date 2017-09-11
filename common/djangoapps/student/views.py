@@ -55,7 +55,7 @@ from student.models import (
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED,
-    LogoutViewConfiguration, RegistrationCookieConfiguration)
+    LogoutViewConfiguration, RegistrationCookieConfiguration, Organization)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from student.tasks import send_activation_email
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
@@ -470,6 +470,7 @@ def signin_user(request):
 def register_user(request, extra_context=None):
     """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
     # Determine the URL to redirect to following login:
+
     redirect_to = get_next_url_for_login_page(request)
     if request.user.is_authenticated():
         return redirect(redirect_to)
@@ -637,10 +638,16 @@ def dashboard(request):
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
     message = ""
+    first_name = user.profile.name.split(" ")[0]
     if not user.is_active:
+        if user.profile.is_poc:
+            msg = ("Success! You are registered as the Admin for %s, %s"
+             % (user.profile.organization.name, first_name))
+        else:
+            msg = "Success! You are registered, %s" % (first_name)
         message = render_to_string(
             'registration/activate_account_notice.html',
-            {'email': user.email, 'platform_name': platform_name}
+            {'msg': msg, 'email': user.email, 'platform_name': platform_name}
         )
 
     # Global staff can see what courses errored on their dashboard
@@ -756,10 +763,14 @@ def dashboard(request):
     else:
         redirect_message = ''
 
+    courses = get_courses(user)
+
     context = {
+        'is_poc': user.profile.is_poc,
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
         'course_enrollments': course_enrollments,
+        'courses_list': courses,
         'course_optouts': course_optouts,
         'message': message,
         'staff_access': staff_access,
@@ -1695,6 +1706,7 @@ def create_account_with_params(request, params):
         not eamap.external_domain.startswith(openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX)
     )
 
+    params['name'] = "{} {}".format(params['first_name'], params['last_name'])
     form = AccountCreationForm(
         data=params,
         extra_fields=extra_fields,
@@ -1709,6 +1721,26 @@ def create_account_with_params(request, params):
     with transaction.atomic():
         # first, create the account
         (user, profile, registration) = _do_create_account(form, custom_form)
+
+        is_poc = True if params['point_of_contact'] == 'true' else False
+
+        organization_to_assign = None
+        if not Organization.objects.filter(name=params['organization']).exists():
+            organization_to_assign = Organization(
+                name=params['organization'],
+                point_of_contact_exist=is_poc
+            )
+            organization_to_assign.save()
+
+        else:
+            organization_to_assign = Organization.objects.filter(name=params['organization']).first()
+            if is_poc and not organization_to_assign.point_of_contact_exist:
+                organization_to_assign.point_of_contact_exist = True
+                organization_to_assign.save()
+
+        profile.organization = organization_to_assign
+        profile.is_poc = is_poc
+        profile.save()
 
         # next, link the account with social auth, if provided via the API.
         # (If the user is using the normal register page, the social auth pipeline does the linking, not this code)
@@ -2028,6 +2060,7 @@ def auto_auth(request):
     full_name = request.GET.get('full_name', username)
     is_staff = request.GET.get('staff', None)
     is_superuser = request.GET.get('superuser', None)
+    is_poc = request.GET.get('is_poc', False)
     course_id = request.GET.get('course_id', None)
     redirect_to = request.GET.get('redirect_to', None)
     active_status = request.GET.get('is_active')
@@ -2654,3 +2687,24 @@ class LogoutView(TemplateView):
         })
 
         return context
+
+@csrf_exempt
+def get_organizations(request):
+
+    if request.is_ajax():
+        query = request.GET.get('term', '')
+
+        all_organizations = Organization.objects.all()
+
+        final_result = {}
+
+        for organization in all_organizations:
+            if organization.name.startswith(query):
+                final_result[organization.name] = organization.point_of_contact_exist
+
+        data = json.dumps(final_result)
+    else:
+        data = 'fail'
+    mimetype = 'application/json'
+
+    return HttpResponse(data, mimetype)
