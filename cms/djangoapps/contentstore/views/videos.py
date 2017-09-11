@@ -33,6 +33,7 @@ from edxval.api import (
     remove_transcript_preferences,
 )
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 
 from contentstore.models import VideoUploadConfig
@@ -129,7 +130,7 @@ class StatusDisplayStrings(object):
         "invalid_token": _INVALID_TOKEN,
         "imported": _IMPORTED,
         "transcription_in_progress": _TRANSCRIPTION_IN_PROGRESS,
-        "transcription_ready": _TRANSCRIPT_READY,
+        "transcript_ready": _TRANSCRIPT_READY,
     }
 
     @staticmethod
@@ -339,6 +340,11 @@ def transcript_preferences_handler(request, course_key_string):
 
     Returns: valid json response or 400 with error message
     """
+    course_key = CourseKey.from_string(course_key_string)
+    is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course_key)
+    if not is_video_transcript_enabled:
+        return HttpResponseNotFound()
+
     if request.method == 'POST':
         data = request.json
         provider = data.get('provider')
@@ -550,6 +556,7 @@ def videos_index_html(course):
     """
     Returns an HTML page to display previous video uploads and allow new ones
     """
+    is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
     context = {
         'context_course': course,
         'image_upload_url': reverse_course_url('video_images_handler', unicode(course.id)),
@@ -567,19 +574,21 @@ def videos_index_html(course):
             'max_width': settings.VIDEO_IMAGE_MAX_WIDTH,
             'max_height': settings.VIDEO_IMAGE_MAX_HEIGHT,
             'supported_file_formats': settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS
-        }
+        },
+        'is_video_transcript_enabled': is_video_transcript_enabled,
+        'video_transcript_settings': None,
+        'active_transcript_preferences': None
     }
 
-    context.update({
-        'video_transcript_settings': {
+    if is_video_transcript_enabled:
+        context['video_transcript_settings'] = {
             'transcript_preferences_handler_url': reverse_course_url(
                 'transcript_preferences_handler',
                 unicode(course.id)
             ),
             'transcription_plans': get_3rd_party_transcription_plans(),
-        },
-        'active_transcript_preferences': get_transcript_preferences(unicode(course.id))
-    })
+        }
+        context['active_transcript_preferences'] = get_transcript_preferences(unicode(course.id))
 
     return render_to_response('videos_index.html', context)
 
@@ -662,9 +671,11 @@ def videos_post(course, request):
             ('course_key', unicode(course.id)),
         ]
 
-        transcript_preferences = get_transcript_preferences(unicode(course.id))
-        if transcript_preferences is not None:
-            metadata_list.append(('transcript_preferences', json.dumps(transcript_preferences)))
+        is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
+        if is_video_transcript_enabled:
+            transcript_preferences = get_transcript_preferences(unicode(course.id))
+            if transcript_preferences is not None:
+                metadata_list.append(('transcript_preferences', json.dumps(transcript_preferences)))
 
         for metadata_name, value in metadata_list:
             key.set_metadata(metadata_name, value)
