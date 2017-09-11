@@ -30,7 +30,7 @@ def user_info(request):
     if request.method == 'POST':
         form = forms.UserInfoModelForm(request.POST)
         if form.is_valid():
-            user_info_survey = form.save(commit=False)
+            user_info_survey = form.save()
             user_info_survey.user = request.user
             user_info_survey.save()
 
@@ -68,7 +68,7 @@ def interests(request):
     if request.method == 'POST':
         form = forms.InterestModelForm(request.POST)
         if form.is_valid():
-            user_interests_survey = form.save(commit=False)
+            user_interests_survey = form.save()
             user_interests_survey.user = request.user
             user_interests_survey.save()
 
@@ -99,7 +99,7 @@ def organization(request):
     if request.method == 'POST':
         form = forms.OrganizationInfoModelForm(request.POST)
         if form.is_valid():
-            organization_survey = form.save(commit=False)
+            organization_survey = form.save()
             partner_network = organization_survey.partner_network
 
             if not partner_network.is_partner_affiliated:
