@@ -337,6 +337,22 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         },
 
         updateSuccessResponseStatus: function(data) {
+            var dateModified = data ? moment.utc(data.modified).format('ll') : '';
+
+            // Update last modified date
+            if (dateModified) {
+                HtmlUtils.setHtml(
+                    this.$el.find('.last-updated-text'),
+                    HtmlUtils.interpolateHtml(
+                        HtmlUtils.HTML('{lastUpdateText} {dateModified}'),
+                        {
+                            lastUpdateText: gettext('Last updated'),
+                            dateModified: dateModified
+                        }
+                    )
+                );
+            }
+
             this.renderResponseStatus(gettext('Settings updated'), 'success');
             // Sync ActiveUploadListView with latest active plan.
             this.activeTranscriptionPlan = data;
@@ -533,6 +549,8 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
         },
 
         closeCourseVideoSettings: function() {
+            // TODO: Slide out when closing settings pane. We may need to hide the view instead of destroying it.
+
             // Trigger destroy transcript event.
             Backbone.trigger('coursevideosettings:destroyCourseVideoSettingsView');
 

@@ -554,6 +554,22 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
 
         self.assert_video_status(url, edx_video_id, 'Failed')
 
+    @ddt.data(True, False)
+    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled')
+    def test_video_index_transcript_feature_enablement(self, is_video_transcript_enabled, video_transcript_feature):
+        """
+        Test that when video transcript is enabled/disabled, correct response is rendered.
+        """
+        video_transcript_feature.return_value = is_video_transcript_enabled
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        # Verify that course video button is present in the response if videos transcript feature is enabled.
+        self.assertEqual(
+            '<button class="button course-video-settings-button">' in response.content,
+            is_video_transcript_enabled
+        )
+
 
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_VIDEO_UPLOAD_PIPELINE': True})
@@ -845,7 +861,10 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         edx_video_id = 'test1'
         video_image_upload_url = self.get_url_for_course_key(self.course.id, {'edx_video_id': edx_video_id})
         with make_image_file(
-            dimensions=(image_data.get('width', settings.VIDEO_IMAGE_MIN_WIDTH), image_data.get('height', settings.VIDEO_IMAGE_MIN_HEIGHT)),
+            dimensions=(
+                image_data.get('width', settings.VIDEO_IMAGE_MIN_WIDTH),
+                image_data.get('height', settings.VIDEO_IMAGE_MIN_HEIGHT)
+            ),
             prefix=image_data.get('prefix', 'videoimage'),
             extension=image_data.get('extension', '.png'),
             force_size=image_data.get('size', settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES'])
@@ -858,6 +877,10 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
 
 
 @ddt.ddt
+@patch(
+    'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
+    Mock(return_value=True)
+)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_VIDEO_UPLOAD_PIPELINE': True})
 class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
     """
@@ -867,35 +890,52 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
     VIEW_NAME = 'transcript_preferences_handler'
 
     @ddt.data(
+        # Video transcript feature disabled
+        (
+            {},
+            False,
+            '',
+            404,
+        ),
         # Error cases
         (
             {},
-            'Invalid provider.'
+            True,
+            'Invalid provider.',
+            400
         ),
         (
             {
                 'provider': ''
             },
-            'Invalid provider.'
+            True,
+            'Invalid provider.',
+            400
         ),
         (
             {
                 'provider': 'dummy-provider'
             },
-            'Invalid provider.'
+            True,
+            'Invalid provider.',
+            400
         ),
         (
             {
                 'provider': TranscriptProvider.CIELO24
             },
-            'Invalid cielo24 fidelity.'
+            True,
+            'Invalid cielo24 fidelity.',
+            400
         ),
         (
             {
                 'provider': TranscriptProvider.CIELO24,
                 'cielo24_fidelity': 'PROFESSIONAL',
             },
-            'Invalid cielo24 turnaround.'
+            True,
+            'Invalid cielo24 turnaround.',
+            400
         ),
         (
             {
@@ -903,7 +943,9 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'cielo24_fidelity': 'PROFESSIONAL',
                 'cielo24_turnaround': 'STANDARD'
             },
-            'Invalid languages.'
+            True,
+            'Invalid languages.',
+            400
         ),
         (
             {
@@ -912,20 +954,26 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'cielo24_turnaround': 'STANDARD',
                 'preferred_languages': ['es', 'ur']
             },
-            'Invalid languages.'
+            True,
+            'Invalid languages.',
+            400
         ),
         (
             {
                 'provider': TranscriptProvider.THREE_PLAY_MEDIA
             },
-            'Invalid 3play turnaround.'
+            True,
+            'Invalid 3play turnaround.',
+            400
         ),
         (
             {
                 'provider': TranscriptProvider.THREE_PLAY_MEDIA,
                 'three_play_turnaround': 'default'
             },
-            'Invalid languages.'
+            True,
+            'Invalid languages.',
+            400
         ),
         (
             {
@@ -933,7 +981,9 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'three_play_turnaround': 'default',
                 'preferred_languages': ['es', 'ur']
             },
-            'Invalid languages.'
+            True,
+            'Invalid languages.',
+            400
         ),
         # Success
         (
@@ -943,7 +993,9 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'cielo24_turnaround': 'STANDARD',
                 'preferred_languages': ['en']
             },
-            ''
+            True,
+            '',
+            200
         ),
         (
             {
@@ -951,37 +1003,45 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'three_play_turnaround': 'default',
                 'preferred_languages': ['en']
             },
-            ''
+            True,
+            '',
+            200
         )
     )
     @ddt.unpack
-    def test_video_transcript(self, preferences, error_message):
+    def test_video_transcript(self, preferences, is_video_transcript_enabled, error_message, expected_status_code):
         """
         Tests that transcript handler works correctly.
         """
         video_transcript_url = self.get_url_for_course_key(self.course.id)
         preferences_data = {
-            'provider': preferences.get('provider', ''),
-            'cielo24_fidelity': preferences.get('cielo24_fidelity', ''),
-            'cielo24_turnaround': preferences.get('cielo24_turnaround', ''),
-            'three_play_turnaround': preferences.get('three_play_turnaround', ''),
+            'provider': preferences.get('provider'),
+            'cielo24_fidelity': preferences.get('cielo24_fidelity'),
+            'cielo24_turnaround': preferences.get('cielo24_turnaround'),
+            'three_play_turnaround': preferences.get('three_play_turnaround'),
             'preferred_languages': preferences.get('preferred_languages', []),
         }
 
-        response = self.client.post(
-            video_transcript_url,
-            json.dumps(preferences_data),
-            content_type='application/json'
-        )
+        with patch(
+            'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled'
+        ) as video_transcript_feature:
+            video_transcript_feature.return_value = is_video_transcript_enabled
+            response = self.client.post(
+                video_transcript_url,
+                json.dumps(preferences_data),
+                content_type='application/json'
+            )
         status_code = response.status_code
-        response = json.loads(response.content)
+        response = json.loads(response.content) if is_video_transcript_enabled else response
 
-        if error_message:
-            self.assertEqual(status_code, 400)
-            self.assertEqual(response['error'], error_message)
-        else:
-            self.assertEqual(status_code, 200)
-            self.assertTrue(response['transcript_preferences'], preferences_data)
+        self.assertEqual(status_code, expected_status_code)
+        self.assertEqual(response.get('error', ''), error_message)
+
+        # Remove modified and course_id fields from the response so as to check the expected transcript preferences.
+        response.get('transcript_preferences', {}).pop('modified', None)
+        response.get('transcript_preferences', {}).pop('course_id', None)
+        expected_preferences = preferences_data if is_video_transcript_enabled and not error_message else {}
+        self.assertDictEqual(response.get('transcript_preferences', {}), expected_preferences)
 
     def test_remove_transcript_preferences(self):
         """
@@ -1008,7 +1068,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         """
         Test that transcript handler works correctly even when no preferences are found.
         """
-        course_id = 'dummy+course+id'
+        course_id = 'course-v1:dummy+course+id'
         # Verify transcript preferences do not exist
         preferences = get_transcript_preferences(course_id)
         self.assertIsNone(preferences)
@@ -1024,23 +1084,39 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         self.assertIsNone(preferences)
 
     @ddt.data(
-        None,
-        {
-            'provider': TranscriptProvider.CIELO24,
-            'cielo24_fidelity': 'PROFESSIONAL',
-            'cielo24_turnaround': 'STANDARD',
-            'preferred_languages': ['en']
-        }
+        (
+            None,
+            False
+        ),
+        (
+            {
+                'provider': TranscriptProvider.CIELO24,
+                'cielo24_fidelity': 'PROFESSIONAL',
+                'cielo24_turnaround': 'STANDARD',
+                'preferred_languages': ['en']
+            },
+            False
+        ),
+        (
+            {
+                'provider': TranscriptProvider.CIELO24,
+                'cielo24_fidelity': 'PROFESSIONAL',
+                'cielo24_turnaround': 'STANDARD',
+                'preferred_languages': ['en']
+            },
+            True
+        )
     )
+    @ddt.unpack
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
     @patch('boto.s3.connection.S3Connection')
     @patch('contentstore.views.videos.get_transcript_preferences')
-    def test_transcript_preferences_metadata(self, transcript_preferences, mock_transcript_preferences,
-                                             mock_conn, mock_key):
+    def test_transcript_preferences_metadata(self, transcript_preferences, is_video_transcript_enabled,
+                                             mock_transcript_preferences, mock_conn, mock_key):
         """
-        Tests that transcript preference metadata is only set if it is transcript
-        preferences are present in request data.
+        Tests that transcript preference metadata is only set if it is video transcript feature is enabled and
+        transcript preferences are already stored in the system.
         """
         file_name = 'test-video.mp4'
         request_data = {'files': [{'file_name': file_name, 'content_type': 'video/mp4'}]}
@@ -1058,11 +1134,16 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         mock_key.side_effect = [mock_key_instance] + [Mock()]
 
         videos_handler_url = reverse_course_url('videos_handler', self.course.id)
-        response = self.client.post(videos_handler_url, json.dumps(request_data), content_type='application/json')
+        with patch(
+            'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled'
+        ) as video_transcript_feature:
+            video_transcript_feature.return_value = is_video_transcript_enabled
+            response = self.client.post(videos_handler_url, json.dumps(request_data), content_type='application/json')
+
         self.assertEqual(response.status_code, 200)
 
         # Ensure `transcript_preferences` was set up in Key correctly if sent through request.
-        if transcript_preferences:
+        if is_video_transcript_enabled and transcript_preferences:
             mock_key_instance.set_metadata.assert_any_call('transcript_preferences', json.dumps(transcript_preferences))
         else:
             with self.assertRaises(AssertionError):
