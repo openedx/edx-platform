@@ -62,7 +62,19 @@
       font-weight: $font-semibold;
       text-decoration: underline;
     }
-    
+
+    .dismiss {
+      @include right($baseline/4);
+      top: $baseline/4;
+      position: absolute;
+      cursor: pointer;
+      color: $black-t3;
+
+      &:hover {
+        color: $black-t2;
+      }
+    }
+
     // Course Goal Styling
     .goal-options-container {
       margin-top: $baseline;

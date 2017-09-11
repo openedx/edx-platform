@@ -6,7 +6,9 @@ import math
 from babel.dates import format_date, format_timedelta
 from datetime import datetime
 
+from course_modes.models import CourseMode
 from courseware.courses import get_course_with_access
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.http import urlquote_plus
@@ -20,7 +22,9 @@ from web_fragments.fragment import Fragment
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import CourseHomeMessages
 
-from .course_goals import set_course_goal, get_course_goal
+from student.models import CourseEnrollment
+from .course_goals import CourseGoalType
+from .. import ENABLE_COURSE_GOALS
 
 
 class CourseHomeMessageFragmentView(EdxFragmentView):
@@ -59,16 +63,24 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         }
 
         # Register the course home messages to be loaded on the page
-        self.register_course_home_messages(request, course, user_access, course_start_data)
+        self.register_course_home_messages(self, request, course_id, user_access, course_start_data)
 
         # Grab the relevant messages
         course_home_messages = list(CourseHomeMessages.user_messages(request))
+
+        # Pass in the url used to set a course goal
+        set_goal_url = reverse(
+            'openedx.course_experience.set_course_goal', kwargs={
+                'course_id': course_id,
+            }
+        )
 
         # Grab the logo
         image_src = "course_experience/images/home_message_author.png"
 
         context = {
             'course_home_messages': course_home_messages,
+            'set_goal_url': set_goal_url,
             'image_src': image_src,
         }
 
@@ -76,10 +88,12 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         return Fragment(html)
 
     @staticmethod
-    def register_course_home_messages(request, course, user_access, course_start_data):
+    def register_course_home_messages(self, request, course_id, user_access, course_start_data):
         """
         Register messages to be shown in the course home content page.
         """
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_with_access(request.user, 'load', course_key)
         if user_access['is_anonymous']:
             CourseHomeMessages.register_info_message(
                 request,
@@ -122,28 +136,50 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
                 )
             )
 
-        # TODO: if course goal not yet set and the user is enrolled
-        # TODO: Question: Does choice get translated in the data-choice object?
-        # TODO: Question: Do we show this in pre-course mode?
-        is_goal_set = False
-        if settings.COURSE_GOALS and not is_goal_set and user_access['is_enrolled']:
+        is_already_verified = CourseEnrollment.is_enrolled_as_verified(request.user, course_key)
+        # available_modes = CourseMode.modes_for_course_dict(unicode(course.id))
+        # has_verified_mode = CourseMode.has_verified_mode(available_modes)
+        # user_goal = get_course_goal(request.user, course_key)
+        # waffle_flag_enabled = ENABLE_COURSE_GOALS.is_enabled(course_key)
+        has_verified_mode = True
+        user_goal = None
+        waffle_flag_enabled = True
+
+        # Only show the set course goal message for enrolled, unverified
+        # users that have not yet set a goal in a course that allows for
+        # verified statuses.
+        if settings.FEATURES.get('ENABLE_COURSE_GOALS') and not user_goal and user_access['is_enrolled'] \
+                and has_verified_mode and not is_already_verified and waffle_flag_enabled:
             goal_choices_html = HTML(_(
                 'To start, set a course goal by selecting the option below that best describes '
                 'your learning plan. <div class="row goal-options-container">'
             ))
-            for choice in settings.COURSE_GOALS['choices']:
-                goal_choices_html += HTML(_(
-                    '<a class="goal-option {col_sel} btn" data-choice="{choice}">{choice}</a>'
-                ).format(
-                    choice=choice,
-                    col_sel='col-' + str(int(math.floor(12 / len(settings.COURSE_GOALS['choices']))))
-                ))
-            dismissible_choice = settings.COURSE_GOALS['dismissible_choice']
+
+            # Add the dismissible option for users that are unsure of their goal
+            # Translators: please do not translate the 'goal' variable below
             goal_choices_html += HTML(_(
-                '<a class="goal-option dismissible" data-choice="{choice}">{choice}</a>'
+                '<a tabindex="0" aria-label="Set goal to, {choice}" class="goal-option dismissible" '
+                'data-choice="{goal}">{choice}</a>'
             ).format(
-                choice=dismissible_choice
+                goal=CourseGoalType.UNSURE.value,
+                choice=self.get_goal_text(CourseGoalType.UNSURE.value)
             ))
+
+            # Add the option to set a goal to earn a certificate,
+            # complete the course or explore the course
+            goal_options = [CourseGoalType.CERTIFY.value, CourseGoalType.COMPLETE.value, CourseGoalType.EXPLORE.value]
+            for goal in goal_options:
+                # Translators: please do not translate the 'goal' variable below
+                goal_text = self.get_goal_text(goal)
+                goal_choices_html += HTML(_(
+                    '<a tabindex="0" aria-label="Set goal to, {goal_text}" class="goal-option {col_sel} btn" '
+                    'data-choice="{goal}">{goal_text}</a>'
+                ).format(
+                    goal=goal,
+                    goal_text=goal_text,
+                    col_sel='col-' + str(int(math.floor(12 / len(goal_options))))
+                ))
+
             CourseHomeMessages.register_info_message(
                 request,
                 HTML('{goal_choices_html}</div>').format(
@@ -154,6 +190,11 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
                 )
             )
 
-        # TODO: remove this, just used for testing.
-        set_course_goal(request.user, course, settings.COURSE_GOALS['choices'][0])
-        get_course_goal(request.user, course)
+    @staticmethod
+    def get_goal_text(goal_type):
+        return {
+            CourseGoalType.CERTIFY.value: Text(_('Earn a certificate')),
+            CourseGoalType.COMPLETE.value: Text(_('Complete the course')),
+            CourseGoalType.EXPLORE.value: Text(_('Explore the course')),
+            CourseGoalType.UNSURE.value: Text(_('Not sure yet')),
+        }[goal_type]

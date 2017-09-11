@@ -65,7 +65,7 @@ urlpatterns = [
         name='openedx.course_experience.dismiss_welcome_message',
     ),
     url(
-        r'^set_course_goal',
+        r'^set_course_goal$',
         set_course_goal,
         name='openedx.course_experience.set_course_goal',
     ),
