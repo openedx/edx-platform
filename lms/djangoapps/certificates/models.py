@@ -867,7 +867,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
     enabled = models.BooleanField(default=False)  # Deprecated
     # Note: the method 'can_self_generate_for_course' should be modified when 'enabled' field is removed.
 
-    can_self_generate = models.NullBooleanField()
+    can_self_generate = models.BooleanField(default=False)
     can_use_language_specific_templates = models.BooleanField(default=False)
 
     class Meta(object):
