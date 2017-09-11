@@ -71,13 +71,14 @@ from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
+from openedx.core.djangoapps.certificates import api as auto_certs_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
     is_credit_course,
     is_user_eligible_for_credit
 )
-from openedx.core.djangoapps.certificates.config import waffle as certificates_waffle
+from openedx.core.djangoapps.certificates import api as auto_certs_api
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
@@ -116,6 +117,62 @@ REQUIREMENTS_DISPLAY_MODES = CourseMode.CREDIT_MODES + [CourseMode.VERIFIED]
 CertData = namedtuple(
     "CertData", ["cert_status", "title", "msg", "download_url", "cert_web_view_url"]
 )
+
+AUDIT_PASSING_CERT_DATA = CertData(
+    CertificateStatuses.audit_passing,
+    _('Your enrollment: Audit track'),
+    _('You are enrolled in the audit track for this course. The audit track does not include a certificate.'),
+    download_url=None,
+    cert_web_view_url=None
+)
+
+GENERATING_CERT_DATA = CertData(
+    CertificateStatuses.generating,
+    _("We're working on it..."),
+    _(
+        "We're creating your certificate. You can keep working in your courses and a link "
+        "to it will appear here and on your Dashboard when it is ready."
+    ),
+    download_url=None,
+    cert_web_view_url=None
+)
+
+INVALID_CERT_DATA = CertData(
+    CertificateStatuses.invalidated,
+    _('Your certificate has been invalidated'),
+    _('Please contact your course team if you have any questions.'),
+    download_url=None,
+    cert_web_view_url=None
+)
+
+REQUESTING_CERT_DATA = CertData(
+    CertificateStatuses.requesting,
+    _('Congratulations, you qualified for a certificate!'),
+    _("You've earned a certificate for this course."),
+    download_url=None,
+    cert_web_view_url=None
+)
+
+UNVERIFIED_CERT_DATA = CertData(
+    CertificateStatuses.unverified,
+    _('Certificate unavailable'),
+    _(
+        'You have not received a certificate because you do not have a current {platform_name} '
+        'verified identity.'
+    ).format(platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)),
+    download_url=None,
+    cert_web_view_url=None
+)
+
+
+def _downloadable_cert_data(download_url=None, cert_web_view_url=None):
+    return CertData(
+        CertificateStatuses.downloadable,
+        _('Your certificate is available'),
+        _("You've earned a certificate for this course."),
+        download_url=download_url,
+        cert_web_view_url=cert_web_view_url
+    )
 
 
 def user_groups(user):
@@ -872,23 +929,22 @@ def _progress(request, course_key, student_id):
 
     course_grade = CourseGradeFactory().create(student, course)
     courseware_summary = course_grade.chapter_grades.values()
-    grade_summary = course_grade.summary
 
     studio_url = get_studio_url(course, 'settings/grading')
     # checking certificate generation configuration
-    enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(student, course_key)
+    enrollment_mode, _ = CourseEnrollment.enrollment_mode_for_user(student, course_key)
 
     context = {
         'course': course,
         'courseware_summary': courseware_summary,
         'studio_url': studio_url,
-        'grade_summary': grade_summary,
+        'grade_summary': course_grade.summary,
         'staff_access': staff_access,
         'masquerade': masquerade,
         'supports_preview_menu': True,
         'student': student,
         'credit_course_requirements': _credit_course_requirements(course_key, student),
-        'certificate_data': _get_cert_data(student, course, course_key, is_active, enrollment_mode, grade_summary),
+        'certificate_data': _get_cert_data(student, course, enrollment_mode, course_grade),
     }
     context.update(
         get_experiment_user_metadata_context(
@@ -903,128 +959,68 @@ def _progress(request, course_key, student_id):
     return response
 
 
-def _get_cert_data(student, course, course_key, is_active, enrollment_mode, grade_summary=None):
+def _downloadable_certificate_message(course, cert_downloadable_status):
+    if certs_api.has_html_certificates_enabled(course):
+        if certs_api.get_active_web_certificate(course) is not None:
+            return _downloadable_cert_data(
+                download_url=None,
+                cert_web_view_url=certs_api.get_certificate_url(
+                    course_id=course.id, uuid=cert_downloadable_status['uuid']
+                )
+            )
+        else:
+            return GENERATING_CERT_DATA
+
+    return _downloadable_cert_data(download_url=cert_downloadable_status['download_url'])
+
+
+def _missing_required_verification(student, enrollment_mode):
+    return (
+        enrollment_mode in CourseMode.VERIFIED_MODES and not SoftwareSecurePhotoVerification.user_is_verified(student)
+    )
+
+
+def _certificate_message(student, course, enrollment_mode):
+    if certs_api.is_certificate_invalid(student, course.id):
+        return INVALID_CERT_DATA
+
+    cert_downloadable_status = certs_api.certificate_downloadable_status(student, course.id)
+
+    if cert_downloadable_status['is_generating']:
+        return GENERATING_CERT_DATA
+
+    if cert_downloadable_status['is_unverified'] or _missing_required_verification(student, enrollment_mode):
+        return UNVERIFIED_CERT_DATA
+
+    if cert_downloadable_status['is_downloadable']:
+        return _downloadable_certificate_message(course, cert_downloadable_status)
+
+    return REQUESTING_CERT_DATA
+
+
+def _get_cert_data(student, course, enrollment_mode, course_grade=None):
     """Returns students course certificate related data.
 
     Arguments:
         student (User): Student for whom certificate to retrieve.
         course (Course): Course object for which certificate data to retrieve.
-        course_key (CourseKey): Course identifier for course.
-        is_active (Bool): Boolean value to check if course is active.
         enrollment_mode (String): Course mode in which student is enrolled.
-        grade_summary (dict): Student grade details.
+        course_grade (CourseGrade): Student's course grade record.
 
     Returns:
         returns dict if course certificate is available else None.
     """
-    from lms.djangoapps.courseware.courses import get_course_by_id
-
     if not CourseMode.is_eligible_for_certificate(enrollment_mode):
-        return CertData(
-            CertificateStatuses.audit_passing,
-            _('Your enrollment: Audit track'),
-            _('You are enrolled in the audit track for this course. The audit track does not include a certificate.'),
-            download_url=None,
-            cert_web_view_url=None
-        )
+        return AUDIT_PASSING_CERT_DATA
 
-    may_view_certificate = False
-    if course_key:
-        may_view_certificate = get_course_by_id(course_key).may_certify()
+    certificates_enabled_for_course = certs_api.cert_generation_enabled(course.id)
+    if course_grade is None:
+        course_grade = CourseGradeFactory().create(student, course)
 
-    switches = certificates_waffle.waffle()
-    switch_enabled = switches.is_enabled(certificates_waffle.AUTO_CERTIFICATE_GENERATION)
-    student_cert_generation_enabled = switch_enabled or certs_api.cert_generation_enabled(course_key)
+    if not auto_certs_api.can_show_certificate_message(course, student, course_grade, certificates_enabled_for_course):
+        return
 
-    # Don't show certificate information if:
-    # 1) the learner has not passed the course
-    # 2) the course is not active
-    # 3) auto-generated certs flags are not enabled, but student cert generation is not enabled either
-    # 4) the learner may not view the certificate, based on the course's advanced course settings.
-    if not all([
-        is_course_passed(course, grade_summary),
-        is_active,
-        student_cert_generation_enabled,
-        may_view_certificate
-    ]):
-        return None
-
-    if certs_api.is_certificate_invalid(student, course_key):
-        return CertData(
-            CertificateStatuses.invalidated,
-            _('Your certificate has been invalidated'),
-            _('Please contact your course team if you have any questions.'),
-            download_url=None,
-            cert_web_view_url=None
-        )
-
-    cert_downloadable_status = certs_api.certificate_downloadable_status(student, course_key)
-
-    generating_certificate_message = CertData(
-        CertificateStatuses.generating,
-        _("We're working on it..."),
-        _(
-            "We're creating your certificate. You can keep working in your courses and a link "
-            "to it will appear here and on your Dashboard when it is ready."
-        ),
-        download_url=None,
-        cert_web_view_url=None
-    )
-
-    if cert_downloadable_status['is_downloadable']:
-        if certs_api.has_html_certificates_enabled(course_key, course):
-            if certs_api.get_active_web_certificate(course) is not None:
-                return CertData(
-                    CertificateStatuses.downloadable,
-                    _('Your certificate is available'),
-                    _("You've earned a certificate for this course."),
-                    download_url=None,
-                    cert_web_view_url=certs_api.get_certificate_url(
-                        course_id=course_key, uuid=cert_downloadable_status['uuid']
-                    )
-                )
-            else:
-                # If there is an error, the user should see the generating certificate message
-                # until a new certificate is generated.
-                return generating_certificate_message
-
-        return CertData(
-            CertificateStatuses.downloadable,
-            _('Your certificate is available'),
-            _("You've earned a certificate for this course."),
-            download_url=cert_downloadable_status['download_url'],
-            cert_web_view_url=None
-        )
-
-    if cert_downloadable_status['is_generating']:
-        return generating_certificate_message
-
-    # If the learner is in verified modes and the student did not have
-    # their ID verified, we need to show message to ask learner to verify their ID first
-    missing_required_verification = (
-        enrollment_mode in CourseMode.VERIFIED_MODES and not SoftwareSecurePhotoVerification.user_is_verified(student)
-    )
-
-    if missing_required_verification or cert_downloadable_status['is_unverified']:
-        platform_name = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
-        return CertData(
-            CertificateStatuses.unverified,
-            _('Certificate unavailable'),
-            _(
-                'You have not received a certificate because you do not have a current {platform_name} '
-                'verified identity.'
-            ).format(platform_name=platform_name),
-            download_url=None,
-            cert_web_view_url=None
-        )
-
-    return CertData(
-        CertificateStatuses.requesting,
-        _('Congratulations, you qualified for a certificate!'),
-        _("You've earned a certificate for this course."),
-        download_url=None,
-        cert_web_view_url=None
-    )
+    return _certificate_message(student, course, enrollment_mode)
 
 
 def _credit_course_requirements(course_key, student):
@@ -1281,26 +1277,21 @@ def course_survey(request, course_id):
     )
 
 
-def is_course_passed(course, grade_summary=None, student=None, request=None):
+def is_course_passed(student, course, course_grade=None):
     """
     check user's course passing status. return True if passed
 
     Arguments:
-        course : course object
-        grade_summary (dict) : contains student grade details.
         student : user object
-        request (HttpRequest)
+        course : course object
+        course_grade (CourseGrade) : contains student grade details.
 
     Returns:
         returns bool value
     """
-    nonzero_cutoffs = [cutoff for cutoff in course.grade_cutoffs.values() if cutoff > 0]
-    success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
-
-    if grade_summary is None:
-        grade_summary = CourseGradeFactory().create(student, course).summary
-
-    return success_cutoff and grade_summary['percent'] >= success_cutoff
+    if course_grade is None:
+        course_grade = CourseGradeFactory().create(student, course)
+    return course_grade.passed
 
 
 # Grades can potentially be written - if so, let grading manage the transaction.
@@ -1343,7 +1334,7 @@ def generate_user_cert(request, course_id):
     if not course:
         return HttpResponseBadRequest(_("Course is not valid"))
 
-    if not is_course_passed(course, None, student, request):
+    if not is_course_passed(student, course):
         return HttpResponseBadRequest(_("Your certificate will be available when you pass the course."))
 
     certificate_status = certs_api.certificate_downloadable_status(student, course.id)

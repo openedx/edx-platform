@@ -10,8 +10,13 @@ from HTMLParser import HTMLParser
 from urllib import quote, urlencode
 from uuid import uuid4
 
-import courseware.views.views as views
 import ddt
+from freezegun import freeze_time
+from mock import MagicMock, PropertyMock, create_autospec, patch
+from nose.plugins.attrib import attr
+from pytz import UTC
+
+import courseware.views.views as views
 import shoppingcart
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from certificates import api as certs_api
@@ -34,13 +39,12 @@ from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
-from freezegun import freeze_time
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.tests.utils import mock_get_score
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import MagicMock, PropertyMock, create_autospec, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
@@ -55,7 +59,6 @@ from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
-from pytz import UTC
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.tests.test_date_utils import fake_pgettext, fake_ugettext
@@ -1222,7 +1225,7 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
             start=datetime(2013, 9, 16, 7, 17, 28),
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
             end=datetime.now(),
-            certificate_available_date=datetime.now(),
+            certificate_available_date=datetime.now(UTC),
             **options
         )
 
@@ -1359,10 +1362,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.assertNotContains(resp, 'Request Certificate')
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
-    @patch(
-        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}),
-    )
     def test_view_certificate_link(self):
         """
         If certificate web view is enabled then certificate web view button should appear for user who certificate is
@@ -1400,28 +1399,30 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
-        resp = self._get_progress_page()
-        self.assertContains(resp, u"View Certificate")
+        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = True
+            course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
 
-        self.assertContains(resp, u"earned a certificate for this course")
-        cert_url = certs_api.get_certificate_url(course_id=self.course.id, uuid=certificate.verify_uuid)
-        self.assertContains(resp, cert_url)
+            resp = self._get_progress_page()
 
-        # when course certificate is not active
-        certificates[0]['is_active'] = False
-        self.store.update_item(self.course, self.user.id)
+            self.assertContains(resp, u"View Certificate")
 
-        resp = self._get_progress_page()
-        self.assertNotContains(resp, u"View Your Certificate")
-        self.assertNotContains(resp, u"You can now view your certificate")
-        self.assertContains(resp, "working on it...")
-        self.assertContains(resp, "creating your certificate")
+            self.assertContains(resp, u"earned a certificate for this course")
+            cert_url = certs_api.get_certificate_url(course_id=self.course.id, uuid=certificate.verify_uuid)
+            self.assertContains(resp, cert_url)
+
+            # when course certificate is not active
+            certificates[0]['is_active'] = False
+            self.store.update_item(self.course, self.user.id)
+
+            resp = self._get_progress_page()
+            self.assertNotContains(resp, u"View Your Certificate")
+            self.assertNotContains(resp, u"You can now view your certificate")
+            self.assertContains(resp, "working on it...")
+            self.assertContains(resp, "creating your certificate")
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
-    @patch(
-        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
-    )
     def test_view_certificate_link_hidden(self):
         """
         If certificate web view is disabled then certificate web view button should not appear for user who certificate
@@ -1441,8 +1442,13 @@ class ProgressPageTests(ProgressPageBaseTests):
         # Enable certificate generation for this course
         certs_api.set_cert_generation_enabled(self.course.id, True)
 
-        resp = self._get_progress_page()
-        self.assertContains(resp, u"Download Your Certificate")
+        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = True
+            course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
+
+            resp = self._get_progress_page()
+            self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
         *itertools.product((True, False), (True, False))
@@ -1452,7 +1458,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(43, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(2):
+        with self.assertNumQueries(43, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
             self._get_progress_page()
 
     @ddt.data(
@@ -1465,20 +1471,16 @@ class ProgressPageTests(ProgressPageBaseTests):
         with grades_waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
             with self.assertNumQueries(
                 initial, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST
-            ), check_mongo_calls(2):
+            ), check_mongo_calls(1):
                 self._get_progress_page()
 
             # subsequent accesses to the progress page require fewer queries.
             for _ in range(2):
                 with self.assertNumQueries(
                     subsequent, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST
-                ), check_mongo_calls(2):
+                ), check_mongo_calls(1):
                     self._get_progress_page()
 
-    @patch(
-        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
-    )
     @ddt.data(
         *itertools.product(
             (
@@ -1502,23 +1504,24 @@ class ProgressPageTests(ProgressPageBaseTests):
             'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
         ) as user_verify:
             user_verify.return_value = user_verified
-            resp = self.client.get(
-                reverse('progress', args=[unicode(self.course.id)])
-            )
+            with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+                course_grade = mock_create.return_value
+                course_grade.passed = True
+                course_grade.summary = {
+                    'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}
+                }
 
-            cert_button_hidden = course_mode is CourseMode.AUDIT or \
-                course_mode in CourseMode.VERIFIED_MODES and not user_verified
+                resp = self._get_progress_page()
 
-            self.assertEqual(
-                cert_button_hidden,
-                'Request Certificate' not in resp.content
-            )
+                cert_button_hidden = course_mode is CourseMode.AUDIT or \
+                    course_mode in CourseMode.VERIFIED_MODES and not user_verified
+
+                self.assertEqual(
+                    cert_button_hidden,
+                    'Request Certificate' not in resp.content
+                )
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
-    @patch(
-        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
-    )
     def test_page_with_invalidated_certificate_with_html_view(self):
         """
         Verify that for html certs if certificate is marked as invalidated than
@@ -1545,14 +1548,17 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
-        resp = self._get_progress_page()
-        self.assertContains(resp, u"View Certificate")
-        self.assert_invalidate_certificate(generated_certificate)
+        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = True
+            course_grade.summary = {
+                'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}
+            }
 
-    @patch(
-        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
-    )
+            resp = self._get_progress_page()
+            self.assertContains(resp, u"View Certificate")
+            self.assert_invalidate_certificate(generated_certificate)
+
     def test_page_with_invalidated_certificate_with_pdf(self):
         """
         Verify that for pdf certs if certificate is marked as invalidated than
@@ -1562,14 +1568,15 @@ class ProgressPageTests(ProgressPageBaseTests):
             "http://www.example.com/certificate.pdf", "honor"
         )
 
-        resp = self._get_progress_page()
-        self.assertContains(resp, u'Download Your Certificate')
-        self.assert_invalidate_certificate(generated_certificate)
+        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = True
+            course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
 
-    @patch(
-        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
-    )
+            resp = self._get_progress_page()
+            self.assertContains(resp, u'Download Your Certificate')
+            self.assert_invalidate_certificate(generated_certificate)
+
     @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
     def test_message_for_audit_mode(self):
         """ Verify that message appears on progress page, if learner is enrolled
@@ -1578,14 +1585,19 @@ class ProgressPageTests(ProgressPageBaseTests):
         user = UserFactory.create()
         self.assertTrue(self.client.login(username=user.username, password='test'))
         CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=CourseMode.AUDIT)
-        response = self._get_progress_page()
 
-        self.assertContains(
-            response,
-            u'You are enrolled in the audit track for this course. The audit track does not include a certificate.'
-        )
+        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = True
+            course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
 
-    @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
+            response = self._get_progress_page()
+
+            self.assertContains(
+                response,
+                u'You are enrolled in the audit track for this course. The audit track does not include a certificate.'
+            )
+
     def test_invalidated_cert_data(self):
         """
         Verify that invalidated cert data is returned if cert is invalidated.
@@ -1600,11 +1612,10 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         # Invalidate user certificate
         generated_certificate.invalidate()
-        response = views._get_cert_data(self.user, self.course, self.course.id, True, CourseMode.HONOR)
+        response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
         self.assertEqual(response.cert_status, 'invalidated')
         self.assertEqual(response.title, 'Your certificate has been invalidated')
 
-    @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
     def test_downloadable_get_cert_data(self):
         """
         Verify that downloadable cert data is returned if cert is downloadable.
@@ -1614,12 +1625,11 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         with patch('certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_downloadable=True)):
-            response = views._get_cert_data(self.user, self.course, self.course.id, True, CourseMode.HONOR)
+            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'downloadable')
         self.assertEqual(response.title, 'Your certificate is available')
 
-    @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
     def test_generating_get_cert_data(self):
         """
         Verify that generating cert data is returned if cert is generating.
@@ -1629,12 +1639,11 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         with patch('certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_generating=True)):
-            response = views._get_cert_data(self.user, self.course, self.course.id, True, CourseMode.HONOR)
+            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'generating')
         self.assertEqual(response.title, "We're working on it...")
 
-    @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
     def test_unverified_get_cert_data(self):
         """
         Verify that unverified cert data is returned if cert is unverified.
@@ -1644,12 +1653,11 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         with patch('certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_unverified=True)):
-            response = views._get_cert_data(self.user, self.course, self.course.id, True, CourseMode.HONOR)
+            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'unverified')
         self.assertEqual(response.title, "Certificate unavailable")
 
-    @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
     def test_request_get_cert_data(self):
         """
         Verify that requested cert data is returned if cert is to be requested.
@@ -1659,7 +1667,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         with patch('certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status()):
-            response = views._get_cert_data(self.user, self.course, self.course.id, True, CourseMode.HONOR)
+            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'requesting')
         self.assertEqual(response.title, "Congratulations, you qualified for a certificate!")
@@ -2013,54 +2021,6 @@ class VerifyCourseKeyDecoratorTests(TestCase):
 
 
 @attr(shard=1)
-class IsCoursePassedTests(ModuleStoreTestCase):
-    """
-    Tests for the is_course_passed helper function
-    """
-
-    SUCCESS_CUTOFF = 0.5
-
-    def setUp(self):
-        super(IsCoursePassedTests, self).setUp()
-
-        self.student = UserFactory()
-        self.course = CourseFactory.create(
-            org='edx',
-            number='verified',
-            display_name='Verified Course',
-            grade_cutoffs={'cutoff': 0.75, 'Pass': self.SUCCESS_CUTOFF}
-        )
-        self.request = RequestFactory()
-        self.request.user = self.student
-
-    def test_user_fails_if_not_clear_exam(self):
-        # If user has not grade then false will return
-        self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
-
-    @patch('lms.djangoapps.grades.new.course_grade.CourseGrade.summary', PropertyMock(return_value={'percent': 0.9}))
-    def test_user_pass_if_percent_appears_above_passing_point(self):
-        # Mocking the grades.grade
-        # If user has above passing marks then True will return
-        self.assertTrue(views.is_course_passed(self.course, None, self.student, self.request))
-
-    @patch('lms.djangoapps.grades.new.course_grade.CourseGrade.summary', PropertyMock(return_value={'percent': 0.2}))
-    def test_user_fail_if_percent_appears_below_passing_point(self):
-        # Mocking the grades.grade
-        # If user has below passing marks then False will return
-        self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
-
-    @patch(
-        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'percent': SUCCESS_CUTOFF})
-    )
-    def test_user_with_passing_marks_and_achieved_marks_equal(self):
-        # Mocking the grades.grade
-        # If user's achieved passing marks are equal to the required passing
-        # marks then it will return True
-        self.assertTrue(views.is_course_passed(self.course, None, self.student, self.request))
-
-
-@attr(shard=1)
 class GenerateUserCertTests(ModuleStoreTestCase):
     """
     Tests for the view function Generated User Certs
@@ -2088,12 +2048,9 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
         self.assertIn("Your certificate will be available when you pass the course.", resp.content)
 
-    @patch(
-        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75})
-    )
+    @patch('courseware.views.views.is_course_passed', return_value=True)
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
-    def test_user_with_passing_grade(self):
+    def test_user_with_passing_grade(self, mock_is_course_passed):
         # If user has above passing grading then json will return cert generating message and
         # status valid code
         # mocking xqueue and analytics
@@ -2104,6 +2061,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
 
         with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
             mock_send_to_queue.return_value = (0, "Successfully queued")
+
             resp = self.client.post(self.url)
             self.assertEqual(resp.status_code, 200)
 
@@ -2123,10 +2081,6 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             )
             mock_tracker.reset_mock()
 
-    @patch(
-        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75})
-    )
     def test_user_with_passing_existing_generating_cert(self):
         # If user has passing grade but also has existing generating cert
         # then json will return cert generating message with bad request code
@@ -2136,14 +2090,15 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             status=CertificateStatuses.generating,
             mode='verified'
         )
-        resp = self.client.post(self.url)
-        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("Certificate is being created.", resp.content)
+        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = True
+            course_grade.summary = {'grade': 'Pass', 'percent': 0.75}
 
-    @patch(
-        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75})
-    )
+            resp = self.client.post(self.url)
+            self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
+            self.assertIn("Certificate is being created.", resp.content)
+
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_existing_downloadable_cert(self):
         # If user has already downloadable certificate
@@ -2156,9 +2111,14 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             mode='verified'
         )
 
-        resp = self.client.post(self.url)
-        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("Certificate has already been created.", resp.content)
+        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = True
+            course_grade.summay = {'grade': 'Pass', 'percent': 0.75}
+
+            resp = self.client.post(self.url)
+            self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
+            self.assertIn("Certificate has already been created.", resp.content)
 
     def test_user_with_non_existing_course(self):
         # If try to access a course with valid key pattern then it will return

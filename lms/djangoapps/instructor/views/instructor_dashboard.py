@@ -331,7 +331,7 @@ def _section_certificates(course):
 
     """
     example_cert_status = None
-    html_cert_enabled = certs_api.has_html_certificates_enabled(course.id, course)
+    html_cert_enabled = certs_api.has_html_certificates_enabled(course)
     if html_cert_enabled:
         can_enable_for_course = True
     else:
