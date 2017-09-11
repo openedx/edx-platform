@@ -1368,7 +1368,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
             user = pipeline.get_authenticated_user(requested_provider, username, third_party_uid)
             third_party_auth_successful = True
         except User.DoesNotExist:
-            AUDIT_LOG.warning(
+            AUDIT_LOG.info(
                 u"Login failed - user with username {username} has no social auth "
                 "with backend_name {backend_name}".format(
                     username=username, backend_name=backend_name)
