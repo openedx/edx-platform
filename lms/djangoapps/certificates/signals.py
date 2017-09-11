@@ -58,7 +58,7 @@ def _listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: dis
 
 
 @receiver(LEARNER_NOW_VERIFIED, dispatch_uid="learner_track_changed")
-def _listen_for_track_change(sender, user, **kwargs):  # pylint: disable=unused-argument
+def _listen_for_track_change(sender, user, verification_status, **kwargs):  # pylint: disable=unused-argument
     """
     Catches a track change signal, determines user status,
     calls fire_ungenerated_certificate_task for passing grades
@@ -70,14 +70,16 @@ def _listen_for_track_change(sender, user, **kwargs):  # pylint: disable=unused-
     grade_factory = CourseGradeFactory()
     for enrollment in user_enrollments:
         if grade_factory.read(user=user, course=enrollment.course_overview).passed:
-            if fire_ungenerated_certificate_task(user, enrollment.course_id):
-                log.info(u'Certificate generation task initiated for {user} : {course} via track change'.format(
-                    user=user.id,
-                    course=enrollment.course_id
+            if fire_ungenerated_certificate_task(user, enrollment.course_id, status):
+                log.info(u'Certificate generation task initiated for {user} : {course} via track change ' +
+                         u'with verification status of {status}'.format(
+                            user=user.id,
+                            course=enrollment.course_id,
+                            verification_status=verification_status
                 ))
 
 
-def fire_ungenerated_certificate_task(user, course_key, status):
+def fire_ungenerated_certificate_task(user, course_key, verification_status):
     """
     Helper function to fire un-generated certificate tasks
 
@@ -89,11 +91,10 @@ def fire_ungenerated_certificate_task(user, course_key, status):
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
     mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
     cert = GeneratedCertificate.certificate_for_student(user, course_key)
-    # Sofiya - expected value here
     if mode_is_verified and (cert is None or cert.status == 'unverified'):
         generate_certificate.apply_async(kwargs={
             'student': unicode(user.id),
             'course_key': unicode(course_key),
-            'verification': unicode(status)
+            'verification_status': unicode(verification_status)
         })
         return True
