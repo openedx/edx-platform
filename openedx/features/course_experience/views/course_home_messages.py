@@ -1,11 +1,13 @@
 """
 View logic for handling course messages.
 """
+import math
 
 from babel.dates import format_date, format_timedelta
 from datetime import datetime
 
 from courseware.courses import get_course_with_access
+from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.http import urlquote_plus
 from django.utils.timezone import UTC
@@ -59,10 +61,6 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
 
         # Grab the relevant messages
         course_home_messages = list(CourseHomeMessages.user_messages(request))
-
-        # Return None if user is enrolled and course has begun
-        if user_access['is_enrolled'] and already_started:
-            return None
 
         # Grab the logo
         image_src = "course_experience/images/home_message_author.png"
@@ -119,5 +117,37 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
                 title=Text("Course starts in {days_until_start_string} on {course_start_date}.").format(
                     days_until_start_string=course_start_data['days_until_start_string'],
                     course_start_date=course_start_data['course_start_date']
+                )
+            )
+
+        # TODO: if course goal not yet set and the user is enrolled
+        # TODO: Question: Does choice get translated in the data-choice object?
+        # TODO: Question: Do we show this in pre-course mode?
+        is_goal_set = False
+        if settings.COURSE_GOALS and not is_goal_set and user_access['is_enrolled']:
+            goal_choices_html = HTML(_(
+                'To start, set a course goal by selecting the option below that best describes '
+                'your learning plan. <div class="row goal-options-container">'
+            ))
+            for choice in settings.COURSE_GOALS['choices']:
+                goal_choices_html += HTML(_(
+                    '<a class="goal-option {col_sel} btn" data-choice="{choice}">{choice}</a>'
+                ).format(
+                    choice=choice,
+                    col_sel='col-' + str(int(math.floor(12 / len(settings.COURSE_GOALS['choices']))))
+                ))
+            dismissible_choice = settings.COURSE_GOALS['dismissible_choice']
+            goal_choices_html += HTML(_(
+                '<a class="goal-option dismissible" data-choice="{choice}">{choice}</a>'
+            ).format(
+                choice=dismissible_choice
+            ))
+            CourseHomeMessages.register_info_message(
+                request,
+                HTML('{goal_choices_html}</div>').format(
+                    goal_choices_html=goal_choices_html
+                ),
+                title=Text(_('Welcome to {course_display_name}')).format(
+                    course_display_name=course.display_name
                 )
             )

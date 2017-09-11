@@ -398,6 +398,18 @@ FEATURES = {
     'ENABLE_BULK_ENROLLMENT_VIEW': False,
 }
 
+# Options that users can select for a course goal
+# To disable course goals, simply set this to None
+COURSE_GOALS = {
+    'choices': [
+        'Earn a certificate',
+        'Complete the course',
+        'Explore the course'
+    ],
+    'dismissible_choice': 'Not sure yet'
+}
+
+
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
 COURSE_REVIEWS_TOOL_PROVIDER_FRAGMENT_NAME = 'coursetalk-reviews-fragment.html'
 COURSE_REVIEWS_TOOL_PROVIDER_PLATFORM_KEY = 'edx'
