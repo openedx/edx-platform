@@ -19,7 +19,7 @@ export class CourseSock {  // eslint-disable-line import/prefer-default-export
       const startFixed = $verificationSock.offset().top + 320;
       const endFixed = (startFixed + $verificationSock.height()) - 220;
 
-      // Assure update button stays in sock even when max-width is exceeded
+      // Ensure update button stays in sock even when max-width is exceeded
       const distLeft = ($verificationSock.offset().left + $verificationSock.width())
         - ($upgradeToVerifiedButton.width() + 22);
 

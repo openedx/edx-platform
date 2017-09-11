@@ -50,7 +50,7 @@ site_status_msg = get_site_status_msg(course_id)
 </%block>
 
 % if uses_bootstrap:
-  <header class="navigation-container header-global ${"slim" if course else ""}">
+  <header class="navigation-container header-global ${'slim' if course else ''}">
     <nav class="navbar navbar-expand-lg navbar-light">
       <%include file="bootstrap/navbar-logo-header.html" args="online_help_token=online_help_token"/>
       <button class="navbar-toggler navbar-toggler-right mt-2" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">

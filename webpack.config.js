@@ -23,6 +23,7 @@ var wpconfig = {
         StudioIndex: './cms/static/js/features_jsx/studio/index.jsx',
 
         // Features
+        CourseGoals: './openedx/features/course_experience/static/course_experience/js/CourseGoals.js',
         CourseHome: './openedx/features/course_experience/static/course_experience/js/CourseHome.js',
         CourseOutline: './openedx/features/course_experience/static/course_experience/js/CourseOutline.js',
         CourseSock: './openedx/features/course_experience/static/course_experience/js/CourseSock.js',
