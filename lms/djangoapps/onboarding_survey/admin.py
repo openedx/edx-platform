@@ -11,7 +11,6 @@ PartnerNetwork,
 OrganizationSurvey,
 OrganizationalCapacityArea,
 CommunityTypeInterest,
-InclusionInCommunityChoice,
 PersonalGoal,
 InterestsSurvey,
 EducationLevel,
@@ -33,7 +32,6 @@ admin.site.register(OrganizationSurvey)
 admin.site.register(OrganizationalCapacityArea)
 
 admin.site.register(CommunityTypeInterest)
-admin.site.register(InclusionInCommunityChoice)
 admin.site.register(PersonalGoal)
 
 admin.site.register(InterestsSurvey)

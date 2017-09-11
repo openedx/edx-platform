@@ -1,8 +1,10 @@
+"""
+The urls for on-boarding app.
+"""
 from django.conf.urls import patterns, url
 
 from onboarding_survey import views
 
-# Additionally, we include login URLs for the browseable API.
 
 urlpatterns = [
     url(r"^user_info/$", views.user_info, name="user_info"),

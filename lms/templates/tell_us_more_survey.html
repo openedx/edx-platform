@@ -7,7 +7,13 @@
 
     <div>
         <p><h1>You are three steps away from completing your registration</h1></p>
-        <p>The bar should come here</p>
+
+    </div>
+
+    <div>
+        <a href="{% url 'user_info' %}" class="circle">1</a>
+        <a href="{% url 'interests' %}" {% if interests %}class="circle deactivate" {% else %} class="circle"{% endif %}>2</a>
+        <a href="{% url 'organization' %}" {% if organization %}class="circle deactivate" {% else %} class="circle"{% endif %}>3</a>
     </div>
 
     <div class="container">
@@ -24,6 +30,22 @@
     </div>
 
     <style>
+        .circle {
+            border-radius: 100%;
+            background: #2888ff;
+            display:inline-block;
+            line-height:100px;
+            width: 100px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .deactivate {
+            pointer-events: none;
+            cursor: default;
+            opacity: 0.6;
+        }
+
         label[for="id_country_of_employment"], label[for="id_city_of_employment"] {
             display: none; !important;
         }

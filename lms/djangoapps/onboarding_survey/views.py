@@ -1,3 +1,6 @@
+"""
+Views for on-boarding app.
+"""
 import json
 import os
 
@@ -13,8 +16,17 @@ from django.http import HttpResponse
 from onboarding_survey import forms
 
 
-# @login_required
+@login_required
 def user_info(request):
+    """
+    The view to handle user info survey from the user.
+
+    If its a GET request then an empty form for survey is returned
+    otherwise, a form is populated form the POST request data and
+    is then saved. After saving the form, user is redirected to the
+    next survey namely, interests survey.
+    """
+
     if request.method == 'POST':
         form = forms.UserInfoModelForm(request.POST)
         if form.is_valid():
@@ -27,12 +39,32 @@ def user_info(request):
     else:
         form = forms.UserInfoModelForm()
 
-    return render(request, 'tell_us_more_survey.html', {'form': form})
+    context = {'form': form}
+    user = request.user
+    try:
+        user.organization_survey
+    except Exception:
+        context['organization'] = True
+
+    try:
+        user.interest_survey
+    except Exception:
+        context['interests'] = True
+
+    return render(request, 'tell_us_more_survey.html', context)
 
 
-# @login_required
+@login_required
 def interests(request):
+    """
+    The view to handle interests survey from the user.
 
+    If its a GET request then an empty form for survey is returned
+    otherwise, a form is populated form the POST request and then is
+    saved. After saving the form, user is redirected to the next survey
+    namely, organization survey.
+
+    """
     if request.method == 'POST':
         form = forms.InterestModelForm(request.POST)
         if form.is_valid():
@@ -44,12 +76,26 @@ def interests(request):
     else:
         form = forms.InterestModelForm()
 
-    return render(request, 'interests_survey.html', {'form': form})
+    context = {'form': form}
+
+    user = request.user
+    try:
+        user.organization_survey
+    except Exception:
+        context['organization'] = True
+
+    return render(request, 'interests_survey.html', context)
 
 
-# @login_required
+@login_required
 def organization(request):
+    """
+    The view to handle organization survey from the user.
 
+    If its a GET request then an empty form for survey is returned
+    otherwise, a form is populated form the POST request and then is
+    saved. After saving the form, user is redirected to dashboard.
+    """
     if request.method == 'POST':
         form = forms.OrganizationInfoModelForm(request.POST)
         if form.is_valid():
@@ -71,6 +117,9 @@ def organization(request):
 
 @csrf_exempt
 def get_country_names(request):
+    """
+    Returns country names.
+    """
     if request.is_ajax():
         file_path = path(os.path.join(
             'lms', 'djangoapps', 'onboarding_survey', 'data', 'world_countries.json'
@@ -92,6 +141,9 @@ def get_country_names(request):
 
 @csrf_exempt
 def get_languages(request):
+    """
+    Returns languages
+    """
     if request.is_ajax():
         file_path = path(os.path.join(
             'lms', 'djangoapps', 'onboarding_survey', 'data', 'world_languages.json'

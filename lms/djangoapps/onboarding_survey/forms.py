@@ -1,3 +1,6 @@
+"""
+Model form for the surveys.
+"""
 from itertools import chain
 
 from django import forms
@@ -10,12 +13,22 @@ from lms.djangoapps.onboarding_survey.models import (
 )
 
 
-# Complete
 class UserInfoModelForm(forms.ModelForm):
+    """
+    Model from to be used in the first step of survey.
 
+    This will record some basic information about the user as modeled in
+    'UserInfoSurvey' model
+    """
     def clean(self):
+        """
+        Clean the form data.
+        """
         cleaned_data = super(UserInfoModelForm, self).clean()
 
+        # if user check that his/her country/city of employment if different
+        # from that of the residence, and user then enters the same country/city
+        # then a validation error should be raised.
         if cleaned_data['is_country_or_city_different']:
 
             if cleaned_data['country_of_employment'] == cleaned_data['country_of_residence']:
@@ -34,6 +47,9 @@ class UserInfoModelForm(forms.ModelForm):
                 )
 
     class Meta:
+        """
+        The meta class used to customize the default behaviour of form fields
+        """
         model = UserInfoSurvey
         fields = [
             'dob', 'level_of_education', 'language',
@@ -68,10 +84,16 @@ class UserInfoModelForm(forms.ModelForm):
 
 
 class RadioSelectNotNull(forms.RadioSelect):
+    """
+    A widget which removes the default '-----' option from RadioSelect
+    """
     def get_renderer(self, name, value, attrs=None, choices=()):
-        """Returns an instance of the renderer."""
+        """
+        Returns an instance of the renderer.
+        """
         if value is None: value = ''
-        str_value = force_unicode(value) # Normalize to string.
+        # Normalize to string.
+        str_value = force_unicode(value)
         final_attrs = self.build_attrs(attrs)
         choices = list(chain(self.choices, choices))
         if choices[0][0] == '':
@@ -79,9 +101,17 @@ class RadioSelectNotNull(forms.RadioSelect):
         return self.renderer(name, str_value, final_attrs, choices)
 
 
-# Complete
 class InterestModelForm(forms.ModelForm):
+    """
+    Model from to be used in the second step of survey.
+
+    This will record user's interests information as modeled in
+    'InterestsSurvey' model.
+    """
     class Meta:
+        """
+        The meta class used to customize the default behaviour of form fields
+        """
         model = InterestsSurvey
         fields = ['capacity_areas', 'reason_of_interest', 'interested_communities', 'personal_goal']
 
@@ -115,9 +145,17 @@ class InterestModelForm(forms.ModelForm):
         }
 
 
-# Complete
 class OrganizationInfoModelForm(forms.ModelForm):
+    """
+    Model from to be used in the third step of survey.
+
+    This will record information about user's organization as modeled in
+    'OrganizationSurvey' model.
+    """
     class Meta:
+        """
+        The meta class used to customize the default behaviour of form fields
+        """
         model = OrganizationSurvey
         fields = ['role_in_org', 'state_mon_year', 'country', 'city', 'url', 'sector', 'level_of_op', 'focus_area',
                   'founding_year', 'total_employees', 'total_volunteers', 'total_annual_clients_or_beneficiary',
@@ -136,6 +174,9 @@ class OrganizationInfoModelForm(forms.ModelForm):
         }
 
     def clean(self):
+        """
+        Clean the form after submission and ensure that year is 4 digit positive number.
+        """
         cleaned_data = super(OrganizationInfoModelForm, self).clean()
 
         year = cleaned_data['founding_year']
