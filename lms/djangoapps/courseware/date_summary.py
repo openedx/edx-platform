@@ -214,6 +214,7 @@ class CertificateAvailableDate(DateSummary):
     def is_enabled(self):
         return (
             can_show_certificate_available_date_field(self.course) and
+            self.has_certificate_modes and
             self.date is not None and
             datetime.datetime.now(utc) <= self.date and
             len(self.active_certificates) > 0
@@ -226,6 +227,14 @@ class CertificateAvailableDate(DateSummary):
     @property
     def date(self):
         return self.course.certificate_available_date
+
+    @property
+    def has_certificate_modes(self):
+        return any([
+            mode.slug for mode in CourseMode.modes_for_course(
+                course_id=self.course.id, include_expired=True
+            ) if mode.slug != CourseMode.AUDIT
+        ])
 
 
 class VerifiedUpgradeDeadlineDate(DateSummary):
