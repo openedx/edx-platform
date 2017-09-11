@@ -9,7 +9,9 @@ from openedx.core.djangoapps.schedules.signals import SCHEDULE_WAFFLE_FLAG
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from ..models import Schedule
@@ -21,13 +23,13 @@ from ..tests.factories import ScheduleConfigFactory
 class CreateScheduleTests(SharedModuleStoreTestCase):
 
     def assert_schedule_created(self):
-        course = create_course_run(self_paced=True)
+        course = _create_course_run(self_paced=True)
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         self.assertIsNotNone(enrollment.schedule)
         self.assertIsNone(enrollment.schedule.upgrade_deadline)
 
     def assert_schedule_not_created(self):
-        course = create_course_run(self_paced=True)
+        course = _create_course_run(self_paced=True)
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         with self.assertRaises(Schedule.DoesNotExist):
             enrollment.schedule
@@ -70,19 +72,64 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         site = SiteFactory.create()
         mock_get_current_site.return_value = site
         ScheduleConfigFactory.create(site=site, enabled=True, create_schedules=True)
-        course = create_course_run(self_paced=False)
+        course = _create_course_run(self_paced=False)
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         with self.assertRaises(Schedule.DoesNotExist):
             enrollment.schedule
 
 
-def create_course_run(self_paced=True):
+@skip_unless_lms
+class UpdateScheduleTests(SharedModuleStoreTestCase):
+    ENABLED_SIGNALS = ['course_published']
+    VERIFICATION_DEADLINE_DAYS = 14
+
+    def setUp(self):
+        super(UpdateScheduleTests, self).setUp()
+        self.site = SiteFactory.create()
+        ScheduleConfigFactory.create(site=self.site)
+        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True, deadline_days=self.VERIFICATION_DEADLINE_DAYS)
+
+    def assert_schedule_dates(self, schedule, expected_start):
+        self.assertEquals(_strip_secs(schedule.start), _strip_secs(expected_start))
+        self.assertEquals(
+            _strip_secs(schedule.upgrade_deadline),
+            _strip_secs(expected_start) + datetime.timedelta(days=self.VERIFICATION_DEADLINE_DAYS),
+        )
+
+    @patch('openedx.core.djangoapps.schedules.signals.get_current_site')
+    def test_schedule_updated(self, mock_get_current_site):
+        mock_get_current_site.return_value = self.site
+
+        course = _create_course_run(self_paced=True, start_day_offset=5)
+        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
+
+        self.assert_schedule_dates(enrollment.schedule, enrollment.course_overview.start)
+        course.start = course.start + datetime.timedelta(days=3)
+        self.store.update_item(course, ModuleStoreEnum.UserID.test)
+        enrollment = CourseEnrollment.objects.get(id=enrollment.id)
+        self.assert_schedule_dates(enrollment.schedule, course.start)
+
+    @patch('openedx.core.djangoapps.schedules.signals.get_current_site')
+    def test_schedule_not_updated(self, mock_get_current_site):
+        mock_get_current_site.return_value = self.site
+
+        course = _create_course_run(self_paced=True, start_day_offset=-5)
+        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
+        self.assert_schedule_dates(enrollment.schedule, enrollment.created)
+
+        course.start = course.start + datetime.timedelta(days=3)
+        self.store.update_item(course, ModuleStoreEnum.UserID.test)
+        self.assert_schedule_dates(enrollment.schedule, enrollment.created)
+
+
+def _create_course_run(self_paced=True, start_day_offset=-1):
     """ Create a new course run and course modes.
 
     Both audit and verified `CourseMode` objects will be created for the course run.
     """
     now = datetime.datetime.now(utc)
-    course = CourseFactory.create(start=now + datetime.timedelta(days=-1), self_paced=self_paced)
+    start = now + datetime.timedelta(days=start_day_offset)
+    course = CourseFactory.create(start=start, self_paced=self_paced)
 
     CourseModeFactory(
         course_id=course.id,
@@ -95,3 +142,7 @@ def create_course_run(self_paced=True):
     )
 
     return course
+
+
+def _strip_secs(timestamp):
+    return timestamp.replace(second=0, microsecond=0)

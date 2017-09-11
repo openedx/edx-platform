@@ -5,19 +5,47 @@ from urlparse import urlparse
 from celery.task import task
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.db.utils import DatabaseError
 from django.utils.http import urlquote
+
+from logging import getLogger
 
 from edx_ace import ace
 from edx_ace.message import MessageType, Message
 from edx_ace.recipient import Recipient
 from edx_ace.utils.date import deserialize
-
 from edxmako.shortcuts import marketing_link
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 
 
+log = getLogger(__name__)
+
+
 ROUTING_KEY = getattr(settings, 'ACE_ROUTING_KEY', None)
+KNOWN_RETRY_ERRORS = (  # Errors we expect occasionally that could resolve on retry
+    DatabaseError,
+    ValidationError,
+)
+
+
+@task(bind=True, default_retry_delay=30, routing_key=ROUTING_KEY)
+def update_course_schedules(self, **kwargs):
+    course_key = CourseKey.from_string(kwargs['course_id'])
+    new_start_date = deserialize(kwargs['new_start_date_str'])
+    new_upgrade_deadline = deserialize(kwargs['new_upgrade_deadline_str'])
+
+    try:
+        Schedule.objects.filter(enrollment__course_id=course_key).update(
+            start=new_start_date,
+            upgrade_deadline=new_upgrade_deadline
+        )
+    except Exception as exc:  # pylint: disable=broad-except
+        if not isinstance(exc, KNOWN_RETRY_ERRORS):
+            log.exception("Unexpected failure: task id: %s, kwargs=%s".format(self.request.id, kwargs))
+        raise self.retry(kwargs=kwargs, exc=exc)
 
 
 class RecurringNudge(MessageType):

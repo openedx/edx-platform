@@ -12,8 +12,8 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from freezegun import freeze_time
 from util.date_utils import strftime_localized
-from django.utils.translation import ugettext as _
 from mock import patch
 from nose.plugins.attrib import attr
 
@@ -795,6 +795,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self.assertIn('course_title_0', response.content)
         self.assertIn('Signatory_Title 0', response.content)
 
+    @freeze_time('2017-09-10 00:00:00Z')
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     @ddt.data(
         (datetime.datetime.now() - datetime.timedelta(days=1), True),
