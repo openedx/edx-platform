@@ -20,6 +20,10 @@ define(
                 fail: 'upload_failed',
                 success: 'upload_completed'
             },
+            videoUploadMaxFileSizeInGB = 5,
+            videoSupportedFileFormats = ['.mp4', '.mov'],
+            createActiveUploadListView,
+            $courseVideoSettingsButton,
             makeUploadUrl,
             getSentRequests,
             verifyUploadViewInfo,
@@ -28,6 +32,22 @@ define(
             sendUploadPostResponse,
             verifyA11YMessage,
             verifyUploadPostRequest;
+
+        createActiveUploadListView = function(isVideoTranscriptEnabled) {
+            return new ActiveVideoUploadListView({
+                concurrentUploadLimit: concurrentUploadLimit,
+                postUrl: POST_URL,
+                courseVideoSettingsButton: $courseVideoSettingsButton,
+                videoSupportedFileFormats: videoSupportedFileFormats,
+                videoUploadMaxFileSizeInGB: videoUploadMaxFileSizeInGB,
+                activeTranscriptPreferences: {},
+                videoTranscriptSettings: {
+                    transcript_preferences_handler_url: '',
+                    transcription_plans: {}
+                },
+                isVideoTranscriptEnabled: isVideoTranscriptEnabled
+            });
+        };
 
         describe('ActiveVideoUploadListView', function() {
             beforeEach(function() {
@@ -40,22 +60,8 @@ define(
                 );
                 TemplateHelpers.installTemplate('active-video-upload');
                 TemplateHelpers.installTemplate('active-video-upload-list');
-                this.postUrl = POST_URL;
-                this.courseVideoSettingsButton = $('.course-video-settings-button');
-                this.videoSupportedFileFormats = ['.mp4', '.mov'];
-                this.videoUploadMaxFileSizeInGB = 5;
-                this.view = new ActiveVideoUploadListView({
-                    concurrentUploadLimit: concurrentUploadLimit,
-                    postUrl: this.postUrl,
-                    courseVideoSettingsButton: this.courseVideoSettingsButton,
-                    videoSupportedFileFormats: this.videoSupportedFileFormats,
-                    videoUploadMaxFileSizeInGB: this.videoUploadMaxFileSizeInGB,
-                    activeTranscriptPreferences: {},
-                    videoTranscriptSettings: {
-                        transcript_preferences_handler_url: '',
-                        transcription_plans: {}
-                    }
-                });
+                $courseVideoSettingsButton = $('.course-video-settings-button');
+                this.view = createActiveUploadListView(true);
                 this.view.render();
                 jasmine.Ajax.install();
             });
@@ -94,9 +100,15 @@ define(
             });
 
             it('shows course video settings pane when course video settings button is clicked', function() {
-                expect($('.course-video-settings-container')).not.toExist();
-                this.courseVideoSettingsButton.click();
-                expect($('.course-video-settings-container')).toExist();
+                $courseVideoSettingsButton.click();
+                expect(this.view.courseVideoSettingsView).toBeDefined();
+                expect(this.view.courseVideoSettingsView.$el.find('.course-video-settings-container')).toExist();
+            });
+
+            it('should not initiate course video settings view when video transcript is disabled', function() {
+                this.view = createActiveUploadListView(false);
+                $courseVideoSettingsButton.click();
+                expect(this.view.courseVideoSettingsView).toBeUndefined();
             });
 
             it('should not show a notification message if there are no active video uploads', function() {
@@ -328,7 +340,7 @@ define(
                             'Your file could not be uploaded',
                             StringUtils.interpolate(
                                 '{fileName} is not in a supported file format. Supported file formats are {supportedFormats}.',  // eslint-disable-line max-len
-                                {fileName: files[index].name, supportedFormats: self.videoSupportedFileFormats.join(' and ')}  // eslint-disable-line max-len
+                                {fileName: files[index].name, supportedFormats: videoSupportedFileFormats.join(' and ')}  // eslint-disable-line max-len
                             )
                         );
                     });
@@ -361,7 +373,7 @@ define(
                                 verifyUploadViewInfo(
                                     uploadView,
                                     'Your file could not be uploaded',
-                                    'file.mp4 exceeds maximum size of ' + this.videoUploadMaxFileSizeInGB + ' GB.'
+                                    'file.mp4 exceeds maximum size of ' + videoUploadMaxFileSizeInGB + ' GB.'
                                 );
                                 verifyA11YMessage(
                                     StringUtils.interpolate(
@@ -431,7 +443,7 @@ define(
                             expect(jasmine.Ajax.requests.count()).toEqual(caseInfo.numFiles);
                             _.each(_.range(caseInfo.numFiles), function(index) {
                                 request = jasmine.Ajax.requests.at(index);
-                                expect(request.url).toEqual(self.postUrl);
+                                expect(request.url).toEqual(POST_URL);
                                 expect(request.method).toEqual('POST');
                                 expect(request.requestHeaders['Content-Type']).toEqual('application/json');
                                 expect(request.requestHeaders.Accept).toContain('application/json');
