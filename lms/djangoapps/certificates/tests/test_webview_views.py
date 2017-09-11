@@ -674,7 +674,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self._add_course_certificates(count=1, signatory_count=0)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course)
+            course_id=unicode(self.course.id)
         )
         response = self.client.get(test_url)
         self.assertNotIn('Signatory_Name 0', response.content)

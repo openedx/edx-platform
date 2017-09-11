@@ -376,7 +376,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
 
     if status == 'ready':
         # showing the certificate web view button if certificate is ready state and feature flags are enabled.
-        if has_html_certificates_enabled(course_overview.id, course_overview):
+        if has_html_certificates_enabled(course_overview):
             if course_overview.has_any_active_web_certificate:
                 status_dict.update({
                     'show_cert_web_view': True,

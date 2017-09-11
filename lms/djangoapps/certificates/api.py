@@ -150,7 +150,12 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
     xqueue = XQueueCertInterface()
     if insecure:
         xqueue.use_https = False
-    generate_pdf = not has_html_certificates_enabled(course_key, course)
+
+    if not course:
+        course = modulestore().get_course(course_key, depth=0)
+
+    generate_pdf = not has_html_certificates_enabled(course)
+
     cert = xqueue.add_cert(
         student,
         course_key,
@@ -198,7 +203,11 @@ def regenerate_user_certificates(student, course_key, course=None,
     if insecure:
         xqueue.use_https = False
 
-    generate_pdf = not has_html_certificates_enabled(course_key, course)
+    if not course:
+        course = modulestore().get_course(course_key, depth=0)
+
+    generate_pdf = not has_html_certificates_enabled(course)
+
     return xqueue.regen_cert(
         student,
         course_key,
@@ -353,44 +362,6 @@ def generate_example_certificates(course_key):
         xqueue.add_example_cert(cert)
 
 
-def has_html_certificates_enabled(course_key, course=None):
-    """
-    Determine if a course has html certificates enabled.
-
-    Arguments:
-        course_key (CourseKey|str): A course key or a string representation
-            of one.
-        course (CourseDescriptor|CourseOverview): A course.
-    """
-    # If the feature is disabled, then immediately return a False
-    if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
-        return False
-
-    # If we don't have a course object, we'll need to assemble one
-    if not course:
-        # Initialize a course key if necessary
-        if not isinstance(course_key, CourseKey):
-            try:
-                course_key = CourseKey.from_string(course_key)
-            except InvalidKeyError:
-                log.warning(
-                    ('Unable to parse course_key "%s"', course_key),
-                    exc_info=True
-                )
-                return False
-        # Pull the course data from the cache
-        try:
-            course = CourseOverview.get_from_id(course_key)
-        except:  # pylint: disable=bare-except
-            log.warning(
-                ('Unable to load CourseOverview object for course_key "%s"', unicode(course_key)),
-                exc_info=True
-            )
-
-    # Return the flag on the course object
-    return course.cert_html_view_enabled if course else False
-
-
 def example_certificates_status(course_key):
     """Check the status of example certificates for a course.
 
@@ -425,50 +396,58 @@ def example_certificates_status(course_key):
     return ExampleCertificateSet.latest_status(course_key)
 
 
-def get_certificate_url(user_id=None, course_id=None, uuid=None):
-    """
-    :return certificate url for web or pdf certs. In case of web certs returns either old
-    or new cert url based on given parameters. For web certs if `uuid` is it would return
-    new uuid based cert url url otherwise old url.
-    """
-    url = ""
-    if has_html_certificates_enabled(course_id):
-        if uuid:
-            url = reverse(
-                'certificates:render_cert_by_uuid',
-                kwargs=dict(certificate_uuid=uuid)
-            )
-        elif user_id and course_id:
-            url = reverse(
-                'certificates:html_view',
-                kwargs={
-                    "user_id": str(user_id),
-                    "course_id": unicode(course_id),
-                }
-            )
-    else:
-        if isinstance(course_id, basestring):
-            try:
-                course_id = CourseKey.from_string(course_id)
-            except InvalidKeyError:
-                log.warning(
-                    ('Unable to parse course_id "%s"', course_id),
-                    exc_info=True
-                )
-                return url
-        try:
-            user_certificate = GeneratedCertificate.eligible_certificates.get(
-                user=user_id,
-                course_id=course_id
-            )
-            url = user_certificate.download_url
-        except GeneratedCertificate.DoesNotExist:
-            log.critical(
-                'Unable to lookup certificate\n'
-                'user id: %d\n'
-                'course: %s', user_id, unicode(course_id)
-            )
+def _safe_course_key(course_key):
+    if not isinstance(course_key, CourseKey):
+        return CourseKey.from_string(course_key)
+    return course_key
 
+
+def _course_from_key(course_key):
+    return CourseOverview.get_from_id(_safe_course_key(course_key))
+
+
+def _certificate_html_url(user_id, course_id, uuid):
+    if uuid:
+        return reverse('certificates:render_cert_by_uuid', kwargs={'certificate_uuid': uuid})
+    elif user_id and course_id:
+        kwargs = {"user_id": str(user_id), "course_id": unicode(course_id)}
+        return reverse('certificates:html_view', kwargs=kwargs)
+    return ''
+
+
+def _certificate_download_url(user_id, course_id):
+    try:
+        user_certificate = GeneratedCertificate.eligible_certificates.get(
+            user=user_id,
+            course_id=_safe_course_key(course_id)
+        )
+        return user_certificate.download_url
+    except GeneratedCertificate.DoesNotExist:
+        log.critical(
+            'Unable to lookup certificate\n'
+            'user id: %d\n'
+            'course: %s', user_id, unicode(course_id)
+        )
+    return ''
+
+
+def has_html_certificates_enabled(course):
+    if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+        return False
+    return course.cert_html_view_enabled
+
+
+def get_certificate_url(user_id=None, course_id=None, uuid=None):
+    url = ''
+
+    course = _course_from_key(course_id)
+    if not course:
+        return url
+
+    if has_html_certificates_enabled(course):
+        url = _certificate_html_url(user_id, course_id, uuid)
+    else:
+        url = _certificate_download_url(user_id, course_id)
     return url
 
 
