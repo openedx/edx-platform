@@ -1,3 +1,35 @@
+
+.survey-step-title {
+    overflow: auto;
+    
+    h1 {
+        margin-top: 30px;
+    }
+}
+
+.survey-steps {
+    text-align: center;
+    
+    .circle {
+        width: 60px;
+        height: 60px;
+        text-align: center;
+        color: #fff;
+        line-height: 60px;
+        margin: 0 15px;
+        
+        &.deactivate {
+           color: #002c85;
+        }
+    }
+}
+
+.step-info {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 20px;
+}
+
 .survey-form {
     width: 800px;
     margin: auto;
@@ -15,7 +47,7 @@
         label {
             display: none;
             
-            &[for='id_is_city_or_country_of_employment_diff'] {
+            &[for='id_is_country_or_city_different'] {
                 display: block;
                 float: right;
                 width: calc(100% - 30px);
