@@ -16,6 +16,7 @@ define([
         videoUploadMaxFileSizeInGB,
         activeTranscriptPreferences,
         videoTranscriptSettings,
+        isVideoTranscriptEnabled,
         videoImageSettings
     ) {
         var activeView = new ActiveVideoUploadListView({
@@ -27,6 +28,7 @@ define([
                 videoImageSettings: videoImageSettings,
                 activeTranscriptPreferences: activeTranscriptPreferences,
                 videoTranscriptSettings: videoTranscriptSettings,
+                isVideoTranscriptEnabled: isVideoTranscriptEnabled,
                 onFileUploadDone: function(activeVideos) {
                     $.ajax({
                         url: videoHandlerUrl,

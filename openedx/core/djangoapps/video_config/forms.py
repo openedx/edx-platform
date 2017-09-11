@@ -7,20 +7,20 @@ from django import forms
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
 
-from openedx.core.djangoapps.video_config.models import CourseHLSPlaybackEnabledFlag
+from openedx.core.djangoapps.video_config.models import CourseHLSPlaybackEnabledFlag, CourseVideoTranscriptEnabledFlag
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
 
-class CourseHLSPlaybackFlagAdminForm(forms.ModelForm):
+class CourseSpecificFlagAdminBaseForm(forms.ModelForm):
     """
-    Form for course-specific HLS Playback configuration.
+    Form for course-specific feature configuration.
     """
 
+    # Make abstract base class
     class Meta(object):
-        model = CourseHLSPlaybackEnabledFlag
-        fields = '__all__'
+        abstract = True
 
     def clean_course_id(self):
         """
@@ -42,3 +42,23 @@ class CourseHLSPlaybackFlagAdminForm(forms.ModelForm):
             raise forms.ValidationError(msg)
 
         return course_key
+
+
+class CourseHLSPlaybackFlagAdminForm(CourseSpecificFlagAdminBaseForm):
+    """
+    Form for course-specific HLS Playback configuration.
+    """
+
+    class Meta(object):
+        model = CourseHLSPlaybackEnabledFlag
+        fields = '__all__'
+
+
+class CourseVideoTranscriptFlagAdminForm(CourseSpecificFlagAdminBaseForm):
+    """
+    Form for course-specific Video Transcript configuration.
+    """
+
+    class Meta(object):
+        model = CourseVideoTranscriptEnabledFlag
+        fields = '__all__'

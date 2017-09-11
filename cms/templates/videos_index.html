@@ -40,6 +40,7 @@
             ${video_upload_max_file_size | n, dump_js_escaped_json},
             ${active_transcript_preferences | n, dump_js_escaped_json},
             ${video_transcript_settings | n, dump_js_escaped_json},
+            ${is_video_transcript_enabled | n, dump_js_escaped_json},
             ${video_image_settings | n, dump_js_escaped_json}
         );
     });
@@ -55,12 +56,14 @@
             <span class="sr">&gt; </span>${_("Video Uploads")}
         </h1>
 
+        % if is_video_transcript_enabled :
         <nav class="nav-actions" aria-label="${_('Page Actions')}">
             <h3 class="sr">${_("Page Actions")}</h3>
             <div class="nav-item">
                 <button class="button course-video-settings-button"><span class="icon fa fa-cog" aria-hidden="true"></span> ${_("Course Video Settings")}</button>
             </div>
         </nav>
+        % endif
     </header>
 </div>
 
