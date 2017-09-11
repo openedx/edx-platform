@@ -32,14 +32,18 @@
         <a href="{% url 'organization' %}" {% if organization %}class="circle deactivate" {% else %} class="circle"{% endif %}>3</a>
     </div>
 
-    <p>Tell us about what you care about so we can recommend the right courses and communities.</p>
+    <div class="container">
 
-    <form action="." method="post" class="survey-form">
-         {{ form.as_p }}
-         {% csrf_token %}
-        <p><input type="submit" value="Next"></p>
+        <p class="step-info">Tell us about what you care about so we can recommend the right courses and communities.</p>
 
-    </form>
+        <form action="." method="post" class="survey-form interests">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <div class="submit-survey">
+                <input type="submit" value="Next">
+            </div>
+        </form>
+    </div>
 
     <script type="text/javascript" src="{% static 'js/jquery.allLoaded.js' %}"></script>
 {% endblock body %}

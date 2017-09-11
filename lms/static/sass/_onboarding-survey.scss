@@ -26,7 +26,9 @@
 
 .step-info {
     text-align: center;
-    margin-bottom: 30px;
+    max-width: 800px;
+    line-height: normal;
+    margin: 0 auto 30px;
     font-size: 20px;
 }
 
@@ -70,6 +72,46 @@
         &:nth-child(7) {
             width: 100%;
         }
+    }
+
+    &.interests {
+
+        p {
+            width: 100%;
+            margin-bottom: 10px;
+
+            label {
+                display: block;
+            }
+        }
+
+        ul {
+
+            li {
+                display: inline-block;
+                vertical-align: middle;
+                margin: 0 auto 15px;
+                width: 45%;
+
+                input {
+                    margin-right: 8px;
+                }
+
+                &:nth-child(odd) {
+                    padding-right: 10px;
+                }
+
+                &:nth-child(even) {
+                    padding-left: 10px;
+                }
+            }
+        }
+    }
+
+    ul {
+        list-style: none;
+        overflow: auto;
+        margin-bottom: 30px;
     }
     
     .submit-survey {

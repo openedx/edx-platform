@@ -28,20 +28,24 @@
         <h1>Just a few questions about Exygy</h1>
     </div>
 
-    <div>
+    <div class="survey-steps">
         <a href="{% url 'user_info' %}" class="circle">1</a>
         <a href="{% url 'interests' %}" {% if interests %}class="circle deactivate" {% else %} class="circle"{% endif %}>2</a>
         <a href="{% url 'organization' %}" {% if organization %}class="circle deactivate" {% else %} class="circle"{% endif %}>3</a>
     </div>
 
-    <p>Specific information about your role and your organization will help us understand how we can be more relevant to you.</p>
+    <div class="container">
 
-    <form action="." method="post" class="survey-form">
-         {{ form.as_p }}
-         {% csrf_token %}
-        <p><input type="submit" value="Send"></p>
+        <p class="step-info">Specific information about your role and your organization will help us understand how we can be more relevant to you.</p>
 
-    </form>
+        <form action="." method="post" class="survey-form">
+             {{ form.as_p }}
+            {% csrf_token %}
+            <div class="submit-survey">
+                <input type="submit" value="Send">
+            </div>
+        </form>
+    </div>
 
     <script type="text/javascript" src="{% static 'js/jquery.allLoaded.js' %}"></script>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" media="all" />
