@@ -161,9 +161,9 @@ class RegistrationView(APIView):
     DEFAULT_FIELDS = ["email", "username", "password"]
 
     EXTRA_FIELDS = [
-        "confirm_password",
         "first_name",
         "last_name",
+        "confirm_password",
         "city",
         "state",
         "country",
@@ -176,6 +176,7 @@ class RegistrationView(APIView):
         "goals",
         "terms_of_service",
         "organization",
+        "if_currently_employed",
         "point_of_contact",
         "admin_email",
         "honor_code"
@@ -447,7 +448,7 @@ class RegistrationView(APIView):
 
         # Translators: This example username is used as a placeholder in
         # a field on the registration form meant to hold the user's username.
-        username_placeholder = _(u"JaneDoe")
+        username_placeholder = _(u"Public Username")
 
         form_desc.add_field(
             "username",
@@ -483,7 +484,8 @@ class RegistrationView(APIView):
                 "min_length": PASSWORD_MIN_LENGTH,
                 "max_length": PASSWORD_MAX_LENGTH,
             },
-            required=required
+            required=required,
+            placeholder='Password'
         )
 
     def _add_confirm_password_field(self, form_desc, required=True):
@@ -508,7 +510,8 @@ class RegistrationView(APIView):
                 "min_length": PASSWORD_MIN_LENGTH,
                 "max_length": PASSWORD_MAX_LENGTH,
             },
-            required=required
+            required=required,
+            placeholder='Confirm Password'
         )
 
     def _add_level_of_education_field(self, form_desc, required=True):
@@ -726,7 +729,8 @@ class RegistrationView(APIView):
         form_desc.add_field(
             "first_name",
             label=first_name_label,
-            required=required
+            required=required,
+            placeholder='First Name'
         )
 
     def _add_last_name_field(self, form_desc, required=False):
@@ -746,7 +750,8 @@ class RegistrationView(APIView):
         form_desc.add_field(
             "last_name",
             label=last_name_label,
-            required=required
+            required=required,
+            placeholder='Last Name'
         )
 
     def _add_country_field(self, form_desc, required=True):
@@ -802,10 +807,8 @@ class RegistrationView(APIView):
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
-        label = _(u"I agree to the {platform_name} {terms_of_service}").format(
-            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
-            terms_of_service=terms_label
-        )
+        label = _(u"Terms and Agreement: By using this Site, you agree to be bound by,"
+                  u" and to comply with, these Terms and Conditions.")
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
@@ -841,7 +844,7 @@ class RegistrationView(APIView):
         # in order to register a new account.
         terms_label = _(u"Terms of Service")
         terms_link = marketing_link("TOS")
-        terms_text = _(u"Review the Terms of Service")
+        terms_text = _(u"Click here to read the Terms and Conditions.")
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
@@ -930,7 +933,7 @@ class RegistrationView(APIView):
         """
         organization_label = _(u"Organization")
         error_msg = _(u"Please select your Organization.")
-        organization_placeholder = _(u"Organization you belong to.")
+        organization_placeholder = _(u"Organization Name.")
 
         form_desc.add_field(
             "organization",
@@ -941,6 +944,8 @@ class RegistrationView(APIView):
                 "required": error_msg
             },
             field_type="text",
+            instructions='You can chose an organization from the auto-suggestion list'
+                         ' or add a new one by entering the name and clicking enter.'
         )
 
     def _add_point_of_contact_field(self, form_desc, required=False):
@@ -973,7 +978,7 @@ class RegistrationView(APIView):
         Keyword Arguments:
             required (bool): Whether this field is required; defaults to False
         """
-        admin_email_label = _(u"If you know who should be the Admin, please provide their email address bellow. We'll "
+        admin_email_label = _(u"If you know who should be the Admin, please provide their email address below. We'll "
                               u"send them an email inviting them to join the platform as the organization admin.")
         error_msg = _(u"Please provide admin email for the organization.")
         admin_email_placeholder = _(u"Organization Admin Email")
@@ -992,6 +997,18 @@ class RegistrationView(APIView):
                 "max_length": EMAIL_MAX_LENGTH,
             }
             )
+
+    def _add_if_currently_employed_field(self, form_desc, required=False):
+
+        form_desc.add_field(
+            "if_currently_employed",
+            label="Check here if you're currently not employed.",
+            field_type="checkbox",
+            default=False,
+            required=required,
+        )
+
+        pass
 
 
 class PasswordResetView(APIView):
