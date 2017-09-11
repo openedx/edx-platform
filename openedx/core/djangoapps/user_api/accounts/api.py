@@ -518,5 +518,5 @@ def _validate_email(email):
         validate_email(email)
     except ValidationError:
         raise AccountEmailInvalid(
-            u"Email '{email}' format is not valid".format(email=email)
+            "The email you entered is not valid. Please provide a valid email in order to create an account."
         )

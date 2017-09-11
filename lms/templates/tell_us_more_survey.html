@@ -1,0 +1,104 @@
+{% extends "main_django.html" %}
+{% load i18n staticfiles %}
+
+{% block title %}{% trans "Tell us more about you." %} | {{ block.super }}{% endblock %}
+
+{% block body %}
+
+    <div class="survey-step-title">
+        <h1>You're three steps away of completing your registration.</h1>
+    </div>
+
+    <div class="survey-steps">
+        <a href="{% url 'user_info' %}" class="circle">1</a>
+        <a href="{% url 'interests' %}" {% if interests %}class="circle deactivate" {% else %} class="circle"{% endif %}>2</a>
+        <a href="{% url 'organization' %}" {% if organization %}class="circle deactivate" {% else %} class="circle"{% endif %}>3</a>
+    </div>
+
+    <div class="container">
+
+        <p class="step-info">Start by telling us a little bit about you</p>
+
+        <form action="." method="post" class="survey-form">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <div class="submit-survey">
+                <input type="submit" value="Next"/>
+            </div>
+        </form>
+    </div>
+
+    <style>
+        .circle {
+            border-radius: 100%;
+            background: #2888ff;
+            display:inline-block;
+            line-height:100px;
+            width: 100px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .deactivate {
+            pointer-events: none;
+            cursor: default;
+            opacity: 0.3;
+        }
+
+        label[for="id_country_of_employment"], label[for="id_city_of_employment"] {
+            display: none; !important;
+        }
+
+        #id_country_of_employment, #id_city_of_employment {
+            display: none;
+        }
+    </style>
+
+    <script type="text/javascript" src="{% static 'js/jquery.allLoaded.js' %}"></script>
+
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" media="all" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript">
+    </script> <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" type="text/javascript">
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#id_dob").datepicker({dateFormat: 'mm/dd/yy'});
+
+            /*$.ajax({
+                 url: "/onboarding_survey/get_languages/", success: function (result) {
+                    languages = result
+                }
+            });*/
+
+            $("#id_language").autocomplete({
+                source: "/onboarding_survey/get_languages/",
+                minLength: 2
+              });
+
+            $("#id_country_of_residence").autocomplete({
+                source: "/onboarding_survey/get_country_names/",
+                minLength: 2
+              });
+
+            $('#id_is_country_or_city_different').change(function() {
+                if($(this).is(":checked")) {
+                    $('#id_country_of_employment').show()
+                    $('#id_city_of_employment').show()
+
+                    $("#id_country_of_employment").autocomplete({
+                        source: "/onboarding_survey/get_country_names/",
+                        minLength: 2
+                      });
+                }
+                else {
+                    $('#id_country_of_employment').hide()
+                    $('#id_city_of_employment').hide()
+                }
+            });
+        });
+
+    </script>
+{% endblock body %}

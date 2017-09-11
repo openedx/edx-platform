@@ -1,0 +1,49 @@
+{% extends "main_django.html" %}
+{% load i18n staticfiles %}
+
+{% block title %}{% trans "Interests survey." %} | {{ block.super }}{% endblock %}
+
+{% block body %}
+    <style>
+        .circle {
+            border-radius: 100%;
+            background: #2888ff;
+            display:inline-block;
+            line-height:100px;
+            width: 100px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .deactivate {
+            pointer-events: none;
+            cursor: default;
+            opacity: 0.6;
+        }
+    </style>
+
+    <div class="survey-step-title">
+        <h1>We want to know more about your interests.</h1>
+    </div>
+
+    <div class="survey-steps">
+        <a href="{% url 'user_info' %}" class="circle">1</a>
+        <a href="{% url 'interests' %}" {% if interests %}class="circle deactivate" {% else %} class="circle"{% endif %}>2</a>
+        <a href="{% url 'organization' %}" {% if organization %}class="circle deactivate" {% else %} class="circle"{% endif %}>3</a>
+    </div>
+
+    <div class="container">
+
+        <p class="step-info">Tell us about what you care about so we can recommend the right courses and communities.</p>
+
+        <form action="." method="post" class="survey-form interests">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <div class="submit-survey">
+                <input type="submit" value="Next">
+            </div>
+        </form>
+    </div>
+
+    <script type="text/javascript" src="{% static 'js/jquery.allLoaded.js' %}"></script>
+{% endblock body %}
