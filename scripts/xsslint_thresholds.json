@@ -13,7 +13,7 @@
         "mako-invalid-js-filter": 192,
         "mako-js-html-string": 0,
         "mako-js-missing-quotes": 0,
-        "mako-missing-default": 182,
+        "mako-missing-default": 181,
         "mako-multiple-page-tags": 0,
         "mako-unknown-context": 0,
         "mako-unparseable-expression": 0,
@@ -28,5 +28,5 @@
         "python-wrap-html": 235,
         "underscore-not-escaped": 507
     },
-    "total": 1783
+    "total": 1782
 }
