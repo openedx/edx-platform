@@ -521,7 +521,8 @@ class PhotoVerification(StatusModel):
         # Emit signal to find and generate eligible certificates
         LEARNER_NOW_VERIFIED.send_robust(
             sender=PhotoVerification,
-            user=self.user
+            user=self.user,
+            status="approved"
         )
 
     @status_before_must_be("must_retry", "submitted", "approved", "denied")

@@ -77,7 +77,7 @@ def _listen_for_track_change(sender, user, **kwargs):  # pylint: disable=unused-
                 ))
 
 
-def fire_ungenerated_certificate_task(user, course_key):
+def fire_ungenerated_certificate_task(user, course_key, status):
     """
     Helper function to fire un-generated certificate tasks
 
@@ -89,9 +89,11 @@ def fire_ungenerated_certificate_task(user, course_key):
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
     mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
     cert = GeneratedCertificate.certificate_for_student(user, course_key)
+    # Sofiya - expected value here
     if mode_is_verified and (cert is None or cert.status == 'unverified'):
         generate_certificate.apply_async(kwargs={
             'student': unicode(user.id),
             'course_key': unicode(course_key),
+            'verification': unicode(status)
         })
         return True
