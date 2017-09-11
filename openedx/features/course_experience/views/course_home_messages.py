@@ -20,6 +20,8 @@ from web_fragments.fragment import Fragment
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import CourseHomeMessages
 
+from .course_goals import set_course_goal, get_course_goal
+
 
 class CourseHomeMessageFragmentView(EdxFragmentView):
     """
@@ -151,3 +153,7 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
                     course_display_name=course.display_name
                 )
             )
+
+        # TODO: remove this, just used for testing.
+        set_course_goal(request.user, course, settings.COURSE_GOALS['choices'][0])
+        get_course_goal(request.user, course)
