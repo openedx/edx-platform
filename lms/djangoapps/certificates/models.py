@@ -890,7 +890,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         except cls.DoesNotExist:
             return False
         else:
-            return latest.can_self_generate or latest.enabled  
+            return latest.can_self_generate or latest.enabled
             # Note: the 'or latest.enabled' should be removed during deletion of 'enabled' field
 
     @classmethod
