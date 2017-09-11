@@ -638,12 +638,13 @@ def dashboard(request):
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
     message = ""
+    first_name = user.profile.name.split(" ")[0]
     if not user.is_active:
         if user.profile.is_poc:
-            msg = ("Success! You have registered as Admin for %s, %s"
-             % (user.profile.organization.name, user.profile.name))
+            msg = ("Success! You are registered as the Admin for %s, %s"
+             % (user.profile.organization.name, first_name))
         else:
-            msg = "Success! You have registered, %s" % (user.profile.name)
+            msg = "Success! You are registered, %s" % (first_name)
         message = render_to_string(
             'registration/activate_account_notice.html',
             {'msg': msg, 'email': user.email, 'platform_name': platform_name}
