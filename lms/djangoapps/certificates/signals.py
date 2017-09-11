@@ -14,6 +14,7 @@ from certificates.models import (
 )
 from certificates.tasks import generate_certificate
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -22,6 +23,7 @@ from student.models import CourseEnrollment
 
 
 log = logging.getLogger(__name__)
+CERTIFICATE_DELAY_SECONDS = 2
 
 
 @receiver(post_save, sender=CertificateWhitelist, dispatch_uid="append_certificate_whitelist")
@@ -55,7 +57,7 @@ def _listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: dis
 
 
 @receiver(LEARNER_NOW_VERIFIED, dispatch_uid="learner_track_changed")
-def _listen_for_track_change(sender, user, **kwargs):  # pylint: disable=unused-argument
+def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylint: disable=unused-argument
     """
     Catches a track change signal, determines user status,
     calls fire_ungenerated_certificate_task for passing grades
@@ -65,16 +67,22 @@ def _listen_for_track_change(sender, user, **kwargs):  # pylint: disable=unused-
 
     user_enrollments = CourseEnrollment.enrollments_for_user(user=user)
     grade_factory = CourseGradeFactory()
+    expected_verification_status, _ = SoftwareSecurePhotoVerification.user_status(user)
     for enrollment in user_enrollments:
         if grade_factory.read(user=user, course=enrollment.course_overview).passed:
-            if fire_ungenerated_certificate_task(user, enrollment.course_id):
-                log.info(u'Certificate generation task initiated for {user} : {course} via track change'.format(
+            if fire_ungenerated_certificate_task(user, enrollment.course_id, expected_verification_status):
+                message = (
+                    u'Certificate generation task initiated for {user} : {course} via track change ' +
+                    u'with verification status of {status}'
+                )
+                log.info(message.format(
                     user=user.id,
-                    course=enrollment.course_id
+                    course=enrollment.course_id,
+                    status=expected_verification_status
                 ))
 
 
-def fire_ungenerated_certificate_task(user, course_key):
+def fire_ungenerated_certificate_task(user, course_key, expected_verification_status=None):
     """
     Helper function to fire un-generated certificate tasks
 
@@ -87,8 +95,11 @@ def fire_ungenerated_certificate_task(user, course_key):
     mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
     cert = GeneratedCertificate.certificate_for_student(user, course_key)
     if mode_is_verified and (cert is None or cert.status == 'unverified'):
-        generate_certificate.apply_async(kwargs={
+        kwargs = {
             'student': unicode(user.id),
-            'course_key': unicode(course_key),
-        })
+            'course_key': unicode(course_key)
+        }
+        if expected_verification_status:
+            kwargs['expected_verification_status'] = unicode(expected_verification_status)
+        generate_certificate.apply_async(countdown=CERTIFICATE_DELAY_SECONDS, kwargs=kwargs)
         return True

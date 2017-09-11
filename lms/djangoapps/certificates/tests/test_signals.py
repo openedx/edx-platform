@@ -15,6 +15,7 @@ from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.certificates.config import waffle
+from lms.djangoapps.certificates.signals import CERTIFICATE_DELAY_SECONDS
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -91,10 +92,13 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                     user=self.user,
                     course_id=self.course.id
                 )
-                mock_generate_certificate_apply_async.assert_called_with(kwargs={
-                    'student': unicode(self.user.id),
-                    'course_key': unicode(self.course.id),
-                })
+                mock_generate_certificate_apply_async.assert_called_with(
+                    countdown=CERTIFICATE_DELAY_SECONDS,
+                    kwargs={
+                        'student': unicode(self.user.id),
+                        'course_key': unicode(self.course.id),
+                    }
+                )
 
     def test_cert_generation_on_whitelist_append_instructor_paced(self):
         """
@@ -116,10 +120,13 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                     user=self.user,
                     course_id=self.ip_course.id
                 )
-                mock_generate_certificate_apply_async.assert_called_with(kwargs={
-                    'student': unicode(self.user.id),
-                    'course_key': unicode(self.ip_course.id),
-                })
+                mock_generate_certificate_apply_async.assert_called_with(
+                    countdown=CERTIFICATE_DELAY_SECONDS,
+                    kwargs={
+                        'student': unicode(self.user.id),
+                        'course_key': unicode(self.ip_course.id),
+                    }
+                )
 
 
 class PassingGradeCertsTest(ModuleStoreTestCase):
@@ -164,10 +171,13 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                 # Certs fired after passing
                 with mock_passing_grade():
                     grade_factory.update(self.user, self.course)
-                    mock_generate_certificate_apply_async.assert_called_with(kwargs={
-                        'student': unicode(self.user.id),
-                        'course_key': unicode(self.course.id),
-                    })
+                    mock_generate_certificate_apply_async.assert_called_with(
+                        countdown=CERTIFICATE_DELAY_SECONDS,
+                        kwargs={
+                            'student': unicode(self.user.id),
+                            'course_key': unicode(self.course.id),
+                        }
+                    )
 
     def test_cert_generation_on_passing_instructor_paced(self):
         with mock.patch(
@@ -182,10 +192,13 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                 # Certs fired after passing
                 with mock_passing_grade():
                     grade_factory.update(self.user, self.ip_course)
-                    mock_generate_certificate_apply_async.assert_called_with(kwargs={
-                        'student': unicode(self.user.id),
-                        'course_key': unicode(self.ip_course.id),
-                    })
+                    mock_generate_certificate_apply_async.assert_called_with(
+                        countdown=CERTIFICATE_DELAY_SECONDS,
+                        kwargs={
+                            'student': unicode(self.user.id),
+                            'course_key': unicode(self.ip_course.id),
+                        }
+                    )
 
     def test_cert_already_generated(self):
         with mock.patch(
@@ -244,10 +257,14 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                     status='submitted'
                 )
                 attempt.approve()
-                mock_generate_certificate_apply_async.assert_called_with(kwargs={
-                    'student': unicode(self.user_one.id),
-                    'course_key': unicode(self.course_one.id),
-                })
+                mock_generate_certificate_apply_async.assert_called_with(
+                    countdown=CERTIFICATE_DELAY_SECONDS,
+                    kwargs={
+                        'student': unicode(self.user_one.id),
+                        'course_key': unicode(self.course_one.id),
+                        'expected_verification_status': SoftwareSecurePhotoVerification.STATUS.approved
+                    }
+                )
 
     def test_cert_generation_on_photo_verification_instructor_paced(self):
         with mock.patch(
@@ -261,7 +278,11 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                     status='submitted'
                 )
                 attempt.approve()
-                mock_generate_certificate_apply_async.assert_called_with(kwargs={
-                    'student': unicode(self.user_two.id),
-                    'course_key': unicode(self.course_two.id),
-                })
+                mock_generate_certificate_apply_async.assert_called_with(
+                    countdown=CERTIFICATE_DELAY_SECONDS,
+                    kwargs={
+                        'student': unicode(self.user_two.id),
+                        'course_key': unicode(self.course_two.id),
+                        'expected_verification_status': SoftwareSecurePhotoVerification.STATUS.approved
+                    }
+                )
