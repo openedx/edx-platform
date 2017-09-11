@@ -9,6 +9,7 @@
         .circle {
             border-radius: 100%;
             background: #2888ff;
+            background: #2888ff;
             display:inline-block;
             line-height:100px;
             width: 100px;
@@ -32,7 +33,7 @@
         <a href="{% url 'organization' %}" {% if organization %}class="circle deactivate" {% else %} class="circle"{% endif %}>3</a>
     </div>
 
-    <h2>Specific information about your role and your organization will help us understand how we can be more relevant to you.</h2>
+    <p>Specific information about your role and your organization will help us understand how we can be more relevant to you.</p>
 
     <form action="." method="post">
          {{ form.as_p }}

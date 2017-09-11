@@ -136,7 +136,7 @@ class PersonalGoal(models.Model):
 
 class InterestsSurvey(models.Model):
     """
-    The model to store the interests survey as provided by the suer.
+    The model to store the interests survey as provided by the user.
     """
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='interest_survey', null=True, blank=True)
     capacity_areas = models.ManyToManyField(OrganizationalCapacityArea)
@@ -185,9 +185,3 @@ class UserInfoSurvey(models.Model):
 
     country_of_employment = models.CharField(max_length=256, blank=True)
     city_of_employment = models.CharField(max_length=256, blank=True)
-
-
-
-
-
-

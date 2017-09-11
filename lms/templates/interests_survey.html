@@ -1,7 +1,7 @@
 {% extends "main_django.html" %}
 {% load i18n staticfiles %}
 
-{% block title %}{% trans "Tell us more about you." %} | {{ block.super }}{% endblock %}
+{% block title %}{% trans "Interests survey." %} | {{ block.super }}{% endblock %}
 
 {% block body %}
     <style>
@@ -23,7 +23,7 @@
     </style>
 
     <div>
-        <p><h1>We want to know more about your interests</h1></p>
+        <p><h1>We want to know more about your interests.</h1></p>
     </div>
 
     <div>
@@ -32,7 +32,7 @@
         <a href="{% url 'organization' %}" {% if organization %}class="circle deactivate" {% else %} class="circle"{% endif %}>3</a>
     </div>
 
-    <h2>Tell us about what you care about so we can recommend the right course and communities</h2>
+    <p>Tell us about what you care about so we can recommend the right courses and communities.</p>
 
     <form action="." method="post">
          {{ form.as_p }}

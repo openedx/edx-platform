@@ -20,6 +20,11 @@ class UserInfoModelForm(forms.ModelForm):
     This will record some basic information about the user as modeled in
     'UserInfoSurvey' model
     """
+    def __init__(self,  *args, **kwargs):
+        super(UserInfoModelForm, self).__init__( *args, **kwargs)
+        self.fields['level_of_education'].empty_label = "Level of Education"
+        self.fields['english_prof'].empty_label = "English Language Proficiency"
+
     def clean(self):
         """
         Clean the form data.
@@ -118,12 +123,13 @@ class InterestModelForm(forms.ModelForm):
         widgets = {
             'capacity_areas': forms.CheckboxSelectMultiple(),
             'interested_communities': forms.CheckboxSelectMultiple(),
-            'personal_goal': forms.CheckboxSelectMultiple()
+            'personal_goal': forms.CheckboxSelectMultiple(),
+            'reason_of_interest': forms.TextInput(attrs={'placeholder': 'Enter your response here'})
         }
 
         labels = {
             'capacity_areas': 'Which of these organizational capacity areas are'
-                              ' interested to you? (Check all that apply)',
+                              ' interesting to you? (Check all that apply)*',
             'interested_communities': 'Which of these community types are interested to you? (Check all that apply)',
             'reason_of_interest': 'Why are these areas of organizational effectiveness interesting to you?',
             'personal_goal': 'Which is your most important personal goal in using the Philanthropy University platform.'
@@ -152,6 +158,18 @@ class OrganizationInfoModelForm(forms.ModelForm):
     This will record information about user's organization as modeled in
     'OrganizationSurvey' model.
     """
+
+    def __init__(self,  *args, **kwargs):
+        super(OrganizationInfoModelForm, self).__init__( *args, **kwargs)
+        self.fields['role_in_org'].empty_label = "Role in the organization"
+        self.fields['sector'].empty_label = "Sector"
+        self.fields['level_of_op'].empty_label = "Level of Operation"
+        self.fields['focus_area'].empty_label = "Focus Area"
+        self.fields['total_employees'].empty_label = "Total Employees"
+        self.fields['total_volunteers'].empty_label = "Total Volunteers"
+        self.fields['partner_network'].empty_label = "Partner Networks"
+
+
     class Meta:
         """
         The meta class used to customize the default behaviour of form fields
