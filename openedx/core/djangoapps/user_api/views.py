@@ -161,9 +161,9 @@ class RegistrationView(APIView):
     DEFAULT_FIELDS = ["email", "username", "password"]
 
     EXTRA_FIELDS = [
+        "confirm_password",
         "first_name",
         "last_name",
-        "confirm_password",
         "city",
         "state",
         "country",
@@ -326,8 +326,7 @@ class RegistrationView(APIView):
                 "username": _(
                     # Translators: This message is shown to users who attempt to create a new
                     # account using a username associated with an existing account.
-                    u"It looks like {username} belongs to an existing account. "
-                    u"Try again with a different username."
+                    u"The username you entered is already being used. Please enter another username."
                 ).format(username=username),
             }
             errors = {
@@ -388,6 +387,10 @@ class RegistrationView(APIView):
             restrictions={
                 "min_length": EMAIL_MIN_LENGTH,
                 "max_length": EMAIL_MAX_LENGTH,
+            },
+            error_messages={
+                "email": "The email you entered is not valid. Please provide"
+                         " a valid email in order to create an account."
             },
             required=required
         )
@@ -459,7 +462,7 @@ class RegistrationView(APIView):
                 "min_length": USERNAME_MIN_LENGTH,
                 "max_length": USERNAME_MAX_LENGTH,
             },
-            required=required
+            required=required,
         )
 
     def _add_password_field(self, form_desc, required=True):
@@ -803,7 +806,7 @@ class RegistrationView(APIView):
             # in order to register a new account.
             terms_label = _(u"Terms of Service and Honor Code")
             terms_link = marketing_link("HONOR")
-            terms_text = _(u"Review the Terms of Service and Honor Code")
+            terms_text = _(u"Click here to read the Terms and Conditions.")
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
@@ -812,10 +815,8 @@ class RegistrationView(APIView):
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
-        error_msg = _(u"You must agree to the {platform_name} {terms_of_service}").format(
-            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
-            terms_of_service=terms_label
-        )
+        error_msg = "Please accept our Terms and Conditions by checking the Terms and Conditions" \
+                    " checkbox before creating an account."
 
         form_desc.add_field(
             "honor_code",
