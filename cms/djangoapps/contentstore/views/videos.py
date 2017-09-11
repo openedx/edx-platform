@@ -109,7 +109,7 @@ class StatusDisplayStrings(object):
     # Translators: This is the status for a video that is having its transcription in progress on servers
     _TRANSCRIPTION_IN_PROGRESS = ugettext_noop("Transcription in Progress")
     # Translators: This is the status for a video whose transcription is complete
-    _TRANSCRIPTION_READY = ugettext_noop("Transcription Ready")
+    _TRANSCRIPT_READY = ugettext_noop("Transcript Ready")
 
     _STATUS_MAP = {
         "upload": _UPLOADING,
@@ -129,7 +129,7 @@ class StatusDisplayStrings(object):
         "invalid_token": _INVALID_TOKEN,
         "imported": _IMPORTED,
         "transcription_in_progress": _TRANSCRIPTION_IN_PROGRESS,
-        "transcription_ready": _TRANSCRIPTION_READY,
+        "transcription_ready": _TRANSCRIPT_READY,
     }
 
     @staticmethod
