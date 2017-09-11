@@ -2,7 +2,6 @@
   display: inline-block;
   position: relative;
   width: 100%;
-  margin-top: $baseline;
   max-width: $lms-max-width;
   margin: $baseline auto 0;
   -webkit-transition: all 0.4s ease-out;
@@ -14,6 +13,7 @@
   .action-toggle-verification-sock {
     @include left(50%);
     @include margin-left(-1 * $baseline * 15/2);
+
     position: absolute;
     top: (-1 * $baseline);
     width: ($baseline * 15);
@@ -71,6 +71,7 @@
 
       .mini-cert {
         @include right($baseline);
+
         position: absolute;
         top: $baseline;
         width: ($baseline * 13);
@@ -96,7 +97,7 @@
           width: ($baseline * 5/2);
         }
 
-        .story-quote > .author{
+        .story-quote > .author {
           display: block;
           margin-top: ($baseline / 4);
           font-weight: 600;
@@ -135,6 +136,7 @@
 
           &.attached {
             @include right($baseline);
+
             position: fixed;
             bottom: $baseline;
             top: auto;
