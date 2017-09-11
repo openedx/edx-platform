@@ -16,6 +16,40 @@ from django.http import HttpResponse
 from onboarding_survey import forms
 
 
+def get_un_submitted_surveys(user):
+    """
+    Get the info about the un-submitted forms
+    """
+    un_submitted_surveys = {}
+    try:
+        user.user_info_survey
+    except Exception:
+        un_submitted_surveys['user_info'] = True
+
+    try:
+        user.interest_survey
+    except Exception:
+        un_submitted_surveys['interests'] = True
+
+    try:
+        user.organization_survey
+    except Exception:
+        un_submitted_surveys['organization'] = True
+
+    if un_submitted_surveys.get('user_info') and un_submitted_surveys.get('interests') and un_submitted_surveys.get('organization'):
+        un_submitted_surveys['user_info'] = False
+
+    elif un_submitted_surveys.get('interests') and un_submitted_surveys.get('organization'):
+        un_submitted_surveys['user_info'] = False
+        un_submitted_surveys['interests'] = False
+
+    else:
+        un_submitted_surveys['user_info'] = False
+        un_submitted_surveys['interests'] = False
+        un_submitted_surveys['organization'] = False
+
+    return un_submitted_surveys
+
 @login_required
 def user_info(request):
     """
@@ -41,15 +75,7 @@ def user_info(request):
 
     context = {'form': form}
     user = request.user
-    try:
-        user.organization_survey
-    except Exception:
-        context['organization'] = True
-
-    try:
-        user.interest_survey
-    except Exception:
-        context['interests'] = True
+    context.update(get_un_submitted_surveys(user))
 
     return render(request, 'tell_us_more_survey.html', context)
 
@@ -79,10 +105,7 @@ def interests(request):
     context = {'form': form}
 
     user = request.user
-    try:
-        user.organization_survey
-    except Exception:
-        context['organization'] = True
+    context.update(get_un_submitted_surveys(user))
 
     return render(request, 'interests_survey.html', context)
 
@@ -112,7 +135,12 @@ def organization(request):
     else:
         form = forms.OrganizationInfoModelForm()
 
-    return render(request, 'organization_survey.html', {'form': form})
+    context = {'form': form}
+
+    user = request.user
+    context.update(get_un_submitted_surveys(user))
+
+    return render(request, 'organization_survey.html', context)
 
 
 @csrf_exempt
