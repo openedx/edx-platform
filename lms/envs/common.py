@@ -3256,6 +3256,7 @@ ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE = _(
     '{platform_name}{end_bold} to offer you high-quality learning opportunities '
     'from the world\'s best universities.'
 )
+ENTERPRISE_TAGLINE = ''
 ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = {
     'age',
     'level_of_education',
