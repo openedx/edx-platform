@@ -6,9 +6,10 @@
         'js/student_account/models/user_preferences_model',
         'js/student_account/views/account_settings_fields',
         'js/student_account/views/account_settings_view',
-        'edx-ui-toolkit/js/utils/string-utils'
+        'edx-ui-toolkit/js/utils/string-utils',
+        'edx-ui-toolkit/js/utils/html-utils'
     ], function(gettext, $, _, Backbone, Logger, UserAccountModel, UserPreferencesModel,
-                 AccountSettingsFieldViews, AccountSettingsView, StringUtils) {
+                 AccountSettingsFieldViews, AccountSettingsView, StringUtils, HtmlUtils) {
         return function(
             fieldsData,
             ordersHistoryData,
@@ -83,8 +84,12 @@
                                 model: userAccountModel,
                                 title: gettext('Full Name'),
                                 valueAttribute: 'name',
-                                helpMessage: gettext(
-                                    'The name that is used for ID verification and appears on your certificates. Other learners never see your full name. Make sure to enter your name exactly as it appears on your government-issued photo ID, including any non-Roman characters.'  // eslint-disable-line max-len
+                                helpMessage: HtmlUtils.interpolateHtml(
+                                    gettext('The name that is used for ID verification and that appears on your certificates. Other learners see your full name if you have selected {bold_start}Full Profile{bold_end} for profile visibility. Make sure to enter your name exactly as it appears on your photo ID, including any non-Roman characters.'),  // eslint-disable-line max-len
+                                    {
+                                        bold_start: HtmlUtils.HTML('<b>'),
+                                        bold_end: HtmlUtils.HTML('</b>')
+                                    }
                                 ),
                                 persistChanges: true
                             })
