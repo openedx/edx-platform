@@ -8,6 +8,19 @@ from django.conf import settings
 from student.models import UserStanding
 
 
+class UserSessionSharingMiddleware(object):
+
+    def process_response(self, request, response):
+        if request.user.is_authenticated():
+            encoded_jwt = jwt.encode({'id': request.user.id,
+                                    'username': request.user.username},
+                                    'secret', algorithm='HS256')
+            response.set_cookie('token', encoded_jwt)
+        else:
+            response.delete_cookie('token')
+        return response
+
+
 class UserStandingMiddleware(object):
     """
     Checks a user's standing on request. Returns a 403 if the user's
