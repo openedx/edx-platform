@@ -1,4 +1,7 @@
+from collections import namedtuple
 import datetime
+import ddt
+from enum import Enum
 from mock import patch
 from pytz import utc
 
@@ -78,7 +81,9 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
             enrollment.schedule
 
 
+@ddt.ddt
 @skip_unless_lms
+@patch('openedx.core.djangoapps.schedules.signals.get_current_site')
 class UpdateScheduleTests(SharedModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
     VERIFICATION_DEADLINE_DAYS = 14
@@ -96,30 +101,42 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
             _strip_secs(expected_start) + datetime.timedelta(days=self.VERIFICATION_DEADLINE_DAYS),
         )
 
-    @patch('openedx.core.djangoapps.schedules.signals.get_current_site')
-    def test_schedule_updated(self, mock_get_current_site):
+    def test_updated_since_course_not_started(self, mock_get_current_site):
         mock_get_current_site.return_value = self.site
 
-        course = _create_course_run(self_paced=True, start_day_offset=5)
+        course = _create_course_run(self_paced=True, start_day_offset=5)  # course starts in future
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-
         self.assert_schedule_dates(enrollment.schedule, enrollment.course_overview.start)
-        course.start = course.start + datetime.timedelta(days=3)
+
+        course.start = course.start + datetime.timedelta(days=3)  # new course start changes to another future date
         self.store.update_item(course, ModuleStoreEnum.UserID.test)
         enrollment = CourseEnrollment.objects.get(id=enrollment.id)
-        self.assert_schedule_dates(enrollment.schedule, course.start)
+        self.assert_schedule_dates(enrollment.schedule, course.start)  # start set to new course start
 
-    @patch('openedx.core.djangoapps.schedules.signals.get_current_site')
-    def test_schedule_not_updated(self, mock_get_current_site):
+    def test_not_updated_since_course_already_started(self, mock_get_current_site):
         mock_get_current_site.return_value = self.site
 
-        course = _create_course_run(self_paced=True, start_day_offset=-5)
+        course = _create_course_run(self_paced=True, start_day_offset=-5)  # course starts in past
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         self.assert_schedule_dates(enrollment.schedule, enrollment.created)
 
-        course.start = course.start + datetime.timedelta(days=3)
+        course.start = course.start + datetime.timedelta(days=3)  # new course start changes to another future date
         self.store.update_item(course, ModuleStoreEnum.UserID.test)
-        self.assert_schedule_dates(enrollment.schedule, enrollment.created)
+        enrollment = CourseEnrollment.objects.get(id=enrollment.id)
+        self.assert_schedule_dates(enrollment.schedule, enrollment.created)  # start remains unchanged
+
+    def test_not_updated_since_new_start_in_past(self, mock_get_current_site):
+        mock_get_current_site.return_value = self.site
+
+        course = _create_course_run(self_paced=True, start_day_offset=5)  # course starts in future
+        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
+        previous_start = enrollment.course_overview.start
+        self.assert_schedule_dates(enrollment.schedule, previous_start)
+
+        course.start = course.start + datetime.timedelta(days=-10)  # new course start changes to a past date
+        self.store.update_item(course, ModuleStoreEnum.UserID.test)
+        enrollment = CourseEnrollment.objects.get(id=enrollment.id)
+        self.assert_schedule_dates(enrollment.schedule, previous_start)  # start remains unchanged
 
 
 def _create_course_run(self_paced=True, start_day_offset=-1):
