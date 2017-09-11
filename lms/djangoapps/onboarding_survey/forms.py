@@ -130,9 +130,10 @@ class InterestModelForm(forms.ModelForm):
         labels = {
             'capacity_areas': 'Which of these organizational capacity areas are'
                               ' interesting to you? (Check all that apply)*',
-            'interested_communities': 'Which of these community types are interested to you? (Check all that apply)',
+            'interested_communities': 'Which of these community types are interesting to you? (Check all that apply)*',
             'reason_of_interest': 'Why are these areas of organizational effectiveness interesting to you?',
-            'personal_goal': 'Which is your most important personal goal in using the Philanthropy University platform.'
+            'personal_goal': 'Which is your most important personal goal in'
+                             ' using the Philanthropy University platform? (Check all that apply)'
         }
 
         required_error = 'Please select an option for {}'

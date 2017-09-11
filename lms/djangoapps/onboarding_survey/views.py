@@ -100,7 +100,7 @@ def interests(request):
 
             return redirect(reverse('organization'))
     else:
-        form = forms.InterestModelForm()
+        form = forms.InterestModelForm(label_suffix="")
 
     context = {'form': form}
 
