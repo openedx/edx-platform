@@ -934,7 +934,7 @@ class RegistrationView(APIView):
         """
         organization_label = _(u"Organization")
         error_msg = _(u"Please select your Organization.")
-        organization_placeholder = _(u"Organization Name.")
+        organization_placeholder = _(u"Organization Name")
 
         form_desc.add_field(
             "organization",
@@ -1000,6 +1000,9 @@ class RegistrationView(APIView):
             )
 
     def _add_if_currently_employed_field(self, form_desc, required=False):
+        """
+        Add a checkbox to get whether you are currently employed.
+        """
 
         form_desc.add_field(
             "if_currently_employed",
@@ -1008,8 +1011,6 @@ class RegistrationView(APIView):
             default=False,
             required=required,
         )
-
-        pass
 
 
 class PasswordResetView(APIView):
