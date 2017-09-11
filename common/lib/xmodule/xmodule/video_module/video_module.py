@@ -41,7 +41,9 @@ from xmodule.x_module import XModule, module_attr
 from xmodule.xml_module import deserialize_field, is_pointer_tag, name_to_pathname
 
 from .bumper_utils import bumperize
-from .transcripts_utils import Transcript, VideoTranscriptsMixin, get_html5_ids
+from .transcripts_utils import (
+    Transcript, VideoTranscriptsMixin, get_html5_ids, get_video_ids_info
+)
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
 from .video_xfields import VideoFields
@@ -595,6 +597,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             ScopeIds(None, block_type, definition_id, usage_id),
             field_data,
         )
+
+        # update val with info extracted from `xml_object`
+        video.import_video_info_into_val(xml_object, getattr(id_generator, 'target_course_id', None))
+
         return video
 
     def definition_to_xml(self, resource_fs):
@@ -658,14 +664,19 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 ele.set('src', self.transcripts[transcript_language])
                 xml.append(ele)
 
-        if self.edx_video_id and edxval_api:
-            try:
-                xml.append(edxval_api.export_to_xml(
-                    self.edx_video_id,
-                    unicode(self.runtime.course_id.for_branch(None)))
-                )
-            except edxval_api.ValVideoNotFoundError:
-                pass
+        if edxval_api:
+            external, video_ids = get_video_ids_info(self.edx_video_id, self.youtube_id_1_0, self.html5_sources)
+            if video_ids:
+                try:
+                    xml.append(
+                        edxval_api.export_to_xml(
+                            video_ids,
+                            unicode(self.runtime.course_id.for_branch(None)),
+                            external=external
+                        )
+                    )
+                except edxval_api.ValVideoNotFoundError:
+                    pass
 
         # handle license specifically
         self.add_license_to_xml(xml)
@@ -864,23 +875,32 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         if 'download_track' not in field_data and track is not None:
             field_data['download_track'] = True
 
-        video_asset_elem = xml.find('video_asset')
-        if (
-                edxval_api and
-                video_asset_elem is not None and
-                'edx_video_id' in field_data
-        ):
-            # Allow ValCannotCreateError to escape
-            edxval_api.import_from_xml(
-                video_asset_elem,
-                field_data['edx_video_id'],
-                course_id=course_id
-            )
-
         # load license if it exists
         field_data = LicenseMixin.parse_license_from_xml(field_data, xml)
 
         return field_data
+
+    def import_video_info_into_val(self, xml, course_id):
+        """
+        Import parsed video info from `xml` into edxval.
+
+        Arguments:
+            xml (lxml object): xml representation of video to be imported
+            course_id (str): course id
+        """
+        if self.edx_video_id is not None:
+            edx_video_id = self.edx_video_id.strip()
+
+        video_asset_elem = xml.find('video_asset')
+        if edxval_api and video_asset_elem is not None:
+            # Always pass the edx_video_id, Whether the video is internal or external
+            # In case of external, we only need to import transcripts and for that
+            # purpose video id is already present in the xml
+            edxval_api.import_from_xml(
+                video_asset_elem,
+                edx_video_id,
+                course_id=course_id
+            )
 
     def index_dictionary(self):
         xblock_body = super(VideoDescriptor, self).index_dictionary()
