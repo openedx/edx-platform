@@ -46,8 +46,9 @@ ENABLE_MKTG_SITE = os.environ.get('ENABLE_MARKETING_SITE', False)
 MARKETING_SITE_ROOT = os.environ.get('MARKETING_SITE_ROOT', 'http://localhost:8080')
 
 MKTG_URLS = {
-    'ABOUT': '/about-us',
+    'ABOUT': '/about',
     'ACCESSIBILITY': '/accessibility',
+    'AFFILIATES': '/affiliates',
     'BLOG': '/blog',
     'CAREERS': '/careers',
     'CONTACT': '/contact',

@@ -2387,7 +2387,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # Translators: This is the website name of www.twitter.com.  Please
         # translate this the way that Twitter advertises in your language.
         "title": _("Twitter"),
-        "icon": "fa-twitter",
+        "icon": "fa-twitter-square",
         "action": _("Follow {platform_name} on Twitter")
     },
     "linkedin": {
@@ -2420,7 +2420,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # Translators: This is the website name of www.reddit.com.  Please
         # translate this the way that Reddit advertises in your language.
         "title": _("Reddit"),
-        "icon": "fa-reddit",
+        "icon": "fa-reddit-square",
         "action": _("Subscribe to the {platform_name} subreddit"),
     },
     "vk": {
@@ -2439,7 +2439,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # Translators: This is the website name of www.youtube.com.  Please
         # translate this the way that YouTube advertises in your language.
         "title": _("Youtube"),
-        "icon": "fa-youtube",
+        "icon": "fa-youtube-square",
         "action": _("Subscribe to the {platform_name} YouTube channel")
     }
 }
