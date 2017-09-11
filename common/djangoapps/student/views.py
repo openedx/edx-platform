@@ -2692,14 +2692,14 @@ class LogoutView(TemplateView):
 def get_organizations(request):
 
     if request.is_ajax():
-        q = request.GET.get('term', '')
+        query = request.GET.get('term', '')
 
         all_organizations = Organization.objects.all()
 
         final_result = {}
 
         for organization in all_organizations:
-            if organization.name.startswith(q):
+            if organization.name.startswith(query):
                 final_result[organization.name] = organization.point_of_contact_exist
 
         data = json.dumps(final_result)

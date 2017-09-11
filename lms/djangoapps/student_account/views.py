@@ -68,7 +68,7 @@ def login_and_registration_form(request, initial_mode="login"):
 
     """
     # Determine the URL to redirect to following login/registration/third_party_auth
-    # _local_server_get('/user_api/v1/account/registration/', request.session)
+    _local_server_get('/user_api/v1/account/registration/', request.session)
     redirect_to = get_next_url_for_login_page(request)
     # If we're already logged in, redirect to the dashboard
     if request.user.is_authenticated():
