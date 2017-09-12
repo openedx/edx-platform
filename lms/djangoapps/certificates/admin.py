@@ -64,8 +64,9 @@ class CertificateGenerationCourseSettingAdmin(admin.ModelAdmin):
     """
     Django admin customizations for CertificateGenerationCourseSetting model
     """
-    list_display = ('course_key', 'enabled')
+    list_display = ('course_key', 'can_self_generate', 'can_use_language_specific_templates')
     search_fields = ('course_key',)
+    exclude = ('enabled',)
     show_full_result_count = False
 
 

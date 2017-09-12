@@ -27,4 +27,4 @@ def toggle_self_generated_certs(course_key, course_self_paced):
     """
     Enable or disable self-generated certificates for a course according to pacing.
     """
-    CertificateGenerationCourseSetting.set_enabled_for_course(course_key, course_self_paced)
+    CertificateGenerationCourseSetting.set_can_self_generate_for_course(course_key, course_self_paced)
