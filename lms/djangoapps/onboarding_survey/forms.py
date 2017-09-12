@@ -184,11 +184,11 @@ class OrganizationInfoModelForm(forms.ModelForm):
             'country': forms.TextInput(attrs={'placeholder': 'Country of Organization Headquarters*'}),
             'city': forms.TextInput(attrs={'placeholder': 'City of Organization Headquarters'}),
             'url': forms.URLInput(attrs={'placeholder': 'Organization Website(if applicable)'}),
-            'founding_year': forms.NumberInput(attrs={'placeholder': 'Founding year'}),
+            'founding_year': forms.NumberInput(attrs={'placeholder': 'Founding Year'}),
             'total_annual_clients_or_beneficiary': forms.NumberInput(
-                attrs={'placeholder': 'Total annual clients or beneficiaries'}),
+                attrs={'placeholder': 'Total Annual Clients or Beneficiaries'}),
             'total_annual_revenue_for_last_fiscal': forms.NumberInput(
-                attrs={'placeholder': 'Total annual revenue for last fiscal year '})
+                attrs={'placeholder': 'Total Annual Revenue for Last Fiscal Year '})
         }
 
     def clean(self):
