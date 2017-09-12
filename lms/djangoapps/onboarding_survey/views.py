@@ -12,6 +12,11 @@ from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 from django.http import HttpResponse
+from lms.djangoapps.onboarding_survey.models import (
+    UserInfoSurvey,
+    InterestsSurvey,
+    OrganizationSurvey
+)
 
 from onboarding_survey import forms
 
@@ -62,16 +67,33 @@ def user_info(request):
     """
 
     if request.method == 'POST':
-        form = forms.UserInfoModelForm(request.POST)
-        if form.is_valid():
-            user_info_survey = form.save()
-            user_info_survey.user = request.user
-            user_info_survey.save()
+        try:
+            form = forms.UserInfoModelForm(request.POST, instance=request.user.user_info_survey)
+            if form.is_valid():
+                form.save()
 
-            return redirect(reverse('interests'))
+        except UserInfoSurvey.DoesNotExist:
+            form = forms.UserInfoModelForm(request.POST)
+            if form.is_valid():
+                user_info_survey = form.save()
+                user_info_survey.user = request.user
+                user_info_survey.save()
+
+        return redirect(reverse('interests'))
 
     else:
-        form = forms.UserInfoModelForm()
+        user_info_instance = UserInfoSurvey.objects.filter(user=request.user).first()
+        if user_info_instance:
+            if user_info_instance.dob:
+                form = forms.UserInfoModelForm(
+                    instance=user_info_instance, initial={'dob': user_info_instance.dob.strftime("%m/%d/%y")}
+                )
+            else:
+                form = forms.UserInfoModelForm(
+                    instance=user_info_instance
+                )
+        else:
+            form = forms.UserInfoModelForm()
 
     context = {'form': form}
     user = request.user
@@ -92,15 +114,25 @@ def interests(request):
 
     """
     if request.method == 'POST':
-        form = forms.InterestModelForm(request.POST)
-        if form.is_valid():
-            user_interests_survey = form.save()
-            user_interests_survey.user = request.user
-            user_interests_survey.save()
+        try:
+            form = forms.InterestModelForm(request.POST, instance=request.user.interest_survey)
+            if form.is_valid():
+                form.save()
 
-            return redirect(reverse('organization'))
+        except InterestsSurvey.DoesNotExist:
+            form = forms.InterestModelForm(request.POST)
+            if form.is_valid():
+                interest_survey = form.save()
+                interest_survey.user = request.user
+                interest_survey.save()
+
+        return redirect(reverse('organization'))
     else:
-        form = forms.InterestModelForm(label_suffix="")
+        user_interest_survey_instance = InterestsSurvey.objects.filter(user=request.user).first()
+        if user_interest_survey_instance:
+            form = forms.InterestModelForm(label_suffix="", instance=user_interest_survey_instance)
+        else:
+            form = forms.InterestModelForm(label_suffix="")
 
     context = {'form': form}
 
@@ -120,21 +152,33 @@ def organization(request):
     saved. After saving the form, user is redirected to dashboard.
     """
     if request.method == 'POST':
-        form = forms.OrganizationInfoModelForm(request.POST)
-        if form.is_valid():
-            organization_survey = form.save()
-            partner_network = organization_survey.partner_network
 
-            if partner_network:
-                if not partner_network.is_partner_affiliated:
-                    partner_network.is_partner_affiliated = True
-                    partner_network.save()
+        try:
+            form = forms.OrganizationInfoModelForm(request.POST, instance=request.user.organization_survey)
+            if form.is_valid():
+                form.save()
 
-            organization_survey.user = request.user
-            organization_survey.save()
-            return redirect(reverse('dashboard'))
+        except OrganizationSurvey.DoesNotExist:
+            form = forms.OrganizationInfoModelForm(request.POST)
+            if form.is_valid():
+                organization_survey = form.save()
+                organization_survey.user = request.user
+                organization_survey.save()
+
+        partner_network = organization_survey.partner_network
+
+        if partner_network:
+            if not partner_network.is_partner_affiliated:
+                partner_network.is_partner_affiliated = True
+                partner_network.save()
+
+        return redirect(reverse('dashboard'))
     else:
-        form = forms.OrganizationInfoModelForm()
+        org_survey_instance = OrganizationSurvey.objects.filter(user=request.user).first()
+        if org_survey_instance:
+            form = forms.OrganizationInfoModelForm(instance=org_survey_instance)
+        else:
+            form = forms.OrganizationInfoModelForm()
 
     context = {'form': form}
 
