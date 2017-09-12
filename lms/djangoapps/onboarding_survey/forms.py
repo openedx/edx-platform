@@ -201,6 +201,7 @@ class OrganizationInfoModelForm(forms.ModelForm):
 
         if year:
             if len("{}".format(year)) < 4 or year < 0 or len("{}".format(year)) > 4:
-                raise forms.ValidationError(
+                self.add_error(
+                    'founding_year',
                     "You entered an invalid year format. Please enter a valid year with 4 digits."
                 )

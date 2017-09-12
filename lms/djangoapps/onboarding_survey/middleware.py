@@ -3,7 +3,6 @@ The middleware for on-boarding survey app.
 """
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
-from django.conf import settings
 
 
 class RedirectMiddleware(object):
@@ -29,7 +28,7 @@ class RedirectMiddleware(object):
         if not request.user.is_anonymous():
             user = request.user
 
-            if user.username == settings.ADMIN_USER_NAME:
+            if user.is_superuser:
                 return None
 
             try:
