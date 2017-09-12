@@ -60,6 +60,17 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
         return user
 
+    def enable_course_certificates(self, course):
+        """ Enable course certificate configuration """
+        course.certificates = {
+            u'certificates': [{
+                u'course_title': u'Test',
+                u'name': u'',
+                u'is_active': True,
+            }]
+        }
+        course.save()
+
     def test_course_info_feature_flag(self):
         SelfPacedConfiguration(enable_course_home_improvements=False).save()
         course = create_course_run()
@@ -339,6 +350,30 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.assertNotEqual(block.date, None)
         self.assertFalse(block.is_enabled)
 
+    # @waffle.testutils.override_switch('certificates.instructor_paced_only', True)
+    def test_no_certificate_available_date_for_audit_course(self):
+        """
+        Tests that Certificate Available Date is not visible in the course "Important Course Dates" section
+        if the course only has audit mode.
+        """
+        course = create_course_run()
+        audit_user = self.create_user()
+
+        # Enroll learner in the audit mode and verify the course only has 1 mode (audit)
+        CourseEnrollmentFactory(course_id=course.id, user=audit_user, mode=CourseMode.AUDIT)
+        CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.VERIFIED).delete()
+        all_course_modes = CourseMode.modes_for_course(course.id)
+        self.assertEqual(len(all_course_modes), 1)
+        self.assertEqual(all_course_modes[0].slug, CourseMode.AUDIT)
+
+        course.certificate_available_date = datetime.now(utc) + timedelta(days=7)
+        course.save()
+
+        # Verify Certificate Available Date is not enabled for learner.
+        block = CertificateAvailableDate(course, audit_user)
+        self.assertFalse(block.is_enabled)
+        self.assertNotEqual(block.date, None)
+
     @waffle.testutils.override_switch('certificates.instructor_paced_only', True)
     def test_certificate_available_date_defined(self):
         course = create_course_run()
@@ -347,14 +382,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         verified_user = self.create_user()
         CourseEnrollmentFactory(course_id=course.id, user=verified_user, mode=CourseMode.VERIFIED)
         course.certificate_available_date = datetime.now(utc) + timedelta(days=7)
-        course.certificates = {
-            u'certificates': [{
-                u'course_title': u'Test',
-                u'name': u'',
-                u'is_active': True,
-            }]
-        }
-        course.save()
+        self.enable_course_certificates(course)
         CertificateAvailableDate(course, audit_user)
         for block in (CertificateAvailableDate(course, audit_user), CertificateAvailableDate(course, verified_user)):
             self.assertIsNotNone(course.certificate_available_date)
