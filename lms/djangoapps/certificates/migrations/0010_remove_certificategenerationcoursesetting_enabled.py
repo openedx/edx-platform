@@ -7,7 +7,7 @@ from django.db.models import F
 
 def copy_field(apps, schema_editor):
     CertificateGenerationCourseSetting = apps.get_model('certificates', 'CertificateGenerationCourseSetting')
-    CertificateGenerationCourseSetting.objects.all().update(self_generation_enabled=F('enabled'))
+    CertificateGenerationCourseSetting.objects.all().update(self_generation_enabled=(F('enabled') or F('self_generation_enabled')))
 
 class Migration(migrations.Migration):
 
