@@ -26,6 +26,7 @@ PYTHON_REQ_FILES = [
     'requirements/edx/pre.txt',
     'requirements/edx/github.txt',
     'requirements/edx/local.txt',
+    'requirements/edx/django.txt',
     'requirements/edx/base.txt',
     'requirements/edx/paver.txt',
     'requirements/edx/development.txt',

@@ -34,7 +34,6 @@ django-statici18n==1.4.0
 django-storages==1.4.1
 django-method-override==0.1.0
 django-user-tasks==0.1.5
-django==1.8.18
 django-waffle==0.12.0
 djangorestframework-jwt==1.11.0
 enum34==1.1.6
