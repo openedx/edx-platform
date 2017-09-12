@@ -17,7 +17,7 @@ $upgrade-message-background-color: $blue-d1;
   -webkit-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
 
-  &:after {
+  &::after {
     content: "";
     display: table;
     clear: both;
@@ -28,12 +28,14 @@ $upgrade-message-background-color: $blue-d1;
     font-size: 1.25rem;
     font-weight: 700;
     margin-bottom: 1rem;
+
     @include float(left);
   }
 
   .vc-selling-points {
     @include clear(left);
     @include padding-left(0);
+
     font-size: 0.825rem;
     margin: 1rem 0;
     display: table;
@@ -42,19 +44,21 @@ $upgrade-message-background-color: $blue-d1;
       list-style: none;
       display: table-row;
 
-      &:before {
+      &::before {
         content: "\2022";
         display: table-cell;
+
         @include padding-right($baseline/2);
       }
 
-      &:after {
+      &::after {
         content: "";
         display: table-row;
         height: 0.25rem;
       }
     }
   }
+
   img {
     max-width: 100%;
   }
@@ -62,12 +66,14 @@ $upgrade-message-background-color: $blue-d1;
   // Show/hide button
   .vc-toggle {
     @include float(right);
+
     color: $white;
   }
 
   // Upgrade Button
   .btn-upgrade {
     @extend %btn-primary-green;
+
     background: $uxpl-green-base;
   }
 
@@ -75,6 +81,7 @@ $upgrade-message-background-color: $blue-d1;
   .vc-hero {
     @include float(right);
     @include padding-left(1rem);
+
     clear: both;
     width: 35%;
 
@@ -95,6 +102,7 @@ $upgrade-message-background-color: $blue-d1;
 
   .vc-title {
     margin: 0;
+
     @include margin-right(auto);
   }
 

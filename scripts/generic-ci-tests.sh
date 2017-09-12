@@ -84,6 +84,8 @@ case "$TEST_SUITE" in
 
         echo "Finding ESLint violations and storing report..."
         paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
+        echo "Finding Stylelint violations and storing report..."
+        paver run_stylelint -l $STYLELINT_THRESHOLD > stylelint.log || { cat stylelint.log; EXIT=1; }
         echo "Running code complexity report (python)."
         paver run_complexity || echo "Unable to calculate code complexity. Ignoring error."
         echo "Running xss linter report."

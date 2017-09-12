@@ -1,5 +1,5 @@
 """
-Tests for paver quality tasks
+Tests for Paver's Stylelint tasks.
 """
 import unittest
 
