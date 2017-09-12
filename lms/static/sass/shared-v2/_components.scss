@@ -1,92 +1,99 @@
 // TODO: tabs should be added to the Pattern Library
 .tabs {
-    @include clearfix();
-    @extend %reset-lists;
-    @include border-top-radius(4px);
-    padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
+  @include clearfix();
 
-    .tab {
-        @include float(left);
-        list-style: none;
-        margin-bottom: 0;
+  @extend %reset-lists;
 
-        &.prominent {
-            @include margin-right(16px);
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 3px;
-        }
+  @include border-top-radius(4px);
 
-        &.prominent + li {
-            @include border-left(1px solid $lms-border-color);
-            @include padding-left($baseline*0.75);
-        }
+  padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
 
-        a,
-        a:visited {
-            @include padding($baseline/2, $baseline*0.75, 13px, $baseline*0.75);
-            display: block;
-            text-align: center;
-            text-decoration: none;
-            border-style: solid;
-            border-width: 0 0 4px 0;
-            border-bottom-color: transparent;
-            color: $lms-inactive-color;
-            font-size: 14px;
+  .tab {
+    @include float(left);
 
-            &:hover,
-            &:focus {
-                color: $lms-active-color;
-                border-bottom-color: $lms-active-color;
-            }
+    list-style: none;
+    margin-bottom: 0;
 
-            &.active {
-                color: $uxpl-blue-hover-active;
-                border-bottom-color: $uxpl-blue-hover-active;
-                background-color: transparent;
-            }
-        }
+    &.prominent {
+      @include margin-right(16px);
+
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 3px;
     }
+
+    &.prominent + li {
+      @include border-left(1px solid $lms-border-color);
+      @include padding-left($baseline*0.75);
+    }
+
+    a,
+    a:visited {
+      @include padding($baseline/2, $baseline*0.75, 13px, $baseline*0.75);
+
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      border-style: solid;
+      border-width: 0 0 4px;
+      border-bottom-color: transparent;
+      color: $lms-inactive-color;
+      font-size: 14px;
+
+      &:hover,
+      &:focus {
+        color: $lms-active-color;
+        border-bottom-color: $lms-active-color;
+      }
+
+      &.active {
+        color: $uxpl-blue-hover-active;
+        border-bottom-color: $uxpl-blue-hover-active;
+        background-color: transparent;
+      }
+    }
+  }
 }
 
 // TODO: search box should be in the Pattern Library
 .page-header-search {
+  display: inline-block;
+
+  .search-form {
     display: inline-block;
+  }
 
-    .search-form {
-        display: inline-block;
+  .search-box {
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+  }
+
+  .search-input {
+    width: 12rem;
+  }
+
+  .action-search {
+    text-shadow: none;
+    vertical-align: middle;
+    padding: $baseline/5 $baseline/2;
+  }
+
+  .action-clear {
+    @include right(0);
+    @include margin(0, ($baseline/4), 0, 0);
+
+    position: absolute;
+    top: 0;
+    color: $lms-gray;
+    padding: $baseline/4;
+
+    // STATE: hover and focus
+    &:hover,
+    &:focus {
+      color: $lms-label-color;
+      border-width: 0;
     }
-
-    .search-box {
-        display: inline-block;
-        position: relative;
-        vertical-align: middle;
-    }
-
-    .search-input {
-        width: 12rem;
-    }
-
-    .action-search {
-        text-shadow: none;
-        vertical-align: middle;
-        padding: $baseline/5 $baseline/2;
-    }
-
-    .action-clear {
-        @include right(0);
-        @include margin(0, ($baseline/4), 0, 0);
-        position: absolute;
-        top: 0;
-        color: $lms-gray;
-        padding: $baseline/4;
-
-        // STATE: hover and focus
-        &:hover,
-        &:focus {
-            color: $lms-label-color;
-            border-width: 0;
-        }
-    }
+  }
 }
 
 .page-banner {
@@ -94,11 +101,16 @@
   margin: 0 auto;
 
   .alert {
+    display: flex;
     margin-top: $baseline;
     border: 1px solid;
 
     .icon-alert {
-      margin-right: $baseline / 4;
+      @include margin-right($baseline);
+    }
+
+    .message-actions {
+      @include margin-left($baseline);
     }
 
     &.alert-info {
@@ -134,7 +146,8 @@
 .wrapper-preview-menu {
   @include clearfix();
   @include box-sizing(border-box);
-  margin: 0 auto 0;
+
+  margin: 0 auto;
   padding: ($baseline*0.75);
   background-color: $lms-preview-menu-color;
 
@@ -150,6 +163,7 @@
 
   .preview-actions {
     @include margin-left(0);
+
     display: inline-block;
     margin-bottom: 0;
 
@@ -158,6 +172,7 @@
 
       .action-preview-label {
         @include margin-right($baseline/2);
+
         display: inline-block;
         margin-bottom: 0;
         vertical-align: middle;
@@ -189,12 +204,12 @@
 }
 
 .section {
-    .icon {
-        width: 20px;
-        text-align: center;
-    }
+  .icon {
+    width: 20px;
+    text-align: center;
+  }
 }
 
 .section:not(:first-child) {
-    margin-top: $baseline;
+  margin-top: $baseline;
 }

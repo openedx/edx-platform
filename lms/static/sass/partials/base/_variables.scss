@@ -227,7 +227,8 @@ $state-success-text: $black !default;
 $state-success-bg: #dff0d8 !default;
 $state-success-border: darken($state-success-bg, 5%) !default;
 
-$state-info-text: $black !default;
+$state-info-text: #31708f !default;
+$state-info-text-link: #245269 !default;
 $state-info-bg: #d9edf7 !default;
 $state-info-border: darken($state-info-bg, 7%) !default;
 

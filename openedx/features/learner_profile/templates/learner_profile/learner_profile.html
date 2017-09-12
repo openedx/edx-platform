@@ -26,17 +26,17 @@ from openedx.core.djangolib.markup import HTML
     <div class="wrapper-profile">
         <div class="profile ${'profile-self' if own_profile else 'profile-other'}">
             <div class="wrapper-profile-field-account-privacy"></div>
-            <div class="wrapper-profile-sections account-settings-container">
-                % if own_profile:
-                    <div class="profile-header">
-                        <div class="header">${_("My Profile")}</div>
-                        <div class="subheader">
-                            ${_('Build out your profile to personalize your identity on {platform_name}.').format(
-                                platform_name=platform_name,
-                            )}
-                        </div>
+            % if own_profile:
+                <div class="profile-header">
+                    <div class="header">${_("My Profile")}</div>
+                    <div class="subheader">
+                        ${_('Build out your profile to personalize your identity on {platform_name}.').format(
+                            platform_name=platform_name,
+                        )}
                     </div>
-                % endif
+                </div>
+            % endif
+            <div class="wrapper-profile-sections account-settings-container">
                 <div class="ui-loading-indicator">
                     <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
                 </div>
