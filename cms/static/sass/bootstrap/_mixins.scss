@@ -34,14 +34,14 @@
 
 // +Font Sizing - Mixin
 // ====================
-@mixin font-size($sizeValue: 16){
+@mixin font-size($sizeValue: 16) {
   font-size: $sizeValue + px;
   font-size: ($sizeValue/10) + rem;
 }
 
 // +Line Height - Mixin
 // ====================
-@mixin line-height($fontSize: auto){
+@mixin line-height($fontSize: auto) {
   line-height: ($fontSize*1.48) + px;
   line-height: (($fontSize/10)*1.48) + rem;
 }
@@ -65,11 +65,13 @@
   :-moz-placeholder {
     color: $color;
   }
+
   ::-webkit-input-placeholder {
     color: $color;
   }
+
   :-ms-input-placeholder {
-     color: $color;
+    color: $color;
   }
 }
 
@@ -118,6 +120,7 @@
 // used for page/view-level wrappers (for centering/grids)
 %ui-wrapper {
   @include clearfix();
+
   width: 100%;
 }
 
@@ -135,7 +138,6 @@
 // ====================
 // extends - UI - utility - first child clearing
 %wipe-first-child {
-
   &:first-child {
     margin-top: 0;
     border-top: none;
@@ -145,7 +147,6 @@
 
 // extends - UI - utility - last child clearing
 %wipe-last-child {
-
   &:last-child {
     margin-bottom: 0;
     border-bottom: none;
@@ -180,18 +181,18 @@
 // +Content - Screenreader Text - Extend
 // ====================
 %cont-text-sr {
-    // clip has been deprecated but is still supported
-    clip: rect(1px 1px 1px 1px);
-    clip: rect(1px, 1px, 1px, 1px);
-    position: absolute;
-    margin: -1px;
-    height: 1px;
-    width: 1px;
-    border: 0;
-    padding: 0;
-    overflow: hidden;
-    // ensure there are spaces in sr text
-    word-wrap: normal;
+  // clip has been deprecated but is still supported
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  position: absolute;
+  margin: -1px;
+  height: 1px;
+  width: 1px;
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+  // ensure there are spaces in sr text
+  word-wrap: normal;
 }
 
 // +Content - Text Wrap - Extend

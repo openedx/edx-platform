@@ -2,7 +2,6 @@
 // ====================
 
 .view-updates {
-
   .course-info-wrapper {
     display: table;
     width: 100%;
@@ -42,6 +41,7 @@
 
     &.editing {
       @extend %ui-depth4;
+
       position: relative;
       padding: 0;
       border-top: none;
@@ -56,12 +56,14 @@
     h1 {
       @extend %t-title4;
       @extend %t-light;
+
       float: none;
     }
 
     h2 {
       @extend %t-title7;
       @extend %t-strong;
+
       margin-bottom: 18px;
       line-height: 30px;
       color: #646464;
@@ -71,30 +73,32 @@
     h3 {
       @extend %t-title6;
       @extend %t-strong;
+
       margin: 34px 0 11px;
     }
 
     .display-date {
-        padding-right: 15px;
+      padding-right: 15px;
     }
 
     .message-error {
-        display: inline-block;
-        font-weight: normal;
-        font-size: 1.2em;
+      display: inline-block;
+      font-weight: normal;
+      font-size: 1.2em;
 
-        &:before {
-            content: "\f06a";
-            font-family: FontAwesome;
-            color: #fdbc56;
-            padding: 5px;
-        }
+      &::before {
+        content: "\f06a";
+        font-family: FontAwesome;
+        color: #fdbc56;
+        padding: 5px;
+      }
     }
   }
 
   .update-contents {
     p {
       @extend %t-copy-base;
+
       line-height: 25px;
     }
 
@@ -128,6 +132,7 @@
 
     pre {
       @extend %t-copy-base;
+
       margin: 1em 0;
       color: $baseFontColor;
       font-family: monospace, serif;
@@ -151,6 +156,7 @@
 
   .new-update-form {
     @include edit-box;
+
     margin-bottom: 24px;
     padding: 30px;
     border: none;
@@ -166,8 +172,10 @@
     .edit-button,
     .delete-button {
       @include white-button();
+
       @extend %t-action4;
       @extend %t-regular;
+
       float: left;
       padding: 3px 10px 4px;
       margin-left: 7px;
@@ -181,25 +189,31 @@
 }
 
 .course-handouts {
-	@extend %ui-window;
-	width: 30%;
-	padding: 20px 30px;
-	margin: 0;
-	@include border-radius(0, 3px, 3px, 0);
-	@include border-left(none);
-	background: $uxpl-light-blue-base;
+  @extend %ui-window;
 
-	.title {
-		@extend %t-title4;
+  width: 30%;
+  padding: 20px 30px;
+  margin: 0;
+
+  @include border-radius(0, 3px, 3px, 0);
+  @include border-left(none);
+
+  background: $uxpl-light-blue-base;
+
+  .title {
+    @extend %t-title4;
     @extend %t-light;
-    margin-bottom: 24px;
-	}
 
-	.edit-button {
+    margin-bottom: 24px;
+  }
+
+  .edit-button {
     @include white-button;
+
     @extend %t-action4;
     @extend %t-regular;
-		float: right;
+
+    float: right;
     padding: 3px 10px 4px;
     margin-left: 7px;
 
@@ -220,7 +234,9 @@
 
 .edit-handouts-form {
   @extend %ui-depth4;
+
   @include edit-box;
+
   position: absolute;
   right: 0;
   top: 0;

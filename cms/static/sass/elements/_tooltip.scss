@@ -1,8 +1,10 @@
 .tooltip {
   @include transition(opacity $tmg-f3 ease-out 0s);
   @include font-size(12);
+
   @extend %t-regular;
   @extend %ui-depth5;
+
   position: absolute;
   top: 0;
   left: 0;
@@ -12,10 +14,11 @@
   line-height: 26px;
   color: $white;
   pointer-events: none;
-  opacity: 0.0;
+  opacity: 0;
 
-  &:after {
+  &::after {
     @include font-size(20);
+
     content: '▾';
     display: block;
     position: absolute;

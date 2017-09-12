@@ -2,15 +2,14 @@
 // ====================
 
 .view-howitworks {
-
   &.not-signedin {
-
     .wrapper-header {
       margin-bottom: 0;
     }
 
     .wrapper-content-header, .wrapper-content-features, .wrapper-content-cta {
       @include box-sizing(border-box);
+
       margin: 0;
       padding: 0 $baseline;
       position: relative;
@@ -19,7 +18,9 @@
 
     .content {
       @extend %t-copy-base;
+
       @include clearfix();
+
       max-width: $fg-max-width;
       min-width: $fg-min-width;
       width: flex-grid(12);
@@ -51,7 +52,8 @@
 
     // welcome content
     .wrapper-content-header {
-      @include linear-gradient($blue-l1,$blue,$blue-d1);
+      @include linear-gradient($blue-l1, $blue, $blue-d1);
+
       padding-bottom: ($baseline*4);
       padding-top: ($baseline*4);
     }
@@ -64,6 +66,7 @@
       h1 {
         @extend %t-title2;
         @extend %t-strong;
+
         float: none;
         margin: 0 0 ($baseline/2) 0;
         border-bottom: 1px solid $blue-l1;
@@ -77,11 +80,13 @@
 
       .logo {
         @extend %t-strong;
+
         margin-left: ($baseline/2);
       }
 
       .tagline {
         @extend %t-title4;
+
         margin: 0;
         color: $blue-l3;
       }
@@ -92,7 +97,8 @@
       background: $white;
       border: 4px solid $black;
     }
-    .arrow_box:after, .arrow_box:before {
+
+    .arrow_box::after, .arrow_box::before {
       top: 100%;
       border: solid transparent;
       content: " ";
@@ -102,14 +108,15 @@
       pointer-events: none;
     }
 
-    .arrow_box:after {
+    .arrow_box::after {
       border-color: rgba(255, 255, 255, 0);
       border-top-color: $white;
       border-width: 30px;
       left: 50%;
       margin-left: -($baseline*1.5);
     }
-    .arrow_box:before {
+
+    .arrow_box::before {
       border-color: $transparent;
       border-top-color: $black;
       border-width: 36px;
@@ -126,7 +133,6 @@
     }
 
     .content-features {
-
       .list-features {
 
       }
@@ -134,18 +140,21 @@
       // indiv features
       .feature {
         @include clearfix();
+
         margin: 0 0 ($baseline*2) 0;
         border-bottom: 1px solid $gray-l4;
         padding: 0 0 ($baseline*2) 0;
 
         .img {
           @include box-sizing(border-box);
+
           float: left;
           width: flex-grid(3, 12);
           margin-right: flex-gutter();
 
           a {
             @include box-sizing(border-box);
+
             box-shadow: 0 1px ($baseline/10) $shadow-l1;
             position: relative;
             top: 0;
@@ -157,14 +166,17 @@
 
             .action-zoom {
               @include transition(bottom $tmg-f2 ease-in-out 0s);
+
               position: absolute;
               bottom: -30px;
               right: ($baseline/2);
-              opacity: 0.0;
+              opacity: 0;
 
               .icon {
                 @include border-top-radius(3px);
+
                 @extend %t-icon4;
+
                 display: inline-block;
                 padding: ($baseline/2);
                 background: $blue;
@@ -177,7 +189,7 @@
               border-color: $blue;
 
               .action-zoom {
-                opacity: 1.0;
+                opacity: 1;
                 bottom: -2px;
               }
             }
@@ -198,28 +210,34 @@
           h3 {
             @extend %t-title4;
             @extend %t-strong;
+
             margin: 0 0 ($baseline/2) 0;
           }
 
           > p {
             @extend %t-copy-lead1;
+
             color: $gray-d1;
           }
 
           strong {
             @extend %t-strong;
+
             color: $gray-d2;
           }
 
           .list-proofpoints {
             @extend %t-copy-sub1;
+
             @include clearfix();
+
             width: flex-grid(9, 9);
             margin: ($baseline*1.5) 0 0 0;
 
             .proofpoint {
               @include box-sizing(border-box);
               @include transition(all $tmg-f2 ease-in-out 0s);
+
               border-radius: ($baseline/4);
               position: relative;
               top: 0;
@@ -233,12 +251,14 @@
               .title {
                 @extend %t-copy-base;
                 @extend %t-strong;
+
                 margin: 0 0 ($baseline/4) 0;
                 color: $gray-d3;
               }
 
               &:hover {
                 @extend %ui-fake-link;
+
                 box-shadow: 0 1px ($baseline/10) $shadow-l1;
                 background: $blue-l5;
                 top: -($baseline/5);
@@ -263,7 +283,6 @@
         }
 
         &:nth-child(even) {
-
           .img {
             float: right;
             margin-right: 0;
@@ -276,7 +295,6 @@
           }
 
           .list-proofpoints {
-
             .proofpoint {
               float: right;
               width: flex-grid(3, 9);
@@ -324,8 +342,10 @@
 
           &.action-primary {
             @include blue-button;
+
             @extend %t-action1;
             @extend %t-strong;
+
             padding: ($baseline*0.75) ($baseline/2);
             text-align: center;
             text-transform: uppercase;
@@ -333,6 +353,7 @@
 
           &.action-secondary {
             @extend %t-action3;
+
             margin-top: ($baseline/2);
           }
         }
