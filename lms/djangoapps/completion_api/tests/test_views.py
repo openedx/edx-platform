@@ -11,7 +11,9 @@ from rest_framework.test import APIClient
 from opaque_keys.edx.keys import UsageKey
 from progress import models
 
+from edx_solutions_api_integration.test_utils import SignalDisconnectTestMixin
 from student.tests.factories import AdminFactory, UserFactory
+from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
@@ -204,3 +206,65 @@ class CompletionViewTestCase(SharedModuleStoreTestCase):
         self.client.force_authenticate(user)
         response = self.client.get('/api/completion/v0/course/?user={}'.format(self.test_user.username))
         self.assertEqual(response.status_code, 200)
+
+
+class CompletionBlockUpdateViewTestCase(SharedModuleStoreTestCase):
+    """
+    Test that CompletionBlockUpdateView can be used to mark XBlocks as completed.
+
+    Ensure that it handles authorization as well.
+    """
+
+    usage_key = 'i4x://edX/toy/video/sample_video'
+
+    @classmethod
+    def setUpClass(cls):
+        super(CompletionBlockUpdateViewTestCase, cls).setUpClass()
+        cls.course = ToyCourseFactory.create()
+
+    def setUp(self):
+        super(CompletionBlockUpdateViewTestCase, self).setUp()
+        self.test_user = UserFactory.create()
+        CourseEnrollment.enroll(self.test_user, self.course.id)
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.test_user)
+        self.update_url = '/api/completion/v0/course/{}/blocks/{}/'.format(self.course.id, self.usage_key)
+
+    def test_create_view(self):
+        # Ensure Solutions signals are always connected.
+        SignalDisconnectTestMixin.connect_signals()
+
+        completion_query_url = '/api/completion/v0/course/edX/toy/2012_Fall/?requested_fields=sequential'
+        before_response = self.client.get(completion_query_url)
+        self.assertEqual(before_response.status_code, 404)
+
+        create_response = self.client.post(self.update_url, {'completion': 1})
+        self.assertEqual(create_response.status_code, 201)
+
+        after_response = self.client.get(completion_query_url)
+        self.assertEqual(after_response.status_code, 200)
+        self.assertEqual(after_response.data['completion']['earned'], 1)  # pylint: disable=no-member
+        self.assertEqual(after_response.data['sequential'][0]['completion']['earned'], 1)  # pylint: disable=no-member
+
+        # Disconnect signals again.
+        SignalDisconnectTestMixin.disconnect_signals()
+
+    def test_create_view_oauth2(self):
+        """
+        Test the create view using OAuth2 Authentication
+        """
+        url = '/api/completion/v0/course/{}/blocks/{}/'.format(self.course.id, self.usage_key)
+
+        self.client.logout()
+        response = self.client.post(url, {'completion': 1})
+        self.assertEqual(response.status_code, 401)
+
+        # Now, try with a valid token header:
+        token = _create_oauth2_token(self.test_user)
+        response = self.client.post(url, {'completion': 1}, HTTP_AUTHORIZATION="Bearer {0}".format(token))
+        self.assertEqual(response.status_code, 201)
+
+    def test_unauthenticated(self):
+        self.client.force_authenticate(None)
+        response = self.client.post(self.update_url, {'completion': 1})
+        self.assertEqual(response.status_code, 401)
