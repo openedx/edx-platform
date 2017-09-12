@@ -966,7 +966,7 @@ class RegistrationView(APIView):
             label=point_of_contact_label,
             required=required,
             field_type="select",
-            options=[(True, 'Yes'), (False, 'No')]
+            options=[(False, 'No'), (True, 'Yes')]
         )
 
     def _add_admin_email_field(self, form_desc, required=False):
