@@ -335,11 +335,11 @@ def _get_stylelint_violations():
     )
 
     try:
-        return int(_get_count_from_last_line(stylelint_report, "eslint"))
+        return int(_get_count_from_last_line(stylelint_report, "stylelint"))
     except TypeError:
         raise BuildFailure(
-            "Error. Number of eslint violations could not be found in {eslint_report}".format(
-                eslint_report=stylelint_report
+            "Error. Number of stylelint violations could not be found in {stylelint_report}".format(
+                stylelint_report=stylelint_report
             )
         )
 
@@ -369,10 +369,6 @@ def run_stylelint(options):
                 violations_limit=violations_limit,
             )
         )
-    if num_violations > 0:
-        print("Stylelint succeeded with no more violations than {violations_limit}".format(
-            violations_limit=violations_limit,
-        ))
 
 
 @task

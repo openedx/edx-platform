@@ -9,13 +9,13 @@ from paver.easy import BuildFailure
 import pavelib.quality
 
 
-class TestPaverStylelint(unittest.TestCase):
+class TestPaverESLint(unittest.TestCase):
     """
-    For testing run_stylelint
+    For testing run_eslint
     """
 
     def setUp(self):
-        super(TestPaverStylelint, self).setUp()
+        super(TestPaverESLint, self).setUp()
 
         # Mock the paver @needs decorator
         self._mock_paver_needs = patch.object(pavelib.quality.run_eslint, 'needs').start()
