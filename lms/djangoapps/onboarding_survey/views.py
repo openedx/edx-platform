@@ -125,9 +125,10 @@ def organization(request):
             organization_survey = form.save()
             partner_network = organization_survey.partner_network
 
-            if not partner_network.is_partner_affiliated:
-                partner_network.is_partner_affiliated = True
-                partner_network.save()
+            if partner_network:
+                if not partner_network.is_partner_affiliated:
+                    partner_network.is_partner_affiliated = True
+                    partner_network.save()
 
             organization_survey.user = request.user
             organization_survey.save()

@@ -22,11 +22,14 @@ class RedirectMiddleware(object):
 
     def process_request(self, request):
 
-        if request.is_ajax():
+        if request.is_ajax() or request.get_full_path() == '/logout':
             return None
 
         if not request.user.is_anonymous():
             user = request.user
+
+            if user.is_superuser:
+                return None
 
             try:
                 user.user_info_survey
