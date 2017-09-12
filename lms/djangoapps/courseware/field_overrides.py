@@ -257,6 +257,7 @@ class OverrideFieldData(FieldData):
 
 class OverrideModulestoreFieldData(OverrideFieldData):
     """Apply field data overrides at the modulestore level. No student context required."""
+    provider_classes = None
 
     @classmethod
     def wrap(cls, block, field_data):  # pylint: disable=arguments-differ

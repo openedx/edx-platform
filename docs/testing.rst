@@ -130,14 +130,15 @@ however, run any acceptance tests.
 
 Note -
 `paver` is a scripting tool. To get information about various options, you can run the this command.
+
 ::
-	paver -h
+
+    paver -h
+
 Running Python Unit tests
 -------------------------
 
-We use `nose <https://nose.readthedocs.org/en/latest/>`__ through the
-`django-nose plugin <https://pypi.python.org/pypi/django-nose>`__ to run
-the test suite.
+We use `pytest <https://pytest.org/>`__ to run the test suite.
 
 For example, this command runs all the python test scripts.
 
@@ -194,7 +195,7 @@ To run a single django test class use this command.
 
 ::
 
-    paver test_system -t lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest
+    paver test_system -t lms/djangoapps/courseware/tests/tests.py::ActivateLoginTest
 
 When developing tests, it is often helpful to be able to really just run
 one single test without the overhead of PIP installs, UX builds, etc. In
@@ -204,23 +205,23 @@ the time of this writing, the command is the following.
 
 ::
 
-    python ./manage.py lms test --verbosity=1 lms/djangoapps/courseware/tests/test_courses.py   --traceback --settings=test
+    pytest lms/djangoapps/courseware/tests/test_courses.py
 
 
 To run a single test format the command like this.
 
 ::
 
-    paver test_system -t lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest.test_activate_login
+    paver test_system -t lms/djangoapps/courseware/tests/tests.py::ActivateLoginTest::test_activate_login
 
-The ``lms`` suite of tests runs with randomized order, by default.
-You can override these by using ``--no-randomize`` to disable randomization.
+You can use ``--randomize`` to randomize the test case sequence.  In the
+short term, this is likely to reveal bugs in our test setup and teardown;
+please fix (or at least file tickets for) any such issues you encounter.
 
 You can also enable test concurrency with the ``--processes=N`` flag (where ``N``
 is the number of processes to run tests with, and ``-1`` means one process per
 available core). Note, however, that when running concurrently, breakpoints may
-not work correctly, and you will not be able to run single test methods (only
-single test classes).
+not work correctly.
 
 For example:
 
@@ -239,44 +240,44 @@ To re-run all failing django tests from lms or cms, use the
     paver test_system -s lms --failed
     paver test_system -s cms --failed
 
-There is also a ``--fail_fast``, ``-x`` option that will stop nosetests
+There is also a ``--exitfirst``, ``-x`` option that will stop pytest
 after the first failure.
 
 common/lib tests are tested with the ``test_lib`` task, which also
-accepts the ``--failed`` and ``--fail_fast`` options.
+accepts the ``--failed`` and ``--exitfirst`` options.
 
 ::
 
     paver test_lib -l common/lib/calc
     paver test_lib -l common/lib/xmodule --failed
 
-For example, this command runs a single nose test file.
+For example, this command runs a single python unit test file.
 
 ::
 
-    nosetests common/lib/xmodule/xmodule/tests/test_stringify.py
+    pytest common/lib/xmodule/xmodule/tests/test_stringify.py
 
-This command runs a single nose test within a specified file.
-
-::
-
-    nosetests common/lib/xmodule/xmodule/tests/test_stringify.py:test_stringify
-
-
-This is an example of how to run a single test and get stdout, with proper env config.
+This command runs a single python unit test within a specified file.
 
 ::
 
-    python manage.py cms --settings test test contentstore.tests.test_import_nostatic -s
+    pytest common/lib/xmodule/xmodule/tests/test_stringify.py::test_stringify
 
-These are examples of how to run a single test and get stdout and get coverage.
+
+This is an example of how to run a single test and get stdout shown immediately, with proper env config.
 
 ::
 
-    python -m coverage run which ./manage.py cms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000 contentstore.tests.test_import_nostatic -s # cms example
-    python -m coverage run which ./manage.py lms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000  courseware.tests.test_module_render -s # lms example
+    pytest cms/djangoapps/contentstore/tests/test_import.py -s
 
-Use this command to generate coverage report.
+These are examples of how to run a single test and get coverage.
+
+::
+
+    pytest cms/djangoapps/contentstore/tests/test_import.py --cov # cms example
+    pytest lms/djangoapps/courseware/tests/test_module_render.py --cov # lms example
+
+Use this command to generate a coverage report.
 
 ::
 
@@ -297,31 +298,32 @@ you can run one of these commands.
 ::
 
     paver test_system -s cms -t common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
-    python -m coverage run `which ./manage.py` cms --settings test test --traceback common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
+    pytest common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
 
 Very handy: if you pass the ``--pdb`` flag to a paver test function, or
 uncomment the ``pdb=1`` line in ``setup.cfg``, the test runner
 will drop you into pdb on error. This lets you go up and down the stack
 and see what the values of the variables are. Check out `the pdb
-documentation <http://docs.python.org/library/pdb.html>`__
+documentation <http://docs.python.org/library/pdb.html>`__  Note that this
+only works if you aren't collecting coverage statistics (pdb and coverage.py
+use the same mechanism to trace code execution).
 
 Use this command to put a temporary debugging breakpoint in a test.
 If you check this in, your tests will hang on jenkins.
 
 ::
 
-    from nose.tools import set_trace; set_trace()
+    import pdb; pdb.set_trace()
 
-
-Note: More on the ``--failed`` functionality
+Note: More on the ``--failed`` functionality:
 
 * In order to use this, you must run the tests first. If you haven't already
   run the tests, or if no tests failed in the previous run, then using the
   ``--failed`` switch will result in **all** of the tests being run. See more
-  about this in the `nose documentation
-  <http://nose.readthedocs.org/en/latest/plugins/testid.html#looping-over-failed-tests>`__.
+  about this in the `pytest documentation
+  <https://docs.pytest.org/en/latest/cache.html>`__.
 
-* Note that ``paver test_python`` calls nosetests separately for cms and lms.
+* Note that ``paver test_python`` calls pytest separately for cms and lms.
   This means that if tests failed only in lms on the previous run, then calling
   ``paver test_python --failed`` will run **all of the tests for cms** in
   addition to the previously failing lms tests. If you want it to run only the
@@ -501,7 +503,7 @@ To run all the bok choy accessibility tests use this command.
 
     paver test_a11y
 
-To run specific tests, use the ``-t`` flag to specify a nose-style test spec
+To run specific tests, use the ``-t`` flag to specify a pytest-style test spec
 relative to the ``common/test/acceptance/tests`` directory. This is an example for it.
 
 ::
@@ -565,7 +567,7 @@ Note if setup has already been done, you can run::
 You must run BOTH `--testsonly` and `--fasttest`.
 
 3. When done, you can kill your servers in the first terminal/ssh session with
-Control-C. *Warning*: Only hit Control-C one time so the nose test framework can
+Control-C. *Warning*: Only hit Control-C one time so the pytest framework can
 properly clean up.
 
 Running Lettuce Acceptance Tests
@@ -644,7 +646,7 @@ Running Tests on Paver Scripts
 
 To run tests on the scripts that power the various Paver commands, use the following command::
 
-  nosetests pavelib
+  pytest pavelib
 
 
 Testing internationalization with dummy translations
@@ -814,7 +816,7 @@ To view JavaScript code style quality run this command.
 
 ::
 
-	paver run_eslint --limit=50000
+    paver run_eslint --limit=50000
 
 
 

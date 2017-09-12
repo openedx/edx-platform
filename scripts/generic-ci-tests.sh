@@ -29,7 +29,7 @@ set -e
 #   `SHARD` is a number indicating which subset of the tests to build.
 #
 #       For "bok-choy" and "lms-unit", the tests are put into shard groups
-#       using the nose 'attr' decorator (e.g. "@attr(shard=1)"). Anything with
+#       using the 'attr' decorator (e.g. "@attr(shard=1)"). Anything with
 #       the 'shard=n' attribute will run in the nth shard. If there isn't a
 #       shard explicitly assigned, the test will run in the last shard.
 #
@@ -68,8 +68,9 @@ function emptyxunit {
 END
 
 }
-PAVER_ARGS="--cov-args='-p' --with-xunitmp -v"
+PAVER_ARGS="-v"
 PARALLEL="--processes=-1"
+export SUBSET_JOB=$JOB_NAME
 case "$TEST_SUITE" in
 
     "quality")
@@ -108,10 +109,10 @@ case "$TEST_SUITE" in
                 paver test_system -s lms $PAVER_ARGS $PARALLEL 2> lms-tests.log
                 ;;
             [1-3])
-                paver test_system -s lms --attr="shard=$SHARD" $PAVER_ARGS $PARALLEL 2> lms-tests.$SHARD.log
+                paver test_system -s lms --eval-attr="shard==$SHARD" $PAVER_ARGS $PARALLEL 2> lms-tests.$SHARD.log
                 ;;
             4|"noshard")
-                paver test_system -s lms --attr='!shard' $PAVER_ARGS $PARALLEL 2> lms-tests.4.log
+                paver test_system -s lms --eval-attr='not shard' $PAVER_ARGS $PARALLEL 2> lms-tests.4.log
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a

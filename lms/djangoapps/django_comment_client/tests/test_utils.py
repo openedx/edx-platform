@@ -1707,28 +1707,24 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         # cohorted_user (who is in the cohort but not the verified enrollment track),
         # and plain_user (who is neither in the cohort nor the verified enrollment track)
         self.group_moderator = UserFactory(username='group_moderator', email='group_moderator@edx.org')
-        self.group_moderator.id = 1
         CourseEnrollmentFactory(
             course_id=self.course.id,
             user=self.group_moderator,
             mode=verified_coursemode
         )
         self.verified_user = UserFactory(username='verified', email='verified@edx.org')
-        self.verified_user.id = 2
         CourseEnrollmentFactory(
             course_id=self.course.id,
             user=self.verified_user,
             mode=verified_coursemode
         )
         self.cohorted_user = UserFactory(username='cohort', email='cohort@edx.org')
-        self.cohorted_user.id = 3
         CourseEnrollmentFactory(
             course_id=self.course.id,
             user=self.cohorted_user,
             mode=audit_coursemode
         )
         self.plain_user = UserFactory(username='plain', email='plain@edx.org')
-        self.plain_user.id = 4
         CourseEnrollmentFactory(
             course_id=self.course.id,
             user=self.plain_user,
@@ -1737,7 +1733,7 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         CohortFactory(
             course_id=self.course.id,
             name='Test Cohort',
-            users=[self.verified_user, self.cohorted_user]
+            users=[self.group_moderator, self.cohorted_user]
         )
 
         # Give group moderator permissions to group_moderator

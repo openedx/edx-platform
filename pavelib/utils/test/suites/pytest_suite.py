@@ -1,7 +1,8 @@
 """
-Classes used for defining and running nose test suites
+Classes used for defining and running pytest test suites
 """
 import os
+from glob import glob
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
@@ -14,13 +15,13 @@ except ImportError:
 __test__ = False  # do not collect
 
 
-class NoseTestSuite(TestSuite):
+class PytestSuite(TestSuite):
     """
     A subclass of TestSuite with extra methods that are specific
-    to nose tests
+    to pytest tests
     """
     def __init__(self, *args, **kwargs):
-        super(NoseTestSuite, self).__init__(*args, **kwargs)
+        super(PytestSuite, self).__init__(*args, **kwargs)
         self.failed_only = kwargs.get('failed_only', False)
         self.fail_fast = kwargs.get('fail_fast', False)
         self.run_under_coverage = kwargs.get('with_coverage', True)
@@ -34,22 +35,17 @@ class NoseTestSuite(TestSuite):
             shard_str = "shard_{}".format(os.environ.get("SHARD"))
             self.report_dir = self.report_dir / shard_str
 
-        self.test_id_dir = Env.TEST_DIR / self.root
-        self.test_ids = self.test_id_dir / 'noseids'
-        self.extra_args = kwargs.get('extra_args', '')
         self.cov_args = kwargs.get('cov_args', '')
-        self.use_ids = True
 
     def __enter__(self):
-        super(NoseTestSuite, self).__enter__()
+        super(PytestSuite, self).__enter__()
         self.report_dir.makedirs_p()
-        self.test_id_dir.makedirs_p()
 
     def __exit__(self, exc_type, exc_value, traceback):
         """
         Cleans mongo afer the tests run.
         """
-        super(NoseTestSuite, self).__exit__(exc_type, exc_value, traceback)
+        super(PytestSuite, self).__exit__(exc_type, exc_value, traceback)
         test_utils.clean_mongo()
 
     def _under_coverage_cmd(self, cmd):
@@ -59,23 +55,18 @@ class NoseTestSuite(TestSuite):
         unaltered otherwise.
         """
         if self.run_under_coverage:
-            # We use "python -m coverage" so that the proper python
-            # will run the importable coverage rather than the
-            # coverage that OS path finds.
-
-            if not cmd[0].endswith('.py'):
-                cmd[0] = "`which {}`".format(cmd[0])
-
-            cmd = [
-                "python",
-                "-m",
-                "coverage",
-                "run",
-                self.cov_args,
-                "--rcfile={}".format(Env.PYTHON_COVERAGERC),
-            ] + cmd
+            cmd.append('--cov')
+            cmd.append('--cov-report=')
 
         return cmd
+
+    @staticmethod
+    def is_success(exit_code):
+        """
+        An exit code of zero means all tests passed, 5 means no tests were
+        found.
+        """
+        return exit_code in [0, 5]
 
     @property
     def test_options_flags(self):
@@ -87,12 +78,12 @@ class NoseTestSuite(TestSuite):
 
         # Handle "--failed" as a special case: we want to re-run only
         # the tests that failed within our Django apps
-        # This sets the --failed flag for the nosetests command, so this
-        # functionality is the same as described in the nose documentation
+        # This sets the --last-failed flag for the pytest command, so this
+        # functionality is the same as described in the pytest documentation
         if self.failed_only:
-            opts.append("--failed")
+            opts.append("--last-failed")
 
-        # This makes it so we use nose's fail-fast feature in two cases.
+        # This makes it so we use pytest's fail-fast feature in two cases.
         # Case 1: --fail-fast is passed as an arg in the paver command
         # Case 2: The environment variable TESTS_FAIL_FAST is set as True
         env_fail_fast_set = (
@@ -100,20 +91,18 @@ class NoseTestSuite(TestSuite):
         )
 
         if self.fail_fast or env_fail_fast_set:
-            opts.append("--stop")
-
-        if self.use_ids:
-            opts.append("--with-id")
+            opts.append("--exitfirst")
 
         return opts
 
 
-class SystemTestSuite(NoseTestSuite):
+class SystemTestSuite(PytestSuite):
     """
-    TestSuite for lms and cms nosetests
+    TestSuite for lms and cms python unit tests
     """
     def __init__(self, *args, **kwargs):
         super(SystemTestSuite, self).__init__(*args, **kwargs)
+        self.eval_attr = kwargs.get('eval_attr', None)
         self.test_id = kwargs.get('test_id', self._default_test_id)
         self.fasttest = kwargs.get('fasttest', False)
 
@@ -127,17 +116,6 @@ class SystemTestSuite(NoseTestSuite):
 
         self.processes = int(self.processes)
 
-        if self.randomize is None:
-            self.randomize = self.root == 'lms'
-
-        if self.processes != 0 and self.verbosity > 1:
-            print colorize(
-                'red',
-                "The TestId module and multiprocessing module can't be run "
-                "together in verbose mode. Disabling TestId for {} tests.".format(self.root)
-            )
-            self.use_ids = False
-
     def __enter__(self):
         super(SystemTestSuite, self).__enter__()
 
@@ -145,23 +123,29 @@ class SystemTestSuite(NoseTestSuite):
     def cmd(self):
 
         cmd = [
-            './manage.py', self.root, 'test',
-            '--verbosity={}'.format(self.verbosity),
-            self.test_id,
-        ] + self.test_options_flags + [
-            '--settings', self.settings,
-            self.extra_args,
-            '--xunitmp-file={}'.format(self.report_dir / "nosetests.xml"),
-            '--with-database-isolation',
-        ]
+            'pytest',
+            '--ds={}'.format('{}.envs.{}'.format(self.root, self.settings)),
+            '--junitxml={}'.format(self.report_dir / "nosetests.xml"),
+        ] + self.test_options_flags
+        if self.verbosity < 1:
+            cmd.append("--quiet")
+        elif self.verbosity > 1:
+            cmd.append("--verbose")
 
-        if self.processes != 0:
-            cmd.append('--processes={}'.format(self.processes))
+        if self.processes == -1:
+            cmd.append('-n auto')
+            cmd.append('--dist=loadscope')
+        elif self.processes != 0:
+            cmd.append('-n {}'.format(self.processes))
+            cmd.append('--dist=loadscope')
 
-        if self.randomize:
-            cmd.append('--with-randomly')
+        if not self.randomize:
+            cmd.append('-p no:randomly')
+        if self.eval_attr:
+            cmd.append("-a '{}'".format(self.eval_attr))
 
         cmd.extend(self.passthrough_options)
+        cmd.append(self.test_id)
 
         return self._under_coverage_cmd(cmd)
 
@@ -174,47 +158,77 @@ class SystemTestSuite(NoseTestSuite):
         using a default test id.
         """
         # We need to use $DIR/*, rather than just $DIR so that
-        # django-nose will import them early in the test process,
+        # pytest will import them early in the test process,
         # thereby making sure that we load any django models that are
         # only defined in test files.
-        default_test_id = (
-            "{system}/djangoapps/*"
-            " common/djangoapps/*"
-            " openedx/core/djangoapps/*"
-            " openedx/tests/*"
-            " openedx/core/lib/*"
-        )
-
+        default_test_globs = [
+            "{system}/djangoapps/*".format(system=self.root),
+            "common/djangoapps/*",
+            "openedx/core/djangoapps/*",
+            "openedx/tests/*",
+            "openedx/core/lib/*",
+        ]
         if self.root in ('lms', 'cms'):
-            default_test_id += " {system}/lib/*"
+            default_test_globs.append("{system}/lib/*".format(system=self.root))
 
         if self.root == 'lms':
-            default_test_id += " {system}/tests.py"
-            default_test_id += " openedx/core/djangolib/*"
-            default_test_id += " openedx/features"
+            default_test_globs.append("{system}/tests.py".format(system=self.root))
+            default_test_globs.append("openedx/core/djangolib/*")
+            default_test_globs.append("openedx/features")
 
-        return default_test_id.format(system=self.root)
+        def included(path):
+            """
+            Should this path be included in the pytest arguments?
+            """
+            if path.endswith('__pycache__'):
+                return False
+            return path.endswith('.py') or os.path.isdir(path)
+
+        default_test_paths = []
+        for path_glob in default_test_globs:
+            if '*' in path_glob:
+                default_test_paths += [path for path in glob(path_glob) if included(path)]
+            else:
+                default_test_paths += [path_glob]
+        return ' '.join(default_test_paths)
 
 
-class LibTestSuite(NoseTestSuite):
+class LibTestSuite(PytestSuite):
     """
-    TestSuite for edx-platform/common/lib nosetests
+    TestSuite for edx-platform/common/lib python unit tests
     """
     def __init__(self, *args, **kwargs):
         super(LibTestSuite, self).__init__(*args, **kwargs)
+        self.append_coverage = kwargs.get('append_coverage', False)
         self.test_id = kwargs.get('test_id', self.root)
         self.xunit_report = self.report_dir / "nosetests.xml"
 
     @property
     def cmd(self):
         cmd = [
-            "nosetests",
-            "--id-file={}".format(self.test_ids),
-            self.test_id,
-        ] + self.test_options_flags + [
-            "--xunit-file={}".format(self.xunit_report),
-            self.extra_args,
-            "--verbosity={}".format(self.verbosity),
-        ] + self.passthrough_options
+            "pytest",
+            "-p",
+            "no:randomly",
+            "--junitxml=".format(self.xunit_report),
+        ] + self.passthrough_options + self.test_options_flags
+        if self.verbosity < 1:
+            cmd.append("--quiet")
+        elif self.verbosity > 1:
+            cmd.append("--verbose")
+        cmd.append(self.test_id)
 
         return self._under_coverage_cmd(cmd)
+
+    def _under_coverage_cmd(self, cmd):
+        """
+        If self.run_under_coverage is True, it returns the arg 'cmd'
+        altered to be run under coverage. It returns the command
+        unaltered otherwise.
+        """
+        if self.run_under_coverage:
+            cmd.append('--cov')
+            if self.append_coverage:
+                cmd.append('--cov-append')
+            cmd.append('--cov-report=')
+
+        return cmd

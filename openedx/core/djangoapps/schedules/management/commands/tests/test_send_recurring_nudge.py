@@ -1,5 +1,6 @@
 import datetime
 import itertools
+from copy import deepcopy
 from unittest import skipUnless
 
 import attr
@@ -201,10 +202,8 @@ class TestSendRecurringNudge(CacheIsolationTestCase):
 
     @ddt.data(*itertools.product((1, 10, 100), (3, 10)))
     @ddt.unpack
-    @override_settings()
     def test_templates(self, message_count, day):
 
-        settings.TEMPLATES[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
         user = UserFactory.create()
         schedules = [
             ScheduleFactory.create(
@@ -226,20 +225,23 @@ class TestSendRecurringNudge(CacheIsolationTestCase):
 
         sent_messages = []
 
-        with patch.object(tasks, '_recurring_nudge_schedule_send') as mock_schedule_send:
-            mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
+        templates_override = deepcopy(settings.TEMPLATES)
+        templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
+        with self.settings(TEMPLATES=templates_override):
+            with patch.object(tasks, '_recurring_nudge_schedule_send') as mock_schedule_send:
+                mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
 
-            with self.assertNumQueries(2):
-                tasks.recurring_nudge_schedule_hour(
-                    self.site_config.site.id, day, test_time_str, [schedules[0].enrollment.course.org],
-                )
+                with self.assertNumQueries(2):
+                    tasks.recurring_nudge_schedule_hour(
+                        self.site_config.site.id, day, test_time_str, [schedules[0].enrollment.course.org],
+                    )
 
-        self.assertEqual(len(sent_messages), 1)
+            self.assertEqual(len(sent_messages), 1)
 
-        for args in sent_messages:
-            tasks._recurring_nudge_schedule_send(*args)
+            for args in sent_messages:
+                tasks._recurring_nudge_schedule_send(*args)
 
-        self.assertEqual(mock_channel.deliver.call_count, 1)
-        for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
-            for template in attr.astuple(email):
-                self.assertNotIn("TEMPLATE WARNING", template)
+            self.assertEqual(mock_channel.deliver.call_count, 1)
+            for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
+                for template in attr.astuple(email):
+                    self.assertNotIn("TEMPLATE WARNING", template)

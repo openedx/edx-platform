@@ -47,7 +47,6 @@ class TestPaverBokChoyCmd(unittest.TestCase):
             "-m",
             "pytest",
             "{}/common/test/acceptance/{}".format(REPO_DIR, name),
-            "--durations=20",
             "--junitxml={}/reports/bok_choy{}/xunit.xml".format(REPO_DIR, shard_str),
             "--verbose",
         ]
