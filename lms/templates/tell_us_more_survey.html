@@ -83,6 +83,19 @@
                 minLength: 2
               });
 
+            if ($("#id_is_country_or_city_different").is(":checked")){
+                $('#id_country_of_employment').show()
+                $('#id_city_of_employment').show()
+                $("#id_country_of_employment").autocomplete({
+                        source: "/onboarding_survey/get_country_names/",
+                        minLength: 2
+                      });
+            }
+            else {
+                $('#id_country_of_employment').hide()
+                $('#id_city_of_employment').hide()
+            }
+
             $('#id_is_country_or_city_different').change(function() {
                 if($(this).is(":checked")) {
                     $('#id_country_of_employment').show()
