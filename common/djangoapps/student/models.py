@@ -2551,8 +2551,7 @@ class UserAttribute(TimeStampedModel):
         user. Overwrites any previous value for that name, if it
         exists.
         """
-        cls.objects.filter(user=user, name=name).delete()
-        cls.objects.create(user=user, name=name, value=value)
+        cls.objects.update_or_create(user=user, name=name, defaults={'value': value})
 
     @classmethod
     def get_user_attribute(cls, user, name):
