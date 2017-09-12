@@ -69,9 +69,11 @@ def create_schedule(sender, **kwargs):
 @receiver(COURSE_START_DATE_CHANGED, dispatch_uid="update_schedules_on_course_start_changed")
 def update_schedules_on_course_start_changed(sender, updated_course_overview, previous_start_date, **kwargs):
     """
-    Updates all course schedules if course hasn't started yet.
+    Updates all course schedules if course hasn't started yet and
+    the updated start date is still in the future.
     """
-    if previous_start_date > timezone.now():
+    current_time = timezone.now()
+    if previous_start_date > current_time and updated_course_overview.start > current_time:
         upgrade_deadline = _calculate_upgrade_deadline(
             updated_course_overview.id,
             content_availability_date=updated_course_overview.start,
