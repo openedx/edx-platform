@@ -20,7 +20,7 @@ email itself. -->
 
 {# Note {view_url} is not a template variable that is evaluated by the Django template engine. It is evaluated by #}
 {# Sailthru when the email is sent. Other email providers would need to replace this variable in the HTML as well. #}
-<a href="{view_url}">{% trans "View on Web" %}</a>
+<p><a href="{view_url}">{% trans "View on Web" %}</a></p>
 {# Note this is another late-bound variable #}
 <img src="{beacon_src}" alt="" role="presentation" aria-hidden="true" />
 
@@ -87,113 +87,88 @@ email itself. -->
                 <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
                     <tr>
                         <td style="padding-bottom: 20px;">
-                            <!-- LOGO / SOCIAL -->
-                            <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <!-- SOCIAL -->
+                            <table role="presentation" align="left" border="0" border="0" cellpadding="0" cellspacing="0" width="210">
                                 <tr>
-                                    <td align="right">
-                                        <!-- SOCIAL -->
-                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="210">
-                                            <tr>
-                                                {% if social_media_urls.linkedin %}
-                                                    <td height="32" width="42" align="right">
-                                                        <a href="{{ social_media_urls.linkedin }}">
-                                                            <img src="https://media.sailthru.com/595/1k1/8/o/599f354ec70cb.png"
-                                                                 width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on LinkedIn{% endblocktrans %}"/>
-                                                        </a>
-                                                    </td>
-                                                {% endif %}
-                                                {% if social_media_urls.twitter %}
-                                                    <td height="32" width="42" align="right">
-                                                        <a href="{{ social_media_urls.twitter }}">
-                                                            <img src="https://media.sailthru.com/595/1k1/8/o/599f354d9c26e.png"
-                                                                 width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Twitter{% endblocktrans %}"/>
-                                                        </a>
-                                                    </td>
-                                                {% endif %}
-                                                {% if social_media_urls.facebook %}
-                                                    <td height="32" width="42" align="right">
-                                                        <a href="{{ social_media_urls.facebook }}">
-                                                            <img src="https://media.sailthru.com/595/1k1/8/o/599f355052c8e.png"
-                                                                 width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Facebook{% endblocktrans %}"/>
-                                                        </a>
-                                                    </td>
-                                                {% endif %}
-                                                {% if social_media_urls.google_plus %}
-                                                    <td height="32" width="42" align="right">
-                                                        <a href="{{ social_media_urls.google_plus }}">
-                                                            <img src="https://media.sailthru.com/595/1k1/8/o/599f354fc554a.png"
-                                                                 width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Google Plus{% endblocktrans %}"/>
-                                                        </a>
-                                                    </td>
-                                                {% endif %}
-                                                {% if social_media_urls.reddit %}
-                                                    <td height="32" width="42" align="right">
-                                                        <a href="{{ social_media_urls.reddit }}">
-                                                            <img src="https://media.sailthru.com/595/1k1/8/o/599f354e326b9.png"
-                                                                 width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Reddit{% endblocktrans %}"/>
-                                                        </a>
-                                                    </td>
-                                                {% endif %}
-                                            </tr>
-                                        </table>
-                                    </td>
+                                    {% if social_media_urls.linkedin %}
+                                        <td height="32" width="42">
+                                            <a href="{{ social_media_urls.linkedin }}">
+                                                <img src="https://media.sailthru.com/595/1k1/8/o/599f354ec70cb.png"
+                                                     width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on LinkedIn{% endblocktrans %}"/>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                    {% if social_media_urls.twitter %}
+                                        <td height="32" width="42">
+                                            <a href="{{ social_media_urls.twitter }}">
+                                                <img src="https://media.sailthru.com/595/1k1/8/o/599f354d9c26e.png"
+                                                     width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Twitter{% endblocktrans %}"/>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                    {% if social_media_urls.facebook %}
+                                        <td height="32" width="42">
+                                            <a href="{{ social_media_urls.facebook }}">
+                                                <img src="https://media.sailthru.com/595/1k1/8/o/599f355052c8e.png"
+                                                     width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Facebook{% endblocktrans %}"/>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                    {% if social_media_urls.google_plus %}
+                                        <td height="32" width="42">
+                                            <a href="{{ social_media_urls.google_plus }}">
+                                                <img src="https://media.sailthru.com/595/1k1/8/o/599f354fc554a.png"
+                                                     width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Google Plus{% endblocktrans %}"/>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                    {% if social_media_urls.reddit %}
+                                        <td height="32" width="42">
+                                            <a href="{{ social_media_urls.reddit }}">
+                                                <img src="https://media.sailthru.com/595/1k1/8/o/599f354e326b9.png"
+                                                     width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Reddit{% endblocktrans %}"/>
+                                            </a>
+                                        </td>
+                                    {% endif %}
                                 </tr>
                             </table>
                         </td>
                     </tr>
                     <tr>
-                        <!-- ACTIONS / APP BUTTONS -->
-                        <td>
-                            <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
-                                <tr>
-                                    <td class="col" width="100%" align="center" valign="top">
-                                        <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
-                                            <tr>
-                                                <td style="padding-bottom: 10px;">
-                                                    {# Note that this variable is evaluated by Sailthru, not the Django template engine #}
-                                                    <a href="{optout_confirm_url}" style="color: #005686">
-                                                        <font color="#005686"><b>{% trans "Unsubscribe from this list" %}</b></font>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                    <!-- APP BUTTONS -->
-                                    <td class="col" width="148" valign="top" align="right" style="padding-bottom: 20px;">
-                                        {% if mobile_store_urls.apple %}
-                                            <a href="{{ mobile_store_urls.apple }}" style="text-decoration: none">
-                                                <img src="https://media.sailthru.com/595/1k1/6/2/5931cfbba391b.png"
-                                                     alt="{% trans "Download the iOS app on the Apple Store" %}" width="136" height="50"/>
-                                            </a>
-                                        {% endif %}
-                                        {% if mobile_store_urls.google %}
-                                            <a href="{{ mobile_store_urls.google }}" style="text-decoration: none">
-                                                <img src="https://media.sailthru.com/595/1k1/6/2/5931cf879a033.png"
-                                                     alt="{% trans "Download the Android app on the Google Play Store" %}"
-                                                     width="136" height="50" style="margin: 10px 0 0 5px"/>
-                                            </a>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            </table>
+                        <!-- APP BUTTONS -->
+                        <td style="padding-bottom: 20px;">
+                            {% if mobile_store_urls.apple %}
+                                <a href="{{ mobile_store_urls.apple }}" style="text-decoration: none">
+                                    <img src="https://media.sailthru.com/595/1k1/6/2/5931cfbba391b.png"
+                                         alt="{% trans "Download the iOS app on the Apple Store" %}"
+                                         width="136" height="50" style="margin-right: 10px"/>
+                                </a>
+                            {% endif %}
+                            {% if mobile_store_urls.google %}
+                                <a href="{{ mobile_store_urls.google }}" style="text-decoration: none">
+                                    <img src="https://media.sailthru.com/595/1k1/6/2/5931cf879a033.png"
+                                         alt="{% trans "Download the Android app on the Google Play Store" %}"
+                                         width="136" height="50"/>
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <!-- Actions -->
+                        <td style="padding-bottom: 20px;">
+                            {# Note that this variable is evaluated by Sailthru, not the Django template engine #}
+                            <a href="{optout_confirm_url}" style="color: #005686">
+                                <font color="#005686"><b>{% trans "Unsubscribe from this list" %}</b></font>
+                            </a>
                         </td>
                     </tr>
                     <tr>
                         <!-- COPYRIGHT -->
                         <td>
-                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-                                <tr>
-                                    <td>
-                                        <p>
-                                            &copy; {% now "Y" %} {{ platform_name }}, {% trans "All rights reserved" %}.
-                                        </p>
-                                        <p>
-                                            {% trans "Our mailing address is" %}:<br/>
-                                            {{ contact_mailing_address }}
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
+                            &copy; {% now "Y" %} {{ platform_name }}, {% trans "All rights reserved" %}.<br/>
+                            <br/>
+                            {% trans "Our mailing address is" %}:<br/>
+                            {{ contact_mailing_address }}
                         </td>
                     </tr>
                 </table>
