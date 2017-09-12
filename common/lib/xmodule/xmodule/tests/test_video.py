@@ -792,67 +792,44 @@ class VideoExportTestCase(VideoDescriptorTestBase):
 
 
 @ddt.ddt
+@patch.object(settings, 'YOUTUBE', create=True, new={
+    # YouTube JavaScript API
+    'API': 'www.youtube.com/iframe_api',
+
+    # URL to get YouTube metadata
+    'METADATA_URL': 'www.googleapis.com/youtube/v3/videos/',
+
+    # Current youtube api for requesting transcripts.
+    # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
+    'TEXT_API': {
+        'url': 'video.google.com/timedtext',
+        'params': {
+            'lang': 'en',
+            'v': 'set_youtube_id_of_11_symbols_here',
+        },
+    },
+})
+@patch.object(settings, 'CONTENTSTORE', create=True, new={
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'DOC_STORE_CONFIG': {
+        'host': 'edx.devstack.mongo' if 'BOK_CHOY_HOSTNAME' in os.environ else 'localhost',
+        'db': 'test_xcontent_%s' % uuid4().hex,
+    },
+    # allow for additional options that can be keyed on a name, e.g. 'trashcan'
+    'ADDITIONAL_OPTIONS': {
+        'trashcan': {
+            'bucket': 'trash_fs'
+        }
+    }
+})
+@patch.object(settings, 'FEATURES', create=True, new={
+    # The default value in {lms,cms}/envs/common.py and xmodule/tests/test_video.py should be consistent.
+    'FALLBACK_TO_ENGLISH_TRANSCRIPTS': True,
+})
 class VideoDescriptorIndexingTestCase(unittest.TestCase):
     """
     Make sure that VideoDescriptor can format data for indexing as expected.
     """
-    def setUp(self):
-        """
-        Overrides YOUTUBE and CONTENTSTORE settings
-        """
-        super(VideoDescriptorIndexingTestCase, self).setUp()
-        self.youtube_setting = getattr(settings, "YOUTUBE", None)
-        self.contentstore_setting = getattr(settings, "CONTENTSTORE", None)
-        settings.YOUTUBE = {
-            # YouTube JavaScript API
-            'API': 'www.youtube.com/iframe_api',
-
-            # URL to get YouTube metadata
-            'METADATA_URL': 'www.googleapis.com/youtube/v3/videos/',
-
-            # Current youtube api for requesting transcripts.
-            # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
-            'TEXT_API': {
-                'url': 'video.google.com/timedtext',
-                'params': {
-                    'lang': 'en',
-                    'v': 'set_youtube_id_of_11_symbols_here',
-                },
-            },
-        }
-
-        settings.CONTENTSTORE = {
-            'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
-            'DOC_STORE_CONFIG': {
-                'host': 'edx.devstack.mongo' if 'BOK_CHOY_HOSTNAME' in os.environ else 'localhost',
-                'db': 'test_xcontent_%s' % uuid4().hex,
-            },
-            # allow for additional options that can be keyed on a name, e.g. 'trashcan'
-            'ADDITIONAL_OPTIONS': {
-                'trashcan': {
-                    'bucket': 'trash_fs'
-                }
-            }
-        }
-
-        self.addCleanup(self.cleanup)
-
-    def cleanup(self):
-        """
-        Returns YOUTUBE and CONTENTSTORE settings to a default value
-        """
-        if self.youtube_setting:
-            settings.YOUTUBE = self.youtube_setting
-            self.youtube_setting = None
-        else:
-            del settings.YOUTUBE
-
-        if self.contentstore_setting:
-            settings.CONTENTSTORE = self.contentstore_setting
-            self.contentstore_setting = None
-        else:
-            del settings.CONTENTSTORE
-
     def test_video_with_no_subs_index_dictionary(self):
         """
         Test index dictionary of a video module without subtitles.
@@ -993,7 +970,7 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
         '''
 
         descriptor = instantiate_descriptor(data=xml_data_transcripts)
-        translations = descriptor.available_translations(descriptor.get_transcripts_info(), verify_assets=False)
+        translations = descriptor.available_translations(descriptor.get_transcripts_info())
         self.assertEqual(translations, ['hr', 'ge'])
 
     def test_video_with_no_transcripts_translation_retrieval(self):
@@ -1003,8 +980,14 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
         does not throw an exception.
         """
         descriptor = instantiate_descriptor(data=None)
-        translations = descriptor.available_translations(descriptor.get_transcripts_info(), verify_assets=False)
-        self.assertEqual(translations, ['en'])
+        translations_with_fallback = descriptor.available_translations(descriptor.get_transcripts_info())
+        self.assertEqual(translations_with_fallback, ['en'])
+
+        with patch.dict(settings.FEATURES, FALLBACK_TO_ENGLISH_TRANSCRIPTS=False):
+            # Some organizations don't have English transcripts for all videos
+            # This feature makes it configurable
+            translations_no_fallback = descriptor.available_translations(descriptor.get_transcripts_info())
+            self.assertEqual(translations_no_fallback, [])
 
     @override_settings(ALL_LANGUAGES=ALL_LANGUAGES)
     def test_video_with_language_do_not_have_transcripts_translation(self):
