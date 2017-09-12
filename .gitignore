@@ -81,6 +81,7 @@ test_root/export_course_repos/
 test_root/paver_logs/
 test_root/uploads/
 django-pyfs
+.tox/
 
 ### Installation artifacts
 *.egg-info
