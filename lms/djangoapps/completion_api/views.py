@@ -84,7 +84,7 @@ class CompletionViewMixin(object):
         return course_completion_serializer_factory(self.get_requested_fields())
 
 
-class CompletionListView(APIView, CompletionViewMixin):
+class CompletionListView(CompletionViewMixin, APIView):
     """
     API view to render serialized CourseCompletions for a single user
     across all enrolled courses.
@@ -239,7 +239,7 @@ class CompletionListView(APIView, CompletionViewMixin):
         return self.paginator.get_paginated_response(serializer.data)
 
 
-class CompletionDetailView(APIView, CompletionViewMixin):
+class CompletionDetailView(CompletionViewMixin, APIView):
     # pylint: disable=line-too-long
     """
     API view to render a serialized CourseCompletion for a single user in a
