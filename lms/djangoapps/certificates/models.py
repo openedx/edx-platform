@@ -842,12 +842,21 @@ class ExampleCertificate(TimeStampedModel):
 class CertificateGenerationCourseSetting(TimeStampedModel):
     """Enable or disable certificate generation for a particular course.
 
+<<<<<<< HEAD
+=======
+    'self_generation_enabled' controls whether students are allowed to "self-generate"
+    certificates for a course.  It does NOT prevent us from
+    batch-generating certificates for a course using management
+    commands.
+
+>>>>>>> 1221e20a9f... removed deprecated 'enabled' field
     In general, we should only enable self-generated certificates
     for a course once we successfully generate example certificates
     for the course.  This is enforced in the UI layer, but
     not in the data layer.
     """
     course_key = CourseKeyField(max_length=255, db_index=True)
+<<<<<<< HEAD
     enabled = models.BooleanField(
         default=False,
         help_text=_(
@@ -855,6 +864,8 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         )
     )
     # TODO: Learner-2549 remove deprecated enabled field
+=======
+>>>>>>> 1221e20a9f... removed deprecated 'enabled' field
 
     self_generation_enabled = models.BooleanField(
         default=False,
@@ -893,8 +904,12 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         except cls.DoesNotExist:
             return False
         else:
+<<<<<<< HEAD
             return latest.self_generation_enabled or latest.enabled
             # TODO: learner-2549 remove references to deprecated 'enabled' field.
+=======
+            return latest.self_generation_enabled
+>>>>>>> 1221e20a9f... removed deprecated 'enabled' field
 
     @classmethod
     def set_self_generatation_enabled_for_course(cls, course_key, is_enabled):
@@ -906,8 +921,14 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
 
         """
         default = {
+<<<<<<< HEAD
             'self_generation_enabled': is_enabled
         }
+=======
+            'self_generation_enabled': is_enabled,
+        }
+
+>>>>>>> 1221e20a9f... removed deprecated 'enabled' field
         CertificateGenerationCourseSetting.objects.update_or_create(
             course_key=course_key,
             defaults=default
