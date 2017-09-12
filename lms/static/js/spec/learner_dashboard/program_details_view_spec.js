@@ -571,7 +571,7 @@ define([
             expect($(view.$('.upgrade-button.complete-program')).text().trim().
                 replace(/\s+/g, ' ')).
                 toEqual(
-                    'Upgrade All Remaining Courses ( $300 USD )'
+                    'Upgrade All Remaining Courses ( $300.00 USD )'
                 );
         });
 
@@ -592,7 +592,7 @@ define([
             expect($(view.$('.upgrade-button.complete-program')).text().trim().
                 replace(/\s+/g, ' ')).
                 toEqual(
-                    'Upgrade All Remaining Courses ( $270 $300 USD )'
+                    'Upgrade All Remaining Courses ( $270.00 $300.00 USD )'
                 );
         });
 
