@@ -17,8 +17,9 @@ from xmodule.modulestore.tests.factories import ToyCourseFactory
 @override_settings(STUDENT_GRADEBOOK=True)
 class CompletionViewTestCase(SharedModuleStoreTestCase):
     """
-    Test that the CourseCompletionFacade handles modulestore data appropriately,
-    and that it interacts properly with the serializer.
+    Test that the CompletionView renders completion data properly.
+
+    Ensure that it handles authorization as well.
     """
 
     @classmethod
@@ -28,11 +29,7 @@ class CompletionViewTestCase(SharedModuleStoreTestCase):
 
     def setUp(self):
         super(CompletionViewTestCase, self).setUp()
-        self.test_user = UserFactory.create(
-            username='test_user',
-            email='test_user@example.com',
-            password='test_pass',
-        )
+        self.test_user = UserFactory.create()
         self.mark_completions()
         self.client = APIClient()
         self.client.force_authenticate(user=self.test_user)
@@ -128,6 +125,10 @@ class CompletionViewTestCase(SharedModuleStoreTestCase):
         }
         self.assertEqual(response.data, expected)  # pylint: disable=no-member
 
+    def test_invalid_optional_fields(self):
+        response = self.client.get('/api/completion/v0/course/edX/toy/2012_Fall/?requested_fields=INVALID')
+        self.assertEqual(response.status_code, 400)
+
     def test_unauthenticated(self):
         self.client.force_authenticate(None)
         detailresponse = self.client.get('/api/completion/v0/course/edX/toy/2012_Fall/')
@@ -138,11 +139,11 @@ class CompletionViewTestCase(SharedModuleStoreTestCase):
     def test_wrong_user(self):
         user = UserFactory.create(username='wrong')
         self.client.force_authenticate(user)
-        response = self.client.get('/api/completion/v0/course/?user=test_user')
+        response = self.client.get('/api/completion/v0/course/?user={}'.format(self.test_user.username))
         self.assertEqual(response.status_code, 404)
 
     def test_staff_access(self):
         user = AdminFactory.create(username='staff')
         self.client.force_authenticate(user)
-        response = self.client.get('/api/completion/v0/course/?user=test_user')
+        response = self.client.get('/api/completion/v0/course/?user={}'.format(self.test_user.username))
         self.assertEqual(response.status_code, 200)
