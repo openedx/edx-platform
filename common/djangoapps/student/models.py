@@ -1726,7 +1726,12 @@ class CourseEnrollment(models.Model):
                 DynamicUpgradeDeadlineConfiguration.is_enabled()
                 or CourseDynamicUpgradeDeadlineConfiguration.is_enabled(self.course_id)
             )
-            if schedule_driven_deadlines_enabled and self.schedule and self.schedule.upgrade_deadline is not None:
+            if (
+                    schedule_driven_deadlines_enabled
+                    and self.course_overview.self_paced
+                    and self.schedule
+                    and self.schedule.upgrade_deadline is not None
+            ):
                 log.debug(
                     'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
                     self.id, self.schedule.id
