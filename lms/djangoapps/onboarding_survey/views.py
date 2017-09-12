@@ -71,6 +71,7 @@ def user_info(request):
             form = forms.UserInfoModelForm(request.POST, instance=request.user.user_info_survey)
             if form.is_valid():
                 form.save()
+                return redirect(reverse('interests'))
 
         except UserInfoSurvey.DoesNotExist:
             form = forms.UserInfoModelForm(request.POST)
@@ -78,8 +79,7 @@ def user_info(request):
                 user_info_survey = form.save()
                 user_info_survey.user = request.user
                 user_info_survey.save()
-
-        return redirect(reverse('interests'))
+                return redirect(reverse('interests'))
 
     else:
         user_info_instance = UserInfoSurvey.objects.filter(user=request.user).first()
@@ -118,6 +118,7 @@ def interests(request):
             form = forms.InterestModelForm(request.POST, instance=request.user.interest_survey)
             if form.is_valid():
                 form.save()
+                return redirect(reverse('organization'))
 
         except InterestsSurvey.DoesNotExist:
             form = forms.InterestModelForm(request.POST)
@@ -125,8 +126,8 @@ def interests(request):
                 interest_survey = form.save()
                 interest_survey.user = request.user
                 interest_survey.save()
+                return redirect(reverse('organization'))
 
-        return redirect(reverse('organization'))
     else:
         user_interest_survey_instance = InterestsSurvey.objects.filter(user=request.user).first()
         if user_interest_survey_instance:
@@ -140,6 +141,17 @@ def interests(request):
     context.update(get_un_submitted_surveys(user))
 
     return render(request, 'interests_survey.html', context)
+
+
+def mark_partner_network(organization_survey):
+    """
+    Marks partner as affiliated if not already.
+    """
+    partner_network = organization_survey.partner_network
+    if partner_network:
+        if not partner_network.is_partner_affiliated:
+            partner_network.is_partner_affiliated = True
+            partner_network.save()
 
 
 @login_required
@@ -156,7 +168,9 @@ def organization(request):
         try:
             form = forms.OrganizationInfoModelForm(request.POST, instance=request.user.organization_survey)
             if form.is_valid():
-                form.save()
+                organization_survey = form.save()
+                mark_partner_network(organization_survey)
+                return redirect(reverse('dashboard'))
 
         except OrganizationSurvey.DoesNotExist:
             form = forms.OrganizationInfoModelForm(request.POST)
@@ -164,15 +178,9 @@ def organization(request):
                 organization_survey = form.save()
                 organization_survey.user = request.user
                 organization_survey.save()
+                mark_partner_network(organization_survey)
+                return redirect(reverse('dashboard'))
 
-        partner_network = organization_survey.partner_network
-
-        if partner_network:
-            if not partner_network.is_partner_affiliated:
-                partner_network.is_partner_affiliated = True
-                partner_network.save()
-
-        return redirect(reverse('dashboard'))
     else:
         org_survey_instance = OrganizationSurvey.objects.filter(user=request.user).first()
         if org_survey_instance:
@@ -234,5 +242,3 @@ def get_languages(request):
     mime_type = 'application/json'
 
     return HttpResponse(data, mime_type)
-
-
