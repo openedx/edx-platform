@@ -82,24 +82,32 @@ class OrganizationSurvey(models.Model):
     The model to save the organization survey as provided by the user.
     """
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='organization_survey', null=True, blank=True)
-    role_in_org = models.ForeignKey(RoleInsideOrg, on_delete=models.CASCADE, related_name='org_survey')
-    state_mon_year = models.CharField(max_length=100)
+    role_in_org = models.ForeignKey(
+        RoleInsideOrg, on_delete=models.CASCADE, related_name='org_survey', blank=True, null=True
+    )
+    state_mon_year = models.CharField(max_length=100, blank=True)
 
     country = models.CharField(max_length=256)
-    city = models.CharField(max_length=265)
-    url = models.URLField(max_length=256)
+    city = models.CharField(max_length=265, blank=True)
+    url = models.URLField(max_length=256, blank=True)
 
     sector = models.ForeignKey(OrgSector, on_delete=models.CASCADE, related_name='org_survey')
     level_of_op = models.ForeignKey(OperationLevel, on_delete=models.CASCADE, related_name='org_survey')
     focus_area = models.ForeignKey(FocusArea, on_delete=models.CASCADE, related_name='org_survey')
 
-    founding_year = models.PositiveSmallIntegerField()
-    total_employees = models.ForeignKey(TotalEmployee, on_delete=models.CASCADE, related_name='org_survey')
-    total_volunteers = models.ForeignKey(TotalVolunteer, on_delete=models.CASCADE, related_name='org_survey')
+    founding_year = models.PositiveSmallIntegerField(blank=True, null=True)
+    total_employees = models.ForeignKey(
+        TotalEmployee, on_delete=models.CASCADE, related_name='org_survey', blank=True, null=True
+    )
+    total_volunteers = models.ForeignKey(
+        TotalVolunteer, on_delete=models.CASCADE, related_name='org_survey', blank=True, null=True
+    )
 
-    total_annual_clients_or_beneficiary = models.PositiveIntegerField()
-    total_annual_revenue_for_last_fiscal = models.CharField(max_length=256)
-    partner_network = models.ForeignKey(PartnerNetwork, on_delete=models.CASCADE, related_name='org_survey')
+    total_annual_clients_or_beneficiary = models.PositiveIntegerField(blank=True, null=True)
+    total_annual_revenue_for_last_fiscal = models.CharField(max_length=256, blank=True)
+    partner_network = models.ForeignKey(
+        PartnerNetwork, on_delete=models.CASCADE, related_name='org_survey', blank=True, null=True
+    )
 
 
 class OrganizationalCapacityArea(models.Model):
@@ -142,7 +150,7 @@ class InterestsSurvey(models.Model):
     capacity_areas = models.ManyToManyField(OrganizationalCapacityArea)
     interested_communities = models.ManyToManyField(CommunityTypeInterest)
     reason_of_interest = models.CharField(max_length=256, blank=True)
-    personal_goal = models.ManyToManyField(PersonalGoal)
+    personal_goal = models.ManyToManyField(PersonalGoal, blank=True)
 
 
 class EducationLevel(models.Model):
@@ -169,17 +177,21 @@ class UserInfoSurvey(models.Model):
     """
     The survey to store the basic information about the user.
     """
-    user = models.OneToOneField(User, unique=True, db_index=True, related_name='user_info_survey', null=True, blank=True)
-    dob = models.DateField()
+    user = models.OneToOneField(
+        User, unique=True, db_index=True, related_name='user_info_survey', null=True, blank=True
+    )
+    dob = models.DateField(blank=True, null=True)
 
-    level_of_education = models.ForeignKey(EducationLevel, on_delete=models.CASCADE, related_name='user_info_survey')
+    level_of_education = models.ForeignKey(
+        EducationLevel, on_delete=models.CASCADE, related_name='user_info_survey', blank=True, null=True
+    )
 
     language = models.CharField(max_length=256)
 
     english_prof = models.ForeignKey(EnglishProficiency, on_delete=models.CASCADE, related_name='user_info_survey')
 
     country_of_residence = models.CharField(max_length=256)
-    city_of_residence = models.CharField(max_length=256)
+    city_of_residence = models.CharField(max_length=256, blank=True)
 
     is_country_or_city_different = models.BooleanField(default=False)
 

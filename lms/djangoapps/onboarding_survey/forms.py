@@ -23,7 +23,7 @@ class UserInfoModelForm(forms.ModelForm):
     def __init__(self,  *args, **kwargs):
         super(UserInfoModelForm, self).__init__( *args, **kwargs)
         self.fields['level_of_education'].empty_label = "Level of Education"
-        self.fields['english_prof'].empty_label = "English Language Proficiency"
+        self.fields['english_prof'].empty_label = "English Language Proficiency*"
 
     def clean(self):
         """
@@ -71,9 +71,9 @@ class UserInfoModelForm(forms.ModelForm):
             'dob': forms.TextInput(attrs={'placeholder': 'Date of Birth'}),
             'country_of_employment': forms.TextInput(attrs={'placeholder': 'Country of Employment'}),
             'city_of_employment': forms.TextInput(attrs={'placeholder': 'City of Employment'}),
-            'country_of_residence': forms.TextInput(attrs={'placeholder': 'Country of Residence'}),
+            'country_of_residence': forms.TextInput(attrs={'placeholder': 'Country of Residence*'}),
             'city_of_residence': forms.TextInput(attrs={'placeholder': 'City of Residence'}),
-            'language': forms.TextInput(attrs={'placeholder': 'Native Language'})
+            'language': forms.TextInput(attrs={'placeholder': 'Native Language*'})
         }
 
         required_error = 'Please select an option for {}'
@@ -163,13 +163,12 @@ class OrganizationInfoModelForm(forms.ModelForm):
     def __init__(self,  *args, **kwargs):
         super(OrganizationInfoModelForm, self).__init__( *args, **kwargs)
         self.fields['role_in_org'].empty_label = "Role in the organization"
-        self.fields['sector'].empty_label = "Sector"
-        self.fields['level_of_op'].empty_label = "Level of Operation"
-        self.fields['focus_area'].empty_label = "Focus Area"
+        self.fields['sector'].empty_label = "Sector*"
+        self.fields['level_of_op'].empty_label = "Level of Operation*"
+        self.fields['focus_area'].empty_label = "Focus Area*"
         self.fields['total_employees'].empty_label = "Total Employees"
         self.fields['total_volunteers'].empty_label = "Total Volunteers"
         self.fields['partner_network'].empty_label = "Partner Networks"
-
 
     class Meta:
         """
@@ -182,9 +181,9 @@ class OrganizationInfoModelForm(forms.ModelForm):
 
         widgets = {
             'state_mon_year': forms.TextInput(attrs={'placeholder': 'Start Month and Year'}),
-            'country': forms.TextInput(attrs={'placeholder': 'Country of Organization Headquarters'}),
+            'country': forms.TextInput(attrs={'placeholder': 'Country of Organization Headquarters*'}),
             'city': forms.TextInput(attrs={'placeholder': 'City of Organization Headquarters'}),
-            'url': forms.URLInput(attrs={'placeholder': 'Organization Website'}),
+            'url': forms.URLInput(attrs={'placeholder': 'Organization Website(if applicable)'}),
             'founding_year': forms.NumberInput(attrs={'placeholder': 'Founding year'}),
             'total_annual_clients_or_beneficiary': forms.NumberInput(
                 attrs={'placeholder': 'Total annual clients or beneficiaries'}),
@@ -200,5 +199,8 @@ class OrganizationInfoModelForm(forms.ModelForm):
 
         year = cleaned_data['founding_year']
 
-        if len("{}".format(year)) < 4 or year < 0:
-            raise forms.ValidationError("You entered an invalid year format. Please enter a valid year with 4 digits.")
+        if year:
+            if len("{}".format(year)) < 4 or year < 0:
+                raise forms.ValidationError(
+                    "You entered an invalid year format. Please enter a valid year with 4 digits."
+                )
