@@ -71,7 +71,7 @@ def set_course_goal(request, course_id, goal=None):
         message = Text(_('Sounds great - We hope you enjoy the course!'))
 
     # Ensure response is dismissible
-    html = HTML('{message}<span tabindex="0" class="icon fa fa-times dismiss"></span>').format(message = message)
+    html = HTML('{message}<span tabindex="0" class="icon fa fa-times dismiss"></span>').format(message=message)
 
     if request.is_ajax():
         return HttpResponse(

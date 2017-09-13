@@ -80,7 +80,7 @@
       margin-top: $baseline;
       text-align: center;
 
-      a.goal-option {
+      .goal-option {
         text-decoration: none;
         font-size: font-size(x-small);
         padding: $baseline/2;
@@ -89,7 +89,13 @@
           @include right($baseline/4);
           position: absolute;
           top: $baseline/2;
+          font-size: font-size(small);
+          color: $uxpl-blue-base;
           cursor: pointer;
+
+          &:hover {
+            color: $black-t2;
+          }
         }
       }
     }

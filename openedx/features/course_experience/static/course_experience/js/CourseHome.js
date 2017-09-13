@@ -37,9 +37,9 @@ export class CourseHome {  // eslint-disable-line import/prefer-default-export
 
     // Allow dismiss on enter press for accessibility purposes
     $(document.body).on('keyup', '.course-message .dismiss', (event) => {
-      if (event.which == 13) {
+      if (event.which === 13) {
         $(event.target).trigger('click');
-      };
+      }
     });
 
     $(document).ready(() => {

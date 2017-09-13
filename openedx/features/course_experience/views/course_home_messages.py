@@ -158,8 +158,8 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
             # Add the dismissible option for users that are unsure of their goal
             # Translators: please do not translate the 'goal' variable below
             goal_choices_html += HTML(_(
-                '<a tabindex="0" aria-label="Set goal to, {choice}" class="goal-option dismissible" '
-                'data-choice="{goal}">{choice}</a>'
+                '<div tabindex="0" aria-label="Set goal to, {choice}" class="goal-option dismissible" '
+                'data-choice="{goal}">{choice}</div>'
             ).format(
                 goal=CourseGoalType.UNSURE.value,
                 choice=self.get_goal_text(CourseGoalType.UNSURE.value)
@@ -172,8 +172,8 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
                 # Translators: please do not translate the 'goal' variable below
                 goal_text = self.get_goal_text(goal)
                 goal_choices_html += HTML(_(
-                    '<a tabindex="0" aria-label="Set goal to, {goal_text}" class="goal-option {col_sel} btn" '
-                    'data-choice="{goal}">{goal_text}</a>'
+                    '<div tabindex="0" aria-label="Set goal to, {goal_text}" class="goal-option {col_sel} btn" '
+                    'data-choice="{goal}">{goal_text}</div>'
                 ).format(
                     goal=goal,
                     goal_text=goal_text,
