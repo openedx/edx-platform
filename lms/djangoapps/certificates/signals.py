@@ -14,10 +14,7 @@ from certificates.models import (
 )
 from certificates.tasks import generate_certificate
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
-from openedx.core.djangoapps.certificates.api import (
-    auto_certificate_generation_enabled,
-    auto_certificate_generation_enabled_for_course,
-)
+from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, LEARNER_NOW_VERIFIED
@@ -30,7 +27,7 @@ log = logging.getLogger(__name__)
 @receiver(post_save, sender=CertificateWhitelist, dispatch_uid="append_certificate_whitelist")
 def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # pylint: disable=unused-argument
     course = CourseOverview.get_from_id(instance.course_id)
-    if not auto_certificate_generation_enabled_for_course(course):
+    if not auto_certificate_generation_enabled():
         return
 
     fire_ungenerated_certificate_task(instance.user, instance.course_id)
@@ -47,7 +44,7 @@ def _listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: dis
     downstream signal from COURSE_GRADE_CHANGED
     """
     course = CourseOverview.get_from_id(course_id)
-    if not auto_certificate_generation_enabled_for_course(course):
+    if not auto_certificate_generation_enabled():
         return
 
     if fire_ungenerated_certificate_task(user, course_id):
