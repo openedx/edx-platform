@@ -30,7 +30,7 @@
             border-style: solid;
             border-width: 0 0 4px 0;
             border-bottom-color: transparent;
-            color: $lms-label-color;
+            color: $lms-inactive-color;
             font-size: 14px;
 
             &:hover,
@@ -40,8 +40,8 @@
             }
 
             &.active {
-                color: $lms-active-color;
-                border-bottom-color: $lms-active-color;
+                color: $uxpl-blue-hover-active;
+                border-bottom-color: $uxpl-blue-hover-active;
                 background-color: transparent;
             }
         }
