@@ -1133,6 +1133,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 
     'student.middleware.UserStandingMiddleware',
+    'student.middleware.UserSessionSharingMiddleware',
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
 
     # Adds user tags to tracking events

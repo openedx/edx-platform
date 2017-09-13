@@ -2,6 +2,8 @@
 Middleware that checks user standing for the purpose of keeping users with
 disabled accounts from accessing the site.
 """
+import jwt
+
 from django.http import HttpResponseForbidden
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -9,7 +11,10 @@ from student.models import UserStanding
 
 
 class UserSessionSharingMiddleware(object):
-
+    """ 
+    Middleware to set jwt login token on sign in
+    Used for session sharing with NodeBB community
+    """
     def process_response(self, request, response):
         if request.user.is_authenticated():
             encoded_jwt = jwt.encode({'id': request.user.id,
