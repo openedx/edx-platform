@@ -66,7 +66,6 @@ class CertificateGenerationCourseSettingAdmin(admin.ModelAdmin):
     """
     list_display = ('course_key', 'self_generation_enabled', 'language_specific_templates_enabled')
     search_fields = ('course_key',)
-    exclude = ('enabled',)
     show_full_result_count = False
 
 

@@ -10,7 +10,12 @@ def copy_field(apps, schema_editor):
     CertificateGenerationCourseSetting.objects.all().update(self_generation_enabled=F('enabled'))
 
 class Migration(migrations.Migration):
-
+    """
+    Adds new field 'language_specific_templates_enabled'.
+    Also adds field 'self_generation_enabled' which is a 
+    replacement for 'enabled'
+    Lastly, copies data from 'enabled' to 'self_generation_enabled'
+    """
     dependencies = [
         ('certificates', '0008_schema__remove_badges'),
     ]
