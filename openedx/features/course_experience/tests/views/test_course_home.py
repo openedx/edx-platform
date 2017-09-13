@@ -44,6 +44,7 @@ TEST_COURSE_HOME_MESSAGE_ANONYMOUS = '/login'
 TEST_COURSE_HOME_MESSAGE_UNENROLLED = 'Enroll now'
 TEST_COURSE_HOME_MESSAGE_PRE_START = 'Course starts in'
 TEST_COURSE_GOAL_OPTIONS = 'goal-options-container'
+COURSE_GOAL_DISMISS_OPTION = 'Not sure yet'
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
@@ -421,6 +422,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         # TODO: Verify that enrolled users that have set a course goal are not shown the set course goal message
         # SET COURSE GOAL
+        # resp = self.client.post(reverse('course_goal.views.set_course_goal'), {'goal': COURSE_GOAL_DISMISS_OPTION})
         # response = self.client.get(course_home_url(self.course))
         # self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
 
