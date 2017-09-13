@@ -469,6 +469,29 @@ def get_or_create_sjson(item, transcripts):
     return sjson_transcript
 
 
+def get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources):
+    """
+    Returns list internal or external video ids.
+
+    Arguments:
+        edx_video_id (str): edx_video_id
+        youtube_id_1_0 (str): youtube id
+        html5_sources (list): html5 video ids
+
+    Returns:
+        tuple: external or internal, video ids list
+    """
+    clean = lambda item: item.strip() if isinstance(item, basestring) else item
+    external = not bool(clean(edx_video_id))
+
+    video_ids = [edx_video_id, youtube_id_1_0] + get_html5_ids(html5_sources)
+
+    # video_ids cleanup
+    video_ids = filter(lambda item: bool(clean(item)), video_ids)
+
+    return external, video_ids
+
+
 class Transcript(object):
     """
     Container for transcript methods.
