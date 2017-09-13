@@ -83,7 +83,7 @@ def get_certificate_description(mode, certificate_type, platform_name):
     return certificate_type_description
 
 
-def _update_certificate_context(context, user_certificate, platform_name):
+def _update_certificate_context(context, course, user_certificate, platform_name):
     """
     Build up the certificate web view context using the provided values
     (Helper method to keep the view clean)
@@ -100,7 +100,6 @@ def _update_certificate_context(context, user_certificate, platform_name):
     )
 
     # Translators:  The format of the date includes the full name of the month
-    course = get_course_by_id(user_certificate.course_id) if user_certificate.course_id else None
     date = display_date_for_certificate(course, user_certificate)
     context['certificate_date_issued'] = _('{month} {day}, {year}').format(
         month=strftime_localized(date, "%B"),
@@ -581,7 +580,7 @@ def render_html_view(request, user_id, course_id):
     _update_social_context(request, context, course, user, user_certificate, platform_name)
 
     # Append/Override the existing view context values with certificate specific values
-    _update_certificate_context(context, user_certificate, platform_name)
+    _update_certificate_context(context, course, user_certificate, platform_name)
 
     # Append badge info
     _update_badge_context(context, course, user)
