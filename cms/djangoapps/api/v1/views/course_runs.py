@@ -16,44 +16,43 @@ from ..serializers.course_runs import (
 )
 
 
-class CourseRunViewSet(viewsets.ViewSet):
+# pylint: disable=unused-argument
+class CourseRunViewSet(viewsets.GenericViewSet):
     authentication_classes = (JwtAuthentication, SessionAuthentication,)
     lookup_value_regex = settings.COURSE_KEY_REGEX
     permission_classes = (permissions.IsAdminUser,)
     serializer_class = CourseRunSerializer
 
-    def get_course_run_or_raise_404(self, course_run_key, user):
-        course_run = get_course_and_check_access(course_run_key, user)
+    def get_object(self):
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+
+        assert lookup_url_kwarg in self.kwargs, (
+            'Expected view %s to be called with a URL keyword argument '
+            'named "%s". Fix your URL conf, or set the `.lookup_field` '
+            'attribute on the view correctly.' %
+            (self.__class__.__name__, lookup_url_kwarg)
+        )
+
+        course_run_key = CourseKey.from_string(self.kwargs[lookup_url_kwarg])
+        course_run = get_course_and_check_access(course_run_key, self.request.user)
         if course_run:
             return course_run
 
         raise Http404
 
-    def get_serializer_context(self):
-        return {
-            'request': self.request,
-            'format': self.format_kwarg,
-            'view': self
-        }
-
-    def get_serializer(self, *args, **kwargs):
-        kwargs['context'] = self.get_serializer_context()
-        return self.serializer_class(*args, **kwargs)
-
-    def list(self, request):
+    def list(self, request, *args, **kwargs):
         course_runs, __ = _accessible_courses_iter(request)
-        serializer = self.get_serializer(course_runs, many=True)
-        return Response(serializer.data)
+        page = self.paginate_queryset(list(course_runs))
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
-    def retrieve(self, request, pk=None):
-        course_run_key = CourseKey.from_string(pk)
-        course_run = self.get_course_run_or_raise_404(course_run_key, request.user)
+    def retrieve(self, request, *args, **kwargs):
+        course_run = self.get_object()
         serializer = self.get_serializer(course_run)
         return Response(serializer.data)
 
-    def update(self, request, pk=None, *args, **kwargs):
-        course_run_key = CourseKey.from_string(pk)
-        course_run = self.get_course_run_or_raise_404(course_run_key, request.user)
+    def update(self, request, *args, **kwargs):
+        course_run = self.get_object()
 
         partial = kwargs.pop('partial', False)
         serializer = self.get_serializer(course_run, data=request.data, partial=partial)
@@ -75,20 +74,16 @@ class CourseRunViewSet(viewsets.ViewSet):
         methods=['post', 'put'],
         parser_classes=(parsers.FormParser, parsers.MultiPartParser,),
         serializer_class=CourseRunImageSerializer)
-    def images(self, request, pk=None):
-        course_run_key = CourseKey.from_string(pk)
-        user = request.user
-        course_run = self.get_course_run_or_raise_404(course_run_key, user)
+    def images(self, request, *args, **kwargs):
+        course_run = self.get_object()
         serializer = CourseRunImageSerializer(course_run, data=request.data, context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
 
     @detail_route(methods=['post'])
-    def rerun(self, request, pk=None):
-        course_run_key = CourseKey.from_string(pk)
-        user = request.user
-        course_run = self.get_course_run_or_raise_404(course_run_key, user)
+    def rerun(self, request, *args, **kwargs):
+        course_run = self.get_object()
         serializer = CourseRunRerunSerializer(course_run, data=request.data, context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
         new_course_run = serializer.save()
