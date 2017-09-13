@@ -20,9 +20,9 @@ class UserSessionSharingMiddleware(object):
             encoded_jwt = jwt.encode({'id': request.user.id,
                                     'username': request.user.username},
                                     'secret', algorithm='HS256')
-            response.set_cookie('token', encoded_jwt)
+            response.set_cookie('token', encoded_jwt, domain=".philanthropyu.org")
         else:
-            response.delete_cookie('token')
+            response.delete_cookie('token', domain=".philanthropyu.org")
         return response
 
 
