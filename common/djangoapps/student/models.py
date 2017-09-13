@@ -2399,15 +2399,6 @@ class SocialLink(models.Model):  # pylint: disable=model-missing-unicode
     social_link = models.CharField(max_length=100, blank=True)
 
 
-class CourseGoal(models.Model):  # pylint: disable=model-missing-unicode
-    """
-    Represents a course goal set by a user on the course home page.
-    """
-    user = models.ForeignKey(User)
-    course_key = CourseKeyField(max_length=255, db_index=True, blank=True)
-    goal = models.CharField(max_length=100, blank=True)
-
-
 class CourseEnrollmentAttribute(models.Model):
     """
     Provide additional information about the user's enrollment.

@@ -4,7 +4,6 @@ Defines URLs for the course experience.
 
 from django.conf.urls import url
 
-from views.course_goals import set_course_goal
 from views.course_home import CourseHomeFragmentView, CourseHomeView
 from views.course_outline import CourseOutlineFragmentView
 from views.course_reviews import CourseReviewsView
@@ -63,10 +62,5 @@ urlpatterns = [
         r'^dismiss_welcome_message$',
         dismiss_welcome_message,
         name='openedx.course_experience.dismiss_welcome_message',
-    ),
-    url(
-        r'^set_course_goal$',
-        set_course_goal,
-        name='openedx.course_experience.set_course_goal',
     ),
 ]

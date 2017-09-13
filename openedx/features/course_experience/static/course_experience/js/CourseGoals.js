@@ -12,9 +12,13 @@ export class CourseGoals {  // eslint-disable-line import/prefer-default-export
         },
         dataType: 'json',
         success: (data) => {
+          // LEARNER-2522 will address the success message
+          // xss-lint: disable=javascript-jquery-html
           $('.message-content').html(data.html);
         },
         error: () => {
+          // LEARNER-2522 will address the error message
+          // xss-lint: disable=javascript-jquery-html
           $('.message-content').html(
               gettext('There was an error in setting your goal, please reload the page and try again.'),
           );

@@ -19,11 +19,10 @@ from openedx.core.djangolib.markup import Text, HTML
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
+from course_goals.views import CourseGoalType
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import CourseHomeMessages
-
 from student.models import CourseEnrollment
-from .course_goals import CourseGoalType
 from .. import ENABLE_COURSE_GOALS
 
 
@@ -70,7 +69,8 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
 
         # Pass in the url used to set a course goal
         set_goal_url = reverse(
-            'openedx.course_experience.set_course_goal', kwargs={
+            'course_goals:set_course_goal',
+            kwargs={
                 'course_id': course_id,
             }
         )
@@ -139,7 +139,7 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         is_already_verified = CourseEnrollment.is_enrolled_as_verified(request.user, course_key)
         # available_modes = CourseMode.modes_for_course_dict(unicode(course.id))
         # has_verified_mode = CourseMode.has_verified_mode(available_modes)
-        # user_goal = get_course_goal(request.user, course_key)
+        # user_goal = get_course_goal(request.user, course_id)
         # waffle_flag_enabled = ENABLE_COURSE_GOALS.is_enabled(course_key)
         has_verified_mode = True
         user_goal = None
@@ -152,38 +152,57 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
                 and has_verified_mode and not is_already_verified and waffle_flag_enabled:
             goal_choices_html = HTML(_(
                 'To start, set a course goal by selecting the option below that best describes '
-                'your learning plan. <div class="row goal-options-container">'
-            ))
+                'your learning plan. {goal_options_container}'
+            )).format(
+                goal_options_container=HTML('<div class="row goal-options-container">')
+            )
 
             # Add the dismissible option for users that are unsure of their goal
-            # Translators: please do not translate the 'goal' variable below
-            goal_choices_html += HTML(_(
-                '<div tabindex="0" aria-label="Set goal to, {choice}" class="goal-option dismissible" '
-                'data-choice="{goal}">{choice}</div>'
+            goal_choices_html += HTML(
+                '{initial_tag}{choice}{closing_tag}'
             ).format(
-                goal=CourseGoalType.UNSURE.value,
-                choice=self.get_goal_text(CourseGoalType.UNSURE.value)
-            ))
+                initial_tag=HTML(
+                    '<div tabindex="0" aria-label="{aria_label_choice}" class="goal-option dismissible" '
+                    'data-choice="{goal}">'
+                ).format(
+                    goal=CourseGoalType.UNSURE.value,
+                    aria_label_choice=Text(_("Set goal to, {choice}")).format(
+                        choice=self.get_goal_text(CourseGoalType.UNSURE.value)
+                    ),
+                ),
+                choice=Text(_('{choice}')).format(
+                    choice=self.get_goal_text(CourseGoalType.UNSURE.value),
+                ),
+                closing_tag=HTML('</div>'),
+            )
 
             # Add the option to set a goal to earn a certificate,
             # complete the course or explore the course
             goal_options = [CourseGoalType.CERTIFY.value, CourseGoalType.COMPLETE.value, CourseGoalType.EXPLORE.value]
             for goal in goal_options:
-                # Translators: please do not translate the 'goal' variable below
                 goal_text = self.get_goal_text(goal)
-                goal_choices_html += HTML(_(
-                    '<div tabindex="0" aria-label="Set goal to, {goal_text}" class="goal-option {col_sel} btn" '
-                    'data-choice="{goal}">{goal_text}</div>'
+                goal_choices_html += HTML(
+                    '{initial_tag}{goal_text}{closing_tag}'
                 ).format(
-                    goal=goal,
+                    initial_tag=HTML(
+                        '<div tabindex="0" aria-label="{aria_label_choice}" class="goal-option {col_sel} btn" '
+                        'data-choice="{goal}">'
+                    ).format(
+                        goal=goal,
+                        aria_label_choice=Text(_("Set goal to, {goal_text}")).format(
+                            goal_text=Text(_(goal_text))
+                        ),
+                        col_sel='col-' + str(int(math.floor(12 / len(goal_options))))
+                    ),
                     goal_text=goal_text,
-                    col_sel='col-' + str(int(math.floor(12 / len(goal_options))))
-                ))
+                    closing_tag=HTML('</div>')
+                )
 
             CourseHomeMessages.register_info_message(
                 request,
-                HTML('{goal_choices_html}</div>').format(
-                    goal_choices_html=goal_choices_html
+                HTML('{goal_choices_html}{closing_tag}').format(
+                    goal_choices_html=goal_choices_html,
+                    closing_tag=HTML('</div>')
                 ),
                 title=Text(_('Welcome to {course_display_name}')).format(
                     course_display_name=course.display_name

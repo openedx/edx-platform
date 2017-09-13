@@ -16,6 +16,7 @@ from waffle.testutils import override_flag
 
 from commerce.models import CommerceConfiguration
 from commerce.utils import EcommerceService
+from course_goals.views import add_course_goal, remove_course_goal
 from course_modes.models import CourseMode
 from courseware.tests.factories import StaffFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
@@ -377,7 +378,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE_UNENROLLED)
 
-        # Verify that enrolled users are not shown any of the messages when enrolled and course has begun
+        # Verify that enrolled users are not shown any state warning message when enrolled and course has begun.
         CourseEnrollment.enroll(user, self.course.id)
         url = course_home_url(self.course)
         response = self.client.get(url)
@@ -393,13 +394,12 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE_PRE_START)
 
-
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     @override_waffle_flag(COURSE_PRE_START_ACCESS_FLAG, active=True)
     @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
     def test_course_goals(self):
         """
-        Ensure that the following four use cases work as expected
+        Ensure that the following four use cases work as expected.
 
         1) Anonymous users are not shown the set course goal message.
         2) Unenrolled users are not shown the set course goal message.
@@ -422,21 +422,20 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         # TODO: Verify that enrolled users that have set a course goal are not shown the set course goal message
         # SET COURSE GOAL
-        # resp = self.client.post(reverse('course_goal.views.set_course_goal'), {'goal': COURSE_GOAL_DISMISS_OPTION})
+        add_course_goal(user, self.course.id, COURSE_GOAL_DISMISS_OPTION)
         # response = self.client.get(course_home_url(self.course))
         # self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
 
         # TODO: Verify that enrolled and verified users are not shown the set course goal message
         # REMOVE THE COURSE GOAL
-        # VERIFY THE USER
+        remove_course_goal(user, self.course.id)
         # response = self.client.get(course_home_url(self.course))
         # self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
-
 
         # TODO: Verify that enrolled users are not shown the set course goal message in an unverifiable course
         # CREATE UNVERIFIABLE COURSE
         # ENROLL THEM IN THE NEW COURSE
-        # response = self.client.get(course_home_url(self.course))
+        response = self.client.get(course_home_url(self.course))
         # self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
 
 

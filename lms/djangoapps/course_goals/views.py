@@ -9,8 +9,8 @@ from openedx.core.djangolib.markup import Text, HTML
 from enum import Enum
 from eventtracking import tracker
 
+from .models import CourseGoal
 from opaque_keys.edx.keys import CourseKey
-from student.models import CourseGoal
 
 
 class CourseGoalType(Enum):
@@ -30,7 +30,7 @@ def get_course_goal_options():
 
 def set_course_goal(request, course_id, goal=None):
     """
-    Given a user, a course key and a particular goal, save the goal.
+    Given a user, a course key and a particular goal, add and save a goal.
     If no goal explicitly given, checks if a goal has been passed as
     a data variable in an ajax call.
     """
@@ -43,12 +43,10 @@ def set_course_goal(request, course_id, goal=None):
         raise KeyError()
 
     # Remove the existing course goal for the user
-    course_key = CourseKey.from_string(course_id)
-    remove_course_goal(request.user, course_key)
+    remove_course_goal(request.user, course_id)
 
     # Create and save course goal
-    new_goal = CourseGoal(user=request.user, course_key=course_key, goal=goal)
-    new_goal.save()
+    add_course_goal(request.user, course_id, goal)
 
     # Log the event
     tracker.emit(
@@ -82,21 +80,33 @@ def set_course_goal(request, course_id, goal=None):
         )
 
 
-def get_course_goal(user, course_key):
+def add_course_goal(user, course_id, goal):
     """
-    Given a user and a course, return their course goal.
+    Given a user, a course id and a goal, create a CourseGoal object
+    and save it.
+    """
+    course_key = CourseKey.from_string(str(course_id))
+    new_goal = CourseGoal(user=user, course_key=course_key, goal=goal)
+    new_goal.save()
+
+
+def get_course_goal(user, course_id):
+    """
+    Given a user and a course id, return their course goal.
     If a course goal does not exist, returns None.
     """
+    course_key = CourseKey.from_string(course_id)
     course_goal = CourseGoal.objects.filter(user=user, course_key=course_key)[0]
     return course_goal
 
 
-def remove_course_goal(user, course_key):
+def remove_course_goal(user, course_id):
     """
     Given a user and a particular course id, grab any associated
     course goal and delete it. This function deletes any goal found
     which can occur in the unlikely chance that there is a race
     condition while adding a new goal.
     """
+    course_key = CourseKey.from_string(str(course_id))
     for goal in CourseGoal.objects.filter(user=user, course_key=course_key):
         goal.delete()

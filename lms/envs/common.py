@@ -397,7 +397,7 @@ FEATURES = {
     # Whether the bulk enrollment view is enabled.
     'ENABLE_BULK_ENROLLMENT_VIEW': False,
 
-    # Whether the user can set goals on verifiable courses
+    # Whether the user can set a course goal
     'ENABLE_COURSE_GOALS': True,
 }
 
@@ -2239,6 +2239,9 @@ INSTALLED_APPS = [
 
     'openedx.core.djangoapps.waffle_utils',
     'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
+
+    # Course Goals
+    'course_goals',
 
     # Features
     'openedx.features.course_bookmarks',

@@ -825,6 +825,12 @@ urlpatterns += (
     url(r'^commerce/', include('commerce.urls', namespace='commerce')),
 )
 
+# Course goals
+if settings.FEATURES.get('ENABLE_COURSE_GOALS'):
+    urlpatterns += (
+        url(r'^course_goals/', include('course_goals.urls', namespace='course_goals')),
+    )
+
 # Embargo
 if settings.FEATURES.get('EMBARGO'):
     urlpatterns += (
