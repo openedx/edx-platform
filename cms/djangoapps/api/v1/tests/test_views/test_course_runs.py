@@ -36,9 +36,11 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         assert course_run.enrollment_end == enrollment_end
 
     def assert_access_role(self, course_run, user, role):
-        # An error will be raised if the endpoint doesn't create the role
+        # An error will be raised if the endpoint did not create the role
         CourseAccessRole.objects.get(course_id=course_run.id, user=user, role=role)
-        assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 1
+
+    def assert_course_access_role_count(self, course_run, expected):
+        assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == expected
 
     def get_serializer_context(self):
         return {'request': RequestFactory().get('')}
@@ -111,6 +113,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         response = self.client.put(url, data, format='json')
         assert response.status_code == 200
         self.assert_access_role(course_run, user, role)
+        self.assert_course_access_role_count(course_run, 1)
 
         course_run = modulestore().get_course(course_run.id)
         assert response.data == CourseRunSerializer(course_run, context=self.get_serializer_context()).data
@@ -134,12 +137,13 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         assert response.data == {'team': [{'user': ['Object with username=test-user does not exist.']}]}
 
     def test_partial_update(self):
+        role = 'staff'
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
         course_run = CourseFactory(start=start, end=None, enrollment_start=None, enrollment_end=None)
-        assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 0
+        CourseAccessRole.objects.create(course_id=course_run.id, role=role, user=UserFactory())
+        assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 1
 
         user = UserFactory()
-        role = 'staff'
         data = {
             'team': [
                 {
@@ -153,6 +157,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         response = self.client.patch(url, data, format='json')
         assert response.status_code == 200
         self.assert_access_role(course_run, user, role)
+        self.assert_course_access_role_count(course_run, 2)
 
         course_run = modulestore().get_course(course_run.id)
         self.assert_course_run_schedule(course_run, start, None, None, None)
@@ -193,6 +198,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         assert course_run.id.run == data['run']
         self.assert_course_run_schedule(course_run, start, end, enrollment_start, enrollment_end)
         self.assert_access_role(course_run, user, role)
+        self.assert_course_access_role_count(course_run, 1)
 
     def test_images_upload(self):
         # http://www.django-rest-framework.org/api-guide/parsers/#fileuploadparser
@@ -260,6 +266,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         assert course_run.id.run == run
         self.assert_course_run_schedule(course_run, start, end, enrollment_start, enrollment_end)
         self.assert_access_role(course_run, user, role)
+        self.assert_course_access_role_count(course_run, 1)
 
     def test_rerun_duplicate_run(self):
         course_run = ToyCourseFactory()
