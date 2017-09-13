@@ -22,6 +22,7 @@ from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.utils import create_catalog_api_client
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.token_utils import JwtBuilder
+from openedx.features.enterprise_support.utils import get_cache_key
 from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
 
@@ -210,26 +211,28 @@ class EnterpriseApiClient(object):
                 }
             }
 
-        Raises:
-            ConnectionError: requests exception "ConnectionError", raised if if ecommerce is unable to connect
-                to enterprise api server.
-            SlumberBaseException: base slumber exception "SlumberBaseException", raised if API response contains
-                http error status like 4xx, 5xx etc.
-            Timeout: requests exception "Timeout", raised if enterprise API is taking too long for returning
-                a response. This exception is raised for both connection timeout and read timeout.
-
         """
         if not user.is_authenticated():
             return None
 
         api_resource_name = 'enterprise-learner'
+        cache_key = get_cache_key(
+            site_domain=site.domain,
+            resource=api_resource_name,
+            username=user.username,
+        )
+
+        response = cache.get(cache_key)
+        if response:
+            return response
 
         try:
             endpoint = getattr(self.client, api_resource_name)
             querystring = {'username': user.username}
             response = endpoint().get(**querystring)
+            cache.set(cache_key, response, settings.ENTERPRISE_API_CACHE_TIMEOUT)
         except (HttpClientError, HttpServerError):
-            message = ("An error occurred while getting EnterpriseLearner data for user {username}".format(
+            message = ('An error occurred while getting EnterpriseLearner data for user {username}'.format(
                 username=user.username
             ))
             LOGGER.exception(message)
