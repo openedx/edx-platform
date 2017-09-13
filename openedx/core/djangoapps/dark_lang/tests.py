@@ -13,6 +13,7 @@ from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from openedx.core.djangoapps.dark_lang.middleware import DarkLangMiddleware
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.tests.factories import UserFactory
 
@@ -255,6 +256,16 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         session = self.client.session
         session[LANGUAGE_SESSION_KEY] = session_language
         session.save()
+
+    @with_site_configuration(configuration={'LANGUAGE_CODE': 'rel'})
+    def test_site_configuration_language(self):
+        # `LANGUAGE_CODE` in site configuration should override session lang
+        self._set_client_session_language('notrel')
+        self.client.get('/home')
+        self.assert_session_lang_equals(
+            'rel',
+            self.client.session
+        )
 
     def test_preview_lang_with_released_language(self):
         # Preview lang should always override selection
