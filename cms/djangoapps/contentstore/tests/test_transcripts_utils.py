@@ -4,6 +4,7 @@ import copy
 import textwrap
 import unittest
 from uuid import uuid4
+import ddt
 
 from django.conf import settings
 from django.test.utils import override_settings
@@ -643,3 +644,43 @@ class TestSubsFilename(unittest.TestCase):
         self.assertEqual(name, u'subs_˙∆©ƒƒƒ.srt.sjson')
         name = transcripts_utils.subs_filename(u"˙∆©ƒƒƒ", 'uk')
         self.assertEqual(name, u'uk_subs_˙∆©ƒƒƒ.srt.sjson')
+
+
+@ddt.ddt
+class TestVideoIdsInfo(unittest.TestCase):
+    """
+    Tests for `get_video_ids_info`.
+    """
+    @ddt.data(
+        {
+            'edx_video_id': '000-000-000',
+            'youtube_id_1_0': '12as34',
+            'html5_sources': [
+                'www.abc.com/foo.mp4', 'www.abc.com/bar.webm', 'foo/bar/baz.m3u8'
+            ],
+            'expected_result': (False, ['000-000-000', '12as34', 'foo', 'bar', 'baz'])
+        },
+        {
+            'edx_video_id': '',
+            'youtube_id_1_0': '12as34',
+            'html5_sources': [
+                'www.abc.com/foo.mp4', 'www.abc.com/bar.webm', 'foo/bar/baz.m3u8'
+            ],
+            'expected_result': (True, ['12as34', 'foo', 'bar', 'baz'])
+        },
+        {
+            'edx_video_id': '',
+            'youtube_id_1_0': '',
+            'html5_sources': [
+                'www.abc.com/foo.mp4', 'www.abc.com/bar.webm',
+            ],
+            'expected_result': (True, ['foo', 'bar'])
+        },
+    )
+    @ddt.unpack
+    def test_get_video_ids_info(self, edx_video_id, youtube_id_1_0, html5_sources, expected_result):
+        """
+        Verify that `get_video_ids_info` works as expected.
+        """
+        actual_result = transcripts_utils.get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources)
+        self.assertEqual(actual_result, expected_result)
