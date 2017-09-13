@@ -4,11 +4,11 @@ export class CourseGoals {  // eslint-disable-line import/prefer-default-export
 
   constructor(options) {
     $('.goal-option').click((e) => {
-      const goal = $(e.target).data().choice;
+      const goalKey = $(e.target).data().choice;
       $.post({
         url: options.setGoalUrl,
         data: {
-          goal,
+          goal_key: goalKey,
         },
         dataType: 'json',
         success: (data) => {

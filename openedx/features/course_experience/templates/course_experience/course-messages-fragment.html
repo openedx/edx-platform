@@ -33,6 +33,6 @@ is_rtl = get_language_bidi()
 
 <%static:webpack entry="CourseGoals">
     new CourseGoals({
-        setGoalUrl: "${set_goal_url | n, js_escaped_string}",
+        setGoalUrl: "${goal_api_url | n, js_escaped_string}",
     });
 </%static:webpack>

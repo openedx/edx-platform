@@ -19,7 +19,7 @@ from openedx.core.djangolib.markup import Text, HTML
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
-from course_goals.views import CourseGoalType
+from course_goals.views import CourseGoalOption
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import CourseHomeMessages
 from student.models import CourseEnrollment
@@ -62,13 +62,13 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         }
 
         # Register the course home messages to be loaded on the page
-        self.register_course_home_messages(self, request, course_id, user_access, course_start_data)
+        self._register_course_home_messages(request, course_id, user_access, course_start_data)
 
         # Grab the relevant messages
         course_home_messages = list(CourseHomeMessages.user_messages(request))
 
         # Pass in the url used to set a course goal
-        set_goal_url = reverse(
+        goal_api_url = reverse(
             'course_goals:set_course_goal',
             kwargs={
                 'course_id': course_id,
@@ -80,15 +80,14 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
 
         context = {
             'course_home_messages': course_home_messages,
-            'set_goal_url': set_goal_url,
+            'goal_api_url': goal_api_url,
             'image_src': image_src,
         }
 
         html = render_to_string('course_experience/course-messages-fragment.html', context)
         return Fragment(html)
 
-    @staticmethod
-    def register_course_home_messages(self, request, course_id, user_access, course_start_data):
+    def _register_course_home_messages(request, course_id, user_access, course_start_data):
         """
         Register messages to be shown in the course home content page.
         """
@@ -165,20 +164,20 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
                     '<div tabindex="0" aria-label="{aria_label_choice}" class="goal-option dismissible" '
                     'data-choice="{goal}">'
                 ).format(
-                    goal=CourseGoalType.UNSURE.value,
-                    aria_label_choice=Text(_("Set goal to, {choice}")).format(
-                        choice=self.get_goal_text(CourseGoalType.UNSURE.value)
+                    goal=CourseGoalOption.UNSURE.value,
+                    aria_label_choice=Text(_("Set goal to: {choice}")).format(
+                        choice=self.get_goal_text(CourseGoalOption.UNSURE.value)
                     ),
                 ),
                 choice=Text(_('{choice}')).format(
-                    choice=self.get_goal_text(CourseGoalType.UNSURE.value),
+                    choice=self.get_goal_text(CourseGoalOption.UNSURE.value),
                 ),
                 closing_tag=HTML('</div>'),
             )
 
             # Add the option to set a goal to earn a certificate,
             # complete the course or explore the course
-            goal_options = [CourseGoalType.CERTIFY.value, CourseGoalType.COMPLETE.value, CourseGoalType.EXPLORE.value]
+            goal_options = [CourseGoalOption.CERTIFY.value, CourseGoalOption.COMPLETE.value, CourseGoalOption.EXPLORE.value]
             for goal in goal_options:
                 goal_text = self.get_goal_text(goal)
                 goal_choices_html += HTML(
@@ -189,7 +188,7 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
                         'data-choice="{goal}">'
                     ).format(
                         goal=goal,
-                        aria_label_choice=Text(_("Set goal to, {goal_text}")).format(
+                        aria_label_choice=Text(_("Set goal to: {goal_text}")).format(
                             goal_text=Text(_(goal_text))
                         ),
                         col_sel='col-' + str(int(math.floor(12 / len(goal_options))))
@@ -212,8 +211,8 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
     @staticmethod
     def get_goal_text(goal_type):
         return {
-            CourseGoalType.CERTIFY.value: Text(_('Earn a certificate')),
-            CourseGoalType.COMPLETE.value: Text(_('Complete the course')),
-            CourseGoalType.EXPLORE.value: Text(_('Explore the course')),
-            CourseGoalType.UNSURE.value: Text(_('Not sure yet')),
+            CourseGoalOption.CERTIFY.value: Text(_('Earn a certificate')),
+            CourseGoalOption.COMPLETE.value: Text(_('Complete the course')),
+            CourseGoalOption.EXPLORE.value: Text(_('Explore the course')),
+            CourseGoalOption.UNSURE.value: Text(_('Not sure yet')),
         }[goal_type]
