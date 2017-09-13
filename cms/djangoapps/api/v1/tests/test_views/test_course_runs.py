@@ -61,7 +61,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
 
         # Order matters for the assertion
         course_runs = sorted(course_runs, key=lambda course_run: str(course_run.id))
-        actual = sorted(response.data, key=lambda course_run: course_run['id'])
+        actual = sorted(response.data['results'], key=lambda course_run: course_run['id'])
         assert actual == CourseRunSerializer(course_runs, many=True, context=self.get_serializer_context()).data
 
     def test_retrieve(self):
