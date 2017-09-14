@@ -1,6 +1,5 @@
-# Requirements to run Paver
+# Requirements to run and test Paver
 Paver==1.2.4
-psutil==1.2.1
 lazy==1.1
 path.py==8.2.1
 watchdog==0.8.3
