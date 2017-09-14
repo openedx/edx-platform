@@ -1456,7 +1456,7 @@ class ContentStoreTest(ContentStoreTestCase):
         resp = self.client.get_html('/home/')
         self.assertContains(
             resp,
-            '<h1 class="page-header">Studio Home</h1>',
+            u'<h1 class="page-header">Studiø Home</h1>',
             status_code=200,
             html=True
         )

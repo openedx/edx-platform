@@ -547,7 +547,7 @@ def account_settings_context(request):
                 'options': TIME_ZONE_CHOICES,
             }
         },
-        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'platform_name': unicode(configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)),
         'password_reset_support_link': configuration_helpers.get_value(
             'PASSWORD_RESET_SUPPORT_LINK', settings.PASSWORD_RESET_SUPPORT_LINK
         ) or settings.SUPPORT_SITE_LINK,
