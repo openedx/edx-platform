@@ -842,26 +842,41 @@ class ExampleCertificate(TimeStampedModel):
 class CertificateGenerationCourseSetting(TimeStampedModel):
     """Enable or disable certificate generation for a particular course.
 
-    This controls whether students are allowed to "self-generate"
-    certificates for a course.  It does NOT prevent us from
-    batch-generating certificates for a course using management
-    commands.
-
     In general, we should only enable self-generated certificates
     for a course once we successfully generate example certificates
     for the course.  This is enforced in the UI layer, but
     not in the data layer.
-
     """
     course_key = CourseKeyField(max_length=255, db_index=True)
-    enabled = models.BooleanField(default=False)
+    enabled = models.BooleanField(
+        default=False,
+        help_text=u"DEPRECATED, please use self_generation_enabled instead."
+    )
+    # TODO: Learner-2549 remove deprecated enabled field
+
+    self_generation_enabled = models.BooleanField(
+        default=False,
+        help_text=(
+            u"Allow students to generate their own certificates for the course. "
+            u"Enabling this does NOT affect usage of the management command used "
+            u"for batch certificate generation."
+        )
+    )
+    language_specific_templates_enabled = models.BooleanField(
+        default=False,
+        help_text=(
+            u"Render translated certificates rather than using the platform's "
+            u"default language. Available translations are controlled by the "
+            u"certificate template."
+        )
+    )
 
     class Meta(object):
         get_latest_by = 'created'
         app_label = "certificates"
 
     @classmethod
-    def is_enabled_for_course(cls, course_key):
+    def is_self_generation_enabled_for_course(cls, course_key):
         """Check whether self-generated certificates are enabled for a course.
 
         Arguments:
@@ -876,10 +891,10 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         except cls.DoesNotExist:
             return False
         else:
-            return latest.enabled
+            return latest.self_generation_enabled
 
     @classmethod
-    def set_enabled_for_course(cls, course_key, is_enabled):
+    def set_self_generatation_enabled_for_course(cls, course_key, is_enabled):
         """Enable or disable self-generated certificates for a course.
 
         Arguments:
@@ -887,9 +902,46 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
             is_enabled (boolean): Whether to enable or disable self-generated certificates.
 
         """
-        CertificateGenerationCourseSetting.objects.create(
+        default = {
+            'self_generation_enabled': is_enabled
+        }
+        CertificateGenerationCourseSetting.objects.update_or_create(
             course_key=course_key,
-            enabled=is_enabled
+            defaults=default
+        )
+
+    def is_language_specific_templates_enabled_for_course(cls, course_key):
+        """Check whether language-specific certificates are enabled for a course.
+
+        Arguments:
+            course_key (CourseKey): The identifier for the course.
+
+        Returns:
+            boolean
+
+        """
+        try:
+            latest = cls.objects.filter(course_key=course_key).latest()
+        except cls.DoesNotExist:
+            return False
+        else:
+            return latest.language_specific_templates_enabled
+
+    @classmethod
+    def set_language_specific_templates_enabled_for_course(cls, course_key, is_enabled):
+        """Enable or disable language-specific certificates for a course.
+
+        Arguments:
+            course_key (CourseKey): The identifier for the course.
+            is_enabled (boolean): Whether to enable or disable language-specific certificates.
+
+        """
+        default = {
+            'language_specific_templates_enabled': is_enabled,
+        }
+        CertificateGenerationCourseSetting.objects.update_or_create(
+            course_key=course_key,
+            defaults=default
         )
 
 
