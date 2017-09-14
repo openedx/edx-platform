@@ -115,8 +115,7 @@ pyuca==1.1
 wrapt==1.10.5
 zendesk==1.1.1
 
-# This needs to be installed *after* Cython, which is in pre.txt
-lxml==3.4.4
+lxml==3.8.0
 
 # Used for shopping cart's pdf invoice/receipt generation
 reportlab==3.1.44
