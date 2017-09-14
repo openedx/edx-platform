@@ -329,7 +329,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.assertEqual(block.link, '{}?sku={}'.format(configuration.MULTIPLE_ITEMS_BASKET_PAGE_URL, sku))
 
     ## CertificateAvailableDate
-    @waffle.testutils.override_switch('certificates.instructor_paced_only', True)
+    @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
     def test_no_certificate_available_date(self):
         course = create_course_run(days_till_start=-1)
         user = self.create_user()
@@ -339,7 +339,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.assertFalse(block.is_enabled)
 
     ## CertificateAvailableDate
-    @waffle.testutils.override_switch('certificates.instructor_paced_only', True)
+    @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
     def test_no_certificate_available_date_for_self_paced(self):
         course = create_self_paced_course_run()
         verified_user = self.create_user()
@@ -350,7 +350,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.assertNotEqual(block.date, None)
         self.assertFalse(block.is_enabled)
 
-    # @waffle.testutils.override_switch('certificates.instructor_paced_only', True)
     def test_no_certificate_available_date_for_audit_course(self):
         """
         Tests that Certificate Available Date is not visible in the course "Important Course Dates" section
@@ -374,7 +373,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.assertFalse(block.is_enabled)
         self.assertNotEqual(block.date, None)
 
-    @waffle.testutils.override_switch('certificates.instructor_paced_only', True)
+    @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
     def test_certificate_available_date_defined(self):
         course = create_course_run()
         audit_user = self.create_user()

@@ -9,8 +9,6 @@ WAFFLE_NAMESPACE = u'certificates'
 
 # Switches
 AUTO_CERTIFICATE_GENERATION = u'auto_certificate_generation'
-SELF_PACED_ONLY = u'self_paced_only'
-INSTRUCTOR_PACED_ONLY = u'instructor_paced_only'
 
 
 def waffle():

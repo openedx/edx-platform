@@ -933,9 +933,8 @@ def _get_cert_data(student, course, course_key, is_active, enrollment_mode, grad
         may_view_certificate = get_course_by_id(course_key).may_certify()
 
     switches = certificates_waffle.waffle()
-    switches_enabled = (switches.is_enabled(certificates_waffle.SELF_PACED_ONLY) and
-                        switches.is_enabled(certificates_waffle.INSTRUCTOR_PACED_ONLY))
-    student_cert_generation_enabled = certs_api.cert_generation_enabled(course_key) if not switches_enabled else True
+    switch_enabled = switches.is_enabled(certificates_waffle.AUTO_CERTIFICATE_GENERATION)
+    student_cert_generation_enabled = switch_enabled or certs_api.cert_generation_enabled(course_key)
 
     # Don't show certificate information if:
     # 1) the learner has not passed the course

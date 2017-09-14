@@ -820,9 +820,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             expected_date = today
         else:
             expected_date = self.course.certificate_available_date
-        with waffle.waffle().override(waffle.SELF_PACED_ONLY, active=True):
-            with waffle.waffle().override(waffle.INSTRUCTOR_PACED_ONLY, active=True):
-                response = self.client.get(test_url)
+        with waffle.waffle().override(waffle.AUTO_CERTIFICATE_GENERATION, active=True):
+            response = self.client.get(test_url)
         date = '{month} {day}, {year}'.format(
             month=strftime_localized(expected_date, "%B"),
             day=expected_date.day,
