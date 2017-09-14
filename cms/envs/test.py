@@ -19,6 +19,7 @@ sessions. Assumes structure:
 # pylint: disable=invalid-name
 
 from .common import *
+from django.utils.translation import ugettext_lazy
 import os
 from path import Path as path
 from warnings import filterwarnings, simplefilter
@@ -44,6 +45,10 @@ MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
 
 THIS_UUID = uuid4().hex[:5]
+
+# Reveal possible error with translated platform names
+STUDIO_NAME = ugettext_lazy(u'édX Studio')
+STUDIO_SHORT_NAME = ugettext_lazy(u'Studiø')
 
 # Nose Test Runner
 TEST_RUNNER = 'openedx.core.djangolib.nose.NoseTestSuiteRunner'
