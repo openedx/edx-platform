@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-30 17:57+0000\n"
-"PO-Revision-Date: 2017-08-30 17:58:11.356308\n"
+"POT-Creation-Date: 2017-09-14 11:34+0000\n"
+"PO-Revision-Date: 2017-09-14 11:35:52.001200\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4603,14 +4603,16 @@ msgstr "بعمم رشوث"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"The name that is used for ID verification and appears on your certificates. "
-"Other learners never see your full name. Make sure to enter your name "
-"exactly as it appears on your government-issued photo ID, including any non-"
+"The name that is used for ID verification and that appears on your "
+"certificates. Other learners see your full name if you have selected "
+"{bold_start}Full Profile{bold_end} for profile visibility. Make sure to "
+"enter your name exactly as it appears on your photo ID, including any non-"
 "Roman characters."
 msgstr ""
-"فاث رشوث فاشف هس عسثي بخق هي دثقهبهذشفهخر شري شححثشقس خر غخعق ذثقفهبهذشفثس. "
-"خفاثق مثشقرثقس رثدثق سثث غخعق بعمم رشوث. وشنث سعقث فخ ثرفثق غخعق رشوث "
-"ثطشذفمغ شس هف شححثشقس خر غخعق لخدثقروثرف-هسسعثي حاخفخ هي, هرذمعيهرل شرغ رخر-"
+"فاث رشوث فاشف هس عسثي بخق هي دثقهبهذشفهخر شري فاشف شححثشقس خر غخعق "
+"ذثقفهبهذشفثس. خفاثق مثشقرثقس سثث غخعق بعمم رشوث هب غخع اشدث سثمثذفثي "
+"{bold_start}بعمم حقخبهمث{bold_end} بخق حقخبهمث دهسهزهمهفغ. وشنث سعقث فخ "
+"ثرفثق غخعق رشوث ثطشذفمغ شس هف شححثشقس خر غخعق حاخفخ هي, هرذمعيهرل شرغ رخر-"
 "قخوشر ذاشقشذفثقس."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -5065,6 +5067,14 @@ msgstr "خدثقشمم سذخقث"
 msgid "Bookmark this page"
 msgstr "زخخنوشقن فاهس حشلث"
 
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "Show more"
+msgstr "ساخص وخقث"
+
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "Show less"
+msgstr "ساخص مثسس"
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -5146,16 +5156,6 @@ msgstr "حقخبهمث هوشلث"
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Profile image for {username}"
 msgstr "حقخبهمث هوشلث بخق {username}"
-
-#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
-msgid "My Profile"
-msgstr "وغ حقخبهمث"
-
-#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
-msgid ""
-"Build out your profile to personalize your identity on {platform_name}."
-msgstr ""
-"زعهمي خعف غخعق حقخبهمث فخ حثقسخرشمهظث غخعق هيثرفهفغ خر {platform_name}."
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "About Me"
@@ -7328,10 +7328,6 @@ msgstr ""
 msgid "End My Exam"
 msgstr "ثري وغ ثطشو"
 
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Hide Timer"
-msgstr "اهيث فهوثق"
-
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
 msgstr "مثشقر وخقث"
@@ -8699,10 +8695,6 @@ msgstr "سفشقف صخقنهرل فخصشقي غخعق رثطف مثشقرهر�
 #: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
 msgid "Find a course"
 msgstr "بهري ش ذخعقسث"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/learner_profile.underscore
-msgid "An error occurred. Try loading the page again."
-msgstr "شر ثققخق خذذعققثي. فقغ مخشيهرل فاث حشلث شلشهر."
 
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "You are currently sharing a limited profile."

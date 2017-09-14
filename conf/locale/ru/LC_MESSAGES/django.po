@@ -6443,7 +6443,7 @@ msgstr "Создать результаты пользователя"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Delete User Results"
-msgstr "Удалить результаты пользователя"
+msgstr "Результат удаления пользователя"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "The git repo location should end with '.git', and be a valid url"
