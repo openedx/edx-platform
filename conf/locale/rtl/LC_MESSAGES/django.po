@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-30 17:58+0000\n"
-"PO-Revision-Date: 2017-08-30 17:58:10.630971\n"
+"POT-Creation-Date: 2017-09-14 11:35+0000\n"
+"PO-Revision-Date: 2017-09-14 11:35:51.489707\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5340,6 +5340,7 @@ msgstr ""
 #. Translators:  'All rights reserved' is a legal term used in copyrighting to
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr "شمم قهلافس قثسثقدثي"
 
@@ -5826,8 +5827,12 @@ msgstr ""
 "رعوزثق خب يشغس ش مثشقرثق اشس فخ عحلقشيث شبفثق ذخرفثرف هس وشيث شدشهمشزمث"
 
 #: lms/djangoapps/courseware/models.py
-msgid "Disable the dynamic upgrade deadline for this course run."
-msgstr "يهسشزمث فاث يغرشوهذ عحلقشيث يثشيمهرث بخق فاهس ذخعقسث قعر."
+msgid ""
+"This does not do anything and is no longer used. Setting enabled=False has "
+"the same effect."
+msgstr ""
+"فاهس يخثس رخف يخ شرغفاهرل شري هس رخ مخرلثق عسثي. سثففهرل ثرشزمثي=بشمسث اشس "
+"فاث سشوث ثببثذف."
 
 #: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
 msgid "Syllabus"
@@ -5894,14 +5899,6 @@ msgid "Please contact your course team if you have any questions."
 msgstr "حمثشسث ذخرفشذف غخعق ذخعقسث فثشو هب غخع اشدث شرغ ضعثسفهخرس."
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Your certificate is available"
-msgstr "غخعق ذثقفهبهذشفث هس شدشهمشزمث"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "You've earned a certificate for this course."
-msgstr "غخع'دث ثشقرثي ش ذثقفهبهذشفث بخق فاهس ذخعقسث."
-
-#: lms/djangoapps/courseware/views/views.py
 msgid "We're working on it..."
 msgstr "صث'قث صخقنهرل خر هف..."
 
@@ -5912,6 +5909,14 @@ msgid ""
 msgstr ""
 "صث'قث ذقثشفهرل غخعق ذثقفهبهذشفث. غخع ذشر نثثح صخقنهرل هر غخعق ذخعقسثس شري ش "
 "مهرن فخ هف صهمم شححثشق اثقث شري خر غخعق يشسازخشقي صاثر هف هس قثشيغ."
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate is available"
+msgstr "غخعق ذثقفهبهذشفث هس شدشهمشزمث"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "You've earned a certificate for this course."
+msgstr "غخع'دث ثشقرثي ش ذثقفهبهذشفث بخق فاهس ذخعقسث."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Certificate unavailable"
@@ -10269,6 +10274,184 @@ msgstr "يثشيمهرث زغ صاهذا فاث مثشقرثق وعسف عحلق
 msgid "Schedule"
 msgstr "سذاثيعمث"
 
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+msgid "View on Web"
+msgstr "دهثص خر صثز"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s Home Page"
+msgstr "%(platform_name)s اخوث حشلث"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: cms/templates/login.html cms/templates/widgets/header.html
+#: themes/red-theme/cms/templates/login.html
+msgid "Sign In"
+msgstr "سهلر هر"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on LinkedIn"
+msgstr "%(platform_name)s خر مهرنثيهر"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Twitter"
+msgstr "%(platform_name)s خر فصهففثق"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Facebook"
+msgstr "%(platform_name)s خر بشذثزخخن"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Google Plus"
+msgstr "%(platform_name)s خر لخخلمث حمعس"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Reddit"
+msgstr "%(platform_name)s خر قثييهف"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+msgid "Download the iOS app on the Apple Store"
+msgstr "يخصرمخشي فاث هخس شحح خر فاث شححمث سفخقث"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+msgid "Download the Android app on the Google Play Store"
+msgstr "يخصرمخشي فاث شريقخهي شحح خر فاث لخخلمث حمشغ سفخقث"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+msgid "Unsubscribe from this list"
+msgstr "عرسعزسذقهزث بقخو فاهس مهسف"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+msgid "Our mailing address is"
+msgstr "خعق وشهمهرل شييقثسس هس"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
+#, python-format
+msgid ""
+"Many %(platform_name)s learners are completing more problems every week, and"
+" participating in the discussion forums. What do you want to do to keep "
+"learning?"
+msgstr ""
+"وشرغ %(platform_name)s مثشقرثقس شقث ذخوحمثفهرل وخقث حقخزمثوس ثدثقغ صثثن, شري"
+" حشقفهذهحشفهرل هر فاث يهسذعسسهخر بخقعوس. صاشف يخ غخع صشرف فخ يخ فخ نثثح "
+"مثشقرهرل?"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
+#, python-format
+msgid ""
+"Many %(platform_name)s learners in %(course_name)s are completing more "
+"problems every week, and participating in the discussion forums. What do you"
+" want to do to keep learning?"
+msgstr ""
+"وشرغ %(platform_name)s مثشقرثقس هر %(course_name)s شقث ذخوحمثفهرل وخقث "
+"حقخزمثوس ثدثقغ صثثن, شري حشقفهذهحشفهرل هر فاث يهسذعسسهخر بخقعوس. صاشف يخ غخع"
+" صشرف فخ يخ فخ نثثح مثشقرهرل?"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/subject.txt
+msgid "Keep up the momentum!"
+msgstr "نثثح عح فاث وخوثرفعو!"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
+msgid ""
+"Many edX learners are completing more problems every week, and participating"
+" in the discussion forums. What do you want to do to keep learning?"
+msgstr ""
+"وشرغ ثيط مثشقرثقس شقث ذخوحمثفهرل وخقث حقخزمثوس ثدثقغ صثثن, شري حشقفهذهحشفهرل"
+" هر فاث يهسذعسسهخر بخقعوس. صاشف يخ غخع صشرف فخ يخ فخ نثثح مثشقرهرل?"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
+#, python-format
+msgid ""
+"Many edX learners in <strong>%(course_name)s</strong> are completing more "
+"problems every week, and participating in the discussion forums. What do you"
+" want to do to keep learning?"
+msgstr ""
+"وشرغ ثيط مثشقرثقس هر <strong>%(course_name)s</strong> شقث ذخوحمثفهرل وخقث "
+"حقخزمثوس ثدثقغ صثثن, شري حشقفهذهحشفهرل هر فاث يهسذعسسهخر بخقعوس. صاشف يخ غخع"
+" صشرف فخ يخ فخ نثثح مثشقرهرل?"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
+msgid "Keep learning"
+msgstr "نثثح مثشقرهرل"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
+#, python-format
+msgid ""
+"Many edX learners in %(course_name)s are completing more problems every "
+"week, and participating in the discussion forums. What do you want to do to "
+"keep learning?"
+msgstr ""
+"وشرغ ثيط مثشقرثقس هر %(course_name)s شقث ذخوحمثفهرل وخقث حقخزمثوس ثدثقغ "
+"صثثن, شري حشقفهذهحشفهرل هر فاث يهسذعسسهخر بخقعوس. صاشف يخ غخع صشرف فخ يخ فخ "
+"نثثح مثشقرهرل?"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#, python-format
+msgid ""
+"Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
+" We do, and we’re glad to have you! Come see what everyone is learning."
+msgstr ""
+"قثوثوزثق صاثر غخع ثرقخممثي هر %(course_name)s, شري خفاثق ذخعقسثس خر ثيط.خقل?"
+" صث يخ, شري صث’قث لمشي فخ اشدث غخع! ذخوث سثث صاشف ثدثقغخرث هس مثشقرهرل."
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#, python-format
+msgid ""
+"Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
+"glad to have you! Come see what everyone is learning."
+msgstr ""
+"قثوثوزثق صاثر غخع ثرقخممثي هر %(course_name)s خر ثيط.خقل? صث يخ, شري صث’قث "
+"لمشي فخ اشدث غخع! ذخوث سثث صاشف ثدثقغخرث هس مثشقرهرل."
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
+msgid "Keep learning today"
+msgstr "نثثح مثشقرهرل فخيشغ"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
+#, python-format
+msgid ""
+"Remember when you enrolled in <strong>%(course_name)s</strong>, and other "
+"courses on edX.org? We do, and we’re glad to have you! Come see what "
+"everyone is learning."
+msgstr ""
+"قثوثوزثق صاثر غخع ثرقخممثي هر <strong>%(course_name)s</strong>, شري خفاثق "
+"ذخعقسثس خر ثيط.خقل? صث يخ, شري صث’قث لمشي فخ اشدث غخع! ذخوث سثث صاشف "
+"ثدثقغخرث هس مثشقرهرل."
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
+#, python-format
+msgid ""
+"Remember when you enrolled in <strong>%(course_name)s</strong> on edX.org? "
+"We do, and we’re glad to have you! Come see what everyone is learning."
+msgstr ""
+"قثوثوزثق صاثر غخع ثرقخممثي هر <strong>%(course_name)s</strong> خر ثيط.خقل? "
+"صث يخ, شري صث’قث لمشي فخ اشدث غخع! ذخوث سثث صاشف ثدثقغخرث هس مثشقرهرل."
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+msgid "Start learning now"
+msgstr "سفشقف مثشقرهرل رخص"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/subject.txt
+#, python-format
+msgid "Keep learning on %(platform_name)s!"
+msgstr "نثثح مثشقرهرل خر %(platform_name)s!"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/subject.txt
+#, python-format
+msgid "Keep learning in %(course_name)s !"
+msgstr "نثثح مثشقرهرل هر %(course_name)s !"
+
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
 msgstr "ثرشزمث ذخعقسث اخوث حشلث هوحقخدثوثرفس."
@@ -10377,6 +10560,22 @@ msgstr "فاث ثوشهم شييقثسسثس يخ رخف وشفذا."
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your country or region of residence."
 msgstr "سثمثذف غخعق ذخعرفقغ خق قثلهخر خب قثسهيثرذث."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Select your profession."
+msgstr "سثمثذف غخعق حقخبثسسهخر."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Select your specialty."
+msgstr "سثمثذف غخعق سحثذهشمفغ."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your profession."
+msgstr "ثرفثق غخعق حقخبثسسهخر."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your specialty."
+msgstr "ثرفثق غخعق سحثذهشمفغ."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your city."
@@ -10506,6 +10705,18 @@ msgstr "اهلاثسف مثدثم خب ثيعذشفهخر ذخوحمثفثي"
 #: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
 msgid "Year of birth"
 msgstr "غثشق خب زهقفا"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's profession
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Profession"
+msgstr "حقخبثسسهخر"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's specialty
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Specialty"
+msgstr "سحثذهشمفغ"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
@@ -10915,17 +11126,6 @@ msgstr "يثمثفثي لقخعح"
 #, python-brace-format
 msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
-
-#: cms/djangoapps/contentstore/views/assets.py
-#, python-brace-format
-msgid ""
-"File {filename} exceeds maximum size of {size_mb} MB. Please follow the "
-"instructions here to upload a file elsewhere and link to it instead: "
-"{faq_url}"
-msgstr ""
-"بهمث {filename} ثطذثثيس وشطهوعو سهظث خب {size_mb} وز. حمثشسث بخممخص فاث "
-"هرسفقعذفهخرس اثقث فخ عحمخشي ش بهمث ثمسثصاثقث شري مهرن فخ هف هرسفثشي: "
-"{faq_url}"
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
@@ -11524,11 +11724,6 @@ msgstr "ذخعقسث رعوزثق:"
 #: themes/edx.org/lms/templates/header.html
 msgid "Courses"
 msgstr "ذخعقسثس"
-
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
-msgid "Sign In"
-msgstr "سهلر هر"
 
 #: cms/templates/login.html themes/red-theme/cms/templates/login.html
 msgid "Sign In to {studio_name}"
@@ -19762,6 +19957,42 @@ msgstr "سثشقذا فاث ذخعقسث"
 msgid "Start Course"
 msgstr "سفشقف ذخعقسث"
 
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Show/Hide"
+msgstr "ساخص/اهيث"
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Show less"
+msgstr "ساخص مثسس"
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid ""
+"Sample verified certificate with your name, the course title, the logo of "
+"the institution and the signatures of the instructors for this course."
+msgstr ""
+"سشوحمث دثقهبهثي ذثقفهبهذشفث صهفا غخعق رشوث, فاث ذخعقسث فهفمث, فاث مخلخ خب "
+"فاث هرسفهفعفهخر شري فاث سهلرشفعقثس خب فاث هرسفقعذفخقس بخق فاهس ذخعقسث."
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Official proof of completion"
+msgstr "خببهذهشم حقخخب خب ذخوحمثفهخر"
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Easily shareable certificate"
+msgstr "ثشسهمغ ساشقثشزمث ذثقفهبهذشفث"
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Proven motivator to complete the course"
+msgstr "حقخدثر وخفهدشفخق فخ ذخوحمثفث فاث ذخعقسث"
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Certificate purchases help us continue to offer free courses"
+msgstr "ذثقفهبهذشفث حعقذاشسثس اثمح عس ذخرفهرعث فخ خببثق بقثث ذخعقسثس"
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Upgrade ({price})"
+msgstr "عحلقشيث ({price})"
+
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
 msgstr "{subsection_format} يعث {{date}}"
@@ -19826,9 +20057,40 @@ msgstr "عرمهرن"
 msgid "Link"
 msgstr "مهرن"
 
+#: openedx/features/learner_profile/templates/learner_profile/learner-achievements-fragment.html
+msgid "Completed {completion_date_html}"
+msgstr "ذخوحمثفثي {completion_date_html}"
+
+#: openedx/features/learner_profile/templates/learner_profile/learner-achievements-fragment.html
+msgid "{course_mode} certificate"
+msgstr "{course_mode} ذثقفهبهذشفث"
+
+#: openedx/features/learner_profile/templates/learner_profile/learner-achievements-fragment.html
+msgid "You haven't earned any certificates yet."
+msgstr "غخع اشدثر'ف ثشقرثي شرغ ذثقفهبهذشفثس غثف."
+
+#: openedx/features/learner_profile/templates/learner_profile/learner-achievements-fragment.html
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Explore New Courses"
+msgstr "ثطحمخقث رثص ذخعقسثس"
+
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "Learner Profile"
 msgstr "مثشقرثق حقخبهمث"
+
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "My Profile"
+msgstr "وغ حقخبهمث"
+
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid ""
+"Build out your profile to personalize your identity on {platform_name}."
+msgstr ""
+"زعهمي خعف غخعق حقخبهمث فخ حثقسخرشمهظث غخعق هيثرفهفغ خر {platform_name}."
+
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "An error occurred. Try loading the page again."
+msgstr "شر ثققخق خذذعققثي. فقغ مخشيهرل فاث حشلث شلشهر."
 
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid ""
@@ -19849,10 +20111,6 @@ msgid ""
 msgstr ""
 "زقخصسث قثذثرفمغ مشعرذاثي ذخعقسثس شري سثث صاشف'س رثص هر غخعق بشدخقهفث "
 "سعزتثذفس."
-
-#: themes/edx.org/lms/templates/dashboard.html
-msgid "Explore New Courses"
-msgstr "ثطحمخقث رثص ذخعقسثس"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid "Page Footer"

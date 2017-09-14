@@ -7919,7 +7919,7 @@ msgstr "שחזר את הסיסמה שלי"
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an {platformName} account?"
-msgstr ""
+msgstr "כבר יש לך חשבון  {platformName} ?"
 
 #: lms/templates/student_account/register.underscore
 msgid "Sign in."
@@ -7927,7 +7927,7 @@ msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an Account"
-msgstr ""
+msgstr "צור חשבון"
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an account using"

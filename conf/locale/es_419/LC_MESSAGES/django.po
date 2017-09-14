@@ -70,6 +70,7 @@
 # karlman72 <karlman72@gmail.com>, 2014
 # karlman72 <karlman72@gmail.com>, 2014
 # Laura Silva <lingison@edx.org>, 2016
+# Luis Moreno <morenoluisma@gmail.com>, 2017
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # MarnyLopez, 2014
@@ -78,6 +79,7 @@
 # Natalia, 2013-2014
 # Natalia, 2013
 # Natalia, 2014
+# Oliver Schulze <oliver.schulze@vivaidea.org>, 2017
 # Valeria Freire <valtodopds@hotmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
@@ -123,6 +125,7 @@
 # camilomaiden <inactive+camilomaiden@transifex.com>, 2014
 # Luis Benites <lbenitesanchez@gmail.com>, 2016
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
+# Luis Moreno <morenoluisma@gmail.com>, 2017
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013-2014
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Marco Morales, 2014
@@ -9606,7 +9609,7 @@ msgstr "Suscríbase al canal YouTube de {platform_name}."
 
 #: lms/envs/common.py
 msgid "Your Platform Insights"
-msgstr ""
+msgstr "Tu Plataforma Insights"
 
 #: lms/envs/common.py
 msgid "Kosovo"
