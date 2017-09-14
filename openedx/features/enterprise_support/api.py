@@ -195,11 +195,14 @@ class EnterpriseApiClient(object):
                                 "is_active": true,
                                 "date_joined": "2016-09-01T19:18:26.026495Z"
                             },
-                            "data_sharing_consent": [
+                            "data_sharing_consent_records": [
                                 {
-                                    "user": 1,
-                                    "state": "enabled",
-                                    "enabled": true
+                                    "username": "myself",
+                                    "enterprise_customer_uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
+                                    "exists": true,
+                                    "course_id": "course-v1:edX DemoX Demo_Course",
+                                    "consent_provided": true,
+                                    "consent_required": false
                                 }
                             ]
                         }
