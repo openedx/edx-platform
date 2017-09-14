@@ -112,7 +112,9 @@ class CourseRunSerializer(CourseRunTeamSerializerMixin, serializers.Serializer):
             return instance
 
     def update_team(self, instance, team):
-        CourseAccessRole.objects.filter(course_id=instance.id).delete()
+        # Existing data should remain intact when performing a partial update.
+        if not self.partial:
+            CourseAccessRole.objects.filter(course_id=instance.id).delete()
 
         # TODO In the future we can optimize by getting users in a single query.
         CourseAccessRole.objects.bulk_create([
