@@ -34,8 +34,8 @@ def get_course_goal(user, course_id):
     If a course goal does not exist, returns None.
     """
     course_key = CourseKey.from_string(course_id)
-    course_goal = CourseGoal.objects.filter(user=user, course_key=course_key)[0]
-    return course_goal
+    course_goals = CourseGoal.objects.filter(user=user, course_key=course_key)
+    return course_goals[0] if course_goals else None
 
 
 def remove_course_goal(user, course_id):

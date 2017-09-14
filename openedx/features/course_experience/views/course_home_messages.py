@@ -8,6 +8,7 @@ from datetime import datetime
 
 from course_modes.models import CourseMode
 from courseware.courses import get_course_with_access
+from django.contrib import auth
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -20,6 +21,7 @@ from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
 from course_goals.views import CourseGoalOption, get_goal_text
+from course_goals.api import get_course_goal
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import CourseHomeMessages
 from student.models import CourseEnrollment
@@ -136,20 +138,14 @@ def _register_course_home_messages(request, course_id, user_access, course_start
             )
         )
 
-    is_already_verified = CourseEnrollment.is_enrolled_as_verified(request.user, course_key)
-    # available_modes = CourseMode.modes_for_course_dict(unicode(course.id))
-    # has_verified_mode = CourseMode.has_verified_mode(available_modes)
-    # user_goal = get_course_goal(request.user, course_id)
-    # waffle_flag_enabled = ENABLE_COURSE_GOALS.is_enabled(course_key)
-    has_verified_mode = True
-    user_goal = None
-    waffle_flag_enabled = True
-
     # Only show the set course goal message for enrolled, unverified
     # users that have not yet set a goal in a course that allows for
     # verified statuses.
-    if settings.FEATURES.get('ENABLE_COURSE_GOALS') and not user_goal and user_access['is_enrolled'] \
-            and has_verified_mode and not is_already_verified and waffle_flag_enabled:
+    has_verified_mode = CourseMode.has_verified_mode(CourseMode.modes_for_course_dict(unicode(course.id)))
+    is_already_verified = CourseEnrollment.is_enrolled_as_verified(request.user, course_key)
+    user_goal = get_course_goal(auth.get_user(request), course_id) if not request.user.is_anonymous() else None
+    if user_access['is_enrolled'] and has_verified_mode and not is_already_verified and not user_goal \
+            and ENABLE_COURSE_GOALS.is_enabled(course_key) and settings.FEATURES.get('ENABLE_COURSE_GOALS'):
         goal_choices_html = HTML(_(
             'To start, set a course goal by selecting the option below that best describes '
             'your learning plan. {goal_options_container}'

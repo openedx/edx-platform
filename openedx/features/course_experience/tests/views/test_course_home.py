@@ -16,7 +16,7 @@ from waffle.testutils import override_flag
 
 from commerce.models import CommerceConfiguration
 from commerce.utils import EcommerceService
-from course_goals.views import add_course_goal, remove_course_goal
+from course_goals.api import add_course_goal, remove_course_goal
 from course_modes.models import CourseMode
 from courseware.tests.factories import StaffFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
@@ -26,7 +26,7 @@ from openedx.features.course_experience import (
     UNIFIED_COURSE_TAB_FLAG
 )
 from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.date_utils import strftime_localized
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -45,7 +45,7 @@ TEST_COURSE_HOME_MESSAGE_ANONYMOUS = '/login'
 TEST_COURSE_HOME_MESSAGE_UNENROLLED = 'Enroll now'
 TEST_COURSE_HOME_MESSAGE_PRE_START = 'Course starts in'
 TEST_COURSE_GOAL_OPTIONS = 'goal-options-container'
-COURSE_GOAL_DISMISS_OPTION = 'Not sure yet'
+COURSE_GOAL_DISMISS_OPTION = 'unsure'
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
@@ -173,7 +173,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         course_home_url(self.course)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(42, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(44, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -399,44 +399,44 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
     @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
     def test_course_goals(self):
         """
-        Ensure that the following four use cases work as expected.
+        Ensure that the following five use cases work as expected.
 
-        1) Anonymous users are not shown the set course goal message.
-        2) Unenrolled users are not shown the set course goal message.
-        3) Enrolled users are shown the set course goal message if they have not yet set a course goal.
-        4) Enrolled users are not shown the set course goal message if they have set a course goal.
-        5) Enrolled and verified users are not shown the set course goal message.
-        6) Enrolled users are not shown the set course goal message in a course that cannot be verified.
+        1) Unenrolled users are not shown the set course goal message.
+        2) Enrolled users are shown the set course goal message if they have not yet set a course goal.
+        3) Enrolled users are not shown the set course goal message if they have set a course goal.
+        4) Enrolled and verified users are not shown the set course goal message.
+        5) Enrolled users are not shown the set course goal message in a course that cannot be verified.
         """
-        # Verify that anonymous and unenrolled users are not shown the set course goal message
-        response = self.client.get(course_home_url(self.course))
-        self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
-        user = self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
-        response = self.client.get(course_home_url(self.course))
+        # Create a course that can be verified
+        verifiable_course = CourseFactory.create()
+        add_course_mode(verifiable_course, upgrade_deadline_expired=False)
+
+        # Verify that unenrolled users are not shown the set course goal message
+        user = self.create_user_for_course(verifiable_course, CourseUserType.UNENROLLED)
+        response = self.client.get(course_home_url(verifiable_course))
         self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
 
         # Verify that enrolled users are shown the set course goal message in a verified course
-        CourseEnrollment.enroll(user, self.course.id)
-        response = self.client.get(course_home_url(self.course))
+        CourseEnrollment.enroll(user, verifiable_course.id)
+        response = self.client.get(course_home_url(verifiable_course))
         self.assertContains(response, TEST_COURSE_GOAL_OPTIONS)
 
-        # TODO: Verify that enrolled users that have set a course goal are not shown the set course goal message
-        # SET COURSE GOAL
-        add_course_goal(user, self.course.id, COURSE_GOAL_DISMISS_OPTION)
-        # response = self.client.get(course_home_url(self.course))
-        # self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
+        # Verify that enrolled users that have set a course goal are not shown the set course goal message
+        add_course_goal(user, verifiable_course.id, COURSE_GOAL_DISMISS_OPTION)
+        response = self.client.get(course_home_url(verifiable_course))
+        self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
 
-        # TODO: Verify that enrolled and verified users are not shown the set course goal message
-        # REMOVE THE COURSE GOAL
-        remove_course_goal(user, self.course.id)
-        # response = self.client.get(course_home_url(self.course))
-        # self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
+        # Verify that enrolled and verified users are not shown the set course goal message
+        remove_course_goal(user, verifiable_course.id)
+        CourseEnrollment.enroll(user, verifiable_course.id, CourseMode.VERIFIED)
+        response = self.client.get(course_home_url(verifiable_course))
+        self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
 
-        # TODO: Verify that enrolled users are not shown the set course goal message in an unverifiable course
-        # CREATE UNVERIFIABLE COURSE
-        # ENROLL THEM IN THE NEW COURSE
-        response = self.client.get(course_home_url(self.course))
-        # self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
+        # Verify that enrolled users are not shown the set course goal message in an unverifiable course
+        unverifiable_course = CourseFactory.create()
+        CourseEnrollment.enroll(user, unverifiable_course.id)
+        response = self.client.get(course_home_url(unverifiable_course))
+        self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
 
 
 class CourseHomeFragmentViewTests(ModuleStoreTestCase):

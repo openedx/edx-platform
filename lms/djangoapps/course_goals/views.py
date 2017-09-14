@@ -63,7 +63,7 @@ def set_course_goal(request, course_id, goal_key=None):
         goal_key = request.POST.get('goal_key')
 
     # Create and save course goal
-        api.add_course_goal(request.user, course_id, goal_key)
+    api.add_course_goal(request.user, course_id, goal_key)
 
     # Log the event
     tracker.emit(
