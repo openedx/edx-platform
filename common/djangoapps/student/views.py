@@ -2629,9 +2629,16 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
         # If password reset was unsuccessful a template response is returned (status_code 200).
         # Check if form is invalid then show an error to the user.
         # Note if password reset was successful we get response redirect (status_code 302).
-        if response.status_code == 200 and not response.context_data['form'].is_valid():
-            response.context_data['err_msg'] = _('Error in resetting your password. Please try again.')
-            return response
+        if response.status_code == 200:
+            form_valid = response.context_data['form'].is_valid() if response.context_data['form'] else False
+            if not form_valid:
+                log.warning(
+                    u'Unable to reset password for user [%s] because form is not valid. '
+                    u'A possible cause is that the user had an invalid reset token',
+                    user.username,
+                )
+                response.context_data['err_msg'] = _('Error in resetting your password. Please try again.')
+                return response
 
         # get the updated user
         updated_user = User.objects.get(id=uid_int)
