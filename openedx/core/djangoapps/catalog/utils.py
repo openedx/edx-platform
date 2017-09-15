@@ -185,3 +185,39 @@ def get_course_runs():
         course_runs = get_edx_api_data(catalog_integration, 'course_runs', api=api, querystring=querystring)
 
     return course_runs
+
+
+def get_course_run_details(course_run_key, fields):
+    """
+    Retrieve information about the course run with the given id
+
+    Arguments:
+        course_run_key: key for the course_run about which we are retrieving information
+
+    Returns:
+        dict with language, start date, end date, and max_effort details about specified course run
+    """
+    catalog_integration = CatalogIntegration.current()
+    course_run_details = dict()
+    if catalog_integration.enabled:
+        try:
+            user = catalog_integration.get_service_user()
+        except ObjectDoesNotExist:
+            msg = 'Catalog service user {} does not exist. Data for course_run {} will not be retrieved'.format(
+                catalog_integration.service_username,
+                course_run_key
+            )
+            logger.error(msg)
+            return course_run_details
+        api = create_catalog_api_client(user)
+
+        cache_key = '{base}.course_runs'.format(base=catalog_integration.CACHE_KEY)
+
+        course_run_details = get_edx_api_data(catalog_integration, 'course_runs', api, resource_id=course_run_key,
+                                              cache_key=cache_key, many=False, traverse_pagination=False, fields=fields)
+    else:
+        msg = 'Unable to retrieve details about course_run {} because Catalog Integration is not enabled'.format(
+            course_run_key
+        )
+        logger.error(msg)
+    return course_run_details

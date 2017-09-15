@@ -13,7 +13,7 @@ from django.core.urlresolvers import reverse
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from util.date_utils import strftime_localized
-from mock import patch
+from mock import Mock, patch
 from nose.plugins.attrib import attr
 
 from certificates.api import get_certificate_url
@@ -884,11 +884,13 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
     @override_settings(LANGUAGE_CODE='fr')
-    def test_certificate_custom_template_with_org_mode_course(self):
+    @patch('certificates.views.webview.get_course_run_details')
+    def test_certificate_custom_template_with_org_mode_course(self, mock_get_course_run_details):
         """
         Tests custom template search and rendering.
         This test should check template matching when org={org}, course={course}, mode={mode}.
         """
+        mock_get_course_run_details.return_value = {'language': 'en'}
         self._add_course_certificates(count=1, signatory_count=2)
         self._create_custom_template(org_id=1, mode='honor', course_key=unicode(self.course.id))
         self._create_custom_template(org_id=2, mode='honor')
@@ -913,12 +915,14 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             self.assertContains(response, 'course name: course_title_0')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    def test_certificate_custom_template_with_org(self):
+    @patch('certificates.views.webview.get_course_run_details')
+    def test_certificate_custom_template_with_org(self, mock_get_course_run_details):
         """
         Tests custom template search if we have a single template for organization and mode
         with course set to Null.
         This test should check template matching when org={org}, course=Null, mode={mode}.
         """
+        mock_get_course_run_details.return_value = {'language': 'en'}
         course = CourseFactory.create(
             org='cstX', number='cst_22', display_name='custom template course'
         )
@@ -940,11 +944,13 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             self.assertContains(response, 'course name: course_title_0')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    def test_certificate_custom_template_with_organization(self):
+    @patch('certificates.views.webview.get_course_run_details')
+    def test_certificate_custom_template_with_organization(self, mock_get_course_run_details):
         """
         Tests custom template search when we have a single template for a organization.
         This test should check template matching when org={org}, course=Null, mode=null.
         """
+        mock_get_course_run_details.return_value = {'language': 'en'}
         self._add_course_certificates(count=1, signatory_count=2)
         self._create_custom_template(org_id=1, mode='honor')
         self._create_custom_template(org_id=1, mode='honor', course_key=self.course.id)
@@ -962,11 +968,13 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             self.assertEqual(response.status_code, 200)
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    def test_certificate_custom_template_with_course_mode(self):
+    @patch('certificates.views.webview.get_course_run_details')
+    def test_certificate_custom_template_with_course_mode(self, mock_get_course_run_details):
         """
         Tests custom template search if we have a single template for a course mode.
         This test should check template matching when org=null, course=Null, mode={mode}.
         """
+        mock_get_course_run_details.return_value = {'language': 'en'}
         mode = 'honor'
         self._add_course_certificates(count=1, signatory_count=2)
         self._create_custom_template(mode=mode)
@@ -982,10 +990,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             self.assertContains(response, 'mode: {}'.format(mode))
 
     @ddt.data(True, False)
-    def test_certificate_custom_template_with_unicode_data(self, custom_certs_enabled):
+    @patch('certificates.views.webview.get_course_run_details')
+    def test_certificate_custom_template_with_unicode_data(self, custom_certs_enabled, mock_get_course_run_details):
         """
         Tests custom template renders properly with unicode data.
         """
+        mock_get_course_run_details.return_value = {'language': 'en'}
         mode = 'honor'
         self._add_course_certificates(count=1, signatory_count=2)
         self._create_custom_template(mode=mode)
@@ -1014,10 +1024,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
                         self.assertContains(response, 'https://twitter.com/intent/tweet')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    def test_certificate_asset_by_slug(self):
+    @patch('certificates.views.webview.get_course_run_details')
+    def test_certificate_asset_by_slug(self, mock_get_course_run_details):
         """
         Tests certificate template asset display by slug using static.certificate_asset_url method.
         """
+        mock_get_course_run_details.return_value = {'language': 'en'}
         self._add_course_certificates(count=1, signatory_count=2)
         self._create_custom_template(mode='honor')
         test_url = get_certificate_url(

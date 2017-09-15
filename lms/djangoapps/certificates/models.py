@@ -910,6 +910,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
             defaults=default
         )
 
+    @classmethod
     def is_language_specific_templates_enabled_for_course(cls, course_key):
         """Check whether language-specific certificates are enabled for a course.
 

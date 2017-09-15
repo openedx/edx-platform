@@ -118,6 +118,8 @@ class CourseRunFactory(DictFactoryBase):
     title = factory.Faker('catch_phrase')
     type = 'verified'
     uuid = factory.Faker('uuid4')
+    language = 'en'
+    max_effort = 5
 
 
 class CourseFactory(DictFactoryBase):
