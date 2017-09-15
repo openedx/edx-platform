@@ -1063,7 +1063,7 @@ class CertificateTemplate(TimeStampedModel):
 
     class Meta(object):
         get_latest_by = 'created'
-        unique_together = (('organization_id', 'course_key', 'mode'),)
+        unique_together = (('organization_id', 'course_key', 'mode', 'language'),)
         app_label = "certificates"
 
 
