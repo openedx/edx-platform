@@ -12,6 +12,7 @@ import tempfile
 
 import ddt
 import pytz
+from boto.exception import BotoServerError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
@@ -3019,6 +3020,27 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         self.assertTrue(
             body.endswith('"{user_id}","41","42"\n'.format(user_id=self.students[-1].id))
         )
+
+    @patch('lms.djangoapps.instructor_task.models.logger.error')
+    @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3'})
+    def test_list_report_downloads_error(self, mock_error):
+        """
+        Tests the Rate-Limit exceeded is handled and does not raise 500 error.
+        """
+        ex_status = 503
+        ex_reason = 'Slow Down'
+        url = reverse('list_report_downloads', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        with patch('openedx.core.storage.S3ReportStorage.listdir', side_effect=BotoServerError(ex_status, ex_reason)):
+            response = self.client.post(url, {})
+        mock_error.assert_called_with(
+            u'Fetching files failed for course: %s, status: %s, reason: %s',
+            self.course.id,
+            ex_status,
+            ex_reason,
+        )
+
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, {"downloads": []})
 
     def test_list_report_downloads(self):
         url = reverse('list_report_downloads', kwargs={'course_id': self.course.id.to_deprecated_string()})
