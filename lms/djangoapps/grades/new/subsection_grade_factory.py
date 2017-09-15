@@ -67,9 +67,7 @@ class SubsectionGradeFactory(object):
         """
         Updates the SubsectionGrade object for the student and subsection.
         """
-        # Save ourselves the extra queries if the course does not persist
-        # subsection grades.
-        self._log_event(log.warning, u"update, subsection: {}".format(subsection.location), subsection)
+        self._log_event(log.debug, u"update, subsection: {}".format(subsection.location), subsection)
 
         calculated_grade = SubsectionGrade(subsection).init_from_structure(
             self.student, self.course_data.structure, self._submissions_scores, self._csm_scores,
