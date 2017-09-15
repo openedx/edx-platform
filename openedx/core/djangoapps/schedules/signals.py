@@ -10,20 +10,13 @@ from courseware.models import DynamicUpgradeDeadlineConfiguration, CourseDynamic
 from edx_ace.utils import date
 from openedx.core.djangoapps.signals.signals import COURSE_START_DATE_CHANGED
 from openedx.core.djangoapps.theming.helpers import get_current_site
-from openedx.core.djangoapps.waffle_utils import WaffleFlagNamespace, CourseWaffleFlag
 from student.models import CourseEnrollment
+from .config import CREATE_SCHEDULE_WAFFLE_FLAG
 from .models import Schedule, ScheduleConfig
 from .tasks import update_course_schedules
 
 
 log = logging.getLogger(__name__)
-
-
-SCHEDULE_WAFFLE_FLAG = CourseWaffleFlag(
-    waffle_namespace=WaffleFlagNamespace('schedules'),
-    flag_name='create_schedules_for_course',
-    flag_undefined_default=False
-)
 
 
 @receiver(post_save, sender=CourseEnrollment, dispatch_uid='create_schedule_for_enrollment')
@@ -41,7 +34,7 @@ def create_schedule(sender, **kwargs):
     schedule_config = ScheduleConfig.current(current_site)
     if (
         not schedule_config.create_schedules
-        and not SCHEDULE_WAFFLE_FLAG.is_enabled(enrollment.course_id)
+        and not CREATE_SCHEDULE_WAFFLE_FLAG.is_enabled(enrollment.course_id)
     ):
         log.debug('Schedules: Creation not enabled for this course or for this site')
         return
