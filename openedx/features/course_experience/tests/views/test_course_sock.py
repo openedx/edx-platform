@@ -56,7 +56,7 @@ class TestCourseSockView(SharedModuleStoreTestCase):
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_standard_course(self):
         """
-        Assure that a course that cannot be verified does
+        Ensure that a course that cannot be verified does
         not have a visible verification sock.
         """
         response = self.client.get(course_home_url(self.standard_course))
@@ -65,7 +65,7 @@ class TestCourseSockView(SharedModuleStoreTestCase):
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_verified_course(self):
         """
-        Assure that a course that can be verified has a
+        Ensure that a course that can be verified has a
         visible verification sock.
         """
         response = self.client.get(course_home_url(self.verified_course))
@@ -74,7 +74,7 @@ class TestCourseSockView(SharedModuleStoreTestCase):
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_verified_course_updated_expired(self):
         """
-        Assure that a course that has an expired upgrade
+        Ensure that a course that has an expired upgrade
         date does not display the verification sock.
         """
         response = self.client.get(course_home_url(self.verified_course_update_expired))
@@ -83,7 +83,7 @@ class TestCourseSockView(SharedModuleStoreTestCase):
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_verified_course_user_already_upgraded(self):
         """
-        Assure that a user that has already upgraded to a
+        Ensure that a user that has already upgraded to a
         verified status cannot see the verification sock.
         """
         response = self.client.get(course_home_url(self.verified_course_already_enrolled))

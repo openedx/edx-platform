@@ -12,4 +12,7 @@ class CourseGoal(models.Model):  # pylint: disable=model-missing-unicode
     """
     user = models.ForeignKey(User)
     course_key = CourseKeyField(max_length=255, db_index=True, blank=True)
-    goal = models.CharField(max_length=100, blank=True)
+    goal_key = models.CharField(max_length=100, blank=True)
+
+    class Meta:
+        unique_together = ("user", "course_key")

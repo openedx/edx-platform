@@ -1,98 +1,64 @@
-""" Course Goal Views """
-import json
-
-from django.http import HttpResponse
-from django.utils.translation import ugettext as _
-from openedx.core.djangolib.markup import Text, HTML
-from enum import Enum
-from eventtracking import tracker
-
+""" Course Goals API """
 import api
 
+from django.http import Http404, JsonResponse
+from rest_framework import serializers, viewsets
 
-class CourseGoalOption(Enum):
+from .models import CourseGoal
+
+
+class CourseGoalSerializer(serializers.HyperlinkedModelSerializer):
     """
-    Types of goals that a user can select.
-
-    These options are set to a string goal key so that they can be
-    referenced elsewhere in the code when necessary. These should not
-    be used in user facing code and should never be translated.
+    Serializes CourseGoal models.
     """
-
-    CERTIFY = 'certify'
-    COMPLETE = 'complete'
-    EXPLORE = 'explore'
-    UNSURE = 'unsure'
-
-    @classmethod
-    def get_course_goal_keys(self):
-        return [key.value for key in self]
+    class Meta:
+        model = CourseGoal
+        fields = ('user', 'course_key', 'goal_key')
 
 
-def get_goal_text(goal_option):
+class CourseGoalViewSet(viewsets.ModelViewSet):
     """
-    This function is used to translate the course goal option into
-    a user facing string to be used to represent that particular goal.
+    API calls to create and retrieve a course goal.
+
+    **Use Case**
+        * Create a new goal for a user.
+
+            Http400 is returned if the format of the request is not correct,
+            the course_id or goal is invalid or cannot be found.
+
+        * Retrieve goal for a user and a particular course.
+
+            Http400 is returned if the format of the request is not correct,
+            or the course_id is invalid or cannot be found.
+
+    **Example Requests**
+        GET /course_goal/api/v0/course_goal?course_key={course_key1}
+        POST /course_goal/api/v0/course_goal?course_key={course_key1}&goal={goal}
+            Request data: {"course_key": <course-key>, "goal_key": "unsure"}
+
+    Returns an HttpResponse Object with a success message html stub.
+
     """
-    return {
-        CourseGoalOption.CERTIFY.value: Text(_('Earn a certificate')),
-        CourseGoalOption.COMPLETE.value: Text(_('Complete the course')),
-        CourseGoalOption.EXPLORE.value: Text(_('Explore the course')),
-        CourseGoalOption.UNSURE.value: Text(_('Not sure yet')),
-    }[goal_option]
+    queryset = CourseGoal.objects.all()
+    serializer_class = CourseGoalSerializer
 
+    def post(self, request, *args, **kwargs):
+        """
+        Attempt to create course goal.
+        """
+        if not request.data:
+            raise Http404
 
-def set_course_goal(request, course_id, goal_key=None):
-    """
-    Given a user, a course key and a particular goal, add and save a goal.
-    If no goal explicitly given, checks if a goal has been passed as
-    a data variable in an ajax call.
+        course_id = request.data.get('course_key')
+        if not course_id:
+            raise Http404('Must provide a course_id')
 
-    Arguments:
-        request (WSGIRequest): the request
-        course_id: The id for the course the goal refers to
-        goal: An optional value that can also be passed in through the data
-            object in an ajax call. This value represents the goal key that maps
-            to one of the enumerated goal keys from CourseGoalOption.
+        goal_key = request.data.get('goal_key')
+        if not goal_key:
+            raise Http404('Must provide a goal_key')
 
-    Returns a HTTPResponse including an html stub that can be rendered
-    to represent the successful setting of a course goal.
-    """
-    # If no explicit goal was passed in, try to grab it from the ajax request
-    if not goal_key and request.is_ajax():
-        goal_key = request.POST.get('goal_key')
+        api.add_course_goal(request.user, course_id, goal_key)
 
-    # Create and save course goal
-    api.add_course_goal(request.user, course_id, goal_key)
-
-    # Log the event
-    tracker.emit(
-        'edx.course.goal.added',
-        {
-            'goal': goal_key,
-        }
-    )
-
-    # Add a success message
-    # TODO: LEARNER-2522: 9/2017: Address success messages later.
-    message = ''
-    if str(goal_key) == CourseGoalOption.UNSURE.value:
-        message = Text(_('No problem, you can add a goal at any point on the sidebar.'))
-    elif str(goal_key) == CourseGoalOption.CERTIFY.value:
-        message = Text(_("That's great! You can upgrade to verified status in the sidebar."))
-    elif str(goal_key) == CourseGoalOption.COMPLETE.value:
-        message = Text(_("That's great! If you decide to upgrade to go for a certified status,"
-                         " you can upgrade to a verified status in the sidebar."))
-    elif str(goal_key) == CourseGoalOption.EXPLORE.value:
-        message = Text(_('Sounds great - We hope you enjoy the course!'))
-
-    # Add a dismissible icon to allow user to hide the success message
-    html = HTML('{message}<span tabindex="0" class="icon fa fa-times dismiss"></span>').format(message=message)
-
-    if request.is_ajax():
-        return HttpResponse(
-            json.dumps({
-                'html': html
-            }),
-            content_type="application/json",
-        )
+        return JsonResponse({
+            'success': true,
+        })

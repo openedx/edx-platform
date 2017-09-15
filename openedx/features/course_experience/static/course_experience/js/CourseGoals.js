@@ -9,6 +9,7 @@ export class CourseGoals {  // eslint-disable-line import/prefer-default-export
         url: options.setGoalUrl,
         data: {
           goal_key: goalKey,
+          course_key: options.courseId,
         },
         dataType: 'json',
         success: (data) => {
