@@ -828,7 +828,7 @@ urlpatterns += (
 # Course goals
 if settings.FEATURES.get('ENABLE_COURSE_GOALS'):
     urlpatterns += (
-        url(r'^course_goals/', include('course_goals.urls', namespace='course_goals')),
+        url(r'^course_goal/', include('course_goals.urls', namespace='course_goal')),
     )
 
 # Embargo

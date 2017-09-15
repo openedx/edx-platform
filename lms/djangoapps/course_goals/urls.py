@@ -1,15 +1,15 @@
 """
 Course Goals API URLs
 """
-from django.conf.urls import patterns, url
+from django.conf.urls import include, patterns, url
+from rest_framework import routers
 
-from course_goals.views import set_course_goal
+from .views import CourseGoalViewSet
+
+router = routers.DefaultRouter()
+router.register(r'course_goal', CourseGoalViewSet, base_name='course_goal_base')
 
 urlpatterns = patterns(
     '',
-    url(
-        r'^api/v0/(?P<course_id>.+)$',
-        set_course_goal,
-        name='set_course_goal',
-    ),
+    url(r'^api/v0/', include(router.urls, namespace='course_goal_api')),
 )
