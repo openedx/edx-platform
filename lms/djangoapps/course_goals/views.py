@@ -7,7 +7,7 @@ from rest_framework import serializers, viewsets
 from .models import CourseGoal
 
 
-class CourseGoalSerializer(serializers.HyperlinkedModelSerializer):
+class CourseGoalSerializer(serializers.ModelSerializer):
     """
     Serializes CourseGoal models.
     """
@@ -60,5 +60,5 @@ class CourseGoalViewSet(viewsets.ModelViewSet):
         api.add_course_goal(request.user, course_id, goal_key)
 
         return JsonResponse({
-            'success': true,
+            'success': True,
         })

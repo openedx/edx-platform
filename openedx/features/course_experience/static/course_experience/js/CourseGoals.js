@@ -5,8 +5,10 @@ export class CourseGoals {  // eslint-disable-line import/prefer-default-export
   constructor(options) {
     $('.goal-option').click((e) => {
       const goalKey = $(e.target).data().choice;
-      $.post({
+      $.ajax({
+        method: 'POST',
         url: options.setGoalUrl,
+        headers: {'X-CSRFToken': $.cookie('csrftoken')},
         data: {
           goal_key: goalKey,
           course_key: options.courseId,
