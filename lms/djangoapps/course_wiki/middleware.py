@@ -79,7 +79,7 @@ class WikiAccessMiddleware(object):
                     return redirect('about_course', course_id.to_deprecated_string())
 
                 # If we need enterprise data sharing consent for this course, then redirect to the form.
-                consent_url = get_enterprise_consent_url(request, course_id)
+                consent_url = get_enterprise_consent_url(request, unicode(course_id))
                 if consent_url:
                     return redirect(consent_url)
 
