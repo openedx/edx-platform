@@ -10,7 +10,7 @@
     </div>
     <div class='course-video-settings-wrapper'>
         <div class='course-video-settings-message-wrapper'></div>
-        <span class="course-video-settings-title"><%- gettext('Transcript Settings') %></span>
+        <span class="course-video-settings-title"><%- gettext('Course Video Settings') %></span>
         <div class='transcript-preferance-wrapper transcript-provider-wrapper'>
             <label class='transcript-preferance-label' for='transcript-provider'><%- gettext('Transcript Provider') %><span class='error-icon' aria-hidden="true"></span></label>
             <div class='transcript-provider-group' id='transcript-provider'></div>
