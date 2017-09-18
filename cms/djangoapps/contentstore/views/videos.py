@@ -31,6 +31,8 @@ from edxval.api import (
     get_transcript_preferences,
     create_or_update_transcript_preferences,
     remove_transcript_preferences,
+    get_transcript_credentials_state_for_org,
+    update_transcript_credentials_state_for_org,
 )
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
@@ -44,7 +46,13 @@ from util.json_request import JsonResponse, expect_json
 from .course import get_course_and_check_access
 
 
-__all__ = ['videos_handler', 'video_encodings_download', 'video_images_handler', 'transcript_preferences_handler']
+__all__ = [
+    'videos_handler',
+    'video_encodings_download',
+    'video_images_handler',
+    'transcript_preferences_handler',
+    'transcript_credentials_handler'
+]
 
 LOGGER = logging.getLogger(__name__)
 
@@ -380,6 +388,32 @@ def transcript_preferences_handler(request, course_key_string):
         return JsonResponse()
 
 
+@expect_json
+@login_required
+@require_POST
+def transcript_credentials_handler(request, course_key_string):
+    """
+    JSON view handler to post the transcript organization credentials.
+
+    Arguments:
+        request: WSGI request object
+        course_key_string: string for course key
+
+    Returns: An empty success response or 404 if transcript feature is not enabled
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    if not VideoTranscriptEnabledFlag.feature_enabled(course_key):
+        return HttpResponseNotFound()
+
+    org = course_key.org
+    provider = request.json.get('provider')
+
+    # TODO: Send organization credentials to edx-pipeline end point.
+    credentials = update_transcript_credentials_state_for_org(org, provider, exists=True)
+
+    return JsonResponse()
+
+
 @login_required
 @require_GET
 def video_encodings_download(request, course_key_string):
@@ -589,7 +623,8 @@ def videos_index_html(course):
         },
         'is_video_transcript_enabled': is_video_transcript_enabled,
         'video_transcript_settings': None,
-        'active_transcript_preferences': None
+        'active_transcript_preferences': None,
+        'transcript_credentials': None
     }
 
     if is_video_transcript_enabled:
@@ -598,9 +633,15 @@ def videos_index_html(course):
                 'transcript_preferences_handler',
                 unicode(course.id)
             ),
+            'transcript_credentials_handler_url': reverse_course_url(
+                'transcript_credentials_handler',
+                unicode(course.id)
+            ),
             'transcription_plans': get_3rd_party_transcription_plans(),
         }
         context['active_transcript_preferences'] = get_transcript_preferences(unicode(course.id))
+        # Cached state for transcript providers' credentials (org-specific)
+        context['transcript_credentials'] = get_transcript_credentials_state_for_org(course.id.org)
 
     return render_to_response('videos_index.html', context)
 
