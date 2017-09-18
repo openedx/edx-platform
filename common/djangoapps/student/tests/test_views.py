@@ -17,10 +17,12 @@ from mock import patch
 from pyquery import PyQuery as pq
 from opaque_keys import InvalidKeyError
 
+from milestones.tests.utils import MilestonesTestCaseMixin
 from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from student.models import CourseEnrollment, REFUND_ORDER, UserProfile
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from util.milestones_helpers import set_prerequisite_courses, remove_prerequisite_course, get_course_milestones
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -232,7 +234,7 @@ class LogoutTests(TestCase):
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class StudentDashboardTests(SharedModuleStoreTestCase):
+class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Tests for the student dashboard.
     """
@@ -316,3 +318,27 @@ class StudentDashboardTests(SharedModuleStoreTestCase):
         response = self.client.get(reverse('dashboard'))
         self.assertEqual('Share on Twitter' in response.content, set_marketing or set_social_sharing)
         self.assertEqual('Share on Facebook' in response.content, set_marketing or set_social_sharing)
+
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    def test_pre_requisites_appear_on_dashboard(self):
+        """
+        When a course has a prerequisite, the dashboard should display the prerequisite.
+        If we remove the prerequisite and access the dashboard again, the prerequisite
+        should not appear.
+        """
+        self.pre_requisite_course = CourseFactory.create(org='edx', number='999', display_name='Pre requisite Course')
+        self.course = CourseFactory.create(
+            org='edx',
+            number='998',
+            display_name='Test Course',
+            pre_requisite_courses=[unicode(self.pre_requisite_course.id)]
+        )
+        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
+
+        set_prerequisite_courses(self.course.id, [unicode(self.pre_requisite_course.id)])
+        response = self.client.get(reverse('dashboard'))
+        self.assertIn('<div class="prerequisites">', response.content)
+
+        remove_prerequisite_course(self.course.id, get_course_milestones(self.course.id)[0])
+        response = self.client.get(reverse('dashboard'))
+        self.assertNotIn('<div class="prerequisites">', response.content)
