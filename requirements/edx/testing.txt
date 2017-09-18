@@ -20,3 +20,5 @@ pytest-django==3.1.2
 pytest-forked==0.2
 pytest-randomly==1.2.1
 pytest-xdist==1.20.0
+tox==2.8.2
+tox-battery==0.5
