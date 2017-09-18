@@ -189,6 +189,7 @@ class TestVideo(BaseTestXmodule):
 
 
 @attr(shard=1)
+@ddt.ddt
 class TestTranscriptAvailableTranslationsDispatch(TestVideo):
     """
     Test video handler that provide available translations info.
@@ -246,6 +247,80 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         request = Request.blank('/available_translations')
         response = self.item.transcript(request=request, dispatch='available_translations')
         self.assertEqual(json.loads(response.body), ['en', 'uk'])
+
+    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages')
+    @ddt.data(
+        (
+            ['en', 'uk', 'ro'],
+            '',
+            {},
+            ['en', 'uk', 'ro']
+        ),
+        (
+            ['uk', 'ro'],
+            True,
+            {},
+            ['en', 'uk', 'ro']
+        ),
+        (
+            ['de', 'ro'],
+            True,
+            {
+                'uk': True,
+                'ro': False,
+            },
+            ['en', 'uk', 'de', 'ro']
+        ),
+        (
+            ['de'],
+            True,
+            {
+                'uk': True,
+                'ro': False,
+            },
+            ['en', 'uk', 'de']
+        ),
+    )
+    @ddt.unpack
+    def test_val_available_translations(self, val_transcripts, sub, transcripts, result, mock_get_transcript_languages):
+        """
+        Tests available translations with video component's and val's transcript languages
+        while the feature is enabled.
+        """
+        for lang_code, in_content_store in dict(transcripts).iteritems():
+            if in_content_store:
+                file_name, __ = os.path.split(self.srt_file.name)
+                _upload_file(self.srt_file, self.item_descriptor.location, file_name)
+                transcripts[lang_code] = file_name
+            else:
+                transcripts[lang_code] = 'non_existent.srt.sjson'
+        if sub:
+            sjson_transcript = _create_file(json.dumps(self.subs))
+            _upload_sjson_file(sjson_transcript, self.item_descriptor.location)
+            sub = _get_subs_id(sjson_transcript.name)
+
+        mock_get_transcript_languages.return_value = val_transcripts
+        self.item.transcripts = transcripts
+        self.item.sub = sub
+        # Make request to available translations dispatch.
+        request = Request.blank('/available_translations')
+        response = self.item.transcript(request=request, dispatch='available_translations')
+        self.assertItemsEqual(json.loads(response.body), result)
+
+    @patch(
+        'xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled',
+        Mock(return_value=False),
+    )
+    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
+    def test_val_available_translations_feature_disabled(self, mock_get_available_transcript_languages):
+        """
+        Tests available translations with val transcript languages when feature is disabled.
+        """
+        mock_get_available_transcript_languages.return_value = ['en', 'de', 'ro']
+        request = Request.blank('/available_translations')
+        response = self.item.transcript(request=request, dispatch='available_translations')
+        self.assertEqual(response.status_code, 404)
 
 
 @attr(shard=1)

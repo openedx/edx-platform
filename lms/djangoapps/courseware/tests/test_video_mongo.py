@@ -1315,6 +1315,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         self.transcript_url = "transcript_url"
         self.video = instantiate_descriptor(data=sample_xml)
         self.video.runtime.handler_url = Mock(return_value=self.transcript_url)
+        self.video.runtime.course_id = MagicMock()
 
     def setup_val_video(self, associate_course_in_val=False):
         """
@@ -1413,6 +1414,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         self.transcript_url = "transcript_url"
         self.video = instantiate_descriptor(data=sample_xml)
         self.video.runtime.handler_url = Mock(return_value=self.transcript_url)
+        self.video.runtime.course_id = MagicMock()
         result = self.get_result()
         self.verify_result_with_youtube_url(result)
 
@@ -1449,6 +1451,43 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         # The video is not in VAL so in contexts that do and don't allow cache misses we should always get a fallback
         result = self.get_result(allow_cache_miss)
         self.verify_result_with_fallback_and_youtube(result)
+
+    @ddt.data(
+        ({}, '', [], ['en']),
+        ({}, '', ['de'], ['de']),
+        ({}, '', ['en', 'de'], ['en', 'de']),
+        ({}, 'en-subs', ['de'], ['en', 'de']),
+        ({'uk': 1}, 'en-subs', ['de'], ['en', 'uk', 'de']),
+        ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
+    )
+    @ddt.unpack
+    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
+    def test_student_view_with_val_transcripts_enabled(self, transcripts, english_sub, val_transcripts,
+                                                       expected_transcripts, mock_get_transcript_languages):
+        """
+        Test `student_view_data` with edx-val transcripts enabled.
+        """
+        mock_get_transcript_languages.return_value = val_transcripts
+        self.video.transcripts = transcripts
+        self.video.sub = english_sub
+        student_view_response = self.get_result()
+        self.assertItemsEqual(student_view_response['transcripts'].keys(), expected_transcripts)
+
+    @patch(
+        'xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled',
+        Mock(return_value=False),
+    )
+    @patch(
+        'xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages',
+        Mock(return_value=['ro', 'es']),
+    )
+    def test_student_view_with_val_transcripts_disabled(self):
+        """
+        Test `student_view_data` with edx-val transcripts disabled.
+        """
+        student_view_response = self.get_result()
+        self.assertDictEqual(student_view_response['transcripts'], {self.TEST_LANGUAGE: self.transcript_url})
 
 
 @attr(shard=1)

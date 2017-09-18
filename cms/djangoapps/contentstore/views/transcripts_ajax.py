@@ -31,9 +31,9 @@ from xmodule.video_module.transcripts_utils import (
     download_youtube_subs,
     GetTranscriptsFromYouTubeException,
     get_video_transcript_content,
-    generate_srt_from_sjson,
     generate_subs_from_source,
     get_transcripts_from_youtube,
+    is_val_transcript_feature_enabled_for_course,
     manage_video_subtitles_save,
     remove_subs_from_store,
     Transcript,
@@ -173,13 +173,15 @@ def download_transcripts(request):
         sjson_transcript = contentstore().find(content_location).data
     except NotFoundError:
         # Try searching in VAL for the transcript as a last resort
-        transcript = get_video_transcript_content(
-            course_id=item.location.course_key,
-            language_code=u'en',
-            edx_video_id=item.edx_video_id,
-            youtube_id_1_0=item.youtube_id_1_0,
-            html5_sources=item.html5_sources,
-        )
+        transcript = None
+        if is_val_transcript_feature_enabled_for_course(item.location.course_key):
+            transcript = get_video_transcript_content(
+                language_code=u'en',
+                edx_video_id=item.edx_video_id,
+                youtube_id_1_0=item.youtube_id_1_0,
+                html5_sources=item.html5_sources,
+            )
+
         if not transcript:
             raise Http404
 
@@ -303,14 +305,14 @@ def check_transcripts(request):
     command, subs_to_use = _transcripts_logic(transcripts_presence, videos)
     if command == 'not_found':
         # Try searching in VAL for the transcript as a last resort
-        video_transcript = get_video_transcript_content(
-            course_id=item.location.course_key,
-            language_code=u'en',
-            edx_video_id=item.edx_video_id,
-            youtube_id_1_0=item.youtube_id_1_0,
-            html5_sources=item.html5_sources,
-        )
-        command = 'found' if video_transcript else command
+        if is_val_transcript_feature_enabled_for_course(item.location.course_key):
+            video_transcript = get_video_transcript_content(
+                language_code=u'en',
+                edx_video_id=item.edx_video_id,
+                youtube_id_1_0=item.youtube_id_1_0,
+                html5_sources=item.html5_sources,
+            )
+            command = 'found' if video_transcript else command
 
     transcripts_presence.update({
         'command': command,
