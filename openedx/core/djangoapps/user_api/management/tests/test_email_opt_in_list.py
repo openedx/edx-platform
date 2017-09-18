@@ -202,6 +202,20 @@ class EmailOptInListTest(ModuleStoreTestCase):
         only_courses = [self.courses[0].id, self.courses[1].id]
         self._run_command(self.TEST_ORG, only_courses=only_courses)
 
+    def test_specify_chunk_size(self):
+        # Create several courses in the same org
+        self._create_courses_and_enrollments(
+            (self.TEST_ORG, True),
+            (self.TEST_ORG, True),
+            (self.TEST_ORG, True),
+        )
+
+        # Execute the command, but exclude the second course from the list
+        output = self._run_command(self.TEST_ORG, chunk_size=2)
+        course_ids = [row['course_id'].strip().decode('utf-8') for row in output]
+        for course in self.courses:
+            assert unicode(course.id) in course_ids
+
     # Choose numbers before and after the query interval boundary
     @ddt.data(2, 3, 4, 5, 6, 7, 8, 9)
     def test_many_users(self, num_users):
@@ -246,7 +260,9 @@ class EmailOptInListTest(ModuleStoreTestCase):
     @ddt.data(0, 1)
     def test_not_enough_args(self, num_args):
         args = ["dummy"] * num_args
-        expected_msg_regex = "^Usage: <OUTPUT_FILENAME> <ORG_ALIASES> --courses=COURSE_ID_LIST$"
+        expected_msg_regex = (
+            "^Usage: <OUTPUT_FILENAME> <ORG_ALIASES> --courses=COURSE_ID_LIST --email-optin-chunk-size=CHUNK_SIZE$"
+        )
         with self.assertRaisesRegexp(CommandError, expected_msg_regex):
             email_opt_in_list.Command().handle(*args)
 
@@ -332,7 +348,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         pref = UserOrgTag.objects.filter(user=user).order_by("-modified")
         return pref[0].modified.isoformat(' ') if len(pref) > 0 else self.DEFAULT_DATETIME_STR
 
-    def _run_command(self, org, other_names=None, only_courses=None, query_interval=None):
+    def _run_command(self, org, other_names=None, only_courses=None, query_interval=None, chunk_size=None):
         """Execute the management command to generate the email opt-in list.
 
         Arguments:
@@ -342,6 +358,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
             other_names (list): List of other aliases for the org.
             only_courses (list): If provided, include only these course IDs in the report.
             query_interval (int): If provided, override the default query interval.
+            chunk_size (int): If provided, overrides the default number of chunks for query iteration.
 
         Returns:
             list: The rows of the generated CSV report.  Each item is a dictionary.
@@ -368,7 +385,10 @@ class EmailOptInListTest(ModuleStoreTestCase):
             command.QUERY_INTERVAL = query_interval
 
         # Execute the command
-        command.handle(output_path, *org_list, courses=only_courses)
+        kwargs = {'courses': only_courses}
+        if chunk_size:
+            kwargs['email_optin_chunk_size'] = chunk_size
+        command.handle(output_path, *org_list, **kwargs)
 
         # Retrieve the output from the file
         try:

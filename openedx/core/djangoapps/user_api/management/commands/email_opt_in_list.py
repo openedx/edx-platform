@@ -35,16 +35,29 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
 
+DEFAULT_CHUNK_SIZE = 10
+
 LOGGER = logging.getLogger(__name__)
+
+
+def chunks(sequence, chunk_size):
+    return (sequence[index: index + chunk_size] for index in xrange(0, len(sequence), chunk_size))
 
 
 class Command(BaseCommand):
     """Generate a list of email opt-in values for user enrollments. """
 
-    args = "<OUTPUT_FILENAME> <ORG_ALIASES> --courses=COURSE_ID_LIST"
+    args = "<OUTPUT_FILENAME> <ORG_ALIASES> --courses=COURSE_ID_LIST --email-optin-chunk-size=CHUNK_SIZE"
     help = "Generate a list of email opt-in values for user enrollments."
     option_list = BaseCommand.option_list + (
         optparse.make_option('--courses ', action='store'),
+        optparse.make_option(
+            '--email-optin-chunk-size',
+            action='store',
+            type='int',
+            default=DEFAULT_CHUNK_SIZE,
+            dest='email_optin_chunk_size',
+            help='The number of courses to get opt-in information for in a single query.')
     )
 
     # Fields output in the CSV
@@ -114,10 +127,13 @@ class Command(BaseCommand):
             )
         )
 
+        email_optin_chunk_size = options.get('email_optin_chunk_size', DEFAULT_CHUNK_SIZE)
+
         # Open the output file and generate the report.
         with open(file_path, "w") as file_handle:
             with self._log_execution_time():
-                self._write_email_opt_in_prefs(file_handle, org_list, courses)
+                for course_group in chunks(courses, email_optin_chunk_size):
+                    self._write_email_opt_in_prefs(file_handle, org_list, course_group)
 
         # Remind the user where the output file is
         LOGGER.info(u"Output file: {file_path}".format(file_path=file_path))
