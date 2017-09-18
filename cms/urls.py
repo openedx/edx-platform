@@ -2,12 +2,15 @@ from django.conf import settings
 from django.conf.urls import include, patterns, url
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
+from django.utils.translation import ugettext_lazy as _
 from ratelimitbackend import admin
 
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 
 
 django_autodiscover()
+admin.site.site_header = _('Studio Administration')
+admin.site.site_title = admin.site.site_header
 
 # Pattern to match a course key or a library key
 COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(

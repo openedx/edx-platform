@@ -7,6 +7,7 @@ from django.conf import settings
 from django.conf.urls import include, patterns, url
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
 
@@ -23,6 +24,9 @@ from openedx.features.enterprise_support.api import enterprise_enabled
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     django_autodiscover()
+    admin.site.site_header = _('LMS Administration')
+    admin.site.site_title = admin.site.site_header
+
 
 # Use urlpatterns formatted as within the Django docs with first parameter "stuck" to the open parenthesis
 urlpatterns = (
