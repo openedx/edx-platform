@@ -15,6 +15,27 @@ except ImportError:
 __test__ = False  # do not collect
 
 
+def default_system_test_dirs(system):
+    """
+    Return a list of all directories in which pytest should begin a search for tests.
+    """
+    default_test_dirs = [
+        "{system}/djangoapps".format(system=system),
+        "common/djangoapps",
+        "openedx/core/djangoapps",
+        "openedx/tests",
+        "openedx/core/lib",
+    ]
+    if system in ('lms', 'cms'):
+        default_test_dirs.append("{system}/lib".format(system=system))
+
+    if system == 'lms':
+        default_test_dirs.append("{system}/tests.py".format(system=system))
+        default_test_dirs.append("openedx/core/djangolib")
+        default_test_dirs.append("openedx/features")
+    return default_test_dirs
+
+
 class PytestSuite(TestSuite):
     """
     A subclass of TestSuite with extra methods that are specific
@@ -25,6 +46,13 @@ class PytestSuite(TestSuite):
         self.failed_only = kwargs.get('failed_only', False)
         self.fail_fast = kwargs.get('fail_fast', False)
         self.run_under_coverage = kwargs.get('with_coverage', True)
+        django_version = kwargs.get('django_version', None)
+        if django_version is None:
+            self.django_toxenv = None
+        elif django_version == '1.11':
+            self.django_toxenv = 'py27-django111'
+        else:
+            self.django_toxenv = 'py27-django18'
         self.report_dir = Env.REPORT_DIR / self.root
 
         # If set, put reports for run in "unique" directories.
@@ -122,11 +150,15 @@ class SystemTestSuite(PytestSuite):
     @property
     def cmd(self):
 
-        cmd = [
-            'pytest',
+        if self.django_toxenv:
+            cmd = ['tox', '-e', self.django_toxenv, '--']
+        else:
+            cmd = ['pytest']
+        cmd.extend([
             '--ds={}'.format('{}.envs.{}'.format(self.root, self.settings)),
             '--junitxml={}'.format(self.report_dir / "nosetests.xml"),
-        ] + self.test_options_flags
+        ])
+        cmd.extend(self.test_options_flags)
         if self.verbosity < 1:
             cmd.append("--quiet")
         elif self.verbosity > 1:
@@ -205,12 +237,16 @@ class LibTestSuite(PytestSuite):
 
     @property
     def cmd(self):
-        cmd = [
-            "pytest",
+        if self.django_toxenv:
+            cmd = ['tox', '-e', self.django_toxenv, '--']
+        else:
+            cmd = ['pytest']
+        cmd.extend([
             "-p",
             "no:randomly",
             "--junitxml=".format(self.xunit_report),
-        ] + self.passthrough_options + self.test_options_flags
+        ])
+        cmd.extend(self.passthrough_options + self.test_options_flags)
         if self.verbosity < 1:
             cmd.append("--quiet")
         elif self.verbosity > 1:
