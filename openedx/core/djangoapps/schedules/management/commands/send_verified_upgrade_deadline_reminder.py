@@ -4,17 +4,15 @@ import datetime
 
 from dateutil.tz import tzutc, gettz
 from django.core.management.base import BaseCommand
-from django.test.utils import CaptureQueriesContext
 from django.db.models import Prefetch
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.db import DEFAULT_DB_ALIAS, connections
 from django.utils.http import urlquote
 
+from openedx.core.djangoapps.schedules.message_type import ScheduleMessageType
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.user_api.models import UserPreference
 
-from edx_ace.message import MessageType
 from edx_ace.recipient_resolver import RecipientResolver
 from edx_ace import ace
 from edx_ace.recipient import Recipient
@@ -24,7 +22,7 @@ from course_modes.models import CourseMode, format_course_price
 from lms.djangoapps.experiments.utils import check_and_get_upgrade_link
 
 
-class VerifiedUpgradeDeadlineReminder(MessageType):
+class VerifiedUpgradeDeadlineReminder(ScheduleMessageType):
     pass
 
 

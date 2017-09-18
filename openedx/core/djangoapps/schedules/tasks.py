@@ -13,12 +13,13 @@ from django.db.models import Min
 from django.db.utils import DatabaseError
 from django.utils.http import urlquote
 from edx_ace import ace
-from edx_ace.message import Message, MessageType
+from edx_ace.message import Message
 from edx_ace.recipient import Recipient
 from edx_ace.utils.date import deserialize
 from opaque_keys.edx.keys import CourseKey
 
 from edxmako.shortcuts import marketing_link
+from openedx.core.djangoapps.schedules.message_type import ScheduleMessageType
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 
 log = getLogger(__name__)
@@ -48,7 +49,7 @@ def update_course_schedules(self, **kwargs):
         raise self.retry(kwargs=kwargs, exc=exc)
 
 
-class RecurringNudge(MessageType):
+class RecurringNudge(ScheduleMessageType):
     def __init__(self, day, *args, **kwargs):
         super(RecurringNudge, self).__init__(*args, **kwargs)
         self.name = "recurringnudge_day{}".format(day)

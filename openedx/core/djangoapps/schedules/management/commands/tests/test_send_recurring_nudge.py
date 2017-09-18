@@ -30,6 +30,8 @@ class TestSendRecurringNudge(CacheIsolationTestCase):
     # pylint: disable=protected-access
 
     def setUp(self):
+        super(TestSendRecurringNudge, self).setUp()
+
         ScheduleFactory.create(start=datetime.datetime(2017, 8, 1, 15, 44, 30, tzinfo=pytz.UTC))
         ScheduleFactory.create(start=datetime.datetime(2017, 8, 1, 17, 34, 30, tzinfo=pytz.UTC))
         ScheduleFactory.create(start=datetime.datetime(2017, 8, 2, 15, 34, 30, tzinfo=pytz.UTC))
@@ -74,7 +76,7 @@ class TestSendRecurringNudge(CacheIsolationTestCase):
         ]
 
         test_time_str = serialize(datetime.datetime(2017, 8, 1, 18, tzinfo=pytz.UTC))
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             tasks.recurring_nudge_schedule_hour(
                 self.site_config.site.id, 3, test_time_str, [schedules[0].enrollment.course.org],
             )
@@ -91,7 +93,7 @@ class TestSendRecurringNudge(CacheIsolationTestCase):
         schedule.enrollment.save()
 
         test_time_str = serialize(datetime.datetime(2017, 8, 1, 20, tzinfo=pytz.UTC))
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             tasks.recurring_nudge_schedule_hour(
                 self.site_config.site.id, 3, test_time_str, [schedule.enrollment.course.org],
             )
@@ -152,7 +154,7 @@ class TestSendRecurringNudge(CacheIsolationTestCase):
             )
 
         test_time_str = serialize(datetime.datetime(2017, 8, 2, 17, tzinfo=pytz.UTC))
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             tasks.recurring_nudge_schedule_hour(
                 limited_config.site.id, 3, test_time_str, org_list=org_list, exclude_orgs=exclude_orgs,
             )
@@ -180,7 +182,7 @@ class TestSendRecurringNudge(CacheIsolationTestCase):
         ]
 
         test_time_str = serialize(datetime.datetime(2017, 8, 1, test_hour, tzinfo=pytz.UTC))
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             tasks.recurring_nudge_schedule_hour(
                 self.site_config.site.id, 3, test_time_str, [schedules[0].enrollment.course.org],
             )
@@ -217,7 +219,7 @@ class TestSendRecurringNudge(CacheIsolationTestCase):
         with patch.object(tasks, '_recurring_nudge_schedule_send') as mock_schedule_send:
             mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
 
-            with self.assertNumQueries(1):
+            with self.assertNumQueries(2):
                 tasks.recurring_nudge_schedule_hour(
                     self.site_config.site.id, day, test_time_str, [schedules[0].enrollment.course.org],
                 )

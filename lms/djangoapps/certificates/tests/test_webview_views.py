@@ -807,7 +807,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         as the issued date for instructor-paced courses
         """
         self.course.self_paced = self_paced
-        today = datetime.datetime.today()
+        today = datetime.datetime.utcnow()
         self.course.certificate_available_date = today + datetime.timedelta(cert_avail_delta)
         self.store.update_item(self.course, self.user.id)
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
