@@ -203,7 +203,8 @@ class Env(object):
     # Directories used for common/lib/ tests
     LIB_TEST_DIRS = []
     for item in (REPO_ROOT / "common/lib").listdir():
-        if (REPO_ROOT / 'common/lib' / item).isdir():
+        dir_name = (REPO_ROOT / 'common/lib' / item)
+        if dir_name.isdir() and not dir_name.endswith(('__pycache__', '.cache')):
             LIB_TEST_DIRS.append(path("common/lib") / item.basename())
     LIB_TEST_DIRS.append(path("pavelib/paver_tests"))
 
