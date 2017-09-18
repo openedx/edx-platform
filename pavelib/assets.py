@@ -802,7 +802,7 @@ def watch_assets(options):
         theme_dirs = [path(_dir) for _dir in theme_dirs]
 
     sass_directories = get_watcher_dirs(theme_dirs, themes)
-    observer = PollingObserver()
+    observer = PollingObserver(timeout=10)
 
     CoffeeScriptWatcher().register(observer)
     SassWatcher().register(observer, sass_directories)
