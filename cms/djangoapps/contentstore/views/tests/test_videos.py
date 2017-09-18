@@ -1001,7 +1001,8 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
             {
                 'provider': TranscriptProvider.THREE_PLAY_MEDIA,
                 'three_play_turnaround': 'default',
-                'preferred_languages': ['en']
+                'preferred_languages': ['en'],
+                'video_source_language': None,  # TODO change this once we support source language in platform.
             },
             True,
             '',
@@ -1020,6 +1021,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
             'cielo24_turnaround': preferences.get('cielo24_turnaround'),
             'three_play_turnaround': preferences.get('three_play_turnaround'),
             'preferred_languages': preferences.get('preferred_languages', []),
+            'video_source_language': preferences.get('video_source_language'),
         }
 
         with patch(

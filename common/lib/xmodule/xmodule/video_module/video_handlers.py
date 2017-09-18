@@ -20,14 +20,15 @@ from opaque_keys.edx.locator import CourseLocator
 
 from .transcripts_utils import (
     get_or_create_sjson,
-    TranscriptException,
-    TranscriptsGenerationException,
     generate_sjson_for_all_speeds,
     get_video_transcript_content,
-    youtube_speed_dict,
-    Transcript,
+    is_val_transcript_feature_enabled_for_course,
     save_to_store,
-    subs_filename
+    subs_filename,
+    Transcript,
+    TranscriptException,
+    TranscriptsGenerationException,
+    youtube_speed_dict,
 )
 
 
@@ -224,7 +225,8 @@ class VideoStudentViewHandlers(object):
                     For 'en' check if SJSON exists. For non-`en` check if SRT file exists.
         """
         is_bumper = request.GET.get('is_bumper', False)
-        transcripts = self.get_transcripts_info(is_bumper)
+        feature_enabled = is_val_transcript_feature_enabled_for_course(self.course_id)
+        transcripts = self.get_transcripts_info(is_bumper, include_val_transcripts=feature_enabled)
         if dispatch.startswith('translation'):
             language = dispatch.replace('translation', '').strip('/')
 
@@ -241,15 +243,17 @@ class VideoStudentViewHandlers(object):
 
             try:
                 transcript = self.translation(request.GET.get('videoId', None), transcripts)
-            except (TypeError, NotFoundError) as ex:
+            except (TypeError, TranscriptException, NotFoundError) as ex:
+                # Catching `TranscriptException` because its also getting raised at places
+                # when transcript is not found in contentstore.
                 log.debug(ex.message)
                 # Try to return static URL redirection as last resort
                 # if no translation is required
                 response = self.get_static_transcript(request, transcripts)
-                if response.status_code == 404:
+                if response.status_code == 404 and feature_enabled:
+                    # Try to get transcript from edx-val as a last resort.
                     transcript = get_video_transcript_content(
-                        course_id=self.course_id,
-                        language_code=language,
+                        language_code=self.transcript_language,
                         edx_video_id=self.edx_video_id,
                         youtube_id_1_0=self.youtube_id_1_0,
                         html5_sources=self.html5_sources,
@@ -257,17 +261,13 @@ class VideoStudentViewHandlers(object):
                     if transcript:
                         response = Response(
                             transcript['content'],
-                            headerlist=[('Content-Language', language)],
+                            headerlist=[('Content-Language', self.transcript_language)],
                             charset='utf8',
                         )
                         response.content_type = Transcript.mime_types['sjson']
 
                 return response
-            except (
-                TranscriptException,
-                UnicodeDecodeError,
-                TranscriptsGenerationException
-            ) as ex:
+            except (UnicodeDecodeError, TranscriptsGenerationException) as ex:
                 log.info(ex.message)
                 response = Response(status=404)
             else:
@@ -280,44 +280,44 @@ class VideoStudentViewHandlers(object):
                 transcript_content, transcript_filename, transcript_mime_type = self.get_transcript(
                     transcripts, transcript_format=self.transcript_download_format, lang=lang
                 )
-            except NotFoundError:
+            except (ValueError, NotFoundError):
                 response = Response(status=404)
-                # Make sure the language is set.
-                if lang is None:
-                    lang = self.get_default_transcript_language(transcripts)
+                # Check for transcripts in edx-val as a last resort if corresponding feature is enabled.
+                if feature_enabled:
+                    # Make sure the language is set.
+                    if not lang:
+                        lang = self.get_default_transcript_language(transcripts)
 
-                transcript = get_video_transcript_content(
-                    course_id=self.course_id,
-                    language_code=lang,
-                    edx_video_id=self.edx_video_id,
-                    youtube_id_1_0=self.youtube_id_1_0,
-                    html5_sources=self.html5_sources,
-                )
-                if transcript:
-                    transcript_content = Transcript.convert(
-                        transcript['content'],
-                        input_format='sjson',
-                        output_format=self.transcript_download_format
+                    transcript = get_video_transcript_content(
+                        language_code=lang,
+                        edx_video_id=self.edx_video_id,
+                        youtube_id_1_0=self.youtube_id_1_0,
+                        html5_sources=self.html5_sources,
                     )
-
-                    # Construct the response
-                    base_name, __ = os.path.splitext(os.path.basename(transcript['file_name']))
-                    filename = '{base_name}.{ext}'.format(
-                        base_name=base_name.encode('utf8'),
-                        ext=self.transcript_download_format
-                    )
-                    response = Response(
-                        transcript_content,
-                        headerlist=[
-                            ('Content-Disposition', 'attachment; filename="{filename}"'.format(filename=filename)),
-                            ('Content-Language', lang),
-                        ],
-                        charset='utf8',
-                    )
-                    response.content_type = Transcript.mime_types[self.transcript_download_format]
+                    if transcript:
+                        transcript_content = Transcript.convert(
+                            transcript['content'],
+                            input_format='sjson',
+                            output_format=self.transcript_download_format
+                        )
+                        # Construct the response
+                        base_name, __ = os.path.splitext(os.path.basename(transcript['file_name']))
+                        filename = '{base_name}.{ext}'.format(
+                            base_name=base_name.encode('utf8'),
+                            ext=self.transcript_download_format
+                        )
+                        response = Response(
+                            transcript_content,
+                            headerlist=[
+                                ('Content-Disposition', 'attachment; filename="{filename}"'.format(filename=filename)),
+                                ('Content-Language', lang),
+                            ],
+                            charset='utf8',
+                        )
+                        response.content_type = Transcript.mime_types[self.transcript_download_format]
 
                 return response
-            except (ValueError, KeyError, UnicodeDecodeError):
+            except (KeyError, UnicodeDecodeError):
                 return Response(status=404)
             else:
                 response = Response(
@@ -332,7 +332,11 @@ class VideoStudentViewHandlers(object):
 
         elif dispatch.startswith('available_translations'):
 
-            available_translations = self.available_translations(transcripts, verify_assets=True)
+            available_translations = self.available_translations(
+                transcripts,
+                verify_assets=True,
+                include_val_transcripts=feature_enabled,
+            )
             if available_translations:
                 response = Response(json.dumps(available_translations))
                 response.content_type = 'application/json'

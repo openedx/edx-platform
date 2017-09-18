@@ -633,6 +633,16 @@ class TestTranscript(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             transcripts_utils.Transcript.convert(self.srt_transcript, 'srt', 'sjson')
 
+    def test_dummy_non_existent_transcript(self):
+        """
+        Test `Transcript.asset` raises `NotFoundError` for dummy non-existent transcript.
+        """
+        with self.assertRaises(NotFoundError):
+            transcripts_utils.Transcript.asset(None, transcripts_utils.NON_EXISTENT_TRANSCRIPT)
+
+        with self.assertRaises(NotFoundError):
+            transcripts_utils.Transcript.asset(None, None, filename=transcripts_utils.NON_EXISTENT_TRANSCRIPT)
+
 
 class TestSubsFilename(unittest.TestCase):
     """

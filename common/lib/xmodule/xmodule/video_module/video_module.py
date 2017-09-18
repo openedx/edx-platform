@@ -44,7 +44,7 @@ from .bumper_utils import bumperize
 from .transcripts_utils import (
     get_html5_ids,
     get_video_ids_info,
-    get_video_transcript_content,
+    is_val_transcript_feature_enabled_for_course,
     Transcript,
     VideoTranscriptsMixin,
 )
@@ -186,26 +186,14 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             elif sub or other_lang:
                 track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
 
-            if not track_url:
-                # Check transcript's availability in edx-val
-                transcript = get_video_transcript_content(
-                    course_id=self.course_id,
-                    language_code=self.transcript_language,
-                    edx_video_id=self.edx_video_id,
-                    youtube_id_1_0=self.youtube_id_1_0,
-                    html5_sources=self.html5_sources,
-                )
-                if transcript:
-                    track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
-
         transcript_language = self.get_default_transcript_language(transcripts)
-
         native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
         languages = {
             lang: native_languages.get(lang, display)
             for lang, display in settings.ALL_LANGUAGES
             if lang in other_lang
         }
+
         if not other_lang or (other_lang and sub):
             languages['en'] = 'English'
 
@@ -295,7 +283,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             if download_video_link and download_video_link.endswith('.m3u8'):
                 download_video_link = None
 
-        track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(self.get_transcripts_info())
+        feature_enabled = is_val_transcript_feature_enabled_for_course(self.course_id)
+        transcripts = self.get_transcripts_info(include_val_transcripts=feature_enabled)
+        track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(transcripts=transcripts)
 
         # CDN_VIDEO_URLS is only to be used here and will be deleted
         # TODO(ali@edx.org): Delete this after the CDN experiment has completed.
@@ -1026,10 +1016,12 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     "file_size": 0,  # File size is not relevant for external link
                 }
 
-        transcripts_info = self.get_transcripts_info()
+        feature_enabled = is_val_transcript_feature_enabled_for_course(self.runtime.course_id.for_branch(None))
+        transcripts_info = self.get_transcripts_info(include_val_transcripts=feature_enabled)
+        available_translations = self.available_translations(transcripts_info, include_val_transcripts=feature_enabled)
         transcripts = {
             lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)
-            for lang in self.available_translations(transcripts_info)
+            for lang in available_translations
         }
 
         return {
