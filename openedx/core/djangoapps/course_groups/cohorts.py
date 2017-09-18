@@ -28,6 +28,7 @@ from .models import (
     CourseUserGroupPartitionGroup,
     UnregisteredLearnerCohortAssignments
 )
+from .signals.signals import COHORT_MEMBERSHIP_UPDATED
 
 log = logging.getLogger(__name__)
 
@@ -424,7 +425,9 @@ def remove_user_from_cohort(cohort, username_or_email):
 
     try:
         membership = CohortMembership.objects.get(course_user_group=cohort, user=user)
+        course_key = membership.course_id
         membership.delete()
+        COHORT_MEMBERSHIP_UPDATED.send(sender=None, user=user, course_key=course_key)
     except CohortMembership.DoesNotExist:
         raise ValueError("User {} was not present in cohort {}".format(username_or_email, cohort))
 
@@ -454,7 +457,7 @@ def add_user_to_cohort(cohort, username_or_email):
 
         membership = CohortMembership(course_user_group=cohort, user=user)
         membership.save()  # This will handle both cases, creation and updating, of a CohortMembership for this user.
-
+        COHORT_MEMBERSHIP_UPDATED.send(sender=None, user=user, course_key=membership.course_id)
         tracker.emit(
             "edx.cohort.user_add_requested",
             {
