@@ -607,6 +607,23 @@ class ViewsTestCase(
         # create_thread_helper verifies that extra data are passed through to the comments service
         self.create_thread_helper(mock_request, extra_response_data={'context': ThreadContext.STANDALONE})
 
+    @ddt.data(
+        ('follow_thread', 'thread_followed'),
+        ('unfollow_thread', 'thread_unfollowed'),
+    )
+    @ddt.unpack
+    def test_follow_unfollow_thread_signals(self, view_name, signal, mock_request):
+        self.create_thread_helper(mock_request)
+
+        with self.assert_discussion_signals(signal):
+            response = self.client.post(
+                reverse(
+                    view_name,
+                    kwargs={"course_id": unicode(self.course_id), "thread_id": 'i4x-MITx-999-course-Robot_Super_Course'}
+                )
+            )
+        self.assertEqual(response.status_code, 200)
+
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_NOTIFICATIONS": True})
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_SOCIAL_ENGAGEMENT": True})
     def test_create_cohorted_thread(self, mock_request):
