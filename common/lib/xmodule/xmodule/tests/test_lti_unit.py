@@ -2,7 +2,7 @@
 """Test for LTI Xmodule functional logic."""
 
 import datetime
-from django.utils.timezone import UTC
+from pytz import UTC
 from mock import Mock, patch, PropertyMock
 import textwrap
 from lxml import etree
@@ -180,7 +180,7 @@ class LTIModuleTest(LogicTest):
         Should fail if we do not accept past due grades, and it is past due.
         """
         self.xmodule.accept_grades_past_due = False
-        self.xmodule.due = datetime.datetime.now(UTC())
+        self.xmodule.due = datetime.datetime.now(UTC)
         self.xmodule.graceperiod = Timedelta().from_json("0 seconds")
         request = Request(self.environ)
         request.body = self.get_request_body()
