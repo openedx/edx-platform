@@ -16,13 +16,16 @@ class UserSessionSharingMiddleware(object):
     Used for session sharing with NodeBB community
     """
     def process_response(self, request, response):
-        if request.user.is_authenticated():
-            encoded_jwt = jwt.encode({'id': request.user.id,
-                                    'username': request.user.username},
-                                    'secret', algorithm='HS256')
-            response.set_cookie('token', encoded_jwt, domain=".philanthropyu.org")
-        else:
-            response.delete_cookie('token', domain=".philanthropyu.org")
+        try:
+            if request.user.is_authenticated():
+                encoded_jwt = jwt.encode({'id': request.user.id,
+                                        'username': request.user.username},
+                                        'secret', algorithm='HS256')
+                response.set_cookie('token', encoded_jwt, domain=".philanthropyu.org")
+            else:
+                response.delete_cookie('token', domain=".philanthropyu.org")
+        except AttributeError:
+            pass
         return response
 
 
