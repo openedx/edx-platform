@@ -864,6 +864,8 @@ def program_marketing(request, program_uuid):
     if program.get('is_learner_eligible_for_one_click_purchase') and skus:
         context['buy_button_href'] = ecommerce_service.get_checkout_page_url(*skus)
 
+    context['uses_bootstrap'] = True
+
     return render_to_response('courseware/program_marketing.html', context)
 
 

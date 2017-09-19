@@ -144,7 +144,7 @@ class PersonFactory(DictFactoryBase):
 
 
 class EndorserFactory(DictFactoryBase):
-    person = PersonFactory()
+    endorser = PersonFactory()
     quote = factory.Faker('sentence')
 
 
@@ -157,16 +157,22 @@ class FAQFactory(DictFactoryBase):
     question = factory.Faker('sentence')
 
 
+class CorporateEndorsementFactory(DictFactoryBase):
+    corporation_name = factory.Faker('company')
+    image = ImageFactory()
+    individual_endorsements = factory.LazyFunction(partial(generate_instances, EndorserFactory))
+
+
 class ProgramFactory(DictFactoryBase):
     authoring_organizations = factory.LazyFunction(partial(generate_instances, OrganizationFactory, count=1))
     applicable_seat_types = []
     banner_image = factory.LazyFunction(generate_sized_stdimage)
     card_image_url = factory.Faker('image_url')
+    corporate_endorsements = factory.LazyFunction(partial(generate_instances, CorporateEndorsementFactory))
     courses = factory.LazyFunction(partial(generate_instances, CourseFactory))
     expected_learning_items = factory.LazyFunction(partial(generate_instances, CourseFactory))
     faq = factory.LazyFunction(partial(generate_instances, FAQFactory))
     hidden = False
-    individual_endorsements = factory.LazyFunction(partial(generate_instances, EndorserFactory))
     is_program_eligible_for_one_click_purchase = True
     job_outlook_items = factory.LazyFunction(partial(generate_instances, JobOutlookItemFactory))
     marketing_slug = factory.Faker('slug')
