@@ -2085,7 +2085,6 @@ INSTALLED_APPS = [
 
     # For testing
     'django.contrib.admin',  # only used in DEBUG mode
-    'django_nose',
     'debug',
     'django_extensions',
 
