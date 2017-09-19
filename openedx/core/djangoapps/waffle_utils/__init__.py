@@ -51,10 +51,6 @@ from contextlib import contextmanager
 from opaque_keys.edx.keys import CourseKey
 from request_cache import get_cache as get_request_cache, get_request
 from waffle import flag_is_active, switch_is_active
-from waffle.models import Flag
-from waffle.testutils import override_switch as waffle_override_switch
-
-from .models import WaffleFlagCourseOverrideModel
 
 log = logging.getLogger(__name__)
 
@@ -154,6 +150,7 @@ class WaffleSwitchNamespace(WaffleNamespace):
         contextmanager.
         Note: The value is overridden in the model, not the request cache.
         """
+        from waffle.testutils import override_switch as waffle_override_switch
         namespaced_switch_name = self._namespaced_name(switch_name)
         with waffle_override_switch(namespaced_switch_name, active):
             log.info(u"%sSwitch '%s' set to %s in model.", self.log_prefix, namespaced_switch_name, active)
@@ -206,6 +203,8 @@ class WaffleFlagNamespace(WaffleNamespace):
             flag_undefined_default (Boolean): A default value to be returned if
                 the waffle flag is to be checked, but doesn't exist.
         """
+        from waffle.models import Flag
+
         # validate arguments
         namespaced_flag_name = self._namespaced_name(flag_name)
         value = None
@@ -295,6 +294,7 @@ class CourseWaffleFlag(WaffleFlag):
                 namespaced_flag_name (String): A namespaced version of the flag
                     to check.
             """
+            from .models import WaffleFlagCourseOverrideModel
             cache_key = u'{}.{}'.format(namespaced_flag_name, unicode(course_key))
             force_override = self.waffle_namespace._cached_flags.get(cache_key)
 

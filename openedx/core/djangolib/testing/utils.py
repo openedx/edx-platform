@@ -16,7 +16,6 @@ import crum
 from django import db
 from django.conf import settings
 from django.contrib import sites
-from django.contrib.auth.models import AnonymousUser
 from django.core.cache import caches
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import RequestFactory, TestCase, override_settings
@@ -244,6 +243,7 @@ def get_mock_request(user=None):
     """
     Create a request object for the user, if specified.
     """
+    from django.contrib.auth.models import AnonymousUser
     request = RequestFactory().get('/')
     if user is not None:
         request.user = user

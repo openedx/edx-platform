@@ -29,7 +29,6 @@ from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.draft_and_published import BranchSettingMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.util.django import get_current_request_hostname
-import xblock.reference.plugins
 
 try:
     # We may not always have the request_cache module available
@@ -245,6 +244,8 @@ def create_modulestore_instance(
     """
     This will return a new instance of a modulestore given an engine and options
     """
+    import xblock.reference.plugins
+
     class_ = load_function(engine)
 
     _options = {}
