@@ -5,7 +5,8 @@ from django.dispatch import receiver
 
 from lms.djangoapps.badges.events.course_meta import award_enrollment_badge
 from lms.djangoapps.badges.utils import badges_enabled
-from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange
+from student.models import EnrollStatusChange
+from student.signals import ENROLL_STATUS_CHANGE
 
 
 @receiver(ENROLL_STATUS_CHANGE)
