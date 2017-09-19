@@ -49,7 +49,7 @@ from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.utils.http import urlquote_plus
 from django.utils.text import slugify
-from django.utils.timezone import UTC
+from pytz import UTC
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -1650,7 +1650,7 @@ def get_financial_aid_courses(user):
                 enrollment.course_overview and \
                 enrollment.course_overview.eligible_for_financial_aid and \
                 CourseMode.objects.filter(
-                    Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gt=datetime.now(UTC())),
+                    Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gt=datetime.now(UTC)),
                     course_id=enrollment.course_id,
                     mode_slug=CourseMode.VERIFIED).exists():
 

@@ -8,7 +8,7 @@ from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock, patch
 
-from django.utils.timezone import UTC
+from pytz import UTC
 
 from xmodule.xml_module import is_pointer_tag
 from opaque_keys.edx.locations import Location
@@ -346,7 +346,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         # Check that the child hasn't started yet
         self.assertLessEqual(
-            datetime.datetime.now(UTC()),
+            datetime.datetime.now(UTC),
             child.start
         )
 
