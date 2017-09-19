@@ -1186,6 +1186,7 @@ MIDDLEWARE_CLASSES = (
     'course_wiki.middleware.WikiAccessMiddleware',
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
+    'lms.djangoapps.onboarding_survey.middleware.RedirectMiddleware',
 
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
@@ -2158,6 +2159,8 @@ INSTALLED_APPS = (
 
     # Unusual migrations
     'database_fixups',
+
+    'lms.djangoapps.onboarding_survey',
 )
 
 ######################### CSRF #########################################
@@ -3038,3 +3041,4 @@ DOC_LINK_BASE_URL = None
 ############## Settings for the Enterprise App ######################
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
+

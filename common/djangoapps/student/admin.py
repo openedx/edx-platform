@@ -12,7 +12,7 @@ from config_models.admin import ConfigurationModelAdmin
 from student.models import (
     UserProfile, UserTestGroup, CourseEnrollmentAllowed, DashboardConfiguration, CourseEnrollment, Registration,
     PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration, UserAttribute, LogoutViewConfiguration,
-    RegistrationCookieConfiguration
+    RegistrationCookieConfiguration, Organization
 )
 from student.roles import REGISTERED_ACCESS_ROLES
 
@@ -190,3 +190,4 @@ admin.site.register(RegistrationCookieConfiguration, ConfigurationModelAdmin)
 
 # We must first un-register the User model since it may also be registered by the auth app.
 admin.site.register(User, UserAdmin)
+admin.site.register(Organization)

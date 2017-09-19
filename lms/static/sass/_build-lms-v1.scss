@@ -71,6 +71,9 @@
 // news
 @import 'news';
 
+// Survey
+@import 'onboarding-survey';
+
 @import 'mixins';
 @import 'mixins-inherited';
 @import 'elements/system-feedback';
@@ -78,3 +81,7 @@
 // overrides
 @import 'developer'; // used for any developer-created scss that needs further polish/refactoring
 @import 'shame';     // used for any bad-form/orphaned scss
+
+// POC dashboard
+@import 'poc-dashboard';
+@import 'learner-dashboard';
