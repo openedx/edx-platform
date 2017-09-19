@@ -3,13 +3,12 @@ import logging
 from collections import defaultdict
 from datetime import datetime
 
-import pytz
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
-from django.utils.timezone import UTC
+from pytz import UTC
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import i4xEncoder
 
@@ -231,7 +230,7 @@ def _filter_unstarted_categories(category_map, course):
     Returns a subset of categories from the provided map which have not yet met the start date
     Includes information about category children, subcategories (different), and entries
     """
-    now = datetime.now(UTC())
+    now = datetime.now(UTC)
 
     result_map = {}
 
@@ -344,7 +343,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
         sort_key = xblock.sort_key
         category = " / ".join([x.strip() for x in xblock.discussion_category.split("/")])
         # Handle case where xblock.start is None
-        entry_start_date = xblock.start if xblock.start else datetime.max.replace(tzinfo=pytz.UTC)
+        entry_start_date = xblock.start if xblock.start else datetime.max.replace(tzinfo=UTC)
         unexpanded_category_map[category].append({"title": title,
                                                   "id": discussion_id,
                                                   "sort_key": sort_key,
@@ -411,7 +410,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
         category_map['entries'][topic] = {
             "id": entry["id"],
             "sort_key": entry.get("sort_key", topic),
-            "start_date": datetime.now(UTC()),
+            "start_date": datetime.now(UTC),
             "is_divided": (
                 discussion_division_enabled and entry["id"] in divided_discussion_ids
             )

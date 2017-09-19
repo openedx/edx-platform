@@ -6,7 +6,7 @@ import json
 import dateutil
 from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest
-from django.utils.timezone import utc
+from pytz import UTC
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
 
@@ -91,7 +91,7 @@ def parse_datetime(datestr):
     UTC.
     """
     try:
-        return dateutil.parser.parse(datestr).replace(tzinfo=utc)
+        return dateutil.parser.parse(datestr).replace(tzinfo=UTC)
     except ValueError:
         raise DashboardError(_("Unable to parse date: ") + datestr)
 

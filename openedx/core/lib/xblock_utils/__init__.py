@@ -15,7 +15,7 @@ from contracts import contract
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.urlresolvers import reverse
-from django.utils.timezone import UTC
+from pytz import UTC
 from django.utils.html import escape
 from django.contrib.auth.models import User
 from edxmako.shortcuts import render_to_string
@@ -350,7 +350,7 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
     # Useful to indicate to staff if problem has been released or not.
     # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access,
     # instead of now>mstart comparison here.
-    now = datetime.datetime.now(UTC())
+    now = datetime.datetime.now(UTC)
     is_released = "unknown"
     mstart = block.start
 

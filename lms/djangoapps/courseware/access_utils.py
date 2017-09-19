@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from logging import getLogger
 
 from django.conf import settings
-from django.utils.timezone import UTC
+from pytz import UTC
 
 from courseware.access_response import AccessResponse, StartDateError
 from courseware.masquerade import is_masquerading_as_student
@@ -64,7 +64,7 @@ def check_start_date(user, days_early_for_beta, start, course_key):
     if start_dates_disabled and not is_masquerading_as_student(user, course_key):
         return ACCESS_GRANTED
     else:
-        now = datetime.now(UTC())
+        now = datetime.now(UTC)
         if start is None or in_preview_mode():
             return ACCESS_GRANTED
 
