@@ -132,3 +132,108 @@
     text-shadow: none;
   }
 }
+
+.contact-us-wrapper {
+  min-width: auto;
+
+  .form-group {
+    font-family: inherit;
+  }
+
+  h2 {
+    font-size: $support-form-base-font-size + 8;
+    font-weight: bold;
+  }
+
+  p {
+    font-size:$support-form-base-font-size + 4;
+    font-weight:$font-regular;
+  }
+
+  label {
+    font-family: inherit;
+    font-size: $support-form-base-font-size + 2;
+    font-style: normal;
+    font-weight: $font-regular;
+  }
+
+  .help-button {
+    margin-bottom: $baseline;
+    width: $baseline * 8;
+    height: $baseline * 2;
+    font-weight: $font-regular;
+    font-size: $support-form-base-font-size + 2;
+    border:1px solid $blue;
+    border-radius:3px;
+    color:$blue;
+
+    &:hover,
+    &:focus
+      {
+        color: $blue;
+        background-color: $mediumGrey !important;
+      }
+  }
+
+  .label-course {
+    margin-bottom: $baseline - 5;
+  }
+
+  .message-desc {
+    color:$dark-gray1;
+    font-size: $support-form-base-font-size - 2;
+    margin-bottom:$baseline - 16;
+  }
+
+  .select-course {
+    font-size: $support-form-base-font-size;
+    height: $baseline * 2;
+    margin-bottom: $baseline;
+  }
+
+  .progress {
+    padding: 0;
+    margin-top: $baseline - 10;
+
+    .progress-bar {
+      background-color: $blue;
+      width: 25%;
+    }
+  }
+
+  .btn-primary {
+    background-color: $blue;
+    width: 100%;
+    height: $baseline * 2;
+    font-size: $support-form-base-font-size + 2;
+
+    &:hover,
+    &:focus
+    {
+      background-image: none;
+      background-color: $m-blue-d6;
+      border-color: $m-blue-d6;
+    }
+  }
+
+  .file-loading, .file-name {
+    font-size: $support-form-base-font-size + 2;
+  }
+
+  .file-action {
+    @include float(right);
+    font-size: $support-form-base-font-size + 2;
+    margin-bottom: $baseline - 10;
+  }
+
+  .btn-signin {
+    width: $baseline * 8;
+    margin-bottom: ($baseline * 2) + 10;
+  }
+
+  @media only screen and (min-width: 768px) {
+    .row {
+      max-width: $baseline * 25;
+    }
+  }
+}
