@@ -585,11 +585,6 @@ class ViewsTestCase(
             yield
 
     def test_create_thread(self, mock_request):
-        # make sure course is not cohorted
-        self.course.cohort_config = {
-            'cohorted': False,
-        }
-        self.store.update_item(self.course, self.student.id)
         with self.assert_discussion_signals('thread_created'):
             self.create_thread_helper(mock_request)
 
@@ -846,6 +841,13 @@ class ViewsTestCase(
         # people not in the cohort, should not get the notification
         assert_equal(get_notifications_count_for_user(b_user.id), 0)
         assert_equal(get_notifications_count_for_user(no_user.id), 0)
+        # make sure course is not cohorted anymore to avoid mock_request response assertion failure
+        # in other tests due to addition of group_id param for cohorted course
+        self.course.cohort_config = {
+            'cohorted': False,
+            'always_cohort_inline_discussions': False
+        }
+        self.store.update_item(self.course, self.student.id)
 
     def test_delete_thread(self, mock_request):
         self._set_mock_request_data(mock_request, {
