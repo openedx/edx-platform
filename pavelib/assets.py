@@ -782,6 +782,7 @@ def listfy(data):
     ('background', 'b', 'Background mode'),
     ('theme-dirs=', '-td', 'The themes dir containing all themes (defaults to None)'),
     ('themes=', '-t', 'The themes to add sass watchers for (defaults to None)'),
+    ('wait=', '-w', 'How long to pause between filesystem scans.')
 ])
 @timed
 def watch_assets(options):
@@ -794,6 +795,7 @@ def watch_assets(options):
 
     themes = get_parsed_option(options, 'themes')
     theme_dirs = get_parsed_option(options, 'theme_dirs', [])
+    wait = get_parsed_option(options, 'wait', 0)
 
     if not theme_dirs and themes:
         # We can not add theme sass watchers without knowing the directory that contains the themes.
@@ -802,7 +804,7 @@ def watch_assets(options):
         theme_dirs = [path(_dir) for _dir in theme_dirs]
 
     sass_directories = get_watcher_dirs(theme_dirs, themes)
-    observer = PollingObserver(timeout=10)
+    observer = PollingObserver()  # (timeout=20)
 
     CoffeeScriptWatcher().register(observer)
     SassWatcher().register(observer, sass_directories)
@@ -869,6 +871,10 @@ def update_assets(args):
         '--collect-log', dest=COLLECTSTATIC_LOG_DIR_ARG, default=None,
         help="When running collectstatic, direct output to specified log directory",
     )
+    parser.add_argument(
+        '--wait', type=float, default=0.0,
+        help="How long to pause between filesystem scans"
+    )
     args = parser.parse_args(args)
     collect_log_args = {}
 
@@ -894,5 +900,10 @@ def update_assets(args):
     if args.watch:
         call_task(
             'pavelib.assets.watch_assets',
-            options={'background': not args.debug, 'theme_dirs': args.theme_dirs, 'themes': args.themes},
+            options={
+                'background': not args.debug,
+                'theme_dirs': args.theme_dirs,
+                'themes': args.themes,
+                'wait': float(args.wait)
+            },
         )
