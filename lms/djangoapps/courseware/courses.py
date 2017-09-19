@@ -25,7 +25,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, QueryDict
 from enrollment.api import get_course_enrollment_details
 from edxmako.shortcuts import render_to_string
-from fs.errors import ResourceNotFoundError
+from fs.errors import ResourceNotFound
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from opaque_keys.edx.keys import UsageKey
@@ -207,13 +207,13 @@ def find_file(filesystem, dirs, filename):
     dirs: a list of path objects
     filename: a string
 
-    Returns d / filename if found in dir d, else raises ResourceNotFoundError.
+    Returns d / filename if found in dir d, else raises ResourceNotFound.
     """
     for directory in dirs:
         filepath = path(directory) / filename
         if filesystem.exists(filepath):
             return filepath
-    raise ResourceNotFoundError(u"Could not find {0}".format(filename))
+    raise ResourceNotFound(u"Could not find {0}".format(filename))
 
 
 def get_course_about_section(request, course, section_key):
@@ -419,7 +419,7 @@ def get_course_syllabus_section(course, section_key):
                     course_id=course.id,
                     static_asset_path=course.static_asset_path,
                 )
-        except ResourceNotFoundError:
+        except ResourceNotFound:
             log.exception(
                 u"Missing syllabus section %s in course %s",
                 section_key, course.location.to_deprecated_string()
