@@ -23,7 +23,7 @@ from commerce.signals import create_zendesk_ticket, generate_refund_notification
 from commerce.tests import JSON
 from commerce.tests.mocks import mock_create_refund, mock_process_refund
 from course_modes.models import CourseMode
-from student.models import REFUND_ORDER
+from student.signals import REFUND_ORDER
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 ZENDESK_URL = 'http://zendesk.example.com/'

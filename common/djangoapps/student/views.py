@@ -118,9 +118,9 @@ from student.models import (
     UserStanding,
     anonymous_id_for_user,
     create_comments_service_user,
-    unique_id_for_user,
-    REFUND_ORDER
+    unique_id_for_user
 )
+from student.signals import REFUND_ORDER
 from student.tasks import send_activation_email
 from third_party_auth import pipeline, provider
 from util.bad_request_rate_limiter import BadRequestRateLimiter

@@ -31,7 +31,7 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import IntegrityError, models
 from django.db.models import Count
 from django.db.models.signals import post_save, pre_save
-from django.dispatch import Signal, receiver
+from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -48,6 +48,7 @@ from slumber.exceptions import HttpClientError, HttpServerError
 import dogstats_wrapper as dog_stats_api
 import lms.lib.comment_client as cc
 import request_cache
+from .signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, REFUND_ORDER
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from courseware.models import DynamicUpgradeDeadlineConfiguration, CourseDynamicUpgradeDeadlineConfiguration
@@ -63,11 +64,6 @@ from util.milestones_helpers import is_entrance_exams_enabled
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
 
-from .signals.signals import ENROLLMENT_TRACK_UPDATED
-
-UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
-ENROLL_STATUS_CHANGE = Signal(providing_args=["event", "user", "course_id", "mode", "cost", "currency"])
-REFUND_ORDER = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
