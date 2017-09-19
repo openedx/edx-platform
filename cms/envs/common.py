@@ -923,9 +923,6 @@ INSTALLED_APPS = [
     # Monitor the status of services
     'openedx.core.djangoapps.service_status',
 
-    # Testing
-    'django_nose',
-
     # Bookmarks
     'openedx.core.djangoapps.bookmarks',
 
