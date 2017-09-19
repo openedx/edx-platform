@@ -10,8 +10,9 @@ import ddt
 from shoppingcart.models import Order, CertificateItem  # pylint: disable=import-error
 from course_modes.models import CourseMode
 from student.management.commands import transfer_students
-from student.models import CourseEnrollment, UNENROLL_DONE, EVENT_NAME_ENROLLMENT_DEACTIVATED, \
+from student.models import CourseEnrollment, EVENT_NAME_ENROLLMENT_DEACTIVATED, \
     EVENT_NAME_ENROLLMENT_ACTIVATED, EVENT_NAME_ENROLLMENT_MODE_CHANGED
+from student.signals import UNENROLL_DONE
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
