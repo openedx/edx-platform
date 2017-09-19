@@ -7,7 +7,6 @@ import mock
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase
-from django.utils.timezone import UTC as django_utc
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 from pytz import UTC
@@ -539,7 +538,6 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         )
 
     def test_get_unstarted_discussion_xblocks(self):
-        later = datetime.datetime(datetime.MAXYEAR, 1, 1, tzinfo=django_utc())
 
         self.create_discussion("Chapter 1", "Discussion 1", start=later)
 

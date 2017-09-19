@@ -4,7 +4,7 @@ Tests for CourseDetails
 
 import datetime
 import ddt
-from django.utils.timezone import UTC
+from pytz import UTC
 from nose.plugins.attrib import attr
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -84,17 +84,17 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).self_paced,
                 jsondetails.self_paced
             )
-            jsondetails.start_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC())
+            jsondetails.start_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC)
             self.assertEqual(
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).start_date,
                 jsondetails.start_date
             )
-            jsondetails.end_date = datetime.datetime(2011, 10, 1, 0, tzinfo=UTC())
+            jsondetails.end_date = datetime.datetime(2011, 10, 1, 0, tzinfo=UTC)
             self.assertEqual(
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).end_date,
                 jsondetails.end_date
             )
-            jsondetails.certificate_available_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC())
+            jsondetails.certificate_available_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC)
             self.assertEqual(
                 CourseDetails.update_from_json(
                     self.course.id, jsondetails.__dict__, self.user
