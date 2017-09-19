@@ -10,7 +10,6 @@ such as the site visible courses, university name and logo.
 from django.conf import settings
 
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
@@ -25,6 +24,8 @@ def get_visible_courses(org=None, filter_=None):
         filter_ (dict): Optional parameter that allows custom filtering by
             fields on the course.
     """
+    from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+
     courses = []
     current_site_orgs = configuration_helpers.get_current_site_orgs()
 

@@ -13,10 +13,8 @@ from opaque_keys.edx.keys import CourseKey
 from py2neo import Graph, Node, Relationship, authenticate, NodeSelector
 from py2neo.compat import integer, string, unicode as neo4j_unicode
 from request_cache.middleware import RequestCache
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 
 log = logging.getLogger(__name__)
 celery_log = logging.getLogger('edx.celery.task')
@@ -135,6 +133,7 @@ def get_course_last_published(course_key):
         text, or None, if there's no record of the last time this course
         was published.
     """
+    from openedx.core.djangoapps.content.course_structures.models import CourseStructure
     try:
         structure = CourseStructure.objects.get(course_id=course_key)
         course_last_published_date = six.text_type(structure.modified)
@@ -154,6 +153,8 @@ def serialize_course(course_id):
         nodes: a list of py2neo Node objects
         relationships: a list of py2neo Relationships objects
     """
+    from xmodule.modulestore.django import modulestore
+
     # create a location to node mapping we'll need later for
     # writing relationships
     location_to_node = {}
@@ -292,6 +293,7 @@ class ModuleStoreSerializer(object):
                 For example, ["course-v1:org+course+run"].
             skip: Also a list of string serializations of course keys.
         """
+        from xmodule.modulestore.django import modulestore
         if courses:
             course_keys = [CourseKey.from_string(course.strip()) for course in courses]
         else:

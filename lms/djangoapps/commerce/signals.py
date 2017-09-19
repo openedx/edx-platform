@@ -10,12 +10,9 @@ from urlparse import urljoin
 import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AnonymousUser
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 
-from commerce.models import CommerceConfiguration
-from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from request_cache.middleware import RequestCache
@@ -31,6 +28,9 @@ def handle_refund_order(sender, course_enrollment=None, **kwargs):
     Signal receiver for unenrollments, used to automatically initiate refunds
     when applicable.
     """
+    from django.contrib.auth.models import AnonymousUser
+    from openedx.core.djangoapps.commerce.utils import is_commerce_service_configured
+
     if not is_commerce_service_configured():
         return
 
@@ -83,6 +83,9 @@ def refund_seat(course_enrollment):
         exceptions.SlumberBaseException: for any unhandled HTTP error during communication with the E-Commerce Service.
         exceptions.Timeout: if the attempt to reach the commerce service timed out.
     """
+    from commerce.models import CommerceConfiguration
+    from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+
     User = get_user_model()  # pylint:disable=invalid-name
     course_key_str = unicode(course_enrollment.course_id)
     enrollee = course_enrollment.user
