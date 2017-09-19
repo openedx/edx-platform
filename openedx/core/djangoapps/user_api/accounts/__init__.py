@@ -2,7 +2,7 @@
 Account constants
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 
 # The minimum and maximum length for the name ("full name") account field
