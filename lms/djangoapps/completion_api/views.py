@@ -391,9 +391,9 @@ class CompletionBlockUpdateView(APIView):
         POST /api/completion/v0/course/UniversityX/CS101/2017_T1/
             blocks/i4x://UniversityX/CS101/html/f5a3dacbac164ac9b7d2b43f3cc1db26/
 
-    **Parameters**
+    **Parameters (as a JSON object in the request body)**
 
-        completed:
+        completion:
             Must be exactly equal to the integer 1. This is to ensure
             forward-compatibility with the next iteration of the
             Completion API.
