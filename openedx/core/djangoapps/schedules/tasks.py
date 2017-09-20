@@ -19,9 +19,9 @@ from edx_ace.recipient import Recipient
 from edx_ace.utils.date import deserialize
 from opaque_keys.edx.keys import CourseKey
 
-from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.schedules.message_type import ScheduleMessageType
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
+from openedx.core.djangoapps.schedules.template_context import absolute_url, get_base_template_context
 
 
 LOG = logging.getLogger(__name__)
@@ -128,11 +128,9 @@ def _recurring_nudge_schedules_for_hour(target_hour, org_list, exclude_orgs=Fals
         user_schedules = list(user_schedules)
         course_id_strs = [str(schedule.enrollment.course_id) for schedule in user_schedules]
 
-        def absolute_url(relative_path):
-            return u'{}{}'.format(settings.LMS_ROOT_URL, urlquote(relative_path))
-
         first_schedule = user_schedules[0]
-        template_context = {
+        template_context = get_base_template_context()
+        template_context.update({
             'student_name': user.profile.name,
 
             'course_name': first_schedule.enrollment.course.display_name,
@@ -140,36 +138,5 @@ def _recurring_nudge_schedules_for_hour(target_hour, org_list, exclude_orgs=Fals
 
             # This is used by the bulk email optout policy
             'course_ids': course_id_strs,
-
-            # Platform information
-            'homepage_url': encode_url(marketing_link('ROOT')),
-            'dashboard_url': absolute_url(dashboard_relative_url),
-            'template_revision': settings.EDX_PLATFORM_REVISION,
-            'platform_name': settings.PLATFORM_NAME,
-            'contact_mailing_address': settings.CONTACT_MAILING_ADDRESS,
-            'social_media_urls': encode_urls_in_dict(getattr(settings, 'SOCIAL_MEDIA_FOOTER_URLS', {})),
-            'mobile_store_urls': encode_urls_in_dict(getattr(settings, 'MOBILE_STORE_URLS', {})),
-        }
+        })
         yield (user, first_schedule.enrollment.course.language, template_context)
-
-
-def encode_url(url):
-    # Sailthru has a bug where URLs that contain "+" characters in their path components are misinterpreted
-    # when GA instrumentation is enabled. We need to percent-encode the path segments of all URLs that are
-    # injected into our templates to work around this issue.
-    parsed_url = urlparse(url)
-    modified_url = parsed_url._replace(path=urlquote(parsed_url.path))
-    return modified_url.geturl()
-
-
-def absolute_url(relative_path):
-    root = settings.LMS_ROOT_URL.rstrip('/')
-    relative_path = relative_path.lstrip('/')
-    return encode_url(u'{root}/{path}'.format(root=root, path=relative_path))
-
-
-def encode_urls_in_dict(mapping):
-    urls = {}
-    for key, value in mapping.iteritems():
-        urls[key] = encode_url(value)
-    return urls
