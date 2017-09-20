@@ -37,6 +37,8 @@ def released_languages():
     list of valid language tuples with the list of released
     language codes.
 
+    If request comes from a Microsite, it will look for the LANGUAGE_LIST in the microsite configuration
+
     Returns:
        list of Language: Languages in which full translations are available.
 
@@ -48,6 +50,11 @@ def released_languages():
     """
     released_language_codes = DarkLangConfig.current().released_languages_list
     default_language_code = settings.LANGUAGE_CODE
+    
+    site_languages = configuration_helpers.get_value('LANGUAGE_LIST', None)
+
+    if site_languages is not None:
+        released_language_codes = site_languages
 
     if default_language_code not in released_language_codes:
         released_language_codes.append(default_language_code)
