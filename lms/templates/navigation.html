@@ -112,6 +112,10 @@ site_status_msg = get_site_status_msg(course_id)
          target="_blank"
          class="doc-link">${_("Help")}</a>
 
+      <a id="faq" href="${reverse('faq:custom_faq')}"
+         class="doc-link">${_("FAQ")}</a>
+
+
       % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
         <ol class="user">
           <li class="primary">
@@ -215,3 +219,15 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 
 <%include file="help_modal.html"/>
+
+<script>
+    $(document).ready(function(){
+        $.ajax({
+            url: "/custom_faq/title/",
+            success: function (result) {
+                    $('#faq').text(result['page_title']);
+                }
+            });
+    });
+
+</script>
