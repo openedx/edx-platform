@@ -15,9 +15,11 @@ ASSUMPTIONS: modules have unique IDs, even across different module_types
 import csv
 import hashlib
 import json
+import logging
 import os.path
 from uuid import uuid4
 
+from boto.exception import BotoServerError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
@@ -25,6 +27,8 @@ from django.db import models, transaction
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from openedx.core.storage import get_storage
+
+logger = logging.getLogger(__name__)
 
 # define custom states used by InstructorTask
 QUEUING = 'QUEUING'
@@ -282,6 +286,14 @@ class DjangoStorageReportStore(ReportStore):
         except OSError:
             # Django's FileSystemStorage fails with an OSError if the course
             # dir does not exist; other storage types return an empty list.
+            return []
+        except BotoServerError as ex:
+            logger.error(
+                u'Fetching files failed for course: %s, status: %s, reason: %s',
+                course_id,
+                ex.status,
+                ex.reason
+            )
             return []
         files = [(filename, os.path.join(course_dir, filename)) for filename in filenames]
         files.sort(key=lambda f: self.storage.modified_time(f[1]), reverse=True)
