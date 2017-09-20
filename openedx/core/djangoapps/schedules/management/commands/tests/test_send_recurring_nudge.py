@@ -143,20 +143,30 @@ class TestSendRecurringNudge(CacheIsolationTestCase):
         for config in (limited_config, unlimited_config):
             ScheduleConfigFactory.create(site=config.site)
 
+        user1 = UserFactory.create()
+        user2 = UserFactory.create()
+
         ScheduleFactory.create(
             start=datetime.datetime(2017, 8, 2, 17, 44, 30, tzinfo=pytz.UTC),
             enrollment__course__org=filtered_org,
+            enrollment__user=user1,
         )
-        for _ in range(2):
-            ScheduleFactory.create(
-                start=datetime.datetime(2017, 8, 2, 17, 44, 30, tzinfo=pytz.UTC),
-                enrollment__course__org=unfiltered_org,
-            )
+        ScheduleFactory.create(
+            start=datetime.datetime(2017, 8, 2, 17, 44, 30, tzinfo=pytz.UTC),
+            enrollment__course__org=unfiltered_org,
+            enrollment__user=user1,
+        )
+        ScheduleFactory.create(
+            start=datetime.datetime(2017, 8, 2, 17, 44, 30, tzinfo=pytz.UTC),
+            enrollment__course__org=unfiltered_org,
+            enrollment__user=user2,
+        )
 
         test_time_str = serialize(datetime.datetime(2017, 8, 2, 17, tzinfo=pytz.UTC))
         with self.assertNumQueries(2):
             tasks.recurring_nudge_schedule_hour(
-                limited_config.site.id, 3, test_time_str, org_list=org_list, exclude_orgs=exclude_orgs,
+                limited_config.site.id, day=3, target_hour_str=test_time_str, org_list=org_list,
+                exclude_orgs=exclude_orgs,
             )
 
         self.assertEqual(mock_schedule_send.apply_async.call_count, expected_message_count)

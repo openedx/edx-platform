@@ -1,6 +1,6 @@
 import datetime
 from itertools import groupby
-from logging import getLogger
+import logging
 from urlparse import urlparse
 
 from celery.task import task
@@ -12,6 +12,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Min
 from django.db.utils import DatabaseError
 from django.utils.http import urlquote
+
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.recipient import Recipient
@@ -22,7 +23,8 @@ from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.schedules.message_type import ScheduleMessageType
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 
-log = getLogger(__name__)
+
+LOG = logging.getLogger(__name__)
 
 
 ROUTING_KEY = getattr(settings, 'ACE_ROUTING_KEY', None)
@@ -45,7 +47,7 @@ def update_course_schedules(self, **kwargs):
         )
     except Exception as exc:  # pylint: disable=broad-except
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
-            log.exception("Unexpected failure: task id: %s, kwargs=%s".format(self.request.id, kwargs))
+            LOG.exception("Unexpected failure: task id: %s, kwargs=%s".format(self.request.id, kwargs))
         raise self.retry(kwargs=kwargs, exc=exc)
 
 
@@ -78,9 +80,11 @@ def recurring_nudge_schedule_hour(
 def _recurring_nudge_schedule_send(site_id, msg_str):
     site = Site.objects.get(pk=site_id)
     if not ScheduleConfig.current(site).deliver_recurring_nudge:
+        LOG.debug('Recurring Nudge: Message delivery disabled for site %s', site.domain)
         return
 
     msg = Message.from_string(msg_str)
+    LOG.debug('Recurring Nudge: Sending message = %s', msg_str)
     ace.send(msg)
 
 
@@ -96,12 +100,6 @@ def _recurring_nudge_schedules_for_hour(target_hour, org_list, exclude_orgs=Fals
         first_schedule__gte=target_hour,
         first_schedule__lt=target_hour + datetime.timedelta(minutes=60)
     )
-
-    if org_list is not None:
-        if exclude_orgs:
-            users = users.exclude(courseenrollment__course__org__in=org_list)
-        else:
-            users = users.filter(courseenrollment__course__org__in=org_list)
 
     schedules = Schedule.objects.select_related(
         'enrollment__user__profile',
@@ -121,6 +119,8 @@ def _recurring_nudge_schedules_for_hour(target_hour, org_list, exclude_orgs=Fals
 
     if "read_replica" in settings.DATABASES:
         schedules = schedules.using("read_replica")
+
+    LOG.debug('Scheduled Nudge: Query = %r', schedules.query.sql_with_params())
 
     dashboard_relative_url = reverse('dashboard')
 

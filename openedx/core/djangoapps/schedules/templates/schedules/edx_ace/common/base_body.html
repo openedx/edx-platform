@@ -15,13 +15,8 @@ email itself. -->
     {% block preview_text %}{% endblock %}
 </div>
 
-{# This "View on Web" link must appear in the document before any layout tables so that accessible email clients can #}
-{# send the user to a proper web browser which can parse the email correctly. #}
-
-{# Note {view_url} is not a template variable that is evaluated by the Django template engine. It is evaluated by #}
+{# Note {beacon_src} is not a template variable that is evaluated by the Django template engine. It is evaluated by #}
 {# Sailthru when the email is sent. Other email providers would need to replace this variable in the HTML as well. #}
-<p><a href="{view_url}">{% trans "View on Web" %}</a></p>
-{# Note this is another late-bound variable #}
 <img src="{beacon_src}" alt="" role="presentation" aria-hidden="true" />
 
 {% get_current_language as LANGUAGE_CODE %}
@@ -156,10 +151,17 @@ email itself. -->
                     <tr>
                         <!-- Actions -->
                         <td style="padding-bottom: 20px;">
-                            {# Note that this variable is evaluated by Sailthru, not the Django template engine #}
-                            <a href="{optout_confirm_url}" style="color: #005686">
-                                <font color="#005686"><b>{% trans "Unsubscribe from this list" %}</b></font>
-                            </a>
+                            {# Note that these variables are evaluated by Sailthru, not the Django template engine #}
+                            <p>
+                                <a href="{view_url}" style="color: #005686">
+                                    <font color="#005686"><b>{% trans "View on Web" %}</b></font>
+                                </a>
+                            </p>
+                            <p>
+                                <a href="{optout_confirm_url}" style="color: #005686">
+                                    <font color="#005686"><b>{% trans "Unsubscribe from this list" %}</b></font>
+                                </a>
+                            </p>
                         </td>
                     </tr>
                     <tr>
