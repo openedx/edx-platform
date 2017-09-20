@@ -2161,6 +2161,9 @@ INSTALLED_APPS = (
     'database_fixups',
 
     'lms.djangoapps.onboarding_survey',
+
+    # Dynamic FAQ page
+    'lms.djangoapps.faq',
 )
 
 ######################### CSRF #########################################
