@@ -14,7 +14,6 @@ from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 from edx_ace.recipient_resolver import RecipientResolver
 
-
 LOG = logging.getLogger(__name__)
 
 
@@ -28,8 +27,28 @@ class ScheduleStartResolver(RecipientResolver):
         Send a message to all users whose schedule started at ``self.current_date`` - ``day``.
         """
         if not ScheduleConfig.current(self.site).enqueue_recurring_nudge:
+            LOG.debug('Recurring Nudge: Message queuing disabled for site %s', self.site.domain)
             return
 
+        exclude_orgs, org_list = self.get_org_filter()
+
+        target_date = self.current_date - datetime.timedelta(days=day)
+        LOG.debug('Scheduled Nudge: Target date = %s', target_date.isoformat())
+        for hour in range(24):
+            target_hour = target_date + datetime.timedelta(hours=hour)
+            task_args = (self.site.id, day, serialize(target_hour), org_list, exclude_orgs, override_recipient_email)
+            LOG.debug('Scheduled Nudge: Launching task with args = %r', task_args)
+            recurring_nudge_schedule_hour.apply_async(task_args, retry=False)
+
+    def get_org_filter(self):
+        """
+        Given the configuration of sites, get the list of orgs that should be included or excluded from this send.
+
+        Returns:
+             tuple: Returns a tuple (exclude_orgs, org_list). If exclude_orgs is True, then org_list is a list of the
+                only orgs that should be included in this send. If exclude_orgs is False, then org_list is a list of
+                orgs that should be excluded from this send. All other orgs should be included.
+        """
         try:
             site_config = SiteConfiguration.objects.get(site_id=self.site.id)
             org_list = site_config.values.get('course_org_filter', None)
@@ -45,14 +64,7 @@ class ScheduleStartResolver(RecipientResolver):
         except SiteConfiguration.DoesNotExist:
             org_list = None
             exclude_orgs = False
-
-        target_date = self.current_date - datetime.timedelta(days=day)
-        for hour in range(24):
-            target_hour = target_date + datetime.timedelta(hours=hour)
-            recurring_nudge_schedule_hour.apply_async(
-                (self.site.id, day, serialize(target_hour), org_list, exclude_orgs, override_recipient_email),
-                retry=False,
-            )
+        return exclude_orgs, org_list
 
 
 class Command(BaseCommand):
@@ -74,7 +86,11 @@ class Command(BaseCommand):
             *[int(x) for x in options['date'].split('-')],
             tzinfo=pytz.UTC
         )
+        LOG.debug('Scheduled Nudge: Args = %r', options)
+        LOG.debug('Scheduled Nudge: Current date = %s', current_date.isoformat())
+
         site = Site.objects.get(domain__iexact=options['site_domain_name'])
+        LOG.debug('Scheduled Nudge: Running for site %s', site.domain)
         resolver = ScheduleStartResolver(site, current_date)
         for day in (3, 10):
             resolver.send(day, options.get('override_recipient_email'))
