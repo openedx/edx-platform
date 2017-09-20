@@ -174,6 +174,15 @@ class PaginationTestCase(AssetsTestCase):
         self.assert_correct_filter_response(self.url, 'asset_type', 'OTHER')
         self.assert_correct_filter_response(
             self.url, 'asset_type', 'Documents')
+        self.assert_correct_filter_response(
+            self.url, 'asset_type', 'Documents,Images')
+        self.assert_correct_filter_response(
+            self.url, 'asset_type', 'Documents,OTHER')
+
+        #Verify invalid request parameters
+        self.assert_invalid_parameters_error(self.url, 'asset_type', 'edX')
+        self.assert_invalid_parameters_error(self.url, 'asset_type', 'edX, OTHER')
+        self.assert_invalid_parameters_error(self.url, 'asset_type', 'edX, Images')
 
         # Verify querying outside the range of valid pages
         self.assert_correct_asset_response(
@@ -247,24 +256,46 @@ class PaginationTestCase(AssetsTestCase):
         """
         Get from the url w/ a filter option and ensure items honor that filter
         """
-        requested_file_types = settings.FILES_AND_UPLOAD_TYPE_FILTERS.get(
-            filter_value, None)
+
+        filter_value_split = filter_value.split(',')
+
+        requested_file_extensions = []
+        all_file_extensions = []
+
+        for requested_filter in filter_value_split:
+            if requested_filter == 'OTHER':
+                for file_type in settings.FILES_AND_UPLOAD_TYPE_FILTERS:
+                    all_file_extensions.extend(file_type)
+            else:
+                file_extensions = settings.FILES_AND_UPLOAD_TYPE_FILTERS.get(
+                    requested_filter, None)
+                if file_extensions is not None:
+                    requested_file_extensions.extend(file_extensions)
+
         resp = self.client.get(
             url + '?' + filter_type + '=' + filter_value, HTTP_ACCEPT='application/json')
         json_response = json.loads(resp.content)
         assets_response = json_response['assets']
+
         if filter_value is not '':
             content_types = [asset['content_type'].lower()
                              for asset in assets_response]
-            if filter_value is 'OTHER':
-                all_file_type_extensions = []
-                for file_type in settings.FILES_AND_UPLOAD_TYPE_FILTERS:
-                    all_file_type_extensions.extend(file_type)
+            if 'OTHER' in filter_value_split:
                 for content_type in content_types:
-                    self.assertNotIn(content_type, all_file_type_extensions)
+                    # content_type is either not any defined type (i.e. OTHER) or is a defined type (if multiple
+                    # parameters including OTHER are used)
+                    self.assertTrue(content_type in requested_file_extensions or content_type not in all_file_extensions)
             else:
                 for content_type in content_types:
-                    self.assertIn(content_type, requested_file_types)
+                    self.assertIn(content_type, requested_file_extensions)
+
+    def assert_invalid_parameters_error(self, url, filter_type, filter_value):
+        """
+        Get from the url w/ invalid filter option(s) and ensure error is received
+        """
+        resp = self.client.get(
+            url + '?' + filter_type + '=' + filter_value, HTTP_ACCEPT='application/json')
+        self.assertEquals(resp.status_code, 400)
 
 
 @ddt

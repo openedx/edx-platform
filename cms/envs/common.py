@@ -1257,7 +1257,8 @@ ADVANCED_PROBLEM_TYPES = [
 # Files and Uploads type filter values
 
 FILES_AND_UPLOAD_TYPE_FILTERS = {
-    "Images": ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/tiff', 'image/tif', 'image/x-icon'],
+    "Images": ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/tiff', 'image/tif', 'image/x-icon',
+               'image/svg+xml', 'image/bmp', 'image/x-ms-bmp', ],
     "Documents": [
         'application/pdf',
         'text/plain',
@@ -1271,7 +1272,25 @@ FILES_AND_UPLOAD_TYPE_FILTERS = {
         'application/msword',
         'application/vnd.ms-excel',
         'application/vnd.ms-powerpoint',
+        'application/csv',
+        'application/vnd.ms-excel.sheet.macroEnabled.12',
+        'text/x-tex',
+        'application/x-pdf',
+        'application/vnd.ms-excel.sheet.macroenabled.12',
+        'file/pdf',
+        'image/pdf',
+        'text/csv',
+        'text/pdf',
+        'text/x-sh',
+        '\application/pdf\""',
     ],
+    "Audio": ['audio/mpeg', 'audio/mp3', 'audio/x-wav', 'audio/ogg', 'audio/wav', 'audio/aac', 'audio/x-m4a',
+              'audio/mp4', 'audio/x-ms-wma', ],
+    "Code": ['application/json', 'text/html', 'text/javascript', 'application/javascript', 'text/css', 'text/x-python',
+             'application/x-java-jnlp-file', 'application/xml', 'application/postscript', 'application/x-javascript',
+             'application/java-vm', 'text/x-c++src', 'text/xml', 'text/x-scss', 'application/x-python-code',
+             'application/java-archive', 'text/x-python-script', 'application/x-ruby', 'application/mathematica',
+             'text/coffeescript', 'text/x-matlab', 'application/sql', 'text/php', ]
 }
 
 # Default to no Search Engine
