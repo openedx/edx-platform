@@ -211,19 +211,6 @@ class UserStanding(models.Model):
     standing_last_changed_at = models.DateTimeField(auto_now=True)
 
 
-class Organization(models.Model):
-    """
-    Represents an organization.
-    """
-
-    name = models.CharField(max_length=255, db_index=True)
-    created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
-    point_of_contact_exist = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.name
-
-
 class UserProfile(models.Model):
     """This is where we store all the user demographic fields. We have a
     separate table for this rather than extending the built-in Django auth_user.
@@ -302,10 +289,9 @@ class UserProfile(models.Model):
     country = CountryField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
-    is_poc = models.BooleanField(default=0)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
-    organization = models.ForeignKey(Organization, related_name='user_profile', blank=True, null=True)
+
 
     @property
     def has_profile_image(self):

@@ -49,7 +49,7 @@
         label {
             display: none;
             
-            &[for='id_is_country_or_city_different'] {
+            &[for='id_is_emp_location_different'] {
                 display: block;
                 float: right;
                 width: calc(100% - 30px);
@@ -126,4 +126,10 @@
             height: 50px;
         }
     }
+
+}
+
+.errorlist {
+    color: #B20610;
+    overflow: inherit !important;
 }

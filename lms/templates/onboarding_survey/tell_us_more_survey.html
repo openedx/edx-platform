@@ -4,10 +4,11 @@
 {% block title %}{% trans "Tell us more about you." %} | {{ block.super }}{% endblock %}
 
 {% block body %}
-
-    <div class="survey-step-title">
-        <h1>You're three steps away of completing your registration.</h1>
-    </div>
+    {% if not are_forms_complete %}
+        <div class="survey-step-title">
+            <h1>You're three steps away of completing your registration.</h1>
+        </div>
+    {% endif %}
 
     <div class="survey-steps">
         <a href="{% url 'user_info' %}" class="circle">1</a>
@@ -19,11 +20,11 @@
 
         <p class="step-info">Start by telling us a little bit about you</p>
 
-        <form action="." method="post" class="survey-form">
+        <form action="./" method="post" class="survey-form">
             {{ form.as_p }}
             {% csrf_token %}
             <div class="submit-survey">
-                <input type="submit" value="Next"/>
+                <input type="submit" {% if are_forms_complete %}value="Update"{% else %}value="Next"{% endif %}/>
             </div>
         </form>
     </div>
@@ -67,12 +68,6 @@
         $(document).ready(function () {
             $("#id_dob").datepicker({dateFormat: 'mm/dd/yy'});
 
-            /*$.ajax({
-                 url: "/onboarding_survey/get_languages/", success: function (result) {
-                    languages = result
-                }
-            });*/
-
             $("#id_language").autocomplete({
                 source: "/onboarding_survey/get_languages/",
                 minLength: 2
@@ -83,7 +78,7 @@
                 minLength: 2
               });
 
-            if ($("#id_is_country_or_city_different").is(":checked")){
+            if ($("#id_is_emp_location_different").is(":checked")){
                 $('#id_country_of_employment').show()
                 $('#id_city_of_employment').show()
                 $("#id_country_of_employment").autocomplete({
@@ -96,7 +91,7 @@
                 $('#id_city_of_employment').hide()
             }
 
-            $('#id_is_country_or_city_different').change(function() {
+            $('#id_is_emp_location_different').change(function() {
                 if($(this).is(":checked")) {
                     $('#id_country_of_employment').show()
                     $('#id_city_of_employment').show()

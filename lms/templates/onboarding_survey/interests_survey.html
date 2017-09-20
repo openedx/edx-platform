@@ -22,9 +22,11 @@
         }
     </style>
 
-    <div class="survey-step-title">
-        <h1>We want to know more about your interests.</h1>
-    </div>
+    {% if not are_forms_complete %}
+        <div class="survey-step-title">
+            <h1>We want to know more about your interests.</h1>
+        </div>
+    {% endif %}
 
     <div class="survey-steps">
         <a href="{% url 'user_info' %}" class="circle">1</a>
@@ -36,11 +38,11 @@
 
         <p class="step-info">Tell us about what you care about so we can recommend the right courses and communities.</p>
 
-        <form action="." method="post" class="survey-form interests">
+        <form action="./" method="post" class="survey-form interests">
             {{ form.as_p }}
             {% csrf_token %}
             <div class="submit-survey">
-                <input type="submit" value="Next">
+                <input type="submit" {% if are_forms_complete %}value="Update"{% else %}value="Next"{% endif %}/>
             </div>
         </form>
     </div>

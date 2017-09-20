@@ -263,7 +263,7 @@ FEATURES = {
     'ENABLE_MOBILE_REST_API': False,
 
     # Enable the combined login/registration form
-    'ENABLE_COMBINED_LOGIN_REGISTRATION': False,
+    'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
     'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER': False,
 
     # Enable organizational email opt-in
@@ -2382,18 +2382,7 @@ XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
 # - 'optional': to display the field, and make it non-mandatory
 # - 'hidden': to not display the field
 
-REGISTRATION_EXTRA_FIELDS = {
-    'level_of_education': 'optional',
-    'gender': 'optional',
-    'year_of_birth': 'optional',
-    'mailing_address': 'optional',
-    'goals': 'optional',
-    'honor_code': 'required',
-    'terms_of_service': 'hidden',
-    'city': 'hidden',
-    'country': 'hidden',
-}
-
+REGISTRATION_EXTRA_FIELDS = {}
 # Optional setting to restrict registration / account creation to only emails
 # that match a regex in this list. Set to None to allow any email (default).
 REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
@@ -2975,7 +2964,7 @@ MAX_BOOKMARKS_PER_COURSE = 100
 # need to add the model's app to the ADDL_INSTALLED_APPS array in your
 # lms.env.json file.
 
-REGISTRATION_EXTENSION_FORM = None
+REGISTRATION_EXTENSION_FORM = 'onboarding_survey.forms.RegModelForm'
 
 # Identifier included in the User Agent from open edX mobile apps.
 MOBILE_APP_USER_AGENT_REGEXES = [

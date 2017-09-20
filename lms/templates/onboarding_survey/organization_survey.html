@@ -24,9 +24,13 @@
         }
     </style>
 
-    <div class="survey-step-title">
-        <h1>Just a few questions about Exygy</h1>
-    </div>
+    {% if not are_forms_complete %}
+
+        <div class="survey-step-title">
+            <h1>Just a few questions about Exygy</h1>
+        </div>
+    {% endif %}
+
 
     <div class="survey-steps">
         <a href="{% url 'user_info' %}" class="circle">1</a>
@@ -38,11 +42,11 @@
 
         <p class="step-info">Specific information about your role and your organization will help us understand how we can be more relevant for you.</p>
 
-        <form action="." method="post" class="survey-form">
+        <form action="./" method="post" class="survey-form">
              {{ form.as_p }}
             {% csrf_token %}
             <div class="submit-survey">
-                <input type="submit" value="Send">
+                <input type="submit" {% if are_forms_complete %}value="Update"{% else %}value="Send"{% endif %}/>
             </div>
         </form>
     </div>
@@ -56,7 +60,7 @@
     <script>
         $(document).ready(function () {
 
-            $("#id_state_mon_year").datepicker({dateFormat: 'mm/yy', changeMonth: true,
+            $("#id_start_month_year").datepicker({dateFormat: 'mm/yy', changeMonth: true,
                 changeYear: true,
                 showButtonPanel: true, onClose: function(dateText, inst) {
                     $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
