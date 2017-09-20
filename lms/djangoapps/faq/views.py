@@ -1,7 +1,5 @@
-import json
 import re
 
-from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseNotFound
 from django.http import JsonResponse
 from django.utils.safestring import mark_safe
@@ -11,7 +9,6 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.faq.models import Faq
 
 
-@login_required
 def get_faq(request):
     """
     Display the Dynamic FAQ Page
@@ -43,6 +40,6 @@ def get_faq_title(request):
         faq_page = Faq.objects.filter(is_active=True).last()
 
         if faq_page:
-            data = json.dumps({"page_title": faq_page.title})
+            data = {"page_title": faq_page.title}
 
     return JsonResponse(data)
