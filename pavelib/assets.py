@@ -15,6 +15,7 @@ from threading import Timer
 from paver import tasks
 from paver.easy import call_task, cmdopts, consume_args, needs, no_help, path, sh, task
 from watchdog.events import PatternMatchingEventHandler
+from watchdog.observers.api import DEFAULT_OBSERVER_TIMEOUT
 from watchdog.observers.polling import PollingObserver
 
 from openedx.core.djangoapps.theming.paver_helpers import get_theme_paths
@@ -782,6 +783,7 @@ def listfy(data):
     ('background', 'b', 'Background mode'),
     ('theme-dirs=', '-td', 'The themes dir containing all themes (defaults to None)'),
     ('themes=', '-t', 'The themes to add sass watchers for (defaults to None)'),
+    ('wait=', '-w', 'How long to pause between filesystem scans.')
 ])
 @timed
 def watch_assets(options):
@@ -795,6 +797,10 @@ def watch_assets(options):
     themes = get_parsed_option(options, 'themes')
     theme_dirs = get_parsed_option(options, 'theme_dirs', [])
 
+    # wait comes in as a list of strings, define the default value similarly for convenience.
+    default_wait = [unicode(DEFAULT_OBSERVER_TIMEOUT)]
+    wait = float(get_parsed_option(options, 'wait', default_wait)[0])
+
     if not theme_dirs and themes:
         # We can not add theme sass watchers without knowing the directory that contains the themes.
         raise ValueError('theme-dirs must be provided for watching theme sass.')
@@ -802,7 +808,7 @@ def watch_assets(options):
         theme_dirs = [path(_dir) for _dir in theme_dirs]
 
     sass_directories = get_watcher_dirs(theme_dirs, themes)
-    observer = PollingObserver()
+    observer = PollingObserver(timeout=wait)
 
     CoffeeScriptWatcher().register(observer)
     SassWatcher().register(observer, sass_directories)
@@ -869,6 +875,10 @@ def update_assets(args):
         '--collect-log', dest=COLLECTSTATIC_LOG_DIR_ARG, default=None,
         help="When running collectstatic, direct output to specified log directory",
     )
+    parser.add_argument(
+        '--wait', type=float, default=0.0,
+        help="How long to pause between filesystem scans"
+    )
     args = parser.parse_args(args)
     collect_log_args = {}
 
@@ -894,5 +904,10 @@ def update_assets(args):
     if args.watch:
         call_task(
             'pavelib.assets.watch_assets',
-            options={'background': not args.debug, 'theme_dirs': args.theme_dirs, 'themes': args.themes},
+            options={
+                'background': not args.debug,
+                'theme_dirs': args.theme_dirs,
+                'themes': args.themes,
+                'wait': float(args.wait)
+            },
         )
