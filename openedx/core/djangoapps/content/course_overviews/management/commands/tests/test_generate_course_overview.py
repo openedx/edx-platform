@@ -106,7 +106,7 @@ class TestGenerateCourseOverview(ModuleStoreTestCase):
         self.command.handle(all_courses=True, force_update=True, routing_key='my-routing-key', chunk_size=10000)
 
         called_kwargs = mock_async_task.apply_async.call_args_list[0][1]
-        self.assertEquals(sorted([unicode(self.course_key_1), unicode(self.course_key_2)]), called_kwargs.pop('args'))
+        self.assertEquals(sorted([unicode(self.course_key_1), unicode(self.course_key_2)]), sorted(called_kwargs.pop('args')))
         self.assertEquals({
             'kwargs': {'force_update': True},
             'routing_key': 'my-routing-key'
