@@ -20,6 +20,10 @@
     <div class="colophon">
       <nav class="nav-colophon" aria-label="${_('About')}">
         <ol>
+            <li class="nav-colophon-00">
+              <a id="faq" href="${reverse('faq:custom_faq')}">${_("FAQ")}</a>
+            </li>
+
             % for item_num, link in enumerate(footer['navigation_links'], start=1):
             <li class="nav-colophon-0${item_num}">
               <a id="${link['name']}" href="${link['url']}">${link['title']}</a>
@@ -83,3 +87,15 @@
     <link rel="stylesheet" type="text/css" href="${url}"></link>
   % endfor
 % endif
+
+<script>
+    $(document).ready(function(){
+        $.ajax({
+            url: "/custom_faq/title/",
+            success: function (result) {
+                    $('#faq').text(result['page_title']);
+                }
+            });
+    });
+
+</script>
