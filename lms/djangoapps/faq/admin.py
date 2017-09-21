@@ -24,6 +24,4 @@ class FaqAdmin(admin.ModelAdmin):
         else:
             obj.updated_by = request.user
 
-        # Save the body part only
-        obj.content = re.search('<body>(.*)</body>', obj.content, re.S)
         super(FaqAdmin, self).save_model(request, obj, form, change)
