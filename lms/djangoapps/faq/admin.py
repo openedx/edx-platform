@@ -1,4 +1,3 @@
-import re
 from django.contrib import admin
 
 from lms.djangoapps.faq.models import Faq
@@ -6,7 +5,7 @@ from lms.djangoapps.faq.models import Faq
 
 @admin.register(Faq)
 class FaqAdmin(admin.ModelAdmin):
-    actions = ['disable']
+    actions = ['disable', 'enable',]
     fields = ('title', 'content',)
     list_display = ('title', 'content', 'created_at', 'added_by', 'updated_by', 'is_active',)
 
@@ -14,6 +13,11 @@ class FaqAdmin(admin.ModelAdmin):
         queryset.update(is_active=False)
 
     disable.short_description = "Disable the selected pages"
+
+    def enable(self, request, queryset):
+        queryset.update(is_active=True)
+
+    enable.short_description = "Enable the selected pages"
 
     def has_delete_permission(self, request, obj=None):
         return False
