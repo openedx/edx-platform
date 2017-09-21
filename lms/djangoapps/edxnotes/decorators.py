@@ -7,7 +7,6 @@ import json
 from django.conf import settings
 
 from edxmako.shortcuts import render_to_string
-from edxnotes.helpers import generate_uid, get_edxnotes_id_token, get_public_endpoint, get_token_url, is_feature_enabled
 
 
 def edxnotes(cls):
@@ -20,6 +19,7 @@ def edxnotes(cls):
         """
         Returns raw html for the component.
         """
+        from edxnotes.helpers import generate_uid, get_edxnotes_id_token, get_public_endpoint, get_token_url, is_feature_enabled
         is_studio = getattr(self.system, "is_author_mode", False)
         course = self.descriptor.runtime.modulestore.get_course(self.runtime.course_id)
 
