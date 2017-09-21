@@ -61,6 +61,10 @@ git+https://github.com/mitodl/django-cas.git@47cfef16cbbf305f943cceb8c0b02514194
 # back to master when and if this fix is merged back.
 # fs==0.4.0
 git+https://github.com/edx/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b#egg=fs==0.4.0
+
+# Branch removes model import from startup.
+git+https://github.com/edx/django-pyfs.git@4998832876f83695ed070fc7eeb92bb53e00f23d#egg=django-pyfs==1.0.6
+
 # The officially released version of django-debug-toolbar-mongo doesn't support DJDT 1.x. This commit does.
 git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808#egg=django-debug-toolbar-mongo==0.1.10
 
@@ -85,7 +89,7 @@ git+https://github.com/edx/django-celery.git@f87c6f914a1410463f54aebf68458c0653b
 -e git+https://github.com/edx/codejail.git@a320d43ce6b9c93b17636b2491f724d9e433be47#egg=codejail==0.0
 -e git+https://github.com/edx/django-splash.git@v0.2#egg=django-splash==0.2
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
-git+https://github.com/edx/edx-ora2.git@2.1.1#egg=ora2==2.1.1
+git+https://github.com/edx/edx-ora2.git@99dd138801d825c68353900dbf9cfae25f9f23fd#egg=ora2==0.0
 git+https://github.com/edx/RecommenderXBlock.git@0e744b393cf1f8b886fe77bc697e7d9d78d65cd6#egg=recommender-xblock==1.2
 git+https://github.com/solashirai/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
 -e git+https://github.com/edx/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
@@ -98,5 +102,6 @@ git+https://github.com/edx/xblock-lti-consumer.git@v1.1.6#egg=lti_consumer-xbloc
 git+https://github.com/edx/edx-proctoring.git@1.2.1#egg=edx-proctoring==1.2.1
 
 # Third Party XBlocks
+git+https://github.com/doctoryes/edx-sga.git@6879a6f20b87ae828edbe4c92c86530839af04c1#egg=edx-sga==0.0
 git+https://github.com/open-craft/xblock-poll@7ba819b968fe8faddb78bb22e1fe7637005eb414#egg=xblock-poll==1.2.7
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.18#egg=xblock-drag-and-drop-v2==2.0.18
