@@ -308,7 +308,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         Test Update Coupon Info Scenarios. Handle all the HttpResponses return by update_coupon view
         """
         coupon = Coupon(
-            code='AS452', description='asdsadsa', course_id=self.course.id.to_deprecated_string(),
+            code='AS452', description='asdsadsa', course_id=self.course.id,
             percentage_discount=10, created_by=self.instructor
         )
         coupon.save()

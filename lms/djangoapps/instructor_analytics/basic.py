@@ -198,6 +198,7 @@ def issued_certificates(course_key, features):
 
     # Report run date
     for data in generated_certificates:
+        data['course_id'] = unicode(data['course_id'])
         data['report_run_date'] = report_run_date
 
     return generated_certificates
@@ -488,7 +489,6 @@ def course_registration_features(features, registration_codes, csv_type):
             except ObjectDoesNotExist:
                 pass
 
-        course_registration_dict['course_id'] = course_registration_dict['course_id'].to_deprecated_string()
         return course_registration_dict
     return [extract_course_registration(code, features, csv_type) for code in registration_codes]
 
