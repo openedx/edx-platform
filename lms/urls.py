@@ -103,6 +103,9 @@ urlpatterns = (
 
     # URLs for API access management
     url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
+
+    # URL for dynamic faq page
+    url(r'^custom_faq/', include('faq.urls', namespace='faq'))
 )
 
 urlpatterns += (
