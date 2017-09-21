@@ -23,7 +23,6 @@ django-filter==1.0.4
 django-ipware==1.1.0
 django-model-utils==3.0.0
 django-mptt>=0.8.6,<0.9
-django-oauth-plus==2.2.8
 django-oauth-toolkit==0.12.0
 django-pipeline-forgiving==1.0.0
 django-sekizai>=0.10

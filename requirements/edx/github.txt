@@ -71,6 +71,9 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 # NOTE (CCB): This must remain. There is one commit on the upstream repo that has not been released to PyPI.
 git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 
+# Use a git-converted fork of django-oauth-plus, which has Django 1.11 support.
+git+https://github.com/doctoryes/django-oauth-plus.git@e3cc95a7e0b9f6dcff7bed5cdc6e111d26b609f3#egg=django-oauth-plus==0.0
+
 # Used for testing
 git+https://github.com/edx/lettuce.git@31b0dfd865766243e9b563ec65fae9122edf7975#egg=lettuce==0.2.23+edx.1
 
