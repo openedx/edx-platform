@@ -56,6 +56,7 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xmodule.video_module.video_module.import_edxval_api', lambda: None)
     @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     @ddt.data(*itertools.product(
         MODULESTORE_SETUPS,

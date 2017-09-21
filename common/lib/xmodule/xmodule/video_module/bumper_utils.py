@@ -12,11 +12,6 @@ from django.conf import settings
 
 from .video_utils import set_query_parameter
 
-try:
-    import edxval.api as edxval_api
-except ImportError:
-    edxval_api = None
-
 log = logging.getLogger(__name__)
 
 
@@ -45,6 +40,12 @@ def is_bumper_enabled(video):
     Returns:
          bool.
     """
+    # Import is placed here to avoid model import at project startup.
+    # See video_module.py for try/except explanation.
+    try:
+        import edxval.api as edxval_api
+    except ImportError:
+        edxval_api = None
     bumper_last_view_date = getattr(video, 'bumper_last_view_date', None)
     utc_now = datetime.utcnow().replace(tzinfo=pytz.utc)
     periodicity = settings.FEATURES.get('SHOW_BUMPER_PERIODICITY', 0)
@@ -103,6 +104,12 @@ def get_bumper_sources(video):
 
     Returns list of sources.
     """
+    # Import is placed here to avoid model import at project startup.
+    # See video_module.py for try/except explanation.
+    try:
+        import edxval.api as edxval_api
+    except ImportError:
+        edxval_api = None
     try:
         val_profiles = ["desktop_webm", "desktop_mp4"]
         val_video_urls = edxval_api.get_urls_for_profiles(video.bumper['edx_video_id'], val_profiles)
