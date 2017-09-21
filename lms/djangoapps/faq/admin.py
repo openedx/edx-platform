@@ -5,7 +5,7 @@ from lms.djangoapps.faq.models import Faq
 
 @admin.register(Faq)
 class FaqAdmin(admin.ModelAdmin):
-    actions = ['disable', 'enable',]
+    actions = ['disable', 'enable']
     fields = ('title', 'content',)
     list_display = ('title', 'content', 'created_at', 'added_by', 'updated_by', 'is_active',)
 
