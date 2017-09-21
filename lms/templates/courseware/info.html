@@ -72,7 +72,7 @@ from openedx.features.course_experience import SHOW_REVIEWS_TOOL_FLAG
       <div class="info-wrapper">
       % if user.is_authenticated():
         <section class="updates">
-          % if studio_url is not None and masquerade and masquerade.role == 'staff':
+          % if (studio_url is not None and masquerade and masquerade.role == 'staff') or user.is_staff:
             <div class="wrap-instructor-info studio-view">
               <a class="instructor-info-action" href="${studio_url}">
                 ${_("View Updates in Studio")}
