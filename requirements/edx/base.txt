@@ -204,6 +204,3 @@ py2neo==3.1.2
 # Support for plugins
 web-fragments==0.2.2
 xblock==1.0.0
-
-# Third Party XBlocks
-edx-sga==0.6.4

@@ -61,6 +61,7 @@ git+https://github.com/mitodl/django-cas.git@47cfef16cbbf305f943cceb8c0b02514194
 # back to master when and if this fix is merged back.
 # fs==0.4.0
 git+https://github.com/edx/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b#egg=fs==0.4.0
+
 # The officially released version of django-debug-toolbar-mongo doesn't support DJDT 1.x. This commit does.
 git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808#egg=django-debug-toolbar-mongo==0.1.10
 
@@ -102,5 +103,6 @@ git+https://github.com/edx/xblock-lti-consumer.git@v1.1.6#egg=lti_consumer-xbloc
 git+https://github.com/edx/edx-proctoring.git@1.2.3#egg=edx-proctoring==1.2.3
 
 # Third Party XBlocks
+git+https://github.com/doctoryes/edx-sga.git@6879a6f20b87ae828edbe4c92c86530839af04c1#egg=edx-sga==0.0
 git+https://github.com/open-craft/xblock-poll@7ba819b968fe8faddb78bb22e1fe7637005eb414#egg=xblock-poll==1.2.7
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.18#egg=xblock-drag-and-drop-v2==2.0.18
