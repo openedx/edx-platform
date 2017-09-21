@@ -44,8 +44,6 @@ class CompressedTextField(models.TextField):
     """ TextField that transparently compresses data when saving to the database, and decompresses the data
     when retrieving it from the database. """
 
-    __metaclass__ = models.SubfieldBase
-
     def get_prep_value(self, value):
         """ Compress the text data. """
         if value is not None:
@@ -59,5 +57,7 @@ class CompressedTextField(models.TextField):
         """ Decompresses the value from the database. """
         if isinstance(value, unicode):
             value = decompress_string(value)
-
         return value
+
+    def from_db_value(self, value, expression, connection, context):
+        return self.to_python(value)

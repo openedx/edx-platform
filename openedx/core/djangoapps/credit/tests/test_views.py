@@ -346,7 +346,7 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
         """ Verify the endpoint can create a new credit request. """
         username = self.user.username
         course = self.eligibility.course
-        course_key = course.course_key
+        course_key = CourseKey.from_string(course.course_key)
         final_grade = 0.95
 
         # Enable provider integration
@@ -521,6 +521,7 @@ class CreditProviderCallbackViewTests(UserMixin, TestCase):
     def _create_credit_request_and_get_uuid(self, username=None, course_key=None):
         """ Initiate a request for credit and return the request UUID. """
         username = username or self.user.username
+
         course = CreditCourse.objects.get(course_key=course_key) if course_key else self.eligibility.course
         credit_request = CreditRequestFactory(username=username, course=course, provider=self.provider)
         return credit_request.uuid

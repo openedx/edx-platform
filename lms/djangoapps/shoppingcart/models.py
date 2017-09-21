@@ -2159,7 +2159,7 @@ class Donation(OrderItem):
             "line_desc": description
         }
 
-        if course_id is not None:
+        if course_id is not None and course_id != '':
             params["course_id"] = course_id
             params["donation_type"] = "course"
         else:
