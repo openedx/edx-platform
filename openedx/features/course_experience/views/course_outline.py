@@ -1,7 +1,7 @@
 """
 Views to show a course outline.
 """
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from django.template.loader import render_to_string
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
