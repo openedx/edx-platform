@@ -24,7 +24,6 @@ from pkg_resources import resource_string
 from django.conf import settings
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
-from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 from openedx.core.lib.license import LicenseMixin
 from xblock.core import XBlock
@@ -46,7 +45,7 @@ from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
 from .video_xfields import VideoFields
 
-# The following import/except block for edxval is temporary measure until
+# The import try/except block for edxval is temporary measure until
 # edxval is a proper XBlock Runtime Service.
 #
 # Here's the deal: the VideoModule should be able to take advantage of edx-val
@@ -72,15 +71,7 @@ from .video_xfields import VideoFields
 # (4) is one of the next items on the backlog for edxval, and should get rid
 # of this particular import silliness. It's just that I haven't made one before,
 # and I was worried about trying it with my deadline constraints.
-try:
-    import edxval.api as edxval_api
-except ImportError:
-    edxval_api = None
 
-try:
-    from branding.models import BrandingInfoConfig
-except ImportError:
-    BrandingInfoConfig = None
 
 log = logging.getLogger(__name__)
 
@@ -198,6 +189,15 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         return track_url, transcript_language, sorted_languages
 
     def get_html(self):
+        try:
+            import edxval.api as edxval_api
+        except ImportError:
+            edxval_api = None
+        try:
+            from branding.models import BrandingInfoConfig
+        except ImportError:
+            BrandingInfoConfig = None
+        from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
         track_status = (self.download_track and self.track)
         transcript_download_format = self.transcript_download_format if not track_status else None
         sources = filter(None, self.html5_sources)
@@ -493,6 +493,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         That means that html5_sources are always in list of fields that were changed (`metadata` param in save_item).
         This should be fixed too.
         """
+        try:
+            import edxval.api as edxval_api
+        except ImportError:
+            edxval_api = None
         metadata_was_changed_by_user = old_metadata != own_metadata(self)
 
         # There is an edge case when old_metadata and own_metadata are same and we are importing transcript from youtube
@@ -601,6 +605,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         """
         Returns an xml string representing this module.
         """
+        try:
+            import edxval.api as edxval_api
+        except ImportError:
+            edxval_api = None
         xml = etree.Element('video')
         youtube_string = create_youtube_string(self)
         # Mild workaround to ensure that tests pass -- if a field
@@ -690,6 +698,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         """
         Extend context by data for transcript basic tab.
         """
+        try:
+            import edxval.api as edxval_api
+        except ImportError:
+            edxval_api = None
+        from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
         _context = super(VideoDescriptor, self).get_context()
 
         metadata_fields = copy.deepcopy(self.editable_metadata_fields)
@@ -792,6 +805,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         Arguments:
             id_generator is used to generate course-specific urls and identifiers
         """
+        try:
+            import edxval.api as edxval_api
+        except ImportError:
+            edxval_api = None
         field_data = {}
 
         # Convert between key types for certain attributes --
@@ -928,6 +945,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         """
         Returns the VAL data for the requested video profiles for the given course.
         """
+        try:
+            import edxval.api as edxval_api
+        except ImportError:
+            edxval_api = None
         return edxval_api.get_video_info_for_course_and_profiles(unicode(course_id), video_profile_names)
 
     def student_view_data(self, context=None):
@@ -935,6 +956,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         Returns a JSON representation of the student_view of this XModule.
         The contract of the JSON content is between the caller and the particular XModule.
         """
+        try:
+            import edxval.api as edxval_api
+        except ImportError:
+            edxval_api = None
         context = context or {}
 
         # If the "only_on_web" field is set on this video, do not return the rest of the video's data
