@@ -87,7 +87,7 @@ class UserMessageCollection():
         raise NotImplementedError('Subclasses must define a namespace for messages.')
 
     @classmethod
-    def get_message_html(self, body_html, title=None):
+    def get_message_html(self, body_html, title=None, dismissable=False):
         """
         Returns the entire HTML snippet for the message.
 
@@ -96,16 +96,35 @@ class UserMessageCollection():
         not use a title can just pass the body_html.
         """
         if title:
-            return Text(_('{header_open}{title}{header_close}{body}')).format(
+            title_area = Text(_('{header_open}{title}{header_close}')).format(
                 header_open=HTML('<div class="message-header">'),
                 title=title,
-                body=body_html,
                 header_close=HTML('</div>')
             )
-        return body_html
+        else:
+            title_area = ''
+        if dismissable:
+            dismiss_button = HTML(
+                '<div class="message-actions">'
+                '<button class="btn-link action-dismiss">'
+                '<span class="sr">{dismiss_text}</span>'
+                '<span class="icon fa fa-times" aria-hidden="true"></span></button>'
+                '</div>'
+            ).format(
+                dismiss_text=Text(_("Dismiss"))
+            )
+        else:
+            dismiss_button = ''
+        return Text('{title_area}{body_area}{dismiss_button}').format(
+            title_area=title_area,
+            body_area=HTML('<div class="message-content">{body_html}</div>').format(
+                body_html=body_html,
+            ),
+            dismiss_button=dismiss_button,
+        )
 
     @classmethod
-    def register_user_message(self, request, message_type, body_html, title=None):
+    def register_user_message(self, request, message_type, body_html, **kwargs):
         """
         Register a message to be shown to the user in the next page.
 
@@ -113,9 +132,10 @@ class UserMessageCollection():
             message_type (UserMessageType): the user message type
             body_html (str): body of the message in html format
             title (str): optional title for the message as plain text
+            dismissable (bool): shows a dismiss button (defaults to no button)
         """
         assert isinstance(message_type, UserMessageType)
-        message = Text(self.get_message_html(body_html, title))
+        message = Text(self.get_message_html(body_html, **kwargs))
         messages.add_message(request, message_type.value, Text(message), extra_tags=self.get_namespace())
 
     @classmethod

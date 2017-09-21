@@ -30,9 +30,9 @@ class UserMessagesTestCase(TestCase):
         MessageMiddleware().process_request(self.request)
 
     @ddt.data(
-        ('Rock & Roll', 'Rock &amp; Roll'),
-        (Text('Rock & Roll'), 'Rock &amp; Roll'),
-        (HTML('<p>Hello, world!</p>'), '<p>Hello, world!</p>')
+        ('Rock & Roll', '<div class="message-content">Rock &amp; Roll</div>'),
+        (Text('Rock & Roll'), '<div class="message-content">Rock &amp; Roll</div>'),
+        (HTML('<p>Hello, world!</p>'), '<div class="message-content"><p>Hello, world!</p></div>')
     )
     @ddt.unpack
     def test_message_escaping(self, message, expected_message_html):
