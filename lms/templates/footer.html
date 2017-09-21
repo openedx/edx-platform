@@ -87,15 +87,3 @@
     <link rel="stylesheet" type="text/css" href="${url}"></link>
   % endfor
 % endif
-
-<script>
-    $(document).ready(function(){
-        $.ajax({
-            url: "/custom_faq/title/",
-            success: function (result) {
-                    $('#faq').text(result['page_title']);
-                }
-            });
-    });
-
-</script>
