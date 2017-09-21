@@ -64,6 +64,10 @@ NPM_INSTALLED_LIBRARIES = [
     'requirejs/require.js',
     'underscore.string/dist/underscore.string.js',
     'underscore/underscore.js',
+    '@edx/studio-frontend/dist/assets.min.js',
+    '@edx/studio-frontend/dist/assets.min.js.map',
+    '@edx/studio-frontend/dist/studio-frontend.min.css',
+    '@edx/studio-frontend/dist/studio-frontend.min.css.map'
 ]
 
 # A list of NPM installed developer libraries that should be copied into the common
@@ -74,7 +78,9 @@ NPM_INSTALLED_DEVELOPER_LIBRARIES = [
 ]
 
 # Directory to install static vendor files
-NPM_VENDOR_DIRECTORY = path('common/static/common/js/vendor')
+NPM_JS_VENDOR_DIRECTORY = path('common/static/common/js/vendor')
+NPM_CSS_VENDOR_DIRECTORY = path("common/static/common/css/vendor")
+NPM_CSS_DIRECTORY = path("common/static/common/css")
 
 # system specific lookup path additions, add sass dirs if one system depends on the sass files for other systems
 SASS_LOOKUP_DEPENDENCIES = {
@@ -604,10 +610,14 @@ def process_npm_assets():
         Copies a vendor library to the shared vendor directory.
         """
         library_path = 'node_modules/{library}'.format(library=library)
+        if library.endswith('.css') or library.endswith('.css.map'):
+            vendor_dir = NPM_CSS_VENDOR_DIRECTORY
+        else:
+            vendor_dir = NPM_JS_VENDOR_DIRECTORY
         if os.path.exists(library_path):
             sh('/bin/cp -rf {library_path} {vendor_dir}'.format(
                 library_path=library_path,
-                vendor_dir=NPM_VENDOR_DIRECTORY,
+                vendor_dir=vendor_dir,
             ))
         elif not skip_if_missing:
             raise Exception('Missing vendor file {library_path}'.format(library_path=library_path))
@@ -618,7 +628,9 @@ def process_npm_assets():
         return
 
     # Ensure that the vendor directory exists
-    NPM_VENDOR_DIRECTORY.mkdir_p()
+    NPM_JS_VENDOR_DIRECTORY.mkdir_p()
+    NPM_CSS_DIRECTORY.mkdir_p()
+    NPM_CSS_VENDOR_DIRECTORY.mkdir_p()
 
     # Copy each file to the vendor directory, overwriting any existing file.
     print("Copying vendor files into static directory")
