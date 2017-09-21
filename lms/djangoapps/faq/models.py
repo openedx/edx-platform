@@ -11,5 +11,5 @@ class Faq(models.Model):
     added_by = models.ForeignKey(User, related_name='faq_user')
     is_active = models.BooleanField(default=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return '{} | {}'.format(self.title, self.is_active)
