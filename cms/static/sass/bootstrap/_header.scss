@@ -11,6 +11,7 @@
 
 .wrapper-header {
   @extend %ui-depth3;
+
   position: relative;
   width: 100%;
   box-shadow: 0 1px 2px 0 $shadow-l1;
@@ -20,6 +21,7 @@
 
   header.primary {
     @include clearfix();
+
     max-width: $studio-max-width;
     width: flex-grid(12);
     margin: 0 auto;
@@ -28,22 +30,27 @@
   // ====================
 
   // basic layout
-  .wrapper-l, .wrapper-r {
+  .wrapper-l,
+  .wrapper-r {
     background: $white;
   }
 
   .wrapper-l {
     float: left;
-    width: flex-grid(7,12);
+    width: flex-grid(7, 12);
   }
 
   .wrapper-r {
     float: right;
-    width: flex-grid(4,12);
+    width: flex-grid(4, 12);
     text-align: right;
   }
 
-  .branding, .info-course, .nav-course, .nav-account, .nav-pitch {
+  .branding,
+  .info-course,
+  .nav-course,
+  .nav-account,
+  .nav-pitch {
     display: inline-block;
     vertical-align: middle;
     margin-bottom: 0;
@@ -66,10 +73,10 @@
 
   // basic layout - nav items
   nav {
-
     > ol > .nav-item {
       @extend %t-action3;
       @extend %t-strong;
+
       display: inline-block;
       vertical-align: middle;
 
@@ -89,7 +96,6 @@
 
   // basic layout - dropdowns
   .nav-dd {
-
     .title {
       padding: $baseline/2 $baseline/2;
       font-size: $font-size-lg;
@@ -99,14 +105,12 @@
       }
 
       &:hover {
-
         .fa-caret-down {
-          opacity: 1.0;
+          opacity: 1;
         }
       }
 
       .nav-sub .nav-item {
-
         .icon {
           display: inline-block;
           vertical-align: middle;
@@ -140,7 +144,8 @@
     border-right: 1px solid $gray-300;
     padding: ($baseline*0.75) flex-gutter() ($baseline*0.75) 0;
 
-    .course-org, .course-number {
+    .course-org,
+    .course-number {
       font-size: $font-size-sm;
       line-height: 12px;
       display: inline-block;
@@ -149,7 +154,7 @@
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      opacity: 1.0;
+      opacity: 1;
       color: theme-color("primary");
     }
 
@@ -160,6 +165,7 @@
     .course-title {
       @extend %t-action2;
       @extend %t-strong;
+
       display: block;
       width: 100%;
       overflow: hidden;
@@ -197,14 +203,12 @@
     }
 
     .nav-account-help {
-
       .wrapper-nav-sub {
         width: ($baseline*10);
       }
     }
 
     .nav-account-user {
-
       .title {
         max-width: ($baseline*6.5);
 
@@ -220,6 +224,7 @@
 
     .settings-language-form {
       margin-top: 4px;
+
       .language-selector {
         width: 130px;
       }
@@ -243,13 +248,12 @@
 
 // CASE: user signed in
 .is-signedin {
-
   .wrapper-l {
-    width: flex-grid(8,12);
+    width: flex-grid(8, 12);
   }
 
   .wrapper-r {
-    width: flex-grid(4,12);
+    width: flex-grid(4, 12);
   }
 
   .branding {
@@ -265,15 +269,13 @@
 
 // CASE: in course {
 .is-signedin.course {
-
   .wrapper-header {
-
     .wrapper-l {
-      width: flex-grid(9,12);
+      width: flex-grid(9, 12);
     }
 
     .wrapper-r {
-      width: flex-grid(3,12);
+      width: flex-grid(3, 12);
     }
 
     .branding {
@@ -296,15 +298,13 @@
 // CASE: user not signed in
 .not-signedin,
 .view-util {
-
   .wrapper-header {
-
     .wrapper-l {
-      width: flex-grid(2,12);
+      width: flex-grid(2, 12);
     }
 
     .wrapper-r {
-      width: flex-grid(10,12);
+      width: flex-grid(10, 12);
     }
 
     .branding {
@@ -337,10 +337,9 @@
 
 // dropdown
 .nav-dd {
-
   .title {
-
-    .label, .fa-caret-down {
+    .label,
+    .fa-caret-down {
       display: inline-block;
       vertical-align: middle;
     }
@@ -353,7 +352,6 @@
 
     // dropped down state
     &.is-selected {
-
       .ui-toggle-dd {
         transform: rotate(-180deg);
         transform-origin: 50% 50%;
@@ -363,10 +361,6 @@
 
   .nav-item {
     position: relative;
-
-    &:hover {
-
-    }
 
     &.nav-course-settings {
       .wrapper-nav-sub {
@@ -378,7 +372,7 @@
   .wrapper-nav-sub {
     position: absolute;
     top: ($baseline*2.5);
-    opacity: 0.0;
+    opacity: 0;
     pointer-events: none;
     width: ($baseline*8);
     overflow: hidden;
@@ -387,7 +381,7 @@
 
     // dropped down state
     &.is-shown {
-      opacity: 1.0;
+      opacity: 1;
       pointer-events: auto;
       overflow: visible;
       height: auto;
@@ -403,7 +397,8 @@
     padding: ($baseline/2) ($baseline*0.75);
     background: $white;
 
-    &:after, &:before {
+    &::after,
+    &::before {
       bottom: 100%;
       border: solid transparent;
       content: " ";
@@ -414,13 +409,13 @@
     }
 
     // ui triangle/nub
-    &:after {
+    &::after {
       border-color: rgba(255, 255, 255, 0);
       border-bottom-color: $white;
       border-width: 10px;
     }
 
-    &:before {
+    &::before {
       border-color: rgba(178, 178, 178, 0);
       border-bottom-color: $gray-500;
       border-width: 11px;
@@ -429,6 +424,7 @@
     .nav-item {
       @extend %t-action3;
       @extend %t-regular;
+
       display: block;
       margin: 0 0 ($baseline/4) 0;
       border-bottom: 1px solid $gray-300;
@@ -450,7 +446,8 @@
         font-size: $font-size-lg;
         font-weight: 600;
 
-        &:hover, &:active {
+        &:hover,
+        &:active {
           color: theme-color("primary");
         }
       }
@@ -459,7 +456,6 @@
 
   // CASE: left-hand side arrow/dd
   &.ui-left {
-
     .wrapper-nav-sub {
       left: 0;
     }
@@ -468,12 +464,12 @@
       text-align: left;
 
       // ui triangle/nub
-      &:after {
+      &::after {
         left: $baseline;
         margin-left: -10px;
       }
 
-      &:before {
+      &::before {
         left: $baseline;
         margin-left: -11px;
       }
@@ -482,7 +478,6 @@
 
   // CASE: right-hand side arrow/dd
   &.ui-right {
-
     > ol {
       margin-bottom: 0;
     }
@@ -495,12 +490,12 @@
     .nav-sub {
 
       // ui triangle/nub
-      &:after {
+      &::after {
         right: $baseline;
         margin-right: -10px;
       }
 
-      &:before {
+      &::before {
         right: $baseline;
         margin-right: -11px;
       }

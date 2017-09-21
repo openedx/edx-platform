@@ -60,7 +60,6 @@
 @import 'views/outline';
 @import 'views/settings';
 @import 'views/static-pages';
-@import 'views/unit';
 @import 'views/container';
 @import 'views/users';
 @import 'views/textbooks';
@@ -80,7 +79,6 @@
 @import 'xmodule/descriptors/css/module-styles.scss';
 @import 'xmodule/headings';
 @import 'elements/xmodules'; // styling for Studio-specific contexts
-
 @import 'developer'; // used for any developer-created scss that needs further polish/refactoring
 @import 'shame';     // used for any bad-form/orphaned scss
 
@@ -90,6 +88,5 @@
 
 // CAPA Problem Feedback
 @import 'edx-pattern-library-shims/buttons';
-
 @import 'edx-pattern-library-shims/base/variables';
 

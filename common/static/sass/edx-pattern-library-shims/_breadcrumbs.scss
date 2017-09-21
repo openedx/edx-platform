@@ -9,9 +9,11 @@
 
   .nav-item {
     @include margin-left($baseline/4);
+
     display: inline-block;
 
-    a, a:visited {
+    a,
+    a:visited {
       color: $uxpl-blue-base;
     }
 
@@ -22,6 +24,7 @@
 
   .fa-angle-right {
     @include margin-left($baseline/4);
+
     display: inline-block;
     color: $base-font-color;
 

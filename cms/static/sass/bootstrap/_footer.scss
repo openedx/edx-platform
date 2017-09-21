@@ -14,7 +14,9 @@
 
   footer.primary {
     @extend %t-copy-sub2;
+
     @include clearfix();
+
     max-width: $studio-max-width;
     width: flex-grid(12);
     margin: 0 auto;
@@ -59,10 +61,12 @@
 
     .footer-content-secondary {
       @include clearfix();
+
       margin-top: $baseline;
     }
 
-    .footer-about-copyright, .footer-about-openedx {
+    .footer-about-copyright,
+    .footer-about-openedx {
       display: inline-block;
       vertical-align: middle;
     }

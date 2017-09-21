@@ -4,6 +4,7 @@
 // JQUI calendar
 .ui-datepicker {
   @extend %t-copy-sub2;
+
   border-color: $darkGrey;
   border-radius: 2px;
   background: $white;
@@ -35,6 +36,7 @@
   .ui-state-default {
     border-color: $mediumGrey;
     color: $blue;
+
     @include transition(none);
 
     &.ui-state-hover {
@@ -79,11 +81,13 @@
   white-space: normal;
 }
 
-.ui-corner-all, .ui-corner-bottom, .ui-corner-left, ui-corner-top, .ui-corner-br, .ui-corner-right {
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-  border-top-right-radius: 0;
-  border-top-left-radius: 0;
+.ui-corner-all,
+.ui-corner-bottom,
+.ui-corner-left,
+.ui-corner-top,
+.ui-corner-br,
+.ui-corner-right {
+  border-radius: 0;
 }
 
 
@@ -91,12 +95,13 @@
   border: 0;
   background: none;
 }
+
 .ui-widget {
   @extend %t-copy-base;
 }
 
 .ui-widget-header {
-  border:none;
+  border: none;
   background: none;
 }
 
@@ -109,20 +114,20 @@
   padding: 0;
   border: none;
   top: 0;
-  margin: 0;
   float: none;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
 
 .ui-tabs-nav {
-
   li {
     top: 0;
     margin: 0;
   }
+
   a {
     @extend %t-regular;
+
     float: none;
   }
 }
@@ -133,27 +138,24 @@
 
 // reapplying the tab styles from unit.scss after removing jquery ui ui-lightness styling
 .problem-type-tabs {
-  border:none;
+  border: none;
   list-style-type: none;
   width: 100%;
-  @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+
+  @include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
   //background-color: $lightBluishGrey;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset;
 
   li:first-child {
     margin-left: $baseline;
   }
+
   li {
     opacity: 0.8;
 
-    &:ui-state-active {
-      @extend %t-regular;
-      background-color: rgba(255, 255, 255, .3);
-      opacity: 1.0;
-    }
     a:focus {
       outline: none;
-      border: 0px;
+      border: 0;
     }
   }
 }
@@ -165,7 +167,9 @@
   margin: 0;
   padding: 0;
   cursor: default;
+
   @include linear-gradient($gray-l5, $white);
+
   border-right: 1px solid $gray-l2;
   border-bottom: 1px solid $gray-l2;
   border-left: 1px solid $gray-l2;
@@ -173,7 +177,7 @@
   box-shadow: inset 0 1px 2px $shadow-l1;
   color: $color-copy-emphasized;
 
-  li.ui-menu-item{
+  li.ui-menu-item {
     padding: 0;
     margin: 0;
 
@@ -181,10 +185,9 @@
       color: $color-copy-emphasized;
     }
 
-    a.ui-state-focus{
+    a.ui-state-focus {
       border: none;
       background-color: $blue;
-      background: $blue;
       color: $white;
     }
   }
