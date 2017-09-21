@@ -324,12 +324,12 @@ class TestGetCourseRunDetails(CatalogIntegrationMixin, TestCase):
         """
         course_run = CourseRunFactory()
         course_run_details = {
-            'language': course_run['language'],
+            'content_language': course_run['content_language'],
             'start': course_run['start'],
             'end': course_run['end'],
             'max_effort': course_run['max_effort']
         }
         mock_get_edx_api_data.return_value = course_run_details
-        data = get_course_run_details(course_run['key'], ['language', 'start', 'end', 'max_effort'])
+        data = get_course_run_details(course_run['key'], ['content_language', 'start', 'end', 'max_effort'])
         self.assertTrue(mock_get_edx_api_data.called)
         self.assertEqual(data, course_run_details)
