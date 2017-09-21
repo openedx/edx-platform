@@ -39,7 +39,7 @@ from courseware.user_state_client import DjangoXBlockUserStateClient
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db import transaction
