@@ -10,7 +10,7 @@ import urllib
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.utils.decorators import method_decorator
