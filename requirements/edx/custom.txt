@@ -17,7 +17,7 @@
 -e git+https://github.com/raccoongang/edx_xblock_scorm.git#egg=edx_xblock_scorm
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.2#egg=xblock-diagnostic-feedback==0.2.2
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@39771899e30700d3083daedc6464611c1ce9427a#egg=xblock-group-project-v2
-git+https://github.com/edx-solutions/api-integration.git@v1.3.4#egg=api-integration==1.3.4
+git+https://github.com/edx-solutions/api-integration.git@v1.3.6#egg=api-integration==1.3.6
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.1.5#egg=organizations-edx-platform-extensions==1.1.5
 git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.1.1#egg=gradebook-edx-platform-extensions==1.1.1
 git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.0.9#egg=projects-edx-platform-extensions==1.0.9
