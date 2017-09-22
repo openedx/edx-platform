@@ -15,15 +15,20 @@ export class CourseGoals {  // eslint-disable-line import/prefer-default-export
           user: options.username,
         },
         dataType: 'json',
-        success: () => {
-          // LEARNER-2522 will address the success message
-          const successMsg = gettext('Thank you for setting your course goal!');
-          // xss-lint: disable=javascript-jquery-html
-          $('.message-content').html(`<div class="success-message">${successMsg}</div>`);
+        success: (data) => { // LEARNER-2522 will address the success message
+          $('.section-goals').slideDown();
+          $('.section-goals .goal .text').text(data.goal_text);
+          $('.section-goals select').val(data.goal_key);
+          const successMsg = gettext(`Thank you for setting your course goal to ${data.goal_text.toLowerCase()}!`);
+          if (!data.is_unsure) {
+            // xss-lint: disable=javascript-jquery-html
+            $('.message-content').html(`<div class="success-message">${successMsg}</div>`);
+          } else {
+            $('.message-content').parent().hide();
+          }
         },
-        error: () => {
-          // LEARNER-2522 will address the error message
-          const errorMsg = gettext('There was an error in setting your goal, please reload the page and try again.'); // eslint-disable-line max-len
+        error: () => { // LEARNER-2522 will address the error message
+          const errorMsg = gettext('There was an error in setting your goal, please reload the page and try again.');
           // xss-lint: disable=javascript-jquery-html
           $('.message-content').html(`<div class="error-message"> ${errorMsg} </div>`);
         },
@@ -31,9 +36,9 @@ export class CourseGoals {  // eslint-disable-line import/prefer-default-export
     });
 
     // Allow goal selection with an enter press for accessibility purposes
-    $('.goal-option').keyup((e) => {
+    $('.goal-option').keypress((e) => {
       if (e.which === 13) {
-        $(e.target).trigger('click');
+        $(e.target).click();
       }
     });
   }

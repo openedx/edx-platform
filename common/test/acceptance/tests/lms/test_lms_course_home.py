@@ -63,7 +63,6 @@ class CourseHomeTest(CourseHomeBaseTest):
     """
     Tests the course home page with course outline.
     """
-
     def test_course_home(self):
         """
         Smoke test of course goals, course outline, breadcrumbs to and from course outline, and bookmarks.
@@ -81,11 +80,14 @@ class CourseHomeTest(CourseHomeBaseTest):
         # Check that the tab lands on the course home page.
         self.assertTrue(self.course_home_page.is_browser_on_page())
 
-        # Check that a success message is shown when selecting a course goal
+        # Check that a success message and update course field are shown when selecting a course goal
         # TODO: LEARNER-2522: Ensure the correct message shows up for a particular goal choice
         self.assertFalse(self.course_home_page.is_course_goal_success_message_shown())
+        self.assertFalse(self.course_home_page.is_course_goal_update_field_shown())
         self.course_home_page.select_course_goal()
+        self.course_home_page.wait_for_ajax()
         self.assertTrue(self.course_home_page.is_course_goal_success_message_shown())
+        self.assertTrue(self.course_home_page.is_course_goal_update_field_shown())
 
         # Check that the course navigation appears correctly
         EXPECTED_SECTIONS = {

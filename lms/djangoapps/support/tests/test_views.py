@@ -10,9 +10,11 @@ from datetime import datetime, timedelta
 
 import ddt
 from django.core.urlresolvers import reverse
+from django.db.models import signals
 from nose.plugins.attrib import attr
 from pytz import UTC
 
+from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
@@ -223,6 +225,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'reason': 'Financial Assistance',
         }, json.loads(response.content)[0]['manual_enrollment'])
 
+    @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
     def test_change_enrollment(self, search_string_type):
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
@@ -274,12 +277,14 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assert_enrollment(CourseMode.AUDIT)
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
 
+    @disable_signal(signals, 'post_save')
     @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional')
     def test_update_enrollment_for_all_modes(self, new_mode):
         """ Verify support can changed the enrollment to all available modes
         except credit. """
         self.assert_update_enrollment('username', new_mode)
 
+    @disable_signal(signals, 'post_save')
     @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional')
     def test_update_enrollment_for_ended_course(self, new_mode):
         """ Verify support can changed the enrollment of archived course. """
@@ -301,6 +306,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         response = self.client.get(url)
         self._assert_generated_modes(response)
 
+    @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
     def test_update_enrollments_with_expired_mode(self, search_string_type):
         """ Verify that enrollment can be updated to verified mode. """
