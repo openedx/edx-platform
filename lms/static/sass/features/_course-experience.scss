@@ -15,11 +15,12 @@
   }
 
   .message-content {
+    @include margin(0, 0, $baseline, $baseline);
     position: relative;
     border: 1px solid $lms-border-color;
-    margin: 0 $baseline $baseline/2;
-    padding: $baseline/2 $baseline;
+    padding: $baseline;
     border-radius: $baseline/4;
+    width: calc(100% - 90px);
 
     @media (max-width: $grid-breakpoints-md) {
       width: 100%;
@@ -30,7 +31,7 @@
     &::before {
       @include left(0);
 
-      bottom: 35%;
+      top: 25px;
       border: solid transparent;
       height: 0;
       width: 0;
@@ -58,12 +59,48 @@
 
     .message-header {
       font-weight: $font-semibold;
-      margin-bottom: $baseline/4;
+      margin-bottom: $baseline/2;
+      width: calc(100% - 40px)
     }
 
     a {
       font-weight: $font-semibold;
       text-decoration: underline;
+    }
+    .dismiss {
+      @include right($baseline/4);
+      top: $baseline/4;
+      position: absolute;
+      cursor: pointer;
+      color: $black-t3;
+
+      &:hover {
+        color: $black-t2;
+      }
+    }
+    // Course Goal Styling
+    .goal-options-container {
+      margin-top: $baseline;
+      text-align: center;
+
+      .goal-option {
+        text-decoration: none;
+        font-size: font-size(x-small);
+        padding: $baseline/2;
+
+        &.dismissible {
+          @include right($baseline/4);
+          position: absolute;
+          top: $baseline/2;
+          font-size: font-size(small);
+          color: $uxpl-blue-base;
+          cursor: pointer;
+
+          &:hover {
+            color: $black-t2;
+          }
+        }
+      }
     }
   }
 }

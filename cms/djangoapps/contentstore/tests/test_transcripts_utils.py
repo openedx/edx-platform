@@ -156,7 +156,7 @@ class TestSaveSubsToStore(SharedModuleStoreTestCase):
 
     def test_save_unjsonable_subs_to_store(self):
         """
-        Assures that subs, that can't be dumped, can't be found later.
+        Ensures that subs, that can't be dumped, can't be found later.
         """
         with self.assertRaises(NotFoundError):
             contentstore().find(self.content_location_unjsonable)

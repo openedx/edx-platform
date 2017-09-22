@@ -30,6 +30,18 @@ export class CourseHome {  // eslint-disable-line import/prefer-default-export
       );
     });
 
+    // Dismissibility for in course messages
+    $(document.body).on('click', '.course-message .dismiss', (event) => {
+      $(event.target).closest('.course-message').hide();
+    });
+
+    // Allow dismiss on enter press for accessibility purposes
+    $(document.body).on('keyup', '.course-message .dismiss', (event) => {
+      if (event.which === 13) {
+        $(event.target).trigger('click');
+      }
+    });
+
     $(document).ready(() => {
       this.configureUpgradeMessage();
     });
