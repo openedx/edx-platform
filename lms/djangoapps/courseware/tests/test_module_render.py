@@ -1848,6 +1848,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
                 'only_if_higher': None,
                 'modified': datetime.now().replace(tzinfo=pytz.UTC),
                 'score_db_table': 'csm',
+                'score_deleted': None,
             }
             send_mock.assert_called_with(**expected_signal_kwargs)
 

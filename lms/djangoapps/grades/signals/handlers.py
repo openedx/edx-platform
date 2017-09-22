@@ -30,7 +30,6 @@ from .signals import (
     SUBSECTION_SCORE_CHANGED,
     SUBSECTION_OVERRIDE_CHANGED,
 )
-from ..config.waffle import waffle, WRITE_ONLY_IF_ENGAGED
 from ..constants import ScoreDatabaseTableEnum
 from ..course_grade_factory import CourseGradeFactory
 from ..scores import weighted_score
@@ -180,6 +179,7 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
             only_if_higher=only_if_higher,
             modified=score_modified_time,
             score_db_table=ScoreDatabaseTableEnum.courseware_student_module,
+            score_deleted=kwargs.get('score_deleted', False),
         )
     return update_score
 
@@ -253,11 +253,8 @@ def force_recalculate_course_and_subsection_grades(sender, user, course_key, **k
     """
     Updates a saved course grade, forcing the subsection grades
     from which it is calculated to update along the way.
-
-    Does not create a grade if the user has never attempted a problem,
-    even if the WRITE_ONLY_IF_ENGAGED waffle switch is off.
     """
-    if waffle().is_enabled(WRITE_ONLY_IF_ENGAGED) or CourseGradeFactory().read(user, course_key=course_key):
+    if CourseGradeFactory().read(user, course_key=course_key):
         CourseGradeFactory().update(user=user, course_key=course_key, force_update_subsections=True)
 
 

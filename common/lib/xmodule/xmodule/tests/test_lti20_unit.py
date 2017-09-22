@@ -251,7 +251,10 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.assertIsNone(self.xmodule.module_score)
         self.assertEqual(self.xmodule.score_comment, u"")
         (_, evt_type, called_grade_obj), _ = self.system.publish.call_args
-        self.assertEqual(called_grade_obj, {'user_id': self.USER_STANDIN.id, 'value': None, 'max_value': None})
+        self.assertEqual(
+            called_grade_obj,
+            {'user_id': self.USER_STANDIN.id, 'value': None, 'max_value': None, 'score_deleted': True},
+        )
         self.assertEqual(evt_type, 'grade')
 
     def test_lti20_delete_success(self):
@@ -271,7 +274,10 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.assertIsNone(self.xmodule.module_score)
         self.assertEqual(self.xmodule.score_comment, u"")
         (_, evt_type, called_grade_obj), _ = self.system.publish.call_args
-        self.assertEqual(called_grade_obj, {'user_id': self.USER_STANDIN.id, 'value': None, 'max_value': None})
+        self.assertEqual(
+            called_grade_obj,
+            {'user_id': self.USER_STANDIN.id, 'value': None, 'max_value': None, 'score_deleted': True},
+        )
         self.assertEqual(evt_type, 'grade')
 
     def test_lti20_put_set_score_success(self):
@@ -288,7 +294,10 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.assertEqual(self.xmodule.score_comment, u"ಠ益ಠ")
         (_, evt_type, called_grade_obj), _ = self.system.publish.call_args
         self.assertEqual(evt_type, 'grade')
-        self.assertEqual(called_grade_obj, {'user_id': self.USER_STANDIN.id, 'value': 0.1, 'max_value': 1.0})
+        self.assertEqual(
+            called_grade_obj,
+            {'user_id': self.USER_STANDIN.id, 'value': 0.1, 'max_value': 1.0, 'score_deleted': False},
+        )
 
     def test_lti20_get_no_score_success(self):
         """

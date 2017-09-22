@@ -11,7 +11,6 @@ from lms.djangoapps.grades.scores import get_score, possibly_scored
 from xmodule import block_metadata_utils, graders
 from xmodule.graders import AggregatedScore, ShowCorrectness
 
-from .config.waffle import WRITE_ONLY_IF_ENGAGED, waffle
 
 log = getLogger(__name__)
 
@@ -149,7 +148,9 @@ class SubsectionGrade(SubsectionGradeBase):
         Saves the subsection grade in a persisted model.
         """
         params = [
-            subsection_grade._persisted_model_params(student) for subsection_grade in subsection_grades  # pylint: disable=protected-access
+            subsection_grade._persisted_model_params(student)  # pylint: disable=protected-access
+            for subsection_grade in subsection_grades
+            if subsection_grade
             if subsection_grade._should_persist_per_attempted()  # pylint: disable=protected-access
         ]
         return PersistentSubsectionGrade.bulk_create_grades(params, course_key)
@@ -179,7 +180,6 @@ class SubsectionGrade(SubsectionGradeBase):
         no attempts but the grade should still be persisted.
         """
         return (
-            not waffle().is_enabled(WRITE_ONLY_IF_ENGAGED) or
             self.all_total.first_attempted is not None or
             score_deleted
         )

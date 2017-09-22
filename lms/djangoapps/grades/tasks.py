@@ -14,7 +14,6 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from lms.djangoapps.courseware import courses
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
@@ -117,10 +116,10 @@ def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pyli
     limited to at most <batch_size> students, starting from the specified
     offset.
     """
-    course = courses.get_course_by_id(CourseKey.from_string(course_key))
-    enrollments = CourseEnrollment.objects.filter(course_id=course.id).order_by('created')
+    course_key = CourseKey.from_string(course_key)
+    enrollments = CourseEnrollment.objects.filter(course_id=course_key).order_by('created')
     student_iter = (enrollment.user for enrollment in enrollments[offset:offset + batch_size])
-    for result in CourseGradeFactory().iter(users=student_iter, course=course, force_update=True):
+    for result in CourseGradeFactory().iter(users=student_iter, course_key=course_key, force_update=True):
         if result.error is not None:
             raise result.error
 
