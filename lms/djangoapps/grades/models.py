@@ -39,38 +39,6 @@ BLOCK_RECORD_LIST_VERSION = 1
 BlockRecord = namedtuple('BlockRecord', ['locator', 'weight', 'raw_possible', 'graded'])
 
 
-class DeleteGradesMixin(object):
-    """
-    A Mixin class that provides functionality to delete grades.
-    """
-
-    @classmethod
-    def query_grades(cls, course_ids=None, modified_start=None, modified_end=None):
-        """
-        Queries all the grades in the table, filtered by the provided arguments.
-        """
-        kwargs = {}
-
-        if course_ids:
-            kwargs['course_id__in'] = [course_id for course_id in course_ids]
-
-        if modified_start:
-            if modified_end:
-                kwargs['modified__range'] = (modified_start, modified_end)
-            else:
-                kwargs['modified__gt'] = modified_start
-
-        return cls.objects.filter(**kwargs)
-
-    @classmethod
-    def delete_grades(cls, *args, **kwargs):
-        """
-        Deletes all the grades in the table, filtered by the provided arguments.
-        """
-        query = cls.query_grades(*args, **kwargs)
-        query.delete()
-
-
 class BlockRecordList(tuple):
     """
     An immutable ordered list of BlockRecord objects.
@@ -285,7 +253,7 @@ class VisibleBlocks(models.Model):
         return u"visible_blocks_cache.{}".format(course_key)
 
 
-class PersistentSubsectionGrade(DeleteGradesMixin, TimeStampedModel):
+class PersistentSubsectionGrade(TimeStampedModel):
     """
     A django model tracking persistent grades at the subsection level.
     """
@@ -546,7 +514,7 @@ class PersistentSubsectionGrade(DeleteGradesMixin, TimeStampedModel):
             )
 
 
-class PersistentCourseGrade(DeleteGradesMixin, TimeStampedModel):
+class PersistentCourseGrade(TimeStampedModel):
     """
     A django model tracking persistent course grades.
     """

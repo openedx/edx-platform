@@ -11,8 +11,10 @@ from xblock.scorable import ScorableXBlockMixin, Score
 from courseware.model_data import get_score, set_score
 from eventtracking import tracker
 from lms.djangoapps.instructor_task.tasks_helper.module_state import GRADES_OVERRIDE_EVENT_TYPE
+from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERSHIP_UPDATED
 from openedx.core.lib.grade_utils import is_score_higher_or_equal
 from student.models import user_by_anonymous_id
+from student.signals.signals import ENROLLMENT_TRACK_UPDATED
 from submissions.models import score_reset, score_set
 from track.event_transaction_utils import (
     create_new_event_transaction_id,
@@ -22,6 +24,7 @@ from track.event_transaction_utils import (
 )
 from util.date_utils import to_timestamp
 
+from ..config.waffle import waffle, WRITE_ONLY_IF_ENGAGED
 from ..constants import ScoreDatabaseTableEnum
 from ..new.course_grade_factory import CourseGradeFactory
 from ..scores import weighted_score
@@ -31,7 +34,7 @@ from .signals import (
     PROBLEM_WEIGHTED_SCORE_CHANGED,
     SCORE_PUBLISHED,
     SUBSECTION_SCORE_CHANGED,
-    SUBSECTION_OVERRIDE_CHANGED
+    SUBSECTION_OVERRIDE_CHANGED,
 )
 
 log = getLogger(__name__)
@@ -237,11 +240,26 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
 
 
 @receiver(SUBSECTION_SCORE_CHANGED)
-def recalculate_course_grade(sender, course, course_structure, user, **kwargs):  # pylint: disable=unused-argument
+def recalculate_course_grade_only(sender, course, course_structure, user, **kwargs):  # pylint: disable=unused-argument
     """
-    Updates a saved course grade.
+    Updates a saved course grade, but does not update the subsection
+    grades the user has in this course.
     """
     CourseGradeFactory().update(user, course=course, course_structure=course_structure)
+
+
+@receiver(ENROLLMENT_TRACK_UPDATED)
+@receiver(COHORT_MEMBERSHIP_UPDATED)
+def force_recalculate_course_and_subsection_grades(sender, user, course_key, **kwargs):
+    """
+    Updates a saved course grade, forcing the subsection grades
+    from which it is calculated to update along the way.
+
+    Does not create a grade if the user has never attempted a problem,
+    even if the WRITE_ONLY_IF_ENGAGED waffle switch is off.
+    """
+    if waffle().is_enabled(WRITE_ONLY_IF_ENGAGED) or CourseGradeFactory().read(user, course_key=course_key):
+        CourseGradeFactory().update(user=user, course_key=course_key, force_update_subsections=True)
 
 
 def _emit_event(kwargs):

@@ -158,7 +158,8 @@ class CreditApiTestBase(ModuleStoreTestCase):
 
     def setUp(self, **kwargs):
         super(CreditApiTestBase, self).setUp()
-        self.course_key = CourseKey.from_string("edX/DemoX/Demo_Course")
+        self.course = CourseFactory.create(org="edx", course="DemoX", run="Demo_Course")
+        self.course_key = self.course.id
 
     def add_credit_course(self, course_key=None, enabled=True):
         """Mark the course as a credit """
@@ -631,8 +632,6 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Configure a course with two credit requirements
         self.add_credit_course()
         user = self.create_and_enroll_user(username=self.USER_INFO['username'], password=self.USER_INFO['password'])
-        CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
-
         requirements = [
             {
                 "namespace": "grade",
@@ -664,7 +663,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertFalse(api.is_user_eligible_for_credit(user.username, self.course_key))
 
         # Satisfy the other requirement
-        with self.assertNumQueries(24):
+        with self.assertNumQueries(23):
             api.set_credit_requirement_status(
                 user,
                 self.course_key,
@@ -822,7 +821,6 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Configure a course with two credit requirements
         self.add_credit_course()
         user = self.create_and_enroll_user(username=self.USER_INFO['username'], password=self.USER_INFO['password'])
-        CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
         requirements = [
             {
                 "namespace": "grade",

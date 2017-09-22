@@ -591,7 +591,8 @@ class TestCohorts(ModuleStoreTestCase):
         )
 
     @patch("openedx.core.djangoapps.course_groups.cohorts.tracker")
-    def test_add_user_to_cohort(self, mock_tracker):
+    @patch("openedx.core.djangoapps.course_groups.cohorts.COHORT_MEMBERSHIP_UPDATED")
+    def test_add_user_to_cohort(self, mock_signal, mock_tracker):
         """
         Make sure cohorts.add_user_to_cohort() properly adds a user to a cohort and
         handles errors.
@@ -602,6 +603,10 @@ class TestCohorts(ModuleStoreTestCase):
         CourseEnrollment.enroll(course_user, self.toy_course_key)
         first_cohort = CohortFactory(course_id=course.id, name="FirstCohort")
         second_cohort = CohortFactory(course_id=course.id, name="SecondCohort")
+
+        def check_and_reset_signal():
+            mock_signal.send.assert_called_with(sender=None, user=course_user, course_key=self.toy_course_key)
+            mock_signal.reset_mock()
 
         # Success cases
         # We shouldn't get back a previous cohort, since the user wasn't in one
@@ -619,6 +624,8 @@ class TestCohorts(ModuleStoreTestCase):
                 "previous_cohort_name": None,
             }
         )
+        check_and_reset_signal()
+
         # Should get (user, previous_cohort_name) when moved from one cohort to
         # another
         self.assertEqual(
@@ -635,6 +642,8 @@ class TestCohorts(ModuleStoreTestCase):
                 "previous_cohort_name": first_cohort.name,
             }
         )
+        check_and_reset_signal()
+
         # Should preregister email address for a cohort if an email address
         # not associated with a user is added
         (user, previous_cohort, prereg) = cohorts.add_user_to_cohort(first_cohort, "new_email@example.com")
@@ -650,6 +659,7 @@ class TestCohorts(ModuleStoreTestCase):
                 "cohort_name": first_cohort.name,
             }
         )
+
         # Error cases
         # Should get ValueError if user already in cohort
         self.assertRaises(

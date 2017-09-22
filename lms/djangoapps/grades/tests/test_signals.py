@@ -1,7 +1,7 @@
 """
 Tests for the score change signals defined in the courseware models module.
 """
-
+import itertools
 import re
 from datetime import datetime
 
@@ -10,15 +10,20 @@ import pytz
 from django.test import TestCase
 from mock import MagicMock, patch
 
+from opaque_keys.edx.locations import CourseLocator
+from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERSHIP_UPDATED
+from student.signals.signals import ENROLLMENT_TRACK_UPDATED
+from student.tests.factories import UserFactory
 from submissions.models import score_reset, score_set
 from util.date_utils import to_timestamp
 
+from ..config.waffle import waffle, WRITE_ONLY_IF_ENGAGED
 from ..constants import ScoreDatabaseTableEnum
 from ..signals.handlers import (
     disconnect_submissions_signal_receiver,
     problem_raw_score_changed_handler,
     submissions_score_reset_handler,
-    submissions_score_set_handler
+    submissions_score_set_handler,
 )
 from ..signals.signals import PROBLEM_RAW_SCORE_CHANGED
 
@@ -251,3 +256,32 @@ class ScoreChangedSignalRelayTest(TestCase):
         with self.assertRaises(ValueError):
             with disconnect_submissions_signal_receiver(PROBLEM_RAW_SCORE_CHANGED):
                 pass
+
+
+@ddt.ddt
+class RecalculateUserGradeSignalsTest(TestCase):
+    def setUp(self):
+        super(RecalculateUserGradeSignalsTest, self).setUp()
+        self.user = UserFactory()
+        self.course_key = CourseLocator("test_org", "test_course_num", "test_run")
+
+    @patch('lms.djangoapps.grades.signals.handlers.CourseGradeFactory.update')
+    @patch('lms.djangoapps.grades.signals.handlers.CourseGradeFactory.read')
+    @ddt.data(*itertools.product((COHORT_MEMBERSHIP_UPDATED, ENROLLMENT_TRACK_UPDATED), (True, False), (True, False)))
+    @ddt.unpack
+    def test_recalculate_on_signal(self, signal, write_only_if_engaged, has_grade, read_mock, update_mock):
+        """
+        Tests the grades handler for signals that trigger regrading.
+        The handler should call CourseGradeFactory.update() with the
+        args below, *except* if the WRITE_ONLY_IF_ENGAGED waffle flag
+        is inactive and the user does not have a grade.
+        """
+        if not has_grade:
+            read_mock.return_value = None
+        with waffle().override(WRITE_ONLY_IF_ENGAGED, active=write_only_if_engaged):
+            signal.send(sender=None, user=self.user, course_key=self.course_key)
+
+        if not write_only_if_engaged and not has_grade:
+            update_mock.assert_not_called()
+        else:
+            update_mock.assert_called_with(course_key=self.course_key, user=self.user, force_update_subsections=True)
