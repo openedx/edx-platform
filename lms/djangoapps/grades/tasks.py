@@ -8,17 +8,16 @@ import six
 from celery import task
 from celery_utils.logged_task import LoggedTask
 from celery_utils.persist_on_failure import PersistOnFailureTask
+from courseware.model_data import get_score
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locator import CourseLocator
-
-from courseware.model_data import get_score
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware import courses
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.monitoring_utils import set_custom_metric, set_custom_metrics_for_course_key
 from student.models import CourseEnrollment
 from submissions import api as sub_api
@@ -28,11 +27,11 @@ from xmodule.modulestore.django import modulestore
 
 from .config.waffle import ESTIMATE_FIRST_ATTEMPTED, DISABLE_REGRADE_ON_POLICY_CHANGE, waffle
 from .constants import ScoreDatabaseTableEnum
+from .course_grade_factory import CourseGradeFactory
 from .exceptions import DatabaseNotReadyError
-from .new.course_grade_factory import CourseGradeFactory
-from .new.subsection_grade_factory import SubsectionGradeFactory
 from .services import GradesService
 from .signals.signals import SUBSECTION_SCORE_CHANGED
+from .subsection_grade_factory import SubsectionGradeFactory
 from .transformer import GradesTransformer
 
 log = getLogger(__name__)

@@ -6,11 +6,11 @@ import dogstats_wrapper as dog_stats_api
 
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED, COURSE_GRADE_NOW_PASSED
 
-from ..config import assume_zero_if_absent, should_persist_grades
-from ..config.waffle import WRITE_ONLY_IF_ENGAGED, waffle
-from ..models import PersistentCourseGrade, VisibleBlocks
+from .config import assume_zero_if_absent, should_persist_grades
+from .config.waffle import WRITE_ONLY_IF_ENGAGED, waffle
 from .course_data import CourseData
 from .course_grade import CourseGrade, ZeroCourseGrade
+from .models import PersistentCourseGrade, VisibleBlocks
 
 log = getLogger(__name__)
 
