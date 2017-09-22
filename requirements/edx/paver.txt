@@ -1,7 +1,3 @@
 # Requirements to run and test Paver
 Paver==1.2.4
-lazy==1.1
-path.py==8.2.1
-watchdog==0.8.3
-python-memcached
 libsass==0.10.0
