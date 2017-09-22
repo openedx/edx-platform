@@ -13,13 +13,19 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="header_extras">
-% for template_name in ["asset"]:
-<script type="text/template" id="${template_name}-tpl">
-    <%static:include path="js/${template_name}.underscore" />
-</script>
-% endfor
+% if waffle_flag_enabled:
+    <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/studio-frontend.min.css')}" />
+    <script type="text/javascript" src="${static.url('common/js/vendor/assets.min.js')}" defer></script>
+% else:
+    % for template_name in ["asset"]:
+    <script type="text/template" id="${template_name}-tpl">
+        <%static:include path="js/${template_name}.underscore" />
+    </script>
+    % endfor
+% endif
 </%block>
 
+% if not waffle_flag_enabled:
 <%block name="requirejs">
     require(["js/factories/asset_index"], function (AssetIndexFactory) {
         AssetIndexFactory({
@@ -30,6 +36,7 @@
         });
     });
 </%block>
+% endif
 
 <%block name="content">
 
@@ -53,7 +60,11 @@
 <div class="wrapper-content wrapper">
     <div class="content">
         <div class="content-primary">
-            <div class="wrapper-assets"> </div>
+            % if waffle_flag_enabled:
+                <div id="root"></div>
+            % else:
+                <div class="wrapper-assets"></div>
+            % endif
             <div class="ui-loading">
                 <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
             </div>
