@@ -16,6 +16,7 @@ from waffle.testutils import override_flag
 
 from commerce.models import CommerceConfiguration
 from commerce.utils import EcommerceService
+from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
 from course_modes.models import CourseMode
 from courseware.tests.factories import StaffFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
@@ -25,14 +26,14 @@ from openedx.features.course_experience import (
     UNIFIED_COURSE_TAB_FLAG
 )
 from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.date_utils import strftime_localized
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from .helpers import add_course_mode
 from .test_course_updates import create_course_update, remove_course_updates
-from ... import COURSE_PRE_START_ACCESS_FLAG
+from ... import COURSE_PRE_START_ACCESS_FLAG, ENABLE_COURSE_GOALS
 
 TEST_PASSWORD = 'test'
 TEST_CHAPTER_NAME = 'Test Chapter'
@@ -43,6 +44,8 @@ TEST_COURSE_HOME_MESSAGE = 'course-message'
 TEST_COURSE_HOME_MESSAGE_ANONYMOUS = '/login'
 TEST_COURSE_HOME_MESSAGE_UNENROLLED = 'Enroll now'
 TEST_COURSE_HOME_MESSAGE_PRE_START = 'Course starts in'
+TEST_COURSE_GOAL_OPTIONS = 'goal-options-container'
+COURSE_GOAL_DISMISS_OPTION = 'unsure'
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
@@ -170,7 +173,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         course_home_url(self.course)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(41, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(44, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -375,11 +378,13 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE_UNENROLLED)
 
-        # Verify that enrolled users are not shown a message when enrolled and course has begun
+        # Verify that enrolled users are not shown any state warning message when enrolled and course has begun.
         CourseEnrollment.enroll(user, self.course.id)
         url = course_home_url(self.course)
         response = self.client.get(url)
-        self.assertNotContains(response, TEST_COURSE_HOME_MESSAGE)
+        self.assertNotContains(response, TEST_COURSE_HOME_MESSAGE_ANONYMOUS)
+        self.assertNotContains(response, TEST_COURSE_HOME_MESSAGE_UNENROLLED)
+        self.assertNotContains(response, TEST_COURSE_HOME_MESSAGE_PRE_START)
 
         # Verify that enrolled users are shown 'days until start' message before start date
         future_course = self.create_future_course()
@@ -388,6 +393,50 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(url)
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE_PRE_START)
+
+    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
+    @override_waffle_flag(COURSE_PRE_START_ACCESS_FLAG, active=True)
+    @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
+    def test_course_goals(self):
+        """
+        Ensure that the following five use cases work as expected.
+
+        1) Unenrolled users are not shown the set course goal message.
+        2) Enrolled users are shown the set course goal message if they have not yet set a course goal.
+        3) Enrolled users are not shown the set course goal message if they have set a course goal.
+        4) Enrolled and verified users are not shown the set course goal message.
+        5) Enrolled users are not shown the set course goal message in a course that cannot be verified.
+        """
+        # Create a course with a verified track.
+        verifiable_course = CourseFactory.create()
+        add_course_mode(verifiable_course, upgrade_deadline_expired=False)
+
+        # Verify that unenrolled users are not shown the set course goal message.
+        user = self.create_user_for_course(verifiable_course, CourseUserType.UNENROLLED)
+        response = self.client.get(course_home_url(verifiable_course))
+        self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
+
+        # Verify that enrolled users are shown the set course goal message in a verified course.
+        CourseEnrollment.enroll(user, verifiable_course.id)
+        response = self.client.get(course_home_url(verifiable_course))
+        self.assertContains(response, TEST_COURSE_GOAL_OPTIONS)
+
+        # Verify that enrolled users that have set a course goal are not shown the set course goal message.
+        add_course_goal(user, verifiable_course.id, COURSE_GOAL_DISMISS_OPTION)
+        response = self.client.get(course_home_url(verifiable_course))
+        self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
+
+        # Verify that enrolled and verified users are not shown the set course goal message.
+        remove_course_goal(user, verifiable_course.id)
+        CourseEnrollment.enroll(user, verifiable_course.id, CourseMode.VERIFIED)
+        response = self.client.get(course_home_url(verifiable_course))
+        self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
+
+        # Verify that enrolled users are not shown the set course goal message in an audit only course.
+        audit_only_course = CourseFactory.create()
+        CourseEnrollment.enroll(user, audit_only_course.id)
+        response = self.client.get(course_home_url(audit_only_course))
+        self.assertNotContains(response, TEST_COURSE_GOAL_OPTIONS)
 
 
 class CourseHomeFragmentViewTests(ModuleStoreTestCase):

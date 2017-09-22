@@ -8,14 +8,13 @@ import itertools
 
 import ddt
 import pytz
-from django.conf import settings
-from mock import patch
-
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.access import has_access
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from django.conf import settings
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
+from mock import patch
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -25,12 +24,12 @@ from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT, WRITE_ONLY_IF_ENGAGED, waffle
+from ..course_data import CourseData
+from ..course_grade import CourseGrade, ZeroCourseGrade
+from ..course_grade_factory import CourseGradeFactory
 from ..models import PersistentSubsectionGrade
-from ..new.course_data import CourseData
-from ..new.course_grade import CourseGrade, ZeroCourseGrade
-from ..new.course_grade_factory import CourseGradeFactory
-from ..new.subsection_grade import SubsectionGrade, ZeroSubsectionGrade
-from ..new.subsection_grade_factory import SubsectionGradeFactory
+from ..subsection_grade import SubsectionGrade, ZeroSubsectionGrade
+from ..subsection_grade_factory import SubsectionGradeFactory
 from .utils import mock_get_score, mock_get_submissions_score
 
 
@@ -248,7 +247,7 @@ class TestCourseGradeFactory(GradeTestBase):
 
     @ddt.data(True, False)
     def test_iter_force_update(self, force_update):
-        base_string = 'lms.djangoapps.grades.new.subsection_grade_factory.SubsectionGradeFactory.{}'
+        base_string = 'lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.{}'
         desired_method_name = base_string.format('update' if force_update else 'create')
         undesired_method_name = base_string.format('create' if force_update else 'update')
         with patch(desired_method_name) as desired_call:
@@ -295,11 +294,11 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         created, saved, then fetched on re-request.
         """
         with patch(
-            'lms.djangoapps.grades.new.subsection_grade.PersistentSubsectionGrade.create_grade',
+            'lms.djangoapps.grades.subsection_grade.PersistentSubsectionGrade.create_grade',
             wraps=PersistentSubsectionGrade.create_grade
         ) as mock_create_grade:
             with patch(
-                'lms.djangoapps.grades.new.subsection_grade_factory.SubsectionGradeFactory._get_bulk_cached_grade',
+                'lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory._get_bulk_cached_grade',
                 wraps=self.subsection_grade_factory._get_bulk_cached_grade
             ) as mock_get_bulk_cached_grade:
                 with self.assertNumQueries(14):
@@ -412,7 +411,7 @@ class ZeroGradeTest(GradeTestBase):
         Creates a zero course grade and ensures that null scores aren't included in the section problem scores.
         """
         with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=assume_zero_enabled):
-            with patch('lms.djangoapps.grades.new.subsection_grade.get_score', return_value=None):
+            with patch('lms.djangoapps.grades.subsection_grade.get_score', return_value=None):
                 course_data = CourseData(self.request.user, structure=self.course_structure)
                 chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
                 for chapter in chapter_grades:
@@ -744,7 +743,7 @@ class TestCourseGradeLogging(ProblemSubmissionTestMixin, SharedModuleStoreTestCa
             course_id=self.course.id,
             enabled_for_course=True
         ):
-            with patch('lms.djangoapps.grades.new.course_grade_factory.log') as log_mock:
+            with patch('lms.djangoapps.grades.course_grade_factory.log') as log_mock:
                 # read, but not persisted
                 self._create_course_grade_and_check_logging(grade_factory.create, log_mock.info, u'Update')
 

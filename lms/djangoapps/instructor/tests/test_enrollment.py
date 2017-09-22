@@ -17,7 +17,7 @@ from opaque_keys.edx.locator import CourseLocator
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.models import StudentModule
-from grades.new.subsection_grade_factory import SubsectionGradeFactory
+from grades.subsection_grade_factory import SubsectionGradeFactory
 from grades.tests.utils import answer_problem
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks

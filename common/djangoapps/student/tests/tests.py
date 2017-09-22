@@ -105,7 +105,7 @@ class CourseEndingTest(TestCase):
         )
 
         cert_status = {'status': 'generating', 'grade': '0.67', 'mode': 'honor'}
-        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
             patch_persisted_grade.return_value = Mock(percent=1.0)
             self.assertEqual(
                 _cert_info(user, course, cert_status, course_mode),
@@ -244,7 +244,7 @@ class CourseEndingTest(TestCase):
         else:
             cert_status = {'status': 'generating', 'mode': 'honor'}
 
-        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
             patch_persisted_grade.return_value = Mock(percent=persisted_grade)
             self.assertEqual(
                 _cert_info(user, course, cert_status, course_mode),
@@ -277,7 +277,7 @@ class CourseEndingTest(TestCase):
         course_mode = 'honor'
         cert_status = {'status': 'generating', 'mode': 'honor'}
 
-        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
             patch_persisted_grade.return_value = None
             self.assertEqual(
                 _cert_info(user, course, cert_status, course_mode),

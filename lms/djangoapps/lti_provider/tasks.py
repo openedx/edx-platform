@@ -11,7 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 
 import lti_provider.outcomes as outcomes
 from lms import CELERY_APP
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lti_provider.models import GradedAssignment
 from lti_provider.views import parse_course_and_usage_keys

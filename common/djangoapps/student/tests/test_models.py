@@ -121,13 +121,14 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
     @factory.django.mute_signals(signals.post_save)
     def test_upgrade_deadline(self):
         """ The property should use either the CourseMode or related Schedule to determine the deadline. """
+        course = CourseFactory(self_paced=True)
         course_mode = CourseModeFactory(
-            course_id=self.course.id,
+            course_id=course.id,
             mode_slug=CourseMode.VERIFIED,
             # This must be in the future to ensure it is returned by downstream code.
             expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
         )
-        enrollment = CourseEnrollmentFactory(course_id=self.course.id, mode=CourseMode.AUDIT)
+        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         self.assertEqual(Schedule.objects.all().count(), 0)
         self.assertEqual(enrollment.upgrade_deadline, course_mode.expiration_datetime)
 
@@ -142,3 +143,19 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
         """ The property should return None if an upgrade cannot be upgraded. """
         enrollment = CourseEnrollmentFactory(course_id=self.course.id, mode=mode)
         self.assertIsNone(enrollment.upgrade_deadline)
+
+    @skip_unless_lms
+    def test_upgrade_deadline_instructor_paced(self):
+        course = CourseFactory(self_paced=False)
+        course_upgrade_deadline = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
+        CourseModeFactory(
+            course_id=course.id,
+            mode_slug=CourseMode.VERIFIED,
+            # This must be in the future to ensure it is returned by downstream code.
+            expiration_datetime=course_upgrade_deadline
+        )
+        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
+        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
+        ScheduleFactory(enrollment=enrollment)
+        self.assertIsNotNone(enrollment.schedule)
+        self.assertEqual(enrollment.upgrade_deadline, course_upgrade_deadline)

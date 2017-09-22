@@ -401,6 +401,9 @@ FEATURES = {
 
     # Whether the bulk enrollment view is enabled.
     'ENABLE_BULK_ENROLLMENT_VIEW': False,
+
+    # Whether course goals is enabled.
+    'ENABLE_COURSE_GOALS': True,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -2244,6 +2247,9 @@ INSTALLED_APPS = [
 
     'openedx.core.djangoapps.waffle_utils',
     'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
+
+    # Course Goals
+    'lms.djangoapps.course_goals',
 
     # Features
     'openedx.features.course_bookmarks',

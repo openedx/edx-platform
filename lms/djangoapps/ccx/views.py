@@ -48,7 +48,7 @@ from lms.djangoapps.ccx.utils import (
     parse_date,
     prep_course_for_grading
 )
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from lms.djangoapps.instructor.views.api import _split_input_list
 from lms.djangoapps.instructor.views.gradebook_api import get_grade_book_page

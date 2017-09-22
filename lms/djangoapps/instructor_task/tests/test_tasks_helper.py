@@ -135,7 +135,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.iter')
+    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.iter')
     def test_grading_failure(self, mock_grades_iter, _mock_current_task):
         """
         Test that any grading errors are properly reported in the
@@ -312,7 +312,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         )
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.iter')
+    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.iter')
     def test_unicode_in_csv_header(self, mock_grades_iter, _mock_current_task):
         """
         Tests that CSV grade report works if unicode in headers.
@@ -762,7 +762,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.iter')
+    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.iter')
     @ddt.data(u'Cannot grade student', '')
     def test_grading_failure(self, error_message, mock_grades_iter, _mock_current_task):
         """

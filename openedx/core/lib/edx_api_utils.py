@@ -25,6 +25,7 @@ def get_fields(fields, response):
         except:
             msg = '{resource} does not have the attribute {field}'.format(resource, field)
             log.exception(msg)
+    return results
 
 
 def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=None, cache_key=None, many=True,

@@ -11,7 +11,7 @@ from lms.djangoapps.grades.scores import get_score, possibly_scored
 from xmodule import block_metadata_utils, graders
 from xmodule.graders import AggregatedScore, ShowCorrectness
 
-from ..config.waffle import WRITE_ONLY_IF_ENGAGED, waffle
+from .config.waffle import WRITE_ONLY_IF_ENGAGED, waffle
 
 log = getLogger(__name__)
 

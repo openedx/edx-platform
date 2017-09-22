@@ -16,14 +16,17 @@ COURSE_OUTLINE_PAGE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'course_outli
 # Waffle flag to enable a single unified "Course" tab.
 UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'unified_course_tab')
 
-# Waffle flag to enable the sock on the footer of the home and courseware pages
+# Waffle flag to enable the sock on the footer of the home and courseware pages.
 DISPLAY_COURSE_SOCK_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'display_course_sock')
 
-# Waffle flag to let learners access a course before its start date
+# Waffle flag to let learners access a course before its start date.
 COURSE_PRE_START_ACCESS_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'pre_start_access')
 
-# Waffle flag to enable a review page link from the unified home page
+# Waffle flag to enable a review page link from the unified home page.
 SHOW_REVIEWS_TOOL_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_reviews_tool')
+
+# Waffle flag to enable the setting of course goals.
+ENABLE_COURSE_GOALS = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_course_goals')
 
 SHOW_UPGRADE_MSG_ON_COURSE_HOME = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_upgrade_msg_on_course_home')
 
