@@ -310,11 +310,11 @@
     @include padding($baseline*1.5, 0, $baseline*1.5, 0);
 
     display: flex;
-    flex-wrap: wrap;
     min-width: 0;
 
     @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
       @include margin-left(0);
+      flex-wrap: wrap;
     }
   }
 
