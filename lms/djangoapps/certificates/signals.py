@@ -13,7 +13,7 @@ from certificates.models import (
     GeneratedCertificate
 )
 from certificates.tasks import generate_certificate
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.certificates.config import waffle

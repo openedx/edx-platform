@@ -67,7 +67,7 @@ from django_comment_common.models import assign_role
 from edxmako.shortcuts import render_to_response, render_to_string
 from eventtracking import tracker
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications

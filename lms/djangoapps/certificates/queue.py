@@ -21,7 +21,7 @@ from certificates.models import (
     certificate_status_for_student
 )
 from course_modes.models import CourseMode
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from student.models import CourseEnrollment, UserProfile
 from xmodule.modulestore.django import modulestore

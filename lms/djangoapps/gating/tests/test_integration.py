@@ -7,7 +7,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from nose.plugins.attrib import attr
 
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import answer_problem
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api

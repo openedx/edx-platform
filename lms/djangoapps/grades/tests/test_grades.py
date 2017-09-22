@@ -6,11 +6,10 @@ import datetime
 import itertools
 
 import ddt
-from mock import patch
-from nose.plugins.attrib import attr
-
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
+from mock import patch
+from nose.plugins.attrib import attr
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment
@@ -20,8 +19,8 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from ..new.course_grade_factory import CourseGradeFactory
-from ..new.subsection_grade_factory import SubsectionGradeFactory
+from ..course_grade_factory import CourseGradeFactory
+from ..subsection_grade_factory import SubsectionGradeFactory
 from .utils import answer_problem
 
 
@@ -80,7 +79,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             self.assertIsNone(course_grade.letter_grade)
             self.assertEqual(course_grade.percent, 0.0)
 
-    @patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create')
+    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.create')
     def test_grading_exception(self, mock_course_grade):
         """Test that we correctly capture exception messages that bubble up from
         grading. Note that we only see errors at this level if the grading
