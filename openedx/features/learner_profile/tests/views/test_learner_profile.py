@@ -3,6 +3,7 @@
 
 import datetime
 import ddt
+import mock
 
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from course_modes.models import CourseMode
@@ -197,3 +198,13 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
             self.assertContains(response, 'You haven&#39;t earned any certificates yet.')
         else:
             self.assertNotContains(response, 'You haven&#39;t earned any certificates yet.')
+
+    @ddt.data(True, False)
+    @override_waffle_flag(SHOW_ACHIEVEMENTS_FLAG, active=True)
+    def test_explore_courses_visibility(self, courses_browsable):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'COURSES_ARE_BROWSABLE': courses_browsable}):
+            response = self.client.get('/u/{username}'.format(username=self.user.username))
+            if courses_browsable:
+                self.assertContains(response, 'Explore New Courses')
+            else:
+                self.assertNotContains(response, 'Explore New Courses')
