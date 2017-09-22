@@ -30,6 +30,7 @@ common/lib/capa/capa/tests/test_files/js
 # Symlinks into common/lib/xmodule/xmodule/js
 cms/static/xmodule_js
 lms/static/xmodule_js
+lms/static/scorm
 
 
 # Mako templates that generate .js files
