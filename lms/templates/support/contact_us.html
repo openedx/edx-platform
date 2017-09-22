@@ -2,14 +2,14 @@
 
 <%!
 from django.utils.translation import ugettext as _
-from django.utils.html import escape
 %>
 
 <%inherit file="../main.html"/>
+<%namespace file='../main.html' import="login_query"/>
 
 <%block name="title">
     <title>
-        Contact US
+        ${_("Contact US")}
     </title>
 </%block>
 
@@ -35,7 +35,7 @@ from django.utils.html import escape
 
         <div class="row">
             <div class="col-sm-12">
-                <a class="btn btn-secondary help-button">${_("Visit edX Help")}</a>
+                <a href="${marketing_link('FAQ')}" class="btn btn-secondary help-button">${_("Visit edX Help")}</a>
             </div>
         </div>
         <!--logged out users-->
@@ -50,7 +50,7 @@ from django.utils.html import escape
             <!-- Sign-in button brings user to sign-in page. After signing in, user is brough to logged in state of contact form.-->
             <div class="row">
                 <div class="col-sm-12">
-                    <button class="btn btn-primary btn-signin">${_("Sign in")}</button>
+                    <a href="/login${login_query()}" class="btn btn-primary btn-signin">${_("Sign in")}</a>
                 </div>
             </div>
 
@@ -64,8 +64,6 @@ from django.utils.html import escape
                 </div>
             </div>
 
-            <!-- Course is an optional text field in logged out state because we don't know what courses
-            the user is enrolled in and the question may not be course-specific-->
             <div class="row">
                 <div class="col-sm-12">
                     <div class="form-group">
@@ -81,7 +79,7 @@ from django.utils.html import escape
 
             <div class="row">
                 <div class="col-sm-12">
-                    <p>${_("What can we help you with, iananderson21?")}</p>
+                    <p>${_("What can we help you with, {username}?").format(username=user.username)}</p>
                 </div>
             </div>
             <br>
@@ -89,12 +87,17 @@ from django.utils.html import escape
             <div class="row">
                 <div class="col-sm-12">
                     <div class="form-group">
-                        <label class="label-course" for="course">${_("Course Name")}</label>
-                        <select class="form-control select-course" id="course">
-                            <option>The Science of Happiness</option>
-                            <option>Video Game Design: Teamwork and Collaboration</option>
-                            <option>Not course-specific</option>
-                        </select>
+                        % if user_enrollments:
+                            <label class="label-course" for="course">${_("Course Name")}</label>
+                            <select class="form-control select-course" id="course">
+                                % for enrollment in user_enrollments:
+                                    <option value="${enrollment.course.id}">${enrollment.course.display_name}</option>
+                                % endfor
+                            </select>
+                        % else:
+                            <label for="course">${_("Course Name")}<span> ${_("(Optional)")}</span></label>
+                            <input type="text" class="form-control" id="course">
+                        % endif
                     </div>
                 </div>
             </div>
