@@ -51,7 +51,7 @@ class Command(BaseCommand):
         course = courses.get_course_by_id(course_id)
         for cert in ungraded:
             # grade the student
-            grade = CourseGradeFactory().create(cert.user, course)
+            grade = CourseGradeFactory().read(cert.user, course)
             log.info('grading %s - %s', cert.user, grade.percent)
             cert.grade = grade.percent
             if not options['noop']:

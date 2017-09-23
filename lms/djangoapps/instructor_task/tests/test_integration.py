@@ -131,7 +131,7 @@ class TestRescoringTask(TestIntegrationTask):
         # are in sync.
         expected_subsection_grade = expected_score
 
-        course_grade = CourseGradeFactory().create(user, self.course)
+        course_grade = CourseGradeFactory().read(user, self.course)
         self.assertEquals(
             course_grade.graded_subsections_by_format['Homework'][self.problem_section.location].graded_total.earned,
             expected_subsection_grade,

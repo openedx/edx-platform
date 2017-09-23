@@ -97,12 +97,12 @@ class GradeTestBase(SharedModuleStoreTestCase):
         super(GradeTestBase, self).setUp()
         self.request = get_mock_request(UserFactory())
         self.client.login(username=self.request.user.username, password="test")
-        self._update_grading_policy()
+        self._set_grading_policy()
         self.course_structure = get_course_blocks(self.request.user, self.course.location)
         self.subsection_grade_factory = SubsectionGradeFactory(self.request.user, self.course, self.course_structure)
         CourseEnrollment.enroll(self.request.user, self.course.id)
 
-    def _update_grading_policy(self, passing=0.5):
+    def _set_grading_policy(self, passing=0.5):
         """
         Updates the course's grading policy.
         """
@@ -149,7 +149,7 @@ class TestCourseGradeFactory(GradeTestBase):
         self.assertEqual(access.error_code, 'not_visible_to_user')
 
         # with self.assertNoExceptionRaised: <- this isn't a real method, it's an implicit assumption
-        grade = CourseGradeFactory().create(self.request.user, invisible_course)
+        grade = CourseGradeFactory().read(self.request.user, invisible_course)
         self.assertEqual(grade.percent, 0)
 
     @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
@@ -171,93 +171,59 @@ class TestCourseGradeFactory(GradeTestBase):
             enabled_for_course=course_setting
         ):
             with patch('lms.djangoapps.grades.models.PersistentCourseGrade.read') as mock_read_grade:
-                grade_factory.create(self.request.user, self.course)
+                grade_factory.read(self.request.user, self.course)
         self.assertEqual(mock_read_grade.called, feature_flag and course_setting)
-
-    def test_create(self):
-        grade_factory = CourseGradeFactory()
-
-        def _assert_create(expected_pass):
-            """
-            Creates the grade, ensuring it is as expected.
-            """
-            course_grade = grade_factory.create(self.request.user, self.course)
-            self.assertEqual(course_grade.letter_grade, u'Pass' if expected_pass else None)
-            self.assertEqual(course_grade.percent, 0.5)
-
-        with self.assertNumQueries(13), mock_get_score(1, 2):
-            _assert_create(expected_pass=True)
-
-        with self.assertNumQueries(13), mock_get_score(1, 2):
-            grade_factory.update(self.request.user, self.course)
-
-        with self.assertNumQueries(1):
-            _assert_create(expected_pass=True)
-
-        self._update_grading_policy(passing=0.9)
-
-        with self.assertNumQueries(8):
-            _assert_create(expected_pass=False)
-
-    @ddt.data(True, False)
-    def test_create_zero(self, assume_zero_enabled):
-        with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=assume_zero_enabled):
-            grade_factory = CourseGradeFactory()
-            course_grade = grade_factory.create(self.request.user, self.course)
-            self._assert_zero_grade(course_grade, ZeroCourseGrade if assume_zero_enabled else CourseGrade)
-
-    def test_create_zero_subs_grade_for_nonzero_course_grade(self):
-        with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT):
-            subsection = self.course_structure[self.sequence.location]
-            with mock_get_score(1, 2):
-                self.subsection_grade_factory.update(subsection)
-            course_grade = CourseGradeFactory().update(self.request.user, self.course)
-            subsection1_grade = course_grade.subsection_grades[self.sequence.location]
-            subsection2_grade = course_grade.subsection_grades[self.sequence2.location]
-            self.assertIsInstance(subsection1_grade, SubsectionGrade)
-            self.assertIsInstance(subsection2_grade, ZeroSubsectionGrade)
 
     def test_read(self):
         grade_factory = CourseGradeFactory()
-        with mock_get_score(1, 2):
-            grade_factory.update(self.request.user, self.course)
 
-        def _assert_read():
+        def _assert_read(expected_pass, expected_percent):
             """
-            Reads the grade, ensuring it is as expected and requires just one query
+            Creates the grade, ensuring it is as expected.
             """
-            with self.assertNumQueries(1):
-                course_grade = grade_factory.read(self.request.user, self.course)
-            self.assertEqual(course_grade.letter_grade, u'Pass')
-            self.assertEqual(course_grade.percent, 0.5)
+            course_grade = grade_factory.read(self.request.user, self.course)
+            self.assertEqual(course_grade.letter_grade, u'Pass' if expected_pass else None)
+            self.assertEqual(course_grade.percent, expected_percent)
 
-        _assert_read()
-        self._update_grading_policy(passing=0.9)
-        _assert_read()
+        with self.assertNumQueries(1), mock_get_score(1, 2):
+            _assert_read(expected_pass=False, expected_percent=0)
 
-    @ddt.data(True, False)
-    def test_read_zero(self, assume_zero_enabled):
+        with self.assertNumQueries(37), mock_get_score(1, 2):
+            grade_factory.update(self.request.user, self.course, force_update_subsections=True)
+
+        with self.assertNumQueries(1):
+            _assert_read(expected_pass=True, expected_percent=0.5)
+
+    @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
+    @ddt.data(*itertools.product((True, False), (True, False)))
+    @ddt.unpack
+    def test_read_zero(self, assume_zero_enabled, create_if_needed):
         with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=assume_zero_enabled):
             grade_factory = CourseGradeFactory()
-            course_grade = grade_factory.read(self.request.user, course_key=self.course.id)
-            if assume_zero_enabled:
-                self._assert_zero_grade(course_grade, ZeroCourseGrade)
+            course_grade = grade_factory.read(self.request.user, self.course, create_if_needed=create_if_needed)
+            if create_if_needed or assume_zero_enabled:
+                self._assert_zero_grade(course_grade, ZeroCourseGrade if assume_zero_enabled else CourseGrade)
             else:
                 self.assertIsNone(course_grade)
 
+    def test_create_zero_subs_grade_for_nonzero_course_grade(self):
+        subsection = self.course_structure[self.sequence.location]
+        with mock_get_score(1, 2):
+            self.subsection_grade_factory.update(subsection)
+        course_grade = CourseGradeFactory().update(self.request.user, self.course)
+        subsection1_grade = course_grade.subsection_grades[self.sequence.location]
+        subsection2_grade = course_grade.subsection_grades[self.sequence2.location]
+        self.assertIsInstance(subsection1_grade, SubsectionGrade)
+        self.assertIsInstance(subsection2_grade, ZeroSubsectionGrade)
+
     @ddt.data(True, False)
     def test_iter_force_update(self, force_update):
-        base_string = 'lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.{}'
-        desired_method_name = base_string.format('update' if force_update else 'create')
-        undesired_method_name = base_string.format('create' if force_update else 'update')
-        with patch(desired_method_name) as desired_call:
-            with patch(undesired_method_name) as undesired_call:
-                set(CourseGradeFactory().iter(
-                    users=[self.request.user], course=self.course, force_update=force_update
-                ))
+        with patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update') as mock_update:
+            set(CourseGradeFactory().iter(
+                users=[self.request.user], course=self.course, force_update=force_update
+            ))
 
-        self.assertTrue(desired_call.called)
-        self.assertFalse(undesired_call.called)
+        self.assertEqual(mock_update.called, force_update)
 
     def test_course_grade_summary(self):
         with mock_get_score(1, 2):
@@ -322,45 +288,13 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
             (expected_earned, expected_possible),
         )
 
-    def test_create(self):
+    def test_create_zero(self):
         """
-        Assuming the underlying score reporting methods work,
-        test that the score is calculated properly.
+        Test that a zero grade is returned.
         """
-        with mock_get_score(1, 2):
-            grade = self.subsection_grade_factory.create(self.sequence)
-        self.assert_grade(grade, 1, 2)
-
-    def test_create_internals(self):
-        """
-        Tests to ensure that a persistent subsection grade is
-        created, saved, then fetched on re-request.
-        """
-        with patch(
-            'lms.djangoapps.grades.subsection_grade.PersistentSubsectionGrade.create_grade',
-            wraps=PersistentSubsectionGrade.create_grade
-        ) as mock_create_grade:
-            with patch(
-                'lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory._get_bulk_cached_grade',
-                wraps=self.subsection_grade_factory._get_bulk_cached_grade
-            ) as mock_get_bulk_cached_grade:
-                with self.assertNumQueries(14):
-                    with mock_get_score(1, 2):
-                        grade_a = self.subsection_grade_factory.create(self.sequence)
-                self.assertTrue(mock_get_bulk_cached_grade.called)
-                self.assertTrue(mock_create_grade.called)
-
-                mock_get_bulk_cached_grade.reset_mock()
-                mock_create_grade.reset_mock()
-
-                with self.assertNumQueries(1):
-                    grade_b = self.subsection_grade_factory.create(self.sequence)
-                self.assertTrue(mock_get_bulk_cached_grade.called)
-                self.assertFalse(mock_create_grade.called)
-
-        self.assertEqual(grade_a.url_name, grade_b.url_name)
-        grade_b.all_total.first_attempted = grade_a.all_total.first_attempted = None
-        self.assertEqual(grade_a.all_total, grade_b.all_total)
+        grade = self.subsection_grade_factory.create(self.sequence)
+        self.assertIsInstance(grade, ZeroSubsectionGrade)
+        self.assert_grade(grade, 0.0, 1.0)
 
     def test_update(self):
         """
@@ -426,6 +360,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         self.assertEqual(mock_read_saved_grade.called, feature_flag and course_setting)
 
 
+@patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
 @ddt.ddt
 class ZeroGradeTest(GradeTestBase):
     """
@@ -762,40 +697,3 @@ class TestCourseGradeLogging(ProblemSubmissionTestMixin, SharedModuleStoreTestCa
         self.course_structure = get_course_blocks(self.request.user, self.course.location)
         self.subsection_grade_factory = SubsectionGradeFactory(self.request.user, self.course, self.course_structure)
         CourseEnrollment.enroll(self.request.user, self.course.id)
-
-    def _create_course_grade_and_check_logging(
-            self,
-            factory_method,
-            log_mock,
-            log_statement,
-    ):
-        """
-        Creates a course grade and asserts that the associated logging
-        matches the expected totals passed in to the function.
-        """
-        factory_method(self.request.user, self.course)
-        self.assertIn(log_statement, log_mock.call_args[0][0])
-        self.assertIn(unicode(self.course.id), log_mock.call_args[0][1])
-        self.assertEquals(self.request.user.id, log_mock.call_args[0][2])
-
-    def test_course_grade_logging(self):
-        grade_factory = CourseGradeFactory()
-        with persistent_grades_feature_flags(
-            global_flag=True,
-            enabled_for_all_courses=False,
-            course_id=self.course.id,
-            enabled_for_course=True
-        ):
-            with patch('lms.djangoapps.grades.course_grade_factory.log') as log_mock:
-                with mock_get_score(1, 2):
-                    # read, but not persisted
-                    self._create_course_grade_and_check_logging(grade_factory.create, log_mock.info, u'Update')
-
-                    # update and persist
-                    self._create_course_grade_and_check_logging(grade_factory.update, log_mock.info, u'Update')
-
-                    # read from persistence, using create
-                    self._create_course_grade_and_check_logging(grade_factory.create, log_mock.debug, u'Read')
-
-                    # read from persistence, using read
-                    self._create_course_grade_and_check_logging(grade_factory.read, log_mock.debug, u'Read')

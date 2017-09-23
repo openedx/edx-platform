@@ -149,7 +149,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         all problems in the course, whether or not they are currently
         gated.
         """
-        course_grade = CourseGradeFactory().create(user, self.course)
+        course_grade = CourseGradeFactory().read(user, self.course)
         for prob in [self.gating_prob1, self.gated_prob2, self.prob3]:
             self.assertIn(prob.location, course_grade.problem_scores)
 

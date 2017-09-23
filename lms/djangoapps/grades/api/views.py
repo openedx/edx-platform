@@ -11,7 +11,6 @@ from rest_framework.generics import GenericAPIView, ListAPIView
 from rest_framework.response import Response
 
 from courseware.access import has_access
-from lms.djangoapps.ccx.utils import prep_course_for_grading
 from lms.djangoapps.courseware import courses
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.grades.api.serializers import GradingPolicySerializer
@@ -184,8 +183,7 @@ class UserGradeView(GradeViewMixin, GenericAPIView):
             # or a 404 if the requested user does not exist.
             return grade_user
 
-        prep_course_for_grading(course, request)
-        course_grade = CourseGradeFactory().create(grade_user, course)
+        course_grade = CourseGradeFactory().read(grade_user, course)
         return Response([{
             'username': grade_user.username,
             'course_key': course_id,

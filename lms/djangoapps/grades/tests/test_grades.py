@@ -79,7 +79,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             self.assertIsNone(course_grade.letter_grade)
             self.assertEqual(course_grade.percent, 0.0)
 
-    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.create')
+    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read')
     def test_grading_exception(self, mock_course_grade):
         """Test that we correctly capture exception messages that bubble up from
         grading. Note that we only see errors at this level if the grading
@@ -287,7 +287,7 @@ class TestScoreForModule(SharedModuleStoreTestCase):
         answer_problem(cls.course, cls.request, cls.l, score=1, max_value=3)
         answer_problem(cls.course, cls.request, cls.n, score=3, max_value=10)
 
-        cls.course_grade = CourseGradeFactory().create(cls.request.user, cls.course)
+        cls.course_grade = CourseGradeFactory().read(cls.request.user, cls.course)
 
     def test_score_chapter(self):
         earned, possible = self.course_grade.score_for_module(self.a.location)
