@@ -243,11 +243,6 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
     Verified track.
     """
     css_class = 'verified-upgrade-deadline'
-    title = ugettext_lazy('Verification Upgrade Deadline')
-    description = ugettext_lazy(
-        'You are still eligible to upgrade to a Verified Certificate! '
-        'Pursue it to highlight the knowledge and skills you gain in this course.'
-    )
     link_text = ugettext_lazy('Upgrade to Verified Certificate')
 
     @property
@@ -298,6 +293,30 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
             deadline = self.enrollment.upgrade_deadline
 
         return deadline
+
+    @property
+    def title(self):
+        dynamic_deadline = self._dynamic_deadline()
+        if dynamic_deadline is not None:
+            return _('Verification Upgrade')
+
+        return _('Verification Upgrade Deadline')
+
+    def _dynamic_deadline(self):
+        if not self.enrollment:
+            return None
+
+        return self.enrollment.dynamic_upgrade_deadline
+
+    @property
+    def description(self):
+        dynamic_deadline = self._dynamic_deadline()
+        if dynamic_deadline is not None:
+            return _('Don\'t miss the opportunity to highlight your new knowledge and skills by earning a verified'
+                     ' certificate.')
+
+        return _('You are still eligible to upgrade to a Verified Certificate! '
+                 'Pursue it to highlight the knowledge and skills you gain in this course.')
 
 
 class VerificationDeadlineDate(DateSummary):
