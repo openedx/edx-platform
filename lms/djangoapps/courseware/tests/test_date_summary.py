@@ -585,6 +585,16 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         self.assertEqual(block.date, expected)
+        self._check_text(block)
+
+    def _check_text(self, upgrade_date_summary):
+        self.assertEqual(upgrade_date_summary.title, 'Upgrade to Verified Certificate')
+        self.assertEqual(
+            upgrade_date_summary.description,
+            'Don\'t miss the opportunity to highlight your new knowledge and skills by earning a verified'
+            ' certificate.'
+        )
+        self.assertEqual(upgrade_date_summary.relative_datestring, 'by {date}')
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_date_with_self_paced_with_enrollment_after_course_start(self):
