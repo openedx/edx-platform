@@ -1709,13 +1709,25 @@ class CourseEnrollment(models.Model):
             return None
 
         if self.dynamic_upgrade_deadline is not None:
+            # When course modes expire they aren't found any more and None would be returned.
+            # Replicate that behavior here by returning None if the personalized deadline is in the past.
+            if datetime.now(UTC) >= self.dynamic_upgrade_deadline:
+                return None
             return self.dynamic_upgrade_deadline
 
         return self.course_upgrade_deadline
 
     @cached_property
     def dynamic_upgrade_deadline(self):
+        """
+        Returns the learner's personalized upgrade deadline if one exists, otherwise it returns None.
 
+        Note that this will return a value even if the deadline is in the past. This property can be used
+        to modify behavior for users with personalized deadlines by checking if it's None or not.
+
+        Returns:
+            datetime|None
+        """
         try:
             course_overview = self.course
         except CourseOverview.DoesNotExist:
@@ -1746,13 +1758,19 @@ class CourseEnrollment(models.Model):
             log.debug('Schedules: No schedule exists for CourseEnrollment %d.', self.id)
             return None
 
-        if upgrade_deadline is None or datetime.now(UTC) >= upgrade_deadline:
-            return None
-
         return upgrade_deadline
 
     @cached_property
     def course_upgrade_deadline(self):
+        """
+        Returns the expiration datetime for the verified course mode.
+
+        If the mode is already expired, return None. Also return None if the course does not have a verified
+        course mode.
+
+        Returns:
+            datetime|None
+        """
         try:
             if self.verified_mode:
                 log.debug('Schedules: Defaulting to verified mode expiration date-time for %s.', self.course_id)
