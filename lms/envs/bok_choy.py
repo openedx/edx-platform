@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Settings for Bok Choy tests that are used when running LMS.
 
@@ -11,6 +12,7 @@ from the same directory.
 """
 
 import os
+from django.utils.translation import ugettext_lazy
 from path import Path as path
 from tempfile import mkdtemp
 
@@ -53,6 +55,9 @@ update_module_store_settings(
 
 # Enable debug so that static assets are served by Django
 DEBUG = True
+
+# Reveal possible error with translated platform names and uncover possible UnicodeEncodeErrors in tests
+PLATFORM_NAME = ugettext_lazy(u"édX")
 
 # Serve static files at /static directly from the staticfiles directory under test root
 # Note: optimized files for testing are generated with settings from test_static_optimized

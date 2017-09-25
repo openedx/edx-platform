@@ -8,6 +8,7 @@ import re
 import json
 import datetime
 
+from django.utils.functional import Promise
 from pytz import UTC
 from collections import defaultdict
 from contextlib import contextmanager
@@ -1434,13 +1435,15 @@ def prefer_xmodules(identifier, entry_points):
 
 class EdxJSONEncoder(json.JSONEncoder):
     """
-    Custom JSONEncoder that handles `Location` and `datetime.datetime` objects.
+    Custom JSONEncoder that handles `Location`, gettext_lazy and `datetime.datetime` objects.
 
-    `Location`s are encoded as their url string form, and `datetime`s as
-    ISO date strings
+    `Location`s are encoded as their url string form, `datetime`s as ISO date strings, and gettext_lazy objects
+    are converted to unicode.
     """
     def default(self, obj):
         if isinstance(obj, (CourseKey, UsageKey)):
+            return unicode(obj)
+        if isinstance(obj, Promise):  # Is a gettext_lazy object
             return unicode(obj)
         elif isinstance(obj, datetime.datetime):
             if obj.tzinfo is not None:

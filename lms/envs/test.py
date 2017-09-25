@@ -19,10 +19,12 @@ sessions. Assumes structure:
 # pylint: disable=invalid-name
 
 from .common import *
+from django.utils.translation import ugettext_lazy
 import os
 from path import Path as path
 from uuid import uuid4
 from warnings import filterwarnings, simplefilter
+
 
 from util.db import NoOpMigrationModules
 from openedx.core.lib.tempdir import mkdtemp_clean
@@ -435,8 +437,9 @@ FEATURES['CLASS_DASHBOARD'] = True
 import openid.oidutil
 openid.oidutil.log = lambda message, level=0: None
 
-# Include a non-ascii character in PLATFORM_NAME to uncover possible UnicodeEncodeErrors in tests.
-PLATFORM_NAME = u"édX"
+
+# Reveal possible error with translated platform names and uncover possible UnicodeEncodeErrors in tests
+PLATFORM_NAME = ugettext_lazy(u"édX")
 SITE_NAME = "edx.org"
 
 # set up some testing for microsites

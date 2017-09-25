@@ -1,3 +1,4 @@
+# coding=utf-8
 # pylint: disable=missing-docstring
 
 import json
@@ -47,7 +48,7 @@ REQUIREJS_WAIT = {
         "js/base", "js/models/course", "js/models/location", "js/models/section"],
 
     # Dashboard
-    re.compile(r'^Studio Home \|'): [
+    re.compile(ur'^Studiø Home \|'): [
         "js/sock", "gettext", "js/base",
         "jquery.ui", "cms/js/main", "underscore"],
 
