@@ -233,7 +233,7 @@ class TestSendRecurringNudge(CacheIsolationTestCase):
         patch_channels(self, [mock_channel])
 
         sent_messages = []
-
+        
         templates_override = deepcopy(settings.TEMPLATES)
         templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
         with self.settings(TEMPLATES=templates_override):

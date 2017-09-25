@@ -18,6 +18,7 @@ from edx_ace.message import Message
 from edx_ace.recipient import Recipient
 from edx_ace.utils.date import deserialize
 from opaque_keys.edx.keys import CourseKey
+from lms.djangoapps.experiments.utils import check_and_get_upgrade_link
 
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.schedules.message_type import ScheduleMessageType
@@ -105,6 +106,40 @@ def _recurring_nudge_schedule_send(site_id, msg_str):
 
 # TODO: delete once _recurring_nudge_schedules_for_bin is fully rolled out
 def _recurring_nudge_schedules_for_hour(site, target_hour, org_list, exclude_orgs=False):
+    users, schedules = _gather_users_and_schedules_for_target_hour(target_hour, org_list, exclude_orgs)
+
+    dashboard_relative_url = reverse('dashboard')
+    for (user, user_schedules) in groupby(schedules, lambda s: s.enrollment.user):
+        user_schedules = list(user_schedules)
+        course_id_strs = [str(schedule.enrollment.course_id) for schedule in user_schedules]
+
+        first_schedule = user_schedules[0]
+
+        template_context = {
+            'student_name': user.profile.name,
+
+            'course_name': first_schedule.enrollment.course.display_name,
+            'course_url': absolute_url(site, reverse('course_root', args=[str(first_schedule.enrollment.course_id)])),
+
+            # This is used by the bulk email optout policy
+            'course_ids': course_id_strs,
+            # Platform information
+            'homepage_url': encode_url(marketing_link('ROOT')),
+            'dashboard_url': absolute_url(site, dashboard_relative_url),
+            'template_revision': settings.EDX_PLATFORM_REVISION,
+            'platform_name': settings.PLATFORM_NAME,
+            'contact_mailing_address': settings.CONTACT_MAILING_ADDRESS,
+            'social_media_urls': encode_urls_in_dict(getattr(settings, 'SOCIAL_MEDIA_FOOTER_URLS', {})),
+            'mobile_store_urls': encode_urls_in_dict(getattr(settings, 'MOBILE_STORE_URLS', {})),
+        }
+
+        # Information for including upsell messaging in template.
+        _add_upsell_button_to_email_template(user, first_schedule, template_context)
+
+        yield (user, first_schedule.enrollment.course.language, template_context)
+
+
+def _gather_users_and_schedules_for_target_hour(target_hour, org_list, exclude_orgs):
     beginning_of_day = target_hour.replace(hour=0, minute=0, second=0)
     users = User.objects.filter(
         courseenrollment__schedule__start__gte=beginning_of_day,
@@ -138,32 +173,39 @@ def _recurring_nudge_schedules_for_hour(site, target_hour, org_list, exclude_org
 
     LOG.debug('Scheduled Nudge: Query = %r', schedules.query.sql_with_params())
 
-    dashboard_relative_url = reverse('dashboard')
+    return users, schedules
 
-    for (user, user_schedules) in groupby(schedules, lambda s: s.enrollment.user):
-        user_schedules = list(user_schedules)
-        course_id_strs = [str(schedule.enrollment.course_id) for schedule in user_schedules]
 
-        first_schedule = user_schedules[0]
-        template_context = {
-            'student_name': user.profile.name,
+def _should_user_be_upsold(enrollment):
+    enrollment_mode = None
+    is_active = None
 
-            'course_name': first_schedule.enrollment.course.display_name,
-            'course_url': absolute_url(site, reverse('course_root', args=[str(first_schedule.enrollment.course_id)])),
+    if enrollment:
+        enrollment_mode = enrollment.mode
+        is_active = enrollment.is_active
 
-            # This is used by the bulk email optout policy
-            'course_ids': course_id_strs,
+    # Return `true` if user is not enrolled in course
+    if enrollment_mode is None and is_active is None:
+        return True
 
-            # Platform information
-            'homepage_url': encode_url(marketing_link('ROOT')),
-            'dashboard_url': absolute_url(site, dashboard_relative_url),
-            'template_revision': settings.EDX_PLATFORM_REVISION,
-            'platform_name': settings.PLATFORM_NAME,
-            'contact_mailing_address': settings.CONTACT_MAILING_ADDRESS,
-            'social_media_urls': encode_urls_in_dict(getattr(settings, 'SOCIAL_MEDIA_FOOTER_URLS', {})),
-            'mobile_store_urls': encode_urls_in_dict(getattr(settings, 'MOBILE_STORE_URLS', {})),
-        }
-        yield (user, first_schedule.enrollment.course.language, template_context)
+    # Show the summary if user enrollment is in which allow user to upsell
+    return is_active and enrollment_mode in ["Verified", "Professional"]
+
+
+def _add_upsell_button_to_email_template(a_user, a_schedule, template_context):
+    show_upsell = _should_user_be_upsold(a_schedule.enrollment)
+    # Check and upgrade link performs a query on CourseMode, which is triggering failures in
+    # test_send_recurring_nudge.py
+    upgrade_data = check_and_get_upgrade_link(a_user, a_schedule.enrollment.course_id)
+
+    upsell_link = ''
+
+    if upgrade_data:
+        upsell_link = upgrade_data.link
+
+    template_context['show_upsell'] = show_upsell
+    template_context['upsell_link'] = upsell_link
+    template_context['user_schedule_upgrade_deadline_time'] = upgrade_data.date
 
 
 @task(ignore_result=True, routing_key=ROUTING_KEY)
