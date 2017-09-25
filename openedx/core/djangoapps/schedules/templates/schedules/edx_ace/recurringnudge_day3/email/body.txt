@@ -1,6 +1,6 @@
 {% load i18n %}
 
-{% if courses|length > 1 %}
+{% if course_ids|length > 1 %}
 {% blocktrans trimmed %}
     Remember when you enrolled in {{ course_name }}, and other courses on edX.org? We do, and we’re glad
     to have you! Come see what everyone is learning.
