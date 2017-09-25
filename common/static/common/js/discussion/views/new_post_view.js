@@ -151,7 +151,7 @@
             };
 
             NewPostView.prototype.updateVisibilityMessage = function($target, forceDivided) {
-                var $visEl = $('.group-visibility .field-label-text');
+                var $visEl = $('#wrapper-visibility-message');
                 var visTemplate = edx.HtmlUtils.template($('#new-post-visibility-template').html());
                 var groupName = null;
                 if (($target && $target.data('divided')) || forceDivided) {
