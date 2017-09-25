@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block preview_text %}
-    {% if courses|length > 1 %}
+    {% if course_ids|length > 1 %}
         {% blocktrans trimmed %}
             Remember when you enrolled in {{ course_name }}, and other courses on edX.org? We do, and we’re glad
             to have you! Come see what everyone is learning.
@@ -22,7 +22,7 @@
             <h1>{% trans "Keep learning today" %}.</h1>
 
             <p>
-                {% if courses|length > 1 %}
+                {% if course_ids|length > 1 %}
                     {% blocktrans trimmed %}
                         Remember when you enrolled in <strong>{{ course_name }}</strong>, and other courses on edX.org? We do, and we’re glad
                         to have you! Come see what everyone is learning.
@@ -38,7 +38,7 @@
             <p>
                 <!-- email client support for style sheets is pretty spotty, so we have to inline all of these styles -->
                 <a
-                {% if courses|length > 1 %}
+                {% if course_ids|length > 1 %}
                     href="{{ dashboard_url }}"
                 {% else %}
                     href="{{ course_url }}"

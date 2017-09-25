@@ -1,5 +1,5 @@
 {% load i18n %}
-{% if courses|length > 1 %}
+{% if course_ids|length > 1 %}
     {% blocktrans trimmed %}
         Many edX learners are completing more problems every week, and
         participating in the discussion forums. What do you want to do to keep learning?
