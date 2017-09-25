@@ -20,7 +20,7 @@ from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
 from student.models import User
 
-from .. import SHOW_ACHIEVEMENTS_FLAG, SHOW_PROFILE_MESSAGE
+from .. import SHOW_PROFILE_MESSAGE
 
 from learner_achievements import LearnerAchievementsFragmentView
 
@@ -100,14 +100,11 @@ def learner_profile_context(request, profile_username, user_is_staff):
 
     preferences_data = get_user_preferences(profile_user, profile_username)
 
-    if SHOW_ACHIEVEMENTS_FLAG.is_enabled():
-        achievements_fragment = LearnerAchievementsFragmentView().render_to_fragment(
-            request,
-            username=profile_user.username,
-            own_profile=own_profile,
-        )
-    else:
-        achievements_fragment = None
+    achievements_fragment = LearnerAchievementsFragmentView().render_to_fragment(
+        request,
+        username=profile_user.username,
+        own_profile=own_profile,
+    )
 
     context = {
         'own_profile': own_profile,

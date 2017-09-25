@@ -19,8 +19,6 @@ from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ... import SHOW_ACHIEVEMENTS_FLAG
-
 
 @ddt.ddt
 class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
@@ -133,7 +131,6 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
         )
 
     @ddt.data(CourseMode.HONOR, CourseMode.PROFESSIONAL, CourseMode.VERIFIED)
-    @override_waffle_flag(SHOW_ACHIEVEMENTS_FLAG, active=True)
     def test_certificate_visibility(self, cert_mode):
         """
         Verify that certificates are displayed with the correct card mode.
@@ -151,7 +148,6 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
         ['notpassing', False],
     )
     @ddt.unpack
-    @override_waffle_flag(SHOW_ACHIEVEMENTS_FLAG, active=True)
     def test_certificate_status_visibility(self, status, is_passed_status):
         """
         Verify that certificates are only displayed for passing status.
@@ -170,7 +166,6 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
         else:
             self.assertNotContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
 
-    @override_waffle_flag(SHOW_ACHIEVEMENTS_FLAG, active=True)
     def test_certificate_for_missing_course(self):
         """
         Verify that a certificate is not shown for a missing course.
@@ -184,7 +179,6 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertNotContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
 
     @ddt.data(True, False)
-    @override_waffle_flag(SHOW_ACHIEVEMENTS_FLAG, active=True)
     def test_no_certificate_visibility(self, own_profile):
         """
         Verify that the 'You haven't earned any certificates yet.' well appears on the user's
@@ -200,7 +194,6 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
             self.assertNotContains(response, 'You haven&#39;t earned any certificates yet.')
 
     @ddt.data(True, False)
-    @override_waffle_flag(SHOW_ACHIEVEMENTS_FLAG, active=True)
     def test_explore_courses_visibility(self, courses_browsable):
         with mock.patch.dict('django.conf.settings.FEATURES', {'COURSES_ARE_BROWSABLE': courses_browsable}):
             response = self.client.get('/u/{username}'.format(username=self.user.username))
