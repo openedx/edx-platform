@@ -11,9 +11,7 @@ If true, it:
 """
 
 _FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
-_MIDDLEWARE_CLASSES = [
-    'third_party_auth.middleware.ExceptionMiddleware',
-]
+_MIDDLEWARE_CLASSES = ['third_party_auth.middleware.ExceptionMiddleware']
 _SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
 _SOCIAL_AUTH_AZUREAD_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
     'msafed': 0

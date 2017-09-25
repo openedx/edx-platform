@@ -67,8 +67,8 @@ TEST_ROOT = path('test_root')
 
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
-INSTALLED_APPS = tuple(app for app in INSTALLED_APPS if app != 'webpack_loader')
-INSTALLED_APPS += ('openedx.tests.util.webpack_loader',)
+INSTALLED_APPS = [app for app in INSTALLED_APPS if app != 'webpack_loader']
+INSTALLED_APPS.append('openedx.tests.util.webpack_loader')
 WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
 
 GITHUB_REPO_ROOT = TEST_ROOT / "data"
@@ -215,10 +215,10 @@ VIDEO_SOURCE_PORT = 8777
 
 ################### Make tests faster
 # http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
-PASSWORD_HASHERS = (
+PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.SHA1PasswordHasher',
     'django.contrib.auth.hashers.MD5PasswordHasher',
-)
+]
 
 # No segment key
 CMS_SEGMENT_KEY = None
@@ -336,11 +336,11 @@ FEATURES['ENABLE_TEAMS'] = True
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 ######### custom courses #########
-INSTALLED_APPS += ('openedx.core.djangoapps.ccxcon',)
+INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon')
 FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # API access management -- needed for simple-history to run.
-INSTALLED_APPS += ('openedx.core.djangoapps.api_admin',)
+INSTALLED_APPS.append('openedx.core.djangoapps.api_admin')
 
 ########################## VIDEO IMAGE STORAGE ############################
 VIDEO_IMAGE_SETTINGS = dict(
