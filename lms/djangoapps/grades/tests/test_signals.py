@@ -260,6 +260,11 @@ class ScoreChangedSignalRelayTest(TestCase):
 
 @ddt.ddt
 class RecalculateUserGradeSignalsTest(TestCase):
+    SIGNALS = {
+        'COHORT_MEMBERSHIP_UPDATED': COHORT_MEMBERSHIP_UPDATED,
+        'ENROLLMENT_TRACK_UPDATED': ENROLLMENT_TRACK_UPDATED,
+    }
+
     def setUp(self):
         super(RecalculateUserGradeSignalsTest, self).setUp()
         self.user = UserFactory()
@@ -267,9 +272,10 @@ class RecalculateUserGradeSignalsTest(TestCase):
 
     @patch('lms.djangoapps.grades.signals.handlers.CourseGradeFactory.update')
     @patch('lms.djangoapps.grades.signals.handlers.CourseGradeFactory.read')
-    @ddt.data(*itertools.product((COHORT_MEMBERSHIP_UPDATED, ENROLLMENT_TRACK_UPDATED), (True, False), (True, False)))
+    @ddt.data(*itertools.product(('COHORT_MEMBERSHIP_UPDATED', 'ENROLLMENT_TRACK_UPDATED'),
+                                 (True, False), (True, False)))
     @ddt.unpack
-    def test_recalculate_on_signal(self, signal, write_only_if_engaged, has_grade, read_mock, update_mock):
+    def test_recalculate_on_signal(self, signal_name, write_only_if_engaged, has_grade, read_mock, update_mock):
         """
         Tests the grades handler for signals that trigger regrading.
         The handler should call CourseGradeFactory.update() with the
@@ -279,6 +285,7 @@ class RecalculateUserGradeSignalsTest(TestCase):
         if not has_grade:
             read_mock.return_value = None
         with waffle().override(WRITE_ONLY_IF_ENGAGED, active=write_only_if_engaged):
+            signal = self.SIGNALS[signal_name]
             signal.send(sender=None, user=self.user, course_key=self.course_key)
 
         if not write_only_if_engaged and not has_grade:

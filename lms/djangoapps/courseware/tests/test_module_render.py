@@ -133,6 +133,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         Set up the course and user context
         """
         super(ModuleRenderTestCase, self).setUp()
+        OverrideFieldData.provider_classes = None
 
         self.mock_user = UserFactory()
         self.mock_user.id = 1
@@ -153,6 +154,10 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 dispatch=self.dispatch
             )
         )
+
+    def tearDown(self):
+        OverrideFieldData.provider_classes = None
+        super(ModuleRenderTestCase, self).tearDown()
 
     def test_get_module(self):
         self.assertEqual(
