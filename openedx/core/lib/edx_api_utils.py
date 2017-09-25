@@ -19,12 +19,7 @@ def get_fields(fields, response):
     """Extracts desired fields from the API response"""
     results = {}
     for field in fields:
-        try:
-            results[field] = response[field]
-        # TODO: Determine what exception would be raised here if response does not have the specified field
-        except:
-            msg = '{resource} does not have the attribute {field}'.format(resource, field)
-            log.exception(msg)
+        results[field] = response.get(field)
     return results
 
 
