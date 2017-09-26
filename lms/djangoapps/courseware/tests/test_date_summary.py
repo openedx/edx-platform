@@ -547,7 +547,6 @@ class TestDateAlerts(SharedModuleStoreTestCase):
                 self.assertEqual(len(messages), 0)
 
 
-
 @attr(shard=1)
 class TestScheduleOverrides(SharedModuleStoreTestCase):
 

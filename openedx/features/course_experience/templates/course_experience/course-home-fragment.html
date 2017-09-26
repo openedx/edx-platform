@@ -82,7 +82,10 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
                             </ul>
 
                             <div class="vc-cta vc-fade vc-polite-only">
-                                <a class="btn-upgrade" href="${ upgrade_url }">${_("Upgrade ({price})").format(price=upgrade_price)}</a>
+                                <a class="btn-upgrade"
+                                   href="${ upgrade_url }"
+                                   data-creative="hero_matthew_smith"
+                                   data-position="hero">${_("Upgrade ({price})").format(price=upgrade_price)}</a>
                             </div>
                         </div>
                     </div>
