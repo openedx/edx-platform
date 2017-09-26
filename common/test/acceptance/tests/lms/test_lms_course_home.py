@@ -5,6 +5,8 @@ End-to-end tests for the LMS that utilize the course home page and course outlin
 
 from nose.plugins.attrib import attr
 
+from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
+
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.bookmarks import BookmarksPage
 from ...pages.lms.course_home import CourseHomePage
@@ -64,8 +66,12 @@ class CourseHomeTest(CourseHomeBaseTest):
 
     def test_course_home(self):
         """
-        Smoke test of course outline, breadcrumbs to and from course outline, and bookmarks.
+        Smoke test of course goals, course outline, breadcrumbs to and from course outline, and bookmarks.
         """
+        ModeCreationPage(
+            self.browser, self.course_id, mode_slug=u'verified',
+            mode_display_name='verified', min_price=10
+        ).visit()
         self.course_home_page.visit()
 
         # TODO: TNL-6546: Remove course_outline_page.
@@ -74,6 +80,12 @@ class CourseHomeTest(CourseHomeBaseTest):
 
         # Check that the tab lands on the course home page.
         self.assertTrue(self.course_home_page.is_browser_on_page())
+
+        # Check that a success message is shown when selecting a course goal
+        # TODO: LEARNER-2522: Ensure the correct message shows up for a particular goal choice
+        self.assertFalse(self.course_home_page.is_course_goal_success_message_shown())
+        self.course_home_page.select_course_goal()
+        self.assertTrue(self.course_home_page.is_course_goal_success_message_shown())
 
         # Check that the course navigation appears correctly
         EXPECTED_SECTIONS = {

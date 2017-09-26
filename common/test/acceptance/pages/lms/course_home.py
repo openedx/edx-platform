@@ -32,6 +32,15 @@ class CourseHomePage(CoursePage):
         # TODO: TNL-6546: Remove the following
         self.course_outline_page = False
 
+    def select_course_goal(self):
+        """ Click on a course goal in a message """
+        self.q(css='.goal-option').first.click()
+        self.wait_for_ajax()
+
+    def is_course_goal_success_message_shown(self):
+        """ Verifies course goal success message appears. """
+        return self.q(css='.success-message').present
+
     def click_bookmarks_button(self):
         """ Click on Bookmarks button """
         self.q(css='.bookmarks-list-button').first.click()
