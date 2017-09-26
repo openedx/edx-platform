@@ -34,7 +34,6 @@ django-statici18n==1.4.0
 django-storages==1.4.1
 django-method-override==0.1.0
 django-user-tasks==0.1.5
-django==1.8.18
 django-waffle==0.12.0
 djangorestframework-jwt==1.11.0
 enum34==1.1.6
@@ -69,9 +68,6 @@ httpretty==0.8.3
 lazy==1.1
 mako==1.0.2
 Markdown>=2.6,<2.7
---allow-external meliae
---allow-unverified meliae
-meliae==0.4.0
 mongoengine==0.10.0
 MySQL-python==1.2.5
 networkx==1.7
@@ -81,6 +77,7 @@ path.py==8.2.1
 piexif==1.0.2
 Pillow==3.4
 polib==1.0.3
+psutil==1.2.1
 pycrypto>=2.6
 pygments==2.2.0
 pygraphviz==1.1
@@ -118,8 +115,7 @@ pyuca==1.1
 wrapt==1.10.5
 zendesk==1.1.1
 
-# This needs to be installed *after* Cython, which is in pre.txt
-lxml==3.4.4
+lxml==3.8.0
 
 # Used for shopping cart's pdf invoice/receipt generation
 reportlab==3.1.44

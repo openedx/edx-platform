@@ -9,6 +9,7 @@
 
 # Requirements for the web application
 -r ../edx/pre.txt
+-r ../edx/django.txt
 -r ../edx/base.txt
 -r ../edx/local.txt
 -r ../edx/github.txt
