@@ -404,7 +404,7 @@ if FEATURES.get('AUTH_USE_CAS'):
         'django_cas.backends.CASBackend',
     )
     INSTALLED_APPS += ('django_cas',)
-    MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
+    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
     CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
     if CAS_ATTRIBUTE_CALLBACK:
         import importlib
@@ -1050,3 +1050,8 @@ ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = ENV_TOKENS.get('ACE_CHANNEL_SAILTHRU_TEMPLA
 ACE_CHANNEL_SAILTHRU_API_KEY = AUTH_TOKENS.get('ACE_CHANNEL_SAILTHRU_API_KEY', ACE_CHANNEL_SAILTHRU_API_KEY)
 ACE_CHANNEL_SAILTHRU_API_SECRET = AUTH_TOKENS.get('ACE_CHANNEL_SAILTHRU_API_SECRET', ACE_CHANNEL_SAILTHRU_API_SECRET)
 ACE_ROUTING_KEY = ENV_TOKENS.get('ACE_ROUTING_KEY', ACE_ROUTING_KEY)
+
+########################## Extra middleware classes  #######################
+
+# Allow extra middleware classes to be added to the app through configuration.
+MIDDLEWARE_CLASSES.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))

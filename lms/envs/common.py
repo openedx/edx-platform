@@ -1168,7 +1168,7 @@ simplefilter('ignore')
 
 ################################# Middleware ###################################
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
 
     'request_cache.middleware.RequestCache',
@@ -1253,7 +1253,7 @@ MIDDLEWARE_CLASSES = (
 
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
-)
+]
 
 # Clickjacking protection can be enabled by setting this to 'DENY'
 X_FRAME_OPTIONS = 'ALLOW'
@@ -2474,7 +2474,7 @@ if FEATURES.get('AUTH_USE_CAS'):
         'django_cas.backends.CASBackend',
     )
     INSTALLED_APPS += ('django_cas',)
-    MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
+    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
 
 ############# Cross-domain requests #################
 

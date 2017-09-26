@@ -11,9 +11,9 @@ If true, it:
 """
 
 _FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
-_MIDDLEWARE_CLASSES = (
+_MIDDLEWARE_CLASSES = [
     'third_party_auth.middleware.ExceptionMiddleware',
-)
+]
 _SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
 _SOCIAL_AUTH_AZUREAD_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
     'msafed': 0
@@ -28,7 +28,7 @@ def apply_settings(django_settings):
     django_settings.FIELDS_STORED_IN_SESSION = _FIELDS_STORED_IN_SESSION
 
     # Inject exception middleware to make redirects fire.
-    django_settings.MIDDLEWARE_CLASSES += _MIDDLEWARE_CLASSES
+    django_settings.MIDDLEWARE_CLASSES.extend(_MIDDLEWARE_CLASSES)
 
     # Where to send the user if there's an error during social authentication
     # and we cannot send them to a more specific URL

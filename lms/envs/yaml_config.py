@@ -252,7 +252,7 @@ if FEATURES.get('AUTH_USE_CAS'):
         'django_cas.backends.CASBackend',
     )
     INSTALLED_APPS += ('django_cas',)
-    MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
+    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware',)
     if CAS_ATTRIBUTE_CALLBACK:
         import importlib
         CAS_USER_DETAILS_RESOLVER = getattr(
@@ -321,3 +321,8 @@ if FEATURES.get('ENABLE_LTI_PROVIDER'):
 ################################ Settings for Credentials Service ################################
 
 CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+
+########################## Extra middleware classes  #######################
+
+# Allow extra middleware classes to be added to the app through configuration.
+MIDDLEWARE_CLASSES.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
