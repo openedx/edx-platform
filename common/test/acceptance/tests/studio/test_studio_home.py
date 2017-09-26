@@ -76,7 +76,7 @@ class StudioLanguageTest(AcceptanceTest):
         self.account_settings = AccountSettingsPage(self.browser)
         AutoAuthPage(self.browser).visit()
 
-    @flaky(max_runs=50, min_passes=50)
+    @flaky(max_runs=100, min_passes=100)
     def test_studio_language_change(self):
         """
         Scenario: Ensure that language selection is working fine.
