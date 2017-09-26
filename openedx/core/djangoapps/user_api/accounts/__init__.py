@@ -4,6 +4,11 @@ Account constants
 
 from django.utils.translation import ugettext_lazy as _
 
+# In Django 1.11, there's django.utils.text.format_lazy.
+from django.utils.functional import allow_lazy
+
+format_lazy = allow_lazy(lambda s, *a, **kw: s.format(*a, **kw), unicode)
+
 
 # The minimum and maximum length for the name ("full name") account field
 NAME_MIN_LENGTH = 2
@@ -60,15 +65,21 @@ USERNAME_CONFLICT_MSG = _(
 
 # Translators: This message is shown to users who enter a username/email/password
 # with an inappropriate length (too short or too long).
-USERNAME_BAD_LENGTH_MSG = _(u"Username must be between {min} and {max} characters long.").format(
-    min=USERNAME_MIN_LENGTH, max=USERNAME_MAX_LENGTH
+USERNAME_BAD_LENGTH_MSG = format_lazy(
+    _(u"Username must be between {min} and {max} characters long."),
+    min=USERNAME_MIN_LENGTH,
+    max=USERNAME_MAX_LENGTH,
 )
-EMAIL_BAD_LENGTH_MSG = _(u"Enter a valid email address that contains at least {min} characters.").format(
-    min=EMAIL_MIN_LENGTH
+EMAIL_BAD_LENGTH_MSG = format_lazy(
+    _(u"Enter a valid email address that contains at least {min} characters."),
+    min=EMAIL_MIN_LENGTH,
 )
 PASSWORD_EMPTY_MSG = _(u"Enter a password.")
 PASSWORD_BAD_MIN_LENGTH_MSG = _(u"Password is not long enough.")
-PASSWORD_BAD_MAX_LENGTH_MSG = _(u"Password cannot be longer than {max} character.").format(max=PASSWORD_MAX_LENGTH)
+PASSWORD_BAD_MAX_LENGTH_MSG = format_lazy(
+    _(u"Password cannot be longer than {max} character."),
+    max=PASSWORD_MAX_LENGTH,
+)
 
 # These strings are normally not user-facing.
 USERNAME_BAD_TYPE_MSG = u"Username must be a string."
