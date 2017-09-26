@@ -1,5 +1,7 @@
 <%namespace name='static' file='../static_content.html'/>
 <%!
+import urllib
+
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -24,7 +26,9 @@ from django.conf import settings
             account=static.get_value('course_about_twitter_account', settings.PLATFORM_TWITTER_ACCOUNT),
             url=u"http://{domain}{path}".format(
                 domain=site_domain,
-                path=reverse('about_course', args=[course.id.to_deprecated_string()])
+                path=urllib.quote_plus(
+                    reverse('about_course', args=[course.id.to_deprecated_string()])
+                )
             )
         ).replace(u" ", u"+")
         tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text)
@@ -39,7 +43,9 @@ from django.conf import settings
                 platform=platform_name,
                 url=u"http://{domain}{path}".format(
                     domain=site_domain,
-                    path=reverse('about_course', args=[course.id.to_deprecated_string()]),
+                    path=urllib.quote_plus(
+                        reverse('about_course', args=[course.id.to_deprecated_string()]),
+                    )
                 )
             )
         ).replace(u" ", u"%20")
