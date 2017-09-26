@@ -4,7 +4,7 @@ Utilities for grades related tests
 from contextlib import contextmanager
 from datetime import datetime
 
-from mock import patch
+from mock import patch, MagicMock
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
@@ -18,9 +18,11 @@ def mock_passing_grade(grade_pass='Pass', percent=0.75, ):
     """
     with patch('lms.djangoapps.grades.course_grade.CourseGrade._compute_letter_grade') as mock_letter_grade:
         with patch('lms.djangoapps.grades.course_grade.CourseGrade._compute_percent') as mock_percent_grade:
-            mock_letter_grade.return_value = grade_pass
-            mock_percent_grade.return_value = percent
-            yield
+            with patch('lms.djangoapps.grades.course_grade.CourseGrade.attempted') as mock_attempted:
+                mock_letter_grade.return_value = grade_pass
+                mock_percent_grade.return_value = percent
+                mock_attempted.return_value = True
+                yield
 
 
 @contextmanager

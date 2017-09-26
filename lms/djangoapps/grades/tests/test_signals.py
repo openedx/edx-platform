@@ -17,7 +17,6 @@ from student.tests.factories import UserFactory
 from submissions.models import score_reset, score_set
 from util.date_utils import to_timestamp
 
-from ..config.waffle import waffle, WRITE_ONLY_IF_ENGAGED
 from ..constants import ScoreDatabaseTableEnum
 from ..signals.handlers import (
     disconnect_submissions_signal_receiver,
@@ -256,39 +255,3 @@ class ScoreChangedSignalRelayTest(TestCase):
         with self.assertRaises(ValueError):
             with disconnect_submissions_signal_receiver(PROBLEM_RAW_SCORE_CHANGED):
                 pass
-
-
-@ddt.ddt
-class RecalculateUserGradeSignalsTest(TestCase):
-    SIGNALS = {
-        'COHORT_MEMBERSHIP_UPDATED': COHORT_MEMBERSHIP_UPDATED,
-        'ENROLLMENT_TRACK_UPDATED': ENROLLMENT_TRACK_UPDATED,
-    }
-
-    def setUp(self):
-        super(RecalculateUserGradeSignalsTest, self).setUp()
-        self.user = UserFactory()
-        self.course_key = CourseLocator("test_org", "test_course_num", "test_run")
-
-    @patch('lms.djangoapps.grades.signals.handlers.CourseGradeFactory.update')
-    @patch('lms.djangoapps.grades.signals.handlers.CourseGradeFactory.read')
-    @ddt.data(*itertools.product(('COHORT_MEMBERSHIP_UPDATED', 'ENROLLMENT_TRACK_UPDATED'),
-                                 (True, False), (True, False)))
-    @ddt.unpack
-    def test_recalculate_on_signal(self, signal_name, write_only_if_engaged, has_grade, read_mock, update_mock):
-        """
-        Tests the grades handler for signals that trigger regrading.
-        The handler should call CourseGradeFactory.update() with the
-        args below, *except* if the WRITE_ONLY_IF_ENGAGED waffle flag
-        is inactive and the user does not have a grade.
-        """
-        if not has_grade:
-            read_mock.return_value = None
-        with waffle().override(WRITE_ONLY_IF_ENGAGED, active=write_only_if_engaged):
-            signal = self.SIGNALS[signal_name]
-            signal.send(sender=None, user=self.user, course_key=self.course_key)
-
-        if not write_only_if_engaged and not has_grade:
-            update_mock.assert_not_called()
-        else:
-            update_mock.assert_called_with(course_key=self.course_key, user=self.user, force_update_subsections=True)

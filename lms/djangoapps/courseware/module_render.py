@@ -471,6 +471,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
                 raw_earned=event['value'],
                 raw_possible=event['max_value'],
                 only_if_higher=event.get('only_if_higher'),
+                score_deleted=event.get('score_deleted'),
             )
         else:
             context = contexts.course_context_from_course_id(course_id)

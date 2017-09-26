@@ -23,7 +23,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
-from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT, WRITE_ONLY_IF_ENGAGED, waffle
+from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT, waffle
 from ..course_data import CourseData
 from ..course_grade import CourseGrade, ZeroCourseGrade
 from ..course_grade_factory import CourseGradeFactory
@@ -207,7 +207,7 @@ class TestCourseGradeFactory(GradeTestBase):
             self._assert_zero_grade(course_grade, ZeroCourseGrade if assume_zero_enabled else CourseGrade)
 
     def test_create_zero_subs_grade_for_nonzero_course_grade(self):
-        with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT), waffle().override(WRITE_ONLY_IF_ENGAGED):
+        with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT):
             subsection = self.course_structure[self.sequence.location]
             with mock_get_score(1, 2):
                 self.subsection_grade_factory.update(subsection)
@@ -259,6 +259,49 @@ class TestCourseGradeFactory(GradeTestBase):
         self.assertTrue(desired_call.called)
         self.assertFalse(undesired_call.called)
 
+    def test_course_grade_summary(self):
+        with mock_get_score(1, 2):
+            self.subsection_grade_factory.update(self.course_structure[self.sequence.location])
+        course_grade = CourseGradeFactory().update(self.request.user, self.course)
+
+        actual_summary = course_grade.summary
+
+        # We should have had a zero subsection grade for sequential 2, since we never
+        # gave it a mock score above.
+        expected_summary = {
+            'grade': None,
+            'grade_breakdown': {
+                'Homework': {
+                    'category': 'Homework',
+                    'percent': 0.25,
+                    'detail': 'Homework = 25.00% of a possible 100.00%',
+                }
+            },
+            'percent': 0.25,
+            'section_breakdown': [
+                {
+                    'category': 'Homework',
+                    'detail': u'Homework 1 - Test Sequential 1 - 50% (1/2)',
+                    'label': u'HW 01',
+                    'percent': 0.5
+                },
+                {
+                    'category': 'Homework',
+                    'detail': u'Homework 2 - Test Sequential 2 - 0% (0/1)',
+                    'label': u'HW 02',
+                    'percent': 0.0
+                },
+                {
+                    'category': 'Homework',
+                    'detail': u'Homework Average = 25%',
+                    'label': u'HW Avg',
+                    'percent': 0.25,
+                    'prominent': True
+                },
+            ]
+        }
+        self.assertEqual(expected_summary, actual_summary)
+
 
 @ddt.ddt
 class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
@@ -302,7 +345,8 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
                 wraps=self.subsection_grade_factory._get_bulk_cached_grade
             ) as mock_get_bulk_cached_grade:
                 with self.assertNumQueries(14):
-                    grade_a = self.subsection_grade_factory.create(self.sequence)
+                    with mock_get_score(1, 2):
+                        grade_a = self.subsection_grade_factory.create(self.sequence)
                 self.assertTrue(mock_get_bulk_cached_grade.called)
                 self.assertTrue(mock_create_grade.called)
 
@@ -315,7 +359,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
                 self.assertFalse(mock_create_grade.called)
 
         self.assertEqual(grade_a.url_name, grade_b.url_name)
-        grade_b.all_total.first_attempted = None
+        grade_b.all_total.first_attempted = grade_a.all_total.first_attempted = None
         self.assertEqual(grade_a.all_total, grade_b.all_total)
 
     def test_update(self):
@@ -333,15 +377,13 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         never attempted a problem, but are persisted if the
         learner's state has been deleted.
         """
-        with waffle().override(WRITE_ONLY_IF_ENGAGED):
-            with mock_get_score(0, 0, None):
-                self.subsection_grade_factory.update(self.sequence)
+        with mock_get_score(0, 0, None):
+            self.subsection_grade_factory.update(self.sequence)
         # ensure no grades have been persisted
         self.assertEqual(0, len(PersistentSubsectionGrade.objects.all()))
 
-        with waffle().override(WRITE_ONLY_IF_ENGAGED):
-            with mock_get_score(0, 0, None):
-                self.subsection_grade_factory.update(self.sequence, score_deleted=True)
+        with mock_get_score(0, 0, None):
+            self.subsection_grade_factory.update(self.sequence, score_deleted=True)
         # ensure a grade has been persisted
         self.assertEqual(1, len(PersistentSubsectionGrade.objects.all()))
 
@@ -430,37 +472,38 @@ class SubsectionGradeTest(GradeTestBase):
         Test that grades are persisted to the database properly,
         and that loading saved grades returns the same data.
         """
-        # Create a grade that *isn't* saved to the database
-        input_grade = SubsectionGrade(self.sequence)
-        input_grade.init_from_structure(
-            self.request.user,
-            self.course_structure,
-            self.subsection_grade_factory._submissions_scores,
-            self.subsection_grade_factory._csm_scores,
-        )
-        self.assertEqual(PersistentSubsectionGrade.objects.count(), 0)
+        with mock_get_score(1, 2):
+            # Create a grade that *isn't* saved to the database
+            input_grade = SubsectionGrade(self.sequence)
+            input_grade.init_from_structure(
+                self.request.user,
+                self.course_structure,
+                self.subsection_grade_factory._submissions_scores,
+                self.subsection_grade_factory._csm_scores,
+            )
+            self.assertEqual(PersistentSubsectionGrade.objects.count(), 0)
 
-        # save to db, and verify object is in database
-        input_grade.create_model(self.request.user)
-        self.assertEqual(PersistentSubsectionGrade.objects.count(), 1)
+            # save to db, and verify object is in database
+            input_grade.create_model(self.request.user)
+            self.assertEqual(PersistentSubsectionGrade.objects.count(), 1)
 
-        # load from db, and ensure output matches input
-        loaded_grade = SubsectionGrade(self.sequence)
-        saved_model = PersistentSubsectionGrade.read_grade(
-            user_id=self.request.user.id,
-            usage_key=self.sequence.location,
-        )
-        loaded_grade.init_from_model(
-            self.request.user,
-            saved_model,
-            self.course_structure,
-            self.subsection_grade_factory._submissions_scores,
-            self.subsection_grade_factory._csm_scores,
-        )
+            # load from db, and ensure output matches input
+            loaded_grade = SubsectionGrade(self.sequence)
+            saved_model = PersistentSubsectionGrade.read_grade(
+                user_id=self.request.user.id,
+                usage_key=self.sequence.location,
+            )
+            loaded_grade.init_from_model(
+                self.request.user,
+                saved_model,
+                self.course_structure,
+                self.subsection_grade_factory._submissions_scores,
+                self.subsection_grade_factory._csm_scores,
+            )
 
-        self.assertEqual(input_grade.url_name, loaded_grade.url_name)
-        loaded_grade.all_total.first_attempted = None
-        self.assertEqual(input_grade.all_total, loaded_grade.all_total)
+            self.assertEqual(input_grade.url_name, loaded_grade.url_name)
+            loaded_grade.all_total.first_attempted = input_grade.all_total.first_attempted = None
+            self.assertEqual(input_grade.all_total, loaded_grade.all_total)
 
 
 @ddt.ddt
@@ -744,59 +787,15 @@ class TestCourseGradeLogging(ProblemSubmissionTestMixin, SharedModuleStoreTestCa
             enabled_for_course=True
         ):
             with patch('lms.djangoapps.grades.course_grade_factory.log') as log_mock:
-                # read, but not persisted
-                self._create_course_grade_and_check_logging(grade_factory.create, log_mock.info, u'Update')
+                with mock_get_score(1, 2):
+                    # read, but not persisted
+                    self._create_course_grade_and_check_logging(grade_factory.create, log_mock.info, u'Update')
 
-                # update and persist
-                self._create_course_grade_and_check_logging(grade_factory.update, log_mock.info, u'Update')
+                    # update and persist
+                    self._create_course_grade_and_check_logging(grade_factory.update, log_mock.info, u'Update')
 
-                # read from persistence, using create
-                self._create_course_grade_and_check_logging(grade_factory.create, log_mock.debug, u'Read')
+                    # read from persistence, using create
+                    self._create_course_grade_and_check_logging(grade_factory.create, log_mock.debug, u'Read')
 
-                # read from persistence, using read
-                self._create_course_grade_and_check_logging(grade_factory.read, log_mock.debug, u'Read')
-
-
-class TestCourseGradeFactory(GradeTestBase):
-    def test_course_grade_summary(self):
-        with mock_get_score(1, 2):
-            self.subsection_grade_factory.update(self.course_structure[self.sequence.location])
-        course_grade = CourseGradeFactory().update(self.request.user, self.course)
-
-        actual_summary = course_grade.summary
-
-        # We should have had a zero subsection grade for sequential 2, since we never
-        # gave it a mock score above.
-        expected_summary = {
-            'grade': None,
-            'grade_breakdown': {
-                'Homework': {
-                    'category': 'Homework',
-                    'percent': 0.25,
-                    'detail': 'Homework = 25.00% of a possible 100.00%',
-                }
-            },
-            'percent': 0.25,
-            'section_breakdown': [
-                {
-                    'category': 'Homework',
-                    'detail': u'Homework 1 - Test Sequential 1 - 50% (1/2)',
-                    'label': u'HW 01',
-                    'percent': 0.5
-                },
-                {
-                    'category': 'Homework',
-                    'detail': u'Homework 2 - Test Sequential 2 - 0% (0/1)',
-                    'label': u'HW 02',
-                    'percent': 0.0
-                },
-                {
-                    'category': 'Homework',
-                    'detail': u'Homework Average = 25%',
-                    'label': u'HW Avg',
-                    'percent': 0.25,
-                    'prominent': True
-                },
-            ]
-        }
-        self.assertEqual(expected_summary, actual_summary)
+                    # read from persistence, using read
+                    self._create_course_grade_and_check_logging(grade_factory.read, log_mock.debug, u'Read')
