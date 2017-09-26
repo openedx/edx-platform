@@ -228,7 +228,14 @@
 
   .btn-signin {
     width: $baseline * 8;
+    color: $white;
     margin-bottom: ($baseline * 2) + 10;
+
+    &:hover,
+    &:focus
+    {
+      color: $white;
+    }
   }
 
   @media only screen and (min-width: 768px) {
