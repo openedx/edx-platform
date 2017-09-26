@@ -28,7 +28,7 @@ class CourseAccessRoleSerializer(serializers.ModelSerializer):
 class CourseRunScheduleSerializer(serializers.Serializer):
     start = serializers.DateTimeField()
     end = serializers.DateTimeField()
-    enrollment_start = serializers.DateTimeField()
+    enrollment_start = serializers.DateTimeField(allow_null=True)
     enrollment_end = serializers.DateTimeField(allow_null=True)
 
 
