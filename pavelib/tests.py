@@ -75,27 +75,6 @@ def test_system(options, passthrough_options):
     assert(system in (None, 'lms', 'cms'))
     assert(django_version in (None, '1.8', '1.11'))
 
-    def _create_tox_system_test_suites(systems):
-        system_tests = []
-        test_paths = []
-        # Add all test directories for the specified systems.
-        for syst in systems:
-            test_paths.extend(suites.default_system_test_dirs(syst))
-        # Remove all duplicate paths.
-        test_paths = list(set(test_paths))
-        for test_id in test_paths:
-            system = test_id.split('/')[0]
-            syst = 'cms'
-            if system in ['common', 'openedx', 'lms']:
-                syst = 'lms'
-            system_tests.append(suites.SystemTestSuite(
-                syst,
-                passthrough_options=passthrough_options,
-                test_id=test_id,
-                **options.test_system
-            ))
-        return system_tests
-
     if test_id:
         # Testing a single test ID.
         # Ensure the proper system for the test id.
@@ -115,16 +94,13 @@ def test_system(options, passthrough_options):
         else:
             # No specified system or test_id, so run all tests of both systems.
             systems = ['cms', 'lms']
-        if django_version:
-            system_tests = _create_tox_system_test_suites(systems)
-        else:
-            system_tests = []
-            for syst in systems:
-                system_tests.append(suites.SystemTestSuite(
-                    syst,
-                    passthrough_options=passthrough_options,
-                    **options.test_system
-                ))
+        system_tests = []
+        for syst in systems:
+            system_tests.append(suites.SystemTestSuite(
+                syst,
+                passthrough_options=passthrough_options,
+                **options.test_system
+            ))
 
     test_suite = suites.PythonTestSuite(
         'python tests',

@@ -15,27 +15,6 @@ except ImportError:
 __test__ = False  # do not collect
 
 
-def default_system_test_dirs(system):
-    """
-    Return a list of all directories in which pytest should begin a search for tests.
-    """
-    default_test_dirs = [
-        "{system}/djangoapps".format(system=system),
-        "common/djangoapps",
-        "openedx/core/djangoapps",
-        "openedx/tests",
-        "openedx/core/lib",
-    ]
-    if system in ('lms', 'cms'):
-        default_test_dirs.append("{system}/lib".format(system=system))
-
-    if system == 'lms':
-        default_test_dirs.append("{system}/tests.py".format(system=system))
-        default_test_dirs.append("openedx/core/djangolib")
-        default_test_dirs.append("openedx/features")
-    return default_test_dirs
-
-
 class PytestSuite(TestSuite):
     """
     A subclass of TestSuite with extra methods that are specific
