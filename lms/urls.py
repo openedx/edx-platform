@@ -26,6 +26,10 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 # Use urlpatterns formatted as within the Django docs with first parameter "stuck" to the open parenthesis
 urlpatterns = (
     '',
+
+    # URL for home page
+    url(r'', include('homepage.urls', namespace='homepage')),
+
     url(r'^onboarding_survey/', include('lms.djangoapps.onboarding_survey.urls')),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
 
@@ -105,7 +109,7 @@ urlpatterns = (
     url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
 
     # URL for dynamic faq page
-    url(r'^custom_faq/', include('faq.urls', namespace='faq'))
+    url(r'^custom_faq/', include('faq.urls', namespace='faq')),
 )
 
 urlpatterns += (
