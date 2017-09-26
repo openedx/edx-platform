@@ -39,6 +39,8 @@ from courseware.masquerade import (
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
+from lms.djangoapps.completion.models import BlockCompletion
+from lms.djangoapps.completion import waffle as completion_waffle
 from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
@@ -384,12 +386,23 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
     )
 
 
-def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=too-many-statements
-                               # Arguments preceding this comment have user binding, those following don't
-                               descriptor, course_id, track_function, xqueue_callback_url_prefix,
-                               request_token, position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                               static_asset_path='', user_location=None, disable_staff_debug_info=False,
-                               course=None):
+def get_module_system_for_user(
+        user,
+        student_data,  # TODO  # pylint: disable=too-many-statements
+        # Arguments preceding this comment have user binding, those following don't
+        descriptor,
+        course_id,
+        track_function,
+        xqueue_callback_url_prefix,
+        request_token,
+        position=None,
+        wrap_xmodule_display=True,
+        grade_bucket_type=None,
+        static_asset_path='',
+        user_location=None,
+        disable_staff_debug_info=False,
+        course=None
+):
     """
     Helper function that returns a module system and student_data bound to a user and a descriptor.
 
@@ -461,18 +474,26 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             course=course
         )
 
+    def get_event_handler(event_type):
+        """
+        Return an appropriate function to handle the event.
+
+        Returns None if no special processing is required.
+        """
+        handlers = {
+            'completion': handle_completion_event,
+            'grade': handle_grade_event,
+            'progress': handle_deprecated_progress_event,
+        }
+        return handlers.get(event_type)
+
     def publish(block, event_type, event):
-        """A function that allows XModules to publish events."""
-        if event_type == 'grade' and not is_masquerading_as_specific_student(user, course_id):
-            SCORE_PUBLISHED.send(
-                sender=None,
-                block=block,
-                user=user,
-                raw_earned=event['value'],
-                raw_possible=event['max_value'],
-                only_if_higher=event.get('only_if_higher'),
-                score_deleted=event.get('score_deleted'),
-            )
+        """
+        A function that allows XModules to publish events.
+        """
+        handle_event = get_event_handler(event_type)
+        if handle_event and not is_masquerading_as_specific_student(user, course_id):
+            handle_event(block, event)
         else:
             context = contexts.course_context_from_course_id(course_id)
             if block.runtime.user_id:
@@ -485,6 +506,57 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
                         context['asides'][aside.scope_ids.block_type] = aside_event_info
             with tracker.get_tracker().context(event_type, context):
                 track_function(event_type, event)
+
+    def handle_completion_event(block, event):
+        """
+        Submit a completion object for the block.
+        """
+        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            raise Http404
+        else:
+            BlockCompletion.objects.submit_completion(
+                user=user,
+                course_key=course_id,
+                block_key=block.scope_ids.usage_id,
+                completion=event['completion'],
+            )
+
+    def handle_grade_event(block, event):
+        """
+        Submit a grade for the block.
+        """
+        SCORE_PUBLISHED.send(
+            sender=None,
+            block=block,
+            user=user,
+            raw_earned=event['value'],
+            raw_possible=event['max_value'],
+            only_if_higher=event.get('only_if_higher'),
+            score_deleted=event.get('score_deleted'),
+        )
+
+    def handle_deprecated_progress_event(block, event):
+        """
+        DEPRECATED: Submit a completion for the block represented by the
+        progress event.
+
+        This exists to support the legacy progress extension used by
+        edx-solutions.  New XBlocks should not emit these events, but instead
+        emit completion events directly.
+        """
+        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            raise Http404
+        else:
+            requested_user_id = event.get('user_id', user.id)
+            if requested_user_id != user.id:
+                log.warning("{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
+                return
+            BlockCompletion.objects.submit_completion(
+                user=user,
+                course_key=course_id,
+                block_key=block.scope_ids.usage_id,
+                completion=1.0,
+            )
 
     def rebind_noauth_module_to_user(module, real_user):
         """

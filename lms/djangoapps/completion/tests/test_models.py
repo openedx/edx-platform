@@ -2,6 +2,8 @@
 Test models, managers, and validators.
 """
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from opaque_keys.edx.keys import UsageKey
@@ -9,6 +11,7 @@ from opaque_keys.edx.keys import UsageKey
 from student.tests.factories import UserFactory
 
 from .. import models
+from .. import waffle
 
 
 class PercentValidatorTestCase(TestCase):
@@ -24,13 +27,8 @@ class PercentValidatorTestCase(TestCase):
             self.assertRaises(ValidationError, models.validate_percent, value)
 
 
-class SubmitCompletionTestCase(TestCase):
-    """
-    Test that BlockCompletion.objects.submit_completion has the desired
-    semantics.
-    """
-    def setUp(self):
-        super(SubmitCompletionTestCase, self).setUp()
+class CompletionSetUpMixin(object):
+    def set_up_completion(self):
         self.user = UserFactory()
         self.block_key = UsageKey.from_string(u'block-v1:edx+test+run+type@video+block@doggos')
         self.completion = models.BlockCompletion.objects.create(
@@ -40,6 +38,19 @@ class SubmitCompletionTestCase(TestCase):
             block_key=self.block_key,
             completion=0.5,
         )
+
+
+class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
+    """
+    Test that BlockCompletion.objects.submit_completion has the desired
+    semantics.
+    """
+    def setUp(self):
+        super(SubmitCompletionTestCase, self).setUp()
+        self._overrider = waffle.waffle().override(waffle.ENABLE_COMPLETION_TRACKING, True)
+        self._overrider.__enter__()
+        self.addCleanup(self._overrider.__exit__, None, None, None)
+        self.set_up_completion()
 
     def test_changed_value(self):
         with self.assertNumQueries(4):  # Get, update, 2 * savepoints
@@ -101,4 +112,33 @@ class SubmitCompletionTestCase(TestCase):
             )
         completion = models.BlockCompletion.objects.get(user=self.user, block_key=self.block_key)
         self.assertEqual(completion.completion, 0.5)
+        self.assertEqual(models.BlockCompletion.objects.count(), 1)
+
+
+class CompletionDisabledTestCase(CompletionSetUpMixin, TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super(CompletionDisabledTestCase, cls).setUpClass()
+        cls.overrider = waffle.waffle().override(waffle.ENABLE_COMPLETION_TRACKING, False)
+        cls.overrider.__enter__()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.overrider.__exit__(None, None, None)
+        super(CompletionDisabledTestCase, cls).tearDownClass()
+
+    def setUp(self):
+        super(CompletionDisabledTestCase, self).setUp()
+        self.set_up_completion()
+
+    def test_cannot_call_submit_completion(self):
+        self.assertEqual(models.BlockCompletion.objects.count(), 1)
+        with self.assertRaises(RuntimeError):
+            models.BlockCompletion.objects.submit_completion(
+                user=self.user,
+                course_key=self.block_key.course_key,
+                block_key=self.block_key,
+                completion=0.9,
+            )
         self.assertEqual(models.BlockCompletion.objects.count(), 1)
