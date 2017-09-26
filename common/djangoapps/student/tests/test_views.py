@@ -48,26 +48,27 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         super(TestStudentDashboardUnenrollments, self).setUp()
         self.user = UserFactory()
         self.enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
-        self.cert_status = None
+        self.cert_status = 'processing'
         self.client.login(username=self.user.username, password=PASSWORD)
 
     def mock_cert(self, _user, _course_overview, _course_mode):
         """ Return a preset certificate status. """
-        if self.cert_status is not None:
-            return {
-                'status': self.cert_status,
-                'can_unenroll': self.cert_status not in DISABLE_UNENROLL_CERT_STATES
-            }
-        else:
-            return {}
+        return {
+            'status': self.cert_status,
+            'can_unenroll': self.cert_status not in DISABLE_UNENROLL_CERT_STATES,
+            'certificate_message_viewable': True,
+            'grade': 100,
+            'show_disabled_download_button': False,
+            'show_download_url': False,
+            'show_survey_button': False
+        }
 
     @ddt.data(
         ('notpassing', 1),
         ('restricted', 1),
         ('processing', 1),
-        (None, 1),
         ('generating', 0),
-        ('ready', 0),
+        ('downloadable', 0),
     )
     @ddt.unpack
     def test_unenroll_available(self, cert_status, unenroll_action_count):
@@ -83,9 +84,8 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         ('notpassing', 200),
         ('restricted', 200),
         ('processing', 200),
-        (None, 200),
         ('generating', 400),
-        ('ready', 400),
+        ('downloadable', 400),
     )
     @ddt.unpack
     @patch.object(CourseEnrollment, 'unenroll')
@@ -108,16 +108,9 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
                 else:
                     course_enrollment.assert_not_called()
 
-    def test_no_cert_status(self):
-        """ Assert that the dashboard loads when cert_status is None."""
-        with patch('student.views.cert_info', return_value=None):
-            response = self.client.get(reverse('dashboard'))
-
-            self.assertEqual(response.status_code, 200)
-
     def test_cant_unenroll_status(self):
         """ Assert that the dashboard loads when cert_status does not allow for unenrollment"""
-        with patch('certificates.models.certificate_status_for_student', return_value={'status': 'ready'}):
+        with patch('certificates.models.certificate_status_for_student', return_value={'status': 'downloadable'}):
             response = self.client.get(reverse('dashboard'))
 
             self.assertEqual(response.status_code, 200)

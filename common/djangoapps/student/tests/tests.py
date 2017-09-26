@@ -84,6 +84,7 @@ class CourseEndingTest(TestCase):
             {
                 'status': 'processing',
                 'show_disabled_download_button': False,
+                'certificate_message_viewable': False,
                 'show_download_url': False,
                 'show_survey_button': False,
                 'can_unenroll': True,
@@ -96,6 +97,7 @@ class CourseEndingTest(TestCase):
             {
                 'status': 'processing',
                 'show_disabled_download_button': False,
+                'certificate_message_viewable': True,
                 'show_download_url': False,
                 'show_survey_button': False,
                 'mode': None,
@@ -112,6 +114,7 @@ class CourseEndingTest(TestCase):
                 {
                     'status': 'generating',
                     'show_disabled_download_button': True,
+                    'certificate_message_viewable': True,
                     'show_download_url': False,
                     'show_survey_button': True,
                     'survey_url': survey_url,
@@ -128,6 +131,7 @@ class CourseEndingTest(TestCase):
             {
                 'status': 'generating',
                 'show_disabled_download_button': True,
+                'certificate_message_viewable': True,
                 'show_download_url': False,
                 'show_survey_button': True,
                 'survey_url': survey_url,
@@ -140,7 +144,8 @@ class CourseEndingTest(TestCase):
 
         download_url = 'http://s3.edx/cert'
         cert_status = {
-            'status': 'downloadable', 'grade': '0.67',
+            'status': 'downloadable',
+            'grade': '0.67',
             'download_url': download_url,
             'mode': 'honor'
         }
@@ -148,8 +153,9 @@ class CourseEndingTest(TestCase):
         self.assertEqual(
             _cert_info(user, course, cert_status, course_mode),
             {
-                'status': 'ready',
+                'status': 'downloadable',
                 'show_disabled_download_button': False,
+                'certificate_message_viewable': True,
                 'show_download_url': True,
                 'download_url': download_url,
                 'show_survey_button': True,
@@ -171,6 +177,7 @@ class CourseEndingTest(TestCase):
             {
                 'status': 'notpassing',
                 'show_disabled_download_button': False,
+                'certificate_message_viewable': True,
                 'show_download_url': False,
                 'show_survey_button': True,
                 'survey_url': survey_url,
@@ -192,6 +199,7 @@ class CourseEndingTest(TestCase):
             {
                 'status': 'notpassing',
                 'show_disabled_download_button': False,
+                'certificate_message_viewable': True,
                 'show_download_url': False,
                 'show_survey_button': False,
                 'grade': '0.67',
@@ -251,6 +259,7 @@ class CourseEndingTest(TestCase):
                 {
                     'status': 'generating',
                     'show_disabled_download_button': True,
+                    'certificate_message_viewable': True,
                     'show_download_url': False,
                     'show_survey_button': True,
                     'survey_url': survey_url,
@@ -283,6 +292,7 @@ class CourseEndingTest(TestCase):
                 _cert_info(user, course, cert_status, course_mode),
                 {
                     'status': 'processing',
+                    'certificate_message_viewable': False,
                     'show_disabled_download_button': False,
                     'show_download_url': False,
                     'show_survey_button': False,
