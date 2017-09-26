@@ -12,6 +12,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 from edxmako.shortcuts import marketing_link
+from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.user_api.errors import UserNotAuthorized, UserNotFound
@@ -134,7 +135,10 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
             'social_platforms': settings.SOCIAL_PLATFORMS,
         },
+        'show_program_listing': ProgramsApiConfig.is_enabled(),
+        'show_dashboard_tabs': True,
         'disable_courseware_js': True,
+        'nav_hidden': True,
     }
 
     if badges_enabled():
