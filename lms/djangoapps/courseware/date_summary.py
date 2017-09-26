@@ -267,23 +267,26 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
         By default, the summary is only shown if it has date and the date is in the
         future and the user's enrollment is in upsell modes
         """
-        is_enabled = super(VerifiedUpgradeDeadlineDate, self).is_enabled
-        if not is_enabled:
-            return False
-
         enrollment_mode = None
         is_active = None
+        course_upgrade_deadline = None
 
         if self.enrollment:
             enrollment_mode = self.enrollment.mode
             is_active = self.enrollment.is_active
+            course_upgrade_deadline = self.enrollment.course_upgrade_deadline
 
         # Return `true` if user is not enrolled in course
         if enrollment_mode is None and is_active is None:
             return True
 
         # Show the summary if user enrollment is in which allow user to upsell
-        return is_active and enrollment_mode in CourseMode.UPSELL_TO_VERIFIED_MODES
+        return (
+            is_active
+            and CourseMode.is_mode_upgradeable(enrollment_mode)
+            and course_upgrade_deadline is not None
+            and datetime.datetime.now(utc) < self.enrollment.course_upgrade_deadline
+        )
 
     @lazy
     def date(self):
@@ -322,8 +325,8 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
         if dynamic_deadline is None:
             return super(VerifiedUpgradeDeadlineDate, self).relative_datestring
 
-        if self.date is None:
-            return ''
+        if self.date is None or self.deadline_has_passed():
+            return ' '
 
         # Translators: This describes the time by which the user
         # should upgrade to the verified track. 'date' will be

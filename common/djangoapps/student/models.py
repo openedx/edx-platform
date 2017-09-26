@@ -1723,18 +1723,7 @@ class CourseEnrollment(models.Model):
         if dynamic_upgrade_deadline is not None:
             return dynamic_upgrade_deadline
 
-        try:
-            if self.verified_mode:
-                log.debug('Schedules: Defaulting to verified mode expiration date-time for %s.', self.course_id)
-                return self.verified_mode.expiration_datetime
-            else:
-                log.debug('Schedules: No verified mode located for %s.', self.course_id)
-        except CourseMode.DoesNotExist:
-            log.debug('Schedules: %s has no verified mode.', self.course_id)
-            pass
-
-        log.debug('Schedules: Returning default of `None`')
-        return None
+        return self.course_upgrade_deadline
 
     @property
     def dynamic_upgrade_deadline(self):
@@ -1760,6 +1749,19 @@ class CourseEnrollment(models.Model):
             # NOTE: Schedule has a one-to-one mapping with CourseEnrollment. If no schedule is associated
             # with this enrollment, Django will raise an exception rather than return None.
             log.debug('Schedules: No schedule exists for CourseEnrollment %d.', self.id)
+            return None
+
+    @property
+    def course_upgrade_deadline(self):
+        try:
+            if self.verified_mode:
+                log.debug('Schedules: Defaulting to verified mode expiration date-time for %s.', self.course_id)
+                return self.verified_mode.expiration_datetime
+            else:
+                log.debug('Schedules: No verified mode located for %s.', self.course_id)
+                return None
+        except CourseMode.DoesNotExist:
+            log.debug('Schedules: %s has no verified mode.', self.course_id)
             return None
 
     def is_verified_enrollment(self):
