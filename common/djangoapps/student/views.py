@@ -78,6 +78,7 @@ from collections import namedtuple
 
 from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date  # pylint: disable=import-error
 from courseware.access import has_access
+from course_structure_api.v0.serializers import CourseSerializer
 
 from django_comment_common.models import Role
 
@@ -384,9 +385,16 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         # showing the certificate web view button if certificate is ready state and feature flags are enabled.
         if has_html_certificates_enabled(course_overview.id, course_overview):
             if course_overview.has_any_active_web_certificate:
+                config_value = configuration_helpers.get_configuration_value('SHARED_ORG', '')
+                course_obj = CourseSerializer()
+                course_org = course_obj.get_org(course_overview)
+                if course_org in config_value:
+                    cert_url = configuration_helpers.get_configuration_value('CERT_URL', '')
+                else:
+                    cert_url = ''
                 status_dict.update({
                     'show_cert_web_view': True,
-                    'cert_web_view_url': get_certificate_url(course_id=course_overview.id, uuid=cert_status['uuid'])
+                    'cert_web_view_url': cert_url + get_certificate_url(course_id=course_overview.id, uuid=cert_status['uuid'])
                 })
             else:
                 # don't show download certificate button if we don't have an active certificate for course
