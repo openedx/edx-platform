@@ -746,7 +746,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         return context, expected_context
 
     # pylint: disable=invalid-name
-    @patch('xmodule.video_module.video_module.BrandingInfoConfig')
+    @patch('branding.models.BrandingInfoConfig')
     @patch('xmodule.video_module.video_module.rewrite_video_url')
     def test_get_html_cdn_source(self, mocked_get_video, mock_BrandingInfoConfig):
         """
@@ -869,14 +869,14 @@ class TestGetHtmlMethod(BaseTestXmodule):
         """
         Verify val profiles on toggling HLS Playback feature.
         """
-        with patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
+        with patch('edxval.api.get_urls_for_profiles') as get_urls_for_profiles:
             get_urls_for_profiles.return_value = {
                 'desktop_webm': 'https://webm.com/dw.webm',
                 'hls': 'https://hls.com/hls.m3u8',
                 'youtube': 'https://yt.com/?v=v0TFmdO4ZP0',
                 'desktop_mp4': 'https://mp4.com/dm.mp4'
             }
-            with patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled') as feature_enabled:
+            with patch('openedx.core.djangoapps.video_config.models.HLSPlaybackEnabledFlag.feature_enabled') as feature_enabled:
                 feature_enabled.return_value = hls_feature_enabled
                 video_xml = '<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
                 self.initialize_module(data=video_xml)
@@ -886,8 +886,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     expected_val_profiles,
                 )
 
-    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
-    @patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles')
+    @patch('openedx.core.djangoapps.video_config.models.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('edxval.api.get_urls_for_profiles')
     def test_get_html_hls(self, get_urls_for_profiles):
         """
         Verify that hls profile functionality works as expected.
@@ -927,7 +927,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         context = self.item_descriptor.render(STUDENT_VIEW).content
         self.assertIn("'download_video_link': None", context)
 
-    @patch('xmodule.video_module.video_module.edxval_api.get_course_video_image_url')
+    @patch('edxval.api.get_course_video_image_url')
     def test_poster_image(self, get_course_video_image_url):
         """
         Verify that poster image functionality works as expected.
@@ -940,7 +940,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         self.assertIn('"poster": "/media/video-images/poster.png"', context)
 
-    @patch('xmodule.video_module.video_module.edxval_api.get_course_video_image_url')
+    @patch('edxval.api.get_course_video_image_url')
     def test_poster_image_without_edx_video_id(self, get_course_video_image_url):
         """
         Verify that poster image is set to None and there is no crash when no edx_video_id.
@@ -1112,7 +1112,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         ),
     )
     @ddt.unpack
-    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('openedx.core.djangoapps.video_config.models.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
     def test_val_encoding_in_context(self, val_video_encodings, video_url):
         """
         Tests that the val encodings correctly override the video url when the edx video id is set and
@@ -1124,7 +1124,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         a video component is initialized. Current implementation considers this youtube source as a valid
         external youtube source.
         """
-        with patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
+        with patch('edxval.api.get_urls_for_profiles') as get_urls_for_profiles:
             get_urls_for_profiles.return_value = val_video_encodings
             self.initialize_module(
                 data='<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
@@ -1153,7 +1153,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         ),
     )
     @ddt.unpack
-    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('openedx.core.djangoapps.video_config.models.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
     def test_val_encoding_in_context_without_external_youtube_source(self, val_video_encodings, video_url):
         """
         Tests that the val encodings correctly override the video url when the edx video id is set and
@@ -1161,7 +1161,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         Accepted order of source priority is:
             VAL's youtube source > external youtube source > hls > mp4 > webm.
         """
-        with patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
+        with patch('edxval.api.get_urls_for_profiles') as get_urls_for_profiles:
             get_urls_for_profiles.return_value = val_video_encodings
             self.initialize_module(
                 data='<video display_name="Video" youtube_id_1_0="" download_video="true" edx_video_id="12345-67890">[]</video>'
@@ -1258,7 +1258,7 @@ class TestEditorSavedMethod(BaseTestXmodule):
         self.assertEqual(item.edx_video_id, stripped_video_id)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    @patch('xmodule.video_module.video_module.edxval_api.get_url_for_profile', Mock(return_value='test_yt_id'))
+    @patch('edxval.api.get_url_for_profile', Mock(return_value='test_yt_id'))
     def test_editor_saved_with_yt_val_profile(self, default_store):
         """
         Verify editor saved overrides `youtube_id_1_0` when a youtube val profile is there
