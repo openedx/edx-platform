@@ -237,8 +237,6 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         course_run = ToyCourseFactory()
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
         end = start + datetime.timedelta(days=30)
-        enrollment_start = start - datetime.timedelta(days=7)
-        enrollment_end = end - datetime.timedelta(days=14)
         user = UserFactory()
         role = 'instructor'
         run = '3T2017'
@@ -248,8 +246,8 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
             'schedule': {
                 'start': serialize_datetime(start),
                 'end': serialize_datetime(end),
-                'enrollment_start': serialize_datetime(enrollment_start),
-                'enrollment_end': serialize_datetime(enrollment_end),
+                'enrollment_start': None,
+                'enrollment_end': None,
             },
             'team': [
                 {
@@ -264,7 +262,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         course_run_key = CourseKey.from_string(response.data['id'])
         course_run = modulestore().get_course(course_run_key)
         assert course_run.id.run == run
-        self.assert_course_run_schedule(course_run, start, end, enrollment_start, enrollment_end)
+        self.assert_course_run_schedule(course_run, start, end, None, None)
         self.assert_access_role(course_run, user, role)
         self.assert_course_access_role_count(course_run, 1)
 
