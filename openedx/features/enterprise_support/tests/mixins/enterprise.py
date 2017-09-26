@@ -168,9 +168,6 @@ class EnterpriseServiceMockMixin(object):
                         'enable_data_sharing_consent': True,
                         'enforce_data_sharing_consent': 'at_login',
                         'enable_audit_enrollment': enable_audit_enrollment,
-                        'enterprise_customer_users': [
-                            1
-                        ],
                         'branding_configuration': {
                             'enterprise_customer': enterprise_customer_uuid,
                             'logo': 'https://open.edx.org/sites/all/themes/edx_open/logo.png'
