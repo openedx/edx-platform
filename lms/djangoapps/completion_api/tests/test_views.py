@@ -198,14 +198,16 @@ class CompletionViewTestCase(SharedModuleStoreTestCase):
     def test_wrong_user(self):
         user = UserFactory.create(username='wrong')
         self.client.force_authenticate(user)
-        response = self.client.get('/api/completion/v0/course/?user={}'.format(self.test_user.username))
+        response = self.client.get('/api/completion/v0/course/?username={}'.format(self.test_user.username))
         self.assertEqual(response.status_code, 404)
 
     def test_staff_access(self):
         user = AdminFactory.create(username='staff')
         self.client.force_authenticate(user)
-        response = self.client.get('/api/completion/v0/course/?user={}'.format(self.test_user.username))
+        response = self.client.get('/api/completion/v0/course/?username={}'.format(self.test_user.username))
         self.assertEqual(response.status_code, 200)
+        expected_completion = {'earned': 1.0, 'possible': 12.0, 'ratio': 1 / 12}
+        self.assertEqual(response.data['results'][0]['completion'], expected_completion)  # pylint: disable=no-member
 
 
 class CompletionBlockUpdateViewTestCase(SharedModuleStoreTestCase):

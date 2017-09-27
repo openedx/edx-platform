@@ -45,7 +45,7 @@ class CompletionViewMixin(object):
 
         Usually the requesting user, but a staff user can override this.
         """
-        requested_username = self.request.GET.get('user')
+        requested_username = self.request.GET.get('username')
         if requested_username is None:
             user = self.request.user
         else:
