@@ -944,7 +944,7 @@ class CourseEnrollmentManager(models.Manager):
 
         return is_course_full
 
-    def users_enrolled_in(self, course_id, include_inactive=False):
+    def users_enrolled_in(self, course_id, include_inactive=False, only_active=False):
         """
         Return a queryset of User for every user enrolled in the course.  If
         `include_inactive` is True, returns both active and inactive enrollees
@@ -955,6 +955,8 @@ class CourseEnrollmentManager(models.Manager):
         }
         if not include_inactive:
             filter_kwargs['courseenrollment__is_active'] = True
+        if only_active:
+            filter_kwargs['is_active'] = True
         return User.objects.filter(**filter_kwargs)
 
     def enrollment_counts(self, course_id):
