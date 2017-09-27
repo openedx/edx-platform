@@ -6,6 +6,7 @@ from django.conf import settings
 from django.conf.urls import patterns, url
 
 from certificates import views
+from certificates.views.shipping_information import shipping_information
 
 urlpatterns = patterns(
     '',
@@ -30,4 +31,5 @@ urlpatterns = patterns(
     url(r'search', views.search_certificates, name="search"),
     url(r'regenerate', views.regenerate_certificate_for_user, name="regenerate_certificate_for_user"),
     url(r'generate', views.generate_certificate_for_user, name="generate_certificate_for_user"),
+    url(r'shipping_information', shipping_information, name="shipping_information"),
 )

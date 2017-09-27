@@ -1,0 +1,81 @@
+<%page expression_filter="h"/>
+
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">Certificate Shipping Information</%block>
+<script type="text/javascript">
+function editMode(){
+    var $editable = $('.editable');
+    var $readOnly = $('.read-only');
+    $readOnly.addClass('hidden');
+    $editable.removeClass('hidden');
+    console.log('called');
+};
+</script>
+
+<style>
+.read-only {
+    line-height: 25px;
+}
+
+#shipping_form {
+    margin: 25px;
+}
+
+label {
+    display: block;
+    float: left;
+    width: 100px;
+    font-style: normal;
+    font-weight: bold;
+    cursor: default;
+}
+
+.clearfix {
+    margin-bottom: 10px;
+}
+</style>
+
+    <h1>
+        Course Certificate Shipping Information
+    </h1>
+
+    <div id="shipping_form">
+        <form method="POST">
+            <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+            <label style="">First Name</label>
+            <span class="read-only">${object['first_name']}</span>
+            <input class="editable hidden" type="text" name="first_name" value="${object['first_name']}" />
+            <div class="clearfix"></div>
+
+            <label>Last Name</label>
+            <span class="read-only">${object['last_name']}</span>
+            <input class="editable hidden" type="text" name="last_name" value="${object['last_name']}"/>
+            <div class="clearfix"></div>
+
+            <label>Address</label>
+            <span class="read-only">${object['address']}</span>
+            <input class="editable hidden" type="text" name="address" value="${object['address']}"/>
+            <div class="clearfix"></div>
+
+            <label>City</label>
+            <span class="read-only">${object['city']}</span>
+            <input class="editable hidden" type="text" name="city" value="${object['city']}"/>
+            <div class="clearfix"></div>
+
+            <label>State</label>
+            <span class="read-only">${object['state']}</span>
+            <input class="editable hidden" type="text" name="state" value="${object['state']}"/>
+            <div class="clearfix"></div>
+
+            <label>Zip Code</label>
+            <span class="read-only">${object['zip_code']}</span>
+            <input class="editable hidden" type="text" name="zip_code" value="${object['zip_code']}"/>
+            <div class="clearfix"></div>
+            <br /><br />
+
+            <button type="button" class="read-only" id="edit-btn" onclick="editMode(); return false;">edit</button>
+            <input class="editable hidden" type="submit" name="submit" value="submit" />
+        </form>
+    </div>
+

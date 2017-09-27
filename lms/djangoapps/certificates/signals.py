@@ -1,23 +1,26 @@
 """
 Signal handler for enabling/disabling self-generated certificates based on the course-pacing.
 """
+import datetime
 import logging
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+import pytz
 
 from certificates.models import (
     CertificateWhitelist,
-    CertificateStatuses,
     GeneratedCertificate
 )
-from certificates.tasks import generate_certificate
+from certificates.tasks import generate_certificate, send_passing_learner_message
+from certificates.views.shipping_information import PHYSICAL_CERTIFICATE_EXPERIMENT_ID, \
+    PHYSICAL_CERTIFICATE_EXPERIMENT_KEY
+from experiments.models import ExperimentData, ExperimentKeyValue
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
-from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, LEARNER_NOW_VERIFIED
+from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, LEARNER_NOW_VERIFIED, COURSE_CERT_AWARDED
 from student.models import CourseEnrollment
 
 
@@ -102,3 +105,62 @@ def fire_ungenerated_certificate_task(user, course_key, expected_verification_st
             kwargs['expected_verification_status'] = unicode(expected_verification_status)
         generate_certificate.apply_async(countdown=CERTIFICATE_DELAY_SECONDS, kwargs=kwargs)
         return True
+
+
+@receiver(COURSE_CERT_AWARDED)
+def handle_course_cert_awarded(sender, user, course_key, mode, status, **kwargs):  # pylint: disable=unused-argument
+    log.warn('handle cert award')
+    try:
+        exp_data = ExperimentData.objects.get(
+            user=user,
+            experiment_id=PHYSICAL_CERTIFICATE_EXPERIMENT_ID,
+            key='ship_cert_{0}'.format(str(course_key)),
+        )
+    except ExperimentData.DoesNotExist:
+        return
+
+    if exp_data.value != '1':
+        return
+
+    send_passing_learner_message.apply_async((user.id, str(course_key)), retry=False)
+
+
+@receiver(post_save, sender=CourseEnrollment, dispatch_uid='check_verified_upgrade')
+def create_schedule(sender, **kwargs):
+    enrollment = kwargs['instance']
+
+    try:
+        exp_data = ExperimentData.objects.get(
+            user=enrollment.user,
+            experiment_id=PHYSICAL_CERTIFICATE_EXPERIMENT_ID,
+            key='showed_interest_{0}'.format(str(enrollment.course_id)),
+        )
+    except ExperimentData.DoesNotExist:
+        return
+
+    if exp_data.value != '1':
+        return
+
+    if enrollment.mode not in GeneratedCertificate.VERIFIED_CERTS_MODES:
+        return
+
+    try:
+        end_time_str = ExperimentKeyValue.objects.get(
+            experiment_id=PHYSICAL_CERTIFICATE_EXPERIMENT_ID,
+            key='end_time'
+        )
+    except ExperimentKeyValue.DoesNotExist:
+        return
+
+    end_time = datetime.datetime.strptime(end_time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+    if datetime.datetime.now(pytz.utc) >= end_time:
+        return
+
+    ship_exp_data = ExperimentData.objects.get_or_create(
+        user=enrollment.user,
+        experiment_id=PHYSICAL_CERTIFICATE_EXPERIMENT_ID,
+        key='ship_cert_{0}'.format(str(enrollment.course_id)),
+        defaults={'value': '1'},
+    )
+    ship_exp_data.value = '1'
+    ship_exp_data.save()
