@@ -8,6 +8,7 @@ import logging
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
@@ -27,7 +28,7 @@ from certificates.queue import XQueueCertInterface
 from eventtracking import tracker
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-from util.organizations_helpers import get_course_organizations
+from util.organizations_helpers import get_course_organization_id
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.certificate")
@@ -463,49 +464,76 @@ def get_active_web_certificate(course, is_preview_mode=None):
     return None
 
 
-def get_certificate_template(course_key, mode, language):  # pylint: disable=unused-argument
+def get_certificate_template(course_key, mode, language):
     """
     Retrieves the custom certificate template based on course_key, mode, and language.
     """
-    org_id, template = None, None
+    template = None
     # fetch organization of the course
-    course_organization = get_course_organizations(course_key)
-    if course_organization:
-        org_id = course_organization[0]['id']
+    org_id = get_course_organization_id(course_key)
 
-    if org_id and mode:
-        template = CertificateTemplate.objects.filter(
+    # only consider active templates
+    active_templates = CertificateTemplate.objects.filter(is_active=True)
+
+    if org_id and mode:  # get template by org, mode, and key
+        org_mode_and_key_templates = active_templates.filter(
             organization_id=org_id,
-            course_key=course_key,
             mode=mode,
-            is_active=True
+            course_key=course_key
         )
-    # if don't template find by org and mode
-    if not template and org_id and mode:
-        template = CertificateTemplate.objects.filter(
+        template = get_language_specific_template_or_default(language, org_mode_and_key_templates)
+
+    # since no template matched that course_key, only consider templates with empty course_key
+    empty_course_key_templates = active_templates.filter(course_key=CourseKeyField.Empty)
+    if not template and org_id and mode:  # get template by org and mode
+        org_and_mode_templates = empty_course_key_templates.filter(
             organization_id=org_id,
-            course_key=CourseKeyField.Empty,
-            mode=mode,
-            is_active=True
+            mode=mode
         )
-    # if don't template find by only org
-    if not template and org_id:
-        template = CertificateTemplate.objects.filter(
+        template = get_language_specific_template_or_default(language, org_and_mode_templates)
+    if not template and org_id:  # get template by only org
+        org_templates = empty_course_key_templates.filter(
             organization_id=org_id,
-            course_key=CourseKeyField.Empty,
-            mode=None,
-            is_active=True
+            mode=None
         )
-    # if we still don't template find by only course mode
-    if not template and mode:
-        template = CertificateTemplate.objects.filter(
+        template = get_language_specific_template_or_default(language, org_templates)
+    if not template and mode:  # get template by only mode
+        mode_templates = empty_course_key_templates.filter(
             organization_id=None,
-            course_key=CourseKeyField.Empty,
-            mode=mode,
-            is_active=True
+            mode=mode
         )
+        template = get_language_specific_template_or_default(language, mode_templates)
+    #return template[0].template if template else None
+    return template.template if template else None
 
-    return template[0].template if template else None
+
+def get_language_specific_template_or_default(language, templates):
+    """
+    Returns templates that match passed in language.
+    Returns default templates If no language matches, or language passed is None
+    """
+    two_letter_language = _get_two_letter_language_code(language)
+    language_or_default_templates = list(templates.filter(Q(language=two_letter_language) | Q(language=None)))
+    language_specific_template = get_language_specific_template(language, language_or_default_templates)
+    if language_specific_template:
+        return language_specific_template
+    else:
+        return language_or_default_templates[0] if language_or_default_templates else None
+
+
+def get_language_specific_template(language, templates):
+    for template in templates:
+        if template.language == language:
+            return template
+    return None
+
+
+def _get_two_letter_language_code(language_code):
+    """
+    Shortens language to only first two characters (e.g. es-419 becomes es)
+    This is needed because Catalog returns locale language which is not always a 2 letter code.
+    """
+    return language_code[:2] if language_code else None
 
 
 def emit_certificate_event(event_name, user, course_id, course=None, event_data=None):
