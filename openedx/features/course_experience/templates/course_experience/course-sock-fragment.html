@@ -55,9 +55,9 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
                     </div>
                 </div>
                 <img class="mini-cert" src="${static.url('course_experience/images/verified-cert.png')}"/>
-                <a href="/verify_student/upgrade/${course_id}/">
-                    <button type="button" class="btn btn-brand stuck-top focusable action-upgrade-certificate">
-                        Upgrade Now (${HTML(course_price)})
+                <a href="${upgrade_url}">
+                    <button type="button" class="btn btn-upgrade stuck-top focusable action-upgrade-certificate">
+                        Upgrade (${HTML(course_price)})
                     </button>
                 </a>
             </div>

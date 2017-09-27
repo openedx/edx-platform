@@ -17,7 +17,7 @@ from rest_framework.reverse import reverse
 from web_fragments.fragment import Fragment
 
 from course_modes.models import CourseMode
-from courseware.courses import get_course_with_access
+from courseware.courses import get_course_date_blocks, get_course_with_access
 from lms.djangoapps.course_goals.api import get_course_goal
 from lms.djangoapps.course_goals.models import GOAL_KEY_CHOICES
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
@@ -64,7 +64,15 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         }
 
         # Register the course home messages to be loaded on the page
-        _register_course_home_messages(request, course_id, user_access, course_start_data)
+        _register_course_home_messages(request, course, user_access, course_start_data)
+
+        # Register course date alerts
+        for course_date_block in get_course_date_blocks(course, request.user):
+            course_date_block.register_alerts(request, course)
+
+        # Register a course goal message, if appropriate
+        if _should_show_course_goal_message(request, course, user_access):
+            _register_course_goal_message(request, course)
 
         # Grab the relevant messages
         course_home_messages = list(CourseHomeMessages.user_messages(request))
@@ -73,7 +81,7 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         goal_api_url = reverse('course_goals_api:v0:course_goal-list', request=request)
 
         # Grab the logo
-        image_src = "course_experience/images/home_message_author.png"
+        image_src = 'course_experience/images/home_message_author.png'
 
         context = {
             'course_home_messages': course_home_messages,
@@ -87,24 +95,22 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         return Fragment(html)
 
 
-def _register_course_home_messages(request, course_id, user_access, course_start_data):
+def _register_course_home_messages(request, course, user_access, course_start_data):
     """
     Register messages to be shown in the course home content page.
     """
-    course_key = CourseKey.from_string(course_id)
-    course = get_course_with_access(request.user, 'load', course_key)
     if user_access['is_anonymous']:
         CourseHomeMessages.register_info_message(
             request,
             Text(_(
-                " {sign_in_link} or {register_link} and then enroll in this course."
+                '{sign_in_link} or {register_link} and then enroll in this course.'
             )).format(
-                sign_in_link=HTML("<a href='/login?next={current_url}'>{sign_in_label}</a>").format(
-                    sign_in_label=_("Sign in"),
+                sign_in_link=HTML('<a href="/login?next={current_url}">{sign_in_label}</a>').format(
+                    sign_in_label=_('Sign in'),
                     current_url=urlquote_plus(request.path),
                 ),
-                register_link=HTML("<a href='/register?next={current_url}'>{register_label}</a>").format(
-                    register_label=_("register"),
+                register_link=HTML('<a href="/register?next={current_url}">{register_label}</a>').format(
+                    register_label=_('register'),
                     current_url=urlquote_plus(request.path),
                 )
             ),
@@ -114,7 +120,7 @@ def _register_course_home_messages(request, course_id, user_access, course_start
         CourseHomeMessages.register_info_message(
             request,
             Text(_(
-                "{open_enroll_link} Enroll now{close_enroll_link} to access the full course."
+                '{open_enroll_link}Enroll now{close_enroll_link} to access the full course.'
             )).format(
                 open_enroll_link='',
                 close_enroll_link=''
@@ -123,81 +129,97 @@ def _register_course_home_messages(request, course_id, user_access, course_start
                 course_display_name=course.display_name
             )
         )
-    if user_access['is_enrolled'] and not course_start_data['already_started']:
-        CourseHomeMessages.register_info_message(
-            request,
-            Text(_(
-                "Don't forget to add a calendar reminder!"
-            )),
-            title=Text(_("Course starts in {days_until_start_string} on {course_start_date}.")).format(
-                days_until_start_string=course_start_data['days_until_start_string'],
-                course_start_date=course_start_data['course_start_date']
-            )
-        )
 
-    # Only show the set course goal message for enrolled, unverified
-    # users that have not yet set a goal in a course that allows for
-    # verified statuses.
-    has_verified_mode = CourseMode.has_verified_mode(CourseMode.modes_for_course_dict(unicode(course.id)))
-    is_already_verified = CourseEnrollment.is_enrolled_as_verified(request.user, course_key)
-    user_goal = get_course_goal(auth.get_user(request), course_key) if not request.user.is_anonymous() else None
-    if user_access['is_enrolled'] and has_verified_mode and not is_already_verified and not user_goal \
-            and ENABLE_COURSE_GOALS.is_enabled(course_key) and settings.FEATURES.get('ENABLE_COURSE_GOALS'):
-        goal_choices_html = Text(_(
-            'To start, set a course goal by selecting the option below that best describes '
-            'your learning plan. {goal_options_container}'
-        )).format(
-            goal_options_container=HTML('<div class="row goal-options-container">')
-        )
 
-        # Add the dismissible option for users that are unsure of their goal
-        goal_choices_html += Text(
-            '{initial_tag}{choice}{closing_tag}'
+def _should_show_course_goal_message(request, course, user_access):
+    """
+    Returns true if the current learner should be shown a course goal message.
+    """
+    course_key = course.id
+
+    # Don't show a message if course goals has not been enabled
+    if not ENABLE_COURSE_GOALS.is_enabled(course_key) or not settings.FEATURES.get('ENABLE_COURSE_GOALS'):
+        return False
+
+    # Don't show a message if the user is not enrolled
+    if not user_access['is_enrolled']:
+        return False
+
+    # Don't show a message if the learner has already specified a goal
+    if get_course_goal(auth.get_user(request), course_key):
+        return False
+
+    # Don't show a message if the course does not have a verified mode
+    if not CourseMode.has_verified_mode(CourseMode.modes_for_course_dict(unicode(course_key))):
+        return False
+
+    # Don't show a message if the learner has already verified
+    if CourseEnrollment.is_enrolled_as_verified(request.user, course_key):
+        return False
+
+    return True
+
+
+def _register_course_goal_message(request, course):
+    """
+    Register a message to let a learner specify a course goal.
+    """
+    goal_choices_html = Text(_(
+        'To start, set a course goal by selecting the option below that best describes '
+        'your learning plan. {goal_options_container}'
+    )).format(
+        goal_options_container=HTML('<div class="row goal-options-container">')
+    )
+
+    # Add the dismissible option for users that are unsure of their goal
+    goal_choices_html += Text(
+        '{initial_tag}{choice}{closing_tag}'
+    ).format(
+        initial_tag=HTML(
+            '<div tabindex="0" aria-label="{aria_label_choice}" class="goal-option dismissible" '
+            'data-choice="{goal_key}">'
+        ).format(
+            goal_key=GOAL_KEY_CHOICES.unsure,
+            aria_label_choice=Text(_("Set goal to: {choice}")).format(
+                choice=GOAL_KEY_CHOICES[GOAL_KEY_CHOICES.unsure]
+            ),
+        ),
+        choice=Text(_('{choice}')).format(
+            choice=GOAL_KEY_CHOICES[GOAL_KEY_CHOICES.unsure],
+        ),
+        closing_tag=HTML('</div>'),
+    )
+
+    # Add the option to set a goal to earn a certificate,
+    # complete the course or explore the course
+    goal_options = [
+        GOAL_KEY_CHOICES.certify,
+        GOAL_KEY_CHOICES.complete,
+        GOAL_KEY_CHOICES.explore
+    ]
+    for goal_key in goal_options:
+        goal_text = GOAL_KEY_CHOICES[goal_key]
+        goal_choices_html += HTML(
+            '{initial_tag}{goal_text}{closing_tag}'
         ).format(
             initial_tag=HTML(
-                '<div tabindex="0" aria-label="{aria_label_choice}" class="goal-option dismissible" '
+                '<div tabindex="0" aria-label="{aria_label_choice}" class="goal-option {col_sel} btn" '
                 'data-choice="{goal_key}">'
             ).format(
-                goal_key=GOAL_KEY_CHOICES.unsure,
-                aria_label_choice=Text(_("Set goal to: {choice}")).format(
-                    choice=GOAL_KEY_CHOICES[GOAL_KEY_CHOICES.unsure]
+                goal_key=goal_key,
+                aria_label_choice=Text(_("Set goal to: {goal_text}")).format(
+                    goal_text=Text(_(goal_text))
                 ),
+                col_sel='col-' + str(int(math.floor(12 / len(goal_options))))
             ),
-            choice=Text(_('{choice}')).format(
-                choice=GOAL_KEY_CHOICES[GOAL_KEY_CHOICES.unsure],
-            ),
-            closing_tag=HTML('</div>'),
+            goal_text=goal_text,
+            closing_tag=HTML('</div>')
         )
 
-        # Add the option to set a goal to earn a certificate,
-        # complete the course or explore the course
-        goal_options = [GOAL_KEY_CHOICES.certify, GOAL_KEY_CHOICES.complete, GOAL_KEY_CHOICES.explore]
-        for goal_key in goal_options:
-            goal_text = GOAL_KEY_CHOICES[goal_key]
-            goal_choices_html += HTML(
-                '{initial_tag}{goal_text}{closing_tag}'
-            ).format(
-                initial_tag=HTML(
-                    '<div tabindex="0" aria-label="{aria_label_choice}" class="goal-option {col_sel} btn" '
-                    'data-choice="{goal_key}">'
-                ).format(
-                    goal_key=goal_key,
-                    aria_label_choice=Text(_("Set goal to: {goal_text}")).format(
-                        goal_text=Text(_(goal_text))
-                    ),
-                    col_sel='col-' + str(int(math.floor(12 / len(goal_options))))
-                ),
-                goal_text=goal_text,
-                closing_tag=HTML('</div>')
-            )
-
-        CourseHomeMessages.register_info_message(
-            request,
-            HTML('{goal_choices_html}{closing_tag}').format(
-                goal_choices_html=goal_choices_html,
-                closing_tag=HTML('</div>')
-            ),
-            title=Text(_('Welcome to {course_display_name}')).format(
-                course_display_name=course.display_name
-            )
+    CourseHomeMessages.register_info_message(
+        request,
+        goal_choices_html,
+        title=Text(_('Welcome to {course_display_name}')).format(
+            course_display_name=course.display_name
         )
+    )

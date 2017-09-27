@@ -6,10 +6,11 @@ from django.utils.translation import get_language
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
-from student.models import CourseEnrollment
+from commerce.utils import EcommerceService
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from courseware.date_summary import VerifiedUpgradeDeadlineDate
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from student.models import CourseEnrollment
 
 
 class CourseSockFragmentView(EdxFragmentView):
@@ -44,13 +45,15 @@ class CourseSockFragmentView(EdxFragmentView):
             not deadline_has_passed and get_language() == 'en'
         )
 
-        # Get the price of the course and format correctly
+        # Get information about the upgrade
         course_price = get_cosmetic_verified_display_price(course)
+        upgrade_url = EcommerceService().upgrade_url(request.user, course_key)
 
         context = {
             'show_course_sock': show_course_sock,
             'course_price': course_price,
-            'course_id': course.id
+            'course_id': course.id,
+            'upgrade_url': upgrade_url,
         }
 
         return context

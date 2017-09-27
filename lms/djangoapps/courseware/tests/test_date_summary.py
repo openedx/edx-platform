@@ -4,7 +4,9 @@ from datetime import datetime, timedelta
 
 import ddt
 import waffle
+from django.contrib.messages.middleware import MessageMiddleware
 from django.core.urlresolvers import reverse
+from django.test import RequestFactory, TestCase
 from freezegun import freeze_time
 from mock import patch
 from nose.plugins.attrib import attr
@@ -31,7 +33,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
+from openedx.features.course_experience import CourseHomeMessages, UNIFIED_COURSE_TAB_FLAG, UPGRADE_DEADLINE_MESSAGE
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, TEST_PASSWORD
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -45,20 +47,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def setUp(self):
         super(CourseDateSummaryTest, self).setUp()
         SelfPacedConfiguration.objects.create(enable_course_home_improvements=True)
-
-    def create_user(self, verification_status=None):
-        """ Create a new User instance.
-
-        Arguments:
-            verification_status (str): User's verification status. If this value is set an instance of
-                SoftwareSecurePhotoVerification will be created for the user with the specified status.
-        """
-        user = UserFactory()
-
-        if verification_status is not None:
-            SoftwareSecurePhotoVerificationFactory.create(user=user, status=verification_status)
-
-        return user
 
     def enable_course_certificates(self, course):
         """ Enable course certificate configuration """
@@ -74,7 +62,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_course_info_feature_flag(self):
         SelfPacedConfiguration(enable_course_home_improvements=False).save()
         course = create_course_run()
-        user = self.create_user()
+        user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
 
         self.client.login(username=user.username, password=TEST_PASSWORD)
@@ -144,7 +132,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     @ddt.unpack
     def test_enabled_block_types(self, course_kwargs, user_kwargs, expected_blocks):
         course = create_course_run(**course_kwargs)
-        user = self.create_user(**user_kwargs)
+        user = create_user(**user_kwargs)
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         self.assert_block_types(course, user, expected_blocks)
 
@@ -160,12 +148,12 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     @ddt.unpack
     def test_enabled_block_types_without_enrollment(self, course_kwargs, expected_blocks):
         course = create_course_run(**course_kwargs)
-        user = self.create_user()
+        user = create_user()
         self.assert_block_types(course, user, expected_blocks)
 
     def test_enabled_block_types_with_non_upgradeable_course_run(self):
         course = create_course_run(days_till_start=-10, days_till_verification_deadline=None)
-        user = self.create_user()
+        user = create_user()
         CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.VERIFIED).delete()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
         self.assert_block_types(course, user, (TodaysDate, CourseEndDate))
@@ -177,7 +165,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         """
         with freeze_time('2015-01-02'):
             course = create_course_run()
-            user = self.create_user()
+            user = create_user()
             block = TodaysDate(course, user)
             self.assertTrue(block.is_enabled)
             self.assertEqual(block.date, datetime.now(utc))
@@ -191,7 +179,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_todays_date_no_timezone(self, url_name):
         with freeze_time('2015-01-02'):
             course = create_course_run()
-            user = self.create_user()
+            user = create_user()
             self.client.login(username=user.username, password=TEST_PASSWORD)
 
             html_elements = [
@@ -216,7 +204,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_todays_date_timezone(self, url_name):
         with freeze_time('2015-01-02'):
             course = create_course_run()
-            user = self.create_user()
+            user = create_user()
             self.client.login(username=user.username, password=TEST_PASSWORD)
             set_user_preference(user, 'time_zone', 'America/Los_Angeles')
             url = reverse(url_name, args=(course.id,))
@@ -237,7 +225,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     ## Tests Course Start Date
     def test_course_start_date(self):
         course = create_course_run()
-        user = self.create_user()
+        user = create_user()
         block = CourseStartDate(course, user)
         self.assertEqual(block.date, course.start)
 
@@ -249,7 +237,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_start_date_render(self, url_name):
         with freeze_time('2015-01-02'):
             course = create_course_run()
-            user = self.create_user()
+            user = create_user()
             self.client.login(username=user.username, password=TEST_PASSWORD)
             url = reverse(url_name, args=(course.id,))
             response = self.client.get(url, follow=True)
@@ -268,7 +256,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_start_date_render_time_zone(self, url_name):
         with freeze_time('2015-01-02'):
             course = create_course_run()
-            user = self.create_user()
+            user = create_user()
             self.client.login(username=user.username, password=TEST_PASSWORD)
             set_user_preference(user, 'time_zone', 'America/Los_Angeles')
             url = reverse(url_name, args=(course.id,))
@@ -284,7 +272,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     ## Tests Course End Date Block
     def test_course_end_date_for_certificate_eligible_mode(self):
         course = create_course_run(days_till_start=-1)
-        user = self.create_user()
+        user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         block = CourseEndDate(course, user)
         self.assertEqual(
@@ -294,7 +282,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
     def test_course_end_date_for_non_certificate_eligible_mode(self):
         course = create_course_run(days_till_start=-1)
-        user = self.create_user()
+        user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
         block = CourseEndDate(course, user)
         self.assertEqual(
@@ -305,7 +293,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
     def test_course_end_date_after_course(self):
         course = create_course_run(days_till_start=-2, days_till_end=-1)
-        user = self.create_user()
+        user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         block = CourseEndDate(course, user)
         self.assertEqual(
@@ -319,7 +307,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         sku = 'TESTSKU'
         configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
         course = create_course_run()
-        user = self.create_user()
+        user = create_user()
         course_mode = CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.VERIFIED)
         course_mode.sku = sku
         course_mode.save()
@@ -332,7 +320,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
     def test_no_certificate_available_date(self):
         course = create_course_run(days_till_start=-1)
-        user = self.create_user()
+        user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
         block = CertificateAvailableDate(course, user)
         self.assertEqual(block.date, None)
@@ -342,7 +330,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
     def test_no_certificate_available_date_for_self_paced(self):
         course = create_self_paced_course_run()
-        verified_user = self.create_user()
+        verified_user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=verified_user, mode=CourseMode.VERIFIED)
         course.certificate_available_date = datetime.now(utc) + timedelta(days=7)
         course.save()
@@ -356,7 +344,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         if the course only has audit mode.
         """
         course = create_course_run()
-        audit_user = self.create_user()
+        audit_user = create_user()
 
         # Enroll learner in the audit mode and verify the course only has 1 mode (audit)
         CourseEnrollmentFactory(course_id=course.id, user=audit_user, mode=CourseMode.AUDIT)
@@ -376,9 +364,9 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
     def test_certificate_available_date_defined(self):
         course = create_course_run()
-        audit_user = self.create_user()
+        audit_user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=audit_user, mode=CourseMode.AUDIT)
-        verified_user = self.create_user()
+        verified_user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=verified_user, mode=CourseMode.VERIFIED)
         course.certificate_available_date = datetime.now(utc) + timedelta(days=7)
         self.enable_course_certificates(course)
@@ -391,14 +379,14 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     ## VerificationDeadlineDate
     def test_no_verification_deadline(self):
         course = create_course_run(days_till_start=-1, days_till_verification_deadline=None)
-        user = self.create_user()
+        user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         block = VerificationDeadlineDate(course, user)
         self.assertFalse(block.is_enabled)
 
     def test_no_verified_enrollment(self):
         course = create_course_run(days_till_start=-1)
-        user = self.create_user()
+        user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
         block = VerificationDeadlineDate(course, user)
         self.assertFalse(block.is_enabled)
@@ -406,7 +394,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_verification_deadline_date_upcoming(self):
         with freeze_time('2015-01-02'):
             course = create_course_run(days_till_start=-1)
-            user = self.create_user()
+            user = create_user()
             CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
 
             block = VerificationDeadlineDate(course, user)
@@ -423,7 +411,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_verification_deadline_date_retry(self):
         with freeze_time('2015-01-02'):
             course = create_course_run(days_till_start=-1)
-            user = self.create_user(verification_status='denied')
+            user = create_user(verification_status='denied')
             CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
 
             block = VerificationDeadlineDate(course, user)
@@ -440,7 +428,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_verification_deadline_date_denied(self):
         with freeze_time('2015-01-02'):
             course = create_course_run(days_till_start=-10, days_till_verification_deadline=-1)
-            user = self.create_user(verification_status='denied')
+            user = create_user(verification_status='denied')
             CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
 
             block = VerificationDeadlineDate(course, user)
@@ -462,11 +450,102 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_render_date_string_past(self, delta, expected_date_string):
         with freeze_time('2015-01-02'):
             course = create_course_run(days_till_start=-10, days_till_verification_deadline=delta)
-            user = self.create_user(verification_status='denied')
+            user = create_user(verification_status='denied')
             CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
 
             block = VerificationDeadlineDate(course, user)
             self.assertEqual(block.relative_datestring, expected_date_string)
+
+
+@attr(shard=1)
+@ddt.ddt
+class TestDateAlerts(SharedModuleStoreTestCase):
+    """
+    Unit tests for date alerts.
+    """
+    def setUp(self):
+        super(TestDateAlerts, self).setUp()
+        with freeze_time('2017-07-01 09:00:00'):
+            self.course = create_course_run(days_till_start=0)
+            self.enrollment = CourseEnrollmentFactory(course_id=self.course.id, mode=CourseMode.AUDIT)
+            self.request = RequestFactory().request()
+            self.request.session = {}
+            self.request.user = self.enrollment.user
+            MessageMiddleware().process_request(self.request)
+
+    @ddt.data(
+        ['2017-01-01 09:00:00', u'in 6 months on <span class="date localized-datetime" data-format="shortDate"'],
+        ['2017-06-17 09:00:00', u'in 2 weeks on <span class="date localized-datetime" data-format="shortDate"'],
+        ['2017-06-30 10:00:00', u'in 1 day at <span class="date localized-datetime" data-format="shortTime"'],
+        ['2017-07-01 08:00:00', u'in 1 hour at <span class="date localized-datetime" data-format="shortTime"'],
+        ['2017-07-01 08:55:00', u'in 5 minutes at <span class="date localized-datetime" data-format="shortTime"'],
+        ['2017-07-01 09:00:00', None],
+        ['2017-08-01 09:00:00', None],
+    )
+    @ddt.unpack
+    def test_start_date_alert(self, current_time, expected_message_html):
+        """
+        Verify that course start date alerts are registered.
+        """
+        with freeze_time(current_time):
+            block = CourseStartDate(self.course, self.request.user)
+            block.register_alerts(self.request, self.course)
+            messages = list(CourseHomeMessages.user_messages(self.request))
+            if expected_message_html:
+                self.assertEqual(len(messages), 1)
+                self.assertIn(expected_message_html, messages[0].message_html)
+            else:
+                self.assertEqual(len(messages), 0)
+
+    @ddt.data(
+        ['2017-06-30 09:00:00', None],
+        ['2017-07-01 09:00:00', u'in 2 weeks on <span class="date localized-datetime" data-format="shortDate"'],
+        ['2017-07-14 10:00:00', u'in 1 day at <span class="date localized-datetime" data-format="shortTime"'],
+        ['2017-07-15 08:00:00', u'in 1 hour at <span class="date localized-datetime" data-format="shortTime"'],
+        ['2017-07-15 08:55:00', u'in 5 minutes at <span class="date localized-datetime" data-format="shortTime"'],
+        ['2017-07-15 09:00:00', None],
+        ['2017-08-15 09:00:00', None],
+    )
+    @ddt.unpack
+    def test_end_date_alert(self, current_time, expected_message_html):
+        """
+        Verify that course end date alerts are registered.
+        """
+        with freeze_time(current_time):
+            block = CourseEndDate(self.course, self.request.user)
+            block.register_alerts(self.request, self.course)
+            messages = list(CourseHomeMessages.user_messages(self.request))
+            if expected_message_html:
+                self.assertEqual(len(messages), 1)
+                self.assertIn(expected_message_html, messages[0].message_html)
+            else:
+                self.assertEqual(len(messages), 0)
+
+    @ddt.data(
+        ['2017-06-20 09:00:00', None],
+        ['2017-06-21 09:00:00', u'Don&#39;t forget, you have 2 weeks left to upgrade to a Verified Certificate.'],
+        ['2017-07-04 10:00:00', u'Don&#39;t forget, you have 1 day left to upgrade to a Verified Certificate.'],
+        ['2017-07-05 08:00:00', u'Don&#39;t forget, you have 1 hour left to upgrade to a Verified Certificate.'],
+        ['2017-07-05 08:55:00', u'Don&#39;t forget, you have 5 minutes left to upgrade to a Verified Certificate.'],
+        ['2017-07-05 09:00:00', None],
+        ['2017-08-05 09:00:00', None],
+    )
+    @ddt.unpack
+    @override_waffle_flag(UPGRADE_DEADLINE_MESSAGE, active=True)
+    def test_verified_upgrade_deadline_alert(self, current_time, expected_message_html):
+        """
+        Verify the verified upgrade deadline alerts.
+        """
+        with freeze_time(current_time):
+            block = VerifiedUpgradeDeadlineDate(self.course, self.request.user)
+            block.register_alerts(self.request, self.course)
+            messages = list(CourseHomeMessages.user_messages(self.request))
+            if expected_message_html:
+                self.assertEqual(len(messages), 1)
+                self.assertIn(expected_message_html, messages[0].message_html)
+            else:
+                self.assertEqual(len(messages), 0)
+
 
 
 @attr(shard=1)
@@ -558,6 +637,21 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
 
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         self.assertEqual(block.date, expected)
+
+
+def create_user(verification_status=None):
+    """ Create a new User instance.
+
+    Arguments:
+        verification_status (str): User's verification status. If this value is set an instance of
+            SoftwareSecurePhotoVerification will be created for the user with the specified status.
+    """
+    user = UserFactory()
+
+    if verification_status is not None:
+        SoftwareSecurePhotoVerificationFactory.create(user=user, status=verification_status)
+
+    return user
 
 
 def create_course_run(

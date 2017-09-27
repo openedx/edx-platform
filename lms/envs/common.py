@@ -431,6 +431,9 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5
 RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
 
+# Deadline message configurations
+COURSE_MESSAGE_ALERT_DURATION_IN_DAYS = 14
+
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
@@ -2587,6 +2590,7 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
 
 ##### LMS DEADLINE DISPLAY TIME_ZONE #######
 TIME_ZONE_DISPLAYED_FOR_DEADLINES = 'UTC'
+
 
 
 ########################## VIDEO IMAGE STORAGE ############################

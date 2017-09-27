@@ -173,7 +173,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         course_home_url(self.course)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(44, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(45, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -477,11 +477,9 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertIn('vc-message', response.content)
         url = EcommerceService().get_checkout_page_url(self.verified_mode.sku)
-        expected = '<a class="btn-upgrade" href="{url}">Upgrade (${price})</a>'.format(
-            url=url,
-            price=self.verified_mode.min_price
-        )
-        self.assertIn(expected, response.content)
+        self.assertIn('<a class="btn-upgrade"', response.content)
+        self.assertIn(url, response.content)
+        self.assertIn('Upgrade (${price})</a>'.format(price=self.verified_mode.min_price), response.content)
 
     def test_no_upgrade_message_if_logged_out(self):
         self.client.logout()

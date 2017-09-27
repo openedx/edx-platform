@@ -1,13 +1,3 @@
-// Upgrade button
-$btn-upgrade-border-color:                $uxpl-green-base !default;
-$btn-upgrade-background:                  $uxpl-green-base !default;
-$btn-upgrade-color:                       #fcfcfc !default;
-$btn-upgrade-focus-color:                 $btn-upgrade-color !default;
-$btn-upgrade-focus-border-color:          rgb(0, 155, 0) !default;
-$btn-upgrade-focus-background:            rgb(0, 155, 0) !default;
-$btn-upgrade-active-border-color:         $uxpl-green-base !default;
-$btn-upgrade-active-background:           $uxpl-green-base !default;
-
 //// Notifications
 // Upgrade
 
@@ -141,31 +131,6 @@ div.info-wrapper {
         .upgrade-banner-button {
           @include margin(0, 0, 0, auto);
           padding: $baseline/2 $baseline;
-        }
-
-        .btn-upgrade {
-          @extend %btn-shims;
-
-          border-color: $btn-upgrade-border-color;
-          background: $btn-upgrade-background;
-          color: $btn-upgrade-color;
-          // STATE: hover and focus
-          &:hover,
-          &.is-hovered,
-          &:focus,
-          &.is-focused {
-            border-color: $btn-upgrade-focus-border-color;
-            background-color: $btn-upgrade-focus-background;
-            color: $btn-upgrade-focus-color;
-          }
-
-          // STATE: is disabled
-          &:disabled,
-          &.is-disabled {
-            border-color: $btn-disabled-border-color;
-            background: $btn-brand-disabled-background;
-            color: $btn-upgrade-color;
-          }
         }
       }
     }

@@ -70,13 +70,6 @@ $upgrade-message-background-color: $blue-d1;
     color: $white;
   }
 
-  // Upgrade Button
-  .btn-upgrade {
-    @extend %btn-primary-green;
-
-    background: $uxpl-green-base;
-  }
-
   // Cert image
   .vc-hero {
     @include float(right);
