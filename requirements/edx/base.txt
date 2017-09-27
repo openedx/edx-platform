@@ -115,6 +115,7 @@ pyuca==1.1
 wrapt==1.10.5
 zendesk==1.1.1
 
+# lxml is also in requirements/edx-sandbox/post.txt
 lxml==3.8.0
 
 # Used for shopping cart's pdf invoice/receipt generation
