@@ -257,11 +257,11 @@ def _record_feedback_in_zendesk(
     # Tag all issues with LMS to distinguish channel in Zendesk; requested by student support team
     zendesk_tags = list(tags.values()) + ["LMS"]
 
-    # Per edX support, we would like to be able to route feedback items by site via tagging
-    current_site_orgs = configuration_helpers.get_current_site_orgs()
-    if current_site_orgs:
-        for org in current_site_orgs:
-            zendesk_tags.append("whitelabel_{org}".format(org=org))
+    # Per edX support, we would like to be able to route white label feedback items
+    # via tagging
+    white_label_org = configuration_helpers.get_value('course_org_filter')
+    if white_label_org:
+        zendesk_tags = zendesk_tags + ["whitelabel_{org}".format(org=white_label_org)]
 
     new_ticket = {
         "ticket": {

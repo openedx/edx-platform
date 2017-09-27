@@ -5,7 +5,6 @@ import ddt
 import mock
 
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from mock import patch
 from django.test.utils import override_settings
@@ -20,7 +19,6 @@ from certificates.models import CertificateStatuses  # pylint: disable=import-er
 from course_modes.models import CourseMode
 
 from student.models import LinkedInAddToProfileConfiguration
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 
 # pylint: disable=no-member
 
@@ -210,30 +208,6 @@ class CertificateDisplayTestLinkedHtmlView(CertificateDisplayTestBase):
     """
     Tests of linked student certificates.
     """
-
-    ENABLED_CACHES = ['default', 'mongo_modulestore_inheritance', 'loc_cache']
-
-    def setUp(self):
-        super(CertificateDisplayTestLinkedHtmlView, self).setUp()
-        self.user = UserFactory.create()
-        self.assertTrue(self.client.login(username=self.user.username, password='test'))
-        sites = Site.objects.all()
-        site = sites[0]
-        values = """
-                 {
-                 "course_org_filter":[
-                   "ELMS",
-                   "Shared"
-                   ],
-                   "SITE_NAME":"example.com",
-                   "LMS_BASE":"example.com",
-                   "SHARED_ORG":[
-                   "Shared"
-                   ],
-                   "CERT_URL":"http://example.com"
-                 }
-                 """
-        SiteConfigurationFactory.create(site=site, values=values)
 
     @classmethod
     def setUpClass(cls):

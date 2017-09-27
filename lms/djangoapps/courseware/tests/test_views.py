@@ -14,7 +14,6 @@ from nose.plugins.attrib import attr
 from freezegun import freeze_time
 
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
@@ -63,7 +62,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 
 
 @attr(shard=1)
@@ -1143,23 +1141,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         super(ProgressPageTests, self).setUp()
         self.user = UserFactory.create()
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
-        sites = Site.objects.all()
-        site = sites[0]
-        values = """
-                 {
-                 "course_org_filter":[
-                   "ELMS",
-                   "Shared"
-                   ],
-                   "SITE_NAME":"example.com",
-                   "LMS_BASE":"example.com",
-                   "SHARED_ORG":[
-                   "Shared"
-                   ],
-                   "CERT_URL":"http://example.com"
-                 }
-                 """
-        SiteConfigurationFactory.create(site=site, values=values)
+
         self.setup_course()
 
     def setup_course(self, **options):

@@ -476,7 +476,7 @@
     // encompassing course link
     .course-link {
       @extend %ui-depth2;
-      width: flex-grid(5, 9);
+      width: flex-grid(6, 9);
       @include margin-right(flex-gutter());
     }
 
@@ -517,7 +517,7 @@
       @include transition(opacity $tmg-f2 ease-in-out 0);
       @extend %ui-depth3;
       position: static;
-      width: flex-grid(4, 9);
+      width: flex-grid(3, 9);
       @include text-align(right);
       opacity: 0;
       pointer-events: none;

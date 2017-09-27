@@ -470,7 +470,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
 
     def test_get_all_courses_by_org(self):
         org_courses = []  # list of lists of courses
-        for index in range(3):
+        for index in range(2):
             org_courses.append([
                 CourseFactory.create(org='test_org_' + unicode(index), emit_signals=True)
                 for __ in range(3)
@@ -478,18 +478,18 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
 
         self.assertEqual(
             {c.id for c in CourseOverview.get_all_courses()},
-            {c.id for c in org_courses[0] + org_courses[1] + org_courses[2]},
+            {c.id for c in org_courses[0] + org_courses[1]},
         )
 
         self.assertEqual(
-            {c.id for c in CourseOverview.get_all_courses(orgs=['test_org_1', 'test_org_2'])},
-            {c.id for c in org_courses[1] + org_courses[2]},
+            {c.id for c in CourseOverview.get_all_courses(org='test_org_1')},
+            {c.id for c in org_courses[1]},
         )
 
         # Test case-insensitivity.
         self.assertEqual(
-            {c.id for c in CourseOverview.get_all_courses(orgs=['TEST_ORG_1', 'TEST_ORG_2'])},
-            {c.id for c in org_courses[1] + org_courses[2]},
+            {c.id for c in CourseOverview.get_all_courses(org='TEST_ORG_1')},
+            {c.id for c in org_courses[1]},
         )
 
     def test_get_all_courses_by_mobile_available(self):

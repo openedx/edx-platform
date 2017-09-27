@@ -111,9 +111,6 @@ require([
                 });
                 dropdownMenuView.postRender();
             }
-            // Change link based on selected site
-            $('.site_name').on('change', selectSite);
-            $('.site_name').trigger('change');
         });
 
         function smoothScrollLink(e) {

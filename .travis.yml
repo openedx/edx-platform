@@ -50,6 +50,7 @@ matrix:
 
 branches:
   only:
+  - revertMultiSiteCourseChanges
   - master
   - oxa/master.fic
   - oxa/release.fic
