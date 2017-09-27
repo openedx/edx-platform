@@ -212,10 +212,8 @@ from openedx.core.djangolib.markup import HTML, Text
                 <div class="bit">
                     <h3 class="title-3">${_("Changing the content learners see")}</h3>
                     <p>${_("To publish draft content, select the Publish icon for a section, subsection, or unit.")}</p>
-                    <p>${Text(_("To make a section, subsection, or unit unavailable to learners, select the Configure icon for that level, then select the appropriate {em_start}Hide{em_end} option. Grades for hidden sections, subsections, and units are not
-                        included in grade calculations.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
-                    <p>${Text(_("To hide the content of a subsection from learners after the subsection due date has passed, select the Configure icon for a subsection, then select {em_start}Hide content after due date{em_end}. Grades for the subsection
-                        remain included in grade calculations.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
+                    <p>${Text(_("To make a section, subsection, or unit unavailable to learners, select the Configure icon for that level, then select the appropriate {em_start}Hide{em_end} option. Grades for hidden sections, subsections, and units are not included in grade calculations.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
+                    <p>${Text(_("To hide the content of a subsection from learners after the subsection due date has passed, select the Configure icon for a subsection, then select {em_start}Hide content after due date{em_end}. Grades for the subsection remain included in grade calculations.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
                     <div class="external-help">
                         <a href="${get_online_help_info('visibility')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about content visibility settings")}</a>
                     </div>
