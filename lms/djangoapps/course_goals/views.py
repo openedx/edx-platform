@@ -11,8 +11,8 @@ from openedx.core.lib.api.permissions import IsStaffOrOwner
 from rest_framework import permissions, serializers, viewsets
 from rest_framework.authentication import SessionAuthentication
 
-from .api import CourseGoalOption
 from .models import CourseGoal
+
 
 User = get_user_model()
 
@@ -26,19 +26,6 @@ class CourseGoalSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseGoal
         fields = ('user', 'course_key', 'goal_key')
-
-    def validate_goal_key(self, value):
-        """
-        Ensure that the goal_key is valid.
-        """
-        if value not in CourseGoalOption.get_course_goal_keys():
-            raise serializers.ValidationError(
-                'Provided goal key, {goal_key}, is not a valid goal key (options= {goal_options}).'.format(
-                    goal_key=value,
-                    goal_options=[option.value for option in CourseGoalOption],
-                )
-            )
-        return value
 
     def validate_course_key(self, value):
         """

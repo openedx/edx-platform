@@ -18,7 +18,8 @@ from web_fragments.fragment import Fragment
 
 from course_modes.models import CourseMode
 from courseware.courses import get_course_with_access
-from lms.djangoapps.course_goals.api import CourseGoalOption, get_course_goal, get_goal_text
+from lms.djangoapps.course_goals.api import get_course_goal
+from lms.djangoapps.course_goals.models import GOAL_KEY_CHOICES
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import CourseHomeMessages
@@ -157,22 +158,22 @@ def _register_course_home_messages(request, course_id, user_access, course_start
                 '<div tabindex="0" aria-label="{aria_label_choice}" class="goal-option dismissible" '
                 'data-choice="{goal_key}">'
             ).format(
-                goal_key=CourseGoalOption.UNSURE.value,
+                goal_key=GOAL_KEY_CHOICES.unsure,
                 aria_label_choice=Text(_("Set goal to: {choice}")).format(
-                    choice=get_goal_text(CourseGoalOption.UNSURE.value)
+                    choice=GOAL_KEY_CHOICES[GOAL_KEY_CHOICES.unsure]
                 ),
             ),
             choice=Text(_('{choice}')).format(
-                choice=get_goal_text(CourseGoalOption.UNSURE.value),
+                choice=GOAL_KEY_CHOICES[GOAL_KEY_CHOICES.unsure],
             ),
             closing_tag=HTML('</div>'),
         )
 
         # Add the option to set a goal to earn a certificate,
         # complete the course or explore the course
-        goal_options = [CourseGoalOption.CERTIFY.value, CourseGoalOption.COMPLETE.value, CourseGoalOption.EXPLORE.value]
+        goal_options = [GOAL_KEY_CHOICES.certify, GOAL_KEY_CHOICES.complete, GOAL_KEY_CHOICES.explore]
         for goal_key in goal_options:
-            goal_text = get_goal_text(goal_key)
+            goal_text = GOAL_KEY_CHOICES[goal_key]
             goal_choices_html += HTML(
                 '{initial_tag}{goal_text}{closing_tag}'
             ).format(
