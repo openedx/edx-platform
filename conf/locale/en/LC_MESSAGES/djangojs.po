@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-09-14 11:34+0000\n"
-"PO-Revision-Date: 2017-09-14 11:35:52.001200\n"
+"POT-Creation-Date: 2017-09-28 16:31+0000\n"
+"PO-Revision-Date: 2017-09-28 16:39:58.125020\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1950,31 +1950,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.js
-msgid "Organization:"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.js
-msgid "Course Number:"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.js
-msgid "Course Run:"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.js
-msgid "(Read-only)"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.js
-msgid "Re-run Course"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.js
-#: cms/templates/js/show-textbook.underscore
-msgid "View Live"
 msgstr ""
 
 #: common/static/common/js/components/utils/view_utils.js
@@ -4777,6 +4752,10 @@ msgstr ""
 msgid "Bookmark this page"
 msgstr ""
 
+#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
+msgid "Thank you for setting your course goal!"
+msgstr ""
+
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "Show more"
 msgstr ""
@@ -5114,6 +5093,10 @@ msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Please enter an integer between %(min)s and %(max)s."
+msgstr ""
+
+#: cms/static/js/models/settings/course_grader.js
+msgid "The assignment type must have a name."
 msgstr ""
 
 #: cms/static/js/models/settings/course_grader.js
@@ -9239,6 +9222,10 @@ msgstr ""
 msgid ""
 "If the subsection does not have a due date, learners always see their scores"
 " when they submit answers to assessments."
+msgstr ""
+
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
 msgstr ""
 
 #: cms/templates/js/signatory-details.underscore

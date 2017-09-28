@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-09-14 11:35+0000\n"
-"PO-Revision-Date: 2017-09-14 11:35:51.489707\n"
+"POT-Creation-Date: 2017-09-28 16:39+0000\n"
+"PO-Revision-Date: 2017-09-28 16:39:57.493848\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2105,7 +2105,7 @@ msgstr ""
 #: lms/templates/register-shib.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
-#: lms/templates/survey/survey.html
+#: lms/templates/support/contact_us.html lms/templates/survey/survey.html
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -5084,6 +5084,22 @@ msgid ""
 "{payment_support_link}."
 msgstr ""
 
+#: lms/djangoapps/course_goals/models.py
+msgid "Earn a certificate."
+msgstr ""
+
+#: lms/djangoapps/course_goals/models.py
+msgid "Complete the course."
+msgstr ""
+
+#: lms/djangoapps/course_goals/models.py
+msgid "Explore the course."
+msgstr ""
+
+#: lms/djangoapps/course_goals/models.py
+msgid "Not sure yet."
+msgstr ""
+
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 msgid "Wiki"
@@ -5260,6 +5276,57 @@ msgid "Textbooks"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
+msgid "Your enrollment: Audit track"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You are enrolled in the audit track for this course. The audit track does "
+"not include a certificate."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "We're working on it..."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"We're creating your certificate. You can keep working in your courses and a "
+"link to it will appear here and on your Dashboard when it is ready."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate has been invalidated"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Please contact your course team if you have any questions."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Congratulations, you qualified for a certificate!"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "You've earned a certificate for this course."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Certificate unavailable"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate is available"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid "To see course content, {sign_in_link} or {register_link}."
 msgstr ""
@@ -5281,58 +5348,8 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
+#: openedx/features/course_experience/views/course_home_messages.py
 msgid "You must be enrolled in the course to see course content."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Your enrollment: Audit track"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"You are enrolled in the audit track for this course. The audit track does "
-"not include a certificate."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Your certificate has been invalidated"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Please contact your course team if you have any questions."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "We're working on it..."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"We're creating your certificate. You can keep working in your courses and a "
-"link to it will appear here and on your Dashboard when it is ready."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Your certificate is available"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "You've earned a certificate for this course."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Certificate unavailable"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
-msgid ""
-"You have not received a certificate because you do not have a current "
-"{platform_name} verified identity."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Congratulations, you qualified for a certificate!"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
@@ -5597,6 +5614,7 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
 #: cms/templates/index.html lms/templates/shoppingcart/receipt.html
+#: lms/templates/support/contact_us.html
 msgid "Course Name"
 msgstr ""
 
@@ -5958,6 +5976,7 @@ msgstr ""
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: openedx/core/djangoapps/user_api/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/support/contact_us.html
 msgid "Email"
 msgstr ""
 
@@ -8174,6 +8193,10 @@ msgid "Your Platform Name Here"
 msgstr ""
 
 #: lms/envs/common.py
+msgid "Your Platform Description Here"
+msgstr ""
+
+#: lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr ""
@@ -8789,6 +8812,10 @@ msgstr ""
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr ""
 
+#: lms/urls.py
+msgid "LMS Administration"
+msgstr ""
+
 #: openedx/core/djangoapps/api_admin/admin.py
 #, python-brace-format
 msgid ""
@@ -9253,10 +9280,6 @@ msgid "Schedule"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-msgid "View on Web"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s Home Page"
 msgstr ""
@@ -9298,6 +9321,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
 msgid "Download the Android app on the Google Play Store"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+msgid "View on Web"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
@@ -9399,12 +9426,12 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/subject.txt
 #, python-format
-msgid "Keep learning on %(platform_name)s!"
+msgid "Keep learning on %(platform_name)s"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/subject.txt
 #, python-format
-msgid "Keep learning in %(course_name)s !"
+msgid "Keep learning in %(course_name)s"
 msgstr ""
 
 #: openedx/core/djangoapps/self_paced/models.py
@@ -9463,9 +9490,6 @@ msgid ""
 "different username."
 msgstr ""
 
-#. Translators: This message is shown to users who enter a
-#. username/email/password
-#. with an inappropriate length (too short or too long).
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
 msgid "Username must be between {min} and {max} characters long."
@@ -9788,6 +9812,18 @@ msgstr ""
 msgid "{header_open}{title}{header_close}{body}"
 msgstr ""
 
+#: openedx/core/djangoapps/util/user_messages.py
+#, python-brace-format
+msgid "{header_open}{title}{header_close}"
+msgstr ""
+
+#: openedx/core/djangoapps/util/user_messages.py
+#: cms/templates/course_outline.html cms/templates/index.html
+#: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
+#: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
+msgid "Dismiss"
+msgstr ""
+
 #: openedx/core/djangoapps/verified_track_content/models.py
 msgid "The course key for the course we would like to be auto-cohorted."
 msgstr ""
@@ -9877,6 +9913,7 @@ msgstr ""
 #: openedx/features/course_experience/views/course_home_messages.py
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
+#: lms/templates/support/contact_us.html
 #: themes/edx.org/lms/templates/header.html
 msgid "Sign in"
 msgstr ""
@@ -9888,7 +9925,39 @@ msgid ""
 msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid "Welcome to {course_display_name}"
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
 msgid "Don't forget to add a calendar reminder!"
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid "Course starts in {days_until_start_string} on {course_start_date}."
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid ""
+"To start, set a course goal by selecting the option below that best "
+"describes your learning plan. {goal_options_container}"
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid "Set goal to: {choice}"
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid "{choice}"
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid "Set goal to: {goal_text}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -9901,6 +9970,14 @@ msgstr ""
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
 msgid "Enrollment in {course_name} was not complete."
+msgstr ""
+
+#: openedx/features/learner_profile/views/learner_profile.py
+#, python-brace-format
+msgid ""
+"Welcome to the new learner profile page. Your full profile now displays more"
+" information to other learners. You can instead choose to display a limited "
+"profile. {learn_more_link_start}Learn more{learn_more_link_end}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/course_group_config.py
@@ -10049,6 +10126,12 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/assets.py
+#, python-brace-format
+msgid ""
+"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/certificates.py
@@ -10527,6 +10610,10 @@ msgstr ""
 msgid "Dictionary with the available tags"
 msgstr ""
 
+#: cms/urls.py
+msgid "Studio Administration"
+msgstr ""
+
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
 msgid "Page Not Found"
@@ -10571,12 +10658,6 @@ msgstr ""
 #: cms/templates/course_outline.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Course Outline"
-msgstr ""
-
-#: cms/templates/course_outline.html cms/templates/index.html
-#: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
-#: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
-msgid "Dismiss"
 msgstr ""
 
 #: cms/templates/course_outline.html
@@ -10770,7 +10851,7 @@ msgstr ""
 msgid "Send an email to {email}"
 msgstr ""
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock.html lms/templates/support/contact_us.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
@@ -12164,10 +12245,6 @@ msgid "Dashboard for:"
 msgstr ""
 
 #: lms/templates/user_dropdown.html
-msgid "Profile"
-msgstr ""
-
-#: lms/templates/user_dropdown.html
 msgid "More options"
 msgstr ""
 
@@ -13157,7 +13234,7 @@ msgstr ""
 msgid "time"
 msgstr ""
 
-#: lms/templates/ccx/schedule.html
+#: lms/templates/ccx/schedule.html lms/templates/support/contact_us.html
 msgid "(Optional)"
 msgstr ""
 
@@ -16873,6 +16950,12 @@ msgid ""
 "translator!{link_end}"
 msgstr ""
 
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header.html
+msgid "Profile"
+msgstr ""
+
 #. Translators: This is short for "System administration".
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
@@ -17670,6 +17753,50 @@ msgstr ""
 msgid "Student Support: Certificates"
 msgstr ""
 
+#: lms/templates/support/contact_us.html
+msgid "Contact US"
+msgstr ""
+
+#: lms/templates/support/contact_us.html
+msgid "Your question may have already been answered."
+msgstr ""
+
+#: lms/templates/support/contact_us.html
+msgid "Visit edX Help"
+msgstr ""
+
+#: lms/templates/support/contact_us.html
+msgid "Sign in for a faster response"
+msgstr ""
+
+#: lms/templates/support/contact_us.html
+msgid "What can we help you with, {username}?"
+msgstr ""
+
+#: lms/templates/support/contact_us.html
+msgid "Message"
+msgstr ""
+
+#: lms/templates/support/contact_us.html
+msgid "The more you tell us, themore quickly and helpfully we can respond!"
+msgstr ""
+
+#: lms/templates/support/contact_us.html
+msgid "Add Attachment"
+msgstr ""
+
+#: lms/templates/support/contact_us.html
+msgid "1 file uploaded:"
+msgstr ""
+
+#: lms/templates/support/contact_us.html
+msgid "Remove file"
+msgstr ""
+
+#: lms/templates/support/contact_us.html
+msgid "Cancel upload"
+msgstr ""
+
 #: lms/templates/support/enrollment.html
 msgid "Student Support: Enrollment"
 msgstr ""
@@ -17972,6 +18099,10 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Upgrade ({price})"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-messages-fragment.html
+msgid "Course message author"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
@@ -21363,6 +21494,18 @@ msgstr ""
 
 #: cms/templates/widgets/user_dropdown.html
 msgid "Maintenance"
+msgstr ""
+
+#: wiki/apps.py
+msgid "Wiki notifications"
+msgstr ""
+
+#: wiki/apps.py
+msgid "Wiki images"
+msgstr ""
+
+#: wiki/apps.py
+msgid "Wiki attachments"
 msgstr ""
 
 #: wiki/forms.py

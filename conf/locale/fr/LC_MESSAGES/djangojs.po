@@ -169,8 +169,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-30 16:34+0000\n"
-"PO-Revision-Date: 2017-08-30 16:43+0000\n"
+"POT-Creation-Date: 2017-09-14 12:33+0000\n"
+"PO-Revision-Date: 2017-09-23 19:57+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -4703,16 +4703,12 @@ msgstr "Nom complet"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"The name that is used for ID verification and appears on your certificates. "
-"Other learners never see your full name. Make sure to enter your name "
-"exactly as it appears on your government-issued photo ID, including any non-"
+"The name that is used for ID verification and that appears on your "
+"certificates. Other learners see your full name if you have selected "
+"{bold_start}Full Profile{bold_end} for profile visibility. Make sure to "
+"enter your name exactly as it appears on your photo ID, including any non-"
 "Roman characters."
 msgstr ""
-"C'est le nom utilisé pour la vérification d'identité qui apparaît dans votre"
-" certificat. Les autres apprenants ne voient jamais votre nom complet. "
-"Assurez vous de saisir votre nom exactement comme il apparaît sur votre "
-"photo d'identité émise par le gouvernement, en incluant les caractères "
-"autres que romains."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
@@ -5158,6 +5154,14 @@ msgstr ""
 msgid "Bookmark this page"
 msgstr ""
 
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "Show more"
+msgstr ""
+
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "Show less"
+msgstr ""
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -5232,15 +5236,6 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Profile image for {username}"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
-msgid "My Profile"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
-msgid ""
-"Build out your profile to personalize your identity on {platform_name}."
 msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
@@ -7390,10 +7385,6 @@ msgstr ""
 msgid "End My Exam"
 msgstr "Terminer mon examen"
 
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Hide Timer"
-msgstr ""
-
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
 msgstr "EN SAVOIR PLUS"
@@ -8735,10 +8726,6 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
 msgid "Find a course"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/learner_profile.underscore
-msgid "An error occurred. Try loading the page again."
 msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore

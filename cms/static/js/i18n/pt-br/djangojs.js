@@ -1098,7 +1098,6 @@
     "The minimum grade for course credit is not set.": "A nota m\u00ednima para obter cr\u00e9ditos para o curso n\u00e3o est\u00e1 especificada.", 
     "The name of this signatory as it should appear on certificates.": "O nome deste signat\u00e1rio conforme deve aparecer nos certificados.", 
     "The name that identifies you throughout {platform_name}. You cannot change your username.": "O nome que lhe identifica dentro da plataforma {platform_name}. Voc\u00ea n\u00e3o poder alter\u00e1-lo.", 
-    "The name that is used for ID verification and appears on your certificates. Other learners never see your full name. Make sure to enter your name exactly as it appears on your government-issued photo ID, including any non-Roman characters.": "O nome que \u00e9 usado para verifica\u00e7\u00e3o de ID e que aparece nos teus certificados. Outros alunos nunca veem teus nomes completos. Tenha certeza de entrar com teu nome exatamente como aparece na tua Identifica\u00e7\u00e3o com foto emitida pelo governo, incluindo quaisquer caracteres que n\u00e3o estejam na fonte Roman", 
     "The organization that this signatory belongs to, as it should appear on certificates.": "A organiza\u00e7\u00e3o a qual este signat\u00e1rio pertence, conforme deve aparecer nos certificados.", 
     "The photo of your face matches the photo on your ID.": "A foto do seu rosto corresponde \u00e0 foto no seu documento.", 
     "The raw error message is:": "A mensagem bruta de erro \u00e9:", 

@@ -131,8 +131,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-08-30 16:34+0000\n"
-"PO-Revision-Date: 2017-08-30 16:43+0000\n"
+"POT-Creation-Date: 2017-09-14 12:33+0000\n"
+"PO-Revision-Date: 2017-09-23 19:57+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
@@ -2114,15 +2114,15 @@ msgstr "Desactivar transcripción"
 
 #: common/static/bundles/StudioIndex.js
 msgid "Organization:"
-msgstr ""
+msgstr "Organización:"
 
 #: common/static/bundles/StudioIndex.js
 msgid "Course Number:"
-msgstr ""
+msgstr "Número de curso:"
 
 #: common/static/bundles/StudioIndex.js
 msgid "Course Run:"
-msgstr ""
+msgstr "Edición del Curso:"
 
 #: common/static/bundles/StudioIndex.js
 msgid "(Read-only)"
@@ -4816,15 +4816,12 @@ msgstr "Nombre completo"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"The name that is used for ID verification and appears on your certificates. "
-"Other learners never see your full name. Make sure to enter your name "
-"exactly as it appears on your government-issued photo ID, including any non-"
+"The name that is used for ID verification and that appears on your "
+"certificates. Other learners see your full name if you have selected "
+"{bold_start}Full Profile{bold_end} for profile visibility. Make sure to "
+"enter your name exactly as it appears on your photo ID, including any non-"
 "Roman characters."
 msgstr ""
-"Nombre que se usará para la verificación de identidad y que aparece en tus "
-"certificados. Otros estudiantes nunca verán tu nombre completo. Asegúrate de"
-" que ingresas el nombre exactamente como aparece en tu identificación "
-"oficial con foto, incluyendo cualquier carácter no romano."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
@@ -5279,6 +5276,14 @@ msgstr "Puntaje general"
 msgid "Bookmark this page"
 msgstr "Marcar esta página"
 
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "Show more"
+msgstr ""
+
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "Show less"
+msgstr ""
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -5363,16 +5368,6 @@ msgstr "Foto de perfil"
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Profile image for {username}"
 msgstr "Foto de perfil para {username}"
-
-#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
-msgid "My Profile"
-msgstr "Mi Perfil"
-
-#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
-msgid ""
-"Build out your profile to personalize your identity on {platform_name}."
-msgstr ""
-"Actualice su perfil para personalizar su identidad en {platform_name}."
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "About Me"
@@ -7574,10 +7569,6 @@ msgstr ""
 msgid "End My Exam"
 msgstr "Terminar mi examen"
 
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Hide Timer"
-msgstr ""
-
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
 msgstr "APRENDER MAS"
@@ -8982,10 +8973,6 @@ msgstr "Empieza a trabajar hacia tu próxima meta de aprendizaje."
 #: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
 msgid "Find a course"
 msgstr "Busca un curso"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/learner_profile.underscore
-msgid "An error occurred. Try loading the page again."
-msgstr "Ocurrió un error. Intenta cargar la página nuevamente."
 
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "You are currently sharing a limited profile."
