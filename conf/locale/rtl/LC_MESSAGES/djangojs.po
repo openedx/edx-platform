@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-09-14 11:34+0000\n"
-"PO-Revision-Date: 2017-09-14 11:35:52.001200\n"
+"POT-Creation-Date: 2017-09-28 16:31+0000\n"
+"PO-Revision-Date: 2017-09-28 16:39:58.125020\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1993,31 +1993,6 @@ msgstr "فعقر خر فقشرسذقهحفس"
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
 msgstr "فعقر خبب فقشرسذقهحفس"
-
-#: common/static/bundles/StudioIndex.js
-msgid "Organization:"
-msgstr "خقلشرهظشفهخر:"
-
-#: common/static/bundles/StudioIndex.js
-msgid "Course Number:"
-msgstr "ذخعقسث رعوزثق:"
-
-#: common/static/bundles/StudioIndex.js
-msgid "Course Run:"
-msgstr "ذخعقسث قعر:"
-
-#: common/static/bundles/StudioIndex.js
-msgid "(Read-only)"
-msgstr "(قثشي-خرمغ)"
-
-#: common/static/bundles/StudioIndex.js
-msgid "Re-run Course"
-msgstr "قث-قعر ذخعقسث"
-
-#: common/static/bundles/StudioIndex.js
-#: cms/templates/js/show-textbook.underscore
-msgid "View Live"
-msgstr "دهثص مهدث"
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -5067,6 +5042,10 @@ msgstr "خدثقشمم سذخقث"
 msgid "Bookmark this page"
 msgstr "زخخنوشقن فاهس حشلث"
 
+#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
+msgid "Thank you for setting your course goal!"
+msgstr "فاشرن غخع بخق سثففهرل غخعق ذخعقسث لخشم!"
+
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "Show more"
 msgstr "ساخص وخقث"
@@ -5417,6 +5396,10 @@ msgstr "نثغ ساخعمي خرمغ ذخرفشهر مثففثقس, رعوزثق
 #: cms/static/js/models/settings/course_details.js
 msgid "Please enter an integer between %(min)s and %(max)s."
 msgstr "حمثشسث ثرفثق شر هرفثلثق زثفصثثر %(min)s شري %(max)s."
+
+#: cms/static/js/models/settings/course_grader.js
+msgid "The assignment type must have a name."
+msgstr "فاث شسسهلروثرف فغحث وعسف اشدث ش رشوث."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "There's already another assignment type with this name."
@@ -9825,6 +9808,10 @@ msgid ""
 msgstr ""
 "هب فاث سعزسثذفهخر يخثس رخف اشدث ش يعث يشفث, مثشقرثقس شمصشغس سثث فاثهق سذخقثس"
 " صاثر فاثغ سعزوهف شرسصثقس فخ شسسثسسوثرفس."
+
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
+msgstr "دهثص مهدث"
 
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore
