@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-09-28 16:39+0000\n"
-"PO-Revision-Date: 2017-09-28 16:39:57.493848\n"
+"POT-Creation-Date: 2017-10-06 13:30+0000\n"
+"PO-Revision-Date: 2017-10-06 13:30:33.183670\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3999,6 +3999,13 @@ msgstr ""
 msgid "General"
 msgstr "Généräl Ⱡ'σяєм ιρѕυм #"
 
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}"
+msgstr ""
+"{assignment_type} = {weighted_percent:.2%} öf ä pössïßlé {weight:.2%} Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Text"
 msgstr "Téxt Ⱡ'σяєм ι#"
@@ -6688,6 +6695,26 @@ msgid "Course Starts"
 msgstr "Çöürsé Stärts Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/djangoapps/courseware/date_summary.py
+msgid "Don't forget to add a calendar reminder!"
+msgstr ""
+"Dön't förgét tö ädd ä çäléndär rémïndér! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "Course starts in {time_remaining_string} on {course_start_date}."
+msgstr ""
+"Çöürsé stärts ïn {time_remaining_string} ön {course_start_date}. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "Course starts in {time_remaining_string} at {course_start_time}."
+msgstr ""
+"Çöürsé stärts ïn {time_remaining_string} ät {course_start_time}. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/djangoapps/courseware/date_summary.py
 msgid "Course End"
 msgstr "Çöürsé Énd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -6713,6 +6740,20 @@ msgstr ""
 " nö löngér äçtïvé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "This course is ending in {time_remaining_string} on {course_end_date}."
+msgstr ""
+"Thïs çöürsé ïs éndïng ïn {time_remaining_string} ön {course_end_date}. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "This course is ending in {time_remaining_string} at {course_end_time}."
+msgstr ""
+"Thïs çöürsé ïs éndïng ïn {time_remaining_string} ät {course_end_time}. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/djangoapps/courseware/date_summary.py
 msgid "Certificate Available"
 msgstr "Çértïfïçäté Àväïläßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
@@ -6721,6 +6762,34 @@ msgid "Day certificates will become available for passing verified learners."
 msgstr ""
 "Däý çértïfïçätés wïll ßéçömé äväïläßlé för pässïng vérïfïéd léärnérs. Ⱡ'σяєм"
 " ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid ""
+"If you have earned a certificate, you will be able to access it "
+"{time_remaining_string} from now. You will also be able to view your "
+"certificates on your {learner_profile_link}."
+msgstr ""
+"Ìf ýöü hävé éärnéd ä çértïfïçäté, ýöü wïll ßé äßlé tö äççéss ït "
+"{time_remaining_string} fröm nöw. Ýöü wïll älsö ßé äßlé tö vïéw ýöür "
+"çértïfïçätés ön ýöür {learner_profile_link}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι"
+" σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαв#"
+
+#: lms/djangoapps/courseware/date_summary.py
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Learner Profile"
+msgstr "Léärnér Pröfïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "We are working on generating course certificates."
+msgstr ""
+"Wé äré wörkïng ön générätïng çöürsé çértïfïçätés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Verification Upgrade Deadline"
@@ -6737,6 +6806,38 @@ msgstr ""
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Upgrade to Verified Certificate"
 msgstr "Ûpgrädé tö Vérïfïéd Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid ""
+"In order to qualify for a certificate, you must meet all course grading "
+"requirements, upgrade before the course deadline, and successfully verify "
+"your identity on {platform_name} if you have not done so "
+"already.{button_panel}"
+msgstr ""
+"Ìn ördér tö qüälïfý för ä çértïfïçäté, ýöü müst méét äll çöürsé grädïng "
+"réqüïréménts, üpgrädé ßéföré thé çöürsé déädlïné, änd süççéssfüllý vérïfý "
+"ýöür ïdéntïtý ön {platform_name} ïf ýöü hävé nöt döné sö "
+"älréädý.{button_panel} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
+"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
+"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
+"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
+"σ¢¢αє#"
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "Upgrade ({upgrade_price})"
+msgstr "Ûpgrädé ({upgrade_price}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid ""
+"Don't forget, you have {time_remaining_string} left to upgrade to a Verified"
+" Certificate."
+msgstr ""
+"Dön't förgét, ýöü hävé {time_remaining_string} léft tö üpgrädé tö ä Vérïfïéd"
+" Çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/courseware/date_summary.py
 #: cms/templates/group_configurations.html
@@ -12647,9 +12748,9 @@ msgstr "Révïéws Ⱡ'σяєм ιρѕυм #"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
-msgid " {sign_in_link} or {register_link} and then enroll in this course."
+msgid "{sign_in_link} or {register_link} and then enroll in this course."
 msgstr ""
-" {sign_in_link} ör {register_link} änd thén énröll ïn thïs çöürsé. Ⱡ'σяєм "
+"{sign_in_link} ör {register_link} änd thén énröll ïn thïs çöürsé. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: openedx/features/course_experience/views/course_home_messages.py
@@ -12663,28 +12764,15 @@ msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid ""
-"{open_enroll_link} Enroll now{close_enroll_link} to access the full course."
+"{open_enroll_link}Enroll now{close_enroll_link} to access the full course."
 msgstr ""
-"{open_enroll_link} Énröll nöw{close_enroll_link} tö äççéss thé füll çöürsé. "
+"{open_enroll_link}Énröll nöw{close_enroll_link} tö äççéss thé füll çöürsé. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "Welcome to {course_display_name}"
 msgstr "Wélçömé tö {course_display_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: openedx/features/course_experience/views/course_home_messages.py
-msgid "Don't forget to add a calendar reminder!"
-msgstr ""
-"Dön't förgét tö ädd ä çäléndär rémïndér! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: openedx/features/course_experience/views/course_home_messages.py
-#, python-brace-format
-msgid "Course starts in {days_until_start_string} on {course_start_date}."
-msgstr ""
-"Çöürsé stärts ïn {days_until_start_string} ön {course_start_date}. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -17852,12 +17940,10 @@ msgstr ""
 "{platform_name}{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid ""
-"Final course details are being wrapped up at this time. Your final standing "
-"will be available shortly."
+msgid "Your certificate will be available on or before {date}"
 msgstr ""
-"Fïnäl çöürsé détäïls äré ßéïng wräppéd üp ät thïs tïmé. Ýöür fïnäl ständïng "
-"wïll ßé äväïläßlé shörtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+"Ýöür çértïfïçäté wïll ßé äväïläßlé ön ör ßéföré {date} Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
@@ -23078,24 +23164,6 @@ msgstr ""
 "Thïs ïs ýöür läst vïsïtéd çöürsé séçtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "This course has not started yet."
-msgstr ""
-"Thïs çöürsé häs nöt stärtéd ýét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "We're still working on course content."
-msgstr ""
-"Wé'ré stïll wörkïng ön çöürsé çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid ""
-"This course has not started yet, and will launch on {launch_date_html}."
-msgstr ""
-"Thïs çöürsé häs nöt stärtéd ýét, änd wïll läünçh ön {launch_date_html}. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
 msgstr ""
@@ -23158,10 +23226,6 @@ msgstr ""
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore New Courses"
 msgstr "Éxplöré Néw Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Learner Profile"
-msgstr "Léärnér Pröfïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "My Profile"

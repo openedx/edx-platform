@@ -14,6 +14,7 @@ from datetime import datetime
 
 from contracts import contract
 from pytz import UTC
+from django.utils.translation import ugettext_lazy as _
 
 log = logging.getLogger("edx.courseware")
 
@@ -270,7 +271,10 @@ class WeightedSubsectionsGrader(CourseGrader):
             subgrade_result = subgrader.grade(grade_sheet, generate_random_scores)
 
             weighted_percent = subgrade_result['percent'] * weight
-            section_detail = u"{0} = {1:.2%} of a possible {2:.2%}".format(assignment_type, weighted_percent, weight)
+            section_detail = _(u"{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}").format(
+                assignment_type=assignment_type,
+                weighted_percent=weighted_percent,
+                weight=weight)
 
             total_percent += weighted_percent
             section_breakdown += subgrade_result['section_breakdown']

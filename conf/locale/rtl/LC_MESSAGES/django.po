@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-09-28 16:39+0000\n"
-"PO-Revision-Date: 2017-09-28 16:39:57.493848\n"
+"POT-Creation-Date: 2017-10-06 13:30+0000\n"
+"PO-Revision-Date: 2017-10-06 13:30:33.183670\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3453,6 +3453,11 @@ msgstr ""
 msgid "General"
 msgstr "لثرثقشم"
 
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}"
+msgstr "{assignment_type} = {weighted_percent:.2%} خب ش حخسسهزمث {weight:.2%}"
+
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Text"
 msgstr "فثطف"
@@ -5741,6 +5746,20 @@ msgid "Course Starts"
 msgstr "ذخعقسث سفشقفس"
 
 #: lms/djangoapps/courseware/date_summary.py
+msgid "Don't forget to add a calendar reminder!"
+msgstr "يخر'ف بخقلثف فخ شيي ش ذشمثريشق قثوهريثق!"
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "Course starts in {time_remaining_string} on {course_start_date}."
+msgstr "ذخعقسث سفشقفس هر {time_remaining_string} خر {course_start_date}."
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "Course starts in {time_remaining_string} at {course_start_time}."
+msgstr "ذخعقسث سفشقفس هر {time_remaining_string} شف {course_start_time}."
+
+#: lms/djangoapps/courseware/date_summary.py
 msgid "Course End"
 msgstr "ذخعقسث ثري"
 
@@ -5763,12 +5782,44 @@ msgstr ""
 " رخ مخرلثق شذفهدث."
 
 #: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "This course is ending in {time_remaining_string} on {course_end_date}."
+msgstr ""
+"فاهس ذخعقسث هس ثريهرل هر {time_remaining_string} خر {course_end_date}."
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "This course is ending in {time_remaining_string} at {course_end_time}."
+msgstr ""
+"فاهس ذخعقسث هس ثريهرل هر {time_remaining_string} شف {course_end_time}."
+
+#: lms/djangoapps/courseware/date_summary.py
 msgid "Certificate Available"
 msgstr "ذثقفهبهذشفث شدشهمشزمث"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Day certificates will become available for passing verified learners."
 msgstr "يشغ ذثقفهبهذشفثس صهمم زثذخوث شدشهمشزمث بخق حشسسهرل دثقهبهثي مثشقرثقس."
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid ""
+"If you have earned a certificate, you will be able to access it "
+"{time_remaining_string} from now. You will also be able to view your "
+"certificates on your {learner_profile_link}."
+msgstr ""
+"هب غخع اشدث ثشقرثي ش ذثقفهبهذشفث, غخع صهمم زث شزمث فخ شذذثسس هف "
+"{time_remaining_string} بقخو رخص. غخع صهمم شمسخ زث شزمث فخ دهثص غخعق "
+"ذثقفهبهذشفثس خر غخعق {learner_profile_link}."
+
+#: lms/djangoapps/courseware/date_summary.py
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Learner Profile"
+msgstr "مثشقرثق حقخبهمث"
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "We are working on generating course certificates."
+msgstr "صث شقث صخقنهرل خر لثرثقشفهرل ذخعقسث ذثقفهبهذشفثس."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Verification Upgrade Deadline"
@@ -5785,6 +5836,33 @@ msgstr ""
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Upgrade to Verified Certificate"
 msgstr "عحلقشيث فخ دثقهبهثي ذثقفهبهذشفث"
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid ""
+"In order to qualify for a certificate, you must meet all course grading "
+"requirements, upgrade before the course deadline, and successfully verify "
+"your identity on {platform_name} if you have not done so "
+"already.{button_panel}"
+msgstr ""
+"هر خقيثق فخ ضعشمهبغ بخق ش ذثقفهبهذشفث, غخع وعسف وثثف شمم ذخعقسث لقشيهرل "
+"قثضعهقثوثرفس, عحلقشيث زثبخقث فاث ذخعقسث يثشيمهرث, شري سعذذثسسبعممغ دثقهبغ "
+"غخعق هيثرفهفغ خر {platform_name} هب غخع اشدث رخف يخرث سخ "
+"شمقثشيغ.{button_panel}"
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "Upgrade ({upgrade_price})"
+msgstr "عحلقشيث ({upgrade_price})"
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid ""
+"Don't forget, you have {time_remaining_string} left to upgrade to a Verified"
+" Certificate."
+msgstr ""
+"يخر'ف بخقلثف, غخع اشدث {time_remaining_string} مثبف فخ عحلقشيث فخ ش دثقهبهثي"
+" ذثقفهبهذشفث."
 
 #: lms/djangoapps/courseware/date_summary.py
 #: cms/templates/group_configurations.html
@@ -10970,8 +11048,8 @@ msgstr "قثدهثصس"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
-msgid " {sign_in_link} or {register_link} and then enroll in this course."
-msgstr " {sign_in_link} خق {register_link} شري فاثر ثرقخمم هر فاهس ذخعقسث."
+msgid "{sign_in_link} or {register_link} and then enroll in this course."
+msgstr "{sign_in_link} خق {register_link} شري فاثر ثرقخمم هر فاهس ذخعقسث."
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #: lms/templates/navigation/navbar-not-authenticated.html
@@ -10984,23 +11062,14 @@ msgstr "سهلر هر"
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid ""
-"{open_enroll_link} Enroll now{close_enroll_link} to access the full course."
+"{open_enroll_link}Enroll now{close_enroll_link} to access the full course."
 msgstr ""
-"{open_enroll_link} ثرقخمم رخص{close_enroll_link} فخ شذذثسس فاث بعمم ذخعقسث."
+"{open_enroll_link}ثرقخمم رخص{close_enroll_link} فخ شذذثسس فاث بعمم ذخعقسث."
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "Welcome to {course_display_name}"
 msgstr "صثمذخوث فخ {course_display_name}"
-
-#: openedx/features/course_experience/views/course_home_messages.py
-msgid "Don't forget to add a calendar reminder!"
-msgstr "يخر'ف بخقلثف فخ شيي ش ذشمثريشق قثوهريثق!"
-
-#: openedx/features/course_experience/views/course_home_messages.py
-#, python-brace-format
-msgid "Course starts in {days_until_start_string} on {course_start_date}."
-msgstr "ذخعقسث سفشقفس هر {days_until_start_string} خر {course_start_date}."
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -15637,12 +15706,8 @@ msgstr ""
 "{platform_name}{link_end}."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid ""
-"Final course details are being wrapped up at this time. Your final standing "
-"will be available shortly."
-msgstr ""
-"بهرشم ذخعقسث يثفشهمس شقث زثهرل صقشححثي عح شف فاهس فهوث. غخعق بهرشم سفشريهرل "
-"صهمم زث شدشهمشزمث ساخقفمغ."
+msgid "Your certificate will be available on or before {date}"
+msgstr "غخعق ذثقفهبهذشفث صهمم زث شدشهمشزمث خر خق زثبخقث {date}"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
@@ -20138,20 +20203,6 @@ msgstr "{subsection_format} يعث {{date}}"
 msgid "This is your last visited course section."
 msgstr "فاهس هس غخعق مشسف دهسهفثي ذخعقسث سثذفهخر."
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "This course has not started yet."
-msgstr "فاهس ذخعقسث اشس رخف سفشقفثي غثف."
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "We're still working on course content."
-msgstr "صث'قث سفهمم صخقنهرل خر ذخعقسث ذخرفثرف."
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid ""
-"This course has not started yet, and will launch on {launch_date_html}."
-msgstr ""
-"فاهس ذخعقسث اشس رخف سفشقفثي غثف, شري صهمم مشعرذا خر {launch_date_html}."
-
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
 msgstr "فاهس ذخعقسث يخثس رخف اشدث شرغ عحيشفثس."
@@ -20210,10 +20261,6 @@ msgstr "غخع اشدثر'ف ثشقرثي شرغ ذثقفهبهذشفثس غثف
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore New Courses"
 msgstr "ثطحمخقث رثص ذخعقسثس"
-
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Learner Profile"
-msgstr "مثشقرثق حقخبهمث"
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "My Profile"
