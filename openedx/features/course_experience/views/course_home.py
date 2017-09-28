@@ -27,7 +27,7 @@ from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
 from web_fragments.fragment import Fragment
 
-from .. import LATEST_UPDATE_FLAG, SHOW_UPGRADE_MSG_ON_COURSE_HOME
+from .. import LATEST_UPDATE_FLAG, SHOW_UPGRADE_MSG_ON_COURSE_HOME, USE_BOOTSTRAP_FLAG
 from ..utils import get_course_outline_block_tree
 from .course_dates import CourseDatesFragmentView
 from .course_home_messages import CourseHomeMessageFragmentView
@@ -51,6 +51,9 @@ class CourseHomeView(CourseTabView):
         Displays the home page for the specified course.
         """
         return super(CourseHomeView, self).get(request, course_id, 'courseware', **kwargs)
+
+    def uses_bootstrap(self, request, course):
+        return USE_BOOTSTRAP_FLAG.is_enabled(course.id)
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
         course_id = unicode(course.id)

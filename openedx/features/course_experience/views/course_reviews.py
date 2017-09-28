@@ -16,12 +16,13 @@ from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
 
+from .. import USE_BOOTSTRAP_FLAG
+
 
 class CourseReviewsView(CourseTabView):
     """
     The course reviews page.
     """
-
     @method_decorator(login_required)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     def get(self, request, course_id, **kwargs):
@@ -29,6 +30,9 @@ class CourseReviewsView(CourseTabView):
         Displays the reviews page for the specified course.
         """
         return super(CourseReviewsView, self).get(request, course_id, 'courseware', **kwargs)
+
+    def uses_bootstrap(self, request, course):
+        return USE_BOOTSTRAP_FLAG.is_enabled(course.id)
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
         course_id = unicode(course.id)

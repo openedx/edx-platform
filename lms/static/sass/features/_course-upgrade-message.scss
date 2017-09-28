@@ -3,11 +3,10 @@
   the creative property. This will allow us to better track individual performance of each style of the message.
   Search for the courseware_verified_certificate_upsell promotion ID.
  */
-$upgrade-message-background-color: $blue-d1;
 
 // Expanded upgrade message
 .vc-message {
-  background: $blue-d1;
+  background: $lms-hero-color;
   color: $white;
   padding: $baseline;
   position: relative;
@@ -28,12 +27,9 @@ $upgrade-message-background-color: $blue-d1;
     font-size: 1.25rem;
     font-weight: 700;
     margin-bottom: 1rem;
-
-    @include float(left);
   }
 
   .vc-selling-points {
-    @include clear(left);
     @include padding-left(0);
 
     font-size: 0.825rem;
@@ -59,15 +55,11 @@ $upgrade-message-background-color: $blue-d1;
     }
   }
 
-  img {
-    max-width: 100%;
-  }
-
   // Show/hide button
   .vc-toggle {
     @include float(right);
 
-    color: $white;
+    color: theme-color("inverse");
   }
 
   // Cert image
@@ -76,10 +68,12 @@ $upgrade-message-background-color: $blue-d1;
     @include padding-left(1rem);
 
     clear: both;
-    width: 35%;
 
     img {
-      max-width: 100%;
+      @include float(right);
+
+      clear: both;
+      width: 250px;
     }
   }
 }
@@ -112,15 +106,7 @@ $upgrade-message-background-color: $blue-d1;
   }
 }
 
-@media (max-width: $bp-screen-md) {
-  .vc-message.polite .vc-title {
-    clear: both;
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-}
-
-@media (max-width: $bp-screen-sm) {
+@media (max-width: $grid-breakpoints-sm) {
   .vc-message .vc-hero {
     display: none !important;
   }

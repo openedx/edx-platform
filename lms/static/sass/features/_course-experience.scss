@@ -1,11 +1,33 @@
 // ------------------------------
 // Styling for files located in the openedx/features repository.
 
+// Course sidebar sections
+.course-sidebar {
+  .section {
+    h3 {
+      font-size: $font-size-base;
+      font-weight: $font-weight-bold;
+    }
+
+    .icon {
+      width: 20px;
+      text-align: center;
+    }
+
+    &:not(:first-child) {
+      margin-top: $baseline;
+    }
+  }
+}
+
 // Course call to action message
 .course-message {
+  display: flex;
+
   .message-author {
     display: inline-block;
     width: 70px;
+    height: 70px;
     border-radius: $baseline*7/4;
     border: 1px solid $lms-border-color;
 
@@ -17,11 +39,11 @@
   .message-content {
     @include margin(0, 0, $baseline, $baseline);
 
+    flex-grow: 1;
     position: relative;
     border: 1px solid $lms-border-color;
     padding: $baseline;
     border-radius: $baseline/4;
-    width: calc(100% - 90px);
 
     @media (max-width: $grid-breakpoints-md) {
       width: 100%;
@@ -59,9 +81,10 @@
     }
 
     .message-header {
+      @include margin-right($baseline*2);
+
       font-weight: $font-semibold;
       margin-bottom: $baseline/2;
-      width: calc(100% - 40px);
     }
 
     a:not(.btn) {
@@ -101,7 +124,7 @@
           position: absolute;
           top: $baseline/2;
           font-size: font-size(small);
-          color: $uxpl-blue-base;
+          color: theme-color("primary");
           cursor: pointer;
 
           &:hover {
@@ -162,6 +185,7 @@
   // Course Goal Updates
   .section-goals {
     @include float(left);
+
     border: 1px solid $lms-border-color;
     padding: $baseline*0.75 $baseline*0.75 $baseline*0.25;
     border-radius: 5px;
@@ -181,6 +205,7 @@
 
     .edit-icon {
       @include right($baseline/4);
+
       position: absolute;
       top: $baseline*0.6;
       cursor: pointer;
@@ -193,7 +218,7 @@
     }
 
     .current-goal-container {
-      .title{
+      .title {
         @include float(left);
         @include margin-right($baseline/4);
       }
@@ -207,18 +232,20 @@
         @include padding-left($baseline*0.4);
 
       }
+
       .response-icon {
         @include margin-left($baseline/4);
         @include right(-1*$baseline);
+
         top: $baseline*0.75;
         position: absolute;
 
         &.fa-check {
-          color: $success-color;
+          color: theme-color("success");
         }
 
         &.fa-close {
-          color: $error-color;
+          color: theme-color("error");
         }
       }
     }
@@ -231,10 +258,9 @@
 
 // Course outline
 .course-outline {
-  color: $lms-gray;
-
   .block-tree {
     margin: 0;
+    padding: 0;
     list-style-type: none;
 
     .section {
@@ -253,7 +279,7 @@
 
         padding: 0;
 
-        h3 {
+        .section-title {
           font-weight: $font-bold;
           font-size: 1.1rem;
           margin: 0;
@@ -266,7 +292,7 @@
 
       ol.outline-item {
         padding-bottom: $baseline;
-        border-bottom: 1px solid $light-grey-solid;
+        border-bottom: 1px solid $lms-border-color;
         margin: 0 0 ($baseline / 2) 0;
 
         .subsection {
@@ -294,7 +320,7 @@
             .subsection-text {
               .details {
                 font-size: $body-font-size;
-                color: $lms-gray;
+                color: theme-color("secondary");
               }
             }
 
@@ -332,22 +358,21 @@
 .date-summary-container {
   .date-summary {
     @include clearfix;
-    @include border-left(3px solid $gray-l3);
+    @include border-left(3px solid $gray-300);
 
     padding: $baseline/2;
 
     .heading {
-      font-size: 1.1rem;
+      font-size: 0.9rem;
       line-height: 1;
       font-weight: $font-bold;
-      color: $lms-gray;
+      color: theme-color("dark");
     }
 
     .description {
       margin-top: $baseline/2;
       margin-bottom: $baseline/2;
       display: inline-block;
-      color: $gray-d1;
     }
 
     .date-summary-link {
@@ -360,7 +385,7 @@
     }
 
     .date {
-      color: $gray-d1;
+      color: theme-color("dark");
     }
 
     &-todays-date {

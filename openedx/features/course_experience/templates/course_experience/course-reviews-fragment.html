@@ -12,7 +12,7 @@ from openedx.features.course_experience import course_home_page_title
 %>
 
 
-<div class="course-reviews container" tabindex="-1">
+<div class="course-reviews page-content-container" tabindex="-1">
     <header class="page-header has-secondary">
         ## Breadcrumb navigation
         <div class="page-header-main">
@@ -28,7 +28,7 @@ from openedx.features.course_experience import course_home_page_title
                 </div>
             </nav>
             % if is_enrolled:
-                <div class="btn toggle-read-write-reviews"></div>
+                <div class="btn btn-secondary toggle-read-write-reviews"></div>
             % endif
         </div>
     </header>

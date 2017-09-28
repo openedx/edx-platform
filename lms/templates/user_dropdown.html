@@ -5,6 +5,8 @@
 ## This template should not use the target student's details when masquerading, see TNL-4895
 <%
 self.real_user = getattr(user, 'real_user', user)
+username = self.real_user.username
+profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
 %>
 
 <%!
@@ -14,34 +16,32 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 %>
 % if uses_bootstrap:
-    <li class="nav-item nav-item-hidden-collapsed">
-        <a href="${reverse('dashboard')}" class="menu-title">
-            <span class="sr-only">${_("Dashboard for:")}</span>
-            <% profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium'] %>
-            <img class="user-image-frame" src="${profile_image_url}" alt="">
-        </a>
-    </li>
-    <li class="nav-item dropdown mt-2 nav-item-hidden-collapsed">
-        <% username = self.real_user.username %>
-        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${username}</a>
-        <ul class="dropdown-menu dropdown-menu-right" id="${_("Usermenu")}" aria-labelledby="dropdownMenuLink" tabindex="-1">
-            <a class="dropdown-item" href="${reverse('dashboard')}">${_("Dashboard")}</a>
-            <a class="dropdown-item" href="${reverse('account_settings')}">${_("Account")}</a>
-            <a class="dropdown-item" href="${reverse('logout')}">${_("Sign Out")}</a>
-        </ul>
-    </li>
-    <li class="nav-item nav-item-open-collapsed-only collapse"><a href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
-    <li class="nav-item nav-item-open-collapsed-only"><a href="${reverse('account_settings')}">${_("Account")}</a></li>
-    <li class="nav-item nav-item-open-collapsed-only"><a href="${reverse('logout')}">${_("Sign Out")}</a></li>
+    <div class="nav-item nav-item-hidden-collapsed container">
+        <div class="nav align-items-center">
+            <a class="menu-title mr-2" href="${reverse('dashboard')}">
+                <span class="sr-only">${_("Dashboard for:")}</span>
+                <img class="user-image-frame" src="${profile_image_url}" alt="${username}">
+            </a>
+            <div class="dropdown">
+                <a class="dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${username}</a>
+                <ul role="menu" class="dropdown-menu dropdown-menu-right" id="${_("Usermenu")}" aria-labelledby="dropdownMenuLink" tabindex="-1">
+                    <li role="presentation"><a role="menuitem" class="dropdown-item" href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
+                    <li role="presentation"><a role="menuitem" class="dropdown-item" href="${reverse('account_settings')}">${_("Account")}</a></li>
+                    <li role="presentation"><a role="menuitem" class="dropdown-item" href="${reverse('logout')}">${_("Sign Out")}</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <ul role="menu" class="nav flex-column align-items-center">
+        <li role="presentation" class="nav-item nav-item-open-collapsed-only collapse"><a role="menuitem" href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
+        <li role="presentation" class="nav-item nav-item-open-collapsed-only"><a role="menuitem" href="${reverse('account_settings')}">${_("Account")}</a></li>
+        <li role="presentation" class="nav-item nav-item-open-collapsed-only"><a role="menuitem" href="${reverse('logout')}">${_("Sign Out")}</a></li>
+    </ul>
 % elif uses_pattern_library:
     <div class="wrapper-user-menu dropdown-menu-container logged-in js-header-user-menu">
         <a href="${reverse('dashboard')}" class="menu-title">
             <span class="sr-only">${_("Dashboard for:")}</span>
-            <%
-            username = self.real_user.username
-            profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
-            %>
-            <img class="menu-image" src="${profile_image_url}" alt="">
+            <img class="menu-image" src="${profile_image_url}" alt="${username}">
             ${username}
         </a>
         <div role="group" aria-label="User menu" class="user-menu">
@@ -63,10 +63,6 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
         <li class="primary">
             <a href="${reverse('dashboard')}" class="user-link">
                 <span class="sr">${_("Dashboard for:")}</span>
-                <%
-                username = self.real_user.username
-                profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
-                %>
                 <img class="user-image-frame" src="${profile_image_url}" alt="">
                 <div class="label-username">${username}</div>
             </a>

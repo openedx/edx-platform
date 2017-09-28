@@ -86,9 +86,9 @@
 }
 
 // ----------------------------
-// #BRAND
+// #PRIMARY
 // ----------------------------
-.btn-brand {
+.btn-primary {
   @extend %btn-shims;
 
   border-color: $btn-brand-border-color;
@@ -149,4 +149,11 @@
     background: $btn-brand-disabled-background;
     color: $btn-upgrade-color;
   }
+}
+
+// ----------------------------
+// #BRAND
+// ----------------------------
+.btn-brand {
+  @extend .btn-primary;
 }

@@ -4,6 +4,10 @@
 $upgrade-color: #009b00 !default;
 $upgrade-dark-color: #008100 !default;
 
+.btn-primary {
+  @extend .btn-brand;
+}
+
 .btn-upgrade {
   @extend %btn;
 

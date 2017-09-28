@@ -18,7 +18,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
 %>
 
 <%block name="content">
-<div class="course-view container" id="course-container">
+<div class="course-view page-content-container" id="course-container">
     <header class="page-header has-secondary">
         <div class="page-header-main">
             <nav aria-label="${_('Course Outline')}" class="sr-is-focusable" tabindex="-1">
@@ -43,7 +43,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
             % endif
             <div class="form-actions">
                 % if resume_course_url:
-                    <a class="btn btn-brand action-resume-course" href="${resume_course_url}">
+                    <a class="btn btn-primary action-resume-course" href="${resume_course_url}">
                         % if has_visited_course:
                             <span data-action-type="resume">${_("Resume Course")}</span>
                         % else:
@@ -55,110 +55,108 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
         </div>
     </header>
     <div class="page-content">
-        <div class="layout layout-1t2t">
-            <main class="layout-col layout-col-b">
+        <main class="page-content-main">
 
-                % if upgrade_url and upgrade_price:
-                    <div class="section">
-                        <div class="vc-message tex2jax_ignore" role="group" aria-labelledby="vc-title" tabindex="-1" style="display: none;">
+            % if upgrade_url and upgrade_price:
+                <div class="section">
+                    <div class="vc-message tex2jax_ignore" role="group" aria-labelledby="vc-title" tabindex="-1" style="display: none;">
 
-                            <h3 class="vc-title vc-fade vc-polite-only">Pursue a verified certificate</h3>
+                        <h3 class="vc-title vc-fade vc-polite-only">Pursue a verified certificate</h3>
 
-                            <button class="vc-toggle vc-fade vc-polite-only btn-link" type="button" aria-controls="moreinfo"
-                                    aria-expanded="true" aria-label="${_("Show/Hide")}">
-                                ${_("Show less")}
-                            </button>
+                        <button class="vc-toggle vc-fade vc-polite-only btn-link" type="button" aria-controls="moreinfo"
+                                aria-expanded="true" aria-label="${_("Show/Hide")}">
+                            ${_("Show less")}
+                        </button>
 
-                            <div class="vc-hero vc-fade">
-                                <img src="${static.url('course_experience/images/verified-cert.png')}"
-                                     alt="${_("Sample verified certificate with your name, the course title, the logo of the institution and the signatures of the instructors for this course.")}"/>
-                            </div>
-
-                            <ul class="vc-selling-points vc-fade">
-                                <li class="vc-selling-point">${_("Official proof of completion")}</li>
-                                <li class="vc-selling-point">${_("Easily shareable certificate")}</li>
-                                <li class="vc-selling-point">${_("Proven motivator to complete the course")}</li>
-                                <li class="vc-selling-point">${_("Certificate purchases help us continue to offer free courses")}</li>
-                            </ul>
-
-                            <div class="vc-cta vc-fade vc-polite-only">
-                                <a class="btn-upgrade"
-                                   href="${ upgrade_url }"
-                                   data-creative="hero_matthew_smith"
-                                   data-position="hero">${_("Upgrade ({price})").format(price=upgrade_price)}</a>
-                            </div>
+                        <div class="vc-hero vc-fade">
+                            <img src="${static.url('course_experience/images/verified-cert.png')}"
+                                 alt="${_("Sample verified certificate with your name, the course title, the logo of the institution and the signatures of the instructors for this course.")}"/>
                         </div>
-                    </div>
-                % endif
 
-                % if course_home_message_fragment:
-                    ${HTML(course_home_message_fragment.body_html())}
-                % endif
-
-                % if update_message_fragment and UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id):
-                    <div class="section section-update-message">
-                        ${HTML(update_message_fragment.body_html())}
-                    </div>
-                % endif
-
-                % if outline_fragment:
-                    ${HTML(outline_fragment.body_html())}
-                % endif
-            </main>
-            <aside class="course-sidebar layout-col layout-col-a">
-                % if has_goal_permission:
-                    <div class="section section-goals ${'' if current_goal else 'hidden'}">
-                        <div class="current-goal-container">
-                            <label class="title title-label hd-6" for="goal">
-                                <h3 class="hd-6">${_("Goal: ")}</h3>
-                            </label>
-                            <h3 class="title hd-6">${_("Goal: ")}</h3>
-                            <div class="goal">
-                                <span class="text">${goal_options[current_goal.goal_key] if current_goal else ""}</span>
-                            </div>
-                            <select class="edit-goal-select" id="goal">
-                                % for goal, goal_text in goal_options.items():
-                                    <option value="${goal}" ${"selected" if current_goal and current_goal.goal_key == goal else ""}>${goal_text}</option>
-                                % endfor
-                            </select>
-                            <span class="sr sr-update-response-msg" aria-live="polite"></span>
-                            <span class="response-icon" aria-hidden="true"></span>
-                            <span class="sr">${_("Edit your course goal:")}</span>
-                            <button class="edit-icon">
-                                <span class="sr">${_("Edit your course goal:")}</span>
-                                <span class="fa fa-pencil" aria-hidden="true"></span>
-                            </button>
-                        </div>
-                    </div>
-                % endif
-                % if course_tools:
-                    <div class="section section-tools">
-                        <h3 class="hd-6">${_("Course Tools")}</h3>
-                        <ul class="list-unstyled">
-                            % for course_tool in course_tools:
-                                <li class="course-tool">
-                                    <a class="course-tool-link" data-analytics-id="${course_tool.analytics_id()}" href="${course_tool.url(course_key)}">
-                                        <span class="icon ${course_tool.icon_classes()}" aria-hidden="true"></span>
-                                        ${course_tool.title()}
-                                    </a>
-                                </li>
-                            % endfor
+                        <ul class="vc-selling-points vc-fade">
+                            <li class="vc-selling-point">${_("Official proof of completion")}</li>
+                            <li class="vc-selling-point">${_("Easily shareable certificate")}</li>
+                            <li class="vc-selling-point">${_("Proven motivator to complete the course")}</li>
+                            <li class="vc-selling-point">${_("Certificate purchases help us continue to offer free courses")}</li>
                         </ul>
+
+                        <div class="vc-cta vc-fade vc-polite-only">
+                            <a class="btn-upgrade"
+                               href="${ upgrade_url }"
+                               data-creative="hero_matthew_smith"
+                               data-position="hero">${_("Upgrade ({price})").format(price=upgrade_price)}</a>
+                        </div>
                     </div>
-                % endif
-                % if dates_fragment:
-                    <div class="section section-dates">
-                        ${HTML(dates_fragment.body_html())}
+                </div>
+            % endif
+
+            % if course_home_message_fragment:
+                ${HTML(course_home_message_fragment.body_html())}
+            % endif
+
+            % if update_message_fragment and UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id):
+                <div class="section section-update-message">
+                    ${HTML(update_message_fragment.body_html())}
+                </div>
+            % endif
+
+            % if outline_fragment:
+                ${HTML(outline_fragment.body_html())}
+            % endif
+        </main>
+        <aside class="page-content-secondary course-sidebar">
+            % if has_goal_permission:
+                <div class="section section-goals ${'' if current_goal else 'hidden'}">
+                    <div class="current-goal-container">
+                        <label class="title title-label hd-6" for="goal">
+                            <h3 class="hd-6">${_("Goal: ")}</h3>
+                        </label>
+                        <h3 class="title hd-6">${_("Goal: ")}</h3>
+                        <div class="goal">
+                            <span class="text">${goal_options[current_goal.goal_key] if current_goal else ""}</span>
+                        </div>
+                        <select class="edit-goal-select" id="goal">
+                            % for goal, goal_text in goal_options.items():
+                                <option value="${goal}" ${"selected" if current_goal and current_goal.goal_key == goal else ""}>${goal_text}</option>
+                            % endfor
+                        </select>
+                        <span class="sr sr-update-response-msg" aria-live="polite"></span>
+                        <span class="response-icon" aria-hidden="true"></span>
+                        <span class="sr">${_("Edit your course goal:")}</span>
+                        <button class="edit-icon">
+                            <span class="sr">${_("Edit your course goal:")}</span>
+                            <span class="fa fa-pencil" aria-hidden="true"></span>
+                        </button>
                     </div>
-                % endif
-                % if handouts_html:
-                    <div class="section section-handouts">
-                        <h3 class="hd-6">${_("Course Handouts")}</h3>
-                        ${HTML(handouts_html)}
-                    </div>
-                % endif
-            </aside>
-        </div>
+                </div>
+            % endif
+            % if course_tools:
+                <div class="section section-tools">
+                    <h3 class="hd-6 section-title">${_("Course Tools")}</h3>
+                    <ul class="list-unstyled">
+                        % for course_tool in course_tools:
+                            <li class="course-tool">
+                                <a class="course-tool-link" data-analytics-id="${course_tool.analytics_id()}" href="${course_tool.url(course_key)}">
+                                    <span class="icon ${course_tool.icon_classes()}" aria-hidden="true"></span>
+                                    ${course_tool.title()}
+                                </a>
+                            </li>
+                        % endfor
+                    </ul>
+                </div>
+            % endif
+            % if dates_fragment:
+                <div class="section section-dates">
+                    ${HTML(dates_fragment.body_html())}
+                </div>
+            % endif
+            % if handouts_html:
+                <div class="section section-handouts">
+                    <h3 class="hd-6 section-title">${_("Course Handouts")}</h3>
+                    ${HTML(handouts_html)}
+                </div>
+            % endif
+        </aside>
     </div>
     % if course_sock_fragment:
         ${HTML(course_sock_fragment.body_html())}
