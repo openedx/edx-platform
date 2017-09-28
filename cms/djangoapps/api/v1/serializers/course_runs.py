@@ -3,12 +3,12 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework.fields import empty
+from xmodule.modulestore.django import modulestore
 
 from cms.djangoapps.contentstore.views.course import create_new_course, get_course_and_check_access, rerun_course
 from contentstore.views.assets import update_course_run_asset
 from openedx.core.lib.courses import course_image_url
 from student.models import CourseAccessRole
-from xmodule.modulestore.django import modulestore
 
 IMAGE_TYPES = {
     'image/jpeg': 'jpg',
@@ -116,11 +116,15 @@ class CourseRunSerializer(CourseRunTeamSerializerMixin, serializers.Serializer):
         if not self.partial:
             CourseAccessRole.objects.filter(course_id=instance.id).delete()
 
-        # TODO In the future we can optimize by getting users in a single query.
-        CourseAccessRole.objects.bulk_create([
-            CourseAccessRole(course_id=instance.id, role=member['role'], user=User.objects.get(username=member['user']))
-            for member in team
-        ])
+        # We iterate here, instead of using a bulk operation, to avoid uniqueness errors that arise
+        # when using `bulk_create` with existing data. Given the relatively small number of team members
+        # in a course, this is not worth optimizing at this time.
+        for member in team:
+            CourseAccessRole.objects.update_or_create(
+                course_id=instance.id,
+                user=User.objects.get(username=member['user']),
+                defaults={'role': member['role']}
+            )
 
 
 class CourseRunCreateSerializer(CourseRunSerializer):

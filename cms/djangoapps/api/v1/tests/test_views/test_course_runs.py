@@ -140,23 +140,32 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         role = 'staff'
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
         course_run = CourseFactory(start=start, end=None, enrollment_start=None, enrollment_end=None)
-        CourseAccessRole.objects.create(course_id=course_run.id, role=role, user=UserFactory())
-        assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 1
 
-        user = UserFactory()
+        # The request should only update or create new team members
+        existing_user = UserFactory()
+        CourseAccessRole.objects.create(course_id=course_run.id, role=role, user=existing_user)
+        new_user = UserFactory()
+        CourseAccessRole.objects.create(course_id=course_run.id, role=role, user=new_user)
+        assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 2
+
         data = {
             'team': [
                 {
-                    'user': user.username,
+                    'user': existing_user.username,
                     'role': role,
-                }
+                },
+                {
+                    'user': new_user.username,
+                    'role': role,
+                },
             ],
         }
 
         url = reverse('api:v1:course_run-detail', kwargs={'pk': str(course_run.id)})
         response = self.client.patch(url, data, format='json')
         assert response.status_code == 200
-        self.assert_access_role(course_run, user, role)
+        self.assert_access_role(course_run, existing_user, role)
+        self.assert_access_role(course_run, new_user, role)
         self.assert_course_access_role_count(course_run, 2)
 
         course_run = modulestore().get_course(course_run.id)
