@@ -107,4 +107,4 @@ git+https://github.com/edx/edx-proctoring.git@1.3.1#egg=edx-proctoring==1.3.1
 git+https://github.com/mitodl/edx-sga.git@d019b8a050c056db535e3ff13c93096145a932de#egg=edx-sga==0.7.1
 git+https://github.com/open-craft/xblock-poll@7ba819b968fe8faddb78bb22e1fe7637005eb414#egg=xblock-poll==1.2.7
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.18#egg=xblock-drag-and-drop-v2==2.0.18
-git+https://github.com/Dillon-Dumesnil/xblock-review@a71d75d6bf245c890ffe5b9125f827785a0d1d54#egg=xblock-review==0.1
+git+https://github.com/Dillon-Dumesnil/xblock-review@5211dd700f7661568b97f1a554ad67deefedf17d#egg=xblock-review==0.1
