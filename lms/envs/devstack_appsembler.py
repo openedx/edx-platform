@@ -18,7 +18,9 @@ INSTALLED_APPS += (
     'openedx.core.djangoapps.appsembler.msft_lp',
 )
 
+# those are usually hardcoded in devstack.py for some reason
 LMS_BASE = ENV_TOKENS.get('LMS_BASE')
+LMS_ROOT_URL = ENV_TOKENS.get('LMS_ROOT_URL')
 
 APPSEMBLER_FEATURES = ENV_TOKENS.get('APPSEMBLER_FEATURES', {})
 
