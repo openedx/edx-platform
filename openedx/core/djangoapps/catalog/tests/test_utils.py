@@ -16,6 +16,7 @@ from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
     get_course_runs,
     get_course_run_details,
+    get_currency_data,
     get_program_types,
     get_programs,
     get_programs_with_type
@@ -235,6 +236,29 @@ class TestGetProgramTypes(CatalogIntegrationMixin, TestCase):
         program = program_types[0]
         data = get_program_types(name=program['name'])
         self.assertEqual(data, program)
+
+
+@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+class TestGetCurrency(CatalogIntegrationMixin, TestCase):
+    """Tests covering retrieval of currency data from the catalog service."""
+    @override_settings(COURSE_CATALOG_API_URL='https://api.example.com/v1/')
+    def test_get_currency_data(self, mock_get_edx_api_data):
+        """Verify get_currency_data returns the currency data."""
+        currency_data = {
+            "code": "CAD",
+            "rate": 1.257237,
+            "symbol": "$"
+        }
+        mock_get_edx_api_data.return_value = currency_data
+
+        # Catalog integration is disabled.
+        data = get_currency_data()
+        self.assertEqual(data, [])
+
+        catalog_integration = self.create_catalog_integration()
+        UserFactory(username=catalog_integration.service_username)
+        data = get_currency_data()
+        self.assertEqual(data, currency_data)
 
 
 @skip_unless_lms
