@@ -191,7 +191,7 @@ class SystemTestSuite(PytestSuite):
             """
             Should this path be included in the pytest arguments?
             """
-            if path.endswith('__pycache__'):
+            if path.endswith(Env.IGNORED_TEST_DIRS):
                 return False
             return path.endswith('.py') or os.path.isdir(path)
 
