@@ -12,17 +12,21 @@ from xmodule.graders import ProblemScore
 
 
 @contextmanager
-def mock_passing_grade(grade_pass='Pass', percent=0.75, ):
+def mock_passing_grade(letter_grade='Pass', percent=0.75, ):
     """
     Mock the grading function to always return a passing grade.
     """
-    with patch('lms.djangoapps.grades.course_grade.CourseGrade._compute_letter_grade') as mock_letter_grade:
-        with patch('lms.djangoapps.grades.course_grade.CourseGrade._compute_percent') as mock_percent_grade:
-            with patch('lms.djangoapps.grades.course_grade.CourseGrade.attempted') as mock_attempted:
-                mock_letter_grade.return_value = grade_pass
-                mock_percent_grade.return_value = percent
-                mock_attempted.return_value = True
-                yield
+    passing_grade_fields = dict(
+        letter_grade=letter_grade,
+        percent=percent,
+        passed=letter_grade is not None,
+        attempted=True,
+    )
+    with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade_read:
+        mock_grade_read.return_value = MagicMock(**passing_grade_fields)
+        with patch('lms.djangoapps.grades.course_grade.CourseGrade.update') as mock_grade_update:
+            mock_grade_update.return_value = MagicMock(**passing_grade_fields)
+            yield
 
 
 @contextmanager

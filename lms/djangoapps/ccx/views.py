@@ -46,7 +46,6 @@ from lms.djangoapps.ccx.utils import (
     get_ccx_for_coach,
     get_date,
     parse_date,
-    prep_course_for_grading
 )
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
@@ -519,7 +518,6 @@ def ccx_gradebook(request, course, ccx=None):
 
     ccx_key = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
     with ccx_course(ccx_key) as course:
-        prep_course_for_grading(course, request)
         student_info, page = get_grade_book_page(request, course, course_key=ccx_key)
 
         return render_to_response('courseware/gradebook.html', {
@@ -547,7 +545,6 @@ def ccx_grades_csv(request, course, ccx=None):
 
     ccx_key = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
     with ccx_course(ccx_key) as course:
-        prep_course_for_grading(course, request)
 
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=ccx_key,

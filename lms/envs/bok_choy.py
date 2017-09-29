@@ -89,12 +89,16 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     TASK_DEFAULT_RETRY_DELAY=0,
 )
 
-###################### Grade Downloads ######################
+###################### Grades ######################
 GRADES_DOWNLOAD = {
     'STORAGE_TYPE': 'localfs',
     'BUCKET': 'edx-grades',
     'ROOT_PATH': os.path.join(mkdtemp(), 'edx-s3', 'grades'),
 }
+
+FEATURES['PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS'] = True
+FEATURES['ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS'] = True
+
 
 # Configure the LMS to use our stub XQueue implementation
 XQUEUE_INTERFACE['url'] = 'http://localhost:8040'

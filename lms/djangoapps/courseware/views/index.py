@@ -425,7 +425,7 @@ class CoursewareIndex(View):
         if course_has_entrance_exam(self.course) and getattr(self.chapter, 'is_entrance_exam', False):
             courseware_context['entrance_exam_passed'] = user_has_passed_entrance_exam(self.effective_user, self.course)
             courseware_context['entrance_exam_current_score'] = get_entrance_exam_score_ratio(
-                CourseGradeFactory().create(self.effective_user, self.course),
+                CourseGradeFactory().read(self.effective_user, self.course),
                 get_entrance_exam_usage_key(self.course),
             )
 

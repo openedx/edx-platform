@@ -42,8 +42,6 @@ from django.test.utils import override_settings
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from lms.djangoapps.grades.tests.utils import mock_get_score
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
@@ -1399,7 +1397,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
-        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.create') as mock_create:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
             course_grade.passed = True
             course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
@@ -1442,7 +1440,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         # Enable certificate generation for this course
         certs_api.set_cert_generation_enabled(self.course.id, True)
 
-        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.create') as mock_create:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
             course_grade.passed = True
             course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
@@ -1458,9 +1456,10 @@ class ProgressPageTests(ProgressPageBaseTests):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(43, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
+        with self.assertNumQueries(36, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
             self._get_progress_page()
 
+    @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
         (False, 43, 27),
         (True, 36, 23)
@@ -1504,7 +1503,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
         ) as user_verify:
             user_verify.return_value = user_verified
-            with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.create') as mock_create:
+            with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
                 course_grade = mock_create.return_value
                 course_grade.passed = True
                 course_grade.summary = {
@@ -1548,7 +1547,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
-        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.create') as mock_create:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
             course_grade.passed = True
             course_grade.summary = {
@@ -1568,7 +1567,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             "http://www.example.com/certificate.pdf", "honor"
         )
 
-        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.create') as mock_create:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
             course_grade.passed = True
             course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
@@ -1586,7 +1585,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.assertTrue(self.client.login(username=user.username, password='test'))
         CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=CourseMode.AUDIT)
 
-        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.create') as mock_create:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
             course_grade.passed = True
             course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
@@ -2090,7 +2089,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             status=CertificateStatuses.generating,
             mode='verified'
         )
-        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.create') as mock_create:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
             course_grade.passed = True
             course_grade.summary = {'grade': 'Pass', 'percent': 0.75}
@@ -2111,7 +2110,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             mode='verified'
         )
 
-        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.create') as mock_create:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
             course_grade.passed = True
             course_grade.summay = {'grade': 'Pass', 'percent': 0.75}

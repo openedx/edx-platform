@@ -254,7 +254,8 @@ def force_recalculate_course_and_subsection_grades(sender, user, course_key, **k
     Updates a saved course grade, forcing the subsection grades
     from which it is calculated to update along the way.
     """
-    if CourseGradeFactory().read(user, course_key=course_key):
+    previous_course_grade = CourseGradeFactory().read(user, course_key=course_key)
+    if previous_course_grade and previous_course_grade.attempted:
         CourseGradeFactory().update(user=user, course_key=course_key, force_update_subsections=True)
 
 

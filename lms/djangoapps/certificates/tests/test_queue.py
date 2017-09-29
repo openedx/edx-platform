@@ -265,7 +265,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             )
 
         # Run grading/cert generation again
-        with mock_passing_grade(grade_pass=grade):
+        with mock_passing_grade(letter_grade=grade):
             with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
                 mock_send.return_value = (0, None)
                 self.xqueue.add_cert(self.user_2, self.course.id)

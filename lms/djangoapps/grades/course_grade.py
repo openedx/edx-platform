@@ -7,6 +7,7 @@ from collections import OrderedDict, defaultdict
 from django.conf import settings
 from lazy import lazy
 
+from ccx_keys.locator import CCXLocator
 from xmodule import block_metadata_utils
 
 from .subsection_grade import ZeroSubsectionGrade
@@ -21,7 +22,7 @@ class CourseGradeBase(object):
     """
     Base class for Course Grades.
     """
-    def __init__(self, user, course_data, percent=0, letter_grade=None, passed=False, force_update_subsections=False):
+    def __init__(self, user, course_data, percent=0.0, letter_grade=None, passed=False, force_update_subsections=False):
         self.user = user
         self.course_data = course_data
 
@@ -137,8 +138,7 @@ class CourseGradeBase(object):
         """
         Returns the result from the course grader.
         """
-        course = self.course_data.course
-        course.set_grading_policy(course.grading_policy)
+        course = self._prep_course_for_grading()
         return course.grader.grade(
             self.graded_subsections_by_format,
             generate_random_scores=settings.GENERATE_PROFILE_SCORES,
@@ -155,6 +155,27 @@ class CourseGradeBase(object):
         grade_summary['percent'] = self.percent
         grade_summary['grade'] = self.letter_grade
         return grade_summary
+
+    def _prep_course_for_grading(self):
+        """
+        Make sure any overrides to the grading policy are used.
+        This is most relevant for CCX courses.
+
+        Right now, we still access the grading policy from the course
+        object. Once we get the grading policy from the BlockStructure
+        this will no longer be needed - since BlockStructure correctly
+        retrieves/uses all field overrides.
+        """
+        course = self.course_data.course
+        if isinstance(self.course_data.course_key, CCXLocator):
+            # clean out any field values that may have been set from the
+            # parent course of the CCX course.
+            course._field_data_cache = {}  # pylint: disable=protected-access
+
+            # this is "magic" code that automatically retrieves any overrides
+            # to the grading policy and updates the course object.
+            course.set_grading_policy(course.grading_policy)
+        return course
 
     def _get_chapter_grade_info(self, chapter, course_structure):
         """
@@ -212,6 +233,7 @@ class CourseGrade(CourseGradeBase):
         self.percent = self._compute_percent(self.grader_result)
         self.letter_grade = self._compute_letter_grade(grade_cutoffs, self.percent)
         self.passed = self._compute_passed(grade_cutoffs, self.percent)
+        return self
 
     @lazy
     def attempted(self):
@@ -226,10 +248,10 @@ class CourseGrade(CourseGradeBase):
         return False
 
     def _get_subsection_grade(self, subsection):
-        # Pass read_only here so the subsection grades can be persisted in bulk at the end.
         if self.force_update_subsections:
             return self._subsection_grade_factory.update(subsection)
         else:
+            # Pass read_only here so the subsection grades can be persisted in bulk at the end.
             return self._subsection_grade_factory.create(subsection, read_only=True)
 
     @staticmethod

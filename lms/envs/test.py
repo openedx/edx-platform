@@ -307,6 +307,7 @@ FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
 ########################### Grades #################################
 FEATURES['PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS'] = True
+FEATURES['ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS'] = True
 
 ###################### Payment ##############################3
 # Enable fake payment processing page

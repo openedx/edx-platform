@@ -20,48 +20,33 @@ class CourseGradeFactory(object):
     """
     GradeResult = namedtuple('GradeResult', ['student', 'course_grade', 'error'])
 
-    def create(self, user, course=None, collected_block_structure=None, course_structure=None, course_key=None):
+    def read(
+            self,
+            user,
+            course=None,
+            collected_block_structure=None,
+            course_structure=None,
+            course_key=None,
+            create_if_needed=True,
+    ):
         """
         Returns the CourseGrade for the given user in the course.
-        Reads the value from storage and validates that the grading
-        policy hasn't changed since the grade was last computed.
+        Reads the value from storage.
         If not in storage, returns a ZeroGrade if ASSUME_ZERO_GRADE_IF_ABSENT.
-        Else, if changed or not in storage, computes and returns a new value.
+        Else if create_if_needed, computes and returns a new value.
+        Else, returns None.
 
         At least one of course, collected_block_structure, course_structure,
         or course_key should be provided.
         """
         course_data = CourseData(user, course, collected_block_structure, course_structure, course_key)
         try:
-            course_grade, read_policy_hash = self._read(user, course_data)
-            if read_policy_hash == course_data.grading_policy_hash:
-                return course_grade
-            read_only = False  # update the persisted grade since the policy changed; TODO(TNL-6786) remove soon
+            return self._read(user, course_data)
         except PersistentCourseGrade.DoesNotExist:
             if assume_zero_if_absent(course_data.course_key):
                 return self._create_zero(user, course_data)
-            read_only = True  # keep the grade un-persisted; TODO(TNL-6786) remove once all grades are backfilled
-
-        return self._update(user, course_data, read_only)
-
-    def read(self, user, course=None, collected_block_structure=None, course_structure=None, course_key=None):
-        """
-        Returns the CourseGrade for the given user in the course as
-        persisted in storage.  Does NOT verify whether the grading
-        policy is still valid since the grade was last computed.
-        If not in storage, returns a ZeroGrade if ASSUME_ZERO_GRADE_IF_ABSENT
-        else returns None.
-
-        At least one of course, collected_block_structure, course_structure,
-        or course_key should be provided.
-        """
-        course_data = CourseData(user, course, collected_block_structure, course_structure, course_key)
-        try:
-            course_grade, _ = self._read(user, course_data)
-            return course_grade
-        except PersistentCourseGrade.DoesNotExist:
-            if assume_zero_if_absent(course_data.course_key):
-                return self._create_zero(user, course_data)
+            elif create_if_needed:
+                return self._update(user, course_data)
             else:
                 return None
 
@@ -82,15 +67,7 @@ class CourseGradeFactory(object):
         or course_key should be provided.
         """
         course_data = CourseData(user, course, collected_block_structure, course_structure, course_key)
-        return self._update(user, course_data, read_only=False, force_update_subsections=force_update_subsections)
-
-    @contextmanager
-    def _course_transaction(self, course_key):
-        """
-        Provides a transaction context in which GradeResults are created.
-        """
-        yield
-        VisibleBlocks.clear_cache(course_key)
+        return self._update(user, course_data, force_update_subsections=force_update_subsections)
 
     def iter(
             self,
@@ -123,6 +100,14 @@ class CourseGradeFactory(object):
                 with dog_stats_api.timer('lms.grades.CourseGradeFactory.iter', tags=stats_tags):
                     yield self._iter_grade_result(user, course_data, force_update)
 
+    @contextmanager
+    def _course_transaction(self, course_key):
+        """
+        Provides a transaction context in which GradeResults are created.
+        """
+        yield
+        VisibleBlocks.clear_cache(course_key)
+
     def _iter_grade_result(self, user, course_data, force_update):
         try:
             kwargs = {
@@ -134,7 +119,7 @@ class CourseGradeFactory(object):
             if force_update:
                 kwargs['force_update_subsections'] = True
 
-            method = CourseGradeFactory().update if force_update else CourseGradeFactory().create
+            method = CourseGradeFactory().update if force_update else CourseGradeFactory().read
             course_grade = method(**kwargs)
             return self.GradeResult(user, course_grade, None)
         except Exception as exc:  # pylint: disable=broad-except
@@ -166,7 +151,9 @@ class CourseGradeFactory(object):
             raise PersistentCourseGrade.DoesNotExist
 
         persistent_grade = PersistentCourseGrade.read(user.id, course_data.course_key)
-        course_grade = CourseGrade(
+        log.debug(u'Grades: Read, %s, User: %s, %s', unicode(course_data), user.id, persistent_grade)
+
+        return CourseGrade(
             user,
             course_data,
             persistent_grade.percent_grade,
@@ -174,12 +161,8 @@ class CourseGradeFactory(object):
             persistent_grade.passed_timestamp is not None,
         )
 
-        log.debug(u'Grades: Read, %s, User: %s, %s', unicode(course_data), user.id, persistent_grade)
-
-        return course_grade, persistent_grade.grading_policy_hash
-
     @staticmethod
-    def _update(user, course_data, read_only, force_update_subsections=False):
+    def _update(user, course_data, force_update_subsections=False):
         """
         Computes, saves, and returns a CourseGrade object for the
         given user and course.
@@ -187,10 +170,9 @@ class CourseGradeFactory(object):
         COURSE_GRADE_NOW_PASSED if learner has passed course.
         """
         course_grade = CourseGrade(user, course_data, force_update_subsections=force_update_subsections)
-        course_grade.update()
+        course_grade = course_grade.update()
 
         should_persist = (
-            (not read_only) and  # TODO(TNL-6786) Remove the read_only boolean once all grades are back-filled.
             should_persist_grades(course_data.course_key) and
             course_grade.attempted
         )

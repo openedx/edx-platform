@@ -92,8 +92,9 @@ class CourseData(object):
     def edited_on(self):
         # get course block from structure only; subtree_edited_on field on modulestore's course block isn't optimized.
         structure = self._effective_structure
-        course_block = structure[self.location]
-        return getattr(course_block, 'subtree_edited_on', None)
+        if structure:
+            course_block = structure[self.location]
+            return getattr(course_block, 'subtree_edited_on', None)
 
     def __unicode__(self):
         return u'Course: course_key: {}'.format(self.course_key)

@@ -36,6 +36,7 @@ from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.ccx.tests.utils import CcxTestCase, flatten
 from lms.djangoapps.ccx.utils import ccx_course, is_email
 from lms.djangoapps.ccx.views import get_date
+from lms.djangoapps.grades.tasks import compute_all_grades_for_course
 from lms.djangoapps.instructor.access import allow_access, list_with_level
 from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
@@ -109,6 +110,8 @@ def setup_students_and_grades(context):
                         course_id=context.course.id,
                         module_state_key=problem.location
                     )
+
+        compute_all_grades_for_course.apply_async(kwargs={'course_key': unicode(context.course.id)})
 
 
 def unhide(unit):

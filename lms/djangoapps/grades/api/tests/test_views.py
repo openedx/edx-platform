@@ -15,7 +15,7 @@ from rest_framework.test import APITestCase
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, StaffFactory
-from lms.djangoapps.grades.tests.utils import mock_get_score
+from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
@@ -149,7 +149,7 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         """
         Test that a user can successfully request her own grade.
         """
-        with check_mongo_calls(6):
+        with check_mongo_calls(3):
             resp = self.client.get(self.get_url(self.student.username))
             self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
@@ -286,22 +286,21 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         self.assertEqual(resp.data, expected_data)  # pylint: disable=no-member
 
     @ddt.data(
-        ((2, 5), {'letter_grade': None, 'percent': 0.4, 'passed': False}),
-        ((5, 5), {'letter_grade': 'Pass', 'percent': 1, 'passed': True}),
+        ({'letter_grade': None, 'percent': 0.4, 'passed': False}),
+        ({'letter_grade': 'Pass', 'percent': 1, 'passed': True}),
     )
-    @ddt.unpack
-    def test_grade(self, grade, result):
+    def test_grade(self, grade):
         """
         Test that the user gets her grade in case she answered tests with an insufficient score.
         """
-        with mock_get_score(*grade):
+        with mock_passing_grade(letter_grade=grade['letter_grade'], percent=grade['percent']):
             resp = self.client.get(self.get_url(self.student.username))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         expected_data = {
             'username': self.student.username,
             'course_key': str(self.course_key),
         }
-        expected_data.update(result)
+        expected_data.update(grade)
         self.assertEqual(resp.data, [expected_data])  # pylint: disable=no-member
 
 

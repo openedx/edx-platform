@@ -89,7 +89,7 @@ def get_grade_book_page(request, course, course_key):
                 'username': student.username,
                 'id': student.id,
                 'email': student.email,
-                'grade_summary': CourseGradeFactory().create(student, course).summary
+                'grade_summary': CourseGradeFactory().read(student, course).summary
             }
             for student in enrolled_students
         ]
