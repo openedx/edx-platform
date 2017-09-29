@@ -256,9 +256,8 @@ def video_images_handler(request, course_key_string, edx_video_id=None):
     return JsonResponse({'image_url': image_url})
 
 
-def validate_transcript_preferences(
-        provider, cielo24_fidelity, cielo24_turnaround, three_play_turnaround, preferred_languages
-):
+def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnaround,
+                                    three_play_turnaround, video_source_language, preferred_languages):
     """
     Validate 3rd Party Transcription Preferences.
 
@@ -267,6 +266,7 @@ def validate_transcript_preferences(
         cielo24_fidelity:  Cielo24 transcription fidelity.
         cielo24_turnaround: Cielo24 transcription turnaround.
         three_play_turnaround: 3PlayMedia transcription turnaround.
+        video_source_language: Source/Speech language of the videos that are going to be submitted to 3PlayMedia.
         preferred_languages: list of language codes.
 
     Returns:
@@ -286,43 +286,49 @@ def validate_transcript_preferences(
 
                 # Validate transcription turnaround
                 if cielo24_turnaround not in transcription_plans[provider]['turnaround']:
-                    error = _('Invalid cielo24 turnaround.')
+                    error = 'Invalid cielo24 turnaround {}.'.format(cielo24_turnaround)
                     return error, preferences
 
                 # Validate transcription languages
                 supported_languages = transcription_plans[provider]['fidelity'][cielo24_fidelity]['languages']
                 if not len(preferred_languages) or not (set(preferred_languages) <= set(supported_languages.keys())):
-                    error = _('Invalid languages.')
+                    error = 'Invalid languages {}.'.format(preferred_languages)
                     return error, preferences
 
                 # Validated Cielo24 preferences
                 preferences = {
                     'cielo24_fidelity': cielo24_fidelity,
                     'cielo24_turnaround': cielo24_turnaround,
-                    'preferred_languages': list(preferred_languages),
+                    'preferred_languages': preferred_languages,
                 }
             else:
-                error = _('Invalid cielo24 fidelity.')
+                error = 'Invalid cielo24 fidelity {}.'.format(cielo24_fidelity)
         elif provider == TranscriptProvider.THREE_PLAY_MEDIA:
 
             # Validate transcription turnaround
             if three_play_turnaround not in transcription_plans[provider]['turnaround']:
-                error = _('Invalid 3play turnaround.')
+                error = 'Invalid 3play turnaround {}.'.format(three_play_turnaround)
                 return error, preferences
 
             # Validate transcription languages
-            supported_languages = transcription_plans[provider]['languages']
-            if not len(preferred_languages) or not (set(preferred_languages) <= set(supported_languages.keys())):
-                error = _('Invalid languages.')
+            valid_translations_map = transcription_plans[provider]['translations']
+            if video_source_language not in valid_translations_map.keys():
+                error = 'Unsupported source language {}.'.format(video_source_language)
+                return error, preferences
+
+            valid_target_languages = valid_translations_map[video_source_language]
+            if not len(preferred_languages) or not (set(preferred_languages) <= set(valid_target_languages)):
+                error = 'Invalid languages {}.'.format(preferred_languages)
                 return error, preferences
 
             # Validated 3PlayMedia preferences
             preferences = {
                 'three_play_turnaround': three_play_turnaround,
-                'preferred_languages': list(preferred_languages),
+                'video_source_language': video_source_language,
+                'preferred_languages': preferred_languages,
             }
     else:
-        error = _('Invalid provider.')
+        error = 'Invalid provider {}.'.format(provider)
 
     return error, preferences
 
@@ -353,6 +359,7 @@ def transcript_preferences_handler(request, course_key_string):
             cielo24_fidelity=data.get('cielo24_fidelity', ''),
             cielo24_turnaround=data.get('cielo24_turnaround', ''),
             three_play_turnaround=data.get('three_play_turnaround', ''),
+            video_source_language=data.get('video_source_language'),
             preferred_languages=data.get('preferred_languages', [])
         )
         if error:
@@ -361,11 +368,11 @@ def transcript_preferences_handler(request, course_key_string):
             preferences.update({'provider': provider})
             transcript_preferences = create_or_update_transcript_preferences(course_key_string, **preferences)
             response = JsonResponse({'transcript_preferences': transcript_preferences}, status=200)
+
+        return response
     elif request.method == 'DELETE':
         remove_transcript_preferences(course_key_string)
-        response = JsonResponse()
-
-    return response
+        return JsonResponse()
 
 
 @login_required
