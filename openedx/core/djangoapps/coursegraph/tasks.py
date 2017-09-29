@@ -167,15 +167,16 @@ def serialize_course(course_id):
             fields[field_name] = coerce_types(value)
 
         node = Node(block_type, 'item', **fields)
-        location_to_node[item.location.block_id] = node
+        location_to_node[item.location.version_agnostic()] = node
 
     # create relationships
     relationships = []
     for item in items:
         previous_child_node = None
         for index, child in enumerate(item.get_children()):
-            parent_node = location_to_node.get(item.location.block_id)
-            child_node = location_to_node.get(child.location.block_id)
+            parent_node = location_to_node.get(item.location.version_agnostic())
+            child_node = location_to_node.get(child.location.version_agnostic())
+
             if parent_node is not None and child_node is not None:
                 child_node["index"] = index
 
