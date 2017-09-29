@@ -18,7 +18,7 @@ from edx_ace.message import Message
 from edx_ace.recipient import Recipient
 from edx_ace.utils.date import deserialize
 from opaque_keys.edx.keys import CourseKey
-from lms.djangoapps.experiments.utils import check_and_get_upgrade_link
+from lms.djangoapps.experiments.utils import check_and_get_upgrade_link_and_date
 
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.schedules.message_type import ScheduleMessageType
@@ -155,6 +155,8 @@ def _gather_users_and_schedules_for_target_hour(target_hour, org_list, exclude_o
     schedules = Schedule.objects.select_related(
         'enrollment__user__profile',
         'enrollment__course',
+    ).prefetch_related(
+        'enrollment__course__modes'
     ).filter(
         enrollment__user__in=users,
         start__gte=beginning_of_day,
@@ -176,37 +178,15 @@ def _gather_users_and_schedules_for_target_hour(target_hour, org_list, exclude_o
     return users, schedules
 
 
-def _should_user_be_upsold(enrollment):
-    enrollment_mode = None
-    is_active = None
-
-    if enrollment:
-        enrollment_mode = enrollment.mode
-        is_active = enrollment.is_active
-
-    # Return `true` if user is not enrolled in course
-    if enrollment_mode is None and is_active is None:
-        return True
-
-    # Show the summary if user enrollment is in which allow user to upsell
-    return is_active and enrollment_mode in ["Verified", "Professional"]
-
-
 def _add_upsell_button_to_email_template(a_user, a_schedule, template_context):
-    show_upsell = _should_user_be_upsold(a_schedule.enrollment)
     # Check and upgrade link performs a query on CourseMode, which is triggering failures in
     # test_send_recurring_nudge.py
-    upgrade_data = check_and_get_upgrade_link(a_user, a_schedule.enrollment.course_id)
+    upgrade_link, upgrade_date = check_and_get_upgrade_link_and_date(a_user, a_schedule.enrollment)
 
-    upsell_link = ''
-
-    if upgrade_data:
-        upsell_link = upgrade_data.link
-
-    template_context['show_upsell'] = show_upsell
-    template_context['upsell_link'] = upsell_link
-    template_context['user_schedule_upgrade_deadline_time'] = upgrade_data.date
-
+    template_context['show_upsell'] = upgrade_link is not None
+    template_context['upsell_link'] = upgrade_link
+    template_context['user_schedule_upgrade_deadline_time'] = upgrade_date
+    
 
 @task(ignore_result=True, routing_key=ROUTING_KEY)
 def recurring_nudge_schedule_bin(
@@ -261,6 +241,10 @@ def _recurring_nudge_schedules_for_bin(site, target_day, bin_num, org_list, excl
             # This is used by the bulk email optout policy
             'course_ids': course_id_strs,
         })
+
+        # Information for including upsell messaging in template.
+        _add_upsell_button_to_email_template(user, first_schedule, template_context)
+
         yield (user, first_schedule.enrollment.course.language, template_context)
 
 
@@ -386,6 +370,8 @@ def get_schedules_with_target_date_by_bin_and_orgs(schedule_date_field, target_d
     schedules = Schedule.objects.select_related(
         'enrollment__user__profile',
         'enrollment__course',
+    ).prefetch_related(
+        'enrollment__course__modes'
     ).filter(
         enrollment__user__in=users,
         enrollment__is_active=True,

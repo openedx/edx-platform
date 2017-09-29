@@ -132,7 +132,6 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
         self.assertEqual(Schedule.objects.all().count(), 0)
         self.assertEqual(enrollment.upgrade_deadline, course_mode.expiration_datetime)
 
-
     @skip_unless_lms
     # NOTE: We mute the post_save signal to prevent Schedules from being created for new enrollments
     @factory.django.mute_signals(signals.post_save)

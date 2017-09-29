@@ -22,12 +22,33 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 from student.tests.factories import UserFactory
 
 
+# Populating recurring nudge emails requires three queries
+# 1a) Find all users whose first enrollment during a day was in the specified hour window
+# 1b) All schedules for all enrollments for that day for users in that window (with 1a as a subquery)
+# 2) Check whether debugging is enabled
+CONST_QUERIES = 2
+
+# 1) Prefetch all course modes for those schedules
+# 2) (When not cached) load the DynamicUpgradeDeadlineConfiguration
+SCHEDULE_QUERIES = 2
+
+# 1) Load the current django site
+# 2) Load the ScheduleConfig
+SEND_QUERIES = 2
+
+# 1) (When not cached) load the CourseDynamicUpgradeDeadlineConfiguration
+# 2) Load the VERIFIED course mode for the course
+PER_COURSE_QUERIES = 2
+
+
 @ddt.ddt
 @skip_unless_lms
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
 class TestSendRecurringNudge(CacheIsolationTestCase):
     # pylint: disable=protected-access
+
+    ENABLED_CACHES = ['default']
 
     def setUp(self):
         super(TestSendRecurringNudge, self).setUp()
@@ -233,7 +254,7 @@ class TestSendRecurringNudge(CacheIsolationTestCase):
         patch_channels(self, [mock_channel])
 
         sent_messages = []
-        
+
         templates_override = deepcopy(settings.TEMPLATES)
         templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
         with self.settings(TEMPLATES=templates_override):

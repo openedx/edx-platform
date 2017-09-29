@@ -20,6 +20,7 @@ from course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from openedx.core.djangoapps.certificates.api import can_show_certificate_available_date_field
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import CourseHomeMessages, UPGRADE_DEADLINE_MESSAGE
 from student.models import CourseEnrollment
@@ -380,6 +381,67 @@ class CertificateAvailableDate(DateSummary):
             )
 
 
+def verified_upgrade_deadline_link(user, course=None, course_id=None):
+    """
+    Format the correct verified upgrade link for the specified ``user``
+    in a course.
+
+    One of ``course`` or ``course_id`` must be supplied. If both are specified,
+    ``course`` will take priority.
+
+    Arguments:
+        user (:class:`~django.contrib.auth.models.User`): The user to display
+            the link for.
+        course (:class:`.CourseOverview`): The course to render a link for.
+        course_id (:class:`.CourseKey`): The course_id of the course to render for.
+
+    Returns:
+        The formatted link to that will allow the user to upgrade to verified
+        in this course.
+    """
+    if course is not None:
+        course_id = course.id
+
+    ecommerce_service = EcommerceService()
+    if ecommerce_service.is_enabled(user):
+        if course is not None and isinstance(course, CourseOverview):
+            course_mode = [
+                mode
+                for mode in course.modes
+                if mode.slug == CourseMode.VERIFIED
+            ]
+        else:
+            course_mode = CourseMode.objects.get(
+                course_id=course_id, mode_slug=CourseMode.VERIFIED
+            )
+        return ecommerce_service.get_checkout_page_url(course_mode.sku)
+    return reverse('verify_student_upgrade_and_verify', args=(course_id,))
+
+
+def verified_upgrade_link_is_valid(enrollment=None):
+    """
+    Return whether this enrollment can be upgraded.
+
+    Arguments:
+        enrollment (:class:`.CourseEnrollment`): The enrollment under consideration.
+            If None, then the enrollment is considered to be upgradeable.
+    """
+    # Return `true` if user is not enrolled in course
+    if enrollment is None:
+        return False
+
+    upgrade_deadline = enrollment.upgrade_deadline
+
+    if upgrade_deadline is None:
+        return False
+
+    if datetime.datetime.now(utc).date() > upgrade_deadline.date():
+        return False
+
+    # Show the summary if user enrollment is in which allow user to upsell
+    return enrollment.is_active and enrollment.mode in CourseMode.UPSELL_TO_VERIFIED_MODES
+
+
 class VerifiedUpgradeDeadlineDate(DateSummary):
     """
     Displays the date before which learners must upgrade to the
@@ -395,7 +457,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
 
     @property
     def link(self):
-        return EcommerceService().upgrade_url(self.user, self.course_id)
+        return verified_upgrade_deadline_link(self.user, self.course, self.course_id)
 
     @cached_property
     def enrollment(self):
@@ -413,19 +475,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
         if not is_enabled:
             return False
 
-        enrollment_mode = None
-        is_active = None
-
-        if self.enrollment:
-            enrollment_mode = self.enrollment.mode
-            is_active = self.enrollment.is_active
-
-        # Return `true` if user is not enrolled in course
-        if enrollment_mode is None and is_active is None:
-            return True
-
-        # Show the summary if user enrollment is in which allow user to upsell
-        return is_active and enrollment_mode in CourseMode.UPSELL_TO_VERIFIED_MODES
+        return verified_upgrade_link_is_valid(self.enrollment)
 
     @lazy
     def date(self):

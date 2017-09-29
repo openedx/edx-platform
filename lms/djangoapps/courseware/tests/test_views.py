@@ -213,8 +213,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 147),
-        (ModuleStoreEnum.Type.split, 4, 147),
+        (ModuleStoreEnum.Type.mongo, 10, 146),
+        (ModuleStoreEnum.Type.split, 4, 146),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -1047,6 +1047,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
         course = modulestore().get_course(course.id)
         self.assertIsNotNone(course.get_children()[0].get_children()[0].due)
         CourseEnrollmentFactory(user=self.user, course_id=course.id)
+        CourseOverview.load_from_module_store(course.id)
         return course
 
     def setUp(self):
@@ -1456,13 +1457,13 @@ class ProgressPageTests(ProgressPageBaseTests):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(36, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
+        with self.assertNumQueries(35, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
             self._get_progress_page()
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 43, 27),
-        (True, 36, 23)
+        (False, 42, 26),
+        (True, 35, 22)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -2213,6 +2214,7 @@ class TestIndexView(ModuleStoreTestCase):
                 state=json.dumps({'state': unicode(item.scope_ids.usage_id)})
             )
 
+        CourseOverview.load_from_module_store(course.id)
         CourseEnrollmentFactory(user=user, course_id=course.id)
 
         self.assertTrue(self.client.login(username=user.username, password='test'))
@@ -2241,6 +2243,7 @@ class TestIndexView(ModuleStoreTestCase):
             vertical = ItemFactory.create(parent=section, category='vertical', display_name="Vertical")
             ItemFactory.create(parent=vertical, category='id_checker', display_name="ID Checker")
 
+        CourseOverview.load_from_module_store(course.id)
         CourseEnrollmentFactory(user=user, course_id=course.id)
 
         self.assertTrue(self.client.login(username=user.username, password='test'))
@@ -2280,6 +2283,8 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
             ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical1")
             ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical2")
             ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical3")
+
+        CourseOverview.load_from_module_store(self.course.id)
 
         self.client.login(username=self.user, password='test')
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
@@ -2505,6 +2510,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCa
         self.user = UserFactory.create()
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
         self.course = CourseFactory.create()
+        CourseOverview.load_from_module_store(self.course.id)
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
     def test_consent_required(self):
