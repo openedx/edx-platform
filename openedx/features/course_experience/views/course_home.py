@@ -1,7 +1,6 @@
 """
 Views for the course home page.
 """
-import datetime
 
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
@@ -9,7 +8,6 @@ from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
-from pytz import utc
 
 from commerce.utils import EcommerceService
 from courseware.access import has_access
@@ -165,12 +163,8 @@ class CourseHomeFragmentView(EdxFragmentView):
         upgrade_price = None
         upgrade_url = None
 
-        if (
-            SHOW_UPGRADE_MSG_ON_COURSE_HOME.is_enabled(course_key)
-            and enrollment
-            and enrollment.upgrade_deadline
-            and datetime.datetime.now(utc) < enrollment.upgrade_deadline
-        ):
+        # TODO Add switch to control deployment
+        if SHOW_UPGRADE_MSG_ON_COURSE_HOME.is_enabled(course_key) and enrollment and enrollment.upgrade_deadline:
             verified_mode = enrollment.verified_mode
             if verified_mode:
                 upgrade_price = verified_mode.min_price
