@@ -1730,10 +1730,11 @@ class CourseEnrollment(models.Model):
         if not self.course_overview.self_paced:
             return None
 
-        if (
-            not CourseDynamicUpgradeDeadlineConfiguration.is_enabled(self.course_id)
-            and not DynamicUpgradeDeadlineConfiguration.is_enabled()
-        ):
+        if not DynamicUpgradeDeadlineConfiguration.is_enabled():
+            return None
+
+        course_config = CourseDynamicUpgradeDeadlineConfiguration.current(self.course_id)
+        if course_config.opt_out:
             return None
 
         try:
