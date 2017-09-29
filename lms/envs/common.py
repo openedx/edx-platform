@@ -393,6 +393,9 @@ FEATURES = {
     # Whether to check the "Notify users by email" checkbox in the batch enrollment form
     # in the instructor dashboard.
     'BATCH_ENROLLMENT_NOTIFY_USERS_DEFAULT': True,
+
+    # Disable bulk email send from random different addresses when 'False'
+    'BULK_EMAIL_FROM_DIFFERENT_ADDRESSES': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews

@@ -20,6 +20,8 @@ from student.roles import CourseInstructorRole, CourseStaffRole
 from util.keyword_substitution import substitute_keywords_with_data
 from util.query import use_read_replica_if_available
 
+from django.conf import settings
+
 log = logging.getLogger(__name__)
 
 
@@ -56,7 +58,6 @@ EMAIL_TARGETS = {target[0] for target in EMAIL_TARGET_CHOICES}
 class Target(models.Model):
     """
     A way to refer to a particular group (within a course) as a "Send to:" target.
-
     Django hackery in this class - polymorphism does not work well in django, for reasons relating to how
     each class is represented by its own database table. Due to this, we can't just override
     methods of Target in CohortTarget and get the child method, as one would expect. The
@@ -98,7 +99,6 @@ class Target(models.Model):
     def get_users(self, course_id, user_id=None):
         """
         Gets the users for a given target.
-
         Result is returned in the form of a queryset, and may contain duplicates.
         """
         staff_qset = CourseStaffRole(course_id).users_with_role()
@@ -160,7 +160,6 @@ class CohortTarget(Target):
     def ensure_valid_cohort(cls, cohort_name, course_id):
         """
         Ensures cohort_name is a valid cohort for course_id.
-
         Returns the cohort if valid, raises an error otherwise.
         """
         if cohort_name is None:
@@ -231,12 +230,16 @@ class CourseEmail(Email):
     class Meta(object):
         app_label = "bulk_email"
 
+    DEFAULT_FROM_EMAIL = (settings.FEATURES.get('BULK_EMAIL_FROM_DIFFERENT_ADDRESSES')
+                    and None
+                    or getattr(settings, 'BULK_EMAIL_DEFAULT_FROM_EMAIL', None))
+
     course_id = CourseKeyField(max_length=255, db_index=True)
     # to_option is deprecated and unused, but dropping db columns is hard so it's still here for legacy reasons
     to_option = models.CharField(max_length=64, choices=[("deprecated", "deprecated")])
     targets = models.ManyToManyField(Target)
     template_name = models.CharField(null=True, max_length=255)
-    from_addr = models.CharField(null=True, max_length=255)
+    from_addr = models.CharField(null=True, max_length=255, default=DEFAULT_FROM_EMAIL)
 
     def __unicode__(self):
         return self.subject
@@ -285,7 +288,7 @@ class CourseEmail(Email):
             html_message=html_message,
             text_message=text_message,
             template_name=template_name,
-            from_addr=from_addr,
+            from_addr=from_addr or cls.DEFAULT_FROM_EMAIL,
         )
         course_email.save()  # Must exist in db before setting M2M relationship values
         course_email.targets.add(*new_targets)
@@ -323,7 +326,6 @@ COURSE_EMAIL_MESSAGE_BODY_TAG = '{{message_body}}'
 class CourseEmailTemplate(models.Model):
     """
     Stores templates for all emails to a course to use.
-
     This is expected to be a singleton, to be shared across all courses.
     Initialization takes place in a migration that in turn loads a fixture.
     The admin console interface disables add and delete operations.
@@ -340,7 +342,6 @@ class CourseEmailTemplate(models.Model):
     def get_template(name=None):
         """
         Fetch the current template
-
         If one isn't stored, an exception is thrown.
         """
         try:
@@ -353,15 +354,12 @@ class CourseEmailTemplate(models.Model):
     def _render(format_string, message_body, context):
         """
         Create a text message using a template, message body and context.
-
         Convert message body (`message_body`) into an email message
         using the provided template.  The template is a format string,
         which is rendered using format() with the provided `context` dict.
-
         Any keywords encoded in the form %%KEYWORD%% found in the message
         body are substituted with user data before the body is inserted into
         the template.
-
         Output is returned as a unicode string.  It is not encoded as utf-8.
         Such encoding is left to the email code, which will use the value
         of settings.DEFAULT_CHARSET to encode the message.
@@ -385,7 +383,6 @@ class CourseEmailTemplate(models.Model):
     def render_plaintext(self, plaintext, context):
         """
         Create plain text message.
-
         Convert plain text body (`plaintext`) into plaintext email message using the
         stored plain template and the provided `context` dict.
         """
@@ -394,7 +391,6 @@ class CourseEmailTemplate(models.Model):
     def render_htmltext(self, htmltext, context):
         """
         Create HTML text message.
-
         Convert HTML text body (`htmltext`) into HTML email message using the
         stored HTML template and the provided `context` dict.
         """
@@ -440,7 +436,6 @@ class CourseAuthorization(models.Model):
 class BulkEmailFlag(ConfigurationModel):
     """
     Enables site-wide configuration for the bulk_email feature.
-
     Staff can only send bulk email for a course if all the following conditions are true:
     1. BulkEmailFlag is enabled.
     2. Course-specific authorization not required, or course authorized to use bulk email.
@@ -452,7 +447,6 @@ class BulkEmailFlag(ConfigurationModel):
     def feature_enabled(cls, course_id=None):
         """
         Looks at the currently active configuration model to determine whether the bulk email feature is available.
-
         If the flag is not enabled, the feature is not available.
         If the flag is enabled, course-specific authorization is required, and the course_id is either not provided
             or not authorixed, the feature is not available.
@@ -478,4 +472,4 @@ class BulkEmailFlag(ConfigurationModel):
         return u"BulkEmailFlag: enabled {}, require_course_email_auth: {}".format(
             current_model.is_enabled(),
             current_model.require_course_email_auth
-        )
+)
