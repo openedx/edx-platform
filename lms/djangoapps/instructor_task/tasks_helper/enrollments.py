@@ -215,8 +215,10 @@ def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input
     current_step = {'step': 'Uploading CSV'}
     task_progress.update_task_state(extra_meta=current_step)
 
+    csv_name = 'active_student_profile_info' if task_input['only_active'] else 'student_profile_info'
+
     # Perform the upload
-    upload_csv_to_report_store(rows, 'student_profile_info', course_id, start_date)
+    upload_csv_to_report_store(rows, csv_name, course_id, start_date)
 
     return task_progress.update_task_state(extra_meta=current_step)
 
