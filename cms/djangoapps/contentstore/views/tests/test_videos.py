@@ -889,6 +889,18 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
 
     VIEW_NAME = 'transcript_preferences_handler'
 
+    def test_405_with_not_allowed_request_method(self):
+        """
+        Verify that 405 is returned in case of not-allowed request methods.
+        Allowed request methods are POST and DELETE.
+        """
+        video_transcript_url = self.get_url_for_course_key(self.course.id)
+        response = self.client.get(
+            video_transcript_url,
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 405)
+
     @ddt.data(
         # Video transcript feature disabled
         (
@@ -901,7 +913,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         (
             {},
             True,
-            'Invalid provider.',
+            u"Invalid provider None.",
             400
         ),
         (
@@ -909,7 +921,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'provider': ''
             },
             True,
-            'Invalid provider.',
+            u"Invalid provider .",
             400
         ),
         (
@@ -917,7 +929,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'provider': 'dummy-provider'
             },
             True,
-            'Invalid provider.',
+            u"Invalid provider dummy-provider.",
             400
         ),
         (
@@ -925,7 +937,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'provider': TranscriptProvider.CIELO24
             },
             True,
-            'Invalid cielo24 fidelity.',
+            u"Invalid cielo24 fidelity None.",
             400
         ),
         (
@@ -934,7 +946,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'cielo24_fidelity': 'PROFESSIONAL',
             },
             True,
-            'Invalid cielo24 turnaround.',
+            u"Invalid cielo24 turnaround None.",
             400
         ),
         (
@@ -944,7 +956,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'cielo24_turnaround': 'STANDARD'
             },
             True,
-            'Invalid languages.',
+            u"Invalid languages [].",
             400
         ),
         (
@@ -955,7 +967,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'preferred_languages': ['es', 'ur']
             },
             True,
-            'Invalid languages.',
+            u"Invalid languages [u'es', u'ur'].",
             400
         ),
         (
@@ -963,26 +975,39 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'provider': TranscriptProvider.THREE_PLAY_MEDIA
             },
             True,
-            'Invalid 3play turnaround.',
-            400
-        ),
-        (
-            {
-                'provider': TranscriptProvider.THREE_PLAY_MEDIA,
-                'three_play_turnaround': 'default'
-            },
-            True,
-            'Invalid languages.',
+            u"Invalid 3play turnaround None.",
             400
         ),
         (
             {
                 'provider': TranscriptProvider.THREE_PLAY_MEDIA,
                 'three_play_turnaround': 'default',
+                'video_source_language': 'zh',
+            },
+            True,
+            u"Unsupported source language zh.",
+            400
+        ),
+        (
+            {
+                'provider': TranscriptProvider.THREE_PLAY_MEDIA,
+                'three_play_turnaround': 'default',
+                'video_source_language': 'es',
                 'preferred_languages': ['es', 'ur']
             },
             True,
-            'Invalid languages.',
+            u"Invalid languages [u'es', u'ur'].",
+            400
+        ),
+        (
+            {
+                'provider': TranscriptProvider.THREE_PLAY_MEDIA,
+                'three_play_turnaround': 'default',
+                'video_source_language': 'en',
+                'preferred_languages': ['es', 'ur']
+            },
+            True,
+            u"Invalid languages [u'es', u'ur'].",
             400
         ),
         # Success
@@ -1002,7 +1027,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'provider': TranscriptProvider.THREE_PLAY_MEDIA,
                 'three_play_turnaround': 'default',
                 'preferred_languages': ['en'],
-                'video_source_language': None,  # TODO change this once we support source language in platform.
+                'video_source_language': 'en',
             },
             True,
             '',
