@@ -62,6 +62,9 @@ git+https://github.com/mitodl/django-cas.git@47cfef16cbbf305f943cceb8c0b02514194
 # fs==0.4.0
 git+https://github.com/edx/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b#egg=fs==0.4.0
 
+# Need the most recent unpackaged changes after the 1.9.0 release.
+git+https://github.com/treyhunner/django-simple-history.git@b01b92c7b5b16d0f6e090de3b984d0bd8bb5cc3c#egg=django-simple-history==1.9.0
+
 # Branch removes model import from startup.
 git+https://github.com/edx/django-pyfs.git@4998832876f83695ed070fc7eeb92bb53e00f23d#egg=django-pyfs==1.0.6
 
