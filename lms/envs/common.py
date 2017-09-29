@@ -2395,6 +2395,11 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ()
     CORS_ORIGIN_ALLOW_ALL = False
+# Set this True to ignore CSRF referer check from s3 bucket. This is
+# required for SCORM xblock to work.
+# We should find a better alternative for this and change our approach
+# for how SCORM xblock is used.
+CORS_REPLACE_HTTPS_REFERER = True
 
 # Default cache expiration for the cross-domain proxy HTML page.
 # This is a static page that can be iframed into an external page
