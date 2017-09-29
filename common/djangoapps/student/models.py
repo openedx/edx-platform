@@ -1696,7 +1696,7 @@ class CourseEnrollment(models.Model):
     def verified_mode(self):
         return CourseMode.verified_mode_for_course(self.course_id)
 
-    @property
+    @cached_property
     def upgrade_deadline(self):
         """
         Returns the upgrade deadline for this enrollment, if it is upgradeable.
