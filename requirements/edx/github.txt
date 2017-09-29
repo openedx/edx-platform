@@ -95,7 +95,7 @@ git+https://github.com/edx/xblock-utils.git@v1.0.5#egg=xblock-utils==1.0.5
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 git+https://github.com/edx/edx-user-state-client.git@1.0.1#egg=edx-user-state-client==1.0.1
 git+https://github.com/edx/xblock-lti-consumer.git@v1.1.6#egg=lti_consumer-xblock==1.1.6
-git+https://github.com/edx/edx-proctoring.git@1.2.1#egg=edx-proctoring==1.2.1
+git+https://github.com/edx/edx-proctoring.git@1.2.2#egg=edx-proctoring==1.2.2
 
 # Third Party XBlocks
 git+https://github.com/open-craft/xblock-poll@7ba819b968fe8faddb78bb22e1fe7637005eb414#egg=xblock-poll==1.2.7
