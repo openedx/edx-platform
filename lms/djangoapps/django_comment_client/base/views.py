@@ -23,6 +23,10 @@ from edx_notifications.lib.publisher import (
     publish_notification_to_user,
     get_notification_type
 )
+from social_engagement.engagement import (
+    get_involved_users_in_thread,
+    get_involved_users_in_comment,
+ )
 from edx_notifications.data import NotificationMessage
 from openedx.core.djangoapps.course_groups.cohorts import is_commentable_cohorted, get_cohort_by_id
 from courseware.courses import get_course_with_access, get_course_overview_with_access, get_course_by_id
@@ -655,8 +659,9 @@ def delete_thread(request, course_id, thread_id):
     """
     course_key = CourseKey.from_string(course_id)
     thread = cc.Thread.find(thread_id)
+    involved_users = get_involved_users_in_thread(request, thread.id)
     thread.delete()
-    thread_deleted.send(sender=None, user=request.user, post=thread)
+    thread_deleted.send(sender=None, user=request.user, post=thread, involved_users=list(involved_users))
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
 
@@ -743,8 +748,9 @@ def delete_comment(request, course_id, comment_id):
     """
     course_key = CourseKey.from_string(course_id)
     comment = cc.Comment.find(comment_id)
+    involved_users = get_involved_users_in_comment(request, comment.id, comment.parent_id, comment.thread_id)
     comment.delete()
-    comment_deleted.send(sender=None, user=request.user, post=comment)
+    comment_deleted.send(sender=None, user=request.user, post=comment, involved_users=list(involved_users))
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 
