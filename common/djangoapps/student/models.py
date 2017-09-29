@@ -1745,12 +1745,17 @@ class CourseEnrollment(models.Model):
                 'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
                 self.id, self.schedule.id
             )
-            return self.schedule.upgrade_deadline
+            upgrade_deadline = self.schedule.upgrade_deadline
         except ObjectDoesNotExist:
             # NOTE: Schedule has a one-to-one mapping with CourseEnrollment. If no schedule is associated
             # with this enrollment, Django will raise an exception rather than return None.
             log.debug('Schedules: No schedule exists for CourseEnrollment %d.', self.id)
             return None
+
+        if upgrade_deadline is None or datetime.now(UTC) >= upgrade_deadline:
+            return None
+
+        return upgrade_deadline
 
     @property
     def course_upgrade_deadline(self):
