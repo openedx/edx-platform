@@ -14,7 +14,7 @@
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/open-craft/xblock-chat.git@96e8fab2f5bffd7330ffc03b622a80536477808e#egg=xblock-chat
 -e git+https://github.com/open-craft/xblock-eoc-journal.git@1d1c5a5ffea4168b690d8922d25da7dfb1fa2fbf#egg=xblock-eoc-journal
--e git+https://github.com/raccoongang/edx_xblock_scorm.git#egg=edx_xblock_scorm
+-e git+https://github.com/mckinseyacademy/xblock-scorm.git@500eb8b588e731b811d820993a349e676e27e47a#egg=xblock-scorm
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.2#egg=xblock-diagnostic-feedback==0.2.2
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.3#egg=xblock-group-project-v2==0.4.3
 git+https://github.com/edx-solutions/api-integration.git@v1.3.7#egg=api-integration==1.3.7
@@ -24,4 +24,3 @@ git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.0.9
 git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.1.1#egg=discussion-edx-platform-extensions==1.1.1
 git+https://github.com/edx-solutions/course-edx-platform-extensions.git@v1.0.3#egg=course-edx-platform-extensions==1.0.3
 git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@1.0.4#egg=progress-edx-platform-extensions==1.0.4
-git+https://github.com/appsembler/edx_xblock_scorm@use_ssla_player#egg=scormxblock
