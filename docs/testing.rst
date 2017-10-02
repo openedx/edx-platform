@@ -263,6 +263,22 @@ This command runs a single python unit test within a specified file.
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py::test_stringify
 
+This command runs a single python unit test method within a specified TestCase
+class within a specified file.
+
+::
+
+    pytest common/lib/xmodule/xmodule/tests/test_stringify.py::TestCase::test_stringify
+
+Note: if the method has an `@ddt.data` decorator, ddt will create multiple
+methods with the same prefix name and each individual data input as the suffix
+(e.g. `test_stringify_1_foo`). To test all of the ddt.data variations of the
+same test method, use the pytest `-k` option.
+
+::
+
+    pytest common/lib/xmodule/xmodule/tests/test_stringify.py::TestCase -k test_stringify
+
 
 This is an example of how to run a single test and get stdout shown immediately, with proper env config.
 
