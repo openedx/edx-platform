@@ -60,6 +60,7 @@ class CourseRunTeamSerializerMixin(serializers.Serializer):
         for member in team:
             CourseAccessRole.objects.update_or_create(
                 course_id=instance.id,
+                org=instance.id.org,
                 user=User.objects.get(username=member['user']),
                 defaults={'role': member['role']}
             )

@@ -37,7 +37,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
 
     def assert_access_role(self, course_run, user, role):
         # An error will be raised if the endpoint did not create the role
-        CourseAccessRole.objects.get(course_id=course_run.id, user=user, role=role)
+        CourseAccessRole.objects.get(course_id=course_run.id, org=course_run.id.org, user=user, role=role)
 
     def assert_course_access_role_count(self, course_run, expected):
         assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == expected
@@ -143,9 +143,9 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
 
         # The request should only update or create new team members
         existing_user = UserFactory()
-        CourseAccessRole.objects.create(course_id=course_run.id, role=role, user=existing_user)
+        CourseAccessRole.objects.create(course_id=course_run.id, org=course_run.id.org, role=role, user=existing_user)
         new_user = UserFactory()
-        CourseAccessRole.objects.create(course_id=course_run.id, role=role, user=new_user)
+        CourseAccessRole.objects.create(course_id=course_run.id, org=course_run.id.org, role=role, user=new_user)
         assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 2
 
         data = {
