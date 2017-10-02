@@ -41,6 +41,7 @@ class PytestSuite(TestSuite):
         if os.environ.get("SHARD", None):
             shard_str = "shard_{}".format(os.environ.get("SHARD"))
             self.report_dir = self.report_dir / shard_str
+        self.xunit_report = self.report_dir / "nosetests.xml"
 
         self.cov_args = kwargs.get('cov_args', '')
 
@@ -135,7 +136,7 @@ class SystemTestSuite(PytestSuite):
             cmd = ['pytest']
         cmd.extend([
             '--ds={}'.format('{}.envs.{}'.format(self.root, self.settings)),
-            '--junitxml={}'.format(self.report_dir / "nosetests.xml"),
+            "--junitxml={}".format(self.xunit_report),
         ])
         cmd.extend(self.test_options_flags)
         if self.verbosity < 1:
@@ -212,7 +213,6 @@ class LibTestSuite(PytestSuite):
         super(LibTestSuite, self).__init__(*args, **kwargs)
         self.append_coverage = kwargs.get('append_coverage', False)
         self.test_id = kwargs.get('test_id', self.root)
-        self.xunit_report = self.report_dir / "nosetests.xml"
 
     @property
     def cmd(self):
@@ -223,7 +223,7 @@ class LibTestSuite(PytestSuite):
         cmd.extend([
             "-p",
             "no:randomly",
-            "--junitxml=".format(self.xunit_report),
+            "--junitxml={}".format(self.xunit_report),
         ])
         cmd.extend(self.passthrough_options + self.test_options_flags)
         if self.verbosity < 1:
