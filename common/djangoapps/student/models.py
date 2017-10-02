@@ -1734,7 +1734,7 @@ class CourseEnrollment(models.Model):
             return None
 
         course_config = CourseDynamicUpgradeDeadlineConfiguration.current(self.course_id)
-        if course_config.opt_out:
+        if not course_config.enabled or course_config.opt_out:
             return None
 
         try:
