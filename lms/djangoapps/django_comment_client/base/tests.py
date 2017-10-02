@@ -581,7 +581,10 @@ class ViewsTestCase(
     def assert_discussion_signals(self, signal, user=None):
         if user is None:
             user = self.student
-        with self.assert_signal_sent(views, signal, sender=None, user=user, exclude_args=('post',)):
+        exclude_args = ['post']
+        if signal in ['thread_deleted', 'comment_deleted']:
+            exclude_args.append('involved_users')
+        with self.assert_signal_sent(views, signal, sender=None, user=user, exclude_args=exclude_args):
             yield
 
     def test_create_thread(self, mock_request):
