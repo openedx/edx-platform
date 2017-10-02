@@ -13,8 +13,6 @@ from edxmako.shortcuts import render_to_string
 from xmodule.capa_module import CapaModule
 from xmodule.x_module import AUTHOR_VIEW
 
-from .models import TagCategories
-
 _ = lambda text: text
 
 
@@ -30,6 +28,7 @@ class StructuredTagsAside(XBlockAside):
         """
         Return available tags
         """
+        from .models import TagCategories
         return TagCategories.objects.all()
 
     def _get_studio_resource_url(self, relative_url):
