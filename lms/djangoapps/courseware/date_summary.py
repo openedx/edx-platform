@@ -276,9 +276,9 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
             is_active = self.enrollment.is_active
             course_upgrade_deadline = self.enrollment.course_upgrade_deadline
 
-        # Return `true` if user is not enrolled in course
+        # Return `false` if user is not enrolled in course
         if enrollment_mode is None and is_active is None:
-            return True
+            return False
 
         # Show the summary if user enrollment is in which allow user to upsell
         return (
