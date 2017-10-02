@@ -26,9 +26,13 @@
             <select id='transcript-fidelity' class='transcript-fidelity'></select>
             <span class='error-info' aria-hidden="true"></span>
         </div>
+        <div class='transcript-preferance-wrapper video-source-language-wrapper'>
+            <label class='transcript-preferance-label' for='video-source-language'><%- gettext('Video Source Language') %><span class='error-icon' aria-hidden="true"></span></label>
+            <select id='video-source-language' class='video-source-language' aria-labelledby="video-source-language-none"></select>
+            <span class='error-info' aria-hidden="true"></span>
+        </div>
         <div class='transcript-preferance-wrapper transcript-languages-wrapper'>
-            <span class='transcript-preferance-label'><%- gettext('Transcript Languages') %></span>
-            <span class='error-icon' aria-hidden="true"></span>
+            <span class='transcript-preferance-label'><%- gettext('Transcript Languages') %><span class='error-icon' aria-hidden="true"></span></span>
             <div class='transcript-languages-container'>
                 <div class='languages-container'></div>
                 <div class="transcript-language-menu-container">
