@@ -575,7 +575,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             self.assert_enrollment_status(username=staff_user.username, expected_status=status.HTTP_200_OK)
 
         # Once the limit is reached, subsequent requests should fail
-        for attempt in xrange(rate_limit + 10):
+        for attempt in xrange(rate_limit + 50):
             self.assert_enrollment_status(username=staff_user.username, expected_status=status. HTTP_429_TOO_MANY_REQUESTS)
 
     def test_enrollment_throttle_for_service(self):
