@@ -4,11 +4,12 @@ Tests for course_modes views.
 
 import decimal
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import ddt
 import freezegun
 import httpretty
+import pytz
 import waffle
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -43,44 +44,61 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
     @patch.dict(settings.FEATURES, {'MODE_CREATION_FOR_TESTING': True})
     def setUp(self):
         super(CourseModeViewTest, self).setUp()
-        self.course = CourseFactory.create()
+        now = datetime.now(pytz.utc)
+        day = timedelta(days=1)
+        tomorrow = now + day
+        yesterday = now - day
+        # Create course that has not started yet and course that started
+        self.course = CourseFactory.create(start=tomorrow)
+        self.course_that_started = CourseFactory.create(start=yesterday)
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @httpretty.activate
     @ddt.data(
-        # is_active?, enrollment_mode, redirect?
-        (True, 'verified', True),
-        (True, 'honor', False),
-        (True, 'audit', False),
-        (False, 'verified', False),
-        (False, 'honor', False),
-        (False, 'audit', False),
-        (False, None, False),
+        # is_active?, enrollment_mode, redirect?, has_started
+        (True, 'verified', True, False),
+        (True, 'honor', False, False),
+        (True, 'audit', False, False),
+        (True, 'verified', True, True),
+        (True, 'honor', False, True),
+        (True, 'audit', False, True),
+        (False, 'verified', False, False),
+        (False, 'honor', False, False),
+        (False, 'audit', False, False),
+        (False, None, False, False),
     )
     @ddt.unpack
-    def test_redirect_to_dashboard(self, is_active, enrollment_mode, redirect):
+    def test_redirect_to_dashboard(self, is_active, enrollment_mode, redirect, has_started):
+        # Configure whether course has started
+        # If it has go to course home instead of dashboard
+        course = self.course_that_started if has_started else self.course
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
+            CourseModeFactory.create(mode_slug=mode, course_id=course.id)
 
         # Enroll the user in the test course
         if enrollment_mode is not None:
             CourseEnrollmentFactory(
                 is_active=is_active,
                 mode=enrollment_mode,
-                course_id=self.course.id,
+                course_id=course.id,
                 user=self.user
             )
 
         # Configure whether we're upgrading or not
-        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        url = reverse('course_modes_choose', args=[unicode(course.id)])
         response = self.client.get(url)
 
         # Check whether we were correctly redirected
         if redirect:
-            self.assertRedirects(response, reverse('dashboard'))
+            if has_started:
+                self.assertRedirects(
+                    response, reverse('openedx.course_experience.course_home', kwargs={'course_id': course.id})
+                )
+            else:
+                self.assertRedirects(response, reverse('dashboard'))
         else:
             self.assertEquals(response.status_code, 200)
 
