@@ -9,7 +9,6 @@ WAFFLE_NAMESPACE = u'grades'
 
 # Switches
 ASSUME_ZERO_GRADE_IF_ABSENT = u'assume_zero_grade_if_absent'
-ESTIMATE_FIRST_ATTEMPTED = u'estimate_first_attempted'
 DISABLE_REGRADE_ON_POLICY_CHANGE = u'disable_regrade_on_policy_change'
 
 # Course Flags

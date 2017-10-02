@@ -2,25 +2,19 @@ import itertools
 from nose.plugins.attrib import attr
 
 import ddt
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.access import has_access
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from django.conf import settings
-from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from mock import patch
-from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
-from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT, waffle
 from ..course_grade import CourseGrade, ZeroCourseGrade
 from ..course_grade_factory import CourseGradeFactory
 from ..subsection_grade import SubsectionGrade, ZeroSubsectionGrade
-from ..subsection_grade_factory import SubsectionGradeFactory
 from .base import GradeTestBase
 from .utils import mock_get_score
 
@@ -75,7 +69,7 @@ class TestCourseGradeFactory(GradeTestBase):
                 grade_factory.read(self.request.user, self.course)
         self.assertEqual(mock_read_grade.called, feature_flag and course_setting)
 
-    def test_read(self):
+    def test_read_and_update(self):
         grade_factory = CourseGradeFactory()
 
         def _assert_read(expected_pass, expected_percent):
@@ -83,18 +77,40 @@ class TestCourseGradeFactory(GradeTestBase):
             Creates the grade, ensuring it is as expected.
             """
             course_grade = grade_factory.read(self.request.user, self.course)
+            _assert_grade_values(course_grade, expected_pass, expected_percent)
+            _assert_section_order(course_grade)
+
+        def _assert_grade_values(course_grade, expected_pass, expected_percent):
             self.assertEqual(course_grade.letter_grade, u'Pass' if expected_pass else None)
             self.assertEqual(course_grade.percent, expected_percent)
 
-        with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT):
-            with self.assertNumQueries(1), mock_get_score(1, 2):
-                _assert_read(expected_pass=False, expected_percent=0)
+        def _assert_section_order(course_grade):
+            sections = course_grade.chapter_grades[self.chapter.location]['sections']
+            self.assertEqual(
+                [section.display_name for section in sections],
+                [self.sequence.display_name, self.sequence2.display_name]
+            )
 
-            with self.assertNumQueries(10), mock_get_score(1, 2):
-                grade_factory.update(self.request.user, self.course)
+        with self.assertNumQueries(2), mock_get_score(1, 2):
+            _assert_read(expected_pass=False, expected_percent=0)  # start off with grade of 0
 
-            with self.assertNumQueries(1):
-                _assert_read(expected_pass=True, expected_percent=0.5)
+        with self.assertNumQueries(29), mock_get_score(1, 2):
+            grade_factory.update(self.request.user, self.course, force_update_subsections=True)
+
+        with self.assertNumQueries(4):
+            _assert_read(expected_pass=True, expected_percent=0.5)  # updated to grade of .5
+
+        with self.assertNumQueries(6), mock_get_score(1, 4):
+            grade_factory.update(self.request.user, self.course, force_update_subsections=False)
+
+        with self.assertNumQueries(4):
+            _assert_read(expected_pass=True, expected_percent=0.5)  # NOT updated to grade of .25
+
+        with self.assertNumQueries(12), mock_get_score(2, 2):
+            grade_factory.update(self.request.user, self.course, force_update_subsections=True)
+
+        with self.assertNumQueries(4):
+            _assert_read(expected_pass=True, expected_percent=1.0)  # updated to grade of 1.0
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(*itertools.product((True, False), (True, False)))
@@ -109,21 +125,20 @@ class TestCourseGradeFactory(GradeTestBase):
                 self.assertIsNone(course_grade)
 
     def test_create_zero_subs_grade_for_nonzero_course_grade(self):
-        with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT):
-            subsection = self.course_structure[self.sequence.location]
-            with mock_get_score(1, 2):
-                self.subsection_grade_factory.update(subsection)
-            course_grade = CourseGradeFactory().update(self.request.user, self.course)
-            subsection1_grade = course_grade.subsection_grades[self.sequence.location]
-            subsection2_grade = course_grade.subsection_grades[self.sequence2.location]
-            self.assertIsInstance(subsection1_grade, SubsectionGrade)
-            self.assertIsInstance(subsection2_grade, ZeroSubsectionGrade)
+        subsection = self.course_structure[self.sequence.location]
+        with mock_get_score(1, 2):
+            self.subsection_grade_factory.update(subsection)
+        course_grade = CourseGradeFactory().update(self.request.user, self.course)
+        subsection1_grade = course_grade.subsection_grades[self.sequence.location]
+        subsection2_grade = course_grade.subsection_grades[self.sequence2.location]
+        self.assertIsInstance(subsection1_grade, SubsectionGrade)
+        self.assertIsInstance(subsection2_grade, ZeroSubsectionGrade)
 
     @ddt.data(True, False)
     def test_iter_force_update(self, force_update):
         with patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update') as mock_update:
             set(CourseGradeFactory().iter(
-                users = [self.request.user], course = self.course, force_update = force_update
+                users=[self.request.user], course=self.course, force_update=force_update,
             ))
         self.assertEqual(mock_update.called, force_update)
 
@@ -149,13 +164,13 @@ class TestCourseGradeFactory(GradeTestBase):
             'section_breakdown': [
                 {
                     'category': 'Homework',
-                    'detail': u'Homework 1 - Test Sequential 1 - 50% (1/2)',
+                    'detail': u'Homework 1 - Test Sequential X - 50% (1/2)',
                     'label': u'HW 01',
                     'percent': 0.5
                 },
                 {
                     'category': 'Homework',
-                    'detail': u'Homework 2 - Test Sequential 2 - 0% (0/1)',
+                    'detail': u'Homework 2 - Test Sequential A - 0% (0/1)',
                     'label': u'HW 02',
                     'percent': 0.0
                 },
@@ -282,81 +297,3 @@ class TestGradeIteration(SharedModuleStoreTestCase):
                 students_to_errors[student] = error
 
         return students_to_course_grades, students_to_errors
-
-
-class TestCourseGradeLogging(ProblemSubmissionTestMixin, SharedModuleStoreTestCase):
-    """
-    Tests logging in the course grades module.
-    Uses a larger course structure than other
-    unit tests.
-    """
-    def setUp(self):
-        super(TestCourseGradeLogging, self).setUp()
-        self.course = CourseFactory.create()
-        with self.store.bulk_operations(self.course.id):
-            self.chapter = ItemFactory.create(
-                parent=self.course,
-                category="chapter",
-                display_name="Test Chapter"
-            )
-            self.sequence = ItemFactory.create(
-                parent=self.chapter,
-                category='sequential',
-                display_name="Test Sequential 1",
-                graded=True
-            )
-            self.sequence_2 = ItemFactory.create(
-                parent=self.chapter,
-                category='sequential',
-                display_name="Test Sequential 2",
-                graded=True
-            )
-            self.sequence_3 = ItemFactory.create(
-                parent=self.chapter,
-                category='sequential',
-                display_name="Test Sequential 3",
-                graded=False
-            )
-            self.vertical = ItemFactory.create(
-                parent=self.sequence,
-                category='vertical',
-                display_name='Test Vertical 1'
-            )
-            self.vertical_2 = ItemFactory.create(
-                parent=self.sequence_2,
-                category='vertical',
-                display_name='Test Vertical 2'
-            )
-            self.vertical_3 = ItemFactory.create(
-                parent=self.sequence_3,
-                category='vertical',
-                display_name='Test Vertical 3'
-            )
-            problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
-                question_text='The correct answer is Choice 2',
-                choices=[False, False, True, False],
-                choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
-            )
-            self.problem = ItemFactory.create(
-                parent=self.vertical,
-                category="problem",
-                display_name="test_problem_1",
-                data=problem_xml
-            )
-            self.problem_2 = ItemFactory.create(
-                parent=self.vertical_2,
-                category="problem",
-                display_name="test_problem_2",
-                data=problem_xml
-            )
-            self.problem_3 = ItemFactory.create(
-                parent=self.vertical_3,
-                category="problem",
-                display_name="test_problem_3",
-                data=problem_xml
-            )
-        self.request = get_mock_request(UserFactory())
-        self.client.login(username=self.request.user.username, password="test")
-        self.course_structure = get_course_blocks(self.request.user, self.course.location)
-        self.subsection_grade_factory = SubsectionGradeFactory(self.request.user, self.course, self.course_structure)
-        CourseEnrollment.enroll(self.request.user, self.course.id)

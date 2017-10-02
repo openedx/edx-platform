@@ -16,8 +16,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
-from ..subsection_grade_factory import SubsectionGradeFactory
-from .utils import answer_problem, mock_get_submissions_score
+from ...subsection_grade_factory import SubsectionGradeFactory
+from ..utils import answer_problem, mock_get_submissions_score
 
 
 @ddt.ddt

@@ -24,7 +24,7 @@ from track.event_transaction_utils import set_event_transaction_id, set_event_tr
 from util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
-from .config.waffle import ESTIMATE_FIRST_ATTEMPTED, DISABLE_REGRADE_ON_POLICY_CHANGE, waffle
+from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE, waffle
 from .constants import ScoreDatabaseTableEnum
 from .course_grade_factory import CourseGradeFactory
 from .exceptions import DatabaseNotReadyError
@@ -83,23 +83,12 @@ def compute_grades_for_course_v2(self, **kwargs):
 
     TODO: Roll this back into compute_grades_for_course once all workers have
     the version with **kwargs.
-
-    Sets the ESTIMATE_FIRST_ATTEMPTED flag, then calls the original task as a
-    synchronous function.
-
-    estimate_first_attempted:
-        controls whether to unconditionally set the ESTIMATE_FIRST_ATTEMPTED
-        waffle switch.  If false or not provided, use the global value of
-        the ESTIMATE_FIRST_ATTEMPTED waffle switch.
     """
     if 'event_transaction_id' in kwargs:
         set_event_transaction_id(kwargs['event_transaction_id'])
 
     if 'event_transaction_type' in kwargs:
         set_event_transaction_type(kwargs['event_transaction_type'])
-
-    if kwargs.get('estimate_first_attempted'):
-        waffle().override_for_request(ESTIMATE_FIRST_ATTEMPTED, True)
 
     try:
         return compute_grades_for_course(kwargs['course_key'], kwargs['offset'], kwargs['batch_size'])

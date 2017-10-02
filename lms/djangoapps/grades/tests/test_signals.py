@@ -1,7 +1,6 @@
 """
 Tests for the score change signals defined in the courseware models module.
 """
-import itertools
 import re
 from datetime import datetime
 
@@ -10,10 +9,6 @@ import pytz
 from django.test import TestCase
 from mock import MagicMock, patch
 
-from opaque_keys.edx.locations import CourseLocator
-from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERSHIP_UPDATED
-from student.signals.signals import ENROLLMENT_TRACK_UPDATED
-from student.tests.factories import UserFactory
 from submissions.models import score_reset, score_set
 from util.date_utils import to_timestamp
 

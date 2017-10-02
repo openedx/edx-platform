@@ -101,46 +101,57 @@ class SubsectionGrade(SubsectionGradeBase):
     """
     Class for Subsection Grades.
     """
-    def __init__(self, subsection):
+    def __init__(self, subsection, problem_scores, all_total, graded_total, override=None):
         super(SubsectionGrade, self).__init__(subsection)
-        self.problem_scores = OrderedDict()  # dict of problem locations to ProblemScore
+        self.problem_scores = problem_scores
+        self.all_total = all_total
+        self.graded_total = graded_total
+        self.override = override
 
-    def init_from_structure(self, student, course_structure, submissions_scores, csm_scores):
+    @classmethod
+    def create(cls, subsection, course_structure, submissions_scores, csm_scores):
         """
-        Compute the grade of this subsection for the given student and course.
+        Compute and create the subsection grade.
         """
-        for descendant_key in course_structure.post_order_traversal(
+        problem_scores = OrderedDict()
+        for block_key in course_structure.post_order_traversal(
                 filter_func=possibly_scored,
-                start_node=self.location,
+                start_node=subsection.location,
         ):
-            self._compute_block_score(descendant_key, course_structure, submissions_scores, csm_scores)
+            problem_score = cls._compute_block_score(block_key, course_structure, submissions_scores, csm_scores)
+            if problem_score:
+                problem_scores[block_key] = problem_score
+        all_total, graded_total = graders.aggregate_scores(problem_scores.values())
 
-        self.all_total, self.graded_total = graders.aggregate_scores(self.problem_scores.values())
-        self._log_event(log.debug, u"init_from_structure", student)
-        return self
+        return cls(subsection, problem_scores, all_total, graded_total)
 
-    def init_from_model(self, student, model, course_structure, submissions_scores, csm_scores):
+    @classmethod
+    def read(cls, subsection, model, course_structure, submissions_scores, csm_scores):
         """
-        Load the subsection grade from the persisted model.
+        Read the subsection grade from the persisted model.
         """
+        problem_scores = OrderedDict()
         for block in model.visible_blocks.blocks:
-            self._compute_block_score(block.locator, course_structure, submissions_scores, csm_scores, block)
+            problem_score = cls._compute_block_score(
+                block.locator, course_structure, submissions_scores, csm_scores, block,
+            )
+            if problem_score:
+                problem_scores[block.locator] = problem_score
 
-        self.graded_total = AggregatedScore(
-            tw_earned=model.earned_graded,
-            tw_possible=model.possible_graded,
-            graded=True,
-            first_attempted=model.first_attempted,
-        )
-        self.all_total = AggregatedScore(
+        all_total = AggregatedScore(
             tw_earned=model.earned_all,
             tw_possible=model.possible_all,
             graded=False,
             first_attempted=model.first_attempted,
         )
-        self.override = model.override if hasattr(model, 'override') else None
-        self._log_event(log.debug, u"init_from_model", student)
-        return self
+        graded_total = AggregatedScore(
+            tw_earned=model.earned_graded,
+            tw_possible=model.possible_graded,
+            graded=True,
+            first_attempted=model.first_attempted,
+        )
+        override = model.override if hasattr(model, 'override') else None
+        return cls(subsection, problem_scores, all_total, graded_total, override)
 
     @classmethod
     def bulk_create_models(cls, student, subsection_grades, course_key):
@@ -153,17 +164,9 @@ class SubsectionGrade(SubsectionGradeBase):
             if subsection_grade
             if subsection_grade._should_persist_per_attempted()  # pylint: disable=protected-access
         ]
-        return PersistentSubsectionGrade.bulk_create_grades(params, course_key)
+        return PersistentSubsectionGrade.bulk_create_grades(params, student.id, course_key)
 
-    def create_model(self, student):
-        """
-        Saves the subsection grade in a persisted model.
-        """
-        if self._should_persist_per_attempted():
-            self._log_event(log.debug, u"create_model", student)
-            return PersistentSubsectionGrade.create_grade(**self._persisted_model_params(student))
-
-    def update_or_create_model(self, student, score_deleted):
+    def update_or_create_model(self, student, score_deleted=False):
         """
         Saves or updates the subsection grade in a persisted model.
         """
@@ -184,8 +187,8 @@ class SubsectionGrade(SubsectionGradeBase):
             score_deleted
         )
 
+    @staticmethod
     def _compute_block_score(
-            self,
             block_key,
             course_structure,
             submissions_scores,
@@ -205,14 +208,12 @@ class SubsectionGrade(SubsectionGradeBase):
             pass
         else:
             if getattr(block, 'has_score', False):
-                problem_score = get_score(
+                return get_score(
                     submissions_scores,
                     csm_scores,
                     persisted_block,
                     block,
                 )
-                if problem_score:
-                    self.problem_scores[block_key] = problem_score
 
     def _persisted_model_params(self, student):
         """

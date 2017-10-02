@@ -5,21 +5,13 @@ from contextlib import contextmanager
 from logging import getLogger
 
 from courseware.model_data import get_score, set_score
-from crum import get_current_user
 from django.dispatch import receiver
-from eventtracking import tracker
-from lms.djangoapps.instructor_task.tasks_helper.module_state import GRADES_OVERRIDE_EVENT_TYPE
 from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERSHIP_UPDATED
 from openedx.core.lib.grade_utils import is_score_higher_or_equal
 from student.models import user_by_anonymous_id
 from student.signals.signals import ENROLLMENT_TRACK_UPDATED
 from submissions.models import score_reset, score_set
-from track.event_transaction_utils import (
-    create_new_event_transaction_id,
-    get_event_transaction_id,
-    get_event_transaction_type,
-    set_event_transaction_type
-)
+from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from util.date_utils import to_timestamp
 from xblock.scorable import ScorableXBlockMixin, Score
 
@@ -32,16 +24,11 @@ from .signals import (
 )
 from ..constants import ScoreDatabaseTableEnum
 from ..course_grade_factory import CourseGradeFactory
+from .. import events
 from ..scores import weighted_score
 from ..tasks import RECALCULATE_GRADE_DELAY, recalculate_subsection_grade_v3
 
 log = getLogger(__name__)
-
-# define values to be used in grading events
-GRADES_RESCORE_EVENT_TYPE = 'edx.grades.problem.rescored'
-PROBLEM_SUBMITTED_EVENT_TYPE = 'edx.grades.problem.submitted'
-SUBSECTION_OVERRIDE_EVENT_TYPE = 'edx.grades.subsection.score_overridden'
-STATE_DELETED_EVENT_TYPE = 'edx.grades.problem.state_deleted'
 
 
 @receiver(score_set)
@@ -127,7 +114,7 @@ def disconnect_submissions_signal_receiver(signal):
         handler = submissions_score_set_handler
     else:
         if signal != score_reset:
-            raise ValueError("This context manager only deal with score_set and score_reset signals.")
+            raise ValueError("This context manager only handles score_set and score_reset signals.")
         handler = submissions_score_reset_handler
 
     signal.disconnect(handler)
@@ -220,8 +207,8 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
     Handles the PROBLEM_WEIGHTED_SCORE_CHANGED or SUBSECTION_OVERRIDE_CHANGED signals by
     enqueueing a subsection update operation to occur asynchronously.
     """
-    _emit_event(kwargs)
-    result = recalculate_subsection_grade_v3.apply_async(
+    events.grade_updated(**kwargs)
+    recalculate_subsection_grade_v3.apply_async(
         kwargs=dict(
             user_id=kwargs['user_id'],
             anonymous_user_id=kwargs.get('anonymous_user_id'),
@@ -249,7 +236,7 @@ def recalculate_course_grade_only(sender, course, course_structure, user, **kwar
 
 @receiver(ENROLLMENT_TRACK_UPDATED)
 @receiver(COHORT_MEMBERSHIP_UPDATED)
-def force_recalculate_course_and_subsection_grades(sender, user, course_key, **kwargs):
+def recalculate_course_and_subsection_grades(sender, user, course_key, **kwargs):
     """
     Updates a saved course grade, forcing the subsection grades
     from which it is calculated to update along the way.
@@ -257,65 +244,3 @@ def force_recalculate_course_and_subsection_grades(sender, user, course_key, **k
     previous_course_grade = CourseGradeFactory().read(user, course_key=course_key)
     if previous_course_grade and previous_course_grade.attempted:
         CourseGradeFactory().update(user=user, course_key=course_key, force_update_subsections=True)
-
-
-def _emit_event(kwargs):
-    """
-    Emits a problem submitted event only if there is no current event
-    transaction type, i.e. we have not reached this point in the code via a
-    rescore or student state deletion.
-
-    If the event transaction type has already been set and the transacation is
-    a rescore, emits a problem rescored event.
-    """
-    root_type = get_event_transaction_type()
-
-    if not root_type:
-        root_id = get_event_transaction_id()
-        if not root_id:
-            root_id = create_new_event_transaction_id()
-        set_event_transaction_type(PROBLEM_SUBMITTED_EVENT_TYPE)
-        tracker.emit(
-            unicode(PROBLEM_SUBMITTED_EVENT_TYPE),
-            {
-                'user_id': unicode(kwargs['user_id']),
-                'course_id': unicode(kwargs['course_id']),
-                'problem_id': unicode(kwargs['usage_id']),
-                'event_transaction_id': unicode(root_id),
-                'event_transaction_type': unicode(PROBLEM_SUBMITTED_EVENT_TYPE),
-                'weighted_earned': kwargs.get('weighted_earned'),
-                'weighted_possible': kwargs.get('weighted_possible'),
-            }
-        )
-
-    if root_type in [GRADES_RESCORE_EVENT_TYPE, GRADES_OVERRIDE_EVENT_TYPE]:
-        current_user = get_current_user()
-        instructor_id = getattr(current_user, 'id', None)
-        tracker.emit(
-            unicode(GRADES_RESCORE_EVENT_TYPE),
-            {
-                'course_id': unicode(kwargs['course_id']),
-                'user_id': unicode(kwargs['user_id']),
-                'problem_id': unicode(kwargs['usage_id']),
-                'new_weighted_earned': kwargs.get('weighted_earned'),
-                'new_weighted_possible': kwargs.get('weighted_possible'),
-                'only_if_higher': kwargs.get('only_if_higher'),
-                'instructor_id': unicode(instructor_id),
-                'event_transaction_id': unicode(get_event_transaction_id()),
-                'event_transaction_type': unicode(root_type),
-            }
-        )
-
-    if root_type in [SUBSECTION_OVERRIDE_EVENT_TYPE]:
-        tracker.emit(
-            unicode(SUBSECTION_OVERRIDE_EVENT_TYPE),
-            {
-                'course_id': unicode(kwargs['course_id']),
-                'user_id': unicode(kwargs['user_id']),
-                'problem_id': unicode(kwargs['usage_id']),
-                'only_if_higher': kwargs.get('only_if_higher'),
-                'override_deleted': kwargs.get('score_deleted', False),
-                'event_transaction_id': unicode(get_event_transaction_id()),
-                'event_transaction_type': unicode(root_type),
-            }
-        )

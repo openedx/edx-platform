@@ -4,10 +4,10 @@ import pytz
 
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
-from util.date_utils import to_timestamp
 
 from .config.waffle import waffle_flags, REJECTED_EXAM_OVERRIDES_GRADE
 from .constants import ScoreDatabaseTableEnum
+from .events import SUBSECTION_OVERRIDE_EVENT_TYPE
 from .models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
 from .signals.signals import SUBSECTION_OVERRIDE_CHANGED
 
@@ -70,9 +70,6 @@ class GradesService(object):
         Fires off a recalculate_subsection_grade async task to update the PersistentSubsectionGrade table. Will not
         override earned_all or earned_graded value if they are None. Both default to None.
         """
-        # prevent circular imports:
-        from .signals.handlers import SUBSECTION_OVERRIDE_EVENT_TYPE
-
         course_key = _get_key(course_key_or_id, CourseKey)
         usage_key = _get_key(usage_key_or_id, UsageKey)
 
@@ -113,9 +110,6 @@ class GradesService(object):
         Fires off a recalculate_subsection_grade async task to update the PersistentSubsectionGrade table. If the
         override does not exist, no error is raised, it just triggers the recalculation.
         """
-        # prevent circular imports:
-        from .signals.handlers import SUBSECTION_OVERRIDE_EVENT_TYPE
-
         course_key = _get_key(course_key_or_id, CourseKey)
         usage_key = _get_key(usage_key_or_id, UsageKey)
 

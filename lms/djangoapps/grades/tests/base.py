@@ -26,7 +26,7 @@ class GradeTestBase(SharedModuleStoreTestCase):
             cls.sequence = ItemFactory.create(
                 parent=cls.chapter,
                 category='sequential',
-                display_name="Test Sequential 1",
+                display_name="Test Sequential X",
                 graded=True,
                 format="Homework"
             )
@@ -49,7 +49,7 @@ class GradeTestBase(SharedModuleStoreTestCase):
             cls.sequence2 = ItemFactory.create(
                 parent=cls.chapter,
                 category='sequential',
-                display_name="Test Sequential 2",
+                display_name="Test Sequential A",
                 graded=True,
                 format="Homework"
             )

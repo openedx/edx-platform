@@ -7,7 +7,6 @@ from time import time
 
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import UsageKey
-from xblock.runtime import KvsFieldData
 
 import dogstats_wrapper as dog_stats_api
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
@@ -15,26 +14,19 @@ from courseware.courses import get_course_by_id, get_problems_in_section
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from courseware.models import StudentModule
 from courseware.module_render import get_module_for_descriptor_internal
-from eventtracking import tracker
-from lms.djangoapps.grades.scores import weighted_score
-from track.contexts import course_context_from_course_id
+from lms.djangoapps.grades.events import GRADES_OVERRIDE_EVENT_TYPE, GRADES_RESCORE_EVENT_TYPE
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 from track.views import task_track
 from util.db import outer_atomic
-from xmodule.modulestore.django import modulestore
 
 from xblock.runtime import KvsFieldData
-from xblock.scorable import Score, ScorableXBlockMixin
+from xblock.scorable import Score
 from xmodule.modulestore.django import modulestore
 from ..exceptions import UpdateProblemModuleStateError
 from .runner import TaskProgress
 from .utils import UNKNOWN_TASK_ID, UPDATE_STATUS_FAILED, UPDATE_STATUS_SKIPPED, UPDATE_STATUS_SUCCEEDED
 
 TASK_LOG = logging.getLogger('edx.celery.task')
-
-# define value to be used in grading events
-GRADES_RESCORE_EVENT_TYPE = 'edx.grades.problem.rescored'
-GRADES_OVERRIDE_EVENT_TYPE = 'edx.grades.problem.score_overridden'
 
 
 def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, task_input, action_name):

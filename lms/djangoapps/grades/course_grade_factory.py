@@ -1,5 +1,4 @@
 from collections import namedtuple
-from contextlib import contextmanager
 from logging import getLogger
 
 import dogstats_wrapper as dog_stats_api
@@ -9,7 +8,7 @@ from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED, COURSE
 from .config import assume_zero_if_absent, should_persist_grades
 from .course_data import CourseData
 from .course_grade import CourseGrade, ZeroCourseGrade
-from .models import PersistentCourseGrade, VisibleBlocks
+from .models import PersistentCourseGrade, prefetch
 
 log = getLogger(__name__)
 
@@ -95,18 +94,9 @@ class CourseGradeFactory(object):
             user=None, course=course, collected_block_structure=collected_block_structure, course_key=course_key,
         )
         stats_tags = [u'action:{}'.format(course_data.course_key)]
-        with self._course_transaction(course_data.course_key):
-            for user in users:
-                with dog_stats_api.timer('lms.grades.CourseGradeFactory.iter', tags=stats_tags):
-                    yield self._iter_grade_result(user, course_data, force_update)
-
-    @contextmanager
-    def _course_transaction(self, course_key):
-        """
-        Provides a transaction context in which GradeResults are created.
-        """
-        yield
-        VisibleBlocks.clear_cache(course_key)
+        for user in users:
+            with dog_stats_api.timer('lms.grades.CourseGradeFactory.iter', tags=stats_tags):
+                yield self._iter_grade_result(user, course_data, force_update)
 
     def _iter_grade_result(self, user, course_data, force_update):
         try:
@@ -169,13 +159,15 @@ class CourseGradeFactory(object):
         Sends a COURSE_GRADE_CHANGED signal to listeners and a
         COURSE_GRADE_NOW_PASSED if learner has passed course.
         """
+        should_persist = should_persist_grades(course_data.course_key)
+
+        if should_persist and force_update_subsections:
+            prefetch(user, course_data.course_key)
+
         course_grade = CourseGrade(user, course_data, force_update_subsections=force_update_subsections)
         course_grade = course_grade.update()
 
-        should_persist = (
-            should_persist_grades(course_data.course_key) and
-            course_grade.attempted
-        )
+        should_persist = should_persist and course_grade.attempted
         if should_persist:
             course_grade._subsection_grade_factory.bulk_create_unsaved()
             PersistentCourseGrade.update_or_create(
