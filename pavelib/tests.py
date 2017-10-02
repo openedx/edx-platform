@@ -31,6 +31,10 @@ __test__ = False  # do not collect
     ("fail-fast", "x", "Fail suite on first failed test"),
     ("fasttest", "a", "Run without collectstatic"),
     make_option(
+        "--django_version", dest="django_version",
+        help="Run against which Django version (1.8 -or- 1.11)."
+    ),
+    make_option(
         "--eval-attr", dest="eval_attr",
         help="Only run tests matching given attribute expression."
     ),
@@ -66,23 +70,32 @@ def test_system(options, passthrough_options):
     """
     system = getattr(options, 'system', None)
     test_id = getattr(options, 'test_id', None)
+    django_version = getattr(options, 'django_version', None)
+
+    assert(system in (None, 'lms', 'cms'))
+    assert(django_version in (None, '1.8', '1.11'))
 
     if test_id:
+        # Testing a single test ID.
+        # Ensure the proper system for the test id.
         if not system:
             system = test_id.split('/')[0]
         if system in ['common', 'openedx']:
             system = 'lms'
-        options.test_system['test_id'] = test_id
-
-    if test_id or system:
         system_tests = [suites.SystemTestSuite(
             system,
             passthrough_options=passthrough_options,
             **options.test_system
         )]
     else:
+        # Testing a single system -or- both systems.
+        if system:
+            systems = [system]
+        else:
+            # No specified system or test_id, so run all tests of both systems.
+            systems = ['cms', 'lms']
         system_tests = []
-        for syst in ('cms', 'lms'):
+        for syst in systems:
             system_tests.append(suites.SystemTestSuite(
                 syst,
                 passthrough_options=passthrough_options,
@@ -108,6 +121,10 @@ def test_system(options, passthrough_options):
     ("failed", "f", "Run only failed tests"),
     ("fail-fast", "x", "Run only failed tests"),
     make_option(
+        "--django_version", dest="django_version",
+        help="Run against which Django version (1.8 -or- 1.11)."
+    ),
+    make_option(
         '-c', '--cov-args', default='',
         help='adds as args to coverage for the test run'
     ),
@@ -124,8 +141,12 @@ def test_lib(options, passthrough_options):
     """
     lib = getattr(options, 'lib', None)
     test_id = getattr(options, 'test_id', lib)
+    django_version = getattr(options, 'django_version', None)
+
+    assert(django_version in (None, '1.8', '1.11'))
 
     if test_id:
+        # Testing a single test id.
         if '/' in test_id:
             lib = '/'.join(test_id.split('/')[0:3])
         else:
@@ -137,6 +158,7 @@ def test_lib(options, passthrough_options):
             **options.test_lib
         )]
     else:
+        # Testing all common/lib test dirs - plus pavelib.
         lib_tests = [
             suites.LibTestSuite(
                 d,

@@ -25,6 +25,13 @@ class PytestSuite(TestSuite):
         self.failed_only = kwargs.get('failed_only', False)
         self.fail_fast = kwargs.get('fail_fast', False)
         self.run_under_coverage = kwargs.get('with_coverage', True)
+        django_version = kwargs.get('django_version', None)
+        if django_version is None:
+            self.django_toxenv = None
+        elif django_version == '1.11':
+            self.django_toxenv = 'py27-django111'
+        else:
+            self.django_toxenv = 'py27-django18'
         self.report_dir = Env.REPORT_DIR / self.root
 
         # If set, put reports for run in "unique" directories.
@@ -122,11 +129,15 @@ class SystemTestSuite(PytestSuite):
     @property
     def cmd(self):
 
-        cmd = [
-            'pytest',
+        if self.django_toxenv:
+            cmd = ['tox', '-e', self.django_toxenv, '--']
+        else:
+            cmd = ['pytest']
+        cmd.extend([
             '--ds={}'.format('{}.envs.{}'.format(self.root, self.settings)),
             '--junitxml={}'.format(self.report_dir / "nosetests.xml"),
-        ] + self.test_options_flags
+        ])
+        cmd.extend(self.test_options_flags)
         if self.verbosity < 1:
             cmd.append("--quiet")
         elif self.verbosity > 1:
@@ -180,7 +191,7 @@ class SystemTestSuite(PytestSuite):
             """
             Should this path be included in the pytest arguments?
             """
-            if path.endswith('__pycache__'):
+            if path.endswith(Env.IGNORED_TEST_DIRS):
                 return False
             return path.endswith('.py') or os.path.isdir(path)
 
@@ -205,12 +216,16 @@ class LibTestSuite(PytestSuite):
 
     @property
     def cmd(self):
-        cmd = [
-            "pytest",
+        if self.django_toxenv:
+            cmd = ['tox', '-e', self.django_toxenv, '--']
+        else:
+            cmd = ['pytest']
+        cmd.extend([
             "-p",
             "no:randomly",
             "--junitxml=".format(self.xunit_report),
-        ] + self.passthrough_options + self.test_options_flags
+        ])
+        cmd.extend(self.passthrough_options + self.test_options_flags)
         if self.verbosity < 1:
             cmd.append("--quiet")
         elif self.verbosity > 1:
