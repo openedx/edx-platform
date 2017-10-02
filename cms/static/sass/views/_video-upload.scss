@@ -105,9 +105,10 @@
         color: $black-t4;
         @include font-size(15);
         font-weight: font-weight(semi-bold);
+        display: block;
       }
 
-      .transcript-provider-group, .transcript-turnaround, .transcript-fidelity  {
+      .transcript-provider-group, .transcript-turnaround, .transcript-fidelity, .video-source-language {
         margin-top: ($baseline*0.8);
       }
 
@@ -123,7 +124,7 @@
         }
       }
 
-      .transcript-turnaround-wrapper, .transcript-fidelity-wrapper, .transcript-languages-wrapper {
+      .transcript-turnaround-wrapper, .transcript-fidelity-wrapper, .video-source-language-wrapper, .transcript-languages-wrapper {
         display: none;
       }
 
@@ -143,7 +144,7 @@
       .transcript-language-menu-container {
         margin-top: ($baseline*0.8);
         .transcript-language-menu {
-          width: 65%;
+          width: 60%;
         }
         .add-language-action {
           display: inline-block;
