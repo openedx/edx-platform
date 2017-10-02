@@ -28,7 +28,11 @@ SHOW_REVIEWS_TOOL_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_reviews_t
 # Waffle flag to enable the setting of course goals.
 ENABLE_COURSE_GOALS = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_course_goals')
 
+# Waffle flag to control the display of the hero
 SHOW_UPGRADE_MSG_ON_COURSE_HOME = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_upgrade_msg_on_course_home')
+
+# Waffle flag to control the display of the upgrade deadline message
+UPGRADE_DEADLINE_MESSAGE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'upgrade_deadline_message')
 
 # Waffle flag to switch between the 'welcome message' and 'latest update' on the course home page.
 # Important Admin Note: This is meant to be configured using waffle_utils course

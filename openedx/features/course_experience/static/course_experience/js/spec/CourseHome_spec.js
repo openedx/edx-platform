@@ -50,7 +50,7 @@ describe('Course Home factory', () => {
   describe('Upgrade message events', () => {
     const segmentEventProperties = {
       promotion_id: 'courseware_verified_certificate_upsell',
-      creative: 'hero_matthew_smith',
+      creative: 'original_hero',
       name: 'In-Course Verification Prompt',
       position: 'hero',
     };

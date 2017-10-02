@@ -10,6 +10,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from commerce.utils import EcommerceService
+from course_modes.models import get_cosmetic_verified_display_price
 from courseware.access import has_access
 from courseware.courses import (
     can_self_enroll_in_course,
@@ -165,15 +166,8 @@ class CourseHomeFragmentView(EdxFragmentView):
 
         # TODO Add switch to control deployment
         if SHOW_UPGRADE_MSG_ON_COURSE_HOME.is_enabled(course_key) and enrollment and enrollment.upgrade_deadline:
-            verified_mode = enrollment.verified_mode
-            if verified_mode:
-                upgrade_price = verified_mode.min_price
-
-                ecommerce_service = EcommerceService()
-                if ecommerce_service.is_enabled(request.user):
-                    upgrade_url = ecommerce_service.get_checkout_page_url(verified_mode.sku)
-                else:
-                    upgrade_url = reverse('verify_student_upgrade_and_verify', args=(course_key,))
+            upgrade_url = EcommerceService().upgrade_url(request.user, course_key)
+            upgrade_price = get_cosmetic_verified_display_price(course)
 
         # Render the course home fragment
         context = {

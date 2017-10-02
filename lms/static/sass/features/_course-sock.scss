@@ -111,10 +111,6 @@
       .action-upgrade-certificate {
         position: absolute;
         right: $baseline;
-        background-color: $success-color;
-        border-color: $success-color;
-        background-image: none;
-        box-shadow: none;
 
         @media (max-width: 960px) {
           & {
@@ -141,11 +137,6 @@
             bottom: $baseline;
             top: auto;
           }
-        }
-
-        &:hover {
-          background-color: $success-color-hover;
-          border-color: $success-color-hover;
         }
       }
     }

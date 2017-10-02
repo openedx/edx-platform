@@ -143,9 +143,8 @@ $error-color: rgb(203, 7, 18) !default;
 $success-color: rgb(0, 155, 0) !default;
 $warning-color: rgb(255, 192, 31) !default;
 $warning-color-accent: rgb(255, 252, 221) !default;
-$general-color: $uxpl-blue-base !default;;
-$general-color-accent: $uxpl-blue-base !default
-
+$general-color: $uxpl-blue-base !default;
+$general-color-accent: $uxpl-blue-base !default;
 
 // CAPA correctness color to be consistent with Alert styles above
 $correct: $success-color !default;
@@ -180,6 +179,16 @@ $btn-brand-active-border-color:           $uxpl-blue-base !default;
 $btn-brand-active-background:             $uxpl-blue-base !default;
 $btn-brand-disabled-background:           #f2f3f3 !default;
 $btn-brand-disabled-color:                #676666 !default;
+
+// Upgrade button
+$btn-upgrade-border-color:                $uxpl-green-base !default;
+$btn-upgrade-background:                  $uxpl-green-base !default;
+$btn-upgrade-color:                       #fcfcfc !default;
+$btn-upgrade-focus-color:                 $btn-upgrade-color !default;
+$btn-upgrade-focus-border-color:          rgb(0, 155, 0) !default;
+$btn-upgrade-focus-background:            rgb(0, 155, 0) !default;
+$btn-upgrade-active-border-color:         $uxpl-green-base !default;
+$btn-upgrade-active-background:           $uxpl-green-base !default;
 
 // ----------------------------
 // #SETTINGS
