@@ -11,7 +11,7 @@ from openedx.core.djangoapps.schedules.management.commands import (
     SendEmailBaseCommand,
     BinnedSchedulesBaseResolver
 )
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory, ScheduleFactory
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 
@@ -96,7 +96,6 @@ class TestBinnedSchedulesBaseResolver(CacheIsolationTestCase):
         assert not exclude_orgs
         assert org_list == expected_org_list
 
-    # factory_boy doesn't make sense at all
     @ddt.unpack
     @ddt.data(
         (None, []),

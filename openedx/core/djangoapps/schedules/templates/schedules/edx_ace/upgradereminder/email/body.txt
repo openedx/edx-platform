@@ -4,17 +4,17 @@
 Dear {{ user_personal_address }},
 {% endblocktrans %}
 
-{% if courses|length > 1 %}
+{% if course_ids|length > 1 %}
 {% blocktrans trimmed %}
     We hope you are enjoying {{ course_name }}, and other courses on edX.org.
-    Upgrade by {{ user_schedule_upgrade_deadline_time|date:"l, F dS, Y" }} to get a shareable certificate!
+    Upgrade by {{ user_schedule_upgrade_deadline_time }} to get a shareable certificate!
 {% endblocktrans %}
 
 {% trans "Upgrade now at" %} <{{ dashboard_url }}>
 {% else %}
 {% blocktrans trimmed %}
     We hope you are enjoying {{ course_name }}.
-    Upgrade by {{ user_schedule_upgrade_deadline_time|date:"l, F dS, Y" }} to get a shareable certificate!
+    Upgrade by {{ user_schedule_upgrade_deadline_time }} to get a shareable certificate!
 {% endblocktrans %}
 
 {% trans "Upgrade now at" %} <{{ course_url }}>

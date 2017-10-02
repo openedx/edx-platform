@@ -8,8 +8,9 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.db.models import F, Min, Prefetch
+from django.db.models import F, Min
 from django.db.utils import DatabaseError
+from django.utils.formats import dateformat, get_format
 
 from edx_ace import ace
 from edx_ace.message import Message
@@ -17,7 +18,6 @@ from edx_ace.recipient import Recipient
 from edx_ace.utils.date import deserialize
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.schedules.message_type import ScheduleMessageType
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
@@ -27,7 +27,6 @@ from openedx.core.djangoapps.schedules.template_context import (
     encode_urls_in_dict,
     get_base_template_context
 )
-from openedx.core.djangoapps.user_api.models import UserPreference
 
 
 LOG = logging.getLogger(__name__)
@@ -232,9 +231,7 @@ def _recurring_nudge_schedules_for_bin(target_day, bin_num, org_list, exclude_or
 
 
 class UpgradeReminder(ScheduleMessageType):
-    def __init__(self, day, *args, **kwargs):
-        super(UpgradeReminder, self).__init__(*args, **kwargs)
-        self.name = "upgradereminder".format(day)
+    pass
 
 
 @task(ignore_result=True, routing_key=ROUTING_KEY)
@@ -242,7 +239,7 @@ def upgrade_reminder_schedule_bin(
     site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
 ):
     target_day = deserialize(target_day_str)
-    msg_type = UpgradeReminder(abs(day_offset))
+    msg_type = UpgradeReminder()
 
     for (user, language, context) in _upgrade_reminder_schedules_for_bin(target_day, bin_num, org_list, exclude_orgs):
         msg = msg_type.personalize(
@@ -267,29 +264,34 @@ def _upgrade_reminder_schedule_send(site_id, msg_str):
 
 
 def _upgrade_reminder_schedules_for_bin(target_day, bin_num, org_list, exclude_orgs=False):
+    beginning_of_day = target_day.replace(hour=0, minute=0, second=0)
+    users = User.objects.filter(
+        courseenrollment__schedule__upgrade_deadline__gte=beginning_of_day,
+        courseenrollment__schedule__upgrade_deadline__lt=beginning_of_day + datetime.timedelta(days=1),
+        courseenrollment__is_active=True,
+    ).annotate(
+        first_schedule=Min('courseenrollment__schedule__upgrade_deadline')
+    ).annotate(
+        id_mod=F('id') % UPGRADE_REMINDER_NUM_BINS
+    ).filter(
+        id_mod=bin_num
+    )
+
     schedules = Schedule.objects.select_related(
         'enrollment__user__profile',
         'enrollment__course',
-    ).prefetch_related(
-        Prefetch(
-            'enrollment__course__modes',
-            queryset=CourseMode.objects.filter(mode_slug=CourseMode.VERIFIED),
-            to_attr='verified_modes'
-        ),
-        Prefetch(
-            'enrollment__user__preferences',
-            queryset=UserPreference.objects.filter(key='time_zone'),
-            to_attr='tzprefs'
-        ),
-    ).annotate(
-        id_mod=F('enrollment__user__id') % UPGRADE_REMINDER_NUM_BINS
     ).filter(
-        id_mod=bin_num
-    ).filter(
-        upgrade_deadline__year=target_day.year,
-        upgrade_deadline__month=target_day.month,
-        upgrade_deadline__day=target_day.day,
-    )
+        enrollment__user__in=users,
+        upgrade_deadline__gte=beginning_of_day,
+        upgrade_deadline__lt=beginning_of_day + datetime.timedelta(days=1),
+        enrollment__is_active=True,
+    ).order_by('enrollment__user__id')
+
+    if org_list is not None:
+        if exclude_orgs:
+            schedules = schedules.exclude(enrollment__course__org__in=org_list)
+        else:
+            schedules = schedules.filter(enrollment__course__org__in=org_list)
 
     if "read_replica" in settings.DATABASES:
         schedules = schedules.using("read_replica")
@@ -299,7 +301,6 @@ def _upgrade_reminder_schedules_for_bin(target_day, bin_num, org_list, exclude_o
         user = enrollment.user
 
         course_id_str = str(enrollment.course_id)
-        course = enrollment.course
 
         # TODO: group by schedule and user like recurring nudge
         course_id_strs = [course_id_str]
@@ -309,7 +310,14 @@ def _upgrade_reminder_schedules_for_bin(target_day, bin_num, org_list, exclude_o
         template_context.update({
             'student_name': user.profile.name,
             'user_personal_address': user.profile.name if user.profile.name else user.username,
-            'user_schedule_upgrade_deadline_time': schedule.upgrade_deadline,
+            'user_schedule_upgrade_deadline_time': dateformat.format(
+                schedule.upgrade_deadline,
+                get_format(
+                    'DATE_FORMAT',
+                    lang=first_schedule.enrollment.course.language,
+                    use_l10n=True
+                )
+            ),
 
             'course_name': first_schedule.enrollment.course.display_name,
             'course_url': absolute_url(reverse('course_root', args=[str(first_schedule.enrollment.course_id)])),
@@ -318,4 +326,4 @@ def _upgrade_reminder_schedules_for_bin(target_day, bin_num, org_list, exclude_o
             'course_ids': course_id_strs,
         })
 
-        yield (user, course.language, template_context)
+        yield (user, first_schedule.enrollment.course.language, template_context)

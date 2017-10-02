@@ -2,15 +2,15 @@
 {% load i18n %}
 
 {% block preview_text %}
-    {% if courses|length > 1 %}
+    {% if course_ids|length > 1 %}
         {% blocktrans trimmed %}
             We hope you are enjoying {{ course_name }}, and other courses on edX.org.
-            Upgrade by {{ user_schedule_upgrade_deadline_time|date:"l, F dS, Y" }} to get a shareable certificate!
+            Upgrade by {{ user_schedule_upgrade_deadline_time }} to get a shareable certificate!
         {% endblocktrans %}
     {% else %}
         {% blocktrans trimmed %}
             We hope you are enjoying {{ course_name }}.
-            Upgrade by {{ user_schedule_upgrade_deadline_time|date:"l, F dS, Y" }} to get a shareable certificate!
+            Upgrade by {{ user_schedule_upgrade_deadline_time }} to get a shareable certificate!
         {% endblocktrans %}
     {% endif %}
 {% endblock %}
@@ -22,16 +22,15 @@
             <h1>{% trans "Upgrade now" %}</h1>
 
             <p>
-                {% if courses|length > 1 %}
+                {% if course_ids|length > 1 %}
                     {% blocktrans trimmed %}
                         We hope you are enjoying <strong>{{ course_name }}</strong>, and other courses on edX.org.
-                        {{ user_schedule_upgrade_deadline_time|date }}
-                        Upgrade by {{ user_schedule_upgrade_deadline_time|date:"l, F dS, Y" }} to get a shareable certificate!
+                        Upgrade by {{ user_schedule_upgrade_deadline_time }} to get a shareable certificate!
                     {% endblocktrans %}
                 {% else %}
                     {% blocktrans trimmed %}
                         We hope you are enjoying <strong>{{ course_name }}</strong>.
-                        Upgrade by {{ user_schedule_upgrade_deadline_time|date:"l, F dS, Y" }} to get a shareable certificate!
+                        Upgrade by {{ user_schedule_upgrade_deadline_time }} to get a shareable certificate!
                     {% endblocktrans %}
                 {% endif %}
             </p>
@@ -39,7 +38,7 @@
             <p>
                 <!-- email client support for style sheets is pretty spotty, so we have to inline all of these styles -->
                 <a
-                {% if courses|length > 1 %}
+                {% if course_ids|length > 1 %}
                     href="{{ dashboard_url }}"
                 {% else %}
                     href="{{ course_url }}"
