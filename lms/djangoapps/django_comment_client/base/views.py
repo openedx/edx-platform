@@ -27,7 +27,7 @@ from edx_notifications.lib.publisher import (
 from social_engagement.engagement import (
     get_involved_users_in_thread,
     get_involved_users_in_comment,
- )
+)
 from edx_notifications.data import NotificationMessage
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_id
 from openedx.core.djangoapps.course_groups.tasks import publish_course_group_notification_task
@@ -712,7 +712,7 @@ def delete_comment(request, course_id, comment_id):
     """
     course_key = CourseKey.from_string(course_id)
     comment = cc.Comment.find(comment_id)
-    involved_users = get_involved_users_in_comment(request, comment.id, comment.parent_id, comment.thread_id)
+    involved_users = get_involved_users_in_comment(request, comment)
     comment.delete()
     comment_deleted.send(sender=None, user=request.user, post=comment, involved_users=list(involved_users))
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
