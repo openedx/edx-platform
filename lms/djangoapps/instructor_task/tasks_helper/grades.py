@@ -306,19 +306,17 @@ class CourseGradeReport(object):
         for assignment_type, assignment_info in context.graded_assignments.iteritems():
             for subsection_location in assignment_info['subsection_headers']:
                 try:
-                    subsection_grade = course_grade.graded_subsections_by_format[assignment_type][subsection_location]
+                    subsection_grade = course_grade.subsection_grade(subsection_location)
                 except KeyError:
                     grade_result = u'Not Available'
                 else:
-                    if subsection_grade.graded_total.first_attempted is not None:
+                    if subsection_grade.attempted_graded:
                         grade_result = subsection_grade.graded_total.earned / subsection_grade.graded_total.possible
                     else:
                         grade_result = u'Not Attempted'
                 grade_results.append([grade_result])
             if assignment_info['separate_subsection_avg_headers']:
-                assignment_average = course_grade.grader_result['grade_breakdown'].get(assignment_type, {}).get(
-                    'percent'
-                )
+                assignment_average = course_grade.assignment_average(assignment_type)
                 grade_results.append([assignment_average])
         return [course_grade.percent] + _flatten(grade_results)
 

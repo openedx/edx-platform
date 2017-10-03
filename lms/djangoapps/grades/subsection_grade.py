@@ -53,6 +53,13 @@ class SubsectionGradeBase(object):
         """
         return ShowCorrectness.correctness_available(self.show_correctness, self.due, has_staff_access)
 
+    @property
+    def attempted_graded(self):
+        """
+        Returns whether the user had attempted a graded problem in this subsection.
+        """
+        raise NotImplementedError
+
 
 class ZeroSubsectionGrade(SubsectionGradeBase):
     """
@@ -62,6 +69,10 @@ class ZeroSubsectionGrade(SubsectionGradeBase):
     def __init__(self, subsection, course_data):
         super(ZeroSubsectionGrade, self).__init__(subsection)
         self.course_data = course_data
+
+    @property
+    def attempted_graded(self):
+        return False
 
     @property
     def all_total(self):
@@ -173,6 +184,10 @@ class SubsectionGrade(SubsectionGradeBase):
         if self._should_persist_per_attempted(score_deleted):
             self._log_event(log.debug, u"update_or_create_model", student)
             return PersistentSubsectionGrade.update_or_create_grade(**self._persisted_model_params(student))
+
+    @property
+    def attempted_graded(self):
+        return self.graded_total.first_attempted is not None
 
     def _should_persist_per_attempted(self, score_deleted=False):
         """

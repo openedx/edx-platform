@@ -44,6 +44,20 @@ class CourseGradeBase(object):
         """
         return False
 
+    def subsection_grade(self, subsection_key):
+        """
+        Returns the subsection grade for given subsection usage key.
+        Raises KeyError if the user doesn't have access to that subsection.
+        """
+        return self._get_subsection_grade(self.course_data.structure[subsection_key])
+
+    @abstractmethod
+    def assignment_average(self, assignment_type):
+        """
+        Returns the average of all assignments of the given assignment type.
+        """
+        raise NotImplementedError
+
     @lazy
     def graded_subsections_by_format(self):
         """
@@ -207,6 +221,9 @@ class ZeroCourseGrade(CourseGradeBase):
     Course Grade class for Zero-value grades when no problems were
     attempted in the course.
     """
+    def assignment_average(self, assignment_type):
+        return 0.0
+
     def _get_subsection_grade(self, subsection):
         return ZeroSubsectionGrade(subsection, self.course_data)
 
@@ -247,6 +264,9 @@ class CourseGrade(CourseGradeBase):
                 if subsection_grade.all_total.first_attempted:
                     return True
         return False
+
+    def assignment_average(self, assignment_type):
+        return self.grader_result['grade_breakdown'].get(assignment_type, {}).get('percent')
 
     def _get_subsection_grade(self, subsection):
         if self.force_update_subsections:
