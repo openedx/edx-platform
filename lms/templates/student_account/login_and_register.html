@@ -30,6 +30,7 @@ newrelic.addPageAction('xfinished');
     <%static:include path="student_account/${template_name}.underscore" />
 </script>
 % endfor
+<script type="text/javascript" src="${static.url('js/onboarding_survey/registration.js')}" charset="utf-8"></script>
 </%block>
 
 <div class="section-bkg-wrapper">
@@ -43,11 +44,11 @@ newrelic.addPageAction('xfinished');
     #register-point_of_contact {
         display: none !important;
     }
-    .form-field.select-point_of_contact, .form-field.email-admin_email {
+    .form-field.select-is_poc, .form-field.text-org_admin_email {
         display: none;
     }
 
-    #register-if_currently_employed {
+    #register-is_currently_employed {
             float: left;
             height: 26px;
             margin-right: 10px;
@@ -106,89 +107,5 @@ newrelic.addPageAction('xfinished');
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" media="all" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript">
 </script> <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
-<script>
-
-
-    $(document).ready(function () {
-        $.ajax({
-            url: "/organizations", success: function (result) {
-                full_result = result
-                orgs = Object.keys(result)
-            }
-        });
-
-        setTimeout(function () {
-            $("#register-organization").autocomplete({
-                source: orgs, minLength: 3
-            });
-
-            $("#register-point_of_contact option").each(function() {
-                // Get values of all option
-                var val = $(this).val();
-                var text = $(this).text();
-
-                // Do magic create boxes like checkbox
-                $(".select-point_of_contact").append('<div class="selectbox" data-value="' + val + '"> ' +  text + '</div>');
-
-            });
-            // Remove empty selectbox
-            $('.selectbox[data-value=""]').remove();
-            $('.selectbox:nth-child(2)').addClass('active');
-
-            // Change select box on click
-            $(".selectbox").click(function(e) {
-                // Remove selected from others
-                $(".selectbox").removeClass("active");
-                // Do active to selected
-                $(this).addClass("active");
-                // Get value
-                var optVal = $(this).data("value");
-                $("#register-point_of_contact").val(optVal + "")
-                if(optVal){
-                    $(".form-field.email-admin_email").hide()
-                } else {
-                    $(".form-field.email-admin_email").show()
-                }
-
-            });
-
-            // Change select box on dropdown change
-            $("#register-point_of_contact").change(function() {
-                var optVal = $(this).val();
-                $(".selectbox").removeClass("active");
-                $(".selectbox[data-value='" + optVal + "']").addClass("active");
-            });
-
-            // Passwords should match.
-            $('#register-password, #register-confirm_password').on('keyup', function () {
-                if ($('#register-password').val() == $('#register-confirm_password').val()) {
-                    $('.note').html('* Required field');
-                    $('.action.action-primary.action-update.js-register.register-button').prop('disabled', false);
-                } else {
-                    $('.note').html('* Required field, Password does not match.');
-                    $('.action.action-primary.action-update.js-register.register-button').prop('disabled', true);
-                }
-            });
-
-            $("#register-organization").focusout(function () {
-
-                if ($("#register-organization").val()) {
-                    if (orgs.includes($("#register-organization").val()) && full_result[$("#register-organization").val()]) {
-                        $(".form-field.select-point_of_contact").hide();
-                        $(".form-field.email-admin_email").hide()
-                    } else {
-                        $(".form-field.select-point_of_contact").show();
-                    }
-                } else {
-                    $(".form-field.select-point_of_contact").hide();
-                    $(".form-field.email-admin_email").hide()
-                }
-            });
-        }, 3000);
-
-    });
-
-
-</script>
 
 

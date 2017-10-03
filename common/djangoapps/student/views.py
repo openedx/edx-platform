@@ -55,7 +55,8 @@ from student.models import (
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED,
-    LogoutViewConfiguration, RegistrationCookieConfiguration, Organization)
+    LogoutViewConfiguration, RegistrationCookieConfiguration)
+from lms.djangoapps.onboarding_survey.models import Organization
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from student.tasks import send_activation_email
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
@@ -638,11 +639,11 @@ def dashboard(request):
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
     message = ""
-    first_name = user.profile.name.split(" ")[0]
+    first_name = user.extended_profile.first_name
     if not user.is_active:
-        if user.profile.is_poc:
+        if user.extended_profile.is_poc:
             msg = ("Success! You are registered as the Admin for %s, %s"
-             % (user.profile.organization.name, first_name))
+             % (user.extended_profile.organization.name, first_name))
         else:
             msg = "Success! You are registered, %s" % (first_name)
         message = render_to_string(
@@ -766,7 +767,7 @@ def dashboard(request):
     courses = get_courses(user)
 
     context = {
-        'is_poc': user.profile.is_poc,
+        'is_poc': user.extended_profile.is_poc,
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
         'course_enrollments': course_enrollments,
@@ -1722,26 +1723,6 @@ def create_account_with_params(request, params):
         # first, create the account
         (user, profile, registration) = _do_create_account(form, custom_form)
 
-        is_poc = True if params['point_of_contact'] == 'true' else False
-
-        organization_to_assign = None
-        if not Organization.objects.filter(name=params['organization']).exists():
-            organization_to_assign = Organization(
-                name=params['organization'],
-                point_of_contact_exist=is_poc
-            )
-            organization_to_assign.save()
-
-        else:
-            organization_to_assign = Organization.objects.filter(name=params['organization']).first()
-            if is_poc and not organization_to_assign.point_of_contact_exist:
-                organization_to_assign.point_of_contact_exist = True
-                organization_to_assign.save()
-
-        profile.organization = organization_to_assign
-        profile.is_poc = is_poc
-        profile.save()
-
         # next, link the account with social auth, if provided via the API.
         # (If the user is using the normal register page, the social auth pipeline does the linking, not this code)
         if should_link_with_social_auth:
@@ -2687,24 +2668,3 @@ class LogoutView(TemplateView):
         })
 
         return context
-
-@csrf_exempt
-def get_organizations(request):
-
-    if request.is_ajax():
-        query = request.GET.get('term', '')
-
-        all_organizations = Organization.objects.all()
-
-        final_result = {}
-
-        for organization in all_organizations:
-            if organization.name.startswith(query):
-                final_result[organization.name] = organization.point_of_contact_exist
-
-        data = json.dumps(final_result)
-    else:
-        data = 'fail'
-    mimetype = 'application/json'
-
-    return HttpResponse(data, mimetype)

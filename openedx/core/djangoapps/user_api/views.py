@@ -161,7 +161,7 @@ class RegistrationView(APIView):
     DEFAULT_FIELDS = ["email", "username", "password"]
 
     EXTRA_FIELDS = [
-        "confirm_password",
+
         "first_name",
         "last_name",
         "city",
@@ -175,10 +175,6 @@ class RegistrationView(APIView):
         "mailing_address",
         "goals",
         "terms_of_service",
-        "organization",
-        "if_currently_employed",
-        "point_of_contact",
-        "admin_email",
         "honor_code"
     ]
 
@@ -489,32 +485,6 @@ class RegistrationView(APIView):
             },
             required=required,
             placeholder='Password'
-        )
-
-    def _add_confirm_password_field(self, form_desc, required=True):
-        """Add a confirm password field to a form description.
-
-        Arguments:
-            form_desc: A form description
-
-        Keyword Arguments:
-            required (bool): Whether this field is required; defaults to True
-
-        """
-        # Translators: This label appears above a field on the registration form
-        # meant to hold the user's password.
-        password_label = _(u"Confirm Password")
-
-        form_desc.add_field(
-            "confirm_password",
-            label=password_label,
-            field_type="password",
-            restrictions={
-                "min_length": PASSWORD_MIN_LENGTH,
-                "max_length": PASSWORD_MAX_LENGTH,
-            },
-            required=required,
-            placeholder='Confirm Password'
         )
 
     def _add_level_of_education_field(self, form_desc, required=True):
@@ -921,96 +891,6 @@ class RegistrationView(APIView):
                         instructions="",
                         restrictions={}
                     )
-
-    def _add_organization_field(self, form_desc, required=True):
-        """
-        Add a Organization field to a form description.
-
-        Arguments:
-            form_desc: A form description
-
-        Keyword Arguments:
-            required (bool): Whether this field is required; defaults to True
-        """
-        organization_label = _(u"Organization")
-        error_msg = _(u"Please select your Organization.")
-        organization_placeholder = _(u"Organization Name")
-
-        form_desc.add_field(
-            "organization",
-            label=organization_label,
-            required=required,
-            placeholder=organization_placeholder,
-            error_messages={
-                "required": error_msg
-            },
-            field_type="text",
-            instructions='You can chose an organization from the auto-suggestion list'
-                         ' or add a new one by entering the name and clicking enter.'
-        )
-
-    def _add_point_of_contact_field(self, form_desc, required=False):
-        """
-        Add a point of contact radio button to a form description.
-
-        Arguments:
-            form_desc: A form description
-
-        Keyword Arguments:
-            required (bool): Whether this field is required; defaults to False
-        """
-        point_of_contact_label = _(u"Are you the Admin of your organization?")
-
-        form_desc.add_field(
-            "point_of_contact",
-            label=point_of_contact_label,
-            required=required,
-            field_type="select",
-            options=[(False, 'No'), (True, 'Yes')]
-        )
-
-    def _add_admin_email_field(self, form_desc, required=False):
-        """
-        Add a field to allow users to enter email for the admin of organization.
-
-        Arguments:
-            form_desc: A form description
-
-        Keyword Arguments:
-            required (bool): Whether this field is required; defaults to False
-        """
-        admin_email_label = _(u"If you know who should be the Admin, please provide their email address below. We'll "
-                              u"send them an email inviting them to join the platform as the organization admin.")
-        error_msg = _(u"Please provide admin email for the organization.")
-        admin_email_placeholder = _(u"Organization Admin Email")
-
-        form_desc.add_field(
-            "admin_email",
-            label=admin_email_label,
-            required=required,
-            placeholder=admin_email_placeholder,
-            error_messages={
-                "required": error_msg
-            },
-            field_type="email",
-            restrictions={
-                "min_length": EMAIL_MIN_LENGTH,
-                "max_length": EMAIL_MAX_LENGTH,
-            }
-            )
-
-    def _add_if_currently_employed_field(self, form_desc, required=False):
-        """
-        Add a checkbox to get whether you are currently employed.
-        """
-
-        form_desc.add_field(
-            "if_currently_employed",
-            label="Check here if you're currently not employed.",
-            field_type="checkbox",
-            default=False,
-            required=required,
-        )
 
 
 class PasswordResetView(APIView):

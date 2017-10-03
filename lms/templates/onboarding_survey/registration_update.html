@@ -1,0 +1,24 @@
+{% extends "main_django.html" %}
+{% load i18n staticfiles %}
+
+{% block title %}{% trans "Update information." %} | {{ block.super }}{% endblock %}
+
+{% block body %}
+
+<p class="step-info">You can update information provided during registration process here.
+</p>
+
+<div class="container">
+    <form id="reg-update-form" class='reg-update-form' action="." method="post" data-org-url="{{ org_url }}">
+    {{ form.as_p }}
+    {% csrf_token %}
+    <div class="submit-survey">
+        <input type="submit" value="Update"/>
+    </div>
+</form>
+</div>
+
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" media="all" />
+<script type="text/javascript" src="{% static 'js/onboarding_survey/onboarding_survey.js' %}"></script>
+
+{% endblock body %}
