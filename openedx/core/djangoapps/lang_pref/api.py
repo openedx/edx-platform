@@ -8,6 +8,7 @@ from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.site_configuration.helpers import get_value
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # Named tuples can be referenced using object-like variable
 # deferencing, making the use of tuples more readable by
