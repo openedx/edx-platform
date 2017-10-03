@@ -48,17 +48,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         super(CourseDateSummaryTest, self).setUp()
         SelfPacedConfiguration.objects.create(enable_course_home_improvements=True)
 
-    def enable_course_certificates(self, course):
-        """ Enable course certificate configuration """
-        course.certificates = {
-            u'certificates': [{
-                u'course_title': u'Test',
-                u'name': u'',
-                u'is_active': True,
-            }]
-        }
-        course.save()
-
     def test_course_info_feature_flag(self):
         SelfPacedConfiguration(enable_course_home_improvements=False).save()
         course = create_course_run()
@@ -369,7 +358,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         verified_user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=verified_user, mode=CourseMode.VERIFIED)
         course.certificate_available_date = datetime.now(utc) + timedelta(days=7)
-        self.enable_course_certificates(course)
+        enable_course_certificates(course)
         CertificateAvailableDate(course, audit_user)
         for block in (CertificateAvailableDate(course, audit_user), CertificateAvailableDate(course, verified_user)):
             self.assertIsNotNone(course.certificate_available_date)
@@ -467,6 +456,8 @@ class TestDateAlerts(SharedModuleStoreTestCase):
         super(TestDateAlerts, self).setUp()
         with freeze_time('2017-07-01 09:00:00'):
             self.course = create_course_run(days_till_start=0)
+            self.course.certificate_available_date = self.course.start + timedelta(days=21)
+            enable_course_certificates(self.course)
             self.enrollment = CourseEnrollmentFactory(course_id=self.course.id, mode=CourseMode.AUDIT)
             self.request = RequestFactory().request()
             self.request.session = {}
@@ -538,6 +529,30 @@ class TestDateAlerts(SharedModuleStoreTestCase):
         """
         with freeze_time(current_time):
             block = VerifiedUpgradeDeadlineDate(self.course, self.request.user)
+            block.register_alerts(self.request, self.course)
+            messages = list(CourseHomeMessages.user_messages(self.request))
+            if expected_message_html:
+                self.assertEqual(len(messages), 1)
+                self.assertIn(expected_message_html, messages[0].message_html)
+            else:
+                self.assertEqual(len(messages), 0)
+
+    @ddt.data(
+        ['2017-07-15 08:00:00', None],
+        ['2017-07-15 09:00:00', u'If you have earned a certificate, you will be able to access it 1 week from now.'],
+        ['2017-07-21 09:00:00', u'If you have earned a certificate, you will be able to access it 1 day from now.'],
+        ['2017-07-22 08:00:00', u'If you have earned a certificate, you will be able to access it 1 hour from now.'],
+        ['2017-07-22 09:00:00', None],
+        ['2017-07-23 09:00:00', None],
+    )
+    @ddt.unpack
+    @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
+    def test_certificate_availability_alert(self, current_time, expected_message_html):
+        """
+        Verify the verified upgrade deadline alerts.
+        """
+        with freeze_time(current_time):
+            block = CertificateAvailableDate(self.course, self.request.user)
             block.register_alerts(self.request, self.course)
             messages = list(CourseHomeMessages.user_messages(self.request))
             if expected_message_html:
@@ -716,3 +731,17 @@ def create_self_paced_course_run(days_till_start=1):
     )
 
     return course
+
+
+def enable_course_certificates(course):
+    """
+    Enable course certificate configuration.
+    """
+    course.certificates = {
+        u'certificates': [{
+            u'course_title': u'Test',
+            u'name': u'',
+            u'is_active': True,
+        }]
+    }
+    course.save()

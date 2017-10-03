@@ -354,6 +354,31 @@ class CertificateAvailableDate(DateSummary):
             ) if mode.slug != CourseMode.AUDIT
         ])
 
+    def register_alerts(self, request, course):
+        """
+        Registers an alert close to the certificate delivery date.
+        """
+        is_enrolled = CourseEnrollment.get_enrollment(request.user, course.id)
+        if not is_enrolled or not self.is_enabled or course.end > self.current_time:
+            return
+        if self.date > self.current_time:
+            CourseHomeMessages.register_info_message(
+                request,
+                Text(_(
+                    'If you have earned a certificate, you will be able to access it {time_remaining_string}'
+                    ' from now. You will also be able to view your certificates on your {learner_profile_link}.'
+                )).format(
+                    time_remaining_string=self.time_remaining_string,
+                    learner_profile_link=HTML(
+                        '<a href="{learner_profile_url}">{learner_profile_name}</a>'
+                    ).format(
+                        learner_profile_url=reverse('learner_profile', kwargs={'username': request.user.username}),
+                        learner_profile_name=_('Learner Profile'),
+                    ),
+                ),
+                title=Text(_('We are working on generating course certificates.'))
+            )
+
 
 class VerifiedUpgradeDeadlineDate(DateSummary):
     """
