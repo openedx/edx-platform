@@ -273,7 +273,7 @@ which is useful when you need to run only one of mutliple tests with the same
 name in different classes or files.
 
 This command runs any python unit test method that matches the substring
-`test_stringify` within a specified TestCass class within a specified file.
+`test_stringify` within a specified TestCase class within a specified file.
 
 ::
 
