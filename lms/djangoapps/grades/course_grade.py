@@ -14,10 +14,6 @@ from .subsection_grade import ZeroSubsectionGrade
 from .subsection_grade_factory import SubsectionGradeFactory
 
 
-def uniqueify(iterable):
-    return OrderedDict([(item, None) for item in iterable]).keys()
-
-
 class CourseGradeBase(object):
     """
     Base class for Course Grades.
@@ -194,7 +190,7 @@ class CourseGradeBase(object):
         """
         return [
             self._get_subsection_grade(course_structure[subsection_key])
-            for subsection_key in uniqueify(course_structure.get_children(chapter_key))
+            for subsection_key in _uniqueify_and_keep_order(course_structure.get_children(chapter_key))
         ]
 
     @abstractmethod
@@ -229,6 +225,11 @@ class CourseGrade(CourseGradeBase):
         if self.force_update_subsections is true, via the lazy call
         to self.grader_result.
         """
+        # TODO update this code to be more functional and readable.
+        # Currently, it is hard to follow since there are plenty of
+        # side-effects. Once functional, force_update_subsections
+        # can be passed through and not confusingly stored and used
+        # at a later time.
         grade_cutoffs = self.course_data.course.grade_cutoffs
         self.percent = self._compute_percent(self.grader_result)
         self.letter_grade = self._compute_letter_grade(grade_cutoffs, self.percent)
@@ -289,3 +290,7 @@ class CourseGrade(CourseGradeBase):
         nonzero_cutoffs = [cutoff for cutoff in grade_cutoffs.values() if cutoff > 0]
         success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
         return success_cutoff and percent >= success_cutoff
+
+
+def _uniqueify_and_keep_order(iterable):
+    return OrderedDict([(item, None) for item in iterable]).keys()

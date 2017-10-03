@@ -43,14 +43,14 @@ class SubsectionGradeFactory(object):
             if assume_zero_if_absent(self.course_data.course_key):
                 subsection_grade = ZeroSubsectionGrade(subsection, self.course_data)
             else:
-                subsection_grade = SubsectionGrade(subsection).init_from_structure(
-                    self.student, self.course_data.structure, self._submissions_scores, self._csm_scores,
+                subsection_grade = SubsectionGrade.create(
+                    subsection, self.course_data.structure, self._submissions_scores, self._csm_scores,
                 )
                 if should_persist_grades(self.course_data.course_key):
                     if read_only:
                         self._unsaved_subsection_grades[subsection_grade.location] = subsection_grade
                     else:
-                        grade_model = subsection_grade.create_model(self.student)
+                        grade_model = subsection_grade.update_or_create_model(self.student)
                         self._update_saved_subsection_grade(subsection.location, grade_model)
         return subsection_grade
 
@@ -69,8 +69,8 @@ class SubsectionGradeFactory(object):
         """
         self._log_event(log.debug, u"update, subsection: {}".format(subsection.location), subsection)
 
-        calculated_grade = SubsectionGrade(subsection).init_from_structure(
-            self.student, self.course_data.structure, self._submissions_scores, self._csm_scores,
+        calculated_grade = SubsectionGrade.create(
+            subsection, self.course_data.structure, self._submissions_scores, self._csm_scores,
         )
 
         if should_persist_grades(self.course_data.course_key):
@@ -80,8 +80,8 @@ class SubsectionGradeFactory(object):
                 except PersistentSubsectionGrade.DoesNotExist:
                     pass
                 else:
-                    orig_subsection_grade = SubsectionGrade(subsection).init_from_model(
-                        self.student, grade_model, self.course_data.structure, self._submissions_scores, self._csm_scores,
+                    orig_subsection_grade = SubsectionGrade.read(
+                        subsection, grade_model, self.course_data.structure, self._submissions_scores, self._csm_scores,
                     )
                     if not is_score_higher_or_equal(
                             orig_subsection_grade.graded_total.earned,
@@ -123,10 +123,10 @@ class SubsectionGradeFactory(object):
         """
         if should_persist_grades(self.course_data.course_key):
             saved_subsection_grades = self._get_bulk_cached_subsection_grades()
-            subsection_grade = saved_subsection_grades.get(subsection.location)
-            if subsection_grade:
-                return SubsectionGrade(subsection).init_from_model(
-                    self.student, subsection_grade, self.course_data.structure, self._submissions_scores, self._csm_scores,
+            grade = saved_subsection_grades.get(subsection.location)
+            if grade:
+                return SubsectionGrade.read(
+                    subsection, grade, self.course_data.structure, self._submissions_scores, self._csm_scores,
                 )
 
     def _get_bulk_cached_subsection_grades(self):

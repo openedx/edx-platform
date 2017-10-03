@@ -21,13 +21,11 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
-from eventtracking import tracker
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 from request_cache import get_cache
-from track import contexts
-from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 
-from .config import waffle
+import events
+
 
 log = logging.getLogger(__name__)
 
@@ -122,24 +120,6 @@ class BlockRecordList(tuple):
         return cls(blocks, course_key)
 
 
-class VisibleBlocksQuerySet(models.QuerySet):
-    """
-    A custom QuerySet representing VisibleBlocks.
-    """
-
-    def create_from_blockrecords(self, blocks):
-        """
-        Creates a new VisibleBlocks model object.
-
-        Argument 'blocks' should be a BlockRecordList.
-        """
-        model, _ = self.get_or_create(
-            hashed=blocks.hash_value,
-            defaults={u'blocks_json': blocks.json_value, u'course_id': blocks.course_key},
-        )
-        return model
-
-
 class VisibleBlocks(models.Model):
     """
     A django model used to track the state of a set of visible blocks under a
@@ -149,12 +129,11 @@ class VisibleBlocks(models.Model):
     in the blocks_json field. A hash of this json array is used for lookup
     purposes.
     """
-    CACHE_NAMESPACE = u"grades.models.VisibleBlocks"
     blocks_json = models.TextField()
     hashed = models.CharField(max_length=100, unique=True)
     course_id = CourseKeyField(blank=False, max_length=255, db_index=True)
 
-    objects = VisibleBlocksQuerySet.as_manager()
+    _CACHE_NAMESPACE = u"grades.models.VisibleBlocks"
 
     class Meta(object):
         app_label = "grades"
@@ -184,10 +163,27 @@ class VisibleBlocks(models.Model):
         Arguments:
             course_key: The course identifier for the desired records
         """
-        prefetched = get_cache(cls.CACHE_NAMESPACE).get(cls._cache_key(course_key))
-        if not prefetched:
+        prefetched = get_cache(cls._CACHE_NAMESPACE).get(cls._cache_key(course_key), None)
+        if prefetched is None:
             prefetched = cls._initialize_cache(course_key)
         return prefetched
+
+    @classmethod
+    def cached_get_or_create(cls, blocks):
+        prefetched = get_cache(cls._CACHE_NAMESPACE).get(cls._cache_key(blocks.course_key))
+        if prefetched is not None:
+            model = prefetched.get(blocks.hash_value)
+            if not model:
+                model = cls.objects.create(
+                    hashed=blocks.hash_value, blocks_json=blocks.json_value, course_id=blocks.course_key,
+                )
+                cls._update_cache(blocks.course_key, [model])
+        else:
+            model, _ = cls.objects.get_or_create(
+                hashed=blocks.hash_value,
+                defaults={u'blocks_json': blocks.json_value, u'course_id': blocks.course_key},
+            )
+        return model
 
     @classmethod
     def bulk_create(cls, course_key, block_record_lists):
@@ -227,7 +223,7 @@ class VisibleBlocks(models.Model):
         block record objects.
         """
         prefetched = {record.hashed: record for record in cls.objects.filter(course_id=course_key)}
-        get_cache(cls.CACHE_NAMESPACE)[cls._cache_key(course_key)] = prefetched
+        get_cache(cls._CACHE_NAMESPACE)[cls._cache_key(course_key)] = prefetched
         return prefetched
 
     @classmethod
@@ -236,17 +232,9 @@ class VisibleBlocks(models.Model):
         Adds a specific set of visible blocks to the request cache.
         This assumes that prefetch has already been called.
         """
-        get_cache(cls.CACHE_NAMESPACE)[cls._cache_key(course_key)].update(
+        get_cache(cls._CACHE_NAMESPACE)[cls._cache_key(course_key)].update(
             {visible_block.hashed: visible_block for visible_block in visible_blocks}
         )
-
-    @classmethod
-    def clear_cache(cls, course_key):
-        """
-        Clears the cache of all contents for a given course.
-        """
-        cache = get_cache(cls.CACHE_NAMESPACE)
-        cache.pop(cls._cache_key(course_key), None)
 
     @classmethod
     def _cache_key(cls, course_key):
@@ -348,7 +336,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
 
         Raises PersistentSubsectionGrade.DoesNotExist if applicable
         """
-        return cls.objects.select_related('visible_blocks').get(
+        return cls.objects.select_related('visible_blocks', 'override').get(
             user_id=user_id,
             course_id=usage_key.course_key,  # course_id is included to take advantage of db indexes
             usage_key=usage_key,
@@ -363,7 +351,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
             user_id: The user associated with the desired grades
             course_key: The course identifier for the desired grades
         """
-        return cls.objects.select_related('visible_blocks').filter(
+        return cls.objects.select_related('visible_blocks', 'override').filter(
             user_id=user_id,
             course_id=course_key,
         )
@@ -373,29 +361,14 @@ class PersistentSubsectionGrade(TimeStampedModel):
         """
         Wrapper for objects.update_or_create.
         """
-        cls._prepare_params_and_visible_blocks(params)
+        cls._prepare_params(params)
+        VisibleBlocks.cached_get_or_create(params['visible_blocks'])
+        cls._prepare_params_visible_blocks_id(params)
+        cls._prepare_params_override(params)
 
         first_attempted = params.pop('first_attempted')
         user_id = params.pop('user_id')
         usage_key = params.pop('usage_key')
-
-        # apply grade override if one exists before saving model
-        try:
-            override = PersistentSubsectionGradeOverride.objects.get(
-                grade__user_id=user_id,
-                grade__course_id=usage_key.course_key,
-                grade__usage_key=usage_key,
-            )
-            if override.earned_all_override is not None:
-                params['earned_all'] = override.earned_all_override
-            if override.possible_all_override is not None:
-                params['possible_all'] = override.possible_all_override
-            if override.earned_graded_override is not None:
-                params['earned_graded'] = override.earned_graded_override
-            if override.possible_graded_override is not None:
-                params['possible_graded'] = override.possible_graded_override
-        except PersistentSubsectionGradeOverride.DoesNotExist:
-            pass
 
         grade, _ = cls.objects.update_or_create(
             user_id=user_id,
@@ -404,62 +377,32 @@ class PersistentSubsectionGrade(TimeStampedModel):
             defaults=params,
         )
         if first_attempted is not None and grade.first_attempted is None:
-            if waffle.waffle().is_enabled(waffle.ESTIMATE_FIRST_ATTEMPTED):
-                grade.first_attempted = first_attempted
-            else:
-                grade.first_attempted = now()
+            grade.first_attempted = first_attempted
             grade.save()
 
         cls._emit_grade_calculated_event(grade)
         return grade
 
     @classmethod
-    def _prepare_first_attempted_for_create(cls, params):
-        """
-        Update the value of 'first_attempted' to now() if we aren't
-        using score-based estimates.
-        """
-        if params['first_attempted'] is not None and not waffle.waffle().is_enabled(waffle.ESTIMATE_FIRST_ATTEMPTED):
-            params['first_attempted'] = now()
-
-    @classmethod
-    def create_grade(cls, **params):
-        """
-        Wrapper for objects.create.
-        """
-        cls._prepare_params_and_visible_blocks(params)
-        cls._prepare_first_attempted_for_create(params)
-
-        grade = cls.objects.create(**params)
-        cls._emit_grade_calculated_event(grade)
-        return grade
-
-    @classmethod
-    def bulk_create_grades(cls, grade_params_iter, course_key):
+    def bulk_create_grades(cls, grade_params_iter, user_id, course_key):
         """
         Bulk creation of grades.
         """
         if not grade_params_iter:
             return
 
+        PersistentSubsectionGradeOverride.prefetch(user_id, course_key)
+
         map(cls._prepare_params, grade_params_iter)
         VisibleBlocks.bulk_get_or_create([params['visible_blocks'] for params in grade_params_iter], course_key)
         map(cls._prepare_params_visible_blocks_id, grade_params_iter)
-        map(cls._prepare_first_attempted_for_create, grade_params_iter)
+        map(cls._prepare_params_override, grade_params_iter)
+
         grades = [PersistentSubsectionGrade(**params) for params in grade_params_iter]
         grades = cls.objects.bulk_create(grades)
         for grade in grades:
             cls._emit_grade_calculated_event(grade)
         return grades
-
-    @classmethod
-    def _prepare_params_and_visible_blocks(cls, params):
-        """
-        Prepares the fields for the grade record, while
-        creating the related VisibleBlocks, if needed.
-        """
-        cls._prepare_params(params)
-        params['visible_blocks'] = VisibleBlocks.objects.create_from_blockrecords(params['visible_blocks'])
 
     @classmethod
     def _prepare_params(cls, params):
@@ -484,34 +427,22 @@ class PersistentSubsectionGrade(TimeStampedModel):
         params['visible_blocks_id'] = params['visible_blocks'].hash_value
         del params['visible_blocks']
 
+    @classmethod
+    def _prepare_params_override(cls, params):
+        override = PersistentSubsectionGradeOverride.get_override(params['user_id'], params['usage_key'])
+        if override:
+            if override.earned_all_override is not None:
+                params['earned_all'] = override.earned_all_override
+            if override.possible_all_override is not None:
+                params['possible_all'] = override.possible_all_override
+            if override.earned_graded_override is not None:
+                params['earned_graded'] = override.earned_graded_override
+            if override.possible_graded_override is not None:
+                params['possible_graded'] = override.possible_graded_override
+
     @staticmethod
     def _emit_grade_calculated_event(grade):
-        """
-        Emits an edx.grades.subsection.grade_calculated event
-        with data from the passed grade.
-        """
-        # TODO: remove this context manager after completion of AN-6134
-        event_name = u'edx.grades.subsection.grade_calculated'
-        context = contexts.course_context_from_course_id(grade.course_id)
-        with tracker.get_tracker().context(event_name, context):
-            tracker.emit(
-                event_name,
-                {
-                    'user_id': unicode(grade.user_id),
-                    'course_id': unicode(grade.course_id),
-                    'block_id': unicode(grade.usage_key),
-                    'course_version': unicode(grade.course_version),
-                    'weighted_total_earned': grade.earned_all,
-                    'weighted_total_possible': grade.possible_all,
-                    'weighted_graded_earned': grade.earned_graded,
-                    'weighted_graded_possible': grade.possible_graded,
-                    'first_attempted': unicode(grade.first_attempted),
-                    'subtree_edited_timestamp': unicode(grade.subtree_edited_timestamp),
-                    'event_transaction_id': unicode(get_event_transaction_id()),
-                    'event_transaction_type': unicode(get_event_transaction_type()),
-                    'visible_blocks_hash': unicode(grade.visible_blocks_id),
-                }
-            )
+        events.subsection_grade_calculated(grade)
 
 
 class PersistentCourseGrade(TimeStampedModel):
@@ -553,7 +484,7 @@ class PersistentCourseGrade(TimeStampedModel):
     # Information related to course completion
     passed_timestamp = models.DateTimeField(u'Date learner earned a passing grade', blank=True, null=True)
 
-    CACHE_NAMESPACE = u"grades.models.PersistentCourseGrade"
+    _CACHE_NAMESPACE = u"grades.models.PersistentCourseGrade"
 
     def __unicode__(self):
         """
@@ -569,15 +500,11 @@ class PersistentCourseGrade(TimeStampedModel):
         ])
 
     @classmethod
-    def _cache_key(cls, course_id):
-        return u"grades_cache.{}".format(course_id)
-
-    @classmethod
     def prefetch(cls, course_id, users):
         """
         Prefetches grades for the given users for the given course.
         """
-        get_cache(cls.CACHE_NAMESPACE)[cls._cache_key(course_id)] = {
+        get_cache(cls._CACHE_NAMESPACE)[cls._cache_key(course_id)] = {
             grade.user_id: grade
             for grade in
             cls.objects.filter(user_id__in=[user.id for user in users], course_id=course_id)
@@ -595,7 +522,7 @@ class PersistentCourseGrade(TimeStampedModel):
         Raises PersistentCourseGrade.DoesNotExist if applicable
         """
         try:
-            prefetched_grades = get_cache(cls.CACHE_NAMESPACE)[cls._cache_key(course_id)]
+            prefetched_grades = get_cache(cls._CACHE_NAMESPACE)[cls._cache_key(course_id)]
             try:
                 return prefetched_grades[user_id]
             except KeyError:
@@ -625,33 +552,24 @@ class PersistentCourseGrade(TimeStampedModel):
         if passed and not grade.passed_timestamp:
             grade.passed_timestamp = now()
             grade.save()
+
         cls._emit_grade_calculated_event(grade)
+        cls._update_cache(course_id, user_id, grade)
         return grade
+
+    @classmethod
+    def _update_cache(cls, course_id, user_id, grade):
+        course_cache = get_cache(cls._CACHE_NAMESPACE).get(cls._cache_key(course_id))
+        if course_cache is not None:
+            course_cache[user_id] = grade
+
+    @classmethod
+    def _cache_key(cls, course_id):
+        return u"grades_cache.{}".format(course_id)
 
     @staticmethod
     def _emit_grade_calculated_event(grade):
-        """
-        Emits an edx.grades.course.grade_calculated event
-        with data from the passed grade.
-        """
-        # TODO: remove this context manager after completion of AN-6134
-        event_name = u'edx.grades.course.grade_calculated'
-        context = contexts.course_context_from_course_id(grade.course_id)
-        with tracker.get_tracker().context(event_name, context):
-            tracker.emit(
-                event_name,
-                {
-                    'user_id': unicode(grade.user_id),
-                    'course_id': unicode(grade.course_id),
-                    'course_version': unicode(grade.course_version),
-                    'percent_grade': grade.percent_grade,
-                    'letter_grade': unicode(grade.letter_grade),
-                    'course_edited_timestamp': unicode(grade.course_edited_timestamp),
-                    'event_transaction_id': unicode(get_event_transaction_id()),
-                    'event_transaction_type': unicode(get_event_transaction_type()),
-                    'grading_policy_hash': unicode(grade.grading_policy_hash),
-                }
-            )
+        events.course_grade_calculated(grade)
 
 
 class PersistentSubsectionGradeOverride(models.Model):
@@ -673,3 +591,32 @@ class PersistentSubsectionGradeOverride(models.Model):
     possible_all_override = models.FloatField(null=True, blank=True)
     earned_graded_override = models.FloatField(null=True, blank=True)
     possible_graded_override = models.FloatField(null=True, blank=True)
+
+    _CACHE_NAMESPACE = u"grades.models.PersistentSubsectionGradeOverride"
+
+    @classmethod
+    def prefetch(cls, user_id, course_key):
+        get_cache(cls._CACHE_NAMESPACE)[(user_id, str(course_key))] = {
+            override.grade.usage_key: override
+            for override in
+            cls.objects.filter(grade__user_id=user_id, grade__course_id=course_key)
+        }
+
+    @classmethod
+    def get_override(cls, user_id, usage_key):
+        prefetch_values = get_cache(cls._CACHE_NAMESPACE).get((user_id, str(usage_key.course_key)), None)
+        if prefetch_values is not None:
+            return prefetch_values.get(usage_key)
+        try:
+            return cls.objects.get(
+                grade__user_id=user_id,
+                grade__course_id=usage_key.course_key,
+                grade__usage_key=usage_key,
+            )
+        except PersistentSubsectionGradeOverride.DoesNotExist:
+            pass
+
+
+def prefetch(user, course_key):
+    PersistentSubsectionGradeOverride.prefetch(user.id, course_key)
+    VisibleBlocks.bulk_read(course_key)
