@@ -960,7 +960,7 @@ class ScoresClient(object):
         # attached to them (since old mongo identifiers don't include runs).
         # So we have to add that info back in before we put it into our lookup.
         self._locations_to_scores.update({
-            UsageKey.from_string(location).map_into_course(self.course_key): self.Score(correct, total, created)
+            UsageKey.from_string(unicode(location)).map_into_course(self.course_key): self.Score(correct, total, created)
             for location, correct, total, created
             in scores_qset.values_list('module_state_key', 'grade', 'max_grade', 'created')
         })

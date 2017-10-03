@@ -9,7 +9,8 @@ from django.conf import settings
 from django.contrib import auth
 from django.template.loader import render_to_string
 from django.utils.http import urlquote_plus
-from django.utils.timezone import UTC
+from pytz import UTC
+from django.utils.translation import get_language, to_locale
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language, to_locale
 from opaque_keys.edx.keys import CourseKey
@@ -54,7 +55,7 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         course = get_course_with_access(request.user, 'load', course_key)
 
         # Get time until the start date, if already started, or no start date, value will be zero or negative
-        now = datetime.now(UTC())
+        now = datetime.now(UTC)
         already_started = course.start and now > course.start
         days_until_start_string = "started" if already_started else format_timedelta(course.start - now, locale=to_locale(get_language()))
         course_start_data = {

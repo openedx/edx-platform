@@ -9,7 +9,6 @@ from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
-from xmodule.modulestore.django import SignalHandler
 
 log = logging.getLogger(__name__)
 

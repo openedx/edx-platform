@@ -20,7 +20,8 @@ from opaque_keys import InvalidKeyError
 from milestones.tests.utils import MilestonesTestCaseMixin
 from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
-from student.models import CourseEnrollment, REFUND_ORDER, UserProfile
+from student.models import CourseEnrollment, UserProfile
+from student.signals import REFUND_ORDER
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.milestones_helpers import set_prerequisite_courses, remove_prerequisite_course, get_course_milestones
 from xmodule.modulestore import ModuleStoreEnum

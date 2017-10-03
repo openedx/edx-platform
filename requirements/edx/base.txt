@@ -17,19 +17,17 @@ defusedxml==0.4.1
 django-babel-underscore==0.5.2
 markey==0.8  # From django-babel-underscore
 django-config-models==0.1.8
-django-countries==4.0
+django-countries==4.6.1
 django-extensions==1.5.9
 django-filter==1.0.4
 django-ipware==1.1.0
 django-model-utils==3.0.0
 django-mptt>=0.8.6,<0.9
-django-oauth-plus==2.2.8
 django-oauth-toolkit==0.12.0
 django-pipeline-forgiving==1.0.0
 django-pyfs==1.0.7
 django-sekizai>=0.10
 django-ses==0.7.1
-django-simple-history==1.6.3
 django-statici18n==1.4.0
 django-storages==1.4.1
 django-method-override==0.1.0
@@ -205,6 +203,3 @@ py2neo==3.1.2
 # Support for plugins
 web-fragments==0.2.2
 xblock==1.0.0
-
-# Third Party XBlocks
-edx-sga==0.6.4

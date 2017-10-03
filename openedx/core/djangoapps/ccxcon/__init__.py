@@ -6,4 +6,5 @@ that is used to interact with the CCX and their master courses.
 The ccxcon app needs to be placed in `openedx.core.djangoapps`
 because it will be used both in CMS and LMS.
 """
-import openedx.core.djangoapps.ccxcon.signals
+
+default_app_config = 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig'

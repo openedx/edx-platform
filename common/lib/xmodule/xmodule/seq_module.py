@@ -5,10 +5,10 @@ xModule implementation of a learning sequence
 # pylint: disable=abstract-method
 import collections
 from datetime import datetime
-from django.utils.timezone import UTC
 import json
 import logging
 from pkg_resources import resource_string
+from pytz import UTC
 
 from lxml import etree
 from xblock.core import XBlock
@@ -215,7 +215,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         return (
             not date or
             not hide_after_date or
-            datetime.now(UTC()) < date
+            datetime.now(UTC) < date
         )
 
     def student_view(self, context):

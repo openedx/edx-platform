@@ -4,7 +4,7 @@ Views that handle course updates.
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
