@@ -334,33 +334,3 @@ class TestCourseOutlinePreview(SharedModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'Future Chapter')
-
-
-@ddt.ddt
-class TestEmptyCourseOutlinePage(SharedModuleStoreTestCase):
-    """
-    Test the new course outline view.
-    """
-    FUTURE_DAY = 'future_day'
-    PAST_DAY = 'past_day'
-    DATES = {
-        'default_start_date': DEFAULT_START_DATE,
-        FUTURE_DAY: datetime.datetime.now() + datetime.timedelta(days=30),
-        PAST_DAY: datetime.datetime.now() - datetime.timedelta(days=30),
-    }
-
-    @ddt.data(
-        (FUTURE_DAY, 'This course has not started yet, and will launch on'),
-        (PAST_DAY, "We're still working on course content."),
-        ('default_start_date', 'This course has not started yet.'),
-    )
-    @ddt.unpack
-    def test_empty_course_rendering(self, start_date_name, expected_text):
-        course = CourseFactory.create(start=self.DATES[start_date_name])
-        test_user = UserFactory(password=TEST_PASSWORD)
-        CourseEnrollment.enroll(test_user, course.id)
-        self.client.login(username=test_user.username, password=TEST_PASSWORD)
-        url = course_home_url(course)
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, escape(expected_text))
