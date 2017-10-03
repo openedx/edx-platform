@@ -260,7 +260,7 @@ For example, this command runs a single python unit test file.
 
 To select tests to run based on their name, provide an expression to the `pytest
 -k option
-<https://docs.pytest.org/en/latest/example/markers.html#using-k-expr-to-select-tests-based-on-their-name>`
+<https://docs.pytest.org/en/latest/example/markers.html#using-k-expr-to-select-tests-based-on-their-name>`__
 which performs a substring match on test names.
 
 ::
@@ -268,7 +268,7 @@ which performs a substring match on test names.
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py -k test_stringify
 
 Alternatively, you can select tests based on their `node ID
-<https://docs.pytest.org/en/latest/example/markers.html#node-id>` directly,
+<https://docs.pytest.org/en/latest/example/markers.html#node-id>`__ directly,
 which is useful when you need to run only one of mutliple tests with the same
 name in different classes or files.
 
