@@ -25,6 +25,7 @@ django-model-utils==3.0.0
 django-mptt>=0.8.6,<0.9
 django-oauth-toolkit==0.12.0
 django-pipeline-forgiving==1.0.0
+django-pyfs==1.0.7
 django-sekizai>=0.10
 django-ses==0.7.1
 django-statici18n==1.4.0
