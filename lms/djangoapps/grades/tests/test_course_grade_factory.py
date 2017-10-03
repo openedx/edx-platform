@@ -36,7 +36,7 @@ class TestCourseGradeFactory(GradeTestBase):
 
     def test_course_grade_no_access(self):
         """
-        Test to ensure a grade can ba calculated for a student in a course, even if they themselves do not have access.
+        Test to ensure a grade can be calculated for a student in a course, even if they themselves do not have access.
         """
         invisible_course = CourseFactory.create(visible_to_staff_only=True)
         access = has_access(self.request.user, 'load', invisible_course)
