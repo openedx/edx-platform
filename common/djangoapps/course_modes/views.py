@@ -103,6 +103,8 @@ class ChooseModeView(View):
                     redirect_url = ecommerce_service.get_checkout_page_url(professional_mode.bulk_sku)
             return redirect(redirect_url)
 
+        course = modulestore().get_course(course_key)
+
         # If there isn't a verified mode available, then there's nothing
         # to do on this page.  Send the user to the dashboard.
         if not CourseMode.has_verified_mode(modes):
@@ -110,12 +112,14 @@ class ChooseModeView(View):
 
         # If a user has already paid, redirect them to the dashboard.
         if is_active and (enrollment_mode in CourseMode.VERIFIED_MODES + [CourseMode.NO_ID_PROFESSIONAL_MODE]):
+            # If the course has started redirect to course home instead
+            if course.has_started():
+                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
             return redirect(reverse('dashboard'))
 
         donation_for_course = request.session.get("donation_for_course", {})
         chosen_price = donation_for_course.get(unicode(course_key), None)
 
-        course = modulestore().get_course(course_key)
         if CourseEnrollment.is_enrollment_closed(request.user, course):
             locale = to_locale(get_language())
             enrollment_end_date = format_datetime(course.enrollment_end, 'short', locale=locale)
@@ -224,10 +228,16 @@ class ChooseModeView(View):
             # system, such as third-party discovery.  These workflows result in learners arriving
             # directly at this screen, and they will not necessarily be pre-enrolled in the audit mode.
             CourseEnrollment.enroll(request.user, course_key, CourseMode.AUDIT)
+            # If the course has started redirect to course home instead
+            if course.has_started():
+                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
             return redirect(reverse('dashboard'))
 
         if requested_mode == 'honor':
             CourseEnrollment.enroll(user, course_key, mode=requested_mode)
+            # If the course has started redirect to course home instead
+            if course.has_started():
+                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
             return redirect(reverse('dashboard'))
 
         mode_info = allowed_modes[requested_mode]

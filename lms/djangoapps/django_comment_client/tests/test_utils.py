@@ -390,6 +390,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.discussion_num = 0
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.maxDiff = None  # pylint: disable=invalid-name
+        self.later = datetime.datetime(2050, 1, 1, tzinfo=UTC)
 
     def create_discussion(self, discussion_category, discussion_target, **kwargs):
         self.discussion_num += 1
@@ -539,7 +540,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
     def test_get_unstarted_discussion_xblocks(self):
 
-        self.create_discussion("Chapter 1", "Discussion 1", start=later)
+        self.create_discussion("Chapter 1", "Discussion 1", start=self.later)
 
         self.assert_category_map_equals(
             {
@@ -551,12 +552,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                 "id": "discussion1",
                                 "sort_key": None,
                                 "is_divided": False,
-                                "start_date": later
+                                "start_date": self.later
                             }
                         },
                         "subcategories": {},
                         "children": [("Discussion 1", TYPE_ENTRY)],
-                        "start_date": later,
+                        "start_date": self.later,
                         "sort_key": "Chapter 1"
                     }
                 },
@@ -696,13 +697,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
     def test_start_date_filter(self):
         now = datetime.datetime.now()
-        later = datetime.datetime.max
         self.create_discussion("Chapter 1", "Discussion 1", start=now)
-        self.create_discussion("Chapter 1", "Discussion 2 обсуждение", start=later)
+        self.create_discussion("Chapter 1", "Discussion 2 обсуждение", start=self.later)
         self.create_discussion("Chapter 2", "Discussion", start=now)
-        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=later)
-        self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=later)
-        self.create_discussion("Chapter 3 / Section 1", "Discussion", start=later)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=self.later)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=self.later)
+        self.create_discussion("Chapter 3 / Section 1", "Discussion", start=self.later)
 
         self.assertFalse(self.course.self_paced)
         self.assert_category_map_equals(
@@ -740,13 +740,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.course.self_paced = True
 
         now = datetime.datetime.now()
-        later = datetime.datetime.max
         self.create_discussion("Chapter 1", "Discussion 1", start=now)
-        self.create_discussion("Chapter 1", "Discussion 2", start=later)
+        self.create_discussion("Chapter 1", "Discussion 2", start=self.later)
         self.create_discussion("Chapter 2", "Discussion", start=now)
-        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=later)
-        self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=later)
-        self.create_discussion("Chapter 3 / Section 1", "Discussion", start=later)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=self.later)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=self.later)
+        self.create_discussion("Chapter 3 / Section 1", "Discussion", start=self.later)
 
         self.assertTrue(self.course.self_paced)
         self.assert_category_map_equals(

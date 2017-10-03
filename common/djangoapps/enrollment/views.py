@@ -75,7 +75,7 @@ class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
     """Limit the number of requests users can make to the enrollment API."""
     THROTTLE_RATES = {
         'user': '40/minute',
-        'staff': '400/minute',
+        'staff': '600/minute',
     }
 
     def allow_request(self, request, view):

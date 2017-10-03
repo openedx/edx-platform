@@ -270,14 +270,14 @@ def import_status_handler(request, course_key_string, filename=None):
     return JsonResponse({"ImportStatus": status})
 
 
-def send_tarball(tarball):
+def send_tarball(tarball, size):
     """
     Renders a tarball to response, for use when sending a tar.gz file to the user.
     """
     wrapper = FileWrapper(tarball)
     response = HttpResponse(wrapper, content_type='application/x-tgz')
     response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(tarball.name.encode('utf-8'))
-    response['Content-Length'] = os.path.getsize(tarball.name)
+    response['Content-Length'] = size
     return response
 
 
@@ -381,6 +381,7 @@ def export_status_handler(request, course_key_string):
         else:
             # local file, serve from the authorization wrapper view
             output_url = reverse_course_url('export_output_handler', course_key)
+
     elif task_status.state in (UserTaskStatus.FAILED, UserTaskStatus.CANCELED):
         status = max(-(task_status.completed_steps + 1), -2)
         errors = UserTaskArtifact.objects.filter(status=task_status, name='Error')
@@ -423,7 +424,7 @@ def export_output_handler(request, course_key_string):
         try:
             artifact = UserTaskArtifact.objects.get(status=task_status, name='Output')
             tarball = course_import_export_storage.open(artifact.file.name)
-            return send_tarball(tarball)
+            return send_tarball(tarball, artifact.file.storage.size(artifact.file.name))
         except UserTaskArtifact.DoesNotExist:
             raise Http404
         finally:
