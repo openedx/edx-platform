@@ -257,27 +257,40 @@ For example, this command runs a single python unit test file.
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py
 
-This command runs a single python unit test within a specified file.
+
+To select tests to run based on their name, provide an expression to the `pytest
+-k option
+<https://docs.pytest.org/en/latest/example/markers.html#using-k-expr-to-select-tests-based-on-their-name>`
+which performs a substring match on test names.
 
 ::
 
-    pytest common/lib/xmodule/xmodule/tests/test_stringify.py::test_stringify
+    pytest common/lib/xmodule/xmodule/tests/test_stringify.py -k test_stringify
 
-This command runs a single python unit test method within a specified TestCase
-class within a specified file.
+Alternatively, you can select tests based on their `node ID
+<https://docs.pytest.org/en/latest/example/markers.html#node-id>` directly,
+which is useful when you need to run only one of mutliple tests with the same
+name in different classes or files.
 
-::
-
-    pytest common/lib/xmodule/xmodule/tests/test_stringify.py::TestCase::test_stringify
-
-Note: if the method has an `@ddt.data` decorator, ddt will create multiple
-methods with the same prefix name and each individual data input as the suffix
-(e.g. `test_stringify_1_foo`). To test all of the ddt.data variations of the
-same test method, use the pytest `-k` option.
+This command runs any python unit test method that matches the substring
+`test_stringify` within a specified TestCass class within a specified file.
 
 ::
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py::TestCase -k test_stringify
+
+Note: if the method has an `@ddt.data` decorator, ddt will create multiple
+methods with the same prefix name and each individual data input as the suffix
+(e.g. `test_stringify_1_foo`). To test all of the ddt.data variations of the
+same test method, pass the prefix name to the pytest `-k` option.
+
+If you need to run only one of the test variations, you can the get the
+name of all test methods in a class, file, or project, including all ddt.data
+variations, by running pytest with `--collectonly`.
+
+::
+
+    pytest common/lib/xmodule/xmodule/tests/test_stringify.py --collectonly
 
 
 This is an example of how to run a single test and get stdout shown immediately, with proper env config.
