@@ -11,21 +11,32 @@ export class CourseTalkReviews {  // eslint-disable-line import/prefer-default-e
 
     // Initialize page to the read reviews view
     self.currentSrc = options.readSrc;
-    $.getScript(options.readSrc);
+    $.getScript(options.readSrc, () => { // eslint-disable-line func-names
+      $('iframe').load(() => {
+        $(options.loadIcon).hide();
+      });
+    });
     $courseTalkToggleReadWriteReviews.text(toWriteBtnText);
 
     $courseTalkToggleReadWriteReviews.on('click', () => {
+      const switchToReadView = self.currentSrc === options.writeSrc;
       // Cache js file for future button clicks
       $.ajaxSetup({ cache: true });
 
-      // Toggle the new coursetalk script object
-      const switchToReadView = self.currentSrc === options.writeSrc;
-      self.currentSrc = switchToReadView ? options.readSrc : options.writeSrc;
-      $.getScript(self.currentSrc);
+      // Show the loading icon
+      $(options.loadIcon).show();
 
-      // Toggle button text on switch to the other view
-      const newText = switchToReadView ? toWriteBtnText : toReadBtnText;
-      $courseTalkToggleReadWriteReviews.text(newText);
+      // Update toggle button text
+      const newBtnText = switchToReadView ? toWriteBtnText : toReadBtnText;
+      $courseTalkToggleReadWriteReviews.text(newBtnText);
+
+      // Toggle the new coursetalk script object
+      self.currentSrc = switchToReadView ? options.readSrc : options.writeSrc;
+      $.getScript(self.currentSrc, () => { // eslint-disable-line func-names
+        $('iframe').load(() => {
+          $(options.loadIcon).hide();
+        });
+      });
     });
   }
 }
