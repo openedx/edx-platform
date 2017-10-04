@@ -171,6 +171,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         self.assertFalse(consent_needed_for_course(request, user, 'fake-course'))
 
     @httpretty.activate
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data')
     @mock.patch('openedx.features.enterprise_support.api.EnterpriseCustomer')
     @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline')
     @mock.patch('openedx.features.enterprise_support.api.Registry')
@@ -179,6 +180,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             mock_registry,
             mock_partial,
             mock_enterprise_customer_model,
+            mock_get_enterprise_learner_data,
     ):
         def mock_get_enterprise_customer(**kwargs):
             uuid = kwargs.get('enterprise_customer_identity_provider__provider_id')
@@ -224,6 +226,16 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         # enterprise customer UUID in the cookie.
         enterprise_customer = enterprise_customer_for_request(
             mock.MagicMock(GET={}, COOKIES={settings.ENTERPRISE_CUSTOMER_COOKIE_NAME: 'real-ent-uuid'}, user=self.user)
+        )
+        self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
+
+        # Verify that we can still get enterprise customer from enterprise
+        # learner API even if we are unable to get it from preferred sources,
+        # e.g. url query parameters, third-party auth pipeline, enterprise
+        # cookie.
+        mock_get_enterprise_learner_data.return_value = [{'enterprise_customer': {'uuid': 'real-ent-uuid'}}]
+        enterprise_customer = enterprise_customer_for_request(
+            mock.MagicMock(GET={}, COOKIES={}, user=self.user, site=1)
         )
         self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
 

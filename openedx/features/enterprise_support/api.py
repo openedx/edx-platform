@@ -364,6 +364,13 @@ def enterprise_customer_for_request(request):
             settings.ENTERPRISE_CUSTOMER_COOKIE_NAME
         )
 
+    if not enterprise_customer_uuid and request.user.is_authenticated():
+        # If there's no way to get an Enterprise UUID for the request, check to see
+        # if there's already an Enterprise attached to the requesting user on the backend.
+        learner_data = get_enterprise_learner_data(request.site, request.user)
+        if learner_data:
+            enterprise_customer_uuid = learner_data[0]['enterprise_customer']['uuid']
+
     if enterprise_customer_uuid:
         # If we were able to obtain an EnterpriseCustomer UUID, go ahead
         # and use it to attempt to retrieve EnterpriseCustomer details
