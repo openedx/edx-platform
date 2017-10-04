@@ -1055,7 +1055,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                     CourseAccessRole.objects.filter(user=request.user, role='staff').values_list('course_id', flat=True)
                 )
                 accessible_course_ids = [item for sublist in (enrolled_courses, staff_courses) for item in sublist]
-                if requested_course_id is not None and requested_course_id not in accessible_course_ids:
+                if requested_course_key is not None and requested_course_key not in accessible_course_ids:
                     return Response(status=status.HTTP_400_BAD_REQUEST)
 
         if not specified_username_or_team:
