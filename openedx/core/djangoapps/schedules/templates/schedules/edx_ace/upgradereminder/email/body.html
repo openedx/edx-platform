@@ -4,13 +4,18 @@
 {% block preview_text %}
     {% if course_ids|length > 1 %}
         {% blocktrans trimmed %}
-            We hope you are enjoying {{ course_name }}, and other courses on edX.org.
-            Upgrade by {{ user_schedule_upgrade_deadline_time }} to get a shareable certificate!
+            We hope you are enjoying learning with us so far in {{ course_name }}, and other courses on
+            {{ platform_name }}! A verified certificate will allow you to highlight your new knowledge and
+            skills. It's official, and easily shareable.
+
+            Upgrade by {{ user_schedule_upgrade_deadline_time }}.
         {% endblocktrans %}
     {% else %}
         {% blocktrans trimmed %}
-            We hope you are enjoying {{ course_name }}.
-            Upgrade by {{ user_schedule_upgrade_deadline_time }} to get a shareable certificate!
+            We hope you are enjoying learning with us so far in {{ course_name }}! A verified certificate
+            will allow you to highlight your new knowledge and skills. It's official, and easily shareable.
+
+            Upgrade by {{ user_schedule_upgrade_deadline_time }}.
         {% endblocktrans %}
     {% endif %}
 {% endblock %}
@@ -21,19 +26,33 @@
         <td>
             <h1>{% trans "Upgrade now" %}</h1>
 
-            <p>
-                {% if course_ids|length > 1 %}
+            {% if course_ids|length > 1 %}
+                <p>
                     {% blocktrans trimmed %}
-                        We hope you are enjoying <strong>{{ course_name }}</strong>, and other courses on edX.org.
-                        Upgrade by {{ user_schedule_upgrade_deadline_time }} to get a shareable certificate!
+                        We hope you are enjoying learning with us so far in <strong>{{ course_name }}</strong>, and
+                        other courses on {{ platform_name }}! A verified certificate will allow you to highlight your
+                        new knowledge and skills. It's official, and easily shareable.
                     {% endblocktrans %}
-                {% else %}
+                </p>
+                <p>
                     {% blocktrans trimmed %}
-                        We hope you are enjoying <strong>{{ course_name }}</strong>.
-                        Upgrade by {{ user_schedule_upgrade_deadline_time }} to get a shareable certificate!
+                        Upgrade by <strong>{{ user_schedule_upgrade_deadline_time }}</strong>.
                     {% endblocktrans %}
-                {% endif %}
-            </p>
+                </p>
+            {% else %}
+                <p>
+                    {% blocktrans trimmed %}
+                        We hope you are enjoying learning with us so far in <strong>{{ course_name }}</strong>! A
+                        verified certificate will allow you to highlight your new knowledge and skills. It's official,
+                        and easily shareable.
+                    {% endblocktrans %}
+                </p>
+                <p>
+                    {% blocktrans trimmed %}
+                        Upgrade by <strong>{{ user_schedule_upgrade_deadline_time }}</strong>.
+                    {% endblocktrans %}
+                </p>
+            {% endif %}
 
             <p>
                 <!-- email client support for style sheets is pretty spotty, so we have to inline all of these styles -->

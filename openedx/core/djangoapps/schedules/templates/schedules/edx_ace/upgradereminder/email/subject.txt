@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {% if course_ids|length > 1 %}
-{% blocktrans %}Only two days left to upgrade on {{ platform_name }}!{% endblocktrans %}
+{% blocktrans %}Upgrade to earn a verified certificate on {{ platform_name }}{% endblocktrans %}
 {% else %}
-{% blocktrans %}Only two days left to upgrade in {{course_name}} !{% endblocktrans %}
+{% blocktrans %}Upgrade to earn a verified certificate in {{ course_name }}{% endblocktrans %}
 {% endif %}
