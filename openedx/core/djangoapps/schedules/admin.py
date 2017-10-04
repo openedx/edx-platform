@@ -30,4 +30,6 @@ class ScheduleAdmin(admin.ModelAdmin):
 @admin.register(models.ScheduleConfig)
 class ScheduleConfigAdmin(admin.ModelAdmin):
     search_fields = ('site',)
-    list_display = ('site', 'create_schedules', 'enqueue_recurring_nudge', 'deliver_recurring_nudge')
+    list_display = ('site', 'create_schedules', 'enqueue_recurring_nudge',
+                    'deliver_recurring_nudge', 'enqueue_upgrade_reminder',
+                    'deliver_upgrade_reminder')
