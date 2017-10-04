@@ -91,14 +91,11 @@ class OpaqueKeyField(models.CharField):
         super(OpaqueKeyField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
-        if value is self.Empty or value is None:
-            return None
+        if value in (self.Empty, None, ''):
+            return '' if self.blank else None
 
         assert isinstance(value, (basestring, self.KEY_CLASS)), \
             "%s is not an instance of basestring or %s" % (value, self.KEY_CLASS)
-        if value == '':
-            # handle empty string for models being created w/o fields populated
-            return None
 
         if isinstance(value, basestring):
             if value.endswith('\n'):
