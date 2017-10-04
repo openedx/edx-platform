@@ -197,8 +197,17 @@ class UserAttributeAdmin(admin.ModelAdmin):
         model = UserAttribute
 
 
+@admin.register(CourseEnrollmentAllowed)
+class CourseEnrollmentAllowedAdmin(admin.ModelAdmin):
+    """ Admin interface for the CourseEnrollmentAllowed model. """
+    list_display = ('email', 'course_id', 'auto_enroll',)
+    search_fields = ('email', 'course_id',)
+
+    class Meta(object):
+        model = CourseEnrollmentAllowed
+
+
 admin.site.register(UserTestGroup)
-admin.site.register(CourseEnrollmentAllowed)
 admin.site.register(Registration)
 admin.site.register(PendingNameChange)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
