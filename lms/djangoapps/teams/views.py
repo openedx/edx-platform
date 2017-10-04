@@ -1068,7 +1068,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         if requested_course_key is not None:
             course_keys = [requested_course_key]
         elif accessible_course_ids is not None:
-            course_keys = [CourseKey.from_string(course_string) for course_string in accessible_course_ids]
+            course_keys = accessible_course_ids
 
         queryset = CourseTeamMembership.get_memberships(username, course_keys, team_id)
         page = self.paginate_queryset(queryset)
