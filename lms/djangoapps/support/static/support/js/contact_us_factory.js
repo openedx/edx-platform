@@ -7,7 +7,7 @@
     ], function(_, ContactUsView) {
         return function(options) {
             options = _.extend({el: '.contact-us-wrapper'}, options);
-            return new ContactUsView(options).render();
+            return new ContactUsView(options);
         };
     });
 }).call(this, define || RequireJS.define);
