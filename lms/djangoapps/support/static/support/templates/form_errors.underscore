@@ -1,6 +1,6 @@
 <div class="col-sm-12">
     <div class="alert alert-danger" role="alert">
-        <strong>We could not submit your request</strong>
+        <strong><%- gettext('Please fix following errors:')%></strong>
         <ul>
             <% _.each(errors, function(item) { %>
             <li>

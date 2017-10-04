@@ -27,7 +27,7 @@
                     $progressContainer = this.$el.find('.progress-container'),
                     fileReader = new FileReader(),
                     maxFileSize = 5000000,  //5mb is max limit
-                    allowedFileTypes = ['gif','png','jpg','jpeg', 'pdf'],
+                    allowedFileTypes = ['gif', 'png', 'jpg', 'jpeg', 'pdf'],
                     fileModel,
                     responseData;
 
@@ -35,10 +35,10 @@
                 $(e.target).val("");
 
                 if (file.size > maxFileSize) {
-                    alert(gettext('File must be smaller than 5 MB in size.'));
+                    this.showErrors([gettext('File must be smaller than 5 MB in size.')]);
                     return
                 } else if ($.inArray(file.name.split('.').pop().toLowerCase(), allowedFileTypes) === -1) {
-                    alert(gettext('Please select image or pdf file!'));
+                    this.showErrors([gettext('Please select image or pdf file!')]);
                     return
                 }
 
@@ -74,11 +74,6 @@
                         resetProgressBar();
                     }
                 };
-
-                request.addEventListener("error", function (e) {
-                    alert(gettext("Something went wrong, Please try again later."));
-                    resetProgressBar();
-                });
 
                 this.$el.find(".abort-upload").click(function (e) {
                     e.preventDefault();
@@ -143,9 +138,9 @@
 
                 //TODO remove hard coded id of custom field
                 data['custom_fields'] = [{
-                        'id': '114099484092',
-                        'value': course
-                    }];
+                    'id': '114099484092',
+                    'value': course
+                }];
 
                 //before submit validate data
                 if (this.validateData(data)) {
@@ -165,37 +160,43 @@
                         }
                     };
                 }
-
             },
 
             validateData: function (data) {
-                var errors = {},
-                $errorContainer = this.$el.find('.form-errors'),
-                regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+                var errors = [],
+                    regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 
                 if (!data['subject']) {
-                    errors['subject'] = gettext('You must enter a subject before submitting.');
+                    errors.push(gettext('You must enter a subject before submitting.'));
                     $('#subject').closest('.form-group').addClass('has-error');
                 }
                 if (!data['comment']['body']) {
-                    errors['message'] = gettext('You must enter a message before submitting.');
+                    errors.push(gettext('You must enter a message before submitting.'));
                     $('#message').closest('.form-group').addClass('has-error');
                 }
                 if (!data['requester']) {
-                    errors['email'] = gettext('You must enter email before submitting.');
+                    errors.push(gettext('You must enter email before submitting.'));
                     $('#email').closest('.form-group').addClass('has-error');
                 } else if (!regex.test(data['requester'])) {
-                    errors['email'] = gettext('You must enter a valid email before submitting.');
+                    errors.push(gettext('You must enter a valid email before submitting.'));
                     $('#email').closest('.form-group').addClass('has-error');
                 }
 
+                if (!errors.length) {
+                    return true;
+                }
+
+                this.showErrors(errors);
+                return false;
+            },
+
+            showErrors: function (errors) {
+                var $errorContainer = this.$el.find('.form-errors');
                 $errorContainer.html(_.template(ErrorsTemplate)({'errors': errors}));
 
                 $('body').animate({
                     scrollTop: $errorContainer.offset().top
                 }, 1000);
-
-                return false;
             }
         });
     });
