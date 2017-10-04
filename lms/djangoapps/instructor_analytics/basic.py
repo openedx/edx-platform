@@ -461,6 +461,7 @@ def course_registration_features(features, registration_codes, csv_type):
         registration_features = [x for x in COURSE_REGISTRATION_FEATURES if x in features]
 
         course_registration_dict = dict((feature, getattr(registration_code, feature)) for feature in registration_features)
+        course_registration_dict['course_id'] = course_registration_dict['course_id']
         course_registration_dict['company_name'] = None
         if registration_code.invoice_item:
             course_registration_dict['company_name'] = registration_code.invoice_item.invoice.company_name
@@ -488,7 +489,6 @@ def course_registration_features(features, registration_codes, csv_type):
             except ObjectDoesNotExist:
                 pass
 
-        course_registration_dict['course_id'] = course_registration_dict['course_id'].to_deprecated_string()
         return course_registration_dict
     return [extract_course_registration(code, features, csv_type) for code in registration_codes]
 
