@@ -363,6 +363,7 @@ class TestStudioView(XBlockWrapperTestMixin, TestCase):
         self.assertEqual(html, rendered_content)
 
 
+@ddt.ddt
 class TestXModuleHandler(TestCase):
     """
     Tests that the xmodule_handler function correctly wraps handle_ajax
@@ -386,6 +387,21 @@ class TestXModuleHandler(TestCase):
         response = self.module.xmodule_handler(self.request)
         self.assertIsInstance(response, webob.Response)
         self.assertEqual(response.body, '{}')
+
+    @ddt.data(
+        u'{"test_key": "test_value"}',
+        '{"test_key": "test_value"}',
+    )
+    def test_xmodule_handler_with_data(self, response_data):
+        """
+        Tests that xmodule_handler function correctly wraps handle_ajax when handle_ajax response is either
+        str or unicode.
+        """
+
+        self.module.handle_ajax = Mock(return_value=response_data)
+        response = self.module.xmodule_handler(self.request)
+        self.assertIsInstance(response, webob.Response)
+        self.assertEqual(response.body, '{"test_key": "test_value"}')
 
 
 class TestXmlExport(XBlockWrapperTestMixin, TestCase):

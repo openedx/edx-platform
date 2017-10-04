@@ -881,21 +881,7 @@ class XModule(HTMLSnippet, XModuleMixin):
                 request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
 
         response_data = self.handle_ajax(suffix, request_post)
-
-        try:
-            return Response(response_data, content_type='application/json')
-        except TypeError:
-            request_environ = getattr(request, 'environ')
-            log.exception(
-                'Response creation failed for problem url: %s, response_data type: %s, LANG: %s, '
-                'LC_ALL: %s and HTTP_ACCEPT_ENCODING: %s',
-                request_environ.get('HTTP_REFERER'),
-                type(response_data),
-                request_environ.get('LANG'),
-                request_environ.get('LC_ALL'),
-                request_environ.get('HTTP_ACCEPT_ENCODING')
-            )
-            raise
+        return Response(response_data, content_type='application/json', charset='UTF-8')
 
     def get_child(self, usage_id):
         if usage_id in self._child_cache:
