@@ -249,20 +249,29 @@ def _update_course_context(request, context, course, course_key, platform_name):
                                                               '{partner_short_name}.').format(
             partner_short_name=context['organization_short_name'],
             platform_name=platform_name)
-    # If language specific templates are enabled for the course, add course_run specific information to the context
-    if CertificateGenerationCourseSetting.is_language_specific_templates_enabled_for_course(course_key):
-        fields = ['start', 'end', 'max_effort', 'content_language']
-        course_run_data = get_course_run_details(course_key, fields)
-        if course_run_data.get('start') and course_run_data.get('end') and course_run_data.get('max_effort'):
-            # Calculate duration of the course run in weeks, multiplied by max_effort for total Hours of Effort
-            try:
-                start = parser.parse(course_run_data.get('start'))
-                end = parser.parse(course_run_data.get('end'))
-                max_effort = int(course_run_data.get('max_effort'))
-                context['hours_of_effort'] = ((end - start).days / 7) * max_effort
-            except ValueError:
-                log.exception('Error occurred while parsing course run details')
-        context['content_language'] = course_run_data.get('content_language')
+
+
+def _update_context_with_catalog_data(context, course_key):
+    """
+    Updates context dictionary with relevant course run info from Discovery.
+    """
+    course_certificate_settings = CertificateGenerationCourseSetting.get(course_key)
+    if course_certificate_settings:
+        course_run_fields = []
+        if course_certificate_settings.language_specific_templates_enabled:
+            course_run_fields.append('content_language')
+        if course_certificate_settings.include_hours_of_effort:
+            course_run_fields.extend(['weeks_to_complete', 'max_effort'])
+        if course_run_fields:
+            course_run_data = get_course_run_details(course_key, course_run_fields)
+            if course_run_data.get('weeks_to_complete') and course_run_data.get('max_effort'):
+                try:
+                    weeks_to_complete = int(course_run_data['weeks_to_complete'])
+                    max_effort = int(course_run_data['max_effort'])
+                    context['hours_of_effort'] = weeks_to_complete * max_effort
+                except ValueError:
+                    log.exception('Error occurred while parsing course run details')
+            context['content_language'] = course_run_data.get('content_language')
 
 
 def _update_social_context(request, context, course, user, user_certificate, platform_name):
@@ -591,6 +600,9 @@ def render_html_view(request, user_id, course_id):
 
     # Append course info
     _update_course_context(request, context, course, course_key, platform_name)
+
+    # Append course run info from discovery
+    _update_context_with_catalog_data(context, course_key)
 
     # Append user info
     _update_context_with_user_info(context, user, user_certificate)

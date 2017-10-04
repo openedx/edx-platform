@@ -870,10 +870,36 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
             u"certificate template."
         )
     )
+    include_hours_of_effort = models.NullBooleanField(
+        default=None,
+        help_text=(
+            u"Display estimated time to complete the course, which is equal to the maximum hours of effort per week "
+            u"times the length of the course in weeks. This attribute will only be displayed in a certificate when the "
+            u"attributes 'Weeks to complete' and 'Max effort' have been provided for the course run and its certificate "
+            u"template includes Hours of Effort."
+        )
+    )
 
     class Meta(object):
         get_latest_by = 'created'
         app_label = "certificates"
+
+    @classmethod
+    def get(cls, course_key):
+        """ Retrieve certificate generation settings for a course.
+
+        Arguments:
+            course_key (CourseKey): The identifier for the course.
+
+        Returns:
+            CertificateGenerationCourseSetting
+        """
+        try:
+            latest = cls.objects.filter(course_key=course_key).latest()
+        except cls.DoesNotExist:
+            return None
+        else:
+            return latest
 
     @classmethod
     def is_self_generation_enabled_for_course(cls, course_key):
@@ -904,41 +930,6 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         """
         default = {
             'self_generation_enabled': is_enabled
-        }
-        CertificateGenerationCourseSetting.objects.update_or_create(
-            course_key=course_key,
-            defaults=default
-        )
-
-    @classmethod
-    def is_language_specific_templates_enabled_for_course(cls, course_key):
-        """Check whether language-specific certificates are enabled for a course.
-
-        Arguments:
-            course_key (CourseKey): The identifier for the course.
-
-        Returns:
-            boolean
-
-        """
-        try:
-            latest = cls.objects.filter(course_key=course_key).latest()
-        except cls.DoesNotExist:
-            return False
-        else:
-            return latest.language_specific_templates_enabled
-
-    @classmethod
-    def set_language_specific_templates_enabled_for_course(cls, course_key, is_enabled):
-        """Enable or disable language-specific certificates for a course.
-
-        Arguments:
-            course_key (CourseKey): The identifier for the course.
-            is_enabled (boolean): Whether to enable or disable language-specific certificates.
-
-        """
-        default = {
-            'language_specific_templates_enabled': is_enabled,
         }
         CertificateGenerationCourseSetting.objects.update_or_create(
             course_key=course_key,
