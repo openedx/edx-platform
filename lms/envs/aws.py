@@ -928,6 +928,9 @@ HELP_TOKENS_BOOKS = ENV_TOKENS.get('HELP_TOKENS_BOOKS', HELP_TOKENS_BOOKS)
 # These configuration settings are specific to the Enterprise service and you should
 # not find references to them within the edx-platform project.
 
+# Determines whether the Enterprise service is used
+ENABLE_ENTERPRISE_INTEGRATION = ENV_TOKENS.get('ENABLE_ENTERPRISE_INTEGRATION', True)
+
 # Publicly-accessible enrollment URL, for use on the client side.
 ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENV_TOKENS.get(
     'ENTERPRISE_PUBLIC_ENROLLMENT_API_URL',
