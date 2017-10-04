@@ -1,8 +1,10 @@
 """ receivers of course_published and library_updated events in order to trigger indexing task """
 
-import logging
 from datetime import datetime
+from functools import wraps
+import logging
 
+from django.core.cache import cache
 from django.dispatch import receiver
 from pytz import UTC
 
@@ -18,6 +20,20 @@ from xmodule.modulestore.django import SignalHandler, modulestore
 
 
 log = logging.getLogger(__name__)
+
+GRADING_POLICY_COUNTDOWN_SECONDS = 3600
+
+
+def locked(expiry_seconds, key):
+    def task_decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            cache_key = '{}-{}'.format(func.__name__, kwargs[key])
+            if cache.add(cache_key, "true", expiry_seconds):
+                log.info('Locking task in cache with key: %s for %s seconds', cache_key, expiry_seconds)
+                return func(*args, **kwargs)
+        return wrapper
+    return task_decorator
 
 
 @receiver(SignalHandler.course_published)
@@ -90,6 +106,7 @@ def handle_item_deleted(**kwargs):
 
 
 @receiver(GRADING_POLICY_CHANGED)
+@locked(expiry_seconds=GRADING_POLICY_COUNTDOWN_SECONDS, key='course_key')
 def handle_grading_policy_changed(sender, **kwargs):
     # pylint: disable=unused-argument
     """
@@ -100,7 +117,7 @@ def handle_grading_policy_changed(sender, **kwargs):
         'event_transaction_id': unicode(get_event_transaction_id()),
         'event_transaction_type': unicode(get_event_transaction_type()),
     }
-    result = compute_all_grades_for_course.apply_async(kwargs=kwargs)
+    result = compute_all_grades_for_course.apply_async(kwargs=kwargs, countdown=GRADING_POLICY_COUNTDOWN_SECONDS)
     log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
         task_name=compute_all_grades_for_course.name,
         task_id=result.task_id,
