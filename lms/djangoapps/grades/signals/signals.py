@@ -26,6 +26,8 @@ PROBLEM_RAW_SCORE_CHANGED = Signal(
         'modified',  # A datetime indicating when the database representation of
                      # this the problem score was saved.
         'score_db_table',  # The database table that houses the score that changed.
+        'score_deleted',  # Boolean indicating whether the score changed due to
+                          # the user state being deleted.
     ]
 )
 
@@ -49,6 +51,8 @@ PROBLEM_WEIGHTED_SCORE_CHANGED = Signal(
         'modified',  # A datetime indicating when the database representation of
                      # this the problem score was saved.
         'score_db_table',  # The database table that houses the score that changed.
+        'score_deleted',  # Boolean indicating whether the score changed due to
+                          # the user state being deleted.
     ]
 )
 

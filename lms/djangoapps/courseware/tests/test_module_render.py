@@ -136,6 +136,7 @@ class StubCompletableXBlock(XBlock):
     def progress(self, json_data, suffix):  # pylint: disable=unused-argument
         """
         Mark the block as complete using the deprecated progress interface.
+
         New code should use the completion event instead.
         """
         return self.runtime.publish(self, 'progress', {})
@@ -425,6 +426,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @attr(shard=1)
+@ddt.ddt
 class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test the handle_xblock_callback function
@@ -606,34 +608,44 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         self.assertEquals(student_module.grade, 0.75)
         self.assertEquals(student_module.max_grade, 1)
 
+    @ddt.data(
+        ('complete', {'completion': 0.625}),
+        ('progress', {}),
+    )
+    @ddt.unpack
     @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
-    def test_completion_event_with_completion_disabled(self):
+    def test_completion_events_with_completion_disabled(self, signal, data):
         with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, False):
             course = CourseFactory.create()
             block = ItemFactory.create(category='comp', parent=course)
             request = self.request_factory.post(
                 '/',
-                data=json.dumps({'completion': 0.625}),
+                data=json.dumps(data),
                 content_type='application/json',
             )
             request.user = self.mock_user
             with self.assertRaises(Http404):
-                result = render.handle_xblock_callback(
+                render.handle_xblock_callback(
                     request,
                     unicode(course.id),
                     quote_slashes(unicode(block.scope_ids.usage_id)),
-                    'complete',
+                    signal,
                     '',
                 )
 
+    @ddt.data(
+        ('complete', {'completion': 0.625}, 0.625),
+        ('progress', {}, 1.0),
+    )
+    @ddt.unpack
     @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
-    def test_completion_event(self):
+    def test_completion_events(self, signal, data, expected_completion):
         with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
             course = CourseFactory.create()
             block = ItemFactory.create(category='comp', parent=course)
             request = self.request_factory.post(
                 '/',
-                data=json.dumps({'completion': 0.625}),
+                data=json.dumps(data),
                 content_type='application/json',
             )
             request.user = self.mock_user
@@ -641,56 +653,12 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
                 request,
                 unicode(course.id),
                 quote_slashes(unicode(block.scope_ids.usage_id)),
-                'complete',
+                signal,
                 '',
             )
-        self.assertEqual(response.status_code, 200)
-        completion = BlockCompletion.objects.get(block_key=block.scope_ids.usage_id)
-        self.assertEqual(completion.completion, 0.625)
-
-    @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
-    def test_progress_event_with_completion_disabled(self):
-        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, False):
-            course = CourseFactory.create()
-            block = ItemFactory.create(category='comp', parent=course)
-            request = self.request_factory.post(
-                '/',
-                data=json.dumps({}),
-                content_type='application/json',
-            )
-            request.user = self.mock_user
-            with self.assertRaises(Http404):
-                response = render.handle_xblock_callback(
-                    request,
-                    unicode(course.id),
-                    quote_slashes(unicode(block.scope_ids.usage_id)),
-                    'progress',
-                    '',
-                )
-                self.assertEqual(response.status_code, 404)
-                raise Http404
-
-    @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
-    def test_progress_event(self):
-        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
-            course = CourseFactory.create()
-            block = ItemFactory.create(category='comp', parent=course)
-            request = self.request_factory.post(
-                '/',
-                data=json.dumps({}),
-                content_type='application/json',
-            )
-            request.user = self.mock_user
-            response = render.handle_xblock_callback(
-                request,
-                unicode(course.id),
-                quote_slashes(unicode(block.scope_ids.usage_id)),
-                'progress',
-                '',
-            )
-        self.assertEqual(response.status_code, 200)
-        completion = BlockCompletion.objects.get(block_key=block.scope_ids.usage_id)
-        self.assertEqual(completion.completion, 1.0)
+            self.assertEqual(response.status_code, 200)
+            completion = BlockCompletion.objects.get(block_key=block.scope_ids.usage_id)
+            self.assertEqual(completion.completion, expected_completion)
 
     @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
     def test_skip_handlers_for_masquerading_staff(self):

@@ -47,9 +47,9 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
     """
     def setUp(self):
         super(SubmitCompletionTestCase, self).setUp()
-        self._overrider = waffle.waffle().override(waffle.ENABLE_COMPLETION_TRACKING, True)
-        self._overrider.__enter__()
-        self.addCleanup(self._overrider.__exit__, None, None, None)
+        _overrider = waffle.waffle().override(waffle.ENABLE_COMPLETION_TRACKING, True)
+        _overrider.__enter__()
+        self.addCleanup(_overrider.__exit__, None, None, None)
         self.set_up_completion()
 
     def test_changed_value(self):
