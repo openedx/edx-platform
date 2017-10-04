@@ -34,16 +34,17 @@
                 request.setRequestHeader("Authorization", "Bearer " + this.accessToken);
                 request.setRequestHeader("Content-Type", "image/jpeg");
 
-                fileReader.readAsArrayBuffer(file);
-                fileReader.onloadend = function () {
-                    request.send(fileReader.result);
-                };
-
                 // show progress container
                 $progressContainer.removeClass('hidden');
                 $progressContainer.find('.file-name').html(file.name);
 
-                request.addEventListener("progress", function (e) {
+                fileReader.readAsArrayBuffer(file);
+
+                fileReader.onloadend = function () {
+                    request.send(fileReader.result);
+                };
+
+                request.upload.addEventListener("progress", function (e) {
                     if (e.lengthComputable) {
                         var percentComplete = (e.loaded / e.total) * 100;
                         $progressContainer.find('.progress-bar').css({"width": percentComplete + "%"});
@@ -119,7 +120,7 @@
                         })
                     }
                 };
-                
+
                 if ($userInfo.length) {
                     data['requester'] = $userInfo.data('email');
                     course = $('#course').find(":selected").text();
