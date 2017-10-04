@@ -18,13 +18,16 @@ from openedx.features.enterprise_support.api import (
 )
 
 
+FEATURES_WITH_ENTERPRISE_ENABLED = settings.FEATURES.copy()
+FEATURES_WITH_ENTERPRISE_ENABLED['ENABLE_ENTERPRISE_INTEGRATION'] = True
+
+
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestEnterpriseApi(unittest.TestCase):
     """
     Test enterprise support APIs.
     """
 
-    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=False)
     def test_utils_with_enterprise_disabled(self):
         """
         Test that disabling the enterprise integration flag causes
@@ -33,7 +36,7 @@ class TestEnterpriseApi(unittest.TestCase):
         self.assertFalse(enterprise_enabled())
         self.assertEqual(insert_enterprise_pipeline_elements(None), None)
 
-    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
+    @override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_ENABLED)
     def test_utils_with_enterprise_enabled(self):
         """
         Test that enabling enterprise integration (which is currently on by default) causes the
@@ -47,7 +50,7 @@ class TestEnterpriseApi(unittest.TestCase):
                                     'social_core.pipeline.social_auth.load_extra_data',
                                     'def'])
 
-    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
+    @override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_ENABLED)
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_request')
     @mock.patch('openedx.features.enterprise_support.api.EnterpriseCustomer')
     def test_enterprise_customer_for_request(self, ec_class_mock, get_ec_pipeline_mock):

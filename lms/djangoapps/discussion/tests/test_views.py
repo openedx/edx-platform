@@ -414,7 +414,7 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             """
             Call single_thread and assert that it returns what we expect.
             """
-            with override_settings(ENABLE_ENTERPRISE_INTEGRATION=enterprise_enabled):
+            with patch.dict("django.conf.settings.FEATURES", dict(ENABLE_ENTERPRISE_INTEGRATION=enterprise_enabled)):
                 response = views.single_thread(
                     request,
                     course.id.to_deprecated_string(),

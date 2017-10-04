@@ -255,7 +255,7 @@ def enterprise_enabled():
     """
     Determines whether the Enterprise app is installed
     """
-    return 'enterprise' in settings.INSTALLED_APPS and getattr(settings, 'ENABLE_ENTERPRISE_INTEGRATION', True)
+    return 'enterprise' in settings.INSTALLED_APPS and settings.FEATURES.get('ENABLE_ENTERPRISE_INTEGRATION', False)
 
 
 def enterprise_customer_for_request(request, tpa_hint=None):

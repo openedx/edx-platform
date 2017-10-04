@@ -944,7 +944,8 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         )
 
     @httpretty.activate
-    @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker')
+    @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker',
+                       FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     def test_enterprise_course_enrollment_api_error(self):
         """Verify that enterprise service errors are handled properly. """
         UserFactory.create(

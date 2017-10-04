@@ -1214,7 +1214,6 @@ class StartDateTests(ModuleStoreTestCase):
 
 # pylint: disable=protected-access, no-member
 @attr(shard=1)
-@override_settings(ENABLE_ENTERPRISE_INTEGRATION=False)
 class ProgressPageBaseTests(ModuleStoreTestCase):
     """
     Base class for progress page tests.
