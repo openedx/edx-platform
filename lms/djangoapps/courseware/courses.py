@@ -34,7 +34,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from path import Path as path
 from static_replace import replace_static_urls
 from student.models import CourseEnrollment
-from survey.utils import is_survey_required_and_unanswered
 from util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -158,6 +157,8 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
 
     # Redirect if the user must answer a survey before entering the course.
     if check_survey_complete and action == 'load':
+        # Import is placed here to avoid model import at project startup.
+        from survey.utils import is_survey_required_and_unanswered
         if is_survey_required_and_unanswered(user, course):
             raise CourseAccessRedirect(reverse('course_survey', args=[unicode(course.id)]))
 
