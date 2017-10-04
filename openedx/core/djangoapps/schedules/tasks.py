@@ -181,36 +181,16 @@ def recurring_nudge_schedule_bin(
 
 def _recurring_nudge_schedules_for_bin(target_day, bin_num, org_list, exclude_orgs=False):
     beginning_of_day = target_day.replace(hour=0, minute=0, second=0)
-    users = User.objects.filter(
-        courseenrollment__schedule__start__gte=beginning_of_day,
-        courseenrollment__schedule__start__lt=beginning_of_day + datetime.timedelta(days=1),
-        courseenrollment__is_active=True,
-    ).annotate(
-        first_schedule=Min('courseenrollment__schedule__start')
-    ).annotate(
-        id_mod=F('id') % RECURRING_NUDGE_NUM_BINS
-    ).filter(
-        id_mod=bin_num
+    schedules = get_schedules_with_target_date_by_bin_and_orgs(
+        schedule_date_field='start',
+        target_date=beginning_of_day,
+        bin_num=bin_num,
+        num_bins=RECURRING_NUDGE_NUM_BINS,
+        org_list=org_list,
+        exclude_orgs=exclude_orgs,
     )
 
-    schedules = Schedule.objects.select_related(
-        'enrollment__user__profile',
-        'enrollment__course',
-    ).filter(
-        enrollment__user__in=users,
-        start__gte=beginning_of_day,
-        start__lt=beginning_of_day + datetime.timedelta(days=1),
-        enrollment__is_active=True,
-    ).order_by('enrollment__user__id')
-
-    if org_list is not None:
-        if exclude_orgs:
-            schedules = schedules.exclude(enrollment__course__org__in=org_list)
-        else:
-            schedules = schedules.filter(enrollment__course__org__in=org_list)
-
-    if "read_replica" in settings.DATABASES:
-        schedules = schedules.using("read_replica")
+    LOG.debug('Recurring Nudge: Query = %r', schedules.query.sql_with_params())
 
     for (user, user_schedules) in groupby(schedules, lambda s: s.enrollment.user):
         user_schedules = list(user_schedules)
@@ -265,36 +245,17 @@ def _upgrade_reminder_schedule_send(site_id, msg_str):
 
 def _upgrade_reminder_schedules_for_bin(target_day, bin_num, org_list, exclude_orgs=False):
     beginning_of_day = target_day.replace(hour=0, minute=0, second=0)
-    users = User.objects.filter(
-        courseenrollment__schedule__upgrade_deadline__gte=beginning_of_day,
-        courseenrollment__schedule__upgrade_deadline__lt=beginning_of_day + datetime.timedelta(days=1),
-        courseenrollment__is_active=True,
-    ).annotate(
-        first_schedule=Min('courseenrollment__schedule__upgrade_deadline')
-    ).annotate(
-        id_mod=F('id') % UPGRADE_REMINDER_NUM_BINS
-    ).filter(
-        id_mod=bin_num
+
+    schedules = get_schedules_with_target_date_by_bin_and_orgs(
+        schedule_date_field='upgrade_deadline',
+        target_date=beginning_of_day,
+        bin_num=bin_num,
+        num_bins=RECURRING_NUDGE_NUM_BINS,
+        org_list=org_list,
+        exclude_orgs=exclude_orgs,
     )
 
-    schedules = Schedule.objects.select_related(
-        'enrollment__user__profile',
-        'enrollment__course',
-    ).filter(
-        enrollment__user__in=users,
-        upgrade_deadline__gte=beginning_of_day,
-        upgrade_deadline__lt=beginning_of_day + datetime.timedelta(days=1),
-        enrollment__is_active=True,
-    ).order_by('enrollment__user__id')
-
-    if org_list is not None:
-        if exclude_orgs:
-            schedules = schedules.exclude(enrollment__course__org__in=org_list)
-        else:
-            schedules = schedules.filter(enrollment__course__org__in=org_list)
-
-    if "read_replica" in settings.DATABASES:
-        schedules = schedules.using("read_replica")
+    LOG.debug('Upgrade Reminder: Query = %r', schedules.query.sql_with_params())
 
     for schedule in schedules:
         enrollment = schedule.enrollment
@@ -327,3 +288,56 @@ def _upgrade_reminder_schedules_for_bin(target_day, bin_num, org_list, exclude_o
         })
 
         yield (user, first_schedule.enrollment.course.language, template_context)
+
+
+def get_schedules_with_target_date_by_bin_and_orgs(schedule_date_field, target_date, bin_num, num_bins=DEFAULT_NUM_BINS,
+                                                   org_list=None, exclude_orgs=False):
+    """
+    Returns Schedules with the target_date, related to Users whose id matches the bin_num, and filtered by org_list.
+
+    Arguments:
+    schedule_date_field -- string field name to query on the User's Schedule model
+    target_date -- datetime day (with zeroed-out time) that the User's Schedule's schedule_date_field value should fall
+                   under
+    bin_num -- int for selecting the bin of Users whose id % num_bins == bin_num
+    num_bin -- int specifying the number of bins to separate the Users into (default: DEFAULT_NUM_BINS)
+    org_list -- list of course_org names (strings) that the returned Schedules must or must not be in (default: None)
+    exclude_orgs -- boolean indicating whether the returned Schedules should exclude (True) the course_orgs in org_list
+                    or strictly include (False) them (default: False)
+    """
+    schedule_date_equals_target_date_filter = {
+        'courseenrollment__schedule__{}__gte'.format(schedule_date_field): target_date,
+        'courseenrollment__schedule__{}__lt'.format(schedule_date_field): target_date + datetime.timedelta(days=1),
+    }
+    users = User.objects.filter(
+        courseenrollment__is_active=True,
+        **schedule_date_equals_target_date_filter
+    ).annotate(
+        id_mod=F('id') % num_bins
+    ).filter(
+        id_mod=bin_num
+    )
+
+    schedule_date_equals_target_date_filter = {
+        '{}__gte'.format(schedule_date_field): target_date,
+        '{}__lt'.format(schedule_date_field): target_date + datetime.timedelta(days=1),
+    }
+    schedules = Schedule.objects.select_related(
+        'enrollment__user__profile',
+        'enrollment__course',
+    ).filter(
+        enrollment__user__in=users,
+        enrollment__is_active=True,
+        **schedule_date_equals_target_date_filter
+    ).order_by('enrollment__user__id')
+
+    if org_list is not None:
+        if exclude_orgs:
+            schedules = schedules.exclude(enrollment__course__org__in=org_list)
+        else:
+            schedules = schedules.filter(enrollment__course__org__in=org_list)
+
+    if "read_replica" in settings.DATABASES:
+        schedules = schedules.using("read_replica")
+
+    return schedules

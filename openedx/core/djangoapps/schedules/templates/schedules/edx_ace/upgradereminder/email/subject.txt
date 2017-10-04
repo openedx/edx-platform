@@ -1,7 +1,3 @@
 {% load i18n %}
 
-{% if course_ids|length > 1 %}
-{% blocktrans %}Upgrade to earn a verified certificate on {{ platform_name }}{% endblocktrans %}
-{% else %}
 {% blocktrans %}Upgrade to earn a verified certificate in {{ course_name }}{% endblocktrans %}
-{% endif %}
