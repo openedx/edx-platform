@@ -1126,16 +1126,18 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         return answers
 
-    def publish_grade(self, only_if_higher=None):
+    def publish_grade(self, score=None, only_if_higher=None):
         """
         Publishes the student's current grade to the system as an event
         """
+        if not score:
+            score = self.score
         self.runtime.publish(
             self,
             'grade',
             {
-                'value': self.score.raw_earned,
-                'max_value': self.score.raw_possible,
+                'value': score.raw_earned,
+                'max_value': score.raw_possible,
                 'only_if_higher': only_if_higher,
             }
         )
@@ -1615,7 +1617,6 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         orig_score = self.get_score()
         event_info['orig_score'] = orig_score.raw_earned
         event_info['orig_total'] = orig_score.raw_possible
-
         try:
             calculated_score = self.calculate_score()
 
@@ -1633,8 +1634,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         # rescoring should have no effect on attempts, so don't
         # need to increment here, or mark done.  Just save.
         self.set_state_from_lcp()
-        self.set_score(calculated_score)
-        self.publish_grade(only_if_higher)
+        self.publish_grade(score=calculated_score, only_if_higher=only_if_higher)
 
         event_info['new_score'] = calculated_score.raw_earned
         event_info['new_total'] = calculated_score.raw_possible
