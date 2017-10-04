@@ -1,13 +1,12 @@
 <div class="col-sm-12">
     <div class="alert alert-danger" role="alert">
         <strong>We could not submit your request</strong>
-
         <ul>
-            <li><%- email %></li>
-            <li><%- subject %></li>
-            <li><%- message %></li>
+            <% _.each(errors, function(item) { %>
+            <li>
+                <span><%= item %></span>
+            </li>
+            <% }); %>
         </ul>
-
     </div>
 </div>
-

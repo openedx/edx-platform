@@ -253,6 +253,11 @@
     font-size: $support-form-base-font-size;
   }
 
+  .has-error{
+    label, p{
+      color: $danger-red;
+    }
+  }
   @media only screen and (min-width: 768px) {
     .row {
       max-width: $baseline * 25;

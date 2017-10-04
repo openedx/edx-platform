@@ -5,11 +5,10 @@
         'backbone',
         'underscore',
         'support/js/models/file',
-        'support/js/models/form_errors',
         'text!support/templates/upload_file.underscore',
         'text!support/templates/form_errors.underscore'
 
-    ], function (Backbone, _, FileModel, ErrorsModel, FileTemplate, ErrorsTemplate) {
+    ], function (Backbone, _, FileModel, FileTemplate, ErrorsTemplate) {
         return Backbone.View.extend({
             //TODO remove hard coded url token and keys https://openedx.atlassian.net/browse/LEARNER-2736
             accessToken: 'd6ed06821334b6584dd9607d04007c281007324ed07e087879c9c44835c684da',
@@ -27,23 +26,34 @@
                     $fileContainer = this.$el.find('.files-container'),
                     $progressContainer = this.$el.find('.progress-container'),
                     fileReader = new FileReader(),
+                    maxFileSize = 5000000,  //5mb is max limit
+                    allowedFileTypes = ['gif','png','jpg','jpeg', 'pdf'],
                     fileModel,
                     responseData;
 
-                // remove file from input and upload it to zendesk
+                // remove file from input and upload it to zendesk after validation
                 $(e.target).val("");
+
+                if (file.size > maxFileSize) {
+                    alert(gettext('File must be smaller than 5 MB in size.'));
+                    return
+                } else if ($.inArray(file.name.split('.').pop().toLowerCase(), allowedFileTypes) === -1) {
+                    alert(gettext('Please select image or pdf file!'));
+                    return
+                }
+
                 request.open('POST', (url + file.name), true);
                 request.setRequestHeader("Authorization", "Bearer " + this.accessToken);
                 request.setRequestHeader("Content-Type", "image/jpeg");
 
-                // show progress container
-                $progressContainer.removeClass('hidden');
-                $progressContainer.find('.file-name').html(file.name);
-
                 fileReader.readAsArrayBuffer(file);
 
                 fileReader.onloadend = function () {
+                    // show progress container
+                    $progressContainer.removeClass('hidden');
+                    $progressContainer.find('.file-name').html(file.name);
                     request.send(fileReader.result);
+
                 };
 
                 request.upload.addEventListener("progress", function (e) {
@@ -159,28 +169,34 @@
             },
 
             validateData: function (data) {
-                var errors = new ErrorsModel(),
-                $errorContainer = this.$el.find('.form-errors');
+                var errors = {},
+                $errorContainer = this.$el.find('.form-errors'),
+                regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 
                 if (!data['subject']) {
-                    errors.set({
-                       'subject': gettext('You must enter a subject before submitting.')
-                    });
+                    errors['subject'] = gettext('You must enter a subject before submitting.');
+                    $('#subject').closest('.form-group').addClass('has-error');
                 }
                 if (!data['comment']['body']) {
-                    errors.set({
-                       'message': gettext('You must enter a message before submitting.')
-                    });
+                    errors['message'] = gettext('You must enter a message before submitting.');
+                    $('#message').closest('.form-group').addClass('has-error');
                 }
-                if (!data['email']) {
-                    errors.set({
-                       'email': gettext('You must enter a valid email before submitting.')
-                    });
+                if (!data['requester']) {
+                    errors['email'] = gettext('You must enter email before submitting.');
+                    $('#email').closest('.form-group').addClass('has-error');
+                } else if (!regex.test(data['requester'])) {
+                    errors['email'] = gettext('You must enter a valid email before submitting.');
+                    $('#email').closest('.form-group').addClass('has-error');
                 }
-                $errorContainer.append(_.template(ErrorsTemplate)(errors.toJSON()));
+
+                $errorContainer.html(_.template(ErrorsTemplate)({'errors': errors}));
+
+                $('body').animate({
+                    scrollTop: $errorContainer.offset().top
+                }, 1000);
+
                 return false;
             }
-
         });
     });
 }).call(this, define || RequireJS.define);
