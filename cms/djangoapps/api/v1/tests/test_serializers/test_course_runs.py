@@ -1,5 +1,6 @@
 import datetime
 
+import ddt
 import pytz
 from django.test import RequestFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -12,14 +13,27 @@ from ..utils import serialize_datetime
 from ...serializers.course_runs import CourseRunSerializer
 
 
+@ddt.ddt
 class CourseRunSerializerTests(ModuleStoreTestCase):
-    def test_data(self):
+
+    @ddt.data(
+        ('instructor_paced', False),
+        ('self_paced', True),
+    )
+    @ddt.unpack
+    def test_data(self, expected_pacing_type, self_paced):
         start = datetime.datetime.now(pytz.UTC)
         end = start + datetime.timedelta(days=30)
         enrollment_start = start - datetime.timedelta(days=7)
         enrollment_end = end - datetime.timedelta(days=14)
 
-        course = CourseFactory(start=start, end=end, enrollment_start=enrollment_start, enrollment_end=enrollment_end)
+        course = CourseFactory(
+            start=start,
+            end=end,
+            enrollment_start=enrollment_start,
+            enrollment_end=enrollment_end,
+            self_paced=self_paced
+        )
         instructor = UserFactory()
         CourseInstructorRole(course.id).add_users(instructor)
         staff = UserFactory()
@@ -48,6 +62,7 @@ class CourseRunSerializerTests(ModuleStoreTestCase):
             ],
             'images': {
                 'card_image': request.build_absolute_uri(course_image_url(course)),
-            }
+            },
+            'pacing_type': expected_pacing_type,
         }
         assert serializer.data == expected
