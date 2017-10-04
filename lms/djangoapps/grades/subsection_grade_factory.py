@@ -80,9 +80,7 @@ class SubsectionGradeFactory(object):
                 except PersistentSubsectionGrade.DoesNotExist:
                     pass
                 else:
-                    orig_subsection_grade = ReadSubsectionGrade(
-                        subsection, grade_model, self.course_data.structure, self._submissions_scores, self._csm_scores,
-                    )
+                    orig_subsection_grade = ReadSubsectionGrade(subsection, grade_model, self)
                     if not is_score_higher_or_equal(
                             orig_subsection_grade.graded_total.earned,
                             orig_subsection_grade.graded_total.possible,
@@ -125,9 +123,7 @@ class SubsectionGradeFactory(object):
             saved_subsection_grades = self._get_bulk_cached_subsection_grades()
             grade = saved_subsection_grades.get(subsection.location)
             if grade:
-                return ReadSubsectionGrade(
-                    subsection, grade, self.course_data.structure, self._submissions_scores, self._csm_scores,
-                )
+                return ReadSubsectionGrade(subsection, grade, self)
 
     def _get_bulk_cached_subsection_grades(self):
         """

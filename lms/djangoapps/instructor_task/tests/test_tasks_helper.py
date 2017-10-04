@@ -1707,6 +1707,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         )
 
 
+@ddt.ddt
 @patch('lms.djangoapps.instructor_task.tasks_helper.misc.DefaultStorage', new=MockDefaultStorage)
 class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
@@ -1782,7 +1783,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                         u'Username': self.student.username,
                         u'Grade': '0.13',
                         u'Homework 1: Subsection': '0.5',
-                        u'Homework 2: Hidden': u'Not Available',
+                        u'Homework 2: Hidden': u'Not Attempted',
                         u'Homework 3: Unattempted': u'Not Attempted',
                         u'Homework 4: Empty': u'Not Attempted',
                         u'Homework (Avg)': '0.125',
@@ -1791,22 +1792,16 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                 ignore_other_columns=True,
             )
 
-    def test_fast_generation_zero_grade(self):
+    @ddt.data(True, False)
+    def test_fast_generation(self, create_non_zero_grade):
+        if create_non_zero_grade:
+            self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            with patch('lms.djangoapps.grades.course_grade.CourseGradeBase._prep_course_for_grading') as mock_grader:
+            with patch('lms.djangoapps.grades.course_data.get_course_blocks') as mock_course_blocks:
                 with patch('lms.djangoapps.grades.subsection_grade.get_score') as mock_get_score:
                     CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
-                    self.assertFalse(mock_grader.called)
                     self.assertFalse(mock_get_score.called)
-
-    def test_slow_generation_nonzero_grade(self):
-        self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
-        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            with patch('lms.djangoapps.grades.course_grade.CourseGradeBase._prep_course_for_grading') as mock_grader:
-                with patch('lms.djangoapps.grades.subsection_grade.get_score') as mock_get_score:
-                    CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
-                    self.assertTrue(mock_grader.called)
-                    self.assertTrue(mock_get_score.called)
+                    self.assertFalse(mock_course_blocks.called)
 
 
 @ddt.ddt

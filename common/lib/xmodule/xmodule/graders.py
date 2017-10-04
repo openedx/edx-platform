@@ -170,7 +170,6 @@ def grader_from_conf(conf):
         weight = subgraderconf.pop("weight", 0)
         try:
             if 'min_count' in subgraderconf:
-                #This is an AssignmentFormatGrader
                 subgrader_class = AssignmentFormatGrader
             else:
                 raise ValueError("Configuration has no appropriate grader class.")
@@ -344,28 +343,28 @@ class AssignmentFormatGrader(CourseGrader):
         self.starting_index = starting_index
         self.hide_average = hide_average
 
+    def total_with_drops(self, breakdown):
+        """
+        Calculates total score for a section while dropping lowest scores
+        """
+        # Create an array of tuples with (index, mark), sorted by mark['percent'] descending
+        sorted_breakdown = sorted(enumerate(breakdown), key=lambda x: -x[1]['percent'])
+
+        # A list of the indices of the dropped scores
+        dropped_indices = []
+        if self.drop_count > 0:
+            dropped_indices = [x[0] for x in sorted_breakdown[-self.drop_count:]]
+        aggregate_score = 0
+        for index, mark in enumerate(breakdown):
+            if index not in dropped_indices:
+                aggregate_score += mark['percent']
+
+        if len(breakdown) - self.drop_count > 0:
+            aggregate_score /= len(breakdown) - self.drop_count
+
+        return aggregate_score, dropped_indices
+
     def grade(self, grade_sheet, generate_random_scores=False):
-        def total_with_drops(breakdown, drop_count):
-            """
-            Calculates total score for a section while dropping lowest scores
-            """
-            # Create an array of tuples with (index, mark), sorted by mark['percent'] descending
-            sorted_breakdown = sorted(enumerate(breakdown), key=lambda x: -x[1]['percent'])
-
-            # A list of the indices of the dropped scores
-            dropped_indices = []
-            if drop_count > 0:
-                dropped_indices = [x[0] for x in sorted_breakdown[-drop_count:]]
-            aggregate_score = 0
-            for index, mark in enumerate(breakdown):
-                if index not in dropped_indices:
-                    aggregate_score += mark['percent']
-
-            if len(breakdown) - drop_count > 0:
-                aggregate_score /= len(breakdown) - drop_count
-
-            return aggregate_score, dropped_indices
-
         scores = grade_sheet.get(self.type, {}).values()
         breakdown = []
         for i in range(max(self.min_count, len(scores))):
@@ -405,7 +404,7 @@ class AssignmentFormatGrader(CourseGrader):
             breakdown.append({'percent': percentage, 'label': short_label,
                               'detail': summary, 'category': self.category})
 
-        total_percent, dropped_indices = total_with_drops(breakdown, self.drop_count)
+        total_percent, dropped_indices = self.total_with_drops(breakdown)
 
         for dropped_index in dropped_indices:
             breakdown[dropped_index]['mark'] = {

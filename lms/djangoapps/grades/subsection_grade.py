@@ -63,6 +63,13 @@ class SubsectionGradeBase(object):
         """
         raise NotImplementedError
 
+    @property
+    def percent_graded(self):
+        """
+        Returns the percent score of the graded problems in this subsection.
+        """
+        raise NotImplementedError
+
 
 class ZeroSubsectionGrade(SubsectionGradeBase):
     """
@@ -76,6 +83,10 @@ class ZeroSubsectionGrade(SubsectionGradeBase):
     @property
     def attempted_graded(self):
         return False
+
+    @property
+    def percent_graded(self):
+        return 0.0
 
     @property
     def all_total(self):
@@ -128,6 +139,10 @@ class NonZeroSubsectionGrade(SubsectionGradeBase):
     def attempted_graded(self):
         return self.graded_total.first_attempted is not None
 
+    @property
+    def percent_graded(self):
+        return self.graded_total.earned / self.graded_total.possible
+
     @staticmethod
     def _compute_block_score(
             block_key,
@@ -157,7 +172,7 @@ class ReadSubsectionGrade(NonZeroSubsectionGrade):
     """
     Class for Subsection grades that are read from the database.
     """
-    def __init__(self, subsection, model, course_structure, submissions_scores, csm_scores):
+    def __init__(self, subsection, model, factory):
         all_total = AggregatedScore(
             tw_earned=model.earned_all,
             tw_possible=model.possible_all,
@@ -174,9 +189,7 @@ class ReadSubsectionGrade(NonZeroSubsectionGrade):
 
         # save these for later since we compute problem_scores lazily
         self.model = model
-        self.course_structure = course_structure
-        self.submissions_scores = submissions_scores
-        self.csm_scores = csm_scores
+        self.factory = factory
 
         super(ReadSubsectionGrade, self).__init__(subsection, all_total, graded_total, override)
 
@@ -185,7 +198,11 @@ class ReadSubsectionGrade(NonZeroSubsectionGrade):
         problem_scores = OrderedDict()
         for block in self.model.visible_blocks.blocks:
             problem_score = self._compute_block_score(
-                block.locator, self.course_structure, self.submissions_scores, self.csm_scores, block,
+                block.locator,
+                self.factory.course_data.structure,
+                self.factory._submissions_scores,
+                self.factory._csm_scores,
+                block,
             )
             if problem_score:
                 problem_scores[block.locator] = problem_score

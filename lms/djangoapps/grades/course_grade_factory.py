@@ -85,7 +85,7 @@ class CourseGradeFactory(object):
         If an error occurred, course_grade will be None and err_msg will be an
         exception message. If there was no error, err_msg is an empty string.
         """
-        # Pre-fetch the collected course_structure so:
+        # Pre-fetch the collected course_structure (in _iter_grade_result) so:
         # 1. Correctness: the same version of the course is used to
         #    compute the grade for all students.
         # 2. Optimization: the collected course_structure is not
