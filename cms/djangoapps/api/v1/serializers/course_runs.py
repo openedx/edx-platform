@@ -85,6 +85,14 @@ class CourseRunImageField(serializers.ImageField):
         return request.build_absolute_uri(value)
 
 
+class CourseRunPacingTypeField(serializers.ChoiceField):
+    def to_representation(self, value):
+        return 'self_paced' if value else 'instructor_paced'
+
+    def to_internal_value(self, data):
+        return data == 'self_paced'
+
+
 class CourseRunImageSerializer(serializers.Serializer):
     # We set an empty default to prevent the parent serializer from attempting
     # to save this value to the Course object.
@@ -100,10 +108,15 @@ class CourseRunImageSerializer(serializers.Serializer):
         return instance
 
 
-class CourseRunSerializer(CourseRunTeamSerializerMixin, serializers.Serializer):
+class CourseRunSerializerCommonFieldsMixin(serializers.Serializer):
+    schedule = CourseRunScheduleSerializer(source='*', required=False)
+    pacing_type = CourseRunPacingTypeField(source='self_paced', required=False,
+                                           choices=(('instructor_paced', False), ('self_paced', True),))
+
+
+class CourseRunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTeamSerializerMixin, serializers.Serializer):
     id = serializers.CharField(read_only=True)
     title = serializers.CharField(source='display_name')
-    schedule = CourseRunScheduleSerializer(source='*', required=False)
     images = CourseRunImageSerializer(source='*', required=False)
 
     def update(self, instance, validated_data):
@@ -135,10 +148,10 @@ class CourseRunCreateSerializer(CourseRunSerializer):
             return instance
 
 
-class CourseRunRerunSerializer(CourseRunTeamSerializerMixin, serializers.Serializer):
+class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTeamSerializerMixin,
+                               serializers.Serializer):
     title = serializers.CharField(source='display_name', required=False)
     run = serializers.CharField(source='id.run')
-    schedule = CourseRunScheduleSerializer(source='*', required=False)
 
     def validate_run(self, value):
         course_run_key = self.instance.id
