@@ -1,5 +1,5 @@
 from ..models import PersistentSubsectionGrade
-from ..subsection_grade import SubsectionGrade
+from ..subsection_grade import CreateSubsectionGrade, ReadSubsectionGrade
 from .utils import mock_get_score
 from .base import GradeTestBase
 
@@ -8,7 +8,7 @@ class SubsectionGradeTest(GradeTestBase):
     def test_create_and_read(self):
         with mock_get_score(1, 2):
             # Create a grade that *isn't* saved to the database
-            created_grade = SubsectionGrade.create(
+            created_grade = CreateSubsectionGrade(
                 self.sequence,
                 self.course_structure,
                 self.subsection_grade_factory._submissions_scores,
@@ -25,7 +25,7 @@ class SubsectionGradeTest(GradeTestBase):
                 user_id=self.request.user.id,
                 usage_key=self.sequence.location,
             )
-            read_grade = SubsectionGrade.read(
+            read_grade = ReadSubsectionGrade(
                 self.sequence,
                 saved_model,
                 self.course_structure,
