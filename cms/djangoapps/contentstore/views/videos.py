@@ -1,11 +1,10 @@
 """
 Views related to the video upload feature
 """
-from contextlib import closing
-
 import csv
 import json
 import logging
+from contextlib import closing
 from datetime import datetime, timedelta
 from uuid import uuid4
 
@@ -18,40 +17,37 @@ from django.core.files.images import get_image_dimensions
 from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
-from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from edxval.api import (
     SortDirection,
     VideoSortField,
-    create_video,
-    get_videos_for_course,
-    remove_video_for_course,
-    update_video_status,
-    update_video_image,
-    get_3rd_party_transcription_plans,
-    get_transcript_preferences,
     create_or_update_transcript_preferences,
-    remove_transcript_preferences,
+    create_video,
+    get_3rd_party_transcription_plans,
     get_transcript_credentials_state_for_org,
-    update_transcript_credentials_state_for_org,
+    get_transcript_preferences,
+    get_videos_for_course,
+    remove_transcript_preferences,
+    remove_video_for_course,
+    update_video_image,
+    update_video_status
 )
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 
 from contentstore.models import VideoUploadConfig
 from contentstore.utils import reverse_course_url
 from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from util.json_request import JsonResponse, expect_json
 
 from .course import get_course_and_check_access
-
 
 __all__ = [
     'videos_handler',
     'video_encodings_download',
     'video_images_handler',
     'transcript_preferences_handler',
-    'transcript_credentials_handler'
 ]
 
 LOGGER = logging.getLogger(__name__)
@@ -386,32 +382,6 @@ def transcript_preferences_handler(request, course_key_string):
     elif request.method == 'DELETE':
         remove_transcript_preferences(course_key_string)
         return JsonResponse()
-
-
-@expect_json
-@login_required
-@require_POST
-def transcript_credentials_handler(request, course_key_string):
-    """
-    JSON view handler to post the transcript organization credentials.
-
-    Arguments:
-        request: WSGI request object
-        course_key_string: string for course key
-
-    Returns: An empty success response or 404 if transcript feature is not enabled
-    """
-    course_key = CourseKey.from_string(course_key_string)
-    if not VideoTranscriptEnabledFlag.feature_enabled(course_key):
-        return HttpResponseNotFound()
-
-    org = course_key.org
-    provider = request.json.get('provider')
-
-    # TODO: Send organization credentials to edx-pipeline end point.
-    credentials = update_transcript_credentials_state_for_org(org, provider, exists=True)
-
-    return JsonResponse()
 
 
 @login_required
