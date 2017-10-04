@@ -5,9 +5,11 @@
         'backbone',
         'underscore',
         'support/js/models/file',
-        'text!support/templates/upload_file.underscore'
+        'support/js/models/form_errors',
+        'text!support/templates/upload_file.underscore',
+        'text!support/templates/form_errors.underscore'
 
-    ], function (Backbone, _, FileModel, FileTemplate) {
+    ], function (Backbone, _, FileModel, ErrorsModel, FileTemplate, ErrorsTemplate) {
         return Backbone.View.extend({
             //TODO remove hard coded url token and keys https://openedx.atlassian.net/browse/LEARNER-2736
             accessToken: 'd6ed06821334b6584dd9607d04007c281007324ed07e087879c9c44835c684da',
@@ -64,7 +66,7 @@
                 };
 
                 request.addEventListener("error", function (e) {
-                    alert("something went wrong");
+                    alert(gettext("Something went wrong, Please try again later."));
                     resetProgressBar();
                 });
 
@@ -75,7 +77,6 @@
 
                 request.addEventListener("abort", function (e) {
                     resetProgressBar();
-                    alert("upload canceld");
                 });
 
                 function resetProgressBar() {
@@ -136,23 +137,49 @@
                         'value': course
                     }];
 
-                request.open('POST', url, true);
-                request.setRequestHeader("Authorization", "Bearer " + this.accessToken);
-                request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                //before submit validate data
+                if (this.validateData(data)) {
 
-                request.send(JSON.stringify({
-                    "ticket": data
-                }));
+                    request.open('POST', url, true);
+                    request.setRequestHeader("Authorization", "Bearer " + this.accessToken);
+                    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
-                request.onreadystatechange = function () {
-                    if (request.readyState === 4 && request.status === 201) {
-                        //TODO https://openedx.atlassian.net/browse/LEARNER-2735
-                        alert("request submited successfully.");
-                    }
-                };
+                    request.send(JSON.stringify({
+                        "ticket": data
+                    }));
 
+                    request.onreadystatechange = function () {
+                        if (request.readyState === 4 && request.status === 201) {
+                            //TODO https://openedx.atlassian.net/browse/LEARNER-2735
+                            alert("request submited successfully.");
+                        }
+                    };
+                }
+
+            },
+
+            validateData: function (data) {
+                var errors = new ErrorsModel(),
+                $errorContainer = this.$el.find('.form-errors');
+
+                if (!data['subject']) {
+                    errors.set({
+                       'subject': gettext('You must enter a subject before submitting.')
+                    });
+                }
+                if (!data['comment']['body']) {
+                    errors.set({
+                       'message': gettext('You must enter a message before submitting.')
+                    });
+                }
+                if (!data['email']) {
+                    errors.set({
+                       'email': gettext('You must enter a valid email before submitting.')
+                    });
+                }
+                $errorContainer.append(_.template(ErrorsTemplate)(errors.toJSON()));
+                return false;
             }
-
 
         });
     });

@@ -1,0 +1,13 @@
+
+	<div class="col-sm-12">
+
+
+    <ul>
+        <li><%- email %></li>
+        <li><%- subject %></li>
+        <li><%- message %></li>
+    </ul>
+
+
+	</div>
+
