@@ -1,13 +1,13 @@
+<div class="col-sm-12">
+    <div class="alert alert-danger" role="alert">
+        <strong>We could not submit your request</strong>
 
-	<div class="col-sm-12">
+        <ul>
+            <li><%- email %></li>
+            <li><%- subject %></li>
+            <li><%- message %></li>
+        </ul>
 
-
-    <ul>
-        <li><%- email %></li>
-        <li><%- subject %></li>
-        <li><%- message %></li>
-    </ul>
-
-
-	</div>
+    </div>
+</div>
 
