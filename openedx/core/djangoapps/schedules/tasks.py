@@ -6,6 +6,7 @@ from celery.task import task
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db.models import F, Min
@@ -285,6 +286,7 @@ def _upgrade_reminder_schedules_for_bin(target_day, bin_num, org_list, exclude_o
 
             # This is used by the bulk email optout policy
             'course_ids': course_id_strs,
+            'cert_image': absolute_url(static('course_experience/images/verified-cert.png')),
         })
 
         yield (user, first_schedule.enrollment.course.language, template_context)
