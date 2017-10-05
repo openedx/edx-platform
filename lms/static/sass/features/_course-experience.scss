@@ -360,5 +360,18 @@
   .course-reviews-tool {
     margin: ($baseline * 2) ($baseline * 3);
     position: relative;
+    text-align: center;
+    min-height: 300px;
+
+    .fa.fa-spinner {
+      @include left(50%);
+      font-size: 2rem;
+      margin-top: $baseline*3;
+      position: absolute;
+    }
+
+    iframe {
+      display: block !important;
+    }
   }
 }
