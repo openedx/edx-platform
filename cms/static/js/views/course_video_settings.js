@@ -21,6 +21,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             'change .transcript-provider-group input': 'providerSelected',
             'change #transcript-turnaround': 'turnaroundSelected',
             'change #transcript-fidelity': 'fidelitySelected',
+            'change #video-source-language': 'videoSourceLanguageSelected',
             'click .action-add-language': 'languageSelected',
             'click .action-remove-language': 'languageRemoved',
             'click .action-update-course-video-settings': 'updateCourseVideoSettings',
@@ -59,8 +60,8 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             this.selectedProvider = '';
             this.selectedTurnaroundPlan = '';
             this.selectedFidelityPlan = '';
-            this.availableLanguages = [];
             this.activeLanguages = [];
+            this.selectedVideoSourceLanguage = '';
             this.selectedLanguages = [];
         },
 
@@ -72,6 +73,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                     this.activeTranscriptionPlan.cielo24_turnaround :
                     this.activeTranscriptionPlan.three_play_turnaround;
                 this.activeLanguages = this.activeTranscriptionPlan.preferred_languages;
+                this.selectedVideoSourceLanguage = this.activeTranscriptionPlan.video_source_language;
             } else {
                 this.resetPlanData();
             }
@@ -93,12 +95,17 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             return fidelityPlan;
         },
 
-        getPlanLanguages: function() {
-            var selectedPlan = this.availableTranscriptionPlans[this.selectedProvider];
-            if (this.selectedProvider === CIELO24) {
-                return selectedPlan.fidelity[this.selectedFidelityPlan].languages;
+        getTargetLanguages: function() {
+            var availableLanguages,
+                selectedPlan = this.selectedProvider ? this.availableTranscriptionPlans[this.selectedProvider] : null;
+            if (selectedPlan) {
+                if (this.selectedProvider === CIELO24 && this.selectedFidelityPlan) {
+                    availableLanguages = selectedPlan.fidelity[this.selectedFidelityPlan].languages;
+                } else if (this.selectedProvider === THREE_PLAY_MEDIA) {
+                    availableLanguages = selectedPlan.languages;
+                }
             }
-            return selectedPlan.languages;
+            return availableLanguages;
         },
 
         fidelitySelected: function(event) {
@@ -109,12 +116,22 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
             // Clear active and selected languages.
             this.selectedLanguages = this.activeLanguages = [];
-            this.renderLanguages();
+            this.renderTargetLanguages();
+        },
+
+        videoSourceLanguageSelected: function(event) {
+            var $videoSourceLanguageContainer = this.$el.find('.video-source-language-wrapper');
+            this.selectedVideoSourceLanguage = event.target.value;
+            // Remove any error if present already.
+            this.clearPreferenceErrorState($videoSourceLanguageContainer);
+
+            // Clear active and selected languages.
+            this.selectedLanguages = this.activeLanguages = [];
+            this.renderTargetLanguages();
         },
 
         turnaroundSelected: function(event) {
             var $turnaroundContainer = this.$el.find('.transcript-turnaround-wrapper');
-
             this.selectedTurnaroundPlan = event.target.value;
             // Remove any error if present already.
             this.clearPreferenceErrorState($turnaroundContainer);
@@ -245,42 +262,85 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             }
         },
 
-        renderLanguages: function() {
+        renderTargetLanguages: function() {
             var self = this,
                 $languagesPreferenceContainer = self.$el.find('.transcript-languages-wrapper'),
                 $languagesContainer = self.$el.find('.languages-container');
 
             // Clear error state if present any.
-            this.clearPreferenceErrorState($languagesPreferenceContainer);
+            self.clearPreferenceErrorState($languagesPreferenceContainer);
 
             $languagesContainer.empty();
 
-            // Show language container if provider is 3PlayMedia, else if fidelity is selected.
-            if (self.selectedProvider === THREE_PLAY_MEDIA || self.selectedFidelityPlan) {
-                self.availableLanguages = self.getPlanLanguages();
-                _.each(self.activeLanguages, function(activeLanguage) {
+            // Show language container if fidelity or source language is selected .
+            if (self.selectedVideoSourceLanguage || self.selectedFidelityPlan) {
+                _.each(self.activeLanguages, function(language) {
                     // Only add if not in the list already.
-                    if (_.indexOf(self.selectedLanguages, activeLanguage) === -1) {
-                        self.selectedLanguages.push(activeLanguage);
-                        self.addLanguage(activeLanguage);
+                    if (_.indexOf(self.selectedLanguages, language) === -1) {
+                        self.selectedLanguages.push(language);
                     }
+                    // Show active/ add language language container
+                    self.addLanguage(language);
                 });
                 $languagesPreferenceContainer.show();
                 self.populateLanguageMenu();
             } else {
-                self.availableLanguages = {};
                 $languagesPreferenceContainer.hide();
             }
         },
 
+        renderVideoSourceLanguageMenu: function() {
+            var self = this,
+                availableTranslations,
+                availableLanguages = self.getTargetLanguages(),
+                $videoSourceLanguageContainer = self.$el.find('.video-source-language-wrapper'),
+                $languageMenuEl = self.$el.find('.video-source-language'),
+                selectOptionEl = new Option(gettext('Select language'), '');
+
+            if (this.selectedProvider === THREE_PLAY_MEDIA) {
+                availableTranslations = self.availableTranscriptionPlans[this.selectedProvider].translations;
+                $videoSourceLanguageContainer.show();
+
+                // We need to set id due to a11y aria-labelledby
+                selectOptionEl.id = 'video-source-language-none';
+
+                HtmlUtils.setHtml(
+                    $languageMenuEl,
+                    HtmlUtils.HTML(selectOptionEl)
+                );
+
+                _.each(availableTranslations, function(translatableLanguage, key) {
+                    var option = new Option(availableLanguages[key], key);
+                    if (self.selectedVideoSourceLanguage === key) {
+                        option.selected = true;
+                    }
+                    HtmlUtils.append(
+                        $languageMenuEl,
+                        HtmlUtils.HTML(option)
+                    );
+                });
+            } else {
+                $videoSourceLanguageContainer.hide();
+            }
+        },
+
         populateLanguageMenu: function() {
-            var availableLanguages,
+            var availableLanguages = this.getTargetLanguages(),
+                availableTranslations = this.availableTranscriptionPlans[THREE_PLAY_MEDIA].translations,
                 $languageMenuEl = this.$el.find('.transcript-language-menu'),
                 $languageMenuContainerEl = this.$el.find('.transcript-language-menu-container'),
                 selectOptionEl = new Option(gettext('Select language'), '');
 
+            if (this.selectedProvider === THREE_PLAY_MEDIA) {
+                // Pick out only those languages from plan laguages that also come from video source language.
+                availableLanguages = _.pick(
+                    availableLanguages,
+                    availableTranslations[this.selectedVideoSourceLanguage]
+                );
+            }
+
             // Omit out selected languages from selecting again.
-            availableLanguages = _.omit(this.availableLanguages, this.selectedLanguages);
+            availableLanguages = _.omit(availableLanguages, this.selectedLanguages);
 
             // If no available language is left, then don't even show add language box.
             if (_.keys(availableLanguages).length) {
@@ -308,7 +368,8 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             this.renderProviders();
             this.renderTurnaround();
             this.renderFidelity();
-            this.renderLanguages();
+            this.renderVideoSourceLanguageMenu();
+            this.renderTargetLanguages();
         },
 
         addLanguage: function(language) {
@@ -320,7 +381,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                     HtmlUtils.interpolateHtml(
                         HtmlUtils.HTML('<span>{languageDisplayName}</span>'),
                         {
-                            languageDisplayName: this.availableLanguages[language]
+                            languageDisplayName: this.getTargetLanguages()[language]
                         }
                     ),
                     HtmlUtils.interpolateHtml(
@@ -425,7 +486,8 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             var isValid = true,
                 $turnaroundEl = this.$el.find('.transcript-turnaround-wrapper'),
                 $fidelityEl = this.$el.find('.transcript-fidelity-wrapper'),
-                $languagesEl = this.$el.find('.transcript-languages-wrapper');
+                $languagesEl = this.$el.find('.transcript-languages-wrapper'),
+                $videoSourcelanguageEl = this.$el.find('.video-source-language-wrapper');
 
 
             // Explicit None selected case.
@@ -447,6 +509,12 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                 this.clearPreferenceErrorState($fidelityEl);
             }
 
+            if (this.selectedProvider === THREE_PLAY_MEDIA && !this.selectedVideoSourceLanguage) {
+                isValid = false;
+                this.addErrorState($videoSourcelanguageEl);
+            } else {
+                this.clearPreferenceErrorState($videoSourcelanguageEl);
+            }
 
             if (this.selectedLanguages.length === 0) {
                 isValid = false;
@@ -471,6 +539,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
                     cielo24_turnaround: self.selectedProvider === CIELO24 ? self.selectedTurnaroundPlan : '',
                     three_play_turnaround: self.selectedProvider === THREE_PLAY_MEDIA ? self.selectedTurnaroundPlan : '',   // eslint-disable-line max-len
                     preferred_languages: self.selectedLanguages,
+                    video_source_language: self.selectedVideoSourceLanguage,
                     global: false   // Do not trigger global AJAX error handler
                 }, function(data) {
                     responseTranscriptPreferences = data ? data.transcript_preferences : null;
