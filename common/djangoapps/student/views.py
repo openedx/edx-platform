@@ -12,7 +12,6 @@ from urlparse import parse_qs, urlsplit, urlunsplit
 
 import analytics
 import edx_oauth2_provider
-import waffle
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -73,6 +72,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps import monitoring_utils
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
+from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.external_auth.login_and_register import login as external_auth_login
@@ -233,9 +233,10 @@ def cert_info(user, course_overview, course_mode):
         course_mode (str): The enrollment mode (honor, verified, audit, etc.)
 
     Returns:
-        dict: Empty dict if certificates are disabled or hidden, or a dictionary with keys:
-            'status': one of 'generating', 'ready', 'notpassing', 'processing', 'restricted'
+        dict: A dictionary with keys:
+            'status': one of 'generating', 'downloadable', 'notpassing', 'processing', 'restricted'
             'show_download_url': bool
+            'certificate_message_viewable': bool -- if certificates are viewable
             'download_url': url, only present if show_download_url is True
             'show_disabled_download_button': bool -- true if state is 'generating'
             'show_survey_button': bool
@@ -243,9 +244,6 @@ def cert_info(user, course_overview, course_mode):
             'grade': if status is not 'processing'
             'can_unenroll': if status allows for unenrollment
     """
-    if not course_overview.may_certify():
-        return {}
-    # Note: this should be rewritten to use the certificates API
     return _cert_info(
         user,
         course_overview,
@@ -328,7 +326,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
     # simplify the status for the template using this lookup table
     template_state = {
         CertificateStatuses.generating: 'generating',
-        CertificateStatuses.downloadable: 'ready',
+        CertificateStatuses.downloadable: 'downloadable',
         CertificateStatuses.notpassing: 'notpassing',
         CertificateStatuses.restricted: 'restricted',
         CertificateStatuses.auditing: 'auditing',
@@ -341,6 +339,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
 
     default_info = {
         'status': default_status,
+        'certificate_message_viewable': False,
         'show_disabled_download_button': False,
         'show_download_url': False,
         'show_survey_button': False,
@@ -359,14 +358,15 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
 
     status_dict = {
         'status': status,
-        'show_download_url': status == 'ready',
+        'certificate_message_viewable': certificates_viewable_for_course(course_overview),
+        'show_download_url': status == 'downloadable',
         'show_disabled_download_button': status == 'generating',
         'mode': cert_status.get('mode', None),
         'linked_in_url': None,
         'can_unenroll': status not in DISABLE_UNENROLL_CERT_STATES,
     }
 
-    if (status in ('generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified') and
+    if (status in ('generating', 'downloadable', 'notpassing', 'restricted', 'auditing', 'unverified') and
             course_overview.end_of_course_survey_url is not None):
         status_dict.update({
             'show_survey_button': True,
@@ -374,8 +374,8 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
     else:
         status_dict['show_survey_button'] = False
 
-    if status == 'ready':
-        # showing the certificate web view button if certificate is ready state and feature flags are enabled.
+    if status == 'downloadable':
+        # showing the certificate web view button if certificate is downloadable state and feature flags are enabled.
         if has_html_certificates_enabled(course_overview):
             if course_overview.has_any_active_web_certificate:
                 status_dict.update({
@@ -410,7 +410,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                     cert_status['download_url']
                 )
 
-    if status in {'generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified'}:
+    if status in {'generating', 'downloadable', 'notpassing', 'restricted', 'auditing', 'unverified'}:
         cert_grade_percent = -1
         persisted_grade_percent = -1
         persisted_grade = CourseGradeFactory().read(user, course=course_overview, create_if_needed=False)

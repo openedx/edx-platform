@@ -2,12 +2,14 @@
 
 import unittest
 
+import datetime
 import ddt
 import mock
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from mock import patch
+from pytz import UTC
 
 from certificates.api import get_certificate_url  # pylint: disable=import-error
 from certificates.models import CertificateStatuses  # pylint: disable=import-error
@@ -21,6 +23,9 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 # pylint: disable=no-member
+
+PAST_DATE = datetime.datetime.now(UTC) - datetime.timedelta(days=2)
+FUTURE_DATE = datetime.datetime.now(UTC) + datetime.timedelta(days=2)
 
 
 class CertificateDisplayTestBase(SharedModuleStoreTestCase):
@@ -57,13 +62,16 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
 
     def _create_certificate(self, enrollment_mode):
         """Simulate that the user has a generated certificate. """
-        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, mode=enrollment_mode)
+        CourseEnrollmentFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            mode=enrollment_mode)
         return GeneratedCertificateFactory(
             user=self.user,
             course_id=self.course.id,
             mode=enrollment_mode,
             download_url=self.DOWNLOAD_URL,
-            status="downloadable",
+            status=CertificateStatuses.downloadable,
             grade=0.98,
         )
 
@@ -94,6 +102,44 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
         self.assertNotContains(response, u'Download Your Test_Certificate (PDF)')
         self.assertNotContains(response, u'Download Test_Certificate (PDF)')
         self.assertNotContains(response, self.DOWNLOAD_URL)
+
+
+@ddt.ddt
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class CertificateDashboardMessageDisplayTest(CertificateDisplayTestBase):
+    """
+    Tests the certificates messages for a course in the dashboard.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super(CertificateDashboardMessageDisplayTest, cls).setUpClass()
+        cls.course.certificates_display_behavior = "end"
+        cls.course.save()
+        cls.store.update_item(cls.course, cls.USERNAME)
+
+    def _check_message(self, certificate_available_date):
+        response = self.client.get(reverse('dashboard'))
+
+        if datetime.datetime.now(UTC) < certificate_available_date:
+            self.assertContains(response, u"Your certificate will be available on")
+            self.assertNotContains(response, u"View Test_Certificate")
+        else:
+            self._check_can_download_certificate()
+
+    @ddt.data(False)
+    def test_certificate_available_date(self, past_certificate_available_date):
+        cert = self._create_certificate('verified')
+        cert.status = CertificateStatuses.downloadable
+        cert.save()
+
+        certificate_available_date = PAST_DATE if past_certificate_available_date else FUTURE_DATE
+
+        self.course.certificate_available_date = certificate_available_date
+        self.course.save()
+        self.store.update_item(self.course, self.USERNAME)
+
+        self._check_message(certificate_available_date)
 
 
 @ddt.ddt
