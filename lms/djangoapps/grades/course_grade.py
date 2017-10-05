@@ -10,6 +10,7 @@ from lazy import lazy
 from ccx_keys.locator import CCXLocator
 from xmodule import block_metadata_utils
 
+from .config import assume_zero_if_absent
 from .subsection_grade import ZeroSubsectionGrade
 from .subsection_grade_factory import SubsectionGradeFactory
 
@@ -46,17 +47,14 @@ class CourseGradeBase(object):
 
     def subsection_grade(self, subsection_key):
         """
-        Returns the subsection grade for given subsection usage key.
-        Raises KeyError if the user doesn't have access to that subsection.
-        """
-        return self._get_subsection_grade(self.course_data.structure[subsection_key])
+        Returns the subsection grade for the given subsection usage key.
 
-    @abstractmethod
-    def assignment_average(self, assignment_type):
+        Note: does NOT check whether the user has access to the subsection.
+        Assumes that if a grade exists, the user has access to it.  If the
+        grade doesn't exist then either the user does not have access to
+        it or hasn't attempted any problems in the subsection.
         """
-        Returns the average of all assignments of the given assignment type.
-        """
-        raise NotImplementedError
+        return self._get_subsection_grade(self.course_data.effective_structure[subsection_key])
 
     @lazy
     def graded_subsections_by_format(self):
@@ -148,7 +146,7 @@ class CourseGradeBase(object):
         """
         Returns the result from the course grader.
         """
-        course = self._prep_course_for_grading()
+        course = self._prep_course_for_grading(self.course_data.course)
         return course.grader.grade(
             self.graded_subsections_by_format,
             generate_random_scores=settings.GENERATE_PROFILE_SCORES,
@@ -166,7 +164,21 @@ class CourseGradeBase(object):
         grade_summary['grade'] = self.letter_grade
         return grade_summary
 
-    def _prep_course_for_grading(self):
+    @classmethod
+    def get_subsection_type_graders(cls, course):
+        """
+        Returns a dictionary mapping subsection types to their
+        corresponding configured graders, per grading policy.
+        """
+        course = cls._prep_course_for_grading(course)
+        return {
+            subsection_type: subsection_type_grader
+            for (subsection_type_grader, subsection_type, _)
+            in course.grader.subgraders
+        }
+
+    @classmethod
+    def _prep_course_for_grading(cls, course):
         """
         Make sure any overrides to the grading policy are used.
         This is most relevant for CCX courses.
@@ -176,8 +188,7 @@ class CourseGradeBase(object):
         this will no longer be needed - since BlockStructure correctly
         retrieves/uses all field overrides.
         """
-        course = self.course_data.course
-        if isinstance(self.course_data.course_key, CCXLocator):
+        if isinstance(course.id, CCXLocator):
             # clean out any field values that may have been set from the
             # parent course of the CCX course.
             course._field_data_cache = {}  # pylint: disable=protected-access
@@ -221,9 +232,6 @@ class ZeroCourseGrade(CourseGradeBase):
     Course Grade class for Zero-value grades when no problems were
     attempted in the course.
     """
-    def assignment_average(self, assignment_type):
-        return 0.0
-
     def _get_subsection_grade(self, subsection):
         return ZeroSubsectionGrade(subsection, self.course_data)
 
@@ -259,14 +267,14 @@ class CourseGrade(CourseGradeBase):
         Returns whether any of the subsections in this course
         have been attempted by the student.
         """
+        if assume_zero_if_absent(self.course_data.course_key):
+            return True
+
         for chapter in self.chapter_grades.itervalues():
             for subsection_grade in chapter['sections']:
                 if subsection_grade.all_total.first_attempted:
                     return True
         return False
-
-    def assignment_average(self, assignment_type):
-        return self.grader_result['grade_breakdown'].get(assignment_type, {}).get('percent')
 
     def _get_subsection_grade(self, subsection):
         if self.force_update_subsections:

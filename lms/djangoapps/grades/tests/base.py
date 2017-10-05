@@ -6,6 +6,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
+from ..course_data import CourseData
 from ..subsection_grade_factory import SubsectionGradeFactory
 
 
@@ -75,6 +76,7 @@ class GradeTestBase(SharedModuleStoreTestCase):
         self.client.login(username=self.request.user.username, password="test")
         self._set_grading_policy()
         self.course_structure = get_course_blocks(self.request.user, self.course.location)
+        self.course_data = CourseData(self.request.user, structure=self.course_structure)
         self.subsection_grade_factory = SubsectionGradeFactory(self.request.user, self.course, self.course_structure)
         CourseEnrollment.enroll(self.request.user, self.course.id)
 
@@ -90,6 +92,13 @@ class GradeTestBase(SharedModuleStoreTestCase):
                     "drop_count": 0,
                     "short_label": "HW",
                     "weight": 1.0,
+                },
+                {
+                    "type": "NoCredit",
+                    "min_count": 0,
+                    "drop_count": 0,
+                    "short_label": "NC",
+                    "weight": 0.0,
                 },
             ],
             "GRADE_CUTOFFS": {

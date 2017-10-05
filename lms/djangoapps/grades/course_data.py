@@ -32,14 +32,14 @@ class CourseData(object):
             if self._course:
                 self._course_key = self._course.id
             else:
-                structure = self._effective_structure
+                structure = self.effective_structure
                 self._course_key = structure.root_block_usage_key.course_key
         return self._course_key
 
     @property
     def location(self):
         if not self._location:
-            structure = self._effective_structure
+            structure = self.effective_structure
             if structure:
                 self._location = structure.root_block_usage_key
             elif self._course:
@@ -72,7 +72,7 @@ class CourseData(object):
 
     @property
     def grading_policy_hash(self):
-        structure = self._effective_structure
+        structure = self.effective_structure
         if structure:
             return structure.get_transformer_block_field(
                 structure.root_block_usage_key,
@@ -84,14 +84,14 @@ class CourseData(object):
 
     @property
     def version(self):
-        structure = self._effective_structure
+        structure = self.effective_structure
         course_block = structure[self.location] if structure else self.course
         return getattr(course_block, 'course_version', None)
 
     @property
     def edited_on(self):
         # get course block from structure only; subtree_edited_on field on modulestore's course block isn't optimized.
-        structure = self._effective_structure
+        structure = self.effective_structure
         if structure:
             course_block = structure[self.location]
             return getattr(course_block, 'subtree_edited_on', None)
@@ -100,7 +100,7 @@ class CourseData(object):
         return u'Course: course_key: {}'.format(self.course_key)
 
     def full_string(self):
-        if self._effective_structure:
+        if self.effective_structure:
             return u'Course: course_key: {}, version: {}, edited_on: {}, grading_policy: {}'.format(
                 self.course_key, self.version, self.edited_on, self.grading_policy_hash,
             )
@@ -108,5 +108,5 @@ class CourseData(object):
             return u'Course: course_key: {}, empty course structure'.format(self.course_key)
 
     @property
-    def _effective_structure(self):
+    def effective_structure(self):
         return self._structure or self._collected_block_structure

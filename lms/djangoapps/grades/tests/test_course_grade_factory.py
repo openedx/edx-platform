@@ -97,19 +97,19 @@ class TestCourseGradeFactory(GradeTestBase):
         with self.assertNumQueries(29), mock_get_score(1, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(2):
             _assert_read(expected_pass=True, expected_percent=0.5)  # updated to grade of .5
 
-        with self.assertNumQueries(6), mock_get_score(1, 4):
+        with self.assertNumQueries(4), mock_get_score(1, 4):
             grade_factory.update(self.request.user, self.course, force_update_subsections=False)
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(2):
             _assert_read(expected_pass=True, expected_percent=0.5)  # NOT updated to grade of .25
 
         with self.assertNumQueries(12), mock_get_score(2, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(2):
             _assert_read(expected_pass=True, expected_percent=1.0)  # updated to grade of 1.0
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
@@ -123,6 +123,35 @@ class TestCourseGradeFactory(GradeTestBase):
                 self._assert_zero_grade(course_grade, ZeroCourseGrade if assume_zero_enabled else CourseGrade)
             else:
                 self.assertIsNone(course_grade)
+
+    def test_read_optimization(self):
+        grade_factory = CourseGradeFactory()
+        with patch('lms.djangoapps.grades.course_data.get_course_blocks') as mocked_course_blocks:
+            mocked_course_blocks.return_value = self.course_structure
+            with mock_get_score(1, 2):
+                grade_factory.update(self.request.user, self.course, force_update_subsections=True)
+                self.assertEquals(mocked_course_blocks.call_count, 1)
+
+        with patch('lms.djangoapps.grades.course_data.get_course_blocks') as mocked_course_blocks:
+            with patch('lms.djangoapps.grades.subsection_grade.get_score') as mocked_get_score:
+                course_grade = grade_factory.read(self.request.user, self.course)
+                self.assertEqual(course_grade.percent, 0.5)  # make sure it's not a zero-valued course grade
+                self.assertFalse(mocked_get_score.called)  # no calls to CSM/submissions tables
+                self.assertFalse(mocked_course_blocks.called)  # no user-specific transformer calculation
+
+    def test_subsection_grade(self):
+        grade_factory = CourseGradeFactory()
+        with mock_get_score(1, 2):
+            grade_factory.update(self.request.user, self.course, force_update_subsections=True)
+        course_grade = grade_factory.read(self.request.user, course_structure=self.course_structure)
+        subsection_grade = course_grade.subsection_grade(self.sequence.location)
+        self.assertEqual(subsection_grade.percent_graded, 0.5)
+
+    def test_subsection_type_graders(self):
+        graders = CourseGrade.get_subsection_type_graders(self.course)
+        self.assertEqual(len(graders), 2)
+        self.assertEqual(graders["Homework"].type, "Homework")
+        self.assertEqual(graders["NoCredit"].min_count, 0)
 
     def test_create_zero_subs_grade_for_nonzero_course_grade(self):
         subsection = self.course_structure[self.sequence.location]
@@ -158,6 +187,11 @@ class TestCourseGradeFactory(GradeTestBase):
                     'category': 'Homework',
                     'percent': 0.25,
                     'detail': 'Homework = 25.00% of a possible 100.00%',
+                },
+                'NoCredit': {
+                    'category': 'NoCredit',
+                    'percent': 0.0,
+                    'detail': 'NoCredit = 0.00% of a possible 0.00%',
                 }
             },
             'percent': 0.25,
@@ -179,6 +213,13 @@ class TestCourseGradeFactory(GradeTestBase):
                     'detail': u'Homework Average = 25%',
                     'label': u'HW Avg',
                     'percent': 0.25,
+                    'prominent': True
+                },
+                {
+                    'category': 'NoCredit',
+                    'detail': u'NoCredit Average = 0%',
+                    'label': u'NC Avg',
+                    'percent': 0,
                     'prominent': True
                 },
             ]
