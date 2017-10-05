@@ -451,6 +451,22 @@ class ProgramDataExtender(object):
     def _attach_course_run_may_certify(self, run_mode):
         run_mode['may_certify'] = self.course_overview.may_certify()
 
+    def _check_enrollment_for_user(self, course_run):
+        applicable_seat_types = self.data['applicable_seat_types']
+
+        (enrollment_mode, active) = CourseEnrollment.enrollment_mode_for_user(
+            self.user,
+            CourseKey.from_string(course_run['key'])
+        )
+
+        is_paid_seat = False
+        if enrollment_mode is not None and active is not None:
+            # Check all the applicable seat types
+            # this will also check for no-id-professional as professional
+            is_paid_seat = any(seat_type in enrollment_mode for seat_type in applicable_seat_types)
+
+        return is_paid_seat
+
     def _collect_one_click_purchase_eligibility_data(self):
         """
         Extend the program data with data about learner's eligibility for one click purchase,
@@ -467,37 +483,17 @@ class ProgramDataExtender(object):
                 unpublished_course_runs = filter(lambda run: run['status'] == 'unpublished', course['course_runs'])
                 published_course_runs = filter(lambda run: run['status'] == 'published', course['course_runs'])
                 if len(published_course_runs) == 1:
-                    # Look at the course runs for a course and determine if the course SKU should be added.
+                    for course_run in unpublished_course_runs:
+                        is_paid_seat = self._check_enrollment_for_user(course_run)
 
-                    if len(unpublished_course_runs) > 0:
-                        for course_run in unpublished_course_runs:
-                            (enrollment_mode, active) = CourseEnrollment.enrollment_mode_for_user(
-                                self.user,
-                                CourseKey.from_string(course_run['key'])
-                            )
-
-                            if enrollment_mode is not None and active is not None:
-                                # Check all the applicable seat types
-                                # this will also check for no-id-professional as professional
-                                applicable_seat = any(seat_type in enrollment_mode
-                                                      for seat_type in applicable_seat_types)
-
-                                # If no applicable seat is found add the course SKU to the list
-                                if applicable_seat:
-                                    unpublished_enrollment = True
+                        if is_paid_seat:
+                            unpublished_enrollment = True
 
                     if not unpublished_enrollment:
                         course_run = published_course_runs[0]
-                        (enrollment_mode, active) = CourseEnrollment.enrollment_mode_for_user(
-                            self.user,
-                            CourseKey.from_string(course_run['key'])
-                        )
-
-                        if enrollment_mode is not None and active is not None:
-                            applicable_seat = any(seat_type in enrollment_mode for seat_type in applicable_seat_types)
-
-                            if not applicable_seat or not active:
-                                add_course_sku = True
+                        is_paid_seat = self._check_enrollment_for_user(course_run)
+                        if not is_paid_seat:
+                            add_course_sku = True
                         else:
                             # There is no enrollment information for the course add the course SKU
                             add_course_sku = True
