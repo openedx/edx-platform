@@ -104,34 +104,6 @@ div.info-wrapper {
             min-width: 80px;
           }
         }
-
-        .upgrade-msg {
-          flex: 5 1 60%; //This percentage was required to get the text
-                         // in the message to wrap when collapsed.
-          flex-direction: column;
-          margin: 0;
-          padding: $baseline/2 0;
-          .msg-title {
-            font-weight: font-weight(semi-bold);
-            font-size: font-size(large);
-            line-height: $base-line-height;
-            margin: 0;
-          }
-          .view-verified-info {
-            margin-top: $baseline/4;
-            font-weight: font-weight(normal);
-            font-size: font-size(base);
-          }
-
-          a:link, a:hover, a:visited, a:active {
-            text-decoration: underline !important;
-          }
-        }
-
-        .upgrade-banner-button {
-          @include margin(0, 0, 0, auto);
-          padding: $baseline/2 $baseline;
-        }
       }
     }
 
