@@ -592,6 +592,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
 
         validateOrganizationCredentials: function() {
             var $OrganizationApiSecretWrapperEl,
+                $OrganizationUsernameWrapperEl,
                 isValid = true,
                 $OrganizationApiKeyWrapperEl = this.$el.find('.' + this.selectedProvider + '-api-key-wrapper');
 
@@ -615,6 +616,14 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                     this.addErrorState($OrganizationApiSecretWrapperEl);
                 } else {
                     this.clearPreferenceErrorState($OrganizationApiSecretWrapperEl);
+                }
+            } else {
+                $OrganizationUsernameWrapperEl = this.$el.find('.' + this.selectedProvider + '-username-wrapper');
+                if ($OrganizationUsernameWrapperEl.find('input').val() === '') {
+                    isValid = false;
+                    this.addErrorState($OrganizationUsernameWrapperEl);
+                } else {
+                    this.clearPreferenceErrorState($OrganizationUsernameWrapperEl);
                 }
             }
 
@@ -659,14 +668,25 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         saveOrganizationCredentials: function() {
-            var self = this;
+            var self = this,
+                username,
+                apiSecret,
+                apiKey = this.$el.find('.' + this.selectedProvider + '-api-key').val();
+
             // First clear response status if present already
             this.clearResponseStatus();
 
-            // TODO: Send actual organization credentials.
+            if (this.selectedProvider === THREE_PLAY_MEDIA) {
+                apiSecret = this.$el.find('.' + this.selectedProvider + '-api-secret').val();
+            } else {
+                username = this.$el.find('.' + this.selectedProvider + '-username').val();
+            }
 
             $.postJSON(self.transcriptCredentialsHandlerUrl, {
                 provider: self.selectedProvider,
+                api_key: apiKey,
+                api_secret_key: apiSecret,
+                username: username,
                 global: false   // Do not trigger global AJAX error handler
             }, function() {
                 self.$el.find('.organization-credentials-wrapper').hide();

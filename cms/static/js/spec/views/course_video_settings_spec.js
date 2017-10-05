@@ -11,13 +11,16 @@ define(
                 verifyTranscriptPreferences,
                 verifyTranscriptPreferencesView,
                 verifyOrganizationCredentialsView,
+                verifyCredentialFieldsPresent,
                 verifyOrganizationCredentialField,
                 verifyMessage,
                 verifyPreferanceErrorState,
                 verifyProviderList,
                 verifyProviderSelectedView,
+                verifyCredentialsSaved,
                 resetProvider,
                 changeProvider,
+                submitOrganizationCredentials,
                 transcriptPreferencesUrl = '/transcript_preferences/course-v1:edX+DemoX+Demo_Course',
                 transcriptCredentialsHandlerUrl = '/transcript_credentials/course-v1:edX+DemoX+Demo_Course',
                 activeTranscriptPreferences = {
@@ -184,6 +187,21 @@ define(
                 expect($courseVideoSettingsEl.find('.organization-credentials-content')).toExist();
             };
 
+            verifyCredentialFieldsPresent = function(fields) {
+                // Verify correct number of input fields are shown.
+                expect(
+                    $courseVideoSettingsEl.find(
+                        '.organization-credentials-wrapper .transcript-preferance-wrapper input'
+                    ).length
+                ).toEqual(_.keys(fields).length
+                );
+
+                // Verify individual field has correct label and key.
+                _.each(fields, function(label, fieldName) {
+                    verifyOrganizationCredentialField(fieldName, label);
+                });
+            };
+
             verifyOrganizationCredentialField = function(fieldName, label) {
                 var elementSelector = courseVideoSettingsView.selectedProvider + '-' + fieldName;
                 // Verify that correct label is shown.
@@ -195,6 +213,22 @@ define(
                 expect(
                     $courseVideoSettingsEl.find('.' + elementSelector + '-wrapper .' + elementSelector)
                 ).toExist();
+            };
+
+            verifyCredentialsSaved = function() {
+                // Verify that success message is shown.
+                verifyMessage(
+                    'success',
+                    transcriptionPlans[courseVideoSettingsView.selectedProvider].display_name + ' credentials saved'
+                );
+
+                // Also verify that transcript credential state is updated.
+                expect(
+                    courseVideoSettingsView.transcriptOrganizationCredentials[courseVideoSettingsView.selectedProvider]
+                ).toBeTruthy();
+
+                // Verify that selected provider view after credentials are saved.
+                verifyProviderSelectedView();
             };
 
             changeProvider = function(selectedProvider) {
@@ -220,6 +254,42 @@ define(
 
                 // Send successful empty content response.
                 AjaxHelpers.respondWithJson(requests, {});
+            };
+
+            submitOrganizationCredentials = function(fieldValues, errorMessage) {
+                var requests = AjaxHelpers.requests(this);
+                // Click change button to render organization credentials view.
+                $courseVideoSettingsEl.find('.action-change-provider').click();
+
+                // Provide organization credentials.
+                _.each(fieldValues, function(key) {
+                    $courseVideoSettingsEl.find('.' + courseVideoSettingsView.selectedProvider + '-' + key).val(key);
+                });
+                // Click save organization credentials button to save credentials.
+                $courseVideoSettingsEl.find('.action-update-org-credentials').click();
+
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'POST',
+                    transcriptCredentialsHandlerUrl,
+                    JSON.stringify(
+                        _.extend(
+                            {provider: courseVideoSettingsView.selectedProvider},
+                            fieldValues,
+                            {global: false}
+                        )
+                    )
+                );
+
+                if (errorMessage) {
+                    // Send error response.
+                    AjaxHelpers.respondWithError(requests, 400, {
+                        error: errorMessage
+                    });
+                } else {
+                    // Send empty response.
+                    AjaxHelpers.respondWithJson(requests, {});
+                }
             };
 
             beforeEach(function() {
@@ -438,30 +508,27 @@ define(
                 verifyOrganizationCredentialsView();
             });
 
-            it('shows api secret input field if selected provider is 3Play Media', function() {
-                // Set selected provider to 3Play Media
-                changeProvider('3PlayMedia');
-
-                // Click change button to render organization credentials view.
-                $courseVideoSettingsEl.find('.action-change-provider').click();
-
-                // Verify 3play api secret and api key are present.
-                verifyOrganizationCredentialField('api-secret', 'API Secret');
-                verifyOrganizationCredentialField('api-key', 'API Key');
-            });
-
-            it('does not show api secret input field if selected provider is not 3Play Media', function() {
+            it('shows cielo specific organization credentials fields only', function() {
                 verifyProviderSelectedView();
                 // Click change button to render organization credentials view.
                 $courseVideoSettingsEl.find('.action-change-provider').click();
 
-                // Verify 3Play Media api secret is not present.
-                expect(
-                    $courseVideoSettingsEl.find('.' + courseVideoSettingsView.selectedProvider + '-api-secret')
-                ).not.toExist();
-
                 // Verify api key is present.
-                verifyOrganizationCredentialField('api-key', 'API Key');
+                verifyCredentialFieldsPresent({
+                    'api-key': 'API Key',
+                    username: 'Username'
+                });
+            });
+
+            it('shows 3play specific organization credentials fields only', function() {
+                // Set selected provider to 3Play Media
+                changeProvider('3PlayMedia');
+
+                // Verify api key and api secret input fields are present.
+                verifyCredentialFieldsPresent({
+                    'api-key': 'API Key',
+                    'api-secret': 'API Secret'
+                });
             });
 
             it('shows warning message when changing organization credentials if present already', function() {
@@ -515,119 +582,40 @@ define(
                 );
             });
 
-            it('saves organization credentials on clicking save credentials button', function() {
-                var requests = AjaxHelpers.requests(this);
-
+            it('saves cielo organization credentials on clicking save credentials button', function() {
                 verifyProviderSelectedView();
-                // Click change button to render organization credentials view.
-                $courseVideoSettingsEl.find('.action-change-provider').click();
+                submitOrganizationCredentials({
+                    api_key: 'api-key',
+                    username: 'username'
+                });
 
-                // Set organization credentials so as to pass validations.
-                $courseVideoSettingsEl.find('.' + courseVideoSettingsView.selectedProvider + '-api-key').val('testkey');
-
-                // Click save organization credentials button to save credentials.
-                $courseVideoSettingsEl.find('.action-update-org-credentials').click();
-
-                AjaxHelpers.expectRequest(
-                    requests,
-                    'POST',
-                    transcriptCredentialsHandlerUrl,
-                    JSON.stringify({
-                        provider: activeTranscriptPreferences.provider,
-                        global: false
-                    })
-                );
-
-                // Send empty response.
-                AjaxHelpers.respondWithJson(requests, {});
-
-                // Verify that success message is shown.
-                verifyMessage(
-                    'success',
-                    transcriptionPlans[courseVideoSettingsView.selectedProvider].display_name + ' credentials saved'
-                );
+                verifyCredentialsSaved();
             });
 
-            it('shows selected provider view afer organization credentials saved', function() {
-                var requests = AjaxHelpers.requests(this);
-                renderCourseVideoSettingsView(null, transcriptionPlans);
-
-                // Verify selected provider view is not shown.
-                expect(
-                    $courseVideoSettingsEl.find('.transcript-provider-wrapper .selected-transcript-provider')
-                ).not.toExist();
-
-                // Verify provider list view is shown.
-                verifyProviderList(providers.none);
-
-                // Check Cielo24 provider
-                changeProvider('Cielo24');
-                verifyProviderList(providers.Cielo24);
-
-                // Set organization credentials so as to pass validations.
-                $courseVideoSettingsEl.find('.' + courseVideoSettingsView.selectedProvider + '-api-key').val('testkey');
-
-                // Click save organization credentials button to save credentials.
-                $courseVideoSettingsEl.find('.action-update-org-credentials').click();
-
-                AjaxHelpers.expectRequest(
-                    requests,
-                    'POST',
-                    transcriptCredentialsHandlerUrl,
-                    JSON.stringify({
-                        provider: activeTranscriptPreferences.provider,
-                        global: false
-                    })
-                );
-
-                // Send empty response.
-                AjaxHelpers.respondWithJson(requests, {});
-
-                // Verify that success message is shown.
-                verifyMessage(
-                    'success',
-                    transcriptionPlans[courseVideoSettingsView.selectedProvider].display_name + ' credentials saved'
-                );
-
-                // Shows selected provider view after credentials are saved.
+            it('saves 3Play organization credentials on clicking save credentials button', function() {
                 verifyProviderSelectedView();
 
-                // Verify provider list view is not shown.
-                expect(
-                    $courseVideoSettingsEl.find('.transcript-provider-wrapper .transcript-provider-group')
-                ).not.toExist();
+                // Set selected provider to 3Play Media
+                changeProvider('3PlayMedia');
+
+                submitOrganizationCredentials({
+                    api_key: 'api-key',
+                    api_secret_key: 'api-secret'
+                });
+
+                verifyCredentialsSaved();
             });
 
             it('shows error message on saving organization credentials if server sends error', function() {
-                var requests = AjaxHelpers.requests(this);
-
                 verifyProviderSelectedView();
-                // Click change button to render organization credentials view.
-                $courseVideoSettingsEl.find('.action-change-provider').click();
 
-                // Set organization credentials so as to pass validations.
-                $courseVideoSettingsEl.find('.' + courseVideoSettingsView.selectedProvider + '-api-key').val('testkey');
-
-                // Click save organization credentials button to save credentials.
-                $courseVideoSettingsEl.find('.action-update-org-credentials').click();
-
-                AjaxHelpers.expectRequest(
-                    requests,
-                    'POST',
-                    transcriptCredentialsHandlerUrl,
-                    JSON.stringify({
-                        provider: activeTranscriptPreferences.provider,
-                        global: false
-                    })
-                );
-
-                // Send error response.
-                AjaxHelpers.respondWithError(requests, 400, {
-                    error: 'Error message'
-                });
+                submitOrganizationCredentials({
+                    api_key: 'api-key',
+                    username: 'username'
+                }, 'Error saving credentials');
 
                 // Verify that error message is shown.
-                verifyMessage('error', 'Error message');
+                verifyMessage('error', 'Error saving credentials');
             });
 
             // TODO: Add more tests like clicking on add language, remove and their scenarios and some other tests
