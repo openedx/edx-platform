@@ -60,6 +60,7 @@ DISCUSSION_SETTINGS = {
 }
 
 LMS_ROOT_URL = "http://localhost:8000"
+LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 
 # Features
 FEATURES = {
@@ -3248,7 +3249,7 @@ HELP_TOKENS_BOOKS = {
 # These configuration settings are specific to the Enterprise service and you should
 # not find references to them within the edx-platform project.
 
-ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
+ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + LMS_ENROLLMENT_API_PATH
 ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENTERPRISE_ENROLLMENT_API_URL
 ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ['audit', 'honor']
 ENTERPRISE_SUPPORT_URL = ''

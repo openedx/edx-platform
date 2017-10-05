@@ -362,6 +362,7 @@ AUTHENTICATION_BACKENDS = (
 
 LMS_BASE = None
 LMS_ROOT_URL = "http://localhost:8000"
+LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = LMS_ROOT_URL + '/consent/api/v1/'
 
@@ -1391,7 +1392,7 @@ USER_TASKS_MAX_AGE = timedelta(days=7)
 
 ############## Settings for the Enterprise App ######################
 
-ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
+ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + LMS_ENROLLMENT_API_PATH
 ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 
