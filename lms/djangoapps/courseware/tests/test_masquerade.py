@@ -8,7 +8,7 @@ from datetime import datetime
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.utils.timezone import UTC
+from pytz import UTC
 from mock import patch
 from nose.plugins.attrib import attr
 from xblock.runtime import DictKeyValueStore
@@ -42,7 +42,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     @classmethod
     def setUpClass(cls):
         super(MasqueradeTestCase, cls).setUpClass()
-        cls.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(UTC())})
+        cls.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(UTC)})
         cls.info_page = ItemFactory.create(
             category="course_info", parent_location=cls.course.location,
             data="OOGIE BLOOGIE", display_name="updates"

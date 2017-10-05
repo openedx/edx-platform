@@ -11,7 +11,7 @@ from functools import partial
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse

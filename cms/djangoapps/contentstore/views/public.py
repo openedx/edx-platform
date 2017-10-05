@@ -2,7 +2,7 @@
 Public views
 """
 from django.conf import settings
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.views.decorators.clickjacking import xframe_options_deny

@@ -13,11 +13,10 @@ Note: The access control logic in this file does NOT check for enrollment in
 import logging
 from datetime import datetime
 
-import pytz
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.utils.timezone import UTC
+from pytz import UTC
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from xblock.core import XBlock
 
@@ -274,9 +273,9 @@ def _can_enroll_courselike(user, courselike):
         debug("Deny: invitation only")
         return ACCESS_DENIED
 
-    now = datetime.now(UTC())
-    enrollment_start = courselike.enrollment_start or datetime.min.replace(tzinfo=pytz.UTC)
-    enrollment_end = courselike.enrollment_end or datetime.max.replace(tzinfo=pytz.UTC)
+    now = datetime.now(UTC)
+    enrollment_start = courselike.enrollment_start or datetime.min.replace(tzinfo=UTC)
+    enrollment_end = courselike.enrollment_end or datetime.max.replace(tzinfo=UTC)
     if reg_method_ok and enrollment_start < now < enrollment_end:
         debug("Allow: in enrollment period")
         return ACCESS_GRANTED

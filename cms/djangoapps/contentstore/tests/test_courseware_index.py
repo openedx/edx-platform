@@ -9,7 +9,6 @@ from uuid import uuid4
 
 import ddt
 import pytest
-from dateutil.tz import tzutc
 from django.conf import settings
 from lazy.lazy import lazy
 from mock import patch
@@ -1187,7 +1186,7 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
             'content_type': 'Text',
             'org': self.course.org,
             'content_groups': content_groups,
-            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=tzutc())
+            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=UTC)
         }
 
     def _html_experiment_group_result(self, html_unit, content_groups):
@@ -1207,7 +1206,7 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
             'content_type': 'Text',
             'org': self.course.org,
             'content_groups': content_groups,
-            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=tzutc())
+            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=UTC)
         }
 
     def _vertical_experiment_group_result(self, vertical, content_groups):
@@ -1215,7 +1214,7 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
         Return object with arguments and content group for split_test vertical.
         """
         return {
-            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=tzutc()),
+            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=UTC),
             'content': {'display_name': vertical.display_name},
             'course': unicode(self.course.id),
             'location': [
@@ -1247,7 +1246,7 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
             'content_type': 'Text',
             'org': self.course.org,
             'content_groups': None,
-            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=tzutc())
+            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=UTC)
         }
 
     def _get_index_values_from_call_args(self, mock_index):
