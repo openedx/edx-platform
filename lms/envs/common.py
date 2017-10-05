@@ -2164,6 +2164,9 @@ INSTALLED_APPS = (
 
     # Dynamic FAQ page
     'lms.djangoapps.faq',
+
+    # NodeBB App
+    'nodebb',
 )
 
 ######################### CSRF #########################################
@@ -3034,3 +3037,5 @@ DOC_LINK_BASE_URL = None
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
 
+# NodeBB settings
+NODEBB_ENDPOINT = 'http://community.philanthropyu.org'
