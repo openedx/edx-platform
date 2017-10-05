@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT, waffle
 from ..course_grade import CourseGrade, ZeroCourseGrade
 from ..course_grade_factory import CourseGradeFactory
-from ..subsection_grade import SubsectionGrade, ZeroSubsectionGrade
+from ..subsection_grade import ReadSubsectionGrade, ZeroSubsectionGrade
 from .base import GradeTestBase
 from .utils import mock_get_score
 
@@ -131,7 +131,7 @@ class TestCourseGradeFactory(GradeTestBase):
         course_grade = CourseGradeFactory().update(self.request.user, self.course)
         subsection1_grade = course_grade.subsection_grades[self.sequence.location]
         subsection2_grade = course_grade.subsection_grades[self.sequence2.location]
-        self.assertIsInstance(subsection1_grade, SubsectionGrade)
+        self.assertIsInstance(subsection1_grade, ReadSubsectionGrade)
         self.assertIsInstance(subsection2_grade, ZeroSubsectionGrade)
 
     @ddt.data(True, False)

@@ -222,7 +222,7 @@ class CourseGradeReport(object):
         Returns a list of all applicable column headers for this grade report.
         """
         return (
-            ["Student ID", "Email", "Username", "Grade"] +
+            ["Student ID", "Email", "Username"] +
             self._grades_header(context) +
             (['Cohort Name'] if context.cohorts_enabled else []) +
             [u'Experiment Group ({})'.format(partition.name) for partition in context.course_experiments] +
@@ -278,7 +278,7 @@ class CourseGradeReport(object):
         Returns the applicable grades-related headers for this report.
         """
         graded_assignments = context.graded_assignments
-        grades_header = []
+        grades_header = ["Grade"]
         for assignment_info in graded_assignments.itervalues():
             if assignment_info['separate_subsection_avg_headers']:
                 grades_header.extend(assignment_info['subsection_headers'].itervalues())
