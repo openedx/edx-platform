@@ -9,7 +9,7 @@
                 });
             });
             $('.date-summary-verified-upgrade-deadline .date-summary-link').on('click', function() {
-                Logger.log('edx.course.enrollment.upgrade.clicked', {location: 'sidebar'});
+                Logger.log('edx.course.enrollment.upgrade.clicked', {location: 'date-sidebar'});
             });
         };
     });

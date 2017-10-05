@@ -17,9 +17,11 @@ define(['jquery', 'logger', 'js/courseware/course_home_events'], function($, Log
             });
         });
 
-        it('sends an event when "Upgrade to Verified" is clicked from the sidebar', function() {
+        it('sends an event when "Upgrade to Verified" is clicked from the date sidebar', function() {
             $('.date-summary-link').click();
-            expect(Logger.log).toHaveBeenCalledWith('edx.course.enrollment.upgrade.clicked', {location: 'sidebar'});
+            expect(Logger.log).toHaveBeenCalledWith('edx.course.enrollment.upgrade.clicked',
+                {location: 'date-sidebar'}
+            );
         });
     });
 });
