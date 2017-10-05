@@ -497,7 +497,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             block_data.edit_info.original_usage = original_usage
             block_data.edit_info.original_usage_version = original_usage_version
 
-    def find_matching_course_indexes(self, branch=None, search_targets=None, org_target=None):
+    def find_matching_course_indexes(self, branch=None, search_targets=None, org_target=None, course_keys=None):
         """
         Find the course_indexes which have the specified branch and search_targets. An optional org_target
         can be specified to apply an ORG filter to return only the courses that are part of
@@ -506,19 +506,44 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         Returns:
             a Cursor if there are no changes in flight or a list if some have changed in current bulk op
         """
-        indexes = self.db_connection.find_matching_course_indexes(branch, search_targets, org_target)
+        indexes = self.db_connection.find_matching_course_indexes(
+            branch,
+            search_targets,
+            org_target,
+            course_keys=course_keys)
 
+        indexes = self._add_indexes_from_active_records(
+            indexes,
+            branch,
+            search_targets,
+            org_target,
+            course_keys=course_keys
+        )
+
+        return indexes
+
+    def _add_indexes_from_active_records(
+            self,
+            course_indexes,
+            branch=None,
+            search_targets=None,
+            org_target=None,
+            course_keys=None
+    ):
+        """
+
+        Add any being built but not yet persisted or in the process of being updated
+        """
         def _replace_or_append_index(altered_index):
             """
             If the index is already in indexes, replace it. Otherwise, append it.
             """
-            for index, existing in enumerate(indexes):
+            for index, existing in enumerate(course_indexes):
                 if all(existing[attr] == altered_index[attr] for attr in ['org', 'course', 'run']):
-                    indexes[index] = altered_index
+                    course_indexes[index] = altered_index
                     return
-            indexes.append(altered_index)
+            course_indexes.append(altered_index)
 
-        # add any being built but not yet persisted or in the process of being updated
         for _, record in self._active_records:
             if branch and branch not in record.index.get('versions', {}):
                 continue
@@ -531,7 +556,6 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
                     for field, value in search_targets.iteritems()
                 ):
                     continue
-
             # if we've specified a filter by org,
             # make sure we've honored that filter when
             # integrating in-transit records
@@ -539,12 +563,22 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
                 if record.index['org'] != org_target:
                     continue
 
-            if not hasattr(indexes, 'append'):  # Just in time conversion to list from cursor
-                indexes = list(indexes)
+            if course_keys:
+                index_exists_in_active_records = False
+                for course_key in course_keys:
+                    if all(record.index[key_attr] == getattr(course_key, key_attr)
+                           for key_attr in ['org', 'course', 'run']):
+                        index_exists_in_active_records = True
+                        break
+                if not index_exists_in_active_records:
+                    continue
+
+            if not hasattr(course_indexes, 'append'):  # Just in time conversion to list from cursor
+                course_indexes = list(course_indexes)
 
             _replace_or_append_index(record.index)
 
-        return indexes
+        return course_indexes
 
     def find_course_blocks_by_id(self, ids):
         """
@@ -905,15 +939,15 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
     def collect_ids_from_matching_indexes(self, branch, **kwargs):
         """
-        Find the course_indexes which have the specified branch. if `kwargs` contains `org`
-        to apply an ORG filter to return only the courses that are part of that ORG. Extract `version_guids`
+        Find the course_indexes which have the specified branch. Extract `version_guids`
         from the course_indexes.
 
         """
         matching_indexes = self.find_matching_course_indexes(
             branch,
             search_targets=None,
-            org_target=kwargs.get('org')
+            org_target=kwargs.get('org'),
+            course_keys=kwargs.get('course_keys')
         )
 
         # collect ids and then query for those
