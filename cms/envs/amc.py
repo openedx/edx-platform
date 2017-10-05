@@ -8,7 +8,7 @@ APPSEMBLER_SECRET_KEY = AUTH_TOKENS.get("APPSEMBLER_SECRET_KEY")
 
 INSTALLED_APPS += (
     'openedx.core.djangoapps.appsembler.sites',
-    'openedx.core.djangoapps.appsembler.msft_lp',
+ #   'openedx.core.djangoapps.appsembler.msft_lp',
 )
 
 APPSEMBLER_FEATURES = ENV_TOKENS.get('APPSEMBLER_FEATURES', {})
