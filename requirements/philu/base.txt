@@ -1,1 +1,1 @@
-pynodebb=0.0.13
+pynodebb==0.0.13
