@@ -198,6 +198,7 @@ def issued_certificates(course_key, features):
 
     # Report run date
     for data in generated_certificates:
+        data['course_id'] = str(data['course_id'])
         data['report_run_date'] = report_run_date
 
     return generated_certificates
