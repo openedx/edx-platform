@@ -460,7 +460,7 @@ class ProgramDataExtender(object):
         )
 
         is_paid_seat = False
-        if enrollment_mode is not None and active is not None:
+        if enrollment_mode is not None and active is not None and active is True:
             # Check all the applicable seat types
             # this will also check for no-id-professional as professional
             is_paid_seat = any(seat_type in enrollment_mode for seat_type in applicable_seat_types)
@@ -478,25 +478,17 @@ class ProgramDataExtender(object):
         bundle_variant = 'full'
         if is_learner_eligible_for_one_click_purchase:
             for course in self.data['courses']:
-                add_course_sku = False
-                unpublished_enrollment = False
-                unpublished_course_runs = filter(lambda run: run['status'] == 'unpublished', course['course_runs'])
-                published_course_runs = filter(lambda run: run['status'] == 'published', course['course_runs'])
+                add_course_sku = True
+                course_runs = course.get('course_runs', [])
+                published_course_runs = filter(lambda run: run['status'] == 'published', course_runs)
+
                 if len(published_course_runs) == 1:
-                    for course_run in unpublished_course_runs:
+                    for course_run in course_runs:
                         is_paid_seat = self._check_enrollment_for_user(course_run)
 
                         if is_paid_seat:
-                            unpublished_enrollment = True
-
-                    if not unpublished_enrollment:
-                        course_run = published_course_runs[0]
-                        is_paid_seat = self._check_enrollment_for_user(course_run)
-                        if not is_paid_seat:
-                            add_course_sku = True
-                        else:
-                            # There is no enrollment information for the course add the course SKU
-                            add_course_sku = True
+                            add_course_sku = False
+                            break
 
                     if add_course_sku:
                         for seat in published_course_runs[0]['seats']:
