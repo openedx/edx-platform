@@ -405,11 +405,7 @@ def verified_upgrade_deadline_link(user, course=None, course_id=None):
     ecommerce_service = EcommerceService()
     if ecommerce_service.is_enabled(user):
         if course is not None and isinstance(course, CourseOverview):
-            course_mode = [
-                mode
-                for mode in course.modes
-                if mode.slug == CourseMode.VERIFIED
-            ]
+            course_mode = course.modes.get(mode_slug=CourseMode.VERIFIED)
         else:
             course_mode = CourseMode.objects.get(
                 course_id=course_id, mode_slug=CourseMode.VERIFIED

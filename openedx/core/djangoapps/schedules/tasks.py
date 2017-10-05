@@ -182,11 +182,22 @@ def _add_upsell_button_to_email_template(a_user, a_schedule, template_context):
     # Check and upgrade link performs a query on CourseMode, which is triggering failures in
     # test_send_recurring_nudge.py
     upgrade_link, upgrade_date = check_and_get_upgrade_link_and_date(a_user, a_schedule.enrollment)
+    has_dynamic_deadline = a_schedule.upgrade_deadline is not None
+    has_upgrade_link = upgrade_link is not None
+    show_upsell = has_dynamic_deadline and has_upgrade_link
 
-    template_context['show_upsell'] = upgrade_link is not None
-    template_context['upsell_link'] = upgrade_link
-    template_context['user_schedule_upgrade_deadline_time'] = upgrade_date
-    
+    template_context['show_upsell'] = show_upsell
+    if show_upsell:
+        template_context['upsell_link'] = upgrade_link
+        template_context['user_schedule_upgrade_deadline_time'] = dateformat.format(
+            upgrade_date,
+            get_format(
+                'DATE_FORMAT',
+                lang=a_schedule.enrollment.course.language,
+                use_l10n=True
+            )
+        )
+
 
 @task(ignore_result=True, routing_key=ROUTING_KEY)
 def recurring_nudge_schedule_bin(

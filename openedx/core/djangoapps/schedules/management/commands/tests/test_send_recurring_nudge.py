@@ -269,8 +269,9 @@ class TestSendRecurringNudge(CacheIsolationTestCase):
 
             self.assertEqual(len(sent_messages), 1)
 
-            for args in sent_messages:
-                tasks._recurring_nudge_schedule_send(*args)
+            with self.assertNumQueries(SEND_QUERIES):
+                for args in sent_messages:
+                    tasks._recurring_nudge_schedule_send(*args)
 
             self.assertEqual(mock_channel.deliver.call_count, 1)
             for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
