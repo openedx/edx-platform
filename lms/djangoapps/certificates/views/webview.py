@@ -253,16 +253,16 @@ def _update_course_context(request, context, course, course_key, platform_name):
     if CertificateGenerationCourseSetting.is_language_specific_templates_enabled_for_course(course_key):
         fields = ['start', 'end', 'max_effort', 'content_language']
         course_run_data = get_course_run_details(course_key, fields)
-        if course_run_data['start'] and course_run_data['end'] and course_run_data['max_effort']:
+        if course_run_data.get('start') and course_run_data.get('end') and course_run_data.get('max_effort'):
             # Calculate duration of the course run in weeks, multiplied by max_effort for total Hours of Effort
             try:
-                start = parser.parse(course_run_data['start'])
-                end = parser.parse(course_run_data['end'])
-                max_effort = int(course_run_data['max_effort'])
+                start = parser.parse(course_run_data.get('start'))
+                end = parser.parse(course_run_data.get('end'))
+                max_effort = int(course_run_data.get('max_effort'))
                 context['hours_of_effort'] = ((end - start).days / 7) * max_effort
             except ValueError:
                 log.exception('Error occurred while parsing course run details')
-        context['content_language'] = course_run_data['content_language']
+        context['content_language'] = course_run_data.get('content_language')
 
 
 def _update_social_context(request, context, course, user, user_certificate, platform_name):
