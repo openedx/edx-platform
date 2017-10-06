@@ -701,7 +701,7 @@
         'js/spec/components/card/card_spec.js',
         'js/spec/components/header/header_spec.js',
         'js/spec/course_sharing/course_sharing_events_spec.js',
-        'js/spec/courseware/course_home_events_spec.js',
+        'js/spec/courseware/course_info_events_spec.js',
         'js/spec/courseware/link_clicked_events_spec.js',
         'js/spec/courseware/updates_visibility_spec.js',
         'js/spec/dashboard/donation.js',

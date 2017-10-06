@@ -1778,7 +1778,7 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'js/views/message_banner': 'js/views/message_banner.js',
     'moment': 'common/js/vendor/moment-with-locales.js',
     'moment-timezone': 'common/js/vendor/moment-timezone-with-data.js',
-    'js/courseware/course_home_events': 'js/courseware/course_home_events.js',
+    'js/courseware/course_info_events': 'js/courseware/course_info_events.js',
     'js/courseware/accordion_events': 'js/courseware/accordion_events.js',
     'js/dateutil_factory': 'js/dateutil_factory.js',
     'js/courseware/link_clicked_events': 'js/courseware/link_clicked_events.js',

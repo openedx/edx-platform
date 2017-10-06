@@ -1,10 +1,10 @@
-define(['jquery', 'logger', 'js/courseware/course_home_events'], function($, Logger, courseHomeEvents) {
+define(['jquery', 'logger', 'js/courseware/course_info_events'], function($, Logger, courseInfoEvents) {
     'use strict';
 
     describe('Course home page eventing', function() {
         beforeEach(function() {
-            loadFixtures('js/fixtures/courseware/course_home_events.html');
-            courseHomeEvents();
+            loadFixtures('js/fixtures/courseware/course_info_events.html');
+            courseInfoEvents();
             spyOn(Logger, 'log');
         });
 
