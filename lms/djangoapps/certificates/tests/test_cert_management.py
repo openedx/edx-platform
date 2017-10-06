@@ -169,6 +169,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
 
     @ddt.data(True, False)
     @override_settings(CERT_QUEUE='test-queue')
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_OPENBADGES': True})
     @patch('certificates.api.XQueueCertInterface', spec=True)
     def test_clear_badge(self, issue_badges, xqueue):
         """
