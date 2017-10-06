@@ -939,7 +939,7 @@ HELP_TOKENS_BOOKS = ENV_TOKENS.get('HELP_TOKENS_BOOKS', HELP_TOKENS_BOOKS)
 # Publicly-accessible enrollment URL, for use on the client side.
 ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENV_TOKENS.get(
     'ENTERPRISE_PUBLIC_ENROLLMENT_API_URL',
-    (LMS_ROOT_URL or '') + '/api/enrollment/v1/'
+    (LMS_ROOT_URL or '') + LMS_ENROLLMENT_API_PATH
 )
 
 # Enrollment URL used on the server-side.
