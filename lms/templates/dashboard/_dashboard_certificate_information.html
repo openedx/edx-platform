@@ -31,9 +31,9 @@ else:
 %>
 
 % if cert_status['status'] != 'processing':
-  <div class="message message-status ${status_css_class} is-shown">
-    % if not cert_status['certificate_message_viewable']:
-      % if (cert_status['status'] == 'generating' or cert_status['status'] == 'downloadable'):
+  % if not cert_status['certificate_message_viewable']:
+    % if (cert_status['status'] == 'generating' or cert_status['status'] == 'downloadable') and course_overview.certificate_available_date:
+      <div class="message message-status ${status_css_class} is-shown">
         <p class="message-copy">
           <%
             certificate_available_date_string = course_overview.certificate_available_date.strftime('%Y-%m-%dT%H:%M:%S%z')
@@ -42,8 +42,10 @@ else:
           %>
           <span class="info-date-block localized-datetime" data-language="${user_language}" data-timezone="${user_timezone}" data-datetime="${certificate_available_date_string}" data-format=${format} data-string="${container_string}"></span>
         </p>
-      % endif
-    % else:
+      </div>
+    % endif
+  % else:
+    <div class="message message-status ${status_css_class} is-shown">
       <p class="message-copy">${_("Your final grade:")}
         <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
 
@@ -143,7 +145,7 @@ else:
         </div>
       % endif
 
-    % endif
-  </div>
+    </div>
+  % endif
 % endif
 
