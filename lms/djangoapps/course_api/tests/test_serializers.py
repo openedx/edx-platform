@@ -17,9 +17,10 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
-
-from ..serializers import CourseDetailSerializer, CourseSerializer
 from .mixins import CourseApiFactoryMixin
+from ..serializers import CourseDetailSerializer, CourseSerializer
+
+LICENSE = 'all-rights-reserved'
 
 
 @attr(shard=3)
@@ -73,10 +74,19 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'mobile_available': False,
             'hidden': False,
             'invitation_only': False,
+            'license': LICENSE,
 
             # 'course_id' is a deprecated field, please use 'id' instead.
             'course_id': u'edX/toy/2012_Fall',
         }
+
+    @staticmethod
+    def create_course(**kwargs):
+        combined_kwargs = {
+            'license': LICENSE,
+        }
+        combined_kwargs.update(kwargs)
+        return CourseApiFactoryMixin.create_course(**combined_kwargs)
 
     def _get_request(self, user=None):
         """
