@@ -90,7 +90,7 @@ git+https://github.com/edx/django-celery.git@f87c6f914a1410463f54aebf68458c0653b
 -e git+https://github.com/edx/codejail.git@a320d43ce6b9c93b17636b2491f724d9e433be47#egg=codejail==0.0
 -e git+https://github.com/edx/django-splash.git@v0.2#egg=django-splash==0.2
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
-git+https://github.com/edx/edx-ora2.git@2.1.2#egg=ora2==2.1.2
+git+https://github.com/edx/edx-ora2.git@2.1.3#egg=ora2==2.1.3
 git+https://github.com/edx/RecommenderXBlock.git@0e744b393cf1f8b886fe77bc697e7d9d78d65cd6#egg=recommender-xblock==1.2
 git+https://github.com/solashirai/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
 -e git+https://github.com/edx/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
