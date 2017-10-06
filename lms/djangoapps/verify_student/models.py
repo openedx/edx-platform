@@ -32,7 +32,6 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from model_utils import Choices
 from model_utils.models import StatusModel, TimeStampedModel
-from simple_history.models import HistoricalRecords
 
 from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.ssencrypt import (
@@ -1042,9 +1041,6 @@ class VerificationDeadline(TimeStampedModel):
     # if the field is set manually we want a way to indicate that so we don't
     # overwrite the manual setting of the field.
     deadline_is_explicit = models.BooleanField(default=False)
-
-    # Maintain a history of changes to deadlines for auditing purposes
-    history = HistoricalRecords()
 
     ALL_DEADLINES_CACHE_KEY = "verify_student.all_verification_deadlines"
 

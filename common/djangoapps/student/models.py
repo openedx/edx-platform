@@ -42,7 +42,6 @@ from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from simple_history.models import HistoricalRecords
 from slumber.exceptions import HttpClientError, HttpServerError
 
 import dogstats_wrapper as dog_stats_api
@@ -1026,9 +1025,6 @@ class CourseEnrollment(models.Model):
     mode = models.CharField(default=CourseMode.DEFAULT_MODE_SLUG, max_length=100)
 
     objects = CourseEnrollmentManager()
-
-    # Maintain a history of requirement status updates for auditing purposes
-    history = HistoricalRecords()
 
     # cache key format e.g enrollment.<username>.<course_key>.mode = 'honor'
     COURSE_ENROLLMENT_CACHE_KEY = u"enrollment.{}.{}.mode"  # TODO Can this be removed?  It doesn't seem to be used.

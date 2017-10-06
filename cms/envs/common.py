@@ -912,9 +912,6 @@ INSTALLED_APPS = [
     # Common views
     'openedx.core.djangoapps.common_views',
 
-    # History tables
-    'simple_history',
-
     # Database-backed configuration
     'config_models',
     'waffle',
