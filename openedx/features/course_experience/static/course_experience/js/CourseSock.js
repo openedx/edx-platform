@@ -24,8 +24,8 @@ export class CourseSock {  // eslint-disable-line import/prefer-default-export
       const distRight = window.outerWidth - ($miniCert.offset().left + $miniCert.width());
 
       // Update positioning when scrolling is in fixed window and screen width is sufficient
-      if ((documentBottom > startFixed && documentBottom < endFixed)
-          || $(window).width() < 960) {
+      if ((documentBottom > startFixed && documentBottom < endFixed
+          && $(window).width() > 960)) {
         $upgradeToVerifiedButton.addClass('attached');
         $upgradeToVerifiedButton.css('right', `${distRight}px`);
       } else {
