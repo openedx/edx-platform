@@ -18,7 +18,7 @@ from course_modes.models import CourseMode
 %>
 
 <%
-if (cert_status['status'] == 'generating' or cert_status['status'] == 'downloadable') and not cert_status['certificate_message_viewable']:
+if cert_status['status'] == 'certificate_earned_but_not_available':
     status_css_class = 'course-status-processing'
 elif cert_status['status'] == 'generating':
     status_css_class = 'course-status-certrendering'
@@ -31,19 +31,17 @@ else:
 %>
 
 % if cert_status['status'] != 'processing':
-  % if not cert_status['certificate_message_viewable']:
-    % if (cert_status['status'] == 'generating' or cert_status['status'] == 'downloadable') and course_overview.certificate_available_date:
-      <div class="message message-status ${status_css_class} is-shown">
-        <p class="message-copy">
-          <%
-            certificate_available_date_string = course_overview.certificate_available_date.strftime('%Y-%m-%dT%H:%M:%S%z')
-            container_string = _("Your certificate will be available on or before {date}")
-            format = 'shortDate'
-          %>
-          <span class="info-date-block localized-datetime" data-language="${user_language}" data-timezone="${user_timezone}" data-datetime="${certificate_available_date_string}" data-format=${format} data-string="${container_string}"></span>
-        </p>
-      </div>
-    % endif
+  % if cert_status['status'] == 'certificate_earned_but_not_available':
+    <div class="message message-status ${status_css_class} is-shown">
+      <p class="message-copy">
+        <%
+          certificate_available_date_string = course_overview.certificate_available_date.strftime('%Y-%m-%dT%H:%M:%S%z')
+          container_string = _("Your certificate will be available on or before {date}")
+          format = 'shortDate'
+        %>
+        <span class="info-date-block localized-datetime" data-language="${user_language}" data-timezone="${user_timezone}" data-datetime="${certificate_available_date_string}" data-format=${format} data-string="${container_string}"></span>
+      </p>
+    </div>
   % else:
     <div class="message message-status ${status_css_class} is-shown">
       <p class="message-copy">${_("Your final grade:")}
@@ -73,37 +71,37 @@ else:
 
       </p>
 
-      % if cert_status['show_disabled_download_button'] or cert_status['show_download_url'] or cert_status['show_survey_button']:
+      % if cert_status['status'] == 'generating' or cert_status['status'] == 'downloadable' or cert_status['show_survey_button']:
         <div class="wrapper-message-primary">
           <ul class="actions actions-primary">
-            % if cert_status['show_disabled_download_button']:
+            % if cert_status['status'] == 'generating':
               <li class="action">
                 <span class="disabled">
                   ${_("Your {cert_name_short} is Generating").format(cert_name_short=cert_name_short)}
                 </span>
               </li>
-            % elif cert_status['show_download_url'] and cert_status.get('show_cert_web_view', False):
+            % elif cert_status['status'] == 'downloadable' and cert_status.get('show_cert_web_view', False):
               <li class="action action-certificate">
                 <a class="btn" href="${cert_status['cert_web_view_url']}" target="_blank"
                    title="${_('This link will open the certificate web view')}">
                   ${_("View {cert_name_short}").format(cert_name_short=cert_name_short,)}
                 </a>
               </li>
-            % elif cert_status['show_download_url'] and enrollment.mode in CourseMode.NON_VERIFIED_MODES:
+            % elif cert_status['status'] == 'downloadable' and enrollment.mode in CourseMode.NON_VERIFIED_MODES:
               <li class="action action-certificate">
                 <a class="btn" href="${cert_status['download_url']}"
                    title="${_('This link will open/download a PDF document')}">
                   ${_("Download {cert_name_short} (PDF)").format(cert_name_short=cert_name_short,)}
                 </a>
               </li>
-            % elif cert_status['show_download_url'] and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':
+            % elif cert_status['status'] == 'downloadable' and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':
               <li class="action">
                 <a class="btn" href="${cert_status['download_url']}"
                    title="${_('This link will open/download a PDF document')}">
                   ${_("Download Your {cert_name_short} (PDF)").format(cert_name_short=cert_name_short)}
                 </a>
               </li>
-            % elif cert_status['show_download_url'] and enrollment.mode in CourseMode.VERIFIED_MODES:
+            % elif cert_status['status'] == 'downloadable' and enrollment.mode in CourseMode.VERIFIED_MODES:
               <li class="action">
                 <a class="btn" href="${cert_status['download_url']}"
                    title="${_('This link will open/download a PDF document of your verified {cert_name_long}.').format(cert_name_long=cert_name_long)}">
@@ -122,7 +120,7 @@ else:
           </ul>
         </div>
 
-        % if cert_status['show_download_url'] and cert_status['linked_in_url']:
+        % if cert_status['status'] == 'downloadable' and cert_status['linked_in_url']:
           <ul class="actions actions-secondary">
               <li class="action action-share">
                 <a class="action-linkedin-profile" target="_blank" href="${cert_status['linked_in_url']}"
@@ -139,7 +137,7 @@ else:
         % endif
       % endif
 
-      % if cert_status['show_download_url'] and cert_status['certificate_message_viewable'] and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':
+      % if cert_status['status'] == 'downloadable' and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':
         <div class="certificate-explanation">
             ${_('Since we did not have a valid set of verification photos from you when your {cert_name_long} was generated, we could not grant you a verified {cert_name_short}. An honor code {cert_name_short} has been granted instead.').format(cert_name_short=cert_name_short, cert_name_long=cert_name_long)}
         </div>

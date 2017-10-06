@@ -234,11 +234,9 @@ def cert_info(user, course_overview, course_mode):
 
     Returns:
         dict: A dictionary with keys:
-            'status': one of 'generating', 'downloadable', 'notpassing', 'processing', 'restricted'
-            'show_download_url': bool
-            'certificate_message_viewable': bool -- if certificates are viewable
+            'status': one of 'generating', 'downloadable', 'notpassing', 'processing', 'restricted', 'unavailable', or
+                'certificate_earned_but_not_available'
             'download_url': url, only present if show_download_url is True
-            'show_disabled_download_button': bool -- true if state is 'generating'
             'show_survey_button': bool
             'survey_url': url, only if show_survey_button is True
             'grade': if status is not 'processing'
@@ -359,13 +357,11 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         CertificateStatuses.unverified: 'unverified',
     }
 
+    certificate_earned_but_not_available_status = 'certificate_earned_but_not_available'
     default_status = 'processing'
 
     default_info = {
         'status': default_status,
-        'certificate_message_viewable': False,
-        'show_disabled_download_button': False,
-        'show_download_url': False,
         'show_survey_button': False,
         'can_unenroll': True,
     }
@@ -373,25 +369,30 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
     if cert_status is None:
         return default_info
 
-    is_hidden_status = cert_status['status'] in ('unavailable', 'processing', 'generating', 'notpassing', 'auditing')
-
-    if course_overview.certificates_display_behavior == 'early_no_info' and is_hidden_status:
-        return {}
-
     status = template_state.get(cert_status['status'], default_status)
+    is_hidden_status = status in ('unavailable', 'processing', 'generating', 'notpassing', 'auditing')
+
+    if (
+        not certificates_viewable_for_course(course_overview) and
+        (status in CertificateStatuses.PASSED_STATUSES) and
+        course_overview.certificate_available_date
+    ):
+        status = certificate_earned_but_not_available_status
+
+    if (
+        course_overview.certificates_display_behavior == 'early_no_info' and
+        is_hidden_status
+    ):
+        return default_info
 
     status_dict = {
         'status': status,
-        'certificate_message_viewable': certificates_viewable_for_course(course_overview),
-        'show_download_url': status == 'downloadable',
-        'show_disabled_download_button': status == 'generating',
         'mode': cert_status.get('mode', None),
         'linked_in_url': None,
         'can_unenroll': status not in DISABLE_UNENROLL_CERT_STATES,
     }
 
-    if (status in ('generating', 'downloadable', 'notpassing', 'restricted', 'auditing', 'unverified') and
-            course_overview.end_of_course_survey_url is not None):
+    if not status == default_status and course_overview.end_of_course_survey_url is not None:
         status_dict.update({
             'show_survey_button': True,
             'survey_url': process_survey_link(course_overview.end_of_course_survey_url, user)})
@@ -408,7 +409,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                 })
             else:
                 # don't show download certificate button if we don't have an active certificate for course
-                status_dict['show_download_url'] = False
+                status_dict['status'] = 'unavailable'
         elif 'download_url' not in cert_status:
             log.warning(
                 u"User %s has a downloadable cert for %s, but no download url",
