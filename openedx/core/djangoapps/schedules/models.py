@@ -35,3 +35,5 @@ class ScheduleConfig(ConfigurationModel):
     create_schedules = models.BooleanField(default=False)
     enqueue_recurring_nudge = models.BooleanField(default=False)
     deliver_recurring_nudge = models.BooleanField(default=False)
+    enqueue_upgrade_reminder = models.BooleanField(default=False)
+    deliver_upgrade_reminder = models.BooleanField(default=False)
