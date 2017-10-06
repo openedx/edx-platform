@@ -44,7 +44,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 6
+    VERSION = 7
 
     # Cache entry versioning.
     version = IntegerField()
@@ -103,6 +103,7 @@ class CourseOverview(TimeStampedModel):
     eligible_for_financial_aid = BooleanField(default=True)
 
     language = TextField(null=True)
+    license = models.CharField(max_length=255, blank=True)
 
     @classmethod
     def _create_or_update(cls, course):
@@ -195,6 +196,7 @@ class CourseOverview(TimeStampedModel):
         course_overview.self_paced = course.self_paced
 
         course_overview.language = course.language
+        course_overview.license = course.license or ''
 
         return course_overview
 

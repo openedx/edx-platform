@@ -508,6 +508,17 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         self.assertEqual(len(course_ids_to_overviews), 1)
         self.assertIn(course_with_overview_1.id, course_ids_to_overviews)
 
+    @ddt.data(
+        ('', '',),
+        (None, '',),
+        ('all-rights-reserved', 'all-rights-reserved',),
+    )
+    @ddt.unpack
+    def test_license(self, license, expected_value):
+        course = CourseFactory.create(emit_signals=True, license=license)
+        course_overview = CourseOverview.get_from_id(course.id)
+        self.assertEqual(course_overview.license, expected_value)
+
 
 @attr(shard=3)
 @ddt.ddt
