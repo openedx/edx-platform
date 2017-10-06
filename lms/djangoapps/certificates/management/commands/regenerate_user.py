@@ -9,6 +9,7 @@ from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 
 from badges.events.course_complete import get_completion_badge
+from badges.utils import badges_enabled
 from certificates.api import regenerate_user_certificates
 from xmodule.modulestore.django import modulestore
 
@@ -100,7 +101,7 @@ class Command(BaseCommand):
                 course_id
             )
 
-            if course.issue_badges:
+            if badges_enabled() and course.issue_badges:
                 badge_class = get_completion_badge(course_id, student)
                 badge = badge_class.get_for_user(student)
 
