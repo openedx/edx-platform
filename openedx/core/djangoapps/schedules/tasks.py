@@ -74,7 +74,12 @@ def recurring_nudge_schedule_hour(
     target_hour = deserialize(target_hour_str)
     msg_type = RecurringNudge(day)
 
-    for (user, language, context) in _recurring_nudge_schedules_for_hour(target_hour, org_list, exclude_orgs):
+    for (user, language, context) in _recurring_nudge_schedules_for_hour(
+        Site.objects.get(id=site_id),
+        target_hour,
+        org_list,
+        exclude_orgs
+    ):
         msg = msg_type.personalize(
             Recipient(
                 user.username,
@@ -99,7 +104,7 @@ def _recurring_nudge_schedule_send(site_id, msg_str):
 
 
 # TODO: delete once _recurring_nudge_schedules_for_bin is fully rolled out
-def _recurring_nudge_schedules_for_hour(target_hour, org_list, exclude_orgs=False):
+def _recurring_nudge_schedules_for_hour(site, target_hour, org_list, exclude_orgs=False):
     beginning_of_day = target_hour.replace(hour=0, minute=0, second=0)
     users = User.objects.filter(
         courseenrollment__schedule__start__gte=beginning_of_day,
@@ -144,14 +149,14 @@ def _recurring_nudge_schedules_for_hour(target_hour, org_list, exclude_orgs=Fals
             'student_name': user.profile.name,
 
             'course_name': first_schedule.enrollment.course.display_name,
-            'course_url': absolute_url(reverse('course_root', args=[str(first_schedule.enrollment.course_id)])),
+            'course_url': absolute_url(site, reverse('course_root', args=[str(first_schedule.enrollment.course_id)])),
 
             # This is used by the bulk email optout policy
             'course_ids': course_id_strs,
 
             # Platform information
             'homepage_url': encode_url(marketing_link('ROOT')),
-            'dashboard_url': absolute_url(dashboard_relative_url),
+            'dashboard_url': absolute_url(site, dashboard_relative_url),
             'template_revision': settings.EDX_PLATFORM_REVISION,
             'platform_name': settings.PLATFORM_NAME,
             'contact_mailing_address': settings.CONTACT_MAILING_ADDRESS,
@@ -168,7 +173,13 @@ def recurring_nudge_schedule_bin(
     target_day = deserialize(target_day_str)
     msg_type = RecurringNudge(abs(day_offset))
 
-    for (user, language, context) in _recurring_nudge_schedules_for_bin(target_day, bin_num, org_list, exclude_orgs):
+    for (user, language, context) in _recurring_nudge_schedules_for_bin(
+        Site.objects.get(id=site_id),
+        target_day,
+        bin_num,
+        org_list,
+        exclude_orgs
+    ):
         msg = msg_type.personalize(
             Recipient(
                 user.username,
@@ -180,7 +191,7 @@ def recurring_nudge_schedule_bin(
         _recurring_nudge_schedule_send.apply_async((site_id, str(msg)), retry=False)
 
 
-def _recurring_nudge_schedules_for_bin(target_day, bin_num, org_list, exclude_orgs=False):
+def _recurring_nudge_schedules_for_bin(site, target_day, bin_num, org_list, exclude_orgs=False):
     beginning_of_day = target_day.replace(hour=0, minute=0, second=0)
     schedules = get_schedules_with_target_date_by_bin_and_orgs(
         schedule_date_field='start',
@@ -198,12 +209,12 @@ def _recurring_nudge_schedules_for_bin(target_day, bin_num, org_list, exclude_or
         course_id_strs = [str(schedule.enrollment.course_id) for schedule in user_schedules]
 
         first_schedule = user_schedules[0]
-        template_context = get_base_template_context()
+        template_context = get_base_template_context(site)
         template_context.update({
             'student_name': user.profile.name,
 
             'course_name': first_schedule.enrollment.course.display_name,
-            'course_url': absolute_url(reverse('course_root', args=[str(first_schedule.enrollment.course_id)])),
+            'course_url': absolute_url(site, reverse('course_root', args=[str(first_schedule.enrollment.course_id)])),
 
             # This is used by the bulk email optout policy
             'course_ids': course_id_strs,
@@ -222,7 +233,13 @@ def upgrade_reminder_schedule_bin(
     target_day = deserialize(target_day_str)
     msg_type = UpgradeReminder()
 
-    for (user, language, context) in _upgrade_reminder_schedules_for_bin(target_day, bin_num, org_list, exclude_orgs):
+    for (user, language, context) in _upgrade_reminder_schedules_for_bin(
+        Site.objects.get(id=site_id),
+        target_day,
+        bin_num,
+        org_list,
+        exclude_orgs
+    ):
         msg = msg_type.personalize(
             Recipient(
                 user.username,
@@ -244,7 +261,7 @@ def _upgrade_reminder_schedule_send(site_id, msg_str):
     ace.send(msg)
 
 
-def _upgrade_reminder_schedules_for_bin(target_day, bin_num, org_list, exclude_orgs=False):
+def _upgrade_reminder_schedules_for_bin(site, target_day, bin_num, org_list, exclude_orgs=False):
     beginning_of_day = target_day.replace(hour=0, minute=0, second=0)
 
     schedules = get_schedules_with_target_date_by_bin_and_orgs(
@@ -268,7 +285,7 @@ def _upgrade_reminder_schedules_for_bin(target_day, bin_num, org_list, exclude_o
         course_id_strs = [course_id_str]
         first_schedule = schedule
 
-        template_context = get_base_template_context()
+        template_context = get_base_template_context(site)
         template_context.update({
             'student_name': user.profile.name,
             'user_personal_address': user.profile.name if user.profile.name else user.username,
@@ -282,11 +299,11 @@ def _upgrade_reminder_schedules_for_bin(target_day, bin_num, org_list, exclude_o
             ),
 
             'course_name': first_schedule.enrollment.course.display_name,
-            'course_url': absolute_url(reverse('course_root', args=[str(first_schedule.enrollment.course_id)])),
+            'course_url': absolute_url(site, reverse('course_root', args=[str(first_schedule.enrollment.course_id)])),
 
             # This is used by the bulk email optout policy
             'course_ids': course_id_strs,
-            'cert_image': absolute_url(static('course_experience/images/verified-cert.png')),
+            'cert_image': absolute_url(site, static('course_experience/images/verified-cert.png')),
         })
 
         yield (user, first_schedule.enrollment.course.language, template_context)

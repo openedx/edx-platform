@@ -83,7 +83,7 @@ class TestUpgradeReminder(CacheIsolationTestCase):
         test_time_str = serialize(test_time)
         for b in range(tasks.UPGRADE_REMINDER_NUM_BINS):
             # waffle flag takes an extra query before it is cached
-            with self.assertNumQueries(2 if b == 0 else 1):
+            with self.assertNumQueries(3 if b == 0 else 2):
                 tasks.upgrade_reminder_schedule_bin(
                     self.site_config.site.id, target_day_str=test_time_str, day_offset=2, bin_num=b,
                     org_list=[schedules[0].enrollment.course.org],
@@ -104,7 +104,7 @@ class TestUpgradeReminder(CacheIsolationTestCase):
         test_time_str = serialize(test_time)
         for b in range(tasks.UPGRADE_REMINDER_NUM_BINS):
             # waffle flag takes an extra query before it is cached
-            with self.assertNumQueries(2 if b == 0 else 1):
+            with self.assertNumQueries(3 if b == 0 else 2):
                 tasks.upgrade_reminder_schedule_bin(
                     self.site_config.site.id, target_day_str=test_time_str, day_offset=2, bin_num=b,
                     org_list=[schedule.enrollment.course.org],
@@ -176,7 +176,7 @@ class TestUpgradeReminder(CacheIsolationTestCase):
 
         test_time = datetime.datetime(2017, 8, 3, 17, tzinfo=pytz.UTC)
         test_time_str = serialize(test_time)
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             tasks.upgrade_reminder_schedule_bin(
                 limited_config.site.id, target_day_str=test_time_str, day_offset=2, bin_num=0,
                 org_list=org_list, exclude_orgs=exclude_orgs,
@@ -200,7 +200,7 @@ class TestUpgradeReminder(CacheIsolationTestCase):
 
         test_time = datetime.datetime(2017, 8, 3, 19, 44, 30, tzinfo=pytz.UTC)
         test_time_str = serialize(test_time)
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             tasks.upgrade_reminder_schedule_bin(
                 self.site_config.site.id, target_day_str=test_time_str, day_offset=2,
                 bin_num=user.id % tasks.UPGRADE_REMINDER_NUM_BINS,
@@ -241,7 +241,7 @@ class TestUpgradeReminder(CacheIsolationTestCase):
             with patch.object(tasks, '_upgrade_reminder_schedule_send') as mock_schedule_send:
                 mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
 
-                with self.assertNumQueries(2):
+                with self.assertNumQueries(3):
                     tasks.upgrade_reminder_schedule_bin(
                         self.site_config.site.id, target_day_str=test_time_str, day_offset=day,
                         bin_num=user.id % tasks.UPGRADE_REMINDER_NUM_BINS,

@@ -7,12 +7,12 @@ from django.utils.http import urlquote
 from edxmako.shortcuts import marketing_link
 
 
-def get_base_template_context():
+def get_base_template_context(site):
     """Dict with entries needed for all templates that use the base template"""
     return {
         # Platform information
         'homepage_url': encode_url(marketing_link('ROOT')),
-        'dashboard_url': absolute_url(reverse('dashboard')),
+        'dashboard_url': absolute_url(site, reverse('dashboard')),
         'template_revision': settings.EDX_PLATFORM_REVISION,
         'platform_name': settings.PLATFORM_NAME,
         'contact_mailing_address': settings.CONTACT_MAILING_ADDRESS,
@@ -30,10 +30,10 @@ def encode_url(url):
     return modified_url.geturl()
 
 
-def absolute_url(relative_path):
-    root = settings.LMS_ROOT_URL.rstrip('/')
+def absolute_url(site, relative_path):
+    root = site.domain.rstrip('/')
     relative_path = relative_path.lstrip('/')
-    return encode_url(u'{root}/{path}'.format(root=root, path=relative_path))
+    return encode_url(u'https://{root}/{path}'.format(root=root, path=relative_path))
 
 
 def encode_urls_in_dict(mapping):
