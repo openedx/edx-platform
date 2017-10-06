@@ -121,19 +121,27 @@ class CertificateDashboardMessageDisplayTest(CertificateDisplayTestBase):
     def _check_message(self, certificate_available_date):
         response = self.client.get(reverse('dashboard'))
 
-        if datetime.datetime.now(UTC) < certificate_available_date:
+        if certificate_available_date is None:
+            self.assertNotContains(response, u"Your certificate will be available on")
+            self.assertNotContains(response, u"View Test_Certificate")
+        elif datetime.datetime.now(UTC) < certificate_available_date:
             self.assertContains(response, u"Your certificate will be available on")
             self.assertNotContains(response, u"View Test_Certificate")
         else:
             self._check_can_download_certificate()
 
-    @ddt.data(False)
+    @ddt.data(True, False, None)
     def test_certificate_available_date(self, past_certificate_available_date):
         cert = self._create_certificate('verified')
         cert.status = CertificateStatuses.downloadable
         cert.save()
 
-        certificate_available_date = PAST_DATE if past_certificate_available_date else FUTURE_DATE
+        if past_certificate_available_date is None:
+            certificate_available_date = None
+        elif past_certificate_available_date:
+            certificate_available_date = PAST_DATE
+        elif not past_certificate_available_date:
+            certificate_available_date = FUTURE_DATE
 
         self.course.certificate_available_date = certificate_available_date
         self.course.save()
