@@ -11,10 +11,23 @@ from urllib import quote, urlencode
 from uuid import uuid4
 
 import ddt
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponseBadRequest
+from django.test import TestCase
+from django.test.client import Client, RequestFactory
+from django.test.utils import override_settings
 from freezegun import freeze_time
+from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, PropertyMock, create_autospec, patch
 from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import Location
 from pytz import UTC
+from xblock.core import XBlock
+from xblock.fields import Scope, String
+from xblock.fragment import Fragment
 
 import courseware.views.views as views
 import shoppingcart
@@ -32,19 +45,9 @@ from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
-from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
-from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseBadRequest
-from django.test import TestCase
-from django.test.client import Client, RequestFactory
-from django.test.utils import override_settings
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
-from milestones.tests.utils import MilestonesTestCaseMixin
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import Location
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -52,19 +55,17 @@ from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory, TEST_PASSWORD
+from student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.tests.test_date_utils import fake_pgettext, fake_ugettext
 from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
-from xblock.core import XBlock
-from xblock.fields import Scope, String
-from xblock.fragment import Fragment
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -2193,6 +2194,7 @@ class TestIndexView(ModuleStoreTestCase):
     """
     Tests of the courseware.views.index view.
     """
+    SEO_WAFFLE_FLAG = CourseWaffleFlag(WaffleFlagNamespace(name='seo'), 'enable_anonymous_courseware_access')
 
     @XBlock.register_temp_plugin(ViewCheckerBlock, 'view_checker')
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -2261,6 +2263,28 @@ class TestIndexView(ModuleStoreTestCase):
             ) + '?activate_block_id=test_block_id'
         )
         self.assertIn("Activate Block ID: test_block_id", response.content)
+
+    def test_anonymous_access(self):
+        course = CourseFactory()
+        with self.store.bulk_operations(course.id):
+            chapter = ItemFactory(parent=course, category='chapter')
+            section = ItemFactory(parent=chapter, category='sequential')
+
+        url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': str(course.id),
+                'chapter': chapter.url_name,
+                'section': section.url_name,
+            }
+        )
+        response = self.client.get(url, follow=False)
+        assert response.status_code == 302
+
+        waffle_flag = CourseWaffleFlag(WaffleFlagNamespace(name='seo'), 'enable_anonymous_courseware_access')
+        with override_waffle_flag(waffle_flag, active=True):
+            response = self.client.get(url, follow=False)
+            assert response.status_code == 200
 
 
 @ddt.ddt

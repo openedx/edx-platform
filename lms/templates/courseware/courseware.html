@@ -94,6 +94,16 @@ from openedx.features.course_experience import course_home_page_title, COURSE_OU
     var $$course_id = "${course.id | n, js_escaped_string}";
   </script>
 
+  % if not request.user.is_authenticated():
+      <script type="text/javascript">
+        // Disable discussions
+        $('.xblock-student_view-discussion button.discussion-show').attr('disabled', true);
+
+        // Insert message informing user discussions are only available to logged in users.
+        $('.discussion-module')
+      </script>
+  % endif
+
 ${HTML(fragment.foot_html())}
 
 </%block>
