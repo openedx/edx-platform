@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-09-28 16:39+0000\n"
-"PO-Revision-Date: 2017-09-28 16:39:57.493848\n"
+"POT-Creation-Date: 2017-10-06 13:30+0000\n"
+"PO-Revision-Date: 2017-10-06 13:30:33.183670\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3132,6 +3132,11 @@ msgstr ""
 msgid "General"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Text"
 msgstr ""
@@ -5165,6 +5170,20 @@ msgid "Course Starts"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
+msgid "Don't forget to add a calendar reminder!"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "Course starts in {time_remaining_string} on {course_start_date}."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "Course starts in {time_remaining_string} at {course_start_time}."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
 msgid "Course End"
 msgstr ""
 
@@ -5184,11 +5203,38 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "This course is ending in {time_remaining_string} on {course_end_date}."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "This course is ending in {time_remaining_string} at {course_end_time}."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
 msgid "Certificate Available"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Day certificates will become available for passing verified learners."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid ""
+"If you have earned a certificate, you will be able to access it "
+"{time_remaining_string} from now. You will also be able to view your "
+"certificates on your {learner_profile_link}."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Learner Profile"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "We are working on generating course certificates."
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -5203,6 +5249,27 @@ msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Upgrade to Verified Certificate"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid ""
+"In order to qualify for a certificate, you must meet all course grading "
+"requirements, upgrade before the course deadline, and successfully verify "
+"your identity on {platform_name} if you have not done so "
+"already.{button_panel}"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "Upgrade ({upgrade_price})"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid ""
+"Don't forget, you have {time_remaining_string} left to upgrade to a Verified"
+" Certificate."
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -9907,7 +9974,7 @@ msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
-msgid " {sign_in_link} or {register_link} and then enroll in this course."
+msgid "{sign_in_link} or {register_link} and then enroll in this course."
 msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
@@ -9921,21 +9988,12 @@ msgstr ""
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid ""
-"{open_enroll_link} Enroll now{close_enroll_link} to access the full course."
+"{open_enroll_link}Enroll now{close_enroll_link} to access the full course."
 msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "Welcome to {course_display_name}"
-msgstr ""
-
-#: openedx/features/course_experience/views/course_home_messages.py
-msgid "Don't forget to add a calendar reminder!"
-msgstr ""
-
-#: openedx/features/course_experience/views/course_home_messages.py
-#, python-brace-format
-msgid "Course starts in {days_until_start_string} on {course_start_date}."
 msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
@@ -14079,9 +14137,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid ""
-"Final course details are being wrapped up at this time. Your final standing "
-"will be available shortly."
+msgid "Your certificate will be available on or before {date}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -18113,19 +18169,6 @@ msgstr ""
 msgid "This is your last visited course section."
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "This course has not started yet."
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "We're still working on course content."
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid ""
-"This course has not started yet, and will launch on {launch_date_html}."
-msgstr ""
-
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
 msgstr ""
@@ -18183,10 +18226,6 @@ msgstr ""
 #: openedx/features/learner_profile/templates/learner_profile/learner-achievements-fragment.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore New Courses"
-msgstr ""
-
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Learner Profile"
 msgstr ""
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
