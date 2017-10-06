@@ -27,7 +27,7 @@ $lms-label-color: palette(grayscale, black) !default;
 $lms-active-color: palette(primary, base) !default;
 $lms-preview-menu-color: #c8c8c8 !default;
 $lms-inactive-color: rgb(94,94,94) !default;
-$success-color: palette(success, accent) !default;
+$success-color: rgb(0, 155, 0) !default;
 $success-color-hover: palette(success, text) !default;
 
 $button-bg-hover-color: $white !default;
@@ -49,6 +49,8 @@ $light-grey-solid: rgba(200,200,200, 1) !default;
 
 $header-border-color: $gray-l1 !default;
 
+$table-bg-accent:               #f9f9f9 !default;
+
 // ----------------------------
 // #TYPOGRAPHY
 // ----------------------------
@@ -67,6 +69,13 @@ $lms-dark-icon-background-color: palette(grayscale, black) !default;
 $site-status-color: rgb(182,37,103) !default;
 
 $shadow-l1: rgba(0,0,0,0.1) !default;
+
+$error-color: rgb(203, 7, 18) !default;
+$warning-color: rgb(255, 192, 31) !default;
+$confirm-color: rgb(0, 132, 1) !default;
+$active-color: $blue !default;
+$highlight-color: rgb(255,255,0) !default;
+$alert-color: rgb(212, 64, 64) !default;
 
 // ----------------------------
 // #ALERTS

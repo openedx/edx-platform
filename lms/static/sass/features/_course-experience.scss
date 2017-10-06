@@ -81,7 +81,11 @@
         color: $black-t2;
       }
     }
-    // Course Goal Styling
+    // Course Goal Message Styling
+    .success-message {
+      font-size: font-size(small);
+    }
+
     .goal-options-container {
       margin-top: $baseline;
       text-align: center;
@@ -155,8 +159,73 @@
   @include margin-left(0);
   @include padding-left($baseline);
 
-  .section-tools li:not(:first-child) {
-    margin-top: ($baseline / 5);
+  // Course Goal Updates
+  .section-goals {
+    @include float(left);
+    border: 1px solid $lms-border-color;
+    padding: $baseline*0.75 $baseline*0.75 $baseline*0.25;
+    border-radius: 5px;
+    position: relative;
+    width: 100%;
+    cursor: pointer;
+    margin-bottom: $baseline/2;
+
+    &.hidden {
+      display: none;
+    }
+
+    .edit-goal-select {
+      display: none;
+      background-color: transparent;
+    }
+
+    .edit-icon {
+      @include right($baseline/4);
+      position: absolute;
+      top: $baseline*0.6;
+      cursor: pointer;
+      border: transparent;
+      background-color: transparent;
+
+      &:hover {
+        color: $lms-border-color;
+      }
+    }
+
+    .current-goal-container {
+      .title{
+        @include float(left);
+        @include margin-right($baseline/4);
+      }
+
+      .title-label {
+        display: none;
+      }
+
+      .goal {
+        @include float(left);
+        @include padding-left($baseline*0.4);
+
+      }
+      .response-icon {
+        @include margin-left($baseline/4);
+        @include right(-1*$baseline);
+        top: $baseline*0.75;
+        position: absolute;
+
+        &.fa-check {
+          color: $success-color;
+        }
+
+        &.fa-close {
+          color: $error-color;
+        }
+      }
+    }
+
+    .section-tools .course-tool:not(:first-child) {
+      margin-top: ($baseline / 5);
+    }
   }
 }
 

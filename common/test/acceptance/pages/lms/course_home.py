@@ -34,12 +34,21 @@ class CourseHomePage(CoursePage):
 
     def select_course_goal(self):
         """ Click on a course goal in a message """
-        self.q(css='.goal-option').first.click()
+        self.q(css='button.goal-option').first.click()
         self.wait_for_ajax()
 
     def is_course_goal_success_message_shown(self):
         """ Verifies course goal success message appears. """
         return self.q(css='.success-message').present
+
+    def is_course_goal_update_field_shown(self):
+        """ Verifies course goal success message appears. """
+        return self.q(css='.current-goal-container').visible
+
+    def is_course_goal_update_icon_shown(self, valid=True):
+        """ Verifies course goal success or error icon appears. """
+        correct_icon = 'check' if valid else 'close'
+        return self.q(css='.fa-{icon}'.format(icon=correct_icon)).present
 
     def click_bookmarks_button(self):
         """ Click on Bookmarks button """

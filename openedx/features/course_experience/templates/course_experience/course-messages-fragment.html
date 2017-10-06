@@ -19,13 +19,13 @@ is_rtl = get_language_bidi()
     % for message in course_home_messages:
         <div class="course-message grid-manual">
             % if not is_rtl:
-                <img class="message-author" alt="${_('Course message author')}" role="none" src="${static.url(image_src)}"/>
+                <img class="message-author" alt="" src="${static.url(image_src)}"/>
             % endif
-            <div class="message-content">
+            <div class="message-content" aria-live="polite">
                 ${HTML(message.message_html)}
             </div>
             % if is_rtl:
-                <img class="message-author" alt="${_('Course message author')}" role="none" src="${static.url(image_src)}"/>
+                <img class="message-author" alt="" src="${static.url(image_src)}"/>
             % endif
         </div>
     % endfor
