@@ -96,7 +96,7 @@ export class CourseHome {  // eslint-disable-line import/prefer-default-export
     const $vcDismissToggle = $('.vc-toggle', $vcMessage);
     const logEventProperties = { courseRunKey: this.courseRunKey };
 
-    Logger.log('edx.course.upgrade.hero.displayed', logEventProperties);
+    Logger.log('edx.bi.course.upgrade.hero.displayed', logEventProperties);
 
     // Get height of container and button
     let vcHeight = $vcMessage.outerHeight();
@@ -125,7 +125,7 @@ export class CourseHome {  // eslint-disable-line import/prefer-default-export
     $vcDismissToggle.click(() => {
       if ($vcMessage.hasClass('polite')) {
         // Expand message
-        Logger.log('edx.course.upgrade.hero.expanded', logEventProperties);
+        Logger.log('edx.bi.course.upgrade.hero.expanded', logEventProperties);
         this.persistUpgradeMessageState(false);
 
         $('.vc-fade').fadeOut(400);
@@ -136,14 +136,15 @@ export class CourseHome {  // eslint-disable-line import/prefer-default-export
         });
       } else {
         // Collapse message
-        Logger.log('edx.course.upgrade.hero.collapsed', logEventProperties);
+        Logger.log('edx.bi.course.upgrade.hero.collapsed', logEventProperties);
         this.persistUpgradeMessageState(true);
         collapseMessage();
       }
     });
 
     $('.btn-upgrade', $vcMessage).click(() => {
-      Logger.log('edx.course.upgrade.hero.clicked', logEventProperties);
+      Logger.log('edx.bi.course.upgrade.hero.clicked', logEventProperties);
+      Logger.log('edx.course.enrollment.upgrade.clicked', { location: 'hero' });
     });
   }
 }

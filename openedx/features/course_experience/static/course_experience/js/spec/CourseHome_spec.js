@@ -57,13 +57,14 @@ describe('Course Home factory', () => {
 
     it('should send events to Segment and edX on initial load', () => {
       expect(window.analytics.track).toHaveBeenCalledWith('Promotion Viewed', segmentEventProperties);
-      expect(Logger.log).toHaveBeenCalledWith('edx.course.upgrade.hero.displayed', { courseRunKey: runKey });
+      expect(Logger.log).toHaveBeenCalledWith('edx.bi.course.upgrade.hero.displayed', { courseRunKey: runKey });
     });
 
     it('should send events to Segment and edX after clicking the upgrade button ', () => {
       $('.vc-message .btn-upgrade').click();
       expect(window.analytics.track).toHaveBeenCalledWith('Promotion Viewed', segmentEventProperties);
-      expect(Logger.log).toHaveBeenCalledWith('edx.course.upgrade.hero.clicked', { courseRunKey: runKey });
+      expect(Logger.log).toHaveBeenCalledWith('edx.bi.course.upgrade.hero.clicked', { courseRunKey: runKey });
+      expect(Logger.log).toHaveBeenCalledWith('edx.course.enrollment.upgrade.clicked', { location: 'hero' });
     });
   });
 
