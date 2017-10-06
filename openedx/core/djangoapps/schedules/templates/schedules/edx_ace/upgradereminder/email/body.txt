@@ -11,4 +11,4 @@ Dear {{ user_personal_address }},
     Upgrade by {{ user_schedule_upgrade_deadline_time }}.
 {% endblocktrans %}
 
-{% trans "Upgrade now at" %} <{{ course_url }}>
+{% trans "Upgrade now at" %} <{{ upsell_link }}>

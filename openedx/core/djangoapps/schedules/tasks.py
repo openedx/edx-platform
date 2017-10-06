@@ -326,14 +326,6 @@ def _upgrade_reminder_schedules_for_bin(site, target_day, bin_num, org_list, exc
         template_context.update({
             'student_name': user.profile.name,
             'user_personal_address': user.profile.name if user.profile.name else user.username,
-            'user_schedule_upgrade_deadline_time': dateformat.format(
-                schedule.upgrade_deadline,
-                get_format(
-                    'DATE_FORMAT',
-                    lang=first_schedule.enrollment.course.language,
-                    use_l10n=True
-                )
-            ),
 
             'course_name': first_schedule.enrollment.course.display_name,
             'course_url': absolute_url(site, reverse('course_root', args=[str(first_schedule.enrollment.course_id)])),
@@ -342,6 +334,8 @@ def _upgrade_reminder_schedules_for_bin(site, target_day, bin_num, org_list, exc
             'course_ids': course_id_strs,
             'cert_image': absolute_url(site, static('course_experience/images/verified-cert.png')),
         })
+
+        _add_upsell_button_to_email_template(user, first_schedule, template_context)
 
         yield (user, first_schedule.enrollment.course.language, template_context)
 
