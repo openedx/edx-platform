@@ -1,13 +1,8 @@
 """
 Utilities for django models.
 """
-import re
-import unicodedata
-
 from django.conf import settings
 from django.dispatch import Signal
-from django.utils.encoding import force_unicode
-from django.utils.safestring import mark_safe
 from django_countries.fields import Country
 
 from eventtracking import tracker
@@ -171,20 +166,3 @@ def _get_truncated_setting_value(value, max_length=None):
         return value[0:max_length], True
     else:
         return value, False
-
-
-# Taken from Django 1.8 source code because it's not supported in 1.4
-def slugify(value):
-    """Converts value into a string suitable for readable URLs.
-
-    Converts to ASCII. Converts spaces to hyphens. Removes characters that
-    aren't alphanumerics, underscores, or hyphens. Converts to lowercase.
-    Also strips leading and trailing whitespace.
-
-    Args:
-        value (string): String to slugify.
-    """
-    value = force_unicode(value)
-    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
-    value = re.sub(r'[^\w\s-]', '', value).strip().lower()
-    return mark_safe(re.sub(r'[-\s]+', '-', value))
