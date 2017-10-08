@@ -1203,7 +1203,7 @@ def get_issued_certificates(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @common_exceptions_400
-def get_students_features(request, course_id, csv=False):  # pylint: disable=redefined-outer-name
+def get_students_features(request, course_id, csv=False, only_active=False):  # pylint: disable=redefined-outer-name
     """
     Respond with json which contains a summary of all enrolled students profile information.
 
@@ -1284,7 +1284,8 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         lms.djangoapps.instructor_task.api.submit_calculate_students_features_csv(
             request,
             course_key,
-            query_features
+            query_features,
+            only_active
         )
         success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
 

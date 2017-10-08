@@ -21,7 +21,7 @@ urlpatterns = patterns(
         'lms.djangoapps.instructor.views.api.get_problem_responses', name="get_problem_responses"),
     url(r'^get_grading_config$',
         'lms.djangoapps.instructor.views.api.get_grading_config', name="get_grading_config"),
-    url(r'^get_students_features(?P<csv>/csv)?$',
+    url(r'^get_students_features(?P<only_active>/active)?/?(?P<csv>/csv)?$',
         'lms.djangoapps.instructor.views.api.get_students_features', name="get_students_features"),
     url(r'^get_issued_certificates/$',
         'lms.djangoapps.instructor.views.api.get_issued_certificates', name="get_issued_certificates"),

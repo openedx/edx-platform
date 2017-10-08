@@ -360,7 +360,7 @@ def submit_problem_grade_report(request, course_key):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def submit_calculate_students_features_csv(request, course_key, features):
+def submit_calculate_students_features_csv(request, course_key, features, only_active=False):
     """
     Submits a task to generate a CSV containing student profile info.
 
@@ -368,7 +368,7 @@ def submit_calculate_students_features_csv(request, course_key, features):
     """
     task_type = 'profile_info_csv'
     task_class = calculate_students_features_csv
-    task_input = features
+    task_input = {"query_features": features, "only_active": only_active}
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

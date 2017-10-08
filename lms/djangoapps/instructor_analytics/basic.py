@@ -203,7 +203,7 @@ def issued_certificates(course_key, features):
     return generated_certificates
 
 
-def enrolled_students_features(course_key, features):
+def enrolled_students_features(course_key, features, only_active=False):
     """
     Return list of student features as dictionaries.
 
@@ -219,10 +219,14 @@ def enrolled_students_features(course_key, features):
     include_enrollment_mode = 'enrollment_mode' in features
     include_verification_status = 'verification_status' in features
 
-    students = User.objects.filter(
-        courseenrollment__course_id=course_key,
-        courseenrollment__is_active=1,
-    ).order_by('username').select_related('profile')
+    filter_kwargs = {
+        'courseenrollment__course_id': course_key,
+        'courseenrollment__is_active': True
+    }
+    if only_active:
+        filter_kwargs['is_active'] = True
+
+    students = User.objects.filter(**filter_kwargs).order_by('username').select_related('profile')
 
     if include_cohort_column:
         students = students.prefetch_related('course_groups')

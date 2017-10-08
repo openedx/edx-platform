@@ -97,6 +97,7 @@
             this.ddc = new DataDownloadCertificate(this.$section.find('.issued_certificates'));
             this.$list_studs_btn = this.$section.find("input[name='list-profiles']");
             this.$list_studs_csv_btn = this.$section.find("input[name='list-profiles-csv']");
+            this.$list_studs_active_csv_btn = this.$section.find("input[name='list-profiles-active-csv']");
             this.$proctored_exam_csv_btn = this.$section.find("input[name='proctored-exam-results-report']");
             this.$survey_results_csv_btn = this.$section.find("input[name='survey-results-report']");
             this.$list_may_enroll_csv_btn = this.$section.find("input[name='list-may-enroll-csv']");
@@ -173,7 +174,7 @@
                 });
             });
             this.$list_studs_csv_btn.click(function() {
-                var url = dataDownloadObj.$list_studs_csv_btn.data('endpoint') + '/csv';
+                var url = $(this).data('endpoint') + '/csv';
                 var errorMessage = gettext('Error generating student profile information. Please try again.');
                 dataDownloadObj.clear_display();
                 return $.ajax({
@@ -197,6 +198,7 @@
                     }
                 });
             });
+            this.$list_studs_active_csv_btn.click(this.$list_studs_csv_btn.data("events").click[0].handler);
             this.$list_studs_btn.click(function() {
                 var url = dataDownloadObj.$list_studs_btn.data('endpoint');
                 dataDownloadObj.clear_display();
