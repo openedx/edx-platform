@@ -35,6 +35,12 @@ CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
 CATALOG_VISIBILITY_ABOUT = "about"
 CATALOG_VISIBILITY_NONE = "none"
 
+DEFAULT_COURSE_VISIBILITY_IN_CATALOG = getattr(
+    settings,
+    'DEFAULT_COURSE_VISIBILITY_IN_CATALOG',
+    'both'
+)
+
 DEFAULT_MOBILE_AVAILABLE = getattr(settings, 'DEFAULT_MOBILE_AVAILABLE', False)
 
 
@@ -671,7 +677,7 @@ class CourseFields(object):
             "of three values: 'both' (show in catalog and allow access to about page), 'about' (only allow access "
             "to about page), 'none' (do not show in catalog and do not allow access to an about page)."
         ),
-        default=CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+        default=DEFAULT_COURSE_VISIBILITY_IN_CATALOG,
         scope=Scope.settings,
         values=[
             {"display_name": _("Both"), "value": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
