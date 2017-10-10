@@ -9,12 +9,15 @@ define(
                 renderCourseVideoSettingsView,
                 destroyCourseVideoSettingsView,
                 verifyPreferanceErrorState,
+                selectPreference,
+                chooseProvider,
                 transcriptPreferencesUrl = '/transcript_preferences/course-v1:edX+DemoX+Demo_Course',
                 activeTranscriptPreferences = {
                     provider: 'Cielo24',
                     cielo24_fidelity: 'PROFESSIONAL',
                     cielo24_turnaround: 'PRIORITY',
                     three_play_turnaround: '',
+                    video_source_language: 'en',
                     preferred_languages: ['fr', 'en'],
                     modified: '2017-08-27T12:28:17.421260Z'
                 },
@@ -22,7 +25,8 @@ define(
                     '3PlayMedia': {
                         languages: {
                             fr: 'French',
-                            en: 'English'
+                            en: 'English',
+                            ur: 'Urdu'
                         },
                         turnaround: {
                             default: '4-Day/Default',
@@ -30,6 +34,10 @@ define(
                             rush_service: '24-hour/Rush',
                             extended_service: '10-Day/Extended',
                             expedited_service: '2-Day/Expedited'
+                        },
+                        translations: {
+                            es: ['en'],
+                            en: ['en', 'ur']
                         },
                         display_name: '3PlayMedia'
                     },
@@ -92,6 +100,18 @@ define(
                 expect($preferanceContainerEl.find('.error-info').html()).toEqual(requiredText);
             };
 
+            selectPreference = function(preferenceSelector, preferanceValue) {
+                var $preference = $courseVideoSettingsEl.find(preferenceSelector);
+                // Select a vlaue for preference.
+                $preference.val(preferanceValue);
+                // Trigger on change event.
+                $preference.change();
+            };
+
+            chooseProvider = function(selectedProvider) {
+                $courseVideoSettingsEl.find('#transcript-provider-' + selectedProvider).click();
+            };
+
             beforeEach(function() {
                 setFixtures(
                     '<div class="video-transcript-settings-wrapper"></div>' +
@@ -135,9 +155,10 @@ define(
                 renderCourseVideoSettingsView(null, null);
 
                 expect($courseVideoSettingsEl.find('.transcript-provider-group').html()).toEqual('');
-                expect($courseVideoSettingsEl.find('#transcript-turnaround').html()).toEqual('');
-                expect($courseVideoSettingsEl.find('#transcript-fidelity').html()).toEqual('');
-                expect($courseVideoSettingsEl.find('#transcript-language').html()).toEqual('');
+                expect($courseVideoSettingsEl.find('.transcript-turnaround').html()).toEqual('');
+                expect($courseVideoSettingsEl.find('.transcript-fidelity').html()).toEqual('');
+                expect($courseVideoSettingsEl.find('.video-source-language').html()).toEqual('');
+                expect($courseVideoSettingsEl.find('.transcript-language-menu').html()).toEqual('');
             });
 
             it('populates transcription plans correctly', function() {
@@ -151,11 +172,14 @@ define(
                 expect($courseVideoSettingsEl.find('.transcript-provider-group input:checked').val()).toEqual(
                     activeTranscriptPreferences.provider
                 );
-                expect($courseVideoSettingsEl.find('#transcript-turnaround').val()).toEqual(
+                expect($courseVideoSettingsEl.find('.transcript-turnaround').val()).toEqual(
                     activeTranscriptPreferences.cielo24_turnaround
                 );
-                expect($courseVideoSettingsEl.find('#transcript-fidelity').val()).toEqual(
+                expect($courseVideoSettingsEl.find('.transcript-fidelity').val()).toEqual(
                     activeTranscriptPreferences.cielo24_fidelity
+                );
+                expect($courseVideoSettingsEl.find('.video-source-language').val()).toEqual(
+                    activeTranscriptPreferences.video_source_language
                 );
                 expect($courseVideoSettingsEl.find('.transcript-language-container').length).toEqual(
                     activeTranscriptPreferences.preferred_languages.length
@@ -165,7 +189,122 @@ define(
                 expect(courseVideoSettingsView.selectedProvider, activeTranscriptPreferences.provider);
                 expect(courseVideoSettingsView.selectedTurnaroundPlan, activeTranscriptPreferences.cielo24_turnaround);
                 expect(courseVideoSettingsView.selectedFidelityPlan, activeTranscriptPreferences.cielo24_fidelity);
+                expect(
+                    courseVideoSettingsView.selectedSourceLanguage,
+                    activeTranscriptPreferences.video_source_language
+                );
                 expect(courseVideoSettingsView.selectedLanguages, activeTranscriptPreferences.preferred_languages);
+            });
+
+            it('shows video source language directly in case of 3Play provider', function() {
+                var sourceLanguages,
+                    selectedProvider = '3PlayMedia';
+
+                // Select CIELIO24 provider
+                chooseProvider(selectedProvider);
+                expect(courseVideoSettingsView.selectedProvider).toEqual(selectedProvider);
+
+                // Verify source langauges menu is shown.
+                sourceLanguages = courseVideoSettingsView.getSourceLanguages();
+                expect($courseVideoSettingsEl.find('.video-source-language option')).toExist();
+                expect($courseVideoSettingsEl.find('.video-source-language option').length).toEqual(
+                    _.keys(sourceLanguages).length + 1
+                );
+
+                expect(_.keys(transcriptionPlans[selectedProvider].translations)).toEqual(_.keys(sourceLanguages));
+            });
+
+            it('shows source language when fidelity is selected', function() {
+                var sourceLanguages,
+                    selectedProvider = 'Cielo24',
+                    selectedFidelity = 'PROFESSIONAL';
+
+                renderCourseVideoSettingsView(null, transcriptionPlans);
+
+                // Select CIELIO24 provider
+                chooseProvider(selectedProvider);
+                expect(courseVideoSettingsView.selectedProvider).toEqual(selectedProvider);
+
+                // Verify source language is not shown.
+                sourceLanguages = courseVideoSettingsView.getSourceLanguages();
+                expect($courseVideoSettingsEl.find('.video-source-language option')).not.toExist();
+                expect(sourceLanguages).toBeUndefined();
+
+                // Select fidelity
+                selectPreference('.transcript-fidelity', selectedFidelity);
+                expect(courseVideoSettingsView.selectedFidelityPlan).toEqual(selectedFidelity);
+
+                // Verify source langauges menu is shown.
+                sourceLanguages = courseVideoSettingsView.getSourceLanguages();
+                expect($courseVideoSettingsEl.find('.video-source-language option')).toExist();
+                expect($courseVideoSettingsEl.find('.video-source-language option').length).toEqual(
+                    _.keys(sourceLanguages).length + 1
+                );
+
+                // Verify getSourceLangaues return a list of langauges.
+                expect(sourceLanguages).toBeDefined();
+                expect(transcriptionPlans[selectedProvider].fidelity[selectedFidelity].languages).toEqual(
+                    sourceLanguages
+                );
+            });
+
+            it('shows target language when source language is selected', function() {
+                var targetLanguages,
+                    selectedSourceLanguage = 'en',
+                    selectedProvider = 'Cielo24',
+                    selectedFidelity = 'PROFESSIONAL';
+
+                // Select CIELIO24 provider
+                chooseProvider(selectedProvider);
+                expect(courseVideoSettingsView.selectedProvider).toEqual(selectedProvider);
+
+                // Select fidelity
+                selectPreference('.transcript-fidelity', selectedFidelity);
+                expect(courseVideoSettingsView.selectedFidelityPlan).toEqual(selectedFidelity);
+
+                // Verify target langauges not shown.
+                expect($courseVideoSettingsEl.find('.transcript-language-menu:visible option')).not.toExist();
+
+                // Select source language
+                selectPreference('.video-source-language', selectedSourceLanguage);
+                expect(courseVideoSettingsView.selectedVideoSourceLanguage).toEqual(selectedSourceLanguage);
+
+                // Verify target languages are shown.
+                targetLanguages = courseVideoSettingsView.getTargetLanguages();
+                expect($courseVideoSettingsEl.find('.transcript-language-menu:visible option')).toExist();
+                expect($courseVideoSettingsEl.find('.transcript-language-menu:visible option').length).toEqual(
+                    _.keys(targetLanguages).length + 1
+                );
+            });
+
+            it('shows target language same as selected source language in case of mechanical fidelity', function() {
+                var targetLanguages,
+                    selectedSourceLanguage = 'en',
+                    selectedProvider = 'Cielo24',
+                    selectedFidelity = 'MECHANICAL';
+
+                // Select CIELIO24 provider
+                chooseProvider(selectedProvider);
+                expect(courseVideoSettingsView.selectedProvider).toEqual(selectedProvider);
+
+                // Select fidelity
+                selectPreference('.transcript-fidelity', selectedFidelity);
+                expect(courseVideoSettingsView.selectedFidelityPlan).toEqual(selectedFidelity);
+
+                // Select source language
+                selectPreference('.video-source-language', selectedSourceLanguage);
+                expect(courseVideoSettingsView.selectedVideoSourceLanguage).toEqual(selectedSourceLanguage);
+
+                // Verify target languages are shown.
+                targetLanguages = courseVideoSettingsView.getTargetLanguages();
+                expect($courseVideoSettingsEl.find('.transcript-language-menu:visible option')).toExist();
+                expect($courseVideoSettingsEl.find('.transcript-language-menu:visible option').length).toEqual(
+                    _.keys(targetLanguages).length + 1
+                );
+
+                // Also verify that target language are same as selected source language.
+                expect(_.keys(targetLanguages).length).toEqual(1);
+                expect(_.keys(targetLanguages)).toEqual([selectedSourceLanguage]);
             });
 
             it('saves transcript settings on update settings button click if preferances are selected', function() {
@@ -182,6 +321,7 @@ define(
                         cielo24_turnaround: activeTranscriptPreferences.cielo24_turnaround,
                         three_play_turnaround: activeTranscriptPreferences.three_play_turnaround,
                         preferred_languages: activeTranscriptPreferences.preferred_languages,
+                        video_source_language: activeTranscriptPreferences.video_source_language,
                         global: false
                     })
                 );
@@ -239,6 +379,7 @@ define(
                         cielo24_turnaround: activeTranscriptPreferences.cielo24_turnaround,
                         three_play_turnaround: activeTranscriptPreferences.three_play_turnaround,
                         preferred_languages: activeTranscriptPreferences.preferred_languages,
+                        video_source_language: activeTranscriptPreferences.video_source_language,
                         global: false
                     })
                 );
@@ -272,9 +413,10 @@ define(
 
             it('removes error state on preferances if selected', function() {
                 // Provide values for preferances.
-                $courseVideoSettingsEl.find('#transcript-turnaround').val('test-value');
-                $courseVideoSettingsEl.find('#transcript-fidelity').val('test-value');
-                $courseVideoSettingsEl.find('#transcript-language-menu').val('test-value');
+                selectPreference('.transcript-turnaround', activeTranscriptPreferences.cielo24_turnaround);
+                selectPreference('.transcript-fidelity', activeTranscriptPreferences.cielo24_fidelity);
+                selectPreference('.video-source-language', activeTranscriptPreferences.video_source_language);
+                selectPreference('.transcript-language-menu', activeTranscriptPreferences.preferred_languages[0]);
 
                 verifyPreferanceErrorState($courseVideoSettingsEl.find('.transcript-turnaround-wrapper'), false);
                 verifyPreferanceErrorState($courseVideoSettingsEl.find('.transcript-fidelity-wrapper'), false);

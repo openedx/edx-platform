@@ -101,11 +101,28 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             if (selectedPlan) {
                 if (this.selectedProvider === CIELO24 && this.selectedFidelityPlan) {
                     availableLanguages = selectedPlan.fidelity[this.selectedFidelityPlan].languages;
+                    // If fidelity is mechanical then target language would be same as source language.
+                    if (this.selectedFidelityPlan === 'MECHANICAL' && this.selectedVideoSourceLanguage) {
+                        availableLanguages = _.pick(
+                            availableLanguages,
+                            this.selectedVideoSourceLanguage
+                        );
+                    }
                 } else if (this.selectedProvider === THREE_PLAY_MEDIA) {
                     availableLanguages = selectedPlan.languages;
                 }
             }
             return availableLanguages;
+        },
+
+        getSourceLanguages: function() {
+            var sourceLanguages = [];
+            if (this.selectedProvider === THREE_PLAY_MEDIA) {
+                sourceLanguages = this.availableTranscriptionPlans[this.selectedProvider].translations;
+            } else {
+                sourceLanguages = this.getTargetLanguages();
+            }
+            return sourceLanguages;
         },
 
         fidelitySelected: function(event) {
@@ -116,6 +133,9 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
             // Clear active and selected languages.
             this.selectedLanguages = this.activeLanguages = [];
+            // Also clear selected language.
+            this.selectedVideoSourceLanguage = '';
+            this.renderSourceLanguages();
             this.renderTargetLanguages();
         },
 
@@ -272,8 +292,8 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
 
             $languagesContainer.empty();
 
-            // Show language container if fidelity or source language is selected .
-            if (self.selectedVideoSourceLanguage || self.selectedFidelityPlan) {
+            // Show language container if source language is selected .
+            if (self.selectedVideoSourceLanguage) {
                 _.each(self.activeLanguages, function(language) {
                     // Only add if not in the list already.
                     if (_.indexOf(self.selectedLanguages, language) === -1) {
@@ -289,16 +309,18 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             }
         },
 
-        renderVideoSourceLanguageMenu: function() {
+        renderSourceLanguages: function() {
             var self = this,
-                availableTranslations,
                 availableLanguages = self.getTargetLanguages(),
+                availableTranslations = self.getSourceLanguages(),
                 $videoSourceLanguageContainer = self.$el.find('.video-source-language-wrapper'),
                 $languageMenuEl = self.$el.find('.video-source-language'),
                 selectOptionEl = new Option(gettext('Select language'), '');
 
-            if (this.selectedProvider === THREE_PLAY_MEDIA) {
-                availableTranslations = self.availableTranscriptionPlans[this.selectedProvider].translations;
+            // Clear error state if present any.
+            self.clearPreferenceErrorState($videoSourceLanguageContainer);
+
+            if (!_.isEmpty(availableTranslations)) {
                 $videoSourceLanguageContainer.show();
 
                 // We need to set id due to a11y aria-labelledby
@@ -368,7 +390,7 @@ function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSett
             this.renderProviders();
             this.renderTurnaround();
             this.renderFidelity();
-            this.renderVideoSourceLanguageMenu();
+            this.renderSourceLanguages();
             this.renderTargetLanguages();
         },
 

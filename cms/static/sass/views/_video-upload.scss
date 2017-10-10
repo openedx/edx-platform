@@ -143,15 +143,15 @@
       }
       .transcript-language-menu-container {
         margin-top: ($baseline*0.8);
-        .transcript-language-menu {
-          width: 60%;
-        }
         .add-language-action {
           display: inline-block;
           .action-add-language {
             @include margin-left($baseline/4);
           }
         }
+      }
+      .transcript-language-menu, .video-source-language {
+        width: 60%;
       }
     }
 

@@ -266,7 +266,7 @@ def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnarou
         cielo24_fidelity:  Cielo24 transcription fidelity.
         cielo24_turnaround: Cielo24 transcription turnaround.
         three_play_turnaround: 3PlayMedia transcription turnaround.
-        video_source_language: Source/Speech language of the videos that are going to be submitted to 3PlayMedia.
+        video_source_language: Source/Speech language of the videos that are going to be submitted to the Providers.
         preferred_languages: list of language codes.
 
     Returns:
@@ -291,12 +291,17 @@ def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnarou
 
                 # Validate transcription languages
                 supported_languages = transcription_plans[provider]['fidelity'][cielo24_fidelity]['languages']
+                if video_source_language not in supported_languages:
+                    error = 'Unsupported source language {}.'.format(video_source_language)
+                    return error, preferences
+
                 if not len(preferred_languages) or not (set(preferred_languages) <= set(supported_languages.keys())):
                     error = 'Invalid languages {}.'.format(preferred_languages)
                     return error, preferences
 
                 # Validated Cielo24 preferences
                 preferences = {
+                    'video_source_language': video_source_language,
                     'cielo24_fidelity': cielo24_fidelity,
                     'cielo24_turnaround': cielo24_turnaround,
                     'preferred_languages': preferred_languages,
