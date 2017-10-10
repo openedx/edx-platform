@@ -396,7 +396,7 @@ def verified_upgrade_deadline_link(user, course=None, course_id=None):
         course_id (:class:`.CourseKey`): The course_id of the course to render for.
 
     Returns:
-        The formatted link to that will allow the user to upgrade to verified
+        The formatted link that will allow the user to upgrade to verified
         in this course.
     """
     if course is not None:

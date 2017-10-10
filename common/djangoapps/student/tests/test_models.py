@@ -14,6 +14,7 @@ from django.db.models.functions import Lower
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -142,9 +143,14 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
             course_id=course.id,
             mode_slug=CourseMode.VERIFIED,
             # This must be in the future to ensure it is returned by downstream code.
-            expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1),
+            expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
         )
-        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
+        course_overview = CourseOverview.load_from_module_store(course.id)
+        enrollment = CourseEnrollmentFactory(
+            course_id=course.id,
+            mode=CourseMode.AUDIT,
+            course=course_overview,
+        )
 
         # The schedule's upgrade deadline should be used if a schedule exists
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
