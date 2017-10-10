@@ -103,14 +103,14 @@ class CourseMetadata(object):
 
         # Appsembler specfic, we don't display the field if the site doesn't
         # belong to a MSFT LP
-        if org and not get_value_for_org(
-            org,
-            "CUSTOMER_IS_MICROSOFT_LEARNING_PARTNER",
-            settings.APPSEMBLER_FEATURES.get(
-               "CUSTOMER_IS_MICROSOFT_LEARNING_PARTNER"
-           )
-        ):
-            filtered_list.append('is_microsoft_course')
+        # if org and not get_value_for_org(
+        #     org,
+        #     "CUSTOMER_IS_MICROSOFT_LEARNING_PARTNER",
+        #     settings.APPSEMBLER_FEATURES.get(
+        #        "CUSTOMER_IS_MICROSOFT_LEARNING_PARTNER"
+        #    )
+        # ):
+        #     filtered_list.append('is_microsoft_course')
 
         return filtered_list
 
