@@ -1493,3 +1493,10 @@ ZENDESK_USER = None
 ZENDESK_API_KEY = None
 ZENDESK_OAUTH_ACCESS_TOKEN = None
 ZENDESK_CUSTOM_FIELDS = {}
+
+
+############## Settings for Completion API #########################
+
+# Once a user has watched this percentage of a video, mark it as complete:
+# (0.0 = 0%, 1.0 = 100%)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95

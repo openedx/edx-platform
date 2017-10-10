@@ -183,6 +183,14 @@ class TestVideo(BaseTestXmodule):
         response = self.item_descriptor.handle_ajax('save_user_state', {u'demoo�': "sample"})
         self.assertEqual(json.loads(response)['success'], True)
 
+    def get_handler_url(self, handler, suffix):
+        """
+        Return the URL for the specified handler on self.item_descriptor.
+        """
+        return self.item_descriptor.xmodule_runtime.handler_url(
+            self.item_descriptor, handler, suffix
+        ).rstrip('/?')
+
     def tearDown(self):
         _clear_assets(self.item_descriptor.location)
         super(TestVideo, self).tearDown()

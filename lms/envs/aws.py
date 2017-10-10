@@ -1088,6 +1088,15 @@ EDX_PLATFORM_REVISION = ENV_TOKENS.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REV
 # Allow extra middleware classes to be added to the app through configuration.
 MIDDLEWARE_CLASSES.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
 
+########################## Settings for Completion API #####################
+
+# Once a user has watched this percentage of a video, mark it as complete:
+# (0.0 = 0%, 1.0 = 100%)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
+    'COMPLETION_VIDEO_COMPLETE_PERCENTAGE',
+    COMPLETION_VIDEO_COMPLETE_PERCENTAGE,
+)
+
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
