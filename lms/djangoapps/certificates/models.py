@@ -968,9 +968,26 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         try:
             latest = cls.objects.filter(course_key=course_key).latest()
         except cls.DoesNotExist:
-            return False
+            return None
         else:
             return latest.include_hours_of_effort
+
+    @classmethod
+    def set_include_hours_of_effort_for_course(cls, course_key, is_included):
+        """Include or exclude Hours of Effort from certificate rendering context for a course.
+
+        Arguments:
+            course_key (CourseKey): The identifier for the course.
+            is_enabled (boolean): Whether to include or exclude Hours of Effort.
+
+        """
+        default = {
+            'include_hours_of_effort': is_included,
+        }
+        CertificateGenerationCourseSetting.objects.update_or_create(
+            course_key=course_key,
+            defaults=default
+        )
 
 
 class CertificateGenerationConfiguration(ConfigurationModel):
