@@ -250,18 +250,18 @@ def _update_course_context(request, context, course, course_key, platform_name):
             partner_short_name=context['organization_short_name'],
             platform_name=platform_name)
     # If language specific templates are enabled for the course, add course_run specific information to the context
+    course_run_fields = []
     if CertificateGenerationCourseSetting.is_language_specific_templates_enabled_for_course(course_key):
-        fields = ['content_language']
-        if CertificateGenerationCourseSetting.is_hours_of_effort_included_for_course(course_key):
-            fields.extend(['start', 'end', 'max_effort'])
-        course_run_data = get_course_run_details(course_key, fields)
-        if course_run_data.get('start') and course_run_data.get('end') and course_run_data.get('max_effort'):
-            # Calculate duration of the course run in weeks, multiplied by max_effort for total Hours of Effort
+        course_run_fields.append('content_language')
+    if CertificateGenerationCourseSetting.is_hours_of_effort_included_for_course(course_key):
+        course_run_fields.extend(['weeks_to_complete', 'max_effort'])
+    if course_run_fields:
+        course_run_data = get_course_run_details(course_key, course_run_fields)
+        if course_run_data.get('weeks_to_complete') and course_run_data.get('max_effort'):
             try:
-                start = parser.parse(course_run_data.get('start'))
-                end = parser.parse(course_run_data.get('end'))
-                max_effort = int(course_run_data.get('max_effort'))
-                context['hours_of_effort'] = ((end - start).days / 7) * max_effort
+                weeks_to_complete = int(course_run_data['weeks_to_complete'])
+                max_effort = int(course_run_data['max_effort'])
+                context['hours_of_effort'] = weeks_to_complete * max_effort
             except ValueError:
                 log.exception('Error occurred while parsing course run details')
         context['content_language'] = course_run_data.get('content_language')
