@@ -247,8 +247,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         super(CertificatesViewsTests, self).setUp()
         self.mock_course_run_details = {
             'content_language': 'en',
-            'start': '2013-02-05T05:00:00Z',
-            'end': '2013-03-05T05:00:00Z',
+            'weeks_to_complete': '4',
             'max_effort': '10'
         }
 
@@ -1361,7 +1360,6 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         CertificateGenerationCourseSetting.objects.update_or_create(
             course_key=self.course.id,
             defaults={
-                'language_specific_templates_enabled': include_effort,
                 'include_hours_of_effort': include_effort
             }
         )
