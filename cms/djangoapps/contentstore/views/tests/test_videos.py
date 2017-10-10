@@ -953,7 +953,8 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
             {
                 'provider': TranscriptProvider.CIELO24,
                 'cielo24_fidelity': 'PROFESSIONAL',
-                'cielo24_turnaround': 'STANDARD'
+                'cielo24_turnaround': 'STANDARD',
+                'video_source_language': 'en'
             },
             True,
             u"Invalid languages [].",
@@ -962,8 +963,20 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         (
             {
                 'provider': TranscriptProvider.CIELO24,
+                'cielo24_fidelity': 'PREMIUM',
+                'cielo24_turnaround': 'STANDARD',
+                'video_source_language': 'es'
+            },
+            True,
+            u"Unsupported source language es.",
+            400
+        ),
+        (
+            {
+                'provider': TranscriptProvider.CIELO24,
                 'cielo24_fidelity': 'PROFESSIONAL',
                 'cielo24_turnaround': 'STANDARD',
+                'video_source_language': 'en',
                 'preferred_languages': ['es', 'ur']
             },
             True,
@@ -1016,6 +1029,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'provider': TranscriptProvider.CIELO24,
                 'cielo24_fidelity': 'PROFESSIONAL',
                 'cielo24_turnaround': 'STANDARD',
+                'video_source_language': 'es',
                 'preferred_languages': ['en']
             },
             True,
