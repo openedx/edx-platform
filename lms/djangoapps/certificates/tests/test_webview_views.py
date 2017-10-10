@@ -1369,7 +1369,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
                 "CERTIFICATE_TWITTER": True,
                 "CERTIFICATE_TWITTER_TEXT": u"nền tảng học tập"
             }):
-                with patch('django.http.HttpRequest.build_absolute_uri') as mock_abs_uri:
+                 with patch('django.http.HttpRequest.build_absolute_uri') as mock_abs_uri:
                     mock_abs_uri.return_value = '='.join(['http://localhost/?param', u'é'])
                     with patch('certificates.api.get_course_organization_id') as mock_get_org_id:
                         mock_get_org_id.return_value = None
