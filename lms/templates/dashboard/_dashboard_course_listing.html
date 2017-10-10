@@ -281,7 +281,9 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
       </div>
       % endif
 
+      % if cert_status:
         <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course_overview=course_overview, enrollment=enrollment, reverify_link=reverify_link'/>
+      % endif
 
       % if credit_status is not None:
         <%include file="_dashboard_credit_info.html" args="credit_status=credit_status"/>

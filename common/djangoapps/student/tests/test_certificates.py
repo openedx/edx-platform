@@ -164,6 +164,12 @@ class CertificateDisplayTest(CertificateDisplayTestBase):
         self._check_can_download_certificate()
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
+    def test_no_certificate_status_no_problem(self):
+        with patch('student.views.cert_info', return_value={}):
+            self._create_certificate('honor')
+            self._check_can_not_download_certificate()
+
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_display_verified_certificate_no_id(self):
         """
         Confirm that if we get a certificate with a no-id-professional mode
