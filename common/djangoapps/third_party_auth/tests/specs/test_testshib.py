@@ -517,8 +517,9 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         with LogCapture(level=logging.WARNING) as log_capture:
             super(SuccessFactorsIntegrationTest, self).test_register()
             expected_message = 'Unable to retrieve user details with username {username} from SAPSuccessFactors ' \
-                               'for company ID {company_id} with url "{odata_api_url}" and error message: ' \
-                               '500 Server Error: Internal Server Error for url: {odata_api_url}'.format(
+                               'for company ID {company_id} with url "{odata_api_url}".  Error message: ' \
+                               '500 Server Error: Internal Server Error for url: {odata_api_url}.  System message: ' \
+                               'Not available.'.format(
                                    username=self.USER_USERNAME,
                                    company_id=odata_company_id,
                                    odata_api_url=mocked_odata_ai_url,
