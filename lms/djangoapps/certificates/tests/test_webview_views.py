@@ -204,6 +204,35 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         )
         template.save()
 
+    def _create_custom_template_with_hours_of_effort(self, org_id=None, mode=None, course_key=None, language=None):
+        """
+        Creates a custom certificate template entry in DB that includes hours of effort.
+        """
+        template_html = """
+            <%namespace name='static' file='static_content.html'/>
+            <html>
+            <body>
+                lang: ${LANGUAGE_CODE}
+                course name: ${accomplishment_copy_course_name}
+                mode: ${course_mode}
+                hours of effort: ${hours_of_effort}
+                ${accomplishment_copy_course_description}
+                ${twitter_url}
+                <img class="custom-logo" src="${static.certificate_asset_url('custom-logo')}" />
+            </body>
+            </html>
+        """
+        template = CertificateTemplate(
+            name='custom template',
+            template=template_html,
+            organization_id=org_id,
+            course_key=course_key,
+            mode=mode,
+            is_active=True,
+            language=language
+        )
+        template.save()
+
 
 @attr(shard=1)
 @ddt.ddt
@@ -1290,6 +1319,33 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'course name: test_right_lang_template')
+
+    @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
+    @patch('certificates.views.webview.get_course_run_details')
+    @patch('certificates.api.get_course_organization_id')
+    def test_certificate_custom_template_with_hours_of_effort(self, mock_get_org_id, mock_get_course_run_details):
+        """
+        Tests custom template renders properly with Hours of Effort data
+        """
+        mock_get_course_run_details.return_value = self.mock_course_run_details
+        CertificateGenerationCourseSetting.set_include_hours_of_effort_for_course(self.course.id, True)
+        CertificateGenerationCourseSetting.set_language_specific_templates_enabled_for_course(self.course.id, True)
+        self._add_course_certificates(count=1, signatory_count=2)
+        self._create_custom_template_with_hours_of_effort(org_id=1, language=None)
+        with patch.dict("django.conf.settings.FEATURES", {
+            "CERTIFICATES_HTML_VIEW": True,
+        }):
+            test_url = get_certificate_url(
+                user_id=self.user.id,
+                course_id=unicode(self.course.id)
+            )
+        with patch('django.http.HttpRequest.build_absolute_uri') as mock_abs_uri:
+            mock_abs_uri.return_value = '='.join(['http://localhost/?param', u'é'])
+            with patch('certificates.api.get_course_organization_id') as mock_get_org_id:
+                mock_get_org_id.return_value = 1
+                response = self.client.get(test_url)
+                self.assertEqual(response.status_code, 200)
+                self.assertIn('hours of effort: 40', response.content)
 
     @ddt.data(True, False)
     @patch('certificates.views.webview.get_course_run_details')
