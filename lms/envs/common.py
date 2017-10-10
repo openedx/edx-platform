@@ -12,6 +12,7 @@ make one call at the end of your site-specific dev file to reset all the
 dependent variables (like INSTALLED_APPS) for you.
 
 Longer TODO:
+Longer TODO:
 1. Right now our treatment of static content in general and in particular
    course-specific static content is haphazard.
 2. We should have a more disciplined approach to feature flagging, even if it
@@ -392,6 +393,9 @@ FEATURES = {
     # Whether to check the "Notify users by email" checkbox in the batch enrollment form
     # in the instructor dashboard.
     'BATCH_ENROLLMENT_NOTIFY_USERS_DEFAULT': True,
+
+    # Disable bulk email send from random different addresses when 'False'
+    'BULK_EMAIL_FROM_DIFFERENT_ADDRESSES': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -1211,6 +1215,9 @@ MIDDLEWARE_CLASSES = (
     # Detects user-requested locale from 'accept-language' header in http request.
     # Must be after DarkLangMiddleware.
     'django.middleware.locale.LocaleMiddleware',
+
+    #
+    'openedx.core.djangoapps.dark_lang.middleware.DarkLangMiddlewareSetLocaleAdditional',
 
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 

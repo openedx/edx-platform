@@ -202,6 +202,14 @@ class ReportStore(object):
                     'gzip': True,
                 },
             )
+        if storage_type == 'azure':
+            return DjangoStorageReportStore(
+                storage_class='openedx.core.storage.AzureStorageExtended',
+                storage_kwargs={
+                    'container': config['CONTAINER'],
+                    'url_expiry_secs': config.get('URL_EXPIRY_SECS', 300)
+                }
+            )
         elif storage_type == 'localfs':
             return DjangoStorageReportStore(
                 storage_class='django.core.files.storage.FileSystemStorage',

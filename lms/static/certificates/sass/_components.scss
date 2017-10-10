@@ -478,9 +478,11 @@
         }
 
         // hide the fancy
-        .accomplishment-signatories .signatory-signature,
         .accomplishment-type-symbol {
-            display: none;
+            display: block;
+        }
+        .accomplishment-signatories .signatory-signature {
+            display: block;
         }
     }
 }

@@ -3,6 +3,7 @@
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.conf import settings
+import urllib
 %>
 
 <header>
@@ -26,10 +27,8 @@ from django.conf import settings
                 domain=site_domain,
                 path=reverse('about_course', args=[course.id.to_deprecated_string()])
             )
-        ).replace(u" ", u"+")
-        tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text)
-
-        facebook_link = static.get_value('course_about_facebook_link', settings.PLATFORM_FACEBOOK_ACCOUNT)
+        )
+        tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text.replace(u"+", u"%2b"))
 
         email_subject = u"mailto:?subject={subject}&body={body}".format(
             subject=_("Take a course with {platform} online").format(platform=platform_name),
@@ -47,7 +46,7 @@ from django.conf import settings
       <a href="${tweet_action}" class="share">
         <span class="icon fa fa-twitter" aria-hidden="true"></span><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
       </a>
-      <a href="${facebook_link}" class="share">
+      <a href="https://www.facebook.com/sharer/sharer.php?u=${ urllib.quote(request.build_absolute_uri(), safe='') }" class="share" target="_blank">
         <span class="icon fa fa-thumbs-up" aria-hidden="true"></span><span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
       </a>
       <a href="${email_subject}" class="share">

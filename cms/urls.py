@@ -5,6 +5,8 @@ from ratelimitbackend import admin
 
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 
+from openassessment.fileupload.urls import urlpatterns as oraurlpatterns
+
 admin.autodiscover()
 
 # Pattern to match a course key or a library key
@@ -211,3 +213,5 @@ urlpatterns += (
     url(r'^404$', handler404),
     url(r'^500$', handler500),
 )
+
+urlpatterns+= oraurlpatterns
