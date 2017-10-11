@@ -597,8 +597,42 @@ def _compile_sass(system, theme, debug, force, timing_info):
                 source_comments=source_comments,
                 output_style=output_style,
             )
+
+        # For Sass files without explicit RTL versions, generate
+        # an RTL version of the CSS using the rtlcss library.
+        for sass_file in glob.glob(sass_source_dir + '/**/*.scss'):
+            if should_generate_rtl_css_file(sass_file):
+                source_css_file = sass_file.replace(sass_source_dir, css_dir).replace('.scss', '.css')
+                target_css_file = source_css_file.replace('.css', '-rtl.css')
+                sh("rtlcss {source_file} {target_file}".format(
+                    source_file=source_css_file,
+                    target_file=target_css_file,
+                ))
+
+        # Capture the time taken
+        if not dry_run:
             duration = datetime.now() - start
             timing_info.append((sass_source_dir, css_dir, duration))
+    return True
+
+
+def should_generate_rtl_css_file(sass_file):
+    """
+    Returns true if a Sass file should have an RTL version generated.
+    """
+    # Don't generate RTL CSS for partials
+    if path(sass_file).name.startswith('_'):
+        return False
+
+    # Don't generate RTL CSS if the file is itself an RTL version
+    if sass_file.endswith('-rtl.scss'):
+        return False
+
+    # Don't generate RTL CSS if there is an explicit Sass version for RTL
+    rtl_sass_file = path(sass_file.replace('.scss', '-rtl.scss'))
+    if rtl_sass_file.exists():
+        return False
+
     return True
 
 
