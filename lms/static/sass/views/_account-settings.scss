@@ -87,7 +87,7 @@
           border-bottom: 4px solid $courseware-border-bottom-color !important;
         }
 
-        &.active{
+        &.active {
           border-bottom: 4px solid $black-t3 !important;
         }
       }
@@ -138,11 +138,11 @@
             position: relative;
             z-index: 10;
 
-            &::-ms-expand{
+            &::-ms-expand {
               display: none;
             }
 
-            ~ .icon-caret-down{
+            ~ .icon-caret-down {
               &::after {
                 content: "";
                 border-left: 6px solid transparent;

@@ -10,7 +10,7 @@ div.poll_question {
   }
 
   .inline {
-      display: inline;
+    display: inline;
   }
 
   h3 {
@@ -42,7 +42,7 @@ div.poll_question {
     margin-bottom: $baseline;
 
     &.short {
-        clear: both;
+      clear: both;
     }
 
     .question {
@@ -59,6 +59,7 @@ div.poll_question {
 
       .button {
         @extend %ui-fake-link;
+
         -webkit-appearance: none;
         -webkit-background-clip: padding-box;
         -webkit-border-image: none;
@@ -94,13 +95,11 @@ div.poll_question {
         /* display: inline-block; */
         display: inline;
         float: left;
-
         font-family: 'Open Sans', Verdana, Geneva, sans-serif;
         font-size: 13px;
         font-style: normal;
         font-variant: normal;
         font-weight: bold;
-
         letter-spacing: normal;
         line-height: 25.59375px;
         margin-bottom: ($baseline*0.75);
@@ -113,13 +112,12 @@ div.poll_question {
         text-transform: none;
         vertical-align: top;
         white-space: pre-line;
-
         width: 25px;
         height: 25px;
-
         word-spacing: 0px;
         writing-mode: lr-tb;
       }
+
       .button.answered {
         -webkit-box-shadow: rgb(97, 184, 225) 0px 1px 0px 0px inset;
         background-color: rgb(29, 157, 217);
@@ -136,6 +134,7 @@ div.poll_question {
 
       .text {
         @extend %ui-fake-link;
+
         display: inline;
         float: left;
         width: 80%;

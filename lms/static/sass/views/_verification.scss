@@ -516,7 +516,7 @@
 
       .wrapper-sts {
         display: inline-block;
-        width: flex-grid(9,12);
+        width: flex-grid(9, 12);
         margin-bottom: ($baseline/4);
       }
 
@@ -1226,6 +1226,7 @@
     .copy {
       @extend %t-copy-lead1;
       @extend %t-weight4;
+
       @include left(calc(50% - 46px));
 
       position: absolute;

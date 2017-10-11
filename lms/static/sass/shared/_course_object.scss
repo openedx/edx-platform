@@ -23,7 +23,7 @@
 
       @include box-sizing(border-box);
 
-      box-shadow: 0 1px 10px 0 rgba(0,0,0, 0.15), inset 0 0 0 1px rgba(255,255,255, 0.9);
+      box-shadow: 0 1px 10px 0 rgba(0, 0,0, 0.15), inset 0 0 0 1px rgba(255,255,255, 0.9);
       margin-bottom: ($baseline*1.5);
       position: relative;
       width: 100%;
@@ -68,11 +68,11 @@
       .meta-info {
         background: $dark-trans-bg;
         bottom: 6px;
-        border: 1px solid rgba(0,0,0, 0.5);
+        border: 1px solid rgba(0, 0,0, 0.5);
 
         @include border-right-radius(2px);
 
-        box-shadow: 0 1px 5px 0 rgba(0,0,0, 0.15);
+        box-shadow: 0 1px 5px 0 rgba(0, 0,0, 0.15);
 
         @include clearfix();
 

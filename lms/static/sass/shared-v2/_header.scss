@@ -99,14 +99,14 @@
       }
     }
 
-    .tab-nav-item{
+    .tab-nav-item {
       @include float(left);
 
       display: flex;
       margin: 0;
       justify-content: center;
 
-      .tab-nav-link{
+      .tab-nav-link {
         font-size: font-size(base);
         font-weight: font-weight(semi-bold);
         color: palette(grayscale, dark);
@@ -120,7 +120,7 @@
         }
       }
 
-      .active{
+      .active {
         border-bottom: 4px solid $black-t3 !important;
       }
     }

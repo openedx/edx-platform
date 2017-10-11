@@ -61,6 +61,7 @@ $spacing-horizontal:        (
   }
 
   @warn "Unknown `#{$key}` in $spacing-vertical.";
+
   @return null;
 }
 
@@ -71,6 +72,7 @@ $spacing-horizontal:        (
   }
 
   @warn "Unknown `#{$key}` in $spacing-horizontal.";
+
   @return null;
 }
 
@@ -104,6 +106,7 @@ $font-sizes: (
   }
 
   @warn "Unknown `#{$key}` in $font-sizes.";
+
   @return null;
 }
 
@@ -114,6 +117,7 @@ $font-sizes: (
   }
 
   @warn "Unknown `#{$key}` in $font-weights.";
+
   @return null;
 }
 
@@ -233,8 +237,10 @@ $btn-small-padding-horizontal: spacing-horizontal(small);
 
 @mixin notification-by-type($color) {
   border-top: 3px solid $color;
+
   .icon {
     @include margin-right(3 * $baseline/ 4);
+
     color: $color;
   }
 }
