@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls import include, patterns, url
+from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
@@ -20,9 +20,7 @@ COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(
 # Pattern to match a library key only
 LIBRARY_KEY_PATTERN = r'(?P<library_key_string>library-v1:[^/+]+\+[^/+]+)'
 
-urlpatterns = patterns(
-    '',
-
+urlpatterns = [
     url(r'', include('student.urls')),
 
     url(r'^transcripts/upload$', 'contentstore.views.upload_transcripts', name='upload_transcripts'),
@@ -75,10 +73,10 @@ urlpatterns = patterns(
     # For redirecting to help pages.
     url(r'^help_token/', include('help_tokens.urls')),
     url(r'^api/', include('cms.djangoapps.api.urls', namespace='api')),
-)
+]
 
 # restful api
-urlpatterns += patterns(
+urlpatterns += [
     'contentstore.views',
 
     url(r'^$', 'howitworks', name='homepage'),
@@ -134,7 +132,7 @@ urlpatterns += patterns(
         settings.COURSE_KEY_PATTERN), 'group_configurations_detail_handler'),
     url(r'^api/val/v0/', include('edxval.urls')),
     url(r'^api/tasks/v0/', include('user_tasks.urls')),
-)
+]
 
 JS_INFO_DICT = {
     'domain': 'djangojs',
@@ -143,45 +141,44 @@ JS_INFO_DICT = {
 }
 
 if settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES'):
-    urlpatterns += (
+    urlpatterns += [
         url(r'^library/{}?$'.format(LIBRARY_KEY_PATTERN),
             'contentstore.views.library_handler', name='library_handler'),
         url(r'^library/{}/team/$'.format(LIBRARY_KEY_PATTERN),
             'contentstore.views.manage_library_users', name='manage_library_users'),
-    )
+    ]
 
 if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
-    urlpatterns += (url(
+    urlpatterns += [url(
         r'^export_git/{}$'.format(
             settings.COURSE_KEY_PATTERN,
         ),
         'contentstore.views.export_git',
         name='export_git',
-    ),)
+    ),]
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
-    urlpatterns += patterns(
-        '',
+    urlpatterns += [
         url(r'^status/', include('openedx.core.djangoapps.service_status.urls')),
-    )
+    ]
 
 if settings.FEATURES.get('AUTH_USE_CAS'):
-    urlpatterns += (
+    urlpatterns += [
         url(r'^cas-auth/login/$', 'openedx.core.djangoapps.external_auth.views.cas_login', name="cas-login"),
         url(r'^cas-auth/logout/$', 'django_cas.views.logout', {'next_page': '/'}, name="cas-logout"),
-    )
+    ]
 
-urlpatterns += patterns('', url(r'^admin/', include(admin.site.urls)),)
+urlpatterns += [url(r'^admin/', include(admin.site.urls)),]
 
 # enable entrance exams
 if settings.FEATURES.get('ENTRANCE_EXAMS'):
-    urlpatterns += (
+    urlpatterns += [
         url(r'^course/{}/entrance_exam/?$'.format(settings.COURSE_KEY_PATTERN), 'contentstore.views.entrance_exam'),
-    )
+    ]
 
 # Enable Web/HTML Certificates
 if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
-    urlpatterns += (
+    urlpatterns += [
         url(r'^certificates/activation/{}/'.format(settings.COURSE_KEY_PATTERN),
             'contentstore.views.certificates.certificate_activation_handler'),
         url(r'^certificates/{}/(?P<certificate_id>\d+)/signatories/(?P<signatory_id>\d+)?$'.format(
@@ -190,13 +187,12 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
             'contentstore.views.certificates.certificates_detail_handler'),
         url(r'^certificates/{}$'.format(settings.COURSE_KEY_PATTERN),
             'contentstore.views.certificates.certificates_list_handler')
-    )
+    ]
 
 # Maintenance Dashboard
-urlpatterns += patterns(
-    '',
+urlpatterns += [
     url(r'^maintenance/', include('maintenance.urls', namespace='maintenance')),
-)
+]
 
 if settings.DEBUG:
     try:
@@ -212,15 +208,14 @@ if settings.DEBUG:
 
 if 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar
-    urlpatterns += (
+    urlpatterns += [
         url(r'^__debug__/', include(debug_toolbar.urls)),
-    )
+    ]
 
 # UX reference templates
-urlpatterns += patterns(
-    '',
+urlpatterns += [
     url(r'^template/(?P<template>.+)$', 'openedx.core.djangoapps.debug.views.show_reference_template'),
-)
+]
 
 # Custom error pages
 # These are used by Django to render these error codes. Do not remove.
@@ -229,7 +224,7 @@ handler404 = 'contentstore.views.render_404'
 handler500 = 'contentstore.views.render_500'
 
 # display error page templates, for testing purposes
-urlpatterns += (
+urlpatterns += [
     url(r'^404$', handler404),
     url(r'^500$', handler500),
-)
+]

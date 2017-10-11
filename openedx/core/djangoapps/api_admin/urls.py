@@ -15,7 +15,8 @@ from openedx.core.djangoapps.api_admin.views import (
     CatalogSearchView
 )
 
-urlpatterns = (
+
+urlpatterns = [
     url(
         r'^status/$',
         api_access_enabled_or_404(login_required(ApiRequestStatusView.as_view())),
@@ -70,4 +71,4 @@ urlpatterns = (
     url(
         r'^api/', include('openedx.core.djangoapps.api_admin.api.urls', namespace='api'),
     ),
-)
+]

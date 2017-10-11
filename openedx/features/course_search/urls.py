@@ -6,6 +6,7 @@ from django.conf.urls import url
 
 from views.course_search import CourseSearchView, CourseSearchFragmentView
 
+
 urlpatterns = [
     url(
         r'^$',

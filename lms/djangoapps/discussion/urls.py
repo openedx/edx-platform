@@ -1,13 +1,11 @@
 """
 Forum urls for the django_comment_client.
 """
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from .views import DiscussionBoardFragmentView
 
-urlpatterns = patterns(
-    'discussion.views',
-
+urlpatterns = [
     url(r'users/(?P<user_id>\w+)/followed$', 'followed_threads', name='followed_threads'),
     url(r'users/(?P<user_id>\w+)$', 'user_profile', name='user_profile'),
     url(r'^(?P<discussion_id>[\w\-.]+)/threads/(?P<thread_id>\w+)$', 'single_thread', name='single_thread'),
@@ -18,4 +16,4 @@ urlpatterns = patterns(
         name='discussion_board_fragment_view'
     ),
     url(r'', 'forum_form_discussion', name='forum_form_discussion'),
-)
+]

@@ -1,11 +1,9 @@
 """
 Base urls for the django_comment_client.
 """
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-urlpatterns = patterns(
-    'django_comment_client.base.views',
-
+urlpatterns = [
     url(r'upload$', 'upload', name='upload'),
     url(r'threads/(?P<thread_id>[\w\-]+)/update$', 'update_thread', name='update_thread'),
     url(r'threads/(?P<thread_id>[\w\-]+)/reply$', 'create_comment', name='create_comment'),
@@ -33,4 +31,4 @@ urlpatterns = patterns(
     url(r'^(?P<commentable_id>[\w\-.]+)/follow$', 'follow_commentable', name='follow_commentable'),
     url(r'^(?P<commentable_id>[\w\-.]+)/unfollow$', 'unfollow_commentable', name='unfollow_commentable'),
     url(r'users$', 'users', name='users'),
-)
+]
