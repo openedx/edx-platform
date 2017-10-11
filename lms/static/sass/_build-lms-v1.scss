@@ -3,6 +3,12 @@
 
 // About: Sass compile for the LMS Elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the lms-main-*.scss files.
 
+// Bootstrap support for use with shared partials
+@import 'bootstrap/theme';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import "bootstrap/scss/mixins/breakpoints";
+
 // base - assets
 @import 'base/font_face';
 @import 'base/extends';

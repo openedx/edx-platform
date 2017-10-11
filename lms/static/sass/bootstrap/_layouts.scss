@@ -1,49 +1,85 @@
 // LMS layouts
 
 .content-wrapper {
-    margin-top: $baseline;
+  margin-top: $baseline;
+  padding-bottom: $baseline*2;
 
-    .course-tabs {
-        padding-bottom: 0;
+  .course-tabs {
+    padding: 0;
+    font-size: $font-size-sm;
 
-        .nav-item {
-            &.active, &:hover{
-                .nav-link {
-                    border-bottom-color: theme-color("primary");
-                    color: theme-color("primary");
-                }
-            }
+    .nav-item {
+      .nav-link {
+        padding: $baseline/2 $baseline*3/4 $baseline*13/20;
+        border-style: solid;
+        border-width: 0 0 $baseline/5 0;
+        border-bottom-color: transparent;
+        color: theme-color("secondary");
 
-            .nav-link {
-                padding: $baseline/2 $baseline*3/4 $baseline*13/20;
-                border-style: solid;
-                border-width: 0 0 $baseline/5 0;
-                border-bottom-color: transparent;
-
-                @include media-breakpoint-down(md) {
-                    border: none;
-                    text-align: left;
-                    padding: 0 0 $baseline/2 0;
-                }
-            }
+        @include media-breakpoint-down(md) {
+          border: none;
+          text-align: left;
+          padding: 0 0 $baseline/2 0;
         }
+      }
+
+      &.active,
+      &:hover {
+        .nav-link {
+          border-bottom-color: theme-color("primary");
+          color: theme-color("primary");
+        }
+      }
+    }
+  }
+
+  &.container-fluid {
+    max-width: map-get($container-max-widths, xl);
+  }
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid $border-color;
+  padding: 20px;
+
+  .page-header-main {
+    flex-grow: 1;  // This column should consume all the available space
+  }
+
+  .page-header-secondary {
+    display: flex;
+
+    @include media-breakpoint-up(md) {
+      margin-left: $baseline;
+
+      &:not(:last-child) {
+        margin-right: $baseline;
+      }
+    }
+  }
+}
+
+.page-content-container {
+  border: 1px solid $border-color;
+  background-color: $body-bg;
+}
+
+.page-content {
+  padding: $baseline;
+
+  @include media-breakpoint-up(md) {
+    display: flex;
+
+    .page-content-main {
+      flex-grow: 1;  // This column should consume all the available space
     }
 
-    .main-container {
-        border: 1px solid $border-color;
-        background-color: $body-bg;
-
-        .page-header {
-            border-bottom: 1px solid $border-color;
-            padding: 20px;
-        }
-
-        .page-content {
-            padding: 20px;
-        }
+    .page-content-secondary {
+      min-width: 350px;  // Note: setting width only is not obeyed
+      max-width: 350px;  // Note: setting width only is not obeyed
+      margin-left: $baseline*2;
     }
-
-    &.container-fluid {
-        max-width: map-get($container-max-widths, xl);
-    }
+  }
 }

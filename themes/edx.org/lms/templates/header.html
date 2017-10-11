@@ -54,47 +54,36 @@ site_status_msg = get_site_status_msg(course_id)
 
 % if uses_bootstrap:
   <nav class="navbar navbar-expand-lg navbar-light" aria-label="${_('Main')}">
-    <h1 class="hd logo-header">
-      <div class="logo">
-        <a class="navbar-brand" href="${reverse('dashboard')}" itemprop="url">
-          <img src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}" itemprop="logo" />
-        </a>
-      </div>
-      % if course and not disable_courseware_header:
-        <div class="course-header">
-          <span class="provider">${course.display_org_with_default}:</span>
-          <span class="course-number">${course.display_number_with_default}</span>
-          <span class="course-name">${course.display_name_with_default}</span>
-        </div>
-      % endif
-    </h1>
-    <button class="navbar-toggler navbar-toggler-right mt-2" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+    <%include file="/header/brand.html" />
+
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon" aria-hidden="true"></span>
     </button>
     % if user.is_authenticated():
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        % if not course or disable_courseware_header:
-          % if not nav_hidden or show_dashboard_tabs:
-            <ul class="navbar-nav mr-auto">
+        <div class="navbar-nav align-items-center ml-auto">
+          % if not course or disable_courseware_header:
+            % if not nav_hidden or show_dashboard_tabs:
+              <ul class="nav align-items-center">
                 % if not nav_hidden:
-                  <li class="nav-item mt-2 nav-item-open-collapsed nav-global-01">
+                  <li class="nav-item nav-item-open-collapsed nav-global-01">
                     <a class="nav-link" href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
                   </li>
-                  <li class="nav-item mt-2 nav-item-open-collapsed nav-global-02">
+                  <li class="nav-item nav-item-open-collapsed nav-global-02">
                     <a class="nav-link" href="${marketing_link('COURSES')}">${_("Find Courses")}</a>
                   </li>
-                  <li class="nav-item mt-2 nav-item-open-collapsed nav-global-03">
+                  <li class="nav-item nav-item-open-collapsed nav-global-03">
                     <a class="nav-link" href="${marketing_link('SCHOOLS')}">${_("Schools & Partners")}</a>
                   </li>
                 % endif
                 % if show_dashboard_tabs:
-                  <li class="nav-item mt-2 nav-item-open-collapsed">
+                  <li class="nav-item nav-item-open-collapsed">
                     <a class="${'active' if reverse('dashboard') == request.path else ''} nav-link" href="${reverse('dashboard')}">
                       ${_("Courses")}
                     </a>
                   </li>
                   % if show_program_listing:
-                    <li class="nav-item mt-2 nav-item-open-collapsed">
+                    <li class="nav-item nav-item-open-collapsed">
                       <a class="${'active' if reverse('program_listing_view') in request.path else ''} nav-link" href="${reverse('program_listing_view')}">
                         ${_("Programs")}
                       </a>
@@ -104,76 +93,64 @@ site_status_msg = get_site_status_msg(course_id)
                     self.real_user = getattr(user, 'real_user', user)
                     is_on_profile_page = data and data.get('profile_user_id') is not None
                   %>
-                  <li class="nav-item mt-2 nav-item-open-collapsed">
+                  <li class="nav-item nav-item-open-collapsed">
                     <a class="${'active ' if is_on_profile_page else ''}tab-nav-link" href="${reverse('learner_profile', args=[self.real_user.username])}">
                       ${_("Profile")}
                     </a>
                   </li>
-              % endif
-                </ul>
+                % endif
+              </ul>
+            % endif
           % endif
-        % endif
-        <ul class="navbar-nav navbar-right">
-          % if should_display_shopping_cart_func(): # see shoppingcart.context_processor.user_has_cart_context_processor
-            <a role="button" class="nav-item-open-collapsed btn-shopping-cart btn btn-secondary mr-3" href="${reverse('shoppingcart.views.show_cart')}">
-              <span class="icon fa fa-shopping-cart" aria-hidden="true"></span> ${_("Shopping Cart")}
-            </a>
-          % endif
-          <li class="nav-item mt-2 nav-item-open-collapsed">
-            <a href="${get_online_help_info(online_help_token)['doc_url']}"
-             target="_blank"
-             class="nav-link">${_("Help")}</a>
-          </li>
-          <%include file="user_dropdown.html"/>
+          <ul class="nav align-items-center">
+            % if should_display_shopping_cart_func(): # see shoppingcart.context_processor.user_has_cart_context_processor
+              <li>
+                <a class="nav-item-open-collapsed btn-shopping-cart btn btn-secondary mr-3" href="${reverse('shoppingcart.views.show_cart')}">
+                  <span class="icon fa fa-shopping-cart" aria-hidden="true"></span> ${_("Shopping Cart")}
+                </a>
+              </li>
+            % endif
+            <li class="nav-item nav-item-open-collapsed">
+              <a href="${get_online_help_info(online_help_token)['doc_url']}"
+               target="_blank"
+               class="nav-link">${_("Help")}</a>
+            </li>
           </ul>
+          <%include file="user_dropdown.html"/>
         </div>
+      </div>
     % else:
       <div class="collapse navbar-collapse" id="navbarSupportedContent" aria-label="${_('Account')}" >
-        <ul class="navbar-nav mr-auto"></ul>
-        <ul class="navbar-nav">
-          <li class="nav-item">
+        <div class="navbar-nav align-items-center ml-auto">
+          <ul>
             % if not settings.FEATURES['DISABLE_LOGIN_BUTTON'] and not combined_login_and_register:
               % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-                <a class="btn btn-primary mt-2" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
-              % else:
-                <a class="btn btn-primary mt-2" href="/login${login_query()}">${_("Sign in")}</a>
+              <li class="nav-item">
+                <a class="nav-link" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
+              </li>
+              % elif static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')):
+              <li>
+                <a class="nav-link" href="/register">${_("Register")}</a>
+              </li>
               % endif
             % endif
-          </li>
-          % if not settings.FEATURES['DISABLE_LOGIN_BUTTON'] and not combined_login_and_register:
-            % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
             <li class="nav-item">
-              <a class="nav-link mt-2" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
+              % if not settings.FEATURES['DISABLE_LOGIN_BUTTON'] and not combined_login_and_register:
+                % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+                  <a class="btn btn-primary" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
+                % else:
+                  <a class="btn btn-primary" href="/login${login_query()}">${_("Sign in")}</a>
+                % endif
+              % endif
             </li>
-            % elif static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')):
-            <li>
-              <a class="nav-link mt-2" href="/register">${_("Register")}</a>
-            </li>
-            % endif
-          % endif
-        </ul>
+          </ul>
+        </div>
       </div>
     % endif
   </nav>
 % else:
   <div class="${"rwd" if responsive else ""} wrapper-header nav-container">
-    <h1 class="hd logo-header">
-      <div class="logo">
-        <a href="${marketing_link('ROOT')}" itemprop="url">
-          <%block name="navigation_logo">
-            <img src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}" itemprop="logo" />
-          </%block>
-        </a>
-      </div>
-
-      % if course and not disable_courseware_header:
-      <div class="course-header">
-        <span class="provider">${course.display_org_with_default}:</span>
-        <span class="course-number">${course.display_number_with_default}</span>
-        <span class="course-name">${course.display_name_with_default}</span>
-      </div>
-      % endif
-    </h1>
+    <%include file="/header/brand.html" />
 
     % if user.is_authenticated():
       % if not course or disable_courseware_header:
@@ -240,26 +217,26 @@ site_status_msg = get_site_status_msg(course_id)
     % else:
       <nav aria-label="${_('Account')}" class="nav-account-management">
         <div class="right nav-courseware list-inline">
-          <div class="item nav-courseware-01">
-            % if not settings.FEATURES['DISABLE_LOGIN_BUTTON'] and not combined_login_and_register:
-              % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-                <a class="btn btn-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
-              % else:
-                <a class="btn btn-login" href="/login${login_query()}">${_("Sign in")}</a>
-              % endif
-            % endif
-          </div>
           % if not settings.FEATURES['DISABLE_LOGIN_BUTTON'] and not combined_login_and_register:
             % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
               <div class="item nav-courseware-02">
-                <a class="btn btn-neutral btn-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
+                <a class="btn btn-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
               </div>
             % elif static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')):
               <div class="item nav-courseware-02">
-                <a class="btn btn-neutral btn-register" href="/register">${_("Register")}</a>
+                <a class="btn btn-register" href="/register">${_("Register")}</a>
               </div>
             % endif
           % endif
+          <div class="item nav-courseware-01">
+            % if not settings.FEATURES['DISABLE_LOGIN_BUTTON'] and not combined_login_and_register:
+              % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+                <a class="btn btn-primary btn-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
+              % else:
+                <a class="btn btn-primary btn-login" href="/login${login_query()}">${_("Sign in")}</a>
+              % endif
+            % endif
+          </div>
         </div>
       </nav>
     % endif

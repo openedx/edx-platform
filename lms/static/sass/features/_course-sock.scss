@@ -17,23 +17,23 @@
     position: absolute;
     top: (-1 * $baseline);
     width: ($baseline * 15);
-    color: $button-bg-hover-color;
-    background-color: $success-color;
-    border-color: $success-color;
+    color: theme-color("inverse");
+    background-color: theme-color("success");
+    border-color: theme-color("success");
     background-image: none;
     box-shadow: none;
     -webkit-transition: background-color 0.5s;
     transition: background-color 0.5s;
 
     &.active {
-      color: $success-color;
-      background-color: $button-bg-hover-color;
-      border-color: $success-color;
+      color: theme-color("success");
+      background-color: theme-color("inverse");
+      border-color: theme-color("success");
       background-image: none;
       box-shadow: none;
 
       &:hover {
-        color: $button-bg-hover-color;
+        color: theme-color("inverse");
         background-color: $success-color-hover;
         border-color: $success-color-hover;
         background-image: none;
@@ -42,7 +42,7 @@
     }
 
     &:hover {
-      color: $button-bg-hover-color;
+      color: theme-color("inverse");
       background-color: $success-color-hover;
       border-color: $success-color-hover;
       background-image: none;
@@ -111,6 +111,10 @@
       .action-upgrade-certificate {
         position: absolute;
         right: $baseline;
+        background-color: theme-color("success");
+        border-color: theme-color("success");
+        background-image: none;
+        box-shadow: none;
 
         @media (max-width: 960px) {
           & {
@@ -154,10 +158,10 @@
       top: (-1 * $baseline * 5/4);
 
       &:not(.active) {
-        color: $button-bg-hover-color;
-        background-color: $success-color;
+        color: theme-color("inverse");
+        background-color: theme-color("success");
         box-shadow: none;
-        border: 1px solid $success-color;
+        border: 1px solid theme-color("success");
 
         &:hover {
           background-color: $success-color-hover;
