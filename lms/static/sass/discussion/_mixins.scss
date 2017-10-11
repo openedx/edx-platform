@@ -17,6 +17,7 @@
 
 @mixin white-button {
   @include discussion-button();
+
   border-color: #aaa;
   background-color: $white;
   color: $dark-gray;
@@ -28,6 +29,7 @@
 
 @mixin discussion-wmd-input {
   @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
+
   box-sizing: border-box;
   margin-top: 0;
   border: 1px solid $forum-color-border;
@@ -42,6 +44,7 @@
 
 @mixin discussion-wmd-preview-container {
   @include border-radius(0, 0, $forum-border-radius, $forum-border-radius);
+
   box-sizing: border-box;
   border: 1px solid $forum-color-border;
   width: 100%;
@@ -50,11 +53,13 @@
 
 @mixin discussion-new-post-wmd-preview-container {
   @include discussion-wmd-preview-container;
+
   border-color: $forum-color-border;
 }
 
 @mixin discussion-wmd-preview-label {
   @include padding-left($baseline/4);
+
   padding-top: 3px;
   width: 100%;
   color: $forum-color-editor-preview-label;
@@ -73,8 +78,8 @@
 }
 
 @-webkit-keyframes fadeIn {
-  0% { opacity: 0.0; }
-  100% { opacity: 1.0; }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 // extends - content - text overflow by ellipsis

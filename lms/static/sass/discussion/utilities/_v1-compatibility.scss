@@ -9,18 +9,18 @@
 }
 
 %text-sr {
-    // clip has been deprecated but is still supported
-    clip: rect(1px 1px 1px 1px);
-    clip: rect(1px, 1px, 1px, 1px);
-    position: absolute;
-    margin: -1px;
-    height: 1px;
-    width: 1px;
-    border: 0;
-    padding: 0;
-    overflow: hidden;
-    // ensure there are spaces in sr text
-    word-wrap: normal;
+  // clip has been deprecated but is still supported
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  position: absolute;
+  margin: -1px;
+  height: 1px;
+  width: 1px;
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+  // ensure there are spaces in sr text
+  word-wrap: normal;
 }
 
 // extends - UI - depth levels
@@ -33,22 +33,27 @@
 
 // weights
 %t-ultrastrong {
- font-weight: 700;
+  font-weight: 700;
 }
+
 %t-strong {
- font-weight: 600;
+  font-weight: 600;
 }
+
 %t-demi-strong {
- font-weight: 500;
+  font-weight: 500;
 }
+
 %t-regular {
- font-weight: 400;
+  font-weight: 400;
 }
+
 %t-light {
- font-weight: 300;
+  font-weight: 300;
 }
+
 %t-ultralight {
- font-weight: 200;
+  font-weight: 200;
 }
 
 // copy
@@ -58,13 +63,17 @@
 
 %t-copy-sub1 {
   @extend %t-copy;
+
   @include line-height(14);
+
   font-size: $forum-base-font-size;
 }
 
 %t-copy-sub2 {
   @extend %t-copy;
+
   @include line-height(12);
+
   font-size: $forum-small-font-size;
 }
 

@@ -8,6 +8,7 @@
   .response-actions-list,
   .comment-actions-list {
     @extend %ui-no-list;
+
     @include text-align(right);
 
     .actions-item {
@@ -53,7 +54,9 @@
   .actions-dropdown {
     @extend %ui-no-list;
     @extend %ui-depth1;
+
     @include right(0);
+
     display: none;
     position: absolute;
     top: 100%;
@@ -77,9 +80,10 @@
       background: $forum-color-background;
 
       // ui triangle/nub
-      &:after,
-      &:before {
+      &::after,
+      &::before {
         @include right(6px);
+
         bottom: 100%;
         border: solid transparent;
         content: " ";
@@ -89,14 +93,15 @@
         pointer-events: none;
       }
 
-      &:after {
+      &::after {
         @include margin-right(1px);
+
         border-color: $transparent;
         border-bottom-color: $white;
         border-width: 6px;
       }
 
-      &:before {
+      &::before {
         border-color: $transparent;
         border-bottom-color: $forum-color-border;
         border-width: 7px;
@@ -118,6 +123,7 @@
   // UI: general action
   .action-button {
     @include transition(border .5s linear 0s);
+
     box-sizing: border-box;
     display: inline-block;
     border: 1px solid transparent;
@@ -136,19 +142,20 @@
 
       .icon {
         @include margin-right(0);
+
         vertical-align: middle;
       }
     }
 
     .action-label {
       @extend %t-copy-sub2;
+
       display: none;
       vertical-align: middle;
       padding: 2px 8px;
     }
 
     &:hover, &:focus {
-
       .action-label {
         display: inline-block;
       }
@@ -160,13 +167,11 @@
 
     // specific button styles
     &.action-follow {
-
       .action-label {
         color: $blue-d1;
       }
 
       &.is-checked, &:hover, &:focus {
-
         .action-icon {
           background-color: $forum-color-following;
           border: 1px solid $blue-d1;
@@ -180,13 +185,11 @@
     }
 
     &.action-vote {
-
       .action-label {
         opacity: 1;
       }
 
       &.is-checked, &:hover, &:focus {
-
         .action-icon {
           background-color: $green-d1;
           border: 1px solid $green-d2;
@@ -204,9 +207,7 @@
     }
 
     &.action-endorse {
-
       &.is-checked, &:hover, &:focus {
-
         .action-icon {
           background-color: $blue-d1;
           border: 1px solid $blue-d2;
@@ -225,9 +226,7 @@
     }
 
     &.action-answer {
-
       &.is-checked, &:hover, &:focus {
-
         .action-icon {
           border: 1px solid $green-d1;
           background-color: $green-d1;
@@ -274,7 +273,9 @@
     // UI: secondary action
     .action-list-item {
       @extend %t-copy-sub2;
+
       @include text-align(right);
+
       display: block;
       width: 100%;
       padding: ($baseline/10) 0;
@@ -287,6 +288,7 @@
 
       .action-icon {
         @include margin-left($baseline/4);
+
         display: inline-block;
         width: ($baseline/2);
         color: inherit;
@@ -320,6 +322,7 @@
   .action-button, .action-list-item {
     .action-label {
       @include float(left);
+
       .label-checked {
         display: none;
       }

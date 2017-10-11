@@ -197,11 +197,11 @@ $ui-notification-height: ($baseline*10);
 // ====================
 
 // social platforms
-$twitter-blue: #55ACEE;
-$facebook-blue: #3B5998;
-$linkedin-blue: #0077B5;
-$google-red: #D73924;
-$microsoft-black: #000000;
+$twitter-blue: #55acee;
+$facebook-blue: #3b5998;
+$linkedin-blue: #0077b5;
+$google-red: #d73924;
+$microsoft-black: #000;
 
 // shadows
 $shadow: rgba(0,0,0,0.2) !default;
@@ -296,7 +296,7 @@ $m-blue-d2: $blue !default;
 $m-blue-d3: rgb(18,111,154) !default;
 $m-blue-d4: rgb(10,74,103) !default;
 $m-blue-d5: rgb(0,158,231) !default;
-$m-blue-d6: #256A97 !default;
+$m-blue-d6: #256a97 !default;
 $m-blue-t0: rgba($m-blue,0.125) !default;
 $m-blue-t1: rgba($m-blue,0.25) !default;
 $m-blue-t2: rgba($m-blue,0.50) !default;
@@ -510,7 +510,7 @@ $courseware-header-image: linear-gradient(top, rgb(255,255,255), rgb(238,238,238
 $courseware-header-bg: transparent !default;
 $courseware-footer-border: none !default;
 $courseware-footer-shadow: none !default;
-$courseware-footer-margin: 0px !default;
+$courseware-footer-margin: 0 !default;
 $courseware-border-bottom-color: rgb(68,162,222) !default;
 $courseware-button-border-color: rgb(230,230,230) !default;
 $courseware-hover-color: rgb(51,52,53) !default;

@@ -1,9 +1,9 @@
 section.wiki-body {
-   h1 {
+  h1 {
     font-weight: bold;
     font-size: 2em;
     margin-bottom: 25px;
-   }
+  }
 
   div#wiki_article {
     html, address, blockquote, body, dd, div, dl, dt, fieldset, form, frame, frameset, h1, h2, h3, h4, h5, h6, noframes, ol, p, ul, center, dir, hr, menu, pre {
@@ -67,19 +67,19 @@ section.wiki-body {
     h1 {
       font-size: 1.6em;
       margin: .67em 0;
-      letter-spacing: 0px;
+      letter-spacing: 0;
     }
 
     h2 {
       text-transform: none;
       font-size: 1.4em;
       margin: .75em 0;
-      letter-spacing: 0px;
+      letter-spacing: 0;
     }
 
     h3 {
       font-size: 1.2em;
-      margin: .83em 0;
+      margin: 0.83em 0;
     }
 
     h4 {
@@ -131,7 +131,7 @@ section.wiki-body {
     }
 
     small, sub, sup {
-      font-size: .83em;
+      font-size: 0.83em;
     }
 
     sub {
@@ -181,7 +181,7 @@ section.wiki-body {
       text-decoration: underline;
     }
 
-    br:before {
+    br::before {
       content: "\A";
       white-space: pre-line;
     }

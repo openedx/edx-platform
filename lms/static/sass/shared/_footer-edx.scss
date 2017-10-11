@@ -30,6 +30,7 @@ footer#footer-edx-v3 {
   p {
     @include font-size(14);
     @include line-height(14);
+
     font-family: $sans-serif;
   }
 
@@ -43,6 +44,7 @@ footer#footer-edx-v3 {
       @include font-size(14);
       @include line-height(14);
       @include margin-right(20px);
+
       color: $edx-footer-link-color;
 
       &:last-of-type {
@@ -77,6 +79,7 @@ footer#footer-edx-v3 {
 
   .openedx-link {
     @include margin(10px, 0, 30px, -8px);
+
     width: 141px;
 
     a {
@@ -92,15 +95,16 @@ footer#footer-edx-v3 {
   .legal-links,
   .social-media-links,
   .mobile-app-links {
-      @extend %ui-no-list;
+    @extend %ui-no-list;
 
-      .list-item {
-          display: inline-block;
-      }
+    .list-item {
+      display: inline-block;
+    }
   }
 
   .mobile-app-links {
     @include clearfix();
+
     position: relative;
     width: 260px;
     height: 42px;
@@ -108,6 +112,7 @@ footer#footer-edx-v3 {
 
   .social-media-links {
     @include clearfix();
+
     margin-bottom: 30px;
   }
 
@@ -122,6 +127,7 @@ footer#footer-edx-v3 {
     @include margin(0, 0, 10px, 10px);
     @include font-size(28);
     @include line-height(28);
+
     width: 35px;
     height: 30px;
     line-height: 1;
@@ -142,7 +148,6 @@ footer#footer-edx-v3 {
   }
 
   .app-link {
-
     &:first-of-type {
       @include left(0);
     }
@@ -171,11 +176,12 @@ footer#footer-edx-v3 {
 
     .openedx-link {
       margin: 0;
+
       @include float(right);
     }
   }
 
-  @include media( $edx-bp-large ) {
+  @include media($edx-bp-large) {
     padding: 20px 10px;
 
     .site-details {
@@ -196,7 +202,7 @@ footer#footer-edx-v3 {
     }
   }
 
-  @include media( $edx-bp-huge ) {
+  @include media($edx-bp-huge) {
     .footer-logo {
       @include span-columns(2);
     }
