@@ -11,7 +11,7 @@ body { margin: 0; font-size: 1em; line-height: 1.4; }
 
 a { color: #005584; } // from the Pattern Library http://ux.edx.org/elements/colors/
 a:visited { color: #003655; } // from the Pattern Library http://ux.edx.org/elements/colors/
-a:hover, a:focus { color: #0079BC; } // from the Pattern Library http://ux.edx.org/elements/colors/
+a:hover, a:focus { color: #0079bc; } // from the Pattern Library http://ux.edx.org/elements/colors/
 abbr[title] { border-bottom: 1px dotted; }
 b, strong { font-weight: bold; }
 blockquote { margin: 1em 40px; }
@@ -92,6 +92,7 @@ td { vertical-align: top; }
   thead { display: table-header-group; }
   tr, img { page-break-inside: avoid; }
   img { max-width: 100% !important; }
+
   @page { margin: 1cm 1.2cm 2cm; }
   p, h2, h3 { orphans: 3; widows: 3; }
   h2, h3 { page-break-after: avoid; }

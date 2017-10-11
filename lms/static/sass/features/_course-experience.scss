@@ -230,7 +230,6 @@
       .goal {
         @include float(left);
         @include padding-left($baseline*0.4);
-
       }
 
       .response-icon {
@@ -459,6 +458,7 @@
 
     .fa.fa-spinner {
       @include left(50%);
+
       font-size: 2rem;
       margin-top: $baseline*3;
       position: absolute;

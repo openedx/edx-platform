@@ -8,5 +8,5 @@
 .sr-is-focusable,
 .sr-is-focusable:focus,
 .sr-is-focusable:active {
-    @extend %no-outline;
+  @extend %no-outline;
 }

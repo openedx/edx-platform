@@ -3,8 +3,8 @@
 // ===================================================================
 
 .certificates-search, .enrollment-search {
-  
   margin: 40px 0;
+
   input[name="query"] {
     width: 350px;
   }
@@ -17,27 +17,27 @@
 
 
 .certificates-results {
-    table {
-        margin: 0 auto;
-    }
+  table {
+    margin: 0 auto;
+  }
 
-    th {
-        text-align: center;
-        text-decoration: underline;
-    }
+  th {
+    text-align: center;
+    text-decoration: underline;
+  }
 
-    th, td {
-        padding: 10px 10px;
-        vertical-align: middle;
-    }
+  th, td {
+    padding: 10px 10px;
+    vertical-align: middle;
+  }
 }
 
 .btn-cert-regenerate {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 .btn-cert-generate {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 .enrollment-modal-wrapper.is-shown {
@@ -60,7 +60,9 @@
     .enrollment-change-title {
       @extend %t-title6;
       @extend %t-strong;
+
       @include text-align(left);
+
       margin-bottom: 0;
       text-transform: none;
     }
@@ -72,6 +74,7 @@
 
       p, label, select, input {
         @extend %t-copy-sub1;
+
         display: inline;
         font-style: normal;
       }
@@ -80,6 +83,7 @@
     .enrollment-change-errors {
       @extend %t-copy-sub1;
       @extend %t-light;
+
       color: $red;
     }
 
@@ -91,6 +95,7 @@
 
     .enrollment-change-submit, .enrollment-change-cancel {
       @extend %t-action4;
+
       margin: ($baseline/4) auto;
       text-transform: none;
       background-image: none;
@@ -122,6 +127,7 @@
 
   .change-enrollment-btn, .change-enrollment-btn:hover {
     @extend %t-action4;
+
     margin: ($baseline/4) auto;
     padding: ($baseline/4) 1px;
     letter-spacing: normal;
@@ -170,9 +176,9 @@
     &:hover,
     &:focus
       {
-        color: $blue;
-        background-color: $mediumGrey !important;
-      }
+      color: $blue;
+      background-color: $mediumGrey !important;
+    }
   }
 
   .label-course {
@@ -222,6 +228,7 @@
 
   .file-action {
     @include float(right);
+
     font-size: $support-form-base-font-size + 2;
     margin-bottom: $baseline - 10;
   }
