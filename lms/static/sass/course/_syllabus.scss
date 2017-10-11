@@ -1,7 +1,5 @@
 div.syllabus {
-
   padding: 2em 2.5em;
-
   text-align: center;
 
   h1 {
@@ -9,13 +7,12 @@ div.syllabus {
   }
 
   .notes {
-    margin: 0px auto 20px;
+    margin: 0 auto 20px;
   }
 
   table {
     table-layout: auto;
     text-align: left;
-
     margin: ($baseline/2) 0;
 
     thead {
@@ -49,7 +46,7 @@ div.syllabus {
       }
 
       &.week_separator {
-        padding: 0px !important;
+        padding: 0 !important;
 
         hr {
           margin: ($baseline/2);

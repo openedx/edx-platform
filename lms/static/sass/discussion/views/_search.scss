@@ -1,8 +1,9 @@
 .forum-search {
-    @include margin-left($baseline);
-    display: inline-block;
+  @include margin-left($baseline);
 
-    .search-input {
-        width: input-width(short);
-    }
+  display: inline-block;
+
+  .search-input {
+    width: input-width(short);
+  }
 }

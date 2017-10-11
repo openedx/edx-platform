@@ -314,6 +314,7 @@
 
     @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
       @include margin-left(0);
+
       flex-wrap: wrap;
     }
   }

@@ -24,10 +24,11 @@ $facet-background-color: #007db8;
 // +Layout - Courses Container
 // ====================
 .find-courses, .university-profile {
-
   .discovery-button:not(:disabled) {
     @extend %t-action2;
+
     @include text-align(left);
+
     outline: 0 none;
     box-shadow:none;
     border: 0;
@@ -51,6 +52,7 @@ $facet-background-color: #007db8;
 
       .courses-listing .courses-listing-item {
         @include fill-parent();
+
         margin: ($baseline*0.75) 0 ($baseline*1.5) 0;
         max-height: $course-card-height;
       }
@@ -130,7 +132,6 @@ $facet-background-color: #007db8;
 // +Hero - Home Header
 // ====================
 .find-courses, .university-profile {
-
   header.search {
     background: $gray-l5;
     background-size: cover;
@@ -172,6 +173,7 @@ $facet-background-color: #007db8;
           @include border-right(1px solid $light-gray);
           @include margin-right(30px);
           @include padding-right(30px);
+
           display: inline-block;
           height: 80px;
           position: relative;
@@ -179,11 +181,12 @@ $facet-background-color: #007db8;
 
           &::after {
             @include right(0px);
+
             content: "";
             display: block;
             height: 80px;
             position: absolute;
-            top: 0px;
+            top: 0;
           }
 
           img {
@@ -196,7 +199,7 @@ $facet-background-color: #007db8;
           font-family: $sans-serif;
           font-style: italic;
           font-weight: 700;
-          letter-spacing: 0px;
+          letter-spacing: 0;
           text-transform: none;
         }
 
@@ -215,14 +218,16 @@ $facet-background-color: #007db8;
 // +Search Input
 // ====================
 .find-courses {
-
   .wrapper-search-context {
     @include outer-container;
+
     @include rtl() { $layout-direction: "RTL"; }
 
     .search-status-label {
       @extend %t-title3;
+
       @include span-columns(9);
+
       min-height: $course-search-input-height;
 
       @include media($bp-tiny) {
@@ -247,7 +252,9 @@ $facet-background-color: #007db8;
 
     .wrapper-search-input {
       @include span-columns(3);
+
       @extend %ui-depth0;
+
       position: relative;
 
       @include media($bp-tiny) {
@@ -272,8 +279,10 @@ $facet-background-color: #007db8;
     @extend %ui-depth1;
     @extend %t-copy-sub1;
     @extend %t-demi-strong;
+
     @include border-radius(3px);
     @include padding-right(55px);
+
     border: 2px solid $gray-l3;
     width: 100%;
     height: $course-search-input-height;
@@ -283,6 +292,7 @@ $facet-background-color: #007db8;
     //STATE: focus
     &:focus {
       @extend %no-outline;
+
       box-shadow: none;
       border-color: $m-blue-d6;
     }
@@ -292,8 +302,10 @@ $facet-background-color: #007db8;
     @extend %ui-depth2;
     @extend %t-icon3;
     @extend %t-strong;
+
     @include margin-left(-2px);
     @include right(0);
+
     position: absolute;
     top: 0;
     border: 2px solid $m-blue-d6;
@@ -313,6 +325,7 @@ $facet-background-color: #007db8;
 
   .loading-spinner {
     @include transition(all $tmg-f1 ease-out 0s);
+
     background: $blue;
     position: absolute;
     top: ($baseline*0.7); // same as padding rule for .discovery-submit
@@ -322,9 +335,9 @@ $facet-background-color: #007db8;
 // +Filters and Facets - Search
 // ====================
 .find-courses {
-
   .filters {
     @include clearfix();
+
     margin-top: ($baseline/2);
     width: 100%;
     height: auto;
@@ -341,12 +354,14 @@ $facet-background-color: #007db8;
 
     .filters-inner {
       @include clearfix();
+
       border-top: 2px solid $courseware-button-border-color;
       border-bottom: 2px solid $courseware-button-border-color;
     }
 
     ul {
       @include padding-left(0);
+
       margin: 0;
       list-style: outside none none;
     }
@@ -354,6 +369,7 @@ $facet-background-color: #007db8;
     li {
       @include float(left);
       @include margin(($baseline/2), $baseline, ($baseline/2), 0);
+
       position: relative;
       padding: ($baseline/2) ($baseline*0.75);
       width: auto;
@@ -361,6 +377,7 @@ $facet-background-color: #007db8;
 
       .facet-option {
         @extend %t-strong;
+
         color: $gray-d2;
         text-decoration: none;
 
@@ -372,8 +389,10 @@ $facet-background-color: #007db8;
 
     .clear-filters {
       @include line-height(29.73);
+
       @extend %t-icon5;
       @extend %t-strong;
+
       margin: ($baseline/2);
       width: auto;
       color: $blue-d1; // WCAG 2.0 AA requirements
@@ -395,7 +414,9 @@ $facet-background-color: #007db8;
     @include fill-parent();
     @include omega();
     @include box-sizing(border-box);
+
     @extend %ui-depth1;
+
     position: relative;
     margin: ($baseline*2) 0 ($baseline*3.5) 0;
     box-shadow: 1px 2px 5px $black-t0;
@@ -430,8 +451,9 @@ $facet-background-color: #007db8;
       overflow: visible;
     }
 
-    &:before {
+    &::before {
       @include right(0);
+
       position: absolute;
       top: (-$baseline*0.15);
       opacity: 0;
@@ -445,6 +467,7 @@ $facet-background-color: #007db8;
     .header-search-facets, .header-facet {
       @extend %t-title6;
       @extend %t-strong;
+
       margin: 0;
       padding: ($baseline/2);
       color: $facet-text-color;
@@ -457,7 +480,9 @@ $facet-background-color: #007db8;
 
     .facet-list {
       @extend %ui-no-list;
+
       @include clearfix();
+
       padding-bottom: ($baseline/2);
 
       &.collapse {
@@ -467,6 +492,7 @@ $facet-background-color: #007db8;
 
       li {
         @include clearfix();
+
         position: relative;
         padding: 0;
         height: ($baseline*1.5);
@@ -478,10 +504,12 @@ $facet-background-color: #007db8;
       @include float(left);
       @include transition(all $tmg-f2 ease-out 0s);
       @include clearfix();
+
       @extend %t-action3;
       @extend %text-truncated;
+
       opacity: 1;
-      border-radius: 0px;
+      border-radius: 0;
       padding: ($baseline/4) ($baseline/2);
       width: 100%;
       color: $facet-text-color;
@@ -491,6 +519,7 @@ $facet-background-color: #007db8;
         @include text-align(right);
         @include box-sizing(border-box);
         @include transition(all 0.2s ease-out);
+
         position: absolute;
         width: ($baseline*2);
       }
@@ -521,8 +550,9 @@ $facet-background-color: #007db8;
           }
         }
 
-        .count:before {
+        .count::before {
           @include left($baseline*0.75);
+
           position: absolute;
           width: ($baseline*2);
           color: $gray-l1;
@@ -539,6 +569,7 @@ $facet-background-color: #007db8;
       button {
         @extend %t-icon6;
         @extend %t-strong;
+
         padding: ($baseline/4) ($baseline/2);
         color: $facet-background-color;
         text-transform: uppercase;
@@ -557,6 +588,7 @@ $facet-background-color: #007db8;
   section.message {
     @include columns(2 20px);
     @include clearfix();
+
     border-top: 1px solid $border-color-2;
     margin-top: $baseline;
     padding-top: ($baseline*3);

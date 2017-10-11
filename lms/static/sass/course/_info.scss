@@ -5,8 +5,9 @@ $notification-highlight-border-color:      $uxpl-green-base !default;
 $lms-border-color:                         $uxpl-gray-background !default;
 $notification-background:                  rgb(255, 255, 255) !default
 
-.home {
+  .home{
   @include clearfix();
+
   max-width: 1140px;
   margin: 0 auto;
   padding: $baseline $baseline ($baseline/2) $baseline;
@@ -31,6 +32,7 @@ $notification-background:                  rgb(255, 255, 255) !default
 
   .page-header-secondary {
     @include float(right);
+
     display: inline-block;
     margin: ($baseline/2);
     padding: ($baseline/2) ($baseline*0.75);
@@ -39,18 +41,20 @@ $notification-background:                  rgb(255, 255, 255) !default
 
     .last-accessed-link {
       @extend %t-title6;
+
       color: $very-light-text;
     }
   }
 }
 
 div.info-wrapper {
-
   background-color: $homepage-background;
 
   section.updates {
     @extend .content;
+
     @include padding-left($baseline);
+
     line-height: lh();
     width: 100%;
     display: block;
@@ -120,6 +124,7 @@ div.info-wrapper {
         border-radius:3px;
         background-color: $white;
         border:1px solid transparent;
+
         &:hover {
           border: 1px solid $gray-l3;
         }
@@ -127,8 +132,11 @@ div.info-wrapper {
 
       .show-older-updates {
         @extend %btn-pl-white-base;
+
         padding: ($baseline/2);
+
         @include font-size(14);
+
         width: 100%;
         display: block;
         text-align: center;
@@ -144,6 +152,7 @@ div.info-wrapper {
 
       > li,article {
         @extend .clearfix;
+
         padding: $baseline;
         list-style-type: none;
         margin-bottom: lh(1.5);
@@ -157,9 +166,11 @@ div.info-wrapper {
 
         .date {
           @extend %t-title9;
+
           margin-bottom: ($baseline/4);
           text-transform: none;
           background: url('#{$static-path}/images/calendar-icon.png') 0 center no-repeat;
+
           @include padding-left($baseline);
           @include float(left);
         }
@@ -167,7 +178,9 @@ div.info-wrapper {
 
         .toggle-visibility-button {
           @extend %t-title9;
+
           @include float(right);
+
           padding: 0;
           cursor: pointer;
           background: none;
@@ -185,13 +198,14 @@ div.info-wrapper {
         section.update-description {
           section {
             &.primary {
-              border: 1px solid #DDD;
+              border: 1px solid #ddd;
               background: $gray-l6;
               padding: 20px;
 
               p {
                 font-weight: bold;
               }
+
               .author {
                 font-weight: normal;
                 font-style: italic;
@@ -225,7 +239,9 @@ div.info-wrapper {
   section.handouts {
     padding: 20px 30px;
     margin: 0;
+
     @extend .sidebar;
+
     background: rgba(0, 0, 0, 0);
     box-shadow: none;
     font-size: 14px;
@@ -245,15 +261,17 @@ div.info-wrapper {
       }
     }
 
-    &:after {
+    &::after {
       left: -1px;
       right: auto;
     }
 
     .handouts-header {
       @include text-align(left);
+
       @extend %t-strong;
       @extend %t-title6;
+
       margin-bottom: 0;
       padding: 12px 26px 10px 0;
     }
@@ -264,6 +282,7 @@ div.info-wrapper {
 
     ol {
       margin-bottom: 14px;
+
       li {
         @include text-align(left);
 
@@ -281,6 +300,7 @@ div.info-wrapper {
         &.expandable,
         &.collapsable {
           margin: 0 16px 14px 16px;
+
           @include transition(all .2s linear 0s);
 
           h4 {
@@ -303,7 +323,6 @@ div.info-wrapper {
         }
 
         &.multiple {
-
           a {
             display: inline-block;
             padding: 0;
@@ -354,12 +373,13 @@ div.info-wrapper {
 
             + h4 {
               @extend a:hover;
+
               text-decoration: underline;
             }
           }
 
           &.expandable-hitarea {
-            background-position: -72px 0px;
+            background-position: -72px 0;
           }
 
           &.collapsable-hitarea {
@@ -383,7 +403,7 @@ div.info-wrapper {
           a {
             padding-right: 8px;
 
-            &:before {
+            &::before {
               color: $gray-l3;
               content: "•";
               display: inline-block;
@@ -391,7 +411,7 @@ div.info-wrapper {
             }
 
             &:first-child {
-              &:before {
+              &::before {
                 content: "";
                 padding-right: 0;
               }

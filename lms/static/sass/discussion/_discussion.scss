@@ -4,6 +4,7 @@
 
 .discussion-body {
   @include clearfix();
+
   border: none;
   background: transparent;
   box-shadow: none;
@@ -50,6 +51,7 @@
 // inline discussion module
 .discussion-module {
   @extend .discussion-body;
+
   display: block;
   position: relative;
   border-radius: $forum-border-radius;
@@ -71,12 +73,14 @@
 
   .discussion-module-header {
     @include float(left);
+
     width: flex-grid(7);
     margin-bottom: ($baseline * 0.75);
   }
 
   .add_post_btn_container {
     @include text-align(right);
+
     width: flex-grid(12);
     height: (2 * $baseline);
   }
@@ -90,6 +94,7 @@
 
 .discussion-show {
   @include float(right);
+
   position: relative;
   top: 3px;
   font-size: $forum-base-font-size;
@@ -136,6 +141,7 @@ section.discussion-pagination {
     ol {
       li {
         @include padding-right($baseline/2);
+
         list-style: none;
         display: inline-block;
 

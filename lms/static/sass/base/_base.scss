@@ -22,7 +22,7 @@ body {
 
 // removing the outline on any element that we make programmatically focusable
 [tabindex="-1"] {
-    outline: none;
+  outline: none;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -83,6 +83,7 @@ p {
     font: inherit;
     font-weight: inherit;
     text-decoration: none;
+
     @include transition(all 0.1s linear 0s);
 
     &:hover, &:focus {
@@ -96,6 +97,7 @@ a, a:visited {
   color: $link-color;
   font: inherit;
   text-decoration: none;
+
   @include transition(all 0.1s linear 0s);
 
   &:hover,
@@ -106,6 +108,7 @@ a, a:visited {
 
   &:disabled, &.is-disabled, &.disabled {
     @extend %ui-disabled;
+
     opacity: 0.5;
     cursor: not-allowed;
   }
@@ -124,6 +127,7 @@ a, a:visited {
 .container {
   @include clearfix();
   @include box-sizing(border-box);
+
   margin: 0 auto 0;
   padding: ($baseline*2) 0;
   max-width: grid-width(12);
@@ -132,7 +136,7 @@ a, a:visited {
 }
 
 .no-min-scale {
-  min-width: 0px !important;
+  min-width: 0 !important;
 }
 
 span.edx {
@@ -142,6 +146,7 @@ span.edx {
 
 .static-container {
   @include clearfix();
+
   margin: 0 auto 0;
   max-width: 1200px;
   padding: ($baseline*3) 0 ($baseline*6);
@@ -181,6 +186,7 @@ span.edx {
 
 .loading-animation {
   @include animation(fa-spin 2s infinite linear);
+
   text-align: center;
   width: 100%;
 }
@@ -210,61 +216,65 @@ mark {
 }
 
 .help-tab {
-    @include transform(rotate(-90deg));
-    @include transform-origin(0 0);
-    @extend %ui-depth2;
-    @extend %ui-print-excluded;
-    position: fixed;
-    top: 250px;
-    left: 0;
+  @include transform(rotate(-90deg));
+  @include transform-origin(0 0);
 
-    a:link,
-    a:visited {
-        border: 1px solid $gray-l3;
-        border-top-style: none;
-        border-radius: 0 0 ($baseline/2) ($baseline/2);
-        background: transparentize($white, 0.25);
-        color: transparentize($base-font-color, 0.25);
-        font-weight: bold;
-        text-decoration: none;
-        padding: 6px 22px 11px;
-        display: inline-block;
+  @extend %ui-depth2;
+  @extend %ui-print-excluded;
 
-        &:hover,
-        &:focus {
-            color: $white;
-            background: $link-color;
-        }
+  position: fixed;
+  top: 250px;
+  left: 0;
+
+  a:link,
+  a:visited {
+    border: 1px solid $gray-l3;
+    border-top-style: none;
+    border-radius: 0 0 ($baseline/2) ($baseline/2);
+    background: transparentize($white, 0.25);
+    color: transparentize($base-font-color, 0.25);
+    font-weight: bold;
+    text-decoration: none;
+    padding: 6px 22px 11px;
+    display: inline-block;
+
+    &:hover,
+    &:focus {
+      color: $white;
+      background: $link-color;
     }
+  }
 }
 
 .help-buttons {
-    padding: ($baseline/2) ($baseline*2.5);
-    text-align: center;
+  padding: ($baseline/2) ($baseline*2.5);
+  text-align: center;
 
-    button {
-        @extend %btn-secondary-blue-outline;
-        margin: .5rem 0;
-        font-weight: initial;
-        text-shadow: none;
-        letter-spacing: initial !important;
-        text-transform: normal !important;
-        vertical-align: initial;
+  button {
+    @extend %btn-secondary-blue-outline;
+
+    margin: .5rem 0;
+    font-weight: initial;
+    text-shadow: none;
+    letter-spacing: initial !important;
+    text-transform: normal !important;
+    vertical-align: initial;
         
-        &:hover,
-        &:focus {
-            background: $link-color !important;
-            color: $white;
-            box-shadow: none !important;
-            text-shadow: none !important;
-        }
+    &:hover,
+    &:focus {
+      background: $link-color !important;
+      color: $white;
+      box-shadow: none !important;
+      text-shadow: none !important;
     }
+  }
 }
 
 #feedback_form {
   input, textarea {
     font: normal 1em/1.4em $sans-serif;
   }
+
   textarea[name="details"] {
     height: 150px;
   }

@@ -1,5 +1,6 @@
 div#wiki_panel {
   @extend .sidebar;
+
   overflow: auto;
 
   ul {
@@ -16,6 +17,7 @@ div#wiki_panel {
 
   div#wiki_create_form {
     @extend .clearfix;
+
     padding: lh(0.5) lh() lh(0.5) 0;
 
     label {
@@ -25,6 +27,7 @@ div#wiki_panel {
 
     input[type="text"] {
       @include box-sizing(border-box);
+
       display: block;
       width: 100%;
       margin-bottom: lh(0.5);
