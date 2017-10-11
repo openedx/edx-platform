@@ -18,6 +18,7 @@ from opaque_keys.edx.locator import CourseLocator
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_recurring_nudge as nudge
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory, ScheduleFactory
@@ -139,6 +140,27 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         # enrollment and course_overview, and thus will skip any rows where course_overview
         # is null.
         self.assertEqual(mock_schedule_send.apply_async.call_count, 0)
+
+    @patch.object(tasks, '_recurring_nudge_schedule_send')
+    def test_send_after_course_end(self, mock_schedule_send):
+        user1 = UserFactory.create(id=tasks.RECURRING_NUDGE_NUM_BINS)
+
+        schedule = ScheduleFactory.create(
+            start=datetime.datetime(2017, 8, 3, 20, 34, 30, tzinfo=pytz.UTC),
+            enrollment__user=user1,
+        )
+        schedule.enrollment.course = CourseOverviewFactory()
+        schedule.enrollment.course.end = datetime.datetime.now() - datetime.timedelta(days=1)
+
+        test_time = datetime.datetime(2017, 8, 3, 20, tzinfo=pytz.UTC)
+        test_time_str = serialize(test_time)
+
+        tasks.recurring_nudge_schedule_bin.apply_async(
+            self.site_config.site.id, target_day_str=test_time_str, day_offset=-3, bin_num=0,
+            org_list=[schedule.enrollment.course.org],
+        )
+
+        self.assertFalse(mock_schedule_send.apply_async.called)
 
     @patch.object(tasks, 'ace')
     def test_delivery_disabled(self, mock_ace):
