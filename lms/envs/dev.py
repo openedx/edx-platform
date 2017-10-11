@@ -197,10 +197,10 @@ CELERY_ALWAYS_EAGER = True
 ################################ DEBUG TOOLBAR ################################
 
 INSTALLED_APPS += ('debug_toolbar', 'djpyfs',)
-MIDDLEWARE_CLASSES += (
+MIDDLEWARE_CLASSES.extend([
     'django_comment_client.utils.QueryCountDebugMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-)
+])
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (

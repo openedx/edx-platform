@@ -264,7 +264,7 @@ if FEATURES.get('AUTH_USE_CAS'):
         'django_cas.backends.CASBackend',
     )
     INSTALLED_APPS += ('django_cas',)
-    MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
+    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
     CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
     if CAS_ATTRIBUTE_CALLBACK:
         import importlib
@@ -523,3 +523,8 @@ PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
     'PARENTAL_CONSENT_AGE_LIMIT',
     PARENTAL_CONSENT_AGE_LIMIT
 )
+
+########################## Extra middleware classes  #######################
+
+# Allow extra middleware classes to be added to the app through configuration.
+MIDDLEWARE_CLASSES.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))

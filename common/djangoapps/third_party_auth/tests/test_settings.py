@@ -7,7 +7,7 @@ from third_party_auth.tests import testutil
 
 _ORIGINAL_AUTHENTICATION_BACKENDS = ('first_authentication_backend',)
 _ORIGINAL_INSTALLED_APPS = ('first_installed_app',)
-_ORIGINAL_MIDDLEWARE_CLASSES = ('first_middleware_class',)
+_ORIGINAL_MIDDLEWARE_CLASSES = ['first_middleware_class']
 _ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS = ('first_template_context_preprocessor',)
 _SETTINGS_MAP = {
     'AUTHENTICATION_BACKENDS': _ORIGINAL_AUTHENTICATION_BACKENDS,
