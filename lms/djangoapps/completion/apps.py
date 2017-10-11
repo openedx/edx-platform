@@ -12,4 +12,3 @@ class CompletionAppConfig(AppConfig):
     """
     name = 'lms.djangoapps.completion'
     verbose_name = 'Completion'
-    pass

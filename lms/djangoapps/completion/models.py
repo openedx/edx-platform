@@ -13,6 +13,13 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 
+# pylint: disable=ungrouped-imports
+try:
+    from django.models import BigAutoField  # New in django 1.10
+except ImportError:
+    from openedx.core.djangolib.fields import BigAutoField
+# pylint: enable=ungrouped-imports
+
 
 def validate_percent(value):
     """
@@ -106,6 +113,7 @@ class BlockCompletion(TimeStampedModel, models.Model):
     only track binary completion, where 1.0 indicates that the block is
     complete, and 0.0 indicates that the block is incomplete.
     """
+    id = BigAutoField(primary_key=True)  # pylint: disable=invalid-name
     user = models.ForeignKey(User)
     course_key = CourseKeyField(max_length=255)
     block_key = UsageKeyField(max_length=255)
