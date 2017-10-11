@@ -34,7 +34,8 @@
     "underscore": "~1.8.3",
     "underscore.string": "~3.3.4",
     "webpack": "^2.2.1",
-    "webpack-bundle-tracker": "^0.2.0"
+    "webpack-bundle-tracker": "^0.2.0",
+    "which-country": "1.0.0"
   },
   "devDependencies": {
     "edx-custom-a11y-rules": "0.1.3",

@@ -5,6 +5,7 @@ Views for the course_mode module
 import decimal
 import urllib
 
+import waffle
 from babel.dates import format_datetime
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -23,6 +24,7 @@ from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
+from openedx.core.djangoapps.catalog.utils import get_currency_data
 from openedx.core.djangoapps.embargo import api as embargo_api
 from student.models import CourseEnrollment
 from third_party_auth.decorators import tpa_hint_ends_existing_session
@@ -184,6 +186,11 @@ class ChooseModeView(View):
                 context["ecommerce_payment_page"] = ecommerce_service.payment_page_url()
                 context["sku"] = verified_mode.sku
                 context["bulk_sku"] = verified_mode.bulk_sku
+
+        context['currency_data'] = []
+        if waffle.switch_is_active('local_currency'):
+            if 'edx-price-l10n' not in request.COOKIES:
+                context['currency_data'] = get_currency_data()
 
         return render_to_response("course_modes/choose.html", context)
 
