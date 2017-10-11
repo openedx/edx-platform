@@ -15,7 +15,7 @@
 
 // Support .sr as a synonym for .sr-only
 .sr {
-    @extend .sr-only;
+  @extend .sr-only;
 }
 
 // ----------------------------

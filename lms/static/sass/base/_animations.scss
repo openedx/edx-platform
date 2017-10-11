@@ -13,24 +13,30 @@
     top: 300px;
     //@include transform(scale(0.9));
   }
+
   45% {
     opacity: 1.0;
   }
+
   65% {
     top: -40px;
     //@include transform(scale(1));
   }
+
   85% {
     top: 10px;
   }
+
   100% {
     top: 0px;
   }
 }
 
 @-webkit-keyframes home-header-pop-up { @include home-header-pop-up-keyframes; }
-   @-moz-keyframes home-header-pop-up { @include home-header-pop-up-keyframes; }
-        @keyframes home-header-pop-up { @include home-header-pop-up-keyframes; }
+
+@-moz-keyframes home-header-pop-up { @include home-header-pop-up-keyframes; }
+
+@keyframes home-header-pop-up { @include home-header-pop-up-keyframes; }
 
 // title appear animation
 //************************************************************************//
@@ -45,28 +51,37 @@
   0% {
     opacity: 0.0;
     top: 60px;
+
     @include transform(scale(0.9));
   }
+
   20% {
     opacity: 1.0;
   }
+
   27% { // this % of total-time should be ~ 1.25s
     top: 40px;
+
     @include transform(scale(1));
   }
+
   90% { // this % of total-time is when 2nd half of animation starts
     opacity: 1.0;
     top: 40px;
+
     @include transform(scale(1));
   }
+
   100% {
     top: 0px;
   }
 }
 
 @-webkit-keyframes title-appear { @include title-appear-keyframes; }
-   @-moz-keyframes title-appear { @include title-appear-keyframes; }
-        @keyframes title-appear { @include title-appear-keyframes; }
+
+@-moz-keyframes title-appear { @include title-appear-keyframes; }
+
+@keyframes title-appear { @include title-appear-keyframes; }
 
 // home appear animation
 //************************************************************************//
@@ -81,30 +96,40 @@
   0% {
     opacity: 0.0;
     top: 60px;
+
     @include transform(scale(0.9));
   }
+
   20% {
     opacity: 1.0;
   }
+
   30% { // this % of total-time should be ~ 1.25s
     top: 40px;
+
     @include transform(scale(1));
   }
+
   80% { // this % of total-time is when 2nd half of animation starts
     opacity: 1.0;
     top: 40px;
+
     @include transform(scale(1));
   }
+
   100% {
     opacity: 0.0;
     top: 60px;
+
     @include transform(scale(0.7));
   }
 }
 
 @-webkit-keyframes home-appear { @include home-appear-keyframes; }
-   @-moz-keyframes home-appear { @include home-appear-keyframes; }
-        @keyframes home-appear { @include home-appear-keyframes; }
+
+@-moz-keyframes home-appear { @include home-appear-keyframes; }
+
+@keyframes home-appear { @include home-appear-keyframes; }
 
 // edx animation
 //************************************************************************//
@@ -119,14 +144,17 @@
   0% {
     opacity: 0.0;
   }
+
   100% {
     opacity: 1.0;
   }
 }
 
 @-webkit-keyframes edx-appear { @include edx-appear-keyframes; }
-   @-moz-keyframes edx-appear { @include edx-appear-keyframes; }
-        @keyframes edx-appear { @include edx-appear-keyframes; }
+
+@-moz-keyframes edx-appear { @include edx-appear-keyframes; }
+
+@keyframes edx-appear { @include edx-appear-keyframes; }
 
 // mit animation
 //************************************************************************//
@@ -141,14 +169,17 @@
   0% {
     left: 80px;
   }
+
   100% {
     left: 0px;
   }
 }
 
 @-webkit-keyframes mit-slide { @include mit-slide-keyframes; }
-   @-moz-keyframes mit-slide { @include mit-slide-keyframes; }
-        @keyframes mit-slide { @include mit-slide-keyframes; }
+
+@-moz-keyframes mit-slide { @include mit-slide-keyframes; }
+
+@keyframes mit-slide { @include mit-slide-keyframes; }
 
 // harvard animation
 //************************************************************************//
@@ -163,14 +194,17 @@
   0% {
     right: 80px;
   }
+
   100% {
     right: 0px;
   }
 }
 
 @-webkit-keyframes harvard-slide { @include harvard-slide-keyframes; }
-   @-moz-keyframes harvard-slide { @include harvard-slide-keyframes; }
-        @keyframes harvard-slide { @include harvard-slide-keyframes; }
+
+@-moz-keyframes harvard-slide { @include harvard-slide-keyframes; }
+
+@keyframes harvard-slide { @include harvard-slide-keyframes; }
 
 // divider left animation
 //************************************************************************//
@@ -185,14 +219,17 @@
   0% {
     left: 340px;
   }
+
   100% {
     left: 200px;
   }
 }
 
 @-webkit-keyframes divider-left-slide { @include divider-left-slide-keyframes; }
-   @-moz-keyframes divider-left-slide { @include divider-left-slide-keyframes; }
-        @keyframes divider-left-slide { @include divider-left-slide-keyframes; }
+
+@-moz-keyframes divider-left-slide { @include divider-left-slide-keyframes; }
+
+@keyframes divider-left-slide { @include divider-left-slide-keyframes; }
 
 // divider right animation
 //************************************************************************//
@@ -207,14 +244,17 @@
   0% {
     left: 340px;
   }
+
   100% {
     left: 480px;
   }
 }
 
 @-webkit-keyframes divider-right-slide { @include divider-right-slide-keyframes; }
-   @-moz-keyframes divider-right-slide { @include divider-right-slide-keyframes; }
-        @keyframes divider-right-slide { @include divider-right-slide-keyframes; }
+
+@-moz-keyframes divider-right-slide { @include divider-right-slide-keyframes; }
+
+@keyframes divider-right-slide { @include divider-right-slide-keyframes; }
 
 // video appear animation
 //************************************************************************//
@@ -230,17 +270,21 @@
     bottom: -270px;
     opacity: 0.9;
   }
+
   80% {
     opacity: 1.0;
   }
+
   100% {
     bottom: 0px;
   }
 }
 
 @-webkit-keyframes video-appear { @include video-appear-keyframes; }
-   @-moz-keyframes video-appear { @include video-appear-keyframes; }
-        @keyframes video-appear { @include video-appear-keyframes; }
+
+@-moz-keyframes video-appear { @include video-appear-keyframes; }
+
+@keyframes video-appear { @include video-appear-keyframes; }
 
 // quick fade-in animation to get user attention
 //************************************************************************//
@@ -253,14 +297,17 @@
   0% {
     opacity: 0.0;
   }
+
   100% {
     opacity: 1.0;
   }
 }
 
 @-webkit-keyframes fade-in-animation{ @include fade-in-keyframes; }
-   @-moz-keyframes fade-in-animation{ @include fade-in-keyframes; }
-        @keyframes fade-in-animation{ @include fade-in-keyframes; }
+
+@-moz-keyframes fade-in-animation{ @include fade-in-keyframes; }
+
+@keyframes fade-in-animation{ @include fade-in-keyframes; }
 
 
 // +utility animations

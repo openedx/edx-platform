@@ -2,9 +2,9 @@
   font-family: 'CreativeCommons';
   src: url('#{$static-path}/fonts/CreativeCommons/cc.eot');
   src: url('#{$static-path}/fonts/CreativeCommons/cc.eot#iefix') format('embedded-opentype'),
-       url('#{$static-path}/fonts/CreativeCommons/cc.woff') format('woff'),
-       url('#{$static-path}/fonts/CreativeCommons/cc.ttf') format('truetype'),
-       url('#{$static-path}/fonts/CreativeCommons/cc.svg#CreativeCommons') format('svg');
+    url('#{$static-path}/fonts/CreativeCommons/cc.woff') format('woff'),
+    url('#{$static-path}/fonts/CreativeCommons/cc.ttf') format('truetype'),
+    url('#{$static-path}/fonts/CreativeCommons/cc.svg#CreativeCommons') format('svg');
   font-weight: normal;
   font-style: normal;
 }

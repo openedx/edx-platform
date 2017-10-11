@@ -14,6 +14,7 @@
 .sidebar {
   @include span(12);
   @include float(right);
+
   margin-bottom: $baseline;
 
   @media(min-width: $bp-screen-md) {
@@ -47,6 +48,7 @@
 
 .empty-programs-message {
   @include span(12);
+
   border: 3px solid $gray-l4;
   background: $gray-l6;
   padding: ($baseline*2) 0;

@@ -7,10 +7,12 @@
     right: auto;
     bottom: $baseline;
   }
+
   padding: $baseline/2 0;
 
   .section {
     @extend .grid-manual;
+
     padding: $baseline/2 $baseline;
   }
 
@@ -19,6 +21,7 @@
 
     .header-img {
       max-width: 100%;
+
       @media(min-width: $bp-screen-sm) {
         max-width: 191px;
       }
@@ -27,8 +30,11 @@
 
   .course-details {
     @include float(right);
+
     width: 100%;
+
     @media(min-width: $bp-screen-sm) { width: calc(100% - 191px); }
+
     padding-left: $baseline*1.5;
 
     .course-title {
@@ -47,7 +53,6 @@
   }
 
   .course-actions {
-
     .enrollment-info {
       width: $baseline*10;
       text-align: center;
@@ -78,6 +83,7 @@
     .enrollment-opens {
       text-align: center;
       margin-bottom: $baseline/2;
+
       .enrollment-open-date {
         white-space: nowrap;
       }
