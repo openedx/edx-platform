@@ -901,7 +901,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
     def test_request_certificate_without_passing(self):
         self.cert.status = CertificateStatuses.unavailable
         self.cert.save()
-        request_certificate_url = reverse('certificates.views.request_certificate')
+        request_certificate_url = reverse('update_example_certificate')
         response = self.client.post(request_certificate_url, {'course_id': unicode(self.course.id)})
         self.assertEqual(response.status_code, 200)
         response_json = json.loads(response.content)
@@ -912,7 +912,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
     def test_request_certificate_after_passing(self):
         self.cert.status = CertificateStatuses.unavailable
         self.cert.save()
-        request_certificate_url = reverse('certificates.views.request_certificate')
+        request_certificate_url = reverse('update_example_certificate')
         with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
             mock_queue.return_value = (0, "Successfully queued")
             with mock_passing_grade():

@@ -198,7 +198,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.client.login(username=self.user.username, password="password")
 
     def test_add_course_to_cart_anon(self):
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        resp = self.client.post(reverse('shoppingcart:add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
         self.assertEqual(resp.status_code, 403)
 
     @patch('shoppingcart.views.render_to_response', render_mock)
@@ -260,12 +260,12 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.login_user()
         # add first course to user cart
         resp = self.client.post(
-            reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()])
+            reverse('shoppingcart:add_course_to_cart', args=[self.course_key.to_deprecated_string()])
         )
         self.assertEqual(resp.status_code, 200)
         # add and apply the coupon code to course in the cart
         self.add_coupon(self.course_key, True, self.coupon_code)
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
         # now add the same coupon code to the second course(testing_course)
@@ -273,11 +273,11 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         #now add the second course to cart, the coupon code should be
         # applied when adding the second course to the cart
         resp = self.client.post(
-            reverse('shoppingcart.views.add_course_to_cart', args=[self.testing_course.id.to_deprecated_string()])
+            reverse('shoppingcart:add_course_to_cart', args=[self.testing_course.id.to_deprecated_string()])
         )
         self.assertEqual(resp.status_code, 200)
         #now check the user cart and see that the discount has been applied on both the courses
-        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
+        resp = self.client.get(reverse('shoppingcart:show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
         #first course price is 40$ and the second course price is 20$
         # after 10% discount on both the courses the total price will be 18+36 = 54
@@ -286,7 +286,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_add_course_to_cart_already_in_cart(self):
         PaidCourseRegistration.add_to_order(self.cart, self.course_key)
         self.login_user()
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        resp = self.client.post(reverse('shoppingcart:add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
         self.assertEqual(resp.status_code, 400)
         self.assertIn('The course {0} is already in your cart.'.format(self.course_key.to_deprecated_string()), resp.content)
 
@@ -294,14 +294,14 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_coupon(self.course_key, True, self.coupon_code)
         self.add_course_to_user_cart(self.course_key)
         non_existing_code = "non_existing_code"
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': non_existing_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': non_existing_code})
         self.assertEqual(resp.status_code, 404)
         self.assertIn("Discount does not exist against code '{0}'.".format(non_existing_code), resp.content)
 
     def test_valid_qty_greater_then_one_and_purchase_type_should_business(self):
         qty = 2
         item = self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
         data = json.loads(resp.content)
         self.assertEqual(data['total_cost'], item.unit_cost * qty)
@@ -312,18 +312,18 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         # invalid quantity, Quantity must be between 1 and 1000.
         qty = 0
         item = self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Quantity must be between 1 and 1000.", resp.content)
 
         # invalid quantity, Quantity must be an integer.
         qty = 'abcde'
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Quantity must be an integer.", resp.content)
 
         # invalid quantity, Quantity is not present in request
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id})
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'ItemId': item.id})
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Quantity must be between 1 and 1000.", resp.content)
 
@@ -331,19 +331,19 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         qty = 2
         item_id = '-1'
         self.login_user()
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item_id, 'qty': qty})
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'ItemId': item_id, 'qty': qty})
         self.assertEqual(resp.status_code, 404)
         self.assertEqual('Order item does not exist.', resp.content)
 
         # now testing the case if item id not found in request,
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'qty': qty})
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'qty': qty})
         self.assertEqual(resp.status_code, 400)
         self.assertEqual('Order item not found in request.', resp.content)
 
     def test_purchase_type_should_be_personal_when_qty_is_one(self):
         qty = 1
         item = self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
         data = json.loads(resp.content)
         self.assertEqual(data['total_cost'], item.unit_cost * 1)
@@ -354,7 +354,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         qty = 5
         self.add_course_to_user_cart(self.course_key)
         item2 = self.add_course_to_user_cart(self.testing_course.id)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item2.id, 'qty': qty})
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'ItemId': item2.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
         cart = Order.get_cart_for_user(self.user)
         cart_items = cart.orderitem_set.all()
@@ -362,7 +362,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         for cartitem in cart_items:
             if cartitem.qty == 5:
                 test_flag = True
-                resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]), {'id': cartitem.id})
+                resp = self.client.post(reverse('shoppingcart:remove_item', args=[]), {'id': cartitem.id})
                 self.assertEqual(resp.status_code, 200)
         self.assertTrue(test_flag)
 
@@ -372,18 +372,18 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_billing_details_btn_in_cart_when_qty_is_greater_than_one(self):
         qty = 5
         item = self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
-        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
+        resp = self.client.get(reverse('show_shoppingcart', args=[]))
         self.assertIn("Billing Details", resp.content)
 
     def test_purchase_type_should_be_personal_when_remove_all_items_from_cart(self):
         item1 = self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item1.id, 'qty': 2})
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'ItemId': item1.id, 'qty': 2})
         self.assertEqual(resp.status_code, 200)
 
         item2 = self.add_course_to_user_cart(self.testing_course.id)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item2.id, 'qty': 5})
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'ItemId': item2.id, 'qty': 5})
         self.assertEqual(resp.status_code, 200)
 
         cart = Order.get_cart_for_user(self.user)
@@ -391,7 +391,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         test_flag = False
         for cartitem in cart_items:
             test_flag = True
-            resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]), {'id': cartitem.id})
+            resp = self.client.post(reverse('shoppingcart:remove_item', args=[]), {'id': cartitem.id})
             self.assertEqual(resp.status_code, 200)
         self.assertTrue(test_flag)
 
@@ -401,14 +401,14 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_use_valid_coupon_code_and_qty_is_greater_than_one(self):
         qty = 5
         item = self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
         data = json.loads(resp.content)
         self.assertEqual(data['total_cost'], item.unit_cost * qty)
 
         # use coupon code
         self.add_coupon(self.course_key, True, self.coupon_code)
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.coupon_code})
         item = self.cart.orderitem_set.all().select_subclasses()[0]
         self.assertEquals(item.unit_cost * qty, 180)
 
@@ -416,14 +416,14 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_reg_code(self.course_key)
         self.add_course_to_user_cart(self.course_key)
         non_existing_code = "non_existing_code"
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': non_existing_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': non_existing_code})
         self.assertEqual(resp.status_code, 404)
         self.assertIn("Discount does not exist against code '{0}'.".format(non_existing_code), resp.content)
 
     def test_course_discount_inactive_coupon(self):
         self.add_coupon(self.course_key, False, self.coupon_code)
         self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 404)
         self.assertIn("Discount does not exist against code '{0}'.".format(self.coupon_code), resp.content)
 
@@ -432,7 +432,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_coupon(course_key, True, self.coupon_code)
         self.add_course_to_user_cart(self.course_key)
 
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 404)
         self.assertIn("Discount does not exist against code '{0}'.".format(self.coupon_code), resp.content)
 
@@ -447,7 +447,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
 
         # now apply the inactive registration code
         # it will raise an exception
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 400)
         self.assertIn(
             "This enrollment code ({enrollment_code}) is no longer valid.".format(
@@ -458,7 +458,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_reg_code(course_key)
         self.add_course_to_user_cart(self.course_key)
 
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 404)
         self.assertIn("Code '{0}' is not valid for any course in the shopping cart.".format(self.reg_code), resp.content)
 
@@ -466,11 +466,11 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         course_key = self.course_key.to_deprecated_string()
         self.add_reg_code(course_key)
         item = self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': 4})
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'ItemId': item.id, 'qty': 4})
         self.assertEqual(resp.status_code, 200)
         # now update the cart item quantity and then apply the registration code
         # it will raise an exception
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 404)
         self.assertIn("Cart item quantity should not be greater than 1 when applying activation code", resp.content)
 
@@ -504,7 +504,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_coupon(self.course_key, True, self.coupon_code)
         self.add_course_to_user_cart(self.course_key)
 
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
         # unit price should be updated for that course
@@ -516,7 +516,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
 
         # now using the same coupon code against the same order.
         # Only one coupon redemption should be allowed per order.
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Only one coupon redemption is allowed against an order", resp.content)
 
@@ -525,7 +525,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_coupon(self.course_key, True, self.coupon_code)
         self.add_course_to_user_cart(self.course_key)
 
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
         # unit price should be updated for that course
@@ -535,7 +535,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         # now using another valid active coupon code.
         # Only one coupon redemption should be allowed per order.
         self.add_coupon(self.course_key, True, 'abxyz')
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'abxyz'})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': 'abxyz'})
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Only one coupon redemption is allowed against an order", resp.content)
 
@@ -547,7 +547,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_course_to_user_cart(self.course_key)
         self.add_course_to_user_cart(self.testing_course.id)
 
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
         # unit price should be updated for that course
@@ -594,7 +594,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_reg_code(self.course_key)
         self.add_course_to_user_cart(self.course_key)
 
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 200)
 
         redeem_url = reverse('register_code_redemption', args=[self.reg_code])
@@ -609,7 +609,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
 
         # now testing registration code already used scenario, reusing the same code
         # the item has been removed when using the registration code for the first time
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 400)
         self.assertIn("This enrollment code ({enrollment_code}) is not valid.".format(
             enrollment_code=self.reg_code
@@ -646,7 +646,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_non_existing_coupon_redemption_on_removing_item(self, debug_log):
 
         reg_item = self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
+        resp = self.client.post(reverse('shoppingcart:remove_item', args=[]),
                                 {'id': reg_item.id})
         debug_log.assert_called_with(
             'Code redemption does not exist for order item id=%s.',
@@ -662,10 +662,10 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_coupon(self.course_key, True, self.coupon_code)
         reg_item = self.add_course_to_user_cart(self.course_key)
 
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
-        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
+        resp = self.client.post(reverse('shoppingcart:remove_item', args=[]),
                                 {'id': reg_item.id})
 
         self.assertEqual(resp.status_code, 200)
@@ -683,10 +683,10 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_coupon(self.course_key, True, self.coupon_code)
         reg_item = self.add_course_to_user_cart(self.course_key)
 
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
-        resp = self.client.post(reverse('shoppingcart.views.reset_code_redemption', args=[]))
+        resp = self.client.post(reverse('shoppingcart:reset_code_redemption', args=[]))
 
         self.assertEqual(resp.status_code, 200)
         info_log.assert_called_with(
@@ -703,7 +703,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
         self.assertEquals(self.cart.orderitem_set.count(), 2)
 
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
         # unit_cost should be updated for that particular course for which coupon code is registered
@@ -718,7 +718,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
 
         # Delete the discounted item, corresponding coupon redemption should
         # be removed for that particular discounted item
-        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
+        resp = self.client.post(reverse('shoppingcart:remove_item', args=[]),
                                 {'id': reg_item.id})
 
         self.assertEqual(resp.status_code, 200)
@@ -738,7 +738,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertEquals(self.cart.orderitem_set.count(), 2)
 
         # Delete the discounted item, corresponding coupon redemption should be removed for that particular discounted item
-        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
+        resp = self.client.post(reverse('shoppingcart:remove_item', args=[]),
                                 {'id': cert_item.id})
 
         self.assertEqual(resp.status_code, 200)
@@ -753,10 +753,10 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertEquals(self.cart.orderitem_set.count(), 2)
 
         self.add_coupon(self.course_key, True, self.coupon_code)
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
-        resp = self.client.post(reverse('shoppingcart.views.clear_cart', args=[]))
+        resp = self.client.post(reverse('shoppingcart:clear_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(self.cart.orderitem_set.count(), 0)
 
@@ -769,20 +769,20 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_add_course_to_cart_already_registered(self):
         CourseEnrollment.enroll(self.user, self.course_key)
         self.login_user()
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        resp = self.client.post(reverse('shoppingcart:add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
         self.assertEqual(resp.status_code, 400)
         self.assertIn('You are already registered in course {0}.'.format(self.course_key.to_deprecated_string()), resp.content)
 
     def test_add_nonexistent_course_to_cart(self):
         self.login_user()
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=['non/existent/course']))
+        resp = self.client.post(reverse('shoppingcart:add_course_to_cart', args=['non/existent/course']))
         self.assertEqual(resp.status_code, 404)
         self.assertIn("The course you requested does not exist.", resp.content)
 
     def test_add_course_to_cart_success(self):
         self.login_user()
-        reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()])
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        reverse('shoppingcart:add_course_to_cart', args=[self.course_key.to_deprecated_string()])
+        resp = self.client.post(reverse('shoppingcart:add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_key))
 
@@ -801,7 +801,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
             self.cost,
             self.course_mode.mode_slug
         )
-        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
+        resp = self.client.get(reverse('shoppingcart:show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
 
         ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=redefined-outer-name
@@ -825,7 +825,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_show_cart_with_override_currency_settings(self):
         self.login_user()
         reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
-        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
+        resp = self.client.get(reverse('shoppingcart:show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
 
         ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=redefined-outer-name
@@ -843,7 +843,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         PaidCourseRegistration.add_to_order(self.cart, self.course_key)
         CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
         self.assertEquals(self.cart.orderitem_set.count(), 2)
-        resp = self.client.post(reverse('shoppingcart.views.clear_cart', args=[]))
+        resp = self.client.post(reverse('shoppingcart:clear_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(self.cart.orderitem_set.count(), 0)
 
@@ -853,14 +853,14 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
         cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
         self.assertEquals(self.cart.orderitem_set.count(), 2)
-        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
+        resp = self.client.post(reverse('shoppingcart:remove_item', args=[]),
                                 {'id': reg_item.id})
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(self.cart.orderitem_set.count(), 1)
         self.assertNotIn(reg_item, self.cart.orderitem_set.all().select_subclasses())
 
         self.cart.purchase()
-        resp2 = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
+        resp2 = self.client.post(reverse('shoppingcart:remove_item', args=[]),
                                  {'id': cert_item.id})
         self.assertEqual(resp2.status_code, 200)
         exception_log.assert_called_with(
@@ -868,7 +868,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         )
 
         resp3 = self.client.post(
-            reverse('shoppingcart.views.remove_item', args=[]),
+            reverse('shoppingcart:remove_item', args=[]),
             {'id': -1}
         )
         self.assertEqual(resp3.status_code, 200)
@@ -881,17 +881,17 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_postpay_callback_success(self):
         postpay_mock.return_value = {'success': True, 'order': self.cart}
         self.login_user()
-        resp = self.client.post(reverse('shoppingcart.views.postpay_callback', args=[]))
+        resp = self.client.post(reverse('shoppingcart:postpay_callback', args=[]))
         self.assertEqual(resp.status_code, 302)
         self.assertEqual(urlparse(resp.__getitem__('location')).path,
-                         reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+                         reverse('shoppingcart:show_receipt', args=[self.cart.id]))
 
     @patch('shoppingcart.views.process_postpay_callback', postpay_mock)
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_postpay_callback_failure(self):
         postpay_mock.return_value = {'success': False, 'order': self.cart, 'error_html': 'ERROR_TEST!!!'}
         self.login_user()
-        resp = self.client.post(reverse('shoppingcart.views.postpay_callback', args=[]))
+        resp = self.client.post(reverse('shoppingcart:postpay_callback', args=[]))
         self.assertEqual(resp.status_code, 200)
         self.assertIn('ERROR_TEST!!!', resp.content)
 
@@ -907,7 +907,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
             CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
         self.cart.purchase()
         self.login_user()
-        url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
+        url = reverse('shoppingcart:show_receipt', args=[self.cart.id])
         resp = self.client.get(url, HTTP_ACCEPT="application/json")
 
         # Should have gotten a successful response
@@ -945,7 +945,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.cart.purchase()
 
         self.login_user()
-        url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
+        url = reverse('shoppingcart:show_receipt', args=[self.cart.id])
         resp = self.client.get(url)
         self.assert_no_xss(resp, '<script>alert("XSS")</script>')
 
@@ -957,7 +957,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_course_to_user_cart(self.xss_course_key)
         self.assertEquals(self.cart.orderitem_set.count(), 1)
 
-        post_response = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
+        post_response = self.client.post(reverse('shoppingcart:use_code'), {'code': self.reg_code})
         self.assertEqual(post_response.status_code, 200)
 
         redeem_url = reverse('register_code_redemption', args=[self.reg_code])
@@ -981,7 +981,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.cart.purchase()
 
         self.login_user()
-        url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
+        url = reverse('shoppingcart:show_receipt', args=[self.cart.id])
         resp = self.client.get(url, HTTP_ACCEPT="application/json")
 
         # Should have gotten a successful response
@@ -1026,7 +1026,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         cert.refund_cert_callback(course_enrollment=mock_enrollment)
 
         self.login_user()
-        url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
+        url = reverse('shoppingcart:show_receipt', args=[self.cart.id])
         resp = self.client.get(url, HTTP_ACCEPT="application/json")
         self.assertEqual(resp.status_code, 200)
 
@@ -1044,17 +1044,17 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         cart2.purchase()
 
         self.login_user()
-        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[cart2.id]))
+        resp = self.client.get(reverse('shoppingcart:show_receipt', args=[cart2.id]))
         self.assertEqual(resp.status_code, 404)
 
-        resp2 = self.client.get(reverse('shoppingcart.views.show_receipt', args=[1000]))
+        resp2 = self.client.get(reverse('shoppingcart:show_receipt', args=[1000]))
         self.assertEqual(resp2.status_code, 404)
 
     def test_total_amount_of_purchased_course(self):
         self.add_course_to_user_cart(self.course_key)
         self.assertEquals(self.cart.orderitem_set.count(), 1)
         self.add_coupon(self.course_key, True, self.coupon_code)
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
@@ -1076,11 +1076,11 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_course_to_user_cart(self.course_key)
         self.add_coupon(self.course_key, True, self.coupon_code)
 
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
 
-        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+        resp = self.client.get(reverse('shoppingcart:show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
         self.assertIn('FirstNameTesting123', resp.content)
         self.assertIn(str(self.get_discount(self.cost)), resp.content)
@@ -1093,7 +1093,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_course_to_user_cart(self.course_key)
         self.assertEquals(self.cart.orderitem_set.count(), 1)
 
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 200)
 
         redeem_url = reverse('register_code_redemption', args=[self.reg_code])
@@ -1120,7 +1120,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         )
         self.assertEquals(self.cart.orderitem_set.count(), 2)
 
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 200)
 
         redeem_url = reverse('register_code_redemption', args=[self.reg_code])
@@ -1133,11 +1133,11 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         resp = self.client.post(redeem_url)
         self.assertEquals(resp.status_code, 200)
 
-        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
+        resp = self.client.get(reverse('shoppingcart:show_cart', args=[]))
         self.assertIn('Payment', resp.content)
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
 
-        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+        resp = self.client.get(reverse('shoppingcart:show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
 
         ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
@@ -1161,11 +1161,11 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_course_to_user_cart(self.course_key)
         self.add_reg_code(self.course_key)
 
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 200)
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
 
-        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+        resp = self.client.get(reverse('shoppingcart:show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
         self.assertIn('0.00', resp.content)
 
@@ -1180,7 +1180,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
 
         self.login_user()
-        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+        resp = self.client.get(reverse('shoppingcart:show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
         self.assertIn('FirstNameTesting123', resp.content)
         self.assertIn('80.00', resp.content)
@@ -1203,7 +1203,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
 
         self.login_user()
-        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+        resp = self.client.get(reverse('shoppingcart:show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
 
         ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
@@ -1241,7 +1241,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertEquals(len(mail.outbox), 3)
 
         self.login_user()
-        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+        resp = self.client.get(reverse('shoppingcart:show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
 
         # when order_type = 'business' the user is not enrolled in the
@@ -1285,7 +1285,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
 
         # now view the receipt page again to see if any registration codes
         # has been expired or not
-        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+        resp = self.client.get(reverse('shoppingcart:show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
         ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
@@ -1308,7 +1308,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.login_user()
 
         self.mock_tracker.emit.reset_mock()  # pylint: disable=maybe-no-member
-        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+        resp = self.client.get(reverse('shoppingcart:show_receipt', args=[self.cart.id]))
 
         self.assertEqual(resp.status_code, 200)
         self.assertIn('FirstNameTesting123', resp.content)
@@ -1337,7 +1337,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         cert_item.save()
         self.assertEqual(self.cart.total_cost, 40)
         self.login_user()
-        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+        resp = self.client.get(reverse('shoppingcart:show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
         self.assertIn('40.00', resp.content)
 
@@ -1353,7 +1353,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         cert_item = CertificateItem.add_to_order(self.cart, self.course_key, self.cost, 'honor')
         self.cart.purchase()
         self.login_user()
-        receipt_url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
+        receipt_url = reverse('shoppingcart:show_receipt', args=[self.cart.id])
         resp = self.client.get(receipt_url)
         self.assertEqual(resp.status_code, 200)
         ((template, _context), _tmp) = render_mock.call_args
@@ -1376,14 +1376,14 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         HTTP 404 status code when we have this flag turned off
         """
         self.login_user()
-        self._assert_404(reverse('shoppingcart.views.show_cart', args=[]))
-        self._assert_404(reverse('shoppingcart.views.clear_cart', args=[]))
-        self._assert_404(reverse('shoppingcart.views.remove_item', args=[]), use_post=True)
-        self._assert_404(reverse('shoppingcart.views.register_code_redemption', args=["testing"]))
-        self._assert_404(reverse('shoppingcart.views.use_code', args=[]), use_post=True)
-        self._assert_404(reverse('shoppingcart.views.update_user_cart', args=[]))
-        self._assert_404(reverse('shoppingcart.views.reset_code_redemption', args=[]), use_post=True)
-        self._assert_404(reverse('shoppingcart.views.billing_details', args=[]))
+        self._assert_404(reverse('shoppingcart:show_cart', args=[]))
+        self._assert_404(reverse('shoppingcart:clear_cart', args=[]))
+        self._assert_404(reverse('shoppingcart:remove_item', args=[]), use_post=True)
+        self._assert_404(reverse('shoppingcart:register_code_redemption', args=["testing"]))
+        self._assert_404(reverse('shoppingcart:use_code', args=[]), use_post=True)
+        self._assert_404(reverse('shoppingcart:update_user_cart', args=[]))
+        self._assert_404(reverse('shoppingcart:reset_code_redemption', args=[]), use_post=True)
+        self._assert_404(reverse('shoppingcart:billing_details', args=[]))
 
     def test_upgrade_postpay_callback_emits_ga_event(self):
         # Enroll as honor in the course with the current user.
@@ -1427,7 +1427,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
 
         resp_params = PaymentFakeView.response_post_params(sign(ordered_params))
         self.assertTrue(self.client.session.get('attempting_upgrade'))
-        url = reverse('shoppingcart.views.postpay_callback')
+        url = reverse('shoppingcart:postpay_callback')
         self.client.post(url, resp_params, follow=True)
         self.assertFalse(self.client.session.get('attempting_upgrade'))
 
@@ -1538,7 +1538,7 @@ class ReceiptRedirectTest(SharedModuleStoreTestCase):
         # Simulate hitting the post-pay callback
         with patch('shoppingcart.views.process_postpay_callback') as mock_process:
             mock_process.return_value = {'success': True, 'order': self.cart}
-            url = reverse('shoppingcart.views.postpay_callback')
+            url = reverse('shoppingcart:postpay_callback')
             resp = self.client.post(url, follow=True)
 
         # Expect to be redirected to the payment confirmation
@@ -1627,7 +1627,7 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
 
         # now add the same coupon code to the second course(testing_course)
         self.add_coupon(self.testing_course.id, True, self.coupon_code)
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
         coupon_redemption = CouponRedemption.objects.filter(coupon__course_id=expired_course_item.course_id,
@@ -1636,7 +1636,7 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         # testing_course enrollment is closed but the course is in the cart
         # so we delete that item from the cart and display the message in the cart
         # coupon redemption entry should also be deleted when the item is expired.
-        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
+        resp = self.client.get(reverse('shoppingcart:show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
         self.assertIn("{course_name} has been removed because the enrollment period has closed.".format(course_name=self.testing_course.display_name), resp.content)
 
@@ -1672,11 +1672,11 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
 
         # testing_course enrollment is closed but the course is in the cart
         # so we delete that item from the cart and display the message in the cart
-        resp = self.client.get(reverse('shoppingcart.views.verify_cart'))
+        resp = self.client.get(reverse('shoppingcart:verify_cart'))
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(json.loads(resp.content)['is_course_enrollment_closed'])
 
-        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
+        resp = self.client.get(reverse('shoppingcart:show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
         self.assertIn("{course_name} has been removed because the enrollment period has closed.".format(course_name=self.testing_course.display_name), resp.content)
         self.assertIn('40.00', resp.content)
@@ -1693,13 +1693,13 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         self.testing_course.enrollment_end = self.nextday
         self.testing_course = self.update_course(self.testing_course, self.user.id)
 
-        resp = self.client.post(reverse('shoppingcart.views.billing_details'))
+        resp = self.client.post(reverse('shoppingcart:billing_details'))
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(json.loads(resp.content)['is_course_enrollment_closed'])
 
         # testing_course enrollment is closed but the course is in the cart
         # so we delete that item from the cart and display the message in the cart
-        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
+        resp = self.client.get(reverse('shoppingcart:show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
         self.assertIn("{course_name} has been removed because the enrollment period has closed.".format(course_name=self.testing_course.display_name), resp.content)
         self.assertIn('40.00', resp.content)
@@ -2035,7 +2035,7 @@ class DonationViewTest(SharedModuleStoreTestCase):
         processor_response_params = PaymentFakeView.response_post_params(payment_info["payment_params"])
 
         # Use the response parameters to simulate a successful payment
-        url = reverse('shoppingcart.views.postpay_callback')
+        url = reverse('shoppingcart:postpay_callback')
         response = self.client.post(url, processor_response_params)
         self.assertRedirects(response, self._receipt_url)
 
@@ -2047,7 +2047,7 @@ class DonationViewTest(SharedModuleStoreTestCase):
     @property
     def _receipt_url(self):
         order_id = Order.objects.get(user=self.user, status="purchased").id
-        return reverse("shoppingcart.views.show_receipt", kwargs={"ordernum": order_id})
+        return reverse('shoppingcart:show_receipt', kwargs={"ordernum": order_id})
 
 
 class CSVReportViewsTest(SharedModuleStoreTestCase):

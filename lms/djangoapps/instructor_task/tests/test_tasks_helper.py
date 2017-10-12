@@ -579,7 +579,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         student_cart = Order.get_cart_for_user(student)
         paid_course_reg_item = PaidCourseRegistration.add_to_order(student_cart, self.course.id)
         # update the quantity of the cart item paid_course_reg_item
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'),
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'),
                                 {'ItemId': paid_course_reg_item.id, 'qty': '4'})
         self.assertEqual(resp.status_code, 200)
         student_cart.purchase()
@@ -1131,12 +1131,12 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         self.client.login(username=self.student1.username, password='test')
         paid_course_reg_item = PaidCourseRegistration.add_to_order(self.student1_cart, self.course.id)
         # update the quantity of the cart item paid_course_reg_item
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {
             'ItemId': paid_course_reg_item.id, 'qty': '4'
         })
         self.assertEqual(resp.status_code, 200)
         # apply the coupon code to the item in the cart
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'coupon1'})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': 'coupon1'})
         self.assertEqual(resp.status_code, 200)
 
         self.student1_cart.purchase()
@@ -1155,7 +1155,7 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         PaidCourseRegistration.add_to_order(self.student2_cart, self.course.id)
 
         # apply the coupon code to the item in the cart
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'coupon1'})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': 'coupon1'})
         self.assertEqual(resp.status_code, 200)
 
         self.student2_cart.purchase()

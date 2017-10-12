@@ -250,7 +250,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.client.login(username=student.username, password="test")
         student_cart = Order.get_cart_for_user(student)
         item = self.add_course_to_user_cart(student_cart, self.course.id)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': 4})
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'ItemId': item.id, 'qty': 4})
         self.assertEqual(resp.status_code, 200)
         student_cart.purchase()
 

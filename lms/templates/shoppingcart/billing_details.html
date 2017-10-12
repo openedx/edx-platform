@@ -109,7 +109,7 @@ from django.core.urlresolvers import reverse
       $.post(post_url, data)
       .success(function(data) {
             if (data.is_course_enrollment_closed == true) {
-              location.href = "${reverse('shoppingcart.views.show_cart')}";
+              location.href = "${reverse('shoppingcart:show_cart')}";
             }
             else {
               payment_form.submit();

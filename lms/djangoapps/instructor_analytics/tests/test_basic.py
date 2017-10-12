@@ -424,7 +424,7 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
         )
         CourseRegCodeItem.add_to_order(order, self.course.id, 4)
         # apply the coupon code to the item in the cart
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': coupon.code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': coupon.code})
         self.assertEqual(resp.status_code, 200)
         order.purchase()
 

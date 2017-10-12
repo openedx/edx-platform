@@ -166,7 +166,7 @@ def update_user_cart(request):
         total_cost = item.order.total_cost
 
         callback_url = request.build_absolute_uri(
-            reverse("shoppingcart.views.postpay_callback")
+            reverse('shoppingcart:postpay_callback')
         )
         cart = Order.get_cart_for_user(request.user)
         form_html = render_purchase_form_html(cart, callback_url=callback_url)
@@ -199,7 +199,7 @@ def show_cart(request):
         cart.update_order_type()
 
     callback_url = request.build_absolute_uri(
-        reverse("shoppingcart.views.postpay_callback")
+        reverse('shoppingcart:postpay_callback')
     )
     form_html = render_purchase_form_html(cart, callback_url=callback_url)
     context = {
@@ -610,7 +610,7 @@ def donate(request):
 
     # Construct the response params (JSON-encoded)
     callback_url = request.build_absolute_uri(
-        reverse("shoppingcart.views.postpay_callback")
+        reverse('shoppingcart:postpay_callback')
     )
 
     # Add extra to make it easier to track transactions
@@ -708,7 +708,7 @@ def postpay_callback(request):
             return verify_flow_redirect
 
         # Otherwise, send the user to the receipt page
-        return HttpResponseRedirect(reverse('shoppingcart.views.show_receipt', args=[result['order'].id]))
+        return HttpResponseRedirect(reverse('shoppingcart:show_receipt', args=[result['order'].id]))
     else:
         request.session['attempting_upgrade'] = False
         return render_to_response('shoppingcart/error.html', {'order': result['order'],
@@ -731,7 +731,7 @@ def billing_details(request):
 
     if request.method == "GET":
         callback_url = request.build_absolute_uri(
-            reverse("shoppingcart.views.postpay_callback")
+            reverse('shoppingcart:postpay_callback')
         )
         form_html = render_purchase_form_html(cart, callback_url=callback_url)
         total_cost = cart.total_cost
