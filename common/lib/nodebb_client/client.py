@@ -9,9 +9,6 @@ from pynodebb.http_client import HttpClient
 
 from common.lib.nodebb_client.categories import ForumCategory
 from common.lib.nodebb_client.users import ForumUser
-from logging import getLogger
-
-log = getLogger(__name__)
 
 
 class NodeBBClient(Client):
@@ -27,10 +24,6 @@ class NodeBBClient(Client):
                        admin_uid=admin_uid)
 
         self.http_client = HttpClient()
-
-        log.info("Node BB client")
-        log.info("Http client end point %s" % self.http_client.endpoint)
-        log.info("Http client end point %s" % self.http_client.headers)
 
         self.users = ForumUser(self.http_client)
         self.topics = Topic(self.http_client)
