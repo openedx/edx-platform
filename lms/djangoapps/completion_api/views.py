@@ -39,12 +39,22 @@ class CompletionViewMixin(object):
     )
     permission_classes = (IsAuthenticated,)
 
+    def __init__(self, *args, **kwargs):
+        """
+        Initialize instance variables.
+        """
+        super(CompletionViewMixin, self).__init__(*args, **kwargs)
+        self._user = None
+
     def get_user(self):
         """
         Return the effective user.
 
         Usually the requesting user, but a staff user can override this.
         """
+        if self._user is not None:
+            return self._user
+
         requested_username = self.request.GET.get('username')
         if requested_username is None:
             user = self.request.user
@@ -61,7 +71,9 @@ class CompletionViewMixin(object):
                     raise NotFound()
         if not user.is_authenticated():
             raise NotAuthenticated()
-        return user
+
+        self._user = user
+        return self._user
 
     def get_progress_queryset(self):
         """
@@ -69,6 +81,13 @@ class CompletionViewMixin(object):
         """
         objs = StudentProgress.objects.filter(user=self.get_user())
         return objs
+
+    def create_progress(self, course_id):
+        """
+        Build an empty StudentProgress object for the current user and given course.
+        """
+        obj = StudentProgress(user=self.get_user(), course_id=course_id)
+        return obj
 
     def get_requested_fields(self):
         """
@@ -235,8 +254,26 @@ class CompletionListView(CompletionViewMixin, APIView):
         Handler for GET requests.
         """
         self.paginator = self.pagination_class()  # pylint: disable=attribute-defined-outside-init
-        paginated = self.paginator.paginate_queryset(self.get_progress_queryset(), self.request, view=self)
-        completions = [CourseCompletionFacade(progress) for progress in paginated]
+
+        # Paginate the list of active enrollments, annotated (manually) with a student progress object.
+        enrollments = CourseEnrollment.objects.filter(user=self.get_user(), is_active=True).order_by('course_id')
+        paginated = self.paginator.paginate_queryset(enrollments, self.request, view=self)
+
+        # Grab the progress items for these enrollments
+        progress_set = self.get_progress_queryset().filter(
+            course_id__in=[enrollment.course_id for enrollment in paginated]
+        )
+        course_progress = {progress.course_id: progress for progress in progress_set}
+
+        # Create the list of completions to be serialized.
+        # If no progress record exists for this enrollment, use a dummy one.
+        completions = [
+            CourseCompletionFacade(
+                course_progress.get(enrollment.course_id) or self.create_progress(enrollment.course_id)
+            ) for enrollment in paginated
+        ]
+
+        # Return the paginated, serialized completions
         serializer = self.get_serializer()(
             instance=completions,
             requested_fields=self.get_requested_fields(),
@@ -312,8 +349,7 @@ class CompletionDetailView(CompletionViewMixin, APIView):
         * 400 if an invalid value was sent for requested_fields.
         * 403 if a user who does not have permission to masquerade as another
           user specifies a username other than their own.
-        * 404 if the course is not available or the requesting user can see no
-          completable sections.
+        * 404 if the user is not enrolled in the requested course.
 
         Example response:
 
@@ -369,10 +405,17 @@ class CompletionDetailView(CompletionViewMixin, APIView):
         Handler for GET requests.
         """
         course_id = CourseKey.from_string(course_id)
+
+        # Return 404 if user does not have an active enrollment in the requested course
+        if not CourseEnrollment.is_enrolled(self.get_user(), course_id):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
         try:
+            # Fetch the StudentProgress object
             progress = self.get_progress_queryset().get(course_id=course_id)
         except StudentProgress.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            # Otherwise, use an empty, unsaved StudentProgress object
+            progress = self.create_progress(course_id)
 
         completion = CourseCompletionFacade(progress)
         return Response(self.get_serializer()(completion, requested_fields=self.get_requested_fields()).data)
