@@ -19,7 +19,6 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.enterprise_support.api import enterprise_enabled
 
-from openassessment.fileupload.urls import urlpatterns as oraurlpatterns
 
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -1032,4 +1031,3 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
         )
     )
 
-urlpatterns+= oraurlpatterns
