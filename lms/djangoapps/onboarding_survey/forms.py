@@ -279,7 +279,7 @@ class RegModelForm(forms.ModelForm):
             'first_name': forms.TextInput(attrs={'placeholder': 'First Name'}),
             'last_name': forms.TextInput(attrs={'placeholder': 'Last Name'}),
             'is_poc': forms.RadioSelect(choices=((1, 'Yes'), (0, 'No'))),
-            'org_admin_email': forms.EmailInput(attrs=({'placeholder': 'Email'}))
+            'org_admin_email': forms.EmailInput(attrs=({'placeholder': 'Organization Admin Email'}))
         }
 
         serialization_options = {
