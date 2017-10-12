@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from django.test.utils import override_settings
 from oauth2_provider import models as dot_models
 from rest_framework.test import APIClient
+from unittest import expectedFailure
 
 from opaque_keys.edx.keys import UsageKey
 from progress import models
@@ -55,10 +56,13 @@ class CompletionViewTestCase(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super(CompletionViewTestCase, cls).setUpClass()
         cls.course = ToyCourseFactory.create()
+        cls.otherOrgCourse = ToyCourseFactory.create(org='otherOrg')
+        cls.futureCourse = ToyCourseFactory.create(org='futureOrg', start=datetime.utcnow() + timedelta(weeks=1))
 
     def setUp(self):
         super(CompletionViewTestCase, self).setUp()
         self.test_user = UserFactory.create()
+        CourseEnrollment.enroll(self.test_user, self.course.id)
         self.mark_completions()
         self.client = APIClient()
         self.client.force_authenticate(user=self.test_user)
@@ -110,6 +114,37 @@ class CompletionViewTestCase(SharedModuleStoreTestCase):
         response = self.client.get(url, HTTP_AUTHORIZATION="Bearer {0}".format(token))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['results'][0]['completion']['earned'], 1.0)  # pylint: disable=no-member
+
+    def test_list_view_enrolled_no_progress(self):
+        """
+        Test that the completion API returns a record for each course the user is enrolled in,
+        even if no progress records exist yet.
+        """
+        CourseEnrollment.enroll(self.test_user, self.otherOrgCourse.id)
+        response = self.client.get('/api/completion/v0/course/')
+        self.assertEqual(response.status_code, 200)
+        expected = {
+            'pagination': {'count': 2, 'previous': None, 'num_pages': 1, 'next': None},
+            'results': [
+                {
+                    'course_key': 'edX/toy/2012_Fall',
+                    'completion': {
+                        'earned': 1.0,
+                        'possible': 12.0,
+                        'ratio': 1 / 12,
+                    },
+                },
+                {
+                    'course_key': 'otherOrg/toy/2012_Fall',
+                    'completion': {
+                        'earned': 0.0,
+                        'possible': 12.0,
+                        'ratio': 0.0,
+                    },
+                }
+            ],
+        }
+        self.assertEqual(response.data, expected)  # pylint: disable=no-member
 
     def test_list_view_with_sequentials(self):
         response = self.client.get('/api/completion/v0/course/?requested_fields=sequential')
@@ -163,6 +198,65 @@ class CompletionViewTestCase(SharedModuleStoreTestCase):
         response = self.client.get(url, HTTP_AUTHORIZATION="Bearer {0}".format(token))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['completion']['earned'], 1.0)  # pylint: disable=no-member
+
+    def test_detail_view_unenrolled(self):
+        """
+        Test that unenrolling from the course will return a 404 for course completions,
+        even if there are existing progress records.
+        """
+        CourseEnrollment.unenroll(self.test_user, self.course.id)
+        response = self.client.get('/api/completion/v0/course/edX/toy/2012_Fall/')
+        self.assertEqual(response.status_code, 404)
+
+    def test_detail_view_not_enrolled(self):
+        """
+        Test that requesting course completions for a course the user is not enrolled in
+        will return a 404.
+        """
+        response = self.client.get('/api/completion/v0/course/otherOrg/toy/2012_Fall/')
+        self.assertEqual(response.status_code, 404)
+
+    def test_detail_view_no_completion(self):
+        """
+        Test that requesting course completions for a course which has started, but the user has not yet started,
+        will return an empty completion record with its "possible" field filled in.
+        """
+        CourseEnrollment.enroll(self.test_user, self.otherOrgCourse.id)
+        response = self.client.get('/api/completion/v0/course/otherOrg/toy/2012_Fall/')
+        self.assertEqual(response.status_code, 200)
+        expected = {
+            'course_key': 'otherOrg/toy/2012_Fall',
+            'completion': {
+                'earned': 0.0,
+                'possible': 12.0,
+                'ratio': 0.0,
+            },
+        }
+        self.assertEqual(response.data, expected)  # pylint: disable=no-member
+
+    @expectedFailure
+    def test_detail_view_future_course(self):
+        """
+        Test that requesting course completions for a course with a start date in the future
+        (also that a user has not started) will return an empty completion record.
+
+        @expectedFailure:
+        The completion record *should* report "possible: 0.0" because the user is not allowed to see the course blocks
+        for future courses, and so can't see what the possible scores may be.  And indeed this is what manual testing
+        demontrates, so something is different about this unit test environment, which needs to be addressed.
+        """
+        CourseEnrollment.enroll(self.test_user, self.futureCourse.id)
+        response = self.client.get('/api/completion/v0/course/futureOrg/toy/2012_Fall/')
+        self.assertEqual(response.status_code, 200)
+        expected = {
+            'course_key': 'futureOrg/toy/2012_Fall',
+            'completion': {
+                'earned': 0.0,
+                'possible': 0.0,
+                'ratio': 1.0,
+            },
+        }
+        self.assertEqual(response.data, expected)  # pylint: disable=no-member
 
     def test_detail_view_with_sequentials(self):
         response = self.client.get('/api/completion/v0/course/edX/toy/2012_Fall/?requested_fields=sequential')
@@ -238,15 +332,24 @@ class CompletionBlockUpdateViewTestCase(SharedModuleStoreTestCase):
 
         completion_query_url = '/api/completion/v0/course/edX/toy/2012_Fall/?requested_fields=sequential'
         before_response = self.client.get(completion_query_url)
-        self.assertEqual(before_response.status_code, 404)
+        self.assertEqual(before_response.status_code, 200)
+
+        before_data = before_response.data  # pylint: disable=no-member
+        self.assertEqual(before_data['completion']['earned'], 0)
+        self.assertEqual(before_data['completion']['possible'], 12)
+        self.assertEqual(before_data['completion']['ratio'], 0)
+        self.assertEqual(before_data['sequential'][0]['completion']['earned'], 0)
 
         create_response = self.client.post(self.update_url, {'completion': 1})
         self.assertEqual(create_response.status_code, 201)
 
         after_response = self.client.get(completion_query_url)
         self.assertEqual(after_response.status_code, 200)
-        self.assertEqual(after_response.data['completion']['earned'], 1)  # pylint: disable=no-member
-        self.assertEqual(after_response.data['sequential'][0]['completion']['earned'], 1)  # pylint: disable=no-member
+        after_data = after_response.data  # pylint: disable=no-member
+        self.assertEqual(after_data['completion']['earned'], 1)
+        self.assertEqual(after_data['completion']['possible'], 12)
+        self.assertEqual(after_data['completion']['ratio'], 1 / 12)
+        self.assertEqual(after_data['sequential'][0]['completion']['earned'], 1)
 
         # Disconnect signals again.
         SignalDisconnectTestMixin.disconnect_signals()
