@@ -36,3 +36,13 @@ class SubsectionGradeTest(GradeTestBase):
             read_grade.all_total.first_attempted = created_grade.all_total.first_attempted = None
             self.assertEqual(created_grade.all_total, read_grade.all_total)
             self.assertEqual(created_grade.percent_graded, 0.5)
+
+    def test_zero(self):
+        with mock_get_score(1, 0):
+            grade = CreateSubsectionGrade(
+                self.sequence,
+                self.course_structure,
+                self.subsection_grade_factory._submissions_scores,
+                self.subsection_grade_factory._csm_scores,
+            )
+            self.assertEqual(grade.percent_graded, 0.0)
