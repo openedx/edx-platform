@@ -74,4 +74,4 @@ class CourseNewAssetsPageFlag(ConfigurationModel):
         if self.enabled:
             not_en = ""
         # pylint: disable=no-member
-        return u"Course '{}': Persistent Grades {}Enabled".format(self.course_id.to_deprecated_string(), not_en)
+        return u"Course '{}': New assets page {}Enabled".format(self.course_id.to_deprecated_string(), not_en)
