@@ -849,7 +849,7 @@ if configuration_helpers.get_value('ENABLE_BULK_ENROLLMENT_VIEW',
 
 # Shopping cart
 urlpatterns += [
-    url(r'^shoppingcart/', include('shoppingcart.urls')),
+    url(r'^shoppingcart/', include('shoppingcart.urls', namespace='shoppingcart')),
     url(r'^commerce/', include('commerce.urls', namespace='commerce')),
 ]
 

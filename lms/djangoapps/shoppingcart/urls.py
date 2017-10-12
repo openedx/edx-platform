@@ -3,7 +3,6 @@ from django.conf.urls import url
 
 from shoppingcart.views import *
 
-app_name = 'shoppingcart'
 
 urlpatterns = [
     # Both the ~accept and ~reject callback pages are handled here
