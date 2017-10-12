@@ -46,7 +46,7 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "Your Platform Name Here"
+PLATFORM_NAME = "Philanthropy U Team"
 CC_MERCHANT_NAME = PLATFORM_NAME
 # Shows up in the platform footer, eg "(c) COPYRIGHT_YEAR"
 COPYRIGHT_YEAR = "2017"
@@ -2167,6 +2167,9 @@ INSTALLED_APPS = (
 
     # NodeBB App
     'nodebb',
+
+    # timed notification and periodic tasks
+    'openedx.core.djangoapps.timed_notification',
 )
 
 ######################### CSRF #########################################
@@ -3039,3 +3042,10 @@ ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
 
 # NodeBB settings
 NODEBB_ENDPOINT = 'http://community.philanthropyu.org'
+
+# Project features
+LMS_BASE_URL = 'https://philanthropyu.org'
+
+# Notification email settings
+NOTIFICATION_FROM_EMAIL = 'no-reply@philanthropyu.org'
+NOTIFICATION_EMAIL_SUBJECT = 'Philanthropy-U-Team Course Notification'
