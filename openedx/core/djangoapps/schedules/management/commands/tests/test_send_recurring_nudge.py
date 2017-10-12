@@ -150,7 +150,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
             enrollment__user=user1,
         )
         schedule.enrollment.course = CourseOverviewFactory()
-        schedule.enrollment.course.end = datetime.datetime.now() - datetime.timedelta(days=1)
+        schedule.enrollment.course.end = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=1)
 
         test_time = datetime.datetime(2017, 8, 3, 20, tzinfo=pytz.UTC)
         test_time_str = serialize(test_time)
