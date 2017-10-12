@@ -1,14 +1,10 @@
 {% load i18n %}
 
 {% blocktrans trimmed %}
-Dear {{ user_personal_address }},
-{% endblocktrans %}
+We hope you are enjoying learning with us so far in {{ course_name }}! A verified certificate
+will allow you to highlight your new knowledge and skills. It's official, and easily shareable.
 
-{% blocktrans trimmed %}
-    We hope you are enjoying learning with us so far in {{ course_name }}! A verified certificate
-    will allow you to highlight your new knowledge and skills. It's official, and easily shareable.
-
-    Upgrade by {{ user_schedule_upgrade_deadline_time }}.
+Upgrade by {{ user_schedule_upgrade_deadline_time }}.
 {% endblocktrans %}
 
 {% trans "Upgrade now at" %} <{{ course_url }}>

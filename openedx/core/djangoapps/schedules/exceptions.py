@@ -1,0 +1,2 @@
+class CourseUpdateDoesNotExist(Exception):
+    pass
