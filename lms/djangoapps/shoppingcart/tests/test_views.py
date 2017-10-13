@@ -374,7 +374,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         item = self.add_course_to_user_cart(self.course_key)
         resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
-        resp = self.client.get(reverse('shoppingcart:show_shoppingcart', args=[]))
+        resp = self.client.get(reverse('shoppingcart:show_cart', args=[]))
         self.assertIn("Billing Details", resp.content)
 
     def test_purchase_type_should_be_personal_when_remove_all_items_from_cart(self):
