@@ -374,7 +374,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         item = self.add_course_to_user_cart(self.course_key)
         resp = self.client.post(reverse('shoppingcart:update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
-        resp = self.client.get(reverse('show_shoppingcart', args=[]))
+        resp = self.client.get(reverse('shoppingcart:show_shoppingcart', args=[]))
         self.assertIn("Billing Details", resp.content)
 
     def test_purchase_type_should_be_personal_when_remove_all_items_from_cart(self):
@@ -1872,7 +1872,7 @@ class RedeemCodeEmbargoTests(UrlResetMixin, ModuleStoreTestCase):
         # Try to redeem the code from a restricted country
         with restrict_course(self.course.id) as redirect_url:
             url = reverse(
-                'register_code_redemption',
+                'shoppingcart:register_code_redemption',
                 kwargs={'registration_code': 'abcd1234'}
             )
             response = getattr(self.client, method)(url)
@@ -2141,8 +2141,8 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
         self.login_user()
         self.add_to_download_group(self.user)
         response = self.client.post(reverse('shoppingcart:payment_csv_report'), {'start_date': start_date,
-                                                                    'end_date': end_date,
-                                                                    'requested_report': report_type})
+                                                                                 'end_date': end_date,
+                                                                                 'requested_report': report_type})
         self.assertEqual(response['Content-Type'], 'text/csv')
         report = initialize_report(report_type, start_date, end_date)
         self.assertIn(",".join(report.header()), response.content)
@@ -2160,10 +2160,10 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
         self.login_user()
         self.add_to_download_group(self.user)
         response = self.client.post(reverse('shoppingcart:payment_csv_report'), {'start_date': start_date,
-                                                                    'end_date': end_date,
-                                                                    'start_letter': start_letter,
-                                                                    'end_letter': end_letter,
-                                                                    'requested_report': report_type})
+                                                                                 'end_date': end_date,
+                                                                                 'start_letter': start_letter,
+                                                                                 'end_letter': end_letter,
+                                                                                 'requested_report': report_type})
         self.assertEqual(response['Content-Type'], 'text/csv')
         report = initialize_report(report_type, start_date, end_date, start_letter, end_letter)
         self.assertIn(",".join(report.header()), response.content)
