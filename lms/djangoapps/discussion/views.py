@@ -3,7 +3,6 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 """
 
 import logging
-from contextlib import contextmanager
 from functools import wraps
 from sets import Set
 
@@ -46,34 +45,17 @@ from django_comment_client.utils import (
 )
 from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from openedx.core.djangoapps.monitoring_utils import function_trace
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.discussions")
-try:
-    import newrelic.agent
-except ImportError:
-    newrelic = None  # pylint: disable=invalid-name
 
 
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
 PAGES_NEARBY_DELTA = 2
-
-
-@contextmanager
-def newrelic_function_trace(function_name):
-    """
-    A wrapper context manager newrelic.agent.FunctionTrace to no-op if the
-    newrelic package is not installed
-    """
-    if newrelic:
-        nr_transaction = newrelic.agent.current_transaction()
-        with newrelic.agent.FunctionTrace(nr_transaction, function_name):
-            yield
-    else:
-        yield
 
 
 def make_course_settings(course, user):
@@ -216,12 +198,12 @@ def inline_discussion(request, course_key, discussion_id):
     except ValueError:
         return HttpResponseServerError("Invalid group_id")
 
-    with newrelic_function_trace("get_metadata_for_threads"):
+    with function_trace("get_metadata_for_threads"):
         annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
 
     is_staff = has_permission(request.user, 'openclose_thread', course.id)
     threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
-    with newrelic_function_trace("add_courseware_context"):
+    with function_trace("add_courseware_context"):
         add_courseware_context(threads, course, request.user)
 
     return utils.JsonResponse({
@@ -256,10 +238,10 @@ def forum_form_discussion(request, course_key):
         except ValueError:
             return HttpResponseServerError("Invalid group_id")
 
-        with newrelic_function_trace("get_metadata_for_threads"):
+        with function_trace("get_metadata_for_threads"):
             annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
 
-        with newrelic_function_trace("add_courseware_context"):
+        with function_trace("add_courseware_context"):
             add_courseware_context(threads, course, request.user)
 
         return utils.JsonResponse({
@@ -300,7 +282,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
             raise_event=True,
         )
 
-        with newrelic_function_trace("get_annotated_content_infos"):
+        with function_trace("get_annotated_content_infos"):
             annotated_content_info = utils.get_annotated_content_infos(
                 course_key,
                 thread,
@@ -309,7 +291,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
             )
 
         content = utils.prepare_content(thread.to_dict(), course_key, is_staff)
-        with newrelic_function_trace("add_courseware_context"):
+        with function_trace("add_courseware_context"):
             add_courseware_context([content], course, request.user)
 
         return utils.JsonResponse({
@@ -457,13 +439,13 @@ def _create_discussion_board_context(request, base_context, thread=None):
     is_staff = has_permission(user, 'openclose_thread', course.id)
     threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
 
-    with newrelic_function_trace("get_metadata_for_threads"):
+    with function_trace("get_metadata_for_threads"):
         annotated_content_info = utils.get_metadata_for_threads(course_key, threads, user, user_info)
 
-    with newrelic_function_trace("add_courseware_context"):
+    with function_trace("add_courseware_context"):
         add_courseware_context(threads, course, user)
 
-    with newrelic_function_trace("get_cohort_info"):
+    with function_trace("get_cohort_info"):
         course_discussion_settings = get_course_discussion_settings(course_key)
         user_group_id = get_group_id_for_user(user, course_discussion_settings)
 
@@ -529,13 +511,13 @@ def user_profile(request, course_key, user_id):
         query_params['page'] = page
         query_params['num_pages'] = num_pages
 
-        with newrelic_function_trace("get_metadata_for_threads"):
+        with function_trace("get_metadata_for_threads"):
             user_info = cc.User.from_django_user(request.user).to_dict()
             annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
 
         is_staff = has_permission(request.user, 'openclose_thread', course.id)
         threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
-        with newrelic_function_trace("add_courseware_context"):
+        with function_trace("add_courseware_context"):
             add_courseware_context(threads, course, request.user)
         if request.is_ajax():
             return utils.JsonResponse({
@@ -549,7 +531,7 @@ def user_profile(request, course_key, user_id):
                 course_id=course.id
             ).order_by("name").values_list("name", flat=True).distinct()
 
-            with newrelic_function_trace("get_cohort_info"):
+            with function_trace("get_cohort_info"):
                 course_discussion_settings = get_course_discussion_settings(course_key)
                 user_group_id = get_group_id_for_user(request.user, course_discussion_settings)
 
@@ -618,7 +600,7 @@ def followed_threads(request, course_key, user_id):
         query_params['num_pages'] = paginated_results.num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
 
-        with newrelic_function_trace("get_metadata_for_threads"):
+        with function_trace("get_metadata_for_threads"):
             annotated_content_info = utils.get_metadata_for_threads(
                 course_key,
                 paginated_results.collection,

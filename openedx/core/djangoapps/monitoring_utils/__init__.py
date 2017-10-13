@@ -20,6 +20,7 @@ At this time, these custom metrics will only be reported to New Relic.
 TODO: supply additional public functions for storing strings and booleans.
 
 """
+from contextlib import contextmanager
 
 from . import middleware
 try:
@@ -95,3 +96,17 @@ def set_monitoring_transaction_name(name, group=None, priority=None):
     if not newrelic:
         return
     newrelic.agent.set_transaction_name(name, group, priority)
+
+
+@contextmanager
+def function_trace(function_name):
+    """
+    Wraps a chunk of code that we want to appear as a separate, explicit,
+    segment in our monitoring tools.
+    """
+    if newrelic:
+        nr_transaction = newrelic.agent.current_transaction()
+        with newrelic.agent.FunctionTrace(nr_transaction, function_name):
+            yield
+    else:
+        yield
