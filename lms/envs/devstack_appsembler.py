@@ -16,6 +16,7 @@ INSTALLED_APPS += (
     'django_extensions',
     'openedx.core.djangoapps.appsembler.sites',
     'openedx.core.djangoapps.appsembler.msft_lp',
+    'openedx.core.djangoapps.appsembler.tpa_admin',
 )
 
 # those are usually hardcoded in devstack.py for some reason
@@ -117,6 +118,18 @@ HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'
 USE_S3_FOR_CUSTOMER_THEMES = False
 
 LMS_BASE = ENV_TOKENS.get('LMS_BASE')
+
+if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+    AUTHENTICATION_BACKENDS = list(AUTHENTICATION_BACKENDS) + (
+        ENV_TOKENS.get('THIRD_PARTY_AUTH_BACKENDS', [
+             'social.backends.google.GoogleOAuth2',
+             'social.backends.linkedin.LinkedinOAuth2',
+             'social.backends.facebook.FacebookOAuth2',
+             'social.backends.azuread.AzureADOAuth2',
+             'third_party_auth.saml.SAMLAuthBackend',
+             'third_party_auth.lti.LTIAuthBackend',
+        ])
+    )
 
 try:
     from .private import *
