@@ -1,6 +1,7 @@
 from urlparse import urlparse
 
 from django.conf import settings
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.urlresolvers import reverse
 from django.utils.http import urlquote
 
@@ -17,7 +18,27 @@ def get_base_template_context(site):
         'platform_name': settings.PLATFORM_NAME,
         'contact_mailing_address': settings.CONTACT_MAILING_ADDRESS,
         'social_media_urls': encode_urls_in_dict(getattr(settings, 'SOCIAL_MEDIA_FOOTER_URLS', {})),
+        'social_media_icons': encode_urls_in_dict(get_social_media_footer_icons(site)),
         'mobile_store_urls': encode_urls_in_dict(getattr(settings, 'MOBILE_STORE_URLS', {})),
+        'mobile_store_icons': encode_urls_in_dict(get_mobile_store_footer_icons(site)),
+        'edx_logo': encode_url(absolute_url(site, static('images/bulk_email/edx-logo-77x36.png'))),
+    }
+
+
+def get_social_media_footer_icons(site):
+    return {
+        'linkedin': absolute_url(site, static('images/bulk_email/LinkedInIcon_gray.png')),
+        'twitter': absolute_url(site, static('images/bulk_email/TwitterIcon_gray.png')),
+        'facebook': absolute_url(site, static('images/bulk_email/FacebookIcon_gray.png')),
+        'google_plus': absolute_url(site, static('images/bulk_email/GooglePlusIcon_gray.png')),
+        'youtube': absolute_url(site, static('images/bulk_email/YoutubeIcon_gray.png')),
+    }
+
+
+def get_mobile_store_footer_icons(site):
+    return {
+        'google': absolute_url(site, static('images/bulk_email/google_play_badge_45.png')),
+        'apple': absolute_url(site, static('images/bulk_email/app_store_badge_135x40.svg')),
     }
 
 
