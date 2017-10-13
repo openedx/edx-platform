@@ -1,6 +1,5 @@
 """ Management command to update courses' search index """
 import logging
-from optparse import make_option
 from textwrap import dedent
 
 from django.core.management import BaseCommand, CommandError
@@ -27,26 +26,21 @@ class Command(BaseCommand):
         ./manage.py reindex_course --setup - reindexes all courses for devstack setup
     """
     help = dedent(__doc__)
-
     can_import_settings = True
-
     args = "<course_id course_id ...>"
-
-    all_option = make_option('--all',
-                             action='store_true',
-                             dest='all',
-                             default=False,
-                             help='Reindex all courses')
-
-    setup_option = make_option('--setup',
-                               action='store_true',
-                               dest='setup',
-                               default=False,
-                               help='Reindex all courses on developers stack setup')
-
-    option_list = BaseCommand.option_list + (all_option, setup_option)
-
     CONFIRMATION_PROMPT = u"Re-indexing all courses might be a time consuming operation. Do you want to continue?"
+
+    def add_arguments(self, parser):
+        parser.add_argument('--all',
+                            action='store_true',
+                            dest='all',
+                            default=False,
+                            help='Reindex all courses')
+        parser.add_argument('--setup',
+                            action='store_true',
+                            dest='setup',
+                            default=False,
+                            help='Reindex all courses on developers stack setup')
 
     def _parse_course_key(self, raw_value):
         """ Parses course key from string """
@@ -65,11 +59,12 @@ class Command(BaseCommand):
         By convention set by Django developers, this method actually executes command's actions.
         So, there could be no better docstring than emphasize this once again.
         """
-        all_option = options.get('all', False)
-        setup_option = options.get('setup', False)
+        course_ids = args
+        all_option = options['all']
+        setup_option = options['setup']
         index_all_courses_option = all_option or setup_option
 
-        if len(args) == 0 and not index_all_courses_option:
+        if len(course_ids) == 0 and not index_all_courses_option:
             raise CommandError(u"reindex_course requires one or more arguments: <course_id>")
 
         store = modulestore()
@@ -108,7 +103,7 @@ class Command(BaseCommand):
                 return
         else:
             # in case course keys are provided as arguments
-            course_keys = map(self._parse_course_key, args)
+            course_keys = map(self._parse_course_key, course_ids)
 
         for course_key in course_keys:
             CoursewareSearchIndexer.do_course_reindex(store, course_key)

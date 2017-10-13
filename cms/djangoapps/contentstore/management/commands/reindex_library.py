@@ -1,5 +1,4 @@
 """ Management command to update libraries' search index """
-from optparse import make_option
 from textwrap import dedent
 
 from django.core.management import BaseCommand, CommandError
@@ -22,21 +21,17 @@ class Command(BaseCommand):
         ./manage.py reindex_library --all - reindexes all available libraries
     """
     help = dedent(__doc__)
-
     can_import_settings = True
-
     args = "<library_id library_id ...>"
+    CONFIRMATION_PROMPT = u"Reindexing all libraries might be a time consuming operation. Do you want to continue?"
 
-    option_list = BaseCommand.option_list + (
-        make_option(
+    def add_arguments(self, parser):
+        parser.add_argument(
             '--all',
             action='store_true',
             dest='all',
-            default=False,
             help='Reindex all libraries'
-        ),)
-
-    CONFIRMATION_PROMPT = u"Reindexing all libraries might be a time consuming operation. Do you want to continue?"
+        )
 
     def _parse_library_key(self, raw_value):
         """ Parses library key from string """
@@ -52,7 +47,7 @@ class Command(BaseCommand):
         By convention set by django developers, this method actually executes command's actions.
         So, there could be no better docstring than emphasize this once again.
         """
-        if len(args) == 0 and not options.get('all', False):
+        if len(args) == 0 and not options['all']:
             raise CommandError(u"reindex_library requires one or more arguments: <library_id>")
 
         store = modulestore()
@@ -66,4 +61,5 @@ class Command(BaseCommand):
             library_keys = map(self._parse_library_key, args)
 
         for library_key in library_keys:
+            print "Indexing library {}".format(library_key)
             LibrarySearchIndexer.do_library_reindex(store, library_key)

@@ -1,5 +1,3 @@
-from optparse import make_option
-
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
@@ -7,16 +5,14 @@ from django_comment_common.models import Role
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--remove',
-                    action='store_true',
-                    dest='remove',
-                    default=False,
-                    help='Remove the role instead of adding it'),
-    )
-
     args = '<user|email> <role> <course_id>'
     help = 'Assign a discussion forum role to a user '
+
+    def add_arguments(self, parser):
+        parser.add_argument('--remove',
+                            action='store_true',
+                            dest='remove',
+                            help='Remove the role instead of adding it')
 
     def handle(self, *args, **options):
         if len(args) != 3:
