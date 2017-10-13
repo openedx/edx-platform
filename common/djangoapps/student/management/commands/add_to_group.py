@@ -1,27 +1,24 @@
-from optparse import make_option
-
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User, Group
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--list',
-                    action='store_true',
-                    dest='list',
-                    default=False,
-                    help='List available groups'),
-        make_option('--create',
-                    action='store_true',
-                    dest='create',
-                    default=False,
-                    help='Create the group if it does not exist'),
-        make_option('--remove',
-                    action='store_true',
-                    dest='remove',
-                    default=False,
-                    help='Remove the user from the group instead of adding it'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('--list',
+                            action='store_true',
+                            dest='list',
+                            default=False,
+                            help='List available groups')
+        parser.add_argument('--create',
+                            action='store_true',
+                            dest='create',
+                            default=False,
+                            help='Create the group if it does not exist')
+        parser.add_argument('--remove',
+                            action='store_true',
+                            dest='remove',
+                            default=False,
+                            help='Remove the user from the group instead of adding it')
 
     args = '<user|email> <group>'
     help = 'Add a user to a group'

@@ -1,5 +1,4 @@
 """ Management command to update course_teams' search index. """
-from optparse import make_option
 from textwrap import dedent
 
 from django.conf import settings
@@ -24,15 +23,14 @@ class Command(BaseCommand):
 
     args = "<course_team_id course_team_id ...>"
 
-    option_list = BaseCommand.option_list + (
-        make_option(
+    def add_arguments(self, parser):
+        parser.add_argument(
             '--all',
             action='store_true',
             dest='all',
             default=False,
             help='Reindex all course teams'
-        ),
-    )
+        )
 
     def _get_course_team(self, team_id):
         """ Returns course_team object from team_id. """

@@ -40,20 +40,22 @@ class Command(BaseCommand):
     """
     args = "<course_id>"
     help = dedent(__doc__).strip()
-    option_list = BaseCommand.option_list + (
-        make_option('--modulestore',
-                    action='store',
-                    default='default',
-                    help='Name of the modulestore'),
-        make_option('--inherited',
-                    action='store_true',
-                    default=False,
-                    help='Whether to include inherited metadata'),
-        make_option('--inherited_defaults',
-                    action='store_true',
-                    default=False,
-                    help='Whether to include default values of inherited metadata'),
-    )
+
+    def add_arguments(self, parser):
+        parser.add_argument('--modulestore',
+                            action='store',
+                            default='default',
+                            help='Name of the modulestore')
+
+        parser.add_argument('--inherited',
+                            action='store_true',
+                            default=False,
+                            help='Whether to include inherited metadata')
+
+        parser.add_argument('--inherited_defaults',
+                            action='store_true',
+                            default=False,
+                            help='Whether to include default values of inherited metadata')
 
     def handle(self, *args, **options):
         if len(args) != 1:

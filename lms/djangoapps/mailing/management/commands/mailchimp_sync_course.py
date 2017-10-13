@@ -7,7 +7,6 @@ import math
 import random
 from collections import namedtuple
 from itertools import chain
-from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 from mailsnake import MailSnake
@@ -32,17 +31,12 @@ class Command(BaseCommand):
     args = '<mailchimp_key mailchimp_list course_id>'
     help = 'Synchronizes a mailchimp list with the students of a course.'
 
-    option_list = BaseCommand.option_list + (
-        make_option('--key', action='store', help='mailchimp api key'),
-        make_option('--list', action='store', dest='list_id',
-                    help='mailchimp list id'),
-        make_option('--course', action='store', dest='course_id',
-                    help='xmodule course_id'),
-
-        make_option('--segments', action='store', dest='segments',
-                    default=0, type=int,
-                    help='number of static random segments to create'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('--key', action='store', help='mailchimp api key')
+        parser.add_argument('--list', action='store', dest='list_id', help='mailchimp list id')
+        parser.add_argument('--course', action='store', dest='course_id', help='xmodule course_id')
+        parser.add_argument('--segments', action='store', dest='segments', default=0, type=int,
+                            help='number of static random segments to create')
 
     def parse_options(self, options):
         """Parses `options` of the command."""

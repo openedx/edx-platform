@@ -22,21 +22,18 @@ class Command(BaseCommand):
         ./manage.py reindex_library --all - reindexes all available libraries
     """
     help = dedent(__doc__)
-
     can_import_settings = True
-
     args = "<library_id library_id ...>"
+    CONFIRMATION_PROMPT = u"Reindexing all libraries might be a time consuming operation. Do you want to continue?"
 
-    option_list = BaseCommand.option_list + (
-        make_option(
+    def add_arguments(self, parser):
+        parser.add_argument_option(
             '--all',
             action='store_true',
             dest='all',
             default=False,
             help='Reindex all libraries'
-        ),)
-
-    CONFIRMATION_PROMPT = u"Reindexing all libraries might be a time consuming operation. Do you want to continue?"
+        )
 
     def _parse_library_key(self, raw_value):
         """ Parses library key from string """

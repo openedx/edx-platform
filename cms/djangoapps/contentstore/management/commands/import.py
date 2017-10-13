@@ -1,8 +1,6 @@
 """
 Script for importing courseware from XML format
 """
-from optparse import make_option
-
 from django.core.management.base import BaseCommand, CommandError
 
 from django_comment_common.utils import are_permissions_roles_seeded, seed_permissions_roles
@@ -18,11 +16,10 @@ class Command(BaseCommand):
     """
     help = 'Import the specified data directory into the default ModuleStore'
 
-    option_list = BaseCommand.option_list + (
-        make_option('--nostatic',
-                    action='store_true',
-                    help='Skip import of static content'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('--nostatic',
+                            action='store_true',
+                            help='Skip import of static content')
 
     def handle(self, *args, **options):
         "Execute the command"

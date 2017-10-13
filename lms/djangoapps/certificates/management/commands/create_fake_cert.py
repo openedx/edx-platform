@@ -10,7 +10,6 @@ Example usage:
 
 """
 import logging
-from optparse import make_option
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
@@ -26,31 +25,30 @@ class Command(BaseCommand):
 
     USAGE = u'Usage: create_fake_cert <USERNAME> <COURSE_KEY> --mode <MODE> --status <STATUS> --grade <GRADE>'
 
-    option_list = BaseCommand.option_list + (
-        make_option(
+    def add_arguments(self, parser):
+        parser.add_argument(
             '-m', '--mode',
             metavar='CERT_MODE',
             dest='cert_mode',
             default='honor',
             help='The course mode of the certificate (e.g. "honor", "verified", or "professional")'
-        ),
+        )
 
-        make_option(
+        parser.add_argument(
             '-s', '--status',
             metavar='CERT_STATUS',
             dest='status',
             default=CertificateStatuses.downloadable,
             help='The status of the certificate'
-        ),
+        )
 
-        make_option(
+        parser.add_argument(
             '-g', '--grade',
             metavar='CERT_GRADE',
             dest='grade',
             default='',
             help='The grade for the course, as a decimal (e.g. "0.89" for 89%)'
-        ),
-    )
+        )
 
     def handle(self, *args, **options):
         """Create a fake certificate for a user.

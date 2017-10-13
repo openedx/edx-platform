@@ -5,7 +5,6 @@ import logging
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
-from optparse import make_option
 
 from student.models import CourseEnrollment, User
 
@@ -41,39 +40,37 @@ class Command(BaseCommand):
 
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option('-f', '--from',
-                    metavar='FROM_MODE',
-                    dest='from_mode',
-                    default=False,
-                    help='move from this enrollment mode'),
-        make_option('-t', '--to',
-                    metavar='TO_MODE',
-                    dest='to_mode',
-                    default=False,
-                    help='move to this enrollment mode'),
-        make_option('-u', '--usernames',
-                    metavar='USERNAME',
-                    dest='username',
-                    default=False,
-                    help="Comma-separated list of usernames to move in the course"),
-        make_option('-e', '--emails',
-                    metavar='EMAIL',
-                    dest='email',
-                    default=False,
-                    help="Comma-separated list of email addresses to move in the course"),
-        make_option('-c', '--course',
-                    metavar='COURSE_ID',
-                    dest='course_id',
-                    default=False,
-                    help="course id to use for transfer"),
-        make_option('-n', '--noop',
-                    action='store_true',
-                    dest='noop',
-                    default=False,
-                    help="display what will be done but don't actually do anything")
-
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('-f', '--from',
+                            metavar='FROM_MODE',
+                            dest='from_mode',
+                            default=False,
+                            help='move from this enrollment mode')
+        parser.add_argument('-t', '--to',
+                            metavar='TO_MODE',
+                            dest='to_mode',
+                            default=False,
+                            help='move to this enrollment mode')
+        parser.add_argument('-u', '--usernames',
+                            metavar='USERNAME',
+                            dest='username',
+                            default=False,
+                            help="Comma-separated list of usernames to move in the course")
+        parser.add_argument('-e', '--emails',
+                            metavar='EMAIL',
+                            dest='email',
+                            default=False,
+                            help="Comma-separated list of email addresses to move in the course")
+        parser.add_argument('-c', '--course',
+                            metavar='COURSE_ID',
+                            dest='course_id',
+                            default=False,
+                            help="course id to use for transfer")
+        parser.add_argument('-n', '--noop',
+                            action='store_true',
+                            dest='noop',
+                            default=False,
+                            help="display what will be done but don't actually do anything")
 
     def handle(self, *args, **options):
         error_users = []

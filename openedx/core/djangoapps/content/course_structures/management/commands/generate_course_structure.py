@@ -4,7 +4,6 @@ Generates and stores course structure information for one or more courses.
 """
 
 import logging
-from optparse import make_option
 
 from django.core.management.base import BaseCommand
 from opaque_keys.edx.keys import CourseKey
@@ -23,12 +22,11 @@ class Command(BaseCommand):
     args = '<course_id course_id ...>'
     help = 'Generates and stores course structure for one or more courses.'
 
-    option_list = BaseCommand.option_list + (
-        make_option('--all',
-                    action='store_true',
-                    default=False,
-                    help='Generate structures for all courses.'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('--all',
+                            action='store_true',
+                            default=False,
+                            help='Generate structures for all courses.')
 
     def handle(self, *args, **options):
         """

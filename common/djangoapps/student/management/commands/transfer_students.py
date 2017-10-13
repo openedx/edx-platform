@@ -3,7 +3,6 @@ Transfer Student Management Command
 """
 from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
-from optparse import make_option
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from shoppingcart.models import CertificateItem
@@ -37,20 +36,19 @@ class Command(TrackedCommand):
 
     """
 
-    option_list = TrackedCommand.option_list + (
-        make_option('-f', '--from',
-                    metavar='SOURCE_COURSE',
-                    dest='source_course',
-                    help='The course to transfer students from.'),
-        make_option('-t', '--to',
-                    metavar='DEST_COURSE_LIST',
-                    dest='dest_course_list',
-                    help='The new course(es) to enroll the student into.'),
-        make_option('-c', '--transfer-certificates',
-                    metavar='TRANSFER_CERTIFICATES',
-                    dest='transfer_certificates',
-                    help="If True, try to transfer certificate items to the new course.")
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('-f', '--from',
+                            metavar='SOURCE_COURSE',
+                            dest='source_course',
+                            help='The course to transfer students from.')
+        parser.add_argument('-t', '--to',
+                            metavar='DEST_COURSE_LIST',
+                            dest='dest_course_list',
+                            help='The new course(es) to enroll the student into.')
+        parser.add_argument('-c', '--transfer-certificates',
+                            metavar='TRANSFER_CERTIFICATES',
+                            dest='transfer_certificates',
+                            help="If True, try to transfer certificate items to the new course.")
 
     @transaction.atomic
     def handle(self, *args, **options):
