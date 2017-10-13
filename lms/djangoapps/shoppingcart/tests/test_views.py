@@ -203,7 +203,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_billing_details(self):
-        billing_url = reverse('billing_details')
+        billing_url = reverse('shoppingcart:billing_details')
         self.login_user()
 
         # page not found error because order_type is not business
@@ -235,7 +235,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     @patch('shoppingcart.views.render_to_response', render_mock)
     @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
     def test_billing_details_with_override_currency_settings(self):
-        billing_url = reverse('billing_details')
+        billing_url = reverse('shoppingcart:billing_details')
         self.login_user()
 
         #chagne the order_type to business
@@ -482,7 +482,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self._add_course_mode(mode_slug='verified', expiration_date=expiration_date)
         self.add_reg_code(course_key, mode_slug='verified')
         self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('register_code_redemption', args=[self.reg_code]), HTTP_HOST='localhost')
+        resp = self.client.post(reverse('shoppingcart:register_code_redemption', args=[self.reg_code]), HTTP_HOST='localhost')
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.course.display_name.encode('utf-8'), resp.content)
 
@@ -494,7 +494,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self._add_course_mode(mode_slug='verified', expiration_date=expiration_date)
         self.add_reg_code(course_key, mode_slug='bananas')
         self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('register_code_redemption', args=[self.reg_code]), HTTP_HOST='localhost')
+        resp = self.client.post(reverse('shoppingcart:register_code_redemption', args=[self.reg_code]), HTTP_HOST='localhost')
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.course.display_name.encode('utf-8'), resp.content)
         self.assertIn("error processing your redeem code", resp.content)
@@ -597,7 +597,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 200)
 
-        redeem_url = reverse('register_code_redemption', args=[self.reg_code])
+        redeem_url = reverse('shoppingcart:register_code_redemption', args=[self.reg_code])
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
@@ -628,7 +628,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         current_enrollment, __ = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_key)
         self.assertEquals('honor', current_enrollment)
 
-        redeem_url = reverse('register_code_redemption', args=[self.reg_code])
+        redeem_url = reverse('shoppingcart:register_code_redemption', args=[self.reg_code])
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
@@ -960,7 +960,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         post_response = self.client.post(reverse('shoppingcart:use_code'), {'code': self.reg_code})
         self.assertEqual(post_response.status_code, 200)
 
-        redeem_url = reverse('register_code_redemption', args=[self.reg_code])
+        redeem_url = reverse('shoppingcart:register_code_redemption', args=[self.reg_code])
         redeem_response = self.client.get(redeem_url)
 
         self.assert_no_xss(redeem_response, '<script>alert("XSS")</script>')
@@ -1096,7 +1096,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 200)
 
-        redeem_url = reverse('register_code_redemption', args=[self.reg_code])
+        redeem_url = reverse('shoppingcart:register_code_redemption', args=[self.reg_code])
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
@@ -1123,7 +1123,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         resp = self.client.post(reverse('shoppingcart:use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 200)
 
-        redeem_url = reverse('register_code_redemption', args=[self.reg_code])
+        redeem_url = reverse('shoppingcart:register_code_redemption', args=[self.reg_code])
         resp = self.client.get(redeem_url)
         self.assertEquals(resp.status_code, 200)
         # check button text
@@ -1276,7 +1276,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
                       .format(total_registration_codes=context['total_registration_codes']), resp.content)
 
         # now redeem one of registration code from the previous order
-        redeem_url = reverse('register_code_redemption', args=[context['reg_code_info_list'][0]['code']])
+        redeem_url = reverse('shoppingcart:register_code_redemption', args=[context['reg_code_info_list'][0]['code']])
 
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
@@ -1744,7 +1744,7 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
         in a row on an non-existing registration code post request
         """
         cache.clear()
-        url = reverse('register_code_redemption', args=['asdasd'])
+        url = reverse('shoppingcart:register_code_redemption', args=['asdasd'])
         self.login_user()
         for i in xrange(30):  # pylint: disable=unused-variable
             response = self.client.post(url)
@@ -1768,7 +1768,7 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
         in a row on an non-existing registration code get request
         """
         cache.clear()
-        url = reverse('register_code_redemption', args=['asdasd'])
+        url = reverse('shoppingcart:register_code_redemption', args=['asdasd'])
         self.login_user()
         for i in xrange(30):  # pylint: disable=unused-variable
             response = self.client.get(url)
@@ -1812,7 +1812,7 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
         self.assertEquals(response.status_code, 200)
         # get the first registration from the newly created registration codes
         registration_code = CourseRegistrationCode.objects.all()[0].code
-        redeem_url = reverse('register_code_redemption', args=[registration_code])
+        redeem_url = reverse('shoppingcart:register_code_redemption', args=[registration_code])
         self.login_user()
 
         response = self.client.get(redeem_url)
@@ -1947,17 +1947,17 @@ class DonationViewTest(SharedModuleStoreTestCase):
         {"amount": "23.45", "course_id": "invalid"}
     )
     def test_donation_bad_request(self, bad_params):
-        response = self.client.post(reverse('donation'), bad_params)
+        response = self.client.post(reverse('shoppingcart:donation'), bad_params)
         self.assertEqual(response.status_code, 400)
 
     def test_donation_requires_login(self):
         self.client.logout()
-        response = self.client.post(reverse('donation'), {'amount': self.DONATION_AMOUNT})
+        response = self.client.post(reverse('shoppingcart:donation'), {'amount': self.DONATION_AMOUNT})
         self.assertEqual(response.status_code, 302)
 
     def test_no_such_course(self):
         response = self.client.post(
-            reverse("donation"),
+            reverse("shoppingcart:donation"),
             {"amount": self.DONATION_AMOUNT, "course_id": "edx/DemoX/Demo"}
         )
         self.assertEqual(response.status_code, 400)
@@ -1965,7 +1965,7 @@ class DonationViewTest(SharedModuleStoreTestCase):
     @ddt.data("get", "put", "head", "options", "delete")
     def test_donation_requires_post(self, invalid_method):
         response = getattr(self.client, invalid_method)(
-            reverse("donation"), {"amount": self.DONATION_AMOUNT}
+            reverse("shoppingcart:donation"), {"amount": self.DONATION_AMOUNT}
         )
         self.assertEqual(response.status_code, 405)
 
@@ -1975,12 +1975,12 @@ class DonationViewTest(SharedModuleStoreTestCase):
         config.save()
 
         # Logged in -- should be a 404
-        response = self.client.post(reverse('donation'))
+        response = self.client.post(reverse('shoppingcart:donation'))
         self.assertEqual(response.status_code, 404)
 
         # Logged out -- should still be a 404
         self.client.logout()
-        response = self.client.post(reverse('donation'))
+        response = self.client.post(reverse('shoppingcart:donation'))
         self.assertEqual(response.status_code, 404)
 
     def _donate(self, donation_amount, course_id=None):
@@ -2005,7 +2005,7 @@ class DonationViewTest(SharedModuleStoreTestCase):
         if course_id is not None:
             params['course_id'] = course_id
 
-        url = reverse('donation')
+        url = reverse('shoppingcart:donation')
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, 200)
 
@@ -2098,20 +2098,20 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
 
     def test_report_csv_no_access(self):
         self.login_user()
-        response = self.client.get(reverse('payment_csv_report'))
+        response = self.client.get(reverse('shoppingcart:payment_csv_report'))
         self.assertEqual(response.status_code, 403)
 
     def test_report_csv_bad_method(self):
         self.login_user()
         self.add_to_download_group(self.user)
-        response = self.client.put(reverse('payment_csv_report'))
+        response = self.client.put(reverse('shoppingcart:payment_csv_report'))
         self.assertEqual(response.status_code, 400)
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_report_csv_get(self):
         self.login_user()
         self.add_to_download_group(self.user)
-        response = self.client.get(reverse('payment_csv_report'))
+        response = self.client.get(reverse('shoppingcart:payment_csv_report'))
 
         ((template, context), unused_kwargs) = render_mock.call_args
         self.assertEqual(template, 'shoppingcart/download_report.html')
@@ -2123,7 +2123,7 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
     def test_report_csv_bad_date(self):
         self.login_user()
         self.add_to_download_group(self.user)
-        response = self.client.post(reverse('payment_csv_report'), {'start_date': 'BAD', 'end_date': 'BAD', 'requested_report': 'itemized_purchase_report'})
+        response = self.client.post(reverse('shoppingcart:payment_csv_report'), {'start_date': 'BAD', 'end_date': 'BAD', 'requested_report': 'itemized_purchase_report'})
 
         ((template, context), unused_kwargs) = render_mock.call_args
         self.assertEqual(template, 'shoppingcart/download_report.html')
@@ -2140,7 +2140,7 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
         self.cart.purchase()
         self.login_user()
         self.add_to_download_group(self.user)
-        response = self.client.post(reverse('payment_csv_report'), {'start_date': start_date,
+        response = self.client.post(reverse('shoppingcart:payment_csv_report'), {'start_date': start_date,
                                                                     'end_date': end_date,
                                                                     'requested_report': report_type})
         self.assertEqual(response['Content-Type'], 'text/csv')
@@ -2159,7 +2159,7 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
         end_letter = 'Z'
         self.login_user()
         self.add_to_download_group(self.user)
-        response = self.client.post(reverse('payment_csv_report'), {'start_date': start_date,
+        response = self.client.post(reverse('shoppingcart:payment_csv_report'), {'start_date': start_date,
                                                                     'end_date': end_date,
                                                                     'start_letter': start_letter,
                                                                     'end_letter': end_letter,

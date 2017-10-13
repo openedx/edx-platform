@@ -493,7 +493,7 @@ def use_registration_code(course_reg, user):
             return HttpResponseNotFound(
                 _("Cart item quantity should not be greater than 1 when applying activation code"))
 
-    redemption_url = reverse('register_code_redemption', kwargs={'registration_code': course_reg.code})
+    redemption_url = reverse('shoppingcart:register_code_redemption', kwargs={'registration_code': course_reg.code})
     return HttpResponse(
         json.dumps({'response': 'success', 'coupon_code_applied': False, 'redemption_url': redemption_url}),
         content_type="application/json"
@@ -922,7 +922,7 @@ def _show_receipt_html(request, order):
             for course_registration_code in course_registration_codes:
                 reg_code_info_list.append({
                     'course_name': course.display_name,
-                    'redemption_url': reverse('register_code_redemption', args=[course_registration_code.code]),
+                    'redemption_url': reverse('shoppingcart:register_code_redemption', args=[course_registration_code.code]),
                     'code': course_registration_code.code,
                     'is_valid': course_registration_code.is_valid,
                     'is_redeemed': RegistrationCodeRedemption.objects.filter(

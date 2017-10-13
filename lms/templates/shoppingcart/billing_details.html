@@ -97,7 +97,7 @@ from django.core.urlresolvers import reverse
       event.preventDefault();
       // Disable the submit button to prevent duplicate submissions
       $(this).addClass("disabled");
-      var post_url = "${reverse('billing_details')}";
+      var post_url = "${reverse('shoppingcart:billing_details')}";
       var data = {
                "company_name" : $('input[name="company_name"]').val(),
                "company_contact_name" : $('input[name="company_contact_name"]').val(),
