@@ -51,13 +51,11 @@ import request_cache
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, REFUND_ORDER, ENROLLMENT_TRACK_UPDATED
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
-from courseware.models import DynamicUpgradeDeadlineConfiguration, CourseDynamicUpgradeDeadlineConfiguration
+from courseware.models import CourseDynamicUpgradeDeadlineConfiguration, DynamicUpgradeDeadlineConfiguration
 from enrollment.api import _default_course_mode
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.schedules.models import ScheduleConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 from track import contexts
 from util.milestones_helpers import is_entrance_exams_enabled
@@ -1717,40 +1715,56 @@ class CourseEnrollment(models.Model):
             )
             return None
 
+        dynamic_upgrade_deadline = self.dynamic_upgrade_deadline
+        if dynamic_upgrade_deadline is not None:
+            return dynamic_upgrade_deadline
+
+        return self.course_upgrade_deadline
+
+    @property
+    def dynamic_upgrade_deadline(self):
+        if not self.course_overview.self_paced:
+            return None
+
+        if not DynamicUpgradeDeadlineConfiguration.is_enabled():
+            return None
+
+        course_config = CourseDynamicUpgradeDeadlineConfiguration.current(self.course_id)
+        if course_config.enabled and course_config.opt_out:
+            return None
+
         try:
-            schedule_driven_deadlines_enabled = (
-                DynamicUpgradeDeadlineConfiguration.is_enabled()
-                or CourseDynamicUpgradeDeadlineConfiguration.is_enabled(self.course_id)
+            if not self.schedule:
+                return None
+
+            log.debug(
+                'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
+                self.id, self.schedule.id
             )
-            if (
-                    schedule_driven_deadlines_enabled
-                    and self.course_overview.self_paced
-                    and self.schedule
-                    and self.schedule.upgrade_deadline is not None
-            ):
-                log.debug(
-                    'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
-                    self.id, self.schedule.id
-                )
-                return self.schedule.upgrade_deadline
+            upgrade_deadline = self.schedule.upgrade_deadline
         except ObjectDoesNotExist:
             # NOTE: Schedule has a one-to-one mapping with CourseEnrollment. If no schedule is associated
             # with this enrollment, Django will raise an exception rather than return None.
             log.debug('Schedules: No schedule exists for CourseEnrollment %d.', self.id)
-            pass
+            return None
 
+        if upgrade_deadline is None or datetime.now(UTC) >= upgrade_deadline:
+            return None
+
+        return upgrade_deadline
+
+    @property
+    def course_upgrade_deadline(self):
         try:
             if self.verified_mode:
                 log.debug('Schedules: Defaulting to verified mode expiration date-time for %s.', self.course_id)
                 return self.verified_mode.expiration_datetime
             else:
                 log.debug('Schedules: No verified mode located for %s.', self.course_id)
+                return None
         except CourseMode.DoesNotExist:
             log.debug('Schedules: %s has no verified mode.', self.course_id)
-            pass
-
-        log.debug('Schedules: Returning default of `None`')
-        return None
+            return None
 
     def is_verified_enrollment(self):
         """
