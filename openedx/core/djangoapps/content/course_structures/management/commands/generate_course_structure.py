@@ -4,7 +4,6 @@ Generates and stores course structure information for one or more courses.
 """
 
 import logging
-from optparse import make_option
 
 from django.core.management.base import BaseCommand
 from opaque_keys.edx.keys import CourseKey
@@ -23,12 +22,10 @@ class Command(BaseCommand):
     args = '<course_id course_id ...>'
     help = 'Generates and stores course structure for one or more courses.'
 
-    option_list = BaseCommand.option_list + (
-        make_option('--all',
-                    action='store_true',
-                    default=False,
-                    help='Generate structures for all courses.'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('--all',
+                            action='store_true',
+                            help='Generate structures for all courses.')
 
     def handle(self, *args, **options):
         """
@@ -48,6 +45,7 @@ class Command(BaseCommand):
 
         for course_key in course_keys:
             try:
+                log.info('Generating course structures for %s.', course_key)
                 # Run the update task synchronously so that we know when all course structures have been updated.
                 # TODO Future improvement: Use .delay(), add return value to ResultSet, and wait for execution of
                 # all tasks using ResultSet.join(). I (clintonb) am opting not to make this improvement right now

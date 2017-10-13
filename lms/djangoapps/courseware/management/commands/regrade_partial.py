@@ -6,7 +6,6 @@ CorrectMap.get_npoints().
 
 import json
 import logging
-from optparse import make_option
 
 from django.core.management.base import BaseCommand
 
@@ -31,12 +30,11 @@ class Command(BaseCommand):
     num_visited = 0
     num_changed = 0
 
-    option_list = BaseCommand.option_list + (
-        make_option('--save',
-                    action='store_true',
-                    dest='save_changes',
-                    default=False,
-                    help='Persist the changes that were encountered.  If not set, no changes are saved.'), )
+    def add_arguments(self, parser):
+        parser.add_argument('--save',
+                            action='store_true',
+                            dest='save_changes',
+                            help='Persist the changes that were encountered.  If not set, no changes are saved.')
 
     def fix_studentmodules(self, save_changes):
         '''Identify the list of StudentModule objects that might need fixing, and then fix each one'''

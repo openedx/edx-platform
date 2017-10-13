@@ -5,7 +5,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from optparse import make_option
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from course_modes.models import CourseMode
@@ -31,39 +30,37 @@ class Command(BaseCommand):
     Without the --commit option, the command will have no effect.
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option(
+    def add_arguments(self, parser):
+        parser.add_argument(
             '-f', '--from_mode',
             dest='from_mode',
             default=None,
             help='move from this enrollment mode'
-        ),
-        make_option(
+        )
+        parser.add_argument(
             '-t', '--to_mode',
             dest='to_mode',
             default=None,
             help='move to this enrollment mode'
-        ),
-        make_option(
+        )
+        parser.add_argument(
             '-c', '--course',
             dest='course',
             default=None,
             help='the course to change enrollments in'
-        ),
-        make_option(
+        )
+        parser.add_argument(
             '-o', '--org',
             dest='org',
             default=None,
             help='all courses belonging to this org will be selected for changing the enrollments'
-        ),
-        make_option(
+        )
+        parser.add_argument(
             '--commit',
             action='store_true',
             dest='commit',
-            default=False,
             help='display what will be done without any effect'
         )
-    )
 
     def handle(self, *args, **options):
         course_id = options.get('course')
