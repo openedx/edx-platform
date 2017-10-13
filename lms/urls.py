@@ -21,7 +21,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.enterprise_support.api import enterprise_enabled
 
-import branding
+from branding.views import index as branding_index, courses as branding_courses
 import student
 from openedx.core.djangoapps.lang_pref.views import update_session_language
 from openedx.core.djangoapps.course_groups.views import (
@@ -103,7 +103,7 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 
 # Use urlpatterns formatted as within the Django docs with first parameter "stuck" to the open parenthesis
 urlpatterns = [
-    url(r'^$', branding.views.index, name="root"),   # Main marketing page, or redirect to courseware
+    url(r'^$', branding_index, name="root"),   # Main marketing page, or redirect to courseware
 
     url(r'', include('student.urls')),
     # TODO: Move lms specific student views out of common code
@@ -354,7 +354,7 @@ urlpatterns += [
     # TODO: These views need to be updated before they work
     url(r'^calculate$', util.views.calculate),
 
-    url(r'^courses/?$', branding.views.courses, name="courses"),
+    url(r'^courses/?$', branding_courses, name="courses"),
 
     #About the course
     url(
