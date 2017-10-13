@@ -108,12 +108,14 @@ def mock_val_import(xml, edx_video_id, course_id):
     assert edx_video_id == 'test_edx_video_id'
     assert course_id == 'test_course_id'
 
+
 def mock_val_export(edx_video_id, course_id):
     """Mock edxval.api.export_to_xml"""
     return etree.Element(
         'video_asset',
         attrib={'export_edx_video_id': edx_video_id}
     )
+
 
 # Because of the way xmodule.video_module.video_module imports edxval.api, we
 # must mock the entire module, which requires making mock exception classes.
