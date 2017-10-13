@@ -14,6 +14,7 @@ import textwrap
 import unittest
 
 import ddt
+from django.utils.encoding import smart_text
 from lxml import etree
 from mock import Mock, patch, DEFAULT
 import webob
@@ -2565,6 +2566,22 @@ class CapaDescriptorTest(unittest.TestCase):
                     'capa_content': capa_content.replace("\n", " ")
                 }
             }
+        )
+
+    def test_indexing_non_latin_problem(self):
+        sample_text_input_problem_xml = textwrap.dedent("""
+            <problem>
+                <script type="text/python">FX1_VAL='Καλημέρα'</script>
+                <p>Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL</p>
+            </problem>
+        """)
+        name = "Non latin Input"
+        descriptor = self._create_descriptor(sample_text_input_problem_xml, name=name)
+        capa_content = " FX1_VAL='Καλημέρα' Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL "
+
+        descriptor_dict = descriptor.index_dictionary()
+        self.assertEquals(
+            descriptor_dict['content']['capa_content'], smart_text(capa_content)
         )
 
     def test_indexing_checkboxes_with_hints_and_feedback(self):
