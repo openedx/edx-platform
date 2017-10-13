@@ -90,15 +90,15 @@ def _recurring_nudge_schedule_send(site_id, msg_str):
 def recurring_nudge_schedule_bin(
     site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
 ):
-    target_date = deserialize(target_day_str)
-    # TODO: in the next refactor of this task, pass in current_date instead of reproducing it here
-    current_date = target_date - datetime.timedelta(days=day_offset)
+    target_datetime = deserialize(target_day_str)
+    # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
+    current_datetime = target_datetime - datetime.timedelta(days=day_offset)
     msg_type = RecurringNudge(abs(day_offset))
 
     for (user, language, context) in _recurring_nudge_schedules_for_bin(
         Site.objects.get(id=site_id),
-        current_date,
-        target_date,
+        current_datetime,
+        target_datetime,
         bin_num,
         org_list,
         exclude_orgs
@@ -114,11 +114,11 @@ def recurring_nudge_schedule_bin(
         _recurring_nudge_schedule_send.apply_async((site_id, str(msg)), retry=False)
 
 
-def _recurring_nudge_schedules_for_bin(site, current_date, target_date, bin_num, org_list, exclude_orgs=False):
+def _recurring_nudge_schedules_for_bin(site, current_datetime, target_datetime, bin_num, org_list, exclude_orgs=False):
     schedules = get_schedules_with_target_date_by_bin_and_orgs(
         schedule_date_field='start',
-        current_date=current_date,
-        target_date=target_date,
+        current_datetime=current_datetime,
+        target_datetime=target_datetime,
         bin_num=bin_num,
         num_bins=RECURRING_NUDGE_NUM_BINS,
         org_list=org_list,
@@ -157,15 +157,15 @@ class UpgradeReminder(ScheduleMessageType):
 def upgrade_reminder_schedule_bin(
     site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
 ):
-    target_date = deserialize(target_day_str)
-    # TODO: in the next refactor of this task, pass in current_date instead of reproducing it here
-    current_date = target_date - datetime.timedelta(days=day_offset)
+    target_datetime = deserialize(target_day_str)
+    # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
+    current_datetime = target_datetime - datetime.timedelta(days=day_offset)
     msg_type = UpgradeReminder()
 
     for (user, language, context) in _upgrade_reminder_schedules_for_bin(
         Site.objects.get(id=site_id),
-        current_date,
-        target_date,
+        current_datetime,
+        target_datetime,
         bin_num,
         org_list,
         exclude_orgs
@@ -191,11 +191,11 @@ def _upgrade_reminder_schedule_send(site_id, msg_str):
     ace.send(msg)
 
 
-def _upgrade_reminder_schedules_for_bin(site, current_date, target_date, bin_num, org_list, exclude_orgs=False):
+def _upgrade_reminder_schedules_for_bin(site, current_datetime, target_datetime, bin_num, org_list, exclude_orgs=False):
     schedules = get_schedules_with_target_date_by_bin_and_orgs(
         schedule_date_field='upgrade_deadline',
-        current_date=current_date,
-        target_date=target_date,
+        current_datetime=current_datetime,
+        target_datetime=target_datetime,
         bin_num=bin_num,
         num_bins=RECURRING_NUDGE_NUM_BINS,
         org_list=org_list,
@@ -232,7 +232,6 @@ def _upgrade_reminder_schedules_for_bin(site, current_date, target_date, bin_num
         yield (user, first_schedule.enrollment.course.language, template_context)
 
 
-<<<<<<< HEAD
 class CourseUpdate(ScheduleMessageType):
     pass
 
@@ -241,12 +240,15 @@ class CourseUpdate(ScheduleMessageType):
 def course_update_schedule_bin(
     site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
 ):
-    target_day = deserialize(target_day_str)
+    target_datetime = deserialize(target_day_str)
+    # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
+    current_datetime = target_datetime - datetime.timedelta(days=day_offset)
     msg_type = CourseUpdate()
 
     for (user, language, context) in _course_update_schedules_for_bin(
         Site.objects.get(id=site_id),
-        target_day,
+        current_datetime,
+        target_datetime,
         day_offset,
         bin_num,
         org_list,
@@ -273,12 +275,13 @@ def _course_update_schedule_send(site_id, msg_str):
     ace.send(msg)
 
 
-def _course_update_schedules_for_bin(site, target_day, day_offset, bin_num, org_list, exclude_orgs=False):
+def _course_update_schedules_for_bin(site, current_datetime, target_datetime, day_offset, bin_num, org_list,
+                                     exclude_orgs=False):
     week_num = abs(day_offset) / 7
-    beginning_of_day = target_day.replace(hour=0, minute=0, second=0)
     schedules = get_schedules_with_target_date_by_bin_and_orgs(
         schedule_date_field='start',
-        target_date=beginning_of_day,
+        current_datetime=current_datetime,
+        target_datetime=target_datetime,
         bin_num=bin_num,
         num_bins=COURSE_UPDATE_NUM_BINS,
         org_list=org_list,
@@ -323,43 +326,38 @@ def get_course_week_summary(course_id, week_num):
         raise CourseUpdateDoesNotExist()
 
 
-def get_schedules_with_target_date_by_bin_and_orgs(schedule_date_field, target_date, bin_num, num_bins=DEFAULT_NUM_BINS,
-                                                   org_list=None, exclude_orgs=False, order_by='enrollment__user__id'):
-||||||| parent of c6f507c4b7... Address Gabe's comments
-def get_schedules_with_target_date_by_bin_and_orgs(schedule_date_field, target_date, bin_num, num_bins=DEFAULT_NUM_BINS,
-                                                   org_list=None, exclude_orgs=False):
-=======
-def get_schedules_with_target_date_by_bin_and_orgs(schedule_date_field, current_date, target_date, bin_num,
-                                                   num_bins=DEFAULT_NUM_BINS, org_list=None, exclude_orgs=False):
->>>>>>> c6f507c4b7... Address Gabe's comments
+def get_schedules_with_target_date_by_bin_and_orgs(schedule_date_field, current_datetime, target_datetime, bin_num,
+                                                   num_bins=DEFAULT_NUM_BINS, org_list=None, exclude_orgs=False,
+                                                   order_by='enrollment__user__id'):
     """
     Returns Schedules with the target_date, related to Users whose id matches the bin_num, and filtered by org_list.
 
     Arguments:
     schedule_date_field -- string field name to query on the User's Schedule model
-    current_date -- datetime that will be used as "right now" in the query
-    target_date -- datetime that the User's Schedule's schedule_date_field value should fall under
+    current_datetime -- datetime that will be used as "right now" in the query
+    target_datetime -- datetime that the User's Schedule's schedule_date_field value should fall under
     bin_num -- int for selecting the bin of Users whose id % num_bins == bin_num
     num_bin -- int specifying the number of bins to separate the Users into (default: DEFAULT_NUM_BINS)
     org_list -- list of course_org names (strings) that the returned Schedules must or must not be in (default: None)
     exclude_orgs -- boolean indicating whether the returned Schedules should exclude (True) the course_orgs in org_list
                     or strictly include (False) them (default: False)
+    order_by -- string for field to sort the resulting Schedules by
     """
-    target_day = _get_datetime_beginning_of_day(target_date)
-    schedule_date_equals_target_date_filter = {
+    target_day = _get_datetime_beginning_of_day(target_datetime)
+    schedule_day_equals_target_day_filter = {
         'courseenrollment__schedule__{}__gte'.format(schedule_date_field): target_day,
         'courseenrollment__schedule__{}__lt'.format(schedule_date_field): target_day + datetime.timedelta(days=1),
     }
     users = User.objects.filter(
         courseenrollment__is_active=True,
-        **schedule_date_equals_target_date_filter
+        **schedule_day_equals_target_day_filter
     ).annotate(
         id_mod=F('id') % num_bins
     ).filter(
         id_mod=bin_num
     )
 
-    schedule_date_equals_target_date_filter = {
+    schedule_day_equals_target_day_filter = {
         '{}__gte'.format(schedule_date_field): target_day,
         '{}__lt'.format(schedule_date_field): target_day + datetime.timedelta(days=1),
     }
@@ -369,10 +367,10 @@ def get_schedules_with_target_date_by_bin_and_orgs(schedule_date_field, current_
     ).prefetch_related(
         'enrollment__course__modes'
     ).filter(
-        Q(enrollment__course__end__isnull=True) | Q(enrollment__course__end__gte=current_date),
+        Q(enrollment__course__end__isnull=True) | Q(enrollment__course__end__gte=current_datetime),
         enrollment__user__in=users,
         enrollment__is_active=True,
-        **schedule_date_equals_target_date_filter
+        **schedule_day_equals_target_day_filter
     ).order_by(order_by)
 
     if org_list is not None:
