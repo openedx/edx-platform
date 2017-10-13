@@ -112,7 +112,7 @@ def _get_upgrade_deadline_delta_setting(course_id):
 
     # Check if the course has a deadline
     course_config = CourseDynamicUpgradeDeadlineConfiguration.current(course_id)
-    if course_config.enabled:
+    if course_config.enabled and not course_config.opt_out:
         delta = course_config.deadline_days
 
     return delta

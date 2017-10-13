@@ -1696,16 +1696,13 @@ class CourseEnrollment(models.Model):
     def verified_mode(self):
         return CourseMode.verified_mode_for_course(self.course_id)
 
-    @property
+    @cached_property
     def upgrade_deadline(self):
         """
         Returns the upgrade deadline for this enrollment, if it is upgradeable.
-
         If the seat cannot be upgraded, None is returned.
-
         Note:
             When loading this model, use `select_related` to retrieve the associated schedule object.
-
         Returns:
             datetime|None
         """
@@ -1717,40 +1714,61 @@ class CourseEnrollment(models.Model):
             )
             return None
 
+        if self.dynamic_upgrade_deadline is not None:
+            return self.dynamic_upgrade_deadline
+
+        return self.course_upgrade_deadline
+
+    @cached_property
+    def dynamic_upgrade_deadline(self):
+
         try:
-            schedule_driven_deadlines_enabled = (
-                DynamicUpgradeDeadlineConfiguration.is_enabled()
-                or CourseDynamicUpgradeDeadlineConfiguration.is_enabled(self.course_id)
+            course_overview = self.course
+        except CourseOverview.DoesNotExist:
+            course_overview = self.course_overview
+
+        if not course_overview.self_paced:
+            return None
+
+        if not DynamicUpgradeDeadlineConfiguration.is_enabled():
+            return None
+
+        course_config = CourseDynamicUpgradeDeadlineConfiguration.current(self.course_id)
+        if course_config.enabled and course_config.opt_out:
+            return None
+
+        try:
+            if not self.schedule:
+                return None
+
+            log.debug(
+                'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
+                self.id, self.schedule.id
             )
-            if (
-                    schedule_driven_deadlines_enabled
-                    and self.course_overview.self_paced
-                    and self.schedule
-                    and self.schedule.upgrade_deadline is not None
-            ):
-                log.debug(
-                    'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
-                    self.id, self.schedule.id
-                )
-                return self.schedule.upgrade_deadline
+            upgrade_deadline = self.schedule.upgrade_deadline
         except ObjectDoesNotExist:
             # NOTE: Schedule has a one-to-one mapping with CourseEnrollment. If no schedule is associated
             # with this enrollment, Django will raise an exception rather than return None.
             log.debug('Schedules: No schedule exists for CourseEnrollment %d.', self.id)
-            pass
+            return None
 
+        if upgrade_deadline is None or datetime.now(UTC) >= upgrade_deadline:
+            return None
+
+        return upgrade_deadline
+
+    @cached_property
+    def course_upgrade_deadline(self):
         try:
             if self.verified_mode:
                 log.debug('Schedules: Defaulting to verified mode expiration date-time for %s.', self.course_id)
                 return self.verified_mode.expiration_datetime
             else:
                 log.debug('Schedules: No verified mode located for %s.', self.course_id)
+                return None
         except CourseMode.DoesNotExist:
             log.debug('Schedules: %s has no verified mode.', self.course_id)
-            pass
-
-        log.debug('Schedules: Returning default of `None`')
-        return None
+            return None
 
     def is_verified_enrollment(self):
         """
