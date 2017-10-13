@@ -119,7 +119,8 @@ class CourseRunFactory(DictFactoryBase):
     type = 'verified'
     uuid = factory.Faker('uuid4')
     content_language = 'en'
-    max_effort = 5
+    max_effort = 4
+    weeks_to_complete = 10
 
 
 class CourseFactory(DictFactoryBase):

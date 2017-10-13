@@ -870,6 +870,15 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
             u"certificate template."
         )
     )
+    include_hours_of_effort = models.NullBooleanField(
+        default=None,
+        help_text=(
+            u"Include estimated time to complete the course in the certificate rendering context. This is equal to the "
+            u"maximum hours of effort per week times the length of the course in weeks. "
+            u"This attribute will only be displayed in certificates when there exists a template "
+            u"that includes Hours of Effort."
+        )
+    )
 
     class Meta(object):
         get_latest_by = 'created'
@@ -939,6 +948,40 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         """
         default = {
             'language_specific_templates_enabled': is_enabled,
+        }
+        CertificateGenerationCourseSetting.objects.update_or_create(
+            course_key=course_key,
+            defaults=default
+        )
+
+    @classmethod
+    def is_hours_of_effort_included_for_course(cls, course_key):
+        """Check whether hours of effort are meant to be included in a course's certificates
+
+        Arguments:
+            course_key (CourseKey): The identifier for the course.
+
+        Returns:
+            boolean
+
+        """
+        try:
+            latest = cls.objects.filter(course_key=course_key).latest()
+        except cls.DoesNotExist:
+            return None
+        else:
+            return latest.include_hours_of_effort
+
+    @classmethod
+    def set_include_hours_of_effort_for_course(cls, course_key, is_included):
+        """Include or exclude Hours of Effort from certificate rendering context for a course.
+
+        Arguments:
+            course_key (CourseKey): The identifier for the course.
+            is_enabled (boolean): Whether to include or exclude Hours of Effort.
+        """
+        default = {
+            'include_hours_of_effort': is_included,
         }
         CertificateGenerationCourseSetting.objects.update_or_create(
             course_key=course_key,

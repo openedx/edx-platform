@@ -503,7 +503,6 @@ def get_certificate_template(course_key, mode, language):
             mode=mode
         )
         template = get_language_specific_template_or_default(language, mode_templates)
-    #return template[0].template if template else None
     return template.template if template else None
 
 
@@ -532,6 +531,7 @@ def get_all_languages_or_default_template(templates):
     for template in templates:
         if template.language == '':
             return template
+
     return templates[0] if templates else None
 
 
