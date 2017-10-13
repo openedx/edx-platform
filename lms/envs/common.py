@@ -3308,7 +3308,7 @@ COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
 
 ############## Settings for ACE ####################################
 ACE_ENABLED_CHANNELS = [
-    'sailthru_email'
+    'file_email'
 ]
 ACE_ENABLED_POLICIES = [
     'bulk_email_optout'
