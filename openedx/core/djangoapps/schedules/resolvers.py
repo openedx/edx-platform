@@ -8,8 +8,10 @@ from openedx.core.djangoapps.schedules.tasks import (
     DEFAULT_NUM_BINS,
     RECURRING_NUDGE_NUM_BINS,
     UPGRADE_REMINDER_NUM_BINS,
+    COURSE_UPDATE_NUM_BINS,
     recurring_nudge_schedule_bin,
-    upgrade_reminder_schedule_bin
+    upgrade_reminder_schedule_bin,
+    course_update_schedule_bin,
 )
 from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -118,3 +120,17 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
     def __init__(self, *args, **kwargs):
         super(UpgradeReminderResolver, self).__init__(*args, **kwargs)
         self.log_prefix = 'Upgrade Reminder'
+
+
+class CourseUpdateResolver(BinnedSchedulesBaseResolver):
+    """
+    Send a message to all users whose schedule started at ``self.current_date`` + ``day_offset`` and the
+    course has updates.
+    """
+    async_send_task = course_update_schedule_bin
+    num_bins = COURSE_UPDATE_NUM_BINS
+    enqueue_config_var = 'enqueue_course_update'
+
+    def __init__(self, *args, **kwargs):
+        super(CourseUpdateResolver, self).__init__(*args, **kwargs)
+        self.log_prefix = 'Course Update'

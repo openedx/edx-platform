@@ -23,6 +23,8 @@ from opaque_keys.edx.keys import CourseKey
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
 
 from edxmako.shortcuts import marketing_link
+from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
+from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.message_type import ScheduleMessageType
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 from openedx.core.djangoapps.schedules.template_context import (
@@ -31,6 +33,8 @@ from openedx.core.djangoapps.schedules.template_context import (
     encode_urls_in_dict,
     get_base_template_context
 )
+from request_cache.middleware import request_cached
+from xmodule.modulestore.django import modulestore
 
 
 LOG = logging.getLogger(__name__)
@@ -44,6 +48,7 @@ KNOWN_RETRY_ERRORS = (  # Errors we expect occasionally that could resolve on re
 DEFAULT_NUM_BINS = 24
 RECURRING_NUDGE_NUM_BINS = DEFAULT_NUM_BINS
 UPGRADE_REMINDER_NUM_BINS = DEFAULT_NUM_BINS
+COURSE_UPDATE_NUM_BINS = DEFAULT_NUM_BINS
 
 
 @task(bind=True, default_retry_delay=30, routing_key=ROUTING_KEY)
@@ -222,8 +227,98 @@ def _upgrade_reminder_schedules_for_bin(site, target_day, bin_num, org_list, exc
         yield (user, first_schedule.enrollment.course.language, template_context)
 
 
+class CourseUpdate(ScheduleMessageType):
+    pass
+
+
+@task(ignore_result=True, routing_key=ROUTING_KEY)
+def course_update_schedule_bin(
+    site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
+):
+    target_day = deserialize(target_day_str)
+    msg_type = CourseUpdate()
+
+    for (user, language, context) in _course_update_schedules_for_bin(
+        Site.objects.get(id=site_id),
+        target_day,
+        day_offset,
+        bin_num,
+        org_list,
+        exclude_orgs
+    ):
+        msg = msg_type.personalize(
+            Recipient(
+                user.username,
+                override_recipient_email or user.email,
+            ),
+            language,
+            context,
+        )
+        _course_update_schedule_send.apply_async((site_id, str(msg)), retry=False)
+
+
+@task(ignore_result=True, routing_key=ROUTING_KEY)
+def _course_update_schedule_send(site_id, msg_str):
+    site = Site.objects.get(pk=site_id)
+    if not ScheduleConfig.current(site).deliver_course_update:
+        return
+
+    msg = Message.from_string(msg_str)
+    ace.send(msg)
+
+
+def _course_update_schedules_for_bin(site, target_day, day_offset, bin_num, org_list, exclude_orgs=False):
+    week_num = abs(day_offset) / 7
+    beginning_of_day = target_day.replace(hour=0, minute=0, second=0)
+    schedules = get_schedules_with_target_date_by_bin_and_orgs(
+        schedule_date_field='start',
+        target_date=beginning_of_day,
+        bin_num=bin_num,
+        num_bins=COURSE_UPDATE_NUM_BINS,
+        org_list=org_list,
+        exclude_orgs=exclude_orgs,
+        order_by='enrollment__course',
+    )
+
+    LOG.debug('Course Update: Query = %r', schedules.query.sql_with_params())
+
+    for schedule in schedules:
+        enrollment = schedule.enrollment
+        try:
+            week_summary = get_course_week_summary(enrollment.course_id, week_num)
+        except CourseUpdateDoesNotExist:
+            continue
+
+        user = enrollment.user
+        course_id_str = str(enrollment.course_id)
+
+        template_context = get_base_template_context(site)
+        template_context.update({
+            'student_name': user.profile.name,
+            'user_personal_address': user.profile.name if user.profile.name else user.username,
+            'course_name': schedule.enrollment.course.display_name,
+            'course_url': absolute_url(site, reverse('course_root', args=[str(schedule.enrollment.course_id)])),
+            'week_num': week_num,
+            'week_summary': week_summary,
+
+            # This is used by the bulk email optout policy
+            'course_ids': [course_id_str],
+        })
+
+        yield (user, schedule.enrollment.course.language, template_context)
+
+
+@request_cached
+def get_course_week_summary(course_id, week_num):
+    if COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course_id):
+        course = modulestore().get_course(course_id)
+        return course.week_summary(week_num)
+    else:
+        raise CourseUpdateDoesNotExist()
+
+
 def get_schedules_with_target_date_by_bin_and_orgs(schedule_date_field, target_date, bin_num, num_bins=DEFAULT_NUM_BINS,
-                                                   org_list=None, exclude_orgs=False):
+                                                   org_list=None, exclude_orgs=False, order_by='enrollment__user__id'):
     """
     Returns Schedules with the target_date, related to Users whose id matches the bin_num, and filtered by org_list.
 
@@ -263,7 +358,7 @@ def get_schedules_with_target_date_by_bin_and_orgs(schedule_date_field, target_d
         enrollment__user__in=users,
         enrollment__is_active=True,
         **schedule_date_equals_target_date_filter
-    ).order_by('enrollment__user__id')
+    ).order_by(order_by)
 
     if org_list is not None:
         if exclude_orgs:

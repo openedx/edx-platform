@@ -37,3 +37,5 @@ class ScheduleConfig(ConfigurationModel):
     deliver_recurring_nudge = models.BooleanField(default=False)
     enqueue_upgrade_reminder = models.BooleanField(default=False)
     deliver_upgrade_reminder = models.BooleanField(default=False)
+    enqueue_course_update = models.BooleanField(default=False)
+    deliver_course_update = models.BooleanField(default=False)

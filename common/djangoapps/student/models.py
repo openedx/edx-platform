@@ -54,9 +54,7 @@ from courseware.models import DynamicUpgradeDeadlineConfiguration, CourseDynamic
 from enrollment.api import _default_course_mode
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.schedules.models import ScheduleConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 from track import contexts
 from util.milestones_helpers import is_entrance_exams_enabled
