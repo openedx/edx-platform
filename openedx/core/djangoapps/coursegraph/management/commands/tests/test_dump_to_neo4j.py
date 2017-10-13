@@ -56,15 +56,20 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
 
         The side-pointing arrows (->) are PRECEDES relationships; the more
         vertical lines are PARENT_OF relationships.
+
+        The vertical in this course and the first video have the same
+        display_name, so that their block_ids are the same. This is to
+        test for a bug where xblocks with the same block_ids (but different
+        locations) pointed to themselves erroneously.
         """
         super(TestDumpToNeo4jCommandBase, cls).setUpClass()
         cls.course = CourseFactory.create()
         cls.chapter = ItemFactory.create(parent=cls.course, category='chapter')
         cls.sequential = ItemFactory.create(parent=cls.chapter, category='sequential')
-        cls.vertical = ItemFactory.create(parent=cls.sequential, category='vertical')
+        cls.vertical = ItemFactory.create(parent=cls.sequential, category='vertical', display_name='subject')
         cls.html = ItemFactory.create(parent=cls.vertical, category='html')
         cls.problem = ItemFactory.create(parent=cls.vertical, category='problem')
-        cls.video = ItemFactory.create(parent=cls.vertical, category='video')
+        cls.video = ItemFactory.create(parent=cls.vertical, category='video', display_name='subject')
         cls.video2 = ItemFactory.create(parent=cls.vertical, category='video')
 
         cls.course2 = CourseFactory.create()
