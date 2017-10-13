@@ -17,7 +17,6 @@ Example usage:
 
 """
 import logging
-from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
@@ -33,16 +32,15 @@ LOGGER = logging.getLogger(__name__)
 class Command(BaseCommand):
     """Resubmit certificates with error status. """
 
-    option_list = BaseCommand.option_list + (
-        make_option(
+    def add_arguments(self, parser):
+        parser.add_argument(
             '-c', '--course',
             metavar='COURSE_KEY',
             dest='course_key_list',
             action='append',
             default=[],
             help='Only re-submit certificates for these courses.'
-        ),
-    )
+        )
 
     def handle(self, *args, **options):
         """Resubmit certificates with status 'error'.
