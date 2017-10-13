@@ -14,7 +14,7 @@ from ..utils.envs import Env
 from .utils import PaverTestCase
 
 ROOT_PATH = path(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-TEST_THEME = ROOT_PATH / "common/test/test-theme"  # pylint: disable=invalid-name
+TEST_THEME_DIR = ROOT_PATH / "common/test/test-theme"  # pylint: disable=invalid-name
 
 
 @ddt.ddt
@@ -40,30 +40,36 @@ class TestPaverAssetTasks(PaverTestCase):
         """
         parameters = options.split(" ")
         system = []
-        if "--system=studio" not in parameters:
-            system += ["lms"]
-        if "--system=lms" not in parameters:
-            system += ["studio"]
-        debug = "--debug" in parameters
-        force = "--force" in parameters
+        if '--system=studio' not in parameters:
+            system += ['lms']
+        if '--system=lms' not in parameters:
+            system += ['studio']
+        debug = '--debug' in parameters
+        force = '--force' in parameters
         self.reset_task_messages()
-        call_task('pavelib.assets.compile_sass', options={"system": system, "debug": debug, "force": force})
+        call_task('pavelib.assets.compile_sass', options={'system': system, 'debug': debug, 'force': force})
         expected_messages = []
         if force:
-            expected_messages.append("rm -rf common/static/css/*.css")
-        expected_messages.append("libsass common/static/sass")
+            expected_messages.append('rm -rf common/static/css/*.css')
+        expected_messages.append('libsass common/static/sass')
 
         if "lms" in system:
             if force:
-                expected_messages.append("rm -rf lms/static/css/*.css")
-            expected_messages.append("libsass lms/static/sass")
+                expected_messages.append(u'rm -rf lms/static/css/*.css')
+            expected_messages.append(u'libsass lms/static/sass')
+            expected_messages.append(
+                u'rtlcss lms/static/css/bootstrap/lms-main.css lms/static/css/bootstrap/lms-main-rtl.css'
+            )
             if force:
-                expected_messages.append("rm -rf lms/static/certificates/css/*.css")
-            expected_messages.append("libsass lms/static/certificates/sass")
+                expected_messages.append(u'rm -rf lms/static/certificates/css/*.css')
+            expected_messages.append(u'libsass lms/static/certificates/sass')
         if "studio" in system:
             if force:
-                expected_messages.append("rm -rf cms/static/css/*.css")
-            expected_messages.append("libsass cms/static/sass")
+                expected_messages.append(u'rm -rf cms/static/css/*.css')
+            expected_messages.append(u'libsass cms/static/sass')
+            expected_messages.append(
+                u'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
+            )
 
         self.assertEquals(self.task_messages, expected_messages)
 
@@ -92,52 +98,83 @@ class TestPaverThemeAssetTasks(PaverTestCase):
         parameters = options.split(" ")
         system = []
 
-        if "--system=studio" not in parameters:
-            system += ["lms"]
+        if '--system=studio' not in parameters:
+            system += ['lms']
         if "--system=lms" not in parameters:
-            system += ["studio"]
-        debug = "--debug" in parameters
-        force = "--force" in parameters
+            system += ['studio']
+        debug = '--debug' in parameters
+        force = '--force' in parameters
 
         self.reset_task_messages()
         call_task(
             'pavelib.assets.compile_sass',
-            options={"system": system, "debug": debug, "force": force, "theme_dirs": [TEST_THEME.dirname()],
-                     "themes": [TEST_THEME.basename()]},
+            options=dict(
+                system=system,
+                debug=debug,
+                force=force,
+                theme_dirs=[TEST_THEME_DIR.dirname()],
+                themes=[TEST_THEME_DIR.basename()]
+            ),
         )
         expected_messages = []
         if force:
-            expected_messages.append("rm -rf common/static/css/*.css")
-        expected_messages.append("libsass common/static/sass")
+            expected_messages.append(u'rm -rf common/static/css/*.css')
+        expected_messages.append(u'libsass common/static/sass')
 
-        if "lms" in system:
-            expected_messages.append("mkdir_p " + repr(TEST_THEME / "lms/static/css"))
-
+        if 'lms' in system:
+            expected_messages.append(u'mkdir_p ' + repr(TEST_THEME_DIR / 'lms/static/css'))
             if force:
-                expected_messages.append("rm -rf " + str(TEST_THEME) + "/lms/static/css/*.css")
+                expected_messages.append(
+                    u'rm -rf {test_theme_dir}/lms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
+                )
             expected_messages.append("libsass lms/static/sass")
+            expected_messages.append(
+                u'rtlcss {test_theme_dir}/lms/static/css/bootstrap/lms-main.css'
+                u' {test_theme_dir}/lms/static/css/bootstrap/lms-main-rtl.css'.format(
+                    test_theme_dir=str(TEST_THEME_DIR),
+                )
+            )
             if force:
-                expected_messages.append("rm -rf " + str(TEST_THEME) + "/lms/static/css/*.css")
-            expected_messages.append("libsass " + str(TEST_THEME) + "/lms/static/sass")
+                expected_messages.append(
+                    'rm -rf {test_theme_dir}/lms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
+                )
+            expected_messages.append(u'libsass {test_theme_dir}/lms/static/sass'.format(test_theme_dir=str(TEST_THEME_DIR)))
             if force:
-                expected_messages.append("rm -rf lms/static/css/*.css")
-            expected_messages.append("libsass lms/static/sass")
+                expected_messages.append(u'rm -rf lms/static/css/*.css')
+            expected_messages.append(u'libsass lms/static/sass')
+            expected_messages.append(
+                u'rtlcss lms/static/css/bootstrap/lms-main.css lms/static/css/bootstrap/lms-main-rtl.css'
+            )
             if force:
-                expected_messages.append("rm -rf lms/static/certificates/css/*.css")
-            expected_messages.append("libsass lms/static/certificates/sass")
+                expected_messages.append(u'rm -rf lms/static/certificates/css/*.css')
+            expected_messages.append(u'libsass lms/static/certificates/sass')
 
         if "studio" in system:
-            expected_messages.append("mkdir_p " + repr(TEST_THEME / "cms/static/css"))
+            expected_messages.append(u'mkdir_p ' + repr(TEST_THEME_DIR / 'cms/static/css'))
             if force:
-                expected_messages.append("rm -rf " + str(TEST_THEME) + "/cms/static/css/*.css")
-            expected_messages.append("libsass cms/static/sass")
+                expected_messages.append(
+                    u'rm -rf {test_theme_dir}/cms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
+                )
+            expected_messages.append(u'libsass cms/static/sass')
+            expected_messages.append(
+                u'rtlcss {test_theme_dir}/cms/static/css/bootstrap/studio-main.css'
+                u' {test_theme_dir}/cms/static/css/bootstrap/studio-main-rtl.css'.format(
+                    test_theme_dir=str(TEST_THEME_DIR),
+                )
+            )
             if force:
-                expected_messages.append("rm -rf " + str(TEST_THEME) + "/cms/static/css/*.css")
-            expected_messages.append("libsass " + str(TEST_THEME) + "/cms/static/sass")
-
+                expected_messages.append(
+                    u'rm -rf {test_theme_dir}/cms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
+                )
+            expected_messages.append(
+                u'libsass {test_theme_dir}/cms/static/sass'.format(test_theme_dir=str(TEST_THEME_DIR))
+            )
             if force:
-                expected_messages.append("rm -rf cms/static/css/*.css")
-            expected_messages.append("libsass cms/static/sass")
+                expected_messages.append(u'rm -rf cms/static/css/*.css')
+            expected_messages.append(u'libsass cms/static/sass')
+            expected_messages.append(
+                u'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
+            )
 
         self.assertEquals(self.task_messages, expected_messages)
 
@@ -190,10 +227,10 @@ class TestPaverWatchAssetTasks(TestCase):
         Test the Paver watch asset tasks with theming enabled.
         """
         self.expected_sass_directories.extend([
-            path(TEST_THEME) / 'lms/static/sass',
-            path(TEST_THEME) / 'lms/static/sass/partials',
-            path(TEST_THEME) / 'cms/static/sass',
-            path(TEST_THEME) / 'cms/static/sass/partials',
+            path(TEST_THEME_DIR) / 'lms/static/sass',
+            path(TEST_THEME_DIR) / 'lms/static/sass/partials',
+            path(TEST_THEME_DIR) / 'cms/static/sass',
+            path(TEST_THEME_DIR) / 'cms/static/sass/partials',
         ])
 
         with patch('pavelib.assets.SassWatcher.register') as mock_register:
@@ -201,8 +238,11 @@ class TestPaverWatchAssetTasks(TestCase):
                 with patch('pavelib.assets.execute_webpack_watch') as mock_webpack:
                     call_task(
                         'pavelib.assets.watch_assets',
-                        options={"background": True, "theme_dirs": [TEST_THEME.dirname()],
-                                 "themes": [TEST_THEME.basename()]},
+                        options={
+                            "background": True,
+                            "theme_dirs": [TEST_THEME_DIR.dirname()],
+                            "themes": [TEST_THEME_DIR.basename()]
+                        },
                     )
                     self.assertEqual(mock_register.call_count, 2)
                     self.assertEqual(mock_webpack.call_count, 1)
