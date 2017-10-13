@@ -1074,6 +1074,13 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'course name: test_null_lang_template')
 
+        #create an org_mode_and_coursekey template language=''
+        self._create_custom_named_template('test_all_languages_template', org_id=1, mode='honor', course_key=unicode(self.course.id), language='')
+        #verify returns null lang template
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'course name: test_all_languages_template')
+
         #create a org_mode_and_coursekey template language=lang
         self._create_custom_named_template('test_right_lang_template', org_id=1, mode='honor', course_key=unicode(self.course.id), language=right_language)
         # verify return right_language template
@@ -1119,6 +1126,13 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'course name: test_null_lang_template')
 
+        #create an org and mode template language=''
+        self._create_custom_named_template('test_all_languages_template', org_id=1, mode='honor', language='')
+        #verify returns All Languages template
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'course name: test_all_languages_template')
+
         #create a org and mode template language=lang
         self._create_custom_named_template('test_right_lang_template', org_id=1, mode='honor', language=right_language)
         # verify return right_language template
@@ -1161,6 +1175,13 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'course name: test_null_lang_template')
+
+        #create an org template language=''
+        self._create_custom_named_template('test_all_languages_template', org_id=1, language='')
+        #verify returns All Languages template
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'course name: test_all_languages_template')
 
         #create a org template language=lang
         self._create_custom_named_template('test_right_lang_template', org_id=1, language=right_language)
@@ -1206,6 +1227,13 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'course name: test_null_lang_template')
 
+        #create a mode template language=''
+        self._create_custom_named_template('test_all_languages_template', mode='honor', language='')
+        #verify returns All Languages template
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'course name: test_all_languages_template')
+
         #create a mode template language=lang
         self._create_custom_named_template('test_right_lang_template', mode='honor', language=right_language)
         # verify return right_language template
@@ -1248,6 +1276,13 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'course name: test_null_lang_template')
+
+        #create a mode template language=''
+        self._create_custom_named_template('test_all_languages_template', org_id=1, mode='honor', language='')
+        #verify returns All Languages template
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'course name: test_all_languages_template')
 
         #create a mode template language=lang
         self._create_custom_named_template('test_right_lang_template', org_id=1, mode='honor', language=right_language)

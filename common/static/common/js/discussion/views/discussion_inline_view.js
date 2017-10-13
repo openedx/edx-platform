@@ -126,7 +126,8 @@
                 course_settings: this.courseSettings,
                 topicId: discussionId,
                 startHeader: this.startHeader,
-                is_commentable_divided: response.is_commentable_divided
+                is_commentable_divided: response.is_commentable_divided,
+                user_group_id: response.user_group_id
             });
 
             this.newPostView.render();

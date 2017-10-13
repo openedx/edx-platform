@@ -3,6 +3,7 @@
 
 .header-global {
   @extend %ui-depth1;
+
   border-bottom: 1px solid $header-border-color;
   box-shadow: 0 1px 5px 0 $shadow-l1;
   background: $header-bg;
@@ -12,6 +13,7 @@
 
   .wrapper-header {
     @include clearfix();
+
     height: 40px;
     margin: 0 auto;
     padding: 18px ($baseline/2) 0;
@@ -25,6 +27,7 @@
   .logo {
     @include float(left);
     @include margin(-2px, 39px, 0, 0);
+
     position: relative;
 
     a {
@@ -35,6 +38,7 @@
 
   nav {
     @include clearfix();
+
     height: 40px;
     margin: 0 auto;
     padding: 18px ($baseline/2) 0;
@@ -91,8 +95,11 @@
 
     > a {
       @include background-image($button-bg-image);
+
       background-color: $button-bg-color;
+
       @include box-sizing(border-box);
+
       box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
       color: $base-font-color;
       display: inline-block;
@@ -118,12 +125,15 @@
 
   .user {
     @include float(right);
+
     @extend %ui-print-excluded;
+
     padding-left: 0;
     margin: 0;
 
     .settings-language-form {
       margin: 4px;
+
       .language-selector {
         width: 120px;
       }
@@ -131,7 +141,9 @@
 
     > .primary {
       display: block;
+
       @include float(left);
+
       margin: 0;
       position: relative;
 
@@ -147,7 +159,9 @@
           &.shopping-cart {
             border-radius: 4px;
             border: 1px solid $border-color-2;
+
             @include margin-right(10px);
+
             padding-bottom: 6px;
           }
         }
@@ -171,8 +185,10 @@
 
       .icon {
         display: inline-block;
+
         @include float(left);
         @include margin(2px, 6px, -3px, 3px);
+
         font-size: 1.2em;
         color: $m-gray;
       }
@@ -202,7 +218,9 @@
       margin-top: 0;
       padding: 5px 10px;
       position: absolute;
+
       @include right(0px);
+
       top: 37px;
       min-width: 120px;
       z-index: 3;
@@ -219,15 +237,18 @@
           bottom: 6px solid transparent;
           left: 6px solid transparent;
         }
+
         box-shadow: 1px 0 0 0 $gray-l3, 0 -1px 0 0 $gray-l3;
         content: "";
         display: block;
-        height: 0px;
+        height: 0;
         position: absolute;
+
         @include transform(rotate(-45deg));
         @include right(7px);
+
         top: -5px;
-        width: 0px;
+        width: 0;
       }
 
       li {
@@ -243,15 +264,19 @@
         > a {
           border: 1px solid transparent;
           border-radius: 3px;
+
           @include box-sizing(border-box);
+
           color: $link-color;
           cursor: pointer;
           display: block;
-          margin: 5px 0px;
+          margin: 5px 0;
           overflow: hidden;
           padding: 3px 5px 4px;
           text-overflow: ellipsis;
+
           @include transition(padding 0.15s linear 0s);
+
           white-space: nowrap;
           width: 100%;
 
@@ -267,27 +292,35 @@
   .nav-global {
     margin-top: ($baseline/2);
     list-style: none;
+
     @include float(left);
+
     .tab-nav-item{
       display: flex;
-      margin: 0px;
+      margin: 0;
       text-transform: none;
+
       @include float(left);
+
       justify-content: center;
+
       .tab-nav-link{
         font-size: em(16);
         color: $gray;
         padding: 5px 25px 23px;
         display: inline-block;
+
         &:hover,
         &:focus{
           border-bottom: 4px solid $courseware-border-bottom-color;
         }
       }
+
       .active{
         border-bottom: 4px solid $black-t3 !important;
       }
     }
+
     li,
     div {
       display: inline-block;
@@ -314,7 +347,6 @@
       }
 
       &.active {
-
         a {
           text-decoration: none;
           color: $link-color;
@@ -330,6 +362,7 @@
 
   .nav-courseware {
     @include float(right);
+
     list-style: none;
 
     li, div {
@@ -344,7 +377,6 @@
 
 // marketing site design syncing
 .view-register, .view-login, .view-passwordreset {
-
   .header-global nav {
     width: 960px;
   }
@@ -367,8 +399,10 @@
 // CASE: marketing/course discovery
 .header-global-new {
   @extend %ui-depth1;
+
   /* Temp. fix until applied globally */
   @include box-sizing(border-box);
+
   position: relative;
   width: 100%;
   border-bottom: 1px solid $gray-l1;
@@ -378,6 +412,7 @@
   .wrapper-header {
     @include clearfix();
     @include box-sizing(border-box);
+
     height: 74px;
     margin: 0 auto;
     padding: 17px 0;
@@ -390,6 +425,7 @@
 
   .logo {
     @include float(left);
+
     margin: -2px 39px 0 10px;
     position: relative;
 
@@ -400,22 +436,28 @@
 
   .nav-global {
     @include float(left);
+
     .tab-nav-item{
       display: flex;
-      margin: 0px;
+      margin: 0;
       text-transform: none;
+
       @include float(left);
+
       justify-content: center;
+
       .tab-nav-link{
         font-size: em(16);
         color: $gray;
         display: inline-block;
         padding: 5px 25px 19px;
+
         &:hover,
         &:focus{
           border-bottom: 4px solid $courseware-border-bottom-color;
         }
       }
+
       .active{
         border-bottom: 4px solid $black-t3 !important;
       }
@@ -475,8 +517,11 @@
 
     > a {
       @include background-image($button-bg-image);
+
       background-color: $button-bg-color;
+
       @include box-sizing(border-box);
+
       box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
       color: $base-font-color;
       font-family: $header-sans-serif;
@@ -501,17 +546,22 @@
 
   .user {
     @include float(right);
+
     margin-top: 0;
 
     > .primary {
       display: block;
+
       @include float(left);
+
       margin: 0;
       position: relative;
 
       > a {
         margin: 0;
+
         @include border-right-radius(0);
+
         background-image: none;
       }
 
@@ -519,6 +569,7 @@
         > a {
           @include border-radius(0, 4px, 4px, 0);
           @include border-left(none);
+
           padding: ($baseline/2) ($baseline/2);
 
           &.shopping-cart {
@@ -530,6 +581,7 @@
         }
       }
     }
+
     .user-link {
       padding: 0;
       position: relative;
@@ -545,8 +597,10 @@
 
       .icon {
         display: inline-block;
+
         @include float(left);
         @include margin(2px, 6px, -3px, 3px);
+
         font-size: 1.2em;
         color: $m-gray;
       }
@@ -576,7 +630,9 @@
       margin-top: 0;
       padding: 5px 10px;
       position: absolute;
+
       @include right(0);
+
       top: 34px;
       width: 170px;
       z-index: 3;
@@ -593,15 +649,18 @@
           bottom: 6px solid transparent;
           left: 6px solid transparent;
         }
+
         box-shadow: 1px 0 0 0 $border-color-3, 0 -1px 0 0 $border-color-3;
         content: "";
         display: block;
-        height: 0px;
+        height: 0;
         position: absolute;
+
         @include transform(rotate(-45deg));
         @include right(7px);
+
         top: -6px;
-        width: 0px;
+        width: 0;
       }
 
       li {
@@ -617,15 +676,19 @@
         > a {
           border: 1px solid transparent;
           border-radius: 3px;
+
           @include box-sizing(border-box);
+
           color: $link-color;
           cursor: pointer;
           display: block;
-          margin: 5px 0px;
+          margin: 5px 0;
           overflow: hidden;
           padding: 3px 5px 4px;
           text-overflow: ellipsis;
+
           @include transition(padding 0.15s linear 0s);
+
           white-space: nowrap;
           width: 100%;
 
@@ -641,6 +704,7 @@
   %default-header-nav {
     margin-top: ($baseline/4);
     list-style: none;
+
     @include float(left);
 
     li,
@@ -674,6 +738,7 @@
 
   .nav-courseware {
     @extend %default-header-nav;
+
     @include float(right);
 
     div {
@@ -711,6 +776,7 @@
 
     .mobile-menu-button {
       @include float(left);
+
       display: inline;
       text-decoration: none;
       color: $m-gray;
@@ -727,7 +793,9 @@
     .logo {
       position: absolute;
       top: 20px;
+
       @include left(calc(50% - 90px));
+
       width: 54px;
 
       img {
@@ -755,7 +823,7 @@
     .nav-global {
       position: absolute;
       top: 73px;
-      left: calc( 50% - 160px );
+      left: calc(50% - 160px);
       z-index: 1000;
       width: 320px;
       background: $m-blue-d3;
@@ -791,7 +859,7 @@
       }
     }
 
-    @include media( $edx-bp-large ) {
+    @include media($edx-bp-large) {
       .wrapper-header {
         width: 100%;
         min-width: 800px;
@@ -804,7 +872,9 @@
       .logo {
         position: relative;
         top: 0;
+
         @include left(0);
+
         width: auto;
 
         img {
@@ -854,7 +924,7 @@
       }
     }
 
-    @include media( $edx-bp-huge ) {
+    @include media($edx-bp-huge) {
       .wrapper-header {
         padding: 17px 0;
       }
@@ -875,7 +945,6 @@
 
 // marketing site design syncing
 .view-register, .view-login {
-
   .header-global nav {
     width: 960px;
   }
@@ -886,7 +955,6 @@
 .view-courses .nav-global-02,
 .view-schools .nav-global-03,
 .view-register .nav-global-04 {
-
   a {
     text-decoration: none;
     color: $link-color !important;
@@ -896,6 +964,7 @@
 .doc-link {
   @include float(right);
   @include margin(($baseline*0.75), ($baseline*0.75), ($baseline*0.75), ($baseline*0.75));
+
   font-size: 14px;
   font-weight: bold;
   color: $base-font-color;

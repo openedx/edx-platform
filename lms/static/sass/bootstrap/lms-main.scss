@@ -9,7 +9,8 @@
 // Legacy support
 @import 'legacy';
 
-// Variables
+// Base
+@import 'base';
 @import 'variables';
 
 // Elements
@@ -26,3 +27,6 @@
 @import 'features/course-search';
 @import 'features/course-sock';
 @import 'features/course-upgrade-message';
+
+// Individual Pages
+@import "views/program-marketing-page";

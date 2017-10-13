@@ -36,6 +36,7 @@ from lms.djangoapps.ccx.utils import ccx_course, is_email
 from lms.djangoapps.ccx.views import get_date
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course
 from lms.djangoapps.instructor.access import allow_access, list_with_level
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
@@ -1061,6 +1062,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
     def setUpClass(cls):
         super(TestCCXGrades, cls).setUpClass()
         cls._course = course = CourseFactory.create(enable_ccx=True)
+        CourseOverview.load_from_module_store(course.id)
 
         # Create a course outline
         cls.mooc_start = start = datetime.datetime(
@@ -1122,6 +1124,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         # which emulates how a student would get access.
         self.ccx_key = CCXLocator.from_course_locator(self._course.id, unicode(ccx.id))
         self.course = get_course_by_id(self.ccx_key, depth=None)
+        CourseOverview.load_from_module_store(self.course.id)
         setup_students_and_grades(self)
         self.client.login(username=coach.username, password="test")
         self.addCleanup(RequestCache.clear_request_cache)

@@ -6,6 +6,9 @@
 @import 'cms/bootstrap/theme';
 @import 'bootstrap/scss/bootstrap';
 
+// Legacy support
+@import 'legacy';
+
 // Variables
 @import 'mixins';
 @import 'variables';

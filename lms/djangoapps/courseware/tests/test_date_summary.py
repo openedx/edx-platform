@@ -618,18 +618,6 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         self.assertEqual(block.date, expected)
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
-    def test_date_with_self_paced_with_single_course(self):
-        """ If the global switch is off, a single course can still be enabled. """
-        course = create_self_paced_course_run(days_till_start=-1)
-        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=False)
-        course_config = CourseDynamicUpgradeDeadlineConfiguration.objects.create(enabled=True, course_id=course.id)
-        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-
-        block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
-        expected = enrollment.created + timedelta(days=course_config.deadline_days)
-        self.assertEqual(block.date, expected)
-
-    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_date_with_existing_schedule(self):
         """ If a schedule is created while deadlines are disabled, they shouldn't magically appear once the feature is
         turned on. """

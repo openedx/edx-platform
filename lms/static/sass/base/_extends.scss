@@ -1,29 +1,34 @@
 %faded-hr-divider {
   @include background-image($faded-hr-image-1);
+
   height: 1px;
   width: 100%;
 }
 
 %faded-hr-divider-medium {
   @include background-image($faded-hr-image-4);
+
   height: 1px;
   width: 100%;
 }
 
 %faded-hr-divider-light {
   @include background-image($faded-hr-image-5);
+
   height: 1px;
   width: 100%;
 }
 
 %faded-vertical-divider {
   @include background-image($faded-hr-image-1);
+
   height: 100%;
   width: 1px;
 }
 
 %faded-vertical-divider-light {
   @include background-image($faded-hr-image-6);
+
   background: transparent;
   height: 100%;
   width: 1px;
@@ -31,10 +36,12 @@
 
 %vertical-divider {
   @extend %faded-vertical-divider;
+
   position: relative;
 
   &::after {
     @extend %faded-vertical-divider-light;
+
     content: "";
     display: block;
     position: absolute;
@@ -44,11 +51,14 @@
 
 %horizontal-divider {
   border: none;
+
   @extend %faded-hr-divider;
+
   position: relative;
 
   &::after {
     @extend %faded-hr-divider-light;
+
     content: "";
     display: block;
     position: absolute;
@@ -58,11 +68,13 @@
 
 %fade-right-hr-divider {
   @include background-image($faded-hr-image-2);
+
   border: none;
 }
 
 %fade-left-hr-divider {
   @include background-image($faded-hr-image-3);
+
   border: none;
 }
 
@@ -134,6 +146,7 @@
 
 %ui-deprecated {
   @extend %t-weight4;
+
   background: tint($warning-color, 85%);
   padding: ($baseline/5) ($baseline/2);
   color: shade($warning-color, 45%);
@@ -142,6 +155,7 @@
 // extends - content - text overflow by ellipsis
 %cont-truncated {
   @include box-sizing(border-box);
+
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

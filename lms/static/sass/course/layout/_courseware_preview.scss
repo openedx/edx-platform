@@ -58,6 +58,7 @@
   // STATE: Fixed to viewport (used for scrolling)
   &.is-fixed {
     @extend %ui-depth4;
+
     box-shadow: 0 3px 3px $shadow-d1;
     position: fixed;
     top: 0;

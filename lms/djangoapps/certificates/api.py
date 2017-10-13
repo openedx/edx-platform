@@ -513,12 +513,12 @@ def get_language_specific_template_or_default(language, templates):
     Returns default templates If no language matches, or language passed is None
     """
     two_letter_language = _get_two_letter_language_code(language)
-    language_or_default_templates = list(templates.filter(Q(language=two_letter_language) | Q(language=None)))
-    language_specific_template = get_language_specific_template(language, language_or_default_templates)
+    language_or_default_templates = list(templates.filter(Q(language=two_letter_language) | Q(language=None) | Q(language='')))
+    language_specific_template = get_language_specific_template(two_letter_language, language_or_default_templates)
     if language_specific_template:
         return language_specific_template
     else:
-        return language_or_default_templates[0] if language_or_default_templates else None
+        return get_all_languages_or_default_template(language_or_default_templates)
 
 
 def get_language_specific_template(language, templates):
@@ -526,6 +526,13 @@ def get_language_specific_template(language, templates):
         if template.language == language:
             return template
     return None
+
+
+def get_all_languages_or_default_template(templates):
+    for template in templates:
+        if template.language == '':
+            return template
+    return templates[0] if templates else None
 
 
 def _get_two_letter_language_code(language_code):

@@ -88,17 +88,17 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         # pylint: disable=protected-access
         self.assertEqual(enterprise_api_service_client.client._store['session'].auth.token, 'test-token')
 
-    def _assert_get_enterprise_customer(self, api_client):
+    def _assert_get_enterprise_customer(self, api_client, enterprise_api_data_for_mock):
         """
         DRY method to verify caching for get enterprise customer method.
         """
-        dummy_enterprise_api_data = {'name': 'dummy-enterprise-customer', 'uuid': 'enterprise-uuid'}
         cache_key = get_cache_key(
             resource='enterprise-customer',
+            resource_id=enterprise_api_data_for_mock['uuid'],
             username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
         )
-        self.mock_get_enterprise_customer('enterprise-uuid', dummy_enterprise_api_data, 200)
-        self._assert_get_enterprise_customer_with_cache(api_client, dummy_enterprise_api_data, cache_key)
+        self.mock_get_enterprise_customer(enterprise_api_data_for_mock['uuid'], enterprise_api_data_for_mock, 200)
+        self._assert_get_enterprise_customer_with_cache(api_client, enterprise_api_data_for_mock, cache_key)
 
     def _assert_get_enterprise_customer_with_cache(self, api_client, enterprise_customer_data, cache_key):
         """
@@ -121,10 +121,17 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         """
         self._assert_api_service_client(EnterpriseApiServiceClient, mock_jwt_builder)
 
-        # Now verify that enterprise customer data is cached properly for
-        # the enterprise api client.
+        # Verify that enterprise customer data is cached properly for the
+        # enterprise api client.
         enterprise_api_client = EnterpriseApiServiceClient()
-        self._assert_get_enterprise_customer(enterprise_api_client)
+        enterprise_api_data_for_mock_1 = {'name': 'dummy-enterprise-customer-1', 'uuid': 'enterprise-uuid-1'}
+        self._assert_get_enterprise_customer(enterprise_api_client, enterprise_api_data_for_mock_1)
+
+        # Now try to get enterprise customer for another enterprise and verify
+        # that enterprise api client returns data according to the provided
+        # enterprise UUID.
+        enterprise_api_data_for_mock_2 = {'name': 'dummy-enterprise-customer-2', 'uuid': 'enterprise-uuid-2'}
+        self._assert_get_enterprise_customer(enterprise_api_client, enterprise_api_data_for_mock_2)
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.JwtBuilder')

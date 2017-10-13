@@ -84,6 +84,7 @@
             'URI': 'empty:',
             'common/js/discussion/views/discussion_inline_view': 'empty:',
             'modernizr': 'empty',
+            'which-country': 'empty',
 
             // Don't bundle UI Toolkit helpers as they are loaded into the "edx" namespace
             'edx-ui-toolkit/js/utils/html-utils': 'empty:',

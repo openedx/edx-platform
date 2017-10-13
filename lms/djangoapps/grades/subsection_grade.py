@@ -141,7 +141,10 @@ class NonZeroSubsectionGrade(SubsectionGradeBase):
 
     @property
     def percent_graded(self):
-        return self.graded_total.earned / self.graded_total.possible
+        if self.graded_total.possible > 0:
+            return self.graded_total.earned / self.graded_total.possible
+        else:
+            return 0.0
 
     @staticmethod
     def _compute_block_score(

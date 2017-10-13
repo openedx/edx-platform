@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 
 
 class CourseNewAssetsPageAdminForm(forms.ModelForm):
-    """Input form for new asset page enablment, allowing us to verify user input."""
+    """Input form for new asset page enablement, allowing us to verify user input."""
 
     class Meta(object):
         model = CourseNewAssetsPageFlag

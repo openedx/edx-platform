@@ -32,7 +32,10 @@ class Command(BaseCommand):
     help = 'Delete a MongoDB backed course'
 
     def add_arguments(self, parser):
-        parser.add_argument('course_key', help='ID of the course to delete.')
+        parser.add_argument(
+            'course_key',
+            help='ID of the course to delete.',
+        )
 
         parser.add_argument(
             '--keep-instructors',
@@ -50,7 +53,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            course_key = CourseKey.from_string(options['course_key'])
+            # a course key may have unicode chars in it
+            course_key = unicode(options['course_key'], 'utf8')
+            course_key = CourseKey.from_string(course_key)
         except InvalidKeyError:
             raise CommandError('Invalid course_key: {}'.format(options['course_key']))
 

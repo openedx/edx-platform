@@ -30,6 +30,7 @@
         </label>
     </div>
     <% } %>
+    <div class="post-field group-visibility" id="wrapper-visibility-message"></div>
     <div class="post-field">
         <label class="field-label">
             <span class="field-label-text"><%- gettext("Title") %></span>
