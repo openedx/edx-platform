@@ -13,6 +13,13 @@
   font-size: ($sizeValue/10) + rem;
 }
 
+// Adds a simple extension that indicates that this element should not print
+%ui-print-excluded {
+  @media print {
+    display: none;
+  }
+}
+
 // Support .sr as a synonym for .sr-only
 .sr {
   @extend .sr-only;

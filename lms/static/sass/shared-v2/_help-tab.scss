@@ -1,3 +1,20 @@
+#help-modal {
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+
+  @media (max-width: $grid-breakpoints-md) {
+    width: 90% !important;
+    margin-left: -47% !important;
+  }
+
+  @media (min-width: $grid-breakpoints-md) {
+    width: 700px !important;
+    margin-left: -350px !important;
+  }
+
+}
+
 .help-tab {
   @include transform(rotate(-90deg));
   @include transform-origin(0 0);
@@ -29,7 +46,9 @@
 }
 
 .help-buttons {
-  padding: ($baseline/2) ($baseline*2.5);
+  .btn {
+    flex-grow: 1;
+  }
 
   a:link,
   a:visited {
