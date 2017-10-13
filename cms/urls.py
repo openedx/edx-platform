@@ -5,6 +5,8 @@ from ratelimitbackend import admin
 
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 
+from openassessment.fileupload import views_filesystem
+
 admin.autodiscover()
 
 # Pattern to match a course key or a library key
@@ -65,6 +67,8 @@ urlpatterns = patterns(
 
     # For redirecting to help pages.
     url(r'^help_token/', include('help_tokens.urls')),
+
+    url(r'^(?P<key>.+)/openassessment-filesystem-storage', views_filesystem.filesystem_storage, name='openassessment-filesystem-storage'),
 )
 
 # restful api
