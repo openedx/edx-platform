@@ -268,6 +268,7 @@ class EnterpriseApiServiceClient(EnterpriseServiceClientMixin, EnterpriseApiClie
         """
         cache_key = get_cache_key(
             resource='enterprise-customer',
+            resource_id=uuid,
             username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
         )
         enterprise_customer = cache.get(cache_key)
