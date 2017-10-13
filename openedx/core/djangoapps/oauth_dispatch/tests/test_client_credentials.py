@@ -63,10 +63,10 @@ class ClientCredentialsTest(mixins.AccessTokenMixin, TestCase):
             'client_id': application.client_id,
             'client_secret': application.client_secret,
             'scope': ' '.join(scopes),
-            'token_type': 'jwt'
+            'token_type': 'jwt',
         }
 
-        response = self.client.post(reverse('access_token'), data)
+        response = self.client.post(reverse('access_token'), data, user=self.user)
         self.assertEqual(response.status_code, 200)
 
         content = json.loads(response.content)
