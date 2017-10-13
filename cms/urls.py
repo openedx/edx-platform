@@ -240,7 +240,7 @@ if settings.FEATURES.get('AUTH_USE_CAS'):
         url(r'^cas-auth/logout/$', cas_logout, {'next_page': '/'}, name="cas-logout"),
     ]
 
-urlpatterns += [url(r'^admin/', include(admin.site.urls)),]
+urlpatterns += [url(r'^admin/', include(admin.site.urls)), ]
 
 # enable entrance exams
 if settings.FEATURES.get('ENTRANCE_EXAMS'):

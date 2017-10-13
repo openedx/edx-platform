@@ -775,9 +775,9 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         url(r'^notification_prefs/disable/', ajax_disable),
         url(r'^notification_prefs/status/', ajax_status),
         url(r'^notification_prefs/unsubscribe/(?P<token>[a-zA-Z0-9-_=]+)/', set_subscription,
-            {'subscribe': False,}, name='unsubscribe_forum_update'),
+            {'subscribe': False, }, name='unsubscribe_forum_update'),
         url(r'^notification_prefs/resubscribe/(?P<token>[a-zA-Z0-9-_=]+)/', set_subscription,
-            {'subscribe': True,}, name='resubscribe_forum_update'),
+            {'subscribe': True, }, name='resubscribe_forum_update'),
     ]
 
 urlpatterns += [
