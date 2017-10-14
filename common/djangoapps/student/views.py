@@ -26,7 +26,8 @@ from django.core import mail
 from django.core.urlresolvers import reverse, NoReverseMatch, reverse_lazy
 from django.core.validators import validate_email, ValidationError
 from django.db import IntegrityError, transaction
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError, Http404
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError, Http404,\
+    HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.encoding import force_bytes, force_text
 from django.utils.translation import ungettext
@@ -1155,7 +1156,7 @@ def change_enrollment(request, check_access=True):
             )
 
         # Otherwise, there is only one mode available (the default)
-        return HttpResponse()
+        return HttpResponse(reverse('info', kwargs={'course_id': unicode(course_id)}))
     elif action == "unenroll":
         enrollment = CourseEnrollment.get_enrollment(user, course_id)
         if not enrollment:
