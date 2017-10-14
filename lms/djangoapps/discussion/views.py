@@ -211,75 +211,75 @@ def forum_form_discussion(request, course_key):
     """
     Renders the main Discussion page, potentially filtered by a search query
     """
-    # nr_transaction = newrelic.agent.current_transaction()
-    #
-    # course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
-    # course_settings = make_course_settings(course, request.user)
-    #
-    # user = cc.User.from_django_user(request.user)
-    # user_info = user.to_dict()
+    nr_transaction = newrelic.agent.current_transaction()
 
-    # try:
-    #     unsafethreads, query_params = get_threads(request, course, user_info)   # This might process a search query
-    #     is_staff = has_permission(request.user, 'openclose_thread', course.id)
-    #     threads = [utils.prepare_content(thread, course_key, is_staff) for thread in unsafethreads]
-    # except cc.utils.CommentClientMaintenanceError:
-    #     log.warning("Forum is in maintenance mode")
-    #     return render_to_response('discussion/maintenance.html', {
-    #         'disable_courseware_js': True,
-    #         'uses_pattern_library': True,
-    #     })
-    # except ValueError:
-    #     return HttpResponseBadRequest("Invalid group_id")
+    course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+    course_settings = make_course_settings(course, request.user)
 
-    # with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
-    #     annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
-    #
-    # with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
-    #     add_courseware_context(threads, course, request.user)
+    user = cc.User.from_django_user(request.user)
+    user_info = user.to_dict()
 
-    # if request.is_ajax():
-    #     return utils.JsonResponse({
-    #         'discussion_data': threads,   # TODO: Standardize on 'discussion_data' vs 'threads'
-    #         'annotated_content_info': annotated_content_info,
-    #         'num_pages': query_params['num_pages'],
-    #         'page': query_params['page'],
-    #         'corrected_text': query_params['corrected_text'],
-    #     })
-    # else:
-    #     with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
-    #         user_cohort_id = get_cohort_id(request.user, course_key)
-    #
-    # context = {
-    #     'csrf': csrf(request)['csrf_token'],
-    #     'course': course,
-    #     #'recent_active_threads': recent_active_threads,
-    #     'staff_access': bool(has_access(request.user, 'staff', course)),
-    #     # 'threads': threads,
-    #     # 'thread_pages': query_params['num_pages'],
-    #     # 'user_info': user_info,
-    #     'can_create_comment': has_permission(request.user, "create_comment", course.id),
-    #     'can_create_subcomment': has_permission(request.user, "create_sub_comment", course.id),
-    #     'can_create_thread': has_permission(request.user, "create_thread", course.id),
-    #     'flag_moderator': bool(
-    #         has_permission(request.user, 'openclose_thread', course.id) or
-    #         has_access(request.user, 'staff', course)
-    #     ),
-    #     # 'annotated_content_info': annotated_content_info,
-    #     'course_id': course.id.to_deprecated_string(),
-    #     'roles': utils.get_role_ids(course_key),
-    #     'is_moderator': has_permission(request.user, "see_all_cohorts", course_key),
-    #     'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
-    #     # 'user_cohort': user_cohort_id,  # read from container in NewPostView
-    #     'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
-    #     # 'sort_preference': user.default_sort_key,
-    #     'category_map': course_settings["category_map"],
-    #     'course_settings': course_settings,
-    #     'disable_courseware_js': True,
-    #     'uses_pattern_library': True,
-    # }
-    # print "start rendering.."
-    return render_to_response('discussion_custom/discussion_board.html', {})
+    try:
+        unsafethreads, query_params = get_threads(request, course, user_info)   # This might process a search query
+        is_staff = has_permission(request.user, 'openclose_thread', course.id)
+        threads = [utils.prepare_content(thread, course_key, is_staff) for thread in unsafethreads]
+    except cc.utils.CommentClientMaintenanceError:
+        log.warning("Forum is in maintenance mode")
+        return render_to_response('discussion/maintenance.html', {
+            'disable_courseware_js': True,
+            'uses_pattern_library': True,
+        })
+    except ValueError:
+        return HttpResponseBadRequest("Invalid group_id")
+
+    with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+        annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
+
+    with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+        add_courseware_context(threads, course, request.user)
+
+    if request.is_ajax():
+        return utils.JsonResponse({
+            'discussion_data': threads,   # TODO: Standardize on 'discussion_data' vs 'threads'
+            'annotated_content_info': annotated_content_info,
+            'num_pages': query_params['num_pages'],
+            'page': query_params['page'],
+            'corrected_text': query_params['corrected_text'],
+        })
+    else:
+        with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
+            user_cohort_id = get_cohort_id(request.user, course_key)
+
+        context = {
+            'csrf': csrf(request)['csrf_token'],
+            'course': course,
+            #'recent_active_threads': recent_active_threads,
+            'staff_access': bool(has_access(request.user, 'staff', course)),
+            'threads': threads,
+            'thread_pages': query_params['num_pages'],
+            'user_info': user_info,
+            'can_create_comment': has_permission(request.user, "create_comment", course.id),
+            'can_create_subcomment': has_permission(request.user, "create_sub_comment", course.id),
+            'can_create_thread': has_permission(request.user, "create_thread", course.id),
+            'flag_moderator': bool(
+                has_permission(request.user, 'openclose_thread', course.id) or
+                has_access(request.user, 'staff', course)
+            ),
+            'annotated_content_info': annotated_content_info,
+            'course_id': course.id.to_deprecated_string(),
+            'roles': utils.get_role_ids(course_key),
+            'is_moderator': has_permission(request.user, "see_all_cohorts", course_key),
+            'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
+            'user_cohort': user_cohort_id,  # read from container in NewPostView
+            'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
+            'sort_preference': user.default_sort_key,
+            'category_map': course_settings["category_map"],
+            'course_settings': course_settings,
+            'disable_courseware_js': True,
+            'uses_pattern_library': True,
+        }
+        # print "start rendering.."
+        return render_to_response('discussion/discussion_board.html', context)
 
 
 @require_GET

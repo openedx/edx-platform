@@ -664,6 +664,12 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
             include('discussion.urls')
         ),
         url(
+            r'^courses/{}/discussion/nodebb/'.format(
+                settings.COURSE_ID_PATTERN,
+            ),
+            include('discussion_nodebb.urls')
+        ),
+        url(
             r'^notification_prefs/enable/',
             'notification_prefs.views.ajax_enable'
         ),
