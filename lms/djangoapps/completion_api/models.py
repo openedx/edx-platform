@@ -191,13 +191,6 @@ class CourseCompletionFacade(CompletionDataMixin, object):
         return self._inner.course_id
 
     @lazy
-    def earned(self):
-        """
-        Return the number of completions earned by the user.
-        """
-        return self._inner.completions
-
-    @lazy
     def chapter(self):
         """
         Return a list of BlockCompletions for each chapter in the course.
