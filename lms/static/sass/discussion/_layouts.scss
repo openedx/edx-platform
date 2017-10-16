@@ -1,6 +1,4 @@
 // Layouts for discussion pages
-@import '../course/base/extends';
-
 .discussion-user-profile-board {
   .discussion-profile-title {
     margin-bottom: $baseline / 5;
@@ -27,8 +25,24 @@
   }
 }
 
+.forum-nav {
+  @include media-breakpoint-up(md) {
+    // Note: a single width setting is not obeyed by a flex layout
+    min-width: 300px;
+    max-width: 300px;
+  }
+}
+
 .discussion-column {
-  min-height: 500px;
+  flex-grow: 1;  // This column should consume all the available space
+  margin-bottom: $baseline;
+
+  @include media-breakpoint-up(md) {
+    @include margin-left($baseline);
+
+    min-height: 500px;
+    margin-bottom: 0;
+  }
 
   .new-post-article {
     margin-top: -$baseline;

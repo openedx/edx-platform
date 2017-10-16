@@ -41,7 +41,7 @@
         @include float(right);
         @include text-align(right);
 
-        display: inline-block;
+        display: flex;
         vertical-align: text-bottom;
 
         .form-actions {

@@ -5,9 +5,15 @@
 .discussion-body {
   @include clearfix();
 
+  width: 100%;
   border: none;
   background: transparent;
   box-shadow: none;
+
+  @include media-breakpoint-up(md) {
+    display: flex;
+    flex-direction: row-reverse;
+  }
 
   .bottom-post-status {
     padding: 30px;
@@ -33,7 +39,7 @@
 
   .discussion-reply-new {
     @include clearfix();
-    @include transition(opacity .2s linear 0s);
+    @include transition(opacity 0.2s linear 0s);
 
     h4 {
       font-size: $forum-large-font-size;
@@ -89,7 +95,6 @@
     margin-top: $baseline;
     margin-bottom: $baseline;
   }
-
 }
 
 .discussion-show {
@@ -101,8 +106,8 @@
   text-align: center;
 
   &.shown {
-    background-color: $btn-default-background-color;
-    color: $uxpl-primary-blue;
+    background-color: theme-color("inverse");
+    color: theme-color("primary");
   }
 }
 
@@ -154,7 +159,7 @@ section.discussion-pagination {
           font-size: $forum-base-font-size;
           font-weight: 700;
           line-height: 32px;
-          color: $gray-d3;
+          color: theme-color("gray-dark");
           text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
         }
       }

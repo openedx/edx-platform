@@ -42,7 +42,7 @@
 
       top: $baseline / 2;
       position: absolute;
-      color: $uxpl-primary-blue;
+      color: theme-color("primary");
 
       &:hover,
       &:focus {

@@ -31,7 +31,10 @@ class CourseReviewsView(CourseTabView):
         """
         return super(CourseReviewsView, self).get(request, course_id, 'courseware', **kwargs)
 
-    def uses_bootstrap(self, request, course):
+    def uses_bootstrap(self, request, course, tab):
+        """
+        Returns true if the USE_BOOTSTRAP Waffle flag is enabled.
+        """
         return USE_BOOTSTRAP_FLAG.is_enabled(course.id)
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):

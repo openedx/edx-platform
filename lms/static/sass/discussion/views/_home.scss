@@ -5,6 +5,13 @@
 .view-discussion-home {
   @include padding-left($baseline);
 
+  display: none;
+
+  // Only show this component for large sizes
+  @include media-breakpoint-up(lg) {
+    display: block;
+  }
+
   section {
     border-bottom: 1px solid $forum-color-border;
   }
@@ -154,9 +161,9 @@
   }
 
   .helpgrid-row-navigation {
-    .fa-bars {color: $light-gray;}
-    .fa-search {color: $light-gray;}
-    .fa-sort {color: $light-gray;}
+    .fa-bars {color: theme-color("light");}
+    .fa-search {color: $gray-300;}
+    .fa-sort {color: $gray-300;}
   }
 
   .helpgrid-row-participation {
@@ -167,6 +174,6 @@
 
   .helpgrid-row-notification {
     .fa-square {color: $green;}
-    .fa-envelope {color: $light-gray;}
+    .fa-envelope {color: $gray-300;}
   }
 }
