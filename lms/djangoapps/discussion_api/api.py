@@ -37,6 +37,8 @@ from django_comment_common.signals import (
     thread_edited,
     thread_deleted,
     thread_voted,
+    thread_followed,
+    thread_unfollowed,
     comment_created,
     comment_edited,
     comment_voted,
@@ -757,8 +759,12 @@ def _handle_following_field(form_value, user, cc_content):
     """follow/unfollow thread for the user"""
     if form_value:
         user.follow(cc_content)
+        if cc_content.type == 'thread':
+            thread_followed.send(sender=None, user=user, post=cc_content)
     else:
         user.unfollow(cc_content)
+        if cc_content.type == 'thread':
+            thread_unfollowed.send(sender=None, user=user, post=cc_content)
 
 
 def _handle_abuse_flagged_field(form_value, user, cc_content):
