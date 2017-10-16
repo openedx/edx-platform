@@ -765,7 +765,7 @@ def checkout_with_shoppingcart(request, user, course_key, course_mode, amount):
     cart.start_purchase()
 
     callback_url = request.build_absolute_uri(
-        reverse("shoppingcart.views.postpay_callback")
+        reverse("shoppingcart:postpay_callback")
     )
 
     payment_data = {

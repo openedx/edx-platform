@@ -651,7 +651,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.cart.order_type = 'business'
         self.cart.save()
         CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'Ad123asd'})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': 'Ad123asd'})
         self.assertEqual(resp.status_code, 200)
         self.cart.purchase()
 
@@ -660,14 +660,14 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.cart.order_type = 'business'
         self.cart.save()
         CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'Ad123asd'})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': 'Ad123asd'})
         self.assertEqual(resp.status_code, 200)
         self.cart.purchase()
 
         self.cart.clear()
         self.cart = Order.get_cart_for_user(self.user)
         PaidCourseRegistration.add_to_order(self.cart, self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': '32213asd'})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': '32213asd'})
         self.assertEqual(resp.status_code, 200)
         self.cart.purchase()
 
