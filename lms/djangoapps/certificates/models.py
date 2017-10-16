@@ -892,18 +892,14 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
             course_key (CourseKey): The identifier for the course.
 
         Returns:
-            dict
+            CertificateGenerationCourseSetting
         """
         try:
             latest = cls.objects.filter(course_key=course_key).latest()
         except cls.DoesNotExist:
-            return {}
+            return None
         else:
-            return {
-                'self_generation_enabled': latest.self_generation_enabled,
-                'language_specific_templates_enabled': latest.language_specific_templates_enabled,
-                'include_hours_of_effort': latest.include_hours_of_effort
-            }
+            return latest
 
     @classmethod
     def is_self_generation_enabled_for_course(cls, course_key):
