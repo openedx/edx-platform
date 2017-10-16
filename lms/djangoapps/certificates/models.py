@@ -848,11 +848,6 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
     not in the data layer.
     """
     course_key = CourseKeyField(max_length=255, db_index=True)
-    enabled = models.BooleanField(
-        default=False,
-        help_text=u"DEPRECATED, please use self_generation_enabled instead."
-    )
-    # TODO: Learner-2549 remove deprecated enabled field
 
     self_generation_enabled = models.BooleanField(
         default=False,
