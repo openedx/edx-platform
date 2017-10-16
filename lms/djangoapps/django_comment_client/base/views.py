@@ -64,7 +64,6 @@ from eventtracking import tracker
 from util.html import strip_tags
 import lms.lib.comment_client as cc
 
-from social_engagement.tasks import task_update_user_engagement_score
 
 log = logging.getLogger(__name__)
 
@@ -316,10 +315,6 @@ def create_thread(request, course_id, commentable_id):
             is_anonymous_user=anonymous or anonymous_to_peers
         )
 
-    # call into the social_engagement django app to
-    # rescore this user
-    _update_user_engagement_score(course_key, request.user.id)
-
     add_thread_group_name(data, course_key)
     if thread.get('group_id') and not thread.get('group_name'):
         thread['group_name'] = get_cohort_by_id(course_key, thread.get('group_id')).name
@@ -506,18 +501,13 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
 
     track_comment_created_event(request, course, comment, comment.thread.commentable_id, followed)
 
-    # Update social stats
     #
-    # NOTE: We do a check for NOTIFICATIONS enablement, because we
-    # need some of the variables (e.g. replying_to_id) below to be set
+    # Send notification
     #
-    if settings.FEATURES.get("ENABLE_SOCIAL_ENGAGEMENT", False) or settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
-        # call into the social_engagement django app to
-        # rescore this user who created the comment
-        _update_user_engagement_score(course_key, request.user.id)
+    # Feature Flag to check that notifications are enabled or not.
+    if settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
 
-        # a response is a reply to a thread
-        # a comment is a reply to a response
+        action_user_id = request.user.id
         is_comment = not thread_id and parent_id
 
         replying_to_id = None  # keep track of who we are replying to
@@ -528,27 +518,12 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
             thread_id = comment.thread_id
             replying_to_id = comment.user_id
 
-            # update the engagement of the author of the response
-            _update_user_engagement_score(course_key, replying_to_id)
-
         thread = cc.Thread.find(thread_id)
 
         # IMPORTANT: we have to use getattr here as
         # otherwise the property will not get fetched
         # from cs_comment_service
         thread_user_id = int(getattr(thread, 'user_id', 0))
-
-        # update the engagement score of the thread creator
-        # as well
-        _update_user_engagement_score(course_key, thread_user_id)
-
-    #
-    # Send notification
-    #
-    # Feature Flag to check that notifications are enabled or not.
-    if settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
-
-        action_user_id = request.user.id
 
         if not replying_to_id:
             # we must be creating a Reponse on a thread,
@@ -775,11 +750,6 @@ def vote_for_comment(request, course_id, comment_id, value):
                 }
             )
 
-    if value == 'up':
-        # call into the social_engagement django app to
-        # rescore this user
-        _update_user_engagement_score(course_key, request.user.id)
-
     return result
 
 
@@ -806,9 +776,6 @@ def vote_for_thread(request, course_id, thread_id, value):
     result = _vote_or_unvote(request, course_id, thread, value)
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    # call into the social_engagement django app to
-    # rescore this user
-    _update_user_engagement_score(course_key, request.user.id)
 
     # Feature Flag to check that notifications are enabled or not.
     if value == 'up' and settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
@@ -960,10 +927,6 @@ def follow_thread(request, course_id, thread_id):
     thread = cc.Thread.find(thread_id)
     user.follow(thread)
     thread_followed.send(sender=None, user=request.user, post=thread)
-
-    # call into the social_engagement django app to
-    # rescore this user
-    _update_user_engagement_score(course_key, getattr(thread, 'user_id', None))
 
     # Feature Flag to check that notifications are enabled or not.
     if settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
@@ -1136,13 +1099,3 @@ def users(request, course_id):
     except User.DoesNotExist:
         pass
     return JsonResponse({"users": user_objs})
-
-
-def _update_user_engagement_score(course_key, user_id):
-    """
-    Helper to call down into the Social Engagement app to recalc the passed in user's
-    Social Engagement score
-    """
-
-    if settings.FEATURES.get('ENABLE_SOCIAL_ENGAGEMENT', False) and course_key and user_id:
-        task_update_user_engagement_score.delay(unicode(course_key), user_id)
