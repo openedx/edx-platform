@@ -3,12 +3,11 @@ URLs for the Enrollment API
 
 """
 from django.conf import settings
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from .views import EnrollmentCourseDetailView, EnrollmentListView, EnrollmentView
 
-urlpatterns = patterns(
-    'enrollment.views',
+urlpatterns = [
     url(
         r'^enrollment/{username},{course_key}$'.format(
             username=settings.USERNAME_PATTERN, course_key=settings.COURSE_ID_PATTERN
@@ -27,4 +26,4 @@ urlpatterns = patterns(
         EnrollmentCourseDetailView.as_view(),
         name='courseenrollmentdetails'
     ),
-)
+]
