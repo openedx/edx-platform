@@ -554,11 +554,11 @@ class CourseTabView(EdxFragmentView):
             log.exception("Error while rendering courseware-error page")
             raise
 
-    def uses_bootstrap(self, request, course):
+    def uses_bootstrap(self, request, course, tab):
         """
         Returns true if this view uses Bootstrap.
         """
-        return False
+        return tab.uses_bootstrap
 
     def create_page_context(self, request, course=None, tab=None, **kwargs):
         """
@@ -566,7 +566,7 @@ class CourseTabView(EdxFragmentView):
         """
         staff_access = has_access(request.user, 'staff', course)
         supports_preview_menu = tab.get('supports_preview_menu', False)
-        uses_bootstrap = self.uses_bootstrap(request, course)
+        uses_bootstrap = self.uses_bootstrap(request, course, tab=tab)
         if supports_preview_menu:
             masquerade, masquerade_user = setup_masquerade(request, course.id, staff_access, reset_masquerade_data=True)
             request.user = masquerade_user
@@ -610,8 +610,9 @@ class CourseTabView(EdxFragmentView):
         """
         if not page_context:
             page_context = self.create_page_context(request, course=course, tab=tab, **kwargs)
+        tab = page_context['tab']
         page_context['fragment'] = fragment
-        if self.uses_bootstrap(request, course):
+        if self.uses_bootstrap(request, course, tab=tab):
             return render_to_response('courseware/tab-view.html', page_context)
         else:
             return render_to_response('courseware/tab-view-v2.html', page_context)

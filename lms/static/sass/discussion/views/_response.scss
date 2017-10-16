@@ -20,8 +20,7 @@
 
   // wrapper - response plus comment area
   .forum-response {
-    @include animation(fadeIn .3s);
-
+    animation: fadeIn 0.3s;
     position: relative;
     margin: $baseline 0;
     border: 1px solid $forum-color-border;
@@ -76,7 +75,7 @@
   display: block;
   padding: ($baseline/2) $baseline;
   width: 100%;
-  background: $gray-l6;
+  background: theme-color("lightest");
   box-shadow: 0 1px 3px -1px $shadow inset;
 }
 
@@ -146,7 +145,7 @@
 
   @include border-radius(0, 0, $forum-border-radius, $forum-border-radius);
 
-  background: $gray-l6;
+  background: theme-color("lightest");
   box-shadow: 0 1px 3px -1px $shadow inset;
 
   > li {

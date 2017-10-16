@@ -3,38 +3,15 @@
 
 @import '../../edx-pattern-library-shims/base/variables';
 
-.forum-nav {
-  border: 1px solid #aaa;
-  border-radius: $forum-border-radius;
-}
-
 // ------
 // Discussion Forums Page Header
 // ------
 .discussion-board > .page-header {
-  $searchBoxPadding: rem($baseline / 2 + 2);
-  $searchBoxHeight: (rem($baseline) + ($searchBoxPadding * 2));
-
-  div {
-    display: inline-block;
-    vertical-align: middle;
-  }
-
   .has-breadcrumbs .breadcrumbs {
     margin-bottom: ($baseline / 2);
     font-size: font-size(base);
     font-weight: font-weight(semi-bold);
     line-height: $base-line-height;
-  }
-
-  .page-header-main {
-    line-height: $searchBoxHeight;
-  }
-
-  .page-header-secondary > .form-actions > button {
-    // Overrides base size set in lms/static/sass/shared-v2/_layouts.scss
-    // Done to match size of UXPL's search box. This is bad, I know.
-    height: $searchBoxHeight !important;
   }
 }
 
@@ -43,7 +20,7 @@
 // -----------
 .forum-nav-browse-menu-wrapper {
   border-bottom: 1px solid $forum-color-border;
-  background: $gray-l5;
+  background: theme-color("light");
 }
 
 .forum-nav-browse-filter {
@@ -113,13 +90,18 @@
 }
 
 .forum-nav-browse-menu {
+  @include padding-left(0);
+
+  margin: 0;
   font-size: $forum-base-font-size;
   overflow-y: scroll;
   list-style: none;
+  max-height: 600px;
 }
 
 .forum-nav-browse-submenu {
   list-style: none;
+  margin: 0;
   padding: 0;
 
   li {
@@ -139,7 +121,7 @@
 
   font-size: $forum-small-font-size;
   border-bottom: 1px solid $forum-color-border;
-  background-color: $gray-l5;
+  background-color: theme-color("light");
   padding: ($baseline/4) ($baseline/2);
   color: $black;
 }
@@ -318,7 +300,7 @@
   margin: 0 ($baseline / 4);
   // 125 is the width we need to save for the "X new" comments indicator - and we want to clip the preview
   // at the same length whether there are unread comments for this story or not.
-  max-width: calc(100% - 125px);
+  max-width: calc(100% - 75px);
   flex-grow: 1;  // This column should consume all the available space
 }
 
@@ -327,7 +309,7 @@
 
   @include text-align(right);
 
-  min-width: 90px;
+  min-width: 40px;
   white-space: nowrap;
 }
 
@@ -367,7 +349,7 @@
   border-radius: $forum-border-radius;
   padding: ($baseline/10) ($baseline/5);
   min-width: 2em; // Fit most comment counts but allow expansion if necessary
-  background-color: $gray-l4;
+  background-color: theme-color("light");
 
   // Speech bubble tail
   &::after {
@@ -383,13 +365,13 @@
     border-style: solid;
 
     @include border-width(0, ($baseline/4), ($baseline/4), 0);
-    @include border-color(transparent, $gray-l4, transparent, transparent);
+    @include border-color(transparent, $forum-color-border, transparent, transparent);
   }
 }
 
 .forum-nav-load-more {
   border-bottom: 1px solid $forum-color-border;
-  background-color: $gray-l5;
+  background-color: theme-color("light");
 }
 
 %forum-nav-load-more-content {

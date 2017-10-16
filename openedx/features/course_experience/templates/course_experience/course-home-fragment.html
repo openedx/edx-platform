@@ -31,13 +31,13 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
                     <form class="search-form" role="search" action="${reverse('openedx.course_search.course_search_results', args=[course_key])}">
                         <label class="field-label sr-only" for="search" id="search-hint">${_('Search the course')}</label>
                         <input
-                                class="field-input input-text search-input"
+                                class="field-input input-text search-input form-control"
                                 type="search"
                                 name="query"
                                 id="search"
                                 placeholder="${_('Search the course')}"
                         />
-                        <button class="btn btn-small search-button" type="submit">${_('Search')}</button>
+                        <button class="btn btn-outline-primary search-button" type="submit">${_('Search')}</button>
                     </form>
                 </div>
             % endif

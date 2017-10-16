@@ -43,7 +43,7 @@
   display: block;
   margin-bottom: $baseline;
   font-size: $forum-x-large-font-size;
-  color: $gray-d3;
+  color: theme-color("gray-dark");
   font-weight: 600;
 }
 

@@ -50,12 +50,16 @@ from student.models import CourseEnrollment
 from util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 
+from . import USE_BOOTSTRAP_FLAG
+
 log = logging.getLogger("edx.discussions")
 
 
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
 PAGES_NEARBY_DELTA = 2
+
+BOOTSTRAP_DISCUSSION_CSS_PATH = 'css/discussion/lms-discussion-bootstrap.css'
 
 
 def make_course_settings(course, user):
@@ -383,6 +387,7 @@ def _create_base_discussion_view_context(request, course_key):
     user_info = cc_user.to_dict()
     course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
     course_settings = make_course_settings(course, user)
+    uses_bootstrap = USE_BOOTSTRAP_FLAG.is_enabled()
     return {
         'csrf': csrf(request)['csrf_token'],
         'course': course,
@@ -399,7 +404,8 @@ def _create_base_discussion_view_context(request, course_key):
         ),
         'course_settings': course_settings,
         'disable_courseware_js': True,
-        'uses_pattern_library': True,
+        'uses_bootstrap': uses_bootstrap,
+        'uses_pattern_library': not uses_bootstrap,
     }
 
 
@@ -721,7 +727,13 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         works in conjunction with the Django pipeline to ensure that in development mode
         the files are loaded individually, but in production just the single bundle is loaded.
         """
-        if get_language_bidi():
+        is_right_to_left = get_language_bidi()
+        if USE_BOOTSTRAP_FLAG.is_enabled():
+            css_file = BOOTSTRAP_DISCUSSION_CSS_PATH
+            if is_right_to_left:
+                css_file = css_file.replace('.css', '-rtl.css')
+            return [css_file]
+        elif is_right_to_left:
             return self.get_css_dependencies('style-discussion-main-rtl')
         else:
             return self.get_css_dependencies('style-discussion-main')

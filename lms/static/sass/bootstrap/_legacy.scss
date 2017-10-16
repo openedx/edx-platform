@@ -65,6 +65,8 @@ $success-color: theme-color("success") !default;
 $success-color-hover: theme-color("success") !default;
 $lms-hero-color: #005e90 !default;
 $lms-purchase-color: theme-color("success") !default;
+$border-color-2: $gray-400 !default;
+$link-hover: #065683 !default; // wcag2a compliant
 
 // Blacks
 $black:     rgb(0, 0, 0) !default;
