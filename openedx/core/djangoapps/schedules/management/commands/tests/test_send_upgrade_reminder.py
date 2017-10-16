@@ -60,6 +60,8 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
         self.site_config = SiteConfigurationFactory.create(site=site)
         ScheduleConfigFactory.create(site=self.site_config.site)
 
+        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
+
     @patch.object(reminder.Command, 'resolver_class')
     def test_handle(self, mock_resolver):
         test_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
@@ -237,7 +239,6 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
     @ddt.data(*itertools.product((1, 10, 100), (2, 10)))
     @ddt.unpack
     def test_templates(self, message_count, day):
-        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         now = datetime.datetime.now(pytz.UTC)
         future_datetime = now + datetime.timedelta(days=21)
 
@@ -253,6 +254,7 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
 
         for schedule in schedules:
             schedule.enrollment.course.self_paced = True
+            schedule.enrollment.course.end = future_datetime + datetime.timedelta(days=30)
             schedule.enrollment.course.save()
 
             CourseModeFactory(
@@ -273,9 +275,7 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
 
         sent_messages = []
 
-        templates_override = deepcopy(settings.TEMPLATES)
-        templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
-        with self.settings(TEMPLATES=templates_override):
+        with self.settings(TEMPLATES=self._get_template_overrides()):
             with patch.object(tasks, '_upgrade_reminder_schedule_send') as mock_schedule_send:
                 mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
 
@@ -285,16 +285,27 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
                 with self.assertNumQueries(num_expected_queries, table_blacklist=WAFFLE_TABLES):
                     tasks.upgrade_reminder_schedule_bin(
                         self.site_config.site.id, target_day_str=test_datetime_str, day_offset=day,
-                        bin_num=user.id % tasks.UPGRADE_REMINDER_NUM_BINS,
+                        bin_num=self._calculate_bin_for_user(user),
                         org_list=[schedules[0].enrollment.course.org],
                     )
 
             self.assertEqual(len(sent_messages), message_count)
 
-            for args in sent_messages:
-                tasks._upgrade_reminder_schedule_send(*args)
+            # Load the site (which we query per message sent)
+            # Check the schedule config
+            with self.assertNumQueries(1 + message_count):
+                for args in sent_messages:
+                    tasks._upgrade_reminder_schedule_send(*args)
 
             self.assertEqual(mock_channel.deliver.call_count, message_count)
             for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
                 for template in attr.astuple(email):
                     self.assertNotIn("TEMPLATE WARNING", template)
+
+    def _get_template_overrides(self):
+        templates_override = deepcopy(settings.TEMPLATES)
+        templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
+        return templates_override
+
+    def _calculate_bin_for_user(self, user):
+        return user.id % tasks.RECURRING_NUDGE_NUM_BINS
