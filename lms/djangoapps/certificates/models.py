@@ -936,40 +936,6 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
             defaults=default
         )
 
-    @classmethod
-    def set_language_specific_templates_enabled_for_course(cls, course_key, is_enabled):
-        """Enable or disable language-specific certificates for a course.
-
-        Arguments:
-            course_key (CourseKey): The identifier for the course.
-            is_enabled (boolean): Whether to enable or disable language-specific certificates.
-
-        """
-        default = {
-            'language_specific_templates_enabled': is_enabled,
-        }
-        CertificateGenerationCourseSetting.objects.update_or_create(
-            course_key=course_key,
-            defaults=default
-        )
-
-    @classmethod
-    def set_include_hours_of_effort_for_course(cls, course_key, is_included):
-        """Include or exclude Hours of Effort from certificate rendering context for a course.
-
-        Arguments:
-            course_key (CourseKey): The identifier for the course.
-            is_included (boolean): Whether to include or exclude Hours of Effort.
-
-        """
-        default = {
-            'include_hours_of_effort': is_included,
-        }
-        CertificateGenerationCourseSetting.objects.update_or_create(
-            course_key=course_key,
-            defaults=default
-        )
-
 
 class CertificateGenerationConfiguration(ConfigurationModel):
     """Configure certificate generation.

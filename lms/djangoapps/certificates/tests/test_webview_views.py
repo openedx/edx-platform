@@ -1083,7 +1083,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         course_run_details.update({'content_language': 'es'})
         mock_get_course_run_details.return_value = course_run_details
 
-        CertificateGenerationCourseSetting.set_language_specific_templates_enabled_for_course(self.course.id, True)
+        CertificateGenerationCourseSetting.objects.update_or_create(
+            course_key=self.course.id,
+            defaults={
+                'language_specific_templates_enabled': True
+            }
+        )
 
         self._add_course_certificates(count=1, signatory_count=2)
 
@@ -1135,7 +1140,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         course_run_details = self.mock_course_run_details
         course_run_details.update({'content_language': 'es'})
         mock_get_course_run_details.return_value = course_run_details
-        CertificateGenerationCourseSetting.set_language_specific_templates_enabled_for_course(self.course.id, True)
+        CertificateGenerationCourseSetting.objects.update_or_create(
+            course_key=self.course.id,
+            defaults={
+                'language_specific_templates_enabled': True
+            }
+        )
 
         self._add_course_certificates(count=1, signatory_count=2)
 
@@ -1186,7 +1196,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         course_run_details = self.mock_course_run_details
         course_run_details.update({'content_language': 'es'})
         mock_get_course_run_details.return_value = course_run_details
-        CertificateGenerationCourseSetting.set_language_specific_templates_enabled_for_course(self.course.id, True)
+        CertificateGenerationCourseSetting.objects.update_or_create(
+            course_key=self.course.id,
+            defaults={
+                'language_specific_templates_enabled': True
+            }
+        )
 
         self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
@@ -1236,7 +1251,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         course_run_details = self.mock_course_run_details
         course_run_details.update({'content_language': 'es'})
         mock_get_course_run_details.return_value = course_run_details
-        CertificateGenerationCourseSetting.set_language_specific_templates_enabled_for_course(self.course.id, True)
+        CertificateGenerationCourseSetting.objects.update_or_create(
+            course_key=self.course.id,
+            defaults={
+                'language_specific_templates_enabled': True
+            }
+        )
 
         self._add_course_certificates(count=1, signatory_count=2)
 
@@ -1286,7 +1306,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         course_run_details = self.mock_course_run_details
         course_run_details.update({'content_language': 'es-419'})
         mock_get_course_run_details.return_value = course_run_details
-        CertificateGenerationCourseSetting.set_language_specific_templates_enabled_for_course(self.course.id, True)
+        CertificateGenerationCourseSetting.objects.update_or_create(
+            course_key=self.course.id,
+            defaults={
+                'language_specific_templates_enabled': True
+            }
+        )
 
         self._add_course_certificates(count=1, signatory_count=2)
 
@@ -1333,8 +1358,13 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         # mock the response data from Discovery that updates the context for template lookup and rendering
         mock_get_course_run_details.return_value = self.mock_course_run_details
         mock_get_org_id.return_value = 1
-        CertificateGenerationCourseSetting.set_include_hours_of_effort_for_course(self.course.id, include_effort)
-        CertificateGenerationCourseSetting.set_language_specific_templates_enabled_for_course(self.course.id, include_effort)
+        CertificateGenerationCourseSetting.objects.update_or_create(
+            course_key=self.course.id,
+            defaults={
+                'language_specific_templates_enabled': include_effort,
+                'include_hours_of_effort': include_effort
+            }
+        )
         self._add_course_certificates(count=1, signatory_count=2)
         self._create_custom_template_with_hours_of_effort(org_id=1, language=None)
         test_url = get_certificate_url(
