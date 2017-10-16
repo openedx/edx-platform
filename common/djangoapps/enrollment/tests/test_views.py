@@ -4,6 +4,7 @@ Tests for user enrollment.
 import datetime
 import itertools
 import json
+import time
 import unittest
 
 import ddt
@@ -159,6 +160,8 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         self.rate_limit_config.enabled = False
         self.rate_limit_config.save()
 
+        self.start_time = time.time()
+        self.elapsed_seconds = 0
         throttle = EnrollmentUserThrottle()
         self.rate_limit, __ = throttle.parse_rate(throttle.rate)
 
@@ -534,8 +537,14 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("No course ", resp.content)
 
-    def test_enrollment_throttle_for_user(self):
+    def fake_timer(self):
+        return self.start_time + self.elapsed_seconds
+
+    @patch.object(EnrollmentUserThrottle, 'timer')
+    def test_enrollment_throttle_for_user(self, mock_timer):
         """Make sure a user requests do not exceed the maximum number of requests"""
+        mock_timer.side_effect = self.fake_timer
+
         self.rate_limit_config.enabled = True
         self.rate_limit_config.save()
         CourseModeFactory.create(
@@ -545,11 +554,14 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         )
 
         for attempt in xrange(self.rate_limit + 10):
+            self.elapsed_seconds += 0.01  # simulate 10 ms delay between requests
             expected_status = status.HTTP_429_TOO_MANY_REQUESTS if attempt >= self.rate_limit else status.HTTP_200_OK
             self.assert_enrollment_status(expected_status=expected_status)
 
-    def test_enrollment_throttle_for_staff_user(self):
+    @patch.object(EnrollmentUserThrottle, 'timer')
+    def test_enrollment_throttle_for_staff_user(self, mock_timer):
         """ Make sure throttle rate is higher for staff users """
+        mock_timer.side_effect = self.fake_timer
         self.rate_limit_config.enabled = True
         self.rate_limit_config.save()
         self.client.logout()
@@ -568,14 +580,23 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
 
         # Make enough requests to reach the rate limit
         for attempt in xrange(rate_limit):
+            self.elapsed_seconds += 0.01  # simulate a 10 ms delay between requests
             self.assert_enrollment_status(username=staff_user.username, expected_status=status.HTTP_200_OK)
 
         # Once the limit is reached, subsequent requests should fail
-        for attempt in xrange(rate_limit + 50):
-            self.assert_enrollment_status(username=staff_user.username, expected_status=status. HTTP_429_TOO_MANY_REQUESTS)
+        for attempt in xrange(50):
+            self.elapsed_seconds += 0.01  # simulate a 10 ms delay between requests
+            self.assert_enrollment_status(
+                username=staff_user.username, expected_status=status.HTTP_429_TOO_MANY_REQUESTS)
 
-    def test_enrollment_throttle_for_service(self):
+        # Once enough time has passed, requests should succeed again
+        self.elapsed_seconds = 60.1
+        self.assert_enrollment_status(username=staff_user.username, expected_status=status.HTTP_200_OK)
+
+    @patch.object(EnrollmentUserThrottle, 'timer')
+    def test_enrollment_throttle_for_service(self, mock_timer):
         """Make sure a service can call the enrollment API as many times as needed. """
+        mock_timer.side_effect = self.fake_timer
         self.rate_limit_config.enabled = True
         self.rate_limit_config.save()
         CourseModeFactory.create(
@@ -585,6 +606,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         )
 
         for __ in xrange(self.rate_limit + 10):
+            self.elapsed_seconds += 0.01  # simulate a 10 ms delay between requests
             self.assert_enrollment_status(as_server=True)
 
     def test_create_enrollment_with_mode(self):
