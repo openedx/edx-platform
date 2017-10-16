@@ -17,35 +17,18 @@ def url_class(is_active):
   <%
     tab_is_active = tab.tab_id in (active_page, default_tab)
     tab_class = url_class(tab_is_active)
-    is_discussion_tab = tab.name == 'Discussion'
   %>
   <li class="tab">
-      % if not is_discussion_tab:
-          <a href="${tab.link_func(course, reverse)}" class="${tab_class}">
-          ${_(tab.name)}
-          % if tab_is_active:
-              <span class="sr">, current location</span>
-          %endif
-          % if tab_image:
-              ## Translators: 'needs attention' is an alternative string for the
-              ## notification image that indicates the tab "needs attention".
-              <img src="${tab_image}" alt="${_('needs attention')}" />
-          %endif
-          </a>
-      %endif
-
-      % if is_discussion_tab:
-          <a href="discussion/nodebb/" class="${tab_class}">
-          ${_(tab.name)}
-          % if tab_is_active:
-              <span class="sr">, current location</span>
-          %endif
-          % if tab_image:
-              ## Translators: 'needs attention' is an alternative string for the
-              ## notification image that indicates the tab "needs attention".
-              <img src="${tab_image}" alt="${_('needs attention')}" />
-          %endif
-          </a>
-      %endif
+  <a href="${tab.link_func(course, reverse)}" class="${tab_class}">
+  ${_(tab.name)}
+  % if tab_is_active:
+      <span class="sr">, current location</span>
+  %endif
+  % if tab_image:
+      ## Translators: 'needs attention' is an alternative string for the
+      ## notification image that indicates the tab "needs attention".
+      <img src="${tab_image}" alt="${_('needs attention')}" />
+  %endif
+  </a>
   </li>
 % endfor
