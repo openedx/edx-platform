@@ -33,7 +33,7 @@
             tabs_url = reverse('tabs_handler', kwargs={'course_key_string': unicode(course_key)})
             certificates_url = ''
             if settings.FEATURES.get("CERTIFICATES_HTML_VIEW") and context_course.cert_html_view_enabled:
-                certificates_url = reverse('certificates.certificates_list_handler', kwargs={'course_key_string': unicode(course_key)})
+                certificates_url = reverse('certificates_list_handler', kwargs={'course_key_string': unicode(course_key)})
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
