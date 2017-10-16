@@ -243,7 +243,7 @@
 
     @include box-sizing(border-box);
 
-    .timestamp{
+    .timestamp {
       margin-top: ($baseline*0.75);
       padding: 15px 0 0 10px;
       border-top: 1px solid $light-gray;
@@ -597,7 +597,7 @@
     margin-top: ($baseline*2);
   }
 
-  #cheatsheet-body pre{
+  #cheatsheet-body pre {
     color: $black;
     text-align: left;
     background: #eee;

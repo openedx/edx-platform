@@ -1,5 +1,4 @@
 @function new-breakpoint($query:$feature $value $columns, $total-columns: $grid-columns) {
-
   @if length($query) == 1 {
     $query: $default-feature nth($query, 1) $total-columns;
   }

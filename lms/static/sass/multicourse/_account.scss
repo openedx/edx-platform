@@ -404,7 +404,7 @@
 
       // states - all
       &.disabled, &.submitted {
-        color: rgba(0,0,0,.25);
+        color: rgba(0, 0,0,.25);
 
         label {
           cursor: text;
@@ -416,7 +416,7 @@
 
         textarea, input {
           background: $container-bg;
-          color: rgba(0,0,0,.25);
+          color: rgba(0, 0,0,.25);
         }
       }
 
@@ -434,7 +434,7 @@
       // states - disabled
       &.disabled {
         label::after {
-          color: rgba(0,0,0,.35);
+          color: rgba(0, 0,0,.35);
           content: "(Disabled Currently)";
         }
       }

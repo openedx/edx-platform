@@ -781,7 +781,7 @@
               width: flex-grid(9, 12);
               display: inline-block;
 
-              .message-copy-bold{
+              .message-copy-bold {
                 font-weight: 600;
               }
             }
@@ -804,7 +804,7 @@
             @include left($baseline/2);
             @include padding(($baseline * 0.4), 0, ($baseline * 0.4), ($baseline * 0.75));
 
-            .action-upgrade-icon{
+            .action-upgrade-icon {
               @include float(left);
 
               display: inline;
@@ -1403,7 +1403,7 @@
   }
 }
 
-p.course-block{
+p.course-block {
   border-style: solid;
   border-color: #e3dc86;
   padding: ($baseline/4);
@@ -1412,7 +1412,7 @@ p.course-block{
 
 }
 
-.enter-course-blocked{
+.enter-course-blocked {
   @include box-sizing(border-box);
   @include float(left);
 
@@ -1440,7 +1440,7 @@ p.course-block{
   }
 }
 
-a.disable-look{
+a.disable-look {
   color: #808080;
 }
 
@@ -1558,7 +1558,7 @@ a.fade-cover {
     border: $palette-info-border 1px solid;
     padding: 5px;
 
-    .message-title{
+    .message-title {
       margin-bottom: 0;
     }
 

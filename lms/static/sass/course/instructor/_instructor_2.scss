@@ -13,7 +13,10 @@
   }
 }
 
-#ui-datepicker-div{z-index: 12000 !important; width: 16.5em !important}
+#ui-datepicker-div {
+  z-index: 12000 !important;
+  width: 16.5em !important;
+}
 
 
 .instructor-dashboard-wrapper-2 {
@@ -27,7 +30,7 @@
     @include font-size(16);
   }
 
-  .studio-edit-link{
+  .studio-edit-link {
     position: absolute;
     top: 40px;
 
@@ -83,7 +86,7 @@
   // TYPE: confirm
   .msg-confirm {
     display: none;
-    background: tint($confirm-color,95%);
+    background: tint($confirm-color, 95%);
     border-top: 2px solid $confirm-color;
     color: $confirm-color;
   }
@@ -98,9 +101,9 @@
     }
   }
 
-  .msg-success{
+  .msg-success {
     border-top: 2px solid $confirm-color;
-    background: tint($confirm-color,95%);
+    background: tint($confirm-color, 95%);
     color: $confirm-color;
   }
 
@@ -141,7 +144,7 @@
       }
     }
   }
-  
+
   .btn-blue {
     @extend %btn-primary-blue;
 
@@ -526,22 +529,23 @@
 
       input[name="send_to"] {
         float: left;
-        margin-top: .3em;
-        margin-left: .1em;
+        margin-top: 0.3em;
+        margin-left: 0.1em;
       }
 
-      input[name="send_to"]+label {
+      input[name="send_to"] + label {
         display: block;
         padding-left: 1.3em;
         margin-bottom: 0;
       }
 
-      input[name="send_to"]:checked+label {
+      input[name="send_to"]:checked + label {
         // "bolds" the text without causing a width recalculation
         text-shadow: 1px 0 0;
       }
 
-      input[name="send_to"]:focus+label, input[name="send_to"]:hover:not([disabled])+label {
+      input[name="send_to"]:focus + label,
+      input[name="send_to"]:hover:not([disabled]) + label {
         background-color: #efefef;
 
         * {
@@ -549,7 +553,7 @@
         }
       }
 
-      input[name="send_to"]:disabled+label {
+      input[name="send_to"]:disabled + label {
         font-weight: lighter;
         background-color: $light-gray3
       }
@@ -596,7 +600,7 @@
     &:last-child {
       margin-bottom: 0;
     }
-        
+
     legend {
       // use the same styles as H3s
       font-size: 1.2em;
@@ -671,14 +675,14 @@
         border-bottom: 8px solid transparent;
       }
     }
-    
+
     /* ***
      * Ideally we want to handle functionality with JS.
-     * This functionality should eventually be moved into CS/JS, and out of here. */ 
-    .has-hint:hover > .hint {    
+     * This functionality should eventually be moved into CS/JS, and out of here. */
+    .has-hint:hover > .hint {
       @include left($baseline*10);
     }
-    
+
     .has-hint input:focus ~ .hint {
       @include left($baseline*10);
     }
@@ -799,7 +803,8 @@
         color: $lighter-base-font-color;
         cursor: pointer;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           color: $alert-color;
         }
       }
@@ -1091,7 +1096,7 @@
     text-shadow: none;
     padding: 0;
     color: $uxpl-blue-base;
-        
+
     &:hover,
     &:focus {
       text-decoration: underline;
@@ -1385,7 +1390,7 @@
       padding-top: ($baseline/2);
     }
 
-    .divided-discussion-text{
+    .divided-discussion-text {
       color: $uxpl-blue-base;
     }
 
@@ -1446,7 +1451,7 @@
 
 // view - data download
 // --------------------
-.instructor-dashboard-wrapper-2 section.idash-section#data_download{
+.instructor-dashboard-wrapper-2 section.idash-section#data_download {
   input {
     margin-bottom: 1em;
     line-height: 1.3em;
@@ -1658,13 +1663,13 @@ input[name="subject"] {
     height: 26px;
     line-height: 26px;
 
-    span{
+    span {
       @include float(right);
 
       font-size: 16px;
       font-weight: bold;
 
-      span{
+      span {
         background: #ddd;
         padding: 2px 9px;
         border-radius: 2px;
@@ -1674,7 +1679,7 @@ input[name="subject"] {
     }
   }
 
-  span.tip{
+  span.tip {
     display: block;
     padding: 10px 15px;
     border-top: 1px solid #ddd;
@@ -1683,7 +1688,7 @@ input[name="subject"] {
     color: #3c3c3c;
     line-height: 30px;
 
-    .add{
+    .add {
       @include button(simple, $uxpl-blue-base);
 
       @extend .button-reset;
@@ -1696,7 +1701,7 @@ input[name="subject"] {
 
 }
 
-#e-commerce{
+#e-commerce {
   input[name='list-order-sale-csv'] {
     @include margin-right(14px);
   }
@@ -1749,7 +1754,7 @@ input[name="subject"] {
     display: none;
   }
 
-  .content{
+  .content {
     padding: 0 !important;
   }
 
@@ -1770,15 +1775,15 @@ input[name="subject"] {
       border-bottom: 1px solid #f3f3f3;
     }
 
-    tr.always-gray{
+    tr.always-gray {
       background: #eee !important;
       border-top: 2px solid $white;
     }
 
-    tr.always-white{
+    tr.always-white {
       background: #fff !important;
 
-      td{
+      td {
         padding: ($baseline*1.5) 0 ($baseline/2);
       }
     }
@@ -1792,7 +1797,7 @@ input[name="subject"] {
         width: 120px;
       }
 
-      th:first-child{
+      th:first-child {
         padding-left: $baseline;
       }
 
@@ -1826,7 +1831,7 @@ input[name="subject"] {
           width: 60px;
         }
 
-        &.c_dsc{
+        &.c_dsc {
           width: 200px;
           word-wrap: break-word;
         }
@@ -1834,22 +1839,22 @@ input[name="subject"] {
     }
 
     // in_active coupon rows style
-    .inactive_coupon{
+    .inactive_coupon {
       background:  #fff0f0 !important;
       text-decoration: line-through;
-      color: rgba(51,51,51,0.2);
+      color: rgba(51, 51, 51, 0.2);
       border-bottom: 1px solid #fff;
 
       td {
         a {
-          color:  rgba(51,51,51,0.2);
+          color: rgba(51, 51, 51, 0.2);
         }
       }
     }
     // in_active coupon rows style
-    .expired_coupon{
-      background:  #feefb3 !important;
-      color: rgba(51,51,51,0.2);
+    .expired_coupon {
+      background: #feefb3 !important;
+      color: rgba(51, 51, 51, 0.2);
       border-bottom: 1px solid #fff;
 
       td:nth-child(3) {
@@ -1865,7 +1870,7 @@ input[name="subject"] {
         line-height: normal;
         font-size: 14px;
 
-        span.old-price{
+        span.old-price {
           top: -1px;
 
           @include left(-75px);
@@ -1877,7 +1882,7 @@ input[name="subject"] {
         }
       }
 
-      td:nth-child(5),td:first-child{
+      td:nth-child(5),td:first-child {
         @include padding-left($baseline);
       }
 
@@ -1895,8 +1900,8 @@ input[name="subject"] {
         text-align: center;
       }
 
-      td{
-        a.edit-right{
+      td {
+        a.edit-right {
           @include margin-left(15px);
         }
       }
@@ -1910,7 +1915,7 @@ input[name="subject"] {
   }
   // coupon edit and add modals
   #add-coupon-modal, #invalidate_registration_code_modal, #edit-coupon-modal,
-  #set-course-mode-price-modal, #registration_code_generation_modal{
+  #set-course-mode-price-modal, #registration_code_generation_modal {
     .inner-wrapper {
       background: $white;
     }
@@ -1960,8 +1965,8 @@ input[name="subject"] {
       background: #fbf2f3;
     }
 
-    ol.list-input{
-      li{
+    ol.list-input {
+      li {
         width: 278px;
 
         @include float(left);
@@ -1991,12 +1996,12 @@ input[name="subject"] {
         }
       }
 
-      li:last-child{
+      li:last-child {
         margin-bottom: 0 !important;
       }
     }
 
-    table.tb_registration_code_status{
+    table.tb_registration_code_status {
       margin-top: $baseline;
       color: #555;
 
@@ -2014,15 +2019,15 @@ input[name="subject"] {
         tr td:last-child {
           text-align: center;
 
-          a:first-child{
+          a:first-child {
             margin-right: 10px;
           }
         }
       }
     }
 
-    form#generate_codes ol.list-input{
-      li{
+    form#generate_codes ol.list-input {
+      li {
         width: 278px;
 
         @include float(left);
@@ -2041,7 +2046,7 @@ input[name="subject"] {
       }
 
       li#generate-registration-modal-field-city, li#generate-registration-modal-field-state,
-      li#generate-registration-modal-field-zipcode{
+      li#generate-registration-modal-field-zipcode {
         width: 205px;
       }
 
@@ -2067,7 +2072,7 @@ input[name="subject"] {
         @include margin-left(15px !important);
       }
 
-      li:last-child{
+      li:last-child {
         label {
           @include float(right);
           @include right(27px);
@@ -2096,7 +2101,7 @@ input[name="subject"] {
       }
     }
 
-    li#set-course-mode-modal-field-price{
+    li#set-course-mode-modal-field-price {
       width: 100%;
 
       label.required::after {
@@ -2105,7 +2110,7 @@ input[name="subject"] {
       }
     }
 
-    li#set-course-mode-modal-field-currency{
+    li#set-course-mode-modal-field-currency {
       @include margin-left(0px !important);
 
       select {
@@ -2206,12 +2211,25 @@ input[name="subject"] {
     }
   }
 
-  #add-coupon-modal{
-    ol.list-input{
-      li{
-        input[type="checkbox"]#expiry-check , input[type="checkbox"]#expiry-check + label {display: inline-block; width: auto;margin-top: 10px;}
-        &.full-width{width: 100%;}
-        input#coupon_expiration_date{width: 278px;display: inline-block;float: right;}
+  #add-coupon-modal {
+    ol.list-input {
+      li {
+        input[type="checkbox"]#expiry-check,
+        input[type="checkbox"]#expiry-check + label {
+          display: inline-block;
+          width: auto;
+          margin-top: 10px;
+        }
+
+        &.full-width {
+          width: 100%;
+        }
+
+        input#coupon_expiration_date {
+          width: 278px;
+          display: inline-block;
+          float: right;
+        }
       }
     }
   }
@@ -2229,7 +2247,7 @@ input[name="subject"] {
 }
 
 input[name="subject"] {
-  width:600px;
+  width: 600px;
 }
 
 .enrollment-wrapper {
@@ -2248,13 +2266,13 @@ input[name="subject"] {
 
     @include padding-left(25px);
 
-    span{
+    span {
       @include float(right);
 
       font-size: 16px;
       font-weight: bold;
 
-      span{
+      span {
         float: none;
         padding: 2px 9px;
         background: #ddd;
@@ -2264,7 +2282,7 @@ input[name="subject"] {
     }
   }
 
-  span.tip{
+  span.tip {
     display: block;
     padding: 10px 15px;
     border-top: 1px solid #ddd;
@@ -2273,7 +2291,7 @@ input[name="subject"] {
     color: #3c3c3c;
     line-height: 30px;
 
-    .add{
+    .add {
       @include button(simple, $uxpl-blue-base);
 
       @extend .button-reset;
@@ -2301,7 +2319,7 @@ input[name="subject"] {
     color: #3c3c3c;
     line-height: 30px;
 
-    .add{
+    .add {
       @include button(simple, $uxpl-blue-base);
 
       @extend .button-reset;
@@ -2317,7 +2335,7 @@ input[name="subject"] {
 
     @include padding(($baseline/2) 15px ($baseline/2) 1px);
 
-    .add{
+    .add {
       font-size: em(13);
     }
   }
@@ -2333,7 +2351,7 @@ input[name="subject"] {
     color: #3c3c3c;
     line-height: 30px;
 
-    .add{
+    .add {
       @include button(simple, $uxpl-blue-base);
 
       @extend .button-reset;
@@ -2360,7 +2378,7 @@ input[name="subject"] {
         text-align: center;
       }
 
-      th:first-child{
+      th:first-child {
         padding-left: $baseline;
       }
 
@@ -2434,7 +2452,7 @@ input[name="subject"] {
         font-size: 14px;
       }
 
-      td:first-child{
+      td:first-child {
         @include padding-left($baseline);
       }
 
@@ -2602,7 +2620,7 @@ input[name="subject"] {
   }
 
   .certificates-wrapper {
-    .message{
+    .message {
       @extend %exception-message;
     }
   }
@@ -2617,23 +2635,23 @@ input[name="subject"] {
     border-top: 7px solid #646464;
   }
 
-  .certificate-generation-history{
-    table{
-      thead{
+  .certificate-generation-history {
+    table {
+      thead {
         tr {
-          td.task-name{
+          td.task-name {
             width: 150px;
           }
 
-          td.task-date{
+          td.task-date {
             width: 200px;
           }
         }
       }
 
-      tbody{
+      tbody {
         tr {
-          td{
+          td {
             padding: 5px;
             vertical-align: middle;
             text-align: left;;
@@ -2685,7 +2703,7 @@ input[name="subject"] {
         text-align: left;
         color: $gray;
 
-        &.date{
+        &.date {
           width: 150px;
         }
 

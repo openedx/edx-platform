@@ -31,11 +31,13 @@
 @function container-span($span: $span) {
   @if length($span) == 3 {
     $container-columns: nth($span, 3);
+
     @return $container-columns;
   }
 
   @else if length($span) == 2 {
     $container-columns: nth($span, 2);
+
     @return $container-columns;
   }
 
@@ -49,11 +51,13 @@
 
   @if length($shift) == 3 {
     $container-columns: nth($shift, 3);
+
     @return $container-columns;
   }
 
   @else if length($shift) == 2 {
     $container-columns: nth($shift, 2);
+
     @return $container-columns;
   }
 
@@ -95,7 +99,9 @@
   
   @if $layout == LTR or $layout == RTL {
     $direction: direction-from-layout($layout);
-  } @else {
+  }
+
+  @else {
     $direction: direction-from-layout($default);
   }
 
@@ -107,7 +113,9 @@
 
   @if $layout == LTR {
     $direction: right;
-  } @else {
+  }
+
+  @else {
     $direction: left;
   }
 

@@ -39,7 +39,8 @@
 
         @include transition(none);
 
-        div#location_sub, div#language_sub {
+        div#location_sub,
+        div#language_sub {
           font-weight: bold;
           display: inline-block;
 
@@ -53,9 +54,6 @@
 
               margin: lh(0.5) 0;
               width: 100%;
-            }
-
-            &[type="input"]{
             }
           }
 
@@ -80,7 +78,8 @@
           text-transform: uppercase;
           top: 9px;
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             color: #555;
           }
         }
@@ -111,7 +110,8 @@
           text-transform: uppercase;
           top: 9px;
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             color: #555;
           }
         }
@@ -171,7 +171,8 @@
         padding: 5px 18px 6px;
         text-align: center;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           text-decoration: none;
         }
       }
@@ -182,7 +183,7 @@
       width: 100%;
     }
 
-    > .credit-eligibility{
+    > .credit-eligibility {
       border-top: 1px solid $lightGrey;
       margin-top: lh();
 
@@ -205,7 +206,7 @@
           @include padding-left(0.2em);
         }
 
-        > .detail-collapse{
+        > .detail-collapse {
           border: none;
           box-shadow: none;
           background: $white;
@@ -216,7 +217,7 @@
             padding: lh(0.25);
           }
 
-          > span{
+          > span {
             color: inherit;
           }
         }
@@ -224,7 +225,7 @@
         > .requirement-container {
           padding: lh();
 
-          > .requirement{
+          > .requirement {
             border-bottom: 1px solid $lightGrey;
             padding: lh(0.5);
 
@@ -233,26 +234,26 @@
               display: inline-block;
             }
 
-            > .requirement-status{
+            > .requirement-status {
               width: bi-app-invert-percentage(60%);
 
               @include float(right);
 
               display: inline-block;
 
-              .fa-times{
+              .fa-times {
                 @extend %t-icon6;
 
                 color: $alert-color;
               }
 
-              .fa-check{
+              .fa-check {
                 @extend %t-icon6;
 
                 color: $success-color;
               }
 
-              > .not-achieve{
+              > .not-achieve {
                 color: $darkGrey;
               }
             }
@@ -300,7 +301,7 @@
           width: flex-grid(7, 9);
 
           > div {
-            padding:0 0 lh() 0;
+            padding: 0 0 lh() 0;
 
             &:first-child {
               padding-top: 0;

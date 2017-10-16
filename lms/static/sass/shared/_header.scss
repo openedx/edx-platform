@@ -212,7 +212,7 @@
     .user-dropdown-menu, .dropdown-menu {
       background: $white;
       border-radius: 4px;
-      box-shadow: 0 2px 2px 0 rgba(0,0,0, 0.3);
+      box-shadow: 0 2px 2px 0 rgba(0, 0,0, 0.3);
       border: 1px solid $gray-l3;
       display: none;
       margin-top: 0;
@@ -295,7 +295,7 @@
 
     @include float(left);
 
-    .tab-nav-item{
+    .tab-nav-item {
       display: flex;
       margin: 0;
       text-transform: none;
@@ -304,19 +304,19 @@
 
       justify-content: center;
 
-      .tab-nav-link{
+      .tab-nav-link {
         font-size: em(16);
         color: $gray;
         padding: 5px 25px 23px;
         display: inline-block;
 
         &:hover,
-        &:focus{
+        &:focus {
           border-bottom: 4px solid $courseware-border-bottom-color;
         }
       }
 
-      .active{
+      .active {
         border-bottom: 4px solid $black-t3 !important;
       }
     }
@@ -437,7 +437,7 @@
   .nav-global {
     @include float(left);
 
-    .tab-nav-item{
+    .tab-nav-item {
       display: flex;
       margin: 0;
       text-transform: none;
@@ -446,19 +446,19 @@
 
       justify-content: center;
 
-      .tab-nav-link{
+      .tab-nav-link {
         font-size: em(16);
         color: $gray;
         display: inline-block;
         padding: 5px 25px 19px;
 
         &:hover,
-        &:focus{
+        &:focus {
           border-bottom: 4px solid $courseware-border-bottom-color;
         }
       }
 
-      .active{
+      .active {
         border-bottom: 4px solid $black-t3 !important;
       }
     }
@@ -624,7 +624,7 @@
     .user-dropdown-menu, .dropdown-menu {
       background: $border-color-4;
       border-radius: 4px;
-      box-shadow: 0 2px 24px 0 rgba(0,0,0, 0.3);
+      box-shadow: 0 2px 24px 0 rgba(0, 0,0, 0.3);
       border: 1px solid $border-color-3;
       display: none;
       margin-top: 0;
