@@ -1332,6 +1332,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         """
         # mock the response data from Discovery that updates the context for template lookup and rendering
         mock_get_course_run_details.return_value = self.mock_course_run_details
+        mock_get_org_id.return_value = 1
         CertificateGenerationCourseSetting.set_include_hours_of_effort_for_course(self.course.id, include_effort)
         CertificateGenerationCourseSetting.set_language_specific_templates_enabled_for_course(self.course.id, include_effort)
         self._add_course_certificates(count=1, signatory_count=2)
@@ -1340,14 +1341,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             user_id=self.user.id,
             course_id=unicode(self.course.id)
         )
-        with patch('certificates.api.get_course_organization_id') as mock_get_org_id:
-            mock_get_org_id.return_value = 1
-            response = self.client.get(test_url)
-            self.assertEqual(response.status_code, 200)
-            if include_effort:
-                self.assertIn('hours of effort: 40', response.content)
-            else:
-                self.assertNotIn('hours of effort', response.content)
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
+        if include_effort:
+            self.assertIn('hours of effort: 40', response.content)
+        else:
+            self.assertNotIn('hours of effort', response.content)
 
     @ddt.data(True, False)
     @patch('certificates.views.webview.get_course_run_details')
