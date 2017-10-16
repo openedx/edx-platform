@@ -3034,6 +3034,8 @@ STUDENTMODULEHISTORYEXTENDED_OFFSET = 10000
 
 AUDIT_CERT_CUTOFF_DATE = None
 
+# Roles to be excluded from course metrics aggregations
+AGGREGATION_EXCLUDE_ROLES = ['observer']
 ################################### EDX-NOTIFICATIONS SUBSYSTEM ######################################
 
 INSTALLED_APPS += (
