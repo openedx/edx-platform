@@ -12,7 +12,7 @@ from collections import namedtuple
 import ddt
 from datetime import datetime, timedelta
 from django.conf import settings
-from django.conf.urls import patterns, url, include
+from django.conf.urls import url, include
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.test import TestCase
@@ -54,8 +54,7 @@ class OAuth2AuthenticationDebug(authentication.OAuth2AuthenticationAllowInactive
     allow_query_params_token = True
 
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
     url(
         r'^oauth2-test/$',
@@ -69,7 +68,7 @@ urlpatterns = patterns(
             permission_classes=[permissions.TokenHasReadWriteScope]
         )
     ),
-)
+]
 
 
 @attr(shard=2)
