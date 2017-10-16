@@ -3,6 +3,7 @@ Views for on-boarding app.
 """
 import json
 import os
+import logging
 
 from path import Path as path
 
@@ -17,10 +18,11 @@ from lms.djangoapps.onboarding_survey.models import (
     UserInfoSurvey,
     InterestsSurvey,
     OrganizationSurvey,
-    Organization
-)
+    Organization)
 from lms.djangoapps.onboarding_survey.history import update_history
 from onboarding_survey import forms
+
+log = logging.getLogger("edx.onboarding_survey")
 
 
 def update_user_history(user):
