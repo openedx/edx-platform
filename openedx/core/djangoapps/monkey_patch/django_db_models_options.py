@@ -15,6 +15,8 @@ def patch():
     """
     Monkey-patch the Options class.
     """
+    # TODO: Remove Django 1.11 upgrade shim
+    # SHIM: Django versions >= 1.10 includes this functionality natively.
     if django.VERSION[0] == 1 and django.VERSION < 10:
         def _expire_cache(self, forward=True, reverse=True):
             # pylint: disable=missing-docstring
