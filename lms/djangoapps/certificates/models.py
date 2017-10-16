@@ -978,7 +978,7 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
 
         Arguments:
             course_key (CourseKey): The identifier for the course.
-            is_enabled (boolean): Whether to include or exclude Hours of Effort.
+            is_included (boolean): Whether to include or exclude Hours of Effort.
 
         """
         default = {
