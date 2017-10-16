@@ -316,6 +316,8 @@ def remove_credit_requirement_status(username, course_key, req_namespace, req_na
         )
         return
 
+    req_to_remove = req_to_remove[0]
+
     # Remove the requirement status
     CreditRequirementStatus.remove_requirement_status(
         username, req_to_remove
