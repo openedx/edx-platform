@@ -252,7 +252,7 @@ def _update_course_context(request, context, course, course_key, platform_name):
     course_certificate_settings = CertificateGenerationCourseSetting.get(course_key)
     if course_certificate_settings and course_certificate_settings.language_specific_templates_enabled:
         fields = ['content_language']
-        if course_certificate_settings and course_certificate_settings.include_hours_of_effort:
+        if course_certificate_settings.include_hours_of_effort:
             fields.extend(['start', 'end', 'max_effort'])
         course_run_data = get_course_run_details(course_key, fields)
         if course_run_data.get('start') and course_run_data.get('end') and course_run_data.get('max_effort'):
