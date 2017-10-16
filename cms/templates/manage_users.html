@@ -119,7 +119,7 @@ from openedx.core.djangolib.js_utils import (
       ManageCourseUsersFactory(
         "${context_course.display_name_with_default | h}",
         ${users | n, dump_js_escaped_json},
-        "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(context_course.id), 'email': '@@EMAIL@@'}) | n, js_escaped_string}",
+        "${reverse('course_team_handler', kwargs={'course_key_string': unicode(context_course.id), 'email': '@@EMAIL@@'}) | n, js_escaped_string}",
         ${request.user.id | n, dump_js_escaped_json},
         ${allow_actions | n, dump_js_escaped_json}
       );
