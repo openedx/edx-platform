@@ -474,7 +474,7 @@ def course_registration_features(features, registration_codes, csv_type):
 
         course_registration_dict['redeem_code_url'] = 'http://{base_url}{redeem_code_url}'.format(
             base_url=site_name,
-            redeem_code_url=reverse('register_code_redemption',
+            redeem_code_url=reverse('shoppingcart:register_code_redemption',
                                     kwargs={'registration_code': registration_code.code})
         )
         # we have to capture the redeemed_by value in the case of the downloading and spent registration

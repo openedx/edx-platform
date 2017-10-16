@@ -424,10 +424,10 @@ class DashboardTest(ModuleStoreTestCase):
 
         cart = shoppingcart.models.Order.get_cart_for_user(self.user)
         shoppingcart.models.PaidCourseRegistration.add_to_order(cart, self.course.id)
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': course_reg_code.code})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': course_reg_code.code})
         self.assertEqual(resp.status_code, 200)
 
-        redeem_url = reverse('register_code_redemption', args=[course_reg_code.code])
+        redeem_url = reverse('shoppingcart:register_code_redemption', args=[course_reg_code.code])
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
