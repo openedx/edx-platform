@@ -885,6 +885,27 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         app_label = "certificates"
 
     @classmethod
+    def get(cls, course_key):
+        """ Retrieve certificate generation settings for a course.
+
+        Arguments:
+            course_key (CourseKey): The identifier for the course.
+
+        Returns:
+            dict
+        """
+        try:
+            latest = cls.objects.filter(course_key=course_key).latest()
+        except cls.DoesNotExist:
+            return {}
+        else:
+            return {
+                'self_generation_enabled': latest.self_generation_enabled,
+                'language_specific_templates_enabled': latest.language_specific_templates_enabled,
+                'include_hours_of_effort': latest.include_hours_of_effort
+            }
+
+    @classmethod
     def is_self_generation_enabled_for_course(cls, course_key):
         """Check whether self-generated certificates are enabled for a course.
 
@@ -920,24 +941,6 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         )
 
     @classmethod
-    def is_language_specific_templates_enabled_for_course(cls, course_key):
-        """Check whether language-specific certificates are enabled for a course.
-
-        Arguments:
-            course_key (CourseKey): The identifier for the course.
-
-        Returns:
-            boolean
-
-        """
-        try:
-            latest = cls.objects.filter(course_key=course_key).latest()
-        except cls.DoesNotExist:
-            return False
-        else:
-            return latest.language_specific_templates_enabled
-
-    @classmethod
     def set_language_specific_templates_enabled_for_course(cls, course_key, is_enabled):
         """Enable or disable language-specific certificates for a course.
 
@@ -953,24 +956,6 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
             course_key=course_key,
             defaults=default
         )
-
-    @classmethod
-    def is_hours_of_effort_included_for_course(cls, course_key):
-        """Check whether hours of effort are meant to be included in a course's certificates
-
-        Arguments:
-            course_key (CourseKey): The identifier for the course.
-
-        Returns:
-            boolean
-
-        """
-        try:
-            latest = cls.objects.filter(course_key=course_key).latest()
-        except cls.DoesNotExist:
-            return None
-        else:
-            return latest.include_hours_of_effort
 
     @classmethod
     def set_include_hours_of_effort_for_course(cls, course_key, is_included):
