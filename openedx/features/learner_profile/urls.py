@@ -6,13 +6,12 @@ from django.conf import settings
 from django.conf.urls import url
 
 from views.learner_achievements import LearnerAchievementsFragmentView
+from openedx.features.learner_profile.views.learner_profile import learner_profile
 
 urlpatterns = [
     url(
-        r'^{username_pattern}$'.format(
-            username_pattern=settings.USERNAME_PATTERN,
-        ),
-        'openedx.features.learner_profile.views.learner_profile.learner_profile',
+        r'^{username_pattern}$'.format(username_pattern=settings.USERNAME_PATTERN,),
+        learner_profile,
         name='learner_profile',
     ),
     url(
