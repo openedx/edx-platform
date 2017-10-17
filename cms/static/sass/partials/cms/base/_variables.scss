@@ -37,17 +37,17 @@ $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
 
 // +Colors - Utility
 // ====================
-$transparent: rgba(0,0,0,0) !default; // used when color value is needed for UI width/transitions but element is transparent
+$transparent: rgba(0, 0, 0, 0) !default; // used when color value is needed for UI width/transitions but element is transparent
 
 // +Colors - UXPL new pattern library colors
 // ====================
 $uxpl-blue-base: rgb(0, 117, 180) !default; // wcag2a compliant
 $uxpl-blue-hover-active: rgb(6, 86, 131) !default; // wcag2a compliant
-$uxpl-light-blue-base: rgb(242, 248, 251) !default
+$uxpl-light-blue-base: rgb(242, 248, 251) !default;
 
 $uxpl-green-base: rgb(0, 129, 0) !default; // wcag2a compliant
 $uxpl-green-hover-active: rgb(0, 155, 0) !default; // wcag2a compliant
-$uxpl-green-dark-hover-active: rgb(0, 88,0) !default;
+$uxpl-green-dark-hover-active: rgb(0, 88, 0) !default;
 
 $uxpl-pink-base: rgb(194, 56, 125) !default; // wcag2a compliant
 $uxpl-pink-hover-active: lighten($uxpl-pink-base, 7%) !default; // wcag2a compliant
@@ -58,7 +58,7 @@ $uxpl-primary-accent: rgb(14, 166, 236) !default;
 
 // +Colors - Primary
 // ====================
-$black: rgb(0,0,0) !default;
+$black: rgb(0, 0, 0) !default;
 $black-t0: rgba($black, 0.125) !default;
 $black-t1: rgba($black, 0.25) !default;
 $black-t2: rgba($black, 0.5) !default;
@@ -83,7 +83,7 @@ $gray-d1: shade($gray, 20%) !default;
 $gray-d2: shade($gray, 40%) !default;
 $gray-d3: shade($gray, 60%) !default;
 $gray-d4: shade($gray, 80%) !default;
-$gray-u1: #ECF0F1;
+$gray-u1: #ecf0f1;
 
 
 // These define button styles similar to LMS
@@ -228,9 +228,9 @@ $color-copy-emphasized: $gray-d2 !default;
 // +Timing
 // ====================
 // used for animation/transition mixin syncing
-$tmg-s3: 3.0s;
-$tmg-s2: 2.0s;
-$tmg-s1: 1.0s;
+$tmg-s3: 3s;
+$tmg-s2: 2s;
+$tmg-s1: 1s;
 $tmg-avg: 0.75s;
 $tmg-f1: 0.5s;
 $tmg-f2: 0.25s;
@@ -277,10 +277,10 @@ $sidebar-color: rgb(246, 246, 246) !default;
 
 // type
 $sans-serif: $f-sans-serif;
-$body-line-height: golden-ratio(.875em, 1);
+$body-line-height: golden-ratio(0.875em, 1);
 
 // carried over from LMS for xmodules
-$action-primary-active-bg: #1AA1DE !default; // $m-blue
+$action-primary-active-bg: #1aa1de !default; // $m-blue
 $very-light-text: $white !default;
 
 $color-background-alternate: rgb(242, 248, 251) !default;
@@ -305,4 +305,4 @@ $state-danger-text: $black !default;
 $state-danger-bg: #f2dede !default;
 $state-danger-border: darken($state-danger-bg, 5%) !default;
 
-$text-dark-black-blue: #2C3E50;
+$text-dark-black-blue: #2c3e50;
