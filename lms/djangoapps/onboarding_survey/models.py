@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 import logging
 
+from common.lib.nodebb_client.client import NodeBBClient
+
 log = logging.getLogger("edx.onboarding_survey")
 
 
@@ -327,22 +329,24 @@ class History(models.Model):
 def sync_user_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
     """ Sync user information with  """
     user = instance.user
-    extended_profile = user.extended_profile
-    user_info_survey = user.user_info_survey
+    try:
+        extended_profile = user.extended_profile
+        user_info_survey = user.user_info_survey
+    except UserInfoSurvey.DoesNotExist:
+        return
 
-    import requests
     data_to_sync = {
         "first_name": extended_profile.first_name,
         "last_name": extended_profile.last_name,
-        "location": "{city}, {country}".format(city=user_info_survey.city_of_residence,
-                                               country=user_info_survey.country_of_residence),
+        "city_of_residence": user_info_survey.city_of_residence,
+        "country_of_residence": user_info_survey.country_of_residence
     }
 
-    r = requests.put("http://community.philanthropyu.org/api/v2/users", data=data_to_sync)
-    if r.status_code == requests.codes.ok:
-        pass
-        log.inf('updated user info synced with nodebb for %s' % user.email)
+    status_code, response_body = NodeBBClient().users.update_profile("zee", kwargs=data_to_sync)
 
-    elif r.status_code == requests.codes.bad_request or r.status_code == requests.codes.page_not_found:
-        log.error('unable to sync user info with nodebb for %s' % user.email)
-        r.raise_for_status()
+    if status_code != 200:
+        log.error(
+            "Error: Can not update user({}) on nodebb due to {}".format(user.username, response_body)
+        )
+    else:
+        log.info('Success: User({}) has been updated on nodebb'.format(user.username))
