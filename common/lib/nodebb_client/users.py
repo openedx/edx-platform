@@ -13,3 +13,7 @@ class ForumUser(User):
     def activate(self, username, **kwargs):
         payload = {'username': username}
         return self.client.post('/api/v2/users/activate', **payload)
+
+    def update_profile(self, username, **kwargs):
+        kwargs.update({'username': username})
+        return self.client.post('/api/v2/users/update', **kwargs)
