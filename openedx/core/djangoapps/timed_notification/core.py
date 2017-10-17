@@ -44,11 +44,12 @@ def send_course_notification_email(course, mako_template_path, context, to_list=
     log.info("Sending email for course %s", course)
     if to_list is None:
         to_list = CourseEnrollment.objects.users_enrolled_in(course.id)
-
+    log.info("Users list %s", to_list)
     total_recipients = len(to_list)
     recipient_num = 0
     total_recipients_successful = 0
     total_recipients_failed = 0
+    log.info("Setting up reference of user information")
     recipients_info = Counter()
 
     log.info(
@@ -57,16 +58,24 @@ def send_course_notification_email(course, mako_template_path, context, to_list=
     )
 
     try:
+        log.info("Getting email connection")
         connection = get_connection()
+        log.info("Opening email connection")
         connection.open()
 
+        log.info("Before loop through to the user-list")
         for current_recipient in to_list:
             recipient_num += 1
+            log.info("Getting user email")
             email = current_recipient.email
+            log.info("Setting up subject of the email")
             subject = settings.NOTIFICATION_EMAIL_SUBJECT
-            context['full_name'] = current_recipient.extended_profile.first_name + current_recipient.extended_profile.\
-                last_name
+            log.info("Adding full name in the context")
+            context['full_name'] = current_recipient.extended_profile.first_name + " " + current_recipient.\
+                extended_profile.last_name
+            log.info("Constructing email template")
             template = render_to_string(mako_template_path, context)
+            log.info("Instantiating email message")
             email_msg = EmailMultiAlternatives(
                 subject=subject,
                 body=template,
@@ -74,6 +83,7 @@ def send_course_notification_email(course, mako_template_path, context, to_list=
                 to=[email],
                 connection=connection
             )
+            log.info("Adding html template")
             email_msg.attach_alternative(template, 'text/html')
 
             try:
@@ -84,7 +94,9 @@ def send_course_notification_email(course, mako_template_path, context, to_list=
                     current_recipient.username,
                     email
                 )
+                log.info("Just before sending email")
                 connection.send_messages([email_msg])
+                log.info("After sending email")
 
             except SMTPDataError as exc:
                 # According to SMTP spec, we'll retry error codes in the 4xx range.  5xx range indicates hard failure.

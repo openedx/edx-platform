@@ -281,6 +281,7 @@ def get_languages(request):
     return HttpResponse(data, mime_type)
 
 
+@login_required
 def update_account_settings(request):
     """
     View to handle update of registration extra fields
