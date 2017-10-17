@@ -198,6 +198,7 @@ def issued_certificates(course_key, features):
 
     # Report run date
     for data in generated_certificates:
+        data['course_id'] = str(data['course_id'])
         data['report_run_date'] = report_run_date
 
     return generated_certificates
@@ -474,7 +475,7 @@ def course_registration_features(features, registration_codes, csv_type):
 
         course_registration_dict['redeem_code_url'] = 'http://{base_url}{redeem_code_url}'.format(
             base_url=site_name,
-            redeem_code_url=reverse('register_code_redemption',
+            redeem_code_url=reverse('shoppingcart:register_code_redemption',
                                     kwargs={'registration_code': registration_code.code})
         )
         # we have to capture the redeemed_by value in the case of the downloading and spent registration
@@ -488,7 +489,6 @@ def course_registration_features(features, registration_codes, csv_type):
             except ObjectDoesNotExist:
                 pass
 
-        course_registration_dict['course_id'] = course_registration_dict['course_id'].to_deprecated_string()
         return course_registration_dict
     return [extract_course_registration(code, features, csv_type) for code in registration_codes]
 

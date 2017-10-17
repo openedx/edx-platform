@@ -4,7 +4,6 @@ courses that have finished, and put their cert requests on the queue.
 """
 import datetime
 import logging
-from optparse import make_option
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
@@ -34,32 +33,30 @@ class Command(BaseCommand):
     queue to be generated.
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option('-n', '--noop',
-                    action='store_true',
-                    dest='noop',
-                    default=False,
-                    help="Don't add certificate requests to the queue"),
-        make_option('--insecure',
-                    action='store_true',
-                    dest='insecure',
-                    default=False,
-                    help="Don't use https for the callback url to the LMS, useful in http test environments"),
-        make_option('-c', '--course',
-                    metavar='COURSE_ID',
-                    dest='course',
-                    default=False,
-                    help='Grade and generate certificates '
-                    'for a specific course'),
-        make_option('-f', '--force-gen',
-                    metavar='STATUS',
-                    dest='force',
-                    default=False,
-                    help='Will generate new certificates for only those users '
-                    'whose entry in the certificate table matches STATUS. '
-                    'STATUS can be generating, unavailable, deleted, error '
-                    'or notpassing.'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('-n', '--noop',
+                            action='store_true',
+                            dest='noop',
+                            default=False,
+                            help="Don't add certificate requests to the queue")
+        parser.add_argument('--insecure',
+                            action='store_true',
+                            dest='insecure',
+                            default=False,
+                            help="Don't use https for the callback url to the LMS, useful in http test environments")
+        parser.add_argument('-c', '--course',
+                            metavar='COURSE_ID',
+                            dest='course',
+                            default=False,
+                            help='Grade and generate certificates for a specific course')
+        parser.add_argument('-f', '--force-gen',
+                            metavar='STATUS',
+                            dest='force',
+                            default=False,
+                            help='Will generate new certificates for only those users '
+                            'whose entry in the certificate table matches STATUS. '
+                            'STATUS can be generating, unavailable, deleted, error '
+                            'or notpassing.')
 
     def handle(self, *args, **options):
 

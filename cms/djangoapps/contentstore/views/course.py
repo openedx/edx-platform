@@ -536,7 +536,7 @@ def course_listing(request):
         u'libraries': [format_library_for_view(lib) for lib in libraries],
         u'show_new_library_button': get_library_creator_status(user),
         u'user': user,
-        u'request_course_creator_url': reverse(u'contentstore.views.request_course_creator'),
+        u'request_course_creator_url': reverse(u'request_course_creator'),
         u'course_creator_status': _get_course_creator_status(user),
         u'rerun_creator_status': GlobalStaff().has_user(user),
         u'allow_unicode_course_id': settings.FEATURES.get(u'ALLOW_UNICODE_COURSE_ID', False),

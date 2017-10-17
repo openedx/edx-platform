@@ -14,7 +14,6 @@ attribute is set and the FEATURE['ENABLE_EXPORT_GIT'] is set.
 """
 
 import logging
-from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
@@ -31,19 +30,15 @@ class Command(BaseCommand):
     """
     Take a course from studio and export it to a git repository.
     """
-
-    option_list = BaseCommand.option_list + (
-        make_option('--username', '-u', dest='user',
-                    help=('Specify a username from LMS/Studio to be used '
-                          'as the commit author.')),
-        make_option('--repo_dir', '-r', dest='repo',
-                    help='Specify existing git repo directory.'),
-    )
-
     help = _('Take the specified course and attempt to '
              'export it to a git repository\n. Course directory '
              'must already be a git repository. Usage: '
              ' git_export <course_loc> <git_url>')
+
+    def add_arguments(self, parser):
+        parser.add_argument('--username', '-u', dest='user',
+                            help='Specify a username from LMS/Studio to be used as the commit author.')
+        parser.add_argument('--repo_dir', '-r', dest='repo', help='Specify existing git repo directory.')
 
     def handle(self, *args, **options):
         """

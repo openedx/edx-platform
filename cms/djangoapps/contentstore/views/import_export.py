@@ -13,7 +13,6 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.files import File
-from django.core.servers.basehttp import FileWrapper
 from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.utils.translation import ugettext as _
@@ -25,6 +24,7 @@ from path import Path as path
 from six import text_type
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
+from wsgiref.util import FileWrapper
 
 from contentstore.storage import course_import_export_storage
 from contentstore.tasks import CourseExportTask, CourseImportTask, create_export_tarball, export_olx, import_olx

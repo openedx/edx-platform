@@ -6,7 +6,6 @@
 # Run it this way:
 #   ./manage.py cms --settings dev edit_course_tabs --course Stanford/CS99/2013_spring
 #
-from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 
@@ -42,24 +41,24 @@ As a first step, run the command with a courseid like this:
 This will print the existing tabs types and names. Then run the
 command again, adding --insert or --delete to edit the list.
 """
-    # Making these option objects separately, so can refer to their .help below
-    course_option = make_option('--course',
-                                action='store',
-                                dest='course',
-                                default=False,
-                                help='--course <id> required, e.g. Stanford/CS99/2013_spring')
-    delete_option = make_option('--delete',
-                                action='store_true',
-                                dest='delete',
-                                default=False,
-                                help='--delete <tab-number>')
-    insert_option = make_option('--insert',
-                                action='store_true',
-                                dest='insert',
-                                default=False,
-                                help='--insert <tab-number> <type> <name>, e.g. 2 "course_info" "Course Info"')
 
-    option_list = BaseCommand.option_list + (course_option, delete_option, insert_option)
+    def add_arguments(self, parser):
+        # Making these option objects separately, so can refer to their .help below
+        parser.add_argument('--course',
+                            action='store',
+                            dest='course',
+                            default=False,
+                            help='--course <id> required, e.g. Stanford/CS99/2013_spring')
+        parser.add_argument('--delete',
+                            action='store_true',
+                            dest='delete',
+                            default=False,
+                            help='--delete <tab-number>')
+        parser.add_argument('--insert',
+                            action='store_true',
+                            dest='insert',
+                            default=False,
+                            help='--insert <tab-number> <type> <name>, e.g. 2 "course_info" "Course Info"')
 
     def handle(self, *args, **options):
         if not options['course']:

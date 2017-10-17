@@ -2365,7 +2365,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         """
         enroll user using a registration code
         """
-        redeem_url = reverse('shoppingcart.views.register_code_redemption', args=[code], is_dashboard_endpoint=False)
+        redeem_url = reverse('shoppingcart:register_code_redemption', args=[code], is_dashboard_endpoint=False)
         self.client.login(username=user.username, password='test')
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -2446,13 +2446,13 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         )
         # update the quantity of the cart item paid_course_reg_item
         resp = self.client.post(
-            reverse('shoppingcart.views.update_user_cart', is_dashboard_endpoint=False),
+            reverse('shoppingcart:update_user_cart', is_dashboard_endpoint=False),
             {'ItemId': paid_course_reg_item.id, 'qty': '4'}
         )
         self.assertEqual(resp.status_code, 200)
         # apply the coupon code to the item in the cart
         resp = self.client.post(
-            reverse('shoppingcart.views.use_code', is_dashboard_endpoint=False),
+            reverse('shoppingcart:use_code', is_dashboard_endpoint=False),
             {'code': coupon.code}
         )
         self.assertEqual(resp.status_code, 200)
@@ -2488,7 +2488,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         PaidCourseRegistration.add_to_order(self.cart, self.course.id)
         # apply the coupon code to the item in the cart
         resp = self.client.post(
-            reverse('shoppingcart.views.use_code', is_dashboard_endpoint=False),
+            reverse('shoppingcart:use_code', is_dashboard_endpoint=False),
             {'code': coupon.code}
         )
         self.assertEqual(resp.status_code, 200)
@@ -2910,13 +2910,13 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         paid_course_reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course.id)
         # update the quantity of the cart item paid_course_reg_item
         resp = self.client.post(
-            reverse('shoppingcart.views.update_user_cart', is_dashboard_endpoint=False),
+            reverse('shoppingcart:update_user_cart', is_dashboard_endpoint=False),
             {'ItemId': paid_course_reg_item.id, 'qty': '4'}
         )
         self.assertEqual(resp.status_code, 200)
         # apply the coupon code to the item in the cart
         resp = self.client.post(
-            reverse('shoppingcart.views.use_code', is_dashboard_endpoint=False),
+            reverse('shoppingcart:use_code', is_dashboard_endpoint=False),
             {'code': self.coupon_code}
         )
         self.assertEqual(resp.status_code, 200)

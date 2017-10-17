@@ -80,7 +80,9 @@ class CohortMembership(models.Model):
         unique_together = (('user', 'course_id'), )
 
     def clean_fields(self, *args, **kwargs):
-        if self.course_id is None:
+        if self.course_id is None and self.course_user_group.course_id is None:
+            raise ValidationError("CohortMembership course_id and course_user_group course_id are both None")
+        if self.course_id in ('', None):
             self.course_id = self.course_user_group.course_id
         super(CohortMembership, self).clean_fields(*args, **kwargs)
 
@@ -91,9 +93,8 @@ class CohortMembership(models.Model):
             raise ValidationError("Non-matching course_ids provided")
 
     def save(self, *args, **kwargs):
-        self.full_clean(validate_unique=False)
-
         log.info("Saving CohortMembership for user '%s' in '%s'", self.user.id, self.course_id)
+        self.full_clean(validate_unique=False)
 
         # Avoid infinite recursion if creating from get_or_create() call below.
         # This block also allows middleware to use CohortMembership.get_or_create without worrying about outer_atomic

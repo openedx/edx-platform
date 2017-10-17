@@ -6,6 +6,7 @@ import uuid  # pylint:disable=unused-import
 from django.contrib.auth.models import User
 import factory
 from factory.fuzzy import FuzzyText
+from opaque_keys.edx.keys import CourseKey
 import pytz
 
 from openedx.core.djangoapps.credit.models import CreditProvider, CreditEligibility, CreditCourse, CreditRequest
@@ -50,7 +51,8 @@ class CreditRequestFactory(factory.DjangoModelFactory):
         Sets up parameters field.
         """
         if not obj.parameters:
-            course_key = obj.course.course_key
+            # Something in the factory isn't correctly setting these keys so we need to clean up here
+            course_key = CourseKey.from_string(obj.course.course_key)
             user = User.objects.get(username=obj.username)
             user_profile = user.profile
 

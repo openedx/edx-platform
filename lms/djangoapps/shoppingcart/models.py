@@ -341,7 +341,7 @@ class Order(models.Model):
             registration_codes = CourseRegistrationCode.objects.filter(course_id=course_id, order=self)
             course_names.append(course.display_name)
             for registration_code in registration_codes:
-                redemption_url = reverse('register_code_redemption', args=[registration_code.code])
+                redemption_url = reverse('shoppingcart:register_code_redemption', args=[registration_code.code])
                 url = '{base_url}{redemption_url}'.format(base_url=site_name, redemption_url=redemption_url)
                 csv_writer.writerow([unicode(course.display_name).encode("utf-8"), registration_code.code, url])
 
@@ -2159,7 +2159,7 @@ class Donation(OrderItem):
             "line_desc": description
         }
 
-        if course_id is not None:
+        if course_id is not None and course_id != '':
             params["course_id"] = course_id
             params["donation_type"] = "course"
         else:

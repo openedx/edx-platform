@@ -13,6 +13,7 @@ from views.course_sock import CourseSockFragmentView
 from views.latest_update import LatestUpdateFragmentView
 from views.welcome_message import WelcomeMessageFragmentView, dismiss_welcome_message
 
+
 urlpatterns = [
     url(
         r'^$',

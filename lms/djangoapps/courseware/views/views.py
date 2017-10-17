@@ -834,7 +834,7 @@ def course_about(request, course_id):
             # context. This value is therefor explicitly set to render the appropriate header.
             'disable_courseware_header': True,
             'can_add_course_to_cart': can_add_course_to_cart,
-            'cart_link': reverse('shoppingcart.views.show_cart'),
+            'cart_link': reverse('shoppingcart:show_cart'),
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
             'reviews_fragment_view': reviews_fragment_view,

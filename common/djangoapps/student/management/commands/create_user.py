@@ -1,5 +1,3 @@
-from optparse import make_option
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
@@ -23,44 +21,43 @@ class Command(TrackedCommand):
         manage.py ... create_user -e test@example.com -p insecure -c edX/Open_DemoX/edx_demo_course -m verified
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option('-m', '--mode',
-                    metavar='ENROLLMENT_MODE',
-                    dest='mode',
-                    default='honor',
-                    choices=('audit', 'verified', 'honor'),
-                    help='Enrollment type for user for a specific course'),
-        make_option('-u', '--username',
-                    metavar='USERNAME',
-                    dest='username',
-                    default=None,
-                    help='Username, defaults to "user" in the email'),
-        make_option('-n', '--name',
-                    metavar='NAME',
-                    dest='name',
-                    default=None,
-                    help='Name, defaults to "user" in the email'),
-        make_option('-p', '--password',
-                    metavar='PASSWORD',
-                    dest='password',
-                    default=None,
-                    help='Password for user'),
-        make_option('-e', '--email',
-                    metavar='EMAIL',
-                    dest='email',
-                    default=None,
-                    help='Email for user'),
-        make_option('-c', '--course',
-                    metavar='COURSE_ID',
-                    dest='course',
-                    default=None,
-                    help='course to enroll the user in (optional)'),
-        make_option('-s', '--staff',
-                    dest='staff',
-                    default=False,
-                    action='store_true',
-                    help='give user the staff bit'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('-m', '--mode',
+                            metavar='ENROLLMENT_MODE',
+                            dest='mode',
+                            default='honor',
+                            choices=('audit', 'verified', 'honor'),
+                            help='Enrollment type for user for a specific course')
+        parser.add_argument('-u', '--username',
+                            metavar='USERNAME',
+                            dest='username',
+                            default=None,
+                            help='Username, defaults to "user" in the email')
+        parser.add_argument('-n', '--name',
+                            metavar='NAME',
+                            dest='name',
+                            default=None,
+                            help='Name, defaults to "user" in the email')
+        parser.add_argument('-p', '--password',
+                            metavar='PASSWORD',
+                            dest='password',
+                            default=None,
+                            help='Password for user')
+        parser.add_argument('-e', '--email',
+                            metavar='EMAIL',
+                            dest='email',
+                            default=None,
+                            help='Email for user')
+        parser.add_argument('-c', '--course',
+                            metavar='COURSE_ID',
+                            dest='course',
+                            default=None,
+                            help='course to enroll the user in (optional)')
+        parser.add_argument('-s', '--staff',
+                            dest='staff',
+                            default=False,
+                            action='store_true',
+                            help='give user the staff bit')
 
     def handle(self, *args, **options):
         username = options['username']
