@@ -16,8 +16,8 @@ def nodebb_form_discussion(request, course_id):
     """
     Redirect user to nodeBB forum page that is loaded into our template using iframe
     """
-
-    course_community = DiscussionCommunity.objects.filter(course_id=course_id).first()
+    # course_id = CourseKeyField()
+    course_community = DiscussionCommunity.objects.filter(course_id="course-v1:edX+DemoX+Demo_Course").first()
     context = {
         "course_id": course_id,
         "course_community": course_community

@@ -2167,7 +2167,7 @@ INSTALLED_APPS = (
 
     # NodeBB related
     'nodebb',
-    'discussion_nodebb',
+    'lms.djangoapps.discussion_nodebb',
 
     # timed notification and periodic tasks
     'openedx.core.djangoapps.timed_notification',
