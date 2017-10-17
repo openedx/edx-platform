@@ -20,7 +20,6 @@ from openedx.core.djangolib.markup import HTML, Text
 <%
 faqs = program['faq']
 program_type = program['type']
-program_type_slug = program['type_slug']
 title = program['title']
 status = program['status']
 courses = program['courses']
@@ -33,7 +32,7 @@ full_program_price_format = '{0:.0f}' if program['full_program_price'].is_intege
 full_program_price = full_program_price_format.format(program['full_program_price'])
 corporate_endorsement = program['corporate_endorsements'][0] if program['corporate_endorsements'] else {}
 corporate_endorsement_name = corporate_endorsement.get('corporation_name')
-corporate_endorsement_image = corporate_endorsement.get('image')['src']
+corporate_endorsement_image = corporate_endorsement.get('image',{}).get('src','')
 endorsement = corporate_endorsement['individual_endorsements'][0]
 endorsement_quote = endorsement.get('quote')
 endorser = endorsement.get('endorser')
@@ -45,9 +44,8 @@ expected_learning_items = program['expected_learning_items']
 authoring_organizations = program['authoring_organizations']
 min_hours_effort_per_week = program['min_hours_effort_per_week']
 max_hours_effort_per_week = program['max_hours_effort_per_week']
-video_url = (program.get('video', {}) or {}).get('src', '')
+video_url = program.get('video', {}).get('src', '')
 banner_image = program.get('banner_image', {}).get('large', {}).get('url', '')
-description_max_length = 250
 %>
 
 <%block name="js_extra">
@@ -287,8 +285,10 @@ description_max_length = 250
           <img alt="" src="${instructor['image']}"/>
         </div>
         <div class="instructor-name">${instructor['name']}</div>
-        <div class="instructor-position">${instructor['position']['position']}</div>
-        <div class="instructor-org">${instructor['position']['organization_name']}</div>
+        % if instructor.get('position'):
+          <div class="instructor-position">${instructor['position'].get('position')}</div>
+          <div class="instructor-org">${instructor['position'].get('organization_name')}</div>
+        % endif
       </div>
     % endfor
   </div>
@@ -308,7 +308,6 @@ description_max_length = 250
           </div>
         </div>
       % endfor
-
     </div>
   % endif
 </div>
