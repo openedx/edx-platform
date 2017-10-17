@@ -35,12 +35,15 @@ from .transformer import GradesTransformer
 
 log = getLogger(__name__)
 
+COURSE_GRADE_TIMEOUT_SECONDS = 1200
 KNOWN_RETRY_ERRORS = (  # Errors we expect occasionally, should be resolved on retry
     DatabaseError,
     ValidationError,
     DatabaseNotReadyError,
 )
-RECALCULATE_GRADE_DELAY = 2  # in seconds, to prevent excessive _has_db_updated failures. See TNL-6424.
+RECALCULATE_GRADE_DELAY_SECONDS = 2  # to prevent excessive _has_db_updated failures. See TNL-6424.
+RETRY_DELAY_SECONDS = 30
+SUBSECTION_GRADE_TIMEOUT_SECONDS = 300
 
 
 class _BaseTask(PersistOnFailureTask, LoggedTask):  # pylint: disable=abstract-method
@@ -72,7 +75,13 @@ def compute_all_grades_for_course(**kwargs):
             )
 
 
-@task(base=_BaseTask, bind=True, default_retry_delay=30, max_retries=1)
+@task(
+    bind=True,
+    base=_BaseTask,
+    default_retry_delay=RETRY_DELAY_SECONDS,
+    max_retries=1,
+    time_limit=COURSE_GRADE_TIMEOUT_SECONDS
+)
 def compute_grades_for_course_v2(self, **kwargs):
     """
     Compute grades for a set of students in the specified course.
@@ -113,7 +122,14 @@ def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pyli
             raise result.error
 
 
-@task(bind=True, base=_BaseTask, default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
+@task(
+    bind=True,
+    base=_BaseTask,
+    time_limit=SUBSECTION_GRADE_TIMEOUT_SECONDS,
+    max_retries=2,
+    default_retry_delay=RETRY_DELAY_SECONDS,
+    routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY
+)
 def recalculate_subsection_grade_v3(self, **kwargs):
     """
     Latest version of the recalculate_subsection_grade task.  See docstring
