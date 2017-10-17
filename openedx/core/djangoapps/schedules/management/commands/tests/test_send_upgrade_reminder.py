@@ -60,29 +60,31 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
         self.site_config = SiteConfigurationFactory.create(site=site)
         ScheduleConfigFactory.create(site=self.site_config.site)
 
+        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
+
     @patch.object(reminder.Command, 'resolver_class')
     def test_handle(self, mock_resolver):
-        test_time = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
+        test_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
         reminder.Command().handle(date='2017-08-01', site_domain_name=self.site_config.site.domain)
-        mock_resolver.assert_called_with(self.site_config.site, test_time)
+        mock_resolver.assert_called_with(self.site_config.site, test_day)
 
         mock_resolver().send.assert_any_call(2, None)
 
     @patch.object(tasks, 'ace')
     @patch.object(resolvers.UpgradeReminderResolver, 'async_send_task')
     def test_resolver_send(self, mock_schedule_bin, mock_ace):
-        current_time = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        test_time = current_time + datetime.timedelta(days=2)
+        current_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
+        test_day = current_day + datetime.timedelta(days=2)
         ScheduleFactory.create(upgrade_deadline=datetime.datetime(2017, 8, 3, 15, 34, 30, tzinfo=pytz.UTC))
 
-        reminder.UpgradeReminderResolver(self.site_config.site, current_time).send(2)
+        reminder.UpgradeReminderResolver(self.site_config.site, current_day).send(2)
         self.assertFalse(mock_schedule_bin.called)
         mock_schedule_bin.apply_async.assert_any_call(
-            (self.site_config.site.id, serialize(test_time), 2, 0, [], True, None),
+            (self.site_config.site.id, serialize(test_day), 2, 0, [], True, None),
             retry=False,
         )
         mock_schedule_bin.apply_async.assert_any_call(
-            (self.site_config.site.id, serialize(test_time), 2, tasks.UPGRADE_REMINDER_NUM_BINS - 1, [], True, None),
+            (self.site_config.site.id, serialize(test_day), 2, tasks.UPGRADE_REMINDER_NUM_BINS - 1, [], True, None),
             retry=False,
         )
         self.assertFalse(mock_ace.send.called)
@@ -100,8 +102,8 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
 
         bins_in_use = frozenset((s.enrollment.user.id % tasks.UPGRADE_REMINDER_NUM_BINS) for s in schedules)
 
-        test_time = datetime.datetime(2017, 8, 3, 18, tzinfo=pytz.UTC)
-        test_time_str = serialize(test_time)
+        test_datetime = datetime.datetime(2017, 8, 3, 18, tzinfo=pytz.UTC)
+        test_datetime_str = serialize(test_datetime)
         for b in range(tasks.UPGRADE_REMINDER_NUM_BINS):
             expected_queries = NUM_QUERIES_NO_MATCHING_SCHEDULES
             if b in bins_in_use:
@@ -110,7 +112,7 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
 
             with self.assertNumQueries(expected_queries, table_blacklist=WAFFLE_TABLES):
                 tasks.upgrade_reminder_schedule_bin(
-                    self.site_config.site.id, target_day_str=test_time_str, day_offset=2, bin_num=b,
+                    self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=b,
                     org_list=[schedules[0].enrollment.course.org],
                 )
 
@@ -126,12 +128,12 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
         schedule.enrollment.course_id = CourseKey.from_string('edX/toy/Not_2012_Fall')
         schedule.enrollment.save()
 
-        test_time = datetime.datetime(2017, 8, 3, 20, tzinfo=pytz.UTC)
-        test_time_str = serialize(test_time)
+        test_datetime = datetime.datetime(2017, 8, 3, 20, tzinfo=pytz.UTC)
+        test_datetime_str = serialize(test_datetime)
         for b in range(tasks.UPGRADE_REMINDER_NUM_BINS):
             with self.assertNumQueries(NUM_QUERIES_NO_MATCHING_SCHEDULES, table_blacklist=WAFFLE_TABLES):
                 tasks.upgrade_reminder_schedule_bin(
-                    self.site_config.site.id, target_day_str=test_time_str, day_offset=2, bin_num=b,
+                    self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=b,
                     org_list=[schedule.enrollment.course.org],
                 )
 
@@ -156,8 +158,8 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
     def test_enqueue_disabled(self, mock_schedule_bin, mock_ace):
         ScheduleConfigFactory.create(site=self.site_config.site, enqueue_upgrade_reminder=False)
 
-        current_time = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        reminder.UpgradeReminderResolver(self.site_config.site, current_time).send(3)
+        current_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
+        reminder.UpgradeReminderResolver(self.site_config.site, current_day).send(3)
         self.assertFalse(mock_schedule_bin.called)
         self.assertFalse(mock_schedule_bin.apply_async.called)
         self.assertFalse(mock_ace.send.called)
@@ -199,11 +201,11 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
             enrollment__user=user2,
         )
 
-        test_time = datetime.datetime(2017, 8, 3, 17, tzinfo=pytz.UTC)
-        test_time_str = serialize(test_time)
+        test_datetime = datetime.datetime(2017, 8, 3, 17, tzinfo=pytz.UTC)
+        test_datetime_str = serialize(test_datetime)
         with self.assertNumQueries(NUM_QUERIES_WITH_MATCHES, table_blacklist=WAFFLE_TABLES):
             tasks.upgrade_reminder_schedule_bin(
-                limited_config.site.id, target_day_str=test_time_str, day_offset=2, bin_num=0,
+                limited_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=0,
                 org_list=org_list, exclude_orgs=exclude_orgs,
             )
 
@@ -223,11 +225,11 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
             for course_num in (1, 2, 3)
         ]
 
-        test_time = datetime.datetime(2017, 8, 3, 19, 44, 30, tzinfo=pytz.UTC)
-        test_time_str = serialize(test_time)
+        test_datetime = datetime.datetime(2017, 8, 3, 19, 44, 30, tzinfo=pytz.UTC)
+        test_datetime_str = serialize(test_datetime)
         with self.assertNumQueries(NUM_QUERIES_WITH_MATCHES, table_blacklist=WAFFLE_TABLES):
             tasks.upgrade_reminder_schedule_bin(
-                self.site_config.site.id, target_day_str=test_time_str, day_offset=2,
+                self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2,
                 bin_num=user.id % tasks.UPGRADE_REMINDER_NUM_BINS,
                 org_list=[schedules[0].enrollment.course.org],
             )
@@ -237,14 +239,13 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
     @ddt.data(*itertools.product((1, 10, 100), (2, 10)))
     @ddt.unpack
     def test_templates(self, message_count, day):
-        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         now = datetime.datetime.now(pytz.UTC)
-        future_date = now + datetime.timedelta(days=21)
+        future_datetime = now + datetime.timedelta(days=21)
 
         user = UserFactory.create()
         schedules = [
             ScheduleFactory.create(
-                upgrade_deadline=future_date,
+                upgrade_deadline=future_datetime,
                 enrollment__user=user,
                 enrollment__course__id=CourseLocator('edX', 'toy', 'Course{}'.format(course_num))
             )
@@ -253,16 +254,17 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
 
         for schedule in schedules:
             schedule.enrollment.course.self_paced = True
+            schedule.enrollment.course.end = future_datetime + datetime.timedelta(days=30)
             schedule.enrollment.course.save()
 
             CourseModeFactory(
                 course_id=schedule.enrollment.course.id,
                 mode_slug=CourseMode.VERIFIED,
-                expiration_datetime=future_date
+                expiration_datetime=future_datetime
             )
 
-        test_time = future_date
-        test_time_str = serialize(test_time)
+        test_datetime = future_datetime
+        test_datetime_str = serialize(test_datetime)
 
         patch_policies(self, [StubPolicy([ChannelType.PUSH])])
         mock_channel = Mock(
@@ -273,9 +275,7 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
 
         sent_messages = []
 
-        templates_override = deepcopy(settings.TEMPLATES)
-        templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
-        with self.settings(TEMPLATES=templates_override):
+        with self.settings(TEMPLATES=self._get_template_overrides()):
             with patch.object(tasks, '_upgrade_reminder_schedule_send') as mock_schedule_send:
                 mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
 
@@ -284,17 +284,28 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
                 num_expected_queries = NUM_QUERIES_WITH_MATCHES + NUM_QUERIES_WITH_DEADLINE + message_count
                 with self.assertNumQueries(num_expected_queries, table_blacklist=WAFFLE_TABLES):
                     tasks.upgrade_reminder_schedule_bin(
-                        self.site_config.site.id, target_day_str=test_time_str, day_offset=day,
-                        bin_num=user.id % tasks.UPGRADE_REMINDER_NUM_BINS,
+                        self.site_config.site.id, target_day_str=test_datetime_str, day_offset=day,
+                        bin_num=self._calculate_bin_for_user(user),
                         org_list=[schedules[0].enrollment.course.org],
                     )
 
             self.assertEqual(len(sent_messages), message_count)
 
-            for args in sent_messages:
-                tasks._upgrade_reminder_schedule_send(*args)
+            # Load the site (which we query per message sent)
+            # Check the schedule config
+            with self.assertNumQueries(1 + message_count):
+                for args in sent_messages:
+                    tasks._upgrade_reminder_schedule_send(*args)
 
             self.assertEqual(mock_channel.deliver.call_count, message_count)
             for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
                 for template in attr.astuple(email):
                     self.assertNotIn("TEMPLATE WARNING", template)
+
+    def _get_template_overrides(self):
+        templates_override = deepcopy(settings.TEMPLATES)
+        templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
+        return templates_override
+
+    def _calculate_bin_for_user(self, user):
+        return user.id % tasks.RECURRING_NUDGE_NUM_BINS
