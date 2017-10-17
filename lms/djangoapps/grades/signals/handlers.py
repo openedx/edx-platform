@@ -26,7 +26,7 @@ from ..constants import ScoreDatabaseTableEnum
 from ..course_grade_factory import CourseGradeFactory
 from .. import events
 from ..scores import weighted_score
-from ..tasks import RECALCULATE_GRADE_DELAY, recalculate_subsection_grade_v3
+from ..tasks import RECALCULATE_GRADE_DELAY_SECONDS, recalculate_subsection_grade_v3
 
 log = getLogger(__name__)
 
@@ -221,7 +221,7 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
             event_transaction_type=unicode(get_event_transaction_type()),
             score_db_table=kwargs['score_db_table'],
         ),
-        countdown=RECALCULATE_GRADE_DELAY,
+        countdown=RECALCULATE_GRADE_DELAY_SECONDS,
     )
 
 
