@@ -1708,7 +1708,7 @@ def create_account_with_params(request, params):
         not eamap.external_domain.startswith(openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX)
     )
 
-    params['name'] = "{} {}".format(params['first_name'], params['last_name'])
+    params['name'] = "{} {}".format(params.get('first_name'), params.get('last_name'))
     form = AccountCreationForm(
         data=params,
         extra_fields=extra_fields,
