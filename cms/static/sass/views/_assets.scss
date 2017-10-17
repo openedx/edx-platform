@@ -21,7 +21,6 @@
       vertical-align: bottom;
       margin-right: ($baseline/5);
     }
-
   }
 
   .no-asset-content {
@@ -191,8 +190,6 @@
             border-radius: 3px;
           }
         }
-
-
       }
     }
 
@@ -230,7 +227,7 @@
           padding-right: ($baseline*0.75);
         }
 
-        &.nav-dd{
+        &.nav-dd {
           // basic layout - nav items
           margin: 0 -($baseline/2);
           color: $blue-d2;
@@ -268,7 +265,7 @@
               }
 
               .nav-item {
-                &.reset-filter{
+                &.reset-filter {
                   display:none;
                 }
 

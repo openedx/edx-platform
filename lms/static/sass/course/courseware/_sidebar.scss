@@ -1,5 +1,5 @@
 .course-index {
-  @include transition(all .2s $ease-in-out-quad 0s);
+  @include transition(all 0.2s $ease-in-out-quad 0s);
   @include border-right(1px solid $border-color-2);
   @include border-radius(3px, 0, 0, 3px);
 
@@ -25,7 +25,7 @@
         @include transition(all $tmg-s3 ease-in-out);
         @include box-sizing(border-box);
         @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
-        @include transition(background-color .1s linear 0s);
+        @include transition(background-color 0.1s linear 0s);
 
         display: block;
         width: 100%;
@@ -42,7 +42,7 @@
 
           position: relative;
           display: block;
-          padding: ($baseline*.75) $baseline ($baseline*.75) ($baseline*2);
+          padding: ($baseline*0.75) $baseline ($baseline*0.75) ($baseline*2);
 
           @include text-align(left);
 

@@ -35,9 +35,9 @@ div.gradebook-wrapper {
       background: url('#{$static-path}/images/search-icon.png') no-repeat 9px center $gray-l6;
       font-family: $sans-serif;
       font-size: 11px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, .12) inset;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) inset;
 
-      @include transition(border-color .15s linear 0s);
+      @include transition(border-color 0.15s linear 0s);
 
       &::-webkit-input-placeholder,
       &::-moz-input-placeholder {
@@ -114,19 +114,19 @@ div.gradebook-wrapper {
       .left-shadow {
         left: 0;
         background-image: -webkit-gradient(linear, left, $shadow-l1, $transparent 20%), -webkit-gradient(linear, left, $shadow-l1, $transparent);
-        background-image:  -webkit-linear-gradient(left, $shadow-l1, $transparent 20%), -webkit-linear-gradient(left, $shadow-l1, $transparent);
-        background-image:     -moz-linear-gradient(left, $shadow-l1, $transparent 20%), -moz-linear-gradient(left, $shadow-l1, $transparent);
-        background-image:      -ms-linear-gradient(left, $shadow-l1, $transparent 20%), -ms-linear-gradient(left, $shadow-l1, $transparent);
-        background-image:       -o-linear-gradient(left, $shadow-l1, $transparent 20%), -o-linear-gradient(left, $shadow-l1, $transparent);
+        background-image: -webkit-linear-gradient(left, $shadow-l1, $transparent 20%), -webkit-linear-gradient(left, $shadow-l1, $transparent);
+        background-image: -moz-linear-gradient(left, $shadow-l1, $transparent 20%), -moz-linear-gradient(left, $shadow-l1, $transparent);
+        background-image: -ms-linear-gradient(left, $shadow-l1, $transparent 20%), -ms-linear-gradient(left, $shadow-l1, $transparent);
+        background-image: -o-linear-gradient(left, $shadow-l1, $transparent 20%), -o-linear-gradient(left, $shadow-l1, $transparent);
       }
 
       .right-shadow {
         right: 0;
         background-image: -webkit-gradient(linear, right, $shadow-l1, $transparent 20%), -webkit-gradient(linear, right, $shadow-l1, $transparent);
-        background-image:  -webkit-linear-gradient(right, $shadow-l1, $transparent 20%), -webkit-linear-gradient(right, $shadow-l1, $transparent);
-        background-image:     -moz-linear-gradient(right, $shadow-l1, $transparent 20%), -moz-linear-gradient(right, $shadow-l1, $transparent);
-        background-image:      -ms-linear-gradient(right, $shadow-l1, $transparent 20%), -ms-linear-gradient(right, $shadow-l1, $transparent);
-        background-image:       -o-linear-gradient(right, $shadow-l1, $transparent 20%), -o-linear-gradient(right, $shadow-l1, $transparent);
+        background-image: -webkit-linear-gradient(right, $shadow-l1, $transparent 20%), -webkit-linear-gradient(right, $shadow-l1, $transparent);
+        background-image: -moz-linear-gradient(right, $shadow-l1, $transparent 20%), -moz-linear-gradient(right, $shadow-l1, $transparent);
+        background-image: -ms-linear-gradient(right, $shadow-l1, $transparent 20%), -ms-linear-gradient(right, $shadow-l1, $transparent);
+        background-image: -o-linear-gradient(right, $shadow-l1, $transparent 20%), -o-linear-gradient(right, $shadow-l1, $transparent);
       }
     }
 
@@ -156,18 +156,18 @@ div.gradebook-wrapper {
         line-height: 10px;
         font-weight: bold;
         text-align: center;
-        box-shadow: 0 1px 0 $table-border-color inset, 0 2px 0 rgba(255, 255, 255, .7) inset;
+        box-shadow: 0 1px 0 $table-border-color inset, 0 2px 0 rgba(255, 255, 255, 0.7) inset;
         border-left: 1px solid $gray-l3;
 
         &:first-child {
           border-radius: 5px 0 0 0;
-          box-shadow: 1px 1px 0 $table-border-color inset, 1px 2px 0 rgba(255, 255, 255, .7) inset;
+          box-shadow: 1px 1px 0 $table-border-color inset, 1px 2px 0 rgba(255, 255, 255, 0.7) inset;
           border-left: none;
         }
 
         &:last-child {
           border-radius: 0 3px 0 0;
-          box-shadow: -1px 1px 0 $table-border-color inset, -1px 2px 0 rgba(255, 255, 255, .7) inset;
+          box-shadow: -1px 1px 0 $table-border-color inset, -1px 2px 0 rgba(255, 255, 255, 0.7) inset;
         }
 
         .assignment {
