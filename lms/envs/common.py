@@ -2608,6 +2608,20 @@ VIDEO_IMAGE_SETTINGS = dict(
     DIRECTORY_PREFIX='video-images/',
 )
 
+########################## VIDEO TRANSCRIPTS STORAGE ############################
+
+VIDEO_TRANSCRIPTS_SETTINGS = dict(
+    VIDEO_TRANSCRIPTS_MAX_BYTES=3 * 1024 * 1024,    # 3 MB
+    # Backend storage
+    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
+    # STORAGE_KWARGS=dict(bucket='video-transcripts-bucket'),
+    STORAGE_KWARGS=dict(
+        location=MEDIA_ROOT,
+        base_url=MEDIA_URL,
+    ),
+    DIRECTORY_PREFIX='video-transcripts/',
+)
+
 
 # Source:
 # http://loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt according to http://en.wikipedia.org/wiki/ISO_639-1

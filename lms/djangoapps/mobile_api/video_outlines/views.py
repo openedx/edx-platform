@@ -6,6 +6,7 @@ only displayed at the course level. This is because it makes it a lot easier to
 optimize and reason about, and it avoids having to tackle the bigger problem of
 general XBlock representation in this rather specialized formatting.
 """
+import os
 from functools import partial
 
 from django.http import Http404, HttpResponse
@@ -16,6 +17,11 @@ from rest_framework.response import Response
 from mobile_api.models import MobileApiConfig
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
+from xmodule.video_module.transcripts_utils import (
+    get_video_transcript_content,
+    is_val_transcript_feature_enabled_for_course,
+    Transcript,
+)
 
 from ..decorators import mobile_course_access, mobile_view
 from .serializers import BlockOutline, video_summary
@@ -111,14 +117,31 @@ class VideoTranscripts(generics.RetrieveAPIView):
         block_id = kwargs['block_id']
         lang = kwargs['lang']
 
-        usage_key = BlockUsageLocator(
-            course.id, block_type="video", block_id=block_id
-        )
+        usage_key = BlockUsageLocator(course.id, block_type='video', block_id=block_id)
+        video_descriptor = modulestore().get_item(usage_key)
+        feature_enabled = is_val_transcript_feature_enabled_for_course(usage_key.course_key)
         try:
-            video_descriptor = modulestore().get_item(usage_key)
-            transcripts = video_descriptor.get_transcripts_info()
+            transcripts = video_descriptor.get_transcripts_info(include_val_transcripts=feature_enabled)
             content, filename, mimetype = video_descriptor.get_transcript(transcripts, lang=lang)
-        except (NotFoundError, ValueError, KeyError):
+        except (ValueError, NotFoundError):
+            # Fallback mechanism for edx-val transcripts
+            transcript = None
+            if feature_enabled:
+                transcript = get_video_transcript_content(
+                    language_code=lang,
+                    edx_video_id=video_descriptor.edx_video_id,
+                    youtube_id_1_0=video_descriptor.youtube_id_1_0,
+                    html5_sources=video_descriptor.html5_sources,
+                )
+
+            if not transcript:
+                raise Http404(u'Transcript not found for {}, lang: {}'.format(block_id, lang))
+
+            base_name, __ = os.path.splitext(os.path.basename(transcript['file_name']))
+            filename = '{base_name}.srt'.format(base_name=base_name)
+            content = Transcript.convert(transcript['content'], 'sjson', 'srt')
+            mimetype = Transcript.mime_types['srt']
+        except KeyError:
             raise Http404(u"Transcript not found for {}, lang: {}".format(block_id, lang))
 
         response = HttpResponse(content, content_type=mimetype)

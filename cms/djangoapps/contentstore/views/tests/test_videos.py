@@ -24,13 +24,16 @@ from contentstore.utils import reverse_course_url
 from contentstore.views.videos import (
     _get_default_video_image_url,
     validate_video_image,
+    validate_transcript_preferences,
     VIDEO_IMAGE_UPLOAD_ENABLED,
     WAFFLE_SWITCHES,
+    TranscriptProvider
 )
 from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+from edxval.api import create_or_update_transcript_preferences, get_transcript_preferences
 
 
 def override_switch(switch, active):
@@ -551,6 +554,22 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
 
         self.assert_video_status(url, edx_video_id, 'Failed')
 
+    @ddt.data(True, False)
+    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled')
+    def test_video_index_transcript_feature_enablement(self, is_video_transcript_enabled, video_transcript_feature):
+        """
+        Test that when video transcript is enabled/disabled, correct response is rendered.
+        """
+        video_transcript_feature.return_value = is_video_transcript_enabled
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        # Verify that course video button is present in the response if videos transcript feature is enabled.
+        self.assertEqual(
+            '<button class="button course-video-settings-button">' in response.content,
+            is_video_transcript_enabled
+        )
+
 
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_VIDEO_UPLOAD_PIPELINE': True})
@@ -842,7 +861,10 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         edx_video_id = 'test1'
         video_image_upload_url = self.get_url_for_course_key(self.course.id, {'edx_video_id': edx_video_id})
         with make_image_file(
-            dimensions=(image_data.get('width', settings.VIDEO_IMAGE_MIN_WIDTH), image_data.get('height', settings.VIDEO_IMAGE_MIN_HEIGHT)),
+            dimensions=(
+                image_data.get('width', settings.VIDEO_IMAGE_MIN_WIDTH),
+                image_data.get('height', settings.VIDEO_IMAGE_MIN_HEIGHT)
+            ),
             prefix=image_data.get('prefix', 'videoimage'),
             extension=image_data.get('extension', '.png'),
             force_size=image_data.get('size', settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES'])
@@ -852,6 +874,323 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 self.verify_error_message(response, error_message)
             else:
                 self.verify_image_upload_reponse(self.course.id, edx_video_id, response)
+
+
+@ddt.ddt
+@patch(
+    'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
+    Mock(return_value=True)
+)
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_VIDEO_UPLOAD_PIPELINE': True})
+class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
+    """
+    Tests for video transcripts preferences.
+    """
+
+    VIEW_NAME = 'transcript_preferences_handler'
+
+    def test_405_with_not_allowed_request_method(self):
+        """
+        Verify that 405 is returned in case of not-allowed request methods.
+        Allowed request methods are POST and DELETE.
+        """
+        video_transcript_url = self.get_url_for_course_key(self.course.id)
+        response = self.client.get(
+            video_transcript_url,
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 405)
+
+    @ddt.data(
+        # Video transcript feature disabled
+        (
+            {},
+            False,
+            '',
+            404,
+        ),
+        # Error cases
+        (
+            {},
+            True,
+            u"Invalid provider None.",
+            400
+        ),
+        (
+            {
+                'provider': ''
+            },
+            True,
+            u"Invalid provider .",
+            400
+        ),
+        (
+            {
+                'provider': 'dummy-provider'
+            },
+            True,
+            u"Invalid provider dummy-provider.",
+            400
+        ),
+        (
+            {
+                'provider': TranscriptProvider.CIELO24
+            },
+            True,
+            u"Invalid cielo24 fidelity None.",
+            400
+        ),
+        (
+            {
+                'provider': TranscriptProvider.CIELO24,
+                'cielo24_fidelity': 'PROFESSIONAL',
+            },
+            True,
+            u"Invalid cielo24 turnaround None.",
+            400
+        ),
+        (
+            {
+                'provider': TranscriptProvider.CIELO24,
+                'cielo24_fidelity': 'PROFESSIONAL',
+                'cielo24_turnaround': 'STANDARD',
+                'video_source_language': 'en'
+            },
+            True,
+            u"Invalid languages [].",
+            400
+        ),
+        (
+            {
+                'provider': TranscriptProvider.CIELO24,
+                'cielo24_fidelity': 'PREMIUM',
+                'cielo24_turnaround': 'STANDARD',
+                'video_source_language': 'es'
+            },
+            True,
+            u"Unsupported source language es.",
+            400
+        ),
+        (
+            {
+                'provider': TranscriptProvider.CIELO24,
+                'cielo24_fidelity': 'PROFESSIONAL',
+                'cielo24_turnaround': 'STANDARD',
+                'video_source_language': 'en',
+                'preferred_languages': ['es', 'ur']
+            },
+            True,
+            u"Invalid languages [u'es', u'ur'].",
+            400
+        ),
+        (
+            {
+                'provider': TranscriptProvider.THREE_PLAY_MEDIA
+            },
+            True,
+            u"Invalid 3play turnaround None.",
+            400
+        ),
+        (
+            {
+                'provider': TranscriptProvider.THREE_PLAY_MEDIA,
+                'three_play_turnaround': 'default',
+                'video_source_language': 'zh',
+            },
+            True,
+            u"Unsupported source language zh.",
+            400
+        ),
+        (
+            {
+                'provider': TranscriptProvider.THREE_PLAY_MEDIA,
+                'three_play_turnaround': 'default',
+                'video_source_language': 'es',
+                'preferred_languages': ['es', 'ur']
+            },
+            True,
+            u"Invalid languages [u'es', u'ur'].",
+            400
+        ),
+        (
+            {
+                'provider': TranscriptProvider.THREE_PLAY_MEDIA,
+                'three_play_turnaround': 'default',
+                'video_source_language': 'en',
+                'preferred_languages': ['es', 'ur']
+            },
+            True,
+            u"Invalid languages [u'es', u'ur'].",
+            400
+        ),
+        # Success
+        (
+            {
+                'provider': TranscriptProvider.CIELO24,
+                'cielo24_fidelity': 'PROFESSIONAL',
+                'cielo24_turnaround': 'STANDARD',
+                'video_source_language': 'es',
+                'preferred_languages': ['en']
+            },
+            True,
+            '',
+            200
+        ),
+        (
+            {
+                'provider': TranscriptProvider.THREE_PLAY_MEDIA,
+                'three_play_turnaround': 'default',
+                'preferred_languages': ['en'],
+                'video_source_language': 'en',
+            },
+            True,
+            '',
+            200
+        )
+    )
+    @ddt.unpack
+    def test_video_transcript(self, preferences, is_video_transcript_enabled, error_message, expected_status_code):
+        """
+        Tests that transcript handler works correctly.
+        """
+        video_transcript_url = self.get_url_for_course_key(self.course.id)
+        preferences_data = {
+            'provider': preferences.get('provider'),
+            'cielo24_fidelity': preferences.get('cielo24_fidelity'),
+            'cielo24_turnaround': preferences.get('cielo24_turnaround'),
+            'three_play_turnaround': preferences.get('three_play_turnaround'),
+            'preferred_languages': preferences.get('preferred_languages', []),
+            'video_source_language': preferences.get('video_source_language'),
+        }
+
+        with patch(
+            'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled'
+        ) as video_transcript_feature:
+            video_transcript_feature.return_value = is_video_transcript_enabled
+            response = self.client.post(
+                video_transcript_url,
+                json.dumps(preferences_data),
+                content_type='application/json'
+            )
+        status_code = response.status_code
+        response = json.loads(response.content) if is_video_transcript_enabled else response
+
+        self.assertEqual(status_code, expected_status_code)
+        self.assertEqual(response.get('error', ''), error_message)
+
+        # Remove modified and course_id fields from the response so as to check the expected transcript preferences.
+        response.get('transcript_preferences', {}).pop('modified', None)
+        response.get('transcript_preferences', {}).pop('course_id', None)
+        expected_preferences = preferences_data if is_video_transcript_enabled and not error_message else {}
+        self.assertDictEqual(response.get('transcript_preferences', {}), expected_preferences)
+
+    def test_remove_transcript_preferences(self):
+        """
+        Test that transcript handler removes transcript preferences correctly.
+        """
+        # First add course wide transcript preferences.
+        preferences = create_or_update_transcript_preferences(unicode(self.course.id))
+
+        # Verify transcript preferences exist
+        self.assertIsNotNone(preferences)
+
+        response = self.client.delete(
+            self.get_url_for_course_key(self.course.id),
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, 204)
+
+        # Verify transcript preferences no loger exist
+        preferences = get_transcript_preferences(unicode(self.course.id))
+        self.assertIsNone(preferences)
+
+    def test_remove_transcript_preferences_not_found(self):
+        """
+        Test that transcript handler works correctly even when no preferences are found.
+        """
+        course_id = 'course-v1:dummy+course+id'
+        # Verify transcript preferences do not exist
+        preferences = get_transcript_preferences(course_id)
+        self.assertIsNone(preferences)
+
+        response = self.client.delete(
+            self.get_url_for_course_key(course_id),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 204)
+
+        # Verify transcript preferences do not exist
+        preferences = get_transcript_preferences(course_id)
+        self.assertIsNone(preferences)
+
+    @ddt.data(
+        (
+            None,
+            False
+        ),
+        (
+            {
+                'provider': TranscriptProvider.CIELO24,
+                'cielo24_fidelity': 'PROFESSIONAL',
+                'cielo24_turnaround': 'STANDARD',
+                'preferred_languages': ['en']
+            },
+            False
+        ),
+        (
+            {
+                'provider': TranscriptProvider.CIELO24,
+                'cielo24_fidelity': 'PROFESSIONAL',
+                'cielo24_turnaround': 'STANDARD',
+                'preferred_languages': ['en']
+            },
+            True
+        )
+    )
+    @ddt.unpack
+    @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
+    @patch('boto.s3.key.Key')
+    @patch('boto.s3.connection.S3Connection')
+    @patch('contentstore.views.videos.get_transcript_preferences')
+    def test_transcript_preferences_metadata(self, transcript_preferences, is_video_transcript_enabled,
+                                             mock_transcript_preferences, mock_conn, mock_key):
+        """
+        Tests that transcript preference metadata is only set if it is video transcript feature is enabled and
+        transcript preferences are already stored in the system.
+        """
+        file_name = 'test-video.mp4'
+        request_data = {'files': [{'file_name': file_name, 'content_type': 'video/mp4'}]}
+
+        mock_transcript_preferences.return_value = transcript_preferences
+
+        bucket = Mock()
+        mock_conn.return_value = Mock(get_bucket=Mock(return_value=bucket))
+        mock_key_instance = Mock(
+            generate_url=Mock(
+                return_value='http://example.com/url_{file_name}'.format(file_name=file_name)
+            )
+        )
+        # If extra calls are made, return a dummy
+        mock_key.side_effect = [mock_key_instance] + [Mock()]
+
+        videos_handler_url = reverse_course_url('videos_handler', self.course.id)
+        with patch(
+            'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled'
+        ) as video_transcript_feature:
+            video_transcript_feature.return_value = is_video_transcript_enabled
+            response = self.client.post(videos_handler_url, json.dumps(request_data), content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+
+        # Ensure `transcript_preferences` was set up in Key correctly if sent through request.
+        if is_video_transcript_enabled and transcript_preferences:
+            mock_key_instance.set_metadata.assert_any_call('transcript_preferences', json.dumps(transcript_preferences))
+        else:
+            with self.assertRaises(AssertionError):
+                mock_key_instance.set_metadata.assert_any_call(
+                    'transcript_preferences', json.dumps(transcript_preferences)
+                )
 
 
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
