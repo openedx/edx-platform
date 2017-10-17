@@ -1,6 +1,8 @@
 """
 UserPartitionScheme for enrollment tracks.
 """
+import logging
+
 from course_modes.models import CourseMode
 from courseware.masquerade import (
     get_course_masquerade,
@@ -12,6 +14,9 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
 from student.models import CourseEnrollment
 from xmodule.partitions.partitions import Group, UserPartition
+
+LOGGER = logging.getLogger(__name__)
+
 
 # These IDs must be less than 100 so that they do not overlap with Groups in
 # CohortUserPartition or RandomUserPartitionScheme
@@ -70,7 +75,15 @@ class EnrollmentTrackPartitionScheme(object):
         If a course is using the Verified Track Cohorting pilot feature, this method
         returns None regardless of the user's enrollment mode.
         """
+        def _log_for_educator_1511(log_statement):
+            # temporary logging for EDUCATOR-1511. Will be rolled back as soon as we have some logs
+            if course_key == CourseKey.from_string('course-v1:ASUx+ENG101x+2177A'):
+                LOGGER.warning('EDUCATOR-1511: get_group_for_user | {0}'.format(log_statement))
+
+        _log_for_educator_1511('Getting group for user id {0}'.format(user.id))
+
         if is_course_using_cohort_instead(course_key):
+            _log_for_educator_1511('Course is using cohort instead.')
             return None
 
         # First, check if we have to deal with masquerading.
@@ -88,9 +101,12 @@ class EnrollmentTrackPartitionScheme(object):
                 mode_slug,
                 modes=CourseMode.modes_for_course(course_key, include_expired=True, only_selectable=False),
             )
+            _log_for_educator_1511('Got enrollment for user {0}: mode slug is {1}'.format(user.id, mode_slug))
             if course_mode and CourseMode.is_credit_mode(course_mode):
+                _log_for_educator_1511('user {0} is in credit mode, returning verified partition'.format(user.id))
                 course_mode = CourseMode.verified_mode_for_course(course_key)
             if not course_mode:
+                _log_for_educator_1511('user {0} in track {1} added to default partition'.format(user.id, mode_slug))
                 course_mode = CourseMode.DEFAULT_MODE
             return Group(ENROLLMENT_GROUP_IDS[course_mode.slug], unicode(course_mode.name))
         else:
