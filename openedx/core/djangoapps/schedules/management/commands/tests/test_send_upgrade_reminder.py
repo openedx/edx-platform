@@ -63,36 +63,34 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
 
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
 
-    @patch.object(reminder.Command, 'resolver_class')
-    def test_handle(self, mock_resolver):
+    @patch.object(reminder.Command, 'async_send_task')
+    def test_handle(self, mock_send):
         test_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
         reminder.Command().handle(date='2017-08-01', site_domain_name=self.site_config.site.domain)
-        mock_resolver.assert_called_with(
+        mock_send.enqueue.assert_called_with(
             self.site_config.site,
             test_day,
-            async_send_task=reminder.Command.async_send_task,
+            2,
+            None
         )
-
-        mock_resolver().send.assert_any_call(2, None)
 
     @patch.object(tasks, 'ace')
     def test_resolver_send(self, mock_ace):
         current_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
         test_day = current_day + datetime.timedelta(days=2)
         ScheduleFactory.create(upgrade_deadline=datetime.datetime(2017, 8, 3, 15, 34, 30, tzinfo=pytz.UTC))
-        mock_schedule_bin = Mock()
 
-        reminder.UpgradeReminderResolver(self.site_config.site, current_day, mock_schedule_bin).send(2)
-        self.assertFalse(mock_schedule_bin.called)
-        mock_schedule_bin.apply_async.assert_any_call(
-            (self.site_config.site.id, serialize(test_day), 2, 0, [], True, None),
-            retry=False,
-        )
-        mock_schedule_bin.apply_async.assert_any_call(
-            (self.site_config.site.id, serialize(test_day), 2, resolvers.UPGRADE_REMINDER_NUM_BINS - 1, [], True, None),
-            retry=False,
-        )
-        self.assertFalse(mock_ace.send.called)
+        with patch.object(tasks.ScheduleUpgradeReminder, 'apply_async') as mock_apply_async:
+            tasks.ScheduleUpgradeReminder.enqueue(self.site_config.site, current_day, 2)
+            mock_apply_async.assert_any_call(
+                (self.site_config.site.id, serialize(test_day), 2, 0, [], True, None),
+                retry=False,
+            )
+            mock_apply_async.assert_any_call(
+                (self.site_config.site.id, serialize(test_day), 2, resolvers.UPGRADE_REMINDER_NUM_BINS - 1, [], True, None),
+                retry=False,
+            )
+            self.assertFalse(mock_ace.send.called)
 
     @ddt.data(1, 10, 100)
     @patch.object(tasks, 'ace')
@@ -164,11 +162,11 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
 
         mock_schedule_bin = Mock()
         current_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        reminder.UpgradeReminderResolver(
+        tasks.ScheduleUpgradeReminder.enqueue(
             self.site_config.site,
             current_day,
-            async_send_task=mock_schedule_bin,
-        ).send(3)
+            day_offset=3,
+        )
         self.assertFalse(mock_schedule_bin.called)
         self.assertFalse(mock_schedule_bin.apply_async.called)
         self.assertFalse(mock_ace.send.called)

@@ -18,24 +18,13 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 class TestSendEmailBaseCommand(CacheIsolationTestCase):
     def setUp(self):
         self.command = SendEmailBaseCommand()
-
-    def test_init_resolver_class(self):
-        assert self.command.resolver_class is None
-
-    def test_make_resolver(self):
-        with patch.object(self.command, 'resolver_class') as resolver_class:
-            example_site = SiteFactory(domain='example.com')
-            self.command.make_resolver(site_domain_name='example.com', date='2017-09-29')
-            resolver_class.assert_called_once_with(
-                example_site,
-                datetime.datetime(2017, 9, 29, tzinfo=pytz.UTC),
-                async_send_task=None,
-            )
+        self.site = SiteFactory()
 
     def test_handle(self):
-        with patch.object(self.command, 'make_resolver') as make_resolver:
-            make_resolver.return_value = 'resolver'
-            with patch.object(self.command, 'send_emails') as send_emails:
-                self.command.handle(date='2017-09-29')
-                make_resolver.assert_called_once_with(date='2017-09-29')
-                send_emails.assert_called_once_with('resolver', date='2017-09-29')
+        with patch.object(self.command, 'send_emails') as send_emails:
+            self.command.handle(site_domain_name=self.site.domain, date='2017-09-29')
+            send_emails.assert_called_once_with(
+                self.site,
+                datetime.datetime(2017, 9, 29, tzinfo=pytz.UTC),
+                None
+            )

@@ -60,35 +60,33 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
 
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
 
-    @patch.object(nudge.Command, 'resolver_class')
-    def test_handle(self, mock_resolver):
+    @patch.object(nudge.Command, 'async_send_task')
+    def test_handle(self, mock_send):
         test_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
         nudge.Command().handle(date='2017-08-01', site_domain_name=self.site_config.site.domain)
-        mock_resolver.assert_called_with(
-            self.site_config.site,
-            test_day,
-            async_send_task=nudge.Command.async_send_task,
-        )
-
         for day in (-3, -10):
-            mock_resolver().send.assert_any_call(day, None)
+            mock_send.enqueue.assert_any_call(
+                self.site_config.site,
+                test_day,
+                day,
+                None
+            )
 
     @patch.object(tasks, 'ace')
     def test_resolver_send(self, mock_ace):
         current_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        mock_schedule_bin = Mock()
-        nudge.ScheduleStartResolver(self.site_config.site, current_day, mock_schedule_bin).send(-3)
-        test_day = current_day + datetime.timedelta(days=-3)
-        self.assertFalse(mock_schedule_bin.called)
-        mock_schedule_bin.apply_async.assert_any_call(
-            (self.site_config.site.id, serialize(test_day), -3, 0, [], True, None),
-            retry=False,
-        )
-        mock_schedule_bin.apply_async.assert_any_call(
-            (self.site_config.site.id, serialize(test_day), -3, resolvers.RECURRING_NUDGE_NUM_BINS - 1, [], True, None),
-            retry=False,
-        )
-        self.assertFalse(mock_ace.send.called)
+        with patch.object(tasks.ScheduleRecurringNudge, 'apply_async') as mock_apply_async:
+            tasks.ScheduleRecurringNudge.enqueue(self.site_config.site, current_day, -3)
+            test_day = current_day + datetime.timedelta(days=-3)
+            mock_apply_async.assert_any_call(
+                (self.site_config.site.id, serialize(test_day), -3, 0, [], True, None),
+                retry=False,
+            )
+            mock_apply_async.assert_any_call(
+                (self.site_config.site.id, serialize(test_day), -3, resolvers.RECURRING_NUDGE_NUM_BINS - 1, [], True, None),
+                retry=False,
+            )
+            self.assertFalse(mock_ace.send.called)
 
     @ddt.data(1, 10, 100)
     @patch.object(tasks, 'ace')
@@ -180,11 +178,12 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
 
         mock_schedule_bin = Mock()
         current_datetime = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        nudge.ScheduleStartResolver(
+        tasks.ScheduleRecurringNudge.enqueue(
             self.site_config.site,
             current_datetime,
             mock_schedule_bin,
-        ).send(3)
+            3
+        )
         self.assertFalse(mock_schedule_bin.called)
         self.assertFalse(mock_schedule_bin.apply_async.called)
         self.assertFalse(mock_ace.send.called)

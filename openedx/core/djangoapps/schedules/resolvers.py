@@ -55,71 +55,8 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         num_bins -- the int number of bins to split the users into
         enqueue_config_var -- the string field name of the config variable on ScheduleConfig to check before enqueuing
     """
-    num_bins = DEFAULT_NUM_BINS
-    enqueue_config_var = None  # define in subclass
-
-    def __init__(self, site, current_date, async_send_task, *args, **kwargs):
-        super(BinnedSchedulesBaseResolver, self).__init__(*args, **kwargs)
-        self.site = site
-        self.current_date = current_date.replace(hour=0, minute=0, second=0)
-        self.async_send_task = async_send_task
-
-    def send(self, day_offset, override_recipient_email=None):
-        if not self.is_enqueue_enabled():
-            self.log_debug('Message queuing disabled for site %s', self.site.domain)
-            return
-
-        exclude_orgs, org_list = self.get_course_org_filter()
-
-        target_date = self.current_date + datetime.timedelta(days=day_offset)
-        self.log_debug('Target date = %s', target_date.isoformat())
-        for bin in range(self.num_bins):
-            task_args = (
-                self.site.id, serialize(target_date), day_offset, bin, org_list, exclude_orgs, override_recipient_email,
-            )
-            self.log_debug('Launching task with args = %r', task_args)
-            self.async_send_task.apply_async(
-                task_args,
-                retry=False,
-            )
-
-    def is_enqueue_enabled(self):
-        if self.enqueue_config_var:
-            return getattr(ScheduleConfig.current(self.site), self.enqueue_config_var)
-        return False
-
-    def get_course_org_filter(self):
-        """
-        Given the configuration of sites, get the list of orgs that should be included or excluded from this send.
-
-        Returns:
-             tuple: Returns a tuple (exclude_orgs, org_list). If exclude_orgs is True, then org_list is a list of the
-                only orgs that should be included in this send. If exclude_orgs is False, then org_list is a list of
-                orgs that should be excluded from this send. All other orgs should be included.
-        """
-        try:
-            site_config = SiteConfiguration.objects.get(site_id=self.site.id)
-            org_list = site_config.get_value('course_org_filter')
-            exclude_orgs = False
-            if not org_list:
-                not_orgs = set()
-                for other_site_config in SiteConfiguration.objects.all():
-                    other = other_site_config.get_value('course_org_filter')
-                    if not isinstance(other, list):
-                        if other is not None:
-                            not_orgs.add(other)
-                    else:
-                        not_orgs.update(other)
-                org_list = list(not_orgs)
-                exclude_orgs = True
-            elif not isinstance(org_list, list):
-                org_list = [org_list]
-        except SiteConfiguration.DoesNotExist:
-            org_list = None
-            exclude_orgs = False
-        finally:
-            return exclude_orgs, org_list
-
+    def send(self, msg_type):
+        pass
 
 def get_schedules_with_target_date_by_bin_and_orgs(schedule_date_field, current_datetime, target_datetime, bin_num,
                                                    num_bins=DEFAULT_NUM_BINS, org_list=None, exclude_orgs=False,
@@ -196,18 +133,6 @@ class RecurringNudge(ScheduleMessageType):
         self.name = "recurringnudge_day{}".format(day)
 
 
-class ScheduleStartResolver(BinnedSchedulesBaseResolver):
-    """
-    Send a message to all users whose schedule started at ``self.current_date`` + ``day_offset``.
-    """
-    num_bins = RECURRING_NUDGE_NUM_BINS
-    enqueue_config_var = 'enqueue_recurring_nudge'
-
-    def __init__(self, *args, **kwargs):
-        super(ScheduleStartResolver, self).__init__(*args, **kwargs)
-        self.log_prefix = 'Scheduled Nudge'
-
-
 def _annotate_for_monitoring(message_type, site, bin_num, target_day_str, day_offset):
     # This identifies the type of message being sent, for example: schedules.recurring_nudge3.
     set_custom_metric('message_name', '{0}.{1}'.format(
@@ -225,73 +150,81 @@ def _annotate_for_monitoring(message_type, site, bin_num, target_day_str, day_of
     set_custom_metric('send_uuid', message_type.uuid)
 
 
-def recurring_nudge_schedule_bin(
-    async_send_task, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
-):
-    target_datetime = deserialize(target_day_str)
-    # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
-    current_datetime = target_datetime - datetime.timedelta(days=day_offset)
-    msg_type = RecurringNudge(abs(day_offset))
-    site = Site.objects.get(id=site_id)
+class ScheduleStartResolver(BinnedSchedulesBaseResolver):
+    """
+    Send a message to all users whose schedule started at ``self.current_date`` + ``day_offset``.
+    """
 
-    _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
+    def __init__(self, *args, **kwargs):
+        super(ScheduleStartResolver, self).__init__(*args, **kwargs)
+        self.log_prefix = 'Scheduled Nudge'
 
-    for (user, language, context) in _recurring_nudge_schedules_for_bin(
-        site,
-        current_datetime,
-        target_datetime,
-        bin_num,
-        org_list,
-        exclude_orgs
+    def recurring_nudge_schedule_bin(
+        self, async_send_task, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
     ):
-        msg = msg_type.personalize(
-            Recipient(
-                user.username,
-                override_recipient_email or user.email,
-            ),
-            language,
-            context,
+        target_datetime = deserialize(target_day_str)
+        # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
+        current_datetime = target_datetime - datetime.timedelta(days=day_offset)
+        msg_type = RecurringNudge(abs(day_offset))
+        site = Site.objects.get(id=site_id)
+
+        _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
+
+        for (user, language, context) in self._recurring_nudge_schedules_for_bin(
+            site,
+            current_datetime,
+            target_datetime,
+            bin_num,
+            org_list,
+            exclude_orgs
+        ):
+            msg = msg_type.personalize(
+                Recipient(
+                    user.username,
+                    override_recipient_email or user.email,
+                ),
+                language,
+                context,
+            )
+            with function_trace('enqueue_send_task'):
+                async_send_task.apply_async(
+                    (site_id, str(msg)), retry=False)
+
+
+    def _recurring_nudge_schedules_for_bin(self, site, current_datetime, target_datetime, bin_num, org_list, exclude_orgs=False):
+        schedules = get_schedules_with_target_date_by_bin_and_orgs(
+            schedule_date_field='start',
+            current_datetime=current_datetime,
+            target_datetime=target_datetime,
+            bin_num=bin_num,
+            num_bins=RECURRING_NUDGE_NUM_BINS,
+            org_list=org_list,
+            exclude_orgs=exclude_orgs,
         )
-        with function_trace('enqueue_send_task'):
-            async_send_task.apply_async(
-                (site_id, str(msg)), retry=False)
 
+        LOG.debug('Recurring Nudge: Query = %r', schedules.query.sql_with_params())
 
+        for (user, user_schedules) in groupby(schedules, lambda s: s.enrollment.user):
+            user_schedules = list(user_schedules)
+            course_id_strs = [str(schedule.enrollment.course_id) for schedule in user_schedules]
 
-def _recurring_nudge_schedules_for_bin(site, current_datetime, target_datetime, bin_num, org_list, exclude_orgs=False):
+            first_schedule = user_schedules[0]
+            template_context = get_base_template_context(site)
+            template_context.update({
+                'student_name': user.profile.name,
 
-    schedules = get_schedules_with_target_date_by_bin_and_orgs(
-        schedule_date_field='start',
-        current_datetime=current_datetime,
-        target_datetime=target_datetime,
-        bin_num=bin_num,
-        num_bins=RECURRING_NUDGE_NUM_BINS,
-        org_list=org_list,
-        exclude_orgs=exclude_orgs,
-    )
+                'course_name': first_schedule.enrollment.course.display_name,
+                'course_url': absolute_url(site, reverse('course_root', args=[str(first_schedule.enrollment.course_id)])),
 
-    for (user, user_schedules) in groupby(schedules, lambda s: s.enrollment.user):
-        user_schedules = list(user_schedules)
-        course_id_strs = [str(schedule.enrollment.course_id)
-                          for schedule in user_schedules]
+                # This is used by the bulk email optout policy
+                'course_ids': course_id_strs,
+            })
 
-        first_schedule = user_schedules[0]
-        template_context = get_base_template_context(site)
-        template_context.update({
-            'student_name': user.profile.name,
+            # Information for including upsell messaging in template.
+            _add_upsell_button_information_to_template_context(
+                user, first_schedule, template_context)
 
-            'course_name': first_schedule.enrollment.course.display_name,
-            'course_url': absolute_url(site, reverse('course_root', args=[str(first_schedule.enrollment.course_id)])),
-
-            # This is used by the bulk email optout policy
-            'course_ids': course_id_strs,
-        })
-
-        # Information for including upsell messaging in template.
-        _add_upsell_button_information_to_template_context(
-            user, first_schedule, template_context)
-
-        yield (user, first_schedule.enrollment.course.language, template_context)
+            yield (user, first_schedule.enrollment.course.language, template_context)
 
 
 def _get_datetime_beginning_of_day(dt):
@@ -308,81 +241,78 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
     """
     Send a message to all users whose verified upgrade deadline is at ``self.current_date`` + ``day_offset``.
     """
-    num_bins = UPGRADE_REMINDER_NUM_BINS
-    enqueue_config_var = 'enqueue_upgrade_reminder'
-
     def __init__(self, *args, **kwargs):
         super(UpgradeReminderResolver, self).__init__(*args, **kwargs)
         self.log_prefix = 'Upgrade Reminder'
 
-
-def upgrade_reminder_schedule_bin(
-    async_send_task, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
-):
-    target_datetime = deserialize(target_day_str)
-    # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
-    current_datetime = target_datetime - datetime.timedelta(days=day_offset)
-    msg_type = UpgradeReminder()
-    site = Site.objects.get(id=site_id)
-
-    _annotate_for_monitoring(msg_type, site, bin_num,target_day_str, day_offset)
-
-    for (user, language, context) in _upgrade_reminder_schedules_for_bin(
-        site,
-        current_datetime,
-        target_datetime,
-        bin_num,
-        org_list,
-        exclude_orgs
+    def upgrade_reminder_schedule_bin(
+        self, async_send_task, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
     ):
-        msg = msg_type.personalize(
-            Recipient(
-                user.username,
-                override_recipient_email or user.email,
-            ),
-            language,
-            context,
+        target_datetime = deserialize(target_day_str)
+        # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
+        current_datetime = target_datetime - datetime.timedelta(days=day_offset)
+        msg_type = UpgradeReminder()
+        site = Site.objects.get(id=site_id)
+
+        _annotate_for_monitoring(msg_type, site, bin_num,
+                                target_day_str, day_offset)
+
+        for (user, language, context) in self._upgrade_reminder_schedules_for_bin(
+            site,
+            current_datetime,
+            target_datetime,
+            bin_num,
+            org_list,
+            exclude_orgs
+        ):
+            msg = msg_type.personalize(
+                Recipient(
+                    user.username,
+                    override_recipient_email or user.email,
+                ),
+                language,
+                context,
+            )
+            with function_trace('enqueue_send_task'):
+                async_send_task.apply_async(
+                    (site_id, str(msg)), retry=False)
+
+
+    def _upgrade_reminder_schedules_for_bin(self, site, current_datetime, target_datetime, bin_num, org_list, exclude_orgs=False):
+        schedules = get_schedules_with_target_date_by_bin_and_orgs(
+            schedule_date_field='upgrade_deadline',
+            current_datetime=current_datetime,
+            target_datetime=target_datetime,
+            bin_num=bin_num,
+            num_bins=RECURRING_NUDGE_NUM_BINS,
+            org_list=org_list,
+            exclude_orgs=exclude_orgs,
         )
-        with function_trace('enqueue_send_task'):
-            async_send_task.apply_async(
-                (site_id, str(msg)), retry=False)
 
+        for (user, user_schedules) in groupby(schedules, lambda s: s.enrollment.user):
+            user_schedules = list(user_schedules)
+            course_id_strs = [str(schedule.enrollment.course_id) for schedule in user_schedules]
 
-def _upgrade_reminder_schedules_for_bin(site, current_datetime, target_datetime, bin_num, org_list, exclude_orgs=False):
-    schedules = get_schedules_with_target_date_by_bin_and_orgs(
-        schedule_date_field='upgrade_deadline',
-        current_datetime=current_datetime,
-        target_datetime=target_datetime,
-        bin_num=bin_num,
-        num_bins=RECURRING_NUDGE_NUM_BINS,
-        org_list=org_list,
-        exclude_orgs=exclude_orgs,
-    )
+            first_schedule = user_schedules[0]
+            template_context = get_base_template_context(site)
+            template_context.update({
+                'student_name': user.profile.name,
+                'course_links': [
+                    {
+                        'url': absolute_url(site, reverse('course_root', args=[str(s.enrollment.course_id)])),
+                        'name': s.enrollment.course.display_name
+                    } for s in user_schedules
+                ],
+                'first_course_name': first_schedule.enrollment.course.display_name,
+                'cert_image': absolute_url(site, static('course_experience/images/verified-cert.png')),
 
-    for (user, user_schedules) in groupby(schedules, lambda s: s.enrollment.user):
-        user_schedules = list(user_schedules)
-        course_id_strs = [str(schedule.enrollment.course_id) for schedule in user_schedules]
+                # This is used by the bulk email optout policy
+                'course_ids': course_id_strs,
+            })
 
-        first_schedule = user_schedules[0]
-        template_context = get_base_template_context(site)
-        template_context.update({
-            'student_name': user.profile.name,
-            'course_links': [
-                {
-                    'url': absolute_url(site, reverse('course_root', args=[str(s.enrollment.course_id)])),
-                    'name': s.enrollment.course.display_name
-                } for s in user_schedules
-            ],
-            'first_course_name': first_schedule.enrollment.course.display_name,
-            'cert_image': absolute_url(site, static('course_experience/images/verified-cert.png')),
+            _add_upsell_button_information_to_template_context(user, first_schedule, template_context)
 
-            # This is used by the bulk email optout policy
-            'course_ids': course_id_strs,
-        })
-
-        _add_upsell_button_information_to_template_context(user, first_schedule, template_context)
-
-        yield (user, first_schedule.enrollment.course.language, template_context)
+            yield (user, first_schedule.enrollment.course.language, template_context)
 
 
 def _add_upsell_button_information_to_template_context(user, schedule, template_context):
@@ -424,87 +354,83 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
     Send a message to all users whose schedule started at ``self.current_date`` + ``day_offset`` and the
     course has updates.
     """
-    num_bins = COURSE_UPDATE_NUM_BINS
-    enqueue_config_var = 'enqueue_course_update'
-
     def __init__(self, *args, **kwargs):
         super(CourseUpdateResolver, self).__init__(*args, **kwargs)
         self.log_prefix = 'Course Update'
 
-
-def course_update_schedule_bin(
-    async_send_task, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
-):
-    target_datetime = deserialize(target_day_str)
-    # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
-    current_datetime = target_datetime - datetime.timedelta(days=day_offset)
-    msg_type = CourseUpdate()
-    site = Site.objects.get(id=site_id)
-
-    _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
-
-    for (user, language, context) in _course_update_schedules_for_bin(
-        site,
-        current_datetime,
-        target_datetime,
-        day_offset,
-        bin_num,
-        org_list,
-        exclude_orgs
+    def course_update_schedule_bin(
+        self, async_send_task, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
     ):
-        msg = msg_type.personalize(
-            Recipient(
-                user.username,
-                override_recipient_email or user.email,
-            ),
-            language,
-            context,
+        target_datetime = deserialize(target_day_str)
+        # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
+        current_datetime = target_datetime - datetime.timedelta(days=day_offset)
+        msg_type = CourseUpdate()
+        site = Site.objects.get(id=site_id)
+
+        _annotate_for_monitoring(msg_type, site, bin_num,
+                                target_day_str, day_offset)
+
+        for (user, language, context) in self._course_update_schedules_for_bin(
+            site,
+            current_datetime,
+            target_datetime,
+            day_offset,
+            bin_num,
+            org_list,
+            exclude_orgs
+        ):
+            msg = msg_type.personalize(
+                Recipient(
+                    user.username,
+                    override_recipient_email or user.email,
+                ),
+                language,
+                context,
+            )
+            with function_trace('enqueue_send_task'):
+                async_send_task.apply_async(
+                    (site_id, str(msg)), retry=False)
+
+    def _course_update_schedules_for_bin(self, site, current_datetime, target_datetime, day_offset, bin_num, org_list,
+                                        exclude_orgs=False):
+        week_num = abs(day_offset) / 7
+        schedules = get_schedules_with_target_date_by_bin_and_orgs(
+            schedule_date_field='start',
+            current_datetime=current_datetime,
+            target_datetime=target_datetime,
+            bin_num=bin_num,
+            num_bins=COURSE_UPDATE_NUM_BINS,
+            org_list=org_list,
+            exclude_orgs=exclude_orgs,
+            order_by='enrollment__course',
         )
-        with function_trace('enqueue_send_task'):
-            async_send_task.apply_async(
-                (site_id, str(msg)), retry=False)
+        LOG.debug('Course Update: Query = %r', schedules.query.sql_with_params())
 
+        for schedule in schedules:
+            enrollment = schedule.enrollment
+            try:
+                week_summary = get_course_week_summary(
+                    enrollment.course_id, week_num)
+            except CourseUpdateDoesNotExist:
+                continue
 
+            user = enrollment.user
+            course_id_str = str(enrollment.course_id)
 
-def _course_update_schedules_for_bin(site, current_datetime, target_datetime, day_offset, bin_num, org_list,
-                                     exclude_orgs=False):
-    week_num = abs(day_offset) / 7
-    schedules = get_schedules_with_target_date_by_bin_and_orgs(
-        schedule_date_field='start',
-        current_datetime=current_datetime,
-        target_datetime=target_datetime,
-        bin_num=bin_num,
-        num_bins=COURSE_UPDATE_NUM_BINS,
-        org_list=org_list,
-        exclude_orgs=exclude_orgs,
-        order_by='enrollment__course',
-    )
+            template_context = get_base_template_context(site)
+            template_context.update({
+                'student_name': user.profile.name,
+                'user_personal_address': user.profile.name if user.profile.name else user.username,
+                'course_name': schedule.enrollment.course.display_name,
+                'course_url': absolute_url(site, reverse('course_root', args=[str(schedule.enrollment.course_id)])),
+                'week_num': week_num,
+                'week_summary': week_summary,
 
-    for schedule in schedules:
-        enrollment = schedule.enrollment
-        try:
-            week_summary = get_course_week_summary(
-                enrollment.course_id, week_num)
-        except CourseUpdateDoesNotExist:
-            continue
+                # This is used by the bulk email optout policy
+                'course_ids': [course_id_str],
+            })
 
-        user = enrollment.user
-        course_id_str = str(enrollment.course_id)
-
-        template_context = get_base_template_context(site)
-        template_context.update({
-            'student_name': user.profile.name,
-            'user_personal_address': user.profile.name if user.profile.name else user.username,
-            'course_name': schedule.enrollment.course.display_name,
-            'course_url': absolute_url(site, reverse('course_root', args=[str(schedule.enrollment.course_id)])),
-            'week_num': week_num,
-            'week_summary': week_summary,
-
-            # This is used by the bulk email optout policy
-            'course_ids': [course_id_str],
-        })
-
-        yield (user, schedule.enrollment.course.language, template_context)
+            yield (user, schedule.enrollment.course.language, template_context)
 
 
 @request_cached
