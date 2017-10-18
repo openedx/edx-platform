@@ -3,6 +3,7 @@
 
   .program_title {
     font-weight: bold;
+    margin-top: $baseline
   }
 
   .logo {
@@ -23,10 +24,12 @@
   .main-banner {
     color: white;
     margin-bottom: 1px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
 
     .authoring-org-logo {
       background-color: $white;
-      margin-bottom: $baseline;
     }
 
     .btn {
@@ -34,7 +37,6 @@
     }
 
     .btn,
-    .authoring-org-logo,
     h1,
     h2,
     a {
@@ -48,6 +50,7 @@
 
       button {
         background-color: transparent;
+        color: $white
       }
 
       iframe {

@@ -44,7 +44,7 @@ expected_learning_items = program['expected_learning_items']
 authoring_organizations = program['authoring_organizations']
 min_hours_effort_per_week = program['min_hours_effort_per_week']
 max_hours_effort_per_week = program['max_hours_effort_per_week']
-video_url = program.get('video', {}).get('src', '')
+video_url = program['video'].get('src') if program['video'] else ''
 banner_image = program.get('banner_image', {}).get('large', {}).get('url', '')
 %>
 
@@ -54,7 +54,7 @@ banner_image = program.get('banner_image', {}).get('large', {}).get('url', '')
 
 <%block name="pagetitle">${program['title']}</%block>
 <div id="program-details-page" class="container">  
-  <div class="row main-banner" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url(${banner_image}) no-repeat center;">
+  <div class="row main-banner" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url(${banner_image});">
     <div class="col col-12 col-md-8">
       % if authoring_organizations and authoring_organizations[0]['logo_image_url']:
       <div>
@@ -80,12 +80,14 @@ banner_image = program.get('banner_image', {}).get('large', {}).get('url', '')
       </div>
     </div>
     <div class="col col-12 col-md-4">
+      % if video_url:
       <div id="program_video">
         <button type="button" class="btn" aria-label="${_('Play')}" onclick="playVideo('${video_url}')">
           <span class="icon fa fa-4x fa-play-circle" aria-hidden="true"></span>
         </button>
         <iframe class="align-middle" title="${_('YouTube Video')}" src="" frameborder="0" allowfullscreen style="display:none;"></iframe>
       </div>
+      % endif
     </div>
   </div>
   <div class="row quick-nav">
