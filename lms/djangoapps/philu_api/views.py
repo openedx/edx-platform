@@ -20,9 +20,10 @@ class UpdateCommunityProfile(APIView):
         """ Update provided information in openEdx received from nodeBB client """
 
         username = request.GET.get('username')
+        email = request.GET.get('email')
 
         token = request.META["HTTP_X_CSRFTOKEN"]
-        if not token == get_encoded_token(username):
+        if not token == get_encoded_token(username, email):
             return JsonResponse({"message": "Invalid Session token"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
