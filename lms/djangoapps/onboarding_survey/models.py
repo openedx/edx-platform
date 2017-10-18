@@ -2,9 +2,13 @@
 Models to support the on-boarding surveys
 """
 from django.db import models
-from django import forms
 from django.contrib.auth.models import User
-from student.models import UserProfile
+from django.dispatch import receiver
+import logging
+
+from common.lib.nodebb_client.client import NodeBBClient
+
+log = logging.getLogger("edx.onboarding_survey")
 
 
 class Organization(models.Model):
@@ -318,3 +322,35 @@ class History(models.Model):
 
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(blank=True, null=True)
+
+
+@receiver(models.signals.post_save, sender=UserInfoSurvey)
+@receiver(models.signals.post_save, sender=ExtendedProfile)
+def sync_user_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
+    """ Sync user information with  """
+    user = instance.user
+
+    if user:
+        try:
+            extended_profile = user.extended_profile
+            user_info_survey = user.user_info_survey
+        except UserInfoSurvey.DoesNotExist:
+            return
+        except ExtendedProfile.DoesNotExist:
+            return
+
+        data_to_sync = {
+            "first_name": extended_profile.first_name,
+            "last_name": extended_profile.last_name,
+            "city_of_residence": user_info_survey.city_of_residence,
+            "country_of_residence": user_info_survey.country_of_residence
+        }
+
+        status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
+
+        if status_code != 200:
+            log.error(
+                "Error: Can not update user({}) on nodebb due to {}".format(user.username, response_body)
+            )
+        else:
+            log.info('Success: User({}) has been updated on nodebb'.format(user.username))
