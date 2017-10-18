@@ -31,10 +31,6 @@ KNOWN_RETRY_ERRORS = (  # Errors we expect occasionally that could resolve on re
     DatabaseError,
     ValidationError,
 )
-DEFAULT_NUM_BINS = 24
-RECURRING_NUDGE_NUM_BINS = DEFAULT_NUM_BINS
-UPGRADE_REMINDER_NUM_BINS = DEFAULT_NUM_BINS
-COURSE_UPDATE_NUM_BINS = DEFAULT_NUM_BINS
 
 
 @task(bind=True, default_retry_delay=30, routing_key=ROUTING_KEY)

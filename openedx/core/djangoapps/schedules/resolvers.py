@@ -18,10 +18,6 @@ from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 from openedx.core.djangoapps.schedules.tasks import (
-    DEFAULT_NUM_BINS,
-    RECURRING_NUDGE_NUM_BINS,
-    UPGRADE_REMINDER_NUM_BINS,
-    COURSE_UPDATE_NUM_BINS,
     recurring_nudge_schedule_bin,
     upgrade_reminder_schedule_bin,
     course_update_schedule_bin,
@@ -40,6 +36,11 @@ from xmodule.modulestore.django import modulestore
 
 
 LOG = logging.getLogger(__name__)
+
+DEFAULT_NUM_BINS = 24
+RECURRING_NUDGE_NUM_BINS = DEFAULT_NUM_BINS
+UPGRADE_REMINDER_NUM_BINS = DEFAULT_NUM_BINS
+COURSE_UPDATE_NUM_BINS = DEFAULT_NUM_BINS
 
 class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
     """

@@ -6,7 +6,7 @@ from django.conf import settings
 from mock import patch
 
 from openedx.core.djangoapps.schedules.resolvers import BinnedSchedulesBaseResolver
-from openedx.core.djangoapps.schedules.tasks import DEFAULT_NUM_BINS
+from openedx.core.djangoapps.schedules.resolvers import DEFAULT_NUM_BINS
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms

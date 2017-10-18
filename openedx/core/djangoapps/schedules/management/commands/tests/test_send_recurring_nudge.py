@@ -81,7 +81,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
             retry=False,
         )
         mock_schedule_bin.apply_async.assert_any_call(
-            (self.site_config.site.id, serialize(test_day), -3, tasks.RECURRING_NUDGE_NUM_BINS - 1, [], True, None),
+            (self.site_config.site.id, serialize(test_day), -3, resolvers.RECURRING_NUDGE_NUM_BINS - 1, [], True, None),
             retry=False,
         )
         self.assertFalse(mock_ace.send.called)
@@ -97,11 +97,11 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
             ) for i in range(schedule_count)
         ]
 
-        bins_in_use = frozenset((s.enrollment.user.id % tasks.RECURRING_NUDGE_NUM_BINS) for s in schedules)
+        bins_in_use = frozenset((s.enrollment.user.id % resolvers.RECURRING_NUDGE_NUM_BINS) for s in schedules)
 
         test_datetime = datetime.datetime(2017, 8, 3, 18, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
-        for b in range(tasks.RECURRING_NUDGE_NUM_BINS):
+        for b in range(resolvers.RECURRING_NUDGE_NUM_BINS):
             expected_queries = NUM_QUERIES_NO_MATCHING_SCHEDULES
             if b in bins_in_use:
                 # to fetch course modes for valid schedules
@@ -126,7 +126,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
 
         test_datetime = datetime.datetime(2017, 8, 3, 20, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
-        for b in range(tasks.RECURRING_NUDGE_NUM_BINS):
+        for b in range(resolvers.RECURRING_NUDGE_NUM_BINS):
             with self.assertNumQueries(NUM_QUERIES_NO_MATCHING_SCHEDULES, table_blacklist=WAFFLE_TABLES):
                 tasks.recurring_nudge_schedule_bin(
                     self.site_config.site.id, target_day_str=test_datetime_str, day_offset=-3, bin_num=b,
@@ -143,7 +143,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
 
     @patch.object(tasks, '_recurring_nudge_schedule_send')
     def test_send_after_course_end(self, mock_schedule_send):
-        user1 = UserFactory.create(id=tasks.RECURRING_NUDGE_NUM_BINS)
+        user1 = UserFactory.create(id=resolvers.RECURRING_NUDGE_NUM_BINS)
 
         schedule = ScheduleFactory.create(
             start=datetime.datetime(2017, 8, 3, 20, 34, 30, tzinfo=pytz.UTC),
@@ -199,8 +199,8 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         for config in (limited_config, unlimited_config):
             ScheduleConfigFactory.create(site=config.site)
 
-        user1 = UserFactory.create(id=tasks.RECURRING_NUDGE_NUM_BINS)
-        user2 = UserFactory.create(id=tasks.RECURRING_NUDGE_NUM_BINS * 2)
+        user1 = UserFactory.create(id=resolvers.RECURRING_NUDGE_NUM_BINS)
+        user2 = UserFactory.create(id=resolvers.RECURRING_NUDGE_NUM_BINS * 2)
 
         ScheduleFactory.create(
             start=datetime.datetime(2017, 8, 3, 17, 44, 30, tzinfo=pytz.UTC),
@@ -247,7 +247,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         with self.assertNumQueries(NUM_QUERIES_WITH_MATCHES, table_blacklist=WAFFLE_TABLES):
             tasks.recurring_nudge_schedule_bin(
                 self.site_config.site.id, target_day_str=test_datetime_str, day_offset=-3,
-                bin_num=user.id % tasks.RECURRING_NUDGE_NUM_BINS,
+                bin_num=user.id % resolvers.RECURRING_NUDGE_NUM_BINS,
                 org_list=[schedules[0].enrollment.course.org],
             )
         self.assertEqual(mock_schedule_send.apply_async.call_count, 1)
@@ -434,7 +434,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         return templates_override
 
     def _calculate_bin_for_user(self, user):
-        return user.id % tasks.RECURRING_NUDGE_NUM_BINS
+        return user.id % resolvers.RECURRING_NUDGE_NUM_BINS
 
     def _contains_upsell_attribute(self, msg_attr):
         msg = Message.from_string(msg_attr)
