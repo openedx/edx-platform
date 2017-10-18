@@ -324,4 +324,11 @@ def get_user_organizations(request):
         for organization in all_organizations:
             final_result[organization.name] = organization.is_poc_exist
 
+        if request.user.is_authenticated():
+            user_extended_profile = request.user.extended_profile
+            final_result['user_org_info'] = {
+                'org': user_extended_profile.organization.name,
+                'admin_email': user_extended_profile.org_admin_email
+            }
+
     return JsonResponse(final_result)

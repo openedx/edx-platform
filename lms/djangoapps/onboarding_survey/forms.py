@@ -299,8 +299,14 @@ class RegModelForm(forms.ModelForm):
         is_poc = extended_profile.is_poc
         organization_to_assign, is_created = Organization.objects.get_or_create(name=organization_name)
         organization_to_assign.is_poc_exist = is_poc
-
         organization_to_assign.save()
+
+        prev_org = extended_profile.organization
+
+        if prev_org:
+            if organization_to_assign.name != prev_org.name:
+                prev_org.is_poc_exist = False
+                prev_org.save()
 
         extended_profile.organization = organization_to_assign
 
