@@ -222,16 +222,11 @@ def _upgrade_reminder_schedules_for_bin(site, current_datetime, target_datetime,
         exclude_orgs=exclude_orgs,
     )
 
-    for schedule in schedules:
-        enrollment = schedule.enrollment
-        user = enrollment.user
+    for (user, user_schedules) in groupby(schedules, lambda s: s.enrollment.user):
+        user_schedules = list(user_schedules)
+        course_id_strs = [str(schedule.enrollment.course_id) for schedule in user_schedules]
 
-        course_id_str = str(enrollment.course_id)
-
-        # TODO: group by schedule and user like recurring nudge
-        course_id_strs = [course_id_str]
-        first_schedule = schedule
-
+        first_schedule = user_schedules[0]
         template_context = get_base_template_context(site)
         template_context.update({
             'student_name': user.profile.name,
@@ -242,6 +237,7 @@ def _upgrade_reminder_schedules_for_bin(site, current_datetime, target_datetime,
 
             # This is used by the bulk email optout policy
             'course_ids': course_id_strs,
+
             'cert_image': absolute_url(site, static('course_experience/images/verified-cert.png')),
         })
 

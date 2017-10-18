@@ -34,8 +34,9 @@ NUM_QUERIES_NO_MATCHING_SCHEDULES = 2
 NUM_QUERIES_WITH_MATCHES = NUM_QUERIES_NO_MATCHING_SCHEDULES + 1
 
 # 1) Global dynamic deadline switch
+# 2) Course dynamic deadline switch
 # 2) E-commerce configuration
-NUM_QUERIES_WITH_DEADLINE = 2
+NUM_QUERIES_WITH_DEADLINE = 3
 
 NUM_COURSE_MODES_QUERIES = 1
 
@@ -233,7 +234,7 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
                 bin_num=user.id % tasks.UPGRADE_REMINDER_NUM_BINS,
                 org_list=[schedules[0].enrollment.course.org],
             )
-        self.assertEqual(mock_schedule_send.apply_async.call_count, 3)
+        self.assertEqual(mock_schedule_send.apply_async.call_count, 1)
         self.assertFalse(mock_ace.send.called)
 
     @ddt.data(*itertools.product((1, 10, 100), (2, 10)))
@@ -281,7 +282,7 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
 
                 # we execute one query per course to see if it's opted out of dynamic upgrade deadlines, however,
                 # since we create a new course for each schedule in this test, we expect there to be one per message
-                num_expected_queries = NUM_QUERIES_WITH_MATCHES + NUM_QUERIES_WITH_DEADLINE + message_count
+                num_expected_queries = NUM_QUERIES_WITH_MATCHES + NUM_QUERIES_WITH_DEADLINE
                 with self.assertNumQueries(num_expected_queries, table_blacklist=WAFFLE_TABLES):
                     tasks.upgrade_reminder_schedule_bin(
                         self.site_config.site.id, target_day_str=test_datetime_str, day_offset=day,
@@ -289,15 +290,15 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
                         org_list=[schedules[0].enrollment.course.org],
                     )
 
-            self.assertEqual(len(sent_messages), message_count)
+            self.assertEqual(len(sent_messages), 1)
 
             # Load the site (which we query per message sent)
             # Check the schedule config
-            with self.assertNumQueries(1 + message_count):
+            with self.assertNumQueries(2):
                 for args in sent_messages:
                     tasks._upgrade_reminder_schedule_send(*args)
 
-            self.assertEqual(mock_channel.deliver.call_count, message_count)
+            self.assertEqual(mock_channel.deliver.call_count, 1)
             for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
                 for template in attr.astuple(email):
                     self.assertNotIn("TEMPLATE WARNING", template)
