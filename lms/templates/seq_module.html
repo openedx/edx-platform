@@ -15,7 +15,11 @@
   <div class="sequence-nav">
     <button class="sequence-nav-button button-previous" aria-hidden="true">
       <span class="icon fa fa-chevron-prev" aria-hidden="true"></span>
-      <span>${_('Previous')}</span>
+      <span class="sequence-nav-button-label">${_('Previous')}</span>
+    </button>
+    <button class="sequence-nav-button button-next" aria-hidden="true">
+      <span class="sequence-nav-button-label">${_('Next')}</span>
+      <span class="icon fa fa-chevron-next" aria-hidden="true"></span>
     </button>
     <nav class="sequence-list-wrapper" aria-label="${_('Sequence')}">
       <ol id="sequence-list" role="tablist">
@@ -41,10 +45,6 @@
         % endfor
       </ol>
     </nav>
-    <button class="sequence-nav-button button-next" aria-hidden="true">
-      <span>${_('Next')}</span>
-      <span class="icon fa fa-chevron-next" aria-hidden="true"></span>
-    </button>
   </div>
 
   <div class="sr-is-focusable" tabindex="-1"></div>

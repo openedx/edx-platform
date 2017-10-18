@@ -54,7 +54,8 @@ $course-search-input-height: ($button-size);
       vertical-align: top;
 
       // STATE: hover and focus
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         .actions {
           display: none;
         }
@@ -152,7 +153,8 @@ $course-search-input-height: ($button-size);
           text-shadow: none;
 
           // STATE: hover and focus
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             background: $m-blue-l1;
           }
         }
@@ -181,7 +183,8 @@ $course-search-input-height: ($button-size);
       width: flex-grid(2) + flex-gutter();
       z-index: 2;
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         text-decoration: underline;
       }
 
@@ -239,7 +242,8 @@ $course-search-input-height: ($button-size);
         }
       }
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         .play-intro {
           @include background-image(linear-gradient(-90deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.8)));
 
@@ -416,7 +420,8 @@ $course-search-input-height: ($button-size);
 
             @include transition(all 0.15s ease-in-out 0s);
 
-            &:hover, &:focus {
+            &:hover,
+            &:focus {
               color: $lighter-base-font-color;
             }
           }
@@ -431,7 +436,8 @@ $course-search-input-height: ($button-size);
           z-index: 2;
         }
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           text-decoration: none;
 
           &::before {
@@ -478,10 +484,11 @@ $course-search-input-height: ($button-size);
             }
 
             .name > span {
-              font-size: 1.0em;
+              font-size: 1em;
             }
 
-            &:hover, &:focus {
+            &:hover,
+            &:focus {
               .name {
                 bottom: 14px;
               }
@@ -571,7 +578,8 @@ $course-search-input-height: ($button-size);
 
           width: flex-grid(4);
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             background: $body-bg;
             border: 1px solid $border-color-2;
             box-shadow: inset 0 0 3px 0 $shadow-l1;
@@ -614,7 +622,8 @@ $course-search-input-height: ($button-size);
               color: $body-color;
               font: 700 1em/1.2em $font-family-sans-serif;
 
-              &:hover, &:focus {
+              &:hover,
+              &:focus {
                 color: $blue;
                 text-decoration: underline;
               }
@@ -649,7 +658,8 @@ $course-search-input-height: ($button-size);
 
             color: lighten($body-color, 50%);
 
-            &:hover, &:focus {
+            &:hover,
+            &:focus {
               color: $blue;
               text-decoration: underline;
             }

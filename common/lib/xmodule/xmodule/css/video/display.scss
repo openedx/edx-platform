@@ -57,7 +57,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
     .video-player {
       position: relative;
 
-      &:before {
+      &::before {
         display: block;
         content: "";
         width: 100%;
@@ -75,16 +75,18 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
   .focus_grabber {
     position: relative;
     display: inline;
-    width: 0px;
-    height: 0px;
+    width: 0;
+    height: 0;
   }
 
   .downloads-heading {
-    margin: 1em 0 0 0;
+    margin: 1em 0 0;
   }
 
   .wrapper-downloads {
-    display: flex;
+    @include media-breakpoint-up(md) {
+      display: flex;
+    }
 
     .hd {
       margin: 0;
@@ -154,8 +156,8 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
         color: theme-color("primary");
       }
 
-      .btn-play:after {
-        background: $white;
+      .btn-play::after {
+        background: theme-color("inverse");
       }
     }
 
@@ -176,7 +178,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       padding: 30px;
       border-radius: 25%;
 
-      &:after{
+      &::after {
         @include animation(rotateCW 3s infinite linear);
 
         content: '';
@@ -200,7 +202,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       font-size: 4em;
       cursor: pointer;
 
-      &:after {
+      &::after {
         background: $white;
         position: absolute;
         width: 50%;
@@ -229,17 +231,17 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       max-height: ($baseline * 3);
       border-radius: ($baseline / 5);
       padding: 8px ($baseline / 2) 8px ($baseline * 1.5);
-      background: rgba(0, 0, 0, .75);
+      background: rgba(0, 0, 0, 0.75);
       color: $yellow;
 
-      &:before {
+      &::before {
         position: absolute;
         display: inline-block;
         top: 50%;
 
         @include left($baseline);
 
-        margin-top: -.6em;
+        margin-top: -0.6em;
         font-family: 'FontAwesome';
         content: "\f142";
         color: $white;
@@ -248,11 +250,11 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
       &:hover,
       &.is-dragging {
-        background: rgba(0, 0, 0, 1.0);
+        background: rgba(0, 0, 0, 1);
         cursor: move;
 
-        &:before {
-          opacity: 1.0;
+        &::before {
+          opacity: 1;
         }
       }
     }
@@ -269,7 +271,8 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
         }
       }
 
-      .video-error, .video-hls-error {
+      .video-error,
+      .video-hls-error {
         padding: ($baseline / 5);
         background: black;
         color: white !important; // the pattern library headings shim is more scoped
@@ -355,7 +358,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       .slider {
         @include clearfix();
         @include transform-origin(bottom left);
-        @include transition(height .7s ease-in-out 0s);
+        @include transition(height 0.7s ease-in-out 0s);
 
         box-sizing: border-box;
         position: absolute;
@@ -386,7 +389,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
           @extend %ui-fake-link;
 
           @include transform-origin(bottom left);
-          @include transition(all .7s ease-in-out 0s);
+          @include transition(all 0.7s ease-in-out 0s);
 
           box-sizing: border-box;
           top: -1px;
@@ -436,13 +439,13 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
           @extend %t-strong;
           @extend %t-title7;
 
-          @include padding-left(lh(.75));
+          @include padding-left(lh(0.75));
 
           display: inline-block;
           color: rgb(207, 216, 220); // UXPL grayscale-cool light
-          -webkit-font-smoothing: antialiased;;
+          -webkit-font-smoothing: antialiased;
 
-          @media            (max-width: 1120px) {
+          @media (max-width: 1120px) {
             @include padding-left(lh(0.5));
           }
         }
@@ -801,7 +804,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
   &.closed {
     .video-wrapper {
-      width: flex-grid(9,9);
+      width: flex-grid(9, 9);
       background-color: inherit;
     }
 
@@ -846,7 +849,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
   &.video-fullscreen {
     @extend %ui-depth4;
 
-    background: rgba(#000, .95);
+    background: rgba(#000, 0.95);
     border: 0;
     bottom: 0;
     height: 100%;
@@ -899,7 +902,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
         object,
         iframe,
-        video{
+        video {
           position: absolute;
           width: auto;
           height: auto;
@@ -974,7 +977,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       background: $black-t2;
       box-shadow: none;
 
-      &:after {
+      &::after {
         // the button class, ties to functionality, also uses an icon font
         // we're overriding it here so we can use our image instead
         display: none;

@@ -48,7 +48,8 @@
     }
 
     // STATE: hover/focus
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       .incontext-editor-open-action {
         opacity: 1;
       }

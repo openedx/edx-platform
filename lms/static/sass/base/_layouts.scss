@@ -6,11 +6,6 @@
 body.view-in-course {
   background-color: $body-bg;
 
-  // keep application of widths to window-wrap
-  .window-wrap {
-    min-width: 760px;
-  }
-
   // courseware header
   .header-global,
   .header-global.slim {
@@ -19,7 +14,8 @@ body.view-in-course {
     .wrapper-header {
       min-width: auto;
 
-      .user-dropdown, .dropdown {
+      .user-dropdown,
+      .dropdown {
         padding: ($baseline/2);
       }
     }
@@ -41,7 +37,7 @@ body.view-in-course {
   }
 
   .wrapper-course-material .course-material {
-    padding: ($baseline/2) 0 0 0;
+    padding: 0;
   }
 
   .wrapper-course-material .course-material .course-tabs {
@@ -53,7 +49,6 @@ body.view-in-course {
     max-width: none;
     min-width: initial;
     width: auto;
-    padding: 0 2%;
   }
 
   // course info page

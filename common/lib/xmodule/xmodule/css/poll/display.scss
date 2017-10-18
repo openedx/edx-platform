@@ -179,7 +179,7 @@ div.poll_question {
 
         .percent {
           background-color: gray;
-          width: 0px;
+          width: 0;
           height: 20px;
 
           &.short { }
@@ -202,16 +202,16 @@ div.poll_question {
   }
 
   .poll_answer.answered {
-    -webkit-box-shadow: rgb(97, 184, 225) 0px 1px 0px 0px inset;
+    -webkit-box-shadow: rgb(97, 184, 225) 0 1px 0 0 inset;
     background-color: rgb(29, 157, 217);
     background-image: -webkit-linear-gradient(top, rgb(29, 157, 217), rgb(14, 124, 176));
     border-bottom-color: rgb(13, 114, 162);
     border-left-color: rgb(13, 114, 162);
     border-right-color: rgb(13, 114, 162);
     border-top-color: rgb(13, 114, 162);
-    box-shadow: rgb(97, 184, 225) 0px 1px 0px 0px inset;
+    box-shadow: rgb(97, 184, 225) 0 1px 0 0 inset;
     color: rgb(255, 255, 255);
-    text-shadow: rgb(7, 103, 148) 0px 1px 0px;
+    text-shadow: rgb(7, 103, 148) 0 1px 0;
   }
 
   .button.reset-button {

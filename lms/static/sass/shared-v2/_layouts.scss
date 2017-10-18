@@ -2,7 +2,12 @@
 
 .content-wrapper {
   max-width: map-get($container-max-widths, xl);
-  padding-bottom: $baseline*2;
+  margin-top: $baseline;
+  padding: 0 0 $baseline/2;
+
+  @include media-breakpoint-up(md) {
+    padding: 0 $baseline $baseline/2;
+  }
 
   .page-content-container {
     @include clearfix();
@@ -39,21 +44,23 @@
         display: inline-block;
       }
 
-      .page-header-secondary {
-        @include float(right);
-        @include text-align(right);
+      @include media-breakpoint-up(md) {
+        .page-header-secondary {
+          @include float(right);
+          @include text-align(right);
 
-        display: flex;
-        vertical-align: text-bottom;
+          display: flex;
+          vertical-align: text-bottom;
 
-        .form-actions {
-          @include margin-left($baseline/2);
+          .form-actions {
+            @include margin-left($baseline/2);
 
-          display: inline-block;
-        }
+            display: inline-block;
+          }
 
-        .form-actions > *:first-child {
-          @include margin-left(0);
+          .form-actions > *:first-child {
+            @include margin-left(0);
+          }
         }
       }
     }

@@ -28,14 +28,14 @@
 
 // +Font Sizing - Mixin
 // ====================
-@mixin font-size($sizeValue: 16){
+@mixin font-size($sizeValue: 16) {
   font-size: $sizeValue + px;
   font-size: ($sizeValue/10) + rem;
 }
 
 // +Line Height - Mixin
 // ====================
-@mixin line-height($fontSize: auto){
+@mixin line-height($fontSize: auto) {
   line-height: ($fontSize*1.48) + px;
   line-height: (($fontSize/10)*1.48) + rem;
 }
@@ -120,14 +120,14 @@
 }
 
 // layout placeholders
-.ui-col-wide  {
+.ui-col-wide {
   width: flex-grid(9, 12);
 
   @include margin-right(flex-gutter());
   @include float(left);
 }
 
-.ui-col-narrow  {
+.ui-col-narrow {
   width: flex-grid(3, 12);
 
   @include float(left);
@@ -145,7 +145,8 @@
   background: $white;
 
   // STATE: hover/active
-  &:hover, &:active {
+  &:hover,
+  &:active {
     box-shadow: 0 1px 1px $shadow;
   }
 }
@@ -203,11 +204,9 @@
   display: inline-block;
   cursor: pointer;
 
-  &:hover, &:active {
-
-  }
-
-  &.disabled, &[disabled], &.is-disabled {
+  &.disabled,
+  &[disabled],
+  &.is-disabled {
     cursor: default;
     pointer-events: none;
     border: 1px solid $gray-l3;
@@ -237,21 +236,26 @@
   @extend %ui-btn-pill;
   @extend %t-strong;
 
-  padding:($baseline/2) $baseline;
+  padding: ($baseline/2) $baseline;
   border-width: 1px;
   border-style: solid;
   box-shadow: none;
   line-height: 1.5em;
   text-align: center;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     box-shadow: 0 2px 1px $shadow;
   }
 
-  &.current, &.active {
+  &.current,
+  &.active {
     box-shadow: inset 1px 1px 2px $shadow-d1;
 
-    &:hover, &:active, &:focus {
+    &:hover,
+    &:active,
+    &:focus {
       box-shadow: inset 1px 1px 1px $shadow-d1;
     }
   }
@@ -264,14 +268,14 @@
 
   border-width: 1px;
   border-style: solid;
-  padding:($baseline/2) $baseline;
+  padding: ($baseline/2) $baseline;
   background: transparent;
   line-height: 1.5em;
   text-align: center;
 }
 
 %ui-btn-flat-outline {
-  @include transition(all .15s);
+  @include transition(all 0.15s);
 
   @extend %t-strong;
   @extend %t-action4;
@@ -283,14 +287,15 @@
   background-color: theme-color("inverse");
   color: theme-color("primary");
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     border: 1px solid $uxpl-blue-hover-active;
     background-color: $uxpl-blue-hover-active;
     color: theme-color("inverse");
   }
 
   &.is-disabled,
-  &[disabled="disabled"]{
+  &[disabled="disabled"] {
     border: 1px solid $gray-l2;
     background-color: $gray-l4;
     color: $gray-l2;
@@ -300,7 +305,7 @@
 
 // button with no button shell until hover for understated actions
 %ui-btn-non {
-  @include transition(all .15s);
+  @include transition(all 0.15s);
 
   @extend %ui-btn-pill;
 
@@ -313,7 +318,8 @@
   background: none;
   color: $gray-l1;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background-color: $gray-l1;
     color: $white;
   }
@@ -323,7 +329,8 @@
 %ui-btn-non-blue {
   @extend %ui-btn-non;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background-color: theme-color("primary");
     color: theme-color("inverse");
   }
@@ -363,7 +370,7 @@
   @extend %ui-well;
   @extend %t-copy-base;
 
-  opacity: .6;
+  opacity: 0.6;
   background-color: $white;
   padding: ($baseline*1.5) $baseline;
   text-align: center;

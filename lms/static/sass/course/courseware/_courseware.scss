@@ -19,6 +19,11 @@ html.video-fullscreen {
   @extend %ui-print-excluded;
 
   margin: ($baseline/2) ($baseline/4) 0 0;
+  display: none;
+
+  @include media-breakpoint-up(md) {
+    display: block;
+  }
 
   &.studio-view {
     margin: 0;
@@ -100,7 +105,6 @@ html.video-fullscreen {
   }
 }
 
-// TO-DO should this be content wrapper?
 .course-wrapper {
   position: relative;
 
@@ -130,6 +134,12 @@ html.video-fullscreen {
       overflow-wrap: break-word;
       word-wrap: break-word;
       word-break: break-word;
+    }
+
+    // Make text-focused blocks have a maximum width for readability.
+    .xmodule_HtmlModule,
+    .xmodule_CapaModule {
+      max-width: $text-width-readability-max;
     }
 
     h1 {

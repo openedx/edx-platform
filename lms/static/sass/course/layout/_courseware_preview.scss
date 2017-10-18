@@ -1,7 +1,7 @@
 .wrapper-preview-menu {
   @include clearfix();
 
-  margin: 0 auto 0;
+  margin: 0 auto;
   padding: ($baseline*0.75);
   background-color: $lms-preview-menu-color;
   box-sizing: border-box;

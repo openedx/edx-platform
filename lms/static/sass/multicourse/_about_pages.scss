@@ -27,8 +27,10 @@
 
       text-transform: lowercase;
 
-      &:hover, &:active, &:focus {
-        border-color: rgb(200,200,200);
+      &:hover,
+      &:active,
+      &:focus {
+        border-color: rgb(200, 200, 200);
         color: $body-color;
         text-decoration: none;
       }
@@ -41,7 +43,7 @@
     }
 
     .our-mission {
-      border-bottom: 1px solid rgb(220,220,220);
+      border-bottom: 1px solid rgb(220, 220, 220);
 
       @include clearfix();
 
@@ -49,7 +51,7 @@
       padding-bottom: 40px;
 
       .logo {
-        @include border-right(1px solid rgb(200,200,200));
+        @include border-right(1px solid rgb(200, 200, 200));
         @include box-sizing(border-box);
         @include float(left);
 
@@ -83,7 +85,7 @@
     }
 
     .message {
-      border-bottom: 1px solid rgb(220,220,220);
+      border-bottom: 1px solid rgb(220, 220, 220);
 
       @include clearfix();
 
@@ -100,7 +102,7 @@
       }
 
       h2 {
-        border-bottom: 1px solid rgb(200,200,200);
+        border-bottom: 1px solid rgb(200, 200, 200);
         padding-bottom: 15px;
       }
 
@@ -114,7 +116,7 @@
         width: flex-grid(3);
 
         img {
-          background: rgb(245,245,245);
+          background: rgb(245, 245, 245);
           display: block;
           width: 100%;
         }
@@ -167,7 +169,7 @@
     @include clearfix();
 
     nav.categories {
-      border: 1px solid rgb(220,220,220);
+      border: 1px solid rgb(220, 220, 220);
 
       @include box-sizing(border-box);
       @include float(left);
@@ -185,8 +187,9 @@
 
         text-align: left;
 
-        &:hover, &:focus {
-          background: rgb(245,245,245);
+        &:hover,
+        &:focus {
+          background: rgb(245, 245, 245);
           text-decoration: none;
         }
       }
@@ -205,7 +208,7 @@
         }
 
         > h2 {
-          border-bottom: 1px solid rgb(220,220,220);
+          border-bottom: 1px solid rgb(220, 220, 220);
           margin-bottom: ($baseline*2);
           padding-bottom: $baseline;
         }
@@ -225,7 +228,7 @@
 
   .press {
     .press-story {
-      border-bottom: 1px solid rgb(220,220,220);
+      border-bottom: 1px solid rgb(220, 220, 220);
 
       @include clearfix();
 
@@ -240,7 +243,7 @@
 
       .article-cover {
         background: rgb(255, 255, 255);
-        border: 1px solid rgb(120,120,120);
+        border: 1px solid rgb(120, 120, 120);
 
         @include box-sizing(border-box);
         @include float(left);

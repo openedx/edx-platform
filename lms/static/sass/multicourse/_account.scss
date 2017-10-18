@@ -92,7 +92,6 @@
     padding: $baseline/2 $baseline*2.5;
     text-transform: lowercase;
     color: $very-light-text;
-    letter-spacing: 0.1rem;
     font-weight: 600;
     cursor: pointer;
     text-align: center;
@@ -194,7 +193,12 @@
     @extend %body-text;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     letter-spacing: 0;
   }
 
@@ -506,7 +510,8 @@
       @extend %m-btn-primary;
       @extend %t-action2;
 
-      &:disabled, &.is-disabled {
+      &:disabled,
+      &.is-disabled {
         opacity: 0.3;
         cursor: default !important;
       }
@@ -564,7 +569,7 @@
   }
 
   .form-actions.form-third-party-auth {
-    width: flex-grid(8,8);
+    width: flex-grid(8, 8);
     margin-bottom: $baseline;
 
     button[type="submit"] {
@@ -615,7 +620,6 @@
       &.button-oa2-linkedin-oauth2:hover {
         box-shadow: 0 2px 1px 0 #005d8e;
       }
-
     }
   }
 
@@ -626,7 +630,7 @@
     margin: 0 0 $baseline 0;
     border-bottom: 3px solid shade($yellow, 10%);
     padding: $baseline $baseline;
-    background: tint($yellow,20%);
+    background: tint($yellow, 20%);
 
     .message-title {
       @extend %heading-4;
