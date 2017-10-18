@@ -19,7 +19,8 @@ class UserSessionSharingMiddleware(object):
         try:
             if request.user.is_authenticated():
                 encoded_jwt = jwt.encode({'id': request.user.id,
-                                        'username': request.user.username},
+                                        'username': request.user.username,
+                                        'email': request.user.email},
                                         'secret', algorithm='HS256')
                 response.set_cookie('token', encoded_jwt, domain=".philanthropyu.org")
             else:
