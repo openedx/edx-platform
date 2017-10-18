@@ -15,4 +15,4 @@ class DiscussionCommunity(TimeStampedModel):
     community_url = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
-        return "%s %s" % (self.course.display_name, self.community_url)
+        return "%s" % self.community_url

@@ -13,7 +13,7 @@ log = logging.getLogger("edx.discussions_nodebb")
 
 
 @login_required
-def nodebb_form_discussion(request, course_id):
+def nodebb_forum_discussion(request, course_id):
     """
     Redirect user to nodeBB forum page that is loaded into our template using iframe
     """
