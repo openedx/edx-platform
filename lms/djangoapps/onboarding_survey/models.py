@@ -342,7 +342,7 @@ def sync_user_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=u
         "country_of_residence": user_info_survey.country_of_residence
     }
 
-    status_code, response_body = NodeBBClient().users.update_profile("zee", kwargs=data_to_sync)
+    status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
 
     if status_code != 200:
         log.error(
