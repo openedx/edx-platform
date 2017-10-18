@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 XMODULES = [
     "book = xmodule.backcompat_module:TranslateCustomTagDescriptor",
-    "chapter = xmodule.seq_module:SequenceDescriptor",
+    "chapter = xmodule.seq_module:SectionDescriptor",
     "conditional = xmodule.conditional_module:ConditionalDescriptor",
     "course = xmodule.course_module:CourseDescriptor",
     "customtag = xmodule.template_module:CustomTagDescriptor",
