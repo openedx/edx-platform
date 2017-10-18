@@ -67,18 +67,22 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': TEST_ROOT / "db" / "test_edx.db",
-        'TEST_NAME': TEST_ROOT / "db" / "test_edx.db",
         'OPTIONS': {
             'timeout': 30,
         },
         'ATOMIC_REQUESTS': True,
+        'TEST': {
+            'NAME': TEST_ROOT / "db" / "test_edx.db",
+        },
     },
     'student_module_history': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': TEST_ROOT / "db" / "test_student_module_history.db",
-        'TEST_NAME': TEST_ROOT / "db" / "test_student_module_history.db",
         'OPTIONS': {
             'timeout': 30,
+        },
+        'TEST': {
+            'NAME': TEST_ROOT / "db" / "test_student_module_history.db",
         },
     }
 }
