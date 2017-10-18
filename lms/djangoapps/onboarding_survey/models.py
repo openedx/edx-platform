@@ -340,7 +340,6 @@ def sync_user_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=u
             return
 
         data_to_sync = {
-            "_uid": 1,
             "first_name": extended_profile.first_name,
             "last_name": extended_profile.last_name,
             "city_of_residence": user_info_survey.city_of_residence,
