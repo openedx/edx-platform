@@ -9,10 +9,9 @@ from django.contrib.sites.models import Site
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.db.models import F, Min, Q
+from django.db.models import F, Q
 from django.db.utils import DatabaseError
 from django.utils.formats import dateformat, get_format
-import pytz
 
 from edx_ace import ace
 from edx_ace.message import Message
@@ -21,21 +20,15 @@ from edx_ace.utils.date import deserialize
 from opaque_keys.edx.keys import CourseKey
 
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from openedx.core.djangoapps.monitoring_utils import set_custom_metric, function_trace
+from request_cache.middleware import request_cached
+from xmodule.modulestore.django import modulestore
 
-from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.message_type import ScheduleMessageType
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
-from openedx.core.djangoapps.schedules.template_context import (
-    absolute_url,
-    encode_url,
-    encode_urls_in_dict,
-    get_base_template_context
-)
-from request_cache.middleware import request_cached
-from xmodule.modulestore.django import modulestore
-
+from openedx.core.djangoapps.schedules.template_context import absolute_url, get_base_template_context
 
 LOG = logging.getLogger(__name__)
 
@@ -82,6 +75,10 @@ def _recurring_nudge_schedule_send(site_id, msg_str):
         return
 
     msg = Message.from_string(msg_str)
+    # A unique identifier for this batch of messages being sent.
+    set_custom_metric('send_uuid', msg.send_uuid)
+    # A unique identifier for this particular message.
+    set_custom_metric('uuid', msg.uuid)
     LOG.debug('Recurring Nudge: Sending message = %s', msg_str)
     ace.send(msg)
 
@@ -94,9 +91,12 @@ def recurring_nudge_schedule_bin(
     # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
     current_datetime = target_datetime - datetime.timedelta(days=day_offset)
     msg_type = RecurringNudge(abs(day_offset))
+    site = Site.objects.get(id=site_id)
+
+    _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
 
     for (user, language, context) in _recurring_nudge_schedules_for_bin(
-        Site.objects.get(id=site_id),
+        site,
         current_datetime,
         target_datetime,
         bin_num,
@@ -111,10 +111,28 @@ def recurring_nudge_schedule_bin(
             language,
             context,
         )
-        _recurring_nudge_schedule_send.apply_async((site_id, str(msg)), retry=False)
+        with function_trace('enqueue_send_task'):
+            _recurring_nudge_schedule_send.apply_async((site_id, str(msg)), retry=False)
+
+
+def _annotate_for_monitoring(message_type, site, bin_num, target_day_str, day_offset):
+    # This identifies the type of message being sent, for example: schedules.recurring_nudge3.
+    set_custom_metric('message_name', '{0}.{1}'.format(message_type.app_label, message_type.name))
+    # The domain name of the site we are sending the message for.
+    set_custom_metric('site', site.domain)
+    # This is the "bin" of data being processed. We divide up the work into chunks so that we don't tie up celery
+    # workers for too long. This could help us identify particular bins that are problematic.
+    set_custom_metric('bin', bin_num)
+    # The date we are processing data for.
+    set_custom_metric('target_day', target_day_str)
+    # The number of days relative to the current date to process data for.
+    set_custom_metric('day_offset', day_offset)
+    # A unique identifier for this batch of messages being sent.
+    set_custom_metric('send_uuid', message_type.uuid)
 
 
 def _recurring_nudge_schedules_for_bin(site, current_datetime, target_datetime, bin_num, org_list, exclude_orgs=False):
+
     schedules = get_schedules_with_target_date_by_bin_and_orgs(
         schedule_date_field='start',
         current_datetime=current_datetime,
@@ -124,8 +142,6 @@ def _recurring_nudge_schedules_for_bin(site, current_datetime, target_datetime, 
         org_list=org_list,
         exclude_orgs=exclude_orgs,
     )
-
-    LOG.debug('Recurring Nudge: Query = %r', schedules.query.sql_with_params())
 
     for (user, user_schedules) in groupby(schedules, lambda s: s.enrollment.user):
         user_schedules = list(user_schedules)
@@ -161,9 +177,12 @@ def upgrade_reminder_schedule_bin(
     # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
     current_datetime = target_datetime - datetime.timedelta(days=day_offset)
     msg_type = UpgradeReminder()
+    site = Site.objects.get(id=site_id)
+
+    _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
 
     for (user, language, context) in _upgrade_reminder_schedules_for_bin(
-        Site.objects.get(id=site_id),
+        site,
         current_datetime,
         target_datetime,
         bin_num,
@@ -178,7 +197,8 @@ def upgrade_reminder_schedule_bin(
             language,
             context,
         )
-        _upgrade_reminder_schedule_send.apply_async((site_id, str(msg)), retry=False)
+        with function_trace('enqueue_send_task'):
+            _upgrade_reminder_schedule_send.apply_async((site_id, str(msg)), retry=False)
 
 
 @task(ignore_result=True, routing_key=ROUTING_KEY)
@@ -201,8 +221,6 @@ def _upgrade_reminder_schedules_for_bin(site, current_datetime, target_datetime,
         org_list=org_list,
         exclude_orgs=exclude_orgs,
     )
-
-    LOG.debug('Upgrade Reminder: Query = %r', schedules.query.sql_with_params())
 
     for schedule in schedules:
         enrollment = schedule.enrollment
@@ -244,9 +262,12 @@ def course_update_schedule_bin(
     # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
     current_datetime = target_datetime - datetime.timedelta(days=day_offset)
     msg_type = CourseUpdate()
+    site = Site.objects.get(id=site_id)
+
+    _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
 
     for (user, language, context) in _course_update_schedules_for_bin(
-        Site.objects.get(id=site_id),
+        site,
         current_datetime,
         target_datetime,
         day_offset,
@@ -262,7 +283,8 @@ def course_update_schedule_bin(
             language,
             context,
         )
-        _course_update_schedule_send.apply_async((site_id, str(msg)), retry=False)
+        with function_trace('enqueue_send_task'):
+            _course_update_schedule_send.apply_async((site_id, str(msg)), retry=False)
 
 
 @task(ignore_result=True, routing_key=ROUTING_KEY)
@@ -288,8 +310,6 @@ def _course_update_schedules_for_bin(site, current_datetime, target_datetime, da
         exclude_orgs=exclude_orgs,
         order_by='enrollment__course',
     )
-
-    LOG.debug('Course Update: Query = %r', schedules.query.sql_with_params())
 
     for schedule in schedules:
         enrollment = schedule.enrollment
@@ -381,6 +401,15 @@ def get_schedules_with_target_date_by_bin_and_orgs(schedule_date_field, current_
 
     if "read_replica" in settings.DATABASES:
         schedules = schedules.using("read_replica")
+
+    LOG.debug('Query = %r', schedules.query.sql_with_params())
+
+    with function_trace('schedule_query_set_evaluation'):
+        # This will run the query and cache all of the results in memory.
+        num_schedules = len(schedules)
+
+    # This should give us a sense of the volume of data being processed by each task.
+    set_custom_metric('num_schedules', num_schedules)
 
     return schedules
 
