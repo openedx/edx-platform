@@ -82,10 +82,7 @@ from student.helpers import (
     get_next_url_for_login_page
 )
 from student.models import (
-    ALLOWEDTOENROLL_TO_ENROLLED,
     CourseEnrollment,
-    CourseEnrollmentAllowed,
-    ManualEnrollmentAudit,
     PasswordHistory,
     PendingEmailChange,
     Registration,
@@ -783,7 +780,6 @@ def create_account_with_params(request, params):
 
     if skip_email:
         registration.activate()
-        _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
     else:
         compose_and_send_activation_email(user, profile, registration)
 
@@ -875,25 +871,6 @@ def skip_activation_email(user, do_external_auth, running_pipeline, third_party_
         (settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH') and do_external_auth) or
         (third_party_provider and third_party_provider.skip_email_verification and valid_email)
     )
-
-
-def _enroll_user_in_pending_courses(student):
-    """
-    Enroll student in any pending courses he/she may have.
-    """
-    ceas = CourseEnrollmentAllowed.objects.filter(email=student.email)
-    for cea in ceas:
-        if cea.auto_enroll:
-            enrollment = CourseEnrollment.enroll(student, cea.course_id)
-            manual_enrollment_audit = ManualEnrollmentAudit.get_manual_enrollment_by_email(student.email)
-            if manual_enrollment_audit is not None:
-                # get the enrolled by user and reason from the ManualEnrollmentAudit table.
-                # then create a new ManualEnrollmentAudit table entry for the same email
-                # different transition state.
-                ManualEnrollmentAudit.create_manual_enrollment_audit(
-                    manual_enrollment_audit.enrolled_by, student.email, ALLOWEDTOENROLL_TO_ENROLLED,
-                    manual_enrollment_audit.reason, enrollment
-                )
 
 
 def record_affiliate_registration_attribution(request, user):
@@ -1046,9 +1023,6 @@ def activate_account(request, key):
                 extra_tags='account-activation aa-icon',
             )
 
-        # Enroll student in any pending courses he/she may have if auto_enroll flag is set
-        _enroll_user_in_pending_courses(registration.user)
-
     return redirect('dashboard')
 
 
@@ -1070,9 +1044,6 @@ def activate_account_studio(request, key):
         if not registration.user.is_active:
             registration.activate()
             already_active = False
-
-        # Enroll student in any pending courses he/she may have if auto_enroll flag is set
-        _enroll_user_in_pending_courses(registration.user)
 
         return render_to_response(
             "registration/activation_complete.html",
