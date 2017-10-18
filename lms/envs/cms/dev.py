@@ -28,10 +28,7 @@ CONTENTSTORE = {
     }
 }
 
-INSTALLED_APPS += (
-    # Mongo perf stats
-    'debug_toolbar_mongo',
-)
+INSTALLED_APPS.append('debug_toolbar_mongo')
 
 
 DEBUG_TOOLBAR_PANELS += (

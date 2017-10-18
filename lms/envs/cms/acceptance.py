@@ -12,8 +12,7 @@ from .dev import *
 
 #  REMOVE DEBUG TOOLBAR
 
-INSTALLED_APPS = tuple(e for e in INSTALLED_APPS if e != 'debug_toolbar')
-INSTALLED_APPS = tuple(e for e in INSTALLED_APPS if e != 'debug_toolbar_mongo')
+INSTALLED_APPS = [e for e in INSTALLED_APPS if e != 'debug_toolbar' and e != 'debug_toolbar_mongo']
 
 MIDDLEWARE_CLASSES = [e for e in MIDDLEWARE_CLASSES if e != 'debug_toolbar.middleware.DebugToolbarMiddleware']
 
@@ -21,7 +20,6 @@ MIDDLEWARE_CLASSES = [e for e in MIDDLEWARE_CLASSES if e != 'debug_toolbar.middl
 ########################### LETTUCE TESTING ##########################
 FEATURES['DISPLAY_TOY_COURSES'] = True
 
-INSTALLED_APPS += ('lettuce.django',)
-# INSTALLED_APPS += ('portal',)
+INSTALLED_APPS.append('lettuce.django')
 
 LETTUCE_APPS = ('portal',)  # dummy app covers the home page, login, registration, and course enrollment

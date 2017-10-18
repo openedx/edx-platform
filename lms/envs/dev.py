@@ -161,7 +161,7 @@ EDX_PLATFORM_VERSION_STRING = os.popen('cd %s; git describe' % REPO_ROOT).read()
 FEATURES['ENABLE_LMS_MIGRATION'] = True
 FEATURES['XQA_SERVER'] = 'http://xqa:server@content-qa.edX.mit.edu/xqa'
 
-INSTALLED_APPS += ('lms_migration',)
+INSTALLED_APPS.append('lms_migration')
 
 LMS_MIGRATION_ALLOWED_IPS = ['127.0.0.1']
 
@@ -196,11 +196,12 @@ CELERY_ALWAYS_EAGER = True
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ('debug_toolbar', 'djpyfs',)
-MIDDLEWARE_CLASSES.extend([
+INSTALLED_APPS += ['debug_toolbar', 'djpyfs']
+MIDDLEWARE_CLASSES += [
     'django_comment_client.utils.QueryCountDebugMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-])
+]
+
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (
@@ -222,10 +223,10 @@ MEDIA_ROOT = ENV_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"
 STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
 FILE_UPLOAD_TEMP_DIR = ENV_ROOT / "uploads"
-FILE_UPLOAD_HANDLERS = (
+FILE_UPLOAD_HANDLERS = [
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
-)
+]
 
 FEATURES['AUTH_USE_SHIB'] = True
 FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
