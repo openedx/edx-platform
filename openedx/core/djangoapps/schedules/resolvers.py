@@ -159,7 +159,8 @@ class ScheduleStartResolver(BinnedSchedulesBaseResolver):
         super(ScheduleStartResolver, self).__init__(*args, **kwargs)
         self.log_prefix = 'Scheduled Nudge'
 
-    def recurring_nudge_schedule_bin(
+
+    def schedule_bin(
         self, async_send_task, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
     ):
         target_datetime = deserialize(target_day_str)
@@ -170,7 +171,7 @@ class ScheduleStartResolver(BinnedSchedulesBaseResolver):
 
         _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
 
-        for (user, language, context) in self._recurring_nudge_schedules_for_bin(
+        for (user, language, context) in self.schedules_for_bin(
             site,
             current_datetime,
             target_datetime,
@@ -191,7 +192,7 @@ class ScheduleStartResolver(BinnedSchedulesBaseResolver):
                     (site_id, str(msg)), retry=False)
 
 
-    def _recurring_nudge_schedules_for_bin(self, site, current_datetime, target_datetime, bin_num, org_list, exclude_orgs=False):
+    def schedules_for_bin(self, site, current_datetime, target_datetime, bin_num, org_list, exclude_orgs=False):
         schedules = get_schedules_with_target_date_by_bin_and_orgs(
             schedule_date_field='start',
             current_datetime=current_datetime,
@@ -245,7 +246,7 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
         super(UpgradeReminderResolver, self).__init__(*args, **kwargs)
         self.log_prefix = 'Upgrade Reminder'
 
-    def upgrade_reminder_schedule_bin(
+    def schedule_bin(
         self, async_send_task, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
     ):
         target_datetime = deserialize(target_day_str)
@@ -257,7 +258,7 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
         _annotate_for_monitoring(msg_type, site, bin_num,
                                 target_day_str, day_offset)
 
-        for (user, language, context) in self._upgrade_reminder_schedules_for_bin(
+        for (user, language, context) in self.schedules_for_bin(
             site,
             current_datetime,
             target_datetime,
@@ -278,7 +279,7 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
                     (site_id, str(msg)), retry=False)
 
 
-    def _upgrade_reminder_schedules_for_bin(self, site, current_datetime, target_datetime, bin_num, org_list, exclude_orgs=False):
+    def schedules_for_bin(self, site, current_datetime, target_datetime, bin_num, org_list, exclude_orgs=False):
         schedules = get_schedules_with_target_date_by_bin_and_orgs(
             schedule_date_field='upgrade_deadline',
             current_datetime=current_datetime,
@@ -358,7 +359,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
         super(CourseUpdateResolver, self).__init__(*args, **kwargs)
         self.log_prefix = 'Course Update'
 
-    def course_update_schedule_bin(
+    def schedule_bin(
         self, async_send_task, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
     ):
         target_datetime = deserialize(target_day_str)
@@ -391,7 +392,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                 async_send_task.apply_async(
                     (site_id, str(msg)), retry=False)
 
-    def _course_update_schedules_for_bin(self, site, current_datetime, target_datetime, day_offset, bin_num, org_list,
+    def schedules_for_bin(self, site, current_datetime, target_datetime, day_offset, bin_num, org_list,
                                         exclude_orgs=False):
         week_num = abs(day_offset) / 7
         schedules = get_schedules_with_target_date_by_bin_and_orgs(
