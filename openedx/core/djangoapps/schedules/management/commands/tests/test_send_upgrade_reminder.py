@@ -116,7 +116,7 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
                 expected_queries += NUM_COURSE_MODES_QUERIES
 
             with self.assertNumQueries(expected_queries, table_blacklist=WAFFLE_TABLES):
-                tasks.upgrade_reminder_schedule_bin(
+                tasks.ScheduleUpgradeReminder().run(
                     self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=b,
                     org_list=[schedules[0].enrollment.course.org],
                 )
@@ -137,7 +137,7 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
         test_datetime_str = serialize(test_datetime)
         for b in range(resolvers.UPGRADE_REMINDER_NUM_BINS):
             with self.assertNumQueries(NUM_QUERIES_NO_MATCHING_SCHEDULES, table_blacklist=WAFFLE_TABLES):
-                tasks.upgrade_reminder_schedule_bin(
+                tasks.ScheduleUpgradeReminder().run(
                     self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=b,
                     org_list=[schedule.enrollment.course.org],
                 )
@@ -213,7 +213,7 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
         test_datetime = datetime.datetime(2017, 8, 3, 17, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
         with self.assertNumQueries(NUM_QUERIES_WITH_MATCHES, table_blacklist=WAFFLE_TABLES):
-            tasks.upgrade_reminder_schedule_bin(
+            tasks.ScheduleUpgradeReminder().run(
                 limited_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=0,
                 org_list=org_list, exclude_orgs=exclude_orgs,
             )
@@ -237,7 +237,7 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
         test_datetime = datetime.datetime(2017, 8, 3, 19, 44, 30, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
         with self.assertNumQueries(NUM_QUERIES_WITH_MATCHES, table_blacklist=WAFFLE_TABLES):
-            tasks.upgrade_reminder_schedule_bin(
+            tasks.ScheduleUpgradeReminder().run(
                 self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2,
                 bin_num=user.id % resolvers.UPGRADE_REMINDER_NUM_BINS,
                 org_list=[schedules[0].enrollment.course.org],
@@ -292,7 +292,7 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
                 # since we create a new course for each schedule in this test, we expect there to be one per message
                 num_expected_queries = NUM_QUERIES_WITH_MATCHES + NUM_QUERIES_WITH_DEADLINE
                 with self.assertNumQueries(num_expected_queries, table_blacklist=WAFFLE_TABLES):
-                    tasks.upgrade_reminder_schedule_bin(
+                    tasks.ScheduleUpgradeReminder().run(
                         self.site_config.site.id, target_day_str=test_datetime_str, day_offset=day,
                         bin_num=self._calculate_bin_for_user(user),
                         org_list=[schedules[0].enrollment.course.org],

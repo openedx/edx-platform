@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-from celery.task import task
+from celery.task import task, Task
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.staticfiles.templatetags.staticfiles import static
@@ -65,36 +65,42 @@ def _recurring_nudge_schedule_send(site_id, msg_str):
     ace.send(msg)
 
 
-@task(ignore_result=True, routing_key=ROUTING_KEY)
-def recurring_nudge_schedule_bin(
-    site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
-):
-    return resolvers.recurring_nudge_schedule_bin(
-        _recurring_nudge_schedule_send,
-        site_id,
-        target_day_str,
-        day_offset,
-        bin_num,
-        org_list,
-        exclude_orgs=exclude_orgs,
-        override_recipient_email=override_recipient_email,
-    )
+class ScheduleRecurringNudge(Task):
+    ignore_result=True
+    routing_key=ROUTING_KEY
+
+    def run(
+        self, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
+    ):
+        return resolvers.recurring_nudge_schedule_bin(
+            _recurring_nudge_schedule_send,
+            site_id,
+            target_day_str,
+            day_offset,
+            bin_num,
+            org_list,
+            exclude_orgs=exclude_orgs,
+            override_recipient_email=override_recipient_email,
+        )
 
 
-@task(ignore_result=True, routing_key=ROUTING_KEY)
-def upgrade_reminder_schedule_bin(
-    site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
-):
-    return resolvers.upgrade_reminder_schedule_bin(
-        _upgrade_reminder_schedule_send,
-        site_id,
-        target_day_str,
-        day_offset,
-        bin_num,
-        org_list,
-        exclude_orgs=exclude_orgs,
-        override_recipient_email=override_recipient_email,
-    )
+class ScheduleUpgradeReminder(Task):
+    ignore_result=True
+    routing_key=ROUTING_KEY
+
+    def run(
+        self, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
+    ):
+        return resolvers.upgrade_reminder_schedule_bin(
+            _upgrade_reminder_schedule_send,
+            site_id,
+            target_day_str,
+            day_offset,
+            bin_num,
+            org_list,
+            exclude_orgs=exclude_orgs,
+            override_recipient_email=override_recipient_email,
+        )
 
 @task(ignore_result=True, routing_key=ROUTING_KEY)
 def _upgrade_reminder_schedule_send(site_id, msg_str):
@@ -106,20 +112,23 @@ def _upgrade_reminder_schedule_send(site_id, msg_str):
     ace.send(msg)
 
 
-@task(ignore_result=True, routing_key=ROUTING_KEY)
-def course_update_schedule_bin(
-    site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
-):
-    return resolvers.course_update_schedule_bin(
-        _course_update_schedule_send,
-        site_id,
-        target_day_str,
-        day_offset,
-        bin_num,
-        org_list,
-        exclude_orgs=exclude_orgs,
-        override_recipient_email=override_recipient_email,
-    )
+class ScheduleCourseUpdate(Task):
+    ignore_result=True
+    routing_key=ROUTING_KEY
+
+    def run(
+        self, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
+    ):
+        return resolvers.course_update_schedule_bin(
+            _course_update_schedule_send,
+            site_id,
+            target_day_str,
+            day_offset,
+            bin_num,
+            org_list,
+            exclude_orgs=exclude_orgs,
+            override_recipient_email=override_recipient_email,
+        )
 
 
 @task(ignore_result=True, routing_key=ROUTING_KEY)

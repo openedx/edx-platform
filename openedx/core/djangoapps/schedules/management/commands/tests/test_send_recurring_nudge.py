@@ -112,7 +112,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
                 expected_queries += NUM_COURSE_MODES_QUERIES
 
             with self.assertNumQueries(expected_queries, table_blacklist=WAFFLE_TABLES):
-                tasks.recurring_nudge_schedule_bin(
+                tasks.ScheduleRecurringNudge().run(
                     self.site_config.site.id, target_day_str=test_datetime_str, day_offset=-3, bin_num=b,
                     org_list=[schedules[0].enrollment.course.org],
                 )
@@ -132,7 +132,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         test_datetime_str = serialize(test_datetime)
         for b in range(resolvers.RECURRING_NUDGE_NUM_BINS):
             with self.assertNumQueries(NUM_QUERIES_NO_MATCHING_SCHEDULES, table_blacklist=WAFFLE_TABLES):
-                tasks.recurring_nudge_schedule_bin(
+                tasks.ScheduleRecurringNudge().run(
                     self.site_config.site.id, target_day_str=test_datetime_str, day_offset=-3, bin_num=b,
                     org_list=[schedule.enrollment.course.org],
                 )
@@ -159,7 +159,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         test_datetime = datetime.datetime(2017, 8, 3, 20, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
 
-        tasks.recurring_nudge_schedule_bin.apply_async(
+        tasks.ScheduleRecurringNudge.apply_async(
             self.site_config.site.id, target_day_str=test_datetime_str, day_offset=-3, bin_num=0,
             org_list=[schedule.enrollment.course.org],
         )
@@ -229,7 +229,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         test_datetime = datetime.datetime(2017, 8, 3, 17, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
         with self.assertNumQueries(NUM_QUERIES_WITH_MATCHES, table_blacklist=WAFFLE_TABLES):
-            tasks.recurring_nudge_schedule_bin(
+            tasks.ScheduleRecurringNudge().run(
                 limited_config.site.id, target_day_str=test_datetime_str, day_offset=-3, bin_num=0,
                 org_list=org_list, exclude_orgs=exclude_orgs,
             )
@@ -253,7 +253,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         test_datetime = datetime.datetime(2017, 8, 3, 19, 44, 30, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
         with self.assertNumQueries(NUM_QUERIES_WITH_MATCHES, table_blacklist=WAFFLE_TABLES):
-            tasks.recurring_nudge_schedule_bin(
+            tasks.ScheduleRecurringNudge().run(
                 self.site_config.site.id, target_day_str=test_datetime_str, day_offset=-3,
                 bin_num=user.id % resolvers.RECURRING_NUDGE_NUM_BINS,
                 org_list=[schedules[0].enrollment.course.org],
@@ -292,7 +292,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
                 mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
 
                 with self.assertNumQueries(NUM_QUERIES_WITH_MATCHES, table_blacklist=WAFFLE_TABLES):
-                    tasks.recurring_nudge_schedule_bin(
+                    tasks.ScheduleRecurringNudge().run(
                         self.site_config.site.id, target_day_str=test_datetime_str, day_offset=day,
                         bin_num=self._calculate_bin_for_user(user), org_list=[schedules[0].enrollment.course.org],
                     )
@@ -339,7 +339,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
             user,
             schedule.enrollment.course.org
         ]
-        sent_messages = self._stub_sender_and_collect_sent_messages(bin_task=tasks.recurring_nudge_schedule_bin,
+        sent_messages = self._stub_sender_and_collect_sent_messages(bin_task=tasks.ScheduleRecurringNudge,
                                                                     stubbed_send_task=patch.object(tasks, '_recurring_nudge_schedule_send'),
                                                                     bin_task_params=bin_task_parameters)
 
@@ -371,7 +371,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
             user,
             schedule.enrollment.course.org
         ]
-        sent_messages = self._stub_sender_and_collect_sent_messages(bin_task=tasks.recurring_nudge_schedule_bin,
+        sent_messages = self._stub_sender_and_collect_sent_messages(bin_task=tasks.ScheduleRecurringNudge,
                                                                     stubbed_send_task=patch.object(tasks, '_recurring_nudge_schedule_send'),
                                                                     bin_task_params=bin_task_parameters)
 
@@ -410,7 +410,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
             user,
             schedule.enrollment.course.org
         ]
-        sent_messages = self._stub_sender_and_collect_sent_messages(bin_task=tasks.recurring_nudge_schedule_bin,
+        sent_messages = self._stub_sender_and_collect_sent_messages(bin_task=tasks.ScheduleRecurringNudge,
                                                                     stubbed_send_task=patch.object(tasks, '_recurring_nudge_schedule_send'),
                                                                     bin_task_params=bin_task_parameters)
 
@@ -426,7 +426,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
 
             mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
 
-            bin_task(
+            bin_task().run(
                 self.site_config.site.id,
                 target_day_str=bin_task_params[0],
                 day_offset=bin_task_params[1],
