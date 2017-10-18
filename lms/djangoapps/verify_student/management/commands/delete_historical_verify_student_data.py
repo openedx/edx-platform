@@ -3,7 +3,7 @@ Command to delete all rows from the verify_student_historicalverificationdeadlin
 """
 
 import logging
-from verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.models import VerificationDeadline
 from openedx.core.djangoapps.util.row_delete import delete_rows, BaseDeletionCommand
 log = logging.getLogger(__name__)
 
