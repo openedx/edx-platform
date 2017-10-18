@@ -117,18 +117,6 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
             return exclude_orgs, org_list
 
 
-class ScheduleStartResolver(BinnedSchedulesBaseResolver):
-    """
-    Send a message to all users whose schedule started at ``self.current_date`` + ``day_offset``.
-    """
-    num_bins = RECURRING_NUDGE_NUM_BINS
-    enqueue_config_var = 'enqueue_recurring_nudge'
-
-    def __init__(self, *args, **kwargs):
-        super(ScheduleStartResolver, self).__init__(*args, **kwargs)
-        self.log_prefix = 'Scheduled Nudge'
-
-
 def get_schedules_with_target_date_by_bin_and_orgs(schedule_date_field, current_datetime, target_datetime, bin_num,
                                                    num_bins=DEFAULT_NUM_BINS, org_list=None, exclude_orgs=False,
                                                    order_by='enrollment__user__id'):
@@ -196,6 +184,18 @@ def get_schedules_with_target_date_by_bin_and_orgs(schedule_date_field, current_
     set_custom_metric('num_schedules', num_schedules)
 
     return schedules
+
+
+class ScheduleStartResolver(BinnedSchedulesBaseResolver):
+    """
+    Send a message to all users whose schedule started at ``self.current_date`` + ``day_offset``.
+    """
+    num_bins = RECURRING_NUDGE_NUM_BINS
+    enqueue_config_var = 'enqueue_recurring_nudge'
+
+    def __init__(self, *args, **kwargs):
+        super(ScheduleStartResolver, self).__init__(*args, **kwargs)
+        self.log_prefix = 'Scheduled Nudge'
 
 
 def _recurring_nudge_schedules_for_bin(site, current_datetime, target_datetime, bin_num, org_list, exclude_orgs=False):
