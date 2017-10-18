@@ -4,11 +4,11 @@ restAPI Views
 import logging
 
 from django.http import JsonResponse
-from rest_framework.authentication import SessionAuthentication
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from student.models import User
+
+from lms.djangoapps.philu_api.helpers import get_encoded_token
 
 log = logging.getLogger("edx.philu_api")
 
@@ -16,14 +16,17 @@ log = logging.getLogger("edx.philu_api")
 class UpdateCommunityProfile(APIView):
     """ Retrieve order details. """
 
-    authentication_classes = (SessionAuthentication,)
-    permission_classes = (IsAuthenticated,)
-
     def post(self, request):
         """ Update provided information in openEdx received from nodeBB client """
 
+        username = request.GET.get('username')
+
+        token = request.META["HTTP_X_CSRFTOKEN"]
+        if not token == get_encoded_token(username):
+            return JsonResponse({"message": "Invalid Session token"}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            user = User.objects.get(username=request.GET.get('username'))
+            user = User.objects.get(username=username)
         except User.DoesNotExist:
             return JsonResponse({'message': "User does not exist for provided username"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -41,8 +44,8 @@ class UpdateCommunityProfile(APIView):
             country = data.get('country', user_info_survey.country_of_residence)
             dob = data.get('dob', user_info_survey.dob)
 
-            extended_profile.firs_name = first_name
-            extended_profile.firs_name = last_name
+            extended_profile.first_name = first_name
+            extended_profile.last_name = last_name
             user.profile.bio = bio
 
             user_info_survey.city_of_residence = city
