@@ -81,6 +81,11 @@ class StdImageFactory(ImageFactoryBase):
     url = factory.Faker('image_url')
 
 
+class VideoFactory(DictFactoryBase):
+    src = factory.Faker('url')
+    description = factory.Faker('sentence')
+
+
 def generate_sized_stdimage():
     return {
         size: StdImageFactory() for size in ['large', 'medium', 'small', 'x-small']
@@ -188,6 +193,7 @@ class ProgramFactory(DictFactoryBase):
     title = factory.Faker('catch_phrase')
     type = factory.Faker('word')
     uuid = factory.Faker('uuid4')
+    video = VideoFactory()
     weeks_to_complete = fake.random_int(1, 45)
 
 
