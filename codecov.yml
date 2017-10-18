@@ -1,8 +1,7 @@
-comment: off
 coverage:
   status:
     patch: false
     project:
       default:
-        target: 85%
+        target: 80%
         threshold: 10%
