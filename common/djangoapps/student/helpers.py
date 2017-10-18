@@ -254,9 +254,13 @@ def get_next_url_for_login_page(request):
         )
         redirect_to = None
 
+    course_id = request.GET.get('course_id', None)
     if not redirect_to:
         try:
-            redirect_to = reverse('dashboard')
+            if course_id:
+                redirect_to = reverse('info', args=[course_id])
+            else:
+                redirect_to = reverse('dashboard')
         except NoReverseMatch:
             redirect_to = reverse('home')
     if any(param in request.GET for param in POST_AUTH_PARAMS):
