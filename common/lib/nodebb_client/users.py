@@ -16,4 +16,4 @@ class ForumUser(User):
 
     def update_profile(self, username, **kwargs):
         kwargs.update({'username': username})
-        return self.client.post('/api/v2/users/update', **kwargs)
+        return self.client.post('/api/v2/users/update', **kwargs['kwargs'])

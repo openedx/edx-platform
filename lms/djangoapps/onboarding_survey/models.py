@@ -329,24 +329,28 @@ class History(models.Model):
 def sync_user_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
     """ Sync user information with  """
     user = instance.user
-    try:
-        extended_profile = user.extended_profile
-        user_info_survey = user.user_info_survey
-    except UserInfoSurvey.DoesNotExist:
-        return
 
-    data_to_sync = {
-        "first_name": extended_profile.first_name,
-        "last_name": extended_profile.last_name,
-        "city_of_residence": user_info_survey.city_of_residence,
-        "country_of_residence": user_info_survey.country_of_residence
-    }
+    if user:
+        try:
+            extended_profile = user.extended_profile
+            user_info_survey = user.user_info_survey
+        except UserInfoSurvey.DoesNotExist:
+            return
+        except ExtendedProfile.DoesNotExist:
+            return
 
-    status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
+        data_to_sync = {
+            "first_name": extended_profile.first_name,
+            "last_name": extended_profile.last_name,
+            "city_of_residence": user_info_survey.city_of_residence,
+            "country_of_residence": user_info_survey.country_of_residence
+        }
 
-    if status_code != 200:
-        log.error(
-            "Error: Can not update user({}) on nodebb due to {}".format(user.username, response_body)
-        )
-    else:
-        log.info('Success: User({}) has been updated on nodebb'.format(user.username))
+        status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
+
+        if status_code != 200:
+            log.error(
+                "Error: Can not update user({}) on nodebb due to {}".format(user.username, response_body)
+            )
+        else:
+            log.info('Success: User({}) has been updated on nodebb'.format(user.username))
