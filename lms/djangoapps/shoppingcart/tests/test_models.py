@@ -1144,7 +1144,7 @@ class DonationTest(ModuleStoreTestCase):
         with self.assertRaises(CourseDoesNotExistException):
             Donation.add_to_order(self.cart, self.COST, course_id=fake_course_id)
 
-    def _assert_donation(self, donation, donation_type=None, course_id=None, unit_cost=None, line_desc=None):
+    def _assert_donation(self, donation, donation_type=None, course_id='', unit_cost=None, line_desc=None):
         """Verify the donation fields and that the donation can be purchased. """
         self.assertEqual(donation.order, self.cart)
         self.assertEqual(donation.user, self.user)
