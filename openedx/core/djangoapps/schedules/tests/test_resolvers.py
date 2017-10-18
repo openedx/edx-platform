@@ -24,12 +24,12 @@ class TestBinnedSchedulesBaseResolver(CacheIsolationTestCase):
         self.site_config = SiteConfigurationFactory.create(site=self.site)
         self.schedule_config = ScheduleConfigFactory.create(site=self.site)
 
-    def setup_resolver(self, site=None, current_date=None):
+    def setup_resolver(self, site=None, current_date=None, async_send_task=None):
         if site is None:
             site = self.site
         if current_date is None:
             current_date = datetime.datetime.now()
-        resolver = BinnedSchedulesBaseResolver(self.site, current_date)
+        resolver = BinnedSchedulesBaseResolver(self.site, current_date, async_send_task)
         return resolver
 
     def test_init_site(self):

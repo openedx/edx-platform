@@ -28,7 +28,8 @@ class TestSendEmailBaseCommand(CacheIsolationTestCase):
             self.command.make_resolver(site_domain_name='example.com', date='2017-09-29')
             resolver_class.assert_called_once_with(
                 example_site,
-                datetime.datetime(2017, 9, 29, tzinfo=pytz.UTC)
+                datetime.datetime(2017, 9, 29, tzinfo=pytz.UTC),
+                async_send_task=None,
             )
 
     def test_handle(self):

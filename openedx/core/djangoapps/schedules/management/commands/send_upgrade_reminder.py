@@ -1,9 +1,11 @@
 from openedx.core.djangoapps.schedules.management.commands import SendEmailBaseCommand
 from openedx.core.djangoapps.schedules.resolvers import UpgradeReminderResolver
+from openedx.core.djangoapps.schedules.tasks import upgrade_reminder_schedule_bin
 
 
 class Command(SendEmailBaseCommand):
     resolver_class = UpgradeReminderResolver
+    async_send_task = upgrade_reminder_schedule_bin
 
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)

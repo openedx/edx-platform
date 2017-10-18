@@ -64,16 +64,20 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
     def test_handle(self, mock_resolver):
         test_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
         nudge.Command().handle(date='2017-08-01', site_domain_name=self.site_config.site.domain)
-        mock_resolver.assert_called_with(self.site_config.site, test_day)
+        mock_resolver.assert_called_with(
+            self.site_config.site,
+            test_day,
+            async_send_task=nudge.Command.async_send_task,
+        )
 
         for day in (-3, -10):
             mock_resolver().send.assert_any_call(day, None)
 
     @patch.object(tasks, 'ace')
-    @patch.object(resolvers.ScheduleStartResolver, 'async_send_task')
-    def test_resolver_send(self, mock_schedule_bin, mock_ace):
+    def test_resolver_send(self, mock_ace):
         current_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        nudge.ScheduleStartResolver(self.site_config.site, current_day).send(-3)
+        mock_schedule_bin = Mock()
+        nudge.ScheduleStartResolver(self.site_config.site, current_day, mock_schedule_bin).send(-3)
         test_day = current_day + datetime.timedelta(days=-3)
         self.assertFalse(mock_schedule_bin.called)
         mock_schedule_bin.apply_async.assert_any_call(
@@ -171,12 +175,16 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         self.assertFalse(mock_ace.send.called)
 
     @patch.object(tasks, 'ace')
-    @patch.object(resolvers.ScheduleStartResolver, 'async_send_task')
-    def test_enqueue_disabled(self, mock_schedule_bin, mock_ace):
+    def test_enqueue_disabled(self, mock_ace):
         ScheduleConfigFactory.create(site=self.site_config.site, enqueue_recurring_nudge=False)
 
+        mock_schedule_bin = Mock()
         current_datetime = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        nudge.ScheduleStartResolver(self.site_config.site, current_datetime).send(3)
+        nudge.ScheduleStartResolver(
+            self.site_config.site,
+            current_datetime,
+            mock_schedule_bin,
+        ).send(3)
         self.assertFalse(mock_schedule_bin.called)
         self.assertFalse(mock_schedule_bin.apply_async.called)
         self.assertFalse(mock_ace.send.called)

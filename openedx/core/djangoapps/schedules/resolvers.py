@@ -14,14 +14,10 @@ from edx_ace.recipient_resolver import RecipientResolver
 from edx_ace.utils.date import serialize
 
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from openedx.core.djangoapps.monitoring_utils import set_custom_metric, function_trace
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
-from openedx.core.djangoapps.schedules.tasks import (
-    recurring_nudge_schedule_bin,
-    upgrade_reminder_schedule_bin,
-    course_update_schedule_bin,
-)
 from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
 from openedx.core.djangoapps.schedules.template_context import (
     absolute_url,
@@ -49,20 +45,20 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
     Arguments:
         site -- Site object that filtered Schedules will be a part of
         current_date -- datetime that will be used (with time zeroed-out) as the current date in the queries
+        async_send_task -- celery task function which this resolver will call out to
 
     Static attributes:
-        async_send_task -- celery task function which this resolver will call out to
         num_bins -- the int number of bins to split the users into
         enqueue_config_var -- the string field name of the config variable on ScheduleConfig to check before enqueuing
     """
-    async_send_task = None  # define in subclass
     num_bins = DEFAULT_NUM_BINS
     enqueue_config_var = None  # define in subclass
 
-    def __init__(self, site, current_date, *args, **kwargs):
+    def __init__(self, site, current_date, async_send_task, *args, **kwargs):
         super(BinnedSchedulesBaseResolver, self).__init__(*args, **kwargs)
         self.site = site
         self.current_date = current_date.replace(hour=0, minute=0, second=0)
+        self.async_send_task = async_send_task
 
     def send(self, day_offset, override_recipient_email=None):
         if not self.is_enqueue_enabled():
@@ -125,7 +121,6 @@ class ScheduleStartResolver(BinnedSchedulesBaseResolver):
     """
     Send a message to all users whose schedule started at ``self.current_date`` + ``day_offset``.
     """
-    async_send_task = recurring_nudge_schedule_bin
     num_bins = RECURRING_NUDGE_NUM_BINS
     enqueue_config_var = 'enqueue_recurring_nudge'
 
@@ -250,7 +245,6 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
     """
     Send a message to all users whose verified upgrade deadline is at ``self.current_date`` + ``day_offset``.
     """
-    async_send_task = upgrade_reminder_schedule_bin
     num_bins = UPGRADE_REMINDER_NUM_BINS
     enqueue_config_var = 'enqueue_upgrade_reminder'
 
@@ -275,17 +269,17 @@ def _upgrade_reminder_schedules_for_bin(site, current_datetime, target_datetime,
         course_id_strs = [str(schedule.enrollment.course_id) for schedule in user_schedules]
 
         first_schedule = user_schedules[0]
-        template_context = get_base_template_context(self.site)
+        template_context = get_base_template_context(site)
         template_context.update({
             'student_name': user.profile.name,
             'course_links': [
                 {
-                    'url': absolute_url(self.site, reverse('course_root', args=[str(s.enrollment.course_id)])),
+                    'url': absolute_url(site, reverse('course_root', args=[str(s.enrollment.course_id)])),
                     'name': s.enrollment.course.display_name
                 } for s in user_schedules
             ],
             'first_course_name': first_schedule.enrollment.course.display_name,
-            'cert_image': absolute_url(self.site, static('course_experience/images/verified-cert.png')),
+            'cert_image': absolute_url(site, static('course_experience/images/verified-cert.png')),
 
             # This is used by the bulk email optout policy
             'course_ids': course_id_strs,
@@ -331,7 +325,6 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
     Send a message to all users whose schedule started at ``self.current_date`` + ``day_offset`` and the
     course has updates.
     """
-    async_send_task = course_update_schedule_bin
     num_bins = COURSE_UPDATE_NUM_BINS
     enqueue_config_var = 'enqueue_course_update'
 

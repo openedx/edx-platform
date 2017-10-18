@@ -9,6 +9,7 @@ from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
 
 class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):
     resolver_class = None  # define in subclass
+    async_send_task = None  # define in subclass
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -36,7 +37,7 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):
 
         site = Site.objects.get(domain__iexact=options['site_domain_name'])
         self.log_debug('Running for site %s', site.domain)
-        return self.resolver_class(site, current_date)
+        return self.resolver_class(site, current_date, async_send_task=self.async_send_task)
 
     def send_emails(self, resolver, *args, **options):
         pass  # define in subclass

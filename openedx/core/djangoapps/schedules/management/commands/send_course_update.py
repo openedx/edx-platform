@@ -1,9 +1,11 @@
 from openedx.core.djangoapps.schedules.management.commands import SendEmailBaseCommand
 from openedx.core.djangoapps.schedules.resolvers import CourseUpdateResolver
+from openedx.core.djangoapps.schedules.tasks import course_update_schedule_bin
 
 
 class Command(SendEmailBaseCommand):
     resolver_class = CourseUpdateResolver
+    async_send_task = course_update_schedule_bin
 
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
