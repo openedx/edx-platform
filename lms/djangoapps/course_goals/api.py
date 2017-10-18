@@ -83,3 +83,20 @@ def get_course_goal_options():
     strings, as defined by theCourseGoal model.
     """
     return {goal_key: goal_text for goal_key, goal_text in models.GOAL_KEY_CHOICES}
+
+
+def valid_course_goals_ordered():
+    """
+    Returns a list of the valid options for goal keys ordered by the level of commitment.
+    Each option is represented as a tuple, with (goal_key, goal_string).
+
+    This list does not return the unsure option since it does not have a relevant commitment level.
+    """
+    goal_options = get_course_goal_options()
+
+    ordered_goal_options = []
+    ordered_goal_options.append((models.GOAL_KEY_CHOICES.certify, goal_options[models.GOAL_KEY_CHOICES.certify]))
+    ordered_goal_options.append((models.GOAL_KEY_CHOICES.complete, goal_options[models.GOAL_KEY_CHOICES.complete]))
+    ordered_goal_options.append((models.GOAL_KEY_CHOICES.explore, goal_options[models.GOAL_KEY_CHOICES.explore]))
+
+    return ordered_goal_options
