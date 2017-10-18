@@ -18,12 +18,18 @@ $theme-colors: ();
 $theme-colors: map-merge((
   primary: $red,
   secondary: $gray-600,
+  inverse: $white,
+  disabled: $gray-600,
   success: $green,
-  info: $cyan,
+  info: $pink,
   warning: $yellow,
   danger: $red,
-  light: $gray-100,
-  dark: $gray-800
+  purchase: $green,
+  lightest: $gray-100,
+  light: $gray-200,
+  dark: $gray-800,
+  darker: $gray-900,
+  darkest: $black
 ), $theme-colors);
 
 // Note: for some reason this doesn't obey the primary color as defined above.

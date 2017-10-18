@@ -81,7 +81,7 @@
     }
 
     .message-header {
-      @include margin-right($baseline*2);
+      @include margin-right($baseline*4);
 
       font-weight: $font-semibold;
       margin-bottom: $baseline/2;
@@ -112,17 +112,34 @@
     .goal-options-container {
       margin-top: $baseline;
       text-align: center;
+      display: flex;
+      flex-direction: row;
 
       .goal-option {
         text-decoration: none;
         font-size: font-size(x-small);
         padding: $baseline/2;
+        margin: $baseline/4 $baseline/4 0;
+        flex-grow: 1;
+
+        &:not(.dismissible):first-of-type {
+          color: theme-color("purchase");
+          border-color: theme-color("purchase");
+
+          &:hover {
+            color: theme-color("inverse");
+            background-color: theme-color("purchase");
+          }
+        }
 
         &.dismissible {
           @include right($baseline/4);
 
           position: absolute;
           top: $baseline/2;
+          margin: 0;
+          width: auto;
+          flex-grow: 1;
           font-size: font-size(small);
           color: theme-color("primary");
           cursor: pointer;
@@ -130,6 +147,15 @@
           &:hover {
             color: $black-t2;
           }
+        }
+      }
+
+      @media (max-width: $grid-breakpoints-md) {
+        flex-direction: column;
+
+        .goal-option {
+          margin-top: $baseline/4;
+          width: 100%;
         }
       }
     }
