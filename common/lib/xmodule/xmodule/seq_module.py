@@ -12,7 +12,7 @@ from pytz import UTC
 
 from lxml import etree
 from xblock.core import XBlock
-from xblock.fields import Integer, Scope, Boolean, String
+from xblock.fields import Integer, Scope, Boolean, String, List
 from xblock.fragment import Fragment
 
 from .exceptions import NotFoundError
@@ -583,3 +583,20 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
         xblock_body["content_type"] = "Sequence"
 
         return xblock_body
+
+
+class HighlightsFields(object):
+    """Only Sections have summaries now, but we may expand that later."""
+    highlights = List(
+        help=_("A list summarizing what students should look forward to in this section."),
+        scope=Scope.settings
+    )
+
+
+class SectionModule(HighlightsFields, SequenceModule):
+    """Module for a Section/Chapter."""
+
+
+class SectionDescriptor(HighlightsFields, SequenceDescriptor):
+    """Descriptor for a Section/Chapter."""
+    module_class = SectionModule
