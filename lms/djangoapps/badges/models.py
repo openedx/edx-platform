@@ -82,7 +82,7 @@ class BadgeClass(models.Model):
         if course_id and not modulestore().get_course(course_id).issue_badges:
             raise CourseBadgesDisabledError("This course does not have badges enabled.")
         if not course_id:
-            course_id = CourseKeyField.Empty
+            course_id = ''
         try:
             return cls.objects.get(slug=slug, issuing_component=issuing_component, course_id=course_id)
         except cls.DoesNotExist:
@@ -97,6 +97,7 @@ class BadgeClass(models.Model):
             description=description,
             criteria=criteria,
         )
+
         badge_class.image.save(image_file_handle.name, image_file_handle)
         badge_class.full_clean()
         badge_class.save()

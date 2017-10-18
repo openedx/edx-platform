@@ -81,8 +81,6 @@ class OpaqueKeyField(models.CharField):
     """
     description = "An OpaqueKey object, saved to the DB in the form of a string."
 
-    __metaclass__ = models.SubfieldBase
-
     Empty = object()
     KEY_CLASS = None
 
@@ -117,6 +115,9 @@ class OpaqueKeyField(models.CharField):
         else:
             return value
 
+    def from_db_value(self, value, expression, connection, context):
+        return self.to_python(value)
+
     def get_prep_lookup(self, lookup, value):
         if lookup == 'isnull':
             raise TypeError('Use {0}.Empty rather than None to query for a missing {0}'.format(self.__class__.__name__))
@@ -131,7 +132,8 @@ class OpaqueKeyField(models.CharField):
         if value is self.Empty or value is None:
             return ''  # CharFields should use '' as their empty value, rather than None
 
-        assert isinstance(value, self.KEY_CLASS), "%s is not an instance of %s" % (value, self.KEY_CLASS)
+        assert isinstance(value, (basestring, self.KEY_CLASS)), \
+            "%s is not an instance of basestring or %s" % (value, self.KEY_CLASS)
         serialized_key = unicode(_strip_value(value))
         if serialized_key.endswith('\n'):
             # An opaque key object serialized to a string with a trailing newline.
