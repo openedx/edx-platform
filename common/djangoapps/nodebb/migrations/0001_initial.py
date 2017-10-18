@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('course_id', openedx.core.djangoapps.xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
-                ('community_url', models.CharField(max_length=100)),
+                ('community_url', models.CharField(unique=True, max_length=100)),
             ],
             options={
                 'abstract': False,

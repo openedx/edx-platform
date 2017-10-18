@@ -5,7 +5,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 from common.lib.nodebb_client.client import NodeBBClient
-from lms.djangoapps.discussion_nodebb.models import DiscussionCommunity
+from nodebb.models import DiscussionCommunity
 from lms.djangoapps.onboarding_survey.models import ExtendedProfile
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange

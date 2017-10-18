@@ -667,7 +667,7 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
             r'^courses/{}/discussion/nodebb/'.format(
                 settings.COURSE_ID_PATTERN,
             ),
-            include('discussion_nodebb.urls')
+            include('nodebb.urls')
         ),
         url(
             r'^notification_prefs/enable/',

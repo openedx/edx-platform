@@ -2165,9 +2165,8 @@ INSTALLED_APPS = (
     # Dynamic FAQ page
     'lms.djangoapps.faq',
 
-    # NodeBB related
+    # NodeBB
     'nodebb',
-    'lms.djangoapps.discussion_nodebb',
 
     # timed notification and periodic tasks
     'openedx.core.djangoapps.timed_notification',

@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.discussion_nodebb.models import DiscussionCommunity
+from nodebb.models import DiscussionCommunity
 
 log = logging.getLogger("edx.discussions_nodebb")
 
