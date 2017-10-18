@@ -1,10 +1,27 @@
 {% load i18n %}
 
+{% if course_ids|length > 1 %}
 {% blocktrans trimmed %}
-We hope you are enjoying learning with us so far in {{ course_name }}! A verified certificate
+We hope you are enjoying learning with us so far on {{ platform_name }}! A verified certificate
+will allow you to highlight your new knowledge and skills. It's official, and easily shareable.
+
+Upgrade by {{ user_schedule_upgrade_deadline_time }}.
+{% endblocktrans %}
+
+{% if course_ids|length > 1 and course_ids|length < 10 %}
+{% for course_link in course_links %}
+* {{ course_link.name }} <{{ course_link.url }}>
+{% endfor %}
+{% endif %}
+
+{% trans "Upgrade now at" %} <{{ dashboard_url }}>
+{% else %}
+{% blocktrans trimmed %}
+We hope you are enjoying learning with us so far in {{ first_course_name }}! A verified certificate
 will allow you to highlight your new knowledge and skills. It's official, and easily shareable.
 
 Upgrade by {{ user_schedule_upgrade_deadline_time }}.
 {% endblocktrans %}
 
 {% trans "Upgrade now at" %} <{{ upsell_link }}>
+{% endif %}

@@ -232,8 +232,14 @@ def _upgrade_reminder_schedules_for_bin(site, current_datetime, target_datetime,
             'student_name': user.profile.name,
             'user_personal_address': user.profile.name if user.profile.name else user.username,
 
-            'course_name': first_schedule.enrollment.course.display_name,
-            'course_url': absolute_url(site, reverse('course_root', args=[str(first_schedule.enrollment.course_id)])),
+            'course_links': [
+                {
+                    'url': absolute_url(site, reverse('course_root', args=[str(s.enrollment.course_id)])),
+                    'name': s.enrollment.course.display_name
+                } for s in user_schedules
+            ],
+
+            'first_course_name': first_schedule.enrollment.course.display_name,
 
             # This is used by the bulk email optout policy
             'course_ids': course_id_strs,

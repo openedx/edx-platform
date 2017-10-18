@@ -3,11 +3,22 @@
 {% load static %}
 
 {% block preview_text %}
-    {% blocktrans trimmed %}
-        We hope you are enjoying learning with us so far in {{ course_name }}! A verified certificate
-        will allow you to highlight your new knowledge and skills. It's official, and easily shareable.
+    {% if course_ids|length > 1 %}
+        {% blocktrans trimmed %}
+            We hope you are enjoying learning with us so far on {{ platform_name }}! A verified certificate
+            will allow you to highlight your new knowledge and skills. It's official, and easily shareable.
 
-        Upgrade by {{ user_schedule_upgrade_deadline_time }}.
+            Upgrade by {{ user_schedule_upgrade_deadline_time }}.
+        {% endblocktrans %}
+    {% else %}
+        {% blocktrans trimmed %}
+            We hope you are enjoying learning with us so far in {{ first_course_name }}! A verified certificate
+            will allow you to highlight your new knowledge and skills. It's official, and easily shareable.
+
+            Upgrade by {{ user_schedule_upgrade_deadline_time }}.
+        {% endblocktrans %}
+    {% endif %}
+    {% blocktrans trimmed %}
     {% endblocktrans %}
 {% endblock %}
 
@@ -18,11 +29,19 @@
             <h1>{% trans "Upgrade now" %}</h1>
 
             <p>
-                {% blocktrans trimmed %}
-                    We hope you are enjoying learning with us so far in <strong>{{ course_name }}</strong>! A
-                    verified certificate will allow you to highlight your new knowledge and skills. It's official,
-                    and easily shareable.
-                {% endblocktrans %}
+                {% if course_ids|length > 1 %}
+                    {% blocktrans trimmed %}
+                        We hope you are enjoying learning with us so far on <strong>{{ platform_name }}</strong>! A
+                        verified certificate will allow you to highlight your new knowledge and skills. It's official,
+                        and easily shareable.
+                    {% endblocktrans %}
+                {% else %}
+                    {% blocktrans trimmed %}
+                        We hope you are enjoying learning with us so far in <strong>{{ first_course_name }}</strong>! A
+                        verified certificate will allow you to highlight your new knowledge and skills. It's official,
+                        and easily shareable.
+                    {% endblocktrans %}
+                {% endif %}
             </p>
             <p>
                 {% blocktrans trimmed %}
@@ -30,27 +49,39 @@
                 {% endblocktrans %}
             </p>
 
-            <a href="{{ upsell_link }}">
-                <img
-                    src="{{ cert_image }}"
-                    alt="{% trans 'Example print-out of a verified certificate' %}"
-                    style="
-                        display: block;
-                        margin-right: auto;
-                        margin-left: auto;
-                        margin-top: 50px;
-                        margin-bottom: 50px;
-                        border-top: 1px solid lightgray;
-                        border-bottom: 3px solid lightgray;
-                        border-right: 3px solid lightgray;
-                        border-left: 1px solid lightgray;
-                " />
-            </a>
+            {% if course_ids|length > 1 and course_ids|length < 10 %}
+                <ul style="margin-bottom: 30px;">
+                {% for course_link in course_links %}
+                    <li>
+                        <a href="{{ course_link.url }}">{{ course_link.name }}</a>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+
+            <img
+                src="{{ cert_image }}"
+                alt="{% trans 'Example print-out of a verified certificate' %}"
+                style="
+                    display: block;
+                    margin-right: auto;
+                    margin-left: auto;
+                    margin-top: 50px;
+                    margin-bottom: 50px;
+                    border-top: 1px solid lightgray;
+                    border-bottom: 3px solid lightgray;
+                    border-right: 3px solid lightgray;
+                    border-left: 1px solid lightgray;
+            " />
 
             <p>
                 {# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
                 <a
-                    href="{{ upsell_link }}"
+                    {% if course_ids|length == 1 %}
+                      href="{{ upsell_link }}"
+                    {% else %}
+                      href="{{ dashboard_url }}"
+                    {% endif %}
                     style="
                         color: #ffffff;
                         text-decoration: none;
