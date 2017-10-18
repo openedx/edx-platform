@@ -3,10 +3,12 @@
 from __future__ import unicode_literals
 
 import mock
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from branding.api import get_footer, get_logo_url
+from branding.api import get_footer, get_home_url, get_logo_url
+from edxmako.shortcuts import marketing_link
 
 
 class TestHeader(TestCase):
@@ -23,6 +25,18 @@ class TestHeader(TestCase):
             logo_url = get_logo_url()
 
         self.assertEqual(logo_url, cdn_url)
+
+    def test_home_url_with_mktg_disabled(self):
+        expected_url = get_home_url()
+        self.assertEqual(reverse('dashboard'), expected_url)
+
+    @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True})
+    @mock.patch.dict('django.conf.settings.MKTG_URLS', {
+        "ROOT": "https://edx.org",
+    })
+    def test_home_url_with_mktg_enabled(self):
+        expected_url = get_home_url()
+        self.assertEqual(marketing_link('ROOT'), expected_url)
 
 
 class TestFooter(TestCase):
