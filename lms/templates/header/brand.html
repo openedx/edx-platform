@@ -14,7 +14,7 @@ from branding import api as branding_api
 
 <h1 class="hd logo-header navbar-brand">
   <div class="logo">
-    <a class="navbar-brand" href="${reverse('dashboard')}" itemprop="url">
+    <a class="navbar-brand" href="${branding_api.get_home_url()}" itemprop="url">
       <img class="logo-image" src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}" itemprop="logo" />
     </a>
   </div>
