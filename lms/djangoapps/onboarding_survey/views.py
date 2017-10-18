@@ -3,6 +3,7 @@ Views for on-boarding app.
 """
 import json
 import os
+import logging
 
 from path import Path as path
 
@@ -17,10 +18,11 @@ from lms.djangoapps.onboarding_survey.models import (
     UserInfoSurvey,
     InterestsSurvey,
     OrganizationSurvey,
-    Organization
-)
+    Organization)
 from lms.djangoapps.onboarding_survey.history import update_history
 from onboarding_survey import forms
+
+log = logging.getLogger("edx.onboarding_survey")
 
 
 def update_user_history(user):
@@ -281,6 +283,7 @@ def get_languages(request):
     return HttpResponse(data, mime_type)
 
 
+@login_required
 def update_account_settings(request):
     """
     View to handle update of registration extra fields
@@ -322,5 +325,12 @@ def get_user_organizations(request):
         all_organizations = Organization.objects.filter(name__startswith=query)
         for organization in all_organizations:
             final_result[organization.name] = organization.is_poc_exist
+
+        if request.user.is_authenticated():
+            user_extended_profile = request.user.extended_profile
+            final_result['user_org_info'] = {
+                'org': user_extended_profile.organization.name,
+                'admin_email': user_extended_profile.org_admin_email
+            }
 
     return JsonResponse(final_result)

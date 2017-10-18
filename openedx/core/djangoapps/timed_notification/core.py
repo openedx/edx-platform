@@ -62,7 +62,6 @@ def send_course_notification_email(course, mako_template_path, context, to_list=
         connection = get_connection()
         log.info("Opening email connection")
         connection.open()
-
         log.info("Before loop through to the user-list")
         for current_recipient in to_list:
             recipient_num += 1
@@ -155,9 +154,9 @@ def send_course_notification_email(course, mako_template_path, context, to_list=
                 len(duplicate_recipients),
                 ', '.join(duplicate_recipients)
             )
-    finally:
-        # Clean up at the end.
         connection.close()
+    except Exception:
+        log.info('Email send failed!')
 
 
 def get_course_link(course_id):

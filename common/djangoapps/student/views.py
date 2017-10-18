@@ -765,14 +765,11 @@ def dashboard(request):
     else:
         redirect_message = ''
 
-    courses = get_courses(user)
-
     context = {
         'is_poc': user.extended_profile.is_poc,
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
         'course_enrollments': course_enrollments,
-        'courses_list': courses,
         'course_optouts': course_optouts,
         'message': message,
         'staff_access': staff_access,
@@ -1708,7 +1705,7 @@ def create_account_with_params(request, params):
         not eamap.external_domain.startswith(openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX)
     )
 
-    params['name'] = "{} {}".format(params['first_name'], params['last_name'])
+    params['name'] = "{} {}".format(params.get('first_name'), params.get('last_name'))
     form = AccountCreationForm(
         data=params,
         extra_fields=extra_fields,
