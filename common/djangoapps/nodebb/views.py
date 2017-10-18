@@ -9,7 +9,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from nodebb.models import DiscussionCommunity
 
-log = logging.getLogger("edx.discussions_nodebb")
+log = logging.getLogger("edx.nodebb")
 
 
 @login_required
