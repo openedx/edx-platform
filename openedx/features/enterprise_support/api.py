@@ -541,6 +541,7 @@ def get_dashboard_consent_notification(request, user, course_enrollments):
             {
                 'title': title,
                 'message': message,
+                'course_name': enrollment.course_overview.display_name,
             }
         )
     return ''
