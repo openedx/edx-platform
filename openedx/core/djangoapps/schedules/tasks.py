@@ -142,8 +142,9 @@ class ScheduleMessageBaseTask(Task):
         except SiteConfiguration.DoesNotExist:
             org_list = None
             exclude_orgs = False
-        finally:
-            return exclude_orgs, org_list
+
+        return exclude_orgs, org_list
+
 
 class ScheduleRecurringNudge(ScheduleMessageBaseTask):
     num_bins = resolvers.RECURRING_NUDGE_NUM_BINS
