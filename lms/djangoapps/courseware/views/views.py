@@ -295,13 +295,13 @@ def course_info(request, course_id):
 
             # The user doesn't have access to the course. If they're
             # denied permission due to the course not being live yet,
-            # redirect to the dashboard page.
+            # redirect to the course about page.
             if isinstance(access_response, StartDateError):
                 start_date = strftime_localized(course.start, 'SHORT_DATE')
                 params = QueryDict(mutable=True)
                 params['notlive'] = start_date
-                return redirect('{dashboard_url}?{params}'.format(
-                    dashboard_url=reverse('dashboard'),
+                return redirect('{course_about_url}?{params}'.format(
+                    course_about_url=reverse('about_course', args=[unicode(course_key)]),
                     params=params.urlencode()
                 ))
             # Otherwise, give a 404 to avoid leaking info about access
