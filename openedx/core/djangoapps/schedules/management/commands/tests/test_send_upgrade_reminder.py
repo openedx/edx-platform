@@ -94,7 +94,7 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
 
     @ddt.data(1, 10, 100)
     @patch.object(tasks, 'ace')
-    @patch.object(tasks, '_upgrade_reminder_schedule_send')
+    @patch.object(tasks.ScheduleUpgradeReminder, 'async_send_task')
     def test_schedule_bin(self, schedule_count, mock_schedule_send, mock_ace):
         schedules = [
             ScheduleFactory.create(
@@ -122,7 +122,7 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
         self.assertEqual(mock_schedule_send.apply_async.call_count, schedule_count)
         self.assertFalse(mock_ace.send.called)
 
-    @patch.object(tasks, '_upgrade_reminder_schedule_send')
+    @patch.object(tasks.ScheduleUpgradeReminder, 'async_send_task')
     def test_no_course_overview(self, mock_schedule_send):
 
         schedule = ScheduleFactory.create(
@@ -157,22 +157,21 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
         self.assertFalse(mock_ace.send.called)
 
     @patch.object(tasks, 'ace')
-    def test_enqueue_disabled(self, mock_ace):
+    @patch.object(tasks.ScheduleUpgradeReminder, 'apply_async')
+    def test_enqueue_disabled(self, mock_ace, mock_apply_async):
         ScheduleConfigFactory.create(site=self.site_config.site, enqueue_upgrade_reminder=False)
 
-        mock_schedule_bin = Mock()
         current_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
         tasks.ScheduleUpgradeReminder.enqueue(
             self.site_config.site,
             current_day,
             day_offset=3,
         )
-        self.assertFalse(mock_schedule_bin.called)
-        self.assertFalse(mock_schedule_bin.apply_async.called)
+        self.assertFalse(mock_apply_async.called)
         self.assertFalse(mock_ace.send.called)
 
     @patch.object(tasks, 'ace')
-    @patch.object(tasks, '_upgrade_reminder_schedule_send')
+    @patch.object(tasks.ScheduleUpgradeReminder, 'async_send_task')
     @ddt.data(
         ((['filtered_org'], False, 1)),
         ((['filtered_org'], True, 2))
@@ -220,7 +219,7 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
         self.assertFalse(mock_ace.send.called)
 
     @patch.object(tasks, 'ace')
-    @patch.object(tasks, '_upgrade_reminder_schedule_send')
+    @patch.object(tasks.ScheduleUpgradeReminder, 'async_send_task')
     def test_multiple_enrollments(self, mock_schedule_send, mock_ace):
         user = UserFactory.create()
         schedules = [
@@ -283,7 +282,7 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
         sent_messages = []
 
         with self.settings(TEMPLATES=self._get_template_overrides()):
-            with patch.object(tasks, '_upgrade_reminder_schedule_send') as mock_schedule_send:
+            with patch.object(tasks.ScheduleUpgradeReminder, 'async_send_task') as mock_schedule_send:
                 mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
 
                 # we execute one query per course to see if it's opted out of dynamic upgrade deadlines, however,

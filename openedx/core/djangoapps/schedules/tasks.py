@@ -50,28 +50,14 @@ def update_course_schedules(self, **kwargs):
         raise self.retry(kwargs=kwargs, exc=exc)
 
 
-@task(ignore_result=True, routing_key=ROUTING_KEY)
-def _recurring_nudge_schedule_send(site_id, msg_str):
-    site = Site.objects.get(pk=site_id)
-    if not ScheduleConfig.current(site).deliver_recurring_nudge:
-        LOG.debug('Recurring Nudge: Message delivery disabled for site %s', site.domain)
-        return
-
-    msg = Message.from_string(msg_str)
-    # A unique identifier for this batch of messages being sent.
-    set_custom_metric('send_uuid', msg.send_uuid)
-    # A unique identifier for this particular message.
-    set_custom_metric('uuid', msg.uuid)
-    LOG.debug('Recurring Nudge: Sending message = %s', msg_str)
-    ace.send(msg)
-
-
 class ScheduleMessageBaseTask(Task):
     ignore_result = True
     routing_key = ROUTING_KEY
     num_bins = resolvers.DEFAULT_NUM_BINS
     enqueue_config_var = None  # define in subclass
     log_prefix = None
+    resolver = None  # define in subclass
+    async_send_task = None  # define in subclass
 
     @classmethod
     def log_debug(cls, message, *args, **kwargs):
@@ -145,46 +131,45 @@ class ScheduleMessageBaseTask(Task):
 
         return exclude_orgs, org_list
 
+    def run(
+        self, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
+    ):
+        return self.resolver().schedule_bin(
+            self.async_send_task,
+            site_id,
+            target_day_str,
+            day_offset,
+            bin_num,
+            org_list,
+            exclude_orgs=exclude_orgs,
+            override_recipient_email=override_recipient_email,
+        )
+
+
+@task(ignore_result=True, routing_key=ROUTING_KEY)
+def _recurring_nudge_schedule_send(site_id, msg_str):
+    site = Site.objects.get(pk=site_id)
+    if not ScheduleConfig.current(site).deliver_recurring_nudge:
+        LOG.debug(
+            'Recurring Nudge: Message delivery disabled for site %s', site.domain)
+        return
+
+    msg = Message.from_string(msg_str)
+    # A unique identifier for this batch of messages being sent.
+    set_custom_metric('send_uuid', msg.send_uuid)
+    # A unique identifier for this particular message.
+    set_custom_metric('uuid', msg.uuid)
+    LOG.debug('Recurring Nudge: Sending message = %s', msg_str)
+    ace.send(msg)
+
 
 class ScheduleRecurringNudge(ScheduleMessageBaseTask):
     num_bins = resolvers.RECURRING_NUDGE_NUM_BINS
     enqueue_config_var = 'enqueue_recurring_nudge'
     log_prefix = 'Scheduled Nudge'
+    resolver = resolvers.ScheduleStartResolver
+    async_send_task = _recurring_nudge_schedule_send
 
-    def run(
-        self, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
-    ):
-        return resolvers.ScheduleStartResolver().schedule_bin(
-            _recurring_nudge_schedule_send,
-            site_id,
-            target_day_str,
-            day_offset,
-            bin_num,
-            org_list,
-            exclude_orgs=exclude_orgs,
-            override_recipient_email=override_recipient_email,
-        )
-
-
-class ScheduleUpgradeReminder(ScheduleMessageBaseTask):
-    num_bins = resolvers.UPGRADE_REMINDER_NUM_BINS
-    enqueue_config_var = 'enqueue_upgrade_reminder'
-    log_prefix = 'Course Update'
-
-
-    def run(
-        self, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
-    ):
-        return resolvers.UpgradeReminderResolver().schedule_bin(
-            _upgrade_reminder_schedule_send,
-            site_id,
-            target_day_str,
-            day_offset,
-            bin_num,
-            org_list,
-            exclude_orgs=exclude_orgs,
-            override_recipient_email=override_recipient_email,
-        )
 
 @task(ignore_result=True, routing_key=ROUTING_KEY)
 def _upgrade_reminder_schedule_send(site_id, msg_str):
@@ -193,27 +178,20 @@ def _upgrade_reminder_schedule_send(site_id, msg_str):
         return
 
     msg = Message.from_string(msg_str)
+    # A unique identifier for this batch of messages being sent.
+    set_custom_metric('send_uuid', msg.send_uuid)
+    # A unique identifier for this particular message.
+    set_custom_metric('uuid', msg.uuid)
     ace.send(msg)
 
 
-class ScheduleCourseUpdate(ScheduleMessageBaseTask):
-    num_bins = resolvers.COURSE_UPDATE_NUM_BINS
-    enqueue_config_var = 'enqueue_course_update'
+class ScheduleUpgradeReminder(ScheduleMessageBaseTask):
+    num_bins = resolvers.UPGRADE_REMINDER_NUM_BINS
+    enqueue_config_var = 'enqueue_upgrade_reminder'
     log_prefix = 'Course Update'
+    resolver = resolvers.UpgradeReminderResolver
+    async_send_task = _upgrade_reminder_schedule_send
 
-    def run(
-        self, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
-    ):
-        return resolvers.CourseUpdateResolver().schedule_bin(
-            _course_update_schedule_send,
-            site_id,
-            target_day_str,
-            day_offset,
-            bin_num,
-            org_list,
-            exclude_orgs=exclude_orgs,
-            override_recipient_email=override_recipient_email,
-        )
 
 
 @task(ignore_result=True, routing_key=ROUTING_KEY)
@@ -223,4 +201,16 @@ def _course_update_schedule_send(site_id, msg_str):
         return
 
     msg = Message.from_string(msg_str)
+    # A unique identifier for this batch of messages being sent.
+    set_custom_metric('send_uuid', msg.send_uuid)
+    # A unique identifier for this particular message.
+    set_custom_metric('uuid', msg.uuid)
     ace.send(msg)
+
+
+class ScheduleCourseUpdate(ScheduleMessageBaseTask):
+    num_bins = resolvers.COURSE_UPDATE_NUM_BINS
+    enqueue_config_var = 'enqueue_course_update'
+    log_prefix = 'Course Update'
+    resolver = resolvers.CourseUpdateResolver
+    async_send_task = _course_update_schedule_send
