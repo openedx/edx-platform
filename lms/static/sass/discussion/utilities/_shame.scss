@@ -24,6 +24,7 @@
 // Override global label rules
 .forum-nav-browse-filter label {
   margin-bottom: 0;
+  width: 100%;
 }
 
 // Override global input rules
@@ -35,15 +36,6 @@
   border-radius: $forum-border-radius !important;
   height: auto !important;
   font-size: $forum-small-font-size !important;
-}
-
-// Override global ul rules
-.forum-nav-browse-menu, .forum-nav-browse-submenu {
-  margin: 0;
-}
-
-.forum-nav-browse-menu {
-  @include padding-left(0);
 }
 
 // --------------------------------

@@ -44,6 +44,16 @@
   border-bottom: 1px solid $border-color;
   padding: 20px;
 
+  .page-header-search {
+    @include media-breakpoint-up(md) {
+      margin-right: $baseline;
+    }
+
+    .search-form {
+      display: flex;
+    }
+  }
+
   .page-header-main {
     flex-grow: 1;  // This column should consume all the available space
   }
