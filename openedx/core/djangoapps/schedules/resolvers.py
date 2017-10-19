@@ -154,11 +154,7 @@ class ScheduleStartResolver(BinnedSchedulesBaseResolver):
     """
     Send a message to all users whose schedule started at ``self.current_date`` + ``day_offset``.
     """
-
-    def __init__(self, *args, **kwargs):
-        super(ScheduleStartResolver, self).__init__(*args, **kwargs)
-        self.log_prefix = 'Scheduled Nudge'
-
+    log_prefix = 'Scheduled Nudge'
 
     def schedule_bin(
         self, async_send_task, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
@@ -242,9 +238,7 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
     """
     Send a message to all users whose verified upgrade deadline is at ``self.current_date`` + ``day_offset``.
     """
-    def __init__(self, *args, **kwargs):
-        super(UpgradeReminderResolver, self).__init__(*args, **kwargs)
-        self.log_prefix = 'Upgrade Reminder'
+    log_prefix = 'Upgrade Reminder'
 
     def schedule_bin(
         self, async_send_task, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
@@ -355,9 +349,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
     Send a message to all users whose schedule started at ``self.current_date`` + ``day_offset`` and the
     course has updates.
     """
-    def __init__(self, *args, **kwargs):
-        super(CourseUpdateResolver, self).__init__(*args, **kwargs)
-        self.log_prefix = 'Course Update'
+    log_prefix = 'Course Update'
 
     def schedule_bin(
         self, async_send_task, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
