@@ -157,13 +157,12 @@ class ScheduleStartResolver(BinnedSchedulesBaseResolver):
     log_prefix = 'Scheduled Nudge'
 
     def schedule_bin(
-        self, async_send_task, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
+        self, async_send_task, site, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
     ):
         target_datetime = deserialize(target_day_str)
         # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
         current_datetime = target_datetime - datetime.timedelta(days=day_offset)
         msg_type = RecurringNudge(abs(day_offset))
-        site = Site.objects.get(id=site_id)
 
         _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
 
@@ -185,7 +184,7 @@ class ScheduleStartResolver(BinnedSchedulesBaseResolver):
             )
             with function_trace('enqueue_send_task'):
                 async_send_task.apply_async(
-                    (site_id, str(msg)), retry=False)
+                    (site.id, str(msg)), retry=False)
 
 
     def schedules_for_bin(self, site, current_datetime, target_datetime, bin_num, org_list, exclude_orgs=False):
@@ -241,13 +240,12 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
     log_prefix = 'Upgrade Reminder'
 
     def schedule_bin(
-        self, async_send_task, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
+        self, async_send_task, site, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
     ):
         target_datetime = deserialize(target_day_str)
         # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
         current_datetime = target_datetime - datetime.timedelta(days=day_offset)
         msg_type = UpgradeReminder()
-        site = Site.objects.get(id=site_id)
 
         _annotate_for_monitoring(msg_type, site, bin_num,
                                 target_day_str, day_offset)
@@ -270,7 +268,7 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
             )
             with function_trace('enqueue_send_task'):
                 async_send_task.apply_async(
-                    (site_id, str(msg)), retry=False)
+                    (site.id, str(msg)), retry=False)
 
 
     def schedules_for_bin(self, site, current_datetime, target_datetime, bin_num, org_list, exclude_orgs=False):
@@ -352,13 +350,12 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
     log_prefix = 'Course Update'
 
     def schedule_bin(
-        self, async_send_task, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
+        self, async_send_task, site, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
     ):
         target_datetime = deserialize(target_day_str)
         # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
         current_datetime = target_datetime - datetime.timedelta(days=day_offset)
         msg_type = CourseUpdate()
-        site = Site.objects.get(id=site_id)
 
         _annotate_for_monitoring(msg_type, site, bin_num,
                                 target_day_str, day_offset)
@@ -382,7 +379,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             )
             with function_trace('enqueue_send_task'):
                 async_send_task.apply_async(
-                    (site_id, str(msg)), retry=False)
+                    (site.id, str(msg)), retry=False)
 
     def schedules_for_bin(self, site, current_datetime, target_datetime, day_offset, bin_num, org_list,
                                         exclude_orgs=False):

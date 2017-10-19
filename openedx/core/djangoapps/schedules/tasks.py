@@ -136,7 +136,7 @@ class ScheduleMessageBaseTask(Task):
     ):
         return self.resolver().schedule_bin(
             self.async_send_task,
-            site_id,
+            Site.objects.get(id=site_id),
             target_day_str,
             day_offset,
             bin_num,
