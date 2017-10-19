@@ -68,7 +68,19 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
     override_recipient_email = attr.ib(default=None)
 
     def send(self, msg_type):
-        pass
+        _annotate_for_monitoring(msg_type, self.site, self.bin_num, self.target_datetime, self.day_offset)
+
+        for (user, language, context) in self.schedules_for_bin():
+            msg = msg_type.personalize(
+                Recipient(
+                    user.username,
+                    self.override_recipient_email or user.email,
+                ),
+                language,
+                context,
+            )
+            with function_trace('enqueue_send_task'):
+                self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)
 
 def get_schedules_with_target_date_by_bin_and_orgs(schedule_date_field, current_datetime, target_datetime, bin_num,
                                                    num_bins=DEFAULT_NUM_BINS, org_list=None, exclude_orgs=False,
@@ -168,22 +180,6 @@ class ScheduleStartResolver(BinnedSchedulesBaseResolver):
     """
     log_prefix = 'Scheduled Nudge'
 
-    def send(self, msg_type):
-        _annotate_for_monitoring(msg_type, self.site, self.bin_num, self.target_datetime, self.day_offset)
-
-        for (user, language, context) in self.schedules_for_bin():
-            msg = msg_type.personalize(
-                Recipient(
-                    user.username,
-                    self.override_recipient_email or user.email,
-                ),
-                language,
-                context,
-            )
-            with function_trace('enqueue_send_task'):
-                self.async_send_task.apply_async(
-                    (self.site.id, str(msg)), retry=False)
-
     def schedules_for_bin(self):
         # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
         current_datetime = self.target_datetime - datetime.timedelta(days=self.day_offset)
@@ -238,22 +234,6 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
     Send a message to all users whose verified upgrade deadline is at ``self.current_date`` + ``day_offset``.
     """
     log_prefix = 'Upgrade Reminder'
-
-    def send(self, msg_type):
-        _annotate_for_monitoring(msg_type, self.site, self.bin_num, self.target_datetime, self.day_offset)
-
-        for (user, language, context) in self.schedules_for_bin():
-            msg = msg_type.personalize(
-                Recipient(
-                    user.username,
-                    self.override_recipient_email or user.email,
-                ),
-                language,
-                context,
-            )
-            with function_trace('enqueue_send_task'):
-                self.async_send_task.apply_async(
-                    (self.site.id, str(msg)), retry=False)
 
     def schedules_for_bin(self):
         # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
@@ -334,22 +314,6 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
     course has updates.
     """
     log_prefix = 'Course Update'
-
-    def send(self, msg_type):
-        _annotate_for_monitoring(msg_type, self.site, self.bin_num, self.target_datetime, self.day_offset)
-
-        for (user, language, context) in self._course_update_schedules_for_bin():
-            msg = msg_type.personalize(
-                Recipient(
-                    user.username,
-                    self.override_recipient_email or user.email,
-                ),
-                language,
-                context,
-            )
-            with function_trace('enqueue_send_task'):
-                self.async_send_task.apply_async(
-                    (self.site.id, str(msg)), retry=False)
 
     def schedules_for_bin(self):
         # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
