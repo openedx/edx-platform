@@ -16,7 +16,7 @@ from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
 from courseware.courses import get_course_date_blocks, get_course_with_access
-from lms.djangoapps.course_goals.api import get_course_goal, get_course_goal_options, get_goal_api_url, has_course_goal_permission
+from lms.djangoapps.course_goals.api import get_course_goal, get_course_goal_options, valid_course_goals_ordered, get_goal_api_url, has_course_goal_permission
 from lms.djangoapps.course_goals.models import GOAL_KEY_CHOICES
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text
@@ -165,22 +165,20 @@ def _register_course_goal_message(request, course):
 
     # Add the option to set a goal to earn a certificate,
     # complete the course or explore the course
-    course_goal_keys = course_goal_options.keys()
-    course_goal_keys.remove(GOAL_KEY_CHOICES.unsure)
-    for goal_key in course_goal_keys:
-        goal_text = course_goal_options[goal_key]
+    course_goals_by_commitment_level = valid_course_goals_ordered()
+    for goal in course_goals_by_commitment_level:
+        goal_key, goal_text = goal
         goal_choices_html += HTML(
             '{initial_tag}{goal_text}{closing_tag}'
         ).format(
             initial_tag=HTML(
-                '<button tabindex="0" aria-label="{aria_label_choice}" class="goal-option {col_sel} btn" '
+                '<button tabindex="0" aria-label="{aria_label_choice}" class="goal-option btn" '
                 'data-choice="{goal_key}">'
             ).format(
                 goal_key=goal_key,
                 aria_label_choice=Text(_("Set goal to: {goal_text}")).format(
                     goal_text=Text(_(goal_text))
-                ),
-                col_sel='col-' + str(int(math.floor(12 / len(course_goal_keys))))
+                )
             ),
             goal_text=goal_text,
             closing_tag=HTML('</button>')
