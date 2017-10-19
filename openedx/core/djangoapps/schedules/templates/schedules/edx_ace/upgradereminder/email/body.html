@@ -50,6 +50,9 @@
             </p>
 
             {% if course_ids|length > 1 and course_ids|length < 10 %}
+                <p>
+                  {% trans "You are eligible to upgrade in these courses:" %}
+                </p>
                 <ul style="margin-bottom: 30px;">
                 {% for course_link in course_links %}
                     <li>
