@@ -134,7 +134,7 @@ class ScheduleMessageBaseTask(Task):
     def run(
         self, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
     ):
-        return self.resolver().schedule_bin(
+        return self.resolver(
             self.async_send_task,
             Site.objects.get(id=site_id),
             deserialize(target_day_str),
@@ -143,7 +143,7 @@ class ScheduleMessageBaseTask(Task):
             org_list,
             exclude_orgs=exclude_orgs,
             override_recipient_email=override_recipient_email,
-        )
+        ).schedule_bin()
 
 
 @task(ignore_result=True, routing_key=ROUTING_KEY)

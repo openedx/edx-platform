@@ -4,6 +4,7 @@
 #   * @edx/ospr - to check licensing
 #   * @edx/devops - to check system requirements
 
+attrs==17.2.0
 beautifulsoup4==4.1.3
 beautifulsoup==3.2.1
 bleach==1.4
