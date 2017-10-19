@@ -86,27 +86,34 @@ engine = Engine(dirs=settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
 source, template_path = Loader(engine).load_template_source(path)
 %>${source | n, decode.utf8}</%def>
 
-<%def name="ericfischer(locale)">
+<%def name="sfeTranslate(locale)">
     <%
         from django.conf import settings
+        from django.contrib.staticfiles.storage import staticfiles_storage
         from django.template import Template, Context
         from webpack_loader.exceptions import WebpackLoaderBadStatsError
 
-        path = "{base}/bundles/studio-frontend/locale_messages/{locale}.json".format(
+        messages = ""
+        messages_path = "{base}/bundles/studio-frontend/locale_messages/{locale}.json".format(
             base=settings.STATIC_ROOT,
             locale=locale
         )
+        with open(messages_path) as inputfile:
+            messages = inputfile.read()
 
-        messages = ""
-        with open(path) as input:
-            messages = input.read()
+        localeScriptUrl = staticfiles_storage.url(
+            "bundles/studio-frontend/locale_scripts/{locale}.js".format(locale=locale)
+        )
 
         return Template("""
-            <div id=studio-frontend-messages style="display: none;">
+            <script type="text/javascript" src={{ localeScriptUrl }}></script>
+            <div id=studio-frontend-messages style="display: none;" data-locale={{locale}}>
                 {{ messages }}
             </div>
         """).render(Context({
+            'localeScriptUrl': localeScriptUrl,
             'messages': messages,
+            'locale': locale
         }))
     %>
 </%def>

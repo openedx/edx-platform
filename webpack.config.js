@@ -123,6 +123,7 @@ var wpconfig = {
                     /studio-frontend/,
                     /paragon/
                 ],
+                exclude: /studio-frontend\/src\/locale_scripts/,
                 use: 'babel-loader'
             },
             {
@@ -133,6 +134,17 @@ var wpconfig = {
                     options: {
                         name: '[name].[ext]',
                         outputPath: 'studio-frontend/locale_messages/'
+                    }
+                }
+            },
+            {
+                test: /\.jsx$/,
+                include: /studio-frontend\/src\/locale_scripts/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        name: '[name].[ext]',
+                        outputPath: 'studio-frontend/locale_scripts/'
                     }
                 }
             },
