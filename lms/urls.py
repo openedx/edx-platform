@@ -109,6 +109,7 @@ urlpatterns += (
     url(r'^dashboard/', include('learner_dashboard.urls')),
     # appsembler management console endpoint for student enrollment
     url(r'^appsembler/api/', include('openedx.core.djangoapps.appsembler.sites.urls')),
+    url(r'^appsembler/api/', include('openedx.core.djangoapps.appsembler.tpa_admin.urls')),
 )
 
 # TODO: This needs to move to a separate urls.py once the student_account and
