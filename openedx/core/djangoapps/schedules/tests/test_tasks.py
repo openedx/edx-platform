@@ -91,9 +91,7 @@ class TestScheduleMessageBaseTask(CacheIsolationTestCase):
         (['course1', 'course2'], [u'course1', u'course2'])
     )
     def test_get_course_org_filter_exclude(self, course_org_filter, expected_org_list):
-        self.other_site = SiteFactory.create()
-        self.other_site_config = SiteConfigurationFactory.create(
-            site=self.other_site,
+        SiteConfigurationFactory.create(
             values={'course_org_filter': course_org_filter},
         )
         exclude_orgs, org_list = self.basetask.get_course_org_filter(self.site)
