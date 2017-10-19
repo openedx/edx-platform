@@ -133,7 +133,7 @@ class RecurringNudge(ScheduleMessageType):
         self.name = "recurringnudge_day{}".format(day)
 
 
-def _annotate_for_monitoring(message_type, site, bin_num, target_day_str, day_offset):
+def _annotate_for_monitoring(message_type, site, bin_num, target_datetime, day_offset):
     # This identifies the type of message being sent, for example: schedules.recurring_nudge3.
     set_custom_metric('message_name', '{0}.{1}'.format(
         message_type.app_label, message_type.name))
@@ -143,7 +143,7 @@ def _annotate_for_monitoring(message_type, site, bin_num, target_day_str, day_of
     # workers for too long. This could help us identify particular bins that are problematic.
     set_custom_metric('bin', bin_num)
     # The date we are processing data for.
-    set_custom_metric('target_day', target_day_str)
+    set_custom_metric('target_day', serialize(target_datetime))
     # The number of days relative to the current date to process data for.
     set_custom_metric('day_offset', day_offset)
     # A unique identifier for this batch of messages being sent.
@@ -157,14 +157,13 @@ class ScheduleStartResolver(BinnedSchedulesBaseResolver):
     log_prefix = 'Scheduled Nudge'
 
     def schedule_bin(
-        self, async_send_task, site, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
+        self, async_send_task, site, target_datetime, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
     ):
-        target_datetime = deserialize(target_day_str)
         # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
         current_datetime = target_datetime - datetime.timedelta(days=day_offset)
         msg_type = RecurringNudge(abs(day_offset))
 
-        _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
+        _annotate_for_monitoring(msg_type, site, bin_num, target_datetime, day_offset)
 
         for (user, language, context) in self.schedules_for_bin(
             site,
@@ -240,15 +239,13 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
     log_prefix = 'Upgrade Reminder'
 
     def schedule_bin(
-        self, async_send_task, site, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
+        self, async_send_task, site, target_datetime, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
     ):
-        target_datetime = deserialize(target_day_str)
         # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
         current_datetime = target_datetime - datetime.timedelta(days=day_offset)
         msg_type = UpgradeReminder()
 
-        _annotate_for_monitoring(msg_type, site, bin_num,
-                                target_day_str, day_offset)
+        _annotate_for_monitoring(msg_type, site, bin_num, target_datetime, day_offset)
 
         for (user, language, context) in self.schedules_for_bin(
             site,
@@ -350,15 +347,13 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
     log_prefix = 'Course Update'
 
     def schedule_bin(
-        self, async_send_task, site, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
+        self, async_send_task, site, target_datetime, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
     ):
-        target_datetime = deserialize(target_day_str)
         # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
         current_datetime = target_datetime - datetime.timedelta(days=day_offset)
         msg_type = CourseUpdate()
 
-        _annotate_for_monitoring(msg_type, site, bin_num,
-                                target_day_str, day_offset)
+        _annotate_for_monitoring(msg_type, site, bin_num, target_datetime, day_offset)
 
         for (user, language, context) in self._course_update_schedules_for_bin(
             site,
