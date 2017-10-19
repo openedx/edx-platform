@@ -634,6 +634,23 @@
     }
   }
 
+  // outline: highlight settings
+  .highlights-button {
+    cursor: pointer;
+    color: $uxpl-blue-base;
+  }
+
+  .highlight-input-text {
+    width: 100%;
+    margin-bottom: 5px;
+    margin-top: 5px;
+  }
+
+  .highlights-description {
+    font-size: 80%;
+    font-weight: bolder;
+  }
+
   // outline: edit item settings
   .wrapper-modal-window-bulkpublish-section,
   .wrapper-modal-window-bulkpublish-subsection,
