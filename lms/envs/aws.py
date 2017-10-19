@@ -974,6 +974,13 @@ ENTERPRISE_SUPPORT_URL = ENV_TOKENS.get(
     ENTERPRISE_SUPPORT_URL
 )
 
+# A shared secret to be used for encrypting passwords passed from the enterprise api
+# to the enteprise reporting script.
+ENTERPRISE_REPORTING_SECRET = AUTH_TOKENS.get(
+    'ENTERPRISE_REPORTING_SECRET',
+    ENTERPRISE_REPORTING_SECRET
+)
+
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class
 # The below environmental settings are utilized by the LMS when interacting with
