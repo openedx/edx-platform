@@ -18,6 +18,7 @@ log = getLogger(__name__)
 def create_user_on_nodebb(sender, instance, created, **kwargs):
     if created:
         user_info = {
+            'email': instance.user.email,
             'first_name': instance.first_name,
             'last_name': instance.last_name,
             'username': instance.user.username,
