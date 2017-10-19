@@ -65,7 +65,7 @@ class ScheduleMessageBaseTask(Task):
 
     @classmethod
     def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):
-        current_date = current_date.replace(hour=0, minute=0, second=0)
+        current_date = resolvers._get_datetime_beginning_of_day(current_date)
 
         if not cls.is_enqueue_enabled(site):
             cls.log_debug(

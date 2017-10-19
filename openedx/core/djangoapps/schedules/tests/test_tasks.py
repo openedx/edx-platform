@@ -58,7 +58,7 @@ class TestScheduleMessageBaseTask(CacheIsolationTestCase):
                 current_date=current_date,
                 day_offset=day_offset
             )
-            target_date = current_date.replace(hour=0, minute=0, second=0) + \
+            target_date = current_date.replace(hour=0, minute=0, second=0, microsecond=0) + \
                 datetime.timedelta(day_offset)
             print(patches['log_debug'].mock_calls)
             patches['log_debug'].assert_any_call(
