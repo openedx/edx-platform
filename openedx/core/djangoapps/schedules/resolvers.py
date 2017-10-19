@@ -168,7 +168,7 @@ class ScheduleStartResolver(BinnedSchedulesBaseResolver):
     """
     log_prefix = 'Scheduled Nudge'
 
-    def schedule_bin(self, msg_type):
+    def send(self, msg_type):
         _annotate_for_monitoring(msg_type, self.site, self.bin_num, self.target_datetime, self.day_offset)
 
         for (user, language, context) in self.schedules_for_bin():
@@ -239,7 +239,7 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
     """
     log_prefix = 'Upgrade Reminder'
 
-    def schedule_bin(self, msg_type):
+    def send(self, msg_type):
         _annotate_for_monitoring(msg_type, self.site, self.bin_num, self.target_datetime, self.day_offset)
 
         for (user, language, context) in self.schedules_for_bin():
@@ -335,7 +335,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
     """
     log_prefix = 'Course Update'
 
-    def schedule_bin(self, msg_type):
+    def send(self, msg_type):
         _annotate_for_monitoring(msg_type, self.site, self.bin_num, self.target_datetime, self.day_offset)
 
         for (user, language, context) in self._course_update_schedules_for_bin():

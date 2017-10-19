@@ -144,7 +144,7 @@ class ScheduleMessageBaseTask(Task):
             org_list,
             exclude_orgs=exclude_orgs,
             override_recipient_email=override_recipient_email,
-        ).schedule_bin(msg_type)
+        ).send(msg_type)
 
     def make_message_type(self, day_offset):
         raise NotImplementedError()
