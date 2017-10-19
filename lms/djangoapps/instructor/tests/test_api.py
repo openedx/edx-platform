@@ -22,7 +22,7 @@ from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from pytz import UTC
 from django.utils.translation import ugettext as _
-from mock import Mock, patch
+from mock import Mock, NonCallableMock, patch
 from nose.plugins.attrib import attr
 from nose.tools import raises
 from opaque_keys.edx.keys import CourseKey
@@ -485,7 +485,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
 
         msg: message to display if assertion fails.
         """
-        mock_problem_key = Mock(return_value=u'')
+        mock_problem_key = NonCallableMock(return_value=u'')
         mock_problem_key.course_key = self.course.id
         with patch.object(UsageKey, 'from_string') as patched_method:
             patched_method.return_value = mock_problem_key
