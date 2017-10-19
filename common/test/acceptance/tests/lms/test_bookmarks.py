@@ -3,6 +3,7 @@
 End-to-end tests for the courseware unit bookmarks.
 """
 import json
+from unittest import skip
 
 import requests
 from nose.plugins.attrib import attr
@@ -365,6 +366,7 @@ class BookmarksTest(BookmarksTestMixin):
         self.bookmarks_page.visit()
         self._verify_breadcrumbs(num_units=1, modified_name=modified_name)
 
+    @skip("andya: 10/19/17: potentially flaky test")
     def test_unreachable_bookmark(self):
         """
         Scenario: We should get a HTTP 404 for an unreachable bookmark.
