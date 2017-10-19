@@ -86,6 +86,31 @@ engine = Engine(dirs=settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
 source, template_path = Loader(engine).load_template_source(path)
 %>${source | n, decode.utf8}</%def>
 
+<%def name="ericfischer(locale)">
+    <%
+        from django.conf import settings
+        from django.template import Template, Context
+        from webpack_loader.exceptions import WebpackLoaderBadStatsError
+
+        path = "{base}/bundles/studio-frontend/locale_messages/{locale}.json".format(
+            base=settings.STATIC_ROOT,
+            locale=locale
+        )
+
+        messages = ""
+        with open(path) as input:
+            messages = input.read()
+
+        return Template("""
+            <div id=studio-frontend-messages style="display: none;">
+                {{ messages }}
+            </div>
+        """).render(Context({
+            'messages': messages,
+        }))
+    %>
+</%def>
+
 <%def name="webpack(entry)">
     <%doc>
         Loads Javascript onto your page from a Webpack-generated bundle.

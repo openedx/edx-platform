@@ -126,6 +126,17 @@ var wpconfig = {
                 use: 'babel-loader'
             },
             {
+                test: /\.json$/,
+                include: /studio-frontend\/i18n\/locales/,
+                use: {
+                    loader: 'file-loader',
+                    options: {
+                        name: '[name].[ext]',
+                        outputPath: 'studio-frontend/locale_messages/'
+                    }
+                }
+            },
+            {
                 test: /(.scss|.css)$/,
                 include: [
                     /studio-frontend/,
