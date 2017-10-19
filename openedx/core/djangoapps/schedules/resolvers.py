@@ -67,6 +67,13 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
     exclude_orgs = attr.ib(default=False)
     override_recipient_email = attr.ib(default=None)
 
+    schedule_date_field = None
+    num_bins = DEFAULT_NUM_BINS
+
+    def __attrs_post_init__(self):
+        # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
+        self.current_datetime = self.target_datetime - datetime.timedelta(days=self.day_offset)
+
     def send(self, msg_type):
         _annotate_for_monitoring(msg_type, self.site, self.bin_num, self.target_datetime, self.day_offset)
 
@@ -82,73 +89,73 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
             with function_trace('enqueue_send_task'):
                 self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)
 
-def get_schedules_with_target_date_by_bin_and_orgs(schedule_date_field, current_datetime, target_datetime, bin_num,
-                                                   num_bins=DEFAULT_NUM_BINS, org_list=None, exclude_orgs=False,
-                                                   order_by='enrollment__user__id'):
-    """
-    Returns Schedules with the target_date, related to Users whose id matches the bin_num, and filtered by org_list.
+    def get_schedules_with_target_date_by_bin_and_orgs(
+        self, order_by='enrollment__user__id'
+    ):
+        """
+        Returns Schedules with the target_date, related to Users whose id matches the bin_num, and filtered by org_list.
 
-    Arguments:
-    schedule_date_field -- string field name to query on the User's Schedule model
-    current_datetime -- datetime that will be used as "right now" in the query
-    target_datetime -- datetime that the User's Schedule's schedule_date_field value should fall under
-    bin_num -- int for selecting the bin of Users whose id % num_bins == bin_num
-    num_bin -- int specifying the number of bins to separate the Users into (default: DEFAULT_NUM_BINS)
-    org_list -- list of course_org names (strings) that the returned Schedules must or must not be in (default: None)
-    exclude_orgs -- boolean indicating whether the returned Schedules should exclude (True) the course_orgs in org_list
-                    or strictly include (False) them (default: False)
-    order_by -- string for field to sort the resulting Schedules by
-    """
-    target_day = _get_datetime_beginning_of_day(target_datetime)
-    schedule_day_equals_target_day_filter = {
-        'courseenrollment__schedule__{}__gte'.format(schedule_date_field): target_day,
-        'courseenrollment__schedule__{}__lt'.format(schedule_date_field): target_day + datetime.timedelta(days=1),
-    }
-    users = User.objects.filter(
-        courseenrollment__is_active=True,
-        **schedule_day_equals_target_day_filter
-    ).annotate(
-        id_mod=F('id') % num_bins
-    ).filter(
-        id_mod=bin_num
-    )
+        Arguments:
+        schedule_date_field -- string field name to query on the User's Schedule model
+        current_datetime -- datetime that will be used as "right now" in the query
+        target_datetime -- datetime that the User's Schedule's schedule_date_field value should fall under
+        bin_num -- int for selecting the bin of Users whose id % num_bins == bin_num
+        num_bin -- int specifying the number of bins to separate the Users into (default: DEFAULT_NUM_BINS)
+        org_list -- list of course_org names (strings) that the returned Schedules must or must not be in (default: None)
+        exclude_orgs -- boolean indicating whether the returned Schedules should exclude (True) the course_orgs in org_list
+                        or strictly include (False) them (default: False)
+        order_by -- string for field to sort the resulting Schedules by
+        """
+        target_day = _get_datetime_beginning_of_day(self.target_datetime)
+        schedule_day_equals_target_day_filter = {
+            'courseenrollment__schedule__{}__gte'.format(self.schedule_date_field): target_day,
+            'courseenrollment__schedule__{}__lt'.format(self.schedule_date_field): target_day + datetime.timedelta(days=1),
+        }
+        users = User.objects.filter(
+            courseenrollment__is_active=True,
+            **schedule_day_equals_target_day_filter
+        ).annotate(
+            id_mod=F('id') % self.num_bins
+        ).filter(
+            id_mod=self.bin_num
+        )
 
-    schedule_day_equals_target_day_filter = {
-        '{}__gte'.format(schedule_date_field): target_day,
-        '{}__lt'.format(schedule_date_field): target_day + datetime.timedelta(days=1),
-    }
-    schedules = Schedule.objects.select_related(
-        'enrollment__user__profile',
-        'enrollment__course',
-    ).prefetch_related(
-        'enrollment__course__modes'
-    ).filter(
-        Q(enrollment__course__end__isnull=True) | Q(
-            enrollment__course__end__gte=current_datetime),
-        enrollment__user__in=users,
-        enrollment__is_active=True,
-        **schedule_day_equals_target_day_filter
-    ).order_by(order_by)
+        schedule_day_equals_target_day_filter = {
+            '{}__gte'.format(self.schedule_date_field): target_day,
+            '{}__lt'.format(self.schedule_date_field): target_day + datetime.timedelta(days=1),
+        }
+        schedules = Schedule.objects.select_related(
+            'enrollment__user__profile',
+            'enrollment__course',
+        ).prefetch_related(
+            'enrollment__course__modes'
+        ).filter(
+            Q(enrollment__course__end__isnull=True) | Q(
+                enrollment__course__end__gte=self.current_datetime),
+            enrollment__user__in=users,
+            enrollment__is_active=True,
+            **schedule_day_equals_target_day_filter
+        ).order_by(order_by)
 
-    if org_list is not None:
-        if exclude_orgs:
-            schedules = schedules.exclude(enrollment__course__org__in=org_list)
-        else:
-            schedules = schedules.filter(enrollment__course__org__in=org_list)
+        if self.org_list is not None:
+            if self.exclude_orgs:
+                schedules = schedules.exclude(enrollment__course__org__in=self.org_list)
+            else:
+                schedules = schedules.filter(enrollment__course__org__in=self.org_list)
 
-    if "read_replica" in settings.DATABASES:
-        schedules = schedules.using("read_replica")
+        if "read_replica" in settings.DATABASES:
+            schedules = schedules.using("read_replica")
 
-    LOG.debug('Query = %r', schedules.query.sql_with_params())
+        LOG.debug('Query = %r', schedules.query.sql_with_params())
 
-    with function_trace('schedule_query_set_evaluation'):
-        # This will run the query and cache all of the results in memory.
-        num_schedules = len(schedules)
+        with function_trace('schedule_query_set_evaluation'):
+            # This will run the query and cache all of the results in memory.
+            num_schedules = len(schedules)
 
-    # This should give us a sense of the volume of data being processed by each task.
-    set_custom_metric('num_schedules', num_schedules)
+        # This should give us a sense of the volume of data being processed by each task.
+        set_custom_metric('num_schedules', num_schedules)
 
-    return schedules
+        return schedules
 
 
 class RecurringNudge(ScheduleMessageType):
@@ -179,20 +186,12 @@ class ScheduleStartResolver(BinnedSchedulesBaseResolver):
     Send a message to all users whose schedule started at ``self.current_date`` + ``day_offset``.
     """
     log_prefix = 'Scheduled Nudge'
+    schedule_date_field = 'start'
+    num_bins = RECURRING_NUDGE_NUM_BINS
 
     def schedules_for_bin(self):
-        # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
-        current_datetime = self.target_datetime - datetime.timedelta(days=self.day_offset)
 
-        schedules = get_schedules_with_target_date_by_bin_and_orgs(
-            schedule_date_field='start',
-            current_datetime=current_datetime,
-            target_datetime=self.target_datetime,
-            bin_num=self.bin_num,
-            num_bins=RECURRING_NUDGE_NUM_BINS,
-            org_list=self.org_list,
-            exclude_orgs=self.exclude_orgs,
-        )
+        schedules = self.get_schedules_with_target_date_by_bin_and_orgs()
 
         LOG.debug('Recurring Nudge: Query = %r', schedules.query.sql_with_params())
 
@@ -234,19 +233,11 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
     Send a message to all users whose verified upgrade deadline is at ``self.current_date`` + ``day_offset``.
     """
     log_prefix = 'Upgrade Reminder'
+    schedule_date_field = 'upgrade_deadline'
+    num_bins = UPGRADE_REMINDER_NUM_BINS
 
     def schedules_for_bin(self):
-        # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
-        current_datetime = self.target_datetime - datetime.timedelta(days=self.day_offset)
-        schedules = get_schedules_with_target_date_by_bin_and_orgs(
-            schedule_date_field='upgrade_deadline',
-            current_datetime=current_datetime,
-            target_datetime=self.target_datetime,
-            bin_num=self.bin_num,
-            num_bins=RECURRING_NUDGE_NUM_BINS,
-            org_list=self.org_list,
-            exclude_orgs=self.exclude_orgs,
-        )
+        schedules = self.get_schedules_with_target_date_by_bin_and_orgs()
 
         for (user, user_schedules) in groupby(schedules, lambda s: s.enrollment.user):
             user_schedules = list(user_schedules)
@@ -314,19 +305,12 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
     course has updates.
     """
     log_prefix = 'Course Update'
+    schedule_date_field = 'start'
+    num_bins = COURSE_UPDATE_NUM_BINS
 
     def schedules_for_bin(self):
-        # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
-        current_datetime = self.target_datetime - datetime.timedelta(days=self.day_offset)
         week_num = abs(self.day_offset) / 7
-        schedules = get_schedules_with_target_date_by_bin_and_orgs(
-            schedule_date_field='start',
-            current_datetime=current_datetime,
-            target_datetime=self.target_datetime,
-            bin_num=self.bin_num,
-            num_bins=COURSE_UPDATE_NUM_BINS,
-            org_list=self.org_list,
-            exclude_orgs=self.exclude_orgs,
+        schedules = self.get_schedules_with_target_date_by_bin_and_orgs(
             order_by='enrollment__course',
         )
         LOG.debug('Course Update: Query = %r', schedules.query.sql_with_params())
