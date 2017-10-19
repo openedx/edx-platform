@@ -165,11 +165,10 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
             template_context['course_ids'] = course_id_strs
 
             first_schedule = user_schedules[0]
-            template_context.update(self.get_template_context(user, user_schedules))
-
-            # Information for including upsell messaging in template.
-            _add_upsell_button_information_to_template_context(
-                user, first_schedule, template_context)
+            try:
+                template_context.update(self.get_template_context(user, user_schedules))
+            except InvalidContextError:
+                continue
 
             yield (user, first_schedule.enrollment.course.language, template_context)
 
@@ -188,8 +187,17 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
             dict: This dict must be JSON serializable (no datetime objects!). When rendering the message templates it
                   it will be used as the template context. Note that it will also include several default values that
                   injected into all template contexts. See `get_base_template_context` for more information.
+
+        Raises:
+            InvalidContextError: If this user and set of schedules are not valid for this type of message. Raising this
+            exception will prevent this user from receiving the message, but allow other messages to be sent to other
+            users.
         """
         return {}
+
+
+class InvalidContextError(Exception):
+    pass
 
 
 class ScheduleStartResolver(BinnedSchedulesBaseResolver):
@@ -202,12 +210,17 @@ class ScheduleStartResolver(BinnedSchedulesBaseResolver):
 
     def get_template_context(self, user, user_schedules):
         first_schedule = user_schedules[0]
-        return {
+        context = {
             'course_name': first_schedule.enrollment.course.display_name,
             'course_url': absolute_url(
                 self.site, reverse('course_root', args=[str(first_schedule.enrollment.course_id)])
             ),
         }
+
+        # Information for including upsell messaging in template.
+        context.update(_get_upsell_information_for_schedule(user, first_schedule))
+
+        return context
 
 
 def _get_datetime_beginning_of_day(dt):
@@ -226,20 +239,41 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
     num_bins = UPGRADE_REMINDER_NUM_BINS
 
     def get_template_context(self, user, user_schedules):
-        first_schedule = user_schedules[0]
-        return {
-            'course_links': [
-                {
-                    'url': absolute_url(self.site, reverse('course_root', args=[str(s.enrollment.course_id)])),
-                    'name': s.enrollment.course.display_name
-                } for s in user_schedules
-            ],
+        course_id_strs = []
+        course_links = []
+        first_valid_upsell_context = None
+        first_schedule = None
+        for schedule in user_schedules:
+            upsell_context = _get_upsell_information_for_schedule(user, schedule)
+            if not upsell_context['show_upsell']:
+                continue
+
+            if first_valid_upsell_context is None:
+                first_schedule = schedule
+                first_valid_upsell_context = upsell_context
+            course_id_str = str(schedule.enrollment.course_id)
+            course_id_strs.append(course_id_str)
+            course_links.append({
+                'url': absolute_url(self.site, reverse('course_root', args=[course_id_str])),
+                'name': schedule.enrollment.course.display_name
+            })
+
+        if first_schedule is None:
+            self.log_debug('No courses eligible for upgrade for user.')
+            raise InvalidContextError()
+
+        context = {
+            'course_links': course_links,
             'first_course_name': first_schedule.enrollment.course.display_name,
             'cert_image': absolute_url(self.site, static('course_experience/images/verified-cert.png')),
+            'course_ids': course_id_strs,
         }
+        context.update(first_valid_upsell_context)
+        return context
 
 
-def _add_upsell_button_information_to_template_context(user, schedule, template_context):
+def _get_upsell_information_for_schedule(user, schedule):
+    template_context = {}
     enrollment = schedule.enrollment
     course = enrollment.course
 
@@ -258,6 +292,7 @@ def _add_upsell_button_information_to_template_context(user, schedule, template_
         )
 
     template_context['show_upsell'] = has_verified_upgrade_link
+    return template_context
 
 
 def _get_verified_upgrade_link(user, schedule):
@@ -293,10 +328,9 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             course_id_str = str(enrollment.course_id)
 
             template_context.update({
-                'student_name': user.profile.name,
                 'course_name': schedule.enrollment.course.display_name,
                 'course_url': absolute_url(
-                    self.site, reverse('course_root', args=[str(schedule.enrollment.course_id)])
+                    self.site, reverse('course_root', args=[course_id_str])
                 ),
                 'week_num': week_num,
                 'week_summary': week_summary,
@@ -304,6 +338,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                 # This is used by the bulk email optout policy
                 'course_ids': [course_id_str],
             })
+            template_context.update(_get_upsell_information_for_schedule(user, schedule))
 
             yield (user, schedule.enrollment.course.language, template_context)
 
