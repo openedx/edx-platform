@@ -17,6 +17,7 @@ import urlparse
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from branding.models import BrandingApiConfig
@@ -418,3 +419,16 @@ def get_about_url():
     Lookup and return About page url
     """
     return get_url("ABOUT")
+
+
+def get_home_url():
+    """
+    Lookup and return home page url, lookup is performed in the following order
+
+    1. return marketing root URL, If marketing is enabled
+    2. Otherwise return dashboard URL.
+    """
+    if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
+        return marketing_link('ROOT')
+
+    return reverse('dashboard')
