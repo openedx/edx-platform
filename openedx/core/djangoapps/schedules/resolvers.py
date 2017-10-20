@@ -22,7 +22,6 @@ from openedx.core.djangoapps.monitoring_utils import set_custom_metric, function
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
-from openedx.core.djangoapps.schedules.message_type import ScheduleMessageType
 from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
 from openedx.core.djangoapps.schedules.template_context import (
     absolute_url,
@@ -158,12 +157,6 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         return schedules
 
 
-class RecurringNudge(ScheduleMessageType):
-    def __init__(self, day, *args, **kwargs):
-        super(RecurringNudge, self).__init__(*args, **kwargs)
-        self.name = "recurringnudge_day{}".format(day)
-
-
 def _annotate_for_monitoring(message_type, site, bin_num, target_datetime, day_offset):
     # This identifies the type of message being sent, for example: schedules.recurring_nudge3.
     set_custom_metric('message_name', '{0}.{1}'.format(
@@ -224,9 +217,6 @@ def _get_datetime_beginning_of_day(dt):
     """
     return dt.replace(hour=0, minute=0, second=0, microsecond=0)
 
-
-class UpgradeReminder(ScheduleMessageType):
-    pass
 
 class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
     """
@@ -293,10 +283,6 @@ def _get_link_to_purchase_verified_certificate(a_user, a_schedule):
         return None
 
     return verified_upgrade_deadline_link(a_user, enrollment.course)
-
-
-class CourseUpdate(ScheduleMessageType):
-    pass
 
 
 class CourseUpdateResolver(BinnedSchedulesBaseResolver):
