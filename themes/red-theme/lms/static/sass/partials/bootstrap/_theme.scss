@@ -14,7 +14,7 @@ $font-family-sans-serif: cursive;
 @import 'edx-bootstrap/sass/open-edx/theme';
 
 // Override the theme to use red as primary
-$theme-colors: ();
+$theme-colors: () !default;
 $theme-colors: map-merge((
   primary: $red,
   secondary: $gray-600,

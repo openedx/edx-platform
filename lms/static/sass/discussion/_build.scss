@@ -4,11 +4,14 @@
 // Set the relative path to the static root
 $static-path: '../..' !default;
 
-// Bootstrap support for use with shared partials
+// edX Bootstrap theme and variables support
 @import 'bootstrap/theme';
+@import 'bootstrap/variables';
+
+// Core Bootstrap functions, variables and mixins
 @import 'bootstrap/scss/functions';
 @import 'bootstrap/scss/variables';
-@import "bootstrap/scss/mixins/breakpoints";
+@import 'bootstrap/scss/mixins/breakpoints';
 
 // Configuration
 @import '../config';
