@@ -27,7 +27,7 @@
   a:link,
   a:visited {
     cursor: pointer;
-    border: 1px solid $lms-border-color;
+    border: 1px solid $border-color;
     border-top-style: none;
     border-radius: 0 0 ($baseline/2) ($baseline/2);
     background: transparentize($white, 0.25);
@@ -58,7 +58,7 @@
     background: $white;
     text-decoration: none;
     display: block;
-    border: 1px solid $lms-border-color;
+    border: 1px solid $border-color;
 
     &#feedback_link_problem {
       border-bottom-style: none;

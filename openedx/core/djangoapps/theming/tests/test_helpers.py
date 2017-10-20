@@ -22,6 +22,7 @@ class TestHelpers(TestCase):
         Tests template paths are returned from enabled theme.
         """
         expected_themes = [
+            Theme('dark-theme', 'dark-theme', get_theme_base_dir('dark-theme')),
             Theme('edge.edx.org', 'edge.edx.org', get_theme_base_dir('edge.edx.org')),
             Theme('edx.org', 'edx.org', get_theme_base_dir('edx.org')),
             Theme('open-edx', 'open-edx', get_theme_base_dir('open-edx')),

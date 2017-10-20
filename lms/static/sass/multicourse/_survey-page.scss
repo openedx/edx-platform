@@ -40,7 +40,6 @@
       @extend %t-title8;
 
       display: inline-block;
-      text-transform: uppercase;
       color: $gray-l1;
     }
 
@@ -125,7 +124,7 @@
 
       &.is-focused {
         .tip {
-          color: $base-font-color;
+          color: $body-color;
         }
       }
     }

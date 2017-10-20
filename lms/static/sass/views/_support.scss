@@ -2,7 +2,8 @@
 // These styles are included on admin pages used by the support team.
 // ===================================================================
 
-.certificates-search, .enrollment-search {
+.certificates-search,
+.enrollment-search {
   margin: 40px 0;
 
   input[name="query"] {
@@ -26,8 +27,9 @@
     text-decoration: underline;
   }
 
-  th, td {
-    padding: 10px 10px;
+  th,
+  td {
+    padding: 10px;
     vertical-align: middle;
   }
 }
@@ -72,7 +74,10 @@
       padding: ($baseline/4) 0;
       border-bottom: 1px solid $gray-l1;
 
-      p, label, select, input {
+      p,
+      label,
+      select,
+      input {
         @extend %t-copy-sub1;
 
         display: inline;
@@ -93,7 +98,8 @@
       list-style: none;
     }
 
-    .enrollment-change-submit, .enrollment-change-cancel {
+    .enrollment-change-submit,
+    .enrollment-change-cancel {
       @extend %t-action4;
 
       margin: ($baseline/4) auto;
@@ -125,7 +131,8 @@
     @extend %t-title7;
   }
 
-  .change-enrollment-btn, .change-enrollment-btn:hover {
+  .change-enrollment-btn,
+  .change-enrollment-btn:hover {
     @extend %t-action4;
 
     margin: ($baseline/4) auto;
@@ -152,8 +159,8 @@
   }
 
   p {
-    font-size:$support-form-base-font-size + 4;
-    font-weight:$font-regular;
+    font-size: $support-form-base-font-size + 4;
+    font-weight: $font-regular;
   }
 
   label {
@@ -168,13 +175,12 @@
     height: $baseline * 2;
     font-weight: $font-regular;
     font-size: $support-form-base-font-size + 2;
-    border:1px solid $blue;
-    border-radius:3px;
-    color:$blue;
+    border: 1px solid $blue;
+    border-radius: 3px;
+    color: $blue;
 
     &:hover,
-    &:focus
-      {
+    &:focus {
       color: $blue;
       background-color: $mediumGrey !important;
     }
@@ -185,9 +191,9 @@
   }
 
   .message-desc {
-    color:$dark-gray1;
+    color: $dark-gray1;
     font-size: $support-form-base-font-size - 2;
-    margin-bottom:$baseline - 16;
+    margin-bottom: $baseline - 16;
   }
 
   .select-course {
@@ -216,15 +222,15 @@
     font-size: $support-form-base-font-size + 2;
 
     &:hover,
-    &:focus
-    {
+    &:focus {
       background-image: none;
       background-color: $m-blue-d6;
       border-color: $m-blue-d6;
     }
   }
 
-  .file-loading, .file-name {
+  .file-loading,
+  .file-name {
     font-size: $support-form-base-font-size + 2;
   }
 
@@ -245,29 +251,29 @@
     margin-bottom: ($baseline * 2) + 10;
 
     &:hover,
-    &:focus
-    {
+    &:focus {
       color: $white;
     }
   }
 
   input[type='text'] {
     font-size: $support-form-base-font-size - 2;
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     font-style: normal;
     font-weight: $font-regular;
-    }
+  }
 
   .alert-danger {
     color: $palette-error-text !important;
     font-size: $support-form-base-font-size;
   }
 
-  .has-error{
-    label{
+  .has-error {
+    label {
       color: $danger-red;
     }
   }
+
   @media only screen and (min-width: 768px) {
     .row {
       max-width: $baseline * 25;

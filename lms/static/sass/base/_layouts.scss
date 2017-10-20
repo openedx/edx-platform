@@ -32,7 +32,7 @@ body.view-in-course {
   }
 
   .wrapper-course-material .course-material,
-  .wrapper-preview-menu .preview-menu  {
+  .wrapper-preview-menu .preview-menu {
     width: auto;
   }
 
@@ -58,7 +58,7 @@ body.view-in-course {
 
   // course info page
   .info-wrapper {
-    max-width: 1180px;
+    max-width: map-get($container-max-widths, xl);
     margin: 0 auto;
   }
 
@@ -69,7 +69,7 @@ body.view-in-course {
   .wiki-wrapper,
   .teams-wrapper,
   .static_tab_wrapper {
-    max-width: 1180px;
+    max-width: map-get($container-max-widths, xl);
     margin: 0 auto;
     padding: 0;
   }
@@ -86,7 +86,7 @@ body.view-in-course {
   }
 
   .course-license {
-    max-width: 1180px;
+    max-width: map-get($container-max-widths, xl);
     margin: 0 auto;
     padding-right: 2%;
     padding-left: 2%;

@@ -43,9 +43,9 @@
 }
 
 .faded-hr-divider-light {
-  @include background-image(linear-gradient(180deg, rgba(255,255,255, 0) 0%,
-  rgba(255,255,255, 0.8) 50%,
-  rgba(255,255,255, 0)));
+  @include background-image(linear-gradient(180deg, rgba(255, 255, 255, 0) 0%,
+  rgba(255, 255, 255, 0.8) 50%,
+  rgba(255, 255, 255, 0)));
 
   height: 1px;
   width: 100%;
@@ -61,9 +61,9 @@
 }
 
 .faded-vertical-divider-light {
-  @include background-image(linear-gradient(90deg, rgba(255,255,255, 0) 0%,
-  rgba(255,255,255, 0.6) 50%,
-  rgba(255,255,255, 0)));
+  @include background-image(linear-gradient(90deg, rgba(255, 255, 255, 0) 0%,
+  rgba(255, 255, 255, 0.6) 50%,
+  rgba(255, 255, 255, 0)));
 
   height: 100%;
   width: 1px;
@@ -186,9 +186,9 @@
   @include button;
   @include linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
 
-  border: 1px solid $uxpl-blue-base;
+  border: 1px solid theme-color("primary");
   border-radius: 3px;
-  background-color: $uxpl-blue-base;
+  background-color: theme-color("primary");
   color: $white;
 
   &:hover, &:focus, &:active {
@@ -329,7 +329,7 @@
   color: #3c3c3c;
 
   label {
-    color: $baseFontColor;
+    color: $body-color;
   }
 
   input,

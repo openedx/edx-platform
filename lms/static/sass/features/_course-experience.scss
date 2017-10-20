@@ -29,7 +29,7 @@
     width: 70px;
     height: 70px;
     border-radius: $baseline*7/4;
-    border: 1px solid $lms-border-color;
+    border: 1px solid $border-color;
 
     @media (max-width: $grid-breakpoints-md) {
       display: none;
@@ -41,7 +41,7 @@
 
     flex-grow: 1;
     position: relative;
-    border: 1px solid $lms-border-color;
+    border: 1px solid $border-color;
     padding: $baseline;
     border-radius: $baseline/4;
 
@@ -75,7 +75,7 @@
 
     &::before {
       @include margin-left($baseline*-1);
-      @include border-right-color($lms-border-color);
+      @include border-right-color($border-color);
 
       border-width: $baseline/2;
     }
@@ -171,7 +171,7 @@
 // Welcome message / Latest Update message
 .welcome-message,
 .update-message {
-  border: solid 1px $lms-border-color;
+  border: solid 1px $border-color;
 
   @include border-left(solid 4px $black);
 
@@ -212,7 +212,7 @@
   .section-goals {
     @include float(left);
 
-    border: 1px solid $lms-border-color;
+    border: 1px solid $border-color;
     padding: $baseline*0.75 $baseline*0.75 $baseline*0.5;
     border-radius: 5px;
     position: relative;
@@ -239,7 +239,7 @@
       background-color: transparent;
 
       &:hover {
-        color: $lms-border-color;
+        color: $border-color;
       }
     }
 
@@ -317,7 +317,7 @@
 
       ol.outline-item {
         padding-bottom: $baseline;
-        border-bottom: 1px solid $lms-border-color;
+        border-bottom: 1px solid $border-color;
         margin: 0 0 ($baseline / 2) 0;
 
         .subsection {
@@ -359,7 +359,7 @@
           }
 
           &.current {
-            border: 1px solid $lms-active-color;
+            border: 1px solid theme-color("primary");
             border-radius: $btn-border-radius;
 
             .resume-right {
@@ -368,7 +368,7 @@
           }
 
           &:hover {
-            border: 1px solid $lms-active-color;
+            border: 1px solid theme-color("primary");
           }
 
           &:last-child {
@@ -448,7 +448,7 @@
     .updates-article {
       margin: ($baseline*6/5) 0;
       padding-bottom: ($baseline*6/5);
-      border-bottom: 1px solid $lms-border-color;
+      border-bottom: 1px solid $border-color;
 
       .date {
         font-size: font-size(small);

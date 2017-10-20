@@ -578,7 +578,7 @@
     display: none;
     padding: ($baseline/2) $baseline;
     border-top: 1px solid $gray-l4;
-    color: $base-font-color; // Overrides the normal white color in this one case
+    color: $body-color; // Overrides the normal white color in this one case
 
     // STATE: shown
     &.is-shown {
@@ -908,7 +908,7 @@
           @include float(right);
 
           .action {
-            @include margin(0, 0, ($baseline/2), ($baseline*.75));
+                    @include margin(0, 0, ($baseline/2), ($baseline*0.75));
 
             float: none;
             text-align: center;
@@ -931,7 +931,7 @@
             border-radius: 3px;
             display: block;
 
-            @include padding(7px, ($baseline*.75), 7px, ($baseline*.75));
+                    @include padding(7px, ($baseline*0.75), 7px, ($baseline*0.75));
 
             text-align: center;
 
@@ -1225,7 +1225,7 @@
     .btn {
       font-size: 16px;
       line-height: 25.16px;
-      padding: 10px 10px;
+      padding: 10px;
       border: 1px solid #0079bc;
       color: #0079bc;
       text-decoration: none;
@@ -1304,7 +1304,7 @@ p.course-block {
   opacity:0.5;
   background:#808080;
   border:0;
-  color:white;
+  color: theme-color("inverse");
   box-shadow:none;
 
   &.archived {
@@ -1351,7 +1351,7 @@ a.fade-cover {
         @extend %t-title5;
         @extend %t-weight4;
 
-        font-family: $f-sans-serif;
+        font-family: $font-family-sans-serif;
 
         // Overriding Platform h2 styles
         text-transform: none;
@@ -1412,7 +1412,7 @@ a.fade-cover {
 .activation-message-container {
   @include clearfix();
 
-  margin: 0 auto 0;
+  margin: 0 auto;
   padding-top: ($baseline/2);
   max-width: grid-width(12);
   min-width: 760px;
@@ -1528,11 +1528,11 @@ a.fade-cover {
     margin-top: 10px;
     margin-left: 2.5%;
     margin-right: 2.5%;
-    color: $white;
+    color: theme-color("inverse");
   }
 
   .survey_button:visited, .survey_button:hover, .survey_button:focus {
-    color: $white;
+    color: theme-color("inverse");
     text-decoration: none;
   }
 

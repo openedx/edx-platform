@@ -59,7 +59,7 @@
   // Upgrade button
   .btn-upgrade {
     color: theme-color("inverse");
-    background-color: $lms-purchase-color;
+    background-color: theme-color("purchase");
     font-size: $font-size-base;
     -webkit-transition: $btn-transition;
     transition: $btn-transition;

@@ -31,7 +31,7 @@ footer#footer-edx-v3 {
     @include font-size(14);
     @include line-height(14);
 
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
   }
 
   .copyright {

@@ -63,7 +63,7 @@
   }
 
   .message-success {
-    color: $success-color;
+    color: theme-color("success");
   }
 }
 

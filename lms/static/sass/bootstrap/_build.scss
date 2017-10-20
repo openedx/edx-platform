@@ -1,0 +1,18 @@
+// Open edX: build
+// ===============
+
+// LMS theme
+@import 'lms/theme/variables';
+
+// Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+// LMS variables
+@import '../variables';
+
+// Legacy support
+@import 'legacy';
+
+// Base
+@import 'base';
+@import 'variables';

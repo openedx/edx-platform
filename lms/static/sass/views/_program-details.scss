@@ -81,7 +81,7 @@
 // CSS for April 2017 version of Program Details Page
 .program-details {
   .window-wrap {
-    background-color: $white;
+    background-color: $body-bg;
   }
 
   .wrapper-footer,
@@ -109,7 +109,7 @@
       }
     }
 
-    @media (min-width: $lms-max-width) {
+    @media (min-width: map-get($container-max-widths, xl)) {
       padding: {
         left: calc(((100% - 1180px) / 2) + 30px);
         right: calc(((100% - 1180px) / 2) + 30px);
@@ -194,7 +194,7 @@
       }
 
       .heading {
-        font-family: "Open Sans";
+        font-family: $font-family-sans-serif;
         font-weight: bold;
         color: palette(primary, dark);
         font-size: 0.9375em;
@@ -245,15 +245,14 @@
       max-width: 700px;
     }
 
-    @media (min-width: $lms-max-width) {
+    @media (min-width: map-get($container-max-widths, xl)) {
       @include margin-left(calc((100% - 1180px) / 2));
     }
   }
 
   .course-list-heading {
-    font-family: "Open Sans";
+    font-family: $font-family-sans-serif;
     font-weight: bold;
-    text-transform: uppercase;
     color: palette(primary, dark);
     font-size: 0.9375em;
     line-height: normal;
@@ -302,7 +301,7 @@
     flex-direction: column;
 
     .program-heading-title {
-      font-family: "Open Sans";
+      font-family: $font-family-sans-serif;
       font-weight: 600;
       font-size: 1.3em;
       color: palette(grayscale, base);
@@ -373,7 +372,7 @@
     .select-choice {
       @include margin-right(2px);
 
-      font-family: "Open Sans";
+      font-family: $font-family-sans-serif;
       font-weight: bold;
       font-size: 0.9375em;
       color: palette(grayscale, base);
@@ -559,7 +558,7 @@
         }
 
         .card-msg {
-          font-family: "Open Sans";
+          font-family: $font-family-sans-serif;
           font-weight: bold;
           font-size: 0.9375em;
           color: palette(grayscale, base);
@@ -584,7 +583,7 @@
       }
 
       .card-msg {
-        font-family: "Open Sans";
+        font-family: $font-family-sans-serif;
         font-weight: bold;
         font-size: 0.9375em;
         color: palette(grayscale, base);
@@ -643,7 +642,7 @@
     }
   }
 
-  @media (min-width: $lms-max-width) {
+  @media (min-width: map-get($container-max-widths, xl)) {
     @include margin-right(calc((100% - 1180px) / 2));
   }
 }

@@ -2,7 +2,7 @@
 
 .content-wrapper {
   margin-top: $baseline;
-  padding-bottom: $baseline*2;
+  padding-bottom: $baseline/2;
 
   .course-tabs {
     padding: 0 $baseline*2;
@@ -85,6 +85,8 @@
 .page-content-container {
   border: 1px solid $border-color;
   background-color: $body-bg;
+  max-width: map-get($container-max-widths, xl);
+  margin: 0 auto;
 }
 
 .page-content {

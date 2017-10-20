@@ -26,8 +26,8 @@
     position: relative;
 
     .photo {
-      background: rgb(255,255,255);
-      border: 1px solid rgb(210,210,210);
+      background: rgb(255, 255, 255);
+      border: 1px solid rgb(210, 210, 210);
 
       @include float(left);
       @include margin-right(flex-gutter());
@@ -144,14 +144,14 @@
         }
 
         h3 {
-          font-family: $sans-serif;
+          font-family: $font-family-sans-serif;
           font-weight: 700;
           margin-bottom: ($baseline*0.75);
         }
 
         h4 {
           font-size: 1.0em;
-          font-family: $sans-serif;
+          font-family: $font-family-sans-serif;
           font-weight: 700;
           margin-top: 25px;
           margin-bottom: ($baseline/2);

@@ -1,8 +1,6 @@
 // discussion - elements - navigation
 // ====================
 
-@import '../../edx-pattern-library-shims/base/variables';
-
 // ------
 // Discussion Forums Page Header
 // ------
@@ -11,7 +9,7 @@
     margin-bottom: ($baseline / 2);
     font-size: font-size(base);
     font-weight: font-weight(semi-bold);
-    line-height: $base-line-height;
+    line-height: $line-height-base;
   }
 }
 

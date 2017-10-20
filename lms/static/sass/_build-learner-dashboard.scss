@@ -1,7 +1,10 @@
 // ------------------------------
 // Learner Dashboard: Shared Build Compile
-// Uses the Pattern Library
 
+// Base build
+@import 'base/build';
+
+// Pattern Library
 @import 'elements/banners';
 @import 'elements/course-card';
 @import 'elements/program-card';

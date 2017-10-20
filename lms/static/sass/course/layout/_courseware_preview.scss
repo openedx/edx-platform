@@ -3,7 +3,7 @@
 
   margin: 0 auto 0;
   padding: ($baseline*0.75);
-  background-color: theme-color("primary");
+  background-color: $lms-preview-menu-color;
   box-sizing: border-box;
 
   @media print {
@@ -31,7 +31,6 @@
         display: inline-block;
         margin-bottom: 0;
         vertical-align: middle;
-        color: theme-color("inverse");
       }
 
       .action-preview-select {
