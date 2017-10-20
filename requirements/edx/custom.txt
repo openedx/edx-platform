@@ -19,7 +19,7 @@
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.4#egg=xblock-group-project-v2==0.4.4
 git+https://github.com/edx-solutions/api-integration.git@v1.4.6#egg=api-integration==1.4.6
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.1.6#egg=organizations-edx-platform-extensions==1.1.6
-git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.1.4#egg=gradebook-edx-platform-extensions==1.1.4
+git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.1.5#egg=gradebook-edx-platform-extensions==1.1.5
 git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.1.2#egg=projects-edx-platform-extensions==1.1.2
 git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.1.7#egg=discussion-edx-platform-extensions==1.1.7
 git+https://github.com/edx-solutions/course-edx-platform-extensions.git@v1.0.4#egg=course-edx-platform-extensions==1.0.4
