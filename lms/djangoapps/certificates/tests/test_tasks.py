@@ -1,9 +1,7 @@
-from unittest import TestCase
-
 import ddt
+from django.test import TestCase
 from mock import call, patch
 from opaque_keys.edx.keys import CourseKey
-from nose.tools import assert_true
 
 from lms.djangoapps.certificates.tasks import generate_certificate
 from student.tests.factories import UserFactory

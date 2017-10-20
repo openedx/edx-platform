@@ -23,10 +23,12 @@ var wpconfig = {
         StudioIndex: './cms/static/js/features_jsx/studio/index.jsx',
 
         // Features
+        CourseGoals: './openedx/features/course_experience/static/course_experience/js/CourseGoals.js',
         CourseHome: './openedx/features/course_experience/static/course_experience/js/CourseHome.js',
         CourseOutline: './openedx/features/course_experience/static/course_experience/js/CourseOutline.js',
         CourseSock: './openedx/features/course_experience/static/course_experience/js/CourseSock.js',
         CourseTalkReviews: './openedx/features/course_experience/static/course_experience/js/CourseTalkReviews.js',
+        Currency: './openedx/features/course_experience/static/course_experience/js/currency.js',
         Enrollment: './openedx/features/course_experience/static/course_experience/js/Enrollment.js',
         LatestUpdate: './openedx/features/course_experience/static/course_experience/js/LatestUpdate.js',
         WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js'

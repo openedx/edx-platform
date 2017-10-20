@@ -8,6 +8,7 @@
   .response-actions-list,
   .comment-actions-list {
     @extend %ui-no-list;
+
     @include text-align(right);
 
     .actions-item {
@@ -53,7 +54,9 @@
   .actions-dropdown {
     @extend %ui-no-list;
     @extend %ui-depth1;
+
     @include right(0);
+
     display: none;
     position: absolute;
     top: 100%;
@@ -72,14 +75,15 @@
       width: 100%;
       border-radius: $forum-border-radius;
       margin: ($baseline/4) 0 0 0;
-      border: 1px solid $gray-l3;
+      border: 1px solid $forum-color-border;
       padding: ($baseline/2) ($baseline*0.75);
       background: $forum-color-background;
 
       // ui triangle/nub
-      &:after,
-      &:before {
+      &::after,
+      &::before {
         @include right(6px);
+
         bottom: 100%;
         border: solid transparent;
         content: " ";
@@ -89,15 +93,16 @@
         pointer-events: none;
       }
 
-      &:after {
+      &::after {
         @include margin-right(1px);
-        border-color: $transparent;
+
+        border-color: transparent;
         border-bottom-color: $white;
         border-width: 6px;
       }
 
-      &:before {
-        border-color: $transparent;
+      &::before {
+        border-color: transparent;
         border-bottom-color: $forum-color-border;
         border-width: 7px;
       }
@@ -118,11 +123,12 @@
   // UI: general action
   .action-button {
     @include transition(border .5s linear 0s);
+
     box-sizing: border-box;
     display: inline-block;
     border: 1px solid transparent;
     border-radius: $forum-border-radius;
-    color: $gray-l1;
+    color: theme-color("secondary");
 
     .action-icon {
       display: inline-block;
@@ -132,23 +138,24 @@
       border: 1px solid $forum-color-border;
       border-radius: $forum-border-radius;
       text-align: center;
-      color: $gray-l1;
+      color: theme-color("secondary");
 
       .icon {
         @include margin-right(0);
+
         vertical-align: middle;
       }
     }
 
     .action-label {
       @extend %t-copy-sub2;
+
       display: none;
       vertical-align: middle;
       padding: 2px 8px;
     }
 
     &:hover, &:focus {
-
       .action-label {
         display: inline-block;
       }
@@ -160,16 +167,14 @@
 
     // specific button styles
     &.action-follow {
-
       .action-label {
-        color: $blue-d1;
+        color: theme-color("primary");
       }
 
       &.is-checked, &:hover, &:focus {
-
         .action-icon {
           background-color: $forum-color-following;
-          border: 1px solid $blue-d1;
+          border: 1px solid theme-color("primary");
           color: $white;
         }
       }
@@ -180,67 +185,61 @@
     }
 
     &.action-vote {
-
       .action-label {
         opacity: 1;
       }
 
       &.is-checked, &:hover, &:focus {
-
         .action-icon {
-          background-color: $green-d1;
-          border: 1px solid $green-d2;
+          background-color: $green;
+          border: 1px solid $green;
           color: $white;
         }
       }
 
       &:hover, &:focus {
-        border-color: $green-d2;
+        border-color: $green;
 
         .action-label {
-          color: $green-d2;
+          color: $green;
         }
       }
     }
 
     &.action-endorse {
-
       &.is-checked, &:hover, &:focus {
-
         .action-icon {
-          background-color: $blue-d1;
-          border: 1px solid $blue-d2;
+          background-color: theme-color("primary");
+          border: 1px solid theme-color("primary");
           color: $white;
         }
       }
 
       &:hover, &:focus {
-        border-color: $blue-d2;
+        border-color: theme-color("primary");
         background-color: $forum-color-background;
 
         .action-label {
-          color: $blue-d2;
+          color: theme-color("primary");
         }
       }
     }
 
     &.action-answer {
-
       &.is-checked, &:hover, &:focus {
-
         .action-icon {
-          border: 1px solid $green-d1;
-          background-color: $green-d1;
+          border: 1px solid $green;
+          background-color: $green;
           color: $white;
         }
       }
 
       &:hover, &:focus {
-        border-color: $green-d1;
+        border-color: $green;
         background-color: $forum-color-background;
 
         .action-label {
-          color: $green-d2;
+          color: $green;
         }
       }
     }
@@ -250,13 +249,13 @@
       position: relative;
 
       &:hover, &:focus {
-        border-color: $gray;
+        border-color: theme-color("dark");
         background-color: $forum-color-background;
 
         .action-icon {
-          border: 1px solid $gray;
-          background-color: $gray;
-          color: $white;
+          border: 1px solid theme-color("dark");
+          background-color: theme-color("dark");
+          color: theme-color("inverse");
         }
 
         .action-label {
@@ -274,12 +273,14 @@
     // UI: secondary action
     .action-list-item {
       @extend %t-copy-sub2;
+
       @include text-align(right);
+
       display: block;
       width: 100%;
       padding: ($baseline/10) 0;
       white-space: nowrap;
-      color: $gray-l1;
+      color: theme-color("secondary");
 
       &:hover, &:focus {
         color: $link-color;
@@ -287,6 +288,7 @@
 
       .action-icon {
         @include margin-left($baseline/4);
+
         display: inline-block;
         width: ($baseline/2);
         color: inherit;
@@ -320,6 +322,7 @@
   .action-button, .action-list-item {
     .action-label {
       @include float(left);
+
       .label-checked {
         display: none;
       }

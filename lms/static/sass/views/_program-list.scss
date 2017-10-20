@@ -6,7 +6,7 @@
   @include grid-container();
   @include span(12);
 
-  @media(min-width: $bp-screen-md) {
+  @media (min-width: $bp-screen-md) {
     @include span(9);
   }
 }
@@ -14,9 +14,10 @@
 .sidebar {
   @include span(12);
   @include float(right);
+
   margin-bottom: $baseline;
 
-  @media(min-width: $bp-screen-md) {
+  @media (min-width: $bp-screen-md) {
     @include span(3);
   }
 
@@ -47,6 +48,7 @@
 
 .empty-programs-message {
   @include span(12);
+
   border: 3px solid $gray-l4;
   background: $gray-l6;
   padding: ($baseline*2) 0;

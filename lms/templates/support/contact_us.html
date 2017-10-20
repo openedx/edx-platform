@@ -1,0 +1,160 @@
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+<%inherit file="../main.html"/>
+<%namespace file='../main.html' import="login_query"/>
+
+<%block name="title">
+    <title>
+        ${_("Contact US")}
+    </title>
+</%block>
+
+<%block name="head_extra">
+    <link type="text/css" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</%block>
+
+<%block name="body">
+
+    <div class="container contact-us-wrapper">
+
+        <div class="row">
+            <div class="col-sm-12">
+                <h2>${_("Contact Us")}</h2>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <p>${_("Your question may have already been answered.")}</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <a href="${marketing_link('FAQ')}" class="btn btn-secondary help-button">${_("Visit edX Help")}</a>
+            </div>
+        </div>
+        <!--logged out users-->
+
+        % if not user.is_authenticated():
+            <div class="row">
+                <div class="col-sm-12">
+                    <p>${_("Sign in for a faster response")}</p>
+                </div>
+            </div>
+
+            <!-- Sign-in button brings user to sign-in page. After signing in, user is brough to logged in state of contact form.-->
+            <div class="row">
+                <div class="col-sm-12">
+                    <a href="/login${login_query()}" class="btn btn-primary btn-signin">${_("Sign in")}</a>
+                </div>
+            </div>
+
+            <!-- No autofilled email in logged out state.-->
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label for="email">${_("Email")}</label>
+                        <input type="text" class="form-control" id="email">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label for="course">${_("Course Name")}<span> ${_("(Optional)")}</span></label>
+                        <input type="text" class="form-control" id="course">
+                    </div>
+                </div>
+            </div>
+
+        % else:
+
+            <!--logged in users-->
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <p>${_("What can we help you with, {username}?").format(username=user.username)}</p>
+                </div>
+            </div>
+            <br>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        % if user_enrollments:
+                            <label class="label-course" for="course">${_("Course Name")}</label>
+                            <select class="form-control select-course" id="course">
+                                % for enrollment in user_enrollments:
+                                    <option value="${enrollment.course.id}">${enrollment.course.display_name}</option>
+                                % endfor
+                            </select>
+                        % else:
+                            <label for="course">${_("Course Name")}<span> ${_("(Optional)")}</span></label>
+                            <input type="text" class="form-control" id="course">
+                        % endif
+                    </div>
+                </div>
+            </div>
+
+        % endif
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label for="message">${_("Message")}</label>
+                    <p class="message-desc">${_("The more you tell us, themore quickly and helpfully we can respond!")}</p>
+                    <textarea aria-describedby="message-desc" class="form-control" rows="7" id="message"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label for="attachment">${_("Add Attachment")}
+                        <span>${_("(Optional)")}</span>
+                    </label>
+                    <input id="attachment" multiple type="file" class="file file-loading" data-allowed-file-extensions='["png", "jpg", "gif", "tif", "jpeg"]'>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <p>${_("1 file uploaded:")}</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <span class="file-name">my_image1.png</span>
+                <span class="file-action"><a href="#">${_("Remove file")}</a></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <span class="file-name">my_image2.png</span>
+                <span class="file-action"><a href="#">${_("Cancel upload")}</a></span>
+
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped" role="progressbar"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <button class="btn btn-primary">${_("Submit")}</button>
+            </div>
+        </div>
+
+    </div>
+</%block>

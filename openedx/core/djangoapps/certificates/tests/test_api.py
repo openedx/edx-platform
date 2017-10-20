@@ -1,11 +1,11 @@
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 import itertools
-from unittest import TestCase
 
 import ddt
 import pytz
 import waffle
+from django.test import TestCase
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.certificates import api

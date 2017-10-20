@@ -4,6 +4,12 @@
 // Set the relative path to the static root
 $static-path: '../..' !default;
 
+// Bootstrap support for use with shared partials
+@import 'bootstrap/theme';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import "bootstrap/scss/mixins/breakpoints";
+
 // Configuration
 @import '../config';
 @import 'base/variables';

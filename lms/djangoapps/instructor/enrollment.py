@@ -20,7 +20,8 @@ from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
-from lms.djangoapps.grades.signals.handlers import disconnect_submissions_signal_receiver, STATE_DELETED_EVENT_TYPE
+from lms.djangoapps.grades.events import STATE_DELETED_EVENT_TYPE
+from lms.djangoapps.grades.signals.handlers import disconnect_submissions_signal_receiver
 from lms.djangoapps.grades.signals.signals import PROBLEM_RAW_SCORE_CHANGED
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

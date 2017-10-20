@@ -13,7 +13,7 @@ from pytz import utc
 
 from courseware.models import StudentModule
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
-from lms.djangoapps.grades.signals.handlers import PROBLEM_SUBMITTED_EVENT_TYPE
+from lms.djangoapps.grades.events import PROBLEM_SUBMITTED_EVENT_TYPE
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
 from student.models import user_by_anonymous_id
 from submissions.models import Submission

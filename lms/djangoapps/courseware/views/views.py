@@ -30,7 +30,6 @@ from courseware.courses import (
     sort_by_announcement,
     sort_by_start_date
 )
-from courseware.date_summary import VerifiedUpgradeDeadlineDate
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
 from courseware.models import BaseStudentModuleHistory, StudentModule
@@ -39,7 +38,7 @@ from courseware.user_state_client import DjangoXBlockUserStateClient
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db import transaction
@@ -49,7 +48,7 @@ from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.utils.http import urlquote_plus
 from django.utils.text import slugify
-from django.utils.timezone import UTC
+from pytz import UTC
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -60,10 +59,9 @@ from enrollment.api import add_enrollment
 from eventtracking import tracker
 from ipware.ip import get_ip
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
-from lms.djangoapps.ccx.utils import prep_course_for_grading
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
@@ -405,9 +403,6 @@ def course_info(request, course_id):
         return render_to_response('courseware/info.html', context)
 
 
-UPGRADE_COOKIE_NAME = 'show_upgrade_notification'
-
-
 class StaticCourseTabView(EdxFragmentView):
     """
     View that displays a static course tab with a given name.
@@ -559,12 +554,19 @@ class CourseTabView(EdxFragmentView):
             log.exception("Error while rendering courseware-error page")
             raise
 
+    def uses_bootstrap(self, request, course, tab):
+        """
+        Returns true if this view uses Bootstrap.
+        """
+        return tab.uses_bootstrap
+
     def create_page_context(self, request, course=None, tab=None, **kwargs):
         """
         Creates the context for the fragment's template.
         """
         staff_access = has_access(request.user, 'staff', course)
         supports_preview_menu = tab.get('supports_preview_menu', False)
+        uses_bootstrap = self.uses_bootstrap(request, course, tab=tab)
         if supports_preview_menu:
             masquerade, masquerade_user = setup_masquerade(request, course.id, staff_access, reset_masquerade_data=True)
             request.user = masquerade_user
@@ -583,7 +585,8 @@ class CourseTabView(EdxFragmentView):
             'staff_access': staff_access,
             'masquerade': masquerade,
             'supports_preview_menu': supports_preview_menu,
-            'uses_pattern_library': True,
+            'uses_bootstrap': uses_bootstrap,
+            'uses_pattern_library': not uses_bootstrap,
             'disable_courseware_js': True,
         }
         context.update(
@@ -607,8 +610,12 @@ class CourseTabView(EdxFragmentView):
         """
         if not page_context:
             page_context = self.create_page_context(request, course=course, tab=tab, **kwargs)
+        tab = page_context['tab']
         page_context['fragment'] = fragment
-        return render_to_response('courseware/tab-view.html', page_context)
+        if self.uses_bootstrap(request, course, tab=tab):
+            return render_to_response('courseware/tab-view.html', page_context)
+        else:
+            return render_to_response('courseware/tab-view-v2.html', page_context)
 
 
 @ensure_csrf_cookie
@@ -858,6 +865,8 @@ def program_marketing(request, program_uuid):
     if program.get('is_learner_eligible_for_one_click_purchase') and skus:
         context['buy_button_href'] = ecommerce_service.get_checkout_page_url(*skus)
 
+    context['uses_bootstrap'] = True
+
     return render_to_response('courseware/program_marketing.html', context)
 
 
@@ -922,12 +931,11 @@ def _progress(request, course_key, student_id):
     if request.user.id != student.id:
         # refetch the course as the assumed student
         course = get_course_with_access(student, 'load', course_key, check_if_enrolled=True)
-    prep_course_for_grading(course, request)
 
     # NOTE: To make sure impersonation by instructor works, use
     # student instead of request.user in the rest of the function.
 
-    course_grade = CourseGradeFactory().create(student, course)
+    course_grade = CourseGradeFactory().read(student, course)
     courseware_summary = course_grade.chapter_grades.values()
 
     studio_url = get_studio_url(course, 'settings/grading')
@@ -1015,7 +1023,7 @@ def _get_cert_data(student, course, enrollment_mode, course_grade=None):
 
     certificates_enabled_for_course = certs_api.cert_generation_enabled(course.id)
     if course_grade is None:
-        course_grade = CourseGradeFactory().create(student, course)
+        course_grade = CourseGradeFactory().read(student, course)
 
     if not auto_certs_api.can_show_certificate_message(course, student, course_grade, certificates_enabled_for_course):
         return
@@ -1290,7 +1298,7 @@ def is_course_passed(student, course, course_grade=None):
         returns bool value
     """
     if course_grade is None:
-        course_grade = CourseGradeFactory().create(student, course)
+        course_grade = CourseGradeFactory().read(student, course)
     return course_grade.passed
 
 
@@ -1652,7 +1660,7 @@ def get_financial_aid_courses(user):
                 enrollment.course_overview and \
                 enrollment.course_overview.eligible_for_financial_aid and \
                 CourseMode.objects.filter(
-                    Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gt=datetime.now(UTC())),
+                    Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gt=datetime.now(UTC)),
                     course_id=enrollment.course_id,
                     mode_slug=CourseMode.VERIFIED).exists():
 

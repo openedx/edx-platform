@@ -10,7 +10,7 @@ import ddt
 import mock
 from django.conf import settings
 from django.test.utils import override_settings
-from django.utils.timezone import UTC
+from pytz import UTC
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 
@@ -61,7 +61,7 @@ class CourseSettingsEncoderTest(CourseTestCase):
         doesn't work for these dates.
         """
         details = CourseDetails.fetch(self.course.id)
-        pre_1900 = datetime.datetime(1564, 4, 23, 1, 1, 1, tzinfo=UTC())
+        pre_1900 = datetime.datetime(1564, 4, 23, 1, 1, 1, tzinfo=UTC)
         details.enrollment_start = pre_1900
         dumped_jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         loaded_jsondetails = json.loads(dumped_jsondetails)
@@ -74,7 +74,7 @@ class CourseSettingsEncoderTest(CourseTestCase):
         details = {
             'number': 1,
             'string': 'string',
-            'datetime': datetime.datetime.now(UTC())
+            'datetime': datetime.datetime.now(UTC)
         }
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         jsondetails = json.loads(jsondetails)
@@ -121,13 +121,12 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         resp = self.client.get_json(url)
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, "virgin get")
 
-        utc = UTC()
-        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 12, 1, 30, tzinfo=utc))
-        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 1, 13, 30, tzinfo=utc))
-        self.alter_field(url, details, 'end_date', datetime.datetime(2013, 2, 12, 1, 30, tzinfo=utc))
-        self.alter_field(url, details, 'enrollment_start', datetime.datetime(2012, 10, 12, 1, 30, tzinfo=utc))
+        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 12, 1, 30, tzinfo=UTC))
+        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 1, 13, 30, tzinfo=UTC))
+        self.alter_field(url, details, 'end_date', datetime.datetime(2013, 2, 12, 1, 30, tzinfo=UTC))
+        self.alter_field(url, details, 'enrollment_start', datetime.datetime(2012, 10, 12, 1, 30, tzinfo=UTC))
 
-        self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012, 11, 15, 1, 30, tzinfo=utc))
+        self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012, 11, 15, 1, 30, tzinfo=UTC))
         self.alter_field(url, details, 'short_description', "Short Description")
         self.alter_field(url, details, 'overview', "Overview")
         self.alter_field(url, details, 'intro_video', "intro_video")

@@ -2,6 +2,12 @@
 // LMS: Shared Build Compile
 // Version 2 - introduces the Pattern Library
 
+// Bootstrap support for use with shared partials
+@import 'bootstrap/theme';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import "bootstrap/scss/mixins/breakpoints";
+
 // Configuration
 @import 'config';
 @import 'base/variables';
@@ -21,6 +27,7 @@
 // Elements
 @import 'notifications';
 @import 'elements/controls';
+@import 'elements-v2/buttons';
 @import 'elements-v2/pagination';
 
 // Features
@@ -29,6 +36,3 @@
 @import 'features/course-search';
 @import 'features/course-sock';
 @import 'features/course-upgrade-message';
-
-// Views
-@import "views/program-marketing-page";

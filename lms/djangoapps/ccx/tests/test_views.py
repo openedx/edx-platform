@@ -7,14 +7,12 @@ import re
 import urlparse
 
 import ddt
-import pytz
 from ccx_keys.locator import CCXLocator
-from dateutil.tz import tzutc
 from django.conf import settings
 from django.core.urlresolvers import resolve, reverse
 from django.test import RequestFactory
 from django.test.utils import override_settings
-from django.utils.timezone import UTC
+from pytz import UTC
 from django.utils.translation import ugettext as _
 from mock import MagicMock, patch
 from nose.plugins.attrib import attr
@@ -36,7 +34,9 @@ from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.ccx.tests.utils import CcxTestCase, flatten
 from lms.djangoapps.ccx.utils import ccx_course, is_email
 from lms.djangoapps.ccx.views import get_date
+from lms.djangoapps.grades.tasks import compute_all_grades_for_course
 from lms.djangoapps.instructor.access import allow_access, list_with_level
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
@@ -110,6 +110,8 @@ def setup_students_and_grades(context):
                         module_state_key=problem.location
                     )
 
+        compute_all_grades_for_course.apply_async(kwargs={'course_key': unicode(context.course.id)})
+
 
 def unhide(unit):
     """
@@ -180,8 +182,8 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         Set up tests
         """
         super(TestCCXProgressChanges, cls).setUpClass()
-        start = datetime.datetime(2016, 7, 1, 0, 0, tzinfo=tzutc())
-        due = datetime.datetime(2016, 7, 8, 0, 0, tzinfo=tzutc())
+        start = datetime.datetime(2016, 7, 1, 0, 0, tzinfo=UTC)
+        due = datetime.datetime(2016, 7, 8, 0, 0, tzinfo=UTC)
 
         cls.course = course = CourseFactory.create(enable_ccx=True, start=start)
         chapter = ItemFactory.create(start=start, parent=course, category=u'chapter')
@@ -464,7 +466,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         """
         Get CCX schedule, modify it, save it.
         """
-        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=pytz.UTC)
+        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=UTC)
         self.make_coach()
         ccx = self.make_ccx()
         url = reverse(
@@ -916,10 +918,10 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
 
         # Create a course outline
         self.mooc_start = start = datetime.datetime(
-            2010, 5, 12, 2, 42, tzinfo=pytz.UTC
+            2010, 5, 12, 2, 42, tzinfo=UTC
         )
         self.mooc_due = due = datetime.datetime(
-            2010, 7, 7, 0, 0, tzinfo=pytz.UTC
+            2010, 7, 7, 0, 0, tzinfo=UTC
         )
 
         self.chapters = [
@@ -1001,7 +1003,7 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         Hides nodes at a different depth and checks that these nodes
         are not in the schedule.
         """
-        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=pytz.UTC)
+        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=UTC)
         self.make_coach()
         ccx = self.make_ccx()
         url = reverse(
@@ -1060,10 +1062,11 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
     def setUpClass(cls):
         super(TestCCXGrades, cls).setUpClass()
         cls._course = course = CourseFactory.create(enable_ccx=True)
+        CourseOverview.load_from_module_store(course.id)
 
         # Create a course outline
         cls.mooc_start = start = datetime.datetime(
-            2010, 5, 12, 2, 42, tzinfo=pytz.UTC
+            2010, 5, 12, 2, 42, tzinfo=UTC
         )
         chapter = ItemFactory.create(
             start=start, parent=course, category='sequential'
@@ -1121,6 +1124,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         # which emulates how a student would get access.
         self.ccx_key = CCXLocator.from_course_locator(self._course.id, unicode(ccx.id))
         self.course = get_course_by_id(self.ccx_key, depth=None)
+        CourseOverview.load_from_module_store(self.course.id)
         setup_students_and_grades(self)
         self.client.login(username=coach.username, password="test")
         self.addCleanup(RequestCache.clear_request_cache)
@@ -1329,7 +1333,7 @@ class TestStudentViewsWithCCX(ModuleStoreTestCase):
 
         # Create a CCX course and enroll the user in it.
         self.ccx = CcxFactory(course_id=self.split_course.id, coach=self.coach)
-        last_week = datetime.datetime.now(UTC()) - datetime.timedelta(days=7)
+        last_week = datetime.datetime.now(UTC) - datetime.timedelta(days=7)
         override_field_for_ccx(self.ccx, self.split_course, 'start', last_week)  # Required by self.ccx.has_started().
         self.ccx_course_key = CCXLocator.from_course_locator(self.split_course.id, self.ccx.id)
         CourseEnrollment.enroll(self.student, self.ccx_course_key)

@@ -65,7 +65,6 @@
                 },
 
                 allThreads: function() {
-                    this.discussionBoardView.updateSidebar();
                     return this.discussionBoardView.goHome();
                 },
 
@@ -106,9 +105,6 @@
                         is_commentable_divided: this.discussion.is_commentable_divided
                     });
                     this.main.render();
-                    this.main.on('thread:responses:rendered', function() {
-                        return self.discussionBoardView.updateSidebar();
-                    });
                     return this.thread.on('thread:thread_type_updated', this.showMain);
                 },
 

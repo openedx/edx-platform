@@ -10,9 +10,11 @@ from datetime import datetime, timedelta
 
 import ddt
 from django.core.urlresolvers import reverse
+from django.db.models import signals
 from nose.plugins.attrib import attr
 from pytz import UTC
 
+from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
@@ -223,6 +225,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'reason': 'Financial Assistance',
         }, json.loads(response.content)[0]['manual_enrollment'])
 
+    @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
     def test_change_enrollment(self, search_string_type):
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
@@ -274,12 +277,14 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assert_enrollment(CourseMode.AUDIT)
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
 
+    @disable_signal(signals, 'post_save')
     @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional')
     def test_update_enrollment_for_all_modes(self, new_mode):
         """ Verify support can changed the enrollment to all available modes
         except credit. """
         self.assert_update_enrollment('username', new_mode)
 
+    @disable_signal(signals, 'post_save')
     @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional')
     def test_update_enrollment_for_ended_course(self, new_mode):
         """ Verify support can changed the enrollment of archived course. """
@@ -301,6 +306,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         response = self.client.get(url)
         self._assert_generated_modes(response)
 
+    @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
     def test_update_enrollments_with_expired_mode(self, search_string_type):
         """ Verify that enrollment can be updated to verified mode. """
@@ -374,3 +380,46 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         )
         verified_mode.expiration_datetime = datetime(year=1970, month=1, day=9, tzinfo=UTC)
         verified_mode.save()
+
+
+class ContactUsViewTests(ModuleStoreTestCase):
+
+    url = reverse('support:contact_us')
+
+    def setUp(self):
+        super(ContactUsViewTests, self).setUp()
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password='test')
+        self.user_enrollment = CourseEnrollmentFactory.create(
+            user=self.user,
+        )
+
+    def test_get_with_logged_in_user(self):
+        """ Verify that logged in users will see courses dropdown."""
+        response = self.client.get(self.url)
+        expected = '<option value="{course_id}">'.format(course_id=self.user_enrollment.course.id)
+        self.assertContains(response, expected)
+
+    def test_get_without_course_enrollment(self):
+        """ Verify that logged in users will see not courses dropdown,
+        if they are not enrolled in any course.
+        """
+        self.client.logout()
+        new_user = UserFactory()
+        self.client.login(username=new_user.username, password='test')
+        response = self.client.get(self.url)
+        self._assert_without_course_enrollment(response)
+
+    def test_get_with_anonymous_user(self):
+        """ Verify that logged out users will see not courses dropdown.
+        They will see sign in button.
+        """
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertContains(response, 'class="btn btn-primary btn-signin">Sign in</a>')
+        self._assert_without_course_enrollment(response)
+
+    def _assert_without_course_enrollment(self, response):
+        """ Assert that users will not see simple course text input."""
+        expected = '<input type="text" class="form-control" id="course">'
+        self.assertContains(response, expected)

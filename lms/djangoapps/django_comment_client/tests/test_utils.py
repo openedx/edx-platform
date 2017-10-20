@@ -7,7 +7,6 @@ import mock
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase
-from django.utils.timezone import UTC as django_utc
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 from pytz import UTC
@@ -391,6 +390,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.discussion_num = 0
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.maxDiff = None  # pylint: disable=invalid-name
+        self.later = datetime.datetime(2050, 1, 1, tzinfo=UTC)
 
     def create_discussion(self, discussion_category, discussion_target, **kwargs):
         self.discussion_num += 1
@@ -539,9 +539,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         )
 
     def test_get_unstarted_discussion_xblocks(self):
-        later = datetime.datetime(datetime.MAXYEAR, 1, 1, tzinfo=django_utc())
 
-        self.create_discussion("Chapter 1", "Discussion 1", start=later)
+        self.create_discussion("Chapter 1", "Discussion 1", start=self.later)
 
         self.assert_category_map_equals(
             {
@@ -553,12 +552,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                 "id": "discussion1",
                                 "sort_key": None,
                                 "is_divided": False,
-                                "start_date": later
+                                "start_date": self.later
                             }
                         },
                         "subcategories": {},
                         "children": [("Discussion 1", TYPE_ENTRY)],
-                        "start_date": later,
+                        "start_date": self.later,
                         "sort_key": "Chapter 1"
                     }
                 },
@@ -698,13 +697,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
     def test_start_date_filter(self):
         now = datetime.datetime.now()
-        later = datetime.datetime.max
         self.create_discussion("Chapter 1", "Discussion 1", start=now)
-        self.create_discussion("Chapter 1", "Discussion 2 обсуждение", start=later)
+        self.create_discussion("Chapter 1", "Discussion 2 обсуждение", start=self.later)
         self.create_discussion("Chapter 2", "Discussion", start=now)
-        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=later)
-        self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=later)
-        self.create_discussion("Chapter 3 / Section 1", "Discussion", start=later)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=self.later)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=self.later)
+        self.create_discussion("Chapter 3 / Section 1", "Discussion", start=self.later)
 
         self.assertFalse(self.course.self_paced)
         self.assert_category_map_equals(
@@ -742,13 +740,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.course.self_paced = True
 
         now = datetime.datetime.now()
-        later = datetime.datetime.max
         self.create_discussion("Chapter 1", "Discussion 1", start=now)
-        self.create_discussion("Chapter 1", "Discussion 2", start=later)
+        self.create_discussion("Chapter 1", "Discussion 2", start=self.later)
         self.create_discussion("Chapter 2", "Discussion", start=now)
-        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=later)
-        self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=later)
-        self.create_discussion("Chapter 3 / Section 1", "Discussion", start=later)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=self.later)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=self.later)
+        self.create_discussion("Chapter 3 / Section 1", "Discussion", start=self.later)
 
         self.assertTrue(self.course.self_paced)
         self.assert_category_map_equals(
@@ -1707,28 +1704,24 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         # cohorted_user (who is in the cohort but not the verified enrollment track),
         # and plain_user (who is neither in the cohort nor the verified enrollment track)
         self.group_moderator = UserFactory(username='group_moderator', email='group_moderator@edx.org')
-        self.group_moderator.id = 1
         CourseEnrollmentFactory(
             course_id=self.course.id,
             user=self.group_moderator,
             mode=verified_coursemode
         )
         self.verified_user = UserFactory(username='verified', email='verified@edx.org')
-        self.verified_user.id = 2
         CourseEnrollmentFactory(
             course_id=self.course.id,
             user=self.verified_user,
             mode=verified_coursemode
         )
         self.cohorted_user = UserFactory(username='cohort', email='cohort@edx.org')
-        self.cohorted_user.id = 3
         CourseEnrollmentFactory(
             course_id=self.course.id,
             user=self.cohorted_user,
             mode=audit_coursemode
         )
         self.plain_user = UserFactory(username='plain', email='plain@edx.org')
-        self.plain_user.id = 4
         CourseEnrollmentFactory(
             course_id=self.course.id,
             user=self.plain_user,
@@ -1737,7 +1730,7 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         CohortFactory(
             course_id=self.course.id,
             name='Test Cohort',
-            users=[self.verified_user, self.cohorted_user]
+            users=[self.group_moderator, self.cohorted_user]
         )
 
         # Give group moderator permissions to group_moderator

@@ -1,6 +1,7 @@
 import json
 
 import factory
+from django.utils.timezone import get_current_timezone
 from factory.django import DjangoModelFactory
 
 from ..models import CourseOverview
@@ -14,7 +15,8 @@ class CourseOverviewFactory(DjangoModelFactory):
 
     version = CourseOverview.VERSION
     pre_requisite_courses = []
-    start = factory.Faker('past_datetime')
+    start = factory.Faker('past_datetime', tzinfo=get_current_timezone())
+    end = factory.Faker('future_datetime', tzinfo=get_current_timezone())
     org = 'edX'
 
     @factory.lazy_attribute

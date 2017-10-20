@@ -5,6 +5,7 @@ Certificate HTML webview.
 import logging
 import urllib
 from datetime import datetime
+from dateutil import parser
 from uuid import uuid4
 
 import pytz
@@ -248,11 +249,29 @@ def _update_course_context(request, context, course, course_key, platform_name):
                                                               '{partner_short_name}.').format(
             partner_short_name=context['organization_short_name'],
             platform_name=platform_name)
-    # If language specific templates are enabled for the course, add course_run specific information to the context
-    if CertificateGenerationCourseSetting.is_language_specific_templates_enabled_for_course(course_key):
-        fields = ['start', 'end', 'max_effort', 'language']
-        course_run_data = get_course_run_details(course_key, fields)
-        context.update(course_run_data)
+
+
+def _update_context_with_catalog_data(context, course_key):
+    """
+    Updates context dictionary with relevant course run info from Discovery.
+    """
+    course_certificate_settings = CertificateGenerationCourseSetting.get(course_key)
+    if course_certificate_settings:
+        course_run_fields = []
+        if course_certificate_settings.language_specific_templates_enabled:
+            course_run_fields.append('content_language')
+        if course_certificate_settings.include_hours_of_effort:
+            course_run_fields.extend(['weeks_to_complete', 'max_effort'])
+        if course_run_fields:
+            course_run_data = get_course_run_details(course_key, course_run_fields)
+            if course_run_data.get('weeks_to_complete') and course_run_data.get('max_effort'):
+                try:
+                    weeks_to_complete = int(course_run_data['weeks_to_complete'])
+                    max_effort = int(course_run_data['max_effort'])
+                    context['hours_of_effort'] = weeks_to_complete * max_effort
+                except ValueError:
+                    log.exception('Error occurred while parsing course run details')
+            context['content_language'] = course_run_data.get('content_language')
 
 
 def _update_social_context(request, context, course, user, user_certificate, platform_name):
@@ -418,7 +437,7 @@ def _render_certificate_template(request, context, course, user_certificate):
     Picks appropriate certificate templates and renders it.
     """
     if settings.FEATURES.get('CUSTOM_CERTIFICATE_TEMPLATES_ENABLED', False):
-        custom_template = get_certificate_template(course.id, user_certificate.mode, context.get('language'))
+        custom_template = get_certificate_template(course.id, user_certificate.mode, context.get('content_language'))
         if custom_template:
             template = Template(
                 custom_template,
@@ -581,6 +600,9 @@ def render_html_view(request, user_id, course_id):
 
     # Append course info
     _update_course_context(request, context, course, course_key, platform_name)
+
+    # Append course run info from discovery
+    _update_context_with_catalog_data(context, course_key)
 
     # Append user info
     _update_context_with_user_info(context, user, user_certificate)

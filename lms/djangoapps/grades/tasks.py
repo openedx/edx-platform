@@ -8,17 +8,15 @@ import six
 from celery import task
 from celery_utils.logged_task import LoggedTask
 from celery_utils.persist_on_failure import PersistOnFailureTask
+from courseware.model_data import get_score
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
+from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
-
-from courseware.model_data import get_score
-from lms.djangoapps.course_blocks.api import get_course_blocks
-from lms.djangoapps.courseware import courses
-from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from openedx.core.djangoapps.monitoring_utils import set_custom_metric, set_custom_metrics_for_course_key
 from student.models import CourseEnrollment
 from submissions import api as sub_api
@@ -26,23 +24,26 @@ from track.event_transaction_utils import set_event_transaction_id, set_event_tr
 from util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
-from .config.waffle import ESTIMATE_FIRST_ATTEMPTED, DISABLE_REGRADE_ON_POLICY_CHANGE, waffle
+from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE, waffle
 from .constants import ScoreDatabaseTableEnum
+from .course_grade_factory import CourseGradeFactory
 from .exceptions import DatabaseNotReadyError
-from .new.course_grade_factory import CourseGradeFactory
-from .new.subsection_grade_factory import SubsectionGradeFactory
 from .services import GradesService
 from .signals.signals import SUBSECTION_SCORE_CHANGED
+from .subsection_grade_factory import SubsectionGradeFactory
 from .transformer import GradesTransformer
 
 log = getLogger(__name__)
 
+COURSE_GRADE_TIMEOUT_SECONDS = 1200
 KNOWN_RETRY_ERRORS = (  # Errors we expect occasionally, should be resolved on retry
     DatabaseError,
     ValidationError,
     DatabaseNotReadyError,
 )
-RECALCULATE_GRADE_DELAY = 2  # in seconds, to prevent excessive _has_db_updated failures. See TNL-6424.
+RECALCULATE_GRADE_DELAY_SECONDS = 2  # to prevent excessive _has_db_updated failures. See TNL-6424.
+RETRY_DELAY_SECONDS = 30
+SUBSECTION_GRADE_TIMEOUT_SECONDS = 300
 
 
 class _BaseTask(PersistOnFailureTask, LoggedTask):  # pylint: disable=abstract-method
@@ -74,7 +75,13 @@ def compute_all_grades_for_course(**kwargs):
             )
 
 
-@task(base=_BaseTask, bind=True, default_retry_delay=30, max_retries=1)
+@task(
+    bind=True,
+    base=_BaseTask,
+    default_retry_delay=RETRY_DELAY_SECONDS,
+    max_retries=1,
+    time_limit=COURSE_GRADE_TIMEOUT_SECONDS
+)
 def compute_grades_for_course_v2(self, **kwargs):
     """
     Compute grades for a set of students in the specified course.
@@ -85,23 +92,12 @@ def compute_grades_for_course_v2(self, **kwargs):
 
     TODO: Roll this back into compute_grades_for_course once all workers have
     the version with **kwargs.
-
-    Sets the ESTIMATE_FIRST_ATTEMPTED flag, then calls the original task as a
-    synchronous function.
-
-    estimate_first_attempted:
-        controls whether to unconditionally set the ESTIMATE_FIRST_ATTEMPTED
-        waffle switch.  If false or not provided, use the global value of
-        the ESTIMATE_FIRST_ATTEMPTED waffle switch.
     """
     if 'event_transaction_id' in kwargs:
         set_event_transaction_id(kwargs['event_transaction_id'])
 
     if 'event_transaction_type' in kwargs:
         set_event_transaction_type(kwargs['event_transaction_type'])
-
-    if kwargs.get('estimate_first_attempted'):
-        waffle().override_for_request(ESTIMATE_FIRST_ATTEMPTED, True)
 
     try:
         return compute_grades_for_course(kwargs['course_key'], kwargs['offset'], kwargs['batch_size'])
@@ -118,15 +114,22 @@ def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pyli
     limited to at most <batch_size> students, starting from the specified
     offset.
     """
-    course = courses.get_course_by_id(CourseKey.from_string(course_key))
-    enrollments = CourseEnrollment.objects.filter(course_id=course.id).order_by('created')
+    course_key = CourseKey.from_string(course_key)
+    enrollments = CourseEnrollment.objects.filter(course_id=course_key).order_by('created')
     student_iter = (enrollment.user for enrollment in enrollments[offset:offset + batch_size])
-    for result in CourseGradeFactory().iter(users=student_iter, course=course, force_update=True):
+    for result in CourseGradeFactory().iter(users=student_iter, course_key=course_key, force_update=True):
         if result.error is not None:
             raise result.error
 
 
-@task(bind=True, base=_BaseTask, default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
+@task(
+    bind=True,
+    base=_BaseTask,
+    time_limit=SUBSECTION_GRADE_TIMEOUT_SECONDS,
+    max_retries=2,
+    default_retry_delay=RETRY_DELAY_SECONDS,
+    routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY
+)
 def recalculate_subsection_grade_v3(self, **kwargs):
     """
     Latest version of the recalculate_subsection_grade task.  See docstring

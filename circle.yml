@@ -27,6 +27,7 @@ dependencies:
     # dependency on a version range of pbr.
     # Install a version which falls within that range.
     - pip install  --exists-action w pbr==0.9.0
+    - pip install --exists-action w -r requirements/edx/django.txt
     - pip install --exists-action w -r requirements/edx/base.txt
     - pip install --exists-action w -r requirements/edx/paver.txt
     - pip install --exists-action w -r requirements/edx/testing.txt

@@ -11,7 +11,9 @@
 // Older Course Extends - to review/remove with LMS cleanup
 h1.top-header {
   border-bottom: 1px solid $border-color-2;
+
   @include text-align(left);
+
   font-size: em(24);
   font-weight: 100;
   padding-bottom: lh();
@@ -29,19 +31,25 @@ h1.top-header {
 .light-button, a.light-button, // only used in askbot as classes
 .gray-button {
   @include simple($gray-l5);
+
   @extend .button-reset;
+
   font-size: em(13);
 }
 
 .blue-button {
   @include simple($blue);
+
   @extend .button-reset;
+
   font-size: em(13);
 }
 
 .pink-button {
   @include simple($pink);
+
   @extend .button-reset;
+
   font-size: em(13);
 }
 
@@ -68,12 +76,12 @@ h1.top-header {
   background: $sidebar-color;
 
   h1, h2, h3, h4 {
-   font-weight: bold;
-   letter-spacing: 0;
-   text-transform: none;
-   font-family: $sans-serif;
-   text-align: left;
-   font-style: normal;
+    font-weight: bold;
+    letter-spacing: 0;
+    text-transform: none;
+    font-family: $sans-serif;
+    text-align: left;
+    font-style: normal;
   }
 
   h1 {
@@ -112,6 +120,7 @@ h1.top-header {
 
     li {
       @include margin-left(20px);
+
       background: none;
       position: relative;
       padding: 0;
@@ -136,7 +145,7 @@ h1.top-header {
 
     a {
       background: #f6f6f6 url('#{$static-path}/images/slide-left-icon.png') center center no-repeat;
-      border: 1px solid #D3D3D3;
+      border: 1px solid #d3d3d3;
       border-radius: 3px 0 0 3px;
       height: 16px;
       padding: 6px;
@@ -160,6 +169,7 @@ h1.top-header {
 
 .topbar {
   @extend .clearfix;
+
   border-bottom: 1px solid $border-color;
 
   @media print {
@@ -179,37 +189,43 @@ h1.top-header {
 }
 
 .tran {
-  @include transition( all .2s $ease-in-out-quad 0s);
+  @include transition(all .2s $ease-in-out-quad 0s);
 }
 
 // FontAwesome rtl chevron next
 .fa-chevron-next {
-  &:before {
+  &::before {
     @if $bi-app-direction == ltr {
-        content: "\f054"; // .fa-chevron-right
-    } @else if $bi-app-direction == rtl {
-        content: "\f053"; // .fa-chevron-left
+      content: "\f054"; // .fa-chevron-right
+    }
+
+    @else if $bi-app-direction == rtl {
+      content: "\f053"; // .fa-chevron-left
     }
   }
 }
 
 // FontAwesome rtl chevron prev
 .fa-chevron-prev {
-  &:before {
+  &::before {
     @if $bi-app-direction == ltr {
-        content: "\f053"; // .fa-chevron-left
-    } @else if $bi-app-direction == rtl {
-        content: "\f054"; // .fa-chevron-right
+      content: "\f053"; // .fa-chevron-left
+    }
+
+    @else if $bi-app-direction == rtl {
+      content: "\f054"; // .fa-chevron-right
     }
   }
 }
 
 .fa-arrow-circle-prev {
-  &:before {
+  &::before {
     @if $bi-app-direction == ltr {
-        content: "\f0a8"; // .fa-arrow-circle-left
-    } @else if $bi-app-direction == rtl {
-        content: "\f0a9"; // .fa-arrow-circle-right
+      content: "\f0a8"; // .fa-arrow-circle-left
+    }
+
+    @else if $bi-app-direction == rtl {
+      content: "\f0a9"; // .fa-arrow-circle-right
     }
   }
 }

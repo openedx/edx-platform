@@ -4,7 +4,6 @@ from datetime import datetime
 from freezegun import freeze_time
 from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
 from lms.djangoapps.grades.services import GradesService, _get_key
-from lms.djangoapps.grades.signals.handlers import SUBSECTION_OVERRIDE_EVENT_TYPE
 from mock import patch, call
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from student.tests.factories import UserFactory

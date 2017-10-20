@@ -13,17 +13,28 @@
     margin: 0 auto;
     max-width: map-get($container-max-widths, xl);
 
+
+    .logo-header {
+      display: flex;
+      align-items: center;
+    }
+
     .logo.slim a {
       height: $baseline*3/2;
       margin-top: $baseline/5;
     }
 
     .course-header {
-      font-size: $font-size-lg;
-      margin: $baseline/2 $baseline/2 0 0;
+      display: none;
 
-      .provider {
-        font-weight: $font-weight-bold;
+      @include media-breakpoint-up(md) {
+        display: block;
+        font-size: $font-size-base;
+        font-weight: $font-weight-light;
+
+        .provider {
+          font-weight: $font-weight-bold;
+        }
       }
     }
 
@@ -31,7 +42,6 @@
       margin: 0 $baseline 0 0;
       font-weight: $font-weight-normal;
       font-family: $font-family-base;
-      text-transform: uppercase;
       list-style: none;
 
       .nav-link {
@@ -49,7 +59,8 @@
       }
 
       @include media-breakpoint-down(md) {
-        &.nav-item-open-collapsed, &.nav-item-open-collapsed-only {
+        &.nav-item-open-collapsed,
+        &.nav-item-open-collapsed-only {
           display: initial;
           margin: $baseline/4 $baseline/2;
 
@@ -63,13 +74,14 @@
             }
           }
         }
+
         &.nav-item-hidden-collapsed {
           display: none;
         }
       }
     }
 
-    .btn-shopping-cart{
+    .btn-shopping-cart {
       padding-top: 0.7rem; // $btn-padding-y-lg once themed
     }
 

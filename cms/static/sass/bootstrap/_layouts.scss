@@ -13,7 +13,8 @@
     padding-bottom: 0;
 
     .nav-item {
-      &.active, &:hover{
+      &.active,
+      &:hover {
         .nav-link {
           border-bottom-color: theme-color("primary");
           color: theme-color("primary");
@@ -57,14 +58,6 @@
 // studio - elements - layouts
 // ====================
 
-// layout - basic
-// the wrapper around the viewable page area, excluding modal and other extra-view content
-.wrapper-view {
-
-}
-
-// ====================
-
 // layout - basic page header
 .wrapper-mast {
   margin: ($baseline*1.5) 0 0 0;
@@ -74,6 +67,7 @@
   .mast,
   .metadata {
     @include clearfix();
+
     position: relative;
     max-width: $studio-max-width;
     width: flex-grid(12);
@@ -102,7 +96,7 @@
 
       .page-header {
         float: left;
-        width: flex-grid(6,12);
+        width: flex-grid(6, 12);
         margin-right: flex-gutter();
       }
 
@@ -110,7 +104,7 @@
         position: relative;
         bottom: -($baseline*0.75);
         float: right;
-        width: flex-grid(6,12);
+        width: flex-grid(6, 12);
         text-align: right;
 
         .nav-item {
@@ -150,7 +144,6 @@
 
     // layout with actions
     &.has-subtitle {
-
       .nav-actions {
         bottom: -($baseline*1.5);
       }
@@ -158,13 +151,13 @@
 
     // layout with breadcrumb navigation
     &.has-navigation {
-
       .nav-actions {
         bottom: -($baseline*1.5);
       }
 
       .navigation-item {
         @extend %cont-truncated;
+
         display: inline-block;
         vertical-align: bottom; // correct for extra padding in FF
         max-width: 250px;
@@ -172,10 +165,11 @@
 
         &.navigation-current {
           @extend %ui-disabled;
+
           color: color("gray");
           max-width: 250px;
 
-          &:before {
+          &::before {
             color: color("gray");
           }
         }
@@ -185,7 +179,7 @@
         color: theme-color("primary");
       }
 
-      .navigation-item:before {
+      .navigation-item::before {
         content: " / ";
         margin: ($baseline/4);
         color: color("gray");
@@ -195,7 +189,7 @@
         }
       }
 
-      .navigation .navigation-item:first-child:before {
+      .navigation .navigation-item:first-child::before {
         content: "";
         margin: 0;
       }
@@ -204,27 +198,23 @@
 
   // CASE: wizard-based mast
   .mast-wizard {
-
     .page-header-sub {
       @extend %t-title4;
+
       color: color("gray");
       font-weight: 300;
     }
 
     .page-header-super {
       @extend %t-title4;
+
       float: left;
-      width: flex-grid(12,12);
+      width: flex-grid(12, 12);
       margin-top: ($baseline/2);
       border-top: 1px solid $border-color;
       padding-top: ($baseline/2);
       font-weight: 600;
     }
-  }
-
-  // page metadata/action bar
-  .metadata {
-
   }
 }
 
@@ -258,6 +248,7 @@
 
     .title-sub {
       @extend %t-copy-sub1;
+
       display: block;
       margin: 0;
       color: $gray-500;
@@ -266,6 +257,7 @@
     .title-1 {
       @extend %t-title3;
       @extend %t-strong;
+
       margin: 0;
       padding: 0;
       color: theme-color("primary");
@@ -286,11 +278,13 @@
 
   .title-2 {
     @extend %t-title4;
+
     margin: 0 0 ($baseline/2) 0;
   }
 
   .title-3 {
     @extend %t-title6;
+
     margin: 0 0 ($baseline/2) 0;
   }
 
@@ -305,6 +299,7 @@
 
     .tip {
       @extend %t-copy-sub2;
+
       width: flex-grid(7, 12);
       float: right;
       margin-top: ($baseline/2);
@@ -316,7 +311,6 @@
 
 // layout - supplemental content
 .content-supplementary {
-
   > section {
     margin: 0 0 $baseline 0;
   }
@@ -332,6 +326,7 @@
 
 .inner-wrapper {
   @include clearfix();
+
   position: relative;
   max-width: 1280px;
   margin: auto;

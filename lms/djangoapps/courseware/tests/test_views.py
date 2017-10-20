@@ -42,8 +42,6 @@ from django.test.utils import override_settings
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
-from lms.djangoapps.grades.tests.utils import mock_get_score
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
@@ -215,8 +213,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 145),
-        (ModuleStoreEnum.Type.split, 4, 145),
+        (ModuleStoreEnum.Type.mongo, 10, 143),
+        (ModuleStoreEnum.Type.split, 4, 143),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -1049,6 +1047,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
         course = modulestore().get_course(course.id)
         self.assertIsNotNone(course.get_children()[0].get_children()[0].due)
         CourseEnrollmentFactory(user=self.user, course_id=course.id)
+        CourseOverview.load_from_module_store(course.id)
         return course
 
     def setUp(self):
@@ -1399,7 +1398,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
-        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
             course_grade.passed = True
             course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
@@ -1442,7 +1441,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         # Enable certificate generation for this course
         certs_api.set_cert_generation_enabled(self.course.id, True)
 
-        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
             course_grade.passed = True
             course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
@@ -1458,12 +1457,13 @@ class ProgressPageTests(ProgressPageBaseTests):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(43, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
+        with self.assertNumQueries(34 if self_paced else 33, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
             self._get_progress_page()
 
+    @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 43, 27),
-        (True, 36, 23)
+        (False, 40, 26),
+        (True, 33, 22)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -1504,7 +1504,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
         ) as user_verify:
             user_verify.return_value = user_verified
-            with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+            with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
                 course_grade = mock_create.return_value
                 course_grade.passed = True
                 course_grade.summary = {
@@ -1548,7 +1548,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
-        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
             course_grade.passed = True
             course_grade.summary = {
@@ -1568,7 +1568,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             "http://www.example.com/certificate.pdf", "honor"
         )
 
-        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
             course_grade.passed = True
             course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
@@ -1586,7 +1586,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.assertTrue(self.client.login(username=user.username, password='test'))
         CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=CourseMode.AUDIT)
 
-        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
             course_grade.passed = True
             course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
@@ -2090,7 +2090,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             status=CertificateStatuses.generating,
             mode='verified'
         )
-        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
             course_grade.passed = True
             course_grade.summary = {'grade': 'Pass', 'percent': 0.75}
@@ -2111,7 +2111,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             mode='verified'
         )
 
-        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create') as mock_create:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
             course_grade.passed = True
             course_grade.summay = {'grade': 'Pass', 'percent': 0.75}
@@ -2214,6 +2214,7 @@ class TestIndexView(ModuleStoreTestCase):
                 state=json.dumps({'state': unicode(item.scope_ids.usage_id)})
             )
 
+        CourseOverview.load_from_module_store(course.id)
         CourseEnrollmentFactory(user=user, course_id=course.id)
 
         self.assertTrue(self.client.login(username=user.username, password='test'))
@@ -2242,6 +2243,7 @@ class TestIndexView(ModuleStoreTestCase):
             vertical = ItemFactory.create(parent=section, category='vertical', display_name="Vertical")
             ItemFactory.create(parent=vertical, category='id_checker', display_name="ID Checker")
 
+        CourseOverview.load_from_module_store(course.id)
         CourseEnrollmentFactory(user=user, course_id=course.id)
 
         self.assertTrue(self.client.login(username=user.username, password='test'))
@@ -2281,6 +2283,8 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
             ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical1")
             ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical2")
             ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical3")
+
+        CourseOverview.load_from_module_store(self.course.id)
 
         self.client.login(username=self.user, password='test')
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
@@ -2506,6 +2510,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCa
         self.user = UserFactory.create()
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
         self.course = CourseFactory.create()
+        CourseOverview.load_from_module_store(self.course.id)
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
     def test_consent_required(self):

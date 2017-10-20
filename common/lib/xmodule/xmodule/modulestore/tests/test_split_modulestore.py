@@ -13,12 +13,6 @@ import uuid
 import ddt
 from contracts import contract
 from nose.plugins.attrib import attr
-# For the cache tests to work, we need to be using the Django default
-# settings (not our usual cms or lms test settings) and they need to
-# be configured before importing from django.core.cache
-from django.conf import settings
-if not settings.configured:
-    settings.configure()
 from django.core.cache import caches, InvalidCacheBackendError
 
 from openedx.core.lib import tempdir

@@ -518,7 +518,7 @@ def dump_grading_context(course):
     msg += hbar
     msg += "Listing grading context for course %s\n" % course.id.to_deprecated_string()
 
-    gcontext = grading_context_for_course(course.id)
+    gcontext = grading_context_for_course(course)
     msg += "graded sections:\n"
 
     msg += '%s\n' % gcontext['all_graded_subsections_by_type'].keys()
@@ -541,6 +541,6 @@ def dump_grading_context(course):
             msg += "      %s (format=%s, Assignment=%s%s)\n"\
                 % (sdesc.display_name, frmat, aname, notes)
     msg += "all graded blocks:\n"
-    msg += "length=%d\n" % len(gcontext['all_graded_blocks'])
+    msg += "length=%d\n" % gcontext['count_all_graded_blocks']
     msg = '<pre>%s</pre>' % msg.replace('<', '&lt;')
     return msg

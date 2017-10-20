@@ -1,7 +1,6 @@
 """
 Tests for the score change signals defined in the courseware models module.
 """
-
 import re
 from datetime import datetime
 
@@ -18,7 +17,7 @@ from ..signals.handlers import (
     disconnect_submissions_signal_receiver,
     problem_raw_score_changed_handler,
     submissions_score_reset_handler,
-    submissions_score_set_handler
+    submissions_score_set_handler,
 )
 from ..signals.signals import PROBLEM_RAW_SCORE_CHANGED
 

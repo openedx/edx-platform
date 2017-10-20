@@ -9,6 +9,8 @@ import django_comment_client.utils as utils
 from courseware.tabs import EnrolledTab
 from xmodule.tabs import TabFragmentViewMixin
 
+from . import USE_BOOTSTRAP_FLAG
+
 
 class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
     """
@@ -30,3 +32,10 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
         if not super(DiscussionTab, cls).is_enabled(course, user):
             return False
         return utils.is_discussion_enabled(course.id)
+
+    @property
+    def uses_bootstrap(self):
+        """
+        Returns true if this tab is rendered with Bootstrap.
+        """
+        return USE_BOOTSTRAP_FLAG.is_enabled()

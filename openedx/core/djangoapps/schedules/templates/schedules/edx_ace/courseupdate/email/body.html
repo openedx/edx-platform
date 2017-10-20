@@ -1,0 +1,51 @@
+{% extends 'schedules/edx_ace/common/base_body.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block preview_text %}
+    {% blocktrans trimmed %}
+        Welcome to week {{ week_num }} of our {{ course_name }} course!
+    {% endblocktrans %}
+{% endblock %}
+
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <p>
+                {% blocktrans trimmed %}
+                    Welcome to week {{ week_num }} of <strong>{{ course_name }}</strong>!
+                {% endblocktrans %}
+            </p>
+            <p>
+                {% blocktrans trimmed %}
+                    Here is what you can look forward to learning this week:
+                    <p>{{ week_summary }}</p>
+                {% endblocktrans %}
+            </p>
+
+            <p>
+                <!-- email client support for style sheets is pretty spotty, so we have to inline all of these styles -->
+                <a
+                    href="{{ course_url }}"
+                    style="
+                        color: #ffffff;
+                        text-decoration: none;
+                        border-radius: 4px;
+                        -webkit-border-radius: 4px;
+                        -moz-border-radius: 4px;
+                        background-color: #005686;
+                        border-top: 10px solid #005686;
+                        border-bottom: 10px solid #005686;
+                        border-right: 16px solid #005686;
+                        border-left: 16px solid #005686;
+                        display: inline-block;
+                ">
+                    <!-- old email clients require the use of the font tag :( -->
+                    <font color="#ffffff"><b>{% trans "Resume your course now" %}</b></font>
+                </a>
+            </p>
+        </td>
+    </tr>
+</table>
+{% endblock %}

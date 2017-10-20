@@ -20,9 +20,8 @@ from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsec
 from lms.djangoapps.grades.services import GradesService
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lms.djangoapps.grades.tasks import (
-    RECALCULATE_GRADE_DELAY,
+    RECALCULATE_GRADE_DELAY_SECONDS,
     _course_task_args,
-    compute_all_grades_for_course,
     compute_grades_for_course_v2,
     recalculate_subsection_grade_v3
 )
@@ -35,6 +34,8 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+
+from .utils import mock_get_score
 
 
 class MockGradesService(GradesService):
@@ -120,7 +121,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         PersistentGradesEnabledFlag.objects.create(enabled_for_all_courses=True, enabled=True)
 
     @contextmanager
-    def mock_get_score(self, score=MagicMock(grade=1.0, max_grade=2.0)):
+    def mock_csm_get_score(self, score=MagicMock(grade=1.0, max_grade=2.0)):
         """
         Mocks the scores needed by the SCORE_PUBLISHED signal
         handler. By default, sets the returned score to 1/2.
@@ -136,12 +137,12 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         send_args = self.problem_weighted_score_changed_kwargs
         local_task_args = self.recalculate_subsection_grade_kwargs.copy()
         local_task_args['event_transaction_type'] = u'edx.grades.problem.submitted'
-        with self.mock_get_score() and patch(
+        with self.mock_csm_get_score() and patch(
             'lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.apply_async',
             return_value=None
         ) as mock_task_apply:
             PROBLEM_WEIGHTED_SCORE_CHANGED.send(sender=None, **send_args)
-            mock_task_apply.assert_called_once_with(countdown=RECALCULATE_GRADE_DELAY, kwargs=local_task_args)
+            mock_task_apply.assert_called_once_with(countdown=RECALCULATE_GRADE_DELAY_SECONDS, kwargs=local_task_args)
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
     def test_triggers_subsection_score_signal(self, mock_subsection_signal):
@@ -163,10 +164,10 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self.assertEquals(mock_block_structure_create.call_count, 1)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 30, True),
-        (ModuleStoreEnum.Type.mongo, 1, 26, False),
-        (ModuleStoreEnum.Type.split, 3, 30, True),
-        (ModuleStoreEnum.Type.split, 3, 26, False),
+        (ModuleStoreEnum.Type.mongo, 1, 23, True),
+        (ModuleStoreEnum.Type.mongo, 1, 23, False),
+        (ModuleStoreEnum.Type.split, 3, 23, True),
+        (ModuleStoreEnum.Type.split, 3, 23, False),
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
@@ -178,8 +179,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                     self._apply_recalculate_subsection_grade()
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 30),
-        (ModuleStoreEnum.Type.split, 3, 30),
+        (ModuleStoreEnum.Type.mongo, 1, 23),
+        (ModuleStoreEnum.Type.split, 3, 23),
     )
     @ddt.unpack
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
@@ -239,8 +240,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self.assertEqual(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 27),
-        (ModuleStoreEnum.Type.split, 3, 27),
+        (ModuleStoreEnum.Type.mongo, 1, 24),
+        (ModuleStoreEnum.Type.split, 3, 24),
     )
     @ddt.unpack
     def test_persistent_grades_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
@@ -253,7 +254,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self.assertGreater(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
-    @patch('lms.djangoapps.grades.new.subsection_grade_factory.SubsectionGradeFactory.update')
+    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update')
     def test_retry_first_time_only(self, mock_update, mock_course_signal):
         """
         Ensures that a task retry completes after a one-time failure.
@@ -264,7 +265,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         self.assertEquals(mock_course_signal.call_count, 1)
 
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
-    @patch('lms.djangoapps.grades.new.subsection_grade_factory.SubsectionGradeFactory.update')
+    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update')
     def test_retry_on_integrity_error(self, mock_update, mock_retry):
         """
         Ensures that tasks will be retried if IntegrityErrors are encountered.
@@ -347,7 +348,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
     @patch('lms.djangoapps.grades.tasks.log')
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
-    @patch('lms.djangoapps.grades.new.subsection_grade_factory.SubsectionGradeFactory.update')
+    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update')
     def test_log_unknown_error(self, mock_update, mock_retry, mock_log):
         """
         Ensures that unknown errors are logged before a retry.
@@ -360,7 +361,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
     @patch('lms.djangoapps.grades.tasks.log')
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
-    @patch('lms.djangoapps.grades.new.subsection_grade_factory.SubsectionGradeFactory.update')
+    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update')
     def test_no_log_known_error(self, mock_update, mock_retry, mock_log):
         """
         Ensures that known errors are not logged before a retry.
@@ -373,14 +374,19 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
     def _apply_recalculate_subsection_grade(
             self,
-            mock_score=MagicMock(modified=datetime.utcnow().replace(tzinfo=pytz.UTC) + timedelta(days=1))
+            mock_score=MagicMock(
+                modified=datetime.utcnow().replace(tzinfo=pytz.UTC) + timedelta(days=1),
+                grade=1.0,
+                max_grade=2.0,
+            )
     ):
         """
         Calls the recalculate_subsection_grade task with necessary
         mocking in place.
         """
-        with self.mock_get_score(mock_score):
-            recalculate_subsection_grade_v3.apply(kwargs=self.recalculate_subsection_grade_kwargs)
+        with self.mock_csm_get_score(mock_score):
+            with mock_get_score(1, 2):
+                recalculate_subsection_grade_v3.apply(kwargs=self.recalculate_subsection_grade_kwargs)
 
     def _assert_retry_called(self, mock_retry):
         """
@@ -414,11 +420,12 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
 
     @ddt.data(*xrange(0, 12, 3))
     def test_behavior(self, batch_size):
-        result = compute_grades_for_course_v2.delay(
-            course_key=six.text_type(self.course.id),
-            batch_size=batch_size,
-            offset=4,
-        )
+        with mock_get_score(1, 2):
+            result = compute_grades_for_course_v2.delay(
+                course_key=six.text_type(self.course.id),
+                batch_size=batch_size,
+                offset=4,
+            )
         self.assertTrue(result.successful)
         self.assertEqual(
             PersistentCourseGrade.objects.filter(course_id=self.course.id).count(),
@@ -428,15 +435,6 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
             PersistentSubsectionGrade.objects.filter(course_id=self.course.id).count(),
             min(batch_size, 8)  # No more than 8 due to offset
         )
-
-    @ddt.data(*xrange(1, 12, 3))
-    def test_compute_all_grades_for_course(self, batch_size):
-        self.set_up_course()
-        result = compute_all_grades_for_course.delay(
-            course_key=six.text_type(self.course.id),
-            batch_size=batch_size,
-        )
-        self.assertTrue(result.successful)
 
     @ddt.data(*xrange(1, 12, 3))
     def test_course_task_args(self, test_batch_size):

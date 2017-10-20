@@ -62,7 +62,7 @@ from xml.sax.saxutils import escape
 import bleach
 import mock
 import oauthlib.oauth1
-from django.utils.timezone import UTC
+from pytz import UTC
 from lxml import etree
 from oauthlib.oauth1.rfc5849 import signature
 from pkg_resources import resource_string
@@ -889,7 +889,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             close_date = due_date + self.graceperiod  # pylint: disable=no-member
         else:
             close_date = due_date
-        return close_date is not None and datetime.datetime.now(UTC()) > close_date
+        return close_date is not None and datetime.datetime.now(UTC) > close_date
 
 
 class LTIDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):

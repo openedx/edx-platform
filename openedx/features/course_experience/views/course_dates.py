@@ -1,6 +1,7 @@
 """
 Fragment for rendering the course dates sidebar.
 """
+from django.http import Http404
 from django.template.loader import render_to_string
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
@@ -26,3 +27,20 @@ class CourseDatesFragmentView(EdxFragmentView):
         }
         html = render_to_string('course_experience/course-dates-fragment.html', context)
         return Fragment(html)
+
+
+class CourseDatesFragmentMobileView(CourseDatesFragmentView):
+    """
+    A course dates fragment to show dates on mobile apps.
+
+    Mobile apps uses WebKit mobile client to create and maintain a session with
+    the server for authenticated requests, and it hasn't exposed any way to find
+    out either session was created with the server or not so mobile app uses a
+    mechanism to automatically create/recreate session with the server for all
+    authenticated requests if the server returns 404.
+    """
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            raise Http404
+
+        return super(CourseDatesFragmentMobileView, self).get(request, *args, **kwargs)

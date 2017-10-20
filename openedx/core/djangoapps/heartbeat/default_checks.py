@@ -51,7 +51,7 @@ def check_database():
     """
     cursor = connection.cursor()
     try:
-        cursor.execute("SELECT CURRENT_DATE")
+        cursor.execute("SELECT 1")
         cursor.fetchone()
         return 'sql', True, u'OK'
     except DatabaseError as fail:

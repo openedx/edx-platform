@@ -27,8 +27,11 @@ $lms-label-color: palette(grayscale, black) !default;
 $lms-active-color: palette(primary, base) !default;
 $lms-preview-menu-color: #c8c8c8 !default;
 $lms-inactive-color: rgb(94,94,94) !default;
-$success-color: palette(success, accent) !default;
+$success-color: rgb(0, 155, 0) !default;
 $success-color-hover: palette(success, text) !default;
+$lms-hero-color: #005e90 !default;
+$lms-purchase-color: $success-color !default;
+$lms-purchase-color-hover: $success-color-hover !default;
 
 $button-bg-hover-color: $white !default;
 
@@ -38,7 +41,7 @@ $white-opacity-60: rgba(255, 255, 255, 0.6) !default;
 $white-opacity-70: rgba(255, 255, 255, 0.7) !default;
 $white-opacity-80: rgba(255, 255, 255, 0.8) !default;
 
-$black:     rgb(0,0,0) !default;
+$black:     rgb(0, 0,0) !default;
 $black-t0:  rgba($black, 0.125) !default;
 $black-t1:  rgba($black, 0.25) !default;
 $black-t2:  rgba($black, 0.5) !default;
@@ -48,6 +51,8 @@ $light-grey-transparent: rgba(200,200,200, 0) !default;
 $light-grey-solid: rgba(200,200,200, 1) !default;
 
 $header-border-color: $gray-l1 !default;
+
+$table-bg-accent:               #f9f9f9 !default;
 
 // ----------------------------
 // #TYPOGRAPHY
@@ -66,7 +71,14 @@ $lms-dark-icon-background-color: palette(grayscale, black) !default;
 
 $site-status-color: rgb(182,37,103) !default;
 
-$shadow-l1: rgba(0,0,0,0.1) !default;
+$shadow-l1: rgba(0, 0,0, 0.1) !default;
+
+$error-color: rgb(203, 7, 18) !default;
+$warning-color: rgb(255, 192, 31) !default;
+$confirm-color: rgb(0, 132, 1) !default;
+$active-color: $blue !default;
+$highlight-color: rgb(255,255,0) !default;
+$alert-color: rgb(212, 64, 64) !default;
 
 // ----------------------------
 // #ALERTS

@@ -12,7 +12,6 @@ from urlparse import parse_qs, urlsplit, urlunsplit
 
 import analytics
 import edx_oauth2_provider
-import waffle
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -20,7 +19,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.views import password_reset_confirm
 from django.core import mail
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import NoReverseMatch, reverse, reverse_lazy
 from django.core.validators import ValidationError, validate_email
@@ -67,12 +66,13 @@ from django_comment_common.models import assign_role
 from edxmako.shortcuts import render_to_response, render_to_string
 from eventtracking import tracker
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps import monitoring_utils
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
+from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.external_auth.login_and_register import login as external_auth_login
@@ -118,9 +118,9 @@ from student.models import (
     UserStanding,
     anonymous_id_for_user,
     create_comments_service_user,
-    unique_id_for_user,
-    REFUND_ORDER
+    unique_id_for_user
 )
+from student.signals import REFUND_ORDER
 from student.tasks import send_activation_email
 from third_party_auth import pipeline, provider
 from util.bad_request_rate_limiter import BadRequestRateLimiter
@@ -233,19 +233,15 @@ def cert_info(user, course_overview, course_mode):
         course_mode (str): The enrollment mode (honor, verified, audit, etc.)
 
     Returns:
-        dict: Empty dict if certificates are disabled or hidden, or a dictionary with keys:
-            'status': one of 'generating', 'ready', 'notpassing', 'processing', 'restricted'
-            'show_download_url': bool
+        dict: A dictionary with keys:
+            'status': one of 'generating', 'downloadable', 'notpassing', 'processing', 'restricted', 'unavailable', or
+                'certificate_earned_but_not_available'
             'download_url': url, only present if show_download_url is True
-            'show_disabled_download_button': bool -- true if state is 'generating'
             'show_survey_button': bool
             'survey_url': url, only if show_survey_button is True
             'grade': if status is not 'processing'
             'can_unenroll': if status allows for unenrollment
     """
-    if not course_overview.may_certify():
-        return {}
-    # Note: this should be rewritten to use the certificates API
     return _cert_info(
         user,
         course_overview,
@@ -277,15 +273,14 @@ def reverification_info(statuses):
     return reverifications
 
 
-def get_course_enrollments(user, orgs_to_include, orgs_to_exclude):
+def get_course_enrollments(user, org_whitelist, org_blacklist):
     """
     Given a user, return a filtered set of his or her course enrollments.
 
     Arguments:
         user (User): the user in question.
-        orgs_to_include (list[str]): If not None, ONLY courses of these orgs will be returned.
-        orgs_to_exclude (list[str]): If orgs_to_include is not None, this
-            argument is ignored. Else, courses of this org will be excluded.
+        org_whitelist (list[str]): If not None, ONLY courses of these orgs will be returned.
+        org_blacklist (list[str]): Courses of these orgs will be excluded.
 
     Returns:
         generator[CourseEnrollment]: a sequence of enrollments to be displayed
@@ -303,17 +298,42 @@ def get_course_enrollments(user, orgs_to_include, orgs_to_exclude):
             )
             continue
 
-        # Filter out anything that is not attributed to the orgs to include.
-        if orgs_to_include and course_overview.location.org not in orgs_to_include:
+        # Filter out anything that is not in the whitelist.
+        if org_whitelist and course_overview.location.org not in org_whitelist:
             continue
 
-        # Conversely, filter out any enrollments with courses attributed to current ORG.
-        elif course_overview.location.org in orgs_to_exclude:
+        # Conversely, filter out any enrollments in the blacklist.
+        elif org_blacklist and course_overview.location.org in org_blacklist:
             continue
 
         # Else, include the enrollment.
         else:
             yield enrollment
+
+
+def get_org_black_and_whitelist_for_site(user):
+    """
+    Returns the org blacklist and whitelist for the current site.
+
+    Returns:
+        (org_whitelist, org_blacklist): A tuple of lists of orgs that serve as
+            either a blacklist or a whitelist of orgs for the current site. The
+            whitelist takes precedence, and the blacklist is used if the
+            whitelist is None.
+    """
+    # Default blacklist is empty.
+    org_blacklist = None
+    # Whitelist the orgs configured for the current site.  Each site outside
+    # of edx.org has a list of orgs associated with its configuration.
+    org_whitelist = configuration_helpers.get_current_site_orgs()
+
+    if not org_whitelist:
+        # If there is no whitelist, the blacklist will include all orgs that
+        # have been configured for any other sites. This applies to edx.org,
+        # where it is easier to blacklist all other orgs.
+        org_blacklist = configuration_helpers.get_all_orgs()
+
+    return (org_whitelist, org_blacklist)
 
 
 def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disable=unused-argument
@@ -328,7 +348,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
     # simplify the status for the template using this lookup table
     template_state = {
         CertificateStatuses.generating: 'generating',
-        CertificateStatuses.downloadable: 'ready',
+        CertificateStatuses.downloadable: 'downloadable',
         CertificateStatuses.notpassing: 'notpassing',
         CertificateStatuses.restricted: 'restricted',
         CertificateStatuses.auditing: 'auditing',
@@ -337,12 +357,11 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         CertificateStatuses.unverified: 'unverified',
     }
 
+    certificate_earned_but_not_available_status = 'certificate_earned_but_not_available'
     default_status = 'processing'
 
     default_info = {
         'status': default_status,
-        'show_disabled_download_button': False,
-        'show_download_url': False,
         'show_survey_button': False,
         'can_unenroll': True,
     }
@@ -350,32 +369,38 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
     if cert_status is None:
         return default_info
 
-    is_hidden_status = cert_status['status'] in ('unavailable', 'processing', 'generating', 'notpassing', 'auditing')
-
-    if course_overview.certificates_display_behavior == 'early_no_info' and is_hidden_status:
-        return {}
-
     status = template_state.get(cert_status['status'], default_status)
+    is_hidden_status = status in ('unavailable', 'processing', 'generating', 'notpassing', 'auditing')
+
+    if (
+        not certificates_viewable_for_course(course_overview) and
+        (status in CertificateStatuses.PASSED_STATUSES) and
+        course_overview.certificate_available_date
+    ):
+        status = certificate_earned_but_not_available_status
+
+    if (
+        course_overview.certificates_display_behavior == 'early_no_info' and
+        is_hidden_status
+    ):
+        return default_info
 
     status_dict = {
         'status': status,
-        'show_download_url': status == 'ready',
-        'show_disabled_download_button': status == 'generating',
         'mode': cert_status.get('mode', None),
         'linked_in_url': None,
         'can_unenroll': status not in DISABLE_UNENROLL_CERT_STATES,
     }
 
-    if (status in ('generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified') and
-            course_overview.end_of_course_survey_url is not None):
+    if not status == default_status and course_overview.end_of_course_survey_url is not None:
         status_dict.update({
             'show_survey_button': True,
             'survey_url': process_survey_link(course_overview.end_of_course_survey_url, user)})
     else:
         status_dict['show_survey_button'] = False
 
-    if status == 'ready':
-        # showing the certificate web view button if certificate is ready state and feature flags are enabled.
+    if status == 'downloadable':
+        # showing the certificate web view button if certificate is downloadable state and feature flags are enabled.
         if has_html_certificates_enabled(course_overview):
             if course_overview.has_any_active_web_certificate:
                 status_dict.update({
@@ -384,7 +409,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                 })
             else:
                 # don't show download certificate button if we don't have an active certificate for course
-                status_dict['show_download_url'] = False
+                status_dict['status'] = 'unavailable'
         elif 'download_url' not in cert_status:
             log.warning(
                 u"User %s has a downloadable cert for %s, but no download url",
@@ -410,10 +435,10 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                     cert_status['download_url']
                 )
 
-    if status in {'generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified'}:
+    if status in {'generating', 'downloadable', 'notpassing', 'restricted', 'auditing', 'unverified'}:
         cert_grade_percent = -1
         persisted_grade_percent = -1
-        persisted_grade = CourseGradeFactory().read(user, course=course_overview)
+        persisted_grade = CourseGradeFactory().read(user, course=course_overview, create_if_needed=False)
         if persisted_grade is not None:
             persisted_grade_percent = persisted_grade.percent
 
@@ -647,21 +672,9 @@ def dashboard(request):
         'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
     ) or settings.SUPPORT_SITE_LINK
 
-    # Let's filter out any courses in an "org" that has been declared to be
-    # in a configuration
-    org_filter_out_set = configuration_helpers.get_all_orgs()
-
-    # Remove current site orgs from the "filter out" list, if applicable.
-    # We want to filter and only show enrollments for courses within
-    # the organizations defined in configuration for the current site.
-    course_org_filter = configuration_helpers.get_current_site_orgs()
-    if course_org_filter:
-        org_filter_out_set = org_filter_out_set - set(course_org_filter)
-
-    # Build our (course, enrollment) list for the user, but ignore any courses that no
-    # longer exist (because the course IDs have changed). Still, we don't delete those
-    # enrollments, because it could have been a data push snafu.
-    course_enrollments = list(get_course_enrollments(user, course_org_filter, org_filter_out_set))
+    # get the org whitelist or the org blacklist for the current site
+    site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site(user)
+    course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist))
 
     # Record how many courses there are so that we can get a better
     # understanding of usage patterns on prod.
@@ -808,7 +821,7 @@ def dashboard(request):
     denied_banner = any(item.display for item in reverifications["denied"])
 
     # Populate the Order History for the side-bar.
-    order_history_list = order_history(user, course_org_filter=course_org_filter, org_filter_out_set=org_filter_out_set)
+    order_history_list = order_history(user, course_org_filter=site_org_whitelist, org_filter_out_set=site_org_blacklist)
 
     # get list of courses having pre-requisites yet to be completed
     courses_having_prerequisites = frozenset(
@@ -864,6 +877,7 @@ def dashboard(request):
         'nav_hidden': True,
         'inverted_programs': inverted_programs,
         'show_program_listing': ProgramsApiConfig.is_enabled(),
+        'show_dashboard_tabs': True,
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
         'display_sidebar_on_dashboard': display_sidebar_on_dashboard,

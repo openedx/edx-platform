@@ -31,7 +31,7 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import IntegrityError, models
 from django.db.models import Count
 from django.db.models.signals import post_save, pre_save
-from django.dispatch import Signal, receiver
+from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -42,29 +42,25 @@ from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from simple_history.models import HistoricalRecords
 from slumber.exceptions import HttpClientError, HttpServerError
 
 import dogstats_wrapper as dog_stats_api
 import lms.lib.comment_client as cc
 import request_cache
+from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, REFUND_ORDER, ENROLLMENT_TRACK_UPDATED
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from courseware.models import DynamicUpgradeDeadlineConfiguration, CourseDynamicUpgradeDeadlineConfiguration
 from enrollment.api import _default_course_mode
+
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.schedules.models import ScheduleConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 from track import contexts
 from util.milestones_helpers import is_entrance_exams_enabled
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
 
-UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
-ENROLL_STATUS_CHANGE = Signal(providing_args=["event", "user", "course_id", "mode", "cost", "currency"])
-REFUND_ORDER = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
@@ -1028,9 +1024,6 @@ class CourseEnrollment(models.Model):
 
     objects = CourseEnrollmentManager()
 
-    # Maintain a history of requirement status updates for auditing purposes
-    history = HistoricalRecords()
-
     # cache key format e.g enrollment.<username>.<course_key>.mode = 'honor'
     COURSE_ENROLLMENT_CACHE_KEY = u"enrollment.{}.{}.mode"  # TODO Can this be removed?  It doesn't seem to be used.
 
@@ -1191,6 +1184,7 @@ class CourseEnrollment(models.Model):
             # Only emit mode change events when the user's enrollment
             # mode has changed from its previous setting
             self.emit_event(EVENT_NAME_ENROLLMENT_MODE_CHANGED)
+            ENROLLMENT_TRACK_UPDATED.send(sender=None, user=self.user, course_key=self.course_id)
 
     def send_signal(self, event, cost=None, currency=None):
         """
@@ -1696,16 +1690,13 @@ class CourseEnrollment(models.Model):
     def verified_mode(self):
         return CourseMode.verified_mode_for_course(self.course_id)
 
-    @property
+    @cached_property
     def upgrade_deadline(self):
         """
         Returns the upgrade deadline for this enrollment, if it is upgradeable.
-
         If the seat cannot be upgraded, None is returned.
-
         Note:
             When loading this model, use `select_related` to retrieve the associated schedule object.
-
         Returns:
             datetime|None
         """
@@ -1717,35 +1708,79 @@ class CourseEnrollment(models.Model):
             )
             return None
 
+        if self.dynamic_upgrade_deadline is not None:
+            # When course modes expire they aren't found any more and None would be returned.
+            # Replicate that behavior here by returning None if the personalized deadline is in the past.
+            if datetime.now(UTC) >= self.dynamic_upgrade_deadline:
+                return None
+            return self.dynamic_upgrade_deadline
+
+        return self.course_upgrade_deadline
+
+    @cached_property
+    def dynamic_upgrade_deadline(self):
+        """
+        Returns the learner's personalized upgrade deadline if one exists, otherwise it returns None.
+
+        Note that this will return a value even if the deadline is in the past. This property can be used
+        to modify behavior for users with personalized deadlines by checking if it's None or not.
+
+        Returns:
+            datetime|None
+        """
         try:
-            schedule_driven_deadlines_enabled = (
-                DynamicUpgradeDeadlineConfiguration.is_enabled()
-                or CourseDynamicUpgradeDeadlineConfiguration.is_enabled(self.course_id)
+            course_overview = self.course
+        except CourseOverview.DoesNotExist:
+            course_overview = self.course_overview
+
+        if not course_overview.self_paced:
+            return None
+
+        if not DynamicUpgradeDeadlineConfiguration.is_enabled():
+            return None
+
+        course_config = CourseDynamicUpgradeDeadlineConfiguration.current(self.course_id)
+        if course_config.enabled and course_config.opt_out:
+            return None
+
+        try:
+            if not self.schedule:
+                return None
+
+            log.debug(
+                'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
+                self.id, self.schedule.id
             )
-            if schedule_driven_deadlines_enabled and self.schedule and self.schedule.upgrade_deadline is not None:
-                log.debug(
-                    'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
-                    self.id, self.schedule.id
-                )
-                return self.schedule.upgrade_deadline
+            upgrade_deadline = self.schedule.upgrade_deadline
         except ObjectDoesNotExist:
             # NOTE: Schedule has a one-to-one mapping with CourseEnrollment. If no schedule is associated
             # with this enrollment, Django will raise an exception rather than return None.
             log.debug('Schedules: No schedule exists for CourseEnrollment %d.', self.id)
-            pass
+            return None
 
+        return upgrade_deadline
+
+    @cached_property
+    def course_upgrade_deadline(self):
+        """
+        Returns the expiration datetime for the verified course mode.
+
+        If the mode is already expired, return None. Also return None if the course does not have a verified
+        course mode.
+
+        Returns:
+            datetime|None
+        """
         try:
             if self.verified_mode:
                 log.debug('Schedules: Defaulting to verified mode expiration date-time for %s.', self.course_id)
                 return self.verified_mode.expiration_datetime
             else:
                 log.debug('Schedules: No verified mode located for %s.', self.course_id)
+                return None
         except CourseMode.DoesNotExist:
             log.debug('Schedules: %s has no verified mode.', self.course_id)
-            pass
-
-        log.debug('Schedules: Returning default of `None`')
-        return None
+            return None
 
     def is_verified_enrollment(self):
         """

@@ -101,7 +101,7 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
         )
         self.course_grade = MagicMock()
         self.course_grade_mock = self.setup_patch(
-            'lti_provider.tasks.CourseGradeFactory.create', self.course_grade
+            'lti_provider.tasks.CourseGradeFactory.read', self.course_grade
         )
         self.module_store = MagicMock()
         self.module_store.get_item = MagicMock(return_value=self.descriptor)

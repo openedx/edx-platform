@@ -343,7 +343,6 @@ class BokChoyTestSuite(TestSuite):
             "-m",
             "pytest",
             test_spec,
-            "--durations=20",
         ] + self.verbosity_processes_command
         if self.extra_args:
             cmd.append(self.extra_args)

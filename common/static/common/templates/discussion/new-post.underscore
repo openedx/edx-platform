@@ -2,7 +2,7 @@
     <h<%- startHeader %> class="thread-title"><%- gettext("Add a Post") %></h<%- startHeader %>>
 
     <% if (mode === 'inline') { %>
-        <button class="btn-default add-post-cancel">
+        <button class="btn btn-outline-primary btn-default add-post-cancel">
             <span class="sr"><%- gettext('Cancel') %></span>
             <span class="fa fa-close" aria-hidden="true"></span>
         </button>
@@ -30,6 +30,7 @@
         </label>
     </div>
     <% } %>
+    <div class="post-field group-visibility" id="wrapper-visibility-message"></div>
     <div class="post-field">
         <label class="field-label">
             <span class="field-label-text"><%- gettext("Title") %></span>
@@ -67,7 +68,7 @@
         <% } %>
     </div>
     <div>
-        <button type="submit" class="btn-brand submit"><%- gettext('Submit') %></button>
-        <button type="button" class="btn cancel"><%- gettext('Cancel') %></button>
+        <button type="submit" class="btn btn-primary submit"><%- gettext('Submit') %></button>
+        <button type="button" class="btn btn-outline-primary cancel"><%- gettext('Cancel') %></button>
     </div>
 </form>

@@ -17,10 +17,13 @@ from mock import patch
 from pyquery import PyQuery as pq
 from opaque_keys import InvalidKeyError
 
+from milestones.tests.utils import MilestonesTestCaseMixin
 from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
-from student.models import CourseEnrollment, REFUND_ORDER, UserProfile
+from student.models import CourseEnrollment, UserProfile
+from student.signals import REFUND_ORDER
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from util.milestones_helpers import set_prerequisite_courses, remove_prerequisite_course, get_course_milestones
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -46,26 +49,26 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         super(TestStudentDashboardUnenrollments, self).setUp()
         self.user = UserFactory()
         self.enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
-        self.cert_status = None
+        self.cert_status = 'processing'
         self.client.login(username=self.user.username, password=PASSWORD)
 
     def mock_cert(self, _user, _course_overview, _course_mode):
         """ Return a preset certificate status. """
-        if self.cert_status is not None:
-            return {
-                'status': self.cert_status,
-                'can_unenroll': self.cert_status not in DISABLE_UNENROLL_CERT_STATES
-            }
-        else:
-            return {}
+        return {
+            'status': self.cert_status,
+            'can_unenroll': self.cert_status not in DISABLE_UNENROLL_CERT_STATES,
+            'download_url': 'fake_url',
+            'linked_in_url': False,
+            'grade': 100,
+            'show_survey_button': False
+        }
 
     @ddt.data(
         ('notpassing', 1),
         ('restricted', 1),
         ('processing', 1),
-        (None, 1),
         ('generating', 0),
-        ('ready', 0),
+        ('downloadable', 0),
     )
     @ddt.unpack
     def test_unenroll_available(self, cert_status, unenroll_action_count):
@@ -81,9 +84,8 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         ('notpassing', 200),
         ('restricted', 200),
         ('processing', 200),
-        (None, 200),
         ('generating', 400),
-        ('ready', 400),
+        ('downloadable', 400),
     )
     @ddt.unpack
     @patch.object(CourseEnrollment, 'unenroll')
@@ -106,16 +108,9 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
                 else:
                     course_enrollment.assert_not_called()
 
-    def test_no_cert_status(self):
-        """ Assert that the dashboard loads when cert_status is None."""
-        with patch('student.views.cert_info', return_value=None):
-            response = self.client.get(reverse('dashboard'))
-
-            self.assertEqual(response.status_code, 200)
-
     def test_cant_unenroll_status(self):
         """ Assert that the dashboard loads when cert_status does not allow for unenrollment"""
-        with patch('certificates.models.certificate_status_for_student', return_value={'status': 'ready'}):
+        with patch('certificates.models.certificate_status_for_student', return_value={'status': 'downloadable'}):
             response = self.client.get(reverse('dashboard'))
 
             self.assertEqual(response.status_code, 200)
@@ -232,7 +227,7 @@ class LogoutTests(TestCase):
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class StudentDashboardTests(SharedModuleStoreTestCase):
+class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Tests for the student dashboard.
     """
@@ -316,3 +311,27 @@ class StudentDashboardTests(SharedModuleStoreTestCase):
         response = self.client.get(reverse('dashboard'))
         self.assertEqual('Share on Twitter' in response.content, set_marketing or set_social_sharing)
         self.assertEqual('Share on Facebook' in response.content, set_marketing or set_social_sharing)
+
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    def test_pre_requisites_appear_on_dashboard(self):
+        """
+        When a course has a prerequisite, the dashboard should display the prerequisite.
+        If we remove the prerequisite and access the dashboard again, the prerequisite
+        should not appear.
+        """
+        self.pre_requisite_course = CourseFactory.create(org='edx', number='999', display_name='Pre requisite Course')
+        self.course = CourseFactory.create(
+            org='edx',
+            number='998',
+            display_name='Test Course',
+            pre_requisite_courses=[unicode(self.pre_requisite_course.id)]
+        )
+        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
+
+        set_prerequisite_courses(self.course.id, [unicode(self.pre_requisite_course.id)])
+        response = self.client.get(reverse('dashboard'))
+        self.assertIn('<div class="prerequisites">', response.content)
+
+        remove_prerequisite_course(self.course.id, get_course_milestones(self.course.id)[0])
+        response = self.client.get(reverse('dashboard'))
+        self.assertNotIn('<div class="prerequisites">', response.content)

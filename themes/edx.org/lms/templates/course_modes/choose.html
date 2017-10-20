@@ -7,6 +7,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
+<%namespace name='static' file='/static_content.html'/>
 <%block name="bodyclass">register verification-process step-select-track</%block>
 <%block name="pagetitle">
     ${_("Enroll In {course_name} | Choose Your Track").format(course_name=course_name)}
@@ -56,6 +57,9 @@ from openedx.core.djangolib.markup import HTML, Text
         });
     </script>
 </%block>
+<%static:webpack entry="Currency">
+    new Currency();
+</%static:webpack>
 
 <%block name="content">
     % if error:
@@ -72,6 +76,7 @@ from openedx.core.djangolib.markup import HTML, Text
         </div>
     %endif
 
+    <div id="currency_data" value="${currency_data}"></div>
     <div class="container">
         <section class="wrapper">
             <div class="wrapper-register-choose wrapper-content-main">

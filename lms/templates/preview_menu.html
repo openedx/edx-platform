@@ -27,7 +27,7 @@ show_preview_menu = course and staff_access and supports_preview_menu
     student_selected = selected(not staff_selected and not specific_student_selected and not masquerade_group_id)
     %>
     <nav class="wrapper-preview-menu" aria-label="${_('Course View')}">
-        <div class="preview-menu">
+        <div class="preview-menu container">
             <ol class="preview-actions">
                 <li class="action-preview">
                     <form action="#" class="action-preview-form" method="post">
@@ -50,7 +50,7 @@ show_preview_menu = course and staff_access and supports_preview_menu
                           <label for="action-preview-username" class="action-preview-label">${_("Username or email:")}</label>
                           <input type="text" class="action-preview-username" id="action-preview-username">
                         </div>
-                        <button type="submit" class="sr" name="submit" value="submit">${_("Set preview mode")}</button>
+                        <button type="submit" class="sr-only" name="submit" value="submit">${_("Set preview mode")}</button>
                     </form>
                 </li>
             </ol>

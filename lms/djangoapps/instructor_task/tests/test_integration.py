@@ -20,7 +20,7 @@ from nose.plugins.attrib import attr
 from capa.responsetypes import StudentInputError
 from capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory
 from courseware.model_data import StudentModule
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor_task.api import (
     submit_delete_problem_state_for_all_students,
     submit_rescore_problem_for_all_students,
@@ -131,7 +131,7 @@ class TestRescoringTask(TestIntegrationTask):
         # are in sync.
         expected_subsection_grade = expected_score
 
-        course_grade = CourseGradeFactory().create(user, self.course)
+        course_grade = CourseGradeFactory().read(user, self.course)
         self.assertEquals(
             course_grade.graded_subsections_by_format['Homework'][self.problem_section.location].graded_total.earned,
             expected_subsection_grade,
@@ -679,7 +679,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
                     {
                         self.student_b: {
                             u'Grade': '0.0',
-                            u'Homework': u'Not Available',
+                            u'Homework': u'Not Attempted',
                         }
                     },
                 ],

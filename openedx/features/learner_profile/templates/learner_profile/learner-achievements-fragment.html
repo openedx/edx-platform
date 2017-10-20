@@ -71,12 +71,14 @@ from openedx.core.djangolib.markup import HTML, Text
         % elif own_profile:
             <div class="learner-message">
                 <h4 class="message-header">${_("You haven't earned any certificates yet.")}</h4>
-                <p class="message-actions">
-                    <a class="btn btn-brand" href="${marketing_link('COURSES')}">
-                        <span class="icon fa fa-search" aria-hidden="true"></span>
-                        ${_('Explore New Courses')}
-                    </a>
-                </p>
+                % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+                    <p class="message-actions">
+                        <a class="btn btn-brand" href="${marketing_link('COURSES')}">
+                            <span class="icon fa fa-search" aria-hidden="true"></span>
+                            ${_('Explore New Courses')}
+                        </a>
+                    </p>
+                % endif
             </div>
         % endif
     % endif
@@ -85,4 +87,3 @@ from openedx.core.djangolib.markup import HTML, Text
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
     DateUtilFactory.transform('.localized-datetime');
 </%static:require_module_async>
-

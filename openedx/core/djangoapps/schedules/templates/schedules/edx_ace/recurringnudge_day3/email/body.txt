@@ -1,6 +1,6 @@
 {% load i18n %}
 
-{% if courses|length > 1 %}
+{% if course_ids|length > 1 %}
 {% blocktrans trimmed %}
     Remember when you enrolled in {{ course_name }}, and other courses on edX.org? We do, and we’re glad
     to have you! Come see what everyone is learning.
@@ -14,4 +14,13 @@
 {% endblocktrans %}
 
 {% trans "Start learning now" %} <{{ course_url }}>
+{% endif %}
+
+{% if show_upsell %}
+{% blocktrans trimmed %}
+    Don't miss the opportunity to highlight your new knowledge and skills by earning a verified
+    certificate. Upgrade by {{ user_schedule_upgrade_deadline_time }}.
+
+    Upgrade Now! <{{ upsell_link }}>
+{% endblocktrans %}
 {% endif %}

@@ -229,7 +229,7 @@ LANGUAGE_DICT = dict(LANGUAGES)
 
 # Additional installed apps
 for app in ADDL_INSTALLED_APPS:
-    INSTALLED_APPS += (app,)
+    INSTALLED_APPS.append(app)
 
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=LOGGING_ENV,
@@ -247,12 +247,15 @@ for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
 
 
 if FEATURES.get('AUTH_USE_CAS'):
-    AUTHENTICATION_BACKENDS = (
+    AUTHENTICATION_BACKENDS = [
         'django.contrib.auth.backends.ModelBackend',
         'django_cas.backends.CASBackend',
-    )
-    INSTALLED_APPS += ('django_cas',)
-    MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
+    ]
+
+    INSTALLED_APPS.append('django_cas')
+
+    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
+
     if CAS_ATTRIBUTE_CALLBACK:
         import importlib
         CAS_USER_DETAILS_RESOLVER = getattr(
@@ -302,7 +305,7 @@ GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
 ##### Custom Courses for EdX #####
 if FEATURES.get('CUSTOM_COURSES_EDX'):
-    INSTALLED_APPS += ('lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon')
+    INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon']
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
         'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',
     )
@@ -315,9 +318,14 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
 
 ##################### LTI Provider #####################
 if FEATURES.get('ENABLE_LTI_PROVIDER'):
-    INSTALLED_APPS += ('lti_provider',)
-    AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend', )
+    INSTALLED_APPS.append('lti_provider')
+    AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
 
 ################################ Settings for Credentials Service ################################
 
 CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+
+########################## Extra middleware classes  #######################
+
+# Allow extra middleware classes to be added to the app through configuration.
+MIDDLEWARE_CLASSES.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))

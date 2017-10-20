@@ -43,12 +43,12 @@
         }
       }
 
-      li:not(:first-child) a:before {
+      li:not(:first-child) a::before {
         content: "- ";
       }
     }
 
-    footer-language-selector {
+    .footer-language-selector {
       margin: $baseline 0;
     }
 

@@ -4,7 +4,7 @@ import json
 
 from django.core.urlresolvers import reverse
 from django.test.client import Client
-from django.utils import unittest
+import unittest
 
 
 class CeleryConfigTest(unittest.TestCase):

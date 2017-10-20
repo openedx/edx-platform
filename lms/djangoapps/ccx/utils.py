@@ -265,12 +265,6 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
     return errors
 
 
-def prep_course_for_grading(course, request):
-    """Set up course module for overrides to function properly"""
-    course._field_data_cache = {}  # pylint: disable=protected-access
-    course.set_grading_policy(course.grading_policy)
-
-
 @contextmanager
 def ccx_course(ccx_locator):
     """Create a context in which the course identified by course_locator exists

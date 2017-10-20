@@ -67,18 +67,22 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': TEST_ROOT / "db" / "test_edx.db",
-        'TEST_NAME': TEST_ROOT / "db" / "test_edx.db",
         'OPTIONS': {
             'timeout': 30,
         },
         'ATOMIC_REQUESTS': True,
+        'TEST': {
+            'NAME': TEST_ROOT / "db" / "test_edx.db",
+        },
     },
     'student_module_history': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': TEST_ROOT / "db" / "test_student_module_history.db",
-        'TEST_NAME': TEST_ROOT / "db" / "test_student_module_history.db",
         'OPTIONS': {
             'timeout': 30,
+        },
+        'TEST': {
+            'NAME': TEST_ROOT / "db" / "test_student_module_history.db",
         },
     }
 }
@@ -142,7 +146,7 @@ USE_I18N = True
 FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = False
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
-INSTALLED_APPS += ('lettuce.django',)
+INSTALLED_APPS.append('lettuce.django')
 LETTUCE_APPS = ('courseware', 'instructor')
 
 # Lettuce appears to have a bug that causes it to search

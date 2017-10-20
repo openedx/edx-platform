@@ -11,7 +11,7 @@ body { margin: 0; font-size: 1em; line-height: 1.4; }
 
 a { color: #005584; } // from the Pattern Library http://ux.edx.org/elements/colors/
 a:visited { color: #003655; } // from the Pattern Library http://ux.edx.org/elements/colors/
-a:hover, a:focus { color: #0079BC; } // from the Pattern Library http://ux.edx.org/elements/colors/
+a:hover, a:focus { color: #0079bc; } // from the Pattern Library http://ux.edx.org/elements/colors/
 abbr[title] { border-bottom: 1px dotted; }
 b, strong { font-weight: bold; }
 blockquote { margin: 1em 40px; }
@@ -23,7 +23,7 @@ pre, code, kbd, samp { font-family: monospace, serif; _font-family: 'courier new
 pre { white-space: pre; white-space: pre-wrap; word-wrap: break-word; }
 
 q { quotes: none; }
-q:before, q:after { content: ""; content: none; }
+q::before, q::after { content: ""; content: none; }
 small { font-size: 85%; }
 sub, sup { font-size: 75%; line-height: 0; position: relative; vertical-align: baseline; }
 sup { top: -0.5em; }
@@ -78,20 +78,21 @@ td { vertical-align: top; }
 .visuallyhidden { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
 .visuallyhidden.focusable:active, .visuallyhidden.focusable:focus { clip: auto; height: auto; margin: 0; overflow: visible; position: static; width: auto; }
 .invisible { visibility: hidden; }
-.clearfix:before, .clearfix:after { content: ""; display: table; }
-.clearfix:after { clear: both; }
+.clearfix::before, .clearfix::after { content: ""; display: table; }
+.clearfix::after { clear: both; }
 .clearfix { *zoom: 1; }
 
 @media print {
   * { background: transparent; color: black !important; box-shadow:none !important; text-shadow: none !important; filter:none !important; -ms-filter: none !important; }
   html, body { background: transparent !important; }
   a, a:visited { text-decoration: underline; }
-  abbr[title]:after { content: " (" attr(title) ")"; }
-  .ir a:after { content: ""; }
+  abbr[title]::after { content: " (" attr(title) ")"; }
+  .ir a::after { content: ""; }
   pre, blockquote { border: 1px solid #999; page-break-inside: avoid; }
   thead { display: table-header-group; }
   tr, img { page-break-inside: avoid; }
   img { max-width: 100% !important; }
+
   @page { margin: 1cm 1.2cm 2cm; }
   p, h2, h3 { orphans: 3; widows: 3; }
   h2, h3 { page-break-after: avoid; }

@@ -1,0 +1,3 @@
+{% load i18n %}
+
+{% blocktrans %}Upgrade to earn a verified certificate in {{ course_name }}{% endblocktrans %}

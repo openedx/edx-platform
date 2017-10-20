@@ -81,6 +81,11 @@ class StdImageFactory(ImageFactoryBase):
     url = factory.Faker('image_url')
 
 
+class VideoFactory(DictFactoryBase):
+    src = factory.Faker('url')
+    description = factory.Faker('sentence')
+
+
 def generate_sized_stdimage():
     return {
         size: StdImageFactory() for size in ['large', 'medium', 'small', 'x-small']
@@ -118,8 +123,9 @@ class CourseRunFactory(DictFactoryBase):
     title = factory.Faker('catch_phrase')
     type = 'verified'
     uuid = factory.Faker('uuid4')
-    language = 'en'
-    max_effort = 5
+    content_language = 'en'
+    max_effort = 4
+    weeks_to_complete = 10
 
 
 class CourseFactory(DictFactoryBase):
@@ -144,7 +150,7 @@ class PersonFactory(DictFactoryBase):
 
 
 class EndorserFactory(DictFactoryBase):
-    person = PersonFactory()
+    endorser = PersonFactory()
     quote = factory.Faker('sentence')
 
 
@@ -157,16 +163,22 @@ class FAQFactory(DictFactoryBase):
     question = factory.Faker('sentence')
 
 
+class CorporateEndorsementFactory(DictFactoryBase):
+    corporation_name = factory.Faker('company')
+    image = ImageFactory()
+    individual_endorsements = factory.LazyFunction(partial(generate_instances, EndorserFactory))
+
+
 class ProgramFactory(DictFactoryBase):
     authoring_organizations = factory.LazyFunction(partial(generate_instances, OrganizationFactory, count=1))
     applicable_seat_types = []
     banner_image = factory.LazyFunction(generate_sized_stdimage)
     card_image_url = factory.Faker('image_url')
+    corporate_endorsements = factory.LazyFunction(partial(generate_instances, CorporateEndorsementFactory))
     courses = factory.LazyFunction(partial(generate_instances, CourseFactory))
     expected_learning_items = factory.LazyFunction(partial(generate_instances, CourseFactory))
     faq = factory.LazyFunction(partial(generate_instances, FAQFactory))
     hidden = False
-    individual_endorsements = factory.LazyFunction(partial(generate_instances, EndorserFactory))
     is_program_eligible_for_one_click_purchase = True
     job_outlook_items = factory.LazyFunction(partial(generate_instances, JobOutlookItemFactory))
     marketing_slug = factory.Faker('slug')
@@ -181,6 +193,7 @@ class ProgramFactory(DictFactoryBase):
     title = factory.Faker('catch_phrase')
     type = factory.Faker('word')
     uuid = factory.Faker('uuid4')
+    video = VideoFactory()
     weeks_to_complete = fake.random_int(1, 45)
 
 

@@ -5,14 +5,14 @@ xModule implementation of a learning sequence
 # pylint: disable=abstract-method
 import collections
 from datetime import datetime
-from django.utils.timezone import UTC
 import json
 import logging
 from pkg_resources import resource_string
+from pytz import UTC
 
 from lxml import etree
 from xblock.core import XBlock
-from xblock.fields import Integer, Scope, Boolean, String
+from xblock.fields import Integer, Scope, Boolean, String, List
 from xblock.fragment import Fragment
 
 from .exceptions import NotFoundError
@@ -215,7 +215,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         return (
             not date or
             not hide_after_date or
-            datetime.now(UTC()) < date
+            datetime.now(UTC) < date
         )
 
     def student_view(self, context):
@@ -583,3 +583,20 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
         xblock_body["content_type"] = "Sequence"
 
         return xblock_body
+
+
+class HighlightsFields(object):
+    """Only Sections have summaries now, but we may expand that later."""
+    highlights = List(
+        help=_("A list summarizing what students should look forward to in this section."),
+        scope=Scope.settings
+    )
+
+
+class SectionModule(HighlightsFields, SequenceModule):
+    """Module for a Section/Chapter."""
+
+
+class SectionDescriptor(HighlightsFields, SequenceDescriptor):
+    """Descriptor for a Section/Chapter."""
+    module_class = SectionModule

@@ -135,7 +135,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.iter')
+    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.iter')
     def test_grading_failure(self, mock_grades_iter, _mock_current_task):
         """
         Test that any grading errors are properly reported in the
@@ -312,7 +312,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         )
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.iter')
+    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.iter')
     def test_unicode_in_csv_header(self, mock_grades_iter, _mock_current_task):
         """
         Tests that CSV grade report works if unicode in headers.
@@ -395,7 +395,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
         RequestCache.clear_request_cache()
 
-        expected_query_count = 41
+        expected_query_count = 36
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with check_mongo_calls(mongo_count):
                 with self.assertNumQueries(expected_query_count):
@@ -762,7 +762,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.iter')
+    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.iter')
     @ddt.data(u'Cannot grade student', '')
     def test_grading_failure(self, error_message, mock_grades_iter, _mock_current_task):
         """
@@ -1707,6 +1707,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         )
 
 
+@ddt.ddt
 @patch('lms.djangoapps.instructor_task.tasks_helper.misc.DefaultStorage', new=MockDefaultStorage)
 class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
@@ -1769,6 +1770,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
+
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0},
                 result,
@@ -1781,14 +1783,25 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                         u'Username': self.student.username,
                         u'Grade': '0.13',
                         u'Homework 1: Subsection': '0.5',
-                        u'Homework 2: Hidden': u'Not Available',
+                        u'Homework 2: Hidden': u'Not Attempted',
                         u'Homework 3: Unattempted': u'Not Attempted',
-                        u'Homework 4: Empty': u'Not Available',
+                        u'Homework 4: Empty': u'Not Attempted',
                         u'Homework (Avg)': '0.125',
                     },
                 ],
                 ignore_other_columns=True,
             )
+
+    @ddt.data(True, False)
+    def test_fast_generation(self, create_non_zero_grade):
+        if create_non_zero_grade:
+            self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
+        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
+            with patch('lms.djangoapps.grades.course_data.get_course_blocks') as mock_course_blocks:
+                with patch('lms.djangoapps.grades.subsection_grade.get_score') as mock_get_score:
+                    CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
+                    self.assertFalse(mock_get_score.called)
+                    self.assertFalse(mock_course_blocks.called)
 
 
 @ddt.ddt
@@ -1976,7 +1989,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 3,
             'skipped': 2
         }
-        with self.assertNumQueries(176):
+        with self.assertNumQueries(106):
             self.assertCertificatesGenerated(task_input, expected_results)
 
         expected_results = {
