@@ -41,20 +41,20 @@ class UpdateCommunityProfile(APIView):
         try:
             first_name = data.get('first_name', extended_profile.first_name)
             last_name = data.get('last_name', extended_profile.last_name)
-            bio = data.get('bio', user.profile.bio)
+            about_me = data.get('aboutme', user.profile.bio)
 
-            city = data.get('city', user_info_survey.city_of_residence)
-            country = data.get('country', user_info_survey.country_of_residence)
-            dob = data.get('dob', user_info_survey.dob)
+            city_of_residence = data.get('city_of_residence', user_info_survey.city_of_residence)
+            country_of_residence = data.get('country_of_residence', user_info_survey.country_of_residence)
+            birthday = data.get('birthday', user_info_survey.dob)
 
             extended_profile.first_name = first_name
             extended_profile.last_name = last_name
-            user.profile.bio = bio
+            user.profile.bio = about_me
 
-            user_info_survey.city_of_residence = city
-            user_info_survey.country_of_residence = country
+            user_info_survey.city_of_residence = city_of_residence
+            user_info_survey.country_of_residence = country_of_residence
 
-            user_info_survey.dob = dob
+            user_info_survey.dob = birthday
 
             extended_profile.save()
             user_info_survey.save()
