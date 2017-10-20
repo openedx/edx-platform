@@ -6,6 +6,7 @@ from functools import wraps
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
@@ -16,6 +17,7 @@ from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerErr
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.token_utils import JwtBuilder
+from openedx.features.enterprise_support.utils import get_cache_key
 from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
 
@@ -187,9 +189,6 @@ class EnterpriseApiClient(object):
                                 },
                                 "enable_data_sharing_consent": true,
                                 "enforce_data_sharing_consent": "at_login",
-                                "enterprise_customer_users": [
-                                    1
-                                ],
                                 "branding_configuration": {
                                     "enterprise_customer": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
                                     "logo": "https://open.edx.org/sites/all/themes/edx_open/logo.png"
@@ -213,7 +212,7 @@ class EnterpriseApiClient(object):
                             },
                             "data_sharing_consent_records": [
                                 {
-                                    "username": "myself",
+                                    "username": "staff",
                                     "enterprise_customer_uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
                                     "exists": true,
                                     "course_id": "course-v1:edX DemoX Demo_Course",
@@ -261,7 +260,25 @@ class EnterpriseApiServiceClient(EnterpriseServiceClientMixin, EnterpriseApiClie
     """
     Class for producing an Enterprise service API client with service user.
     """
-    pass
+
+    def get_enterprise_customer(self, uuid):
+        """
+        Fetch enterprise customer with enterprise service user and cache the
+        API response`.
+        """
+        cache_key = get_cache_key(
+            resource='enterprise-customer',
+            resource_id=uuid,
+            username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
+        )
+        enterprise_customer = cache.get(cache_key)
+        if not enterprise_customer:
+            endpoint = getattr(self.client, 'enterprise-customer')
+            enterprise_customer = endpoint(uuid).get()
+            if enterprise_customer:
+                cache.set(cache_key, enterprise_customer, settings.ENTERPRISE_API_CACHE_TIMEOUT)
+
+        return enterprise_customer
 
 
 def data_sharing_consent_required(view_func):
@@ -308,18 +325,15 @@ def enterprise_enabled():
     return 'enterprise' in settings.INSTALLED_APPS and getattr(settings, 'ENABLE_ENTERPRISE_INTEGRATION', True)
 
 
-def enterprise_customer_for_request(request):
+def enterprise_customer_uuid_for_request(request):
     """
-    Check all the context clues of the request to determine if
-    the request being made is tied to a particular EnterpriseCustomer.
+    Check all the context clues of the request to gather a particular EnterpriseCustomer's UUID.
     """
-
     if not enterprise_enabled():
         return None
 
-    enterprise_customer = None
+    enterprise_customer_uuid = None
     sso_provider_id = request.GET.get('tpa_hint')
-
     running_pipeline = get_partial_pipeline(request)
     if running_pipeline:
         # Determine if the user is in the middle of a third-party auth pipeline,
@@ -338,9 +352,7 @@ def enterprise_customer_for_request(request):
                 enterprise_customer_identity_provider__provider_id=sso_provider_id
             ).uuid
         except EnterpriseCustomer.DoesNotExist:
-            # If there is not an EnterpriseCustomer linked to this SSO provider, set
-            # the UUID variable to be null.
-            enterprise_customer_uuid = None
+            pass
     else:
         # Check if we got an Enterprise UUID passed directly as either a query
         # parameter, or as a value in the Enterprise cookie.
@@ -354,14 +366,27 @@ def enterprise_customer_for_request(request):
         learner_data = get_enterprise_learner_data(request.site, request.user)
         if learner_data:
             enterprise_customer_uuid = learner_data[0]['enterprise_customer']['uuid']
+
+    return enterprise_customer_uuid
+
+
+def enterprise_customer_for_request(request):
+    """
+    Check all the context clues of the request to determine if
+    the request being made is tied to a particular EnterpriseCustomer.
+    """
+    enterprise_customer = None
+    enterprise_customer_uuid = enterprise_customer_uuid_for_request(request)
     if enterprise_customer_uuid:
         # If we were able to obtain an EnterpriseCustomer UUID, go ahead
         # and use it to attempt to retrieve EnterpriseCustomer details
         # from the EnterpriseCustomer API.
+        enterprise_api_client = EnterpriseApiServiceClient()
+        if request.user.is_authenticated():
+            enterprise_api_client = EnterpriseApiClient(user=request.user)
+
         try:
-            enterprise_customer = EnterpriseApiClient(user=request.user).get_enterprise_customer(
-                enterprise_customer_uuid
-            )
+            enterprise_customer = enterprise_api_client.get_enterprise_customer(enterprise_customer_uuid)
         except HttpNotFoundError:
             enterprise_customer = None
 
@@ -418,8 +443,7 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None, en
     if not enterprise_enabled():
         return ''
 
-    if user is None:
-        user = request.user
+    user = user or request.user
 
     if not consent_needed_for_course(request, user, course_id, enrollment_exists=enrollment_exists):
         return None
@@ -430,6 +454,7 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None, en
         return_path = reverse(return_to, args=(course_id,))
 
     url_params = {
+        'enterprise_customer_uuid': enterprise_customer_uuid_for_request(request),
         'course_id': course_id,
         'next': request.build_absolute_uri(return_path),
         'failure_url': request.build_absolute_uri(
@@ -516,6 +541,7 @@ def get_dashboard_consent_notification(request, user, course_enrollments):
             {
                 'title': title,
                 'message': message,
+                'course_name': enrollment.course_overview.display_name,
             }
         )
     return ''

@@ -5,389 +5,394 @@
 
 // --------------------
 // LEARNER-1726 Track Selection V3
+
 /* This css was added as part of the LEARNER-1726 experiment */
 .v2.register-choice {
-    margin: 0 2% 20px 0 !important
+  margin: 0 2% 20px 0 !important
 }
 
 .v2.register-choice-certificate .list-actions {
-    text-align: left !important;
+  text-align: left !important;
 }
 
 .v2.register-choice-continue .list-actions {
-    margin-bottom: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .v2.register-choice-continue .action-select {
-    display: inline-block !important;
-    list-style-type: none !important;
-    width: 100% !important;
+  display: inline-block !important;
+  list-style-type: none !important;
+  width: 100% !important;
 }
 
 .v2.register-choice-continue .continue-link {
-    display: inline-block !important;
-    padding: 10px 15px !important;
-    border-radius: 3px !important;
-    border: 1px solid #D7548E !important;
-    box-shadow: 0 2px 1px 0 #982c62 !important;
-    background: white !important;
-    text-align: center !important;
-    color: #D7548E !important;
-    float: left !important;
-    font-size: 15px;
-    font-weight: 500 !important;
+  display: inline-block !important;
+  padding: 10px 15px !important;
+  border-radius: 3px !important;
+  border: 1px solid #d7548e !important;
+  box-shadow: 0 2px 1px 0 #982c62 !important;
+  background: white !important;
+  text-align: center !important;
+  color: #d7548e !important;
+  float: left !important;
+  font-size: 15px;
+  font-weight: 500 !important;
 }
 
 .v2.register-choice-v2-donate {
-    height: 300px;
-    background: none !important;
-    border-top-color: grey !important;
-    border-top-width: 1px !important;
+  height: 300px;
+  background: none !important;
+  border-top-color: grey !important;
+  border-top-width: 1px !important;
 }
 
 @media screen and (min-width: 375px) {
-    .v2.register-choice-v2-donate {
-        height: 250px;
-    }
+  .v2.register-choice-v2-donate {
+    height: 250px;
+  }
 }
 
 .v2.register-choice-v2-donate .list-actions {
-    margin-bottom: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .v2.register-choice-v2-donate .list-actions a {
-    background: transparent !important;
-    color: #0075b4 !important;
-    box-shadow: none !important;
-    text-decoration: underline !important;
-    border: none !important;
-    white-space: normal;
+  background: transparent !important;
+  color: #0075b4 !important;
+  box-shadow: none !important;
+  text-decoration: underline !important;
+  border: none !important;
+  white-space: normal;
 }
 
 .v2.register-choice-v2-donate .wrapper-copy-inline {
-    height: 70px !important;
-    width: 100% !important;
-    display: flex !important;
+  height: 70px !important;
+  width: 100% !important;
+  display: flex !important;
 }
 
 .v2.register-choice-v2-donate .wrapper-copy {
-    width: 70% !important;
-    height: auto !important;
+  width: 70% !important;
+  height: auto !important;
 }
 
 .v2.page-header {
-    padding: 0;
+  padding: 0;
 }
 
 .v2 img {
-    margin-top: 20px;
-    margin-left: 5px;
+  margin-top: 20px;
+  margin-left: 5px;
 }
 
 .v2 .continue-link {
-    font-weight: bold !important;
+  font-weight: bold !important;
 }
 
 .v2.register-choice-certificate,
 .v2.register-choice-continue,
 .v2.register-choice-view {
-    width: 100%;
+  width: 100%;
 }
 
 .v2.register-choice-continue {
-    border-color: #D7548E !important;
+  border-color: #d7548e !important;
 }
 
 .v2 .wrapper-copy-inline {
-    max-height: 115px;
+  max-height: 115px;
 }
 
 .v2.register-choice-v2-donate .wrapper-copy-inline {
-    display: block !important;
+  display: block !important;
 }
 
 .v2.register-choice-v2-donate .copy-inline {
-    width: 100% !important;
+  width: 100% !important;
 }
 
 .v2.register-choice-v2-donate .list-actions {
-    width: 100% !important;
-    margin-top: 20px !important;
-    text-align: center !important;
+  width: 100% !important;
+  margin-top: 20px !important;
+  text-align: center !important;
 }
 
 .v2 .wrapper-copy-inline .wrapper-copy {
-    width: 100% !important;
+  width: 100% !important;
 }
 
 .v2 input, .v2 a {
-    font-size: 15px !important;
+  font-size: 15px !important;
 }
 
 .v2 button {
-    background-color: rgb(0, 103, 0);
-    border-color: rgb(0, 103, 0);
-    border-radius: 2px;
-    box-shadow: rgb(0, 77, 0) 0px 2px 1px 0px;
-    cursor: pointer;
-    font-family: "Open Sans";
-    height: auto;
-    margin-right: 4px;
-    margin-top: 0px;
-    padding: 10px 15px;
-    width: initial;
-    background-image: none !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
+  background-color: rgb(0, 103, 0);
+  border-color: rgb(0, 103, 0);
+  border-radius: 2px;
+  box-shadow: rgb(0, 77, 0) 0 2px 1px 0;
+  cursor: pointer;
+  font-family: "Open Sans";
+  height: auto;
+  margin-right: 4px;
+  margin-top: 0;
+  padding: 10px 15px;
+  width: initial;
+  background-image: none !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
 
-    &:hover, &:focus {
-        background-color: #009b00 !important;
-        border-color: #009b00;
-        box-shadow: #004d00 0px 2px 1px 0px;
-    }
+  &:hover, &:focus {
+    background-color: #009b00 !important;
+    border-color: #009b00;
+    box-shadow: #004d00 0 2px 1px 0;
+  }
 }
 
 .savings-message {
-    margin-top: 10px;
-    font-size: 11px;
+  margin-top: 10px;
+  font-size: 11px;
 }
+
 @media screen and (min-width: 375px) {
-    .savings-message {
-        font-size: 13px;
-        margin-left: 16px;
-    }
+  .savings-message {
+    font-size: 13px;
+    margin-left: 16px;
+  }
 }
 
 .v2 .continue-link, .v2 input, .v2 button, .v2 a {
-    width: 100%;
+  width: 100%;
 }
 
 .v2 img {
-    display: none;
+  display: none;
 }
 
 .v2 .deco-divider {
-    display: none;
+  display: none;
 }
 
 .v2 .visual-reference {
-    width: 38%;
+  width: 38%;
 }
 
 @media (min-width: 420px) {
-    .v2 button {
-        height: 45px;
-        font-size: 16px !important;
-    }
+  .v2 button {
+    height: 45px;
+    font-size: 16px !important;
+  }
 }
 
 @media (min-width: 768px) {
-    .v2.register-choice-certificate,
-    .v2.register-choice-continue,
-    .v2.deco-divider {
-        width: 46.5% !important;
-        display: inline-block;
-        min-height: 270px;
-    }
+  .v2.register-choice-certificate,
+  .v2.register-choice-continue,
+  .v2.deco-divider {
+    width: 46.5% !important;
+    display: inline-block;
+    min-height: 270px;
+  }
 
-    .v2.register-choice-v2-donate .wrapper-copy-inline {
-        display: flex !important;
-    }
+  .v2.register-choice-v2-donate .wrapper-copy-inline {
+    display: flex !important;
+  }
 
-    .v2.register-choice-v2-donate .copy-inline {
-        width: 40% !important;
-    }
+  .v2.register-choice-v2-donate .copy-inline {
+    width: 40% !important;
+  }
 
-    .v2.register-choice-v2-donate .list-actions {
-        margin-top: 0 !important;
-        text-align: right !important;
-    }
+  .v2.register-choice-v2-donate .list-actions {
+    margin-top: 0 !important;
+    text-align: right !important;
+  }
 
-    .v2 .wrapper-copy-inline .wrapper-copy {
-        width: 100% !important;
-    }
+  .v2 .wrapper-copy-inline .wrapper-copy {
+    width: 100% !important;
+  }
 
-    .v2 input, .v2 a {
-        font-size: 15px !important;
-    }
+  .v2 input, .v2 a {
+    font-size: 15px !important;
+  }
 
-    .v2 .continue-link, .v2.register-choice-certificate button, .v2.register-choice-certificate input {
-        margin-top: 20px;
-        width: initial;
-    }
+  .v2 .continue-link, .v2.register-choice-certificate button, .v2.register-choice-certificate input {
+    margin-top: 20px;
+    width: initial;
+  }
 
-    .v2.register-choice-v2-donate a {
-        width: 100% !important;
-    }
+  .v2.register-choice-v2-donate a {
+    width: 100% !important;
+  }
 
-    .v2.register-choice-view {
-        height: 250px;
-    }
+  .v2.register-choice-view {
+    height: 250px;
+  }
 
-    .v2 img {
-        display: initial;
-    }
+  .v2 img {
+    display: initial;
+  }
 
-    .v2.register-choice {
-        margin: 0 2% 20px 0;
-    }
+  .v2.register-choice {
+    margin: 0 2% 20px 0;
+  }
 
-    .v2.register-choice-continue .wrapper-copy-inline .wrapper-copy, .v2.register-choice-certificate .wrapper-copy-inline .wrapper-copy {
-        width: 60%;
-    }
+  .v2.register-choice-continue .wrapper-copy-inline .wrapper-copy, .v2.register-choice-certificate .wrapper-copy-inline .wrapper-copy {
+    width: 60%;
+  }
 
-    .v2.register-choice-view .wrapper-copy-inline .wrapper-copy {
-        width: 100%;
-    }
+  .v2.register-choice-view .wrapper-copy-inline .wrapper-copy {
+    width: 100%;
+  }
 
-    .v2.register-choice {
-        padding: 15px !important;
-    }
+  .v2.register-choice {
+    padding: 15px !important;
+  }
 
-    .v2.register-choice-continue .wrapper-copy-inline .wrapper-copy, .v2.register-choice-certificate .wrapper-copy-inline .wrapper-copy {
-        width: 60%;
-    }
+  .v2.register-choice-continue .wrapper-copy-inline .wrapper-copy, .v2.register-choice-certificate .wrapper-copy-inline .wrapper-copy {
+    width: 60%;
+  }
 
-    .v2.register-choice {
-        padding: 20px !important;
-    }
+  .v2.register-choice {
+    padding: 20px !important;
+  }
 
-    .v2.register-choice.register-choice-view {
-        margin-right: 0;
-    }
+  .v2.register-choice.register-choice-view {
+    margin-right: 0;
+  }
 
-    .v2.register-choice .list-actions:last-child {
-        float: left;
-        width: 100%;
-        margin-top: 0px;
-    }
+  .v2.register-choice .list-actions:last-child {
+    float: left;
+    width: 100%;
+    margin-top: 0;
+  }
 
-    .v2.register-choice .action-select {
-        width: 100% !important;
-    }
+  .v2.register-choice .action-select {
+    width: 100% !important;
+  }
 
-    .v2 .continue-link:hover,
-    .v2 .continue-link:focus {
-        background-color: #D7548E !important;
-        color: white !important;
-        text-decoration: none;
-    }
+  .v2 .continue-link:hover,
+  .v2 .continue-link:focus {
+    background-color: #d7548e !important;
+    color: white !important;
+    text-decoration: none;
+  }
 
-    .v2 .continue-link:hover {
-        cursor: pointer;
-    }
+  .v2 .continue-link:hover {
+    cursor: pointer;
+  }
 
-    .v2 .copy li {
-        margin-bottom: 5px;
-    }
+  .v2 .copy li {
+    margin-bottom: 5px;
+  }
 
-    .v2.register-choice .copy-inline {
-        width: 100%;
-    }
+  .v2.register-choice .copy-inline {
+    width: 100%;
+  }
 
-    .v2 .register-choice-view {
-        border-color: #2991c3 !important;
-    }
+  .v2 .register-choice-view {
+    border-color: #2991c3 !important;
+  }
 
-    .v2 .visual-reference {
-        vertical-align: top;
-    }
+  .v2 .visual-reference {
+    vertical-align: top;
+  }
 
-    .v2 .wrapper-copy-inline .wrapper-copy ul {
-        margin-top: 0px;
-        padding-left: 30px;
-    }
+  .v2 .wrapper-copy-inline .wrapper-copy ul {
+    margin-top: 0;
+    padding-left: 30px;
+  }
 
-    .v2 .img-certificate {
-        border: 2px solid #009b00 !important;
-        float: right;
-        height: 120px;
-        width: auto;
-        margin-top: 0 !important;
-        display: none;
-    }
+  .v2 .img-certificate {
+    border: 2px solid #009b00 !important;
+    float: right;
+    height: 120px;
+    width: auto;
+    margin-top: 0 !important;
+    display: none;
+  }
 
-    .v2 .img-donate {
-        margin-top: 0;
-        float: right;
-        border: 2px solid #D7548E !important;
-        display: none;
-    }
+  .v2 .img-donate {
+    margin-top: 0;
+    float: right;
+    border: 2px solid #d7548e !important;
+    display: none;
+  }
 
-    .v2 .img-view {
-        border: 2px solid #2991c3 !important;
-    }
+  .v2 .img-view {
+    border: 2px solid #2991c3 !important;
+  }
 
-    .v2.register-choice .title {
-        width: 100%;
-        margin-bottom: 20px;
-    }
+  .v2.register-choice .title {
+    width: 100%;
+    margin-bottom: 20px;
+  }
 
-    .v2.register-choice.register-choice-view .action-select {
-        border: 1px solid transparent !important;
-        border-radius: 3px;
-    }
+  .v2.register-choice.register-choice-view .action-select {
+    border: 1px solid transparent !important;
+    border-radius: 3px;
+  }
 
-    .v2.register-choice.register-choice-view .action-select button {
-        border: 1px solid transparent !important;
-    }
+  .v2.register-choice.register-choice-view .action-select button {
+    border: 1px solid transparent !important;
+  }
 
-    .v2.register-choice.register-choice-view .action-select:hover {
-        border: 1px solid #0075b4 !important;
-    }
+  .v2.register-choice.register-choice-view .action-select:hover {
+    border: 1px solid #0075b4 !important;
+  }
 
-    .v2.deco-divider {
-        width: 3% !important;
-        box-sizing: border-box;
-        float: left;
-        display: inline-block;
-        height: 250px;
-        margin: 0px 0 40px 0 !important;
-        border-left: 4px solid #f5f5f5 !important; border-top:none !important;
+  .v2.deco-divider {
+    width: 3% !important;
+    box-sizing: border-box;
+    float: left;
+    display: inline-block;
+    height: 250px;
+    margin: 0 0 40px 0 !important;
+    border-left: 4px solid #f5f5f5 !important; border-top:none !important;
 
-        .copy {
-            position: absolute;
-            top: 110px !important;
-            left: calc(50% - 40px) !important;
-            margin-left: 20px;
-            background: white;
-            text-align: center;
-            color: #474747;
-            width: 10px;
-            padding: 0 !important;
-        }
+    .copy {
+      position: absolute;
+      top: 110px !important;
+      left: calc(50% - 40px) !important;
+      margin-left: 20px;
+      background: white;
+      text-align: center;
+      color: #474747;
+      width: 10px;
+      padding: 0 !important;
     }
+  }
 }
 
 @media (min-width: 835px) {
-    .v2.register-choice-certificate,
-    .v2.register-choice-continue,
-    .v2.deco-divider {
-        min-height: 250px;
-    }
+  .v2.register-choice-certificate,
+  .v2.register-choice-continue,
+  .v2.deco-divider {
+    min-height: 250px;
+  }
 }
 
 @media (min-width: 1024px) {
-    .v2 .continue-link {
-        width: 55%;
-    }
-    .v2.deco-divider .copy {
-        margin-left: 15px;
-    }
+  .v2 .continue-link {
+    width: 55%;
+  }
+
+  .v2.deco-divider .copy {
+    margin-left: 15px;
+  }
 }
 
 @media (min-width: 1096px) {
-    .v2.register-choice-certificate,
-    .v2.register-choice-continue,
-    .v2.deco-divider {
-        min-height: 260px;
-    }
-    .v2 .img-certificate, .v2 .img-donate {
-        margin-top: 10px;
-        display: initial;
-    }
-    .v2 .continue-link, .v2.register-choice-certificate button,
-    .v2.register-choice-certificate input {
-        margin-top: -22px !important;
-    }
+  .v2.register-choice-certificate,
+  .v2.register-choice-continue,
+  .v2.deco-divider {
+    min-height: 260px;
+  }
+
+  .v2 .img-certificate, .v2 .img-donate {
+    margin-top: 10px;
+    display: initial;
+  }
+
+  .v2 .continue-link, .v2.register-choice-certificate button,
+  .v2.register-choice-certificate input {
+    margin-top: -22px !important;
+  }
 }

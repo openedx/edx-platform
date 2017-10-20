@@ -1,12 +1,6 @@
 // studio - elements - layouts
 // ====================
 
-// layout - basic
-// the wrapper around the viewable page area, excluding modal and other extra-view content
-.wrapper-view {
-
-}
-
 // ====================
 
 // layout - basic page header
@@ -18,6 +12,7 @@
   .mast,
   .metadata {
     @include clearfix();
+
     position: relative;
     max-width: $fg-max-width;
     min-width: $fg-min-width;
@@ -41,20 +36,26 @@
 
       .page-header {
         @include float(left);
-        width: flex-grid(6,12);
+
+        width: flex-grid(6, 12);
+
         @include margin-right(flex-gutter());
       }
 
       .nav-actions {
         position: relative;
         bottom: -($baseline*0.75);
+
         @include float(right);
-        width: flex-grid(6,12);
+
+        width: flex-grid(6, 12);
+
         @include text-align(right);
 
         .nav-item {
           display: inline-block;
           vertical-align: top;
+
           @include margin-right(($baseline/2));
 
           &:last-child {
@@ -89,7 +90,6 @@
 
     // layout with actions
     &.has-subtitle {
-
       .nav-actions {
         bottom: -($baseline*1.5);
       }
@@ -97,13 +97,13 @@
 
     // layout with breadcrumb navigation
     &.has-navigation {
-
       .nav-actions {
         bottom: -($baseline*1.5);
       }
 
       .navigation-item {
         @extend %cont-truncated;
+
         display: inline-block;
         vertical-align: bottom; // correct for extra padding in FF
         max-width: 250px;
@@ -111,10 +111,11 @@
 
         &.navigation-current {
           @extend %ui-disabled;
+
           color: $gray;
           max-width: 250px;
 
-          &:before {
+          &::before {
             color: $gray;
           }
         }
@@ -124,7 +125,7 @@
         color: $blue;
       }
 
-      .navigation-item:before {
+      .navigation-item::before {
         content: " / ";
         margin: ($baseline/4);
         color: $gray;
@@ -134,7 +135,7 @@
         }
       }
 
-      .navigation .navigation-item:first-child:before {
+      .navigation .navigation-item:first-child::before {
         content: "";
         margin: 0;
       }
@@ -143,27 +144,23 @@
 
   // CASE: wizard-based mast
   .mast-wizard {
-
     .page-header-sub {
       @extend %t-title4;
+
       color: $gray;
       font-weight: 300;
     }
 
     .page-header-super {
       @extend %t-title4;
+
       float: left;
-      width: flex-grid(12,12);
+      width: flex-grid(12, 12);
       margin-top: ($baseline/2);
       border-top: 1px solid $gray-l4;
       padding-top: ($baseline/2);
       font-weight: 600;
     }
-  }
-
-  // page metadata/action bar
-  .metadata {
-
   }
 }
 
@@ -176,7 +173,9 @@
 
 .content {
   @include clearfix();
+
   @extend %t-copy-base;
+
   max-width: $fg-max-width;
   min-width: $fg-min-width;
   width: flex-grid(12);
@@ -191,6 +190,7 @@
 
     .title-sub {
       @extend %t-copy-sub1;
+
       display: block;
       margin: 0;
       color: $gray-l2;
@@ -199,6 +199,7 @@
     .title-1 {
       @extend %t-title3;
       @extend %t-strong;
+
       margin: 0;
       padding: 0;
       color: $gray-d3;
@@ -216,7 +217,8 @@
   .content-primary {
     @include float(left);
     @include margin-right(flex-gutter());
-    width: flex-grid(9,12);
+
+    width: flex-grid(9, 12);
     box-shadow: none;
     border: 0;
     background-color: $white;
@@ -224,25 +226,27 @@
 
   .content-supplementary {
     @include float(left);
-    width: flex-grid(3,12);
+
+    width: flex-grid(3, 12);
   }
 }
 
 
 // layout - primary content
 .content-primary {
-
   .title-1 {
     @extend %t-title3;
   }
 
   .title-2 {
     @extend %t-title4;
+
     margin: 0 0 ($baseline/2) 0;
   }
 
   .title-3 {
     @extend %t-title6;
+
     margin: 0 0 ($baseline/2) 0;
   }
 
@@ -257,6 +261,7 @@
 
     .tip {
       @extend %t-copy-sub2;
+
       width: flex-grid(7, 12);
       float: right;
       margin-top: ($baseline/2);
@@ -268,7 +273,6 @@
 
 // layout - supplemental content
 .content-supplementary {
-
   > section {
     margin: 0 0 $baseline 0;
   }
@@ -284,6 +288,7 @@
 
 .inner-wrapper {
   @include clearfix();
+
   position: relative;
   max-width: 1280px;
   margin: auto;

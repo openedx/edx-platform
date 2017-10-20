@@ -11,7 +11,7 @@ from django.core import exceptions
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest
 from django.test import TestCase
-from django.utils.timezone import UTC
+from pytz import UTC
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
@@ -45,7 +45,7 @@ class FilenameGeneratorTestCase(TestCase):
     """
     Tests for course_and_time_based_filename_generator
     """
-    NOW = datetime.strptime('1974-06-22T01:02:03', '%Y-%m-%dT%H:%M:%S').replace(tzinfo=UTC())
+    NOW = datetime.strptime('1974-06-22T01:02:03', '%Y-%m-%dT%H:%M:%S').replace(tzinfo=UTC)
 
     def setUp(self):
         super(FilenameGeneratorTestCase, self).setUp()

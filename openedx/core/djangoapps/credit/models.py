@@ -21,7 +21,6 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
-from simple_history.models import HistoricalRecords
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from request_cache.middleware import RequestCache, ns_request_cached
@@ -386,7 +385,7 @@ class CreditRequirement(TimeStampedModel):
             name(str): Name of credit course requirement
 
         Returns:
-            CreditRequirement object if exists
+            CreditRequirement object if exists, None otherwise.
 
         """
         try:
@@ -436,9 +435,6 @@ class CreditRequirementStatus(TimeStampedModel):
     # final grade when the user completes the course.  This allows us to display
     # the grade to users later and to send the information to credit providers.
     reason = JSONField(default={})
-
-    # Maintain a history of requirement status updates for auditing purposes
-    history = HistoricalRecords()
 
     class Meta(object):
         unique_together = ('username', 'requirement')
@@ -654,8 +650,6 @@ class CreditRequest(TimeStampedModel):
         choices=REQUEST_STATUS_CHOICES,
         default=REQUEST_STATUS_PENDING
     )
-
-    history = HistoricalRecords()
 
     class Meta(object):
         # Enforce the constraint that each user can have exactly one outstanding

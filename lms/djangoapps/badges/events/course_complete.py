@@ -5,7 +5,7 @@ import hashlib
 import logging
 
 from django.core.urlresolvers import reverse
-from django.template.defaultfilters import slugify
+from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 
 from badges.models import BadgeAssertion, BadgeClass, CourseCompleteImageConfiguration

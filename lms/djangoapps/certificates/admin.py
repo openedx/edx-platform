@@ -47,7 +47,7 @@ class CertificateTemplateAdmin(admin.ModelAdmin):
     """
     Django admin customizations for CertificateTemplate model
     """
-    list_display = ('name', 'description', 'organization_id', 'course_key', 'mode', 'is_active')
+    list_display = ('name', 'description', 'organization_id', 'course_key', 'mode', 'language', 'is_active')
     form = CertificateTemplateForm
 
 

@@ -61,6 +61,14 @@ class TestSuite(object):
         """
         return None
 
+    @staticmethod
+    def is_success(exit_code):
+        """
+        Determine if the given exit code represents a success of the test
+        suite.  By default, only a zero counts as a success.
+        """
+        return exit_code == 0
+
     def run_test(self):
         """
         Runs a self.cmd in a subprocess and waits for it to finish.
@@ -88,7 +96,7 @@ class TestSuite(object):
 
         try:
             process = subprocess.Popen(cmd, **kwargs)
-            return (process.wait() == 0)
+            return self.is_success(process.wait())
         except KeyboardInterrupt:
             kill_process(process)
             sys.exit(1)

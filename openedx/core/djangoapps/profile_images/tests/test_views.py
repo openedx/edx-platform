@@ -33,40 +33,6 @@ TEST_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
 TEST_UPLOAD_DT2 = datetime.datetime(2003, 1, 9, 15, 43, 01, tzinfo=UTC)
 
 
-class PatchedClient(APIClient):
-    """
-    Patch DRF's APIClient to avoid a unicode error on file upload.
-
-    Famous last words: This is a *temporary* fix that we should be
-    able to remove once we upgrade Django past 1.4.
-    """
-
-    def request(self, *args, **kwargs):
-        """Construct an API request. """
-        # DRF's default test client implementation uses `six.text_type()`
-        # to convert the CONTENT_TYPE to `unicode`.  In Django 1.4,
-        # this causes a `UnicodeDecodeError` when Django parses a multipart
-        # upload.
-        #
-        # This is the DRF code we're working around:
-        #   https://github.com/tomchristie/django-rest-framework/blob/3.1.3/rest_framework/compat.py#L227
-        #
-        # ... and this is the Django code that raises the exception:
-        #
-        #   https://github.com/django/django/blob/1.4.22/django/http/multipartparser.py#L435
-        #
-        # Django unhelpfully swallows the exception, so to the application code
-        # it appears as though the user didn't send any file data.
-        #
-        # This appears to be an issue only with requests constructed in the test
-        # suite, not with the upload code used in production.
-        #
-        if isinstance(kwargs.get("CONTENT_TYPE"), basestring):
-            kwargs["CONTENT_TYPE"] = str(kwargs["CONTENT_TYPE"])
-
-        return super(PatchedClient, self).request(*args, **kwargs)
-
-
 class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
     """
     Base class / shared infrastructure for tests of profile_image "upload" and
@@ -75,7 +41,6 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
     # subclasses should override this with the name of the view under test, as
     # per the urls.py configuration.
     _view_name = None
-    client_class = PatchedClient
 
     def setUp(self):
         super(ProfileImageEndpointMixin, self).setUp()

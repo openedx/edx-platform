@@ -392,8 +392,8 @@ class TestCourseIndexArchived(CourseTestCase):
 
     @ddt.data(
         # Staff user has course staff access
-        (True, 'staff', None, 4, 21),
-        (False, 'staff', None, 4, 21),
+        (True, 'staff', None, 3, 17),
+        (False, 'staff', None, 3, 17),
         # Base user has global staff access
         (True, 'user', ORG, 3, 17),
         (False, 'user', ORG, 3, 17),

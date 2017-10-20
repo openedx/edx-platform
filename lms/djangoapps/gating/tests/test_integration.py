@@ -7,7 +7,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from nose.plugins.attrib import attr
 
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import answer_problem
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
@@ -149,7 +149,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         all problems in the course, whether or not they are currently
         gated.
         """
-        course_grade = CourseGradeFactory().create(user, self.course)
+        course_grade = CourseGradeFactory().read(user, self.course)
         for prob in [self.gating_prob1, self.gated_prob2, self.prob3]:
             self.assertIn(prob.location, course_grade.problem_scores)
 

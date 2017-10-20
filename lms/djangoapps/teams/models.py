@@ -21,13 +21,15 @@ from django_comment_common.signals import (
     thread_created,
     thread_deleted,
     thread_edited,
-    thread_voted
+    thread_voted,
+    thread_followed,
+    thread_unfollowed,
 )
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
 from lms.djangoapps.teams.utils import emit_team_event
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from student.models import CourseEnrollment, LanguageField
-from util.model_utils import slugify
+from django.utils.text import slugify
 
 from .errors import AlreadyOnTeamInCourse, ImmutableMembershipFieldException, NotEnrolledInCourseForTeam
 
@@ -38,6 +40,14 @@ from .errors import AlreadyOnTeamInCourse, ImmutableMembershipFieldException, No
 @receiver(comment_created)
 def post_create_vote_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """Update the user's last activity date upon creating or voting for a
+    post."""
+    handle_activity(kwargs['user'], kwargs['post'])
+
+
+@receiver(thread_followed)
+@receiver(thread_unfollowed)
+def post_followed_unfollowed_handler(sender, **kwargs):  # pylint: disable=unused-argument
+    """Update the user's last activity date upon followed or unfollowed of a
     post."""
     handle_activity(kwargs['user'], kwargs['post'])
 

@@ -75,18 +75,22 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': TEST_ROOT / "db" / "test_edx.db",
-        'TEST_NAME': TEST_ROOT / "db" / "test_edx.db",
         'OPTIONS': {
             'timeout': 30,
         },
         'ATOMIC_REQUESTS': True,
+        'TEST': {
+            'NAME': TEST_ROOT / "db" / "test_edx.db",
+        },
     },
     'student_module_history': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': TEST_ROOT / "db" / "test_student_module_history.db",
-        'TEST_NAME': TEST_ROOT / "db" / "test_student_module_history.db",
         'OPTIONS': {
             'timeout': 30,
+        },
+        'TEST': {
+            'NAME': TEST_ROOT / "db" / "test_student_module_history.db",
         },
     }
 }
@@ -107,13 +111,13 @@ FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 USE_I18N = True
 
 # Override the test stub webpack_loader that is installed in test.py.
-INSTALLED_APPS = tuple(app for app in INSTALLED_APPS if app != 'openedx.tests.util.webpack_loader')
-INSTALLED_APPS += ('webpack_loader',)
+INSTALLED_APPS = [app for app in INSTALLED_APPS if app != 'openedx.tests.util.webpack_loader']
+INSTALLED_APPS.append('webpack_loader')
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 # django.contrib.staticfiles used to be loaded by lettuce, now we must add it ourselves
 # django.contrib.staticfiles is not added to lms as there is a ^/static$ route built in to the app
-INSTALLED_APPS += ('lettuce.django',)
+INSTALLED_APPS.append('lettuce.django')
 LETTUCE_APPS = ('contentstore',)
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
 

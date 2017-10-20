@@ -200,10 +200,12 @@ class Env(object):
 
     JS_REPORT_DIR = REPORT_DIR / 'javascript'
 
-    # Directories used for common/lib/ tests
+    # Directories used for common/lib/tests
+    IGNORED_TEST_DIRS = ('__pycache__', '.cache')
     LIB_TEST_DIRS = []
     for item in (REPO_ROOT / "common/lib").listdir():
-        if (REPO_ROOT / 'common/lib' / item).isdir():
+        dir_name = (REPO_ROOT / 'common/lib' / item)
+        if dir_name.isdir() and not dir_name.endswith(IGNORED_TEST_DIRS):
             LIB_TEST_DIRS.append(path("common/lib") / item.basename())
     LIB_TEST_DIRS.append(path("pavelib/paver_tests"))
 

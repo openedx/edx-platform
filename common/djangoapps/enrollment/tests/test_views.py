@@ -56,7 +56,6 @@ class EnrollmentTestMixin(object):
             enrollment_attributes=None,
             min_mongo_calls=0,
             max_mongo_calls=0,
-            enterprise_course_consent=None,
             linked_enterprise_customer=None,
     ):
         """
@@ -83,9 +82,6 @@ class EnrollmentTestMixin(object):
 
         if email_opt_in is not None:
             data['email_opt_in'] = email_opt_in
-
-        if enterprise_course_consent is not None:
-            data['enterprise_course_consent'] = enterprise_course_consent
 
         if linked_enterprise_customer is not None:
             data['linked_enterprise_customer'] = linked_enterprise_customer
@@ -548,48 +544,9 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
         )
 
-        for attempt in xrange(self.rate_limit + 10):
+        for attempt in xrange(self.rate_limit + 2):
             expected_status = status.HTTP_429_TOO_MANY_REQUESTS if attempt >= self.rate_limit else status.HTTP_200_OK
             self.assert_enrollment_status(expected_status=expected_status)
-
-    def test_enrollment_throttle_for_staff_user(self):
-        """ Make sure throttle rate is higher for staff users """
-        self.rate_limit_config.enabled = True
-        self.rate_limit_config.save()
-        self.client.logout()
-        staff_user = UserFactory.create(password=self.PASSWORD, is_staff=True)
-        self.client.login(username=staff_user.username, password=self.PASSWORD)
-
-        CourseModeFactory(
-            course_id=self.course.id,
-            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
-            mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
-        )
-
-        throttle = EnrollmentUserThrottle()
-        throttle.scope = 'staff'
-        rate_limit, __ = throttle.parse_rate(throttle.get_rate())
-
-        # Make enough requests to reach the rate limit
-        for attempt in xrange(rate_limit):
-            self.assert_enrollment_status(username=staff_user.username, expected_status=status.HTTP_200_OK)
-
-        # Once the limit is reached, subsequent requests should fail
-        for attempt in xrange(rate_limit + 10):
-            self.assert_enrollment_status(username=staff_user.username, expected_status=status. HTTP_429_TOO_MANY_REQUESTS)
-
-    def test_enrollment_throttle_for_service(self):
-        """Make sure a service can call the enrollment API as many times as needed. """
-        self.rate_limit_config.enabled = True
-        self.rate_limit_config.save()
-        CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
-            mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
-        )
-
-        for __ in xrange(self.rate_limit + 10):
-            self.assert_enrollment_status(as_server=True)
 
     def test_create_enrollment_with_mode(self):
         """With the right API key, create a new enrollment with a mode set other than the default."""
@@ -965,82 +922,6 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
         self.assertTrue(is_active)
         self.assertEqual(course_mode, updated_mode)
-
-    @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker')
-    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
-    def test_enterprise_course_enrollment_invalid_consent(self):
-        """Verify that the enterprise_course_consent must be a boolean. """
-        UserFactory.create(
-            username='enterprise_worker',
-            email=self.EMAIL,
-            password=self.PASSWORD,
-        )
-        CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
-            mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
-        )
-        self.assert_enrollment_status(
-            expected_status=status.HTTP_400_BAD_REQUEST,
-            enterprise_course_consent='invalid',
-            as_server=True,
-        )
-
-    @httpretty.activate
-    @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker')
-    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
-    def test_enterprise_course_enrollment_api_error(self):
-        """Verify that enterprise service errors are handled properly. """
-        UserFactory.create(
-            username='enterprise_worker',
-            email=self.EMAIL,
-            password=self.PASSWORD,
-        )
-        CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
-            mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
-        )
-        self.mock_enterprise_course_enrollment_post_api_failure()
-        self.assert_enrollment_status(
-            expected_status=status.HTTP_400_BAD_REQUEST,
-            enterprise_course_consent=True,
-            as_server=True,
-            username='enterprise_worker'
-        )
-        self.assertEqual(
-            httpretty.last_request().path,
-            '/enterprise/api/v1/enterprise-course-enrollment/',
-            'No request was made to the mocked enterprise-course-enrollment API'
-        )
-
-    @httpretty.activate
-    @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker')
-    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
-    def test_enterprise_course_enrollment_successful(self):
-        """Verify that the enrollment completes when the EnterpriseCourseEnrollment creation succeeds. """
-        UserFactory.create(
-            username='enterprise_worker',
-            email=self.EMAIL,
-            password=self.PASSWORD,
-        )
-        CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
-            mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
-        )
-        self.mock_enterprise_course_enrollment_post_api(username=self.user.username, course_id=unicode(self.course.id))
-        self.assert_enrollment_status(
-            expected_status=status.HTTP_200_OK,
-            enterprise_course_consent=True,
-            as_server=True,
-            username='enterprise_worker'
-        )
-        self.assertEqual(
-            httpretty.last_request().path,
-            '/enterprise/api/v1/enterprise-course-enrollment/',
-            'No request was made to the mocked enterprise-course-enrollment API'
-        )
 
     @httpretty.activate
     @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker')

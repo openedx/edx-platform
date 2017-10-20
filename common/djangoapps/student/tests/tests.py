@@ -83,8 +83,6 @@ class CourseEndingTest(TestCase):
             _cert_info(user, course, None, course_mode),
             {
                 'status': 'processing',
-                'show_disabled_download_button': False,
-                'show_download_url': False,
                 'show_survey_button': False,
                 'can_unenroll': True,
             }
@@ -95,8 +93,6 @@ class CourseEndingTest(TestCase):
             _cert_info(user, course, cert_status, course_mode),
             {
                 'status': 'processing',
-                'show_disabled_download_button': False,
-                'show_download_url': False,
                 'show_survey_button': False,
                 'mode': None,
                 'linked_in_url': None,
@@ -105,14 +101,12 @@ class CourseEndingTest(TestCase):
         )
 
         cert_status = {'status': 'generating', 'grade': '0.67', 'mode': 'honor'}
-        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
             patch_persisted_grade.return_value = Mock(percent=1.0)
             self.assertEqual(
                 _cert_info(user, course, cert_status, course_mode),
                 {
                     'status': 'generating',
-                    'show_disabled_download_button': True,
-                    'show_download_url': False,
                     'show_survey_button': True,
                     'survey_url': survey_url,
                     'grade': '1.0',
@@ -127,8 +121,6 @@ class CourseEndingTest(TestCase):
             _cert_info(user, course, cert_status, course_mode),
             {
                 'status': 'generating',
-                'show_disabled_download_button': True,
-                'show_download_url': False,
                 'show_survey_button': True,
                 'survey_url': survey_url,
                 'grade': '0.67',
@@ -140,7 +132,8 @@ class CourseEndingTest(TestCase):
 
         download_url = 'http://s3.edx/cert'
         cert_status = {
-            'status': 'downloadable', 'grade': '0.67',
+            'status': 'downloadable',
+            'grade': '0.67',
             'download_url': download_url,
             'mode': 'honor'
         }
@@ -148,9 +141,7 @@ class CourseEndingTest(TestCase):
         self.assertEqual(
             _cert_info(user, course, cert_status, course_mode),
             {
-                'status': 'ready',
-                'show_disabled_download_button': False,
-                'show_download_url': True,
+                'status': 'downloadable',
                 'download_url': download_url,
                 'show_survey_button': True,
                 'survey_url': survey_url,
@@ -170,8 +161,6 @@ class CourseEndingTest(TestCase):
             _cert_info(user, course, cert_status, course_mode),
             {
                 'status': 'notpassing',
-                'show_disabled_download_button': False,
-                'show_download_url': False,
                 'show_survey_button': True,
                 'survey_url': survey_url,
                 'grade': '0.67',
@@ -191,8 +180,6 @@ class CourseEndingTest(TestCase):
             _cert_info(user, course2, cert_status, course_mode),
             {
                 'status': 'notpassing',
-                'show_disabled_download_button': False,
-                'show_download_url': False,
                 'show_survey_button': False,
                 'grade': '0.67',
                 'mode': 'honor',
@@ -204,14 +191,28 @@ class CourseEndingTest(TestCase):
         # test when the display is unavailable or notpassing, we get the correct results out
         course2.certificates_display_behavior = 'early_no_info'
         cert_status = {'status': 'unavailable'}
-        self.assertEqual(_cert_info(user, course2, cert_status, course_mode), {})
+        self.assertEqual(
+            _cert_info(user, course2, cert_status, course_mode),
+            {
+                'status': 'processing',
+                'show_survey_button': False,
+                'can_unenroll': True,
+            }
+        )
 
         cert_status = {
             'status': 'notpassing', 'grade': '0.67',
             'download_url': download_url,
             'mode': 'honor'
         }
-        self.assertEqual(_cert_info(user, course2, cert_status, course_mode), {})
+        self.assertEqual(
+            _cert_info(user, course2, cert_status, course_mode),
+            {
+                'status': 'processing',
+                'show_survey_button': False,
+                'can_unenroll': True,
+            }
+        )
 
     @ddt.data(
         (0.70, 0.60),
@@ -244,14 +245,12 @@ class CourseEndingTest(TestCase):
         else:
             cert_status = {'status': 'generating', 'mode': 'honor'}
 
-        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
             patch_persisted_grade.return_value = Mock(percent=persisted_grade)
             self.assertEqual(
                 _cert_info(user, course, cert_status, course_mode),
                 {
                     'status': 'generating',
-                    'show_disabled_download_button': True,
-                    'show_download_url': False,
                     'show_survey_button': True,
                     'survey_url': survey_url,
                     'grade': unicode(expected_grade),
@@ -277,14 +276,12 @@ class CourseEndingTest(TestCase):
         course_mode = 'honor'
         cert_status = {'status': 'generating', 'mode': 'honor'}
 
-        with patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
             patch_persisted_grade.return_value = None
             self.assertEqual(
                 _cert_info(user, course, cert_status, course_mode),
                 {
                     'status': 'processing',
-                    'show_disabled_download_button': False,
-                    'show_download_url': False,
                     'show_survey_button': False,
                     'can_unenroll': True,
                 }

@@ -11,7 +11,7 @@ import shutil
 import tempfile
 
 import ddt
-import pytz
+from boto.exception import BotoServerError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
@@ -20,7 +20,7 @@ from django.core.urlresolvers import reverse as django_reverse
 from django.http import HttpRequest, HttpResponse
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
-from django.utils.timezone import utc
+from pytz import UTC
 from django.utils.translation import ugettext as _
 from mock import Mock, patch
 from nose.plugins.attrib import attr
@@ -3020,6 +3020,27 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             body.endswith('"{user_id}","41","42"\n'.format(user_id=self.students[-1].id))
         )
 
+    @patch('lms.djangoapps.instructor_task.models.logger.error')
+    @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3'})
+    def test_list_report_downloads_error(self, mock_error):
+        """
+        Tests the Rate-Limit exceeded is handled and does not raise 500 error.
+        """
+        ex_status = 503
+        ex_reason = 'Slow Down'
+        url = reverse('list_report_downloads', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        with patch('openedx.core.storage.S3ReportStorage.listdir', side_effect=BotoServerError(ex_status, ex_reason)):
+            response = self.client.post(url, {})
+        mock_error.assert_called_with(
+            u'Fetching files failed for course: %s, status: %s, reason: %s',
+            self.course.id,
+            ex_status,
+            ex_reason,
+        )
+
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, {"downloads": []})
+
     def test_list_report_downloads(self):
         url = reverse('list_report_downloads', kwargs={'course_id': self.course.id.to_deprecated_string()})
         with patch('lms.djangoapps.instructor_task.models.DjangoStorageReportStore.links_for') as mock_links_for:
@@ -4113,7 +4134,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     def setUpClass(cls):
         super(TestDueDateExtensions, cls).setUpClass()
         cls.course = CourseFactory.create()
-        cls.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
+        cls.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
 
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
             cls.week1 = ItemFactory.create(due=cls.due)
@@ -4195,7 +4216,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             'due_datetime': '12/30/2013 00:00'
         })
         self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(datetime.datetime(2013, 12, 30, 0, 0, tzinfo=utc),
+        self.assertEqual(datetime.datetime(2013, 12, 30, 0, 0, tzinfo=UTC),
                          get_extended_due(self.course, self.week1, self.user1))
 
     def test_change_to_invalid_due_date(self):
@@ -4282,7 +4303,7 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
         super(TestDueDateExtensionsDeletedDate, self).setUp()
 
         self.course = CourseFactory.create()
-        self.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
+        self.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
 
         with self.store.bulk_operations(self.course.id, emit_signals=False):
             self.week1 = ItemFactory.create(due=self.due)
@@ -4363,7 +4384,7 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
             'due_datetime': '12/30/2013 00:00'
         })
         self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(datetime.datetime(2013, 12, 30, 0, 0, tzinfo=utc),
+        self.assertEqual(datetime.datetime(2013, 12, 30, 0, 0, tzinfo=UTC),
                          get_extended_due(self.course, self.week1, self.user1))
 
         self.week1.due = None
@@ -4927,7 +4948,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
             coupon = Coupon(
                 code='coupon{0}'.format(i), description='test_description', course_id=self.course.id,
                 percentage_discount='{0}'.format(i), created_by=self.instructor, is_active=True,
-                expiration_date=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=2)
+                expiration_date=datetime.datetime.now(UTC) + datetime.timedelta(days=2)
             )
             coupon.save()
 

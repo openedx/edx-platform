@@ -4,11 +4,12 @@
 }
 
 h1 {
-    color: $baseFontColor;
-    font: normal 2em/1.4em $sans-serif;
-    letter-spacing: 1px;
-    @include margin(0, 0, 1.416em, 0);
-  }
+  color: $baseFontColor;
+  font: normal 2em/1.4em $sans-serif;
+  letter-spacing: 1px;
+
+  @include margin(0, 0, 1.416em, 0);
+}
 
 h2 {
   color: #646464;
@@ -20,6 +21,7 @@ h2 {
 
 h3, h4, h5, h6 {
   @include margin(0, 0, ($baseline/2), 0);
+
   font-weight: 600;
 }
 
@@ -73,6 +75,7 @@ blockquote {
 ol, ul {
   // Using the lower level Bi App Sass mixin to avoid @padding conflicts with bourbon.
   @include bi-app-compact(padding, 0, 0, 0, 1em);
+
   margin: 1em 0;
   color: $baseFontColor;
 
@@ -152,9 +155,9 @@ th {
 
 // modal - image zoom, fill window
 .wrapper-modal-image {
-  
   .modal-ui-icon {
     @extend %ui-fake-link;
+
     position: absolute;
     display: block;
     padding: ($baseline/4) 7px;
@@ -175,6 +178,7 @@ th {
   
   .image-link {
     @extend %ui-fake-link;
+
     position: relative;
     display: block;
     
@@ -192,6 +196,7 @@ th {
   .image-modal {
     @extend %ui-fake-link;
     @extend %ui-depth5;
+
     position: fixed;
     top: 0;
     left: 0;
@@ -247,9 +252,11 @@ th {
             &.action-zoom-in {
               margin-right: ($baseline/4);
             }
+
             &.action-zoom-out {
               margin-left: ($baseline/4);
             }
+
             &.is-disabled {
               opacity: 0.5;
               cursor: default;
@@ -275,11 +282,11 @@ th {
         }
       }
     }
+
     &.image-is-zoomed {
       display: block;
       
       .image-content .image-wrapper {
-        
         img {
           max-width: none;
           max-height: none;

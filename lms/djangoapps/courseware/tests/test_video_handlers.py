@@ -11,7 +11,7 @@ import ddt
 import freezegun
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
-from webob import Request
+from webob import Request, Response
 
 from common.test.utils import normalize_repr
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
@@ -189,6 +189,7 @@ class TestVideo(BaseTestXmodule):
 
 
 @attr(shard=1)
+@ddt.ddt
 class TestTranscriptAvailableTranslationsDispatch(TestVideo):
     """
     Test video handler that provide available translations info.
@@ -246,6 +247,80 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         request = Request.blank('/available_translations')
         response = self.item.transcript(request=request, dispatch='available_translations')
         self.assertEqual(json.loads(response.body), ['en', 'uk'])
+
+    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages')
+    @ddt.data(
+        (
+            ['en', 'uk', 'ro'],
+            '',
+            {},
+            ['en', 'uk', 'ro']
+        ),
+        (
+            ['uk', 'ro'],
+            True,
+            {},
+            ['en', 'uk', 'ro']
+        ),
+        (
+            ['de', 'ro'],
+            True,
+            {
+                'uk': True,
+                'ro': False,
+            },
+            ['en', 'uk', 'de', 'ro']
+        ),
+        (
+            ['de'],
+            True,
+            {
+                'uk': True,
+                'ro': False,
+            },
+            ['en', 'uk', 'de']
+        ),
+    )
+    @ddt.unpack
+    def test_val_available_translations(self, val_transcripts, sub, transcripts, result, mock_get_transcript_languages):
+        """
+        Tests available translations with video component's and val's transcript languages
+        while the feature is enabled.
+        """
+        for lang_code, in_content_store in dict(transcripts).iteritems():
+            if in_content_store:
+                file_name, __ = os.path.split(self.srt_file.name)
+                _upload_file(self.srt_file, self.item_descriptor.location, file_name)
+                transcripts[lang_code] = file_name
+            else:
+                transcripts[lang_code] = 'non_existent.srt.sjson'
+        if sub:
+            sjson_transcript = _create_file(json.dumps(self.subs))
+            _upload_sjson_file(sjson_transcript, self.item_descriptor.location)
+            sub = _get_subs_id(sjson_transcript.name)
+
+        mock_get_transcript_languages.return_value = val_transcripts
+        self.item.transcripts = transcripts
+        self.item.sub = sub
+        # Make request to available translations dispatch.
+        request = Request.blank('/available_translations')
+        response = self.item.transcript(request=request, dispatch='available_translations')
+        self.assertItemsEqual(json.loads(response.body), result)
+
+    @patch(
+        'xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled',
+        Mock(return_value=False),
+    )
+    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
+    def test_val_available_translations_feature_disabled(self, mock_get_available_transcript_languages):
+        """
+        Tests available translations with val transcript languages when feature is disabled.
+        """
+        mock_get_available_transcript_languages.return_value = ['en', 'de', 'ro']
+        request = Request.blank('/available_translations')
+        response = self.item.transcript(request=request, dispatch='available_translations')
+        self.assertEqual(response.status_code, 404)
 
 
 @attr(shard=1)
@@ -369,6 +444,55 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.body, 'Subs!')
         self.assertEqual(response.headers['Content-Type'], 'application/x-subrip; charset=utf-8')
         self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename="塞.srt"')
+
+    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
+    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('xmodule.video_module.VideoModule.get_transcript', Mock(side_effect=NotFoundError))
+    def test_download_fallback_transcript(self, mock_get_video_transcript_data):
+        """
+        Verify val transcript is returned as a fallback if it is not found in the content store.
+        """
+        mock_get_video_transcript_data.return_value = {
+            'content': json.dumps({
+                "start": [10],
+                "end": [100],
+                "text": ["Hi, welcome to Edx."],
+            }),
+            'file_name': 'edx.sjson'
+        }
+
+        # Make request to XModule transcript handler
+        request = Request.blank('/download')
+        response = self.item.transcript(request=request, dispatch='download')
+
+        # Expected response
+        expected_content = u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+        expected_headers = {
+            'Content-Disposition': 'attachment; filename="edx.srt"',
+            'Content-Language': u'en',
+            'Content-Type': 'application/x-subrip; charset=utf-8'
+        }
+
+        # Assert the actual response
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, expected_content)
+        for attribute, value in expected_headers.iteritems():
+            self.assertEqual(response.headers[attribute], value)
+
+    @patch(
+        'xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled',
+        Mock(return_value=False),
+    )
+    @patch('xmodule.video_module.VideoModule.get_transcript', Mock(side_effect=NotFoundError))
+    def test_download_fallback_transcript_feature_disabled(self):
+        """
+        Verify val transcript if its feature is disabled.
+        """
+        # Make request to XModule transcript handler
+        request = Request.blank('/download')
+        response = self.item.transcript(request=request, dispatch='download')
+        # Assert the actual response
+        self.assertEqual(response.status_code, 404)
 
 
 @attr(shard=1)
@@ -601,6 +725,55 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         store = modulestore()
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
             store.update_item(self.course, self.user.id)
+
+    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
+    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('xmodule.video_module.VideoModule.translation', Mock(side_effect=NotFoundError))
+    @patch('xmodule.video_module.VideoModule.get_static_transcript', Mock(return_value=Response(status=404)))
+    def test_translation_fallback_transcript(self, mock_get_video_transcript_data):
+        """
+        Verify that the val transcript is returned as a fallback,
+        if it is not found in the content store.
+        """
+        transcript = {
+            'content': json.dumps({
+                "start": [10],
+                "end": [100],
+                "text": ["Hi, welcome to Edx."],
+            }),
+            'file_name': 'edx.sjson'
+        }
+        mock_get_video_transcript_data.return_value = transcript
+
+        # Make request to XModule transcript handler
+        response = self.item.transcript(request=Request.blank('/translation/en'), dispatch='translation/en')
+
+        # Expected headers
+        expected_headers = {
+            'Content-Language': 'en',
+            'Content-Type': 'application/json'
+        }
+
+        # Assert the actual response
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, transcript['content'])
+        for attribute, value in expected_headers.iteritems():
+            self.assertEqual(response.headers[attribute], value)
+
+    @patch(
+        'xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled',
+        Mock(return_value=False),
+    )
+    @patch('xmodule.video_module.VideoModule.translation', Mock(side_effect=NotFoundError))
+    @patch('xmodule.video_module.VideoModule.get_static_transcript', Mock(return_value=Response(status=404)))
+    def test_translation_fallback_transcript_feature_disabled(self):
+        """
+        Verify that val transcript is not returned when its feature is disabled.
+        """
+        # Make request to XModule transcript handler
+        response = self.item.transcript(request=Request.blank('/translation/en'), dispatch='translation/en')
+        # Assert the actual response
+        self.assertEqual(response.status_code, 404)
 
 
 @attr(shard=1)

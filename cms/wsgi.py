@@ -6,9 +6,6 @@ defuse_xml_libs()
 import contracts
 contracts.disable_all()
 
-import openedx.core.operations
-openedx.core.operations.install_memory_dumper()
-
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cms.envs.aws")
 

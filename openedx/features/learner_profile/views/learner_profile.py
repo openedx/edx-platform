@@ -8,16 +8,20 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.shortcuts import render_to_response
+from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 from edxmako.shortcuts import marketing_link
+from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.user_api.errors import UserNotAuthorized, UserNotFound
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
+from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+from openedx.core.djangolib.markup import HTML, Text
 from student.models import User
 
-from .. import SHOW_ACHIEVEMENTS_FLAG
+from .. import SHOW_PROFILE_MESSAGE
 
 from learner_achievements import LearnerAchievementsFragmentView
 
@@ -42,10 +46,33 @@ def learner_profile(request, username):
         GET /account/profile
     """
     try:
-        return render_to_response(
+        context = learner_profile_context(request, username, request.user.is_staff)
+        # TODO: LEARNER-2554: 09/2017: Remove message and cookie logic when we no longer want this message
+        message_viewed = False
+        if (context['own_profile'] and
+                SHOW_PROFILE_MESSAGE.is_enabled() and
+                request.COOKIES.get('profile-message-viewed', '') != 'True'):
+            message_text = Text(_(
+                'Welcome to the new learner profile page. Your full profile now displays more '
+                'information to other learners. You can instead choose to display a limited '
+                'profile. {learn_more_link_start}Learn more{learn_more_link_end}'
+            )).format(
+                learn_more_link_start=HTML(
+                    '<a href="http://edx.readthedocs.io/projects/open-edx-learner-guide/en/'
+                    'latest/SFD_dashboard_profile_SectionHead.html#adding-profile-information">'
+                ),
+                learn_more_link_end=HTML('</a>')
+            )
+            PageLevelMessages.register_info_message(request, message_text, dismissable=True)
+            message_viewed = True
+        response = render_to_response(
             'learner_profile/learner_profile.html',
-            learner_profile_context(request, username, request.user.is_staff)
+            context
         )
+
+        if message_viewed:
+            response.set_cookie('profile-message-viewed', 'True')
+        return response
     except (UserNotAuthorized, UserNotFound, ObjectDoesNotExist):
         raise Http404
 
@@ -74,14 +101,11 @@ def learner_profile_context(request, profile_username, user_is_staff):
 
     preferences_data = get_user_preferences(profile_user, profile_username)
 
-    if SHOW_ACHIEVEMENTS_FLAG.is_enabled():
-        achievements_fragment = LearnerAchievementsFragmentView().render_to_fragment(
-            request,
-            username=profile_user.username,
-            own_profile=own_profile,
-        )
-    else:
-        achievements_fragment = None
+    achievements_fragment = LearnerAchievementsFragmentView().render_to_fragment(
+        request,
+        username=profile_user.username,
+        own_profile=own_profile,
+    )
 
     context = {
         'own_profile': own_profile,
@@ -111,7 +135,10 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
             'social_platforms': settings.SOCIAL_PLATFORMS,
         },
+        'show_program_listing': ProgramsApiConfig.is_enabled(),
+        'show_dashboard_tabs': True,
         'disable_courseware_js': True,
+        'nav_hidden': True,
     }
 
     if badges_enabled():

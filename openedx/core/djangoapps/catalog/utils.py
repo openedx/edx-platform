@@ -119,6 +119,29 @@ def get_program_types(name=None):
         return []
 
 
+def get_currency_data():
+    """Retrieve currency data from the catalog service.
+
+    Returns:
+        list of dict, representing program types.
+        dict, if a specific program type is requested.
+    """
+    catalog_integration = CatalogIntegration.current()
+    if catalog_integration.enabled:
+        try:
+            user = catalog_integration.get_service_user()
+        except ObjectDoesNotExist:
+            return []
+
+        api = create_catalog_api_client(user)
+        cache_key = '{base}.currency'.format(base=catalog_integration.CACHE_KEY)
+
+        return get_edx_api_data(catalog_integration, 'currency', api=api,
+                                cache_key=cache_key if catalog_integration.is_cache_enabled else None)
+    else:
+        return []
+
+
 def get_programs_with_type(site, include_hidden=True):
     """
     Return the list of programs. You can filter the types of programs returned by using the optional

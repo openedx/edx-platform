@@ -106,10 +106,10 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         self.problem = TestProblem(self.course)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_EDXNOTES': True})
-    @patch("edxnotes.decorators.get_public_endpoint", autospec=True)
-    @patch("edxnotes.decorators.get_token_url", autospec=True)
-    @patch("edxnotes.decorators.get_edxnotes_id_token", autospec=True)
-    @patch("edxnotes.decorators.generate_uid", autospec=True)
+    @patch("edxnotes.helpers.get_public_endpoint", autospec=True)
+    @patch("edxnotes.helpers.get_token_url", autospec=True)
+    @patch("edxnotes.helpers.get_edxnotes_id_token", autospec=True)
+    @patch("edxnotes.helpers.generate_uid", autospec=True)
     def test_edxnotes_enabled(self, mock_generate_uid, mock_get_id_token, mock_get_token_url, mock_get_endpoint):
         """
         Tests if get_html is wrapped when feature flag is on and edxnotes are

@@ -14,6 +14,7 @@ import textwrap
 import unittest
 
 import ddt
+from django.utils.encoding import smart_text
 from lxml import etree
 from mock import Mock, patch, DEFAULT
 import webob
@@ -1043,7 +1044,7 @@ class CapaModuleTest(unittest.TestCase):
 
     def test_rescore_problem_correct(self):
 
-        module = CapaFactory.create(attempts=1, done=True)
+        module = CapaFactory.create(attempts=0, done=True)
 
         # Simulate that all answers are marked correct, no matter
         # what the input is, by patching LoncapaResponse.evaluate_answers()
@@ -1053,10 +1054,47 @@ class CapaModuleTest(unittest.TestCase):
                 correctness='correct',
                 npoints=1,
             )
+            with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+                mock_is_correct.return_value = True
+
+                # Check the problem
+                get_request_dict = {CapaFactory.input_key(): '1'}
+                module.submit_problem(get_request_dict)
             module.rescore(only_if_higher=False)
 
         # Expect that the problem is marked correct
         self.assertEqual(module.is_correct(), True)
+
+        # Expect that the number of attempts is not incremented
+        self.assertEqual(module.attempts, 1)
+
+    def test_rescore_problem_additional_correct(self):
+        # make sure it also works when new correct answer has been added
+        module = CapaFactory.create(attempts=0)
+
+        # Simulate that all answers are marked correct, no matter
+        # what the input is, by patching CorrectMap.is_correct()
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+                mock_is_correct.return_value = True
+
+                # Check the problem
+                get_request_dict = {CapaFactory.input_key(): '1'}
+                result = module.submit_problem(get_request_dict)
+
+        # Expect that the problem is marked correct
+        self.assertEqual(result['success'], 'correct')
+        # Expect that the number of attempts is incremented
+        self.assertEqual(module.attempts, 1)
+        self.assertEqual(module.get_score(), (1, 1))
+
+        # Simulate that after adding a new correct answer the new calculated score is (0,1)
+        # by patching CapaMixin.calculate_score()
+        # In case of rescore with only_if_higher=True it should not update score of module
+        # if previous score was higher
+        with patch('xmodule.capa_base.CapaMixin.calculate_score') as mock_calculate_score:
+            mock_calculate_score.return_value = Score(raw_earned=0, raw_possible=1)
+            module.rescore(only_if_higher=True)
+        self.assertEqual(module.get_score(), (1, 1))
 
         # Expect that the number of attempts is not incremented
         self.assertEqual(module.attempts, 1)
@@ -2528,6 +2566,22 @@ class CapaDescriptorTest(unittest.TestCase):
                     'capa_content': capa_content.replace("\n", " ")
                 }
             }
+        )
+
+    def test_indexing_non_latin_problem(self):
+        sample_text_input_problem_xml = textwrap.dedent("""
+            <problem>
+                <script type="text/python">FX1_VAL='Καλημέρα'</script>
+                <p>Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL</p>
+            </problem>
+        """)
+        name = "Non latin Input"
+        descriptor = self._create_descriptor(sample_text_input_problem_xml, name=name)
+        capa_content = " FX1_VAL='Καλημέρα' Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL "
+
+        descriptor_dict = descriptor.index_dictionary()
+        self.assertEquals(
+            descriptor_dict['content']['capa_content'], smart_text(capa_content)
         )
 
     def test_indexing_checkboxes_with_hints_and_feedback(self):

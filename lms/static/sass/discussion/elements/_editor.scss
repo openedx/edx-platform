@@ -47,6 +47,7 @@
 
 .wmd-button-row {
   @include transition(all .2s ease-out 0s);
+
   position: relative;
   overflow: hidden;
   margin: ($baseline/2) ($baseline/4) ($baseline/4) ($baseline/4);
@@ -56,6 +57,7 @@
 
 .wmd-spacer {
   @include margin-left(14px);
+
   position: absolute;
   display: inline-block;
   width: 1px;
@@ -107,6 +109,7 @@
 
 .wmd-input {
   @include discussion-wmd-input;
+
   box-sizing: border-box;
   width: 100%;
   background: $forum-color-background;
@@ -118,6 +121,7 @@
 
 .wmd-prompt-dialog {
   @extend .modal;
+
   background: $forum-color-background;
   padding: $baseline;
 
@@ -137,7 +141,7 @@
 
   > form > input[type="button"] {
     border: 1px solid #888;
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     font-size: $forum-x-large-font-size;
   }
 
@@ -147,6 +151,7 @@
 
   .field-group .field .field-hint {
     @include margin-left(0);
+
     width: 100%;
   }
 

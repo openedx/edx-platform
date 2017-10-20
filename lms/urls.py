@@ -829,6 +829,11 @@ urlpatterns += (
     url(r'^commerce/', include('commerce.urls', namespace='commerce')),
 )
 
+# Course goals
+urlpatterns += (
+    url(r'^api/course_goals/', include('lms.djangoapps.course_goals.urls', namespace='course_goals_api')),
+)
+
 # Embargo
 if settings.FEATURES.get('EMBARGO'):
     urlpatterns += (

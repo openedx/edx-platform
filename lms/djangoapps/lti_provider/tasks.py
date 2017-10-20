@@ -11,7 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 
 import lti_provider.outcomes as outcomes
 from lms import CELERY_APP
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lti_provider.models import GradedAssignment
 from lti_provider.views import parse_course_and_usage_keys
@@ -110,7 +110,7 @@ def send_composite_outcome(user_id, course_id, assignment_id, version):
     mapped_usage_key = assignment.usage_key.map_into_course(course_key)
     user = User.objects.get(id=user_id)
     course = modulestore().get_course(course_key, depth=0)
-    course_grade = CourseGradeFactory().create(user, course)
+    course_grade = CourseGradeFactory().read(user, course)
     earned, possible = course_grade.score_for_module(mapped_usage_key)
     if possible == 0:
         weighted_score = 0

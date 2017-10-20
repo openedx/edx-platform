@@ -44,8 +44,8 @@ from openedx.core.djangolib.markup import HTML, Text
 <%static:require_module_async module_name="js/courseware/toggle_element_visibility" class_name="ToggleElementVisibility">
         ToggleElementVisibility();
 </%static:require_module_async>
-<%static:require_module_async module_name="js/courseware/course_home_events" class_name="CourseHomeEvents">
-        CourseHomeEvents();
+<%static:require_module_async module_name="js/courseware/course_info_events" class_name="CourseInfoEvents">
+        CourseInfoEvents();
 </%static:require_module_async>
 
 <%block name="bodyclass">view-in-course view-course-info ${course.css_class or ''}</%block>

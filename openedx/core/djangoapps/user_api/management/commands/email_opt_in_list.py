@@ -30,6 +30,7 @@ import optparse
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.db import connections
+from django.utils import timezone
 
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
@@ -255,6 +256,17 @@ class Command(BaseCommand):
         row_count = 0
         for row in self._iterate_results(cursor):
             user_id, username, email, full_name, course_id, is_opted_in, pref_set_datetime = row
+
+            if pref_set_datetime:
+                # TODO: Remove Django 1.11 upgrade shim
+                # SHIM: pref_set_datetime.tzinfo should always be None here after the 1.11 upgrade
+                # As of Django 1.9 datetimes returned from raw sql queries are no longer coerced to being tz aware
+                # so we correct for that here.
+                if pref_set_datetime.tzinfo is None or pref_set_datetime.tzinfo.utcoffset(pref_set_datetime) is None:
+                    pref_set_datetime = timezone.make_aware(pref_set_datetime, timezone.utc)
+            else:
+                pref_set_datetime = self.DEFAULT_DATETIME_STR
+
             writer.writerow({
                 "user_id": user_id,
                 "username": username.encode('utf-8'),
@@ -264,7 +276,7 @@ class Command(BaseCommand):
                 "full_name": full_name.encode('utf-8') if full_name else '',
                 "course_id": course_id.encode('utf-8'),
                 "is_opted_in_for_email": is_opted_in if is_opted_in else "True",
-                "preference_set_datetime": pref_set_datetime if pref_set_datetime else self.DEFAULT_DATETIME_STR,
+                "preference_set_datetime": pref_set_datetime,
             })
             row_count += 1
 

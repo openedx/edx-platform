@@ -59,11 +59,13 @@
   :-moz-placeholder {
     color: $color;
   }
+
   ::-webkit-input-placeholder {
     color: $color;
   }
+
   :-ms-input-placeholder {
-     color: $color;
+    color: $color;
   }
 }
 
@@ -113,18 +115,21 @@
 %ui-wrapper {
   @include clearfix();
   @include box-sizing(border-box);
+
   width: 100%;
 }
 
 // layout placeholders
 .ui-col-wide  {
   width: flex-grid(9, 12);
+
   @include margin-right(flex-gutter());
   @include float(left);
 }
 
 .ui-col-narrow  {
   width: flex-grid(3, 12);
+
   @include float(left);
 }
 
@@ -132,6 +137,7 @@
 // ====================
 %ui-window {
   @include clearfix();
+
   border-radius: ($baseline/10);
   box-shadow: 0 1px 1px $shadow-l2;
   margin-bottom: $baseline;
@@ -172,7 +178,6 @@
 // ====================
 // extends - UI - utility - first child clearing
 %wipe-first-child {
-
   &:first-child {
     margin-top: 0;
     border-top: none;
@@ -182,7 +187,6 @@
 
 // extends - UI - utility - last child clearing
 %wipe-last-child {
-
   &:last-child {
     margin-bottom: 0;
     border-bottom: none;
@@ -195,6 +199,7 @@
 %ui-btn {
   @include box-sizing(border-box);
   @include transition(color $tmg-f2 ease-in-out 0s, border-color $tmg-f2 ease-in-out 0s, background $tmg-f2 ease-in-out 0s, box-shadow $tmg-f2 ease-in-out 0s);
+
   display: inline-block;
   cursor: pointer;
 
@@ -231,6 +236,7 @@
   @extend %ui-btn;
   @extend %ui-btn-pill;
   @extend %t-strong;
+
   padding:($baseline/2) $baseline;
   border-width: 1px;
   border-style: solid;
@@ -255,6 +261,7 @@
 %ui-btn-secondary {
   @extend %ui-btn;
   @extend %ui-btn-pill;
+
   border-width: 1px;
   border-style: solid;
   padding:($baseline/2) $baseline;
@@ -265,8 +272,10 @@
 
 %ui-btn-flat-outline {
   @include transition(all .15s);
+
   @extend %t-strong;
   @extend %t-action4;
+
   text-align: center;
   border-radius: ($baseline/4);
   border: 1px solid $uxpl-blue-base;
@@ -282,18 +291,21 @@
 
   &.is-disabled,
   &[disabled="disabled"]{
-   border: 1px solid $gray-l2;
-   background-color: $gray-l4;
-   color: $gray-l2;
-   pointer-events: none;
+    border: 1px solid $gray-l2;
+    background-color: $gray-l4;
+    color: $gray-l2;
+    pointer-events: none;
   }
 }
 
 // button with no button shell until hover for understated actions
 %ui-btn-non {
   @include transition(all .15s);
+
   @extend %ui-btn-pill;
+
   @include transition(all $tmg-f2 linear 0s);
+
   display: inline-block;
   vertical-align: middle;
   border: none;
@@ -326,6 +338,7 @@
 
 %no-content {
   @extend %ui-well;
+
   padding: ($baseline*2);
   background-color: $gray-l4;
   text-align: center;
@@ -335,6 +348,7 @@
   .action {
     @extend %btn-primary-green;
     @extend %t-action3;
+
     margin-left: $baseline;
 
     .icon {
@@ -345,8 +359,10 @@
 
 .ui-loading {
   @include animation(fadeIn $tmg-f2 linear 1);
+
   @extend %ui-well;
   @extend %t-copy-base;
+
   opacity: .6;
   background-color: $white;
   padding: ($baseline*1.5) $baseline;
@@ -354,6 +370,7 @@
 
   .spin {
     @extend %anim-rotateCW;
+
     display: inline-block;
   }
 
@@ -393,18 +410,18 @@
 // +Content - Screenreader Text - Extend
 // ====================
 %cont-text-sr {
-    // clip has been deprecated but is still supported
-    clip: rect(1px 1px 1px 1px);
-    clip: rect(1px, 1px, 1px, 1px);
-    position: absolute;
-    margin: -1px;
-    height: 1px;
-    width: 1px;
-    border: 0;
-    padding: 0;
-    overflow: hidden;
-    // ensure there are spaces in sr text
-    word-wrap: normal;
+  // clip has been deprecated but is still supported
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  position: absolute;
+  margin: -1px;
+  height: 1px;
+  width: 1px;
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+  // ensure there are spaces in sr text
+  word-wrap: normal;
 }
 
 // +Content - Text Wrap - Extend
@@ -417,6 +434,7 @@
 // ====================
 %cont-truncated {
   @include box-sizing(border-box);
+
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

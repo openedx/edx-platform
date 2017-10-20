@@ -17,7 +17,7 @@ from instructor_analytics.basic import list_problem_responses
 from instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.grades.context import grading_context, grading_context_for_course
 from lms.djangoapps.grades.models import PersistentCourseGrade
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
@@ -103,7 +103,7 @@ class _CourseGradeReportContext(object):
         Returns an OrderedDict that maps an assignment type to a dict of
         subsection-headers and average-header.
         """
-        grading_cxt = grading_context(self.course_structure)
+        grading_cxt = grading_context(self.course, self.course_structure)
         graded_assignments_map = OrderedDict()
         for assignment_type_name, subsection_infos in grading_cxt['all_graded_subsections_by_type'].iteritems():
             graded_subsections_map = OrderedDict()
@@ -127,7 +127,8 @@ class _CourseGradeReportContext(object):
             graded_assignments_map[assignment_type_name] = {
                 'subsection_headers': graded_subsections_map,
                 'average_header': average_header,
-                'separate_subsection_avg_headers': separate_subsection_avg_headers
+                'separate_subsection_avg_headers': separate_subsection_avg_headers,
+                'grader': grading_cxt['subsection_type_graders'].get(assignment_type_name),
             }
         return graded_assignments_map
 
@@ -222,7 +223,7 @@ class CourseGradeReport(object):
         Returns a list of all applicable column headers for this grade report.
         """
         return (
-            ["Student ID", "Email", "Username", "Grade"] +
+            ["Student ID", "Email", "Username"] +
             self._grades_header(context) +
             (['Cohort Name'] if context.cohorts_enabled else []) +
             [u'Experiment Group ({})'.format(partition.name) for partition in context.course_experiments] +
@@ -278,7 +279,7 @@ class CourseGradeReport(object):
         Returns the applicable grades-related headers for this report.
         """
         graded_assignments = context.graded_assignments
-        grades_header = []
+        grades_header = ["Grade"]
         for assignment_info in graded_assignments.itervalues():
             if assignment_info['separate_subsection_avg_headers']:
                 grades_header.extend(assignment_info['subsection_headers'].itervalues())
@@ -297,30 +298,55 @@ class CourseGradeReport(object):
         users = users.select_related('profile__allow_certificate')
         return grouper(users)
 
-    def _user_grade_results(self, course_grade, context):
+    def _user_grades(self, course_grade, context):
         """
         Returns a list of grade results for the given course_grade corresponding
         to the headers for this report.
         """
         grade_results = []
         for assignment_type, assignment_info in context.graded_assignments.iteritems():
-            for subsection_location in assignment_info['subsection_headers']:
-                try:
-                    subsection_grade = course_grade.graded_subsections_by_format[assignment_type][subsection_location]
-                except KeyError:
-                    grade_result = u'Not Available'
-                else:
-                    if subsection_grade.graded_total.first_attempted is not None:
-                        grade_result = subsection_grade.graded_total.earned / subsection_grade.graded_total.possible
-                    else:
-                        grade_result = u'Not Attempted'
-                grade_results.append([grade_result])
-            if assignment_info['separate_subsection_avg_headers']:
-                assignment_average = course_grade.grader_result['grade_breakdown'].get(assignment_type, {}).get(
-                    'percent'
-                )
+
+            subsection_grades, subsection_grades_results = self._user_subsection_grades(
+                course_grade,
+                assignment_info['subsection_headers'],
+            )
+            grade_results.extend(subsection_grades_results)
+
+            assignment_average = self._user_assignment_average(course_grade, subsection_grades, assignment_info)
+            if assignment_average is not None:
                 grade_results.append([assignment_average])
+
         return [course_grade.percent] + _flatten(grade_results)
+
+    def _user_subsection_grades(self, course_grade, subsection_headers):
+        """
+        Returns a list of grade results for the given course_grade corresponding
+        to the headers for this report.
+        """
+        subsection_grades = []
+        grade_results = []
+        for subsection_location in subsection_headers:
+            subsection_grade = course_grade.subsection_grade(subsection_location)
+            if subsection_grade.attempted_graded:
+                grade_result = subsection_grade.percent_graded
+            else:
+                grade_result = u'Not Attempted'
+            grade_results.append([grade_result])
+            subsection_grades.append(subsection_grade)
+        return subsection_grades, grade_results
+
+    def _user_assignment_average(self, course_grade, subsection_grades, assignment_info):
+        if assignment_info['separate_subsection_avg_headers']:
+            if assignment_info['grader']:
+                if course_grade.attempted:
+                    subsection_breakdown = [
+                        {'percent': subsection_grade.percent_graded}
+                        for subsection_grade in subsection_grades
+                    ]
+                    assignment_average, _ = assignment_info['grader'].total_with_drops(subsection_breakdown)
+                else:
+                    assignment_average = 0.0
+                return assignment_average
 
     def _user_cohort_group_names(self, user, context):
         """
@@ -413,7 +439,7 @@ class CourseGradeReport(object):
                 else:
                     success_rows.append(
                         [user.id, user.email, user.username] +
-                        self._user_grade_results(course_grade, context) +
+                        self._user_grades(course_grade, context) +
                         self._user_cohort_group_names(user, context) +
                         self._user_experiment_group_names(user, context) +
                         self._user_team_names(user, bulk_context.teams) +
@@ -442,7 +468,8 @@ class ProblemGradeReport(object):
         # as the keys.  It is structured in this way to keep the values related.
         header_row = OrderedDict([('id', 'Student ID'), ('email', 'Email'), ('username', 'Username')])
 
-        graded_scorable_blocks = cls._graded_scorable_blocks_to_header(course_id)
+        course = get_course_by_id(course_id)
+        graded_scorable_blocks = cls._graded_scorable_blocks_to_header(course)
 
         # Just generate the static fields for now.
         rows = [list(header_row.values()) + ['Enrollment Status', 'Grade'] + _flatten(graded_scorable_blocks.values())]
@@ -453,7 +480,6 @@ class ProblemGradeReport(object):
         # whether each user is currently enrolled in the course.
         CourseEnrollment.bulk_fetch_enrollment_states(enrolled_students, course_id)
 
-        course = get_course_by_id(course_id)
         for student, course_grade, error in CourseGradeFactory().iter(enrolled_students, course):
             student_fields = [getattr(student, field_name) for field_name in header_row]
             task_progress.attempted += 1
@@ -497,13 +523,13 @@ class ProblemGradeReport(object):
         return task_progress.update_task_state(extra_meta={'step': 'Uploading CSV'})
 
     @classmethod
-    def _graded_scorable_blocks_to_header(cls, course_key):
+    def _graded_scorable_blocks_to_header(cls, course):
         """
         Returns an OrderedDict that maps a scorable block's id to its
         headers in the final report.
         """
         scorable_blocks_map = OrderedDict()
-        grading_context = grading_context_for_course(course_key)
+        grading_context = grading_context_for_course(course)
         for assignment_type_name, subsection_infos in grading_context['all_graded_subsections_by_type'].iteritems():
             for subsection_index, subsection_info in enumerate(subsection_infos, start=1):
                 for scorable_block in subsection_info['scored_descendants']:

@@ -24,25 +24,18 @@
 // Override global label rules
 .forum-nav-browse-filter label {
   margin-bottom: 0;
+  width: 100%;
 }
 
 // Override global input rules
 .forum-nav-browse-filter-input {
   @include padding-left($baseline/4);
   @include padding-right($baseline/2 + 12px); // Leave room for icon
+
   box-shadow: none !important;
   border-radius: $forum-border-radius !important;
   height: auto !important;
   font-size: $forum-small-font-size !important;
-}
-
-// Override global ul rules
-.forum-nav-browse-menu, .forum-nav-browse-submenu {
-  margin: 0;
-}
-
-.forum-nav-browse-menu {
-  @include padding-left(0);
 }
 
 // --------------------------------
@@ -75,7 +68,7 @@ li[class*=forum-nav-thread-label-] {
   }
 
   // Override clearfix stuff in .sidebar ul li rules
-  &:before, &:after {
+  &::before, &::after {
     display: none !important;
   }
 }
@@ -101,7 +94,6 @@ li[class*=forum-nav-thread-label-] {
 // Inline Discussion Module Overrides
 // -------
 .discussion-module {
-
   .post-header {
     margin-bottom: 0 !important;  // overrides default header styling
     padding-bottom: 0 !important;  // overrides default header styling

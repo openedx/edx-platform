@@ -549,11 +549,15 @@ class CreditProviderCallbackViewTests(UserMixin, TestCase):
         self.assertEqual(response.status_code, 403)
 
     @ddt.data(
-        to_timestamp(datetime.datetime.now(pytz.UTC) - datetime.timedelta(0, 60 * 15 + 1)),
+        -datetime.timedelta(0, 60 * 15 + 1),
         'invalid'
     )
-    def test_post_with_invalid_timestamp(self, timestamp):
+    def test_post_with_invalid_timestamp(self, timedelta):
         """ Verify HTTP 400 is returned for requests with an invalid timestamp. """
+        if timedelta == 'invalid':
+            timestamp = timedelta
+        else:
+            timestamp = to_timestamp(datetime.datetime.now(pytz.UTC) + timedelta)
         request_uuid = self._create_credit_request_and_get_uuid()
         response = self._credit_provider_callback(request_uuid, 'approved', timestamp=timestamp)
         self.assertEqual(response.status_code, 400)

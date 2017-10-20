@@ -57,6 +57,13 @@
                     $('.wrapper-profile-section-container-one').removeClass('is-hidden');
                     $('.wrapper-profile-section-container-two').removeClass('is-hidden');
 
+                    // Only show accomplishments if this is a full profile
+                    if (this.showFullProfile()) {
+                        $('.learner-achievements').removeClass('is-hidden');
+                    } else {
+                        $('.learner-achievements').addClass('is-hidden');
+                    }
+
                     if (this.showFullProfile() && (this.options.accountSettingsModel.get('accomplishments_shared'))) {
                         tabs = [
                             {view: this.sectionTwoView, title: gettext('About Me'), url: 'about_me'},

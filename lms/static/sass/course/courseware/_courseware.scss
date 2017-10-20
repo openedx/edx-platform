@@ -27,9 +27,11 @@ html.video-fullscreen {
 
   .instructor-info-action {
     @extend %t-copy-sub2;
+
     @include float(right);
     @include margin-left($baseline/2);
     @include text-align(right);
+
     padding: ($baseline/4) ($baseline/2);
     border-radius: ($baseline/4);
     background-color: $light-gray1;
@@ -44,9 +46,9 @@ html.video-fullscreen {
 }
 
 .content-wrapper {
-
   .container-footer {
     @include text-align(right);
+
     margin: 0 auto;
     max-width: grid-width(12);
     min-width: 760px;
@@ -55,47 +57,48 @@ html.video-fullscreen {
 }
 
 .content-wrapper {
+  .course-license,
+  .xblock-license {
+    @include text-align(right);
 
-    .course-license,
-    .xblock-license {
-        @include text-align(right);
-        @extend %t-title7;
-        display: block;
-        width: auto;
-        padding: ($baseline/4) 0;
-        color: $base-font-color;
+    @extend %t-title7;
 
-        span {
-            color: inherit;
-        }
+    display: block;
+    width: auto;
+    padding: ($baseline/4) 0;
+    color: $base-font-color;
 
-        a:link,
-        a:visited {
-            color: $base-font-color;
-        }
-
-        a:active,
-        a:hover {
-            color: $uxpl-blue-base;
-        }
-
-        .license-label,
-        .license-value,
-        .license-actions {
-            display: inline-block;
-            vertical-align: middle;
-            margin-bottom: 0;
-        }
-
-        i,
-        em {
-            font-style: normal;
-        }
-
-        img {
-            display: inline;
-        }
+    span {
+      color: inherit;
     }
+
+    a:link,
+    a:visited {
+      color: $base-font-color;
+    }
+
+    a:active,
+    a:hover {
+      color: $uxpl-blue-base;
+    }
+
+    .license-label,
+    .license-value,
+    .license-actions {
+      display: inline-block;
+      vertical-align: middle;
+      margin-bottom: 0;
+    }
+
+    i,
+    em {
+      font-style: normal;
+    }
+
+    img {
+      display: inline;
+    }
+  }
 }
 
 // TO-DO should this be content wrapper?
@@ -121,55 +124,68 @@ html.video-fullscreen {
   .course-content,
   .courseware-results-wrapper {
     @extend .content;
+
     line-height: 1.6;
 
     .xblock {
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-        word-break: break-word;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      word-break: break-word;
     }
 
     h1 {
       margin: 0 0 lh();
       letter-spacing: 0;
     }
+
     div.timed-exam {
       h3 {
         margin-bottom: 12px;
         font-size: 22px;
         font-weight: 600;
       }
+
       h1 {
         margin-bottom: ($baseline/2);
         font-size: 26px;
         font-weight: 600;
       }
+
       h4 {
         margin: 20px 0;
         font-weight: 600;
+
         b.success {
-          color: #2B8048;
+          color: #2b8048;
         }
+
         b.success {
-          color: #2B8048;
+          color: #2b8048;
         }
+
         b.failure {
-          color: #CB4765;
+          color: #cb4765;
         }
       }
+
       p {
         color: #797676;
+
         strong {
           font-weight: 600;
         }
       }
+
       button.gated-sequence {
         background: $transparent;
         color: $uxpl-blue-base;
         border: none;
         box-shadow: none;
+
         @include text-align(left);
+
         @extend %t-copy-base;
+
         width: 100%;
 
         &:hover {
@@ -182,34 +198,41 @@ html.video-fullscreen {
         margin-top: 5px;
         font-size: 1.3em;
       }
+
       .gated-sequence {
         color: $uxpl-blue-base;
         font-weight: 600;
         padding: ($baseline / 1.5) ($baseline / 4);
+
         a.start-timed-exam {
           cursor: pointer;
           color: $uxpl-blue-base;
           font-weight: 600;
           position: relative;
           top: ($baseline/10);
+
           i.fa-arrow-circle-right {
             font-size: $baseline;
           }
         }
       }
+
       .proctored-exam-select-code {
         @include margin-left(30px);
       }
 
       .exam-action-button {
         @extend %t-weight4;
+
         @include margin-right($baseline);
+
         background-image: none;
         box-shadow: none;
         text-shadow: none;
 
         &.btn-pl-primary {
           @extend %btn-pl-primary-base;
+
           border: 0;
 
           &:hover,
@@ -219,41 +242,50 @@ html.video-fullscreen {
         }
       }
 
-      background-color: #F2F8FB;
+      background-color: #f2f8fb;
       padding: 30px;
       font-size: 16px;
       box-shadow: inset 1px 1px 2px rgba(0, 0, 0, .1);
       border: 1px solid #ddd;
+
       &.critical-time {
         border-left: 4px solid #b30101 !important;
         margin: 0 auto;
       }
+
       &.success {
-        border-left: 4px solid #22B557 !important;
+        border-left: 4px solid #22b557 !important;
         margin: 0 auto;
       }
+
       &.success-top-bar {
-        border-top: 4px solid #22B557 !important;
+        border-top: 4px solid #22b557 !important;
         margin: 0 auto;
       }
+
       &.success-left-bar {
-        border-left: 4px solid #22B557 !important;
+        border-left: 4px solid #22b557 !important;
         margin: 0 auto;
       }
+
       &.message-top-bar {
-        border-top: 4px solid #FAB95C !important;
+        border-top: 4px solid #fab95c !important;
         margin: 0 auto;
       }
+
       &.message-left-bar {
-        border-left: 4px solid #FAB95C !important;
+        border-left: 4px solid #fab95c !important;
         margin: 0 auto;
       }
+
       &.failure {
-        border-left: 4px solid #C93B34 !important;
+        border-left: 4px solid #c93b34 !important;
         margin: 0 auto;
       }
+
       &.warning {
         @include border-left(4px solid $warning-color);
+
         margin: 0 auto;
       }
     }
@@ -299,6 +331,7 @@ html.video-fullscreen {
 
         p {
           color: $uxpl-gray-base;
+
           strong {
             font-weight: 600;
           }
@@ -306,6 +339,7 @@ html.video-fullscreen {
 
         .icon {
           @include right(35px);
+
           position: absolute;
           font-size: 30px;
           color: $uxpl-gray-base;
@@ -337,64 +371,81 @@ html.video-fullscreen {
 
       .proctored-exam-skip-actions {
         @include float(right);
+
         margin-top: $baseline;
       }
     }
+
     .footer-sequence {
-      padding: 30px 0px 20px 0px;
-      border-bottom: ($baseline/10) solid #CFD9DD;
+      padding: 30px 0 20px 0;
+      border-bottom: ($baseline/10) solid #cfd9dd;
+
       hr {
         border-bottom: 1px solid $uxpl-gray-background;
       }
+
       .clearfix {
         clear: both;
       }
+
       h4 {
         margin-bottom: 12px;
         font-size: 22px;
         font-weight: 400;
       }
+
       span {
         margin-bottom: 10px;
         display: inline-block;
         font-weight: 600;
       }
+
       p.proctored-exam-option {
         float: left;
         width: 80%;
         margin-bottom: 25px;
 
       }
+
       a.contest-review {
         @include float(right);
         @include text-align(right);
+
         font-size: 12px;
         margin: 0;
         width: 20%;
       }
+
       p {
         margin-bottom: ($baseline/20);
         color: #797676;
       }
+
       .proctored-exam-instruction {
         padding: ($baseline/2) 0;
         border-bottom: 2px solid $uxpl-gray-background;
       }
     }
+
     .border-b-0 {
       border-bottom: none;
     }
+
     .padding-b-0 {
       padding-bottom: ($baseline/20);
     }
+
     .faq-proctoring-exam {
       @extend .footer-sequence;
+
       border-bottom : none;
+
       a.footer-link {
         display: block;
         padding: ($baseline/2) 0;
       }
     }
+
     p {
       margin-bottom: lh();
     }
@@ -404,6 +455,7 @@ html.video-fullscreen {
       background-color: $gray-l5;
       padding: ($baseline * 0.75);
       border-radius: 3px;
+
       @include font-size(13);
     }
 
@@ -415,6 +467,7 @@ html.video-fullscreen {
 
     .path {
       @extend %t-copy-sub1;
+
       margin-top: -($baseline);
       margin-bottom: $baseline;
       color: $gray;
@@ -446,6 +499,7 @@ html.video-fullscreen {
 
         header {
           @extend h1.top-header;
+
           border-radius: 0 4px 0 0;
           margin-bottom: -16px;
           border-bottom: 0;
@@ -458,6 +512,7 @@ html.video-fullscreen {
           h2 {
             @include border-right(0);
             @include padding-right(0);
+
             margin: 12px 0 0;
             font-size: em(14, 24);
           }
@@ -476,10 +531,12 @@ html.video-fullscreen {
 
         ul {
           @include padding-left(1em);
+
           list-style: disc outside none;
 
           &.discussion-errors {
             @include padding-left(2em);
+
             list-style: none;
           }
 
@@ -502,15 +559,16 @@ html.video-fullscreen {
 
       .vert {
         @extend .clearfix;
+
         border-bottom: 1px solid #ddd;
         margin-bottom: ($baseline*0.75);
         padding: 0 0 15px;
       }
 
       .vert > .xblock-student_view.is-hidden {
-          display: none;
-          border-bottom: 0px;
-          margin-bottom: 0px;
+        display: none;
+        border-bottom: 0;
+        margin-bottom: 0;
       }
     }
 
@@ -525,13 +583,16 @@ html.video-fullscreen {
 
       ul {
         margin: 0;
+
         @include clearfix();
+
         padding: 0;
         list-style: none;
 
         li {
           @include float(left);
           @include margin-right(flex-gutter(9));
+
           width: flex-grid(3, 9);
           margin-bottom: lh();
           line-height: lh();
@@ -555,22 +616,25 @@ html.video-fullscreen {
       p.error {
         color: $error-color
       }
+
       p.success {
         color: $success-color;
       }
     }
 
     .xqa-modal, .staff-modal, .history-modal {
-        width: 80%;
-        height: 80%;
-        left: left(20%);
-        overflow: auto;
-        display: none;
+      width: 80%;
+      height: 80%;
+      left: left(20%);
+      overflow: auto;
+      display: none;
     }
 
     div.staff_info {
       display: none;
+
       @include clearfix();
+
       white-space: pre-wrap;
       border-top: 1px solid $gray-l3;
       padding-top: lh();
@@ -680,8 +744,7 @@ section.self-assessment {
  */
 
 .CodeMirror {
-    
-    .CodeMirror-linenumber.CodeMirror-gutter-elt {
-        color: $gray-d3 !important;
-    }
+  .CodeMirror-linenumber.CodeMirror-gutter-elt {
+    color: $gray-d3 !important;
+  }
 }

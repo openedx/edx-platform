@@ -9,11 +9,12 @@ import httpretty
 import mock
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.test import TestCase
 from django.test.utils import override_settings
 
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.enterprise_support.api import (
     ConsentApiClient,
     ConsentApiServiceClient,
@@ -25,8 +26,8 @@ from openedx.features.enterprise_support.api import (
     get_dashboard_consent_notification,
     get_enterprise_consent_url,
 )
-
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
+from openedx.features.enterprise_support.utils import get_cache_key
 from student.tests.factories import UserFactory
 
 
@@ -42,10 +43,12 @@ class MockEnrollment(mock.MagicMock):
 @ddt.ddt
 @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestEnterpriseApi(EnterpriseServiceMockMixin, TestCase):
+class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
     """
     Test enterprise support APIs.
     """
+    ENABLED_CACHES = ['default']
+
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory.create(
@@ -85,6 +88,30 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, TestCase):
         # pylint: disable=protected-access
         self.assertEqual(enterprise_api_service_client.client._store['session'].auth.token, 'test-token')
 
+    def _assert_get_enterprise_customer(self, api_client, enterprise_api_data_for_mock):
+        """
+        DRY method to verify caching for get enterprise customer method.
+        """
+        cache_key = get_cache_key(
+            resource='enterprise-customer',
+            resource_id=enterprise_api_data_for_mock['uuid'],
+            username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
+        )
+        self.mock_get_enterprise_customer(enterprise_api_data_for_mock['uuid'], enterprise_api_data_for_mock, 200)
+        self._assert_get_enterprise_customer_with_cache(api_client, enterprise_api_data_for_mock, cache_key)
+
+    def _assert_get_enterprise_customer_with_cache(self, api_client, enterprise_customer_data, cache_key):
+        """
+        DRY method to verify that get enterprise customer response is cached.
+        """
+        cached_enterprise_customer = cache.get(cache_key)
+        self.assertIsNone(cached_enterprise_customer)
+
+        enterprise_customer = api_client.get_enterprise_customer(enterprise_customer_data['uuid'])
+        self.assertEqual(enterprise_customer_data, enterprise_customer)
+        cached_enterprise_customer = cache.get(cache_key)
+        self.assertEqual(cached_enterprise_customer, enterprise_customer)
+
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.JwtBuilder')
     def test_enterprise_api_client_with_service_user(self, mock_jwt_builder):
@@ -93,6 +120,18 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, TestCase):
         by default to authenticate and access enterprise API.
         """
         self._assert_api_service_client(EnterpriseApiServiceClient, mock_jwt_builder)
+
+        # Verify that enterprise customer data is cached properly for the
+        # enterprise api client.
+        enterprise_api_client = EnterpriseApiServiceClient()
+        enterprise_api_data_for_mock_1 = {'name': 'dummy-enterprise-customer-1', 'uuid': 'enterprise-uuid-1'}
+        self._assert_get_enterprise_customer(enterprise_api_client, enterprise_api_data_for_mock_1)
+
+        # Now try to get enterprise customer for another enterprise and verify
+        # that enterprise api client returns data according to the provided
+        # enterprise UUID.
+        enterprise_api_data_for_mock_2 = {'name': 'dummy-enterprise-customer-2', 'uuid': 'enterprise-uuid-2'}
+        self._assert_get_enterprise_customer(enterprise_api_client, enterprise_api_data_for_mock_2)
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.JwtBuilder')
@@ -148,7 +187,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, TestCase):
             mock_registry,
             mock_partial,
             mock_enterprise_customer_model,
-            mock_get_el_data
+            mock_get_enterprise_learner_data,
     ):
         def mock_get_enterprise_customer(**kwargs):
             uuid = kwargs.get('enterprise_customer_identity_provider__provider_id')
@@ -159,48 +198,52 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, TestCase):
         dummy_request = mock.MagicMock(session={}, user=self.user)
         mock_enterprise_customer_model.objects.get.side_effect = mock_get_enterprise_customer
         mock_enterprise_customer_model.DoesNotExist = Exception
-
         mock_partial.return_value = True
         mock_registry.get_from_pipeline.return_value.provider_id = 'real-ent-uuid'
 
+        # Verify that the method `enterprise_customer_for_request` returns
+        # expected enterprise customer against the requesting user.
         self.mock_get_enterprise_customer('real-ent-uuid', {'real': 'enterprisecustomer'}, 200)
-
         enterprise_customer = enterprise_customer_for_request(dummy_request)
-
         self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
 
         httpretty.reset()
 
+        # Verify that the method `enterprise_customer_for_request` returns no
+        # enterprise customer if the enterprise customer API throws 404.
         self.mock_get_enterprise_customer('real-ent-uuid', {'detail': 'Not found.'}, 404)
-
         enterprise_customer = enterprise_customer_for_request(dummy_request)
-
         self.assertIsNone(enterprise_customer)
-
-        mock_registry.get_from_pipeline.return_value.provider_id = None
 
         httpretty.reset()
 
+        # Verify that the method `enterprise_customer_for_request` returns
+        # expected enterprise customer against the requesting user even if
+        # the third-party auth pipeline has no `provider_id`.
+        mock_registry.get_from_pipeline.return_value.provider_id = None
         self.mock_get_enterprise_customer('real-ent-uuid', {'real': 'enterprisecustomer'}, 200)
-
         enterprise_customer = enterprise_customer_for_request(
             mock.MagicMock(GET={'enterprise_customer': 'real-ent-uuid'}, user=self.user)
         )
-
         self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
 
+        # Verify that the method `enterprise_customer_for_request` returns
+        # expected enterprise customer against the requesting user even if
+        # the third-party auth pipeline has no `provider_id` but there is
+        # enterprise customer UUID in the cookie.
         enterprise_customer = enterprise_customer_for_request(
             mock.MagicMock(GET={}, COOKIES={settings.ENTERPRISE_CUSTOMER_COOKIE_NAME: 'real-ent-uuid'}, user=self.user)
         )
-
         self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
 
-        mock_get_el_data.return_value = [{'enterprise_customer': {'uuid': 'real-ent-uuid'}}]
-
+        # Verify that we can still get enterprise customer from enterprise
+        # learner API even if we are unable to get it from preferred sources,
+        # e.g. url query parameters, third-party auth pipeline, enterprise
+        # cookie.
+        mock_get_enterprise_learner_data.return_value = [{'enterprise_customer': {'uuid': 'real-ent-uuid'}}]
         enterprise_customer = enterprise_customer_for_request(
             mock.MagicMock(GET={}, COOKIES={}, user=self.user, site=1)
         )
-
         self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
 
     def check_data_sharing_consent(self, consent_required=False, consent_url=None):
@@ -284,22 +327,30 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, TestCase):
         mock_enterprise_enabled.assert_called_once()
         mock_consent_necessary.assert_called_once()
 
+    @httpretty.activate
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request')
     @mock.patch('openedx.features.enterprise_support.api.reverse')
     @mock.patch('openedx.features.enterprise_support.api.consent_needed_for_course')
-    def test_get_enterprise_consent_url(self, needed_for_course_mock, reverse_mock):
+    def test_get_enterprise_consent_url(
+            self,
+            needed_for_course_mock,
+            reverse_mock,
+            enterprise_customer_uuid_for_request_mock,
+    ):
         """
         Verify that get_enterprise_consent_url correctly builds URLs.
         """
+
         def fake_reverse(*args, **kwargs):
             if args[0] == 'grant_data_sharing_permissions':
                 return '/enterprise/grant_data_sharing_permissions'
             return reverse(*args, **kwargs)
 
+        enterprise_customer_uuid_for_request_mock.return_value = 'cf246b88-d5f6-4908-a522-fc307e0b0c59'
         reverse_mock.side_effect = fake_reverse
         needed_for_course_mock.return_value = True
-
         request_mock = mock.MagicMock(
-            user=None,
+            user=self.user,
             build_absolute_uri=lambda x: 'http://localhost:8000' + x  # Don't do it like this in prod. Ever.
         )
 
@@ -309,8 +360,9 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, TestCase):
         expected_url = (
             '/enterprise/grant_data_sharing_permissions?course_id=course-v1%3AedX%2BDemoX%2BDemo_'
             'Course&failure_url=http%3A%2F%2Flocalhost%3A8000%2Fdashboard%3Fconsent_failed%3Dcou'
-            'rse-v1%253AedX%252BDemoX%252BDemo_Course&next=http%3A%2F%2Flocalhost%3A8000%2Fcours'
-            'es%2Fcourse-v1%3AedX%2BDemoX%2BDemo_Course%2Finfo'
+            'rse-v1%253AedX%252BDemoX%252BDemo_Course&enterprise_customer_uuid=cf246b88-d5f6-4908'
+            '-a522-fc307e0b0c59&next=http%3A%2F%2Flocalhost%3A8000%2Fcourses%2Fcourse-v1%3AedX%2B'
+            'DemoX%2BDemo_Course%2Finfo'
         )
         actual_url = get_enterprise_consent_url(request_mock, course_id, return_to=return_to)
         self.assertEqual(actual_url, expected_url)

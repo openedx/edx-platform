@@ -45,6 +45,7 @@
 // Sock
 .wrapper-sock {
   @include clearfix();
+
   position: relative;
   margin: ($baseline*2) 0 0 0;
   border-top: 1px solid $gray-500;
@@ -60,6 +61,7 @@
   // sock - actions
   .list-cta {
     @extend %ui-depth1;
+
     position: absolute;
     top: -($baseline*0.75);
     width: 100%;
@@ -70,6 +72,7 @@
     .cta-show-sock {
       @extend %ui-btn-pill;
       @extend %t-action4;
+
       background: theme-color("light");
       padding: ($baseline/2) $baseline;
       color: theme-color("dark");
@@ -88,7 +91,9 @@
   // sock - additional help
   .sock {
     @include clearfix();
+
     @extend %t-copy-sub2;
+
     max-width: $studio-max-width;
     width: flex-grid(12);
     margin: 0 auto;
@@ -97,11 +102,9 @@
 
     // support body
     header {
-
       .title {
         @extend %t-title4;
       }
-
     }
 
     .list-actions {
@@ -109,15 +112,18 @@
     }
 
     // shared elements
-    .support, .feedback {
+    .support,
+    .feedback {
       .title {
         @extend %t-title6;
+
         color: $white;
         margin-bottom: ($baseline/2);
       }
 
       .copy {
         @extend %t-copy-sub2;
+
         margin: 0 0 $baseline 0;
       }
 
@@ -135,16 +141,14 @@
 
           .action {
             @extend %t-action4;
+
             display: block;
 
             .icon {
               @extend %t-icon4;
+
               vertical-align: middle;
               margin-right: $baseline/4;
-            }
-
-            &:hover, &:active {
-
             }
           }
 
@@ -162,22 +166,22 @@
 
     // studio support content
     .support {
-      width: flex-grid(8,12);
+      width: flex-grid(8, 12);
       float: left;
       margin-right: flex-gutter();
 
       .action-item {
-        width: flexgrid(4,8);
+        width: flexgrid(4, 8);
       }
     }
 
     // studio feedback content
     .feedback {
-      width: flex-grid(4,12);
+      width: flex-grid(4, 12);
       float: left;
 
       .action-item {
-        width: flexgrid(4,4);
+        width: flexgrid(4, 4);
       }
     }
   }

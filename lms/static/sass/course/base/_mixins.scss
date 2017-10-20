@@ -5,7 +5,9 @@
   padding: 0 15px;
   border-radius: 3px;
   border: 1px solid #2d81ad;
+
   @include linear-gradient(top, #6dccf1, #38a8e5);
+
   font-size: 13px;
   font-weight: 700;
   line-height: 32px;
@@ -15,6 +17,7 @@
 
   &:hover, &:focus {
     border-color: #297095;
+
     @include linear-gradient(top, #4fbbe4, #2090d0);
   }
 }
@@ -25,7 +28,9 @@
   padding: 0 15px;
   border-radius: 3px;
   border: 1px solid #444;
+
   @include linear-gradient(top, #eee, $gray-l3);
+
   font-size: 13px;
   font-weight: 700;
   line-height: 32px;

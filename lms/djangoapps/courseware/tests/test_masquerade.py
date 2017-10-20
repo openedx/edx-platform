@@ -8,7 +8,7 @@ from datetime import datetime
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.utils.timezone import UTC
+from pytz import UTC
 from mock import patch
 from nose.plugins.attrib import attr
 from xblock.runtime import DictKeyValueStore
@@ -42,7 +42,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     @classmethod
     def setUpClass(cls):
         super(MasqueradeTestCase, cls).setUpClass()
-        cls.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(UTC())})
+        cls.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(UTC)})
         cls.info_page = ItemFactory.create(
             category="course_info", parent_location=cls.course.location,
             data="OOGIE BLOOGIE", display_name="updates"
@@ -153,20 +153,6 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         problem_html = json.loads(self.get_problem().content)['html']
         self.assertIn(self.problem_display_name, problem_html)
         self.assertEqual(show_answer_expected, "Show Answer" in problem_html)
-
-    def verify_real_user_profile_link(self):
-        """
-        Verifies that the 'Profile' link in the navigation dropdown is pointing
-        to the real user.
-        """
-        content = self.get_courseware_page().content
-        self.assertIn(
-            '<a href="/u/{}" role="menuitem" class="action dropdown-menuitem">Profile</a>'.format(
-                self.test_user.username
-            ),
-            content,
-            "Profile link should point to real user",
-        )
 
     def ensure_masquerade_as_group_member(self, partition_id, group_id):
         """
@@ -376,9 +362,6 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.update_masquerade(role='student', user_name=self.student_user.username)
         self.assertEqual(self.get_progress_detail(), u'2/2')
 
-        # Verify that the user dropdown links have not changed
-        self.verify_real_user_profile_link()
-
         # Temporarily override the student state.
         self.submit_answer('Correct', 'Incorrect')
         self.assertEqual(self.get_progress_detail(), u'1/2')
@@ -461,7 +444,6 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         masquerade_progress = self.get_progress_page().content
         self.assertNotIn("1 of 2 possible points", masquerade_progress)
         self.assertIn("2 of 2 possible points", masquerade_progress)
-        self.verify_real_user_profile_link()
 
 
 @attr(shard=1)

@@ -1,0 +1,9 @@
+{% load i18n %}
+
+{% blocktrans trimmed %}
+Welcome to week {{ week_num }} of our {{ course_name }} course!
+
+Here is what you can look forward to learning this week:
+{{ week_summary }}
+
+{% endblocktrans %}

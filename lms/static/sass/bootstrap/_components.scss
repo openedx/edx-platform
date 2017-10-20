@@ -13,7 +13,13 @@
 
 // Alerts
 .alert {
+  display: flex;
+
   .icon-alert {
-    margin-right: $baseline / 4;
+    margin-right: $baseline;
+  }
+
+  .message-actions {
+    margin-left: $baseline;
   }
 }

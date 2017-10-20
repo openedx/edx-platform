@@ -6,12 +6,12 @@
 
 .post-type-label {
   @include margin-right($baseline);
+
   display: inline-block;
   line-height: 100%;
 }
 
 .field-label {
-
   .post-options & {
     display: inline-block;
   }

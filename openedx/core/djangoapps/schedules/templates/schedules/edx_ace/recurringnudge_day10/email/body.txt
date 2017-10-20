@@ -1,5 +1,5 @@
 {% load i18n %}
-{% if courses|length > 1 %}
+{% if course_ids|length > 1 %}
     {% blocktrans trimmed %}
         Many edX learners are completing more problems every week, and
         participating in the discussion forums. What do you want to do to keep learning?
@@ -11,4 +11,12 @@
         participating in the discussion forums. What do you want to do to keep learning?
     {% endblocktrans %}
     {% trans "Keep learning" %} <{{course_url}}>
+{% endif %}
+{% if show_upsell %}
+{% blocktrans trimmed %}
+    Don't miss the opportunity to highlight your new knowledge and skills by earning a verified
+    certificate. Upgrade by {{ user_schedule_upgrade_deadline_time }}.
+
+    Upgrade Now! <{{ upsell_link }}>
+{% endblocktrans %}
 {% endif %}

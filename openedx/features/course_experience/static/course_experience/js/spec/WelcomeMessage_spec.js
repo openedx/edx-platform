@@ -30,4 +30,56 @@ describe('Welcome Message factory', () => {
       requests.restore();
     });
   });
+
+  describe('Ensure cookies behave as expected', () => {
+    const endpointUrl = '/course/course_id/dismiss_message/';
+
+    function deleteAllCookies() {
+      const cookies = document.cookie.split(';');
+      cookies.forEach((cookie) => {
+        const eqPos = cookie.indexOf('=');
+        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+      });
+    }
+
+    beforeEach(() => {
+      deleteAllCookies();
+    });
+
+    function createWelcomeMessage() {
+      loadFixtures('course_experience/fixtures/welcome-message-fragment.html');
+      new WelcomeMessage({ dismissUrl: endpointUrl });  // eslint-disable-line no-new
+    }
+
+    it('Cookies are created if none exist.', () => {
+      createWelcomeMessage();
+      expect($.cookie('welcome-message-viewed')).toBe('True');
+      expect($.cookie('welcome-message-timer')).toBe('True');
+    });
+
+    it('Nothing is hidden or dismissed if the timer is still active', () => {
+      const $message = $('.welcome-message');
+      $.cookie('welcome-message-viewed', 'True');
+      $.cookie('welcome-message-timer', 'True');
+      createWelcomeMessage();
+      expect($message.attr('style')).toBe(undefined);
+    });
+
+    it('Message is dismissed if the timer has expired and the message has been viewed.', () => {
+      const requests = mockRequests(this);
+      $.cookie('welcome-message-viewed', 'True');
+      createWelcomeMessage();
+
+      const $message = $('.welcome-message');
+      expectRequest(
+        requests,
+        'POST',
+        endpointUrl,
+      );
+      respondWithJson(requests);
+      expect($message.attr('style')).toBe('display: none;');
+      requests.restore();
+    });
+  });
 });

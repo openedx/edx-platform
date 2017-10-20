@@ -28,7 +28,7 @@ class CourseAccessRoleSerializer(serializers.ModelSerializer):
 class CourseRunScheduleSerializer(serializers.Serializer):
     start = serializers.DateTimeField()
     end = serializers.DateTimeField()
-    enrollment_start = serializers.DateTimeField()
+    enrollment_start = serializers.DateTimeField(allow_null=True)
     enrollment_end = serializers.DateTimeField(allow_null=True)
 
 
@@ -50,13 +50,20 @@ class CourseRunTeamSerializerMixin(serializers.Serializer):
     team = CourseRunTeamSerializer(required=False)
 
     def update_team(self, instance, team):
-        CourseAccessRole.objects.filter(course_id=instance.id).delete()
+        # Existing data should remain intact when performing a partial update.
+        if not self.partial:
+            CourseAccessRole.objects.filter(course_id=instance.id).delete()
 
-        # TODO In the future we can optimize by getting users in a single query.
-        CourseAccessRole.objects.bulk_create([
-            CourseAccessRole(course_id=instance.id, role=member['role'], user=User.objects.get(username=member['user']))
-            for member in team
-        ])
+        # We iterate here, instead of using a bulk operation, to avoid uniqueness errors that arise
+        # when using `bulk_create` with existing data. Given the relatively small number of team members
+        # in a course, this is not worth optimizing at this time.
+        for member in team:
+            CourseAccessRole.objects.update_or_create(
+                course_id=instance.id,
+                org=instance.id.org,
+                user=User.objects.get(username=member['user']),
+                defaults={'role': member['role']}
+            )
 
 
 def image_is_jpeg_or_png(value):
@@ -78,6 +85,14 @@ class CourseRunImageField(serializers.ImageField):
         return request.build_absolute_uri(value)
 
 
+class CourseRunPacingTypeField(serializers.ChoiceField):
+    def to_representation(self, value):
+        return 'self_paced' if value else 'instructor_paced'
+
+    def to_internal_value(self, data):
+        return data == 'self_paced'
+
+
 class CourseRunImageSerializer(serializers.Serializer):
     # We set an empty default to prevent the parent serializer from attempting
     # to save this value to the Course object.
@@ -93,10 +108,15 @@ class CourseRunImageSerializer(serializers.Serializer):
         return instance
 
 
-class CourseRunSerializer(CourseRunTeamSerializerMixin, serializers.Serializer):
+class CourseRunSerializerCommonFieldsMixin(serializers.Serializer):
+    schedule = CourseRunScheduleSerializer(source='*', required=False)
+    pacing_type = CourseRunPacingTypeField(source='self_paced', required=False,
+                                           choices=(('instructor_paced', False), ('self_paced', True),))
+
+
+class CourseRunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTeamSerializerMixin, serializers.Serializer):
     id = serializers.CharField(read_only=True)
     title = serializers.CharField(source='display_name')
-    schedule = CourseRunScheduleSerializer(source='*', required=False)
     images = CourseRunImageSerializer(source='*', required=False)
 
     def update(self, instance, validated_data):
@@ -110,17 +130,6 @@ class CourseRunSerializer(CourseRunTeamSerializerMixin, serializers.Serializer):
 
             modulestore().update_item(instance, self.context['request'].user.id)
             return instance
-
-    def update_team(self, instance, team):
-        # Existing data should remain intact when performing a partial update.
-        if not self.partial:
-            CourseAccessRole.objects.filter(course_id=instance.id).delete()
-
-        # TODO In the future we can optimize by getting users in a single query.
-        CourseAccessRole.objects.bulk_create([
-            CourseAccessRole(course_id=instance.id, role=member['role'], user=User.objects.get(username=member['user']))
-            for member in team
-        ])
 
 
 class CourseRunCreateSerializer(CourseRunSerializer):
@@ -139,10 +148,10 @@ class CourseRunCreateSerializer(CourseRunSerializer):
             return instance
 
 
-class CourseRunRerunSerializer(CourseRunTeamSerializerMixin, serializers.Serializer):
+class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTeamSerializerMixin,
+                               serializers.Serializer):
     title = serializers.CharField(source='display_name', required=False)
     run = serializers.CharField(source='id.run')
-    schedule = CourseRunScheduleSerializer(source='*', required=False)
 
     def validate_run(self, value):
         course_run_key = self.instance.id

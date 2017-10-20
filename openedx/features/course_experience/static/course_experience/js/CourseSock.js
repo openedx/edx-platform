@@ -5,6 +5,7 @@ export class CourseSock {  // eslint-disable-line import/prefer-default-export
     const $toggleActionButton = $('.action-toggle-verification-sock');
     const $verificationSock = $('.verification-sock .verification-main-panel');
     const $upgradeToVerifiedButton = $('.verification-sock .action-upgrade-certificate');
+    const $miniCert = $('.mini-cert');
     const pageLocation = window.location.href.indexOf('courseware') > -1
         ? 'Course Content Page' : 'Home Page';
 
@@ -19,19 +20,18 @@ export class CourseSock {  // eslint-disable-line import/prefer-default-export
       const startFixed = $verificationSock.offset().top + 320;
       const endFixed = (startFixed + $verificationSock.height()) - 220;
 
-      // Assure update button stays in sock even when max-width is exceeded
-      const distLeft = ($verificationSock.offset().left + $verificationSock.width())
-        - ($upgradeToVerifiedButton.width() + 22);
+      // Ensure update button stays in sock even when max-width is exceeded
+      const distRight = window.outerWidth - ($miniCert.offset().left + $miniCert.width());
 
       // Update positioning when scrolling is in fixed window and screen width is sufficient
-      if ((documentBottom > startFixed && documentBottom < endFixed)
-          || $(window).width() < 960) {
+      if ((documentBottom > startFixed && documentBottom < endFixed
+          && $(window).width() > 960)) {
         $upgradeToVerifiedButton.addClass('attached');
-        $upgradeToVerifiedButton.css('left', `${distLeft}px`);
+        $upgradeToVerifiedButton.css('right', `${distRight}px`);
       } else {
         // If outside sliding window, reset to un-attached state
         $upgradeToVerifiedButton.removeClass('attached');
-        $upgradeToVerifiedButton.css('left', 'auto');
+        $upgradeToVerifiedButton.css('right', '20px');
 
         // Add class to define absolute location
         if (documentBottom < startFixed) {

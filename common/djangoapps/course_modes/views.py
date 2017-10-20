@@ -5,6 +5,7 @@ Views for the course_mode module
 import decimal
 import urllib
 
+import waffle
 from babel.dates import format_datetime
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -23,6 +24,7 @@ from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
+from openedx.core.djangoapps.catalog.utils import get_currency_data
 from openedx.core.djangoapps.embargo import api as embargo_api
 from student.models import CourseEnrollment
 from third_party_auth.decorators import tpa_hint_ends_existing_session
@@ -103,6 +105,8 @@ class ChooseModeView(View):
                     redirect_url = ecommerce_service.get_checkout_page_url(professional_mode.bulk_sku)
             return redirect(redirect_url)
 
+        course = modulestore().get_course(course_key)
+
         # If there isn't a verified mode available, then there's nothing
         # to do on this page.  Send the user to the dashboard.
         if not CourseMode.has_verified_mode(modes):
@@ -110,12 +114,14 @@ class ChooseModeView(View):
 
         # If a user has already paid, redirect them to the dashboard.
         if is_active and (enrollment_mode in CourseMode.VERIFIED_MODES + [CourseMode.NO_ID_PROFESSIONAL_MODE]):
+            # If the course has started redirect to course home instead
+            if course.has_started():
+                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
             return redirect(reverse('dashboard'))
 
         donation_for_course = request.session.get("donation_for_course", {})
         chosen_price = donation_for_course.get(unicode(course_key), None)
 
-        course = modulestore().get_course(course_key)
         if CourseEnrollment.is_enrollment_closed(request.user, course):
             locale = to_locale(get_language())
             enrollment_end_date = format_datetime(course.enrollment_end, 'short', locale=locale)
@@ -181,6 +187,11 @@ class ChooseModeView(View):
                 context["sku"] = verified_mode.sku
                 context["bulk_sku"] = verified_mode.bulk_sku
 
+        context['currency_data'] = []
+        if waffle.switch_is_active('local_currency'):
+            if 'edx-price-l10n' not in request.COOKIES:
+                context['currency_data'] = get_currency_data()
+
         return render_to_response("course_modes/choose.html", context)
 
     @method_decorator(tpa_hint_ends_existing_session)
@@ -224,10 +235,16 @@ class ChooseModeView(View):
             # system, such as third-party discovery.  These workflows result in learners arriving
             # directly at this screen, and they will not necessarily be pre-enrolled in the audit mode.
             CourseEnrollment.enroll(request.user, course_key, CourseMode.AUDIT)
+            # If the course has started redirect to course home instead
+            if course.has_started():
+                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
             return redirect(reverse('dashboard'))
 
         if requested_mode == 'honor':
             CourseEnrollment.enroll(user, course_key, mode=requested_mode)
+            # If the course has started redirect to course home instead
+            if course.has_started():
+                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
             return redirect(reverse('dashboard'))
 
         mode_info = allowed_modes[requested_mode]

@@ -15,10 +15,10 @@ course_mode_class = course_mode if course_mode else ''
 
             <div class="accomplishment-type">
                 <span class="accomplishment-type-symbol">
-                    <img class="src" src="/static/certificates/images/ico-${course_mode_class}.png" alt="">
+                    <img class="src" src="/static/certificates/images/ico-${course_mode_class}.png" alt="Image for course mode of type ${course_mode_class}">
                 </span>
 
-                <span class="accomplishment-type-label hd-4">${document_title}</span>
+                <span class="accomplishment-type-label hd-3">${document_title}</span>
             </div>
 
             <div class="wrapper-statement-and-signatories">
@@ -93,7 +93,7 @@ course_mode_class = course_mode if course_mode else ''
                     <dt class="label sr-only">Awarded to:</dt>
                     <dd class="value copy copy-meta">
                         <span class="recipient-img">
-                            <img class="src" src="/static/certificates/images/demo-user-profile.png" alt="">
+                            <img class="src" src="/static/certificates/images/demo-user-profile.png" alt="Recipient Image">
                         </span>
                         <div class="recipient-details">
                             <h3 class="recipient-name">${accomplishment_copy_name | h}</h3>

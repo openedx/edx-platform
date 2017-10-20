@@ -31,7 +31,7 @@ VERIFY_STATUS_NEED_TO_REVERIFY = "verify_need_to_reverify"
 
 DISABLE_UNENROLL_CERT_STATES = [
     'generating',
-    'ready',
+    'downloadable',
 ]
 
 

@@ -35,6 +35,7 @@ def program_listing(request):
         'programs': meter.engaged_programs,
         'progress': meter.progress(),
         'show_program_listing': programs_config.enabled,
+        'show_dashboard_tabs': True,
         'uses_pattern_library': True,
     }
 
@@ -75,6 +76,7 @@ def program_details(request, program_uuid):
     context = {
         'urls': urls,
         'show_program_listing': programs_config.enabled,
+        'show_dashboard_tabs': True,
         'nav_hidden': True,
         'disable_courseware_js': True,
         'uses_pattern_library': True,

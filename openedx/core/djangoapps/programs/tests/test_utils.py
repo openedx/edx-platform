@@ -550,7 +550,7 @@ class TestProgramProgressMeter(TestCase):
         self.assertEqual(meter._is_course_complete(course), True)
 
 
-def _create_course(self, course_price):
+def _create_course(self, course_price, course_run_count=1):
     """
     Creates the course in mongo and update it with the instructor data.
     Also creates catalog course with respect to course run.
@@ -558,17 +558,18 @@ def _create_course(self, course_price):
     Returns:
         Catalog course dict.
     """
-    course = ModuleStoreCourseFactory()
-    course.start = datetime.datetime.now(utc) - datetime.timedelta(days=1)
-    course.end = datetime.datetime.now(utc) + datetime.timedelta(days=1)
-    course.instructor_info = self.instructors
-    course = self.update_course(course, self.user.id)
+    course_runs = []
+    for x in range(course_run_count):
+        course = ModuleStoreCourseFactory.create(run='Run_' + str(x))
+        course.start = datetime.datetime.now(utc) - datetime.timedelta(days=1)
+        course.end = datetime.datetime.now(utc) + datetime.timedelta(days=1)
+        course.instructor_info = self.instructors
+        course = self.update_course(course, self.user.id)
 
-    course_run = CourseRunFactory(
-        key=unicode(course.id),
-        seats=[SeatFactory(price=course_price)]
-    )
-    return CourseFactory(course_runs=[course_run])
+        run = CourseRunFactory(key=unicode(course.id), seats=[SeatFactory(price=course_price)])
+        course_runs.append(run)
+
+    return CourseFactory(course_runs=course_runs)
 
 
 @ddt.ddt
@@ -808,6 +809,25 @@ class TestProgramDataExtender(ModuleStoreTestCase):
             applicable_seat_types=['verified'],
         )
         data = ProgramDataExtender(program2, self.user).extend()
+        self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
+
+    def test_learner_eligibility_for_one_click_purchase_with_unpublished(self):
+        """
+        Learner should be eligible for one click purchase if:
+            - program is eligible for one click purchase
+            - There are courses remaining that have not been purchased and enrolled in.
+        """
+        course1 = _create_course(self, self.course_price, course_run_count=2)
+        course2 = _create_course(self, self.course_price)
+        CourseEnrollmentFactory(user=self.user, course_id=course1['course_runs'][0]['key'], mode='verified')
+        course1['course_runs'][0]['status'] = 'unpublished'
+        program2 = ProgramFactory(
+            courses=[course1, course2],
+            is_program_eligible_for_one_click_purchase=True,
+            applicable_seat_types=['verified'],
+        )
+        data = ProgramDataExtender(program2, self.user).extend()
+        self.assertEqual(len(data['skus']), 1)
         self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
 
     def test_learner_eligibility_for_one_click_purchase_professional_no_id(self):

@@ -121,37 +121,6 @@ from openedx.core.djangolib.markup import HTML, Text
                 </li>
             % endfor
         </ol>
-    % else:
-        <div class="well depth-0 message-area">
-            <div class="copy-large">
-                <span class="icon fa fa-calendar-o" aria-hidden="true"></span>
-                <%
-                course_started = course.start.date() <= date.today()
-                %>
-
-                % if course.start_date_is_still_default:
-                    ${_("This course has not started yet.")}
-                % elif course_started:
-                    ${_("We're still working on course content.")}
-                % else:
-                    ${Text(_("This course has not started yet, and will launch on {launch_date_html}.")).format(
-                        launch_date_html=HTML(
-                            '<span'
-                            '    class="localized-datetime start-date"'
-                            '    data-datetime="{start_date}"'
-                            '    data-format="shortDate"'
-                            '    data-timezone="{user_timezone}"'
-                            '    data-language="{user_language}"'
-                            '></span>'
-                        ).format(
-                            start_date=course.start,
-                            user_timezone=user_timezone,
-                            user_language=user_language,
-                        ),
-                    )}
-                % endif
-            </div>
-        </div>
     % endif
 </main>
 

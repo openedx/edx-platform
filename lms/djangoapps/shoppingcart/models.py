@@ -37,7 +37,8 @@ from eventtracking import tracker
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from shoppingcart.pdf import PDFInvoice
-from student.models import UNENROLL_DONE, CourseEnrollment, EnrollStatusChange
+from student.models import CourseEnrollment, EnrollStatusChange
+from student.signals import UNENROLL_DONE
 from util.query import use_read_replica_if_available
 from xmodule.modulestore.django import modulestore
 

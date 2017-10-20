@@ -1,5 +1,6 @@
 import datetime
 
+import ddt
 import pytz
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
@@ -20,6 +21,7 @@ from ..utils import serialize_datetime
 from ...serializers.course_runs import CourseRunSerializer
 
 
+@ddt.ddt
 class CourseRunViewSetTests(ModuleStoreTestCase):
     list_url = reverse('api:v1:course_run-list')
 
@@ -37,7 +39,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
 
     def assert_access_role(self, course_run, user, role):
         # An error will be raised if the endpoint did not create the role
-        CourseAccessRole.objects.get(course_id=course_run.id, user=user, role=role)
+        CourseAccessRole.objects.get(course_id=course_run.id, org=course_run.id.org, user=user, role=role)
 
     def assert_course_access_role_count(self, course_run, expected):
         assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == expected
@@ -139,30 +141,46 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
     def test_partial_update(self):
         role = 'staff'
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
-        course_run = CourseFactory(start=start, end=None, enrollment_start=None, enrollment_end=None)
-        CourseAccessRole.objects.create(course_id=course_run.id, role=role, user=UserFactory())
-        assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 1
+        course_run = CourseFactory(start=start, end=None, enrollment_start=None, enrollment_end=None, self_paced=False)
 
-        user = UserFactory()
+        # The request should only update or create new team members
+        existing_user = UserFactory()
+        CourseAccessRole.objects.create(course_id=course_run.id, org=course_run.id.org, role=role, user=existing_user)
+        new_user = UserFactory()
+        CourseAccessRole.objects.create(course_id=course_run.id, org=course_run.id.org, role=role, user=new_user)
+        assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 2
+
         data = {
             'team': [
                 {
-                    'user': user.username,
+                    'user': existing_user.username,
                     'role': role,
-                }
+                },
+                {
+                    'user': new_user.username,
+                    'role': role,
+                },
             ],
+            'pacing_type': 'self_paced',
         }
 
         url = reverse('api:v1:course_run-detail', kwargs={'pk': str(course_run.id)})
         response = self.client.patch(url, data, format='json')
         assert response.status_code == 200
-        self.assert_access_role(course_run, user, role)
+        self.assert_access_role(course_run, existing_user, role)
+        self.assert_access_role(course_run, new_user, role)
         self.assert_course_access_role_count(course_run, 2)
 
         course_run = modulestore().get_course(course_run.id)
+        assert course_run.self_paced is True
         self.assert_course_run_schedule(course_run, start, None, None, None)
 
-    def test_create(self):
+    @ddt.data(
+        ('instructor_paced', False),
+        ('self_paced', True),
+    )
+    @ddt.unpack
+    def test_create(self, pacing_type, expected_self_paced_value):
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
         end = start + datetime.timedelta(days=30)
         enrollment_start = start - datetime.timedelta(days=7)
@@ -186,6 +204,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
                     'role': role,
                 }
             ],
+            'pacing_type': pacing_type,
         }
         response = self.client.post(self.list_url, data, format='json')
         assert response.status_code == 201
@@ -196,6 +215,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         assert course_run.id.org == data['org']
         assert course_run.id.course == data['number']
         assert course_run.id.run == data['run']
+        assert course_run.self_paced is expected_self_paced_value
         self.assert_course_run_schedule(course_run, start, end, enrollment_start, enrollment_end)
         self.assert_access_role(course_run, user, role)
         self.assert_course_access_role_count(course_run, 1)
@@ -233,12 +253,15 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         # There should now be an image stored
         contentstore().find(content_key)
 
-    def test_rerun(self):
+    @ddt.data(
+        ('instructor_paced', False),
+        ('self_paced', True),
+    )
+    @ddt.unpack
+    def test_rerun(self, pacing_type, expected_self_paced_value):
         course_run = ToyCourseFactory()
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
         end = start + datetime.timedelta(days=30)
-        enrollment_start = start - datetime.timedelta(days=7)
-        enrollment_end = end - datetime.timedelta(days=14)
         user = UserFactory()
         role = 'instructor'
         run = '3T2017'
@@ -248,8 +271,8 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
             'schedule': {
                 'start': serialize_datetime(start),
                 'end': serialize_datetime(end),
-                'enrollment_start': serialize_datetime(enrollment_start),
-                'enrollment_end': serialize_datetime(enrollment_end),
+                'enrollment_start': None,
+                'enrollment_end': None,
             },
             'team': [
                 {
@@ -257,6 +280,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
                     'role': role,
                 }
             ],
+            'pacing_type': pacing_type,
         }
         response = self.client.post(url, data, format='json')
         assert response.status_code == 201
@@ -264,7 +288,8 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         course_run_key = CourseKey.from_string(response.data['id'])
         course_run = modulestore().get_course(course_run_key)
         assert course_run.id.run == run
-        self.assert_course_run_schedule(course_run, start, end, enrollment_start, enrollment_end)
+        assert course_run.self_paced is expected_self_paced_value
+        self.assert_course_run_schedule(course_run, start, end, None, None)
         self.assert_access_role(course_run, user, role)
         self.assert_course_access_role_count(course_run, 1)
 

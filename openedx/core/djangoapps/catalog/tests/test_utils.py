@@ -16,6 +16,7 @@ from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
     get_course_runs,
     get_course_run_details,
+    get_currency_data,
     get_program_types,
     get_programs,
     get_programs_with_type
@@ -237,6 +238,29 @@ class TestGetProgramTypes(CatalogIntegrationMixin, TestCase):
         self.assertEqual(data, program)
 
 
+@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+class TestGetCurrency(CatalogIntegrationMixin, TestCase):
+    """Tests covering retrieval of currency data from the catalog service."""
+    @override_settings(COURSE_CATALOG_API_URL='https://api.example.com/v1/')
+    def test_get_currency_data(self, mock_get_edx_api_data):
+        """Verify get_currency_data returns the currency data."""
+        currency_data = {
+            "code": "CAD",
+            "rate": 1.257237,
+            "symbol": "$"
+        }
+        mock_get_edx_api_data.return_value = currency_data
+
+        # Catalog integration is disabled.
+        data = get_currency_data()
+        self.assertEqual(data, [])
+
+        catalog_integration = self.create_catalog_integration()
+        UserFactory(username=catalog_integration.service_username)
+        data = get_currency_data()
+        self.assertEqual(data, currency_data)
+
+
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
 class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
@@ -324,12 +348,11 @@ class TestGetCourseRunDetails(CatalogIntegrationMixin, TestCase):
         """
         course_run = CourseRunFactory()
         course_run_details = {
-            'language': course_run['language'],
-            'start': course_run['start'],
-            'end': course_run['end'],
+            'content_language': course_run['content_language'],
+            'weeks_to_complete': course_run['weeks_to_complete'],
             'max_effort': course_run['max_effort']
         }
         mock_get_edx_api_data.return_value = course_run_details
-        data = get_course_run_details(course_run['key'], ['language', 'start', 'end', 'max_effort'])
+        data = get_course_run_details(course_run['key'], ['content_language', 'weeks_to_complete', 'max_effort'])
         self.assertTrue(mock_get_edx_api_data.called)
         self.assertEqual(data, course_run_details)

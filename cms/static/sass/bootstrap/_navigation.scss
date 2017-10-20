@@ -49,7 +49,8 @@
       }
 
       @include media-breakpoint-down(md) {
-        &.nav-item-open-collapsed, &.nav-item-open-collapsed-only {
+        &.nav-item-open-collapsed,
+        &.nav-item-open-collapsed-only {
           display: initial;
           margin: $baseline/4 $baseline/2;
 
@@ -63,13 +64,14 @@
             }
           }
         }
+
         &.nav-item-hidden-collapsed {
           display: none;
         }
       }
     }
 
-    .btn-shopping-cart{
+    .btn-shopping-cart {
       padding-top: 0.7rem; // $btn-padding-y-lg once themed
     }
 

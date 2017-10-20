@@ -1117,7 +1117,6 @@
     "The minimum grade for course credit is not set.": "La note minimale d'obtention d'un cr\u00e9dit pour ce cours n'est pas fix\u00e9e.", 
     "The minimum score percentage must be a whole number between 0 and 100.": "Le score minimum en pourcentage doit-\u00eatre un nombre entier compris entre 0 et 100.", 
     "The name that identifies you throughout {platform_name}. You cannot change your username.": "Votre nom sur {platform_name}. Vous ne pouvez pas modifier votre nom d'utilisateur", 
-    "The name that is used for ID verification and appears on your certificates. Other learners never see your full name. Make sure to enter your name exactly as it appears on your government-issued photo ID, including any non-Roman characters.": "C'est le nom utilis\u00e9 pour la v\u00e9rification d'identit\u00e9 qui appara\u00eet dans votre certificat. Les autres apprenants ne voient jamais votre nom complet. Assurez vous de saisir votre nom exactement comme il appara\u00eet sur votre photo d'identit\u00e9 \u00e9mise par le gouvernement, en incluant les caract\u00e8res autres que romains.", 
     "The page \"{route}\" could not be found.": "Page \"{route}\" non trouv\u00e9e.", 
     "The photo of your face matches the photo on your ID.": "La photo de votre visage concorde avec la photo sur votre pi\u00e8ce d'identit\u00e9.", 
     "The raw error message is:": "Le message d'erreur est:", 

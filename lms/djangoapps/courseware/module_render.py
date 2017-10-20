@@ -11,7 +11,7 @@ from functools import partial
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
@@ -64,7 +64,7 @@ from student.roles import CourseBetaTesterRole
 from track import contexts
 from util import milestones_helpers
 from util.json_request import JsonResponse
-from util.model_utils import slugify
+from django.utils.text import slugify
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
@@ -471,6 +471,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
                 raw_earned=event['value'],
                 raw_possible=event['max_value'],
                 only_if_higher=event.get('only_if_higher'),
+                score_deleted=event.get('score_deleted'),
             )
         else:
             context = contexts.course_context_from_course_id(course_id)
