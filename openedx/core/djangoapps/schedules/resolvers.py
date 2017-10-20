@@ -18,7 +18,7 @@ from courseware.date_summary import verified_upgrade_deadline_link, verified_upg
 from openedx.core.djangoapps.monitoring_utils import function_trace, set_custom_metric
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
-from openedx.core.djangoapps.schedules.models import Schedule
+from openedx.core.djangoapps.schedules.models import DEFAULT_EXPERIENCE_TYPE, EXPERIENCE_TYPES, Schedule
 from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
 from openedx.core.djangoapps.schedules.template_context import (
     absolute_url,
@@ -64,6 +64,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
                                relative to. For example, if this resolver finds schedules that started 7 days ago
                                this variable should be set to "start".
         num_bins -- the int number of bins to split the users into
+        experience_type -- the string name for the experience type that users will be filtered to
     """
     async_send_task = attr.ib()
     site = attr.ib()
@@ -74,6 +75,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
 
     schedule_date_field = None
     num_bins = DEFAULT_NUM_BINS
+    experience_type = DEFAULT_EXPERIENCE_TYPE
 
     def __attrs_post_init__(self):
         # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
@@ -123,10 +125,14 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
             'enrollment__user__profile',
             'enrollment__course',
         ).prefetch_related(
-            'enrollment__course__modes'
+            'enrollment__course__modes',
+            'experience',
         ).filter(
             Q(enrollment__course__end__isnull=True) | Q(
                 enrollment__course__end__gte=self.current_datetime),
+            Q(experience__isnull=True) | Q(experience__experience_type=self.experience_type)
+            if self.experience_type == DEFAULT_EXPERIENCE_TYPE else
+            Q(experience__isnull=False) & Q(experience__experience_type=self.experience_type),
             enrollment__user__in=users,
             enrollment__is_active=True,
             **schedule_day_equals_target_day_filter
@@ -333,6 +339,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
     log_prefix = 'Course Update'
     schedule_date_field = 'start'
     num_bins = COURSE_UPDATE_NUM_BINS
+    experience_type = EXPERIENCE_TYPES[1][0]
 
     def schedules_for_bin(self):
         week_num = abs(self.day_offset) / 7
