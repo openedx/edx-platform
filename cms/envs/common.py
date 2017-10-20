@@ -963,6 +963,9 @@ INSTALLED_APPS = (
 
     # NodeBB app
     'nodebb',
+
+    # Custom settings app
+    'custom_settings',
 )
 
 

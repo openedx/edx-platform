@@ -10,8 +10,18 @@ from lms.djangoapps.onboarding_survey.models import ExtendedProfile
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange
 from xmodule.modulestore.django import modulestore
+from custom_settings.models import CustomSettings
 
 log = getLogger(__name__)
+
+
+@receiver(post_save, sender=CourseOverview, dispatch_uid="nodebb.signals.handlers.set_is_featured_false")
+def set_is_featured_false(sender, instance, created, **kwargs):
+    if created:
+        course_key = instance.id
+        CustomSettings.objects.get_or_create(id=course_key)
+
+        log.info("Course {} is set as not featured".format(course_key))
 
 
 @receiver(post_save, sender=ExtendedProfile, dispatch_uid='create_user_on_nodebb')

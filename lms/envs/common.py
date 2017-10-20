@@ -2168,6 +2168,9 @@ INSTALLED_APPS = (
     # NodeBB
     'nodebb',
 
+    # Custom settings App
+    'custom_settings',
+
     # RestAPI
     'lms.djangoapps.philu_api',
 
