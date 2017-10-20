@@ -32,6 +32,9 @@ log = logging.getLogger(__name__)
 def run():
     """
     Executed during django startup
+
+    NOTE: DO **NOT** add additional code to this method or this file! The Platform Team
+          is moving all startup code to more standard locations using Django best practices.
     """
     django_db_models_options.patch()
 
