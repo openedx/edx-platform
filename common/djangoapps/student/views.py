@@ -2170,7 +2170,7 @@ def record_registration_attributions(request, user):
 def create_account(request, post_override=None):
     """
     JSON call to create new edX account.
-    Used by form in signup_modal.html, which is included into navigation.html
+    Used by form in signup_modal.html, which is included into header.html
     """
     # Check if ALLOW_PUBLIC_ACCOUNT_CREATION flag turned off to restrict user account creation
     if not configuration_helpers.get_value(

@@ -3,11 +3,14 @@
 
 // About: Sass compile for the LMS Courseware Elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the lms-course-*.scss files.
 
-// Bootstrap support for use with shared partials
+// edX Bootstrap theme and variables support
 @import 'bootstrap/theme';
+@import 'bootstrap/variables';
+
+// Core Bootstrap functions, variables and mixins
 @import 'bootstrap/scss/functions';
 @import 'bootstrap/scss/variables';
-@import "bootstrap/scss/mixins/breakpoints";
+@import 'bootstrap/scss/mixins/breakpoints';
 
 // Base
 @import 'base/base';
@@ -75,6 +78,7 @@
 
 // responsive
 @import 'base/layouts'; // temporary spot for responsive course
+@import 'header';
 
 // features
 @import 'features/course-sock';
