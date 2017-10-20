@@ -10,7 +10,6 @@ from babel.dates import format_timedelta
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.utils.formats import date_format
 from django.utils.functional import cached_property
 from django.utils.translation import get_language, to_locale, ugettext_lazy
 from django.utils.translation import ugettext as _
@@ -445,6 +444,11 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
     Verified track.
     """
     css_class = 'verified-upgrade-deadline'
+    title = ugettext_lazy('Verification Upgrade Deadline')
+    description = ugettext_lazy(
+        'You are still eligible to upgrade to a Verified Certificate! '
+        'Pursue it to highlight the knowledge and skills you gain in this course.'
+    )
     link_text = ugettext_lazy('Upgrade to Verified Certificate')
 
     @property
@@ -471,49 +475,12 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
 
     @lazy
     def date(self):
+        deadline = None
+
         if self.enrollment:
-            return self.enrollment.upgrade_deadline
-        else:
-            return None
+            deadline = self.enrollment.upgrade_deadline
 
-    @property
-    def title(self):
-        dynamic_deadline = self._dynamic_deadline()
-        if dynamic_deadline is not None:
-            return _('Upgrade to Verified Certificate')
-
-        return _('Verification Upgrade Deadline')
-
-    def _dynamic_deadline(self):
-        if not self.enrollment:
-            return None
-
-        return self.enrollment.dynamic_upgrade_deadline
-
-    @property
-    def description(self):
-        dynamic_deadline = self._dynamic_deadline()
-        if dynamic_deadline is not None:
-            return _('Don\'t miss the opportunity to highlight your new knowledge and skills by earning a verified'
-                     ' certificate.')
-
-        return _('You are still eligible to upgrade to a Verified Certificate! '
-                 'Pursue it to highlight the knowledge and skills you gain in this course.')
-
-    @property
-    def relative_datestring(self):
-        dynamic_deadline = self._dynamic_deadline()
-        if dynamic_deadline is None:
-            return super(VerifiedUpgradeDeadlineDate, self).relative_datestring
-
-        if self.date is None or self.deadline_has_passed():
-            return ' '
-
-        # Translators: This describes the time by which the user
-        # should upgrade to the verified track. 'date' will be
-        # their personalized verified upgrade deadline formatted
-        # according to their locale.
-        return _(u'by {date}')
+        return deadline
 
     def register_alerts(self, request, course):
         """
@@ -524,13 +491,6 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
             return
         days_left_to_upgrade = (self.date - self.current_time).days
         if self.date > self.current_time and days_left_to_upgrade <= settings.COURSE_MESSAGE_ALERT_DURATION_IN_DAYS:
-            upgrade_message = _(
-                "Don't forget, you have {time_remaining_string} left to upgrade to a Verified Certificate."
-            ).format(time_remaining_string=self.time_remaining_string)
-            if self._dynamic_deadline() is not None:
-                upgrade_message = _(
-                    "Don't forget to upgrade to a verified certificate by {localized_date}."
-                ).format(localized_date=date_format(self.date))
             CourseHomeMessages.register_info_message(
                 request,
                 Text(_(
@@ -550,7 +510,11 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
                         upgrade_label=Text(_('Upgrade ({upgrade_price})')).format(upgrade_price=upgrade_price),
                     )
                 ),
-                title=Text(upgrade_message)
+                title=Text(_(
+                    "Don't forget, you have {time_remaining_string} left to upgrade to a Verified Certificate."
+                )).format(
+                    time_remaining_string=self.time_remaining_string,
+                )
             )
 
 
