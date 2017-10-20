@@ -254,10 +254,17 @@ mark {
 
   &:focus,
   &:active {
-    position: relative;
-    top: auto;
+    @include left(50%);
+    @include margin-left(-1 * $baseline * 1.5);
+    position: absolute;
+    top: $baseline/4;
     width: auto;
     height: auto;
+    background-color: black;
     margin: 0;
+    opacity: 0.8;
+    color: white !important;
+    text-decoration: none !important;
+    outline: none;
   }
 }
