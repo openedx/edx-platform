@@ -363,7 +363,18 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
         response = self.item.transcript(request=request, dispatch=self.dispatch)
         self.assertEqual(json.loads(response.body), [lang])
 
-    def test_multiple_available_translations(self):
+    @ddt.data(True, False)
+    @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages')
+    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled')
+    def test_multiple_available_translations(self, feature_enabled,
+                                             mock_val_video_transcript_feature, mock_get_transcript_languages):
+        """
+        Verify that the available translations dispatch works as expected for multiple translations with
+        or without enabling the edx-val video transcripts feature.
+        """
+        mock_val_video_transcript_feature.return_value = feature_enabled
+        # Assuming that edx-val has German translation available for this video component.
+        mock_get_transcript_languages.return_value = ['de']
         en_translation = _create_srt_file()
         en_translation_filename = os.path.split(en_translation.name)[1]
         uk_translation_filename = os.path.split(self.srt_file.name)[1]
@@ -378,9 +389,11 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
 
         request = Request.blank('/' + self.dispatch)
         response = self.item.transcript(request=request, dispatch=self.dispatch)
+        # Assert that bumper only get its own translations.
         self.assertEqual(json.loads(response.body), ['en', 'uk'])
 
 
+@ddt.ddt
 class TestTranscriptDownloadDispatch(TestVideo):
     """
     Test video handler that provide translation transcripts.
@@ -773,6 +786,33 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         # Make request to XModule transcript handler
         response = self.item.transcript(request=Request.blank('/translation/en'), dispatch='translation/en')
         # Assert the actual response
+        self.assertEqual(response.status_code, 404)
+
+    @ddt.data(True, False)
+    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
+    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled')
+    def test_translations_bumper_transcript(self, feature_enabled,
+                                            mock_val_video_transcript_feature, mock_get_video_transcript_data):
+        """
+        Tests that the translations dispatch response remains the same with or without enabling
+        video transcript feature.
+        """
+        # Mock val api util and return the valid transcript file.
+        transcript = {
+            'content': json.dumps({
+                "start": [10],
+                "end": [100],
+                "text": ["Hi, welcome to Edx."],
+            }),
+            'file_name': 'edx.sjson'
+        }
+        mock_get_video_transcript_data.return_value = transcript
+
+        mock_val_video_transcript_feature.return_value = feature_enabled
+        self.item.video_bumper = {"transcripts": {"en": "unknown.srt.sjson"}}
+        request = Request.blank('/translations/en?is_bumper=1')
+        response = self.item.transcript(request=request, dispatch='translation/en')
+        # Assert that despite the existence of val video transcripts, response remains 404.
         self.assertEqual(response.status_code, 404)
 
 
