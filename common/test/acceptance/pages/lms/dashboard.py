@@ -215,7 +215,7 @@ class DashboardPage(PageObject):
         """
         Return list username dropdown links.
         """
-        return self.q(css='.user-dropdown-menu li a').text
+        return self.q(css='.user-dropdown-menu a').text
 
     @property
     def tabs_link_text(self):
@@ -234,7 +234,7 @@ class DashboardPage(PageObject):
         """
         Click on `Account` link.
         """
-        self.q(css='.user-dropdown-menu li a').nth(2).click()
+        self.q(css='.user-dropdown-menu a').nth(1).click()
 
     @property
     def language_selector(self):

@@ -2,11 +2,14 @@
 // LMS: Shared Build Compile
 // Version 2 - introduces the Pattern Library
 
-// Bootstrap support for use with shared partials
+// edX Bootstrap theme and variables support
 @import 'bootstrap/theme';
+@import 'bootstrap/variables';
+
+// Core Bootstrap functions, variables and mixins
 @import 'bootstrap/scss/functions';
 @import 'bootstrap/scss/variables';
-@import "bootstrap/scss/mixins/breakpoints";
+@import 'bootstrap/scss/mixins/breakpoints';
 
 // Configuration
 @import 'config';
@@ -36,3 +39,6 @@
 @import 'features/course-search';
 @import 'features/course-sock';
 @import 'features/course-upgrade-message';
+
+// Responsive Design
+@import 'header';

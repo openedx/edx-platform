@@ -14,10 +14,19 @@
 
   &:focus,
   &:active {
-    position: relative;
-    top: auto;
-    width: auto;
-    height: auto;
-    margin: 0;
+    @include left(50%);
+    @include margin-left(-6.5em)
+    margin-top: 0;
+    padding: 10px 0.5em;
+    text-align: center;
+    position: absolute;
+    width: 12em;
+    z-index: 1050;
+    top: 0;
+    background-color: $black !important;
+    opacity: 0.8;
+    color: $white !important;
+    text-decoration: none;
+    outline: none;
   }
 }
