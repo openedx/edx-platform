@@ -8,6 +8,7 @@ from django.shortcuts import render
 from opaque_keys.edx.keys import CourseKey
 
 from nodebb.models import DiscussionCommunity
+from common.djangoapps.nodebb.helpers import get_course_related_tabs
 
 log = logging.getLogger("edx.nodebb")
 
@@ -17,12 +18,21 @@ def nodebb_forum_discussion(request, course_id):
     """
     Redirect user to nodeBB forum page that is loaded into our template using iframe
     """
-    course = CourseKey.from_string(course_id)
-    course_community = DiscussionCommunity.objects.filter(course_id=course).first()
+    # To avoid circuler dependencies
+    from xmodule.modulestore.django import modulestore
+    modulestore = modulestore()
+
+    course_key = CourseKey.from_string(course_id)
+    course_community = DiscussionCommunity.objects.filter(course_id=course_key).first()
+    current_course = modulestore.get_course(course_key)
+    course_tabs = get_course_related_tabs(request, current_course)
+
     context = {
+        "provider": current_course.org,
+        "course_display_name": current_course.display_name,
+        "course_tabs": course_tabs,
         "course_id": course_id,
-        "course_name": course.run,
-        "community_url": course_community.community_url
+        "community_url": course_community.community_url if course_community else ""
     }
 
     return render(request, 'discussion_nodebb/discussion_board.html', context)
