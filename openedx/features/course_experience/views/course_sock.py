@@ -27,8 +27,12 @@ class CourseSockFragmentView(EdxFragmentView):
     def get_verification_context(request, course):
         enrollment = CourseEnrollment.get_enrollment(request.user, course.id)
         show_course_sock = verified_upgrade_link_is_valid(enrollment) and get_language() == 'en'
-        upgrade_url = verified_upgrade_deadline_link(request.user, course=course)
-        course_price = get_cosmetic_verified_display_price(course)
+        if show_course_sock:
+            upgrade_url = verified_upgrade_deadline_link(request.user, course=course)
+            course_price = get_cosmetic_verified_display_price(course)
+        else:
+            upgrade_url = ''
+            course_price = ''
 
         context = {
             'show_course_sock': show_course_sock,
