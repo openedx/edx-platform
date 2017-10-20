@@ -415,7 +415,7 @@ class CourseMode(models.Model):
             return None
 
     @classmethod
-    def verified_mode_for_course(cls, course_id, modes=None):
+    def verified_mode_for_course(cls, course_id, modes=None, include_expired=False):
         """Find a verified mode for a particular course.
 
         Since we have multiple modes that can go through the verify flow,
@@ -436,7 +436,7 @@ class CourseMode(models.Model):
             Mode or None
 
         """
-        modes_dict = cls.modes_for_course_dict(course_id, modes=modes)
+        modes_dict = cls.modes_for_course_dict(course_id, modes=modes, include_expired=include_expired)
         verified_mode = modes_dict.get('verified', None)
         professional_mode = modes_dict.get('professional', None)
         # we prefer professional over verify
