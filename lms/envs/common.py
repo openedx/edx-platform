@@ -2098,7 +2098,7 @@ INSTALLED_APPS = [
     'django_comment_client',
     'django_comment_common',
     'discussion_api',
-    'lms.djangoapps.discussion',
+    'lms.djangoapps.discussion.apps.DiscussionConfig',
 
     # Notes
     'notes',
