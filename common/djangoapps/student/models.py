@@ -13,6 +13,7 @@ file and check it in at the same time as your model changes. To do that,
 import hashlib
 import json
 import logging
+import six
 import uuid
 from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, timedelta
@@ -1529,7 +1530,7 @@ class CourseEnrollment(models.Model):
 
         if not status_hash:
             enrollments = cls.enrollments_for_user(user).values_list('course_id', 'mode')
-            enrollments = [(e[0].lower(), e[1].lower()) for e in enrollments]
+            enrollments = [(six.text_type(e[0]).lower(), e[1].lower()) for e in enrollments]
             enrollments = sorted(enrollments, key=lambda e: e[0])
             hash_elements = [user.username]
             hash_elements += ['{course_id}={mode}'.format(course_id=e[0], mode=e[1]) for e in enrollments]
