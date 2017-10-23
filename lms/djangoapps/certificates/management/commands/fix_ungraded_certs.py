@@ -2,9 +2,10 @@
 Management command which fixes ungraded certificates for students
 """
 import logging
-from optparse import make_option
+import types
 
 from django.core.management.base import BaseCommand
+from opaque_keys.edx.keys import CourseKey
 
 from certificates.models import GeneratedCertificate
 from courseware import courses
@@ -23,32 +24,40 @@ class Command(BaseCommand):
     and grade them.
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option(
+    def add_arguments(self, parser):
+        parser.add_argument(
             '-n',
             '--noop',
             action='store_true',
             dest='noop',
             default=False,
             help="Print but do not update the GeneratedCertificate table"
-        ),
-        make_option(
+        )
+
+        parser.add_argument(
             '-c',
             '--course',
             metavar='COURSE_ID',
             dest='course',
-            default=False,
+            required=True,
             help='Grade ungraded users for this course'
-        ),
-    )
+        )
 
     def handle(self, *args, **options):
         course_id = options['course']
         log.info('Fetching ungraded students for %s.', course_id)
+
+        # I got an error in testing that course wasn't an OpaqueKey. Not sure if this is an old command
+        # or if we're calling it programmatically with OpaqueKey types, but I attempted to handle it here.
+        if isinstance(options['course'], types.StringType):
+            course_key = CourseKey.from_string(options['course'])
+        else:
+            course_key = options['course']
+
         ungraded = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
-            course_id__exact=course_id
+            course_id__exact=course_key
         ).filter(grade__exact='')
-        course = courses.get_course_by_id(course_id)
+        course = courses.get_course_by_id(course_key)
         for cert in ungraded:
             # grade the student
             grade = CourseGradeFactory().read(cert.user, course)

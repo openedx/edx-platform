@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
 import os
-from optparse import make_option
 from student.models import UserProfile
 import csv
 
@@ -31,29 +30,27 @@ class Command(BaseCommand):
 
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option('-i', '--import',
-                    metavar='IMPORT_FILE',
-                    dest='import',
-                    default=False,
-                    help='csv file to import, comma delimitted file with '
-                         'double-quoted entries'),
-        make_option('-o', '--output',
-                    metavar='EXPORT_FILE',
-                    dest='output',
-                    default=False,
-                    help='csv file to export'),
-        make_option('-e', '--enable',
-                    metavar='STUDENT',
-                    dest='enable',
-                    default=False,
-                    help="enable a single student's certificate"),
-        make_option('-d', '--disable',
-                    metavar='STUDENT',
-                    dest='disable',
-                    default=False,
-                    help="disable a single student's certificate")
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('-i', '--import',
+                            metavar='IMPORT_FILE',
+                            dest='import',
+                            default=False,
+                            help='csv file to import, comma delimitted file with double-quoted entries')
+        parser.add_argument('-o', '--output',
+                            metavar='EXPORT_FILE',
+                            dest='output',
+                            default=False,
+                            help='csv file to export')
+        parser.add_argument('-e', '--enable',
+                            metavar='STUDENT',
+                            dest='enable',
+                            default=False,
+                            help="enable a single student's certificate")
+        parser.add_argument('-d', '--disable',
+                            metavar='STUDENT',
+                            dest='disable',
+                            default=False,
+                            help="disable a single student's certificate")
 
     def handle(self, *args, **options):
         if options['output']:

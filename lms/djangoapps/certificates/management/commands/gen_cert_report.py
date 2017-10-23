@@ -1,11 +1,10 @@
 """
 Generate a report of certificate statuses
 """
-
-from optparse import make_option
+import types
 
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.db.models import Count
 from opaque_keys.edx.keys import CourseKey
 
@@ -36,24 +35,23 @@ class Command(BaseCommand):
 
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option('-c', '--course',
-                    metavar='COURSE_ID',
-                    dest='course',
-                    default=None,
-                    help='Only generate for COURSE_ID'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('-c', '--course',
+                            metavar='COURSE_ID',
+                            dest='course',
+                            required=True,
+                            help='Only generate for COURSE_ID')
 
     def handle(self, *args, **options):
-
         # Find all courses that have ended
+        cert_data = {}
 
-        if options['course']:
+        # I got an error in testing that course_id wasn't an OpaqueKey. Not sure if this is an old command
+        # or if we're calling it programmatically with OpaqueKey types, but I attempted to handle it here.
+        if isinstance(options['course'], types.StringType):
             course_id = CourseKey.from_string(options['course'])
         else:
-            raise CommandError("You must specify a course")
-
-        cert_data = {}
+            course_id = options['course']
 
         # find students who are active
         # number of enrolled students = downloadable + notpassing

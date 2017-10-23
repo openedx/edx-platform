@@ -2,7 +2,6 @@
 
 import copy
 import logging
-from optparse import make_option
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
@@ -23,42 +22,42 @@ class Command(BaseCommand):
 
     help = """Put a request on the queue to recreate the certificate for a particular user in a particular course."""
 
-    option_list = BaseCommand.option_list + (
-        make_option('-n', '--noop',
-                    action='store_true',
-                    dest='noop',
-                    default=False,
-                    help="Don't grade or add certificate requests to the queue"),
-        make_option('--insecure',
-                    action='store_true',
-                    dest='insecure',
-                    default=False,
-                    help="Don't use https for the callback url to the LMS, useful in http test environments"),
-        make_option('-c', '--course',
-                    metavar='COURSE_ID',
-                    dest='course',
-                    default=False,
-                    help='The course id (e.g., mit/6-002x/circuits-and-electronics) for which the student named in'
-                         '<username> should be graded'),
-        make_option('-u', '--user',
-                    metavar='USERNAME',
-                    dest='username',
-                    default=False,
-                    help='The username or email address for whom grading and certification should be requested'),
-        make_option('-G', '--grade',
-                    metavar='GRADE',
-                    dest='grade_value',
-                    default=None,
-                    help='The grade string, such as "Distinction", which should be passed to the certificate agent'),
-        make_option('-T', '--template',
-                    metavar='TEMPLATE',
-                    dest='template_file',
-                    default=None,
-                    help='The template file used to render this certificate, like "QMSE01-distinction.pdf"'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('-n', '--noop',
+                            action='store_true',
+                            dest='noop',
+                            default=False,
+                            help="Don't grade or add certificate requests to the queue"),
+        parser.add_argument('--insecure',
+                            action='store_true',
+                            dest='insecure',
+                            default=False,
+                            help="Don't use https for the callback url to the LMS, useful in http test environments"),
+        parser.add_argument('-c', '--course',
+                            metavar='COURSE_ID',
+                            dest='course',
+                            required=True,
+                            help='The course id (e.g., mit/6-002x/circuits-and-electronics) for which the student named'
+                                 ' in <username> should be graded'),
+        parser.add_argument('-u', '--user',
+                            metavar='USERNAME',
+                            dest='username',
+                            required=True,
+                            help='The username or email address for whom grading and certification should be'
+                                 ' requested'),
+        parser.add_argument('-G', '--grade',
+                            metavar='GRADE',
+                            dest='grade_value',
+                            default=None,
+                            help='The grade string, such as "Distinction", which should be passed to the certificate'
+                                 ' agent'),
+        parser.add_argument('-T', '--template',
+                            metavar='TEMPLATE',
+                            dest='template_file',
+                            default=None,
+                            help='The template file used to render this certificate, like "QMSE01-distinction.pdf"'),
 
     def handle(self, *args, **options):
-
         # Scrub the username from the log message
         cleaned_options = copy.copy(options)
         if 'username' in cleaned_options:
@@ -72,17 +71,10 @@ class Command(BaseCommand):
             unicode(cleaned_options)
         )
 
-        if options['course']:
-            # try to parse out the course from the serialized form
-            course_id = CourseKey.from_string(options['course'])
-        else:
-            raise CommandError("You must specify a course")
-
+        # try to parse out the course from the serialized form
+        course_id = CourseKey.from_string(options['course'])
         user = options['username']
-        if not (course_id and user):
-            raise CommandError('both course id and student username are required')
 
-        student = None
         if '@' in user:
             student = User.objects.get(email=user, courseenrollment__course_id=course_id)
         else:
