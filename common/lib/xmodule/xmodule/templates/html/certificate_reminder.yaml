@@ -1,0 +1,18 @@
+---
+metadata:
+    display_name: Certificate Reminder
+    editor: certificate_reminder
+data: |
+      <p></p>
+      <div style="width: 100%; margin-bottom: 20px;">
+      <div style="width: 30%; display: inline-block; margin-right: 5%; vertical-align: top;">
+      <h3 style="font-size: 16px;"><span style="color: #000080;"><strong>Earn Your&nbsp;Certificate!</strong></span></h3>
+      <p style="font-size: 16px;">Interested in using an edX certificate to bolster a college application or to advance your career? With an edX verified certificate, you can demonstrate to colleges, employers, and colleagues that you successfully completed a challenging edX course, while helping to support the edX non-profit mission.&nbsp;</p>
+      <p style="font-size: 16px;"><strong><span style="color: #000080;">Register for your certificate</span>&nbsp;<a href="/verify_student/upgrade/%%COURSE_ID%%" target="_blank" style="line-height: 25.6px;">here</a><span style="line-height: 25.6px;">.</span></strong></p>
+      <p style="font-size: 16px;"></p>
+      </div>
+      <div style="width: 60%; display: inline-block; vertical-align: top;"><a href="/verify_student/upgrade/%%COURSE_ID%%" target="[object Object]"><img style="width: 100%; display: block;" src="https://d37djvu3ytnwxt.cloudfront.net/assets/courseware/v1/afb687cef7c70f4c22a2b4c33ce67693/asset-v1:UBCx+Marketing1x+3T2015+type@asset+block/verifiedcert.png" alt="  image link to verified registration" type="saveimage" target="[object Object]" width="584" height="412" /></a></div>
+      </div>
+      <p class="p1" style="font-size: 16px;"></p>
+      <p></p>
+      <p></p>

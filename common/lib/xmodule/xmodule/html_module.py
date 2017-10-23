@@ -82,9 +82,13 @@ class HtmlBlock(object):
         # When we switch this to an XBlock, we can merge this with student_view,
         # but for now the XModule mixin requires that this method be defined.
         # pylint: disable=no-member
+        data = self.data
+
+        data = data.replace("%%COURSE_ID%%", unicode(self.system.course_id))
         if self.system.anonymous_student_id:
-            return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
-        return self.data
+            data = data.replace("%%USER_ID%%", self.system.anonymous_student_id)
+
+        return data
 
 
 class HtmlModuleMixin(HtmlBlock, XModule):
