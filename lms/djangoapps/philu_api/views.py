@@ -3,6 +3,7 @@ restAPI Views
 """
 import logging
 
+from datetime import datetime
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.views import APIView
@@ -53,8 +54,9 @@ class UpdateCommunityProfile(APIView):
 
             user_info_survey.city_of_residence = city_of_residence
             user_info_survey.country_of_residence = country_of_residence
-
-            user_info_survey.dob = birthday
+            
+            if birthday:
+                user_info_survey.dob = datetime.strptime(birthday, '%m/%d/%Y')
 
             extended_profile.save()
             user_info_survey.save()
