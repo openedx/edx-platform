@@ -487,7 +487,6 @@ class CourseTabView(EdxFragmentView):
         """
         Register messages to be shown to the user if they have limited access.
         """
-        is_enrolled = CourseEnrollment.is_enrolled(request.user, course_key)
         if request.user.is_anonymous():
             PageLevelMessages.register_warning_message(
                 request,
@@ -502,23 +501,24 @@ class CourseTabView(EdxFragmentView):
                     ),
                 )
             )
-        elif not is_enrolled:
-            # Only show enroll button if course is open for enrollment.
-            if course_open_for_self_enrollment(course_key):
-                enroll_message = _('You must be enrolled in the course to see course content. \
-                        {enroll_link_start}Enroll now{enroll_link_end}.')
-                PageLevelMessages.register_warning_message(
-                    request,
-                    Text(enroll_message).format(
-                        enroll_link_start=HTML('<button class="enroll-btn btn-link">'),
-                        enroll_link_end=HTML('</button>')
+        else:
+            if not CourseEnrollment.is_enrolled(request.user, course_key):
+                # Only show enroll button if course is open for enrollment.
+                if course_open_for_self_enrollment(course_key):
+                    enroll_message = _('You must be enrolled in the course to see course content. \
+                            {enroll_link_start}Enroll now{enroll_link_end}.')
+                    PageLevelMessages.register_warning_message(
+                        request,
+                        Text(enroll_message).format(
+                            enroll_link_start=HTML('<button class="enroll-btn btn-link">'),
+                            enroll_link_end=HTML('</button>')
+                        )
                     )
-                )
-            else:
-                PageLevelMessages.register_warning_message(
-                    request,
-                    Text(_('You must be enrolled in the course to see course content.'))
-                )
+                else:
+                    PageLevelMessages.register_warning_message(
+                        request,
+                        Text(_('You must be enrolled in the course to see course content.'))
+                    )
 
     @staticmethod
     def handle_exceptions(request, course, exception):
