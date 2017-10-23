@@ -13,16 +13,11 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="header_extras">
-% if waffle_flag_enabled:
-    <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/studio-frontend.min.css')}" />
-    <script type="text/javascript" src="${static.url('common/js/vendor/assets.min.js')}" defer></script>
-% else:
     % for template_name in ["asset"]:
     <script type="text/template" id="${template_name}-tpl">
         <%static:include path="js/${template_name}.underscore" />
     </script>
     % endfor
-% endif
 </%block>
 
 % if not waffle_flag_enabled:
@@ -62,6 +57,7 @@
         <div class="content-primary">
             % if waffle_flag_enabled:
                 <div id="root"></div>
+                <%static:webpack entry="AssetsPage"></%static:webpack>
             % else:
                 <div class="wrapper-assets"></div>
             % endif
