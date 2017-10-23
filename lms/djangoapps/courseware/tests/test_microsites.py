@@ -13,6 +13,8 @@ from xmodule.course_module import (
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
+import unittest
+
 
 @attr(shard=1)
 class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -133,6 +135,7 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertNotContains(resp, 'This is a Test Site footer')
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
+    @unittest.skip('Copyright url is not customized')
     def test_site_anonymous_copyright_content(self):
         """
         Verify that the copyright, when accessed via a Site domain, returns
@@ -144,6 +147,7 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.assertContains(resp, 'This is a copyright page for an Open edX site.')
 
+    @unittest.skip('Copyright url is not customized')
     def test_not_site_anonymous_copyright_content(self):
         """
         Verify that the copyright page does not exist if we are not in a configured site.
