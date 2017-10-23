@@ -1,12 +1,10 @@
 """
 Models to support the on-boarding surveys
 """
-from django.db import models
-from django.contrib.auth.models import User
-from django.dispatch import receiver
 import logging
 
-from common.lib.nodebb_client.client import NodeBBClient
+from django.contrib.auth.models import User
+from django.db import models
 
 log = logging.getLogger("edx.onboarding_survey")
 
@@ -118,7 +116,8 @@ class OrganizationSurvey(models.Model):
     """
     The model to save the organization survey as provided by the user.
     """
-    user = models.OneToOneField(User, unique=True, db_index=True, related_name='organization_survey', null=True, blank=True)
+    user = models.OneToOneField(User, unique=True, db_index=True, related_name='organization_survey', null=True,
+                                blank=True)
     role_in_org = models.ForeignKey(
         RoleInsideOrg, on_delete=models.CASCADE, related_name='org_survey', blank=True, null=True
     )
@@ -225,7 +224,8 @@ class UserInfoSurvey(models.Model):
 
     language = models.CharField(max_length=256)
 
-    english_proficiency = models.ForeignKey(EnglishProficiency, on_delete=models.CASCADE, related_name='user_info_survey')
+    english_proficiency = models.ForeignKey(EnglishProficiency, on_delete=models.CASCADE,
+                                            related_name='user_info_survey')
 
     country_of_residence = models.CharField(max_length=256)
     city_of_residence = models.CharField(max_length=256, blank=True)
@@ -322,35 +322,3 @@ class History(models.Model):
 
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(blank=True, null=True)
-
-
-@receiver(models.signals.post_save, sender=UserInfoSurvey)
-@receiver(models.signals.post_save, sender=ExtendedProfile)
-def sync_user_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
-    """ Sync user information with  """
-    user = instance.user
-
-    if user:
-        try:
-            extended_profile = user.extended_profile
-            user_info_survey = user.user_info_survey
-        except UserInfoSurvey.DoesNotExist:
-            return
-        except ExtendedProfile.DoesNotExist:
-            return
-
-        data_to_sync = {
-            "first_name": extended_profile.first_name,
-            "last_name": extended_profile.last_name,
-            "city_of_residence": user_info_survey.city_of_residence,
-            "country_of_residence": user_info_survey.country_of_residence
-        }
-
-        status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
-
-        if status_code != 200:
-            log.error(
-                "Error: Can not update user({}) on nodebb due to {}".format(user.username, response_body)
-            )
-        else:
-            log.info('Success: User({}) has been updated on nodebb'.format(user.username))
