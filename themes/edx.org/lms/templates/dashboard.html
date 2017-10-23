@@ -102,8 +102,8 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 </div>
 
-<section class="container dashboard" id="dashboard-main">
-<main id="main" aria-label="Content" tabindex="-1">
+<section class="dashboard" id="dashboard-main">
+<main class="main-container" id="main" aria-label="Content" tabindex="-1">
   <section class="my-courses" id="my-courses">
     <header class="wrapper-header-courses">
       <h2 class="header-courses">${_("My Courses")}</h2>
@@ -159,7 +159,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
     % endif
   </section>
 </main>
-
+<div class="side-container">
   %if sidebar_account_activation_message:
     <div class="sidebar-notification">
       ${sidebar_account_activation_message | n, decode.utf8}
@@ -181,9 +181,6 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
         </div>
       </form>
     </div>
-  % endif
-
-  % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <section id="dashboard-search-results" class="search-results dashboard-search-results"></section>
   % endif
 
@@ -226,6 +223,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
       </section>
     </section>
   % endif
+</div>
 </section>
 
 <section id="email-settings-modal" class="modal" aria-hidden="true">

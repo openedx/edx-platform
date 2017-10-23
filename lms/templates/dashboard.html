@@ -102,115 +102,116 @@ from openedx.core.djangolib.markup import HTML, Text
 </div>
 
 <main id="main" aria-label="Content" tabindex="-1">
-    <div class="container dashboard" id="dashboard-main">
-      <div class="my-courses" id="my-courses">
-        <%include file="learner_dashboard/_dashboard_navigation_courses.html"/>
+    <div class="dashboard" id="dashboard-main">
 
-        % if len(course_enrollments) > 0:
-          <ul class="listing-courses">
-          <%
-              share_settings = configuration_helpers.get_value(
-                  'SOCIAL_SHARING_SETTINGS',
-                  getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
-              )
-          %>
-          % for dashboard_index, enrollment in enumerate(course_enrollments):
-            <% show_courseware_link = (enrollment.course_id in show_courseware_links_for) %>
-            <% cert_status = cert_statuses.get(enrollment.course_id) %>
-            <% can_unenroll = (not cert_status) or cert_status.get('can_unenroll') %>
-            <% credit_status = credit_statuses.get(enrollment.course_id) %>
-            <% show_email_settings = (enrollment.course_id in show_email_settings_for) %>
-            <% course_mode_info = all_course_modes.get(enrollment.course_id) %>
-            <% is_paid_course = (enrollment.course_id in enrolled_courses_either_paid) %>
-            <% is_course_blocked = (enrollment.course_id in block_courses) %>
-            <% course_verification_status = verification_status_by_course.get(enrollment.course_id, {}) %>
-            <% course_requirements = courses_requirements_not_met.get(enrollment.course_id) %>
-            <% related_programs = inverted_programs.get(unicode(enrollment.course_id)) %>
-            <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=enrollment.course_overview, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard' />
-          % endfor
+      <div class="main-container">
+        <div class="my-courses" id="my-courses">
+          <%include file="learner_dashboard/_dashboard_navigation_courses.html"/>
 
-          </ul>
-        % else:
-          <div class="empty-dashboard-message">
-            <p>${_("You are not enrolled in any courses yet.")}</p>
-
-            % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-              <a href="${marketing_link('COURSES')}">
-                ${_("Explore courses")}
-              </a>
-
-            %endif
-        </div>
-        % endif
-
-        % if staff_access and len(errored_courses) > 0:
-          <div id="course-errors">
-            <h2>${_("Course-loading errors")}</h2>
-
-          % for course_dir, errors in errored_courses.items():
-             <h3>${course_dir}</h3>
-                 <ul>
-               % for (msg, err) in errors:
-                   <li>${msg}
-                     <ul><li><pre>${err}</pre></li></ul>
-                   </li>
-               % endfor
-                 </ul>
-          % endfor
-          </div>
-        % endif
-    </div>
-
-      %if sidebar_account_activation_message:
-        <div class="sidebar-notification">
-          ${sidebar_account_activation_message | n, decode.utf8}
-        </div>
-      %endif
-
-      % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
-        <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
-          <form class="search-form">
-            <label for="dashboard-search-input">${_('Search Your Courses')}</label>
-            <div class="search-field-wrapper">
-              <input id="dashboard-search-input" type="text" class="search-field"/>
-              <button type="submit" class="search-button" title="${_('Search')}">
-                <span class="icon fa fa-search" aria-hidden="true"></span>
-              </button>
-              <button type="button" class="cancel-button" title="${_('Clear search')}">
-                <span class="icon fa fa-remove" aria-hidden="true"></span>
-              </button>
-            </div>
-          </form>
-        </div>
-      % endif
-
-      % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
-        <div id="dashboard-search-results" class="search-results dashboard-search-results"></div>
-      % endif
-
-      % if display_sidebar_on_dashboard:
-        <div class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
-          <header class="profile">
-            <h2 class="account-status-title sr">${_("Account Status Info")}: </h2>
-          </header>
-          <div class="user-info">
-            <ul>
-
-              % if len(order_history_list):
-              <li class="order-history">
-                <span class="title">${_("Order History")}</span>
-                % for order_history_item in order_history_list:
-                  <span><a href="${order_history_item['receipt_url']}" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
-                % endfor
-              </li>
-              % endif
-
-              <%include file="${static.get_template_path('dashboard/_dashboard_status_verification.html')}" />
+          % if len(course_enrollments) > 0:
+            <ul class="listing-courses">
+            <%
+                share_settings = configuration_helpers.get_value(
+                    'SOCIAL_SHARING_SETTINGS',
+                    getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
+                )
+            %>
+            % for dashboard_index, enrollment in enumerate(course_enrollments):
+              <% show_courseware_link = (enrollment.course_id in show_courseware_links_for) %>
+              <% cert_status = cert_statuses.get(enrollment.course_id) %>
+              <% can_unenroll = (not cert_status) or cert_status.get('can_unenroll') %>
+              <% credit_status = credit_statuses.get(enrollment.course_id) %>
+              <% show_email_settings = (enrollment.course_id in show_email_settings_for) %>
+              <% course_mode_info = all_course_modes.get(enrollment.course_id) %>
+              <% is_paid_course = (enrollment.course_id in enrolled_courses_either_paid) %>
+              <% is_course_blocked = (enrollment.course_id in block_courses) %>
+              <% course_verification_status = verification_status_by_course.get(enrollment.course_id, {}) %>
+              <% course_requirements = courses_requirements_not_met.get(enrollment.course_id) %>
+              <% related_programs = inverted_programs.get(unicode(enrollment.course_id)) %>
+              <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=enrollment.course_overview, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard' />
+            % endfor
 
             </ul>
+          % else:
+            <div class="empty-dashboard-message">
+              <p>${_("You are not enrolled in any courses yet.")}</p>
+
+              % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+                <a href="${marketing_link('COURSES')}">
+                  ${_("Explore courses")}
+                </a>
+
+              %endif
           </div>
+          % endif
+
+          % if staff_access and len(errored_courses) > 0:
+            <div id="course-errors">
+              <h2>${_("Course-loading errors")}</h2>
+
+            % for course_dir, errors in errored_courses.items():
+               <h3>${course_dir}</h3>
+                   <ul>
+                 % for (msg, err) in errors:
+                     <li>${msg}
+                       <ul><li><pre>${err}</pre></li></ul>
+                     </li>
+                 % endfor
+                   </ul>
+            % endfor
+            </div>
+          % endif
         </div>
-      % endif
+      </div>
+      <div class="side-container">
+        %if sidebar_account_activation_message:
+          <div class="sidebar-notification">
+            ${sidebar_account_activation_message | n, decode.utf8}
+          </div>
+        %endif
+
+        % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
+          <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
+            <form class="search-form">
+              <label for="dashboard-search-input">${_('Search Your Courses')}</label>
+              <div class="search-field-wrapper">
+                <input id="dashboard-search-input" type="text" class="search-field"/>
+                <button type="submit" class="search-button" title="${_('Search')}">
+                  <span class="icon fa fa-search" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="cancel-button" title="${_('Clear search')}">
+                  <span class="icon fa fa-remove" aria-hidden="true"></span>
+                </button>
+              </div>
+            </form>
+          </div>
+          <div id="dashboard-search-results" class="search-results dashboard-search-results"></div>
+        % endif
+
+        % if display_sidebar_on_dashboard:
+          <div class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
+            <header class="profile">
+              <h2 class="account-status-title sr">${_("Account Status Info")}: </h2>
+            </header>
+            <div class="user-info">
+              <ul>
+
+                % if len(order_history_list):
+                <li class="order-history">
+                  <span class="title">${_("Order History")}</span>
+                  % for order_history_item in order_history_list:
+                    <span><a href="${order_history_item['receipt_url']}" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
+                  % endfor
+                </li>
+                % endif
+
+                <%include file="${static.get_template_path('dashboard/_dashboard_status_verification.html')}" />
+
+              </ul>
+            </div>
+          </div>
+        % endif
+      </div>
     </div>
 </main>
 
