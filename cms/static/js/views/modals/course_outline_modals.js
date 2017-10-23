@@ -13,10 +13,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     $, Backbone, _, gettext, BaseView, BaseModal, date, XBlockViewUtils, DateUtils, HtmlUtils, StringUtils
 ) {
     'use strict';
-    var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, AbstractEditor, BaseDateEditor,
+    var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, HighlightsXBlockModal,
+        AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
         StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
-        AccessEditor, ShowCorrectnessEditor;
+        AccessEditor, ShowCorrectnessEditor, HighlightsEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
@@ -202,6 +203,38 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         addActionButtons: function() {
             this.addActionButton('publish', gettext('Publish'), true);
+            this.addActionButton('cancel', gettext('Cancel'));
+        }
+    });
+
+    HighlightsXBlockModal = CourseOutlineXBlockModal.extend({
+        initialize: function() {
+            CourseOutlineXBlockModal.prototype.initialize.call(this);
+            if (this.options.xblockType) {
+                this.options.modalName = 'highlights-' + this.options.xblockType;
+            }
+        },
+
+        getTitle: function() {
+            return StringUtils.interpolate(
+                gettext('Highlights for {display_name}'),
+                {display_name: this.model.get('display_name')}
+            );
+        },
+
+        getIntroductionMessage: function() {
+            return StringUtils.interpolate(
+                gettext(
+                    'The highlights you provide here are messaged (i.e., emailed) to learners. Each {item}\'s ' +
+                    'highlights are emailed at the time that we expect the learner to start working on that {item}. ' +
+                    'At this time, we assume that each {item} will take 1 week to complete.'
+                ),
+                {item: this.options.xblockType}
+            );
+        },
+
+        addActionButtons: function() {
+            this.addActionButton('save', gettext('Save'), true);
             this.addActionButton('cancel', gettext('Cancel'));
         }
     });
@@ -844,12 +877,58 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         }
     });
 
+    HighlightsEditor = AbstractEditor.extend({
+        templateName: 'highlights-editor',
+        className: 'edit-show-highlights',
+
+        currentValue: function() {
+            var highlights = [];
+            $('.highlight-input-text').each(function() {
+                var value = $(this).val();
+                if (value !== '' && value !== null) {
+                    highlights.push(value);
+                }
+            });
+            return highlights;
+        },
+
+        hasChanges: function() {
+            return this.model.get('highlights') !== this.currentValue();
+        },
+
+        getRequestData: function() {
+            if (this.hasChanges()) {
+                return {
+                    publish: 'republish',
+                    metadata: {
+                        highlights: this.currentValue()
+                    }
+                };
+            } else {
+                return {};
+            }
+        },
+        getContext: function() {
+            return $.extend(
+                {},
+                AbstractEditor.prototype.getContext.call(this),
+                {
+                    highlights: this.model.get('highlights') || []
+                }
+            );
+        }
+    });
+
     return {
         getModal: function(type, xblockInfo, options) {
             if (type === 'edit') {
                 return this.getEditModal(xblockInfo, options);
             } else if (type === 'publish') {
                 return this.getPublishModal(xblockInfo, options);
+            } else if (type === 'highlights') {
+                return this.getHighlightsModal(xblockInfo, options);
+            } else {
+                return null;
             }
         },
 
@@ -916,6 +995,13 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         getPublishModal: function(xblockInfo, options) {
             return new PublishXBlockModal($.extend({
                 editors: [PublishEditor],
+                model: xblockInfo
+            }, options));
+        },
+
+        getHighlightsModal: function(xblockInfo, options) {
+            return new HighlightsXBlockModal($.extend({
+                editors: [HighlightsEditor],
                 model: xblockInfo
             }, options));
         }

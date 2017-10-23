@@ -1,0 +1,27 @@
+<form>
+<h3 class="modal-section-title" id="highlights_label"><%- gettext('Section Highlights') %></h3>
+<div class="modal-section-content block-highlights">
+    <div role="group" class="list-fields" aria-labelledby="highlights_label">
+        <p class='field-message highlights-description' id='highlights_description'>
+            <%- gettext('Please enter 3-5 highlights to be sent as separate bullet points in the message.') %>
+        </p>
+        <%
+            var max_number_of_highlights = 5;
+        %>
+        <% _.each(highlights, function(highlight){ %>
+            <input
+                    class="input input-text highlight-input-text"
+                    type="text" maxlength="250" aria-describedby="highlights_description"
+                    value="<%= _.escape(highlight) %>"
+            />
+        <% }); %>
+        <% for (i = highlights.length; i < max_number_of_highlights; i++) { %>
+            <input
+                    class="input input-text highlight-input-text"
+                    type="text" maxlength="250" aria-describedby="highlights_description"
+                    placeholder="<%- gettext('A highlight to look forward to this week.') %>"
+            />
+        <% } %>
+    </div>
+</div>
+</form>

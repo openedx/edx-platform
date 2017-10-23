@@ -326,6 +326,8 @@ SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 
 FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 
+FEATURES['ENABLE_SECTION_HIGHLIGHTS'] = True
+
 ########################## AUTHOR PERMISSION #######################
 FEATURES['ENABLE_CREATOR_GROUP'] = False
 

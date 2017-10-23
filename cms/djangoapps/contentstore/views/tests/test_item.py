@@ -2389,7 +2389,8 @@ class TestXBlockInfo(ItemTest):
         super(TestXBlockInfo, self).setUp()
         user_id = self.user.id
         self.chapter = ItemFactory.create(
-            parent_location=self.course.location, category='chapter', display_name="Week 1", user_id=user_id
+            parent_location=self.course.location, category='chapter', display_name="Week 1", user_id=user_id,
+            highlights=['highlight'],
         )
         self.sequential = ItemFactory.create(
             parent_location=self.chapter.location, category='sequential', display_name="Lesson 1", user_id=user_id
@@ -2596,6 +2597,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['graded'], False)
         self.assertEqual(xblock_info['due'], None)
         self.assertEqual(xblock_info['format'], None)
+        self.assertEqual(xblock_info['highlights'], self.chapter.highlights)
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info)
