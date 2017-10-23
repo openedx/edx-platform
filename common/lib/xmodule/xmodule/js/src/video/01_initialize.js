@@ -286,7 +286,7 @@ function(VideoPlayer, i18n, moment, _) {
      */
     function extractHLSVideoSources(state) {
         return _.filter(state.config.sources, function(source) {
-            return /\.m3u8$/.test(source);
+            return /\.m3u8(\?.*)?$/.test(source);
         });
     }
 
