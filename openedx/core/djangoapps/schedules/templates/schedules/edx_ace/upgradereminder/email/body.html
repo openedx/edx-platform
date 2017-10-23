@@ -5,15 +5,17 @@
 {% block preview_text %}
     {% if course_ids|length > 1 %}
         {% blocktrans trimmed %}
-            We hope you are enjoying learning with us so far on {{ platform_name }}! A verified certificate
-            will allow you to highlight your new knowledge and skills. It's official, and easily shareable.
+            We hope you are enjoying learning with us so far on {{ platform_name }}! A verified certificate allows you to
+            highlight your new knowledge and skills. An {{ platform_name }} certificate is official and easily
+            shareable.
 
             Upgrade by {{ user_schedule_upgrade_deadline_time }}.
         {% endblocktrans %}
     {% else %}
         {% blocktrans trimmed %}
-            We hope you are enjoying learning with us so far in {{ first_course_name }}! A verified certificate
-            will allow you to highlight your new knowledge and skills. It's official, and easily shareable.
+            We hope you are enjoying learning with us so far in {{ first_course_name }}! A verified certificate allows
+            you to highlight your new knowledge and skills. An {{ platform_name }} certificate is official and easily
+            shareable.
 
             Upgrade by {{ user_schedule_upgrade_deadline_time }}.
         {% endblocktrans %}
@@ -32,14 +34,14 @@
                 {% if course_ids|length > 1 %}
                     {% blocktrans trimmed %}
                         We hope you are enjoying learning with us so far on <strong>{{ platform_name }}</strong>! A
-                        verified certificate will allow you to highlight your new knowledge and skills. It's official,
-                        and easily shareable.
+                        verified certificate allows you to highlight your new knowledge and skills. An {{ platform_name
+                        }} certificate is official and easily shareable.
                     {% endblocktrans %}
                 {% else %}
                     {% blocktrans trimmed %}
                         We hope you are enjoying learning with us so far in <strong>{{ first_course_name }}</strong>! A
-                        verified certificate will allow you to highlight your new knowledge and skills. It's official,
-                        and easily shareable.
+                        verified certificate allows you to highlight your new knowledge and skills. An {{ platform_name
+                        }} certificate is official and easily shareable.
                     {% endblocktrans %}
                 {% endif %}
             </p>
