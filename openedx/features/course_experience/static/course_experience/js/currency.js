@@ -17,6 +17,10 @@ export class Currency {  // eslint-disable-line import/prefer-default-export
 
     if (countryL10nData) {
       countryL10nData.countryCode = countryCode;
+      $.cookie('edx-price-l10n', JSON.stringify(countryL10nData), {
+        domain: 'edx.org',
+        expires: 1,
+      });
     } else {
       countryL10nData = {
         countryCode: 'USA',
@@ -26,9 +30,6 @@ export class Currency {  // eslint-disable-line import/prefer-default-export
       };
     }
     this.countryL10nData = countryL10nData;
-    $.cookie('edx-price-l10n', JSON.stringify(countryL10nData), {
-      expires: 1,
-    });
   }
 
   setPrice() {
