@@ -679,5 +679,5 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
 
             # Deduplicate program instructors using instructor name
             self.instructors.update(
-                {instructor.get('name'): instructor for instructor in course_instructors.get('instructors', [])}
+                {instructor.get('name', '').strip(): instructor for instructor in course_instructors.get('instructors', [])}
             )
