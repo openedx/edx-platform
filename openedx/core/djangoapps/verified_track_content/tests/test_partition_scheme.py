@@ -146,6 +146,19 @@ class EnrollmentTrackPartitionSchemeTest(SharedModuleStoreTestCase):
         create_mode(self.course, CourseMode.VERIFIED, "Verified Enrollment Track", min_price=1)
         self.assertEqual("Verified Enrollment Track", self._get_user_group().name)
 
+    def test_credit_after_upgrade_deadline(self):
+        create_mode(self.course, CourseMode.CREDIT_MODE, "Credit Enrollment Track", min_price=1)
+        CourseEnrollment.enroll(self.student, self.course.id, mode=CourseMode.CREDIT_MODE)
+
+        # Create a verified mode and check that it is returned for the learner enrolled in Credit.
+        # Make the mode "expired" to ensure that credit users can still see verified-only content after
+        # the upgrade deadline has passed (see EDUCATOR-1511 for why this matters).
+        create_mode(
+            self.course, CourseMode.VERIFIED, "Verified Enrollment Track", min_price=1,
+            expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=-1)
+        )
+        self.assertEqual("Verified Enrollment Track", self._get_user_group().name)
+
     def test_using_verified_track_cohort(self):
         VerifiedTrackCohortedCourse.objects.create(course_key=self.course.id, enabled=True).save()
         CourseEnrollment.enroll(self.student, self.course.id)
