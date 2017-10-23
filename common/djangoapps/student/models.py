@@ -1700,69 +1700,43 @@ class CourseEnrollment(models.Model):
         Returns:
             datetime|None
         """
-        log.debug('Schedules: Determining upgrade deadline for CourseEnrollment %d...', self.id)
-        if not CourseMode.is_mode_upgradeable(self.mode):
-            log.debug(
-                'Schedules: %s mode of %s is not upgradeable. Returning None for upgrade deadline.',
-                self.mode, self.course_id
-            )
-            return None
-
-        if self.dynamic_upgrade_deadline is not None:
-            return self.dynamic_upgrade_deadline
-
-        return self.course_upgrade_deadline
+        if CourseMode.is_mode_upgradeable(self.mode):
+            if self.dynamic_upgrade_deadline is not None:
+                return self.dynamic_upgrade_deadline
+            else:
+                return self.course_upgrade_deadline
+        return None
 
     @cached_property
     def dynamic_upgrade_deadline(self):
+        if self._is_dynamic_upgrade_deadline_enabled() and self.schedule:
+            try:
+                return self.schedule.upgrade_deadline
+            except ObjectDoesNotExist:
+                # NOTE: Schedule has a one-to-one mapping with CourseEnrollment. If no schedule is associated
+                # with this enrollment, Django will raise an exception rather than return None.
+                log.debug('Schedules: No schedule exists for CourseEnrollment %d.', self.id)
+        return None
 
+    def _is_dynamic_upgrade_deadline_enabled(self):
         try:
             course_overview = self.course
         except CourseOverview.DoesNotExist:
             course_overview = self.course_overview
 
-        if not course_overview.self_paced:
-            return None
+        if course_overview.self_paced and DynamicUpgradeDeadlineConfiguration.is_enabled():
+            course_config = CourseDynamicUpgradeDeadlineConfiguration.current(self.course_id)
+            return not (course_config.enabled and course_config.opt_out)
 
-        if not DynamicUpgradeDeadlineConfiguration.is_enabled():
-            return None
-
-        course_config = CourseDynamicUpgradeDeadlineConfiguration.current(self.course_id)
-        if course_config.enabled and course_config.opt_out:
-            return None
-
-        try:
-            if not self.schedule:
-                return None
-
-            log.debug(
-                'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
-                self.id, self.schedule.id
-            )
-            upgrade_deadline = self.schedule.upgrade_deadline
-        except ObjectDoesNotExist:
-            # NOTE: Schedule has a one-to-one mapping with CourseEnrollment. If no schedule is associated
-            # with this enrollment, Django will raise an exception rather than return None.
-            log.debug('Schedules: No schedule exists for CourseEnrollment %d.', self.id)
-            return None
-
-        if upgrade_deadline is None or datetime.now(UTC) >= upgrade_deadline:
-            return None
-
-        return upgrade_deadline
+        return None
 
     @cached_property
     def course_upgrade_deadline(self):
         try:
             if self.verified_mode:
-                log.debug('Schedules: Defaulting to verified mode expiration date-time for %s.', self.course_id)
                 return self.verified_mode.expiration_datetime
-            else:
-                log.debug('Schedules: No verified mode located for %s.', self.course_id)
-                return None
         except CourseMode.DoesNotExist:
             log.debug('Schedules: %s has no verified mode.', self.course_id)
-            return None
 
     def is_verified_enrollment(self):
         """
