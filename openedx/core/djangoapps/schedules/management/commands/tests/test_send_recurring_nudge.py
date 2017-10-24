@@ -60,35 +60,37 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
 
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
 
-    @patch.object(nudge.Command, 'resolver_class')
-    def test_handle(self, mock_resolver):
+    @patch.object(nudge.Command, 'async_send_task')
+    def test_handle(self, mock_send):
         test_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
         nudge.Command().handle(date='2017-08-01', site_domain_name=self.site_config.site.domain)
-        mock_resolver.assert_called_with(self.site_config.site, test_day)
-
         for day in (-3, -10):
-            mock_resolver().send.assert_any_call(day, None)
+            mock_send.enqueue.assert_any_call(
+                self.site_config.site,
+                test_day,
+                day,
+                None
+            )
 
     @patch.object(tasks, 'ace')
-    @patch.object(resolvers.ScheduleStartResolver, 'async_send_task')
-    def test_resolver_send(self, mock_schedule_bin, mock_ace):
+    def test_resolver_send(self, mock_ace):
         current_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        nudge.ScheduleStartResolver(self.site_config.site, current_day).send(-3)
-        test_day = current_day + datetime.timedelta(days=-3)
-        self.assertFalse(mock_schedule_bin.called)
-        mock_schedule_bin.apply_async.assert_any_call(
-            (self.site_config.site.id, serialize(test_day), -3, 0, [], True, None),
-            retry=False,
-        )
-        mock_schedule_bin.apply_async.assert_any_call(
-            (self.site_config.site.id, serialize(test_day), -3, tasks.RECURRING_NUDGE_NUM_BINS - 1, [], True, None),
-            retry=False,
-        )
-        self.assertFalse(mock_ace.send.called)
+        with patch.object(tasks.ScheduleRecurringNudge, 'apply_async') as mock_apply_async:
+            tasks.ScheduleRecurringNudge.enqueue(self.site_config.site, current_day, -3)
+            test_day = current_day + datetime.timedelta(days=-3)
+            mock_apply_async.assert_any_call(
+                (self.site_config.site.id, serialize(test_day), -3, 0, [], True, None),
+                retry=False,
+            )
+            mock_apply_async.assert_any_call(
+                (self.site_config.site.id, serialize(test_day), -3, resolvers.RECURRING_NUDGE_NUM_BINS - 1, [], True, None),
+                retry=False,
+            )
+            self.assertFalse(mock_ace.send.called)
 
     @ddt.data(1, 10, 100)
     @patch.object(tasks, 'ace')
-    @patch.object(tasks, '_recurring_nudge_schedule_send')
+    @patch.object(tasks.ScheduleRecurringNudge, 'async_send_task')
     def test_schedule_bin(self, schedule_count, mock_schedule_send, mock_ace):
         schedules = [
             ScheduleFactory.create(
@@ -97,25 +99,25 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
             ) for i in range(schedule_count)
         ]
 
-        bins_in_use = frozenset((s.enrollment.user.id % tasks.RECURRING_NUDGE_NUM_BINS) for s in schedules)
+        bins_in_use = frozenset((s.enrollment.user.id % resolvers.RECURRING_NUDGE_NUM_BINS) for s in schedules)
 
         test_datetime = datetime.datetime(2017, 8, 3, 18, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
-        for b in range(tasks.RECURRING_NUDGE_NUM_BINS):
+        for b in range(resolvers.RECURRING_NUDGE_NUM_BINS):
             expected_queries = NUM_QUERIES_NO_MATCHING_SCHEDULES
             if b in bins_in_use:
                 # to fetch course modes for valid schedules
                 expected_queries += NUM_COURSE_MODES_QUERIES
 
             with self.assertNumQueries(expected_queries, table_blacklist=WAFFLE_TABLES):
-                tasks.recurring_nudge_schedule_bin(
+                tasks.ScheduleRecurringNudge.delay(
                     self.site_config.site.id, target_day_str=test_datetime_str, day_offset=-3, bin_num=b,
                     org_list=[schedules[0].enrollment.course.org],
                 )
         self.assertEqual(mock_schedule_send.apply_async.call_count, schedule_count)
         self.assertFalse(mock_ace.send.called)
 
-    @patch.object(tasks, '_recurring_nudge_schedule_send')
+    @patch.object(tasks.ScheduleRecurringNudge, 'async_send_task')
     def test_no_course_overview(self, mock_schedule_send):
         schedule = ScheduleFactory.create(
             start=datetime.datetime(2017, 8, 3, 20, 34, 30, tzinfo=pytz.UTC),
@@ -126,9 +128,9 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
 
         test_datetime = datetime.datetime(2017, 8, 3, 20, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
-        for b in range(tasks.RECURRING_NUDGE_NUM_BINS):
+        for b in range(resolvers.RECURRING_NUDGE_NUM_BINS):
             with self.assertNumQueries(NUM_QUERIES_NO_MATCHING_SCHEDULES, table_blacklist=WAFFLE_TABLES):
-                tasks.recurring_nudge_schedule_bin(
+                tasks.ScheduleRecurringNudge.delay(
                     self.site_config.site.id, target_day_str=test_datetime_str, day_offset=-3, bin_num=b,
                     org_list=[schedule.enrollment.course.org],
                 )
@@ -141,9 +143,9 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         # is null.
         self.assertEqual(mock_schedule_send.apply_async.call_count, 0)
 
-    @patch.object(tasks, '_recurring_nudge_schedule_send')
+    @patch.object(tasks.ScheduleRecurringNudge, 'async_send_task')
     def test_send_after_course_end(self, mock_schedule_send):
-        user1 = UserFactory.create(id=tasks.RECURRING_NUDGE_NUM_BINS)
+        user1 = UserFactory.create(id=resolvers.RECURRING_NUDGE_NUM_BINS)
 
         schedule = ScheduleFactory.create(
             start=datetime.datetime(2017, 8, 3, 20, 34, 30, tzinfo=pytz.UTC),
@@ -155,7 +157,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         test_datetime = datetime.datetime(2017, 8, 3, 20, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
 
-        tasks.recurring_nudge_schedule_bin.apply_async(
+        tasks.ScheduleRecurringNudge.apply_async(
             self.site_config.site.id, target_day_str=test_datetime_str, day_offset=-3, bin_num=0,
             org_list=[schedule.enrollment.course.org],
         )
@@ -171,18 +173,21 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         self.assertFalse(mock_ace.send.called)
 
     @patch.object(tasks, 'ace')
-    @patch.object(resolvers.ScheduleStartResolver, 'async_send_task')
-    def test_enqueue_disabled(self, mock_schedule_bin, mock_ace):
+    @patch.object(tasks.ScheduleUpgradeReminder, 'apply_async')
+    def test_enqueue_disabled(self, mock_ace, mock_apply_async):
         ScheduleConfigFactory.create(site=self.site_config.site, enqueue_recurring_nudge=False)
 
         current_datetime = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        nudge.ScheduleStartResolver(self.site_config.site, current_datetime).send(3)
-        self.assertFalse(mock_schedule_bin.called)
-        self.assertFalse(mock_schedule_bin.apply_async.called)
+        tasks.ScheduleRecurringNudge.enqueue(
+            self.site_config.site,
+            current_datetime,
+            3
+        )
+        self.assertFalse(mock_apply_async.called)
         self.assertFalse(mock_ace.send.called)
 
     @patch.object(tasks, 'ace')
-    @patch.object(tasks, '_recurring_nudge_schedule_send')
+    @patch.object(tasks.ScheduleRecurringNudge, 'async_send_task')
     @ddt.data(
         ((['filtered_org'], False, 1)),
         ((['filtered_org'], True, 2))
@@ -199,8 +204,8 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         for config in (limited_config, unlimited_config):
             ScheduleConfigFactory.create(site=config.site)
 
-        user1 = UserFactory.create(id=tasks.RECURRING_NUDGE_NUM_BINS)
-        user2 = UserFactory.create(id=tasks.RECURRING_NUDGE_NUM_BINS * 2)
+        user1 = UserFactory.create(id=resolvers.RECURRING_NUDGE_NUM_BINS)
+        user2 = UserFactory.create(id=resolvers.RECURRING_NUDGE_NUM_BINS * 2)
 
         ScheduleFactory.create(
             start=datetime.datetime(2017, 8, 3, 17, 44, 30, tzinfo=pytz.UTC),
@@ -221,7 +226,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         test_datetime = datetime.datetime(2017, 8, 3, 17, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
         with self.assertNumQueries(NUM_QUERIES_WITH_MATCHES, table_blacklist=WAFFLE_TABLES):
-            tasks.recurring_nudge_schedule_bin(
+            tasks.ScheduleRecurringNudge.delay(
                 limited_config.site.id, target_day_str=test_datetime_str, day_offset=-3, bin_num=0,
                 org_list=org_list, exclude_orgs=exclude_orgs,
             )
@@ -230,7 +235,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         self.assertFalse(mock_ace.send.called)
 
     @patch.object(tasks, 'ace')
-    @patch.object(tasks, '_recurring_nudge_schedule_send')
+    @patch.object(tasks.ScheduleRecurringNudge, 'async_send_task')
     def test_multiple_enrollments(self, mock_schedule_send, mock_ace):
         user = UserFactory.create()
         schedules = [
@@ -245,9 +250,9 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         test_datetime = datetime.datetime(2017, 8, 3, 19, 44, 30, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
         with self.assertNumQueries(NUM_QUERIES_WITH_MATCHES, table_blacklist=WAFFLE_TABLES):
-            tasks.recurring_nudge_schedule_bin(
+            tasks.ScheduleRecurringNudge.delay(
                 self.site_config.site.id, target_day_str=test_datetime_str, day_offset=-3,
-                bin_num=user.id % tasks.RECURRING_NUDGE_NUM_BINS,
+                bin_num=user.id % resolvers.RECURRING_NUDGE_NUM_BINS,
                 org_list=[schedules[0].enrollment.course.org],
             )
         self.assertEqual(mock_schedule_send.apply_async.call_count, 1)
@@ -280,11 +285,11 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         sent_messages = []
 
         with self.settings(TEMPLATES=self._get_template_overrides()):
-            with patch.object(tasks, '_recurring_nudge_schedule_send') as mock_schedule_send:
+            with patch.object(tasks.ScheduleRecurringNudge, 'async_send_task') as mock_schedule_send:
                 mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
 
                 with self.assertNumQueries(NUM_QUERIES_WITH_MATCHES, table_blacklist=WAFFLE_TABLES):
-                    tasks.recurring_nudge_schedule_bin(
+                    tasks.ScheduleRecurringNudge.delay(
                         self.site_config.site.id, target_day_str=test_datetime_str, day_offset=day,
                         bin_num=self._calculate_bin_for_user(user), org_list=[schedules[0].enrollment.course.org],
                     )
@@ -331,8 +336,8 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
             user,
             schedule.enrollment.course.org
         ]
-        sent_messages = self._stub_sender_and_collect_sent_messages(bin_task=tasks.recurring_nudge_schedule_bin,
-                                                                    stubbed_send_task=patch.object(tasks, '_recurring_nudge_schedule_send'),
+        sent_messages = self._stub_sender_and_collect_sent_messages(bin_task=tasks.ScheduleRecurringNudge,
+                                                                    stubbed_send_task=patch.object(tasks.ScheduleRecurringNudge, 'async_send_task'),
                                                                     bin_task_params=bin_task_parameters)
 
         self.assertEqual(len(sent_messages), 1)
@@ -363,8 +368,8 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
             user,
             schedule.enrollment.course.org
         ]
-        sent_messages = self._stub_sender_and_collect_sent_messages(bin_task=tasks.recurring_nudge_schedule_bin,
-                                                                    stubbed_send_task=patch.object(tasks, '_recurring_nudge_schedule_send'),
+        sent_messages = self._stub_sender_and_collect_sent_messages(bin_task=tasks.ScheduleRecurringNudge,
+                                                                    stubbed_send_task=patch.object(tasks.ScheduleRecurringNudge, 'async_send_task'),
                                                                     bin_task_params=bin_task_parameters)
 
         self.assertEqual(len(sent_messages), 1)
@@ -402,8 +407,8 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
             user,
             schedule.enrollment.course.org
         ]
-        sent_messages = self._stub_sender_and_collect_sent_messages(bin_task=tasks.recurring_nudge_schedule_bin,
-                                                                    stubbed_send_task=patch.object(tasks, '_recurring_nudge_schedule_send'),
+        sent_messages = self._stub_sender_and_collect_sent_messages(bin_task=tasks.ScheduleRecurringNudge,
+                                                                    stubbed_send_task=patch.object(tasks.ScheduleRecurringNudge, 'async_send_task'),
                                                                     bin_task_params=bin_task_parameters)
 
         self.assertEqual(len(sent_messages), 1)
@@ -418,7 +423,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
 
             mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
 
-            bin_task(
+            bin_task.delay(
                 self.site_config.site.id,
                 target_day_str=bin_task_params[0],
                 day_offset=bin_task_params[1],
@@ -434,7 +439,7 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
         return templates_override
 
     def _calculate_bin_for_user(self, user):
-        return user.id % tasks.RECURRING_NUDGE_NUM_BINS
+        return user.id % resolvers.RECURRING_NUDGE_NUM_BINS
 
     def _contains_upsell_attribute(self, msg_attr):
         msg = Message.from_string(msg_attr)
