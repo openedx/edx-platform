@@ -37,6 +37,9 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):
         override_recipient_email = options.get('override_recipient_email')
         self.send_emails(site, current_date, override_recipient_email)
 
+    def send_emails(self, *args, **kwargs):
+        raise NotImplementedError
+
     def enqueue(self, day_offset, site, current_date, override_recipient_email=None):
         self.async_send_task.enqueue(
             site,
@@ -44,6 +47,3 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):
             day_offset,
             override_recipient_email,
         )
-
-    def send_emails(self, *args, **kwargs):
-        pass  # define in subclass
