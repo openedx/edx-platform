@@ -13,12 +13,13 @@ from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from progress import models
 
+from edx_solutions_api_integration.test_utils import SignalDisconnectTestMixin
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 from ..serializers import course_completion_serializer_factory
-from ..models import CourseCompletionFacade
+from ..models import CourseCompletionFacade, _Stats
 
 
 class MockCourseCompletion(CourseCompletionFacade):
@@ -28,6 +29,10 @@ class MockCourseCompletion(CourseCompletionFacade):
     def __init__(self, progress):
         super(MockCourseCompletion, self).__init__(progress)
         self._possible = 19
+
+    @property
+    def stats(self):
+        return _Stats(earned=16, possible=19)
 
     @property
     def possible(self):
@@ -114,7 +119,7 @@ class CourseCompletionSerializerTestCase(TestCase):
         self.assertEqual(
             serial.data['completion'],
             {
-                'earned': 0.0,
+                'earned': 16.0,
                 'possible': 0.0,
                 'ratio': 1.0,
             },
@@ -123,7 +128,7 @@ class CourseCompletionSerializerTestCase(TestCase):
 
 @ddt.ddt
 @override_settings(STUDENT_GRADEBOOK=True)
-class ToyCourseCompletionTestCase(SharedModuleStoreTestCase):
+class ToyCourseCompletionTestCase(SignalDisconnectTestMixin, SharedModuleStoreTestCase):
     """
     Test that the CourseCompletionFacade handles modulestore data appropriately,
     and that it interacts properly with the serializer.
@@ -162,11 +167,15 @@ class ToyCourseCompletionTestCase(SharedModuleStoreTestCase):
         )
 
     def test_with_completions(self):
-        progress = models.StudentProgress.objects.create(
-            user=self.test_user,
-            course_id=self.course.id,
-            completions=3,
-        )
+        for block_id in ('sample_video', 'separate_file_video', 'video_with_end_time'):
+            usage_key_str = 'i4x://edX/toy/video/{}'.format(block_id)
+            models.CourseModuleCompletion.objects.create(
+                user=self.test_user,
+                course_id=self.course.id,
+                content_id=UsageKey.from_string(usage_key_str).map_into_course(self.course.id),
+            )
+        # Now, check the result:
+        progress = models.StudentProgress.objects.get(user=self.test_user, course_id=self.course.id)
         completion = CourseCompletionFacade(progress)
         self.assertEqual(completion.earned, 3)
         self.assertEqual(completion.possible, 12)
@@ -180,7 +189,7 @@ class ToyCourseCompletionTestCase(SharedModuleStoreTestCase):
                 'completion': {
                     'earned': 3.0,
                     'possible': 12.0,
-                    'ratio': 1 / 4,
+                    'ratio': 3 / 12,
                 }
             }
         )
@@ -193,11 +202,7 @@ class ToyCourseCompletionTestCase(SharedModuleStoreTestCase):
             course_id=self.course.id,
             content_id=block_key,
         )
-        progress = models.StudentProgress.objects.create(
-            user=self.test_user,
-            course_id=self.course.id,
-            completions=1,
-        )
+        progress = models.StudentProgress.objects.get(user=self.test_user, course_id=self.course.id)
         completion = CourseCompletionFacade(progress)
         serial = course_completion_serializer_factory(['sequential'])(completion)
         self.assertEqual(
@@ -234,11 +239,7 @@ class ToyCourseCompletionTestCase(SharedModuleStoreTestCase):
             course_id=self.course.id,
             content_id=block_key,
         )
-        progress = models.StudentProgress.objects.create(
-            user=self.test_user,
-            course_id=self.course.id,
-            completions=1,
-        )
+        progress = models.StudentProgress.objects.get(user=self.test_user, course_id=self.course.id)
         completion = CourseCompletionFacade(progress)
         # Float rounding errors get introduced, so we use assertAlmostEqual.
         self.assertAlmostEqual(completion.mean, mean)
@@ -266,11 +267,7 @@ class ToyCourseCompletionTestCase(SharedModuleStoreTestCase):
             course_id=self.course.id,
             content_id=block_key,
         )
-        progress = models.StudentProgress.objects.create(
-            user=self.test_user,
-            course_id=self.course.id,
-            completions=1,
-        )
+        progress = models.StudentProgress.objects.get(user=self.test_user, course_id=self.course.id)
         completion = CourseCompletionFacade(progress)
         serializer_cls = course_completion_serializer_factory({'chapter', 'mean', 'sequential', 'vertical'})
         serial = serializer_cls(completion, {'chapter', 'mean', 'sequential', 'vertical'})
