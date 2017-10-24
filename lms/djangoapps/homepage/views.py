@@ -28,7 +28,7 @@ def get_featured_courses(user):
         if unicode(course.id) in featured_custom_settings:
             course_details = modulestore().get_course(course.id)
             instructors = course_details.instructor_info.get('instructors')
-            course.instructor = instructors[0] if instructors else {}
+            course.instructors = instructors if instructors else []
             featured_courses += [course]
 
     return featured_courses
