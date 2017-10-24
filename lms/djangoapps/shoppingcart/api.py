@@ -32,7 +32,7 @@ def order_history(user, **kwargs):
                         (course_org_filter is None and order_item_course_id.org not in org_filter_out_set):
                     order_history_list.append({
                         'order_id': order_item.order.id,
-                        'receipt_url': reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': order_item.order.id}),
+                        'receipt_url': reverse('shoppingcart:show_receipt', kwargs={'ordernum': order_item.order.id}),
                         'order_date': ModuleI18nService().strftime(order_item.order.purchase_time, 'SHORT_DATE')
                     })
     return order_history_list

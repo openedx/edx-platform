@@ -110,7 +110,7 @@ class SSLClientTest(ModuleStoreTestCase):
         redirects them to the signup page on CMS.
         """
         self.client.get(
-            reverse('contentstore.views.login_page'),
+            reverse('login'),
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
         )
 
@@ -152,7 +152,7 @@ class SSLClientTest(ModuleStoreTestCase):
         """
 
         response = self.client.get(
-            reverse('contentstore.views.login_page'),
+            reverse('login'),
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
         )
         self.assertEqual(response.status_code, 302)
