@@ -422,20 +422,11 @@ def verified_upgrade_link_is_valid(enrollment=None):
         enrollment (:class:`.CourseEnrollment`): The enrollment under consideration.
             If None, then the enrollment is considered to be upgradeable.
     """
-    # Return `true` if user is not enrolled in course
-    if enrollment is None:
-        return False
-
-    upgrade_deadline = enrollment.upgrade_deadline
-
-    if upgrade_deadline is None:
-        return False
-
-    if datetime.datetime.now(utc).date() > upgrade_deadline.date():
-        return False
-
-    # Show the summary if user enrollment is in which allow user to upsell
-    return enrollment.is_active and enrollment.mode in CourseMode.UPSELL_TO_VERIFIED_MODES
+    if enrollment:
+        upgrade_deadline = enrollment.upgrade_deadline
+        if upgrade_deadline and datetime.datetime.now(utc).date() <= upgrade_deadline.date():
+            return enrollment.is_active and enrollment.mode in CourseMode.UPSELL_TO_VERIFIED_MODES
+    return False
 
 
 class VerifiedUpgradeDeadlineDate(DateSummary):
