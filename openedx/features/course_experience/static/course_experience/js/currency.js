@@ -66,9 +66,16 @@ export class Currency {  // eslint-disable-line import/prefer-default-export
     this.setPrice();
   }
 
+  getCountryCaller(position) {
+    const caller = function callerFunction() {
+      this.getCountry(position);
+    }.bind(this);
+    $(document).ready(caller);
+  }
+
   getUserLocation() {
     // Get user location from browser
-    navigator.geolocation.getCurrentPosition(this.getCountry.bind(this));
+    navigator.geolocation.getCurrentPosition(this.getCountryCaller.bind(this));
   }
 
   constructor(skipInitialize) {
