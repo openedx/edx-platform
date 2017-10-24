@@ -57,6 +57,7 @@
         <div class="content-primary">
             % if waffle_flag_enabled:
                 <div id="root"></div>
+                <%static:sfeTranslate locale="fr"></%static:sfeTranslate>
                 <%static:webpack entry="AssetsPage"></%static:webpack>
             % else:
                 <div class="wrapper-assets"></div>
