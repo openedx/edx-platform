@@ -1,12 +1,14 @@
 import datetime
-import itertools
 from copy import deepcopy
+import logging
 from unittest import skipUnless
 
 import attr
 import ddt
 import pytz
 from django.conf import settings
+from edx_ace import Message
+from freezegun import freeze_time
 from edx_ace.channel import ChannelType
 from edx_ace.test_utils import StubPolicy, patch_channels, patch_policies
 from edx_ace.utils.date import serialize
@@ -17,41 +19,70 @@ from opaque_keys.edx.locator import CourseLocator
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_upgrade_reminder as reminder
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory, ScheduleFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms, FilteredQueryCountMixin
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
-# 1) Load the current django site
-# 2) Query the schedules to find all of the template context information
-NUM_QUERIES_NO_MATCHING_SCHEDULES = 2
+SITE_QUERY = 1
+SCHEDULES_QUERY = 1
+COURSE_MODES_QUERY = 1
+GLOBAL_DEADLINE_SWITCH_QUERY = 1
+COMMERCE_CONFIG_QUERY = 1
 
-# 3) Query all course modes for all courses in returned schedules
-NUM_QUERIES_WITH_MATCHES = NUM_QUERIES_NO_MATCHING_SCHEDULES + 1
+NUM_QUERIES_NO_MATCHING_SCHEDULES = SITE_QUERY + SCHEDULES_QUERY
 
-# 1) Global dynamic deadline switch
-# 2) Course dynamic deadline switch
-# 2) E-commerce configuration
-NUM_QUERIES_WITH_DEADLINE = 3
+NUM_QUERIES_WITH_MATCHES = (
+    NUM_QUERIES_NO_MATCHING_SCHEDULES +
+    COURSE_MODES_QUERY
+)
 
-NUM_COURSE_MODES_QUERIES = 1
+NUM_QUERIES_FIRST_MATCH = (
+    NUM_QUERIES_WITH_MATCHES
+    + GLOBAL_DEADLINE_SWITCH_QUERY
+    + COMMERCE_CONFIG_QUERY
+)
+
+LOG = logging.getLogger(__name__)
 
 
 @ddt.ddt
 @skip_unless_lms
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
-class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
-    # pylint: disable=protected-access
+@freeze_time('2017-08-01 00:00:00', tz_offset=0, tick=True)
+class TestUpgradeReminder(SharedModuleStoreTestCase):
 
     ENABLED_CACHES = ['default']
 
+    @classmethod
+    def setUpClass(cls):
+        super(TestUpgradeReminder, cls).setUpClass()
+
+        cls.course = CourseFactory.create(
+            org='edX',
+            number='test',
+            display_name='Test Course',
+            self_paced=True,
+            start=datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=30),
+        )
+        cls.course_overview = CourseOverview.get_from_id(cls.course.id)
+
     def setUp(self):
         super(TestUpgradeReminder, self).setUp()
+
+        CourseModeFactory(
+            course_id=self.course.id,
+            mode_slug=CourseMode.VERIFIED,
+            expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
+        )
 
         ScheduleFactory.create(upgrade_deadline=datetime.datetime(2017, 8, 1, 15, 44, 30, tzinfo=pytz.UTC))
         ScheduleFactory.create(upgrade_deadline=datetime.datetime(2017, 8, 1, 17, 34, 30, tzinfo=pytz.UTC))
@@ -96,22 +127,37 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
     @patch.object(tasks, 'ace')
     @patch.object(tasks.ScheduleUpgradeReminder, 'async_send_task')
     def test_schedule_bin(self, schedule_count, mock_schedule_send, mock_ace):
+        upgrade_deadline = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=2)
         schedules = [
             ScheduleFactory.create(
-                upgrade_deadline=datetime.datetime(2017, 8, 3, 18, 44, 30, tzinfo=pytz.UTC),
-                enrollment__course__id=CourseLocator('edX', 'toy', 'Bin')
+                upgrade_deadline=upgrade_deadline,
+                enrollment__course=self.course_overview,
             ) for i in range(schedule_count)
         ]
 
         bins_in_use = frozenset((s.enrollment.user.id % resolvers.UPGRADE_REMINDER_NUM_BINS) for s in schedules)
+        is_first_match = True
 
-        test_datetime = datetime.datetime(2017, 8, 3, 18, tzinfo=pytz.UTC)
+        course_switch_queries = len(set(s.enrollment.course.id for s in schedules))
+
+        test_datetime = datetime.datetime(upgrade_deadline.year, upgrade_deadline.month, upgrade_deadline.day, 18,
+                                          tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
+
         for b in range(resolvers.UPGRADE_REMINDER_NUM_BINS):
+            LOG.debug('Running bin %d', b)
             expected_queries = NUM_QUERIES_NO_MATCHING_SCHEDULES
             if b in bins_in_use:
-                # to fetch course modes for valid schedules
-                expected_queries += NUM_COURSE_MODES_QUERIES
+                if is_first_match:
+                    expected_queries = (
+                        # Since this is the first match, we need to cache all of the config models, so we run a query
+                        # for each of those...
+                        NUM_QUERIES_FIRST_MATCH
+                        + course_switch_queries
+                    )
+                    is_first_match = False
+                else:
+                    expected_queries = NUM_QUERIES_WITH_MATCHES
 
             with self.assertNumQueries(expected_queries, table_blacklist=WAFFLE_TABLES):
                 tasks.ScheduleUpgradeReminder.delay(
@@ -194,22 +240,27 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
         ScheduleFactory.create(
             upgrade_deadline=datetime.datetime(2017, 8, 3, 17, 44, 30, tzinfo=pytz.UTC),
             enrollment__course__org=filtered_org,
+            enrollment__course__self_paced=True,
             enrollment__user=user1,
         )
         ScheduleFactory.create(
             upgrade_deadline=datetime.datetime(2017, 8, 3, 17, 44, 30, tzinfo=pytz.UTC),
             enrollment__course__org=unfiltered_org,
+            enrollment__course__self_paced=True,
             enrollment__user=user1,
         )
         ScheduleFactory.create(
             upgrade_deadline=datetime.datetime(2017, 8, 3, 17, 44, 30, tzinfo=pytz.UTC),
             enrollment__course__org=unfiltered_org,
+            enrollment__course__self_paced=True,
             enrollment__user=user2,
         )
 
         test_datetime = datetime.datetime(2017, 8, 3, 17, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
-        with self.assertNumQueries(NUM_QUERIES_WITH_MATCHES, table_blacklist=WAFFLE_TABLES):
+
+        course_switch_queries = 1
+        with self.assertNumQueries(NUM_QUERIES_FIRST_MATCH + course_switch_queries, table_blacklist=WAFFLE_TABLES):
             tasks.ScheduleUpgradeReminder.delay(
                 limited_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=0,
                 org_list=org_list, exclude_orgs=exclude_orgs,
@@ -226,14 +277,18 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
             ScheduleFactory.create(
                 upgrade_deadline=datetime.datetime(2017, 8, 3, 19, 44, 30, tzinfo=pytz.UTC),
                 enrollment__user=user,
+                enrollment__course__self_paced=True,
                 enrollment__course__id=CourseLocator('edX', 'toy', 'Course{}'.format(course_num))
             )
             for course_num in (1, 2, 3)
         ]
 
+        num_courses = len(set(s.enrollment.course.id for s in schedules))
+
         test_datetime = datetime.datetime(2017, 8, 3, 19, 44, 30, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
-        with self.assertNumQueries(NUM_QUERIES_WITH_MATCHES, table_blacklist=WAFFLE_TABLES):
+
+        with self.assertNumQueries(NUM_QUERIES_FIRST_MATCH + num_courses, table_blacklist=WAFFLE_TABLES):
             tasks.ScheduleUpgradeReminder.delay(
                 self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2,
                 bin_num=user.id % resolvers.UPGRADE_REMINDER_NUM_BINS,
@@ -242,9 +297,8 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
         self.assertEqual(mock_schedule_send.apply_async.call_count, 1)
         self.assertFalse(mock_ace.send.called)
 
-    @ddt.data(*itertools.product((1, 10, 100), (2, 10)))
-    @ddt.unpack
-    def test_templates(self, message_count, day):
+    @ddt.data(1, 10, 100)
+    def test_templates(self, message_count):
         now = datetime.datetime.now(pytz.UTC)
         future_datetime = now + datetime.timedelta(days=21)
 
@@ -253,21 +307,21 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
             ScheduleFactory.create(
                 upgrade_deadline=future_datetime,
                 enrollment__user=user,
+                enrollment__course__self_paced=True,
+                enrollment__course__end=future_datetime + datetime.timedelta(days=30),
                 enrollment__course__id=CourseLocator('edX', 'toy', 'Course{}'.format(course_num))
             )
             for course_num in range(message_count)
         ]
 
         for schedule in schedules:
-            schedule.enrollment.course.self_paced = True
-            schedule.enrollment.course.end = future_datetime + datetime.timedelta(days=30)
-            schedule.enrollment.course.save()
-
             CourseModeFactory(
                 course_id=schedule.enrollment.course.id,
                 mode_slug=CourseMode.VERIFIED,
                 expiration_datetime=future_datetime
             )
+
+        num_courses = len(set(s.enrollment.course.id for s in schedules))
 
         test_datetime = future_datetime
         test_datetime_str = serialize(test_datetime)
@@ -285,12 +339,11 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
             with patch.object(tasks.ScheduleUpgradeReminder, 'async_send_task') as mock_schedule_send:
                 mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
 
-                # we execute one query per course to see if it's opted out of dynamic upgrade deadlines, however,
-                # since we create a new course for each schedule in this test, we expect there to be one per message
-                num_expected_queries = NUM_QUERIES_WITH_MATCHES + NUM_QUERIES_WITH_DEADLINE
+                # we execute one query per course to see if it's opted out of dynamic upgrade deadlines
+                num_expected_queries = NUM_QUERIES_FIRST_MATCH + num_courses
                 with self.assertNumQueries(num_expected_queries, table_blacklist=WAFFLE_TABLES):
                     tasks.ScheduleUpgradeReminder.delay(
-                        self.site_config.site.id, target_day_str=test_datetime_str, day_offset=day,
+                        self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2,
                         bin_num=self._calculate_bin_for_user(user),
                         org_list=[schedules[0].enrollment.course.org],
                     )
@@ -316,4 +369,68 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
         return templates_override
 
     def _calculate_bin_for_user(self, user):
-        return user.id % resolvers.RECURRING_NUDGE_NUM_BINS
+        return user.id % resolvers.UPGRADE_REMINDER_NUM_BINS
+
+    @patch.object(tasks, '_upgrade_reminder_schedule_send')
+    def test_dont_send_to_verified_learner(self, mock_schedule_send):
+        upgrade_deadline = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=2)
+        ScheduleFactory.create(
+            upgrade_deadline=upgrade_deadline,
+            enrollment__user=UserFactory.create(id=resolvers.UPGRADE_REMINDER_NUM_BINS),
+            enrollment__course=self.course_overview,
+            enrollment__mode=CourseMode.VERIFIED,
+        )
+        test_datetime_str = serialize(datetime.datetime.now(pytz.UTC))
+
+        tasks.ScheduleUpgradeReminder.delay(
+            self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=0,
+            org_list=[self.course.org],
+        )
+
+        self.assertFalse(mock_schedule_send.called)
+        self.assertFalse(mock_schedule_send.apply_async.called)
+
+    def test_filter_out_verified_schedules(self):
+        now = datetime.datetime.now(pytz.UTC)
+        future_datetime = now + datetime.timedelta(days=21)
+
+        user = UserFactory.create()
+        schedules = [
+            ScheduleFactory.create(
+                upgrade_deadline=future_datetime,
+                enrollment__user=user,
+                enrollment__course__self_paced=True,
+                enrollment__course__end=future_datetime + datetime.timedelta(days=30),
+                enrollment__course__id=CourseLocator('edX', 'toy', 'Course{}'.format(i)),
+                enrollment__mode=CourseMode.VERIFIED if i in (0, 3) else CourseMode.AUDIT,
+            )
+            for i in range(5)
+        ]
+
+        for schedule in schedules:
+            CourseModeFactory(
+                course_id=schedule.enrollment.course.id,
+                mode_slug=CourseMode.VERIFIED,
+                expiration_datetime=future_datetime
+            )
+
+        test_datetime = future_datetime
+        test_datetime_str = serialize(test_datetime)
+        bin_num = self._calculate_bin_for_user(user)
+
+        sent_messages = []
+        with patch.object(tasks.ScheduleUpgradeReminder, 'async_send_task') as mock_schedule_send:
+            mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args[1])
+
+            tasks.ScheduleUpgradeReminder.delay(
+                self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=bin_num,
+                org_list=[schedules[0].enrollment.course.org],
+            )
+
+            messages = [Message.from_string(m) for m in sent_messages]
+            self.assertEqual(len(messages), 1)
+            message = messages[0]
+            self.assertItemsEqual(
+                message.context['course_ids'],
+                [str(schedules[i].enrollment.course.id) for i in (1, 2, 4)]
+            )
