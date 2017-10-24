@@ -307,6 +307,8 @@ class TestUpgradeReminder(FilteredQueryCountMixin, CacheIsolationTestCase):
             for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
                 for template in attr.astuple(email):
                     self.assertNotIn("TEMPLATE WARNING", template)
+                    self.assertNotIn("{{", template)
+                    self.assertNotIn("}}", template)
 
     def _get_template_overrides(self):
         templates_override = deepcopy(settings.TEMPLATES)
