@@ -40,16 +40,29 @@ COURSE_UPDATE_NUM_BINS = DEFAULT_NUM_BINS
 @attr.s
 class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
     """
-    Starts num_bins number of async tasks, each of which sends emails to an equal group of learners.
+    Identifies learners to send messages to, pulls all needed context and sends a message to each learner.
+
+    Note that for performance reasons, it actually enqueues a task to send the message instead of sending the message
+    directly.
 
     Arguments:
+        async_send_task -- celery task function that sends the message
         site -- Site object that filtered Schedules will be a part of
-        current_date -- datetime that will be used (with time zeroed-out) as the current date in the queries
-        async_send_task -- celery task function which this resolver will call out to
+        target_datetime -- datetime that the User's Schedule's schedule_date_field value should fall under
+        day_offset -- int number of days relative to the Schedule's schedule_date_field that we are targeting
+        bin_num -- int for selecting the bin of Users whose id % num_bins == bin_num
+        org_list -- list of course_org names (strings) that the returned Schedules must or must not be in
+                    (default: None)
+        exclude_orgs -- boolean indicating whether the returned Schedules should exclude (True) the course_orgs in
+                        org_list or strictly include (False) them (default: False)
+        override_recipient_email -- string email address that should receive all emails instead of the normal
+                                    recipient. (default: None)
 
     Static attributes:
+        schedule_date_field -- the name of the model field that represents the date that offsets should be computed
+                               relative to. For example, if this resolver finds schedules that started 7 days ago
+                               this variable should be set to "start".
         num_bins -- the int number of bins to split the users into
-        enqueue_config_var -- the string field name of the config variable on ScheduleConfig to check before enqueuing
     """
     async_send_task = attr.ib()
     site = attr.ib()
@@ -87,14 +100,6 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         Returns Schedules with the target_date, related to Users whose id matches the bin_num, and filtered by org_list.
 
         Arguments:
-        schedule_date_field -- string field name to query on the User's Schedule model
-        current_datetime -- datetime that will be used as "right now" in the query
-        target_datetime -- datetime that the User's Schedule's schedule_date_field value should fall under
-        bin_num -- int for selecting the bin of Users whose id % num_bins == bin_num
-        num_bin -- int specifying the number of bins to separate the Users into (default: DEFAULT_NUM_BINS)
-        org_list -- list of course_org names (strings) that the returned Schedules must or must not be in (default: None)
-        exclude_orgs -- boolean indicating whether the returned Schedules should exclude (True) the course_orgs in org_list
-                        or strictly include (False) them (default: False)
         order_by -- string for field to sort the resulting Schedules by
         """
         target_day = _get_datetime_beginning_of_day(self.target_datetime)
@@ -148,6 +153,44 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
 
         return schedules
 
+    def schedules_for_bin(self):
+        schedules = self.get_schedules_with_target_date_by_bin_and_orgs()
+        template_context = get_base_template_context(self.site)
+
+        for (user, user_schedules) in groupby(schedules, lambda s: s.enrollment.user):
+            user_schedules = list(user_schedules)
+            course_id_strs = [str(schedule.enrollment.course_id) for schedule in user_schedules]
+
+            # This is used by the bulk email optout policy
+            template_context['course_ids'] = course_id_strs
+
+            first_schedule = user_schedules[0]
+            template_context.update(self.get_template_context(user, user_schedules))
+
+            # Information for including upsell messaging in template.
+            _add_upsell_button_information_to_template_context(
+                user, first_schedule, template_context)
+
+            yield (user, first_schedule.enrollment.course.language, template_context)
+
+    def get_template_context(self, user, user_schedules):
+        """
+        Given a user and their schedules, build the context needed to render the template for this message.
+
+        Arguments:
+             user -- the User who will be receiving the message
+             user_schedules -- a list of Schedule objects representing all of their schedules that should be covered by
+                               this message. For example, when a user enrolls in multiple courses on the same day, we
+                               don't want to send them multiple reminder emails. Instead this list would have multiple
+                               elements, allowing us to send a single message for all of the courses.
+
+        Returns:
+            dict: This dict must be JSON serializable (no datetime objects!). When rendering the message templates it
+                  it will be used as the template context. Note that it will also include several default values that
+                  injected into all template contexts. See `get_base_template_context` for more information.
+        """
+        return {}
+
 
 class ScheduleStartResolver(BinnedSchedulesBaseResolver):
     """
@@ -157,30 +200,14 @@ class ScheduleStartResolver(BinnedSchedulesBaseResolver):
     schedule_date_field = 'start'
     num_bins = RECURRING_NUDGE_NUM_BINS
 
-    def schedules_for_bin(self):
-
-        schedules = self.get_schedules_with_target_date_by_bin_and_orgs()
-        template_context = get_base_template_context(self.site)
-
-        for (user, user_schedules) in groupby(schedules, lambda s: s.enrollment.user):
-            user_schedules = list(user_schedules)
-            course_id_strs = [str(schedule.enrollment.course_id) for schedule in user_schedules]
-
-            first_schedule = user_schedules[0]
-            template_context.update({
-                'student_name': user.profile.name,
-                'course_name': first_schedule.enrollment.course.display_name,
-                'course_url': absolute_url(self.site, reverse('course_root', args=[str(first_schedule.enrollment.course_id)])),
-
-                # This is used by the bulk email optout policy
-                'course_ids': course_id_strs,
-            })
-
-            # Information for including upsell messaging in template.
-            _add_upsell_button_information_to_template_context(
-                user, first_schedule, template_context)
-
-            yield (user, first_schedule.enrollment.course.language, template_context)
+    def get_template_context(self, user, user_schedules):
+        first_schedule = user_schedules[0]
+        return {
+            'course_name': first_schedule.enrollment.course.display_name,
+            'course_url': absolute_url(
+                self.site, reverse('course_root', args=[str(first_schedule.enrollment.course_id)])
+            ),
+        }
 
 
 def _get_datetime_beginning_of_day(dt):
@@ -198,33 +225,18 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
     schedule_date_field = 'upgrade_deadline'
     num_bins = UPGRADE_REMINDER_NUM_BINS
 
-    def schedules_for_bin(self):
-        schedules = self.get_schedules_with_target_date_by_bin_and_orgs()
-
-        for (user, user_schedules) in groupby(schedules, lambda s: s.enrollment.user):
-            user_schedules = list(user_schedules)
-            course_id_strs = [str(schedule.enrollment.course_id) for schedule in user_schedules]
-
-            first_schedule = user_schedules[0]
-            template_context = get_base_template_context(self.site)
-            template_context.update({
-                'student_name': user.profile.name,
-                'course_links': [
-                    {
-                        'url': absolute_url(self.site, reverse('course_root', args=[str(s.enrollment.course_id)])),
-                        'name': s.enrollment.course.display_name
-                    } for s in user_schedules
-                ],
-                'first_course_name': first_schedule.enrollment.course.display_name,
-                'cert_image': absolute_url(self.site, static('course_experience/images/verified-cert.png')),
-
-                # This is used by the bulk email optout policy
-                'course_ids': course_id_strs,
-            })
-
-            _add_upsell_button_information_to_template_context(user, first_schedule, template_context)
-
-            yield (user, first_schedule.enrollment.course.language, template_context)
+    def get_template_context(self, user, user_schedules):
+        first_schedule = user_schedules[0]
+        return {
+            'course_links': [
+                {
+                    'url': absolute_url(self.site, reverse('course_root', args=[str(s.enrollment.course_id)])),
+                    'name': s.enrollment.course.display_name
+                } for s in user_schedules
+            ],
+            'first_course_name': first_schedule.enrollment.course.display_name,
+            'cert_image': absolute_url(self.site, static('course_experience/images/verified-cert.png')),
+        }
 
 
 def _add_upsell_button_information_to_template_context(user, schedule, template_context):
@@ -269,6 +281,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             order_by='enrollment__course',
         )
 
+        template_context = get_base_template_context(self.site)
         for schedule in schedules:
             enrollment = schedule.enrollment
             try:
@@ -279,11 +292,12 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             user = enrollment.user
             course_id_str = str(enrollment.course_id)
 
-            template_context = get_base_template_context(self.site)
             template_context.update({
                 'student_name': user.profile.name,
                 'course_name': schedule.enrollment.course.display_name,
-                'course_url': absolute_url(self.site, reverse('course_root', args=[str(schedule.enrollment.course_id)])),
+                'course_url': absolute_url(
+                    self.site, reverse('course_root', args=[str(schedule.enrollment.course_id)])
+                ),
                 'week_num': week_num,
                 'week_summary': week_summary,
 
