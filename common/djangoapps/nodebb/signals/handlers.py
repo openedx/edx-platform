@@ -78,6 +78,8 @@ def create_user_on_nodebb(sender, instance, created, **kwargs):
         else:
             log.info('Success: User(%s) has been created on nodebb' % instance.user.username)
 
+        return status_code
+
 
 @receiver(pre_save, sender=User, dispatch_uid='activate_user_on_nodebb')
 def activate_user_on_nodebb(sender, instance, **kwargs):

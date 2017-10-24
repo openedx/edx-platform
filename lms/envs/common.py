@@ -1922,6 +1922,9 @@ INSTALLED_APPS = (
     # History tables
     'simple_history',
 
+    # Philu management commands
+    'philu_commands',
+
     # Database-backed configuration
     'config_models',
 
