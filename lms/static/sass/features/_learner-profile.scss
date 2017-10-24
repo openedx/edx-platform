@@ -273,6 +273,11 @@
         border: none;
         box-shadow: none;
         padding: 0;
+
+        @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
+          max-width: calc(100% - 40px);
+          min-width: auto;
+        }
       }
 
       .u-field-title {

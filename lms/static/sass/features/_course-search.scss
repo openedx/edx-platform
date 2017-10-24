@@ -23,8 +23,6 @@
   }
 
   .search-results-item {
-    @include padding-right(140px);
-
     position: relative;
     border-top: 1px solid $border-color;
     padding: $baseline ($baseline/2);
@@ -52,10 +50,9 @@
   }
 
   .result-link {
-    @include right($baseline/2);
+    @include float(right);
+    @include padding-left($baseline/4);
 
-    position: absolute;
-    top: $baseline;
     line-height: 1.6em;
   }
 
