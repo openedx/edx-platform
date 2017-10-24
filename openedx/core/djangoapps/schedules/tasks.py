@@ -17,7 +17,6 @@ from openedx.core.djangoapps.monitoring_utils import set_custom_metric
 from openedx.core.djangoapps.schedules import message_types
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 from openedx.core.djangoapps.schedules import resolvers
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 
 LOG = logging.getLogger(__name__)
@@ -73,8 +72,6 @@ class ScheduleMessageBaseTask(Task):
             cls.log_debug('Message queuing disabled for site %s', site.domain)
             return
 
-        exclude_orgs, org_list = cls.get_course_org_filter(site)
-
         target_date = current_date + datetime.timedelta(days=day_offset)
         cls.log_debug('Target date = %s', target_date.isoformat())
         for bin in range(cls.num_bins):
@@ -83,8 +80,6 @@ class ScheduleMessageBaseTask(Task):
                 serialize(target_date),
                 day_offset,
                 bin,
-                org_list,
-                exclude_orgs,
                 override_recipient_email,
             )
             cls.log_debug('Launching task with args = %r', task_args)
@@ -99,44 +94,11 @@ class ScheduleMessageBaseTask(Task):
             return getattr(ScheduleConfig.current(site), cls.enqueue_config_var)
         return False
 
-    @classmethod
-    def get_course_org_filter(cls, site):
-        """
-        Given the configuration of sites, get the list of orgs that should be included or excluded from this send.
-
-        Returns:
-             tuple: Returns a tuple (exclude_orgs, org_list). If exclude_orgs is True, then org_list is a list of the
-                only orgs that should be included in this send. If exclude_orgs is False, then org_list is a list of
-                orgs that should be excluded from this send. All other orgs should be included.
-        """
-        try:
-            site_config = SiteConfiguration.objects.get(site_id=site.id)
-            org_list = site_config.get_value('course_org_filter')
-            exclude_orgs = False
-            if not org_list:
-                not_orgs = set()
-                for other_site_config in SiteConfiguration.objects.all():
-                    other = other_site_config.get_value('course_org_filter')
-                    if not isinstance(other, list):
-                        if other is not None:
-                            not_orgs.add(other)
-                    else:
-                        not_orgs.update(other)
-                org_list = list(not_orgs)
-                exclude_orgs = True
-            elif not isinstance(org_list, list):
-                org_list = [org_list]
-        except SiteConfiguration.DoesNotExist:
-            org_list = None
-            exclude_orgs = False
-
-        return exclude_orgs, org_list
-
     def run(
-        self, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
+        self, site_id, target_day_str, day_offset, bin_num, override_recipient_email=None,
     ):
         msg_type = self.make_message_type(day_offset)
-        site = Site.objects.get(id=site_id)
+        site = Site.objects.select_related('configuration').get(id=site_id)
         _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
         return self.resolver(
             self.async_send_task,
@@ -144,8 +106,6 @@ class ScheduleMessageBaseTask(Task):
             deserialize(target_day_str),
             day_offset,
             bin_num,
-            org_list,
-            exclude_orgs=exclude_orgs,
             override_recipient_email=override_recipient_email,
         ).send(msg_type)
 

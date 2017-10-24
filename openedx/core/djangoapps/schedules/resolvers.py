@@ -24,6 +24,7 @@ from openedx.core.djangoapps.schedules.template_context import (
     absolute_url,
     get_base_template_context
 )
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 from request_cache.middleware import request_cached
 from xmodule.modulestore.django import modulestore
@@ -69,8 +70,6 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
     target_datetime = attr.ib()
     day_offset = attr.ib()
     bin_num = attr.ib()
-    org_list = attr.ib()
-    exclude_orgs = attr.ib(default=False)
     override_recipient_email = attr.ib(default=None)
 
     schedule_date_field = None
@@ -79,6 +78,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
     def __attrs_post_init__(self):
         # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
         self.current_datetime = self.target_datetime - datetime.timedelta(days=self.day_offset)
+        self.exclude_orgs, self.org_list = self.get_course_org_filter()
 
     def send(self, msg_type):
         for (user, language, context) in self.schedules_for_bin():
@@ -152,6 +152,38 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         set_custom_metric('num_schedules', num_schedules)
 
         return schedules
+
+    def get_course_org_filter(self):
+        """
+        Given the configuration of sites, get the list of orgs that should be included or excluded from this send.
+
+        Returns:
+             tuple: Returns a tuple (exclude_orgs, org_list). If exclude_orgs is True, then org_list is a list of the
+                only orgs that should be included in this send. If exclude_orgs is False, then org_list is a list of
+                orgs that should be excluded from this send. All other orgs should be included.
+        """
+        try:
+            site_config = self.site.configuration
+            org_list = site_config.get_value('course_org_filter')
+            exclude_orgs = False
+            if not org_list:
+                not_orgs = set()
+                for other_site_config in SiteConfiguration.objects.all():
+                    other = other_site_config.get_value('course_org_filter')
+                    if not isinstance(other, list):
+                        if other is not None:
+                            not_orgs.add(other)
+                    else:
+                        not_orgs.update(other)
+                org_list = list(not_orgs)
+                exclude_orgs = True
+            elif not isinstance(org_list, list):
+                org_list = [org_list]
+        except SiteConfiguration.DoesNotExist:
+            org_list = None
+            exclude_orgs = False
+
+        return exclude_orgs, org_list
 
     def schedules_for_bin(self):
         schedules = self.get_schedules_with_target_date_by_bin_and_orgs()
