@@ -942,7 +942,7 @@ INSTALLED_APPS = [
 
     # Maintenance tools
     'maintenance',
-    'django_extensions',
+    'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Tracking
     'track',

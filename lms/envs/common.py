@@ -2093,7 +2093,7 @@ INSTALLED_APPS = [
     # For testing
     'django.contrib.admin',  # only used in DEBUG mode
     'debug',
-    'django_extensions',
+    'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Discussion forums
     'django_comment_client',

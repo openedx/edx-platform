@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django_extensions.db.models import TimeStampedModel
 from django.contrib.sites.models import Site
+from model_utils.models import TimeStampedModel
 
 from config_models.models import ConfigurationModel
 

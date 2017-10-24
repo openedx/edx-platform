@@ -13,9 +13,9 @@ from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
-from django_extensions.db.models import TimeStampedModel
 
 from edxmako.shortcuts import render_to_string
+from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
@@ -46,6 +46,10 @@ class ApiAccessRequest(TimeStampedModel):
     company_address = models.CharField(max_length=255, default='')
     site = models.ForeignKey(Site)
     contacted = models.BooleanField(default=False)
+
+    class Meta:
+        get_latest_by = 'modified'
+        ordering = ('-modified', '-created',)
 
     @classmethod
     def has_api_access(cls, user):

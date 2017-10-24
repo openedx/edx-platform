@@ -239,7 +239,7 @@ class Env(object):
             django_cmd(
                 system,
                 settings,
-                "print_settings {django_setting} --format=value 2>/dev/null".format(
+                "print_setting {django_setting} 2>/dev/null".format(
                     django_setting=django_setting
                 )
             ),
