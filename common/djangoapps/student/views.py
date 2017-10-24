@@ -51,6 +51,7 @@ from social_django import utils as social_utils
 import dogstats_wrapper as dog_stats_api
 import openedx.core.djangoapps.external_auth.views
 import third_party_auth
+from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 import track.views
 from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-error
 from certificates.api import get_certificate_url, has_html_certificates_enabled  # pylint: disable=import-error
@@ -2038,32 +2039,16 @@ def create_account_with_params(request, params):
 
     create_comments_service_user(user)
 
-    # Don't send email if we are:
-    #
-    # 1. Doing load testing.
-    # 2. Random user generation for other forms of testing.
-    # 3. External auth bypassing activation.
-    # 4. Have the platform configured to not require e-mail activation.
-    # 5. Registering a new user using a trusted third party provider (with skip_email_verification=True)
-    #
-    # Note that this feature is only tested as a flag set one way or
-    # the other for *new* systems. we need to be careful about
-    # changing settings on a running system to make sure no users are
-    # left in an inconsistent state (or doing a migration if they are).
-    send_email = (
-        not settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) and
-        not settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') and
-        not (do_external_auth and settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH')) and
-        not (
-            third_party_provider and third_party_provider.skip_email_verification and
-            user.email == running_pipeline['kwargs'].get('details', {}).get('email')
-        )
+    # Check if we system is configured to skip activation email for the current user.
+    skip_email = skip_activation_email(
+        user, do_external_auth, running_pipeline, third_party_provider,
     )
-    if send_email:
-        compose_and_send_activation_email(user, profile, registration)
-    else:
+
+    if skip_email:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
+    else:
+        compose_and_send_activation_email(user, profile, registration)
 
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
@@ -2097,6 +2082,54 @@ def create_account_with_params(request, params):
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(new_user.username, new_user.email))
 
     return new_user
+
+
+def skip_activation_email(user, do_external_auth, running_pipeline, third_party_provider):
+    """
+    Return `True` if activation email should be skipped.
+
+    Skip email if we are:
+        1. Doing load testing.
+        2. Random user generation for other forms of testing.
+        3. External auth bypassing activation.
+        4. Have the platform configured to not require e-mail activation.
+        5. Registering a new user using a trusted third party provider (with skip_email_verification=True)
+
+    Note that this feature is only tested as a flag set one way or
+    the other for *new* systems. we need to be careful about
+    changing settings on a running system to make sure no users are
+    left in an inconsistent state (or doing a migration if they are).
+
+    Arguments:
+        user (User): Django User object for the current user.
+        do_external_auth (bool): True if external authentication is in progress.
+        running_pipeline (dict): Dictionary containing user and pipeline data for third party authentication.
+        third_party_provider (ProviderConfig): An instance of third party provider configuration.
+
+    Returns:
+        (bool): `True` if account activation email should be skipped, `False` if account activation email should be
+            sent.
+    """
+    sso_pipeline_email = running_pipeline and running_pipeline['kwargs'].get('details', {}).get('email')
+
+    # Email is valid if the SAML assertion email matches the user account email or
+    # no email was provided in the SAML assertion. Some IdP's use a callback
+    # to retrieve additional user account information (including email) after the
+    # initial account creation.
+    valid_email = (
+        sso_pipeline_email == user.email or (
+            sso_pipeline_email is None and
+            third_party_provider and
+            getattr(third_party_provider, "identity_provider_type", None) == SAP_SUCCESSFACTORS_SAML_KEY
+        )
+    )
+
+    return (
+        settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) or
+        settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') or
+        (settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH') and do_external_auth) or
+        (third_party_provider and third_party_provider.skip_email_verification and valid_email)
+    )
 
 
 def _enroll_user_in_pending_courses(student):
