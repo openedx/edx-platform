@@ -30,6 +30,11 @@ KNOWN_RETRY_ERRORS = (  # Errors we expect occasionally that could resolve on re
 )
 
 
+RECURRING_NUDGE_LOG_PREFIX = 'Recurring Nudge'
+UPGRADE_REMINDER_LOG_PREFIX = 'Upgrade Reminder'
+COURSE_UPDATE_LOG_PREFIX = 'Course Update'
+
+
 @task(bind=True, default_retry_delay=30, routing_key=ROUTING_KEY)
 def update_course_schedules(self, **kwargs):
     course_key = CourseKey.from_string(kwargs['course_id'])
@@ -65,8 +70,7 @@ class ScheduleMessageBaseTask(Task):
         current_date = resolvers._get_datetime_beginning_of_day(current_date)
 
         if not cls.is_enqueue_enabled(site):
-            cls.log_debug(
-                'Message queuing disabled for site %s', site.domain)
+            cls.log_debug('Message queuing disabled for site %s', site.domain)
             return
 
         exclude_orgs, org_list = cls.get_course_org_filter(site)
@@ -132,9 +136,11 @@ class ScheduleMessageBaseTask(Task):
         self, site_id, target_day_str, day_offset, bin_num, org_list, exclude_orgs=False, override_recipient_email=None,
     ):
         msg_type = self.make_message_type(day_offset)
+        site = Site.objects.get(id=site_id)
+        _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
         return self.resolver(
             self.async_send_task,
-            Site.objects.get(id=site_id),
+            site,
             deserialize(target_day_str),
             day_offset,
             bin_num,
@@ -144,30 +150,43 @@ class ScheduleMessageBaseTask(Task):
         ).send(msg_type)
 
     def make_message_type(self, day_offset):
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 @task(ignore_result=True, routing_key=ROUTING_KEY)
 def _recurring_nudge_schedule_send(site_id, msg_str):
-    site = Site.objects.get(pk=site_id)
-    if not ScheduleConfig.current(site).deliver_recurring_nudge:
-        LOG.debug(
-            'Recurring Nudge: Message delivery disabled for site %s', site.domain)
-        return
+    _schedule_send(
+        msg_str,
+        site_id,
+        'deliver_recurring_nudge',
+        RECURRING_NUDGE_LOG_PREFIX,
+    )
 
-    msg = Message.from_string(msg_str)
-    # A unique identifier for this batch of messages being sent.
-    set_custom_metric('send_uuid', msg.send_uuid)
-    # A unique identifier for this particular message.
-    set_custom_metric('uuid', msg.uuid)
-    LOG.debug('Recurring Nudge: Sending message = %s', msg_str)
-    ace.send(msg)
+
+@task(ignore_result=True, routing_key=ROUTING_KEY)
+def _upgrade_reminder_schedule_send(site_id, msg_str):
+    _schedule_send(
+        msg_str,
+        site_id,
+        'deliver_upgrade_reminder',
+        UPGRADE_REMINDER_LOG_PREFIX,
+    )
+
+
+@task(ignore_result=True, routing_key=ROUTING_KEY)
+def _course_update_schedule_send(site_id, msg_str):
+    _schedule_send(
+        msg_str,
+        site_id,
+        'deliver_course_update',
+        COURSE_UPDATE_LOG_PREFIX,
+    )
 
 
 class ScheduleRecurringNudge(ScheduleMessageBaseTask):
     num_bins = resolvers.RECURRING_NUDGE_NUM_BINS
     enqueue_config_var = 'enqueue_recurring_nudge'
-    log_prefix = 'Scheduled Nudge'
+    log_prefix = RECURRING_NUDGE_LOG_PREFIX
     resolver = resolvers.ScheduleStartResolver
     async_send_task = _recurring_nudge_schedule_send
 
@@ -175,24 +194,10 @@ class ScheduleRecurringNudge(ScheduleMessageBaseTask):
         return message_types.RecurringNudge(abs(day_offset))
 
 
-@task(ignore_result=True, routing_key=ROUTING_KEY)
-def _upgrade_reminder_schedule_send(site_id, msg_str):
-    site = Site.objects.get(pk=site_id)
-    if not ScheduleConfig.current(site).deliver_upgrade_reminder:
-        return
-
-    msg = Message.from_string(msg_str)
-    # A unique identifier for this batch of messages being sent.
-    set_custom_metric('send_uuid', msg.send_uuid)
-    # A unique identifier for this particular message.
-    set_custom_metric('uuid', msg.uuid)
-    ace.send(msg)
-
-
 class ScheduleUpgradeReminder(ScheduleMessageBaseTask):
     num_bins = resolvers.UPGRADE_REMINDER_NUM_BINS
     enqueue_config_var = 'enqueue_upgrade_reminder'
-    log_prefix = 'Course Update'
+    log_prefix = UPGRADE_REMINDER_LOG_PREFIX
     resolver = resolvers.UpgradeReminderResolver
     async_send_task = _upgrade_reminder_schedule_send
 
@@ -200,27 +205,51 @@ class ScheduleUpgradeReminder(ScheduleMessageBaseTask):
         return message_types.UpgradeReminder()
 
 
-
-@task(ignore_result=True, routing_key=ROUTING_KEY)
-def _course_update_schedule_send(site_id, msg_str):
-    site = Site.objects.get(pk=site_id)
-    if not ScheduleConfig.current(site).deliver_course_update:
-        return
-
-    msg = Message.from_string(msg_str)
-    # A unique identifier for this batch of messages being sent.
-    set_custom_metric('send_uuid', msg.send_uuid)
-    # A unique identifier for this particular message.
-    set_custom_metric('uuid', msg.uuid)
-    ace.send(msg)
-
-
 class ScheduleCourseUpdate(ScheduleMessageBaseTask):
     num_bins = resolvers.COURSE_UPDATE_NUM_BINS
     enqueue_config_var = 'enqueue_course_update'
-    log_prefix = 'Course Update'
+    log_prefix = COURSE_UPDATE_LOG_PREFIX
     resolver = resolvers.CourseUpdateResolver
     async_send_task = _course_update_schedule_send
 
     def make_message_type(self, day_offset):
         return message_types.CourseUpdate()
+
+
+def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):
+    if _is_delivery_enabled(site_id, delivery_config_var, log_prefix):
+        msg = Message.from_string(msg_str)
+        _annonate_send_task_for_monitoring(msg)
+        LOG.debug('%s: Sending message = %s', log_prefix, msg_str)
+        ace.send(msg)
+
+
+def _is_delivery_enabled(site_id, delivery_config_var, log_prefix):
+    site = Site.objects.get(pk=site_id)
+    if getattr(ScheduleConfig.current(site), delivery_config_var, False):
+        return True
+    else:
+        LOG.debug('%s: Message delivery disabled for site %s', log_prefix, site.domain)
+
+
+def _annotate_for_monitoring(message_type, site, bin_num, target_day_str, day_offset):
+    # This identifies the type of message being sent, for example: schedules.recurring_nudge3.
+    set_custom_metric('message_name', '{0}.{1}'.format(message_type.app_label, message_type.name))
+    # The domain name of the site we are sending the message for.
+    set_custom_metric('site', site.domain)
+    # This is the "bin" of data being processed. We divide up the work into chunks so that we don't tie up celery
+    # workers for too long. This could help us identify particular bins that are problematic.
+    set_custom_metric('bin', bin_num)
+    # The date we are processing data for.
+    set_custom_metric('target_day', target_day_str)
+    # The number of days relative to the current date to process data for.
+    set_custom_metric('day_offset', day_offset)
+    # A unique identifier for this batch of messages being sent.
+    set_custom_metric('send_uuid', message_type.uuid)
+
+
+def _annonate_send_task_for_monitoring(msg):
+    # A unique identifier for this batch of messages being sent.
+    set_custom_metric('send_uuid', msg.send_uuid)
+    # A unique identifier for this particular message.
+    set_custom_metric('uuid', msg.uuid)

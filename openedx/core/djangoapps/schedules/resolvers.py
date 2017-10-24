@@ -13,7 +13,6 @@ from django.utils.formats import dateformat, get_format
 
 from edx_ace.recipient_resolver import RecipientResolver
 from edx_ace.recipient import Recipient
-from edx_ace.utils.date import serialize
 
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
 from openedx.core.djangoapps.monitoring_utils import function_trace, set_custom_metric
@@ -69,8 +68,6 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         self.current_datetime = self.target_datetime - datetime.timedelta(days=self.day_offset)
 
     def send(self, msg_type):
-        _annotate_for_monitoring(msg_type, self.site, self.bin_num, self.target_datetime, self.day_offset)
-
         for (user, language, context) in self.schedules_for_bin():
             msg = msg_type.personalize(
                 Recipient(
@@ -150,23 +147,6 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         set_custom_metric('num_schedules', num_schedules)
 
         return schedules
-
-
-def _annotate_for_monitoring(message_type, site, bin_num, target_datetime, day_offset):
-    # This identifies the type of message being sent, for example: schedules.recurring_nudge3.
-    set_custom_metric('message_name', '{0}.{1}'.format(
-        message_type.app_label, message_type.name))
-    # The domain name of the site we are sending the message for.
-    set_custom_metric('site', site.domain)
-    # This is the "bin" of data being processed. We divide up the work into chunks so that we don't tie up celery
-    # workers for too long. This could help us identify particular bins that are problematic.
-    set_custom_metric('bin', bin_num)
-    # The date we are processing data for.
-    set_custom_metric('target_day', serialize(target_datetime))
-    # The number of days relative to the current date to process data for.
-    set_custom_metric('day_offset', day_offset)
-    # A unique identifier for this batch of messages being sent.
-    set_custom_metric('send_uuid', message_type.uuid)
 
 
 class ScheduleStartResolver(BinnedSchedulesBaseResolver):
@@ -251,8 +231,7 @@ def _add_upsell_button_information_to_template_context(user, schedule, template_
     enrollment = schedule.enrollment
     course = enrollment.course
 
-    verified_upgrade_link = _get_link_to_purchase_verified_certificate(
-        user, schedule)
+    verified_upgrade_link = _get_verified_upgrade_link(user, schedule)
     has_verified_upgrade_link = verified_upgrade_link is not None
 
     if has_verified_upgrade_link:
@@ -269,12 +248,10 @@ def _add_upsell_button_information_to_template_context(user, schedule, template_
     template_context['show_upsell'] = has_verified_upgrade_link
 
 
-def _get_link_to_purchase_verified_certificate(a_user, a_schedule):
-    enrollment = a_schedule.enrollment
-    if enrollment.dynamic_upgrade_deadline is None or not verified_upgrade_link_is_valid(enrollment):
-        return None
-
-    return verified_upgrade_deadline_link(a_user, enrollment.course)
+def _get_verified_upgrade_link(user, schedule):
+    enrollment = schedule.enrollment
+    if enrollment.dynamic_upgrade_deadline is not None and verified_upgrade_link_is_valid(enrollment):
+        return verified_upgrade_deadline_link(user, enrollment.course)
 
 
 class CourseUpdateResolver(BinnedSchedulesBaseResolver):
@@ -291,13 +268,11 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
         schedules = self.get_schedules_with_target_date_by_bin_and_orgs(
             order_by='enrollment__course',
         )
-        LOG.debug('Course Update: Query = %r', schedules.query.sql_with_params())
 
         for schedule in schedules:
             enrollment = schedule.enrollment
             try:
-                week_summary = get_course_week_summary(
-                    enrollment.course_id, week_num)
+                week_summary = get_course_week_summary(enrollment.course_id, week_num)
             except CourseUpdateDoesNotExist:
                 continue
 
@@ -307,7 +282,6 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             template_context = get_base_template_context(self.site)
             template_context.update({
                 'student_name': user.profile.name,
-                'user_personal_address': user.profile.name if user.profile.name else user.username,
                 'course_name': schedule.enrollment.course.display_name,
                 'course_url': absolute_url(self.site, reverse('course_root', args=[str(schedule.enrollment.course_id)])),
                 'week_num': week_num,
