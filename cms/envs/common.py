@@ -1252,3 +1252,5 @@ USER_TASKS_MAX_AGE = timedelta(days=7)
 
 # NodeBB settings
 NODEBB_ENDPOINT = 'http://community.philanthropyu.org'
+
+FEATURES['ENABLE_EXTENDED_COURSE_DETAILS'] = True
