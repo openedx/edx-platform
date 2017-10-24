@@ -374,10 +374,14 @@ class CoursewareIndex(View):
         Returns and creates the rendering context for the courseware.
         Also returns the table of contents for the courseware.
         """
+        active_tab = self.request.GET.get('active_tab', '')
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
             'COURSE_TITLE': self.course.display_name_with_default_escaped,
             'course': self.course,
+            'chapter': self.chapter.display_name if self.chapter else {},
+            'section': self.section.display_name if self.chapter else {},
+            'active_tab': active_tab,
             'init': '',
             'fragment': Fragment(),
             'staff_access': self.is_staff,
@@ -397,6 +401,7 @@ class CoursewareIndex(View):
             self.section_url_name,
             self.field_data_cache,
         )
+        courseware_context['toc'] = table_of_contents
         courseware_context['accordion'] = render_accordion(
             self.request,
             self.course,

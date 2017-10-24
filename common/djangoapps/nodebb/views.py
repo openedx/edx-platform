@@ -8,7 +8,7 @@ from django.shortcuts import render
 from opaque_keys.edx.keys import CourseKey
 
 from nodebb.models import DiscussionCommunity
-from common.djangoapps.nodebb.helpers import get_course_related_tabs
+from common.djangoapps.nodebb.helpers import get_course_related_tabs, get_all_course_progress
 
 log = logging.getLogger("edx.nodebb")
 
@@ -27,8 +27,11 @@ def nodebb_forum_discussion(request, course_id):
     current_course = modulestore.get_course(course_key)
     course_tabs = get_course_related_tabs(request, current_course)
 
+    progress = get_all_course_progress(request.user, current_course)
+
     context = {
         "provider": current_course.org,
+        "progress": progress,
         "course_display_name": current_course.display_name,
         "course_tabs": course_tabs,
         "course_id": course_id,
