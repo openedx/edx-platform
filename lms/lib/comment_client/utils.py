@@ -31,7 +31,9 @@ def extract(dic, keys):
 
 
 def merge_dict(dic1, dic2):
-    return dict(dic1.items() + dic2.items())
+    merged_dict = dic2.copy()
+    merged_dict.update(dic2)
+    return merged_dict
 
 
 @contextmanager
