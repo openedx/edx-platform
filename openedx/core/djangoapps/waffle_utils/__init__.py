@@ -48,9 +48,13 @@ To test WaffleSwitchNamespace, use the provided context managers.  For example:
 import logging
 from abc import ABCMeta
 from contextlib import contextmanager
+
+import six
 from opaque_keys.edx.keys import CourseKey
-from request_cache import get_cache as get_request_cache, get_request
 from waffle import flag_is_active, switch_is_active
+
+from request_cache import get_cache as get_request_cache
+from request_cache import get_request
 
 log = logging.getLogger(__name__)
 
@@ -163,6 +167,31 @@ class WaffleSwitchNamespace(WaffleNamespace):
         Returns a dictionary of all namespaced switches in the request cache.
         """
         return self._get_request_cache().setdefault('switches', {})
+
+
+class WaffleSwitch(object):
+    """
+    Represents a single waffle switch, using a cached namespace.
+    """
+    def __init__(self, waffle_namespace, switch_name):
+        """
+        Arguments:
+            waffle_namespace (WaffleSwitchNamespace | String): Namespace for this switch.
+            switch_name (String): The name of the switch (without namespacing).
+        """
+        if isinstance(waffle_namespace, six.string_types):
+            waffle_namespace = WaffleSwitchNamespace(name=waffle_namespace)
+
+        self.waffle_namespace = waffle_namespace
+        self.switch_name = switch_name
+
+    def is_enabled(self):
+        return self.waffle_namespace.is_enabled(self.switch_name)
+
+    @contextmanager
+    def override(self, active=True):
+        with self.waffle_namespace.override(self.switch_name, active):
+            yield
 
 
 class WaffleFlagNamespace(WaffleNamespace):

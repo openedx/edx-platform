@@ -33,7 +33,8 @@ from contentstore.views.item import (
     _get_source_index,
     _xblock_type_and_display_name,
     add_container_page_publishing_info,
-    create_xblock_info
+    create_xblock_info,
+    highlights_setting,
 )
 from lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
@@ -2571,6 +2572,12 @@ class TestXBlockInfo(ItemTest):
 
             self.assertEqual(xblock_info['start'], DEFAULT_START_DATE.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
+    def test_highlights_enabled(self):
+        chapter = modulestore().get_item(self.chapter.location)
+        with highlights_setting().override():
+            xblock_info = create_xblock_info(chapter)
+            self.assertTrue(xblock_info['highlights_enabled'])
+
     def validate_course_xblock_info(self, xblock_info, has_child_info=True, course_outline=False):
         """
         Validate that the xblock info is correct for the test course.
@@ -2598,6 +2605,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['due'], None)
         self.assertEqual(xblock_info['format'], None)
         self.assertEqual(xblock_info['highlights'], self.chapter.highlights)
+        self.assertFalse(xblock_info['highlights_enabled'])
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info)

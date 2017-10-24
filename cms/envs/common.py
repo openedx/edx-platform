@@ -265,9 +265,6 @@ FEATURES = {
     # Whether archived courses (courses with end dates in the past) should be
     # shown in Studio in a separate list.
     'ENABLE_SEPARATE_ARCHIVED_COURSES': True,
-
-    # Whether section-level highlights are enabled on the platform.
-    'ENABLE_SECTION_HIGHLIGHTS': False,
 }
 
 ENABLE_JASMINE = False
