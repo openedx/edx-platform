@@ -180,18 +180,15 @@ class ScheduleStartResolver(BinnedSchedulesBaseResolver):
     def schedules_for_bin(self):
 
         schedules = self.get_schedules_with_target_date_by_bin_and_orgs()
-
-        LOG.debug('Recurring Nudge: Query = %r', schedules.query.sql_with_params())
+        template_context = get_base_template_context(self.site)
 
         for (user, user_schedules) in groupby(schedules, lambda s: s.enrollment.user):
             user_schedules = list(user_schedules)
             course_id_strs = [str(schedule.enrollment.course_id) for schedule in user_schedules]
 
             first_schedule = user_schedules[0]
-            template_context = get_base_template_context(self.site)
             template_context.update({
                 'student_name': user.profile.name,
-
                 'course_name': first_schedule.enrollment.course.display_name,
                 'course_url': absolute_url(self.site, reverse('course_root', args=[str(first_schedule.enrollment.course_id)])),
 
