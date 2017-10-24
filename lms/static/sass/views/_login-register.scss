@@ -32,6 +32,22 @@
   }
 }
 
+.enterprise-tagline {
+  width: 300px;
+  font-size: 14px;
+  text-align: left;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+  margin-left: -30px;
+}
+
+@media (max-width: $bp-screen-sm) {
+  .enterprise-tagline {
+    width: 200px
+  }
+}
+
 .window-wrap {
   background: $white;
 }

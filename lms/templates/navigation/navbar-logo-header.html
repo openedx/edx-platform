@@ -7,6 +7,7 @@
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from lms.djangoapps.ccx.overrides import get_current_ccx
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # App that handles subdomain specific branding
 from branding import api as branding_api
@@ -20,6 +21,12 @@ from branding import api as branding_api
       </%block>
     </a>
   </div>
+  % if enable_enterprise_sidebar:
+    <span class="enterprise-tagline">
+      <% tagline = configuration_helpers.get_value('ENTERPRISE_TAGLINE', settings.ENTERPRISE_TAGLINE) %>
+      ${tagline}
+    </span>
+  % endif
   % if course:
     <div class="course-header">
       <span class="provider">${course.display_org_with_default}:</span>

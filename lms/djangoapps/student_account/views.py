@@ -267,7 +267,8 @@ def enterprise_sidebar_context(request):
 
     platform_name = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
 
-    logo_url = enterprise_customer.get('branding_configuration', {}).get('logo', '')
+    branding_configuration = enterprise_customer.get('branding_configuration', {})
+    logo_url = branding_configuration.get('logo', '') if isinstance(branding_configuration, dict) else ''
 
     branded_welcome_template = configuration_helpers.get_value(
         'ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE',
