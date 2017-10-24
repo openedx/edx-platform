@@ -4,15 +4,12 @@ import logging
 from celery.task import task, Task
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+
 from django.db.utils import DatabaseError
-from django.utils.formats import dateformat, get_format
 
 from edx_ace import ace
 from edx_ace.message import Message
-from edx_ace.recipient import Recipient
 from edx_ace.utils.date import deserialize, serialize
 from opaque_keys.edx.keys import CourseKey
 

@@ -5,31 +5,26 @@ import logging
 import attr
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.urlresolvers import reverse
-from django.db.models import F, Min, Q
+from django.db.models import F, Q
 from django.utils.formats import dateformat, get_format
-
 
 
 from edx_ace.recipient_resolver import RecipientResolver
 from edx_ace.recipient import Recipient
-from edx_ace.utils.date import serialize, deserialize
+from edx_ace.utils.date import serialize
 
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
-from openedx.core.djangoapps.monitoring_utils import set_custom_metric, function_trace
+from openedx.core.djangoapps.monitoring_utils import function_trace, set_custom_metric
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
-from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
+from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
 from openedx.core.djangoapps.schedules.template_context import (
     absolute_url,
-    encode_url,
-    encode_urls_in_dict,
     get_base_template_context
 )
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 from request_cache.middleware import request_cached
 from xmodule.modulestore.django import modulestore
