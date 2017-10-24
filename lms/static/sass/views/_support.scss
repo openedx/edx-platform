@@ -203,7 +203,10 @@
 
     .progress-bar {
       background-color: $blue;
-      width: 25%;
+    }
+
+    .zero-width {
+      width: 0;
     }
   }
 
@@ -245,6 +248,23 @@
     }
   }
 
+  input[type='text'] {
+    font-size: $support-form-base-font-size - 2;
+    font-family: $sans-serif;
+    font-style: normal;
+    font-weight: $font-regular;
+    }
+
+  .alert-danger {
+    color: $palette-error-text !important;
+    font-size: $support-form-base-font-size;
+  }
+
+  .has-error{
+    label{
+      color: $danger-red;
+    }
+  }
   @media only screen and (min-width: 768px) {
     .row {
       max-width: $baseline * 25;

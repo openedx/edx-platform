@@ -1,0 +1,12 @@
+<div class="col-sm-12">
+    <div class="alert alert-danger" role="alert">
+        <strong><%- gettext('Please fix following errors:')%></strong>
+        <ul>
+            <% _.each(errors, function(item) { %>
+            <li>
+                <span><%= item %></span>
+            </li>
+            <% }); %>
+        </ul>
+    </div>
+</div>
