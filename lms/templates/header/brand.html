@@ -7,6 +7,7 @@
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # App that handles subdomain specific branding
 from branding import api as branding_api
@@ -18,6 +19,12 @@ from branding import api as branding_api
       <img class="logo-image" src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}" itemprop="logo" />
     </a>
   </div>
+  % if enable_enterprise_sidebar:
+    <span class="enterprise-tagline">
+      <% tagline = configuration_helpers.get_value('ENTERPRISE_TAGLINE', settings.ENTERPRISE_TAGLINE) %>
+      ${tagline}
+    </span>
+  % endif
   % if course and not disable_courseware_header:
     <div class="course-header">
       <span class="provider">${course.display_org_with_default}:</span>
