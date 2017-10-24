@@ -175,7 +175,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         course_home_url(self.course)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(50, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(49, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -244,7 +244,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         expected_count = 1 if (is_enrolled or is_unenrolled_staff) else 0
         self.assertContains(response, TEST_CHAPTER_NAME, count=expected_count)
         self.assertContains(response, 'Start Course', count=expected_count)
-        self.assertContains(response, 'Learn About Verified Certificate', count=expected_count)
+        self.assertContains(response, 'Learn About Verified Certificate', count=(1 if is_enrolled else 0))
         self.assertContains(response, TEST_WELCOME_MESSAGE, count=expected_count)
 
         # Verify that the expected message is shown to the user
@@ -285,7 +285,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         expected_count = 1 if (is_enrolled or is_unenrolled_staff) else 0
         self.assertContains(response, TEST_CHAPTER_NAME, count=expected_count)
         self.assertContains(response, 'Start Course', count=expected_count)
-        self.assertContains(response, 'Learn About Verified Certificate', count=expected_count)
+        self.assertContains(response, 'Learn About Verified Certificate', count=(1 if is_enrolled else 0))
 
         # Verify that the expected message is shown to the user
         self.assertContains(response, '<div class="user-messages">', count=1 if expected_message else 0)
