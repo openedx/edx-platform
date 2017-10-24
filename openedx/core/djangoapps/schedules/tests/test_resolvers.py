@@ -30,28 +30,40 @@ class TestBinnedSchedulesBaseResolver(CacheIsolationTestCase):
             bin_num=2,
         )
 
-    @ddt.unpack
     @ddt.data(
-        ('course1', ['course1']),
-        (['course1', 'course2'], ['course1', 'course2'])
+        'course1'
     )
-    def test_get_course_org_filter_include(self, course_org_filter, expected_org_list):
+    def test_get_course_org_filter_equal(self, course_org_filter):
         self.site_config.values['course_org_filter'] = course_org_filter
         self.site_config.save()
-        exclude_orgs, org_list = self.resolver.get_course_org_filter()
-        assert not exclude_orgs
-        assert org_list == expected_org_list
+        mock_query = Mock()
+        result = self.resolver.filter_by_org(mock_query)
+        self.assertEqual(result, mock_query.filter.return_value)
+        mock_query.filter.assert_called_once_with(enrollment__course__org=course_org_filter)
 
     @ddt.unpack
     @ddt.data(
-        (None, []),
-        ('course1', [u'course1']),
-        (['course1', 'course2'], [u'course1', u'course2'])
+        (['course1', 'course2'], ['course1', 'course2'])
     )
-    def test_get_course_org_filter_exclude(self, course_org_filter, expected_org_list):
+    def test_get_course_org_filter_include__in(self, course_org_filter, expected_org_list):
+        self.site_config.values['course_org_filter'] = course_org_filter
+        self.site_config.save()
+        mock_query = Mock()
+        result = self.resolver.filter_by_org(mock_query)
+        self.assertEqual(result, mock_query.filter.return_value)
+        mock_query.filter.assert_called_once_with(enrollment__course__org__in=expected_org_list)
+
+    @ddt.unpack
+    @ddt.data(
+        (None, set([])),
+        ('course1', set([u'course1'])),
+        (['course1', 'course2'], set([u'course1', u'course2']))
+    )
+    def test_get_course_org_filter_exclude__in(self, course_org_filter, expected_org_list):
         SiteConfigurationFactory.create(
             values={'course_org_filter': course_org_filter},
         )
-        exclude_orgs, org_list = self.resolver.get_course_org_filter()
-        assert exclude_orgs
-        self.assertItemsEqual(org_list, expected_org_list)
+        mock_query = Mock()
+        result = self.resolver.filter_by_org(mock_query)
+        mock_query.exclude.assert_called_once_with(enrollment__course__org__in=expected_org_list)
+        self.assertEqual(result, mock_query.exclude.return_value)

@@ -78,7 +78,6 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
     def __attrs_post_init__(self):
         # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
         self.current_datetime = self.target_datetime - datetime.timedelta(days=self.day_offset)
-        self.exclude_orgs, self.org_list = self.get_course_org_filter()
 
     def send(self, msg_type):
         for (user, language, context) in self.schedules_for_bin():
@@ -133,11 +132,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
             **schedule_day_equals_target_day_filter
         ).order_by(order_by)
 
-        if self.org_list is not None:
-            if self.exclude_orgs:
-                schedules = schedules.exclude(enrollment__course__org__in=self.org_list)
-            else:
-                schedules = schedules.filter(enrollment__course__org__in=self.org_list)
+        schedules = self.filter_by_org(schedules)
 
         if "read_replica" in settings.DATABASES:
             schedules = schedules.using("read_replica")
@@ -153,7 +148,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
 
         return schedules
 
-    def get_course_org_filter(self):
+    def filter_by_org(self, schedules):
         """
         Given the configuration of sites, get the list of orgs that should be included or excluded from this send.
 
@@ -165,7 +160,6 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         try:
             site_config = self.site.configuration
             org_list = site_config.get_value('course_org_filter')
-            exclude_orgs = False
             if not org_list:
                 not_orgs = set()
                 for other_site_config in SiteConfiguration.objects.all():
@@ -175,15 +169,13 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
                             not_orgs.add(other)
                     else:
                         not_orgs.update(other)
-                org_list = list(not_orgs)
-                exclude_orgs = True
+                return schedules.exclude(enrollment__course__org__in=not_orgs)
             elif not isinstance(org_list, list):
-                org_list = [org_list]
+                return schedules.filter(enrollment__course__org=org_list)
         except SiteConfiguration.DoesNotExist:
-            org_list = None
-            exclude_orgs = False
+            return schedules
 
-        return exclude_orgs, org_list
+        return schedules.filter(enrollment__course__org__in=org_list)
 
     def schedules_for_bin(self):
         schedules = self.get_schedules_with_target_date_by_bin_and_orgs()
