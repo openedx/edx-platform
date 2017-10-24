@@ -2329,12 +2329,14 @@ SOCIAL_SHARING_SETTINGS = {
     # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in cms/envs/common.py
     'CUSTOM_COURSE_URLS': False,
     'DASHBOARD_FACEBOOK': False,
+    'FACEBOOK_BRAND': None,
     'CERTIFICATE_FACEBOOK': False,
     'CERTIFICATE_FACEBOOK_TEXT': None,
     'CERTIFICATE_TWITTER': False,
     'CERTIFICATE_TWITTER_TEXT': None,
     'DASHBOARD_TWITTER': False,
-    'DASHBOARD_TWITTER_TEXT': None
+    'DASHBOARD_TWITTER_TEXT': None,
+    'TWITTER_BRAND': None
 }
 
 ################# Social Media Footer Links #######################
