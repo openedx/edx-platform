@@ -3,20 +3,16 @@ Classes that override default django-oauth-toolkit behavior
 """
 from __future__ import unicode_literals
 
-import logging
 from datetime import datetime
 
 from django.contrib.auth import authenticate, get_user_model
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
-from pytz import utc
-
 from oauth2_provider.models import AccessToken
 from oauth2_provider.oauth2_validators import OAuth2Validator
+from pytz import utc
 
 from .models import RestrictedApplication
-
-log = logging.getLogger(__name__)
 
 
 @receiver(pre_save, sender=AccessToken)
@@ -77,9 +73,6 @@ class EdxOAuth2Validator(OAuth2Validator):
         grant_type = request.grant_type
         user = request.user
 
-        _token_prefix = token['access_token'][:3]
-        log.info('Saving bearer token with prefix [%s] for user [%d]', _token_prefix, user.id)
-
         if grant_type == 'client_credentials':
             # Temporarily remove the grant type to avoid triggering the super method's code that removes request.user.
             request.grant_type = None
@@ -106,8 +99,6 @@ class EdxOAuth2Validator(OAuth2Validator):
             assert expires_in < 0
 
             token['expires_in'] = expires_in
-
-        log.info('Finished bearer token with prefix [%s] for user [%d]', _token_prefix, user.id)
 
         # Restore the original request attributes
         request.grant_type = grant_type
