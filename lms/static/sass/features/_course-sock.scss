@@ -24,27 +24,13 @@
     box-shadow: none;
     -webkit-transition: background-color 0.5s;
     transition: background-color 0.5s;
+    cursor: pointer;
 
-    &.active {
+    &.active,
+    &:hover {
       color: theme-color("success");
       background-color: theme-color("inverse");
       border-color: theme-color("success");
-      background-image: none;
-      box-shadow: none;
-
-      &:hover {
-        color: theme-color("inverse");
-        background-color: $success-color-hover;
-        border-color: $success-color-hover;
-        background-image: none;
-        box-shadow: none;
-      }
-    }
-
-    &:hover {
-      color: theme-color("inverse");
-      background-color: $success-color-hover;
-      border-color: $success-color-hover;
       background-image: none;
       box-shadow: none;
     }
@@ -113,6 +99,7 @@
         right: $baseline;
         background-color: theme-color("success");
         border-color: theme-color("success");
+        color: theme-color("inverse");
         background-image: none;
         box-shadow: none;
 

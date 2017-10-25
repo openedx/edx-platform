@@ -517,7 +517,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertIn('vc-message', response.content)
         url = EcommerceService().get_checkout_page_url(self.verified_mode.sku)
-        self.assertIn('<a class="btn-upgrade"', response.content)
+        self.assertIn('<a class="btn btn-upgrade"', response.content)
         self.assertIn(url, response.content)
         self.assertIn('Upgrade (${price})</a>'.format(price=self.verified_mode.min_price), response.content)
 

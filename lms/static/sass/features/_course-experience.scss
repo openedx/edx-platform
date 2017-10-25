@@ -117,7 +117,7 @@
 
       .goal-option {
         text-decoration: none;
-        font-size: font-size(x-small);
+        font-size: $font-size-base;
         padding: $baseline/2;
         margin: $baseline/4 $baseline/4 0;
         flex-grow: 1;
@@ -213,12 +213,12 @@
     @include float(left);
 
     border: 1px solid $lms-border-color;
-    padding: $baseline*0.75 $baseline*0.75 $baseline*0.25;
+    padding: $baseline*0.75 $baseline*0.75 $baseline*0.5;
     border-radius: 5px;
     position: relative;
     width: 100%;
     cursor: pointer;
-    margin-bottom: $baseline/2;
+    margin-bottom: $baseline;
 
     &.hidden {
       display: none;
@@ -245,8 +245,8 @@
 
     .current-goal-container {
       .title {
+        @include margin($baseline/5, $baseline*0.4, 0, 0);
         @include float(left);
-        @include margin-right($baseline/4);
       }
 
       .title-label {
@@ -324,6 +324,7 @@
           list-style-type: none;
           border: 1px solid transparent;
           border-radius: 3px;
+          margin-bottom: $baseline/4;
 
           a.outline-item {
             display: flex;
@@ -368,6 +369,10 @@
 
           &:hover {
             border: 1px solid $lms-active-color;
+          }
+
+          &:last-child {
+            margin-bottom: 0;
           }
         }
 

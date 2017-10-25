@@ -1,6 +1,8 @@
 // Styles for course search results
 
 .search-results {
+  flex-grow: 1;
+
   .search-result-list {
     list-style: none;
     margin: 0;
