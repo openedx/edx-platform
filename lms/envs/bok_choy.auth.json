@@ -35,6 +35,9 @@
             "ENGINE": "django.db.backends.mysql",
             "HOST": "localhost",
             "NAME": "edxtest",
+            "OPTIONS": {
+                "init_command": "SET foreign_key_checks = 0;"
+            },
             "PASSWORD": "",
             "PORT": "3306",
             "USER": "root"
