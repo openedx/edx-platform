@@ -36,6 +36,7 @@ SCHEDULES_QUERY = 1
 COURSE_MODES_QUERY = 1
 GLOBAL_DEADLINE_SWITCH_QUERY = 1
 COMMERCE_CONFIG_QUERY = 1
+NUM_QUERIES_NO_ORG_LIST = 1
 
 NUM_QUERIES_NO_MATCHING_SCHEDULES = SITE_QUERY + SCHEDULES_QUERY
 
@@ -114,11 +115,11 @@ class TestUpgradeReminder(SharedModuleStoreTestCase):
         with patch.object(tasks.ScheduleUpgradeReminder, 'apply_async') as mock_apply_async:
             tasks.ScheduleUpgradeReminder.enqueue(self.site_config.site, current_day, 2)
             mock_apply_async.assert_any_call(
-                (self.site_config.site.id, serialize(test_day), 2, 0, [], True, None),
+                (self.site_config.site.id, serialize(test_day), 2, 0, None),
                 retry=False,
             )
             mock_apply_async.assert_any_call(
-                (self.site_config.site.id, serialize(test_day), 2, resolvers.UPGRADE_REMINDER_NUM_BINS - 1, [], True, None),
+                (self.site_config.site.id, serialize(test_day), 2, resolvers.UPGRADE_REMINDER_NUM_BINS - 1, None),
                 retry=False,
             )
             self.assertFalse(mock_ace.send.called)
@@ -135,13 +136,10 @@ class TestUpgradeReminder(SharedModuleStoreTestCase):
             ) for i in range(schedule_count)
         ]
 
-        bins_in_use = frozenset((s.enrollment.user.id % resolvers.UPGRADE_REMINDER_NUM_BINS) for s in schedules)
+        bins_in_use = frozenset((self._calculate_bin_for_user(s.enrollment.user)) for s in schedules)
         is_first_match = True
-
         course_switch_queries = len(set(s.enrollment.course.id for s in schedules))
-
-        test_datetime = datetime.datetime(upgrade_deadline.year, upgrade_deadline.month, upgrade_deadline.day, 18,
-                                          tzinfo=pytz.UTC)
+        test_datetime = upgrade_deadline
         test_datetime_str = serialize(test_datetime)
 
         for b in range(resolvers.UPGRADE_REMINDER_NUM_BINS):
@@ -159,11 +157,12 @@ class TestUpgradeReminder(SharedModuleStoreTestCase):
                 else:
                     expected_queries = NUM_QUERIES_WITH_MATCHES
 
+            expected_queries += NUM_QUERIES_NO_ORG_LIST
+
             with self.assertNumQueries(expected_queries, table_blacklist=WAFFLE_TABLES):
-                tasks.ScheduleUpgradeReminder.delay(
-                    self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=b,
-                    org_list=[schedules[0].enrollment.course.org],
-                )
+                tasks.ScheduleUpgradeReminder.apply(kwargs=dict(
+                    site_id=self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=b,
+                ))
 
         self.assertEqual(mock_schedule_send.apply_async.call_count, schedule_count)
         self.assertFalse(mock_ace.send.called)
@@ -180,11 +179,11 @@ class TestUpgradeReminder(SharedModuleStoreTestCase):
         test_datetime = datetime.datetime(2017, 8, 3, 20, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
         for b in range(resolvers.UPGRADE_REMINDER_NUM_BINS):
-            with self.assertNumQueries(NUM_QUERIES_NO_MATCHING_SCHEDULES, table_blacklist=WAFFLE_TABLES):
-                tasks.ScheduleUpgradeReminder.delay(
-                    self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=b,
-                    org_list=[schedule.enrollment.course.org],
-                )
+
+            with self.assertNumQueries(NUM_QUERIES_NO_MATCHING_SCHEDULES + NUM_QUERIES_NO_ORG_LIST, table_blacklist=WAFFLE_TABLES):
+                tasks.ScheduleUpgradeReminder.apply(kwargs=dict(
+                    site_id=self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=b,
+                ))
 
         # There is no database constraint that enforces that enrollment.course_id points
         # to a valid CourseOverview object. However, in that case, schedules isn't going
@@ -219,19 +218,17 @@ class TestUpgradeReminder(SharedModuleStoreTestCase):
     @patch.object(tasks, 'ace')
     @patch.object(tasks.ScheduleUpgradeReminder, 'async_send_task')
     @ddt.data(
-        ((['filtered_org'], False, 1)),
-        ((['filtered_org'], True, 2))
+        ((['filtered_org'], [], 1)),
+        (([], ['filtered_org'], 2))
     )
     @ddt.unpack
-    def test_site_config(self, org_list, exclude_orgs, expected_message_count, mock_schedule_send, mock_ace):
+    def test_site_config(self, this_org_list, other_org_list, expected_message_count, mock_schedule_send, mock_ace):
         filtered_org = 'filtered_org'
         unfiltered_org = 'unfiltered_org'
-        site1 = SiteFactory.create(domain='foo1.bar', name='foo1.bar')
-        limited_config = SiteConfigurationFactory.create(values={'course_org_filter': [filtered_org]}, site=site1)
-        site2 = SiteFactory.create(domain='foo2.bar', name='foo2.bar')
-        unlimited_config = SiteConfigurationFactory.create(values={'course_org_filter': []}, site=site2)
+        this_config = SiteConfigurationFactory.create(values={'course_org_filter': this_org_list})
+        other_config = SiteConfigurationFactory.create(values={'course_org_filter': other_org_list})
 
-        for config in (limited_config, unlimited_config):
+        for config in (this_config, other_config):
             ScheduleConfigFactory.create(site=config.site)
 
         user1 = UserFactory.create(id=resolvers.UPGRADE_REMINDER_NUM_BINS)
@@ -260,11 +257,14 @@ class TestUpgradeReminder(SharedModuleStoreTestCase):
         test_datetime_str = serialize(test_datetime)
 
         course_switch_queries = 1
-        with self.assertNumQueries(NUM_QUERIES_FIRST_MATCH + course_switch_queries, table_blacklist=WAFFLE_TABLES):
-            tasks.ScheduleUpgradeReminder.delay(
-                limited_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=0,
-                org_list=org_list, exclude_orgs=exclude_orgs,
-            )
+        expected_queries = NUM_QUERIES_FIRST_MATCH + course_switch_queries
+        if not this_org_list:
+            expected_queries += NUM_QUERIES_NO_ORG_LIST
+
+        with self.assertNumQueries(expected_queries, table_blacklist=WAFFLE_TABLES):
+            tasks.ScheduleUpgradeReminder.apply(kwargs=dict(
+                site_id=this_config.site.id, target_day_str=test_datetime_str, day_offset=-3, bin_num=0
+            ))
 
         self.assertEqual(mock_schedule_send.apply_async.call_count, expected_message_count)
         self.assertFalse(mock_ace.send.called)
@@ -287,13 +287,12 @@ class TestUpgradeReminder(SharedModuleStoreTestCase):
 
         test_datetime = datetime.datetime(2017, 8, 3, 19, 44, 30, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
-
-        with self.assertNumQueries(NUM_QUERIES_FIRST_MATCH + num_courses, table_blacklist=WAFFLE_TABLES):
-            tasks.ScheduleUpgradeReminder.delay(
-                self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2,
-                bin_num=user.id % resolvers.UPGRADE_REMINDER_NUM_BINS,
-                org_list=[schedules[0].enrollment.course.org],
-            )
+        expected_query_count = NUM_QUERIES_FIRST_MATCH + num_courses + NUM_QUERIES_NO_ORG_LIST
+        with self.assertNumQueries(expected_query_count, table_blacklist=WAFFLE_TABLES):
+            tasks.ScheduleUpgradeReminder.apply(kwargs=dict(
+                site_id=self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2,
+                bin_num=self._calculate_bin_for_user(user),
+            ))
         self.assertEqual(mock_schedule_send.apply_async.call_count, 1)
         self.assertFalse(mock_ace.send.called)
 
@@ -340,13 +339,13 @@ class TestUpgradeReminder(SharedModuleStoreTestCase):
                 mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
 
                 # we execute one query per course to see if it's opted out of dynamic upgrade deadlines
-                num_expected_queries = NUM_QUERIES_FIRST_MATCH + num_courses
+                num_expected_queries = NUM_QUERIES_FIRST_MATCH + NUM_QUERIES_NO_ORG_LIST + num_courses
+
                 with self.assertNumQueries(num_expected_queries, table_blacklist=WAFFLE_TABLES):
-                    tasks.ScheduleUpgradeReminder.delay(
-                        self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2,
+                    tasks.ScheduleUpgradeReminder.apply(kwargs=dict(
+                        site_id=self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2,
                         bin_num=self._calculate_bin_for_user(user),
-                        org_list=[schedules[0].enrollment.course.org],
-                    )
+                    ))
 
             self.assertEqual(len(sent_messages), 1)
 
@@ -416,16 +415,15 @@ class TestUpgradeReminder(SharedModuleStoreTestCase):
 
         test_datetime = future_datetime
         test_datetime_str = serialize(test_datetime)
-        bin_num = self._calculate_bin_for_user(user)
 
         sent_messages = []
         with patch.object(tasks.ScheduleUpgradeReminder, 'async_send_task') as mock_schedule_send:
             mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args[1])
 
-            tasks.ScheduleUpgradeReminder.delay(
-                self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=bin_num,
-                org_list=[schedules[0].enrollment.course.org],
-            )
+            tasks.ScheduleUpgradeReminder.apply(kwargs=dict(
+                site_id=self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2,
+                bin_num=self._calculate_bin_for_user(user),
+            ))
 
             messages = [Message.from_string(m) for m in sent_messages]
             self.assertEqual(len(messages), 1)

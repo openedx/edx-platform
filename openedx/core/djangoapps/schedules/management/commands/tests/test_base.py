@@ -7,7 +7,7 @@ from django.conf import settings
 from mock import patch
 
 from openedx.core.djangoapps.schedules.management.commands import SendEmailBaseCommand
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 
 
@@ -19,6 +19,7 @@ class TestSendEmailBaseCommand(CacheIsolationTestCase):
     def setUp(self):
         self.command = SendEmailBaseCommand()
         self.site = SiteFactory()
+        self.site_config = SiteConfigurationFactory.create(site=self.site)
 
     def test_handle(self):
         with patch.object(self.command, 'send_emails') as send_emails:
