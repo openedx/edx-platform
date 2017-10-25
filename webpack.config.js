@@ -28,6 +28,9 @@ var wpconfig = {
         Import: './cms/static/js/features/import/factories/import.js',
         StudioIndex: './cms/static/js/features_jsx/studio/index.jsx',
 
+        // LMS: single support form
+        SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',
+
         // Features
         CourseGoals: './openedx/features/course_experience/static/course_experience/js/CourseGoals.js',
         CourseHome: './openedx/features/course_experience/static/course_experience/js/CourseHome.js',
