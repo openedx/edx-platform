@@ -69,7 +69,7 @@ def create_user_on_nodebb(sender, instance, created, **kwargs):
             'last_name': instance.last_name,
             'username': instance.user.username,
             'organization': instance.organization.name,
-            'date_joined': instance.user.date_joined,
+            'date_joined': instance.user.date_joined.strftime('%d/%m/%Y'),
         }
 
         status_code, response_body = NodeBBClient().users.create(username=instance.user.username, kwargs=user_info)
