@@ -22,6 +22,8 @@ from course_modes.models import CourseMode
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -88,6 +90,8 @@ class ProgramProgressMeter(object):
             self.enrolled_run_modes[enrollment_id] = mode
             # We can't use dict.keys() for this because the course run ids need to be ordered
             self.course_run_ids.append(enrollment_id)
+
+        self.course_grade_factory = CourseGradeFactory()
 
         if uuid:
             self.programs = [get_programs(self.site, uuid=uuid)]
@@ -216,11 +220,17 @@ class ProgramProgressMeter(object):
                 else:
                     not_started.append(course)
 
+            grades = {}
+            for run in self.course_run_ids:
+                grade = self.course_grade_factory.read(self.user, course_key=CourseKey.from_string(run))
+                grades[run] = grade.percent
+
             progress.append({
                 'uuid': program_copy['uuid'],
                 'completed': len(completed) if count_only else completed,
                 'in_progress': len(in_progress) if count_only else in_progress,
                 'not_started': len(not_started) if count_only else not_started,
+                'grades': grades,
             })
 
         return progress
@@ -325,7 +335,7 @@ class ProgramProgressMeter(object):
 
             course_data = {
                 'course_run_id': unicode(certificate['course_key']),
-                'type': certificate_type
+                'type': certificate_type,
             }
 
             if certificate_api.is_passing_status(certificate['status']):

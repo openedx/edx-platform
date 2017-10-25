@@ -520,6 +520,19 @@
       width: 100%;
     }
 
+
+    .final-grade {
+      .grade-header {
+        color: palette(grayscale, base);
+        font-weight: bold;
+      }
+      .grade-display {
+          padding-right: 15px;
+          font-size: 1.5em;
+          color: palette(primary, accent);
+      }
+    }
+
     .upgrade-message {
       flex-wrap: wrap;
 
