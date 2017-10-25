@@ -4,7 +4,7 @@ from unittest import skipUnless
 import ddt
 import pytz
 from django.conf import settings
-from mock import patch
+from mock import patch, DEFAULT, Mock
 
 from openedx.core.djangoapps.schedules.management.commands import SendEmailBaseCommand
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
@@ -29,3 +29,18 @@ class TestSendEmailBaseCommand(CacheIsolationTestCase):
                 datetime.datetime(2017, 9, 29, tzinfo=pytz.UTC),
                 None
             )
+
+    def test_send_emails(self):
+        with patch.multiple(
+            self.command,
+            offsets=(1, 3, 5),
+            enqueue=DEFAULT,
+        ):
+            arg = Mock(name='arg')
+            kwarg = Mock(name='kwarg')
+            self.command.send_emails(arg, kwarg=kwarg)
+            self.assertFalse(arg.called)
+            self.assertFalse(kwarg.called)
+
+            for offset in self.command.offsets:
+                self.command.enqueue.assert_any_call(offset, arg, kwarg=kwarg)
