@@ -58,7 +58,7 @@ from openedx.core.lib.gating import api as gating_api
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory, TEST_PASSWORD
 from util.tests.test_date_utils import fake_pgettext, fake_ugettext
 from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
@@ -227,9 +227,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
                 for _ in range(self.NUM_PROBLEMS):
                     ItemFactory.create(category='problem', parent_location=vertical.location)
 
-        password = 'test'
-        self.user = UserFactory(password=password)
-        self.client.login(username=self.user.username, password=password)
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
         CourseEnrollment.enroll(self.user, course.id)
 
         with self.assertNumQueries(expected_mysql_query_count, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
@@ -302,8 +301,8 @@ class ViewsTestCase(ModuleStoreTestCase):
             )
 
         self.course_key = self.course.id
-        self.password = '123456'
-        self.user = UserFactory(username='dummy', password=self.password, email='test@mit.edu')
+        # Set profile country to Åland Islands to check Unicode characters does not raise error
+        self.user = UserFactory(username='dummy', profile__country='AX')
         self.date = datetime(2013, 1, 22, tzinfo=UTC)
         self.enrollment = CourseEnrollment.enroll(self.user, self.course_key)
         self.enrollment.created = self.date
@@ -314,7 +313,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.org = u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ"
         self.org_html = "<p>'+Stark/Industries+'</p>"
 
-        self.assertTrue(self.client.login(username=self.user.username, password=self.password))
+        self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
 
         # refresh the course from the modulestore so that it has children
         self.course = modulestore().get_course(self.course.id)
@@ -390,7 +389,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         Create global staff user and log them in
         """
         self.global_staff = GlobalStaffFactory.create()  # pylint: disable=attribute-defined-outside-init
-        self.assertTrue(self.client.login(username=self.global_staff.username, password='test'))
+        self.assertTrue(self.client.login(username=self.global_staff.username, password=TEST_PASSWORD))
 
     def _create_url_for_enroll_staff(self):
         """
@@ -457,7 +456,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertNotIn(in_cart_span, response.content)
 
         # authenticated user with nothing in cart
-        self.assertTrue(self.client.login(username=self.user.username, password=self.password))
+        self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
         response = self.client.get(reverse('about_course', args=[unicode(course.id)]))
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(in_cart_span, response.content)
@@ -486,7 +485,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         if is_anonymous:
             self.client.logout()
         else:
-            self.assertTrue(self.client.login(username=self.user.username, password=self.password))
+            self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
 
         # Construct the link according the following scenarios and verify its presence in the response:
         #      (1) shopping cart is enabled and the user is not logged in
@@ -563,7 +562,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.section.location.name,
             'f'
         ])
-        self.assertTrue(self.client.login(username=self.user.username, password=self.password))
+        self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
         response = self.client.get(request_url)
         self.assertEqual(response.status_code, 404)
 
@@ -576,7 +575,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.section.location.name,
             '1'
         ]
-        self.assertTrue(self.client.login(username=self.user.username, password=self.password))
+        self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
         for idx, val in enumerate(url_parts):
             url_parts_copy = url_parts[:]
             url_parts_copy[idx] = val + u'χ'
@@ -2028,7 +2027,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
     def setUp(self):
         super(GenerateUserCertTests, self).setUp()
 
-        self.student = UserFactory(username='dummy', password='123456', email='test@mit.edu')
+        self.student = UserFactory()
         self.course = CourseFactory.create(
             org='edx',
             number='verified',
@@ -2038,7 +2037,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             self_paced=True
         )
         self.enrollment = CourseEnrollment.enroll(self.student, self.course.id, mode='honor')
-        self.assertTrue(self.client.login(username=self.student, password='123456'))
+        self.assertTrue(self.client.login(username=self.student, password=TEST_PASSWORD))
         self.url = reverse('generate_user_cert', kwargs={'course_id': unicode(self.course.id)})
 
     def test_user_with_out_passing_grades(self):
@@ -2442,14 +2441,13 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
     @classmethod
     def setUpTestData(cls):
         """Set up and enroll our fake user in the course."""
-        cls.password = 'test'
-        cls.user = UserFactory(password=cls.password)
+        cls.user = UserFactory()
         CourseEnrollment.enroll(cls.user, cls.course.id)
 
     def setUp(self):
         """Do the client login."""
         super(TestIndexViewCrawlerStudentStateWrites, self).setUp()
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
     def test_write_by_default(self):
         """By default, always write student state, regardless of user agent."""

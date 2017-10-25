@@ -1567,7 +1567,7 @@ def financial_assistance_form(request):
             'email': user.email,
             'username': user.username,
             'name': user.profile.name,
-            'country': str(user.profile.country.name),
+            'country': unicode(user.profile.country.name),
         },
         'submit_url': reverse('submit_financial_assistance_request'),
         'fields': [
