@@ -86,10 +86,6 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase, SharedModuleStoreTestCase):
             expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
         )
 
-        ScheduleFactory.create(upgrade_deadline=datetime.datetime(2017, 8, 1, 15, 44, 30, tzinfo=pytz.UTC))
-        ScheduleFactory.create(upgrade_deadline=datetime.datetime(2017, 8, 1, 17, 34, 30, tzinfo=pytz.UTC))
-        ScheduleFactory.create(upgrade_deadline=datetime.datetime(2017, 8, 2, 15, 34, 30, tzinfo=pytz.UTC))
-
         site = SiteFactory.create()
         self.site_config = SiteConfigurationFactory.create(site=site)
         ScheduleConfigFactory.create(site=self.site_config.site)
