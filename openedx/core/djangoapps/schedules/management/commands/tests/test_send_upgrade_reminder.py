@@ -18,13 +18,12 @@ from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_upgrade_reminder as reminder
 from openedx.core.djangoapps.schedules.management.commands.tests.tools import ScheduleBaseEmailTestBase
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory, ScheduleFactory
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
@@ -85,12 +84,6 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase, SharedModuleStoreTestCase):
             mode_slug=CourseMode.VERIFIED,
             expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
         )
-
-        site = SiteFactory.create()
-        self.site_config = SiteConfigurationFactory.create(site=site)
-        ScheduleConfigFactory.create(site=self.site_config.site)
-
-        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
 
     @patch.object(reminder.Command, 'async_send_task')
     def test_handle(self, mock_send):

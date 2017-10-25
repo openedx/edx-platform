@@ -23,7 +23,7 @@ from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_recurring_nudge as nudge
 from openedx.core.djangoapps.schedules.management.commands.tests.tools import ScheduleBaseEmailTestBase
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory, ScheduleFactory
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms, FilteredQueryCountMixin
 from student.tests.factories import UserFactory
@@ -49,15 +49,6 @@ NUM_COURSE_MODES_QUERIES = 1
 class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
     # pylint: disable=protected-access
     tested_task = tasks.ScheduleRecurringNudge
-
-    def setUp(self):
-        super(TestSendRecurringNudge, self).setUp()
-
-        site = SiteFactory.create()
-        self.site_config = SiteConfigurationFactory.create(site=site)
-        ScheduleConfigFactory.create(site=self.site_config.site)
-
-        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
 
     @patch.object(nudge.Command, 'async_send_task')
     def test_handle(self, mock_send):
