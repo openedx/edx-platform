@@ -49,8 +49,6 @@ NUM_COURSE_MODES_QUERIES = 1
 class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
     # pylint: disable=protected-access
 
-    ENABLED_CACHES = ['default']
-
     def setUp(self):
         super(TestSendRecurringNudge, self).setUp()
 

@@ -62,8 +62,6 @@ LOG = logging.getLogger(__name__)
 @freeze_time('2017-08-01 00:00:00', tz_offset=0, tick=True)
 class TestUpgradeReminder(ScheduleBaseEmailTestBase, SharedModuleStoreTestCase):
 
-    ENABLED_CACHES = ['default']
-
     @classmethod
     def setUpClass(cls):
         super(TestUpgradeReminder, cls).setUpClass()
