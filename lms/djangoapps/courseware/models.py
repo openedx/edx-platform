@@ -400,3 +400,26 @@ class CourseDynamicUpgradeDeadlineConfiguration(ConfigurationModel):
         default=False,
         help_text=_('Disable the dynamic upgrade deadline for this course run.')
     )
+
+
+class OrgDynamicUpgradeDeadlineConfiguration(ConfigurationModel):
+    """
+    Per-org configuration for dynamic upgrade deadlines.
+
+    This model controls dynamic upgrade deadlines on a per-org level, allowing organizations to
+    have different deadlines or opt out of the functionality altogether.
+    """
+    class Meta(object):
+        app_label = 'courseware'
+
+    KEY_FIELDS = ('org_id',)
+
+    org_id = models.CharField(max_length=255, db_index=True)
+    deadline_days = models.PositiveSmallIntegerField(
+        default=21,
+        help_text=_('Number of days a learner has to upgrade after content is made available')
+    )
+    opt_out = models.BooleanField(
+        default=False,
+        help_text=_('Disable the dynamic upgrade deadline for this organization.')
+    )
