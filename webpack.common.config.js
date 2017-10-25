@@ -5,21 +5,14 @@
 var path = require('path');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var StringReplace = require('string-replace-webpack-plugin');
-
-var isProd = process.env.NODE_ENV === 'production';
-var extractSass = new ExtractTextPlugin({
-    filename: 'css/[name].[contenthash].css',
-    disable: !isProd
-});
 
 var namespacedRequireFiles = [
     path.resolve(__dirname, 'common/static/common/js/components/views/feedback_notification.js'),
     path.resolve(__dirname, 'common/static/common/js/components/views/feedback.js')
 ];
 
-var wpconfig = {
+module.exports = {
     context: __dirname,
 
     entry: {
@@ -45,22 +38,12 @@ var wpconfig = {
 
     output: {
         path: path.resolve(__dirname, 'common/static/bundles'),
-        filename: isProd ? '[name].[chunkhash].js' : '[name].js',
         libraryTarget: 'window'
     },
 
-    devtool: isProd ? false : 'source-map',
-
     plugins: [
-        new ExtractTextPlugin('node_modules/@edx/studio-frontend/dist/studio-frontend.min.css'),
         new webpack.NoEmitOnErrorsPlugin(),
         new webpack.NamedModulesPlugin(),
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-        }),
-        new webpack.LoaderOptionsPlugin({
-            debug: !isProd
-        }),
         new BundleTracker({
             path: process.env.STATIC_ROOT_CMS,
             filename: 'webpack-stats.json'
@@ -129,34 +112,6 @@ var wpconfig = {
                 use: 'babel-loader'
             },
             {
-                test: /(.scss|.css)$/,
-                include: [
-                    /studio-frontend/,
-                    /paragon/,
-                    /font-awesome/
-                ],
-                use: extractSass.extract({
-                    use: [{
-                        loader: 'css-loader',
-                        options: {
-                            modules: true,
-                            localIdentName: '[name]__[local]___[hash:base64:5]'
-                        }
-                    }, {
-                        loader: 'sass-loader',
-                        options: {
-                            data: '$base-rem-size: 0.625; @import "paragon-reset";',
-                            includePaths: [
-                                path.join(__dirname, './node_modules/@edx/paragon/src/utils'),
-                                path.join(__dirname, './node_modules/')
-                            ],
-                            sourceMap: true
-                        }
-                    }],
-                    fallback: 'style-loader'
-                })
-            },
-            {
                 test: /\.coffee$/,
                 exclude: /node_modules/,
                 use: 'coffee-loader'
@@ -217,14 +172,3 @@ var wpconfig = {
         poll: true
     }
 };
-
-if (isProd) {
-    wpconfig.plugins = wpconfig.plugins.concat([
-        new webpack.LoaderOptionsPlugin({  // This may not be needed; legacy option for loaders written for webpack 1
-            minimize: true
-        }),
-        new webpack.optimize.UglifyJsPlugin()
-    ]);
-}
-
-module.exports = wpconfig;
