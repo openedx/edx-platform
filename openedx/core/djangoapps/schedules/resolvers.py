@@ -344,7 +344,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
         for schedule in schedules:
             enrollment = schedule.enrollment
             try:
-                week_summary = get_course_week_summary(enrollment.course_id, week_num)
+                week_highlights = get_week_highlights(enrollment.course_id, week_num)
             except CourseUpdateDoesNotExist:
                 continue
 
@@ -357,7 +357,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                     self.site, reverse('course_root', args=[course_id_str])
                 ),
                 'week_num': week_num,
-                'week_summary': week_summary,
+                'week_highlights': week_highlights,
 
                 # This is used by the bulk email optout policy
                 'course_ids': [course_id_str],
@@ -368,9 +368,9 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
 
 
 @request_cached
-def get_course_week_summary(course_id, week_num):
+def get_week_highlights(course_id, week_num):
     if COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course_id):
         course = modulestore().get_course(course_id)
-        return course.week_summary(week_num)
+        return course.highlights_for_week(week_num)
     else:
         raise CourseUpdateDoesNotExist()

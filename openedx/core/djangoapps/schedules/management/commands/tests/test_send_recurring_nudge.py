@@ -312,6 +312,8 @@ class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
             for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
                 for template in attr.astuple(email):
                     self.assertNotIn("TEMPLATE WARNING", template)
+                    self.assertNotIn("{{", template)
+                    self.assertNotIn("}}", template)
 
     def test_user_in_course_with_verified_coursemode_receives_upsell(self):
         user = UserFactory.create()

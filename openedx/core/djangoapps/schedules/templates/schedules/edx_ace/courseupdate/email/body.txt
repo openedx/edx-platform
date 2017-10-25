@@ -7,3 +7,5 @@ Here is what you can look forward to learning this week:
 {{ week_summary }}
 
 {% endblocktrans %}
+
+{% include "schedules/edx_ace/common/upsell_cta.txt"%}

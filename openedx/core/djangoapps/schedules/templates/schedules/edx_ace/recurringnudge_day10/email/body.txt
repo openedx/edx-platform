@@ -12,11 +12,5 @@
     {% endblocktrans %}
     {% trans "Keep learning" %} <{{course_url}}>
 {% endif %}
-{% if show_upsell %}
-{% blocktrans trimmed %}
-    Don't miss the opportunity to highlight your new knowledge and skills by earning a verified
-    certificate. Upgrade by {{ user_schedule_upgrade_deadline_time }}.
 
-    Upgrade Now! <{{ upsell_link }}>
-{% endblocktrans %}
-{% endif %}
+{% include "schedules/edx_ace/common/upsell_cta.txt"%}
