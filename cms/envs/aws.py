@@ -12,11 +12,14 @@ This is the default template for our main set of AWS servers.
 # pylint: disable=invalid-name
 
 import json
+from logging.handlers import SysLogHandler
+import os
+import platform
+import sys
 
 from .common import *
 
-from openedx.core.lib.logsettings import get_logger_config
-import os
+
 
 from path import Path as path
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
@@ -240,10 +243,77 @@ for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
 
 WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 
-LOGGING = get_logger_config(LOG_DIR,
-                            logging_env=ENV_TOKENS['LOGGING_ENV'],
-                            debug=False,
-                            service_variant=SERVICE_VARIANT)
+
+LOGGING = ENV_TOKENS.get('LOGGING', {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': (
+                '%(asctime)s %(levelname)s %(process)d '
+                '[%(name)s] %(filename)s:%(lineno)d - %(message)s'
+            ),
+        },
+        'syslog_format': {
+            'format': (
+                "[service_variant={service_variant}]"
+                "[%(name)s][env:{logging_env}] %(levelname)s "
+                "[{hostname}  %(process)d] [%(filename)s:%(lineno)d] "
+                "- %(message)s"
+            ).format(
+                service_variant=SERVICE_VARIANT,
+                logging_env=ENV_TOKENS['LOGGING_ENV'],
+                hostname=platform.node().split(".")[0]
+            )
+        },
+        'raw': {'format': '%(message)s'},
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard',
+            'stream': sys.stderr,
+        },
+        'local': {
+            'level': ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO'),
+            'class': 'logging.handlers.SysLogHandler',
+            'address': '/dev/log',
+            'formatter': 'syslog_format',
+            'facility': SysLogHandler.LOG_LOCAL0,
+        },
+        'tracking': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.SysLogHandler',
+            'address': '/dev/log',
+            'facility': SysLogHandler.LOG_LOCAL1,
+            'formatter': 'raw',
+        },
+    },
+    'loggers': {
+        'tracking': {
+            'handlers': ['tracking'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        '': {
+            'handlers': ['console', 'local'],
+            # for production environments we will only log INFO and up
+            'level': 'INFO',
+            'propagate': False
+        },
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        # requests is so loud at INFO (logs every connection) that we force it to warn in production environments
+        'requests.packages.urllib3': {
+            'level': 'WARN',
+        }
+    }
+})
+
 
 #theming start:
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', PLATFORM_NAME)
