@@ -3358,3 +3358,8 @@ if not EDX_PLATFORM_REVISION:
     except TypeError:
         # Not a git repository
         EDX_PLATFORM_REVISION = 'unknown'
+
+
+# NEW
+
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95

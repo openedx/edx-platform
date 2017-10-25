@@ -108,6 +108,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.ogv"/>
         </video>
     """
+    has_custom_completion = True
+    completion_method = u'completable'
+
     video_time = 0
     icon_class = 'video'
 
@@ -150,7 +153,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             resource_string(module, 'js/src/video/09_poster.js'),
             resource_string(module, 'js/src/video/095_video_context_menu.js'),
             resource_string(module, 'js/src/video/10_commands.js'),
-            resource_string(module, 'js/src/video/10_main.js')
+            resource_string(module, 'js/src/video/10_main.js'),
         ]
     }
     css = {'scss': [
@@ -336,6 +339,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'savedVideoPosition': self.saved_video_position.total_seconds(),
             'start': self.start_time.total_seconds(),
             'end': self.end_time.total_seconds(),
+            'completeAfter': self.start_time.total_seconds() + settings.COMPLETION_VIDEO_COMPLETE_PERCENTAGE * (self.end_time.total_seconds() - self.start_time.total_seconds()),
             'transcriptLanguage': transcript_language,
             'transcriptLanguages': sorted_languages,
             'ytTestTimeout': settings.YOUTUBE['TEST_TIMEOUT'],
@@ -349,6 +353,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'transcriptAvailableTranslationsUrl': self.runtime.handler_url(
                 self, 'transcript', 'available_translations'
             ).rstrip('/?'),
+            'publishCompletionUrl': self.runtime.handler_url(self, 'publish_completion', None).rstrip('/?'),
 
             ## For now, the option "data-autohide-html5" is hard coded. This option
             ## either enables or disables autohiding of controls and captions on mouse
