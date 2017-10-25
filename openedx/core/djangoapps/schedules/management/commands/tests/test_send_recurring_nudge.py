@@ -54,36 +54,6 @@ class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
     tested_command = nudge.Command
     expected_offsets = (-3, -10)
 
-
-    @ddt.data(1, 10, 100)
-    @patch.object(tasks, 'ace')
-    @patch.object(tested_task, 'async_send_task')
-    def test_schedule_bin(self, schedule_count, mock_schedule_send, mock_ace):
-        schedules = [
-            ScheduleFactory.create(
-                start=datetime.datetime(2017, 8, 3, 18, 44, 30, tzinfo=pytz.UTC),
-                enrollment__course__id=CourseLocator('edX', 'toy', 'Bin')
-            ) for i in range(schedule_count)
-        ]
-
-        bins_in_use = frozenset((s.enrollment.user.id % resolvers.RECURRING_NUDGE_NUM_BINS) for s in schedules)
-
-        test_datetime = datetime.datetime(2017, 8, 3, 18, tzinfo=pytz.UTC)
-        test_datetime_str = serialize(test_datetime)
-        for b in range(resolvers.RECURRING_NUDGE_NUM_BINS):
-            expected_queries = NUM_QUERIES_NO_MATCHING_SCHEDULES + NUM_QUERIES_NO_ORG_LIST
-            if b in bins_in_use:
-                # to fetch course modes for valid schedules
-                expected_queries += NUM_COURSE_MODES_QUERIES
-
-            with self.assertNumQueries(expected_queries, table_blacklist=WAFFLE_TABLES):
-
-                self.tested_task.apply(kwargs=dict(
-                    site_id=self.site_config.site.id, target_day_str=test_datetime_str, day_offset=-3, bin_num=b,
-                ))
-        self.assertEqual(mock_schedule_send.apply_async.call_count, schedule_count)
-        self.assertFalse(mock_ace.send.called)
-
     @patch.object(tested_task, 'async_send_task')
     def test_no_course_overview(self, mock_schedule_send):
         schedule = ScheduleFactory.create(

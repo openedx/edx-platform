@@ -8,7 +8,6 @@ import ddt
 import pytz
 from django.conf import settings
 from edx_ace import Message
-from freezegun import freeze_time
 from edx_ace.channel import ChannelType
 from edx_ace.test_utils import StubPolicy, patch_channels, patch_policies
 from edx_ace.utils.date import serialize
@@ -18,7 +17,6 @@ from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_upgrade_reminder as reminder
 from openedx.core.djangoapps.schedules.management.commands.tests.tools import ScheduleBaseEmailTestBase
@@ -27,8 +25,6 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfi
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 SITE_QUERY = 1
@@ -58,26 +54,14 @@ LOG = logging.getLogger(__name__)
 @skip_unless_lms
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
-@freeze_time('2017-08-01 00:00:00', tz_offset=0, tick=True)
-class TestUpgradeReminder(ScheduleBaseEmailTestBase, SharedModuleStoreTestCase):
+class TestUpgradeReminder(ScheduleBaseEmailTestBase):
     __test__ = True
 
     tested_task = tasks.ScheduleUpgradeReminder
     tested_command = reminder.Command
     expected_offsets = (2,)
 
-    @classmethod
-    def setUpClass(cls):
-        super(TestUpgradeReminder, cls).setUpClass()
-
-        cls.course = CourseFactory.create(
-            org='edX',
-            number='test',
-            display_name='Test Course',
-            self_paced=True,
-            start=datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=30),
-        )
-        cls.course_overview = CourseOverview.get_from_id(cls.course.id)
+    has_course_queries = True
 
     def setUp(self):
         super(TestUpgradeReminder, self).setUp()
@@ -87,50 +71,6 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase, SharedModuleStoreTestCase):
             mode_slug=CourseMode.VERIFIED,
             expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
         )
-
-    @ddt.data(1, 10, 100)
-    @patch.object(tasks, 'ace')
-    @patch.object(tested_task, 'async_send_task')
-    def test_schedule_bin(self, schedule_count, mock_schedule_send, mock_ace):
-        upgrade_deadline = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=2)
-        schedules = [
-            ScheduleFactory.create(
-                upgrade_deadline=upgrade_deadline,
-                enrollment__course=self.course_overview,
-            ) for i in range(schedule_count)
-        ]
-
-        bins_in_use = frozenset((self._calculate_bin_for_user(s.enrollment.user)) for s in schedules)
-        is_first_match = True
-        course_switch_queries = len(set(s.enrollment.course.id for s in schedules))
-        org_switch_queries = len(set(s.enrollment.course.id.org for s in schedules))
-        test_datetime = upgrade_deadline
-        test_datetime_str = serialize(test_datetime)
-
-        for b in range(resolvers.UPGRADE_REMINDER_NUM_BINS):
-            LOG.debug('Running bin %d', b)
-            expected_queries = NUM_QUERIES_NO_MATCHING_SCHEDULES
-            if b in bins_in_use:
-                if is_first_match:
-                    expected_queries = (
-                        # Since this is the first match, we need to cache all of the config models, so we run a query
-                        # for each of those...
-                        NUM_QUERIES_FIRST_MATCH
-                        + course_switch_queries + org_switch_queries
-                    )
-                    is_first_match = False
-                else:
-                    expected_queries = NUM_QUERIES_WITH_MATCHES
-
-            expected_queries += NUM_QUERIES_NO_ORG_LIST
-
-            with self.assertNumQueries(expected_queries, table_blacklist=WAFFLE_TABLES):
-                self.tested_task.apply(kwargs=dict(
-                    site_id=self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=b,
-                ))
-
-        self.assertEqual(mock_schedule_send.apply_async.call_count, schedule_count)
-        self.assertFalse(mock_ace.send.called)
 
     @patch.object(tested_task, 'async_send_task')
     def test_no_course_overview(self, mock_schedule_send):
