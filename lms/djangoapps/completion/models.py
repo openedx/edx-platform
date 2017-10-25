@@ -12,6 +12,7 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
+from . import waffle
 
 # pylint: disable=ungrouped-imports
 try:
@@ -52,7 +53,8 @@ class BlockCompletionManager(models.Manager):
 
         Return Value:
             (BlockCompletion, bool): A tuple comprising the created or updated
-            BlockCompletion object and a boolean value indicating whether the value
+            BlockCompletion object and a boolean value indicating whether the
+            object was newly created by this call.
 
         Raises:
 
@@ -84,17 +86,23 @@ class BlockCompletionManager(models.Manager):
                 "block_key must be an instance of `opaque_keys.edx.keys.UsageKey`.  Got {}".format(type(block_key))
             )
 
-        obj, isnew = self.get_or_create(
-            user=user,
-            course_key=course_key,
-            block_type=block_type,
-            block_key=block_key,
-            defaults={'completion': completion},
-        )
-        if not isnew and obj.completion != completion:
-            obj.completion = completion
-            obj.full_clean()
-            obj.save()
+        if waffle.waffle().is_enabled(waffle.ENABLE_COMPLETION_TRACKING):
+            obj, isnew = self.get_or_create(
+                user=user,
+                course_key=course_key,
+                block_type=block_type,
+                block_key=block_key,
+                defaults={'completion': completion},
+            )
+            if not isnew and obj.completion != completion:
+                obj.completion = completion
+                obj.full_clean()
+                obj.save()
+        else:
+            # If the feature is not enabled, this method should not be called.  Error out with a RuntimeError.
+            raise RuntimeError(
+                "BlockCompletion.objects.submit_completion should not be called when the feature is disabled."
+            )
         return obj, isnew
 
 
