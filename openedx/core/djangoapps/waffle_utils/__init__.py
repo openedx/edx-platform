@@ -360,3 +360,61 @@ class CourseWaffleFlag(WaffleFlag):
             check_before_waffle_callback=self._get_course_override_callback(course_key),
             flag_undefined_default=self.flag_undefined_default
         )
+
+
+class OrgWaffleFlag(WaffleFlag):
+    """
+    Represents a single waffle flag that can be forced on/off for an organization.
+
+    Uses a cached waffle namespace.
+    """
+
+    def _get_org_override_callback(self, org_key):
+        """
+        Returns a function to use as the check_before_waffle_callback.
+
+        Arguments:
+            org_key (String): The org component of the CourseKey to check for override
+            before checking waffle.
+        """
+        def org_override_callback(namespaced_flag_name):
+            """
+            Returns True/False if the flag was forced on or off for the provided
+            org.  Returns None if the flag was not overridden.
+
+            Note: Has side effect of caching the override value.
+
+            Arguments:
+                namespaced_flag_name (String): A namespaced version of the flag
+                    to check.
+            """
+            # Import is placed here to avoid model import at project startup.
+            from .models import WaffleFlagOrgOverrideModel
+            cache_key = u'{}.{}'.format(namespaced_flag_name, unicode(org_key))
+            force_override = self.waffle_namespace._cached_flags.get(cache_key)
+
+            if force_override is None:
+                force_override = WaffleFlagOrgOverrideModel.override_value(namespaced_flag_name, org_key)
+                self.waffle_namespace._cached_flags[cache_key] = force_override
+
+            if force_override == WaffleFlagOrgOverrideModel.ALL_CHOICES.on:
+                return True
+            if force_override == WaffleFlagOrgOverrideModel.ALL_CHOICES.off:
+                return False
+            return None
+
+        return org_override_callback
+
+    def is_enabled(self, org_key=None):
+        """
+        Returns whether or not the flag is enabled.
+
+        Arguments:
+            org_key (String): The org component of the CourseKey to check for override before
+            checking waffle.
+        """
+        return self.waffle_namespace.is_flag_active(
+            self.flag_name,
+            check_before_waffle_callback=self._get_org_override_callback(org_key),
+            flag_undefined_default=self.flag_undefined_default
+        )

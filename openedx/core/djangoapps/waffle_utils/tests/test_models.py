@@ -7,7 +7,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from request_cache.middleware import RequestCache
 
-from ..models import WaffleFlagCourseOverrideModel
+from ..models import WaffleFlagCourseOverrideModel, WaffleFlagOrgOverrideModel
 
 
 @ddt
@@ -48,4 +48,45 @@ class WaffleFlagCourseOverrideTests(TestCase):
             override_choice=override_choice,
             enabled=is_enabled,
             course_id=self.TEST_COURSE_KEY
+        )
+
+
+@ddt
+class WaffleFlagOrgOverrideTests(TestCase):
+    """
+    Tests for the waffle flag organization override model.
+    """
+
+    WAFFLE_TEST_NAME = 'waffle_test_org_override'
+    TEST_ORG_KEY = 'edX'
+    OVERRIDE_CHOICES = WaffleFlagOrgOverrideModel.ALL_CHOICES
+
+    # Data format: ( is_enabled, override_choice, expected_result )
+    @data((True, OVERRIDE_CHOICES.on, OVERRIDE_CHOICES.on),
+          (True, OVERRIDE_CHOICES.off, OVERRIDE_CHOICES.off),
+          (False, OVERRIDE_CHOICES.on, OVERRIDE_CHOICES.unset))
+    @unpack
+    def test_setting_override(self, is_enabled, override_choice, expected_result):
+        RequestCache.clear_request_cache()
+        self.set_waffle_org_override(override_choice, is_enabled)
+        override_value = WaffleFlagOrgOverrideModel.override_value(
+            self.WAFFLE_TEST_NAME, self.TEST_ORG_KEY
+        )
+        self.assertEqual(override_value, expected_result)
+
+    def test_setting_override_multiple_times(self):
+        RequestCache.clear_request_cache()
+        self.set_waffle_org_override(self.OVERRIDE_CHOICES.on)
+        self.set_waffle_org_override(self.OVERRIDE_CHOICES.off)
+        override_value = WaffleFlagOrgOverrideModel.override_value(
+            self.WAFFLE_TEST_NAME, self.TEST_ORG_KEY
+        )
+        self.assertEqual(override_value, self.OVERRIDE_CHOICES.off)
+
+    def set_waffle_org_override(self, override_choice, is_enabled=True):
+        WaffleFlagOrgOverrideModel.objects.create(
+            waffle_flag=self.WAFFLE_TEST_NAME,
+            override_choice=override_choice,
+            enabled=is_enabled,
+            org_id=self.TEST_ORG_KEY
         )

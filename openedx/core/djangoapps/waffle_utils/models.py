@@ -59,3 +59,54 @@ class WaffleFlagCourseOverrideModel(ConfigurationModel):
         enabled_label = "Enabled" if self.enabled else "Not Enabled"
         # pylint: disable=no-member
         return u"Course '{}': Persistent Grades {}".format(self.course_id.to_deprecated_string(), enabled_label)
+
+
+class WaffleFlagOrgOverrideModel(ConfigurationModel):
+    """
+    Used to force a waffle flag on or off for an organization.
+    """
+    OVERRIDE_CHOICES = Choices(('on', _('Force On')), ('off', _('Force Off')))
+    ALL_CHOICES = OVERRIDE_CHOICES + Choices('unset')
+
+    KEY_FIELDS = ('waffle_flag', 'org_id')
+
+    # The org that these features are attached to.
+    waffle_flag = CharField(max_length=255, db_index=True)
+    org_id = CharField(max_length=255, db_index=True)
+    override_choice = CharField(choices=OVERRIDE_CHOICES, default=OVERRIDE_CHOICES.on, max_length=3)
+
+    @classmethod
+    @request_cached
+    def override_value(cls, waffle_flag, org_id):
+        """
+        Returns whether the waffle flag was overridden (on or off) for the
+        org, or is unset.
+
+        Arguments:
+            waffle_flag (String): The name of the flag.
+            org_id (String): The org id for which the flag may have
+                been overridden.
+
+        If the current config is not set or disabled for this waffle flag and
+            org id, returns ALL_CHOICES.unset.
+        Otherwise, returns ALL_CHOICES.on or ALL_CHOICES.off as configured for
+            the override_choice.
+
+        """
+        if not org_id or not waffle_flag:
+            return cls.ALL_CHOICES.unset
+
+        effective = cls.objects.filter(waffle_flag=waffle_flag, org_id=org_id).order_by('-change_date').first()
+        if effective and effective.enabled:
+            return effective.override_choice
+        return cls.ALL_CHOICES.unset
+
+    class Meta(object):
+        app_label = "waffle_utils"
+        verbose_name = 'Waffle flag org override'
+        verbose_name_plural = 'Waffle flag org overrides'
+
+    def __unicode__(self):
+        enabled_label = "Enabled" if self.enabled else "Not Enabled"
+        # pylint: disable=no-member
+        return u"Org '{}': Persistent Grades {}".format(self.org_id, enabled_label)
