@@ -47,21 +47,12 @@ NUM_COURSE_MODES_QUERIES = 1
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
 class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
+    __test__ = True
+
     # pylint: disable=protected-access
     tested_task = tasks.ScheduleRecurringNudge
     tested_command = nudge.Command
-
-    @patch.object(tested_command, 'async_send_task')
-    def test_handle(self, mock_send):
-        test_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        self.tested_command().handle(date='2017-08-01', site_domain_name=self.site_config.site.domain)
-        for day in (-3, -10):
-            mock_send.enqueue.assert_any_call(
-                self.site_config.site,
-                test_day,
-                day,
-                None
-            )
+    expected_offsets = (-3, -10)
 
     @patch.object(tasks, 'ace')
     def test_resolver_send(self, mock_ace):

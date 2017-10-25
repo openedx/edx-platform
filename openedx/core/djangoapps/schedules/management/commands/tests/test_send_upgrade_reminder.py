@@ -64,6 +64,7 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase, SharedModuleStoreTestCase):
 
     tested_task = tasks.ScheduleUpgradeReminder
     tested_command = reminder.Command
+    expected_offsets = (2,)
 
     @classmethod
     def setUpClass(cls):
@@ -85,17 +86,6 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase, SharedModuleStoreTestCase):
             course_id=self.course.id,
             mode_slug=CourseMode.VERIFIED,
             expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
-        )
-
-    @patch.object(tested_command, 'async_send_task')
-    def test_handle(self, mock_send):
-        test_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        self.tested_command().handle(date='2017-08-01', site_domain_name=self.site_config.site.domain)
-        mock_send.enqueue.assert_called_with(
-            self.site_config.site,
-            test_day,
-            2,
-            None
         )
 
     @patch.object(tasks, 'ace')
