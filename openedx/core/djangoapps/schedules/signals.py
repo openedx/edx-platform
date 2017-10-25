@@ -6,7 +6,11 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from course_modes.models import CourseMode
-from courseware.models import DynamicUpgradeDeadlineConfiguration, CourseDynamicUpgradeDeadlineConfiguration
+from courseware.models import (
+    CourseDynamicUpgradeDeadlineConfiguration,
+    DynamicUpgradeDeadlineConfiguration,
+    OrgDynamicUpgradeDeadlineConfiguration
+)
 from edx_ace.utils import date
 from openedx.core.djangoapps.signals.signals import COURSE_START_DATE_CHANGED
 from openedx.core.djangoapps.theming.helpers import get_current_site
@@ -110,9 +114,18 @@ def _get_upgrade_deadline_delta_setting(course_id):
         # Use the default from this model whether or not the feature is enabled
         delta = global_config.deadline_days
 
+    # Check if the org has a deadline
+    org_config = OrgDynamicUpgradeDeadlineConfiguration.current(course_id.org)
+    if org_config.opted_in():
+        delta = org_config.deadline_days
+    elif org_config.opted_out():
+        delta = None
+
     # Check if the course has a deadline
     course_config = CourseDynamicUpgradeDeadlineConfiguration.current(course_id)
-    if course_config.enabled and not course_config.opt_out:
+    if course_config.opted_in():
         delta = course_config.deadline_days
+    elif course_config.opted_out():
+        delta = None
 
     return delta
