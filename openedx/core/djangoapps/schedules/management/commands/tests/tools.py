@@ -6,6 +6,8 @@ from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFact
 
 class ScheduleBaseEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase):
 
+    __test__ = False
+
     ENABLED_CACHES = ['default']
 
     def setUp(self):
@@ -16,3 +18,6 @@ class ScheduleBaseEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
         ScheduleConfigFactory.create(site=self.site_config.site)
 
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
+
+    def test_command_task_binding(self):
+        self.assertEqual(self.tested_command.async_send_task, self.tested_task)

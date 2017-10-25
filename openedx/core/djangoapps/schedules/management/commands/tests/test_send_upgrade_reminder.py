@@ -60,8 +60,10 @@ LOG = logging.getLogger(__name__)
             "Can't test schedules if the app isn't installed")
 @freeze_time('2017-08-01 00:00:00', tz_offset=0, tick=True)
 class TestUpgradeReminder(ScheduleBaseEmailTestBase, SharedModuleStoreTestCase):
+    __test__ = True
 
     tested_task = tasks.ScheduleUpgradeReminder
+    tested_command = reminder.Command
 
     @classmethod
     def setUpClass(cls):
@@ -85,10 +87,10 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase, SharedModuleStoreTestCase):
             expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
         )
 
-    @patch.object(reminder.Command, 'async_send_task')
+    @patch.object(tested_command, 'async_send_task')
     def test_handle(self, mock_send):
         test_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        reminder.Command().handle(date='2017-08-01', site_domain_name=self.site_config.site.domain)
+        self.tested_command().handle(date='2017-08-01', site_domain_name=self.site_config.site.domain)
         mock_send.enqueue.assert_called_with(
             self.site_config.site,
             test_day,

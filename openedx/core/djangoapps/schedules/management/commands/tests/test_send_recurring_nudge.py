@@ -49,11 +49,12 @@ NUM_COURSE_MODES_QUERIES = 1
 class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
     # pylint: disable=protected-access
     tested_task = tasks.ScheduleRecurringNudge
+    tested_command = nudge.Command
 
-    @patch.object(nudge.Command, 'async_send_task')
+    @patch.object(tested_command, 'async_send_task')
     def test_handle(self, mock_send):
         test_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        nudge.Command().handle(date='2017-08-01', site_domain_name=self.site_config.site.domain)
+        self.tested_command().handle(date='2017-08-01', site_domain_name=self.site_config.site.domain)
         for day in (-3, -10):
             mock_send.enqueue.assert_any_call(
                 self.site_config.site,
