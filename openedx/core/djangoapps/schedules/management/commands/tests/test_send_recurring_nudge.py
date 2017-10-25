@@ -55,31 +55,6 @@ class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
     expected_offsets = (-3, -10)
 
     @patch.object(tested_task, 'async_send_task')
-    def test_no_course_overview(self, mock_schedule_send):
-        schedule = ScheduleFactory.create(
-            start=datetime.datetime(2017, 8, 3, 20, 34, 30, tzinfo=pytz.UTC),
-            enrollment__user=UserFactory.create(),
-        )
-        schedule.enrollment.course_id = CourseKey.from_string('edX/toy/Not_2012_Fall')
-        schedule.enrollment.save()
-
-        test_datetime = datetime.datetime(2017, 8, 3, 20, tzinfo=pytz.UTC)
-        test_datetime_str = serialize(test_datetime)
-        for b in range(resolvers.RECURRING_NUDGE_NUM_BINS):
-            with self.assertNumQueries(NUM_QUERIES_NO_MATCHING_SCHEDULES + NUM_QUERIES_NO_ORG_LIST, table_blacklist=WAFFLE_TABLES):
-                self.tested_task.apply(kwargs=dict(
-                    site_id=self.site_config.site.id, target_day_str=test_datetime_str, day_offset=-3, bin_num=b
-                ))
-
-        # There is no database constraint that enforces that enrollment.course_id points
-        # to a valid CourseOverview object. However, in that case, schedules isn't going
-        # to attempt to address it, and will instead simply skip those users.
-        # This happens 'transparently' because django generates an inner-join between
-        # enrollment and course_overview, and thus will skip any rows where course_overview
-        # is null.
-        self.assertEqual(mock_schedule_send.apply_async.call_count, 0)
-
-    @patch.object(tested_task, 'async_send_task')
     def test_send_after_course_end(self, mock_schedule_send):
         user1 = UserFactory.create(id=resolvers.RECURRING_NUDGE_NUM_BINS)
 

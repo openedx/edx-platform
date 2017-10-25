@@ -8,7 +8,7 @@ import pytz
 
 from courseware.models import DynamicUpgradeDeadlineConfiguration
 from edx_ace.utils.date import serialize
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangoapps.schedules import resolvers, tasks
@@ -156,3 +156,31 @@ class ScheduleBaseEmailTestBase(SharedModuleStoreTestCase):
 
             self.assertEqual(mock_schedule_send.apply_async.call_count, schedule_count)
             self.assertFalse(mock_ace.send.called)
+
+    def test_no_course_overview(self):
+        current_day, offset, target_day = self._get_dates()
+        schedule = ScheduleFactory.create(
+            start=target_day,
+            upgrade_deadline=target_day,
+            enrollment__course__self_paced=True,
+        )
+        schedule.enrollment.course_id = CourseKey.from_string('edX/toy/Not_2012_Fall')
+        schedule.enrollment.save()
+
+        with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
+            for b in range(self.tested_task.num_bins):
+                self.tested_task.apply(kwargs=dict(
+                    site_id=self.site_config.site.id,
+                    target_day_str=serialize(target_day),
+                    day_offset=offset,
+                    bin_num=b,
+                ))
+
+        # There is no database constraint that enforces that enrollment.course_id points
+        # to a valid CourseOverview object. However, in that case, schedules isn't going
+        # to attempt to address it, and will instead simply skip those users.
+        # This happens 'transparently' because django generates an inner-join between
+        # enrollment and course_overview, and thus will skip any rows where course_overview
+        # is null.
+        self.assertEqual(mock_schedule_send.apply_async.call_count, 0)
+

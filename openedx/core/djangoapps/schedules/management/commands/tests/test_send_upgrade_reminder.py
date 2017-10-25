@@ -72,32 +72,6 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase):
             expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
         )
 
-    @patch.object(tested_task, 'async_send_task')
-    def test_no_course_overview(self, mock_schedule_send):
-
-        schedule = ScheduleFactory.create(
-            upgrade_deadline=datetime.datetime(2017, 8, 3, 20, 34, 30, tzinfo=pytz.UTC),
-        )
-        schedule.enrollment.course_id = CourseKey.from_string('edX/toy/Not_2012_Fall')
-        schedule.enrollment.save()
-
-        test_datetime = datetime.datetime(2017, 8, 3, 20, tzinfo=pytz.UTC)
-        test_datetime_str = serialize(test_datetime)
-        for b in range(resolvers.UPGRADE_REMINDER_NUM_BINS):
-
-            with self.assertNumQueries(NUM_QUERIES_NO_MATCHING_SCHEDULES + NUM_QUERIES_NO_ORG_LIST, table_blacklist=WAFFLE_TABLES):
-                self.tested_task.apply(kwargs=dict(
-                    site_id=self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=b,
-                ))
-
-        # There is no database constraint that enforces that enrollment.course_id points
-        # to a valid CourseOverview object. However, in that case, schedules isn't going
-        # to attempt to address it, and will instead simply skip those users.
-        # This happens 'transparently' because django generates an inner-join between
-        # enrollment and course_overview, and thus will skip any rows where course_overview
-        # is null.
-        self.assertEqual(mock_schedule_send.apply_async.call_count, 0)
-
     @patch.object(tasks, 'ace')
     def test_delivery_disabled(self, mock_ace):
         ScheduleConfigFactory.create(site=self.site_config.site, deliver_upgrade_reminder=False)
