@@ -5,7 +5,7 @@ from django.db.models.signals import post_save, pre_save, m2m_changed
 from django.dispatch import receiver
 
 from common.lib.nodebb_client.client import NodeBBClient
-from lms.djangoapps.onboarding_survey.models import ExtendedProfile, UserInfoSurvey, InterestsSurvey
+from lms.djangoapps.onboarding_survey.models import ExtendedProfile, UserInfoSurvey, InterestsSurvey, OrganizationSurvey
 from nodebb.models import DiscussionCommunity
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange
@@ -27,6 +27,7 @@ def set_is_featured_false(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=UserInfoSurvey)
 @receiver(post_save, sender=ExtendedProfile)
+@receiver(post_save, sender=OrganizationSurvey)
 @receiver(save_interests, sender=InterestsSurvey)
 def sync_user_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
     """ Sync user information with  """
@@ -36,12 +37,22 @@ def sync_user_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=u
         if sender == ExtendedProfile:
             data_to_sync = {
                 "first_name": instance.first_name,
-                "last_name": instance.last_name,
+                "last_name": instance.last_name
             }
+
+            if instance.organization:
+                data_to_sync["organization"] = instance.organization.name
+
         elif sender == UserInfoSurvey:
             data_to_sync = {
                 "city_of_residence": instance.city_of_residence,
-                "country_of_residence": instance.country_of_residence
+                "country_of_residence": instance.country_of_residence,
+                "birthday": instance.dob,
+                "language": instance.language,
+            }
+        elif sender == OrganizationSurvey:
+            data_to_sync = {
+                "focus_area": instance.focus_area
             }
         elif sender == InterestsSurvey:
             data_to_sync = {

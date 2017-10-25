@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from student.models import User
 
+from lms.djangoapps.onboarding_survey.models import Organization, ExtendedProfile
 from lms.djangoapps.philu_api.helpers import get_encoded_token
 
 log = logging.getLogger("edx.philu_api")
@@ -43,18 +44,28 @@ class UpdateCommunityProfile(APIView):
             first_name = data.get('first_name', extended_profile.first_name)
             last_name = data.get('last_name', extended_profile.last_name)
             about_me = data.get('aboutme', user.profile.bio)
+            organization = data.get('organization')
+            if organization:
+                organization, is_created = Organization.objects.get_or_create(name=organization)
+
+                if organization != extended_profile.organization:
+                    is_poc_value, is_poc_label = ExtendedProfile.POC_CHOICES[0]
+                    extended_profile.org_admin_email = ""
+                    extended_profile.is_poc = is_poc_value
+                    extended_profile.organization = organization
 
             city_of_residence = data.get('city_of_residence', user_info_survey.city_of_residence)
             country_of_residence = data.get('country_of_residence', user_info_survey.country_of_residence)
+            language = data.get('language', user_info_survey.language)
             birthday = data.get('birthday', user_info_survey.dob)
 
             extended_profile.first_name = first_name
             extended_profile.last_name = last_name
             user.profile.bio = about_me
-
             user_info_survey.city_of_residence = city_of_residence
             user_info_survey.country_of_residence = country_of_residence
-            
+            user_info_survey.language = language
+
             if birthday:
                 user_info_survey.dob = datetime.strptime(birthday, '%m/%d/%Y')
 
