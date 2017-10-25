@@ -37,7 +37,7 @@ def create_youtube_string(module):
     ])
 
 
-def rewrite_video_url(cdn_base_url, original_video_url):
+def rewrite_video_url(cdn_base_url, original_video_url, whitelist):
     """
     Returns a re-written video URL for cases when an alternate source
     has been configured and is selected using factors like
@@ -57,6 +57,21 @@ def rewrite_video_url(cdn_base_url, original_video_url):
         return None
 
     parsed = urlparse(original_video_url)
+
+    # malformed input, say not scheme, results in the netloc
+    # being returned as an empty string.
+    if not parsed.netloc:
+        return None
+
+    # Only re-write URLs if the original netloc is in the whitelist, otherwise
+    # no guarantees can be made that the re-write target can service the request.
+    try:
+        if parsed.netloc not in whitelist:
+            return None
+    except TypeError:
+        log.exception("message")
+        return None
+
     # Contruction of the rewrite url is intentionally very flexible of input.
     # For example, https://www.edx.org/ + /foo.html will be rewritten to
     # https://www.edx.org/foo.html.
