@@ -438,6 +438,8 @@
 // Course Updates Page
 .course-updates {
   .all-updates {
+    flex-grow: 1;
+
     .updates-article {
       margin: ($baseline*6/5) 0;
       padding-bottom: ($baseline*6/5);
