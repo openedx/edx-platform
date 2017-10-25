@@ -2177,6 +2177,8 @@ INSTALLED_APPS = (
     # RestAPI
     'lms.djangoapps.philu_api',
 
+    # Philu Overrides
+    'lms.djangoapps.philu_overrides',
     # timed notification and periodic tasks
     'openedx.core.djangoapps.timed_notification',
 )
