@@ -88,24 +88,6 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase, SharedModuleStoreTestCase):
             expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
         )
 
-    @patch.object(tasks, 'ace')
-    def test_resolver_send(self, mock_ace):
-        current_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        test_day = current_day + datetime.timedelta(days=2)
-        ScheduleFactory.create(upgrade_deadline=datetime.datetime(2017, 8, 3, 15, 34, 30, tzinfo=pytz.UTC))
-
-        with patch.object(self.tested_task, 'apply_async') as mock_apply_async:
-            self.tested_task.enqueue(self.site_config.site, current_day, 2)
-            mock_apply_async.assert_any_call(
-                (self.site_config.site.id, serialize(test_day), 2, 0, None),
-                retry=False,
-            )
-            mock_apply_async.assert_any_call(
-                (self.site_config.site.id, serialize(test_day), 2, resolvers.UPGRADE_REMINDER_NUM_BINS - 1, None),
-                retry=False,
-            )
-            self.assertFalse(mock_ace.send.called)
-
     @ddt.data(1, 10, 100)
     @patch.object(tasks, 'ace')
     @patch.object(tested_task, 'async_send_task')
