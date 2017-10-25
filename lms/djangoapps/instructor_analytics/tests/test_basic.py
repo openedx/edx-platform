@@ -574,7 +574,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
             self.assertIn(course_registration['code'], [registration_code.code for registration_code in registration_codes])
             self.assertIn(
                 course_registration['course_id'],
-                [registration_code.course_id.to_deprecated_string() for registration_code in registration_codes]
+                [registration_code.course_id for registration_code in registration_codes]
             )
             self.assertIn(
                 course_registration['company_name'],

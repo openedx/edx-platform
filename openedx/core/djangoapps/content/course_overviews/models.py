@@ -552,8 +552,7 @@ class CourseOverview(TimeStampedModel):
         Returns all course keys from course overviews.
         """
         return [
-            CourseKey.from_string(course_overview['id'])
-            for course_overview in CourseOverview.objects.values('id')
+            course_overview['id'] for course_overview in CourseOverview.objects.values('id')
         ]
 
     def is_discussion_tab_enabled(self):
