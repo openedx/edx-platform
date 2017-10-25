@@ -1,7 +1,6 @@
 """
 Test scenarios for the review xblock.
 """
-import json
 import unittest
 
 from django.conf import settings
@@ -15,7 +14,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from review import ReviewXBlock, get_review_ids
+from review import get_review_ids
 import crum
 
 
@@ -230,13 +229,14 @@ class TestReviewFunctions(TestReviewXBlock):
                 'course_id': self.course_actual.id,
                 'chapter': self.chapter_actual.location.name,
                 'section': self.review_section_actual.location.name,
-        }))
+            }
+        ))
 
         expected_h2 = 'Nothing to review'
         expected_p = 'Oh no! You have not interacted with enough problems yet to have any to review. '\
-                        'Go back and try more problems so you have content to review.'
-        self.assertTrue(expected_h2 in response.content)
-        self.assertTrue(expected_p in response.content)
+            'Go back and try more problems so you have content to review.'
+        self.assertIn(expected_h2, response.content)
+        self.assertIn(expected_p, response.content)
 
     def test_too_few_review_problems(self):
         """
@@ -258,7 +258,8 @@ class TestReviewFunctions(TestReviewXBlock):
                 'course_id': self.course_actual.id,
                 'chapter': self.chapter_actual.location.name,
                 'section': self.section2_actual.location.name,
-        }))
+            }
+        ))
 
         # Loading the review section
         response = self.client.get(reverse(
@@ -267,14 +268,15 @@ class TestReviewFunctions(TestReviewXBlock):
                 'course_id': self.course_actual.id,
                 'chapter': self.chapter_actual.location.name,
                 'section': self.review_section_actual.location.name,
-        }))
+            }
+        ))
 
         expected_h2 = 'Nothing to review'
         expected_p = 'Oh no! You have not interacted with enough problems yet to have any to review. '\
-                        'Go back and try more problems so you have content to review.'
+            'Go back and try more problems so you have content to review.'
 
-        self.assertTrue(expected_h2 in response.content)
-        self.assertTrue(expected_p in response.content)
+        self.assertIn(expected_h2, response.content)
+        self.assertIn(expected_p, response.content)
 
     def test_review_problems(self):
         """
@@ -295,14 +297,16 @@ class TestReviewFunctions(TestReviewXBlock):
                 'course_id': self.course_actual.id,
                 'chapter': self.chapter_actual.location.name,
                 'section': self.section1_actual.location.name,
-        }))
+            }
+        ))
         self.client.get(reverse(
             'courseware_section',
             kwargs={
                 'course_id': self.course_actual.id,
                 'chapter': self.chapter_actual.location.name,
                 'section': self.section2_actual.location.name,
-        }))
+            }
+        ))
 
         # Loading the review section
         response = self.client.get(reverse(
@@ -311,24 +315,25 @@ class TestReviewFunctions(TestReviewXBlock):
                 'course_id': self.course_actual.id,
                 'chapter': self.chapter_actual.location.name,
                 'section': self.review_section_actual.location.name,
-        }))
+            }
+        ))
 
         expected_header_text = 'Below are 5 review problems for you to try out and see '\
-                                'how well you have mastered the material of this class'
+            'how well you have mastered the material of this class'
         # The problems are defaulted to correct upon load, so the
         # correctness text should be displayed as follows
         # This happens because the problems "raw_possible" field is 0 and the
         # "raw_earned" field is also 0.
         expected_correctness_text = 'When you originally tried this problem, you ended '\
-                                    'up being correct after 0 attempts.'
+            'up being correct after 0 attempts.'
         expected_problems = ['Review Problem 1', 'Review Problem 2', 'Review Problem 3',
-                            'Review Problem 4', 'Review Problem 5']
+                             'Review Problem 4', 'Review Problem 5']
         expected_url_beginning = 'https://courses.edx.org/xblock/block-v1:DillonX/DAD101rx/3T2017+type@problem+block@'
 
-        self.assertTrue(expected_header_text in response.content)
+        self.assertIn(expected_header_text, response.content)
         self.assertEqual(response.content.count(expected_correctness_text), 5)
         for problem in expected_problems:
-            self.assertTrue(problem in response.content)
+            self.assertIn(problem, response.content)
         self.assertEqual(response.content.count(expected_url_beginning), 5)
 
     def test_review_problem_urls(self):
@@ -350,14 +355,16 @@ class TestReviewFunctions(TestReviewXBlock):
                 'course_id': self.course_actual.id,
                 'chapter': self.chapter_actual.location.name,
                 'section': self.section1_actual.location.name,
-        }))
+            }
+        ))
         self.client.get(reverse(
             'courseware_section',
             kwargs={
                 'course_id': self.course_actual.id,
                 'chapter': self.chapter_actual.location.name,
                 'section': self.section2_actual.location.name,
-        }))
+            }
+        ))
 
         user = User.objects.get(email=self.STUDENTS[0]['email'])
         crum.set_current_user(user)
@@ -373,7 +380,7 @@ class TestReviewFunctions(TestReviewXBlock):
         ]
 
         for url in expected_urls:
-            self.assertTrue(url in result_urls)
+            self.assertIn(url, result_urls)
 
     def test_review_problem_urls_unique_problem(self):
         """
@@ -396,14 +403,16 @@ class TestReviewFunctions(TestReviewXBlock):
                 'course_id': self.course_actual.id,
                 'chapter': self.chapter_actual.location.name,
                 'section': self.section1_actual.location.name,
-        }))
+            }
+        ))
         self.client.get(reverse(
             'courseware_section',
             kwargs={
                 'course_id': self.course_actual.id,
                 'chapter': self.chapter_actual.location.name,
                 'section': self.section3_actual.location.name,
-        }))
+            }
+        ))
 
         user = User.objects.get(email=self.STUDENTS[0]['email'])
         crum.set_current_user(user)
@@ -421,8 +430,8 @@ class TestReviewFunctions(TestReviewXBlock):
         expected_not_loaded_problem = (url_beginning + 'i4x://DillonX/DAD101x/problem/Problem_5', 'correct', 0)
 
         for url in expected_urls:
-            self.assertTrue(url in result_urls)
-        self.assertFalse(expected_not_loaded_problem in result_urls)
+            self.assertIn(url, result_urls)
+        self.assertNotIn(expected_not_loaded_problem, result_urls)
 
     # NOTE: This test is failing because when I grab the problem from the CSM,
     # it is unable to find its parents. This is some issue with the BlockStructure
@@ -444,13 +453,14 @@ class TestReviewFunctions(TestReviewXBlock):
     #             'course_id': self.course_actual.id,
     #             'chapter': self.chapter_actual.location.name,
     #             'section': self.section1_actual.location.name,
-    #     }))
+    #         }
+    #     ))
 
     #     user = User.objects.get(email=self.STUDENTS[0]['email'])
     #     crum.set_current_user(user)
     #     result_url = get_review_ids.get_vertical(self.course_actual.id)
 
     #     expected_url = 'https://courses.edx.org/xblock/block-v1:DillonX/DAD101rx/3T2017+type@'\
-    #                     'vertical+block@i4x://DillonX/DAD101x/chapter/New_Unit_1'
+    #         'vertical+block@i4x://DillonX/DAD101x/chapter/New_Unit_1'
 
     #     self.assertEqual(result_url, expected_url)
