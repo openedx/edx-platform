@@ -4,10 +4,7 @@ from openedx.core.djangoapps.schedules.tasks import ScheduleCourseUpdate
 
 class Command(SendEmailBaseCommand):
     async_send_task = ScheduleCourseUpdate
-
-    def __init__(self, *args, **kwargs):
-        super(Command, self).__init__(*args, **kwargs)
-        self.log_prefix = 'Upgrade Reminder'
+    log_prefix = 'Course Update'
 
     def send_emails(self, *args, **kwargs):
         for day_offset in xrange(-7, -77, -7):
