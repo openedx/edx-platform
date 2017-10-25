@@ -59,6 +59,7 @@ edxval==0.1.2
 event-tracking==0.2.4
 feedparser==5.1.3
 firebase-token-generator==1.3.2
+fs==2.0.10a1
 GitPython==0.3.2.RC1
 glob2==0.3
 gunicorn==0.17.4

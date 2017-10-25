@@ -6,7 +6,7 @@ import sys
 import textwrap
 from datetime import datetime
 
-from fs.errors import ResourceNotFoundError
+from fs.errors import ResourceNotFound
 from lxml import etree
 from path import Path as path
 from pkg_resources import resource_string
@@ -260,7 +260,7 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
 
                     return definition, []
 
-            except (ResourceNotFoundError) as err:
+            except ResourceNotFound as err:
                 msg = 'Unable to load file contents at path {0}: {1} '.format(
                     filepath, err)
                 # add more info and re-raise
