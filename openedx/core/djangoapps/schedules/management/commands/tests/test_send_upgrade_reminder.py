@@ -22,6 +22,7 @@ from courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_upgrade_reminder as reminder
+from openedx.core.djangoapps.schedules.management.commands.tests.tools import ScheduleBaseEmailTestBase
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory, ScheduleFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
@@ -59,7 +60,7 @@ LOG = logging.getLogger(__name__)
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
 @freeze_time('2017-08-01 00:00:00', tz_offset=0, tick=True)
-class TestUpgradeReminder(SharedModuleStoreTestCase):
+class TestUpgradeReminder(ScheduleBaseEmailTestBase, SharedModuleStoreTestCase):
 
     ENABLED_CACHES = ['default']
 

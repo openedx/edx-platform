@@ -21,6 +21,7 @@ from courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_recurring_nudge as nudge
+from openedx.core.djangoapps.schedules.management.commands.tests.tools import ScheduleBaseEmailTestBase
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory, ScheduleFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
@@ -45,7 +46,7 @@ NUM_COURSE_MODES_QUERIES = 1
 @skip_unless_lms
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
-class TestSendRecurringNudge(FilteredQueryCountMixin, CacheIsolationTestCase):
+class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
     # pylint: disable=protected-access
 
     ENABLED_CACHES = ['default']
