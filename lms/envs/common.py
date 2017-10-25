@@ -510,6 +510,7 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 
 OAUTH2_PROVIDER = {
     'OAUTH2_VALIDATOR_CLASS': 'openedx.core.djangoapps.oauth_dispatch.dot_overrides.EdxOAuth2Validator',
+    'REFRESH_TOKEN_EXPIRE_SECONDS': 20160,
     'SCOPES': {
         'read': 'Read scope',
         'write': 'Write scope',
