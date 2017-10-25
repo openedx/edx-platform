@@ -19,6 +19,7 @@ from lms.djangoapps.onboarding_survey.models import (
     InterestsSurvey,
     OrganizationSurvey,
     Organization)
+from lms.djangoapps.onboarding_survey.signals import save_interests
 from lms.djangoapps.onboarding_survey.history import update_history
 from onboarding_survey import forms
 
@@ -132,7 +133,9 @@ def interests(request):
         try:
             form = forms.InterestModelForm(request.POST, instance=request.user.interest_survey)
             if form.is_valid():
-                form.save()
+                interest_survey = form.save()
+                save_interests.send(sender=InterestsSurvey, instance=interest_survey)
+
                 update_user_history(request.user)
                 if not are_forms_complete:
                     return redirect(reverse('organization'))
@@ -145,6 +148,8 @@ def interests(request):
                 interest_survey = form.save()
                 interest_survey.user = request.user
                 interest_survey.save()
+                save_interests.send(sender=InterestsSurvey, instance=interest_survey)
+
                 update_user_history(request.user)
                 if not are_forms_complete:
                     return redirect(reverse('organization'))

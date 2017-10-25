@@ -11,6 +11,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange
 from xmodule.modulestore.django import modulestore
 from custom_settings.models import CustomSettings
+from lms.djangoapps.onboarding_survey.signals import save_interests
 
 log = getLogger(__name__)
 
@@ -26,7 +27,7 @@ def set_is_featured_false(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=UserInfoSurvey)
 @receiver(post_save, sender=ExtendedProfile)
-@receiver(m2m_changed, sender=InterestsSurvey.capacity_areas.through)
+@receiver(save_interests, sender=InterestsSurvey)
 def sync_user_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
     """ Sync user information with  """
     user = instance.user
@@ -42,7 +43,7 @@ def sync_user_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=u
                 "city_of_residence": instance.city_of_residence,
                 "country_of_residence": instance.country_of_residence
             }
-        elif sender == InterestsSurvey.capacity_areas.through and kwargs['action'] in ['post_add', 'post_remove']:
+        elif sender == InterestsSurvey:
             data_to_sync = {
                 'interests': ','.join([area.label for area in instance.capacity_areas.all()])
             }
