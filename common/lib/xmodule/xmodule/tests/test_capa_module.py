@@ -459,6 +459,11 @@ class CapaModuleTest(unittest.TestCase):
         self.assertTrue(still_in_grace.answer_available())
 
     def test_showanswer_answered(self):
+        """
+        Tests that with showanswer="answered" should show answer after the problem is correctly answered.
+        It should *NOT* show answer if the answer is incorrect.
+        """
+        # Can not see "Show Answer" when student answer is wrong
         answer_wrong = CapaFactory.create(
             showanswer=SHOWANSWER.ANSWERED,
             max_attempts="1",
@@ -468,7 +473,7 @@ class CapaModuleTest(unittest.TestCase):
         )
         self.assertFalse(answer_wrong.answer_available())
 
-
+        # Expect to see "Show Answer" when answer is correct
         answer_correct = CapaFactory.create(
             showanswer=SHOWANSWER.ANSWERED,
             max_attempts="1",
@@ -477,7 +482,6 @@ class CapaModuleTest(unittest.TestCase):
             correct=True
         )
         self.assertTrue(answer_correct.answer_available())
-
 
     @ddt.data('', 'other-value')
     def test_show_correctness_other(self, show_correctness):
