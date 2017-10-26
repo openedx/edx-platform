@@ -83,56 +83,6 @@ class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
 
     @patch.object(tasks, 'ace')
     @patch.object(tested_task, 'async_send_task')
-    @ddt.data(
-        ((['filtered_org'], [], 1)),
-        (([], ['filtered_org'], 2))
-    )
-    @ddt.unpack
-    def test_site_config(self, this_org_list, other_org_list, expected_message_count, mock_schedule_send, mock_ace):
-        filtered_org = 'filtered_org'
-        unfiltered_org = 'unfiltered_org'
-        this_config = SiteConfigurationFactory.create(values={'course_org_filter': this_org_list})
-        other_config = SiteConfigurationFactory.create(values={'course_org_filter': other_org_list})
-
-        for config in (this_config, other_config):
-            ScheduleConfigFactory.create(site=config.site)
-
-        user1 = UserFactory.create(id=resolvers.RECURRING_NUDGE_NUM_BINS)
-        user2 = UserFactory.create(id=resolvers.RECURRING_NUDGE_NUM_BINS * 2)
-
-        ScheduleFactory.create(
-            start=datetime.datetime(2017, 8, 3, 17, 44, 30, tzinfo=pytz.UTC),
-            enrollment__course__org=filtered_org,
-            enrollment__user=user1,
-        )
-        ScheduleFactory.create(
-            start=datetime.datetime(2017, 8, 3, 17, 44, 30, tzinfo=pytz.UTC),
-            enrollment__course__org=unfiltered_org,
-            enrollment__user=user1,
-        )
-        ScheduleFactory.create(
-            start=datetime.datetime(2017, 8, 3, 17, 44, 30, tzinfo=pytz.UTC),
-            enrollment__course__org=unfiltered_org,
-            enrollment__user=user2,
-        )
-
-        test_datetime = datetime.datetime(2017, 8, 3, 17, tzinfo=pytz.UTC)
-        test_datetime_str = serialize(test_datetime)
-
-        expected_queries = NUM_QUERIES_WITH_MATCHES
-        if not this_org_list:
-            expected_queries += NUM_QUERIES_NO_ORG_LIST
-
-        with self.assertNumQueries(expected_queries, table_blacklist=WAFFLE_TABLES):
-            self.tested_task.apply(kwargs=dict(
-                site_id=this_config.site.id, target_day_str=test_datetime_str, day_offset=-3, bin_num=0
-            ))
-
-        self.assertEqual(mock_schedule_send.apply_async.call_count, expected_message_count)
-        self.assertFalse(mock_ace.send.called)
-
-    @patch.object(tasks, 'ace')
-    @patch.object(tested_task, 'async_send_task')
     def test_multiple_enrollments(self, mock_schedule_send, mock_ace):
         user = UserFactory.create()
         schedules = [

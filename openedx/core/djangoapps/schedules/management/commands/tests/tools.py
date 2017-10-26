@@ -15,6 +15,7 @@ from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory, ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, FilteredQueryCountMixin
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -214,3 +215,52 @@ class ScheduleBaseEmailTestBase(SharedModuleStoreTestCase):
             self.assertTrue(mock_apply_async.called)
         else:
             self.assertFalse(mock_apply_async.called)
+
+    @patch.object(tasks, 'ace')
+    @ddt.data(
+        ((['filtered_org'], [], 1)),
+        (([], ['filtered_org'], 2))
+    )
+    @ddt.unpack
+    def test_site_config(self, this_org_list, other_org_list, expected_message_count, mock_ace):
+        filtered_org = 'filtered_org'
+        unfiltered_org = 'unfiltered_org'
+        this_config = SiteConfigurationFactory.create(values={'course_org_filter': this_org_list})
+        other_config = SiteConfigurationFactory.create(values={'course_org_filter': other_org_list})
+
+        for config in (this_config, other_config):
+            ScheduleConfigFactory.create(site=config.site)
+
+        user1 = UserFactory.create(id=self.tested_task.num_bins)
+        user2 = UserFactory.create(id=self.tested_task.num_bins * 2)
+        current_day, offset, target_day = self._get_dates()
+
+        ScheduleFactory.create(
+            upgrade_deadline=target_day,
+            start=target_day,
+            enrollment__course__org=filtered_org,
+            enrollment__course__self_paced=True,
+            enrollment__user=user1,
+        )
+        ScheduleFactory.create(
+            upgrade_deadline=target_day,
+            start=target_day,
+            enrollment__course__org=unfiltered_org,
+            enrollment__course__self_paced=True,
+            enrollment__user=user1,
+        )
+        ScheduleFactory.create(
+            upgrade_deadline=target_day,
+            start=target_day,
+            enrollment__course__org=unfiltered_org,
+            enrollment__course__self_paced=True,
+            enrollment__user=user2,
+        )
+
+        with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
+            self.tested_task.apply(kwargs=dict(
+                site_id=this_config.site.id, target_day_str=serialize(target_day), day_offset=offset, bin_num=0
+            ))
+
+        self.assertEqual(mock_schedule_send.apply_async.call_count, expected_message_count)
+        self.assertFalse(mock_ace.send.called)
