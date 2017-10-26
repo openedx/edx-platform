@@ -21,7 +21,8 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
 
     var CourseVideoSettingsView,
         CIELO24 = 'Cielo24',
-        THREE_PLAY_MEDIA = '3PlayMedia';
+        THREE_PLAY_MEDIA = '3PlayMedia',
+        INTERNAL_SERVER_ERROR_MESSAGE = gettext('An error has occurred. Wait a few minutes, and then try again.');
 
     CourseVideoSettingsView = Backbone.View.extend({
         el: 'div.video-transcript-settings-wrapper',
@@ -36,6 +37,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             'click .action-change-provider': 'renderOrganizationCredentials',
             'click .action-update-org-credentials': 'updateOrganizationCredentials',
             'click .action-update-course-video-settings': 'updateCourseVideoSettings',
+            'click .action-cancel-course-video-settings': 'discardChanges',
             'click .action-close-course-video-settings': 'closeCourseVideoSettings'
         },
 
@@ -177,12 +179,16 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         providerSelected: function(event) {
+            this.resetPlanData();
+            this.selectedProvider = event.target.value;
+            // Re-render view
+            this.reRenderView();
+        },
+
+        reRenderView: function() {
             var $courseVideoSettingsContentEl = this.$el.find('.course-video-settings-content'),
                 dateModified = this.activeTranscriptionPlan ?
                     moment.utc(this.activeTranscriptionPlan.modified).format('ll') : '';
-
-            this.resetPlanData();
-            this.selectedProvider = event.target.value;
 
             if (!this.selectedProvider) {
                 // Hide organization credentials and transcript preferences views
@@ -254,7 +260,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                             {
                                 key: 'none',
                                 value: '',
-                                name: gettext('N/A'),
+                                name: gettext('None'),
                                 checked: this.selectedProvider === '' ? 'checked' : ''
                             },
                             {
@@ -504,9 +510,8 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             // show some error to user
             try {
                 errorMessage = $.parseJSON(data).error;
-            } catch (e) {}  // eslint-disable-line no-empty
-            errorMessage = errorMessage || gettext('Error saving data');
-            this.renderResponseStatus(errorMessage, 'error');
+            } catch (e) {}   // eslint-disable-line no-empty
+            this.renderResponseStatus(errorMessage || INTERNAL_SERVER_ERROR_MESSAGE, 'error');
         },
 
         renderResponseStatus: function(responseText, type) {
@@ -663,20 +668,20 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                     responseTranscriptPreferences = data ? data.transcript_preferences : null;
                     self.updateSuccessResponseStatus(responseTranscriptPreferences);
                 }).fail(function(jqXHR) {
-                    if (jqXHR.responseText) {
-                        self.updateFailResponseStatus(jqXHR.responseText);
-                    }
+                    self.updateFailResponseStatus(jqXHR.responseText);
                 });
             } else {
                 $.ajax({
                     type: 'DELETE',
                     url: self.transcriptHandlerUrl
                 }).done(function() {
-                    self.updateSuccessResponseStatus(null);
+                    responseTranscriptPreferences = null;
+                    self.updateSuccessResponseStatus(
+                        responseTranscriptPreferences,
+                        gettext('Automatic transcripts are disabled.')
+                    );
                 }).fail(function(jqXHR) {
-                    if (jqXHR.responseText) {
-                        self.updateFailResponseStatus(jqXHR.responseText);
-                    }
+                    self.updateFailResponseStatus(jqXHR.responseText);
                 });
             }
         },
@@ -716,9 +721,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                     )
                 );
             }).fail(function(jqXHR) {
-                if (jqXHR.responseText) {
-                    self.updateFailResponseStatus(jqXHR.responseText);
-                }
+                self.updateFailResponseStatus(jqXHR.responseText);
             });
         },
 
@@ -735,6 +738,13 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             } else {
                 $messageWrapperEl.empty();
             }
+        },
+
+        discardChanges: function() {
+            this.setActiveTranscriptPlanData();
+            // Re-render views
+            this.renderProviders();
+            this.reRenderView();
         },
 
         renderOrganizationCredentials: function() {

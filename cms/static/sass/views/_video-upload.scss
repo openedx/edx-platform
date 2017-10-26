@@ -189,15 +189,16 @@
       padding: ($baseline/2);
     }
 
-    .action-update-org-credentials {
-      margin-top: ($baseline*1.6);
+    .action-cancel-course-video-settings {
+      @include margin-right($baseline/2);
     }
 
     .course-video-settings-footer {
       margin-top: ($baseline*1.6);
       .last-updated-text {
         @include font-size(12);
-        @include margin-left($baseline/4);
+        display: block;
+        margin-top: ($baseline/2);
       }
     }
 
