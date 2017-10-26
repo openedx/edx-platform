@@ -50,7 +50,7 @@ LOG = logging.getLogger(__name__)
 
 @ddt.ddt
 @freeze_time('2017-08-01 00:00:00', tz_offset=0, tick=True)
-class ScheduleBaseEmailTestBase(SharedModuleStoreTestCase):
+class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
 
     __test__ = False
 
@@ -59,7 +59,7 @@ class ScheduleBaseEmailTestBase(SharedModuleStoreTestCase):
     has_course_queries = False
 
     def setUp(self):
-        super(ScheduleBaseEmailTestBase, self).setUp()
+        super(ScheduleSendEmailTestBase, self).setUp()
 
         site = SiteFactory.create()
         self.site_config = SiteConfigurationFactory.create(site=site)

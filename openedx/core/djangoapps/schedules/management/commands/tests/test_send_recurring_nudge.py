@@ -14,7 +14,7 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.schedules import tasks
 from openedx.core.djangoapps.schedules.management.commands import send_recurring_nudge as nudge
-from openedx.core.djangoapps.schedules.management.commands.tests.tools import ScheduleBaseEmailTestBase
+from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base import ScheduleSendEmailTestBase
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
@@ -24,7 +24,7 @@ from student.tests.factories import UserFactory
 @skip_unless_lms
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
-class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
+class TestSendRecurringNudge(ScheduleSendEmailTestBase):
     __test__ = True
 
     # pylint: disable=protected-access

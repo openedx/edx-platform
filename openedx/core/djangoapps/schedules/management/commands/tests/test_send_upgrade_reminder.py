@@ -11,7 +11,7 @@ from opaque_keys.edx.locator import CourseLocator
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.schedules import tasks
 from openedx.core.djangoapps.schedules.management.commands import send_upgrade_reminder as reminder
-from openedx.core.djangoapps.schedules.management.commands.tests.tools import ScheduleBaseEmailTestBase
+from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base import ScheduleSendEmailTestBase
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
@@ -24,7 +24,7 @@ LOG = logging.getLogger(__name__)
 @skip_unless_lms
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
-class TestUpgradeReminder(ScheduleBaseEmailTestBase):
+class TestUpgradeReminder(ScheduleSendEmailTestBase):
     __test__ = True
 
     tested_task = tasks.ScheduleUpgradeReminder
