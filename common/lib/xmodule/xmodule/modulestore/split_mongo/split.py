@@ -58,6 +58,8 @@ import datetime
 import hashlib
 import logging
 import six
+import time
+
 from contracts import contract, new_contract
 from importlib import import_module
 from mongodb_proxy import autoretry_read
@@ -512,6 +514,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             org_target,
             course_keys=course_keys)
 
+        start_time = time.time()
         indexes = self._add_indexes_from_active_records(
             indexes,
             branch,
@@ -519,6 +522,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             org_target,
             course_keys=course_keys
         )
+        log.info('Active records traversed in [%f]', (time.time() - start_time))
 
         return indexes
 
@@ -943,12 +947,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         from the course_indexes.
 
         """
+        start_time = time.time()
         matching_indexes = self.find_matching_course_indexes(
             branch,
             search_targets=None,
             org_target=kwargs.get('org'),
             course_keys=kwargs.get('course_keys')
         )
+        log.info('Matching indexes fetched in [%f]', (time.time() - start_time))
 
         # collect ids and then query for those
         version_guids = []
