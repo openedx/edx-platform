@@ -92,21 +92,18 @@ class ScheduleBaseEmailTestBase(SharedModuleStoreTestCase):
 
     @patch.object(tasks, 'ace')
     def test_resolver_send(self, mock_ace):
-        current_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        offset = self.expected_offsets[0]
-        target_day = current_day + datetime.timedelta(days=offset)
-
+        current_day, offset, target_day = self._get_dates()
         with patch.object(self.tested_task, 'apply_async') as mock_apply_async:
             self.tested_task.enqueue(self.site_config.site, current_day, offset)
-            mock_apply_async.assert_any_call(
-                (self.site_config.site.id, serialize(target_day), offset, 0, None),
-                retry=False,
-            )
-            mock_apply_async.assert_any_call(
-                (self.site_config.site.id, serialize(target_day), offset, self.tested_task.num_bins - 1, None),
-                retry=False,
-            )
-            self.assertFalse(mock_ace.send.called)
+        mock_apply_async.assert_any_call(
+            (self.site_config.site.id, serialize(target_day), offset, 0, None),
+            retry=False,
+        )
+        mock_apply_async.assert_any_call(
+            (self.site_config.site.id, serialize(target_day), offset, self.tested_task.num_bins - 1, None),
+            retry=False,
+        )
+        self.assertFalse(mock_ace.send.called)
 
     @ddt.data(1, 10, 100)
     @patch.object(tasks, 'ace')
