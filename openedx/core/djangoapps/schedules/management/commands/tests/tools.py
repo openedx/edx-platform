@@ -291,3 +291,28 @@ class ScheduleBaseEmailTestBase(SharedModuleStoreTestCase):
             self.assertFalse(mock_schedule_send.apply_async.called)
         else:
             self.assertTrue(mock_schedule_send.apply_async.called)
+
+    @patch.object(tasks, 'ace')
+    def test_multiple_enrollments(self, mock_ace):
+        user = UserFactory.create()
+        current_day, offset, target_day = self._get_dates()
+        num_courses = 3
+        for course_index in range(num_courses):
+            ScheduleFactory.create(
+                start=target_day,
+                upgrade_deadline=target_day,
+                enrollment__course__self_paced=True,
+                enrollment__user=user,
+                enrollment__course__id=CourseKey.from_string('edX/toy/course{}'.format(course_index))
+            )
+
+        course_queries = num_courses if self.has_course_queries else 0
+        expected_query_count = NUM_QUERIES_FIRST_MATCH + course_queries + NUM_QUERIES_NO_ORG_LIST
+        with self.assertNumQueries(expected_query_count, table_blacklist=WAFFLE_TABLES):
+            with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
+                self.tested_task.apply(kwargs=dict(
+                    site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
+                    bin_num=self._calculate_bin_for_user(user),
+                ))
+            self.assertEqual(mock_schedule_send.apply_async.call_count, 1)
+            self.assertFalse(mock_ace.send.called)

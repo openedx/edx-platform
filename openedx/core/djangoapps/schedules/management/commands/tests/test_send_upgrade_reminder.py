@@ -75,36 +75,6 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase):
             expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
         )
 
-    @patch.object(tasks, 'ace')
-    @patch.object(tested_task, 'async_send_task')
-    def test_multiple_enrollments(self, mock_schedule_send, mock_ace):
-        user = UserFactory.create()
-        schedules = [
-            ScheduleFactory.create(
-                upgrade_deadline=datetime.datetime(2017, 8, 3, 19, 44, 30, tzinfo=pytz.UTC),
-                enrollment__user=user,
-                enrollment__course__self_paced=True,
-                enrollment__course__id=CourseLocator('edX', 'toy', 'Course{}'.format(course_num))
-            )
-            for course_num in (1, 2, 3)
-        ]
-
-        course_switch_queries = len(set(s.enrollment.course.id for s in schedules))
-        org_switch_queries = len(set(s.enrollment.course.id.org for s in schedules))
-
-        test_datetime = datetime.datetime(2017, 8, 3, 19, 44, 30, tzinfo=pytz.UTC)
-        test_datetime_str = serialize(test_datetime)
-        expected_query_count = (
-            NUM_QUERIES_FIRST_MATCH + course_switch_queries + org_switch_queries + NUM_QUERIES_NO_ORG_LIST
-        )
-        with self.assertNumQueries(expected_query_count, table_blacklist=WAFFLE_TABLES):
-            self.tested_task.apply(kwargs=dict(
-                site_id=self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2,
-                bin_num=self._calculate_bin_for_user(user),
-            ))
-        self.assertEqual(mock_schedule_send.apply_async.call_count, 1)
-        self.assertFalse(mock_ace.send.called)
-
     @ddt.data(1, 10, 100)
     def test_templates(self, message_count):
         now = datetime.datetime.now(pytz.UTC)

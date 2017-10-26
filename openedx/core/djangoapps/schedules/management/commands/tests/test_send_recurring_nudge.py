@@ -57,29 +57,6 @@ class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
     enqueue_config = 'enqueue_recurring_nudge'
     expected_offsets = (-3, -10)
 
-    @patch.object(tasks, 'ace')
-    @patch.object(tested_task, 'async_send_task')
-    def test_multiple_enrollments(self, mock_schedule_send, mock_ace):
-        user = UserFactory.create()
-        schedules = [
-            ScheduleFactory.create(
-                start=datetime.datetime(2017, 8, 3, 19, 44, 30, tzinfo=pytz.UTC),
-                enrollment__user=user,
-                enrollment__course__id=CourseLocator('edX', 'toy', 'Course{}'.format(course_num))
-            )
-            for course_num in (1, 2, 3)
-        ]
-
-        test_datetime = datetime.datetime(2017, 8, 3, 19, 44, 30, tzinfo=pytz.UTC)
-        test_datetime_str = serialize(test_datetime)
-        with self.assertNumQueries(NUM_QUERIES_WITH_MATCHES + NUM_QUERIES_NO_ORG_LIST, table_blacklist=WAFFLE_TABLES):
-            self.tested_task.apply(kwargs=dict(
-                site_id=self.site_config.site.id, target_day_str=test_datetime_str, day_offset=-3,
-                bin_num=user.id % resolvers.RECURRING_NUDGE_NUM_BINS,
-            ))
-        self.assertEqual(mock_schedule_send.apply_async.call_count, 1)
-        self.assertFalse(mock_ace.send.called)
-
     @ddt.data(*itertools.product((1, 10, 100), (-3, -10)))
     @ddt.unpack
     def test_templates(self, message_count, day):
