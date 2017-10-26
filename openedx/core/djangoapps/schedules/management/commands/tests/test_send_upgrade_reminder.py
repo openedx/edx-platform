@@ -51,58 +51,46 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase):
             expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
         )
 
-    @patch.object(tasks, '_upgrade_reminder_schedule_send')
-    def test_dont_send_to_verified_learner(self, mock_schedule_send):
-        upgrade_deadline = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=2)
+    @ddt.data(True, False)
+    @patch.object(tasks, 'ace')
+    def test_verified_learner(self, is_verified, mock_ace):
+        user = UserFactory.create(id=self.tested_task.num_bins)
+        current_day, offset, target_day = self._get_dates()
         ScheduleFactory.create(
-            upgrade_deadline=upgrade_deadline,
-            enrollment__user=UserFactory.create(id=resolvers.UPGRADE_REMINDER_NUM_BINS),
-            enrollment__course=self.course_overview,
-            enrollment__mode=CourseMode.VERIFIED,
-        )
-        test_datetime_str = serialize(datetime.datetime.now(pytz.UTC))
-
-        self.tested_task.delay(
-            self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2, bin_num=0,
-            org_list=[self.course.org],
+            upgrade_deadline=target_day,
+            enrollment__course__self_paced=True,
+            enrollment__user=user,
+            enrollment__mode=CourseMode.VERIFIED if is_verified else CourseMode.AUDIT,
         )
 
-        self.assertFalse(mock_schedule_send.called)
-        self.assertFalse(mock_schedule_send.apply_async.called)
+        self.tested_task.apply(kwargs=dict(
+            site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
+            bin_num=self._calculate_bin_for_user(user),
+        ))
+
+        self.assertEqual(mock_ace.send.called, not is_verified)
 
     def test_filter_out_verified_schedules(self):
-        now = datetime.datetime.now(pytz.UTC)
-        future_datetime = now + datetime.timedelta(days=21)
+        current_day, offset, target_day = self._get_dates()
 
         user = UserFactory.create()
         schedules = [
             ScheduleFactory.create(
-                upgrade_deadline=future_datetime,
+                upgrade_deadline=target_day,
                 enrollment__user=user,
                 enrollment__course__self_paced=True,
-                enrollment__course__end=future_datetime + datetime.timedelta(days=30),
                 enrollment__course__id=CourseLocator('edX', 'toy', 'Course{}'.format(i)),
                 enrollment__mode=CourseMode.VERIFIED if i in (0, 3) else CourseMode.AUDIT,
             )
             for i in range(5)
         ]
 
-        for schedule in schedules:
-            CourseModeFactory(
-                course_id=schedule.enrollment.course.id,
-                mode_slug=CourseMode.VERIFIED,
-                expiration_datetime=future_datetime
-            )
-
-        test_datetime = future_datetime
-        test_datetime_str = serialize(test_datetime)
-
         sent_messages = []
         with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
             mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args[1])
 
             self.tested_task.apply(kwargs=dict(
-                site_id=self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2,
+                site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                 bin_num=self._calculate_bin_for_user(user),
             ))
 
