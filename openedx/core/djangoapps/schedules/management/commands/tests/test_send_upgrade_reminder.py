@@ -139,6 +139,7 @@ class TestUpgradeReminder(SharedModuleStoreTestCase):
         bins_in_use = frozenset((self._calculate_bin_for_user(s.enrollment.user)) for s in schedules)
         is_first_match = True
         course_switch_queries = len(set(s.enrollment.course.id for s in schedules))
+        org_switch_queries = len(set(s.enrollment.course.id.org for s in schedules))
         test_datetime = upgrade_deadline
         test_datetime_str = serialize(test_datetime)
 
@@ -151,7 +152,7 @@ class TestUpgradeReminder(SharedModuleStoreTestCase):
                         # Since this is the first match, we need to cache all of the config models, so we run a query
                         # for each of those...
                         NUM_QUERIES_FIRST_MATCH
-                        + course_switch_queries
+                        + course_switch_queries + org_switch_queries
                     )
                     is_first_match = False
                 else:
@@ -257,7 +258,8 @@ class TestUpgradeReminder(SharedModuleStoreTestCase):
         test_datetime_str = serialize(test_datetime)
 
         course_switch_queries = 1
-        expected_queries = NUM_QUERIES_FIRST_MATCH + course_switch_queries
+        org_switch_queries = 1
+        expected_queries = NUM_QUERIES_FIRST_MATCH + course_switch_queries + org_switch_queries
         if not this_org_list:
             expected_queries += NUM_QUERIES_NO_ORG_LIST
 
@@ -283,11 +285,14 @@ class TestUpgradeReminder(SharedModuleStoreTestCase):
             for course_num in (1, 2, 3)
         ]
 
-        num_courses = len(set(s.enrollment.course.id for s in schedules))
+        course_switch_queries = len(set(s.enrollment.course.id for s in schedules))
+        org_switch_queries = len(set(s.enrollment.course.id.org for s in schedules))
 
         test_datetime = datetime.datetime(2017, 8, 3, 19, 44, 30, tzinfo=pytz.UTC)
         test_datetime_str = serialize(test_datetime)
-        expected_query_count = NUM_QUERIES_FIRST_MATCH + num_courses + NUM_QUERIES_NO_ORG_LIST
+        expected_query_count = (
+            NUM_QUERIES_FIRST_MATCH + course_switch_queries + org_switch_queries + NUM_QUERIES_NO_ORG_LIST
+        )
         with self.assertNumQueries(expected_query_count, table_blacklist=WAFFLE_TABLES):
             tasks.ScheduleUpgradeReminder.apply(kwargs=dict(
                 site_id=self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2,
@@ -320,7 +325,8 @@ class TestUpgradeReminder(SharedModuleStoreTestCase):
                 expiration_datetime=future_datetime
             )
 
-        num_courses = len(set(s.enrollment.course.id for s in schedules))
+        course_switch_queries = len(set(s.enrollment.course.id for s in schedules))
+        org_switch_queries = len(set(s.enrollment.course.id.org for s in schedules))
 
         test_datetime = future_datetime
         test_datetime_str = serialize(test_datetime)
@@ -339,7 +345,9 @@ class TestUpgradeReminder(SharedModuleStoreTestCase):
                 mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
 
                 # we execute one query per course to see if it's opted out of dynamic upgrade deadlines
-                num_expected_queries = NUM_QUERIES_FIRST_MATCH + NUM_QUERIES_NO_ORG_LIST + num_courses
+                num_expected_queries = (
+                    NUM_QUERIES_FIRST_MATCH + NUM_QUERIES_NO_ORG_LIST + course_switch_queries + org_switch_queries
+                )
 
                 with self.assertNumQueries(num_expected_queries, table_blacklist=WAFFLE_TABLES):
                     tasks.ScheduleUpgradeReminder.apply(kwargs=dict(
