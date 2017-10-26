@@ -1,10 +1,10 @@
+/* global gettext */
 /* eslint react/no-array-index-key: 0 */
 
 import React from 'react';
 import PropTypes from 'prop-types';
 
 class ShowErrors extends React.Component {
-  
   render() {
     window.scrollTo(0, 0);
     return this.props.errorList.length > 0 &&

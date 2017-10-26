@@ -1,11 +1,12 @@
 """
 Signle support contact view
 """
+from django.conf import settings
 from django.views.generic import View
-
 from edxmako.shortcuts import render_to_response
-
 from student.models import CourseEnrollment
+
+from openedx.core.djangoapps.site_configuration import helpers
 
 
 class ContactUsView(View):
@@ -14,7 +15,9 @@ class ContactUsView(View):
     """
 
     def get(self, request):
-        context = {}
+        context = {
+            'platform_name': helpers.get_value('platform_name', settings.PLATFORM_NAME)
+        }
         if request.user.is_authenticated():
             context['user_enrollments'] = CourseEnrollment.enrollments_for_user(request.user)
 
