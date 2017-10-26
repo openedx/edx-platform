@@ -433,34 +433,38 @@ class TestReviewFunctions(TestReviewXBlock):
             self.assertIn(url, result_urls)
         self.assertNotIn(expected_not_loaded_problem, result_urls)
 
-    # NOTE: This test is failing because when I grab the problem from the CSM,
-    # it is unable to find its parents. This is some issue with the BlockStructure
-    # and it not being populated the way we want. For now, this is being left out
-    # since the first course I'm working with does not use this function.
-    # TODO: Fix get_vertical from get_review_ids to have the block structure for this test
-    # def test_review_vertical_url(self):
-    #     """
-    #     Verify that the URL returned from the Review xBlock is a valid and
-    #     correct URL for the vertical the learner has seen.
-    #     """
-    #     self.enroll_student(self.STUDENTS[0]['email'], self.STUDENTS[0]['password'], self.course_actual)
-    #     self.enroll_student(self.STUDENTS[0]['email'], self.STUDENTS[0]['password'], self.course_review)
+    """
+        NOTE: This test is failing because when I grab the problem from the CSM,
+        it is unable to find its parents. This is some issue with the BlockStructure
+        and it not being populated the way we want. For now, this is being left out
+        since the first course I'm working with does not use this function.
+        TODO: Fix get_vertical from get_review_ids to have the block structure for this test
+        or fix something in this file to make sure it populates the block structure for the CSM
+    """
+    @unittest.skip
+    def test_review_vertical_url(self):
+        """
+        Verify that the URL returned from the Review xBlock is a valid and
+        correct URL for the vertical the learner has seen.
+        """
+        self.enroll_student(self.STUDENTS[0]['email'], self.STUDENTS[0]['password'], self.course_actual)
+        self.enroll_student(self.STUDENTS[0]['email'], self.STUDENTS[0]['password'], self.course_review)
 
-    #     # Loading problems so the learner has problems and thus a vertical in the CSM
-    #     self.client.get(reverse(
-    #         'courseware_section',
-    #         kwargs={
-    #             'course_id': self.course_actual.id,
-    #             'chapter': self.chapter_actual.location.name,
-    #             'section': self.section1_actual.location.name,
-    #         }
-    #     ))
+        # Loading problems so the learner has problems and thus a vertical in the CSM
+        self.client.get(reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': self.course_actual.id,
+                'chapter': self.chapter_actual.location.name,
+                'section': self.section1_actual.location.name,
+            }
+        ))
 
-    #     user = User.objects.get(email=self.STUDENTS[0]['email'])
-    #     crum.set_current_user(user)
-    #     result_url = get_review_ids.get_vertical(self.course_actual.id)
+        user = User.objects.get(email=self.STUDENTS[0]['email'])
+        crum.set_current_user(user)
+        result_url = get_review_ids.get_vertical(self.course_actual.id)
 
-    #     expected_url = 'https://courses.edx.org/xblock/block-v1:DillonX/DAD101rx/3T2017+type@'\
-    #         'vertical+block@i4x://DillonX/DAD101x/chapter/New_Unit_1'
+        expected_url = 'https://courses.edx.org/xblock/block-v1:DillonX/DAD101rx/3T2017+type@'\
+            'vertical+block@i4x://DillonX/DAD101x/chapter/New_Unit_1'
 
-    #     self.assertEqual(result_url, expected_url)
+        self.assertEqual(result_url, expected_url)
