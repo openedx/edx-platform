@@ -58,7 +58,9 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase):
     __test__ = True
 
     tested_task = tasks.ScheduleUpgradeReminder
+    deliver_task = tasks._upgrade_reminder_schedule_send
     tested_command = reminder.Command
+    deliver_config = 'deliver_upgrade_reminder'
     expected_offsets = (2,)
 
     has_course_queries = True
@@ -71,14 +73,6 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase):
             mode_slug=CourseMode.VERIFIED,
             expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
         )
-
-    @patch.object(tasks, 'ace')
-    def test_delivery_disabled(self, mock_ace):
-        ScheduleConfigFactory.create(site=self.site_config.site, deliver_upgrade_reminder=False)
-
-        mock_msg = Mock()
-        tasks._upgrade_reminder_schedule_send(self.site_config.site.id, mock_msg)
-        self.assertFalse(mock_ace.send.called)
 
     @patch.object(tasks, 'ace')
     @patch.object(tested_task, 'apply_async')

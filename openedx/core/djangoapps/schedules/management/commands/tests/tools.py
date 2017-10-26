@@ -3,7 +3,7 @@ import ddt
 import logging
 
 from freezegun import freeze_time
-from mock import patch
+from mock import Mock, patch
 import pytz
 
 from courseware.models import DynamicUpgradeDeadlineConfiguration
@@ -181,3 +181,19 @@ class ScheduleBaseEmailTestBase(SharedModuleStoreTestCase):
         # is null.
         self.assertEqual(mock_schedule_send.apply_async.call_count, 0)
 
+    @ddt.data(True, False)
+    @patch.object(tasks, 'ace')
+    @patch.object(tasks, 'Message')
+    def test_deliver_config(self, is_enabled, mock_message, mock_ace):
+        schedule_config_kwargs = {
+            'site': self.site_config.site,
+            self.deliver_config: is_enabled,
+        }
+        ScheduleConfigFactory.create(**schedule_config_kwargs)
+
+        mock_msg = Mock()
+        self.deliver_task(self.site_config.site.id, mock_msg)
+        if is_enabled:
+            self.assertTrue(mock_ace.send.called)
+        else:
+            self.assertFalse(mock_ace.send.called)

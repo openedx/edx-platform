@@ -51,7 +51,9 @@ class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
 
     # pylint: disable=protected-access
     tested_task = tasks.ScheduleRecurringNudge
+    deliver_task = tasks._recurring_nudge_schedule_send
     tested_command = nudge.Command
+    deliver_config = 'deliver_recurring_nudge'
     expected_offsets = (-3, -10)
 
     @patch.object(tested_task, 'async_send_task')
@@ -77,14 +79,6 @@ class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
         ))
 
         self.assertFalse(mock_schedule_send.apply_async.called)
-
-    @patch.object(tasks, 'ace')
-    def test_delivery_disabled(self, mock_ace):
-        ScheduleConfigFactory.create(site=self.site_config.site, deliver_recurring_nudge=False)
-
-        mock_msg = Mock()
-        tasks._recurring_nudge_schedule_send(self.site_config.site.id, mock_msg)
-        self.assertFalse(mock_ace.send.called)
 
     @patch.object(tasks, 'ace')
     @patch.object(tasks.ScheduleUpgradeReminder, 'apply_async')
