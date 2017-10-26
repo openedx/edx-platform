@@ -1,14 +1,15 @@
-from datetime import timedelta
 import unittest
+from datetime import timedelta
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.db.models import QuerySet
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils import timezone
 from mock import patch
-from oauth2_provider.models import AccessToken
+from oauth2_provider.models import AccessToken, RefreshToken
 from testfixtures import LogCapture
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories
@@ -33,6 +34,7 @@ def counter(fn):
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EdxClearExpiredTokensTests(TestCase):
 
+    # patching REFRESH_TOKEN_EXPIRE_SECONDS because override_settings not working.
     @patch('oauth2_provider.settings.oauth2_settings.REFRESH_TOKEN_EXPIRE_SECONDS', 'xyz')
     def test_invalid_expiration_time(self):
         with LogCapture(LOGGER_NAME) as log:
@@ -46,8 +48,37 @@ class EdxClearExpiredTokensTests(TestCase):
                     )
                 )
 
-    @patch('oauth2_provider.settings.oauth2_settings.REFRESH_TOKEN_EXPIRE_SECONDS', 3600)
+    @override_settings()
+    def test_excluded_application_ids(self):
+        settings.OAUTH2_PROVIDER['REFRESH_TOKEN_EXPIRE_SECONDS'] = 3600
+        expires = timezone.now() - timedelta(days=1)
+        application = factories.ApplicationFactory()
+        access_token = factories.AccessTokenFactory(user=application.user, application=application, expires=expires)
+        factories.RefreshTokenFactory(user=application.user, application=application, access_token=access_token)
+        with LogCapture(LOGGER_NAME) as log:
+            call_command('edx_clear_expired_tokens', sleep_time=0, excluded_application_ids=str(application.id))
+            log.check(
+                (
+                    LOGGER_NAME,
+                    'INFO',
+                    'Cleaning {} rows from {} table'.format(0, RefreshToken.__name__)
+                ),
+                (
+                    LOGGER_NAME,
+                    'INFO',
+                    'Cleaning {} rows from {} table'.format(0, AccessToken.__name__),
+                ),
+                (
+                    LOGGER_NAME,
+                    'INFO',
+                    'Cleaning 0 rows from Grant table',
+                )
+            )
+        self.assertTrue(RefreshToken.objects.filter(application=application).exists())
+
+    @override_settings()
     def test_clear_expired_tokens(self):
+        settings.OAUTH2_PROVIDER['REFRESH_TOKEN_EXPIRE_SECONDS'] = 3600
         initial_count = 5
         now = timezone.now()
         expires = now - timedelta(days=1)
