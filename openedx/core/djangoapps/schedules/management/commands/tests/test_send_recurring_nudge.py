@@ -25,19 +25,6 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 from student.tests.factories import UserFactory
 
 
-# 1) Load the current django site
-# 2) Query the schedules to find all of the template context information
-NUM_QUERIES_NO_MATCHING_SCHEDULES = 2
-
-# 3) Query all course modes for all courses in returned schedules
-NUM_QUERIES_WITH_MATCHES = NUM_QUERIES_NO_MATCHING_SCHEDULES + 1
-
-# 4) Load the non-matching site configurations
-NUM_QUERIES_NO_ORG_LIST = 1
-
-NUM_COURSE_MODES_QUERIES = 1
-
-
 @ddt.ddt
 @skip_unless_lms
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
