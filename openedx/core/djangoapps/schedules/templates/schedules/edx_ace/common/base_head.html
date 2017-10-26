@@ -1,5 +1,12 @@
+{% load i18n %}
+
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>{% block title %}edX Email{% endblock %}</title>
+{% get_current_language as LANGUAGE_CODE %}
+<title lang="{{ LANGUAGE_CODE|default:"en" }}">
+  {% block title %}
+  {% trans "edX Email" %}
+  {% endblock %}
+</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 <style type="text/css">
