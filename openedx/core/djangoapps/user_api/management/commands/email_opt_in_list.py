@@ -25,7 +25,6 @@ import time
 import datetime
 import contextlib
 import logging
-import optparse
 
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
@@ -50,16 +49,6 @@ class Command(BaseCommand):
 
     args = "<OUTPUT_FILENAME> <ORG_ALIASES> --courses=COURSE_ID_LIST --email-optin-chunk-size=CHUNK_SIZE"
     help = "Generate a list of email opt-in values for user enrollments."
-    option_list = BaseCommand.option_list + (
-        optparse.make_option('--courses ', action='store'),
-        optparse.make_option(
-            '--email-optin-chunk-size',
-            action='store',
-            type='int',
-            default=DEFAULT_CHUNK_SIZE,
-            dest='email_optin_chunk_size',
-            help='The number of courses to get opt-in information for in a single query.')
-    )
 
     # Fields output in the CSV
     OUTPUT_FIELD_NAMES = [
@@ -78,6 +67,16 @@ class Command(BaseCommand):
 
     # Default datetime if the user has not set a preference
     DEFAULT_DATETIME_STR = datetime.datetime(year=2014, month=12, day=1).isoformat(' ')
+
+    def add_arguments(self, parser):
+        parser.add_argument('--courses ', action='store'),
+        parser.add_argument(
+            '--email-optin-chunk-size',
+            action='store',
+            type=int,
+            default=DEFAULT_CHUNK_SIZE,
+            dest='email_optin_chunk_size',
+            help='The number of courses to get opt-in information for in a single query.')
 
     def handle(self, *args, **options):
         """Execute the command.

@@ -7,7 +7,6 @@ import math
 import random
 from collections import namedtuple
 from itertools import chain
-from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 from mailsnake import MailSnake
@@ -32,35 +31,35 @@ class Command(BaseCommand):
     args = '<mailchimp_key mailchimp_list course_id>'
     help = 'Synchronizes a mailchimp list with the students of a course.'
 
-    option_list = BaseCommand.option_list + (
-        make_option('--key', action='store', help='mailchimp api key'),
-        make_option('--list', action='store', dest='list_id',
-                    help='mailchimp list id'),
-        make_option('--course', action='store', dest='course_id',
-                    help='xmodule course_id'),
-
-        make_option('--segments', action='store', dest='segments',
-                    default=0, type=int,
-                    help='number of static random segments to create'),
-    )
-
-    def parse_options(self, options):
-        """Parses `options` of the command."""
-        if not options['key']:
-            raise CommandError('missing key')
-
-        if not options['list_id']:
-            raise CommandError('missing list id')
-
-        if not options['course_id']:
-            raise CommandError('missing course id')
-
-        return (options['key'], options['list_id'],
-                options['course_id'], options['segments'])
+    def add_arguments(self, parser):
+        parser.add_argument('--key',
+                            action='store',
+                            help='mailchimp api key',
+                            required=True)
+        parser.add_argument('--list',
+                            action='store',
+                            dest='list_id',
+                            help='mailchimp list id',
+                            required=True,
+                            type=int)
+        parser.add_argument('--course',
+                            action='store',
+                            dest='course_id',
+                            help='xmodule course_id',
+                            required=True)
+        parser.add_argument('--segments',
+                            action='store',
+                            dest='segments',
+                            efault=0,
+                            type=int,
+                            help='number of static random segments to create')
 
     def handle(self, *args, **options):
         """Synchronizes a mailchimp list with the students of a course."""
-        key, list_id, course_id, nsegments = self.parse_options(options)
+        key = options['key']
+        list_id = options['list_id']
+        course_id = options['course']
+        nsegments = options['segments']
 
         log.info('Syncronizing email list for %s', course_id)
 

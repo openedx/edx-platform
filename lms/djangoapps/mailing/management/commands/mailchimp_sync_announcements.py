@@ -2,7 +2,6 @@
 Synchronizes the announcement list with all active students.
 """
 import logging
-from optparse import make_option
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
@@ -16,27 +15,23 @@ class Command(BaseCommand):
     """
     Synchronizes the announcement list with all active students.
     """
-    args = '<mailchimp_key mailchimp_list course_id>'
     help = 'Synchronizes the announcement list with all active students.'
 
-    option_list = BaseCommand.option_list + (
-        make_option('--key', action='store', help='mailchimp api key'),
-        make_option('--list', action='store', dest='list_id',
-                    help='mailchimp list id'),
-    )
-
-    def parse_options(self, options):
-        """Parses `options` of the command."""
-        if not options['key']:
-            raise CommandError('missing key')
-
-        if not options['list_id']:
-            raise CommandError('missing list id')
-
-        return (options['key'], options['list_id'])
+    def add_arguments(self, parser):
+        parser.add_argument('--key',
+                            action='store',
+                            help='mailchimp api key',
+                            required=True)
+        parser.add_argument('--list',
+                            action='store',
+                            dest='list_id',
+                            type=int,
+                            help='mailchimp list id',
+                            required=True)
 
     def handle(self, *args, **options):
-        key, list_id = self.parse_options(options)
+        key = options['key']
+        list_id = options['list_id']
 
         log.info('Syncronizing announcement mailing list')
 

@@ -17,7 +17,6 @@ The resulting JSON object has one entry for each module in the course:
 """
 
 import json
-from optparse import make_option
 from textwrap import dedent
 
 from django.core.management.base import BaseCommand, CommandError
@@ -40,31 +39,29 @@ class Command(BaseCommand):
     """
     args = "<course_id>"
     help = dedent(__doc__).strip()
-    option_list = BaseCommand.option_list + (
-        make_option('--modulestore',
-                    action='store',
-                    default='default',
-                    help='Name of the modulestore'),
-        make_option('--inherited',
-                    action='store_true',
-                    default=False,
-                    help='Whether to include inherited metadata'),
-        make_option('--inherited_defaults',
-                    action='store_true',
-                    default=False,
-                    help='Whether to include default values of inherited metadata'),
-    )
+
+    def add_arguments(self, parser):
+        parser.add_argument('--modulestore',
+                            action='store',
+                            default='default',
+                            help='Name of the modulestore')
+
+        parser.add_argument('--inherited',
+                            action='store_true',
+                            help='Whether to include inherited metadata')
+
+        parser.add_argument('--inherited_defaults',
+                            action='store_true',
+                            help='Whether to include default values of inherited metadata')
 
     def handle(self, *args, **options):
         if len(args) != 1:
             raise CommandError("course_id not specified")
 
         # Get the modulestore
-
         store = modulestore()
 
         # Get the course data
-
         try:
             course_key = CourseKey.from_string(args[0])
         except InvalidKeyError:
@@ -75,12 +72,10 @@ class Command(BaseCommand):
             raise CommandError("Invalid course_id")
 
         # Precompute inherited metadata at the course level, if needed:
-
         if options['inherited']:
             compute_inherited_metadata(course)
 
         # Convert course data to dictionary and dump it as JSON to stdout
-
         info = dump_module(course, inherited=options['inherited'], defaults=options['inherited_defaults'])
 
         return json.dumps(info, indent=2, sort_keys=True, default=unicode)
