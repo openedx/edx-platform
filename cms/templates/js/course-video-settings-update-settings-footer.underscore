@@ -1,3 +1,7 @@
+<button class='button-link action-cancel-course-video-settings' aria-describedby='cancel-button-text'>
+    <%- gettext('Reset') %>
+    <span id='cancel-button-text' class='sr'><%-gettext('Press reset to discard changes.') %></span>
+</button>
 <button class="button action-update-course-video-settings" aria-describedby='update-button-text'>
     <%- gettext('Update Settings') %>
     <span id='update-button-text' class='sr'><%-gettext('Press update settings to update course video settings') %></span>
