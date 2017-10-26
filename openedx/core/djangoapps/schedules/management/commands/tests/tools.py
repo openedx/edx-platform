@@ -1,13 +1,18 @@
+from copy import deepcopy
 import datetime
 import ddt
 import logging
 
+import attr
+from django.conf import settings
 from freezegun import freeze_time
 from mock import Mock, patch
 import pytz
 
 from courseware.models import DynamicUpgradeDeadlineConfiguration
+from edx_ace.channel import ChannelType
 from edx_ace.utils.date import serialize
+from edx_ace.test_utils import StubPolicy, patch_channels, patch_policies
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
@@ -74,6 +79,11 @@ class ScheduleBaseEmailTestBase(SharedModuleStoreTestCase):
         ScheduleConfigFactory.create(site=self.site_config.site)
 
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
+
+    def _get_template_overrides(self):
+        templates_override = deepcopy(settings.TEMPLATES)
+        templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
+        return templates_override
 
     def test_command_task_binding(self):
         self.assertEqual(self.tested_command.async_send_task, self.tested_task)
@@ -316,3 +326,56 @@ class ScheduleBaseEmailTestBase(SharedModuleStoreTestCase):
                 ))
             self.assertEqual(mock_schedule_send.apply_async.call_count, 1)
             self.assertFalse(mock_ace.send.called)
+
+    @ddt.data(1, 10, 100)
+    def test_templates(self, message_count):
+        for offset in self.expected_offsets:
+            self._assert_template_for_offset(offset, message_count)
+            self.clear_caches()
+
+    def _assert_template_for_offset(self, offset, message_count):
+        current_day, offset, target_day = self._get_dates(offset)
+
+        user = UserFactory.create()
+        for course_index in range(message_count):
+            ScheduleFactory.create(
+                start=target_day,
+                upgrade_deadline=target_day,
+                enrollment__course__self_paced=True,
+                enrollment__user=user,
+                enrollment__course__id=CourseKey.from_string('edX/toy/course{}'.format(course_index))
+            )
+
+        patch_policies(self, [StubPolicy([ChannelType.PUSH])])
+        mock_channel = Mock(
+            name='test_channel',
+            channel_type=ChannelType.EMAIL
+        )
+        patch_channels(self, [mock_channel])
+
+        sent_messages = []
+        with self.settings(TEMPLATES=self._get_template_overrides()):
+            with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
+                mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
+
+                num_expected_queries = NUM_QUERIES_NO_ORG_LIST + NUM_QUERIES_FIRST_MATCH
+                if self.has_course_queries:
+                    num_expected_queries += message_count
+
+                with self.assertNumQueries(num_expected_queries, table_blacklist=WAFFLE_TABLES):
+                    self.tested_task.apply(kwargs=dict(
+                        site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
+                        bin_num=self._calculate_bin_for_user(user),
+                    ))
+            self.assertEqual(len(sent_messages), 1)
+
+            with self.assertNumQueries(2):
+                for args in sent_messages:
+                    self.deliver_task(*args)
+
+            self.assertEqual(mock_channel.deliver.call_count, 1)
+            for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
+                for template in attr.astuple(email):
+                    self.assertNotIn("TEMPLATE WARNING", template)
+                    self.assertNotIn("{{", template)
+                    self.assertNotIn("}}", template)

@@ -1,14 +1,10 @@
 import datetime
 import itertools
-from copy import deepcopy
 from unittest import skipUnless
 
-import attr
 import ddt
 import pytz
 from django.conf import settings
-from edx_ace.channel import ChannelType
-from edx_ace.test_utils import StubPolicy, patch_channels, patch_policies
 from edx_ace.utils.date import serialize
 from edx_ace.message import Message
 from mock import Mock, patch
@@ -56,57 +52,6 @@ class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
     deliver_config = 'deliver_recurring_nudge'
     enqueue_config = 'enqueue_recurring_nudge'
     expected_offsets = (-3, -10)
-
-    @ddt.data(*itertools.product((1, 10, 100), (-3, -10)))
-    @ddt.unpack
-    def test_templates(self, message_count, day):
-
-        user = UserFactory.create()
-        schedules = [
-            ScheduleFactory.create(
-                start=datetime.datetime(2017, 8, 3, 19, 44, 30, tzinfo=pytz.UTC),
-                enrollment__user=user,
-                enrollment__course__id=CourseLocator('edX', 'toy', 'Course{}'.format(course_num))
-            )
-            for course_num in range(message_count)
-        ]
-
-        test_datetime = datetime.datetime(2017, 8, 3, 19, tzinfo=pytz.UTC)
-        test_datetime_str = serialize(test_datetime)
-
-        patch_policies(self, [StubPolicy([ChannelType.PUSH])])
-        mock_channel = Mock(
-            name='test_channel',
-            channel_type=ChannelType.EMAIL
-        )
-        patch_channels(self, [mock_channel])
-
-        sent_messages = []
-
-        with self.settings(TEMPLATES=self._get_template_overrides()):
-            with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
-                mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
-
-                with self.assertNumQueries(NUM_QUERIES_WITH_MATCHES + NUM_QUERIES_NO_ORG_LIST, table_blacklist=WAFFLE_TABLES):
-                    self.tested_task.apply(kwargs=dict(
-                        site_id=self.site_config.site.id, target_day_str=test_datetime_str, day_offset=day,
-                        bin_num=self._calculate_bin_for_user(user),
-                    ))
-
-            self.assertEqual(len(sent_messages), 1)
-
-            # Load the site
-            # Check the schedule config
-            with self.assertNumQueries(2):
-                for args in sent_messages:
-                    tasks._recurring_nudge_schedule_send(*args)
-
-            self.assertEqual(mock_channel.deliver.call_count, 1)
-            for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
-                for template in attr.astuple(email):
-                    self.assertNotIn("TEMPLATE WARNING", template)
-                    self.assertNotIn("{{", template)
-                    self.assertNotIn("}}", template)
 
     def test_user_in_course_with_verified_coursemode_receives_upsell(self):
         user = UserFactory.create()
@@ -232,11 +177,6 @@ class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
             ))
 
         return sent_messages
-
-    def _get_template_overrides(self):
-        templates_override = deepcopy(settings.TEMPLATES)
-        templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
-        return templates_override
 
     def _calculate_bin_for_user(self, user):
         return user.id % resolvers.RECURRING_NUDGE_NUM_BINS

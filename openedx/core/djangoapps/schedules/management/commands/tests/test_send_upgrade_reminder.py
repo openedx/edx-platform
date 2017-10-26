@@ -1,15 +1,11 @@
 import datetime
-from copy import deepcopy
 import logging
 from unittest import skipUnless
 
-import attr
 import ddt
 import pytz
 from django.conf import settings
 from edx_ace import Message
-from edx_ace.channel import ChannelType
-from edx_ace.test_utils import StubPolicy, patch_channels, patch_policies
 from edx_ace.utils.date import serialize
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
@@ -74,80 +70,6 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase):
             mode_slug=CourseMode.VERIFIED,
             expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
         )
-
-    @ddt.data(1, 10, 100)
-    def test_templates(self, message_count):
-        now = datetime.datetime.now(pytz.UTC)
-        future_datetime = now + datetime.timedelta(days=21)
-
-        user = UserFactory.create()
-        schedules = [
-            ScheduleFactory.create(
-                upgrade_deadline=future_datetime,
-                enrollment__user=user,
-                enrollment__course__self_paced=True,
-                enrollment__course__end=future_datetime + datetime.timedelta(days=30),
-                enrollment__course__id=CourseLocator('edX', 'toy', 'Course{}'.format(course_num))
-            )
-            for course_num in range(message_count)
-        ]
-
-        for schedule in schedules:
-            CourseModeFactory(
-                course_id=schedule.enrollment.course.id,
-                mode_slug=CourseMode.VERIFIED,
-                expiration_datetime=future_datetime
-            )
-
-        course_switch_queries = len(set(s.enrollment.course.id for s in schedules))
-        org_switch_queries = len(set(s.enrollment.course.id.org for s in schedules))
-
-        test_datetime = future_datetime
-        test_datetime_str = serialize(test_datetime)
-
-        patch_policies(self, [StubPolicy([ChannelType.PUSH])])
-        mock_channel = Mock(
-            name='test_channel',
-            channel_type=ChannelType.EMAIL
-        )
-        patch_channels(self, [mock_channel])
-
-        sent_messages = []
-
-        with self.settings(TEMPLATES=self._get_template_overrides()):
-            with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
-                mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
-
-                # we execute one query per course to see if it's opted out of dynamic upgrade deadlines
-                num_expected_queries = (
-                    NUM_QUERIES_FIRST_MATCH + NUM_QUERIES_NO_ORG_LIST + course_switch_queries + org_switch_queries
-                )
-
-                with self.assertNumQueries(num_expected_queries, table_blacklist=WAFFLE_TABLES):
-                    self.tested_task.apply(kwargs=dict(
-                        site_id=self.site_config.site.id, target_day_str=test_datetime_str, day_offset=2,
-                        bin_num=self._calculate_bin_for_user(user),
-                    ))
-
-            self.assertEqual(len(sent_messages), 1)
-
-            # Load the site (which we query per message sent)
-            # Check the schedule config
-            with self.assertNumQueries(2):
-                for args in sent_messages:
-                    tasks._upgrade_reminder_schedule_send(*args)
-
-            self.assertEqual(mock_channel.deliver.call_count, 1)
-            for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
-                for template in attr.astuple(email):
-                    self.assertNotIn("TEMPLATE WARNING", template)
-                    self.assertNotIn("{{", template)
-                    self.assertNotIn("}}", template)
-
-    def _get_template_overrides(self):
-        templates_override = deepcopy(settings.TEMPLATES)
-        templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
-        return templates_override
 
     def _calculate_bin_for_user(self, user):
         return user.id % resolvers.UPGRADE_REMINDER_NUM_BINS
