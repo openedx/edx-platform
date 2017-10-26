@@ -1,7 +1,8 @@
 {% load i18n %}
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title lang="{{ get_current_language | default:"en" }}">
+{% get_current_language as LANGUAGE_CODE %}
+<title lang="{{ LANGUAGE_CODE|default:"en" }}">
   {% block title %}
   {% trans "edX Email" %}
   {% endblock %}
