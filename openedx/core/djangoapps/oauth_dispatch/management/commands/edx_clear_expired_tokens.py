@@ -31,6 +31,12 @@ class Command(BaseCommand):
                             type=int,
                             default=10,
                             help='Sleep time between deletion of batches')
+        parser.add_argument('--excluded-application-ids',
+                            action='store',
+                            dest='excluded-application-ids',
+                            type=str,
+                            default='',
+                            help='Comma-separated list of application IDs for which tokens will NOT be removed')
 
     def clear_table_data(self, query_set, batch_size, model, sleep_time):
         message = 'Cleaning {} rows from {} table'.format(query_set.count(), model.__name__)
@@ -57,11 +63,16 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         batch_size = options['batch_size']
         sleep_time = options['sleep_time']
+        if options['excluded-application-ids']:
+            excluded_application_ids = [int(x) for x in options['excluded-application-ids'].split(',')]
+        else:
+            excluded_application_ids = []
 
         now = timezone.now()
         refresh_expire_at = self.get_expiration_time(now)
 
-        query_set = RefreshToken.objects.filter(access_token__expires__lt=refresh_expire_at)
+        query_set = RefreshToken.objects.filter(access_token__expires__lt=refresh_expire_at).exclude(
+            application_id__in=excluded_application_ids)
         self.clear_table_data(query_set, batch_size, RefreshToken, sleep_time)
 
         query_set = AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=now)
