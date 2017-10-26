@@ -17,6 +17,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangoapps.schedules import resolvers, tasks
+from openedx.core.djangoapps.schedules.resolvers import _get_datetime_beginning_of_day
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory, ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, FilteredQueryCountMixin
@@ -82,6 +83,12 @@ class ScheduleBaseEmailTestBase(SharedModuleStoreTestCase):
 
     def _calculate_bin_for_user(self, user):
         return user.id % self.tested_task.num_bins
+
+    def _get_dates(self, offset=None):
+        current_day = _get_datetime_beginning_of_day(datetime.datetime.now(pytz.UTC))
+        offset = offset or self.expected_offsets[0]
+        target_day = current_day + datetime.timedelta(days=offset)
+        return current_day, offset, target_day
 
     def _get_template_overrides(self):
         templates_override = deepcopy(settings.TEMPLATES)
