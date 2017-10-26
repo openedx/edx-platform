@@ -197,3 +197,20 @@ class ScheduleBaseEmailTestBase(SharedModuleStoreTestCase):
             self.assertTrue(mock_ace.send.called)
         else:
             self.assertFalse(mock_ace.send.called)
+
+    @ddt.data(True, False)
+    def test_enqueue_config(self, is_enabled):
+        schedule_config_kwargs = {
+            'site': self.site_config.site,
+            self.enqueue_config: is_enabled,
+        }
+        ScheduleConfigFactory.create(**schedule_config_kwargs)
+
+        current_datetime = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
+        with patch.object(self.tested_task, 'apply_async') as mock_apply_async:
+            self.tested_task.enqueue(self.site_config.site, current_datetime, 3)
+
+        if is_enabled:
+            self.assertTrue(mock_apply_async.called)
+        else:
+            self.assertFalse(mock_apply_async.called)

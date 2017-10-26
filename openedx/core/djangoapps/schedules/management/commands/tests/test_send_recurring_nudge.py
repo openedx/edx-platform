@@ -54,6 +54,7 @@ class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
     deliver_task = tasks._recurring_nudge_schedule_send
     tested_command = nudge.Command
     deliver_config = 'deliver_recurring_nudge'
+    enqueue_config = 'enqueue_recurring_nudge'
     expected_offsets = (-3, -10)
 
     @patch.object(tested_task, 'async_send_task')
@@ -79,20 +80,6 @@ class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
         ))
 
         self.assertFalse(mock_schedule_send.apply_async.called)
-
-    @patch.object(tasks, 'ace')
-    @patch.object(tasks.ScheduleUpgradeReminder, 'apply_async')
-    def test_enqueue_disabled(self, mock_ace, mock_apply_async):
-        ScheduleConfigFactory.create(site=self.site_config.site, enqueue_recurring_nudge=False)
-
-        current_datetime = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        self.tested_task.enqueue(
-            self.site_config.site,
-            current_datetime,
-            3
-        )
-        self.assertFalse(mock_apply_async.called)
-        self.assertFalse(mock_ace.send.called)
 
     @patch.object(tasks, 'ace')
     @patch.object(tested_task, 'async_send_task')

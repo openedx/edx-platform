@@ -61,6 +61,7 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase):
     deliver_task = tasks._upgrade_reminder_schedule_send
     tested_command = reminder.Command
     deliver_config = 'deliver_upgrade_reminder'
+    enqueue_config = 'enqueue_upgrade_reminder'
     expected_offsets = (2,)
 
     has_course_queries = True
@@ -73,20 +74,6 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase):
             mode_slug=CourseMode.VERIFIED,
             expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
         )
-
-    @patch.object(tasks, 'ace')
-    @patch.object(tested_task, 'apply_async')
-    def test_enqueue_disabled(self, mock_ace, mock_apply_async):
-        ScheduleConfigFactory.create(site=self.site_config.site, enqueue_upgrade_reminder=False)
-
-        current_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        self.tested_task.enqueue(
-            self.site_config.site,
-            current_day,
-            day_offset=3,
-        )
-        self.assertFalse(mock_apply_async.called)
-        self.assertFalse(mock_ace.send.called)
 
     @patch.object(tasks, 'ace')
     @patch.object(tested_task, 'async_send_task')
