@@ -178,9 +178,6 @@ class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
 
         return sent_messages
 
-    def _calculate_bin_for_user(self, user):
-        return user.id % resolvers.RECURRING_NUDGE_NUM_BINS
-
     def _contains_upsell_attribute(self, msg_attr):
         msg = Message.from_string(msg_attr)
         tmp = msg.context["show_upsell"]

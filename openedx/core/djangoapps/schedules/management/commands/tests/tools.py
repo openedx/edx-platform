@@ -80,6 +80,9 @@ class ScheduleBaseEmailTestBase(SharedModuleStoreTestCase):
 
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
 
+    def _calculate_bin_for_user(self, user):
+        return user.id % self.tested_task.num_bins
+
     def _get_template_overrides(self):
         templates_override = deepcopy(settings.TEMPLATES)
         templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"

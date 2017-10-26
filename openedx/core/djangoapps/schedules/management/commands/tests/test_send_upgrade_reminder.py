@@ -71,9 +71,6 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase):
             expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
         )
 
-    def _calculate_bin_for_user(self, user):
-        return user.id % resolvers.UPGRADE_REMINDER_NUM_BINS
-
     @patch.object(tasks, '_upgrade_reminder_schedule_send')
     def test_dont_send_to_verified_learner(self, mock_schedule_send):
         upgrade_deadline = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=2)
