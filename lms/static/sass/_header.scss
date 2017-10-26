@@ -39,7 +39,7 @@
 
     .course-header {
       @include float(left);
-      @include margin($baseline, 0, 0, $baseline);
+      @include margin($baseline*1.25, 0, 0, $baseline);
 
       font-size: $font-size-lg;
       color: theme-color("dark");
@@ -319,6 +319,7 @@
     .mobile-nav-link {
       position: static;
       transform: none;
+      padding: 0;
 
       a {
         font-size: $font-size-base;
