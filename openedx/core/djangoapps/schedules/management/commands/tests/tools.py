@@ -14,16 +14,13 @@ from edx_ace.channel import ChannelType
 from edx_ace.utils.date import serialize
 from edx_ace.test_utils import StubPolicy, patch_channels, patch_policies
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.resolvers import _get_datetime_beginning_of_day
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory, ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, FilteredQueryCountMixin
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 SITE_QUERY = 1
@@ -58,19 +55,6 @@ class ScheduleBaseEmailTestBase(SharedModuleStoreTestCase):
     ENABLED_CACHES = ['default']
 
     has_course_queries = False
-
-    @classmethod
-    def setUpClass(cls):
-        super(ScheduleBaseEmailTestBase, cls).setUpClass()
-
-        cls.course = CourseFactory.create(
-            org='edX',
-            number='test',
-            display_name='Test Course',
-            self_paced=True,
-            start=datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=30),
-        )
-        cls.course_overview = CourseOverview.get_from_id(cls.course.id)
 
     def setUp(self):
         super(ScheduleBaseEmailTestBase, self).setUp()

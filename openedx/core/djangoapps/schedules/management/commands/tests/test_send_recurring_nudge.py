@@ -1,27 +1,22 @@
 import datetime
-import itertools
 from unittest import skipUnless
 
 import ddt
-import pytz
 from django.conf import settings
 from edx_ace.utils.date import serialize
 from edx_ace.message import Message
-from mock import Mock, patch
-from opaque_keys.edx.keys import CourseKey
+from mock import patch
 from opaque_keys.edx.locator import CourseLocator
+import pytz
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.schedules import resolvers, tasks
+from openedx.core.djangoapps.schedules import tasks
 from openedx.core.djangoapps.schedules.management.commands import send_recurring_nudge as nudge
 from openedx.core.djangoapps.schedules.management.commands.tests.tools import ScheduleBaseEmailTestBase
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory, ScheduleFactory
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms, FilteredQueryCountMixin
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 
 
@@ -167,5 +162,4 @@ class TestSendRecurringNudge(ScheduleBaseEmailTestBase):
 
     def _contains_upsell_attribute(self, msg_attr):
         msg = Message.from_string(msg_attr)
-        tmp = msg.context["show_upsell"]
         return msg.context["show_upsell"]

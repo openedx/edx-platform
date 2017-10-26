@@ -1,24 +1,18 @@
-import datetime
 import logging
 from unittest import skipUnless
 
 import ddt
-import pytz
 from django.conf import settings
 from edx_ace import Message
 from edx_ace.utils.date import serialize
 from mock import Mock, patch
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from openedx.core.djangoapps.schedules import resolvers, tasks
+from openedx.core.djangoapps.schedules import tasks
 from openedx.core.djangoapps.schedules.management.commands import send_upgrade_reminder as reminder
 from openedx.core.djangoapps.schedules.management.commands.tests.tools import ScheduleBaseEmailTestBase
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory, ScheduleFactory
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 
@@ -41,15 +35,6 @@ class TestUpgradeReminder(ScheduleBaseEmailTestBase):
     expected_offsets = (2,)
 
     has_course_queries = True
-
-    def setUp(self):
-        super(TestUpgradeReminder, self).setUp()
-
-        CourseModeFactory(
-            course_id=self.course.id,
-            mode_slug=CourseMode.VERIFIED,
-            expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
-        )
 
     @ddt.data(True, False)
     @patch.object(tasks, 'ace')
