@@ -379,27 +379,21 @@ class DynamicUpgradeDeadlineConfiguration(ConfigurationModel):
     )
 
 
-class OptOutDynamicUpgradeDeadlineConfiguration(DynamicUpgradeDeadlineConfiguration):
-    """ Dynamic upgrade deadline configuration with opt-out switch.
-
-    This is an abstract model that both CourseDynamicUpgradeDeadlineConfiguration and
-    OrgDynamicUpgradeDeadlineConfiguration inherit.
+class OptOutDynamicUpgradeDeadlineMixin(object):
     """
-    opt_out = models.BooleanField(
-        default=False,
-        help_text=_('Disable the dynamic upgrade deadline for this course run.')
-    )
+    Provides convenience methods for interpreting the enabled and opt out status.
+    """
 
     def opted_in(self):
-        """Convienence function that returns True if this config model is both enabled and opt_out is False"""
+        """Convenience function that returns True if this config model is both enabled and opt_out is False"""
         return self.enabled and not self.opt_out
 
     def opted_out(self):
-        """Convienence function that returns True if this config model is both enabled and opt_out is True"""
+        """Convenience function that returns True if this config model is both enabled and opt_out is True"""
         return self.enabled and self.opt_out
 
 
-class CourseDynamicUpgradeDeadlineConfiguration(OptOutDynamicUpgradeDeadlineConfiguration):
+class CourseDynamicUpgradeDeadlineConfiguration(OptOutDynamicUpgradeDeadlineMixin, ConfigurationModel):
     """
     Per-course run configuration for dynamic upgrade deadlines.
 
@@ -410,8 +404,18 @@ class CourseDynamicUpgradeDeadlineConfiguration(OptOutDynamicUpgradeDeadlineConf
 
     course_id = CourseKeyField(max_length=255, db_index=True)
 
+    deadline_days = models.PositiveSmallIntegerField(
+        default=21,
+        help_text=_('Number of days a learner has to upgrade after content is made available')
+    )
 
-class OrgDynamicUpgradeDeadlineConfiguration(OptOutDynamicUpgradeDeadlineConfiguration):
+    opt_out = models.BooleanField(
+        default=False,
+        help_text=_('Disable the dynamic upgrade deadline for this course run.')
+    )
+
+
+class OrgDynamicUpgradeDeadlineConfiguration(OptOutDynamicUpgradeDeadlineMixin, ConfigurationModel):
     """
     Per-org configuration for dynamic upgrade deadlines.
 
@@ -421,3 +425,13 @@ class OrgDynamicUpgradeDeadlineConfiguration(OptOutDynamicUpgradeDeadlineConfigu
     KEY_FIELDS = ('org_id',)
 
     org_id = models.CharField(max_length=255, db_index=True)
+
+    deadline_days = models.PositiveSmallIntegerField(
+        default=21,
+        help_text=_('Number of days a learner has to upgrade after content is made available')
+    )
+
+    opt_out = models.BooleanField(
+        default=False,
+        help_text=_('Disable the dynamic upgrade deadline for this organization.')
+    )

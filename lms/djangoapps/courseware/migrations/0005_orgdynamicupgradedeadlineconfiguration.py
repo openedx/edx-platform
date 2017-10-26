@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django.db.models.deletion
 from django.conf import settings
+import courseware.models
 
 
 class Migration(migrations.Migration):
@@ -25,5 +26,14 @@ class Migration(migrations.Migration):
                 ('opt_out', models.BooleanField(default=False, help_text='Disable the dynamic upgrade deadline for this organization.')),
                 ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
             ],
+            options={
+                'ordering': ('-change_date',),
+                'abstract': False,
+            },
+            bases=(courseware.models.OptOutDynamicUpgradeDeadlineMixin, models.Model),
+        ),
+        migrations.AlterModelOptions(
+            name='coursedynamicupgradedeadlineconfiguration',
+            options={'ordering': ('-change_date',)},
         ),
     ]
