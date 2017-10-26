@@ -264,3 +264,30 @@ class ScheduleBaseEmailTestBase(SharedModuleStoreTestCase):
 
         self.assertEqual(mock_schedule_send.apply_async.call_count, expected_message_count)
         self.assertFalse(mock_ace.send.called)
+
+    @ddt.data(True, False)
+    def test_course_end(self, has_course_ended):
+        user1 = UserFactory.create(id=self.tested_task.num_bins)
+        current_day, offset, target_day = self._get_dates()
+
+        schedule = ScheduleFactory.create(
+            start=target_day,
+            upgrade_deadline=target_day,
+            enrollment__course__self_paced=True,
+            enrollment__user=user1,
+        )
+
+        schedule.enrollment.course.start = current_day - datetime.timedelta(days=30)
+        end_date_offset = -2 if has_course_ended else 2
+        schedule.enrollment.course.end = current_day + datetime.timedelta(days=end_date_offset)
+        schedule.enrollment.course.save()
+
+        with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
+            self.tested_task.apply(kwargs=dict(
+                site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset, bin_num=0,
+            ))
+
+        if has_course_ended:
+            self.assertFalse(mock_schedule_send.apply_async.called)
+        else:
+            self.assertTrue(mock_schedule_send.apply_async.called)
