@@ -115,9 +115,6 @@ FEATURES = {
     # with Shib.  Feature was requested by Stanford's office of general counsel
     'SHIB_DISABLE_TOS': False,
 
-    # Toggles OAuth2 authentication provider
-    'ENABLE_OAUTH2_PROVIDER': False,
-
     # Allows to enable an API endpoint to serve XBlock view, used for example by external applications.
     # See jquey-xblock: https://github.com/edx-solutions/jquery-xblock
     'ENABLE_XBLOCK_VIEW_ENDPOINT': False,
@@ -254,8 +251,6 @@ FEATURES = {
     # Set to True to change the course sorting behavior by their start dates, latest first.
     'ENABLE_COURSE_SORTING_BY_START_DATE': True,
 
-    # Expose Mobile REST API. Note that if you use this, you must also set
-    # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
 
     # Enable the combined login/registration form

@@ -4,21 +4,21 @@ Tests for OAuth token exchange views
 
 # pylint: disable=no-member
 
-from datetime import timedelta
 import json
-import mock
 import unittest
+from datetime import timedelta
 
 import ddt
-from django.conf import settings
+import httpretty
+import mock
+import provider.constants
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-import httpretty
-import provider.constants
 from provider.oauth2.models import AccessToken, Client
 from rest_framework.test import APIClient
 from social_django.models import Partial
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 from .mixins import DOPAdapterMixin, DOTAdapterMixin
@@ -165,7 +165,7 @@ class DOTAccessTokenExchangeViewTestGoogle(
     pass
 
 
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
+@skip_unless_lms
 class TestLoginWithAccessTokenView(TestCase):
     """
     Tests for LoginWithAccessTokenView

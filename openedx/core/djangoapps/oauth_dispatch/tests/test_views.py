@@ -3,7 +3,6 @@ Tests for Blocks Views
 """
 
 import json
-import unittest
 
 import ddt
 import httpretty
@@ -14,20 +13,15 @@ from django.test import RequestFactory, TestCase, override_settings
 from oauth2_provider import models as dot_models
 from provider import constants
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
 from . import mixins
 from .constants import DUMMY_REDIRECT_URL
-from .. import adapters
-from .. import models
+from .. import adapters, models
 
-# NOTE (CCB): We use this feature flag in a roundabout way to determine if the oauth_dispatch app is installed
-# in the current service--LMS or Studio. Normally we would check if settings.ROOT_URLCONF == 'lms.urls'; however,
-# simply importing the views will results in an error due to the requisite apps not being installed (in Studio). Thus,
-# we are left with this hack, of checking the feature flag which will never be True for Studio.
-OAUTH_PROVIDER_ENABLED = settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER')
-
-if OAUTH_PROVIDER_ENABLED:
+# FIXME This is a hack that results from mixing LMS-specific apps with Studio-specific apps.
+if settings.ROOT_URLCONF == 'lms.urls':
     from .. import views
 
 
@@ -68,7 +62,7 @@ class AccessTokenLoginMixin(object):
         self.assertEqual(self.login_with_access_token(access_token=access_token).status_code, 401)
 
 
-@unittest.skipUnless(OAUTH_PROVIDER_ENABLED, 'OAuth2 not enabled')
+@skip_unless_lms
 class _DispatchingViewTestCase(TestCase):
     """
     Base class for tests that exercise DispatchingViews.
@@ -393,7 +387,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         return response.redirect_chain[-1][0]
 
 
-@unittest.skipUnless(OAUTH_PROVIDER_ENABLED, 'OAuth2 not enabled')
+@skip_unless_lms
 class TestViewDispatch(TestCase):
     """
     Test that the DispatchingView dispatches the right way.
@@ -565,7 +559,7 @@ class TestRevokeTokenView(AccessTokenLoginMixin, _DispatchingViewTestCase):  # p
         self.verify_revoke_token(self.access_token)
 
 
-@unittest.skipUnless(OAUTH_PROVIDER_ENABLED, 'OAuth2 not enabled')
+@skip_unless_lms
 class JwksViewTests(TestCase):
     def test_serialize_rsa_key(self):
         key = """\
@@ -635,7 +629,7 @@ Ld/IRK0DgpGP5EJRwpKsDYe/UQ==
         self.assertEqual(actual, {'keys': []})
 
 
-@unittest.skipUnless(OAUTH_PROVIDER_ENABLED, 'OAuth2 not enabled')
+@skip_unless_lms
 class ProviderInfoViewTests(TestCase):
     DOMAIN = 'testserver.fake'
 
