@@ -2136,7 +2136,7 @@ INSTALLED_APPS = [
     'bulk_enroll',
 
     # Student Identity Verification
-    'lms.djangoapps.verify_student',
+    'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
 
     # Dark-launching languages
     'openedx.core.djangoapps.dark_lang',
