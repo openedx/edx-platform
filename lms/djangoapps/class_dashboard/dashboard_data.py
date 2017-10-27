@@ -45,7 +45,7 @@ def get_problem_grade_distribution(course_id):
 
     # Loop through resultset building data for each problem
     for row in db_query:
-        curr_problem = UsageKey.from_string(row['module_state_key']).map_into_course(course_id)
+        curr_problem = row['module_state_key'].map_into_course(course_id)
 
         # Build set of grade distributions for each problem that has student responses
         if curr_problem in prob_grade_distrib:
@@ -85,7 +85,7 @@ def get_sequential_open_distrib(course_id):
     # Build set of "opened" data for each subsection that has "opened" data
     sequential_open_distrib = {}
     for row in db_query:
-        row_loc = UsageKey.from_string(row['module_state_key']).map_into_course(course_id)
+        row_loc = row['module_state_key'].map_into_course(course_id)
         sequential_open_distrib[row_loc] = row['count_sequential']
 
     return sequential_open_distrib
@@ -122,7 +122,7 @@ def get_problem_set_grade_distrib(course_id, problem_set):
 
     # Loop through resultset building data for each problem
     for row in db_query:
-        row_loc = UsageKey.from_string(row['module_state_key']).map_into_course(course_id)
+        row_loc = row['module_state_key'].map_into_course(course_id)
         if row_loc not in prob_grade_distrib:
             prob_grade_distrib[row_loc] = {
                 'max_grade': 0,
