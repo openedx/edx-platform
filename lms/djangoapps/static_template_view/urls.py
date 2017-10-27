@@ -17,19 +17,19 @@ urlpatterns = (
     url(r'^404$', 'render_404'),  # Can this be deleted? Test test_404_microsites fails with this.
     url(r'^500$', 'render_500'),
 
-    url(r'^blog$', 'render', {'template': 'blog.html'}, name="blog"),
-    url(r'^contact$', 'render', {'template': 'contact.html'}, name="contact"),
-    url(r'^donate$', 'render', {'template': 'donate.html'}, name="donate"),
+    #url(r'^blog$', 'render', {'template': 'blog.html'}, name="blog"),
+    #url(r'^contact$', 'render', {'template': 'contact.html'}, name="contact"),
+    #url(r'^donate$', 'render', {'template': 'donate.html'}, name="donate"),
     url(r'^faq$', 'render', {'template': 'faq.html'}, name="faq"),
-    url(r'^help$', 'render', {'template': 'help.html'}, name="help_edx"),
-    url(r'^jobs$', 'render', {'template': 'jobs.html'}, name="jobs"),
-    url(r'^news$', 'render', {'template': 'news.html'}, name="news"),
-    url(r'^press$', 'render', {'template': 'press.html'}, name="press"),
-    url(r'^media-kit$', 'render', {'template': 'media-kit.html'}, name="media-kit"),
-    url(r'^copyright$', 'render', {'template': 'copyright.html'}, name="copyright"),
+    #url(r'^help$', 'render', {'template': 'help.html'}, name="help_edx"),
+    #url(r'^jobs$', 'render', {'template': 'jobs.html'}, name="jobs"),
+    #url(r'^news$', 'render', {'template': 'news.html'}, name="news"),
+    #url(r'^press$', 'render', {'template': 'press.html'}, name="press"),
+    #url(r'^media-kit$', 'render', {'template': 'media-kit.html'}, name="media-kit"),
+    #url(r'^copyright$', 'render', {'template': 'copyright.html'}, name="copyright"),
 
     # Press releases
-    url(r'^press/([_a-zA-Z0-9-]+)$', 'render_press_release', name='press_release'),
+    # url(r'^press/([_a-zA-Z0-9-]+)$', 'render_press_release', name='press_release'),
 )
 
 # Only enable URLs for those marketing links actually enabled in the
