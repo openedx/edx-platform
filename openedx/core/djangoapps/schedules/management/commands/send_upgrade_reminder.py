@@ -4,10 +4,5 @@ from openedx.core.djangoapps.schedules.tasks import ScheduleUpgradeReminder
 
 class Command(SendEmailBaseCommand):
     async_send_task = ScheduleUpgradeReminder
-
-    def __init__(self, *args, **kwargs):
-        super(Command, self).__init__(*args, **kwargs)
-        self.log_prefix = 'Upgrade Reminder'
-
-    def send_emails(self, *args, **kwargs):
-        self.enqueue(2, *args, **kwargs)
+    log_prefix = 'Upgrade Reminder'
+    offsets = (2,)
