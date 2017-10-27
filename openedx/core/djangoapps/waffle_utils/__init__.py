@@ -45,6 +45,7 @@ To test WaffleSwitchNamespace, use the provided context managers.  For example:
         ...
 
 """
+import crum
 import logging
 from abc import ABCMeta
 from contextlib import contextmanager
@@ -54,7 +55,6 @@ from opaque_keys.edx.keys import CourseKey
 from waffle import flag_is_active, switch_is_active
 
 from request_cache import get_cache as get_request_cache
-from request_cache import get_request
 
 log = logging.getLogger(__name__)
 
@@ -256,7 +256,17 @@ class WaffleFlagNamespace(WaffleNamespace):
                         value = flag_undefined_default
 
                 if value is None:
-                    value = flag_is_active(get_request(), namespaced_flag_name)
+                    request = crum.get_current_request()
+                    if request:
+                        value = flag_is_active(request, namespaced_flag_name)
+                    else:
+                        log.warn(u"%sFlag '%s' accessed without a request", self.log_prefix, namespaced_flag_name)
+                        # Return the default value if not in a request context.
+                        # Note: this skips the cache as the value might be different
+                        # in a normal request context. This case seems to occur when
+                        # a page redirects to a 404. In this case, we'll just return
+                        # the default value.
+                        return bool(flag_undefined_default)
 
                 self._cached_flags[namespaced_flag_name] = value
         return value

@@ -1,7 +1,11 @@
 """
 Tests for waffle utils test utilities.
 """
+
+import crum
+
 from django.test import TestCase
+from django.test.client import RequestFactory
 from opaque_keys.edx.keys import CourseKey
 
 from request_cache.middleware import RequestCache
@@ -25,6 +29,8 @@ class OverrideWaffleFlagTests(TestCase):
 
     def setUp(self):
         super(OverrideWaffleFlagTests, self).setUp()
+        request = RequestFactory().request()
+        crum.set_current_request(request)
         RequestCache.clear_request_cache()
 
     @override_waffle_flag(TEST_COURSE_FLAG, True)
