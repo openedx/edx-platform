@@ -7,6 +7,11 @@
 from openedx.core.djangolib.markup import HTML
 %>
 
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
+%>
+
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
@@ -14,7 +19,7 @@ from openedx.core.djangolib.markup import HTML
 
 <%def name="online_help_token()"><% return "${tab['online_help_token']}" %></%def>
 
-<%block name="pagetitle">${tab['name']} | ${course.display_number_with_default}</%block>
+<%block name="pagetitle">${_(tab['name'])} | ${course.display_number_with_default}</%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page=active_page" />
 
