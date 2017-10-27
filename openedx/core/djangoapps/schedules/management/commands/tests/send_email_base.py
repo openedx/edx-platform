@@ -19,8 +19,8 @@ from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.resolvers import _get_datetime_beginning_of_day
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory, ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.core.djangolib.testing.utils import FilteredQueryCountMixin, CacheIsolationTestCase
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
 SITE_QUERY = 2  # django_site, site_configuration_siteconfiguration
@@ -56,7 +56,7 @@ LOG = logging.getLogger(__name__)
 
 @ddt.ddt
 @freeze_time('2017-08-01 00:00:00', tz_offset=0, tick=True)
-class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
+class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase):
 
     __test__ = False
 

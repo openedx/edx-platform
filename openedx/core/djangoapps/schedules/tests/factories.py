@@ -6,6 +6,13 @@ from student.tests.factories import CourseEnrollmentFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 
 
+class ScheduleExperienceFactory(factory.DjangoModelFactory):
+    class Meta(object):
+        model = models.ScheduleExperience
+
+    experience_type = models.ScheduleExperience.DEFAULT
+
+
 class ScheduleFactory(factory.DjangoModelFactory):
     class Meta(object):
         model = models.Schedule
@@ -13,6 +20,7 @@ class ScheduleFactory(factory.DjangoModelFactory):
     start = factory.Faker('future_datetime', tzinfo=pytz.UTC)
     upgrade_deadline = factory.Faker('future_datetime', tzinfo=pytz.UTC)
     enrollment = factory.SubFactory(CourseEnrollmentFactory)
+    experience = factory.RelatedFactory(ScheduleExperienceFactory, 'schedule')
 
 
 class ScheduleConfigFactory(factory.DjangoModelFactory):
