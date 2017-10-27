@@ -5,6 +5,7 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 import logging
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from django.core.urlresolvers import reverse
 from opaque_keys.edx.keys import CourseKey
 
 from nodebb.models import DiscussionCommunity
@@ -29,8 +30,11 @@ def nodebb_forum_discussion(request, course_id):
 
     progress = get_all_course_progress(request.user, current_course)
 
+    course_link = reverse('about_course', args=[course_id])
+
     context = {
         "provider": current_course.org,
+        "course_link": course_link,
         "progress": progress,
         "course_display_name": current_course.display_name,
         "course_tabs": course_tabs,

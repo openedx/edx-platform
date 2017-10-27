@@ -535,6 +535,27 @@ class EnrollStaffView(View):
         # In any other case redirect to the course about page.
         return redirect(reverse('about_course', args=[unicode(course_key)]))
 
+def get_course_related_keys(request, course):
+    """
+        Get course first chapter & first section keys
+    """
+    first_chapter_url = ""
+    first_section = ""
+
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, request.user, course, depth=2,
+    )
+    course_module = get_module_for_descriptor(
+        request.user, request, course, field_data_cache, course.id, course=course
+    )
+
+    chapters = course_module.get_display_items()
+    if chapters:
+        first_chapter = chapters[0]
+        first_chapter_url = first_chapter.url_name
+        first_section = first_chapter.get_display_items()[0].url_name
+
+    return first_chapter_url, first_section
 
 @ensure_csrf_cookie
 @cache_if_anonymous()
@@ -569,7 +590,9 @@ def course_about(request, course_id):
         studio_url = get_studio_url(course, 'settings/details')
 
         if has_access(request.user, 'load', course):
-            course_target = reverse('info', args=[course.id.to_deprecated_string()])
+            first_chapter_url, first_section = get_course_related_keys(request, course)
+            course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
+                                                                first_section])
         else:
             course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
 
