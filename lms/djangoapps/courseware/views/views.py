@@ -33,6 +33,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from rest_framework import status
+
+from common.djangoapps.student.views import get_course_related_keys
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.ccx.utils import prep_course_for_grading
 from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
@@ -83,6 +85,7 @@ from shoppingcart.utils import is_shopping_cart_enabled
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.models import UserTestGroup, CourseEnrollment
 from student.roles import GlobalStaff
+from student.views import get_course_enrollments
 from util.cache import cache, cache_if_anonymous
 from util.date_utils import strftime_localized
 from util.db import outer_atomic
@@ -154,6 +157,9 @@ def courses(request):
     if configuration_helpers.get_value("DISPLAY_PROGRAMS_ON_MARKETING_PAGES",
                                        settings.FEATURES.get("DISPLAY_PROGRAMS_ON_MARKETING_PAGES")):
         programs_list = get_programs_data(request.user)
+
+    if request.user.is_authenticated():
+        add_tag_to_enrolled_courses(request.user, courses_list)
 
     return render_to_response(
         "courseware/courses.html",
@@ -291,13 +297,13 @@ def course_info(request, course_id):
 
             # The user doesn't have access to the course. If they're
             # denied permission due to the course not being live yet,
-            # redirect to the dashboard page.
+            # redirect to the course about page.
             if isinstance(access_response, StartDateError):
                 start_date = strftime_localized(course.start, 'SHORT_DATE')
                 params = QueryDict(mutable=True)
                 params['notlive'] = start_date
-                return redirect('{dashboard_url}?{params}'.format(
-                    dashboard_url=reverse('dashboard'),
+                return redirect('{course_about_url}?{params}'.format(
+                    course_about_url=reverse('about_course', args=[unicode(course_key)]),
                     params=params.urlencode()
                 ))
             # Otherwise, give a 404 to avoid leaking info about access
@@ -531,7 +537,6 @@ class EnrollStaffView(View):
         # In any other case redirect to the course about page.
         return redirect(reverse('about_course', args=[unicode(course_key)]))
 
-
 @ensure_csrf_cookie
 @cache_if_anonymous()
 def course_about(request, course_id):
@@ -565,7 +570,9 @@ def course_about(request, course_id):
         studio_url = get_studio_url(course, 'settings/details')
 
         if has_access(request.user, 'load', course):
-            course_target = reverse('info', args=[course.id.to_deprecated_string()])
+            first_chapter_url, first_section = get_course_related_keys(request, course)
+            course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
+                                                                first_section])
         else:
             course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
 
@@ -1500,3 +1507,40 @@ def financial_assistance_form(request):
             }
         ],
     })
+
+
+def get_enrolled_courses(user):
+
+    course_org_filter = configuration_helpers.get_value('course_org_filter')
+
+    # Let's filter out any courses in an "org" that has been declared to be
+    # in a configuration
+    org_filter_out_set = configuration_helpers.get_all_orgs()
+
+    # remove our current org from the "filter out" list, if applicable
+    if course_org_filter:
+        org_filter_out_set.remove(course_org_filter)
+
+    # Build our (course, enrollment) list for the user, but ignore any courses that no
+    # longer exist (because the course IDs have changed). Still, we don't delete those
+    # enrollments, because it could have been a data push snafu.
+    course_enrollments = list(get_course_enrollments(user, course_org_filter, org_filter_out_set))
+
+    # sort the enrollment pairs by the enrollment date
+    course_enrollments.sort(key=lambda x: x.created, reverse=True)
+
+    # construct enrolled courses list
+    courses = list()
+    for course_enrollment in course_enrollments:
+        courses.append(course_enrollment.course_overview)
+
+    return courses
+
+
+def add_tag_to_enrolled_courses(user, courses_list):
+    enrolled_courses = get_enrolled_courses(user)
+    for course in courses_list:
+        if course in enrolled_courses:
+            course.enrolled = True
+        else:
+            course.enrolled = False

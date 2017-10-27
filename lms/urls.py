@@ -27,6 +27,10 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 urlpatterns = (
     '',
 
+    # URL for home page
+    url(r'', include('homepage.urls', namespace='homepage')),
+
+    url(r'^onboarding_survey/', include('lms.djangoapps.onboarding_survey.urls')),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
 
     url(r'', include('student.urls')),
@@ -68,6 +72,8 @@ urlpatterns = (
     # Course API
     url(r'^api/courses/', include('course_api.urls')),
 
+    url(r'^philu/api/', include('lms.djangoapps.philu_api.urls')),
+
     # User API endpoints
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
@@ -103,6 +109,9 @@ urlpatterns = (
 
     # URLs for API access management
     url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
+
+    # URL for dynamic faq page
+    url(r'^platform_faq/', include('faq.urls', namespace='faq')),
 )
 
 urlpatterns += (
@@ -655,6 +664,12 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
                 settings.COURSE_ID_PATTERN,
             ),
             include('discussion.urls')
+        ),
+        url(
+            r'^courses/{}/discussion/nodebb/'.format(
+                settings.COURSE_ID_PATTERN,
+            ),
+            include('nodebb.urls')
         ),
         url(
             r'^notification_prefs/enable/',

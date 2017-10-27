@@ -368,6 +368,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 
     'student.middleware.UserStandingMiddleware',
+    'student.middleware.UserSessionSharingMiddleware',
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
 
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -959,6 +960,12 @@ INSTALLED_APPS = (
 
     # Unusual migrations
     'database_fixups',
+
+    # NodeBB app
+    'nodebb',
+
+    # Custom settings app
+    'custom_settings',
 )
 
 
@@ -1242,3 +1249,8 @@ RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
 
 # How long until database records about the outcome of a task and its artifacts get deleted?
 USER_TASKS_MAX_AGE = timedelta(days=7)
+
+# NodeBB settings
+NODEBB_ENDPOINT = 'http://community.philanthropyu.org'
+
+FEATURES['ENABLE_EXTENDED_COURSE_DETAILS'] = True

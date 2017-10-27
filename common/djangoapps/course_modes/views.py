@@ -104,11 +104,11 @@ class ChooseModeView(View):
         # in the "honor" track by this point, so we send the user
         # to the dashboard.
         if not CourseMode.has_verified_mode(modes):
-            return redirect(reverse('dashboard'))
+            return redirect(reverse('info', args=[course_id]))
 
         # If a user has already paid, redirect them to the dashboard.
         if is_active and (enrollment_mode in CourseMode.VERIFIED_MODES + [CourseMode.NO_ID_PROFESSIONAL_MODE]):
-            return redirect(reverse('dashboard'))
+            return redirect(reverse('info', args=[course_id]))
 
         donation_for_course = request.session.get("donation_for_course", {})
         chosen_price = donation_for_course.get(unicode(course_key), None)
@@ -205,11 +205,11 @@ class ChooseModeView(View):
             # The user will have already been enrolled in the audit mode at this
             # point, so we just redirect them to the dashboard, thereby avoiding
             # hitting the database a second time attempting to enroll them.
-            return redirect(reverse('dashboard'))
+            return redirect(reverse('info', args=[course_id]))
 
         if requested_mode == 'honor':
             CourseEnrollment.enroll(user, course_key, mode=requested_mode)
-            return redirect(reverse('dashboard'))
+            return redirect(reverse('info', args=[course_id]))
 
         mode_info = allowed_modes[requested_mode]
 

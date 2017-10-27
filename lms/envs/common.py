@@ -46,7 +46,7 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "Your Platform Name Here"
+PLATFORM_NAME = "Philanthropy U Team"
 CC_MERCHANT_NAME = PLATFORM_NAME
 # Shows up in the platform footer, eg "(c) COPYRIGHT_YEAR"
 COPYRIGHT_YEAR = "2017"
@@ -263,7 +263,7 @@ FEATURES = {
     'ENABLE_MOBILE_REST_API': False,
 
     # Enable the combined login/registration form
-    'ENABLE_COMBINED_LOGIN_REGISTRATION': False,
+    'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
     'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER': False,
 
     # Enable organizational email opt-in
@@ -1133,6 +1133,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 
     'student.middleware.UserStandingMiddleware',
+    'student.middleware.UserSessionSharingMiddleware',
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
 
     # Adds user tags to tracking events
@@ -1185,6 +1186,7 @@ MIDDLEWARE_CLASSES = (
     'course_wiki.middleware.WikiAccessMiddleware',
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
+    'lms.djangoapps.onboarding_survey.middleware.RedirectMiddleware',
 
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
@@ -1920,6 +1922,9 @@ INSTALLED_APPS = (
     # History tables
     'simple_history',
 
+    # Philu management commands
+    'philu_commands',
+
     # Database-backed configuration
     'config_models',
 
@@ -2157,6 +2162,25 @@ INSTALLED_APPS = (
 
     # Unusual migrations
     'database_fixups',
+
+    'lms.djangoapps.onboarding_survey',
+
+    # Dynamic FAQ page
+    'lms.djangoapps.faq',
+
+    # NodeBB
+    'nodebb',
+
+    # Custom settings App
+    'custom_settings',
+
+    # RestAPI
+    'lms.djangoapps.philu_api',
+
+    # Philu Overrides
+    'lms.djangoapps.philu_overrides',
+    # timed notification and periodic tasks
+    'openedx.core.djangoapps.timed_notification',
 )
 
 ######################### CSRF #########################################
@@ -2375,18 +2399,7 @@ XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
 # - 'optional': to display the field, and make it non-mandatory
 # - 'hidden': to not display the field
 
-REGISTRATION_EXTRA_FIELDS = {
-    'level_of_education': 'optional',
-    'gender': 'optional',
-    'year_of_birth': 'optional',
-    'mailing_address': 'optional',
-    'goals': 'optional',
-    'honor_code': 'required',
-    'terms_of_service': 'hidden',
-    'city': 'hidden',
-    'country': 'hidden',
-}
-
+REGISTRATION_EXTRA_FIELDS = {}
 # Optional setting to restrict registration / account creation to only emails
 # that match a regex in this list. Set to None to allow any email (default).
 REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
@@ -2858,7 +2871,7 @@ PROFILE_IMAGE_MIN_BYTES = 100
 
 # Sets the maximum number of courses listed on the homepage
 # If set to None, all courses will be listed on the homepage
-HOMEPAGE_COURSE_MAX = None
+HOMEPAGE_COURSE_MAX = 9
 
 ################################ Settings for Credit Courses ################################
 # Initial delay used for retrying tasks.
@@ -2968,7 +2981,7 @@ MAX_BOOKMARKS_PER_COURSE = 100
 # need to add the model's app to the ADDL_INSTALLED_APPS array in your
 # lms.env.json file.
 
-REGISTRATION_EXTENSION_FORM = None
+REGISTRATION_EXTENSION_FORM = 'onboarding_survey.forms.RegModelForm'
 
 # Identifier included in the User Agent from open edX mobile apps.
 MOBILE_APP_USER_AGENT_REGEXES = [
@@ -3037,3 +3050,13 @@ DOC_LINK_BASE_URL = None
 ############## Settings for the Enterprise App ######################
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
+
+# NodeBB settings
+NODEBB_ENDPOINT = 'http://community.philanthropyu.org'
+
+# Project features
+LMS_BASE_URL = 'https://philanthropyu.org'
+
+# Notification email settings
+NOTIFICATION_FROM_EMAIL = 'no-reply@philanthropyu.org'
+NOTIFICATION_EMAIL_SUBJECT = 'Philanthropy-U-Team Course Notification'
