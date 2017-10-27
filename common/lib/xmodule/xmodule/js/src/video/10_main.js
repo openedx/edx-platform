@@ -54,6 +54,7 @@
             'video/09_events_plugin.js',
             'video/09_events_bumper_plugin.js',
             'video/09_poster.js',
+            'video/99_completion.js',
             'video/10_commands.js',
             'video/095_video_context_menu.js'
         ],
@@ -61,8 +62,8 @@
             VideoStorage, initialize, FocusGrabber, VideoAccessibleMenu, VideoControl, VideoFullScreen,
             VideoQualityControl, VideoProgressSlider, VideoVolumeControl, VideoSpeedControl, VideoCaption,
             VideoPlayPlaceholder, VideoPlayPauseControl, VideoPlaySkipControl, VideoSkipControl, VideoBumper,
-            VideoSaveStatePlugin, VideoEventsPlugin, VideoEventsBumperPlugin, VideoPoster, VideoCommands,
-            VideoContextMenu
+            VideoSaveStatePlugin, VideoEventsPlugin, VideoEventsBumperPlugin, VideoPoster, 
+            VideoCompletionHandler, VideoCommands, VideoContextMenu
         ) {
             var youtubeXhr = null,
                 oldVideo = window.Video;
@@ -75,7 +76,7 @@
                     mainVideoModules = [FocusGrabber, VideoControl, VideoPlayPlaceholder,
                         VideoPlayPauseControl, VideoProgressSlider, VideoSpeedControl, VideoVolumeControl,
                         VideoQualityControl, VideoFullScreen, VideoCaption, VideoCommands, VideoContextMenu,
-                        VideoSaveStatePlugin, VideoEventsPlugin],
+                        VideoSaveStatePlugin, VideoEventsPlugin, VideoCompletionHandler],
                     bumperVideoModules = [VideoControl, VideoPlaySkipControl, VideoSkipControl,
                         VideoVolumeControl, VideoCaption, VideoCommands, VideoSaveStatePlugin, VideoEventsBumperPlugin],
                     state = {
@@ -115,6 +116,7 @@
                     storage: storage,
                     saveStateUrl: state.metadata.saveStateUrl
                 });
+
 
                 if (bumperMetadata) {
                     new VideoPoster(el, {

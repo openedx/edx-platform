@@ -8,20 +8,20 @@
      * @param {Object} state The object containing the state of the video
      * @return {jquery Promise}
      */
-        var CompletionListener = function(state) {
-            if (!(this instanceof CompletionListener)) {
-                return new CompletionListener(state);
+        var VideoCompletionHandler = function(state) {
+            if (!(this instanceof VideoCompletionHandler)) {
+                return new VideoCompletionHandler(state);
             }
 
             _.bindAll(this, 'play', 'pause', 'onClick', 'destroy');
             this.state = state;
-            this.state.completionListener = this;
+            this.state.completionHandler = this;
             this.initialize();
 
             return $.Deferred().resolve().promise();
         };
 
-        CompletionListener.prototype = {
+        VideoCompletionHandler.prototype = {
             destroy: function() {
                 this.el.remove();
                 this.state.el.off('destroy', this.destroy);
@@ -30,20 +30,23 @@
 
         /** Initializes the module. */
             initialize: function() {
-                this.complete = False;
+                this.complete = false;
+                this.lastValue = 1;
                 this.bindHandlers();
             },
 
         /** Bind any necessary function callbacks to DOM events. */
             bindHandlers: function() {
-                this.state.el.on({
-                    'timeupdate': this.checkCompletion,
-                });
+                this.state.el.on({timeupdate: this.checkCompletion});
             },
 
         /** Event handler to check if the video is complete, and submit a completion if it is */
             checkCompletion: function(currentTime) {
                 // Need to access runtime for this.
+                if (currentTime != this.lastValue) {
+                    console.warn("CURRENT TIME", currentTime);
+                    this.lastValue = currentTime;
+                }
                 if (this.complete === false && currentTime > this.state.completeAfter) {
                     this.complete = true;
                     if (this.state.config.publishCompletionUrl) {
@@ -54,13 +57,13 @@
                                 completion: 1.0
                             })
                         });
-		    } else {
-			console.warn("publishCompletionUrl not defined");
-		    }
+                    } else {
+                        console.warn('publishCompletionUrl not defined');
+                    }
                 }
             }
         };
 
-        return CompletionListener;
+        return VideoCompletionHandler;
     });
 }(RequireJS.define));
