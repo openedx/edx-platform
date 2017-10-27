@@ -3,7 +3,7 @@ Script for importing courseware from XML format
 """
 from optparse import make_option
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from django_comment_common.utils import are_permissions_roles_seeded, seed_permissions_roles
 from xmodule.contentstore.django import contentstore
