@@ -1617,7 +1617,6 @@
     "Time Sent:": "Hora de env\u00edo:", 
     "Time Zone": "Zona horaria", 
     "Timed": "Cronometrado", 
-    "Timed Exam": "Examen cronometrado", 
     "Timed Transcript Conflict": "Conflicto en la transcripci\u00f3n", 
     "Timed Transcript Found": "Se encontr\u00f3 una transcripci\u00f3n", 
     "Timed Transcript Uploaded Successfully": "Transcripci\u00f3n cargada exitosamente", 
