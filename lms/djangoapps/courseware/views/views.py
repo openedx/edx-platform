@@ -33,6 +33,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from rest_framework import status
+
+from common.djangoapps.student.views import get_course_related_keys
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.ccx.utils import prep_course_for_grading
 from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
@@ -534,28 +536,6 @@ class EnrollStaffView(View):
 
         # In any other case redirect to the course about page.
         return redirect(reverse('about_course', args=[unicode(course_key)]))
-
-def get_course_related_keys(request, course):
-    """
-        Get course first chapter & first section keys
-    """
-    first_chapter_url = ""
-    first_section = ""
-
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        course.id, request.user, course, depth=2,
-    )
-    course_module = get_module_for_descriptor(
-        request.user, request, course, field_data_cache, course.id, course=course
-    )
-
-    chapters = course_module.get_display_items()
-    if chapters:
-        first_chapter = chapters[0]
-        first_chapter_url = first_chapter.url_name
-        first_section = first_chapter.get_display_items()[0].url_name
-
-    return first_chapter_url, first_section
 
 @ensure_csrf_cookie
 @cache_if_anonymous()

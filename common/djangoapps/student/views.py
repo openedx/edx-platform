@@ -57,7 +57,7 @@ from student.models import (
     create_comments_service_user, PasswordHistory, UserSignupSource,
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED,
     LogoutViewConfiguration, RegistrationCookieConfiguration)
-from lms.djangoapps.onboarding_survey.models import Organization
+
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from student.tasks import send_activation_email
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
@@ -121,7 +121,7 @@ from eventtracking import tracker
 
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
-
+from courseware.model_data import FieldDataCache
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.programs import utils as programs_utils
@@ -130,7 +130,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.catalog.utils import get_programs_data
-
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -222,6 +222,27 @@ def index(request, extra_context=None, user=AnonymousUser()):
 
     return render_to_response('index.html', context)
 
+def get_course_related_keys(request, course):
+    """
+        Get course first chapter & first section keys
+    """
+    first_chapter_url = ""
+    first_section = ""
+
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, request.user, course, depth=2,
+    )
+    course_module = get_module_for_descriptor(
+        request.user, request, course, field_data_cache, course.id, course=course
+    )
+
+    chapters = course_module.get_display_items()
+    if chapters:
+        first_chapter = chapters[0]
+        first_chapter_url = first_chapter.url_name
+        first_section = first_chapter.get_display_items()[0].url_name
+
+    return first_chapter_url, first_section
 
 def process_survey_link(survey_link, user):
     """
@@ -1153,7 +1174,12 @@ def change_enrollment(request, check_access=True):
             )
 
         # Otherwise, there is only one mode available (the default)
-        return HttpResponse(reverse('info', kwargs={'course_id': unicode(course_id)}))
+
+        current_course = modulestore().get_course(course_id)
+        first_chapter_url, first_section = get_course_related_keys(request, current_course)
+        course_target = reverse('courseware_section', args=[course_id, first_chapter_url, first_section])
+
+        return HttpResponse(course_target)
     elif action == "unenroll":
         enrollment = CourseEnrollment.get_enrollment(user, course_id)
         if not enrollment:
