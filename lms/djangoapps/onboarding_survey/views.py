@@ -252,7 +252,7 @@ def get_country_names(request):
         with open(file_path) as json_data:
             q = request.GET.get('term', '')
             all_countries = json.load(json_data)
-            filtered_countries = [country for country in all_countries if q.lower() in country.lower()]
+            filtered_countries = [country for country in all_countries if country.lower().startswith(q.lower())]
 
         data = json.dumps(filtered_countries)
 
@@ -276,7 +276,7 @@ def get_languages(request):
         with open(file_path) as json_data:
             q = request.GET.get('term', '')
             all_languages = json.load(json_data)
-            filtered_languages = [language for language in all_languages if q.lower() in language.lower()]
+            filtered_languages = [language for language in all_languages if language.lower().startswith(q.lower())]
 
         data = json.dumps(filtered_languages)
 
