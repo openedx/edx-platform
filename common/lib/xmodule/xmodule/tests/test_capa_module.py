@@ -35,7 +35,7 @@ from xblock.scorable import Score
 from . import get_test_system
 from pytz import UTC
 from capa.correctmap import CorrectMap
-from ..capa_base_constants import RANDOMIZATION
+from ..capa_base_constants import RANDOMIZATION, SHOWANSWER
 
 
 class CapaFactory(object):
@@ -457,6 +457,31 @@ class CapaModuleTest(unittest.TestCase):
                                             due=self.yesterday_str,
                                             graceperiod=self.two_day_delta_str)
         self.assertTrue(still_in_grace.answer_available())
+
+    def test_showanswer_answered(self):
+        """
+        Tests that with showanswer="answered" should show answer after the problem is correctly answered.
+        It should *NOT* show answer if the answer is incorrect.
+        """
+        # Can not see "Show Answer" when student answer is wrong
+        answer_wrong = CapaFactory.create(
+            showanswer=SHOWANSWER.ANSWERED,
+            max_attempts="1",
+            attempts="0",
+            due=self.tomorrow_str,
+            correct=False
+        )
+        self.assertFalse(answer_wrong.answer_available())
+
+        # Expect to see "Show Answer" when answer is correct
+        answer_correct = CapaFactory.create(
+            showanswer=SHOWANSWER.ANSWERED,
+            max_attempts="1",
+            attempts="0",
+            due=self.tomorrow_str,
+            correct=True
+        )
+        self.assertTrue(answer_correct.answer_available())
 
     @ddt.data('', 'other-value')
     def test_show_correctness_other(self, show_correctness):
