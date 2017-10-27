@@ -56,6 +56,9 @@ class UpdateCommunityProfile(APIView):
 
             city_of_residence = data.get('city_of_residence', user_info_survey.city_of_residence)
             country_of_residence = data.get('country_of_residence', user_info_survey.country_of_residence)
+            city_of_employment = data.get('city_of_employment', user_info_survey.city_of_employment)
+            country_of_employment = data.get('country_of_employment', user_info_survey.country_of_employment)
+
             language = data.get('language', user_info_survey.language)
             birthday = data.get('birthday', user_info_survey.dob)
 
@@ -64,6 +67,8 @@ class UpdateCommunityProfile(APIView):
             user.profile.bio = about_me
             user_info_survey.city_of_residence = city_of_residence
             user_info_survey.country_of_residence = country_of_residence
+            user_info_survey.city_of_employment = city_of_employment
+            user_info_survey.country_of_employment = country_of_employment
             user_info_survey.language = language
 
             if birthday:
