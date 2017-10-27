@@ -48,7 +48,7 @@ class TestReindexCourse(ModuleStoreTestCase):
 
     def test_given_no_arguments_raises_command_error(self):
         """ Test that raises CommandError for incorrect arguments """
-        with self.assertRaisesRegexp(CommandError, ".* requires one or more arguments.*"):
+        with self.assertRaisesRegexp(CommandError, ".* requires one or more *"):
             call_command('reindex_course')
 
     @ddt.data('qwerty', 'invalid_key', 'xblockv1:qwerty')
