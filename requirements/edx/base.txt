@@ -19,7 +19,6 @@ django-babel-underscore==0.5.2
 markey==0.8  # From django-babel-underscore
 django-config-models==0.1.8
 django-countries==4.6.1
-django-extensions==1.5.9
 django-filter==1.0.4
 django-ipware==1.1.0
 django-model-utils==3.0.0
