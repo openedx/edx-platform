@@ -1,28 +1,15 @@
-#program-details-page {
-  font-size: 16px;
-
+#program-details-hero {
   .program_title {
     font-weight: bold;
-    margin-top: $baseline
+    margin-top: $baseline;
   }
 
   .logo {
     height: 100px;
   }
 
-  .section_title {
-    margin-bottom: $baseline;
-    color: theme-color("dark");
-  }
-
-  .thick_rule {
-    height: 4px;
-    border: 0;
-    background-color: theme-color('secondary');
-  }
-
   .main-banner {
-    color: white;
+    color: $white;
     margin-bottom: 1px;
     background-size: cover;
     background-repeat: no-repeat;
@@ -50,7 +37,7 @@
 
       button {
         background-color: transparent;
-        color: $white
+        color: $white;
       }
 
       iframe {
@@ -70,12 +57,31 @@
 
   .quick-nav {
     background-color: theme-color('light');
-    margin-bottom: $baseline/2;
 
     .nav-item {
       font-size: 18px;
       color: $white;
     }
+  }
+}
+
+#program-details-page {
+  margin-top: $baseline;
+  font-size: $font-size-base;
+
+  .logo {
+    height: 100px;
+  }
+
+  .section_title {
+    margin-bottom: $baseline;
+    color: theme-color("dark");
+  }
+
+  .thick_rule {
+    height: 4px;
+    border: 0;
+    background-color: theme-color('secondary');
   }
 
   .program-info {
