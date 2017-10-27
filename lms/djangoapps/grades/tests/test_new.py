@@ -329,7 +329,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
     """
 
     SCORED_BLOCK_COUNT = 7
-    ACTUAL_TOTAL_POSSIBLE = 17.0
+    ACTUAL_TOTAL_POSSIBLE = 16.0   # change this to 17.0 after upgrading to new DnD version
 
     @classmethod
     def setUpClass(cls):
