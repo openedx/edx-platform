@@ -3052,10 +3052,10 @@ DOC_LINK_BASE_URL = None
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
 
 # NodeBB settings
-NODEBB_ENDPOINT = 'http://community.philanthropyu.org'
+NODEBB_ENDPOINT = 'http://utp.community.philanthropyu.arbisoft.com'
 
 # Project features
-LMS_BASE_URL = 'https://philanthropyu.org'
+LMS_BASE_URL = 'http://utp.philanthropyu.arbisoft.com/'
 
 # Notification email settings
 NOTIFICATION_FROM_EMAIL = 'no-reply@philanthropyu.org'

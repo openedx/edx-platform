@@ -1251,6 +1251,6 @@ RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
 USER_TASKS_MAX_AGE = timedelta(days=7)
 
 # NodeBB settings
-NODEBB_ENDPOINT = 'http://community.philanthropyu.org'
+NODEBB_ENDPOINT = 'http://utp.community.philanthropyu.arbisoft.com'
 
 FEATURES['ENABLE_EXTENDED_COURSE_DETAILS'] = True
