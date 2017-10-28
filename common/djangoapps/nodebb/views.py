@@ -24,7 +24,7 @@ def nodebb_forum_discussion(request, course_id):
     modulestore = modulestore()
 
     course_key = CourseKey.from_string(course_id)
-    course_community = DiscussionCommunity.objects.filter(course_id=course_key).first()
+    course_community = DiscussionCommunity.objects.filter(course_id=course_key).order_by("-created").first()
     current_course = modulestore.get_course(course_key)
     course_tabs = get_course_related_tabs(request, current_course)
 
