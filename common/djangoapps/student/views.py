@@ -16,6 +16,7 @@ from ipware.ip import get_ip
 
 import edx_oauth2_provider
 from django.conf import settings
+from django.utils import timezone
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
@@ -26,8 +27,7 @@ from django.core import mail
 from django.core.urlresolvers import reverse, NoReverseMatch, reverse_lazy
 from django.core.validators import validate_email, ValidationError
 from django.db import IntegrityError, transaction
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError, Http404,\
-    HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError, Http404
 from django.shortcuts import redirect
 from django.utils.encoding import force_bytes, force_text
 from django.utils.translation import ungettext
@@ -1176,8 +1176,13 @@ def change_enrollment(request, check_access=True):
         # Otherwise, there is only one mode available (the default)
 
         current_course = modulestore().get_course(course_id)
-        first_chapter_url, first_section = get_course_related_keys(request, current_course)
-        course_target = reverse('courseware_section', args=[course_id, first_chapter_url, first_section])
+        today_date = timezone.now()
+        course_start_date = current_course.start
+        if course_start_date > today_date:
+            course_target = reverse('about_course', args=[unicode(course_id)])
+        else:
+            first_chapter_url, first_section = get_course_related_keys(request, current_course)
+            course_target = reverse('courseware_section', args=[course_id, first_chapter_url, first_section])
 
         return HttpResponse(course_target)
     elif action == "unenroll":

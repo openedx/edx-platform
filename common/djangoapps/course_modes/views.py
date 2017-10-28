@@ -6,6 +6,7 @@ import decimal
 import urllib
 
 from babel.dates import format_datetime
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db import transaction
@@ -101,8 +102,13 @@ class ChooseModeView(View):
             return redirect(redirect_url)
 
         course = modulestore().get_course(course_key)
-        first_chapter_url, first_section = get_course_related_keys(request, course)
-        course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
+        today_date = timezone.now()
+        course_start_date = course.start
+        if course_start_date > today_date:
+            course_target = reverse('about_course', args=[unicode(course_id)])
+        else:
+            first_chapter_url, first_section = get_course_related_keys(request, course)
+            course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
                                                             first_section])
 
         # If there isn't a verified mode available, then there's nothing
@@ -207,9 +213,15 @@ class ChooseModeView(View):
         if requested_mode not in allowed_modes:
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
-        first_chapter_url, first_section = get_course_related_keys(request, course)
-        course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
-                                                            first_section])
+        course = modulestore().get_course(course_key)
+        today_date = timezone.now()
+        course_start_date = course.start
+        if course_start_date > today_date:
+            course_target = reverse('about_course', args=[unicode(course_id)])
+        else:
+            first_chapter_url, first_section = get_course_related_keys(request, course)
+            course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
+                                                                first_section])
 
         if requested_mode == 'audit':
             # The user will have already been enrolled in the audit mode at this
