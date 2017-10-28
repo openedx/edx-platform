@@ -19,6 +19,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 
+from common.djangoapps.student.views import get_course_related_keys
 from lms.djangoapps.commerce.utils import EcommerceService
 from course_modes.models import CourseMode
 from courseware.access import has_access
@@ -99,21 +100,26 @@ class ChooseModeView(View):
                     redirect_url = ecommerce_service.checkout_page_url(professional_mode.bulk_sku)
             return redirect(redirect_url)
 
+        course = modulestore().get_course(course_key)
+        first_chapter_url, first_section = get_course_related_keys(request, course)
+        course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
+                                                            first_section])
+
         # If there isn't a verified mode available, then there's nothing
         # to do on this page.  The user has almost certainly been auto-registered
         # in the "honor" track by this point, so we send the user
         # to the dashboard.
         if not CourseMode.has_verified_mode(modes):
-            return redirect(reverse('info', args=[course_id]))
+            return redirect(course_target)
 
         # If a user has already paid, redirect them to the dashboard.
         if is_active and (enrollment_mode in CourseMode.VERIFIED_MODES + [CourseMode.NO_ID_PROFESSIONAL_MODE]):
-            return redirect(reverse('info', args=[course_id]))
+            return redirect(course_target)
 
         donation_for_course = request.session.get("donation_for_course", {})
         chosen_price = donation_for_course.get(unicode(course_key), None)
 
-        course = modulestore().get_course(course_key)
+
         if CourseEnrollment.is_enrollment_closed(request.user, course):
             locale = to_locale(get_language())
             enrollment_end_date = format_datetime(course.enrollment_end, 'short', locale=locale)
@@ -201,15 +207,19 @@ class ChooseModeView(View):
         if requested_mode not in allowed_modes:
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
+        first_chapter_url, first_section = get_course_related_keys(request, course)
+        course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
+                                                            first_section])
+
         if requested_mode == 'audit':
             # The user will have already been enrolled in the audit mode at this
             # point, so we just redirect them to the dashboard, thereby avoiding
             # hitting the database a second time attempting to enroll them.
-            return redirect(reverse('info', args=[course_id]))
+            return redirect(course_target)
 
         if requested_mode == 'honor':
             CourseEnrollment.enroll(user, course_key, mode=requested_mode)
-            return redirect(reverse('info', args=[course_id]))
+            return redirect(course_target)
 
         mode_info = allowed_modes[requested_mode]
 
