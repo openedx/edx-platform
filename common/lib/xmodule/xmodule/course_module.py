@@ -7,6 +7,8 @@ from cStringIO import StringIO
 from datetime import datetime, timedelta
 import dateutil.parser
 
+from django.conf import settings
+
 import requests
 from lazy import lazy
 from lxml import etree
@@ -31,6 +33,8 @@ _ = lambda text: text
 CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
 CATALOG_VISIBILITY_ABOUT = "about"
 CATALOG_VISIBILITY_NONE = "none"
+
+DEFAULT_MOBILE_AVAILABLE = getattr(settings, 'DEFAULT_MOBILE_AVAILABLE', False)
 
 
 class StringOrDate(Date):
@@ -337,7 +341,7 @@ class CourseFields(object):
     mobile_available = Boolean(
         display_name=_("Mobile Course Available"),
         help=_("Enter true or false. If true, the course will be available to mobile devices."),
-        default=False,
+        default=DEFAULT_MOBILE_AVAILABLE,
         scope=Scope.settings
     )
     video_upload_pipeline = Dict(
