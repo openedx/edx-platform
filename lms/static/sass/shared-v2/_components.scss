@@ -148,7 +148,7 @@
   @include box-sizing(border-box);
 
   margin: 0 auto;
-  padding: ($baseline*0.75);
+  padding: ($baseline*0.75) ($baseline*2);
   background-color: $lms-preview-menu-color;
 
   @media print {

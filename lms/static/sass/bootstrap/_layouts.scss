@@ -5,7 +5,7 @@
   padding-bottom: $baseline*2;
 
   .course-tabs {
-    padding: 0;
+    padding: 0 $baseline*2;
     font-size: $font-size-sm;
 
     .nav-item {
@@ -42,7 +42,7 @@
   display: flex;
   flex-wrap: wrap;
   border-bottom: 1px solid $border-color;
-  padding: 20px;
+  padding: $baseline $baseline*2;
 
   .page-header-search {
     @include margin-right($baseline);
@@ -62,6 +62,10 @@
 
   .page-header-main {
     flex-grow: 1;  // This column should consume all the available space
+
+    .page-title {
+      margin-top: $baseline*0.4;
+    }
   }
 
   .page-header-secondary {
@@ -84,7 +88,7 @@
 }
 
 .page-content {
-  padding: $baseline;
+  padding: $baseline*2;
 
   @include media-breakpoint-up(md) {
     display: flex;
