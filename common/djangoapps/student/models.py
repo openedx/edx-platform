@@ -1686,9 +1686,13 @@ class CourseEnrollment(models.Model):
         """
         if not self._course_overview:
             try:
-                self._course_overview = CourseOverview.get_from_id(self.course_id)
-            except (CourseOverview.DoesNotExist, IOError):
-                self._course_overview = None
+                self._course_overview = self.course
+            except CourseOverview.DoesNotExist:
+                log.info('Course Overviews: unable to find course overview for enrollment, loading from modulestore.')
+                try:
+                    self._course_overview = CourseOverview.get_from_id(self.course_id)
+                except (CourseOverview.DoesNotExist, IOError):
+                    self._course_overview = None
         return self._course_overview
 
     @cached_property
@@ -1717,7 +1721,14 @@ class CourseEnrollment(models.Model):
             # When course modes expire they aren't found any more and None would be returned.
             # Replicate that behavior here by returning None if the personalized deadline is in the past.
             if datetime.now(UTC) >= self.dynamic_upgrade_deadline:
+                log.debug('Schedules: Returning None since dynamic upgrade deadline has already passed.')
                 return None
+
+            if self.verified_mode is None:
+                log.debug('Schedules: Returning None for dynamic upgrade deadline since the course does not have a '
+                          'verified mode.')
+                return None
+
             return self.dynamic_upgrade_deadline
 
         return self.course_upgrade_deadline
@@ -1733,12 +1744,7 @@ class CourseEnrollment(models.Model):
         Returns:
             datetime|None
         """
-        try:
-            course_overview = self.course
-        except CourseOverview.DoesNotExist:
-            course_overview = self.course_overview
-
-        if not course_overview.self_paced:
+        if not self.course_overview.self_paced:
             return None
 
         if not DynamicUpgradeDeadlineConfiguration.is_enabled():

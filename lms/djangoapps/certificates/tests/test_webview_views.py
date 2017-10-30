@@ -12,8 +12,9 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+
 from util.date_utils import strftime_localized
-from mock import Mock, patch
+from mock import patch
 from nose.plugins.attrib import attr
 
 from certificates.api import get_certificate_url
@@ -73,6 +74,9 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
     """
     Common setUp and utility methods for Certificate tests
     """
+
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         super(CommonCertificatesTestCase, self).setUp()
         self.client = Client()

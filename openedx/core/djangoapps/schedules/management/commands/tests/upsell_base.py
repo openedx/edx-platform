@@ -8,7 +8,6 @@ from edx_ace.utils.date import serialize
 from edx_ace.message import Message
 
 from courseware.models import DynamicUpgradeDeadlineConfiguration
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 
 
 @ddt.ddt
@@ -34,10 +33,8 @@ class ScheduleUpsellTestMixin(object):
         if testcase.set_deadline:
             upgrade_deadline = current_day + datetime.timedelta(days=testcase.deadline_offset)
 
-        schedule = ScheduleFactory.create(
-            start=target_day,
-            upgrade_deadline=upgrade_deadline,
-            enrollment__course__self_paced=True,
+        schedule = self._schedule_factory(
+            upgrade_deadline=upgrade_deadline
         )
 
         sent_messages = []

@@ -6,6 +6,7 @@ from pytz import utc
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.schedules.signals import CREATE_SCHEDULE_WAFFLE_FLAG
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -24,16 +25,22 @@ from ..tests.factories import ScheduleConfigFactory
 @skip_unless_lms
 class CreateScheduleTests(SharedModuleStoreTestCase):
 
-    def assert_schedule_created(self, experience_type=ScheduleExperience.DEFAULT):
+    def assert_schedule_created(self, experience_type=ScheduleExperience.EXPERIENCES.default):
         course = _create_course_run(self_paced=True)
-        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
+        enrollment = CourseEnrollmentFactory(
+            course_id=course.id,
+            mode=CourseMode.AUDIT,
+        )
         self.assertIsNotNone(enrollment.schedule)
         self.assertIsNone(enrollment.schedule.upgrade_deadline)
         self.assertEquals(enrollment.schedule.experience.experience_type, experience_type)
 
     def assert_schedule_not_created(self):
         course = _create_course_run(self_paced=True)
-        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
+        enrollment = CourseEnrollmentFactory(
+            course_id=course.id,
+            mode=CourseMode.AUDIT,
+        )
         with self.assertRaises(Schedule.DoesNotExist):
             enrollment.schedule
 
@@ -86,7 +93,7 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         site = SiteFactory.create()
         mock_get_week_highlights.return_value = True
         mock_get_current_site.return_value = site
-        self.assert_schedule_created(experience_type=ScheduleExperience.COURSE_UPDATES)
+        self.assert_schedule_created(experience_type=ScheduleExperience.EXPERIENCES.course_updates)
 
 
 @ddt.ddt
@@ -114,7 +121,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
 
         course = _create_course_run(self_paced=True, start_day_offset=5)  # course starts in future
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-        self.assert_schedule_dates(enrollment.schedule, enrollment.course_overview.start)
+        self.assert_schedule_dates(enrollment.schedule, enrollment.course.start)
 
         course.start = course.start + datetime.timedelta(days=3)  # new course start changes to another future date
         self.store.update_item(course, ModuleStoreEnum.UserID.test)
@@ -138,7 +145,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
 
         course = _create_course_run(self_paced=True, start_day_offset=5)  # course starts in future
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-        previous_start = enrollment.course_overview.start
+        previous_start = enrollment.course.start
         self.assert_schedule_dates(enrollment.schedule, previous_start)
 
         course.start = course.start + datetime.timedelta(days=-10)  # new course start changes to a past date

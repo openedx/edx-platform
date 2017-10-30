@@ -10,7 +10,7 @@ class ScheduleExperienceFactory(factory.DjangoModelFactory):
     class Meta(object):
         model = models.ScheduleExperience
 
-    experience_type = models.ScheduleExperience.DEFAULT
+    experience_type = models.ScheduleExperience.EXPERIENCES.default
 
 
 class ScheduleFactory(factory.DjangoModelFactory):

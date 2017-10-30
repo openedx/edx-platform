@@ -405,14 +405,17 @@ def verified_upgrade_deadline_link(user, course=None, course_id=None):
 
     ecommerce_service = EcommerceService()
     if ecommerce_service.is_enabled(user):
-        if course is not None and isinstance(course, CourseOverview):
-            course_mode = course.modes.get(mode_slug=CourseMode.VERIFIED)
+        course_mode = CourseMode.verified_mode_for_course(course_id)
+        if course_mode is not None:
+            return ecommerce_service.get_checkout_page_url(course_mode.sku)
         else:
-            course_mode = CourseMode.objects.get(
-                course_id=course_id, mode_slug=CourseMode.VERIFIED
-            )
-        return ecommerce_service.get_checkout_page_url(course_mode.sku)
+            raise CourseModeNotFoundException('Cannot generate a verified upgrade link without a valid verified mode'
+                                              ' for course {}'.format(unicode(course_id)))
     return reverse('verify_student_upgrade_and_verify', args=(course_id,))
+
+
+class CourseModeNotFoundException(Exception):
+    pass
 
 
 def verified_upgrade_link_is_valid(enrollment=None):

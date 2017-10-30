@@ -29,6 +29,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
     """
 
     ACCOUNT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
+    ENABLED_SIGNALS = ['course_published']
 
     @staticmethod
     def _reverse_urls(names, course):

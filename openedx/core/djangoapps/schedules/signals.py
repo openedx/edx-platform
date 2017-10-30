@@ -64,14 +64,14 @@ def create_schedule(sender, **kwargs):
 
     try:
         get_week_highlights(enrollment.course_id, 1)
-        experience_type = ScheduleExperience.COURSE_UPDATES
+        experience_type = ScheduleExperience.EXPERIENCES.course_updates
     except CourseUpdateDoesNotExist:
-        experience_type = ScheduleExperience.DEFAULT
+        experience_type = ScheduleExperience.EXPERIENCES.default
 
     ScheduleExperience(schedule=schedule, experience_type=experience_type).save()
 
     log.debug('Schedules: created a new schedule starting at %s with an upgrade deadline of %s and experience type: %s',
-              content_availability_date, upgrade_deadline, ScheduleExperience.EXPERIENCES[experience_type][1])
+              content_availability_date, upgrade_deadline, ScheduleExperience.EXPERIENCES[experience_type])
 
 
 @receiver(COURSE_START_DATE_CHANGED, dispatch_uid="update_schedules_on_course_start_changed")
