@@ -759,7 +759,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         view_path = reverse('account_settings')
         response = self.client.get(path=view_path)
 
-        self.assertContains(response, '<li class="tab-nav-item">')
+        self.assertContains(response, 'global-header')
 
     def test_header_with_programs_listing_disabled(self):
         """
@@ -769,7 +769,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         view_path = reverse('account_settings')
         response = self.client.get(path=view_path)
 
-        self.assertContains(response, '<li class="item nav-global-01">')
+        self.assertContains(response, 'global-header')
 
     def test_commerce_order_detail(self):
         """

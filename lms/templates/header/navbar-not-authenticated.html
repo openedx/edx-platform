@@ -18,7 +18,7 @@ from django.utils.translation import ugettext as _
   restrict_enroll_for_course = course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain
   allow_public_account_creation = static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION'))
 %>
-<nav class="nav-links">
+<nav class="nav-links" aria-label="Supplemental Links">
   <div class="main">
   % if mktg_site_enabled:
     <div class="mobile-nav-item hidden-mobile nav-item">

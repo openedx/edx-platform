@@ -1,13 +1,5 @@
 ## mako
 <%page expression_filter="h" args="online_help_token"/>
 <%namespace name='static' file='static_content.html'/>
-<%!
-  from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-  RESPONSIVE_HEADER_ENABLED = WaffleFlag(WaffleFlagNamespace(name='lms'), 'responsive_header_enabled')
-%>
 
-% if RESPONSIVE_HEADER_ENABLED.is_enabled():
-  <%include file="${static.get_template_path(relative_path='header/header.html')}"  args="online_help_token=online_help_token"  />
-% else:
-  <%include file="${static.get_template_path(relative_path='legacy_header.html')}"  args="online_help_token=online_help_token"  />
-% endif
+<%include file="${static.get_template_path(relative_path='header/header.html')}"  args="online_help_token=online_help_token"  />
