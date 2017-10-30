@@ -15,21 +15,12 @@ class MarketingSiteViewTests(TestCase):
         self.assertEqual(resp['Content-Type'], mimetype)
 
     def test_sitemap(self):
-        """
-        Test the sitemap view
-        """
         self._test_view('sitemap_xml', 'application/xml')
 
     def test_about(self):
-        """
-        Test the about view
-        """
         self._test_view('about', 'text/html')
 
     def test_404(self):
-        """
-        Test the 404 view.
-        """
         url = reverse('static_template_view.views.render_404')
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
@@ -38,9 +29,6 @@ class MarketingSiteViewTests(TestCase):
         self.assertContains(resp, settings.TECH_SUPPORT_EMAIL)
 
     def test_500(self):
-        """
-        Test the 500 view.
-        """
         url = reverse('static_template_view.views.render_500')
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 500)
@@ -58,9 +46,6 @@ class MarketingSiteViewTests(TestCase):
         self.assertContains(resp, settings.TECH_SUPPORT_EMAIL, status_code=500)
 
     def test_404_microsites(self):
-        """
-        Test the 404 view as if called in a microsite.
-        """
         url = reverse('static_template_view.views.render_404')
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
@@ -71,9 +56,6 @@ class MarketingSiteViewTests(TestCase):
         self.assertContains(resp, settings.MICROSITE_CONFIGURATION['test_site']['email_from_address'])
 
     def test_500_microsites(self):
-        """
-        Test the 500 view as if called in a microsite.
-        """
         url = reverse('static_template_view.views.render_500')
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 500)
