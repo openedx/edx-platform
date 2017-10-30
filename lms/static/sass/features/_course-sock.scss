@@ -2,7 +2,7 @@
   display: inline-block;
   position: relative;
   width: 100%;
-  max-width: $lms-max-width;
+  max-width: map-get($container-max-widths, xl);
   margin: $baseline auto 0;
   -webkit-transition: all 0.4s ease-out;
   -moz-transition: all 0.4s ease-out;
@@ -39,7 +39,7 @@
   .verification-main-panel {
     display: none;
     overflow: hidden;
-    border-top: 1px solid $lms-border-color;
+    border-top: 1px solid $border-color;
     padding: ($baseline * 5/2) ($baseline * 2);
     -webkit-transition: height ease-out;
     transition: height ease-out;
@@ -158,7 +158,7 @@
 
     .verification-main-panel {
       border-top: 0;
-      border-bottom: 1px solid $lms-border-color;
+      border-bottom: 1px solid $border-color;
     }
   }
 }

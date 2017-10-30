@@ -142,15 +142,15 @@
   }
 
   &.error {
-    border-top: 3px solid $error-color;
+    border-top: 3px solid theme-color("danger");
   }
 
   &.warning {
-    border-top: 3px solid $warning-color;
+    border-top: 3px solid theme-color("warning");
   }
 
   &.success {
-    border-top: 3px solid $success-color;
+    border-top: 3px solid theme-color("success");
   }
 
 

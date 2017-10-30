@@ -3,28 +3,16 @@
 
 // About: Sass compile for the LMS Elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the lms-main-*.scss files.
 
+// Base build
+@import 'base/build';
+
 // base - assets
-@import 'base/font_face';
 @import 'base/extends';
 @import 'base/animations';
 @import 'base/utilities';
 
 // base - starter
 @import 'base/base';
-
-// edX Bootstrap theme and variables support
-@import 'bootstrap/theme';
-@import 'bootstrap/variables';
-
-// Core Bootstrap functions, variables and mixins
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import 'bootstrap/scss/mixins/breakpoints';
-
-// Pattern Library shims
-@import 'edx-pattern-library-shims/base/variables';
-@import 'edx-pattern-library-shims/breadcrumbs';
-@import 'edx-pattern-library-shims/buttons';
 
 // base - elements
 @import 'elements/banners';
@@ -95,3 +83,6 @@
 @import 'developer'; // used for any developer-created scss that needs further polish/refactoring
 @import 'shame';     // used for any bad-form/orphaned scss
 @import 'experiments';     // used for any ab tests and other experiments
+
+// Extra theme-specific rules
+@import 'lms/theme/extras';

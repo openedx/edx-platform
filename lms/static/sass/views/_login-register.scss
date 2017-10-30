@@ -49,7 +49,7 @@
 }
 
 .window-wrap {
-  background: $white;
+  background: $body-bg;
 }
 
 .login-register-content {
@@ -70,7 +70,7 @@
 
     margin-top: $baseline;
     letter-spacing: normal;
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     color: $uxpl-blue-hover-active;
   }
 
@@ -80,7 +80,7 @@
 
     margin: 0;
     letter-spacing: normal;
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     color: $uxpl-gray-dark;
   }
 
@@ -141,7 +141,7 @@
       @include font-size(35);
 
       padding: 0 10px;
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       font-weight: $font-semibold;
       text-align: left;
       margin-bottom: 0;
@@ -153,7 +153,7 @@
       @include font-size(24);
 
       padding: 0 10px;
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       font-weight: $font-regular;
     }
   }
@@ -267,7 +267,7 @@
   %bold-label {
     @include font-size(16);
 
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     font-weight: $font-semibold;
   }
 
@@ -280,7 +280,7 @@
   .action-label {
     @include font-size(13);
 
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
   }
 
   .form-field {
@@ -309,7 +309,7 @@
       height: auto;
       line-height: 1.5em;
       border-radius: 0;
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       font-style: normal;
       font-weight: 500;
     }
@@ -353,11 +353,11 @@
       box-shadow: none;
       text-transform: initial;
       letter-spacing: normal;
-      color: $uxpl-blue-base;
+      color: theme-color("primary");
       font-weight: $font-regular;
       text-decoration: none;
       text-shadow: none;
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
 
       &:hover,
       &:focus {
@@ -619,7 +619,7 @@
     .message-title {
       @extend %t-title5;
 
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       margin: 0 0 ($baseline/4) 0;
       font-weight: 600;
     }
@@ -628,7 +628,7 @@
     .message-copy p {
       @extend %t-copy-base;
 
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       margin: 0 !important;
       padding: 0;
 
@@ -796,7 +796,7 @@
 
       h1#modal-header-text {
         float: left;
-        font-family: $sans-serif;
+        font-family: $font-family-sans-serif;
         font-size: font-size(large);
         font-weight: bold;
         margin-bottom: 0;
@@ -814,7 +814,7 @@
         border-radius: 0;
         box-shadow: none;
         box-sizing: border-box;
-        color: $uxpl-blue-base;
+        color: theme-color("primary");
         float: right;
         font-size: font-size(large);
         height: 48px;

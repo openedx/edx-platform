@@ -294,7 +294,7 @@
           @extend %cont-text-wrap;
 
           a {
-            color: $uxpl-blue-base;
+            color: theme-color("primary");
 
             &:hover {
               color: $orange-d1;

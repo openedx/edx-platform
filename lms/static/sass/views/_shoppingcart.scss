@@ -84,7 +84,6 @@ $light-border: 1px solid $gray-l5;
     .sub-title {
       @extend %t-title5;
 
-      text-transform: uppercase;
       color: $gray-l1;
     }
 
@@ -329,7 +328,6 @@ $light-border: 1px solid $gray-l5;
         @extend %t-title6;
 
         padding: 0;
-        text-transform: uppercase;
         color: $light-gray2;
       }
 
@@ -352,7 +350,6 @@ $light-border: 1px solid $gray-l5;
 
         display: block;
         padding: 0;
-        text-transform: uppercase;
         color: $light-gray2;
       }
 
@@ -409,7 +406,6 @@ $light-border: 1px solid $gray-l5;
 
           padding-top: ($baseline*0.55);
           width: ($baseline*22.5);
-          text-transform: uppercase;
           color: $light-gray2;
 
           .price {
@@ -438,7 +434,6 @@ $light-border: 1px solid $gray-l5;
 
           margin-top: ($baseline*0.15);
           width: ($baseline*17.5);
-          text-transform: uppercase;
           color: $light-gray2;
 
           .numbers-row {
@@ -449,7 +444,6 @@ $light-border: 1px solid $gray-l5;
               @extend %t-strong;
 
               cursor: text;
-              text-transform: uppercase;
               color: $light-gray2;
               font-style: normal;
             }
@@ -1038,7 +1032,6 @@ $light-border: 1px solid $gray-l5;
 
       border-bottom: $hr-border;
       padding: ($baseline*0.4) 0;
-      text-transform: uppercase;
       color: $light-gray2;
       font-weight: normal;
 

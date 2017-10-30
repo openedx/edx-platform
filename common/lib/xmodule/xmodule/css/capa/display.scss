@@ -21,7 +21,7 @@
 
 // +Variables - Capa
 // ====================
-$annotation-yellow: rgba(255,255,10,0.3);
+$annotation-yellow: rgba(255, 255,10, 0.3);
 $color-copy-tip: rgb(100,100,100);
 
 // FontAwesome Icon code
@@ -220,7 +220,7 @@ div.problem {
     width: 100%;
 
     &:after {
-      @include margin-left($baseline*.75);
+      @include margin-left($baseline*0.75);
     }
 
     &:hover {
@@ -329,7 +329,7 @@ div.problem {
 // Summary status indicators shown after the input area
 div.problem {
   .indicator-container {
-    @include margin-left($baseline*.75);
+    @include margin-left($baseline*0.75);
 
     .status {
       width: $baseline;
@@ -1089,15 +1089,15 @@ div.problem {
     line-height: $base-line-height;
 
     &.success {
-      @include notification-by-type($success-color);
+      @include notification-by-type($success);
     }
 
     &.error {
-      @include notification-by-type($error-color);
+      @include notification-by-type($danger);
     }
 
     &.warning {
-      @include notification-by-type($warning-color);
+      @include notification-by-type($warning);
     }
 
     &.general {
@@ -1263,7 +1263,6 @@ div.problem {
         @extend %t-strong;
 
         color: #aaa;
-        text-transform: uppercase;
         font-style: normal;
         font-size: 0.9em;
       }
@@ -1563,7 +1562,6 @@ div.problem {
 
         display: block;
         content: "debug input value";
-        text-transform: uppercase;
         font-size: 1.5em;
       }
     }
@@ -1606,7 +1604,7 @@ div.problem {
 
     label.choicetextgroup_show_correct, section.choicetextgroup_show_correct {
       &:after {
-        @include margin-left($baseline*.75);
+        @include margin-left($baseline*0.75);
 
         content: url('#{$static-path}/images/correct-icon.png');
       }

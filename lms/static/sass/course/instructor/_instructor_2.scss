@@ -40,7 +40,7 @@
 
   .file-download-link a {
     font-size: 15px;
-    color: $uxpl-blue-base;
+    color: theme-color("primary");
     text-decoration: underline;
     padding: ($baseline/4);
   }
@@ -187,7 +187,7 @@
       overflow: hidden;
 
       .browse {
-        @include button(simple, $uxpl-blue-base);
+        @include button(simple, $primary);
         @include margin-left(268px);
 
         border-radius: 0 3px 3px 0;
@@ -263,7 +263,7 @@
     @extend .top-header;
 
     display: inline-block;
-    margin-bottom: ($baseline*.75);
+    margin-bottom: ($baseline*0.75);
     padding-bottom: 0;
     border-bottom: 0;
   }
@@ -355,7 +355,7 @@
     }
 
     .message-copy {
-      color: $base-font-color;
+      color: $body-color;
     }
   }
 
@@ -369,7 +369,7 @@
     }
 
     .message-copy {
-      color: $base-font-color;
+      color: $body-color;
     }
   }
 
@@ -791,7 +791,7 @@
         // .add-field
 
         input[type="button"].add {
-          @include idashbutton($uxpl-blue-base);
+          @include idashbutton($primary);
 
           position: absolute;
 
@@ -878,7 +878,7 @@
   }
 
   .form-submit {
-    @include idashbutton($uxpl-blue-base);
+    @include idashbutton($primary);
     @include font-size(14);
     @include line-height(14);
 
@@ -902,7 +902,7 @@
     }
 
     .action-create {
-      @include idashbutton($uxpl-blue-base);
+      @include idashbutton($primary);
 
       @extend %t-weight4;
 
@@ -928,7 +928,7 @@
 
     // specific message actions
     .message .action-create {
-      @include idashbutton($uxpl-blue-base);
+      @include idashbutton($primary);
     }
   }
 
@@ -1095,7 +1095,7 @@
     box-shadow: none;
     text-shadow: none;
     padding: 0;
-    color: $uxpl-blue-base;
+    color: theme-color("primary");
 
     &:hover,
     &:focus {
@@ -1127,7 +1127,7 @@
     }
 
     .action-submit {
-      @include idashbutton($uxpl-blue-base);
+      @include idashbutton($primary);
       // needed to override very poor specificity and base rules for blue button
       @include font-size(14);
 
@@ -1271,7 +1271,7 @@
         border-radius: 0;
         border: 0;
         box-shadow: none;
-        color: $uxpl-blue-base;
+        color: theme-color("primary");
         // These transitions null out previously/globally set transitions
         -webkit-transition: none;
         -moz-transition: none;
@@ -1346,7 +1346,7 @@
 
   // cohort management
   .form-submit {
-    @include idashbutton($uxpl-blue-base);
+    @include idashbutton($primary);
     @include font-size(14);
     @include line-height(14);
 
@@ -1391,7 +1391,7 @@
     }
 
     .divided-discussion-text {
-      color: $uxpl-blue-base;
+      color: theme-color("primary");
     }
 
     .discussions-wrapper {
@@ -1542,7 +1542,7 @@
       right: 0;
       bottom: 0;
       left: 0;
-      background-color: rgba(255,255,255, .75);
+      background-color: rgba(255, 255, 255, .75);
 
       .metrics-overlay-content-wrapper {
         position: relative;
@@ -1689,7 +1689,7 @@ input[name="subject"] {
     line-height: 30px;
 
     .add {
-      @include button(simple, $uxpl-blue-base);
+      @include button(simple, $primary);
 
       @extend .button-reset;
 
@@ -1735,7 +1735,7 @@ input[name="subject"] {
     color:#b72667;
     text-align: center;
     padding: ($baseline/2) 0;
-    font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+    font-family: $font-family-sans-serif;
     font-size: 15px;
     border-bottom: 1px solid #b72667;
     margin-bottom: $baseline;
@@ -1744,10 +1744,10 @@ input[name="subject"] {
 
   .success-msgs {
     background: #d0f5d5;
-    color:#008801;
+    color: #008801;
     text-align: center;
     padding: ($baseline/2) 0;
-    font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+    font-family: $font-family-sans-serif;
     font-size: 15px;
     border-bottom: 1px solid #008801;
     margin-bottom: $baseline;
@@ -1935,7 +1935,7 @@ input[name="subject"] {
 
     input[type="button"]#update_coupon_button, input[type="button"]#add_coupon_button,
     input[type="button"]#set_course_button, input[type="button"]#lookup_regcode {
-      @include button(simple, $uxpl-blue-base);
+      @include button(simple, $primary);
 
       @extend .button-reset;
 
@@ -1947,7 +1947,7 @@ input[name="subject"] {
     }
 
     input[name="generate-registration-codes-csv"]{
-      @include button(simple, $uxpl-blue-base);
+      @include button(simple, $primary);
 
       @extend .button-reset;
     }
@@ -2135,7 +2135,7 @@ input[name="subject"] {
         h2 {
           font-size: 24px;
           font-weight: 100;
-          color: $uxpl-blue-base;
+          color: theme-color("primary");
 
           @include text-align(left);
         }
@@ -2292,7 +2292,7 @@ input[name="subject"] {
     line-height: 30px;
 
     .add {
-      @include button(simple, $uxpl-blue-base);
+      @include button(simple, $primary);
 
       @extend .button-reset;
 
@@ -2320,7 +2320,7 @@ input[name="subject"] {
     line-height: 30px;
 
     .add {
-      @include button(simple, $uxpl-blue-base);
+      @include button(simple, $primary);
 
       @extend .button-reset;
 
@@ -2352,7 +2352,7 @@ input[name="subject"] {
     line-height: 30px;
 
     .add {
-      @include button(simple, $uxpl-blue-base);
+      @include button(simple, $primary);
 
       @extend .button-reset;
 
@@ -2581,8 +2581,8 @@ input[name="subject"] {
       &:focus {
         z-index: 2;
         color: #fff;
-        background-color: $uxpl-blue-base;
-        border-color: $uxpl-blue-base;
+        background-color: theme-color("primary");
+        border-color: theme-color("primary");
         cursor: default;
       }
     }
@@ -2798,7 +2798,7 @@ input[name="subject"] {
         border: none;
         background: transparent;
         box-shadow: none;
-        color: $uxpl-blue-base;
+        color: theme-color("primary");
         font-weight: bold;
       }
     }

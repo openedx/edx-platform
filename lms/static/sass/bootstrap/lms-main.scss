@@ -2,16 +2,11 @@
 // LMS main styles for Bootstrap
 // -----------------------------
 
-// Bootstrap theme
-@import 'bootstrap/theme';
-@import 'bootstrap/scss/bootstrap';
+// Set the relative path to the static root
+$static-path: '../..';
 
-// Legacy support
-@import 'legacy';
-
-// Base
-@import 'base';
-@import 'variables';
+// Base build
+@import 'build';
 
 // Elements
 @import 'header';
@@ -35,3 +30,6 @@
 
 // Responsive Design
 @import '../header';
+
+// Extra theme-specific rules
+@import 'lms/theme/extras';

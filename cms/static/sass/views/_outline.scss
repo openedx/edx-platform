@@ -637,7 +637,7 @@
   // outline: highlight settings
   .highlights-button {
     cursor: pointer;
-    color: $uxpl-blue-base;
+    color: theme-color("primary");
   }
 
   .highlight-input-text {

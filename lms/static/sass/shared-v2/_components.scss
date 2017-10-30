@@ -22,7 +22,7 @@
     }
 
     &.prominent + li {
-      @include border-left(1px solid $lms-border-color);
+      @include border-left(1px solid $border-color);
       @include padding-left($baseline*0.75);
     }
 
@@ -36,13 +36,13 @@
       border-style: solid;
       border-width: 0 0 4px;
       border-bottom-color: transparent;
-      color: $lms-inactive-color;
+      color: $gray-700;
       font-size: 14px;
 
       &:hover,
       &:focus {
-        color: $lms-active-color;
-        border-bottom-color: $lms-active-color;
+        color: theme-color("primary");
+        border-bottom-color: theme-color("primary");
       }
 
       &.active {
@@ -84,20 +84,20 @@
 
     position: absolute;
     top: 0;
-    color: $lms-gray;
+    color: $gray;
     padding: $baseline/4;
 
     // STATE: hover and focus
     &:hover,
     &:focus {
-      color: $lms-label-color;
+      color: $body-color;
       border-width: 0;
     }
   }
 }
 
 .page-banner {
-  max-width: $lms-max-width;
+  max-width: map-get($container-max-widths, xl);
   margin: 0 auto;
 
   .alert {
@@ -156,7 +156,7 @@
   }
 
   .preview-menu {
-    max-width: $lms-max-width;
+    max-width: map-get($container-max-widths, xl);
     width: auto;
     margin: 0 auto;
   }

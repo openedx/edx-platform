@@ -36,7 +36,7 @@
     @include border-top-right-radius(3px);
     @include border-bottom-right-radius(3px);
 
-    background: $uxpl-blue-base;
+    background: theme-color("primary");
     padding: 0 10px;
     height: 35px;
     color: $white;
@@ -126,7 +126,7 @@
     .search-results-ellipsis {
       @extend %t-copy-sub2;
 
-      color: $gray;
+      color: theme-color("dark");
 
       &::after {
         content: '\2026';
@@ -139,10 +139,8 @@
     border: 2px solid $link-color;
     padding: 1rem;
     border-radius: 3px;
-    color: $base-font-color;
-    text-transform: uppercase;
+    color: $body-color;
   }
-
 }
 
 .courseware-search-bar {
@@ -157,17 +155,16 @@
   label {
     @extend %t-regular;
 
-    font-family: $sans-serif;
-    color: $gray;
+    font-family: $font-family-sans-serif;
+    color: theme-color("dark");
     font-size: 13px;
     font-style: normal;
-    text-transform: uppercase;
   }
 
   .search-field {
     background: $white;
     box-shadow: 0 1px 0 0 $white, inset 0 0 3px 0 $shadow-l2;
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     font-style: normal;
   }
 }

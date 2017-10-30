@@ -154,7 +154,7 @@ nav {
 
         &:hover,
         &:active {
-          color: $uxpl-blue-base;
+          color: theme-color("primary");
         }
       }
     }

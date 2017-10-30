@@ -30,7 +30,7 @@
     }
 
     a {
-      color: $uxpl-blue-base;
+      color: theme-color("primary");
 
       &:hover,
       &:active {

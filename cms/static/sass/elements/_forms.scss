@@ -455,7 +455,7 @@ input.search {
   border-radius: 20px;
   background: url('#{$static-path}/images/search-icon.png') no-repeat 8px 7px #edf1f5;
   font-family: 'Open Sans', sans-serif;
-  color: $baseFontColor;
+  color: $body-color;
   outline: 0;
 
   &::-webkit-input-placeholder {

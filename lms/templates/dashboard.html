@@ -137,7 +137,7 @@ from openedx.core.djangolib.markup import HTML, Text
               <p>${_("You are not enrolled in any courses yet.")}</p>
 
               % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-                <a href="${marketing_link('COURSES')}">
+                <a class="btn btn-primary" href="${marketing_link('COURSES')}">
                   ${_("Explore courses")}
                 </a>
 
