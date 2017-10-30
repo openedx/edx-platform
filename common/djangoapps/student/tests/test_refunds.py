@@ -193,7 +193,7 @@ class RefundableTest(SharedModuleStoreTestCase):
             ))
 
         self.client.login(username=self.user.username, password=self.USER_PASSWORD)
-        resp = self.client.post(reverse('student.views.dashboard', args=[]))
+        resp = self.client.post(reverse('dashboard', args=[]))
         self.assertEqual(resp.status_code, 200)
 
     @ddt.data(HttpServerError, HttpClientError, SlumberBaseException)
@@ -207,5 +207,5 @@ class RefundableTest(SharedModuleStoreTestCase):
 
         self.client.login(username=self.user.username, password=self.USER_PASSWORD)
         with mock_order_endpoint(order_number=self.ORDER_NUMBER, exception=exception, reset_on_exit=False):
-            response = self.client.post(reverse('student.views.dashboard', args=[]))
+            response = self.client.post(reverse('dashboard', args=[]))
             self.assertEqual(response.status_code, 200)
