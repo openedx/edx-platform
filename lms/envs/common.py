@@ -406,6 +406,9 @@ FEATURES = {
 
     # Whether course goals is enabled.
     'ENABLE_COURSE_GOALS': True,
+
+    # Set to enable Enterprise integration
+    'ENABLE_ENTERPRISE_INTEGRATION': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -507,6 +510,7 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 
 OAUTH2_PROVIDER = {
     'OAUTH2_VALIDATOR_CLASS': 'openedx.core.djangoapps.oauth_dispatch.dot_overrides.EdxOAuth2Validator',
+    'REFRESH_TOKEN_EXPIRE_SECONDS': 20160,
     'SCOPES': {
         'read': 'Read scope',
         'write': 'Write scope',
@@ -1797,6 +1801,7 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
     }
 }
+WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
 
 ########################## DJANGO DEBUG TOOLBAR ###############################
 
@@ -2087,15 +2092,14 @@ INSTALLED_APPS = [
 
     # For testing
     'django.contrib.admin',  # only used in DEBUG mode
-    'django_nose',
     'debug',
-    'django_extensions',
+    'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Discussion forums
     'django_comment_client',
     'django_comment_common',
     'discussion_api',
-    'lms.djangoapps.discussion',
+    'lms.djangoapps.discussion.apps.DiscussionConfig',
 
     # Notes
     'notes',
@@ -2125,11 +2129,14 @@ INSTALLED_APPS = [
     # Enrollment API
     'enrollment',
 
+    # Entitlement API
+    'entitlements',
+
     # Bulk Enrollment API
     'bulk_enroll',
 
     # Student Identity Verification
-    'lms.djangoapps.verify_student',
+    'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
 
     # Dark-launching languages
     'openedx.core.djangoapps.dark_lang',
@@ -2330,12 +2337,14 @@ SOCIAL_SHARING_SETTINGS = {
     # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in cms/envs/common.py
     'CUSTOM_COURSE_URLS': False,
     'DASHBOARD_FACEBOOK': False,
+    'FACEBOOK_BRAND': None,
     'CERTIFICATE_FACEBOOK': False,
     'CERTIFICATE_FACEBOOK_TEXT': None,
     'CERTIFICATE_TWITTER': False,
     'CERTIFICATE_TWITTER_TEXT': None,
     'DASHBOARD_TWITTER': False,
-    'DASHBOARD_TWITTER_TEXT': None
+    'DASHBOARD_TWITTER_TEXT': None,
+    'TWITTER_BRAND': None
 }
 
 ################# Social Media Footer Links #######################
@@ -3265,6 +3274,8 @@ HELP_TOKENS_BOOKS = {
 # However, for all intents and purposes this service is treated as a standalone IDA.
 # These configuration settings are specific to the Enterprise service and you should
 # not find references to them within the edx-platform project.
+#
+# Only used if FEATURES['ENABLE_ENTERPRISE_INTEGRATION'] == True.
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + LMS_ENROLLMENT_API_PATH
 ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENTERPRISE_ENROLLMENT_API_URL

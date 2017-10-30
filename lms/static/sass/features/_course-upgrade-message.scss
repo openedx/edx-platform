@@ -25,8 +25,9 @@
   // Message copy
   .vc-title {
     font-size: 1.25rem;
-    font-weight: 700;
+    font-weight: $font-weight-light;
     margin-bottom: 1rem;
+    width: calc(100% - 70px);
   }
 
   .vc-selling-points {
@@ -55,11 +56,32 @@
     }
   }
 
+  // Upgrade button
+  .btn-upgrade {
+    color: theme-color("inverse");
+    background-color: theme-color("purchase");
+    font-size: $font-size-base;
+    -webkit-transition: $btn-transition;
+    transition: $btn-transition;
+
+    &:hover {
+      background-color: theme-color("success");
+    }
+  }
+
   // Show/hide button
   .vc-toggle {
-    @include float(right);
+    @include right($baseline/2);
 
+    top: $baseline/2;
+    position: absolute;
     color: theme-color("inverse");
+
+    &:hover {
+      cursor: pointer;
+      text-decoration: none;
+      color: theme-color("light");
+    }
   }
 
   // Cert image
@@ -80,29 +102,46 @@
 
 // Collapsed upgrade message
 .vc-message.polite {
+  @include padding($baseline/2, 0, $baseline/2, $baseline);
   padding-top: $baseline/2;
   padding-bottom: $baseline/2;
   min-height: 46px;
   display: flex;
-  flex-flow: row wrap;
   align-items: center;
 
   .vc-title {
-    margin: 0;
-
     @include margin-right(auto);
+
+    margin: 0;
+    flex-grow: 1;
   }
 
   .vc-cta {
-    @include margin-right(1rem);
+    flex-grow: 1;
   }
 
   .vc-toggle {
+    @include right(0);
+
+    margin: 0 $baseline/2;
     order: 99;
+    position: relative;
+    white-space: nowrap;
+    width: $baseline*6;
+    top: 0;
   }
 
   .vc-fade:not(.vc-polite-only) {
     display: none;
+  }
+
+  @include media-breakpoint-down(sm) {
+    flex-flow: row wrap;
+
+    .vc-title {
+      width: auto;
+      margin-bottom: $baseline/2;
+    }
   }
 }
 

@@ -67,9 +67,9 @@ $annotatable--body-font-size: em(14);
   $highlight_index: 0;
 
   @each $highlight in (
-    (yellow rgba(255,255,10,0.3) rgba(255,255,10,0.9)),
+    (yellow rgba(255, 255,10, 0.3) rgba(255, 255,10, 0.9)),
     (red rgba(178,19,16,0.3) rgba(178,19,16,0.9)),
-    (orange rgba(255,165,0,0.3) rgba(255,165,0,0.9)),
+    (orange rgba(255,165,0, 0.3) rgba(255,165,0, 0.9)),
     (green rgba(25,255,132,0.3) rgba(25,255,132,0.9)),
     (blue rgba(35,163,255,0.3) rgba(35,163,255,0.9)),
     (purple rgba(115,9,178,0.3) rgba(115,9,178,0.9))) {
@@ -110,7 +110,7 @@ $annotatable--body-font-size: em(14);
   font-size: $annotatable--body-font-size;
   border: 1px solid #333;
   border-radius: 1em;
-  background-color: rgba(0,0,0,0.85);
+  background-color: rgba(0, 0, 0, 0.85);
   color: $white;
   -webkit-font-smoothing: antialiased;
 

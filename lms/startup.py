@@ -32,12 +32,11 @@ log = logging.getLogger(__name__)
 def run():
     """
     Executed during django startup
+
+    NOTE: DO **NOT** add additional code to this method or this file! The Platform Team
+          is moving all startup code to more standard locations using Django best practices.
     """
     django_db_models_options.patch()
-
-    # To override the settings before executing the autostartup() for python-social-auth
-    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
-        enable_third_party_auth()
 
     # Comprehensive theming needs to be set up before django startup,
     # because modifying django template paths after startup has no effect.
@@ -114,14 +113,3 @@ def enable_microsites():
     Here for backwards compatibility
     """
     microsite.enable_microsites(log)
-
-
-def enable_third_party_auth():
-    """
-    Enable the use of third_party_auth, which allows users to sign in to edX
-    using other identity providers. For configuration details, see
-    common/djangoapps/third_party_auth/settings.py.
-    """
-
-    from third_party_auth import settings as auth_settings
-    auth_settings.apply_settings(settings)

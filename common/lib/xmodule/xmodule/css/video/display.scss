@@ -128,7 +128,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
         left: -9999em;
         display: inline-block;
         vertical-align: middle;
-        color: $base-font-color;
+        color: $body-color;
       }
 
       .brand-logo {
@@ -151,7 +151,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
     &:hover {
       .btn-play {
-        color: $uxpl-blue-base;
+        color: theme-color("primary");
       }
 
       .btn-play:after {
@@ -564,7 +564,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
             .label {
               @include padding(0 ($baseline/3) 0 0);
 
-              font-family: $body-font-family;
+              font-family: $font-family-sans-serif;
               color: rgb(231, 236, 238); // UXPL grayscale-cool x-light
 
               @media (max-width: 1120px) {

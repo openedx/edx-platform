@@ -72,7 +72,7 @@
 .payment-buttons {
   .purchase {
     float: left;
-    padding: ($baseline*.5) 0;
+    padding: ($baseline*0.5) 0;
 
     .product-info, .product-name, .price {
       @extend %t-ultrastrong;
@@ -106,7 +106,6 @@
     .left-floater {
       @include float(left);
 
-      text-transform: uppercase;
       font-weight: $font-semibold;
       color: $white;
       line-height: $body-line-height;

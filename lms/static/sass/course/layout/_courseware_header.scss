@@ -97,15 +97,15 @@
       @include background-image(linear-gradient(-90deg, lighten($link-color, 8%), lighten($link-color, 5%) 50%, $link-color 50%, darken($link-color, 10%) 100%));
 
       border: 1px solid transparent;
-      border-color: $uxpl-blue-base;
+      border-color: theme-color("primary");
       border-radius: 3px;
 
       @include box-sizing(border-box);
 
-      box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
+      box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
       color: $white;
       display: inline-block;
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       font-size: 14px;
       font-weight: bold;
       display: inline-block;
@@ -119,7 +119,7 @@
       vertical-align: middle;
 
       &:hover, &:active, &:focus {
-        @include background-image(linear-gradient(-90deg, $uxpl-blue-base, $uxpl-blue-base 50%, $uxpl-blue-base 50%, $uxpl-blue-base 100%));
+        @include background-image(linear-gradient(-90deg, $primary, $primary 50%, $primary 50%, $primary 100%));
       }
     }
   }

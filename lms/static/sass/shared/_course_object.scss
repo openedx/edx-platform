@@ -23,7 +23,7 @@
 
       @include box-sizing(border-box);
 
-      box-shadow: 0 1px 10px 0 rgba(0, 0,0, 0.15), inset 0 0 0 1px rgba(255,255,255, 0.9);
+      box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.9);
       margin-bottom: ($baseline*1.5);
       position: relative;
       width: 100%;
@@ -40,7 +40,6 @@
         padding: 2px ($baseline/2);
         border-radius: 2px;
         position: absolute;
-        text-transform: uppercase;
         top: -6px;
       }
 
@@ -68,11 +67,11 @@
       .meta-info {
         background: $dark-trans-bg;
         bottom: 6px;
-        border: 1px solid rgba(0, 0,0, 0.5);
+        border: 1px solid rgba(0, 0, 0, 0.5);
 
         @include border-right-radius(2px);
 
-        box-shadow: 0 1px 5px 0 rgba(0, 0,0, 0.15);
+        box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.15);
 
         @include clearfix();
 
@@ -82,7 +81,7 @@
         @include transition(all 0.15s linear 0s);
 
         p {
-          color: rgb(255,255,255);
+          color: rgb(255, 255, 255);
           font-style: italic;
           line-height: 1.2em;
           padding: 4px 12px 5px;
@@ -105,15 +104,15 @@
         z-index: 3;
 
         // > a {
-        @include background-image(linear-gradient(-90deg, rgba(255,255,255, 1), rgba(255,255,255, 0.85)));
+        @include background-image(linear-gradient(-90deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.85)));
 
-        box-shadow: inset 0 -1px 0 0 rgba(255,255,255, 0.2);
+        box-shadow: inset 0 -1px 0 0 rgba(255, 255, 255, 0.2);
         border-bottom: 1px solid rgba(150,150,150, 0.7);
         display: block;
         height: 50px;
 
         &:hover, &:focus {
-          @include background-image(linear-gradient(-90deg, rgba(255,255,255, 1), rgba(255,255,255, 0.8)));
+          @include background-image(linear-gradient(-90deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8)));
 
           text-decoration: none;
 
@@ -135,16 +134,16 @@
           top: 0;
 
           h2 {
-            color: $base-font-color;
+            color: $body-color;
             display: table-cell;
-            font-family: $sans-serif;
+            font-family: $font-family-sans-serif;
             font-size: 0.8em;
             font-weight: 700;
             height: 48px;
             letter-spacing: 0;
             margin-bottom: 0;
             padding-top: 0;
-            text-shadow: 0 1px rgba(255,255,255, 0.6);
+            text-shadow: 0 1px rgba(255, 255, 255, 0.6);
             text-overflow: ellipsis;
             text-transform: none;
             vertical-align: middle;
@@ -161,16 +160,16 @@
 
           @include box-sizing(border-box);
 
-          color: $base-font-color;
+          color: $body-color;
           display: inline-block;
-          font: bold 1.6em/1.2em $sans-serif;
+          font: bold 1.6em/1.2em $font-family-sans-serif;
           height: 100%;
           opacity: 0.6;
           padding-top: ($baseline/2);
           position: absolute;
           right: 0;
           text-align: center;
-          text-shadow: 0 1px rgba(255,255,255, 0.6);
+          text-shadow: 0 1px rgba(255, 255, 255, 0.6);
           top: 0;
           width: 60px;
           vertical-align: middle;
@@ -180,7 +179,7 @@
       // }
 
       .info {
-        background: $content-wrapper-bg;
+        background: $body-bg;
         height: 220px + 130px;
         left: 0;
         position: absolute;
@@ -213,7 +212,7 @@
           width: 100%;
 
           section {
-            color: $base-font-color;
+            color: $body-color;
             font: normal 1em/1.6em $serif;
             margin: 0;
             height: 100%;

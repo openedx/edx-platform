@@ -200,6 +200,22 @@ if (is_proctored_exam) {
                 </p>
               </div>
             <% } %>
+            <% if (xblockInfo.get('highlights_enabled') && course.get('self_paced') && xblockInfo.isChapter()) { %>
+              <div class="block-highlights">
+                    <span class="sr block-highlights-label"><%- gettext('Highlights:') %></span>
+                    <% var number_of_highlights = (xblockInfo.get('highlights') || []).length; %>
+                    <% if (number_of_highlights > 0) { %>
+                        <span class="block-highlights-value highlights-button action-button">
+                            <%- edx.StringUtils.interpolate(
+                                gettext('Section Highlights: {number_of_highlights} entered'),
+                                {number_of_highlights: number_of_highlights}
+                            ) %>
+                        </span>
+                    <% } else { %>
+                        <span class="block-highlights-value highlights-button action-button"><%- gettext('Enter Section Highlights') %></span>
+                    <% } %>
+              </div>
+            <% } %>
             <% if (xblockInfo.get('is_time_limited')) { %>
                 <div class="status-timed-proctored-exam">
                     <p>

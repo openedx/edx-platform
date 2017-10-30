@@ -14,7 +14,7 @@
 
     a,
     a:visited {
-      color: $uxpl-blue-base;
+      color: theme-color("primary");
     }
 
     a:hover {
@@ -26,7 +26,7 @@
     @include margin-left($baseline/4);
 
     display: inline-block;
-    color: $base-font-color;
+    color: $body-color;
 
     @include rtl {
       @include transform(rotateY(180deg));

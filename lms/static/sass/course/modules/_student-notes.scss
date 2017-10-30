@@ -46,7 +46,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 }
 
 %notes-reset-font {
-  font-family: $f-sans-serif !important;
+  font-family: $font-family-sans-serif !important;
   font-style: normal !important;
   font-weight: $font-regular !important;
 }
@@ -216,7 +216,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
       border: none !important;
       border-radius: 0 !important;
       background: $gray-l5 !important;
-      font-family: $f-sans-serif !important;
+      font-family: $font-family-sans-serif !important;
 
       // actions
       .annotator-save, .annotator-cancel {
@@ -225,7 +225,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
         padding: ($baseline/4) ($baseline/2) !important;
         border: none;
         box-shadow: none;
-        font-family: $f-sans-serif !important;
+        font-family: $font-family-sans-serif !important;
         font-size: 14px !important;
         text-shadow: none !important;
 

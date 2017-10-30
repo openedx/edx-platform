@@ -69,9 +69,9 @@
 %btn-primary-blue {
   @extend %ui-btn-primary;
 
-  background: $uxpl-blue-base;
-  border-color: $uxpl-blue-base;
-  color: $white;
+  background: theme-color("primary");
+  border-color: theme-color("primary");
+  color: theme-color("inverse");
 
   &:hover,
   &:active {
@@ -98,7 +98,7 @@
 
   background: $uxpl-green-base;
   border-color: $uxpl-green-base;
-  color: $white;
+  color: theme-color("inverse");
 
   &:hover,
   &:active {
@@ -109,7 +109,7 @@
   &.current,
   &.active {
     background: $uxpl-green-dark-hover-active;
-    color: $white;
+    color: theme-color("inverse");
     border-color: $uxpl-green-dark-hover-active;
 
     &:hover,
@@ -151,7 +151,7 @@
   @extend %ui-btn-secondary;
 
   border-color: $blue-l3;
-  color: $uxpl-blue-base;
+  color: theme-color("primary");
 
   &:hover,
   &:active {
@@ -163,7 +163,7 @@
   &.active {
     border-color: $blue-l3;
     background: $blue-l3;
-    color: $uxpl-blue-base;
+    color: theme-color("primary");
   }
 }
 
@@ -335,7 +335,7 @@
       color: $gray-d1;
 
       &:hover {
-        background-color: $uxpl-blue-base;
+        background-color: theme-color("primary");
         color: $gray-l6;
       }
 
@@ -410,7 +410,7 @@
   vertical-align: top;
 
   &:hover {
-    color: $uxpl-blue-base;
+    color: theme-color("primary");
   }
 
   .ui-toggle-expansion {
@@ -453,7 +453,7 @@
     &:active {
       @extend %ui-fake-link;
 
-      color: $uxpl-blue-base;
+      color: theme-color("primary");
     }
   }
 

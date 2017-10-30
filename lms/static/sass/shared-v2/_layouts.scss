@@ -1,20 +1,22 @@
 // LMS layouts
 
 .content-wrapper {
-  max-width: $lms-max-width;
+  max-width: map-get($container-max-widths, xl);
   padding-bottom: $baseline*2;
 
   .page-content-container {
     @include clearfix();
 
-    border: 1px solid $lms-border-color;
-    background-color: $lms-container-background-color;
+    border: 1px solid $border-color;
+    background-color: $body-bg;
+    max-width: map-get($container-max-widths, xl);
+    margin: 0 auto;
   }
 
   .page-header {
     @include clearfix();
 
-    border-bottom: 1px solid $lms-border-color;
+    border-bottom: 1px solid $border-color;
     padding: $baseline;
 
     .page-title {

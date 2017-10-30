@@ -21,7 +21,7 @@
     margin: 0 auto;
     padding: 10px 10px 0;
     width: 100%;
-    max-width: $lms-max-width;
+    max-width: map-get($container-max-widths, xl);
 
     .left {
       @include float(left);
@@ -44,7 +44,7 @@
       @include float(left);
       @include margin(12px, 10px, 0, 10px);
 
-      color: $lms-label-color;
+      color: $body-color;
 
       .provider {
         font-weight: bold;
@@ -73,10 +73,9 @@
         @include margin(0, 0, 0, $baseline/2);
 
         .btn {
-          text-transform: uppercase;
           border: none;
           padding: 0;
-          color: $lms-active-color;
+          color: theme-color("primary");
           background: transparent;
 
           &:hover {
@@ -116,7 +115,7 @@
         &:active,
         &:focus,
         &:hover {
-          border-bottom: 4px solid $lms-border-color;
+          border-bottom: 4px solid $border-color;
         }
       }
 
@@ -157,9 +156,9 @@
 
   font-size: 14px;
   font-weight: bold;
-  color: $base-font-color;
+  color: $body-color;
 
   &:visited {
-    color: $base-font-color;
+    color: $body-color;
   }
 }

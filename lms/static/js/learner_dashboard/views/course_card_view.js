@@ -38,6 +38,9 @@
                          this.enrollModel.urlRoot = this.urlModel.get('commerce_api_url');
                      }
                      this.context = options.context || {};
+                     this.grade = this.context.courseData.grades[this.model.get('course_run_key')];
+                     this.grade = this.grade * 100;
+                     this.collectionCourseStatus = this.context.collectionCourseStatus || '';
                      this.render();
                      this.listenTo(this.model, 'change', this.render);
                  },
@@ -59,6 +62,8 @@
                      this.enrollView = new CourseEnrollView({
                          $parentEl: this.$('.course-actions'),
                          model: this.model,
+                         grade: this.grade,
+                         collectionCourseStatus: this.collectionCourseStatus,
                          urlModel: this.urlModel,
                          enrollModel: this.enrollModel
                      });

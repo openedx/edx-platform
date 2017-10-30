@@ -2,10 +2,10 @@
 
 .content-wrapper {
   margin-top: $baseline;
-  padding-bottom: $baseline*2;
+  padding-bottom: $baseline/2;
 
   .course-tabs {
-    padding: 0;
+    padding: 0 $baseline*2;
     font-size: $font-size-sm;
 
     .nav-item {
@@ -42,24 +42,35 @@
   display: flex;
   flex-wrap: wrap;
   border-bottom: 1px solid $border-color;
-  padding: 20px;
+  padding: $baseline $baseline*2;
 
   .page-header-search {
-    @include media-breakpoint-up(md) {
-      margin-right: $baseline;
-    }
+    @include margin-right($baseline);
+
+    flex-grow: 1;
 
     .search-form {
       display: flex;
     }
   }
 
+  .form-actions {
+    @include media-breakpoint-down(xs) {
+      margin-top: $baseline/2;
+    }
+  }
+
   .page-header-main {
     flex-grow: 1;  // This column should consume all the available space
+
+    .page-title {
+      margin-top: $baseline*0.4;
+    }
   }
 
   .page-header-secondary {
     display: flex;
+    flex-wrap: wrap;
 
     @include media-breakpoint-up(md) {
       margin-left: $baseline;
@@ -74,10 +85,12 @@
 .page-content-container {
   border: 1px solid $border-color;
   background-color: $body-bg;
+  max-width: map-get($container-max-widths, xl);
+  margin: 0 auto;
 }
 
 .page-content {
-  padding: $baseline;
+  padding: $baseline*2;
 
   @include media-breakpoint-up(md) {
     display: flex;

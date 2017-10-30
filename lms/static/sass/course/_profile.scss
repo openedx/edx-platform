@@ -75,7 +75,6 @@
           font-size: 12px;
           position: absolute;
           right: lh(0.5);
-          text-transform: uppercase;
           top: 9px;
 
           &:hover,
@@ -107,7 +106,6 @@
           padding: 0;
           position: absolute;
           right: lh(0.5);
-          text-transform: uppercase;
           top: 9px;
 
           &:hover,
@@ -128,7 +126,6 @@
         font-size: $body-font-size;
         font-weight: bold;
         margin-top: 0;
-        text-transform: uppercase;
       }
     }
   }
@@ -166,7 +163,7 @@
         @include box-sizing(border-box);
 
         border-radius: 3px;
-        font: normal 15px/1.6rem $sans-serif;
+        font: normal 15px/1.6rem $font-family-sans-serif;
         letter-spacing: 0;
         padding: 5px 18px 6px;
         text-align: center;
@@ -250,7 +247,7 @@
               .fa-check {
                 @extend %t-icon6;
 
-                color: $success-color;
+                color: theme-color("success");
               }
 
               > .not-achieve {

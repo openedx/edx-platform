@@ -133,13 +133,13 @@
             text-transform: uppercase;
 
             &:hover {
-              background-color: $white;
-              color: $uxpl-blue-base;
+              background-color: theme-color("inverse");
+              color: theme-color("primary");
             }
 
             &.active {
-              border-bottom: 4px solid $uxpl-blue-base;
-              color: $uxpl-blue-base;
+              border-bottom: 4px solid theme-color("primary");
+              color: theme-color("primary");
             }
           }
         }

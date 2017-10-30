@@ -1,5 +1,5 @@
 div.book-wrapper {
-  max-width: 1150px;
+  max-width: map-get($container-max-widths, xl);
   margin: 0 auto;
   width: 100%;
 
@@ -59,7 +59,7 @@ div.book-wrapper {
           @include clearfix();
 
           padding: 0;
-          color: $uxpl-blue-base;
+          color: theme-color("primary");
 
           &:hover, &:focus {
             background-color: transparent;

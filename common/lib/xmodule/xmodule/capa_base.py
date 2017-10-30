@@ -906,7 +906,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         elif self.showanswer == SHOWANSWER.ANSWERED:
             # NOTE: this is slightly different from 'attempted' -- resetting the problems
             # makes lcp.done False, but leaves attempts unchanged.
-            return self.lcp.done
+            return self.is_correct()
         elif self.showanswer == SHOWANSWER.CLOSED:
             return self.closed()
         elif self.showanswer == SHOWANSWER.FINISHED:

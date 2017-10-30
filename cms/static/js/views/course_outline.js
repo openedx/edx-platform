@@ -197,6 +197,19 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                 }
             },
 
+            highlightsXBlock: function() {
+                var modal = CourseOutlineModalsFactory.getModal('highlights', this.model, {
+                    onSave: this.refresh.bind(this),
+                    xblockType: XBlockViewUtils.getXBlockType(
+                        this.model.get('category'), this.parentView.model, true
+                    )
+                });
+
+                if (modal) {
+                    modal.show();
+                }
+            },
+
             addButtonActions: function(element) {
                 XBlockOutlineView.prototype.addButtonActions.apply(this, arguments);
                 element.find('.configure-button').click(function(event) {
@@ -206,6 +219,10 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                 element.find('.publish-button').click(function(event) {
                     event.preventDefault();
                     this.publishXBlock();
+                }.bind(this));
+                element.find('.highlights-button').click(function(event) {
+                    event.preventDefault();
+                    this.highlightsXBlock();
                 }.bind(this));
             },
 

@@ -136,7 +136,7 @@ def get_currency_data():
         api = create_catalog_api_client(user)
         cache_key = '{base}.currency'.format(base=catalog_integration.CACHE_KEY)
 
-        return get_edx_api_data(catalog_integration, 'currency', api=api,
+        return get_edx_api_data(catalog_integration, 'currency', api=api, traverse_pagination=False,
                                 cache_key=cache_key if catalog_integration.is_cache_enabled else None)
     else:
         return []

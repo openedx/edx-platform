@@ -6,6 +6,7 @@ import json
 import logging
 import random
 import string  # pylint: disable=deprecated-module
+import time
 
 import django.utils
 import six
@@ -467,7 +468,9 @@ def _accessible_courses_list_from_groups(request):
     course_keys = course_keys.values()
 
     if course_keys:
+        start_time = time.time()
         courses_list = modulestore().get_course_summaries(course_keys=course_keys)
+        log.info('[%d] Course summaries fetched in [%f]', len(courses_list), (time.time() - start_time))
 
     return courses_list, []
 
@@ -498,7 +501,9 @@ def course_listing(request):
         WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
 
     org = request.GET.get('org', '') if optimization_enabled else None
+    start_time = time.time()
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
+    log.info('get_courses_accessible_to_user completed in [%f]', (time.time() - start_time))
     user = request.user
     libraries = _accessible_libraries_iter(request.user, org) if LIBRARIES_ENABLED else []
 
@@ -665,7 +670,9 @@ def get_courses_accessible_to_user(request, org=None):
         courses, in_process_course_actions = _accessible_courses_summary_iter(request, org)
     else:
         try:
+            start_time = time.time()
             courses, in_process_course_actions = _accessible_courses_list_from_groups(request)
+            log.info('_accessible_courses_list_from_groups completed in [%f]', (time.time() - start_time))
         except AccessListFallback:
             # user have some old groups or there was some error getting courses from django groups
             # so fallback to iterating through all courses

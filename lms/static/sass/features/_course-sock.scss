@@ -2,7 +2,7 @@
   display: inline-block;
   position: relative;
   width: 100%;
-  max-width: $lms-max-width;
+  max-width: map-get($container-max-widths, xl);
   margin: $baseline auto 0;
   -webkit-transition: all 0.4s ease-out;
   -moz-transition: all 0.4s ease-out;
@@ -24,27 +24,13 @@
     box-shadow: none;
     -webkit-transition: background-color 0.5s;
     transition: background-color 0.5s;
+    cursor: pointer;
 
-    &.active {
+    &.active,
+    &:hover {
       color: theme-color("success");
       background-color: theme-color("inverse");
       border-color: theme-color("success");
-      background-image: none;
-      box-shadow: none;
-
-      &:hover {
-        color: theme-color("inverse");
-        background-color: $success-color-hover;
-        border-color: $success-color-hover;
-        background-image: none;
-        box-shadow: none;
-      }
-    }
-
-    &:hover {
-      color: theme-color("inverse");
-      background-color: $success-color-hover;
-      border-color: $success-color-hover;
       background-image: none;
       box-shadow: none;
     }
@@ -53,7 +39,7 @@
   .verification-main-panel {
     display: none;
     overflow: hidden;
-    border-top: 1px solid $lms-border-color;
+    border-top: 1px solid $border-color;
     padding: ($baseline * 5/2) ($baseline * 2);
     -webkit-transition: height ease-out;
     transition: height ease-out;
@@ -113,6 +99,7 @@
         right: $baseline;
         background-color: theme-color("success");
         border-color: theme-color("success");
+        color: theme-color("inverse");
         background-image: none;
         box-shadow: none;
 
@@ -171,7 +158,7 @@
 
     .verification-main-panel {
       border-top: 0;
-      border-bottom: 1px solid $lms-border-color;
+      border-bottom: 1px solid $border-color;
     }
   }
 }

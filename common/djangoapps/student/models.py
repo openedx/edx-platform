@@ -13,6 +13,7 @@ file and check it in at the same time as your model changes. To do that,
 import hashlib
 import json
 import logging
+import six
 import uuid
 from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, timedelta
@@ -50,7 +51,11 @@ import request_cache
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, REFUND_ORDER, ENROLLMENT_TRACK_UPDATED
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
-from courseware.models import DynamicUpgradeDeadlineConfiguration, CourseDynamicUpgradeDeadlineConfiguration
+from courseware.models import (
+    CourseDynamicUpgradeDeadlineConfiguration,
+    DynamicUpgradeDeadlineConfiguration,
+    OrgDynamicUpgradeDeadlineConfiguration
+)
 from enrollment.api import _default_course_mode
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -1529,7 +1534,7 @@ class CourseEnrollment(models.Model):
 
         if not status_hash:
             enrollments = cls.enrollments_for_user(user).values_list('course_id', 'mode')
-            enrollments = [(e[0].lower(), e[1].lower()) for e in enrollments]
+            enrollments = [(six.text_type(e[0]).lower(), e[1].lower()) for e in enrollments]
             enrollments = sorted(enrollments, key=lambda e: e[0])
             hash_elements = [user.username]
             hash_elements += ['{course_id}={mode}'.format(course_id=e[0], mode=e[1]) for e in enrollments]
@@ -1740,7 +1745,12 @@ class CourseEnrollment(models.Model):
             return None
 
         course_config = CourseDynamicUpgradeDeadlineConfiguration.current(self.course_id)
-        if course_config.enabled and course_config.opt_out:
+        if course_config.opted_out():
+            # Course-level config should be checked first since it overrides the org-level config
+            return None
+
+        org_config = OrgDynamicUpgradeDeadlineConfiguration.current(self.course_id.org)
+        if org_config.opted_out() and not course_config.opted_in():
             return None
 
         try:

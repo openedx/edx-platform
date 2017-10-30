@@ -264,7 +264,7 @@ FEATURES = {
 
     # Whether archived courses (courses with end dates in the past) should be
     # shown in Studio in a separate list.
-    'ENABLE_SEPARATE_ARCHIVED_COURSES': True
+    'ENABLE_SEPARATE_ARCHIVED_COURSES': True,
 }
 
 ENABLE_JASMINE = False
@@ -814,6 +814,7 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
     }
 }
+WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
 
 ################################# CELERY ######################################
 
@@ -923,9 +924,6 @@ INSTALLED_APPS = [
     # Monitor the status of services
     'openedx.core.djangoapps.service_status',
 
-    # Testing
-    'django_nose',
-
     # Bookmarks
     'openedx.core.djangoapps.bookmarks',
 
@@ -944,7 +942,7 @@ INSTALLED_APPS = [
 
     # Maintenance tools
     'maintenance',
-    'django_extensions',
+    'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Tracking
     'track',
@@ -1038,7 +1036,7 @@ INSTALLED_APPS = [
     # These are apps that aren't strictly needed by Studio, but are imported by
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
-    'lms.djangoapps.verify_student',
+    'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
 
     # Microsite configuration application
     'microsite_configuration',

@@ -58,7 +58,7 @@
   }
 
   // reset: typography
-  font-family: $sans-serif;
+  font-family: $font-family-sans-serif;
 
   // reset: typography - heading
   h1,
@@ -80,7 +80,7 @@
   input,
   select,
   textarea {
-    font-family: $f-sans-serif;
+    font-family: $font-family-sans-serif;
     color: $m-gray-d1;
   }
 
@@ -121,7 +121,7 @@
   label {
     @extend %t-weight4;
 
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     font-style: normal;
     color: $m-gray-d4;
   }
@@ -182,7 +182,7 @@
 
   // elements: layout
   .content-wrapper {
-    background: $m-gray-l4;
+    background: $body-bg;
     padding-bottom: 0;
   }
 
@@ -568,7 +568,7 @@
   }
 
   .progress {
-    width: flex-grid(12,12);
+    width: flex-grid(12, 12);
     margin: 0 auto;
     border-bottom: ($baseline/4) solid $m-gray-l4;
 
@@ -590,7 +590,9 @@
       padding: $baseline $baseline ($baseline*1.5) $baseline;
       text-align: center;
 
-      .wrapper-step-number, .step-number, .step-name {
+      .wrapper-step-number,
+      .step-number,
+      .step-name {
         display: block;
       }
 
@@ -807,7 +809,7 @@
             .icon {
               @extend %t-icon4;
 
-              padding: ($baseline*.25) ($baseline*.5);
+              padding: ($baseline*0.25) ($baseline*0.5);
               display: block;
             }
           }
@@ -1220,7 +1222,7 @@
   .deco-divider {
     position: relative;
     display: block;
-    margin: $baseline 0 ($baseline*2) 0;
+    margin: $baseline 0 ($baseline*2);
     border-top: ($baseline/5) solid $m-gray-l4;
 
     .copy {
@@ -1406,7 +1408,7 @@
   &.step-select-track {
     .container {
       min-width: 0;
-      max-width: 1200px;
+      max-width: map-get($container-max-widths, xl);
     }
 
     .sts-track {
@@ -1424,7 +1426,8 @@
       }
     }
 
-    .register-choice, .help-register {
+    .register-choice,
+    .help-register {
       @include float(left);
     }
 
@@ -1646,7 +1649,8 @@
           }
         }
 
-        .contribution-option-other1 label, .contribution-option-other2 label {
+        .contribution-option-other1 label,
+        .contribution-option-other2 label {
           @extend %text-sr;
         }
       }
@@ -1791,7 +1795,8 @@
             color: $white;
           }
 
-          .fa-stack-1x, .fa-stack-2x {
+          .fa-stack-1x,
+          .fa-stack-2x {
             position: relative;
           }
 
@@ -2063,17 +2068,15 @@
           @extend %t-copy-sub1;
         }
       }
-
-      .step-proceed {
-
-      }
     }
 
     // progress nav
     .progress .progress-step {
 
       // STATE: is completed
-      &#progress-step0, &#progress-step1, &#progress-step2 {
+      &#progress-step0,
+      &#progress-step1,
+      &#progress-step2 {
         border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
         .wrapper-step-number {
@@ -2144,7 +2147,8 @@
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
@@ -2198,23 +2202,6 @@
         .action-dashboard {
           @extend %btn-primary-blue;
         }
-      }
-    }
-
-    // information - verification
-    .verification-info {
-
-    }
-
-    // information - payment
-    .payment-info {
-
-    }
-
-    // UI: table/report
-    .wrapper-report {
-      .report {
-
       }
     }
 
@@ -2326,7 +2313,8 @@
         border-color: $verified-color-lvl3;
       }
 
-      .step-number, .step-name {
+      .step-number,
+      .step-name {
         color: $m-gray-l3;
       }
     }
@@ -2420,7 +2408,8 @@
           border-color: $verified-color-lvl3;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-l3;
         }
       }

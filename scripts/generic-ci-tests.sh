@@ -68,7 +68,12 @@ function emptyxunit {
 END
 
 }
-PAVER_ARGS="-v"
+
+if [[ $DJANGO_VERSION == '1.11' ]]; then
+    PAVER_ARGS="-v --django_version=1.11"
+else
+    PAVER_ARGS="-v"
+fi
 PARALLEL="--processes=-1"
 export SUBSET_JOB=$JOB_NAME
 case "$TEST_SUITE" in

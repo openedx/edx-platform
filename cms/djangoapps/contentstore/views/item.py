@@ -47,6 +47,7 @@ from contentstore.views.helpers import (
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
+from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import request_token, wrap_xblock
 from static_replace import replace_static_urls
@@ -1182,6 +1183,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             xblock_info.update({
                 'hide_after_due': xblock.hide_after_due,
             })
+        elif xblock.category == 'chapter':
+            xblock_info.update({
+                'highlights': xblock.highlights,
+                'highlights_enabled': highlights_setting().is_enabled(),
+            })
 
         # update xblock_info with special exam information if the feature flag is enabled
         if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
@@ -1240,6 +1246,12 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info['user_partition_info'] = get_visibility_partition_info(xblock, course=course)
 
     return xblock_info
+
+
+def highlights_setting():
+    namespace = u'dynamic_pacing'
+    switch = u'studio_course_update'
+    return WaffleSwitch(namespace, switch)
 
 
 def add_container_page_publishing_info(xblock, xblock_info):  # pylint: disable=invalid-name

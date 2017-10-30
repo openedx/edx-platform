@@ -161,7 +161,7 @@ $seq-nav-height: 44px;
           margin-top: ($baseline/5);
           background: $seq-nav-tooltip-color;
           color: $white;
-          font-family: $sans-serif;
+          font-family: $font-family-sans-serif;
           line-height: lh();
           right: 0;  // Should not be RTLed, tooltips do not move in RTL
           padding: 6px;

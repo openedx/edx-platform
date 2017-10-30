@@ -4,8 +4,8 @@
 }
 
 h1 {
-  color: $baseFontColor;
-  font: normal 2em/1.4em $sans-serif;
+  color: $body-color;
+  font: normal 2em/1.4em $font-family-sans-serif;
   letter-spacing: 1px;
 
   @include margin(0, 0, 1.416em, 0);
@@ -13,7 +13,7 @@ h1 {
 
 h2 {
   color: #646464;
-  font: normal 1.2em/1.2em $sans-serif;
+  font: normal 1.2em/1.2em $font-family-sans-serif;
   letter-spacing: 1px;
   margin-bottom: ($baseline*0.75);
   -webkit-font-smoothing: antialiased;
@@ -45,7 +45,7 @@ p {
   margin-bottom: 1.416em;
   font-size: 1em;
   line-height: 1.6em !important;
-  color: $baseFontColor;
+  color: $body-color;
 }
 
 em, i {
@@ -77,7 +77,7 @@ ol, ul {
   @include bi-app-compact(padding, 0, 0, 0, 1em);
 
   margin: 1em 0;
-  color: $baseFontColor;
+  color: $body-color;
 
   li {
     margin-bottom: 0.708em;
@@ -104,7 +104,7 @@ img {
 
 pre {
   margin: 1em 0;
-  color: $baseFontColor;
+  color: $body-color;
   font-family: monospace, serif;
   font-size: 1em;
   white-space: pre-wrap;
@@ -112,7 +112,7 @@ pre {
 }
 
 code {
-  color: $baseFontColor;
+  color: $body-color;
   font-family: monospace, serif;
   background: none;
   padding: 0;

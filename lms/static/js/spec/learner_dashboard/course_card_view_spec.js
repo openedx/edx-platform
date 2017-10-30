@@ -13,14 +13,27 @@ define([
             startDate = 'Feb 28, 2017',
             endDate = 'May 30, 2017',
 
-            setupView = function(data, isEnrolled) {
-                var programData = $.extend({}, data);
+            setupView = function(data, isEnrolled, collectionCourseStatus) {
+                var programData = $.extend({}, data),
+                    context = {
+                        courseData: {
+                            grades: {
+                                'course-v1:WageningenX+FFESx+1T2017': 0.8
+                            }
+                        },
+                        collectionCourseStatus: collectionCourseStatus
+                    };
+
+                if (typeof collectionCourseStatus === 'undefined') {
+                    context.collectionCourseStatus = 'completed';
+                }
 
                 programData.course_runs[0].is_enrolled = isEnrolled;
                 setFixtures('<div class="program-course-card"></div>');
                 courseCardModel = new CourseCardModel(programData);
                 view = new CourseCardView({
-                    model: courseCardModel
+                    model: courseCardModel,
+                    context: context
                 });
             },
 
@@ -82,6 +95,18 @@ define([
             view.remove();
             setupView(course, true);
             validateCourseInfoDisplay();
+        });
+
+        it('should render final grade if course is completed', function() {
+            view.remove();
+            setupView(course, true);
+            expect(view.$('.grade-display').text()).toEqual('80%');
+        });
+
+        it('should not render final grade if course has not been completed', function() {
+            view.remove();
+            setupView(course, true, 'in_progress');
+            expect(view.$('.final-grade').length).toEqual(0);
         });
 
         it('should render the course card based on the data not enrolled', function() {
