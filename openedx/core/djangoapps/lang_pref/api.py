@@ -51,7 +51,7 @@ def released_languages():
     """
     released_language_codes = DarkLangConfig.current().released_languages_list
     default_language_code = settings.LANGUAGE_CODE
-    
+
     site_languages = configuration_helpers.get_value('LANGUAGE_LIST', None)
 
     if site_languages is not None:
