@@ -23,15 +23,20 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
-SITE_QUERY = 1
-ORG_DEADLINE_QUERY = 1
-SCHEDULES_QUERY = 1
-COURSE_MODES_QUERY = 1
-GLOBAL_DEADLINE_SWITCH_QUERY = 1
-COMMERCE_CONFIG_QUERY = 1
-NUM_QUERIES_NO_ORG_LIST = 1
+SITE_QUERY = 2  # django_site, site_configuration_siteconfiguration
 
-NUM_QUERIES_NO_MATCHING_SCHEDULES = SITE_QUERY + SCHEDULES_QUERY
+SCHEDULES_QUERY = 1  # schedules_schedule
+COURSE_MODES_QUERY = 1  # course_modes_coursemode
+
+GLOBAL_DEADLINE_QUERY = 1  # courseware_dynamicupgradedeadlineconfiguration
+ORG_DEADLINE_QUERY = 1  # courseware_orgdynamicupgradedeadlineconfiguration
+COURSE_DEADLINE_QUERY = 1  # courseware_coursedynamicupgradedeadlineconfiguration
+COMMERCE_CONFIG_QUERY = 1  # commerce_commerceconfiguration
+
+NUM_QUERIES_NO_MATCHING_SCHEDULES = (
+    SITE_QUERY +
+    SCHEDULES_QUERY
+)
 
 NUM_QUERIES_WITH_MATCHES = (
     NUM_QUERIES_NO_MATCHING_SCHEDULES +
@@ -40,8 +45,9 @@ NUM_QUERIES_WITH_MATCHES = (
 
 NUM_QUERIES_FIRST_MATCH = (
     NUM_QUERIES_WITH_MATCHES
-    + GLOBAL_DEADLINE_SWITCH_QUERY
+    + GLOBAL_DEADLINE_QUERY
     + ORG_DEADLINE_QUERY
+    + COURSE_DEADLINE_QUERY
     + COMMERCE_CONFIG_QUERY
 )
 
@@ -56,7 +62,8 @@ class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
 
     ENABLED_CACHES = ['default']
 
-    has_course_queries = False
+    queries_deadline_for_each_course = False
+    consolidates_emails_for_learner = False
 
     def setUp(self):
         super(ScheduleSendEmailTestBase, self).setUp()
@@ -68,13 +75,17 @@ class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
 
     def _calculate_bin_for_user(self, user):
-        return user.id % self.tested_task.num_bins
+        return user.id % self.task.num_bins
 
     def _get_dates(self, offset=None):
         current_day = _get_datetime_beginning_of_day(datetime.datetime.now(pytz.UTC))
         offset = offset or self.expected_offsets[0]
         target_day = current_day + datetime.timedelta(days=offset)
-        return current_day, offset, target_day
+        if self.resolver.schedule_date_field == 'upgrade_deadline':
+            upgrade_deadline = target_day
+        else:
+            upgrade_deadline = current_day + datetime.timedelta(days=7)
+        return current_day, offset, target_day, upgrade_deadline
 
     def _get_template_overrides(self):
         templates_override = deepcopy(settings.TEMPLATES)
@@ -82,12 +93,12 @@ class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
         return templates_override
 
     def test_command_task_binding(self):
-        self.assertEqual(self.tested_command.async_send_task, self.tested_task)
+        self.assertEqual(self.command.async_send_task, self.task)
 
     def test_handle(self):
-        with patch.object(self.tested_command, 'async_send_task') as mock_send:
+        with patch.object(self.command, 'async_send_task') as mock_send:
             test_day = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-            self.tested_command().handle(date='2017-08-01', site_domain_name=self.site_config.site.domain)
+            self.command().handle(date='2017-08-01', site_domain_name=self.site_config.site.domain)
 
             for offset in self.expected_offsets:
                 mock_send.enqueue.assert_any_call(
@@ -99,15 +110,15 @@ class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
 
     @patch.object(tasks, 'ace')
     def test_resolver_send(self, mock_ace):
-        current_day, offset, target_day = self._get_dates()
-        with patch.object(self.tested_task, 'apply_async') as mock_apply_async:
-            self.tested_task.enqueue(self.site_config.site, current_day, offset)
+        current_day, offset, target_day, _ = self._get_dates()
+        with patch.object(self.task, 'apply_async') as mock_apply_async:
+            self.task.enqueue(self.site_config.site, current_day, offset)
         mock_apply_async.assert_any_call(
             (self.site_config.site.id, serialize(target_day), offset, 0, None),
             retry=False,
         )
         mock_apply_async.assert_any_call(
-            (self.site_config.site.id, serialize(target_day), offset, self.tested_task.num_bins - 1, None),
+            (self.site_config.site.id, serialize(target_day), offset, self.task.num_bins - 1, None),
             retry=False,
         )
         self.assertFalse(mock_ace.send.called)
@@ -116,22 +127,21 @@ class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
     @patch.object(tasks, 'ace')
     @patch.object(resolvers, 'set_custom_metric')
     def test_schedule_bin(self, schedule_count, mock_metric, mock_ace):
-        with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
-            current_day, offset, target_day = self._get_dates()
+        with patch.object(self.task, 'async_send_task') as mock_schedule_send:
+            current_day, offset, target_day, upgrade_deadline = self._get_dates()
             schedules = [
                 ScheduleFactory.create(
                     start=target_day,
-                    upgrade_deadline=target_day,
+                    upgrade_deadline=upgrade_deadline,
                     enrollment__course__self_paced=True,
                 ) for _ in range(schedule_count)
             ]
 
             bins_in_use = frozenset((self._calculate_bin_for_user(s.enrollment.user)) for s in schedules)
             is_first_match = True
-            course_queries = len(set(s.enrollment.course.id for s in schedules)) if self.has_course_queries else 0
             target_day_str = serialize(target_day)
 
-            for b in range(self.tested_task.num_bins):
+            for b in range(self.task.num_bins):
                 LOG.debug('Running bin %d', b)
                 expected_queries = NUM_QUERIES_NO_MATCHING_SCHEDULES
                 if b in bins_in_use:
@@ -139,16 +149,14 @@ class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
                         expected_queries = (
                             # Since this is the first match, we need to cache all of the config models, so we run a
                             # query for each of those...
-                            NUM_QUERIES_FIRST_MATCH + course_queries
+                            NUM_QUERIES_FIRST_MATCH
                         )
                         is_first_match = False
                     else:
                         expected_queries = NUM_QUERIES_WITH_MATCHES
 
-                expected_queries += NUM_QUERIES_NO_ORG_LIST
-
                 with self.assertNumQueries(expected_queries, table_blacklist=WAFFLE_TABLES):
-                    self.tested_task.apply(kwargs=dict(
+                    self.task.apply(kwargs=dict(
                         site_id=self.site_config.site.id, target_day_str=target_day_str, day_offset=offset, bin_num=b,
                     ))
 
@@ -162,18 +170,18 @@ class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
             self.assertFalse(mock_ace.send.called)
 
     def test_no_course_overview(self):
-        current_day, offset, target_day = self._get_dates()
+        current_day, offset, target_day, upgrade_deadline = self._get_dates()
         schedule = ScheduleFactory.create(
             start=target_day,
-            upgrade_deadline=target_day,
+            upgrade_deadline=upgrade_deadline,
             enrollment__course__self_paced=True,
         )
         schedule.enrollment.course_id = CourseKey.from_string('edX/toy/Not_2012_Fall')
         schedule.enrollment.save()
 
-        with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
-            for b in range(self.tested_task.num_bins):
-                self.tested_task.apply(kwargs=dict(
+        with patch.object(self.task, 'async_send_task') as mock_schedule_send:
+            for b in range(self.task.num_bins):
+                self.task.apply(kwargs=dict(
                     site_id=self.site_config.site.id,
                     target_day_str=serialize(target_day),
                     day_offset=offset,
@@ -214,8 +222,8 @@ class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
         ScheduleConfigFactory.create(**schedule_config_kwargs)
 
         current_datetime = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
-        with patch.object(self.tested_task, 'apply_async') as mock_apply_async:
-            self.tested_task.enqueue(self.site_config.site, current_datetime, 3)
+        with patch.object(self.task, 'apply_async') as mock_apply_async:
+            self.task.enqueue(self.site_config.site, current_datetime, 3)
 
         if is_enabled:
             self.assertTrue(mock_apply_async.called)
@@ -237,34 +245,34 @@ class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
         for config in (this_config, other_config):
             ScheduleConfigFactory.create(site=config.site)
 
-        user1 = UserFactory.create(id=self.tested_task.num_bins)
-        user2 = UserFactory.create(id=self.tested_task.num_bins * 2)
-        current_day, offset, target_day = self._get_dates()
+        user1 = UserFactory.create(id=self.task.num_bins)
+        user2 = UserFactory.create(id=self.task.num_bins * 2)
+        current_day, offset, target_day, upgrade_deadline = self._get_dates()
 
         ScheduleFactory.create(
-            upgrade_deadline=target_day,
+            upgrade_deadline=upgrade_deadline,
             start=target_day,
             enrollment__course__org=filtered_org,
             enrollment__course__self_paced=True,
             enrollment__user=user1,
         )
         ScheduleFactory.create(
-            upgrade_deadline=target_day,
+            upgrade_deadline=upgrade_deadline,
             start=target_day,
             enrollment__course__org=unfiltered_org,
             enrollment__course__self_paced=True,
             enrollment__user=user1,
         )
         ScheduleFactory.create(
-            upgrade_deadline=target_day,
+            upgrade_deadline=upgrade_deadline,
             start=target_day,
             enrollment__course__org=unfiltered_org,
             enrollment__course__self_paced=True,
             enrollment__user=user2,
         )
 
-        with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
-            self.tested_task.apply(kwargs=dict(
+        with patch.object(self.task, 'async_send_task') as mock_schedule_send:
+            self.task.apply(kwargs=dict(
                 site_id=this_config.site.id, target_day_str=serialize(target_day), day_offset=offset, bin_num=0
             ))
 
@@ -273,12 +281,12 @@ class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
 
     @ddt.data(True, False)
     def test_course_end(self, has_course_ended):
-        user1 = UserFactory.create(id=self.tested_task.num_bins)
-        current_day, offset, target_day = self._get_dates()
+        user1 = UserFactory.create(id=self.task.num_bins)
+        current_day, offset, target_day, upgrade_deadline = self._get_dates()
 
         schedule = ScheduleFactory.create(
             start=target_day,
-            upgrade_deadline=target_day,
+            upgrade_deadline=upgrade_deadline,
             enrollment__course__self_paced=True,
             enrollment__user=user1,
         )
@@ -288,8 +296,8 @@ class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
         schedule.enrollment.course.end = current_day + datetime.timedelta(days=end_date_offset)
         schedule.enrollment.course.save()
 
-        with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
-            self.tested_task.apply(kwargs=dict(
+        with patch.object(self.task, 'async_send_task') as mock_schedule_send:
+            self.task.apply(kwargs=dict(
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset, bin_num=0,
             ))
 
@@ -299,29 +307,31 @@ class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
             self.assertTrue(mock_schedule_send.apply_async.called)
 
     @patch.object(tasks, 'ace')
-    def test_multiple_enrollments(self, mock_ace):
+    def test_multiple_target_schedules(self, mock_ace):
         user = UserFactory.create()
-        current_day, offset, target_day = self._get_dates()
+        current_day, offset, target_day, upgrade_deadline = self._get_dates()
         num_courses = 3
         for course_index in range(num_courses):
             ScheduleFactory.create(
                 start=target_day,
-                upgrade_deadline=target_day,
+                upgrade_deadline=upgrade_deadline,
                 enrollment__course__self_paced=True,
                 enrollment__user=user,
                 enrollment__course__id=CourseKey.from_string('edX/toy/course{}'.format(course_index))
             )
 
-        course_queries = num_courses if self.has_course_queries else 0
-        expected_query_count = NUM_QUERIES_FIRST_MATCH + course_queries + NUM_QUERIES_NO_ORG_LIST
+        additional_course_queries = num_courses - 1 if self.queries_deadline_for_each_course else 0
+        expected_query_count = NUM_QUERIES_FIRST_MATCH + additional_course_queries
         with self.assertNumQueries(expected_query_count, table_blacklist=WAFFLE_TABLES):
-            with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
-                self.tested_task.apply(kwargs=dict(
+            with patch.object(self.task, 'async_send_task') as mock_schedule_send:
+                self.task.apply(kwargs=dict(
                     site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                     bin_num=self._calculate_bin_for_user(user),
                 ))
-            self.assertEqual(mock_schedule_send.apply_async.call_count, 1)
-            self.assertFalse(mock_ace.send.called)
+
+        expected_call_count = 1 if self.consolidates_emails_for_learner else num_courses
+        self.assertEqual(mock_schedule_send.apply_async.call_count, expected_call_count)
+        self.assertFalse(mock_ace.send.called)
 
     @ddt.data(1, 10, 100)
     def test_templates(self, message_count):
@@ -330,13 +340,13 @@ class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
             self.clear_caches()
 
     def _assert_template_for_offset(self, offset, message_count):
-        current_day, offset, target_day = self._get_dates(offset)
+        current_day, offset, target_day, upgrade_deadline = self._get_dates(offset)
 
         user = UserFactory.create()
         for course_index in range(message_count):
             ScheduleFactory.create(
                 start=target_day,
-                upgrade_deadline=target_day,
+                upgrade_deadline=upgrade_deadline,
                 enrollment__course__self_paced=True,
                 enrollment__user=user,
                 enrollment__course__id=CourseKey.from_string('edX/toy/course{}'.format(course_index))
@@ -351,23 +361,23 @@ class ScheduleSendEmailTestBase(SharedModuleStoreTestCase):
 
         sent_messages = []
         with self.settings(TEMPLATES=self._get_template_overrides()):
-            with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
+            with patch.object(self.task, 'async_send_task') as mock_schedule_send:
                 mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args)
 
-                num_expected_queries = NUM_QUERIES_NO_ORG_LIST + NUM_QUERIES_FIRST_MATCH
-                if self.has_course_queries:
-                    num_expected_queries += message_count
+                num_expected_queries = NUM_QUERIES_FIRST_MATCH
+                if self.queries_deadline_for_each_course:
+                    num_expected_queries += (message_count - 1)
 
                 with self.assertNumQueries(num_expected_queries, table_blacklist=WAFFLE_TABLES):
-                    self.tested_task.apply(kwargs=dict(
+                    self.task.apply(kwargs=dict(
                         site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                         bin_num=self._calculate_bin_for_user(user),
                     ))
-            self.assertEqual(len(sent_messages), 1)
+            num_expected_messages = 1 if self.consolidates_emails_for_learner else message_count
+            self.assertEqual(len(sent_messages), num_expected_messages)
 
             with self.assertNumQueries(2):
-                for args in sent_messages:
-                    self.deliver_task(*args)
+                self.deliver_task(*sent_messages[0])
 
             self.assertEqual(mock_channel.deliver.call_count, 1)
             for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:

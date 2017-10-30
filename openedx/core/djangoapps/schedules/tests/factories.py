@@ -25,3 +25,5 @@ class ScheduleConfigFactory(factory.DjangoModelFactory):
     deliver_recurring_nudge = True
     enqueue_upgrade_reminder = True
     deliver_upgrade_reminder = True
+    enqueue_course_update = True
+    deliver_course_update = True

@@ -5,11 +5,11 @@ import ddt
 from django.conf import settings
 from edx_ace import Message
 from edx_ace.utils.date import serialize
-from mock import Mock, patch
+from mock import patch
 from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.models import CourseMode
-from openedx.core.djangoapps.schedules import tasks
+from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_upgrade_reminder as reminder
 from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base import ScheduleSendEmailTestBase
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
@@ -27,28 +27,30 @@ LOG = logging.getLogger(__name__)
 class TestUpgradeReminder(ScheduleSendEmailTestBase):
     __test__ = True
 
-    tested_task = tasks.ScheduleUpgradeReminder
+    resolver = resolvers.UpgradeReminderResolver
+    task = tasks.ScheduleUpgradeReminder
     deliver_task = tasks._upgrade_reminder_schedule_send
-    tested_command = reminder.Command
+    command = reminder.Command
     deliver_config = 'deliver_upgrade_reminder'
     enqueue_config = 'enqueue_upgrade_reminder'
     expected_offsets = (2,)
 
-    has_course_queries = True
+    queries_deadline_for_each_course = True
+    consolidates_emails_for_learner = True
 
     @ddt.data(True, False)
     @patch.object(tasks, 'ace')
     def test_verified_learner(self, is_verified, mock_ace):
-        user = UserFactory.create(id=self.tested_task.num_bins)
-        current_day, offset, target_day = self._get_dates()
+        user = UserFactory.create(id=self.task.num_bins)
+        current_day, offset, target_day, upgrade_deadline = self._get_dates()
         ScheduleFactory.create(
-            upgrade_deadline=target_day,
+            upgrade_deadline=upgrade_deadline,
             enrollment__course__self_paced=True,
             enrollment__user=user,
             enrollment__mode=CourseMode.VERIFIED if is_verified else CourseMode.AUDIT,
         )
 
-        self.tested_task.apply(kwargs=dict(
+        self.task.apply(kwargs=dict(
             site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
             bin_num=self._calculate_bin_for_user(user),
         ))
@@ -56,12 +58,12 @@ class TestUpgradeReminder(ScheduleSendEmailTestBase):
         self.assertEqual(mock_ace.send.called, not is_verified)
 
     def test_filter_out_verified_schedules(self):
-        current_day, offset, target_day = self._get_dates()
+        current_day, offset, target_day, upgrade_deadline = self._get_dates()
 
         user = UserFactory.create()
         schedules = [
             ScheduleFactory.create(
-                upgrade_deadline=target_day,
+                upgrade_deadline=upgrade_deadline,
                 enrollment__user=user,
                 enrollment__course__self_paced=True,
                 enrollment__course__id=CourseLocator('edX', 'toy', 'Course{}'.format(i)),
@@ -71,10 +73,10 @@ class TestUpgradeReminder(ScheduleSendEmailTestBase):
         ]
 
         sent_messages = []
-        with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
+        with patch.object(self.task, 'async_send_task') as mock_schedule_send:
             mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args[1])
 
-            self.tested_task.apply(kwargs=dict(
+            self.task.apply(kwargs=dict(
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                 bin_num=self._calculate_bin_for_user(user),
             ))

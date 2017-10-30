@@ -29,7 +29,7 @@ class ScheduleUpsellTestMixin(object):
     def test_upsell(self, enable_config, testcase):
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=enable_config)
 
-        current_day, offset, target_day = self._get_dates()
+        current_day, offset, target_day, _ = self._get_dates()
         upgrade_deadline = None
         if testcase.set_deadline:
             upgrade_deadline = current_day + datetime.timedelta(days=testcase.deadline_offset)
@@ -41,9 +41,9 @@ class ScheduleUpsellTestMixin(object):
         )
 
         sent_messages = []
-        with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
+        with patch.object(self.task, 'async_send_task') as mock_schedule_send:
             mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args[1])
-            self.tested_task.apply(kwargs=dict(
+            self.task.apply(kwargs=dict(
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                 bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
             ))
