@@ -16,6 +16,7 @@ defined in the environment:
 import yaml
 
 from .common import *
+from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.logsettings import get_logger_config
 from util.config_parse import convert_tokens
 import os
@@ -329,3 +330,7 @@ CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 # Allow extra middleware classes to be added to the app through configuration.
 MIDDLEWARE_CLASSES.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
+
+########################## Derive Any Derived Settings  #######################
+
+derive_settings(__name__)

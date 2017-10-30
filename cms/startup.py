@@ -8,16 +8,15 @@ from django.conf import settings
 import cms.lib.xblock.runtime
 import xmodule.x_module
 from openedx.core.djangoapps.monkey_patch import django_db_models_options
-from openedx.core.djangoapps.theming.core import enable_theming
-from openedx.core.djangoapps.theming.helpers import is_comprehensive_theming_enabled
 from openedx.core.lib.django_startup import autostartup
-from openedx.core.lib.xblock_utils import xblock_local_resource_url
-from openedx.core.release import doc_version
-from startup_configurations.validate_config import validate_cms_config
 
 # Force settings to run so that the python path is modified
 
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
+
+from openedx.core.lib.xblock_utils import xblock_local_resource_url
+from openedx.core.release import doc_version
+from startup_configurations.validate_config import validate_cms_config
 
 
 def run():
@@ -28,11 +27,6 @@ def run():
           is moving all startup code to more standard locations using Django best practices.
     """
     django_db_models_options.patch()
-
-    # Comprehensive theming needs to be set up before django startup,
-    # because modifying django template paths after startup has no effect.
-    if is_comprehensive_theming_enabled():
-        enable_theming()
 
     django.setup()
 

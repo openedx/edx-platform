@@ -5,12 +5,18 @@ import os
 import re
 from logging import getLogger
 
-from django.conf import ImproperlyConfigured, settings
-from django.contrib.staticfiles.storage import staticfiles_storage
+from django.conf import settings
 from path import Path
 
 from microsite_configuration import microsite
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers_dirs import (
+    get_theme_base_dirs_from_settings,
+    get_themes_unchecked,
+    get_theme_dirs,
+    get_project_root_name_from_settings,
+    Theme
+)
 from request_cache.middleware import RequestCache
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
@@ -101,6 +107,23 @@ def get_all_theme_template_dirs():
     return template_paths
 
 
+def get_project_root_name():
+    """
+    Return root name for the current project
+
+    Example:
+        >> get_project_root_name()
+        'lms'
+        # from studio
+        >> get_project_root_name()
+        'cms'
+
+    Returns:
+        (str): component name of platform e.g lms, cms
+    """
+    return get_project_root_name_from_settings(settings.PROJECT_ROOT)
+
+
 def strip_site_theme_templates_path(uri):
     """
     Remove site template theme path from the uri.
@@ -189,6 +212,7 @@ def get_current_theme():
             name=site_theme.theme_dir_name,
             theme_dir_name=site_theme.theme_dir_name,
             themes_base_dir=get_theme_base_dir(site_theme.theme_dir_name),
+            project_root=get_project_root_name()
         )
     except ValueError as error:
         # Log exception message and return None, so that open source theme is used instead
@@ -232,78 +256,64 @@ def get_theme_base_dir(theme_dir_name, suppress_error=False):
         ))
 
 
-def get_project_root_name():
+def theme_exists(theme_name, themes_dir=None):
     """
-    Return root name for the current project
+    Returns True if a theme exists with the specified name.
+    """
+    for theme in get_themes(themes_dir=themes_dir):
+        if theme.theme_dir_name == theme_name:
+            return True
+    return False
+
+
+def get_themes(themes_dir=None):
+    """
+    get a list of all themes known to the system.
+
+    Args:
+        themes_dir (str): (Optional) Path to themes base directory
+    Returns:
+        list of themes known to the system.
+    """
+    if not is_comprehensive_theming_enabled():
+        return []
+    if themes_dir is None:
+        themes_dir = get_theme_base_dirs_unchecked()
+    return get_themes_unchecked(themes_dir, settings.PROJECT_ROOT)
+
+
+def get_theme_base_dirs_unchecked():
+    """
+    Return base directories that contains all the themes.
 
     Example:
-        >> get_project_root_name()
-        'lms'
-        # from studio
-        >> get_project_root_name()
-        'cms'
+        >> get_theme_base_dirs_unchecked()
+        ['/edx/app/ecommerce/ecommerce/themes']
 
     Returns:
-        (str): component name of platform e.g lms, cms
+         (List of Paths): Base theme directory paths
     """
-    root = Path(settings.PROJECT_ROOT)
-    if root.name == "":
-        root = root.parent
-    return root.name
+    theme_dirs = getattr(settings, "COMPREHENSIVE_THEME_DIRS", None)
+
+    return get_theme_base_dirs_from_settings(theme_dirs)
 
 
 def get_theme_base_dirs():
     """
-    Return base directory that contains all the themes.
-
-    Raises:
-        ImproperlyConfigured - exception is raised if
-            1 - COMPREHENSIVE_THEME_DIRS is not a list
-            1 - theme dir path is not a string
-            2 - theme dir path is not an absolute path
-            3 - path specified in COMPREHENSIVE_THEME_DIRS does not exist
+    Return base directories that contains all the themes.
+    Ensures comprehensive theming is enabled.
 
     Example:
         >> get_theme_base_dirs()
         ['/edx/app/ecommerce/ecommerce/themes']
 
     Returns:
-         (Path): Base theme directory path
+         (List of Paths): Base theme directory paths
     """
     # Return an empty list if theming is disabled
     if not is_comprehensive_theming_enabled():
         return []
-
-    theme_base_dirs = []
-
-    # Legacy code for COMPREHENSIVE_THEME_DIR backward compatibility
-    if hasattr(settings, "COMPREHENSIVE_THEME_DIR"):
-        theme_dir = settings.COMPREHENSIVE_THEME_DIR
-
-        if not isinstance(theme_dir, basestring):
-            raise ImproperlyConfigured("COMPREHENSIVE_THEME_DIR must be a string.")
-        if not theme_dir.startswith("/"):
-            raise ImproperlyConfigured("COMPREHENSIVE_THEME_DIR must be an absolute paths to themes dir.")
-        if not os.path.isdir(theme_dir):
-            raise ImproperlyConfigured("COMPREHENSIVE_THEME_DIR must be a valid path.")
-
-        theme_base_dirs.append(Path(theme_dir))
-
-    if hasattr(settings, "COMPREHENSIVE_THEME_DIRS"):
-        theme_dirs = settings.COMPREHENSIVE_THEME_DIRS
-
-        if not isinstance(theme_dirs, list):
-            raise ImproperlyConfigured("COMPREHENSIVE_THEME_DIRS must be a list.")
-        if not all([isinstance(theme_dir, basestring) for theme_dir in theme_dirs]):
-            raise ImproperlyConfigured("COMPREHENSIVE_THEME_DIRS must contain only strings.")
-        if not all([theme_dir.startswith("/") for theme_dir in theme_dirs]):
-            raise ImproperlyConfigured("COMPREHENSIVE_THEME_DIRS must contain only absolute paths to themes dirs.")
-        if not all([os.path.isdir(theme_dir) for theme_dir in theme_dirs]):
-            raise ImproperlyConfigured("COMPREHENSIVE_THEME_DIRS must contain valid paths.")
-
-        theme_base_dirs.extend([Path(theme_dir) for theme_dir in theme_dirs])
-
-    return theme_base_dirs
+    return get_theme_base_dirs_unchecked()
 
 
 def is_comprehensive_theming_enabled():
@@ -326,149 +336,3 @@ def is_comprehensive_theming_enabled():
         return False
 
     return settings.ENABLE_COMPREHENSIVE_THEMING
-
-
-def get_static_file_url(asset):
-    """
-    Returns url of the themed asset if asset is not themed than returns the default asset url.
-
-    Example:
-        >> get_static_file_url('css/lms-main-v1.css')
-        '/static/red-theme/css/lms-main-v1.css'
-
-    Parameters:
-        asset (str): asset's path relative to the static files directory
-
-    Returns:
-        (str): static asset's url
-    """
-    return staticfiles_storage.url(asset)
-
-
-def get_themes(themes_dir=None):
-    """
-    get a list of all themes known to the system.
-
-    Args:
-        themes_dir (str): (Optional) Path to themes base directory
-    Returns:
-        list of themes known to the system.
-    """
-    if not is_comprehensive_theming_enabled():
-        return []
-
-    themes_dirs = [Path(themes_dir)] if themes_dir else get_theme_base_dirs()
-    # pick only directories and discard files in themes directory
-    themes = []
-    for themes_dir in themes_dirs:
-        themes.extend([Theme(name, name, themes_dir) for name in get_theme_dirs(themes_dir)])
-
-    return themes
-
-
-def theme_exists(theme_name, themes_dir=None):
-    """
-    Returns True if a theme exists with the specified name.
-    """
-    for theme in get_themes(themes_dir=themes_dir):
-        if theme.theme_dir_name == theme_name:
-            return True
-    return False
-
-
-def get_theme_dirs(themes_dir=None):
-    """
-    Returns theme dirs in given dirs
-    Args:
-        themes_dir (Path): base dir that contains themes.
-    """
-    return [_dir for _dir in os.listdir(themes_dir) if is_theme_dir(themes_dir / _dir)]
-
-
-def is_theme_dir(_dir):
-    """
-    Returns true if given dir contains theme overrides.
-    A theme dir must have subdirectory 'lms' or 'cms' or both.
-
-    Args:
-        _dir: directory path to check for a theme
-
-    Returns:
-        Returns true if given dir is a theme directory.
-    """
-    theme_sub_directories = {'lms', 'cms'}
-    return bool(os.path.isdir(_dir) and theme_sub_directories.intersection(os.listdir(_dir)))
-
-
-class Theme(object):
-    """
-    class to encapsulate theme related information.
-    """
-    name = ''
-    theme_dir_name = ''
-    themes_base_dir = None
-
-    def __init__(self, name='', theme_dir_name='', themes_base_dir=None):
-        """
-        init method for Theme
-
-        Args:
-            name: name if the theme
-            theme_dir_name: directory name of the theme
-            themes_base_dir: directory path of the folder that contains the theme
-        """
-        self.name = name
-        self.theme_dir_name = theme_dir_name
-        self.themes_base_dir = themes_base_dir
-
-    def __eq__(self, other):
-        """
-        Returns True if given theme is same as the self
-        Args:
-            other: Theme object to compare with self
-
-        Returns:
-            (bool) True if two themes are the same else False
-        """
-        return (self.theme_dir_name, self.path) == (other.theme_dir_name, other.path)
-
-    def __hash__(self):
-        return hash((self.theme_dir_name, self.path))
-
-    def __unicode__(self):
-        return u"<Theme: {name} at '{path}'>".format(name=self.name, path=self.path)
-
-    def __repr__(self):
-        return self.__unicode__()
-
-    @property
-    def path(self):
-        """
-        Get absolute path of the directory that contains current theme's templates, static assets etc.
-
-        Returns:
-            Path: absolute path to current theme's contents
-        """
-        return Path(self.themes_base_dir) / self.theme_dir_name / get_project_root_name()
-
-    @property
-    def template_path(self):
-        """
-        Get absolute path of current theme's template directory.
-
-        Returns:
-            Path: absolute path to current theme's template directory
-        """
-        return Path(self.theme_dir_name) / get_project_root_name() / 'templates'
-
-    @property
-    def template_dirs(self):
-        """
-        Get a list of all template directories for current theme.
-
-        Returns:
-            list: list of all template directories for current theme.
-        """
-        return [
-            self.path / 'templates',
-        ]

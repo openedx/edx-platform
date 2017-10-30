@@ -21,8 +21,6 @@ import xmodule.x_module
 import lms_xblock.runtime
 
 from startup_configurations.validate_config import validate_lms_config
-from openedx.core.djangoapps.theming.core import enable_theming
-from openedx.core.djangoapps.theming.helpers import is_comprehensive_theming_enabled
 
 from microsite_configuration import microsite
 
@@ -37,11 +35,6 @@ def run():
           is moving all startup code to more standard locations using Django best practices.
     """
     django_db_models_options.patch()
-
-    # Comprehensive theming needs to be set up before django startup,
-    # because modifying django template paths after startup has no effect.
-    if is_comprehensive_theming_enabled():
-        enable_theming()
 
     # We currently use 2 template rendering engines, mako and django_templates,
     # and one of them (django templates), requires the directories be added

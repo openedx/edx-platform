@@ -24,6 +24,7 @@ from path import Path as path
 from warnings import filterwarnings, simplefilter
 from uuid import uuid4
 from util.db import NoOpMigrationModules
+from openedx.core.lib.derived import derive_settings
 
 # import settings from LMS for consistent behavior with CMS
 # pylint: disable=unused-import
@@ -360,3 +361,7 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
     ),
     DIRECTORY_PREFIX='video-transcripts/',
 )
+
+########################## Derive Any Derived Settings  #######################
+
+derive_settings(__name__)

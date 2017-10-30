@@ -25,6 +25,7 @@ from uuid import uuid4
 from warnings import filterwarnings, simplefilter
 
 from util.db import NoOpMigrationModules
+from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.tempdir import mkdtemp_clean
 
 # This patch disables the commit_on_success decorator during tests
@@ -506,7 +507,7 @@ MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
 TEST_THEME = COMMON_ROOT / "test" / "test-theme"
 
 # add extra template directory for test-only templates
-MAKO_TEMPLATES['main'].extend([
+MAIN_MAKO_TEMPLATES_BASE.extend([
     COMMON_ROOT / 'test' / 'templates',
     COMMON_ROOT / 'test' / 'test_sites',
     REPO_ROOT / 'openedx' / 'core' / 'djangolib' / 'tests' / 'templates',
@@ -605,3 +606,7 @@ ENTERPRISE_CONSENT_API_URL = 'http://enterprise.example.com/consent/api/v1/'
 ACTIVATION_EMAIL_FROM_ADDRESS = 'test_activate@edx.org'
 
 TEMPLATES[0]['OPTIONS']['debug'] = True
+
+########################## Derive Any Derived Settings  #######################
+
+derive_settings(__name__)
