@@ -106,7 +106,7 @@ $(document).on('keydown', function(e) {
     }
 
     // Enable arrow functionality within the menu.
-    if (e.keyCode === 38 || e.keyCode === 40 && (isDropdownOption || isMobileOption ||
+    if ((e.keyCode === 38 || e.keyCode === 40) && (isDropdownOption || isMobileOption ||
         (isHamburgerMenu && $hamburgerMenu.hasClass('open')) || isToggle && $toggleUserDropdown.hasClass('open'))) {
         isNext = e.keyCode === 40;
         if (isNext && !isHamburgerMenu && !isToggle && isLastItem) {
