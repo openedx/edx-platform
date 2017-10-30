@@ -29,7 +29,7 @@ class ScheduleUpsellTestMixin(object):
     def test_upsell(self, enable_config, testcase):
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=enable_config)
 
-        current_day, offset, target_day = self._get_dates()
+        current_day, offset, target_day, _ = self._get_dates()
         upgrade_deadline = None
         if testcase.set_deadline:
             upgrade_deadline = current_day + datetime.timedelta(days=testcase.deadline_offset)

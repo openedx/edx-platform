@@ -2,7 +2,7 @@ from unittest import skipUnless
 
 from django.conf import settings
 
-from openedx.core.djangoapps.schedules import tasks
+from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_recurring_nudge as nudge
 from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base import ScheduleSendEmailTestBase
 from openedx.core.djangoapps.schedules.management.commands.tests.upsell_base import ScheduleUpsellTestMixin
@@ -18,9 +18,12 @@ class TestSendRecurringNudge(ScheduleUpsellTestMixin, ScheduleSendEmailTestBase)
     __test__ = True
 
     # pylint: disable=protected-access
+    tested_resolver = resolvers.RecurringNudgeResolver
     tested_task = tasks.ScheduleRecurringNudge
     deliver_task = tasks._recurring_nudge_schedule_send
     tested_command = nudge.Command
     deliver_config = 'deliver_recurring_nudge'
     enqueue_config = 'enqueue_recurring_nudge'
     expected_offsets = (-3, -10)
+
+    consolidates_emails_for_learner = True

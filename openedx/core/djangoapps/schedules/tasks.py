@@ -147,7 +147,7 @@ class ScheduleRecurringNudge(ScheduleMessageBaseTask):
     num_bins = resolvers.RECURRING_NUDGE_NUM_BINS
     enqueue_config_var = 'enqueue_recurring_nudge'
     log_prefix = RECURRING_NUDGE_LOG_PREFIX
-    resolver = resolvers.ScheduleStartResolver
+    resolver = resolvers.RecurringNudgeResolver
     async_send_task = _recurring_nudge_schedule_send
 
     def make_message_type(self, day_offset):

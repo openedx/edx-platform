@@ -224,11 +224,11 @@ class InvalidContextError(Exception):
     pass
 
 
-class ScheduleStartResolver(BinnedSchedulesBaseResolver):
+class RecurringNudgeResolver(BinnedSchedulesBaseResolver):
     """
     Send a message to all users whose schedule started at ``self.current_date`` + ``day_offset``.
     """
-    log_prefix = 'Scheduled Nudge'
+    log_prefix = 'Recurring Nudge'
     schedule_date_field = 'start'
     num_bins = RECURRING_NUDGE_NUM_BINS
 

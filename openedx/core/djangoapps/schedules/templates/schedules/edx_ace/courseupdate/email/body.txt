@@ -4,8 +4,11 @@
 Welcome to week {{ week_num }} of our {{ course_name }} course!
 
 Here is what you can look forward to learning this week:
-{{ week_summary }}
-
 {% endblocktrans %}
+
+{% for highlight in week_highlights %}
+  * {{ highlight }}
+{% endfor %}
+
 
 {% include "schedules/edx_ace/common/upsell_cta.txt"%}
