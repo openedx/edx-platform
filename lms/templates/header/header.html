@@ -16,10 +16,6 @@ from branding import api as branding_api
 # app that handles site status messages
 from status.status import get_site_status_msg
 from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
-
-# Waffle flag to enable and disable the responsive header
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-RESPONSIVE_HEADER_ENABLED = WaffleFlag(WaffleFlagNamespace(name='lms'), 'responsive_header_enabled')
 %>
 
 ## Provide a hook for themes to inject branding on top.
@@ -42,79 +38,31 @@ site_status_msg = get_site_status_msg(course_id)
 % if site_status_msg:
   <div class="site-status">
     <div class="inner-wrapper">
-      <span class="icon fa fa-warning"></span>
+      <span class="icon fa fa-warning" aria-hidden="true"></span>
       <p>${site_status_msg}</p>
     </div>
   </div>
 % endif
 </%block>
 
-
-% if RESPONSIVE_HEADER_ENABLED.is_enabled():
-  <header class="global-header ${'slim' if course else ''}">
-    <%include file="navbar-logo-header.html" args="online_help_token=online_help_token"/>
-    <div class="hamburger-menu" role="button" aria-label="Options Menu" aria-hidden="true" aria-expanded="false" aria-controls="mobile-menu" tabindex="0"><span></span><span></span><span></span><span></span></div>
-    % if user.is_authenticated():
-      <%include file="navbar-authenticated.html" args="online_help_token=online_help_token"/>
-    % else:
-      <%include file="navbar-not-authenticated.html" args="online_help_token=online_help_token"/>
-    % endif
-  </header>
-  <div class="mobile-menu" aria-label="More Options" role="menu" id="mobile-menu"></div>
-% elif uses_bootstrap:
-  <header class="navigation-container header-global ${'slim' if course else ''}">
-    <nav class="navbar navbar-expand-lg">
-      <%include file="../navigation/bootstrap/navbar-logo-header.html" args="online_help_token=online_help_token"/>
-      <button class="navbar-toggler navbar-toggler-right mt-2" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      % if user.is_authenticated():
-        <%include file="../navigation/bootstrap/navbar-authenticated.html" args="online_help_token=online_help_token"/>
-      % else:
-        <%include file="navbar-not-authenticated.html" args="online_help_token=online_help_token"/>
-      % endif
-    </nav>
-  </header>
-% else:
-  <header id="global-navigation" class="header-global ${"slim" if course else ""}" >
-    <nav class="wrapper-header" aria-label="${_('Global')}">
-      <%include file="../navigation/navbar-logo-header.html" args="online_help_token=online_help_token"/>
-      % if user.is_authenticated():
-        <%include file="../navigation/navbar-authenticated.html" args="online_help_token=online_help_token"/>
-      % else:
-        <%include file="../navigation/navbar-not-authenticated.html" args="online_help_token=online_help_token"/>
-      % endif
-      % if header_language_selector_is_enabled():
-        <% languages = released_languages() %>
-        % if len(languages) > 1:
-          <ol class="user">
-            <li class="primary">
-              <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">
-                <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                % if user.is_authenticated():
-                  <input title="preference api" type="hidden" class="url-endpoint" value="${reverse('preferences_api', kwargs={'username': user.username})}" data-user-is-authenticated="true">
-                % else:
-                  <input title="session update url" type="hidden" class="url-endpoint" value="${reverse('session_language')}" data-user-is-authenticated="false">
-                % endif
-                <label><span class="sr">${_("Choose Language")}</span>
-                  <select class="input select language-selector" id="settings-language-value" name="language">
-                    % for language in languages:
-                      % if language[0] == LANGUAGE_CODE:
-                        <option value="${language[0]}" selected="selected">${language[1]}</option>
-                      % else:
-                        <option value="${language[0]}" >${language[1]}</option>
-                      % endif
-                    % endfor
-                  </select>
-                </label>
-              </form>
-            </li>
-          </ol>
+<header class="global-header ${'slim' if course else ''}">
+    <div class="main-header">
+        <%include file="navbar-logo-header.html" args="online_help_token=online_help_token"/>
+        <div class="hamburger-menu" role="button" aria-label=${_("Options Menu")} aria-expanded="false" aria-controls="mobile-menu" tabindex="0">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+        </div>
+        % if user.is_authenticated():
+            <%include file="navbar-authenticated.html" args="online_help_token=online_help_token"/>
+        % else:
+            <%include file="navbar-not-authenticated.html" args="online_help_token=online_help_token"/>
         % endif
-      % endif
-    </nav>
-  </header>
-% endif
+    </div>
+    <div class="mobile-menu hidden" aria-label=${_("More Options")} role="menu" id="mobile-menu"></div>
+</header>
+
 % if course:
 <!--[if lte IE 9]>
 <div class="ie-banner" aria-hidden="true">${Text(_('{begin_strong}Warning:{end_strong} Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.')).format(
@@ -129,4 +77,29 @@ site_status_msg = get_site_status_msg(course_id)
 <%include file="../help_modal.html"/>
 % if settings.FEATURES.get('ENABLE_COOKIE_CONSENT', False):
   <%include file="../widgets/cookie-consent.html" />
+% endif
+
+% if header_language_selector_is_enabled():
+    <% languages = released_languages() %>
+    % if len(languages) > 1:
+        <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">
+            <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+            % if user.is_authenticated():
+                <input title="preference api" type="hidden" class="url-endpoint" value="${reverse('preferences_api', kwargs={'username': user.username})}" data-user-is-authenticated="true">
+            % else:
+                <input title="session update url" type="hidden" class="url-endpoint" value="${reverse('session_language')}" data-user-is-authenticated="false">
+            % endif
+            <label><span class="sr">${_("Choose Language")}</span>
+            <select class="input select language-selector" id="settings-language-value" name="language">
+                % for language in languages:
+                    % if language[0] == LANGUAGE_CODE:
+                        <option value="${language[0]}" selected="selected">${language[1]}</option>
+                    % else:
+                        <option value="${language[0]}" >${language[1]}</option>
+                    % endif
+                % endfor
+            </select>
+            </label>
+        </form>
+    % endif
 % endif
