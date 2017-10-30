@@ -19,10 +19,10 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestBase):
     __test__ = True
 
     # pylint: disable=protected-access
-    tested_resolver = resolvers.CourseUpdateResolver
-    tested_task = tasks.ScheduleCourseUpdate
+    resolver = resolvers.CourseUpdateResolver
+    task = tasks.ScheduleCourseUpdate
     deliver_task = tasks._course_update_schedule_send
-    tested_command = nudge.Command
+    command = nudge.Command
     deliver_config = 'deliver_course_update'
     enqueue_config = 'enqueue_course_update'
     expected_offsets = xrange(-7, -77, -7)

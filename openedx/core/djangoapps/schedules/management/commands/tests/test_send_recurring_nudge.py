@@ -18,10 +18,10 @@ class TestSendRecurringNudge(ScheduleUpsellTestMixin, ScheduleSendEmailTestBase)
     __test__ = True
 
     # pylint: disable=protected-access
-    tested_resolver = resolvers.RecurringNudgeResolver
-    tested_task = tasks.ScheduleRecurringNudge
+    resolver = resolvers.RecurringNudgeResolver
+    task = tasks.ScheduleRecurringNudge
     deliver_task = tasks._recurring_nudge_schedule_send
-    tested_command = nudge.Command
+    command = nudge.Command
     deliver_config = 'deliver_recurring_nudge'
     enqueue_config = 'enqueue_recurring_nudge'
     expected_offsets = (-3, -10)

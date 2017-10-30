@@ -27,10 +27,10 @@ LOG = logging.getLogger(__name__)
 class TestUpgradeReminder(ScheduleSendEmailTestBase):
     __test__ = True
 
-    tested_resolver = resolvers.UpgradeReminderResolver
-    tested_task = tasks.ScheduleUpgradeReminder
+    resolver = resolvers.UpgradeReminderResolver
+    task = tasks.ScheduleUpgradeReminder
     deliver_task = tasks._upgrade_reminder_schedule_send
-    tested_command = reminder.Command
+    command = reminder.Command
     deliver_config = 'deliver_upgrade_reminder'
     enqueue_config = 'enqueue_upgrade_reminder'
     expected_offsets = (2,)
@@ -41,7 +41,7 @@ class TestUpgradeReminder(ScheduleSendEmailTestBase):
     @ddt.data(True, False)
     @patch.object(tasks, 'ace')
     def test_verified_learner(self, is_verified, mock_ace):
-        user = UserFactory.create(id=self.tested_task.num_bins)
+        user = UserFactory.create(id=self.task.num_bins)
         current_day, offset, target_day, upgrade_deadline = self._get_dates()
         ScheduleFactory.create(
             upgrade_deadline=upgrade_deadline,
@@ -50,7 +50,7 @@ class TestUpgradeReminder(ScheduleSendEmailTestBase):
             enrollment__mode=CourseMode.VERIFIED if is_verified else CourseMode.AUDIT,
         )
 
-        self.tested_task.apply(kwargs=dict(
+        self.task.apply(kwargs=dict(
             site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
             bin_num=self._calculate_bin_for_user(user),
         ))
@@ -73,10 +73,10 @@ class TestUpgradeReminder(ScheduleSendEmailTestBase):
         ]
 
         sent_messages = []
-        with patch.object(self.tested_task, 'async_send_task') as mock_schedule_send:
+        with patch.object(self.task, 'async_send_task') as mock_schedule_send:
             mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args[1])
 
-            self.tested_task.apply(kwargs=dict(
+            self.task.apply(kwargs=dict(
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                 bin_num=self._calculate_bin_for_user(user),
             ))
