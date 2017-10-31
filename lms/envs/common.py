@@ -2181,6 +2181,9 @@ INSTALLED_APPS = (
     'lms.djangoapps.philu_overrides',
     # timed notification and periodic tasks
     'openedx.core.djangoapps.timed_notification',
+
+    # student_dashboard App
+    'lms.djangoapps.student_dashboard',
 )
 
 ######################### CSRF #########################################
