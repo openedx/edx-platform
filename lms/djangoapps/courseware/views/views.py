@@ -5,11 +5,12 @@ import json
 import logging
 import urllib
 from collections import OrderedDict, namedtuple
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import analytics
 import shoppingcart
 import survey.views
+import waffle
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses
 from commerce.utils import EcommerceService
@@ -68,6 +69,7 @@ from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
+from openedx.core.djangoapps.certificates import api as auto_certs_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
@@ -1341,18 +1343,9 @@ def generate_user_cert(request, course_id):
         return HttpResponseBadRequest(_("Course is not valid"))
 
     if not is_course_passed(student, course):
-        log.info(u"User %s has not passed the course: %s", student.username, course_id)
         return HttpResponseBadRequest(_("Your certificate will be available when you pass the course."))
 
     certificate_status = certs_api.certificate_downloadable_status(student, course.id)
-
-    log.info(
-        u"User %s has requested for certificate in %s, current status: is_downloadable: %s, is_generating: %s",
-        student.username,
-        course_id,
-        certificate_status["is_downloadable"],
-        certificate_status["is_generating"],
-    )
 
     if certificate_status["is_downloadable"]:
         return HttpResponseBadRequest(_("Certificate has already been created."))
