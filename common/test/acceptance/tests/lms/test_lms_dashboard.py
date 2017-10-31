@@ -298,7 +298,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.course_fixture.configure_course()
 
         start_date = TEST_DATE_FORMAT.format(dt=course_start_date)
-        expected_course_date = "Starts - {start_date} GMT".format(start_date=start_date)
+        expected_course_date = "Starts - {start_date} UTC".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
         self.dashboard_page.visit()
