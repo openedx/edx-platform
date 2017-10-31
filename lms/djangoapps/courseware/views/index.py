@@ -405,6 +405,9 @@ class CoursewareIndex(View):
         if self.chapter:
             default_chapter = self.chapter.display_name
 
+            if self.section:
+                default_chapter = "%s-%s" % (default_chapter, self.section.display_name)
+
         active_tab = self.request.GET.get('active_tab', default_chapter)
 
         courseware_context['toc'] = table_of_contents
