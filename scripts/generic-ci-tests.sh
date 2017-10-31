@@ -111,13 +111,13 @@ case "$TEST_SUITE" in
     "lms-unit")
         case "$SHARD" in
             "all")
-                paver test_system -s lms $PAVER_ARGS $PARALLEL 2> lms-tests.log
+                paver test_system -s lms --disable_capture $PAVER_ARGS $PARALLEL 2> lms-tests.log
                 ;;
             [1-3])
-                paver test_system -s lms --eval-attr="shard==$SHARD" $PAVER_ARGS $PARALLEL 2> lms-tests.$SHARD.log
+                paver test_system -s lms --disable_capture --eval-attr="shard==$SHARD" $PAVER_ARGS $PARALLEL 2> lms-tests.$SHARD.log
                 ;;
             4|"noshard")
-                paver test_system -s lms --eval-attr='not shard' $PAVER_ARGS $PARALLEL 2> lms-tests.4.log
+                paver test_system -s lms --disable_capture --eval-attr='not shard' $PAVER_ARGS $PARALLEL 2> lms-tests.4.log
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
@@ -131,11 +131,11 @@ case "$TEST_SUITE" in
         ;;
 
     "cms-unit")
-        paver test_system -s cms $PAVER_ARGS 2> cms-tests.log
+        paver test_system -s cms --disable_capture $PAVER_ARGS 2> cms-tests.log
         ;;
 
     "commonlib-unit")
-        paver test_lib $PAVER_ARGS 2> common-tests.log
+        paver test_lib --disable_capture $PAVER_ARGS 2> common-tests.log
         ;;
 
     "js-unit")
