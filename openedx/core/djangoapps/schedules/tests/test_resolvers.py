@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 from unittest import skipUnless
 
@@ -5,10 +6,20 @@ import ddt
 from django.conf import settings
 from mock import patch, DEFAULT, Mock
 
-from openedx.core.djangoapps.schedules.resolvers import BinnedSchedulesBaseResolver
+from openedx.core.djangoapps.schedules.resolvers import (
+    BinnedSchedulesBaseResolver, get_week_highlights, course_has_highlights
+)
+from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
+from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from student.tests.factories import UserFactory
+from student.models import CourseEnrollment
 
 
 @ddt.ddt
@@ -67,3 +78,93 @@ class TestBinnedSchedulesBaseResolver(CacheIsolationTestCase):
         result = self.resolver.filter_by_org(mock_query)
         mock_query.exclude.assert_called_once_with(enrollment__course__org__in=expected_org_list)
         self.assertEqual(result, mock_query.exclude.return_value)
+
+
+class TestGetWeekHighlights(ModuleStoreTestCase):
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    def setUp(self):
+        super(TestGetWeekHighlights, self).setUp()
+        # Basic course
+        self.course = CourseFactory.create()
+        self.course_key = self.course.id
+
+        # Users
+        self.enrolled_student = UserFactory(username='enrolled')
+        CourseEnrollment.enroll(self.enrolled_student, self.course_key)
+        self.unenrolled_student = UserFactory(username='unenrolled')
+
+    def test_no_course_or_course_flag_off(self):
+        with self.assertRaises(CourseUpdateDoesNotExist):
+            get_week_highlights(self.enrolled_student, self.course_key, 1)
+
+        bad_course_key = self.course_key.replace(run='no_such_run')
+        with self.assertRaises(CourseUpdateDoesNotExist):
+            get_week_highlights(self.enrolled_student, bad_course_key, 1)
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    def test_course_with_no_highlights(self):
+        with self.store.bulk_operations(self.course_key):
+            ItemFactory.create(
+                parent=self.course,
+                display_name="Intro Week",
+                category='chapter'
+            )
+            ItemFactory.create(
+                parent=self.course,
+                display_name="Week 1",
+                category='chapter'
+            )
+
+        # Update course and fetch it back just to make sure our modulestore
+        # changes actually went through.
+        self.store.update_item(self.course, self.enrolled_student.id)
+        self.course = self.store.get_course(self.course_key)
+        self.assertEqual(len(self.course.get_children()), 2)
+
+        # We entered no highlights for any week.
+        self.assertFalse(course_has_highlights(self.course_key))
+
+        with self.assertRaises(CourseUpdateDoesNotExist):
+            get_week_highlights(self.enrolled_student, self.course_key, 1)
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    def test_course_with_highlights(self):
+        with self.store.bulk_operations(self.course_key):
+            ItemFactory.create(
+                parent=self.course,
+                display_name="Week 1",
+                category='chapter',
+                highlights=[]
+            )
+            ItemFactory.create(
+                parent=self.course,
+                display_name="Week 2",
+                category='chapter',
+                highlights=[u'A', u'B', u'á']
+            )
+            ItemFactory.create(
+                parent=self.course,
+                display_name="Week 3",
+                category='chapter',
+                highlights=["I'm a secret!"]
+            )
+        self.store.update_item(self.course, self.enrolled_student.id)
+
+        # Generic check for highlights existing
+        self.assertTrue(course_has_highlights(self.course_key))
+
+        # Getting highlights for the week that has them.
+        self.assertEqual(
+            get_week_highlights(self.enrolled_student, self.course_key, 2),
+            [u'A', u'B', u'á'],
+        )
+
+        # Getting highlights for the week that doesn't.
+        with self.assertRaises(CourseUpdateDoesNotExist):
+            get_week_highlights(self.enrolled_student, self.course_key, 1)
+
+        # Getting highlights for a user that can't access that week (e.g. they
+        # unenrolled).
+        with self.assertRaises(CourseUpdateDoesNotExist):
+            get_week_highlights(self.unenrolled_student, self.course_key, 2)
