@@ -13,7 +13,6 @@ settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from openedx.core.lib.django_startup import autostartup
 from openedx.core.release import doc_version
-import analytics
 
 from openedx.core.djangoapps.monkey_patch import django_db_models_options
 
@@ -56,10 +55,6 @@ def run():
 
     # Mako requires the directories to be added after the django setup.
     microsite.enable_microsites(log)
-
-    # Initialize Segment analytics module by setting the write_key.
-    if settings.LMS_SEGMENT_KEY:
-        analytics.write_key = settings.LMS_SEGMENT_KEY
 
     # register any dependency injections that we need to support in edx_proctoring
     # right now edx_proctoring is dependent on the openedx.core.djangoapps.credit and

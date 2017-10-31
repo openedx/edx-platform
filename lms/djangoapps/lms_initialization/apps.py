@@ -22,4 +22,11 @@ class LMSInitializationConfig(AppConfig):
         Global LMS initialization methods are called here.  This runs after
         settings have loaded, but before most other djangoapp initializations.
         """
-        pass
+        self._initialize_analytics()
+
+    def _initialize_analytics(self):
+        """
+        Initialize Segment analytics module by setting the write_key.
+        """
+        if settings.LMS_SEGMENT_KEY:
+            analytics.write_key = settings.LMS_SEGMENT_KEY
