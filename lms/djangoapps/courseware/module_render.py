@@ -481,10 +481,13 @@ def get_module_system_for_user(
         Returns None if no special processing is required.
         """
         handlers = {
-            'completion': handle_completion_event,
             'grade': handle_grade_event,
-            'progress': handle_deprecated_progress_event,
         }
+        if completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            handlers.update({
+                'completion': handle_completion_event,
+                'progress': handle_deprecated_progress_event,
+            })
         return handlers.get(event_type)
 
     def publish(block, event_type, event):
