@@ -2016,6 +2016,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'djcelery',
 
+    # Initialization
+    'lms_initialization.apps.LMSInitializationConfig',
+
     # Common views
     'openedx.core.djangoapps.common_views',
 
