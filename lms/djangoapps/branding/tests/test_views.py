@@ -185,9 +185,9 @@ class TestFooter(TestCase):
         self.assertEqual(resp.status_code, 200)
 
         if show_logo:
-            self.assertIn(settings.FOOTER_OPENEDX_URL, resp.content)
+            self.assertIn('alt="Powered by Open edX"', resp.content)
         else:
-            self.assertNotIn(settings.FOOTER_OPENEDX_URL, resp.content)
+            self.assertNotIn('alt="Powered by Open edX"', resp.content)
 
     @ddt.data(
         # OpenEdX
