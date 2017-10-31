@@ -640,10 +640,24 @@
     color: theme-color("primary");
   }
 
+  .number-highlights {
+    background: theme-color("primary");
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    color: $white;
+    display: inline-block;
+    font-weight: bold;
+    line-height: 18px;
+    margin-right: 2px;
+    text-align: center;
+    width: 18px;
+  }
+
   .highlight-input-text {
     width: 100%;
-    margin-bottom: 5px;
-    margin-top: 5px;
+    margin-bottom: ($baseline/4);
+    margin-top: ($baseline/4);
   }
 
   .highlights-description {
