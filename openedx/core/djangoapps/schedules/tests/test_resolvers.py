@@ -152,6 +152,7 @@ class TestGetWeekHighlights(ModuleStoreTestCase):
                 category='chapter',
                 highlights=["I'm a secret!"]
             )
+
         self.store.update_item(self.course, self.enrolled_student.id)
 
         # Generic check for highlights existing
@@ -163,7 +164,7 @@ class TestGetWeekHighlights(ModuleStoreTestCase):
             [u'A', u'B', u'á'],
         )
 
-        # Getting highlights for the week that doesn't.
+        # Getting highlights for the week that doesn't have them.
         with self.assertRaises(CourseUpdateDoesNotExist):
             get_week_highlights(self.enrolled_student, self.course_key, 1)
 
@@ -171,3 +172,25 @@ class TestGetWeekHighlights(ModuleStoreTestCase):
         # unenrolled).
         with self.assertRaises(CourseUpdateDoesNotExist):
             get_week_highlights(self.unenrolled_student, self.course_key, 2)
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    def test_access_permissions(self):
+        with self.store.bulk_operations(self.course_key):
+            # Staff-only Chapter
+            ItemFactory.create(
+                parent=self.course,
+                visible_to_staff_only=True,
+                display_name="Hidden Week",
+                category='chapter',
+                highlights=["I'm a secret!"]
+            )
+        self.store.update_item(self.course, self.enrolled_student.id)
+
+        # Staff-only is sometimes used as a staging area for content that will
+        # go live, so still count it as a course with highlights even if those
+        # highlights only exist in staff-only chapters.
+        self.assertTrue(course_has_highlights(self.course_key))
+
+        # But we shouldn't be able to access those highlights as a student.
+        with self.assertRaises(CourseUpdateDoesNotExist):
+            get_week_highlights(self.enrolled_student, self.course_key, 1)
