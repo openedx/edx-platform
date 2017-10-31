@@ -67,7 +67,7 @@ $(window).click(function(e) {
 });
 
 // Accessibility keyboard controls for user dropdown and mobile menu
-$(document).on('keydown', function(e) {
+$('.mobile-menu, .global-header').on('keydown', function(e) {
     'use strict';
     var isNext;
     var nextLink;
