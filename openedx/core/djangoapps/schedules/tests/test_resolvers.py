@@ -80,6 +80,9 @@ class TestBinnedSchedulesBaseResolver(CacheIsolationTestCase):
         self.assertEqual(result, mock_query.exclude.return_value)
 
 
+@skip_unless_lms
+@skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
+            "Can't test schedules if the app isn't installed")
 class TestGetWeekHighlights(ModuleStoreTestCase):
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 

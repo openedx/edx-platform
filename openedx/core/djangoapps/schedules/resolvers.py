@@ -412,7 +412,7 @@ def get_week_highlights(user, course_key, week_num):
         for section in course_module.get_children()
         if not section.hide_from_toc
     ]
-    if not (1 <= week_num < len(usage_keys_and_highlights)):
+    if not (0 < week_num <= len(usage_keys_and_highlights)):
         raise CourseUpdateDoesNotExist(
             "Requested week {} but {} has only {} weeks.".format(
                 week_num, course_key, len(usage_keys_and_highlights)
@@ -434,4 +434,8 @@ def course_has_highlights(course_key):
     inaccessible content.
     """
     course = modulestore().get_course(course_key, depth=1)
-    return any(section.highlights for section in course.get_children())
+    return any(
+        section.highlights
+        for section in course.get_children()
+        if not section.hide_from_toc
+    )
