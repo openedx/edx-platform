@@ -66,11 +66,3 @@ def add_mimetypes():
     mimetypes.add_type('application/x-font-opentype', '.otf')
     mimetypes.add_type('application/x-font-ttf', '.ttf')
     mimetypes.add_type('application/font-woff', '.woff')
-
-
-def enable_microsites():
-    """
-    Calls the enable_microsites function in the microsite backend.
-    Here for backwards compatibility
-    """
-    microsite.enable_microsites(log)
