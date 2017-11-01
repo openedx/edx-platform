@@ -296,8 +296,8 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
             });
 
             afterEach(function() {
-                EditHelpers.removeMockAnalytics();
                 EditHelpers.cancelModalIfShowing();
+                EditHelpers.removeMockAnalytics();
                 // Clean up after the $.datepicker
                 $('#start_date').datepicker('destroy');
                 $('#due_date').datepicker('destroy');
