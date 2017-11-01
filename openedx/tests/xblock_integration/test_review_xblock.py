@@ -116,15 +116,11 @@ class TestReviewXBlock(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         cls.course_actual_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': cls.course_actual.id.to_deprecated_string(),
+                'course_id': unicode(cls.course_actual.id),
                 'chapter': 'Overview',
                 'section': 'Welcome',
             }
         )
-
-        # refresh the course from the modulestore so that it has children
-        # Not sure if this is actually needed or not
-        cls.course_actual = modulestore().get_course(cls.course_actual.id)
 
         # Set up for the review course where the review problems are hosted
         cls.course_review = CourseFactory.create(
@@ -183,7 +179,7 @@ class TestReviewXBlock(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         cls.course_review_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': cls.course_review.id.to_deprecated_string(),
+                'course_id': unicode(cls.course_review.id),
                 'chapter': 'Overview',
                 'section': 'Welcome',
             }
