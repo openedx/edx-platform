@@ -2874,7 +2874,7 @@ PROFILE_IMAGE_MIN_BYTES = 100
 
 # Sets the maximum number of courses listed on the homepage
 # If set to None, all courses will be listed on the homepage
-HOMEPAGE_COURSE_MAX = 9
+HOMEPAGE_COURSE_MAX = 4
 
 ################################ Settings for Credit Courses ################################
 # Initial delay used for retrying tasks.
