@@ -225,11 +225,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         getIntroductionMessage: function() {
             return StringUtils.interpolate(
                 gettext(
-                    'The highlights you provide here are messaged (i.e., emailed) to learners. Each {item}\'s ' +
-                    'highlights are emailed at the time that we expect the learner to start working on that {item}. ' +
-                    'At this time, we assume that each {item} will take 1 week to complete.'
-                ),
-                {item: this.options.xblockType}
+                  'Enter 3-5 highlights to include in the email message that learners receive for ' +
+                  'this section (250 character limit).'
+                )
             );
         },
 
