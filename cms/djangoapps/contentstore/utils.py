@@ -274,7 +274,7 @@ def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
     kwargs_for_reverse = {key_name: unicode(key_value)} if key_name else None
     if kwargs:
         kwargs_for_reverse.update(kwargs)
-    return reverse('contentstore.views.' + handler_name, kwargs=kwargs_for_reverse)
+    return reverse(handler_name, kwargs=kwargs_for_reverse)
 
 
 def reverse_course_url(handler_name, course_key, kwargs=None):
