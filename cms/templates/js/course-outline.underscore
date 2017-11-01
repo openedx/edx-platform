@@ -203,10 +203,10 @@ if (is_proctored_exam) {
             <% if (xblockInfo.get('highlights_enabled') && course.get('self_paced') && xblockInfo.isChapter()) { %>
                 <div class="block-highlights">
                     <% var number_of_highlights = (xblockInfo.get('highlights') || []).length; %>
-                        <span class="block-highlights-value highlights-button action-button">
+                        <button class="block-highlights-value highlights-button action-button">
                             <span class="number-highlights"><%- number_of_highlights %></span>
                             <%- gettext('Section Highlights') %>
-                        </span>
+                        </button>
                 </div>
             <% } %>
             <% if (xblockInfo.get('is_time_limited')) { %>
