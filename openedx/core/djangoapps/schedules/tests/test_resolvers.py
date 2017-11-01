@@ -3,7 +3,7 @@ from unittest import skipUnless
 
 import ddt
 from django.conf import settings
-from mock import patch, DEFAULT, Mock
+from mock import Mock
 
 from openedx.core.djangoapps.schedules.resolvers import BinnedSchedulesBaseResolver
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
