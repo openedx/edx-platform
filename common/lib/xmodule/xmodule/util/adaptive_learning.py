@@ -169,8 +169,15 @@ class AdaptiveLearningAPIMixin(object):
         """
         url = self.generate_student_url(student_uid)
         payload = {'key_type': 'uid'}
-        response = requests.get(url, headers=self.request_headers, data=payload)
-        students = json.loads(response.content)
+        try:
+            response = requests.get(url, headers=self.request_headers, data=payload)
+            students = json.loads(response.content)
+        except requests.ConnectionError:
+            students = []
+            log.warning(
+                "Could not retrieve information about student "
+                "identified by student_uid {student_uid}.".format(student_uid=student_uid)
+            )
         if len(students) == 0:
             student = None
         elif len(students) == 1:
@@ -184,8 +191,15 @@ class AdaptiveLearningAPIMixin(object):
         """
         url = self.students_url
         payload = {'uid': student_uid}
-        response = requests.post(url, headers=self.request_headers, data=payload)
-        student = json.loads(response.content)
+        try:
+            response = requests.post(url, headers=self.request_headers, data=payload)
+            student = json.loads(response.content)
+        except requests.ConnectionError:
+            student = {}
+            log.warning(
+                "Could not create student identified "
+                "by student_uid {student_uid}.".format(student_uid=student_uid)
+            )
         return student
 
     def get_knowledge_node_student(self, knowledge_node_uid, student_uid):
@@ -211,8 +225,15 @@ class AdaptiveLearningAPIMixin(object):
         """
         url = self.knowledge_node_students_url
         payload = {'student_id': student_uid, 'key_type': 'uid'}
-        response = requests.get(url, headers=self.request_headers, data=payload)
-        links = json.loads(response.content)
+        try:
+            response = requests.get(url, headers=self.request_headers, data=payload)
+            links = json.loads(response.content)
+        except requests.ConnectionError:
+            links = []
+            log.warning(
+                "Could not retrieve 'knowledge node student' "
+                "objects for user identified by student_uid {student_uid}.".format(student_uid=student_uid)
+            )
         return links
 
     def create_knowledge_node_student(self, knowledge_node_uid, student_uid):
@@ -222,8 +243,18 @@ class AdaptiveLearningAPIMixin(object):
         """
         url = self.knowledge_node_students_url
         payload = {'knowledge_node_uid': knowledge_node_uid, 'student_uid': student_uid}
-        response = requests.post(url, headers=self.request_headers, data=payload)
-        knowledge_node_student = json.loads(response.content)
+        try:
+            response = requests.post(url, headers=self.request_headers, data=payload)
+            knowledge_node_student = json.loads(response.content)
+        except requests.ConnectionError:
+            knowledge_node_student = {}
+            log.warning(
+                "Could not create 'knowledge node student' object "
+                "that links student identified by student_uid {student_uid} "
+                "to unit identified by knowledge_node_uid {knowledge_node_uid}.".format(
+                    student_uid=student_uid, knowledge_node_uid=knowledge_node_uid
+                )
+            )
         return knowledge_node_student
 
     def create_event(self, knowledge_node_uid, student_uid, event_type, **data):
@@ -240,8 +271,18 @@ class AdaptiveLearningAPIMixin(object):
         payload.update(data)
 
         # Send request
-        response = requests.post(url, headers=self.request_headers, data=payload)
-        event = json.loads(response.content)
+        try:
+            response = requests.post(url, headers=self.request_headers, data=payload)
+            event = json.loads(response.content)
+        except requests.ConnectionError:
+            event = {}
+            log.warning(
+                "Could not create event of type {event_type} for "
+                "unit identified by knowledge_node_uid {knowledge_node_uid} "
+                "and student identified by student_uid {student_uid}.".format(
+                    event_type=event_type, student_uid=student_uid, knowledge_node_uid=knowledge_node_uid
+                )
+            )
         return event
 
     def generate_student_url(self, student_uid):
@@ -319,9 +360,17 @@ class AdaptiveLearningAPIClient(AdaptiveLearningAPIMixin):
         url = self.pending_reviews_url
         student_uid = self.generate_student_uid(user_id)
         payload = {'student_uid': student_uid, 'nested': True}
-        response = requests.get(url, headers=self.request_headers, data=payload)
-        if response.content == 'No Student Found':
+        try:
+            response = requests.get(url, headers=self.request_headers, data=payload)
+        except requests.ConnectionError:
             pending_reviews_user = []
+            log.warning(
+                "Could not get pending reviews for user "
+                "identified by user_id {user_id}.".format(user_id=user_id)
+            )
         else:
-            pending_reviews_user = json.loads(response.content)
+            if response.content == 'No Student Found':
+                pending_reviews_user = []
+            else:
+                pending_reviews_user = json.loads(response.content)
         return pending_reviews_user

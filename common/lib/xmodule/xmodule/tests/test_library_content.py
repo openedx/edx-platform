@@ -499,6 +499,23 @@ class AdaptiveLibraryContentModuleTestMixin(LibraryContentModuleTestMixin):
             patched_methods['send_unit_viewed_event'].assert_called_once_with()
             patched_methods['link_current_user_to_children'].assert_called_once_with()
 
+    def test_student_view_no_reviews(self):
+        """
+        Tests that when no questions are scheduled for review, a message is shown instead of blocks.
+        """
+        self._bind_course_module(self.lc_block)
+        module = self.lc_block._xmodule  # pylint: disable=protected-access
+        with patch.multiple(
+                module,
+                send_unit_viewed_event=DEFAULT,
+                link_current_user_to_children=DEFAULT,
+                _get_selected_child_blocks=DEFAULT
+        ) as patched_methods:
+            patched_methods['_get_selected_child_blocks'].return_value = []
+            context = {}
+            fragment = module.student_view(context)
+            self.assertIn('No questions are currently scheduled for review. Please check back later.', fragment.content)
+
 
 @patch('xmodule.library_tools.SearchEngine.get_search_engine', Mock(return_value=None, autospec=True))
 class TestLibraryContentModuleNoSearchIndex(LibraryContentModuleTestMixin, LibraryContentTest):

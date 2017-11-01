@@ -7,6 +7,7 @@ import logging
 import random
 from copy import copy
 from gettext import ngettext
+from django.utils.translation import ugettext as _
 
 from lazy import lazy
 from lxml import etree
@@ -554,7 +555,32 @@ class AdaptiveLibraryContentModule(AdaptiveLibraryContentFields, LibraryContentM
         # Link current user to children of this block
         self.link_current_user_to_children()
 
-        return super(AdaptiveLibraryContentModule, self).student_view(context)
+        # Renders children that are scheduled for review, or returns a message.
+        fragment = Fragment()
+        contents = []
+        child_context = {} if not context else copy(context)
+
+        for child in self._get_selected_child_blocks():
+            for displayable in child.displayable_items():
+                rendered_child = displayable.render(STUDENT_VIEW, child_context)
+                fragment.add_frag_resources(rendered_child)
+                contents.append({
+                    'id': displayable.location.to_deprecated_string(),
+                    'content': rendered_child.content,
+                })
+
+        if not contents:
+            contents.append({
+                'id': 'adaptive-learning-no-reviews-message',
+                'content': _('No questions are currently scheduled for review. Please check back later.'),
+            })
+
+        fragment.add_content(self.system.render_template('vert_module.html', {
+            'items': contents,
+            'xblock_context': context,
+            'show_bookmark_button': False,
+        }))
+        return fragment
 
     def send_unit_viewed_event(self):
         """
