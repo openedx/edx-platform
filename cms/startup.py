@@ -15,7 +15,6 @@ from openedx.core.lib.django_startup import autostartup
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from openedx.core.lib.xblock_utils import xblock_local_resource_url
-from openedx.core.release import doc_version
 from startup_configurations.validate_config import validate_cms_config
 
 
@@ -40,10 +39,6 @@ def run():
     # https://openedx.atlassian.net/wiki/display/PLAT/Convert+from+Storage-centric+runtimes+to+Application-centric+runtimes
     xmodule.x_module.descriptor_global_handler_url = cms.lib.xblock.runtime.handler_url
     xmodule.x_module.descriptor_global_local_resource_url = xblock_local_resource_url
-
-    # Set the version of docs that help-tokens will go to.
-    settings.HELP_TOKENS_LANGUAGE_CODE = settings.LANGUAGE_CODE
-    settings.HELP_TOKENS_VERSION = doc_version()
 
     # validate configurations on startup
     validate_cms_config(settings)

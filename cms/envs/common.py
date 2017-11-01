@@ -133,6 +133,7 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
 )
 from openedx.core.lib.license import LicenseMixin
 from openedx.core.lib.derived import derived, derived_dict_entry
+from openedx.core.release import doc_version
 
 ############################ FEATURE CONFIGURATION #############################
 
@@ -1382,6 +1383,9 @@ AFFILIATE_COOKIE_NAME = 'affiliate_id'
 ############## Settings for Studio Context Sensitive Help ##############
 
 HELP_TOKENS_INI_FILE = REPO_ROOT / "cms" / "envs" / "help_tokens.ini"
+HELP_TOKENS_LANGUAGE_CODE = lambda settings: settings.LANGUAGE_CODE
+HELP_TOKENS_VERSION = lambda settings: doc_version()
+derived('HELP_TOKENS_LANGUAGE_CODE', 'HELP_TOKENS_VERSION')
 
 # This is required for the migrations in oauth_dispatch.models
 # otherwise it fails saying this attribute is not present in Settings
