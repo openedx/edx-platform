@@ -9,7 +9,7 @@ from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.urlresolvers import reverse
 from django.db.models import F, Q
 from django.utils.formats import dateformat, get_format
-
+from django.test import RequestFactory
 
 from edx_ace.recipient_resolver import RecipientResolver
 from edx_ace.recipient import Recipient
@@ -25,6 +25,11 @@ from openedx.core.djangoapps.schedules.template_context import (
     get_base_template_context
 )
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+
+from courseware.courses import get_course_with_access
+from courseware.module_render import get_module_for_descriptor
+from courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 
 from request_cache.middleware import request_cached
 from xmodule.modulestore.django import modulestore
@@ -343,12 +348,12 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
         template_context = get_base_template_context(self.site)
         for schedule in schedules:
             enrollment = schedule.enrollment
+            user = enrollment.user
             try:
-                week_highlights = get_week_highlights(enrollment.course_id, week_num)
+                week_highlights = get_week_highlights(user, enrollment.course_id, week_num)
             except CourseUpdateDoesNotExist:
                 continue
 
-            user = enrollment.user
             course_id_str = str(enrollment.course_id)
 
             template_context.update({
@@ -367,10 +372,70 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             yield (user, schedule.enrollment.course.language, template_context)
 
 
-@request_cached
-def get_week_highlights(course_id, week_num):
-    if COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course_id):
-        course = modulestore().get_course(course_id)
-        return course.highlights_for_week(week_num)
-    else:
-        raise CourseUpdateDoesNotExist()
+def get_week_highlights(user, course_key, week_num):
+    """
+    Get highlights (list of unicode strings) for a given week.
+    """
+    if not COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course_key):
+        raise CourseUpdateDoesNotExist(
+            "%s does not have Course Updates enabled.",
+            course_key
+        )
+
+    try:
+        # Descriptor and basic access check. This has no student-state applied.
+        course_descriptor = get_course_with_access(
+            user, 'load', course_key, depth=1, check_if_enrolled=True
+        )
+    except CourseAccessRedirect:
+        raise CourseUpdateDoesNotExist(
+            "Could not load course {} for user {} to get week highlights".format(
+                course_key, user.username
+            )
+        )
+
+    # Now evil modulestore magic to inflate our descriptor with user state and
+    # permissions checks.
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course_key, user, course_descriptor, depth=1, read_only=True,
+    )
+
+    # Fake a request to fool parts of the courseware that want to inspect it.
+    # Ugly, but easier than refactoring that code.
+    request = RequestFactory().get(reverse('courseware', args=(course_key,)))
+    request.user = user
+    course_module = get_module_for_descriptor(
+        user, request, course_descriptor, field_data_cache, course_key, course=course_descriptor
+    )
+    usage_keys_and_highlights = [
+        (section.location, section.highlights)
+        for section in course_module.get_children()
+        if not section.hide_from_toc
+    ]
+    if not (0 < week_num <= len(usage_keys_and_highlights)):
+        raise CourseUpdateDoesNotExist(
+            "Requested week {} but {} has only {} weeks.".format(
+                week_num, course_key, len(usage_keys_and_highlights)
+            )
+        )
+
+    usage_key, highlights = usage_keys_and_highlights[week_num - 1]
+    if not highlights:
+        raise CourseUpdateDoesNotExist("Section {} has no highlights".format(usage_key))
+
+    return highlights
+
+
+def course_has_highlights(course_key):
+    """
+    Does the course have any highlights for any section/week in it?
+
+    This ignores access checks, since highlights may be lurking in currently
+    inaccessible content.
+    """
+    course = modulestore().get_course(course_key, depth=1)
+    return any(
+        section.highlights
+        for section in course.get_children()
+        if not section.hide_from_toc
+    )
