@@ -102,11 +102,11 @@ class TestOrderHistoryOnSiteDashboard(SiteMixin, ModuleStoreTestCase):
     def test_shows_orders_with_current_site_courses_only(self):
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
-        receipt_url_course = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.fakex_site_order_id})
-        receipt_url_course2 = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.foox_site_order_id})
-        receipt_url = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.order_id})
-        receipt_url_cert = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.certificate_order_id})
-        receipt_url_donation = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.donation_order_id})
+        receipt_url_course = reverse('shoppingcart:show_receipt', kwargs={'ordernum': self.fakex_site_order_id})
+        receipt_url_course2 = reverse('shoppingcart:show_receipt', kwargs={'ordernum': self.foox_site_order_id})
+        receipt_url = reverse('shoppingcart:show_receipt', kwargs={'ordernum': self.order_id})
+        receipt_url_cert = reverse('shoppingcart:show_receipt', kwargs={'ordernum': self.certificate_order_id})
+        receipt_url_donation = reverse('shoppingcart:show_receipt', kwargs={'ordernum': self.donation_order_id})
 
         # We need to decode because of these chars: © & ▸
         content = response.content.decode('utf-8')
@@ -120,13 +120,13 @@ class TestOrderHistoryOnSiteDashboard(SiteMixin, ModuleStoreTestCase):
         self.use_site(self.site_other)
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
-        receipt_url_course = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.fakex_site_order_id})
-        receipt_url_course2 = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.foox_site_order_id})
-        receipt_url = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.order_id})
-        receipt_url_cert = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.certificate_order_id})
-        receipt_url_donation = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.donation_order_id})
+        receipt_url_course = reverse('shoppingcart:show_receipt', kwargs={'ordernum': self.fakex_site_order_id})
+        receipt_url_course2 = reverse('shoppingcart:show_receipt', kwargs={'ordernum': self.foox_site_order_id})
+        receipt_url = reverse('shoppingcart:show_receipt', kwargs={'ordernum': self.order_id})
+        receipt_url_cert = reverse('shoppingcart:show_receipt', kwargs={'ordernum': self.certificate_order_id})
+        receipt_url_donation = reverse('shoppingcart:show_receipt', kwargs={'ordernum': self.donation_order_id})
         receipt_url_courseless_donation = reverse(
-            'shoppingcart.views.show_receipt',
+            'shoppingcart:show_receipt',
             kwargs={'ordernum': self.courseless_donation_order_id},
         )
 

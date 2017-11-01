@@ -21,7 +21,7 @@
 
 <%block name="requirejs">
     require(["js/factories/edit_tabs"], function (EditTabsFactory) {
-        EditTabsFactory("${context_course.location | n, js_escaped_string}", "${reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': context_course.id})}");
+        EditTabsFactory("${context_course.location | n, js_escaped_string}", "${reverse('tabs_handler', kwargs={'course_key_string': context_course.id})}");
     });
 </%block>
 

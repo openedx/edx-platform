@@ -579,13 +579,13 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         student_cart = Order.get_cart_for_user(student)
         paid_course_reg_item = PaidCourseRegistration.add_to_order(student_cart, self.course.id)
         # update the quantity of the cart item paid_course_reg_item
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'),
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'),
                                 {'ItemId': paid_course_reg_item.id, 'qty': '4'})
         self.assertEqual(resp.status_code, 200)
         student_cart.purchase()
 
         course_reg_codes = CourseRegistrationCode.objects.filter(order=student_cart)
-        redeem_url = reverse('register_code_redemption', args=[course_reg_codes[0].code])
+        redeem_url = reverse('shoppingcart:register_code_redemption', args=[course_reg_codes[0].code])
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
@@ -619,7 +619,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         )
         course_registration_code.save()
 
-        redeem_url = reverse('register_code_redemption', args=['abcde'])
+        redeem_url = reverse('shoppingcart:register_code_redemption', args=['abcde'])
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
@@ -660,7 +660,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         )
         course_registration_code.save()
 
-        redeem_url = reverse('register_code_redemption', args=['abcde'])
+        redeem_url = reverse('shoppingcart:register_code_redemption', args=['abcde'])
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
@@ -1131,18 +1131,18 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         self.client.login(username=self.student1.username, password='test')
         paid_course_reg_item = PaidCourseRegistration.add_to_order(self.student1_cart, self.course.id)
         # update the quantity of the cart item paid_course_reg_item
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {
+        resp = self.client.post(reverse('shoppingcart:update_user_cart'), {
             'ItemId': paid_course_reg_item.id, 'qty': '4'
         })
         self.assertEqual(resp.status_code, 200)
         # apply the coupon code to the item in the cart
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'coupon1'})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': 'coupon1'})
         self.assertEqual(resp.status_code, 200)
 
         self.student1_cart.purchase()
 
         course_reg_codes = CourseRegistrationCode.objects.filter(order=self.student1_cart)
-        redeem_url = reverse('register_code_redemption', args=[course_reg_codes[0].code])
+        redeem_url = reverse('shoppingcart:register_code_redemption', args=[course_reg_codes[0].code])
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
@@ -1155,7 +1155,7 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         PaidCourseRegistration.add_to_order(self.student2_cart, self.course.id)
 
         # apply the coupon code to the item in the cart
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'coupon1'})
+        resp = self.client.post(reverse('shoppingcart:use_code'), {'code': 'coupon1'})
         self.assertEqual(resp.status_code, 200)
 
         self.student2_cart.purchase()

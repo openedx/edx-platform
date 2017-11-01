@@ -42,7 +42,7 @@ from openedx.core.lib.courses import course_image_url
 
       $("#add_to_cart_post").click(function(event){
         $.ajax({
-          url: "${reverse('add_course_to_cart', args=[course.id.to_deprecated_string()])}",
+          url: "${reverse('shoppingcart:add_course_to_cart', args=[course.id.to_deprecated_string()])}",
           type: "POST",
           /* Rant: HAD TO USE COMPLETE B/C PROMISE.DONE FOR SOME REASON DOES NOT WORK ON THIS PAGE. */
           complete: add_course_complete_handler
@@ -164,7 +164,7 @@ from openedx.core.lib.courses import course_image_url
           </a>
           <div id="register_error"></div>
         %else:
-          <% 
+          <%
             if ecommerce_checkout:
               reg_href = ecommerce_checkout_link
             else:

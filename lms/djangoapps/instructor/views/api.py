@@ -1717,7 +1717,7 @@ def generate_registration_codes(request, course_id):
     for registration_code in registration_codes:
         full_redeem_code_url = 'http://{base_url}{redeem_code_url}'.format(
             base_url=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
-            redeem_code_url=reverse('register_code_redemption', kwargs={'registration_code': registration_code.code})
+            redeem_code_url=reverse('shoppingcart:register_code_redemption', kwargs={'registration_code': registration_code.code})
         )
         csv_writer.writerow([registration_code.code, full_redeem_code_url])
     finance_email = configuration_helpers.get_value('finance_email', settings.FINANCE_EMAIL)
