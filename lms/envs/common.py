@@ -2193,7 +2193,7 @@ MKTG_URLS = {}
 MKTG_URL_LINK_MAP = {
     #'ABOUT': 'about',
     #'CONTACT': 'contact',
-    #'FAQ': 'help',
+    'FAQ': 'faq',
     'COURSES': 'courses',
     'ROOT': 'root',
     'TOS': 'tos',
