@@ -2074,7 +2074,7 @@ INSTALLED_APPS = [
     'util',
     'certificates.apps.CertificatesConfig',
     'dashboard',
-    'lms.djangoapps.instructor',
+    'lms.djangoapps.instructor.apps.InstructorConfig',
     'lms.djangoapps.instructor_task',
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
@@ -2228,7 +2228,7 @@ INSTALLED_APPS = [
     'commerce',
 
     # Credit courses
-    'openedx.core.djangoapps.credit',
+    'openedx.core.djangoapps.credit.apps.CreditConfig',
 
     # Course teams
     'lms.djangoapps.teams',
