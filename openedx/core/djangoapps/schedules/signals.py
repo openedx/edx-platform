@@ -12,9 +12,8 @@ from courseware.models import (
     OrgDynamicUpgradeDeadlineConfiguration
 )
 from edx_ace.utils import date
-from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
-from openedx.core.djangoapps.schedules.resolvers import get_week_highlights
+from openedx.core.djangoapps.schedules.content_highlights import course_has_highlights
 from openedx.core.djangoapps.signals.signals import COURSE_START_DATE_CHANGED
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from student.models import CourseEnrollment
@@ -62,10 +61,9 @@ def create_schedule(sender, **kwargs):
         upgrade_deadline=upgrade_deadline
     )
 
-    try:
-        get_week_highlights(enrollment.course_id, 1)
+    if course_has_highlights(enrollment.course_id):
         experience_type = ScheduleExperience.EXPERIENCES.course_updates
-    except CourseUpdateDoesNotExist:
+    else:
         experience_type = ScheduleExperience.EXPERIENCES.default
 
     ScheduleExperience(schedule=schedule, experience_type=experience_type).save()
