@@ -18,8 +18,6 @@ from openedx.core.djangoapps.monkey_patch import django_db_models_options
 import xmodule.x_module
 import lms_xblock.runtime
 
-from startup_configurations.validate_config import validate_lms_config
-
 log = logging.getLogger(__name__)
 
 
@@ -44,9 +42,6 @@ def run():
     # https://openedx.atlassian.net/wiki/display/PLAT/Convert+from+Storage-centric+runtimes+to+Application-centric+runtimes
     xmodule.x_module.descriptor_global_handler_url = lms_xblock.runtime.handler_url
     xmodule.x_module.descriptor_global_local_resource_url = lms_xblock.runtime.local_resource_url
-
-    # validate configurations on startup
-    validate_lms_config(settings)
 
 
 def add_mimetypes():
