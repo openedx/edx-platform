@@ -413,6 +413,9 @@ FEATURES = {
 
     # Set to enable Enterprise integration
     'ENABLE_ENTERPRISE_INTEGRATION': False,
+
+    # Whether HTML XBlocks/XModules return HTML content with the Course Blocks API student_view_data
+    'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
