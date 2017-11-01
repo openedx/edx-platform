@@ -6,7 +6,7 @@
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@7b054467159fd2cbe2e0adccf9a0665d36a2a197#egg=xblock-drag-and-drop-v2
 # Temporary new version for A2E course only; installs in parallel with the above version. Aim to remove this and upgrade the above ASAP.
--e git+https://github.com/open-craft/xblock-drag-and-drop-v2.git@a2c4d52744943d862e2b1449757a5dc316fe2ee7#egg=xblock-drag-and-drop-v2-new
+-e git+https://github.com/open-craft/xblock-drag-and-drop-v2.git@f88bf48b2b543cd854d3b9f45cbbf0f1018ad1d1#egg=xblock-drag-and-drop-v2-new
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@v2.0.12#egg=xblock-ooyala==2.0.12
 -e git+https://github.com/edx-solutions/xblock-group-project.git@6a68ea09478e49e796ee4c0a985018ec4257b7d7#egg=xblock-group-project
 -e git+https://github.com/edx-solutions/xblock-adventure.git@7bdeb62b1055377dc04a7b503f7eea8264f5847b#egg=xblock-adventure
