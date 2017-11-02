@@ -277,7 +277,7 @@ class OrganizationInfoModelForm(forms.ModelForm):
         }
 
     def clean_url(self):
-        is_org_url_exist = int(self.data['is_org_url_exist'])
+        is_org_url_exist = int(self.data.get('is_org_url_exist')) if self.data.get('is_org_url_exist') else None
         organization_website = self.cleaned_data['url']
 
         if is_org_url_exist and not organization_website:
