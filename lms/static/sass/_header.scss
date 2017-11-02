@@ -102,7 +102,7 @@
             font-weight: $font-weight-normal;
             display: inline-block;
             margin-bottom: -1*$baseline/2;
-            border-bottom: 3px solid transparent;
+            border-bottom: 4px solid transparent;
             cursor: pointer;
 
             &.active,
@@ -192,7 +192,6 @@
         }
 
         .dropdown-user-menu {
-          display: none;
           border: 1px solid theme-color("secondary");
           position: absolute;
           background-color: theme-color("inverse");
@@ -239,35 +238,30 @@
 
   // Responsive styling for mobile
   @include media-breakpoint-down(md) {
+    .main-header {
+      height: $header-logo-height;
+    }
+
     // Display the menu icon and allow for transition to an X on click
     .hamburger-menu {
-      @include left(22px);
+      @include left($baseline);
       position: absolute;
-      top: $baseline*1.25;
+      top: $baseline*0.9;
       width: 30px;
       height: 20px;
+      padding-bottom: $baseline/4;
       -webkit-transform: rotate(0deg);
       transform: rotate(0deg);
       -webkit-transition: 0.5s ease-in-out;
       transition: 0.5s ease-in-out;
       cursor: pointer;
-      outline: none;
 
-      &:focus,
-      &:hover {
-        span {
-          background: theme-color("primary");
-          height: 3px;
-        }
-      }
-
-      span {
+      .line {
         display: block;
         position: absolute;
-        height: 2px;
+        height: 5px;
         width: 100%;
-        background: theme-color("secondary");
-        border-radius: 9px;
+        background: $gray-600;
         opacity: 1;
         left: 0;
         -webkit-transform: rotate(0deg);
@@ -281,15 +275,15 @@
 
         &:nth-child(2),
         &:nth-child(3) {
-          top: 6px;
+          top: $baseline/2;
         }
 
         &:nth-child(4) {
-          top: 12px;
+          top: $baseline;
         }
       }
 
-      &.open span {
+      &.open .line {
         &:nth-child(1) {
           top: 18px;
           width: 0%;
@@ -314,31 +308,35 @@
       }
     }
   }
+
+  // Hiding and displaying control classes
+  .hidden {
+    display: none !important;
+  }
 }
 
 /*
   Mobile menu styling
 */
 .mobile-menu {
-  border-bottom: 1px solid theme-color('primary');
+  border-top: 1px solid theme-color('primary');
+  margin: $baseline*1.25 0 -0.5*$baseline;
 
   @include media-breakpoint-up(lg) {
     display: none !important;
   }
 
   @include media-breakpoint-down(md) {
-    display: none;
-
     // Override standard styling for the mobile menu links
     .mobile-nav-link {
       position: static;
       transform: none;
+      overflow: hidden;
       padding: 0;
 
       a {
         font-size: $font-size-base;
         font-weight: 600;
-        color: theme-color('dark');
         text-decoration: none;
         outline: none;
         display: block;
@@ -352,7 +350,7 @@
 
         &:hover,
         &:focus {
-          background-color: theme-color('dark');
+          background-color: $gray-600;
           color: theme-color('inverse');
         }
 
@@ -363,6 +361,11 @@
       }
     }
   }
+
+  // Hiding and displaying control classes
+  &.hidden {
+    display: none !important;
+  }
 }
 
 // Hide elements in menu bar when they exist in mobile
@@ -372,4 +375,12 @@
       display: none;
     }
   }
+}
+
+// Language selection styling
+
+.settings-language-form {
+  @include float(right);
+
+  padding: $baseline/2;
 }
