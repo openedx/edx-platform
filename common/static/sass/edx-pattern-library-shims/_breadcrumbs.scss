@@ -12,6 +12,17 @@
 
     display: inline-block;
 
+    @include media-breakpoint-down(md) {
+      max-width: 60px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    &.nav-item-course {
+      max-width: none;
+    }
+
     a,
     a:visited {
       color: theme-color("primary");
@@ -24,6 +35,11 @@
 
   .fa-angle-right {
     @include margin-left($baseline/4);
+
+    @include media-breakpoint-down(md) {
+      position: relative;
+      top: -5px;
+    }
 
     display: inline-block;
     color: $body-color;

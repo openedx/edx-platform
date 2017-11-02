@@ -12,12 +12,12 @@ $annotatable--body-font-size: em(14);
 }
 
 .annotatable-header {
-  margin-bottom: .5em;
+  margin-bottom: 0.5em;
 }
 
 .annotatable-section {
   position: relative;
-  padding: .5em 1em;
+  padding: 0.5em 1em;
   border: 1px solid $annotatable--border-color;
   border-radius: 0.5em;
   margin-bottom: 0.5em;
@@ -55,8 +55,8 @@ $annotatable--body-font-size: em(14);
   position: absolute;
   right: 0;
   margin: 2px 1em 2px 0;
-  &.expanded:after { content: " \2191" }
-  &.collapsed:after { content: " \2193" }
+  &.expanded::after { content: " \2191"; }
+  &.collapsed::after { content: " \2193"; }
 }
 
 .annotatable-span {
@@ -75,9 +75,9 @@ $annotatable--body-font-size: em(14);
     (purple rgba(115,9,178,0.3) rgba(115,9,178,0.9))) {
 
     $highlight_index: $highlight_index + 1;
-    $marker: nth($highlight,1);
-    $color: nth($highlight,2);
-    $selected_color: nth($highlight,3);
+    $marker: nth($highlight, 1);
+    $color: nth($highlight, 2);
+    $selected_color: nth($highlight, 3);
 
     @if $highlight_index == 1 {
       &.highlight {
@@ -177,7 +177,7 @@ $annotatable--body-font-size: em(14);
     }
   }
 
-  &:after {
+  &::after {
     content: '';
     display: inline-block;
     position: absolute;

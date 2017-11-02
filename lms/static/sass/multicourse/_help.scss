@@ -3,7 +3,7 @@
     @include clearfix();
 
     nav.categories {
-      border: 1px solid rgb(220,220,220);
+      border: 1px solid rgb(220, 220, 220);
 
       @include box-sizing(border-box);
       @include float(left);
@@ -20,8 +20,9 @@
         @include padding(12px, 0, 12px, 20px);
         @include text-align(left);
 
-        &:hover, &:focus {
-          background: rgb(245,245,245);
+        &:hover,
+        &:focus {
+          background: rgb(245, 245, 245);
           text-decoration: none;
         }
       }
@@ -40,7 +41,7 @@
         }
 
         > h2 {
-          border-bottom: 1px solid rgb(220,220,220);
+          border-bottom: 1px solid rgb(220, 220, 220);
           margin-bottom: ($baseline*2);
           padding-bottom: $baseline;
         }

@@ -5,7 +5,7 @@ form#wiki_revision {
 
   label {
     display: block;
-    margin-bottom: 7px ;
+    margin-bottom: 7px;
   }
 
   .CodeMirror-scroll {
@@ -56,7 +56,8 @@ form#wiki_revision {
   margin-top: lh();
   width: flex-grid(3, 9);
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     color: #333;
   }
 

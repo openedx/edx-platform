@@ -14,7 +14,7 @@
     "coffee-loader": "^0.7.3",
     "coffee-script": "1.6.1",
     "css-loader": "^0.28.5",
-    "@edx/edx-bootstrap": "^0.4.0",
+    "@edx/edx-bootstrap": "^0.4.1",
     "@edx/paragon": "^0.2.0",
     "@edx/studio-frontend": "^0.3.0",
     "edx-pattern-library": "0.18.1",
