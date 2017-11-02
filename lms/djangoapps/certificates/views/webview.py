@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 from django.http import Http404, HttpResponse
 from django.template import RequestContext
 from django.utils.encoding import smart_str
-from django.utils.translation import ugettext as _
+from django.utils import translation
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -41,6 +41,7 @@ from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
+from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
 from openedx.core.djangoapps.certificates.api import display_date_for_certificate
@@ -51,6 +52,10 @@ from util.views import handle_500
 
 
 log = logging.getLogger(__name__)
+_ = translation.ugettext
+
+
+INVALID_CERTIFICATE_TEMPLATE_PATH = 'certificates/invalid.html'
 
 
 def get_certificate_description(mode, certificate_type, platform_name):
@@ -251,29 +256,6 @@ def _update_course_context(request, context, course, course_key, platform_name):
             platform_name=platform_name)
 
 
-def _update_context_with_catalog_data(context, course_key):
-    """
-    Updates context dictionary with relevant course run info from Discovery.
-    """
-    course_certificate_settings = CertificateGenerationCourseSetting.get(course_key)
-    if course_certificate_settings:
-        course_run_fields = []
-        if course_certificate_settings.language_specific_templates_enabled:
-            course_run_fields.append('content_language')
-        if course_certificate_settings.include_hours_of_effort:
-            course_run_fields.extend(['weeks_to_complete', 'max_effort'])
-        if course_run_fields:
-            course_run_data = get_course_run_details(course_key, course_run_fields)
-            if course_run_data.get('weeks_to_complete') and course_run_data.get('max_effort'):
-                try:
-                    weeks_to_complete = int(course_run_data['weeks_to_complete'])
-                    max_effort = int(course_run_data['max_effort'])
-                    context['hours_of_effort'] = weeks_to_complete * max_effort
-                except ValueError:
-                    log.exception('Error occurred while parsing course run details')
-            context['content_language'] = course_run_data.get('content_language')
-
-
 def _update_social_context(request, context, course, user, user_certificate, platform_name):
     """
     Updates context dictionary with info required for social sharing.
@@ -432,26 +414,6 @@ def _track_certificate_events(request, context, course, user, user_certificate):
         })
 
 
-def _render_certificate_template(request, context, course, user_certificate):
-    """
-    Picks appropriate certificate templates and renders it.
-    """
-    if settings.FEATURES.get('CUSTOM_CERTIFICATE_TEMPLATES_ENABLED', False):
-        custom_template = get_certificate_template(course.id, user_certificate.mode, context.get('content_language'))
-        if custom_template:
-            template = Template(
-                custom_template,
-                output_encoding='utf-8',
-                input_encoding='utf-8',
-                default_filters=['decode.utf8'],
-                encoding_errors='replace',
-            )
-            context = RequestContext(request, context)
-            return HttpResponse(template.render(context))
-
-    return render_to_response("certificates/valid.html", context)
-
-
 def _update_configuration_context(context, configuration):
     """
     Site Configuration will need to be able to override any hard coded
@@ -535,14 +497,10 @@ def render_html_view(request, user_id, course_id):
     preview_mode = request.GET.get('preview', None)
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
     configuration = CertificateHtmlViewConfiguration.get_config()
-    # Create the initial view context, bootstrapping with Django settings and passed-in values
-    context = {}
-    _update_context_with_basic_info(context, course_id, platform_name, configuration)
-    invalid_template_path = 'certificates/invalid.html'
 
     # Kick the user back to the "Invalid" screen if the feature is disabled globally
     if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
-        return render_to_response(invalid_template_path, context)
+        return _render_invalid_certificate(course_id, platform_name, configuration)
 
     # Load the course and user objects
     try:
@@ -557,7 +515,7 @@ def render_html_view(request, user_id, course_id):
             "%d. Specific error: %s"
         )
         log.info(error_str, course_id, user_id, str(exception))
-        return render_to_response(invalid_template_path, context)
+        return _render_invalid_certificate(course_id, platform_name, configuration)
 
     # Kick the user back to the "Invalid" screen if the feature is disabled for the course
     if not course.cert_html_view_enabled:
@@ -566,7 +524,7 @@ def render_html_view(request, user_id, course_id):
             course_id,
             user_id,
         )
-        return render_to_response(invalid_template_path, context)
+        return _render_invalid_certificate(course_id, platform_name, configuration)
 
     # Load user's certificate
     user_certificate = _get_user_certificate(request, user, course_key, course, preview_mode)
@@ -576,7 +534,7 @@ def render_html_view(request, user_id, course_id):
             user_id,
             course_id,
         )
-        return render_to_response(invalid_template_path, context)
+        return _render_invalid_certificate(course_id, platform_name, configuration)
 
     # Get the active certificate configuration for this course
     # If we do not have an active certificate, we'll need to send the user to the "Invalid" screen
@@ -588,46 +546,155 @@ def render_html_view(request, user_id, course_id):
             course_id,
             user_id,
         )
-        return render_to_response(invalid_template_path, context)
+        return _render_invalid_certificate(course_id, platform_name, configuration)
 
-    context['certificate_data'] = active_configuration
+    # Get data from Discovery service that will be necessary for rendering this Certificate.
+    catalog_data = _get_catalog_data_for_course(course_key)
 
-    # Append/Override the existing view context values with any mode-specific ConfigurationModel values
-    context.update(configuration.get(user_certificate.mode, {}))
+    # Determine whether to use the standard or custom template to render the certificate.
+    custom_template = None
+    custom_template_language = None
+    if settings.FEATURES.get('CUSTOM_CERTIFICATE_TEMPLATES_ENABLED', False):
+        custom_template, custom_template_language = _get_custom_template_and_language(
+            course.id,
+            user_certificate.mode,
+            catalog_data.pop('content_language', None)
+        )
 
-    # Append organization info
-    _update_organization_context(context, course)
+    # Determine the language that should be used to render the certificate.
+    # For the standard certificate template, use the user language. For custom templates, use
+    # the language associated with the template.
+    user_language = translation.get_language()
+    certificate_language = custom_template_language if custom_template else user_language
 
-    # Append course info
-    _update_course_context(request, context, course, course_key, platform_name)
+    # Generate the certificate context in the correct language, then render the template.
+    with translation.override(certificate_language):
+        context = {'user_language': user_language}
 
-    # Append course run info from discovery
-    _update_context_with_catalog_data(context, course_key)
+        _update_context_with_basic_info(context, course_id, platform_name, configuration)
 
-    # Append user info
-    _update_context_with_user_info(context, user, user_certificate)
+        context['certificate_data'] = active_configuration
 
-    # Append social sharing info
-    _update_social_context(request, context, course, user, user_certificate, platform_name)
+        # Append/Override the existing view context values with any mode-specific ConfigurationModel values
+        context.update(configuration.get(user_certificate.mode, {}))
 
-    # Append/Override the existing view context values with certificate specific values
-    _update_certificate_context(context, course, user_certificate, platform_name)
+        # Append organization info
+        _update_organization_context(context, course)
 
-    # Append badge info
-    _update_badge_context(context, course, user)
+        # Append course info
+        _update_course_context(request, context, course, course_key, platform_name)
 
-    # Append site configuration overrides
-    _update_configuration_context(context, configuration)
+        # Append course run info from discovery
+        context.update(catalog_data)
 
-    # Add certificate header/footer data to current context
-    context.update(get_certificate_header_context(is_secure=request.is_secure()))
-    context.update(get_certificate_footer_context())
+        # Append user info
+        _update_context_with_user_info(context, user, user_certificate)
 
-    # Append/Override the existing view context values with any course-specific static values from Advanced Settings
-    context.update(course.cert_html_view_overrides)
+        # Append social sharing info
+        _update_social_context(request, context, course, user, user_certificate, platform_name)
 
-    # Track certificate view events
-    _track_certificate_events(request, context, course, user, user_certificate)
+        # Append/Override the existing view context values with certificate specific values
+        _update_certificate_context(context, course, user_certificate, platform_name)
 
-    # FINALLY, render appropriate certificate
-    return _render_certificate_template(request, context, course, user_certificate)
+        # Append badge info
+        _update_badge_context(context, course, user)
+
+        # Append site configuration overrides
+        _update_configuration_context(context, configuration)
+
+        # Add certificate header/footer data to current context
+        context.update(get_certificate_header_context(is_secure=request.is_secure()))
+        context.update(get_certificate_footer_context())
+
+        # Append/Override the existing view context values with any course-specific static values from Advanced Settings
+        context.update(course.cert_html_view_overrides)
+
+        # Track certificate view events
+        _track_certificate_events(request, context, course, user, user_certificate)
+
+        # Render the certificate
+        return _render_valid_certificate(request, context, custom_template)
+
+
+def _get_catalog_data_for_course(course_key):
+    """
+    Retrieve data from the Discovery service necessary for rendering a certificate for a specific course.
+    """
+    course_certificate_settings = CertificateGenerationCourseSetting.get(course_key)
+    if not course_certificate_settings:
+        return {}
+
+    catalog_data = {}
+    course_run_fields = []
+    if course_certificate_settings.language_specific_templates_enabled:
+        course_run_fields.append('content_language')
+    if course_certificate_settings.include_hours_of_effort:
+        course_run_fields.extend(['weeks_to_complete', 'max_effort'])
+
+    if course_run_fields:
+        course_run_data = get_course_run_details(course_key, course_run_fields)
+        if course_run_data.get('weeks_to_complete') and course_run_data.get('max_effort'):
+            try:
+                weeks_to_complete = int(course_run_data['weeks_to_complete'])
+                max_effort = int(course_run_data['max_effort'])
+                catalog_data['hours_of_effort'] = weeks_to_complete * max_effort
+            except ValueError:
+                log.exception('Error occurred while parsing course run details')
+        catalog_data['content_language'] = course_run_data.get('content_language')
+
+    return catalog_data
+
+
+def _get_custom_template_and_language(course_id, course_mode, course_language):
+    """
+    Return the custom certificate template, if any, that should be rendered for the provided course/mode/language
+    combination, along with the language that should be used to render that template.
+    """
+    closest_released_language = _get_closest_released_language(course_language) if course_language else None
+    template = get_certificate_template(course_id, course_mode, closest_released_language)
+
+    if template and template.language:
+        return (template, closest_released_language)
+    elif template:
+        return (template, settings.LANGUAGE_CODE)
+    else:
+        return (None, None)
+
+
+def _get_closest_released_language(target):
+    """
+    Return the language code that most closely matches the target and is fully supported by the LMS, or None
+    if there are no fully supported languages that match the target.
+    """
+    match = None
+    languages = released_languages()
+
+    for language in languages:
+        if language.code == target:
+            match = language.code
+            break
+        elif (match is None) and (language.code[:2] == target[:2]):
+            match = language.code
+
+    return match
+
+
+def _render_invalid_certificate(course_id, platform_name, configuration):
+    context = {}
+    _update_context_with_basic_info(context, course_id, platform_name, configuration)
+    return render_to_response(INVALID_CERTIFICATE_TEMPLATE_PATH, context)
+
+
+def _render_valid_certificate(request, context, custom_template=None):
+    if custom_template:
+        template = Template(
+            custom_template.template,
+            output_encoding='utf-8',
+            input_encoding='utf-8',
+            default_filters=['decode.utf8'],
+            encoding_errors='replace',
+        )
+        context = RequestContext(request, context)
+        return HttpResponse(template.render(context))
+    else:
+        return render_to_response("certificates/valid.html", context)
