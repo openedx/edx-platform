@@ -30,23 +30,28 @@ module.exports = Merge.smart(commonConfig, {
                     /paragon/,
                     /font-awesome/
                 ],
-                use: [{
-                    loader: 'css-loader',
-                    options: {
-                        modules: true,
-                        localIdentName: '[name]__[local]___[hash:base64:5]'
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            sourceMap: true,
+                            modules: true,
+                            localIdentName: '[path][name]__[local]--[hash:base64:5]'
+                        }
+                    },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            data: '$base-rem-size: 0.625; @import "paragon-reset";',
+                            includePaths: [
+                                path.join(__dirname, './node_modules/@edx/paragon/src/utils'),
+                                path.join(__dirname, './node_modules/')
+                            ],
+                            sourceMap: true
+                        }
                     }
-                }, {
-                    loader: 'sass-loader',
-                    options: {
-                        data: '$base-rem-size: 0.625; @import "paragon-reset";',
-                        includePaths: [
-                            path.join(__dirname, './node_modules/@edx/paragon/src/utils'),
-                            path.join(__dirname, './node_modules/')
-                        ],
-                        sourceMap: true
-                    }
-                }]
+                ]
             }
         ]
     }

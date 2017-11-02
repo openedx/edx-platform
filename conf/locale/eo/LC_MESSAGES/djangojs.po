@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-10-27 10:09+0000\n"
-"PO-Revision-Date: 2017-10-27 10:15:38.112782\n"
+"POT-Creation-Date: 2017-11-02 09:29+0000\n"
+"PO-Revision-Date: 2017-11-02 09:35:50.998146\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -36,27 +36,6 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: common/static/bundles/Import.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
-"Thïs mäý ßé häppénïng ßéçäüsé öf än érrör wïth öür sérvér ör ýöür ïntérnét "
-"çönnéçtïön. Trý réfréshïng thé pägé ör mäkïng süré ýöü äré önlïné. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт #"
-
-#: cms/static/cms/js/main.js common/static/bundles/Import.js
-msgid "Studio's having trouble saving your work"
-msgstr ""
-"Stüdïö's hävïng tröüßlé sävïng ýöür wörk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -129,77 +108,6 @@ msgstr "Délété Ⱡ'σяєм ιρѕυ#"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cancel"
 msgstr "Çänçél Ⱡ'σяєм ιρѕυ#"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error during the upload process."
-msgstr ""
-"Théré wäs än érrör dürïng thé üplöäd pröçéss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while unpacking the file."
-msgstr ""
-"Théré wäs än érrör whïlé ünpäçkïng thé fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while verifying the file you submitted."
-msgstr ""
-"Théré wäs än érrör whïlé vérïfýïng thé fïlé ýöü süßmïttéd. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "Choose new file"
-msgstr "Çhöösé néw fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid ""
-"File format not supported. Please upload a file with a {ext} extension."
-msgstr ""
-"Fïlé förmät nöt süppörtéd. Pléäsé üplöäd ä fïlé wïth ä {ext} éxténsïön. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while importing the new library to our database."
-msgstr ""
-"Théré wäs än érrör whïlé ïmpörtïng thé néw lïßrärý tö öür dätäßäsé. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while importing the new course to our database."
-msgstr ""
-"Théré wäs än érrör whïlé ïmpörtïng thé néw çöürsé tö öür dätäßäsé. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "Your import has failed."
-msgstr "Ýöür ïmpört häs fäïléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: cms/static/js/features/import/views/import.js
-#: common/static/bundles/Import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
-"Ýöür ïmpört ïs ïn prögréss; nävïgätïng äwäý wïll äßört ït. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/static/js/features/import/views/import.js
-#: common/static/bundles/Import.js
-msgid "Error importing course"
-msgstr "Érrör ïmpörtïng çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: cms/static/js/features/import/views/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error with the upload"
-msgstr ""
-"Théré wäs än érrör wïth thé üplöäd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
@@ -2086,85 +1994,6 @@ msgstr "Türn ön tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
 msgstr "Türn öff tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: common/static/bundles/CourseGoals.b56f05f27734759a3a6a.js
-#: common/static/bundles/CourseGoals.js
-msgid "Thank you for setting your course goal to "
-msgstr ""
-"Thänk ýöü för séttïng ýöür çöürsé göäl tö  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: common/static/bundles/CourseGoals.b56f05f27734759a3a6a.js
-#: common/static/bundles/CourseGoals.js
-msgid ""
-"There was an error in setting your goal, please reload the page and try "
-"again."
-msgstr ""
-"Théré wäs än érrör ïn séttïng ýöür göäl, pléäsé rélöäd thé pägé änd trý "
-"ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: common/static/bundles/CourseHome.40ee1b4e0334515d1613.js
-#: common/static/bundles/CourseHome.a5e2414bdecbf3f88196.js
-#: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "You have successfully updated your goal."
-msgstr ""
-"Ýöü hävé süççéssfüllý üpdätéd ýöür göäl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: common/static/bundles/CourseHome.40ee1b4e0334515d1613.js
-#: common/static/bundles/CourseHome.a5e2414bdecbf3f88196.js
-#: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "There was an error updating your goal."
-msgstr ""
-"Théré wäs än érrör üpdätïng ýöür göäl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: common/static/bundles/CourseHome.40ee1b4e0334515d1613.js
-#: common/static/bundles/CourseHome.a5e2414bdecbf3f88196.js
-#: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "Show more"
-msgstr "Shöw möré Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: common/static/bundles/CourseHome.40ee1b4e0334515d1613.js
-#: common/static/bundles/CourseHome.a5e2414bdecbf3f88196.js
-#: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "Show less"
-msgstr "Shöw léss Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: common/static/bundles/StudioIndex.ae56ffd9f272143aaf03.js
-#: common/static/bundles/StudioIndex.js
-msgid "Organization:"
-msgstr "Örgänïzätïön: Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: common/static/bundles/StudioIndex.ae56ffd9f272143aaf03.js
-#: common/static/bundles/StudioIndex.js
-msgid "Course Number:"
-msgstr "Çöürsé Nümßér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: common/static/bundles/StudioIndex.ae56ffd9f272143aaf03.js
-#: common/static/bundles/StudioIndex.js
-msgid "Course Run:"
-msgstr "Çöürsé Rün: Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: common/static/bundles/StudioIndex.ae56ffd9f272143aaf03.js
-#: common/static/bundles/StudioIndex.js
-msgid "(Read-only)"
-msgstr "(Réäd-önlý) Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: common/static/bundles/StudioIndex.ae56ffd9f272143aaf03.js
-#: common/static/bundles/StudioIndex.js
-msgid "Re-run Course"
-msgstr "Ré-rün Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: common/static/bundles/StudioIndex.ae56ffd9f272143aaf03.js
-#: common/static/bundles/StudioIndex.js
-#: cms/templates/js/show-textbook.underscore
-msgid "View Live"
-msgstr "Vïéw Lïvé Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -5753,6 +5582,26 @@ msgstr "Övéräll Sçöré Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 msgid "Bookmark this page"
 msgstr "Böökmärk thïs pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "You have successfully updated your goal."
+msgstr ""
+"Ýöü hävé süççéssfüllý üpdätéd ýöür göäl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "There was an error updating your goal."
+msgstr ""
+"Théré wäs än érrör üpdätïng ýöür göäl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "Show more"
+msgstr "Shöw möré Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "Show less"
+msgstr "Shöw léss Ⱡ'σяєм ιρѕυм ∂σł#"
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -5854,6 +5703,26 @@ msgstr "Àççömplïshménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
 msgstr "Pröfïlé Ⱡ'σяєм ιρѕυм #"
+
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
+"Thïs mäý ßé häppénïng ßéçäüsé öf än érrör wïth öür sérvér ör ýöür ïntérnét "
+"çönnéçtïön. Trý réfréshïng thé pägé ör mäkïng süré ýöü äré önlïné. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт #"
+
+#: cms/static/cms/js/main.js
+msgid "Studio's having trouble saving your work"
+msgstr ""
+"Stüdïö's hävïng tröüßlé sävïng ýöür wörk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
@@ -6018,6 +5887,66 @@ msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr ""
 "Ýöü hävé ünsävéd çhängés. Dö ýöü réällý wänt tö léävé thïs pägé? Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error during the upload process."
+msgstr ""
+"Théré wäs än érrör dürïng thé üplöäd pröçéss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while unpacking the file."
+msgstr ""
+"Théré wäs än érrör whïlé ünpäçkïng thé fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while verifying the file you submitted."
+msgstr ""
+"Théré wäs än érrör whïlé vérïfýïng thé fïlé ýöü süßmïttéd. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "Choose new file"
+msgstr "Çhöösé néw fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/static/js/features/import/factories/import.js
+msgid ""
+"File format not supported. Please upload a file with a {ext} extension."
+msgstr ""
+"Fïlé förmät nöt süppörtéd. Pléäsé üplöäd ä fïlé wïth ä {ext} éxténsïön. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while importing the new library to our database."
+msgstr ""
+"Théré wäs än érrör whïlé ïmpörtïng thé néw lïßrärý tö öür dätäßäsé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while importing the new course to our database."
+msgstr ""
+"Théré wäs än érrör whïlé ïmpörtïng thé néw çöürsé tö öür dätäßäsé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "Your import has failed."
+msgstr "Ýöür ïmpört häs fäïléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: cms/static/js/features/import/views/import.js
+msgid "Your import is in progress; navigating away will abort it."
+msgstr ""
+"Ýöür ïmpört ïs ïn prögréss; nävïgätïng äwäý wïll äßört ït. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/static/js/features/import/views/import.js
+msgid "Error importing course"
+msgstr "Érrör ïmpörtïng çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: cms/static/js/features/import/views/import.js
+msgid "There was an error with the upload"
+msgstr ""
+"Théré wäs än érrör wïth thé üplöäd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
@@ -10476,18 +10405,9 @@ msgid "Scheduled:"
 msgstr "Sçhédüléd: Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/templates/js/course-outline.underscore
-msgid "Highlights:"
-msgstr "Hïghlïghts: Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: cms/templates/js/course-outline.underscore
-msgid "Section Highlights: {number_of_highlights} entered"
-msgstr ""
-"Séçtïön Hïghlïghts: {number_of_highlights} éntéréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢т#"
-
-#: cms/templates/js/course-outline.underscore
-msgid "Enter Section Highlights"
-msgstr "Éntér Séçtïön Hïghlïghts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+#: cms/templates/js/highlights-editor.underscore
+msgid "Section Highlights"
+msgstr "Séçtïön Hïghlïghts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Graded as:"
@@ -10851,10 +10771,6 @@ msgid "delete group"
 msgstr "délété gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/js/highlights-editor.underscore
-msgid "Section Highlights"
-msgstr "Séçtïön Hïghlïghts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: cms/templates/js/highlights-editor.underscore
 msgid ""
 "Please enter 3-5 highlights to be sent as separate bullet points in the "
 "message."
@@ -11200,6 +11116,10 @@ msgid ""
 msgstr ""
 "Ìf thé süßséçtïön döés nöt hävé ä düé däté, léärnérs älwäýs séé théïr sçörés"
 " whén théý süßmït änswérs tö ässéssménts. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
+msgstr "Vïéw Lïvé Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore

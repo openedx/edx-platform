@@ -1,6 +1,7 @@
 """
 A script to create some dummy users
 """
+from __future__ import print_function
 import uuid
 
 from django.core.management.base import BaseCommand
@@ -32,6 +33,7 @@ def create(num, course_key):
         (user, _, _) = _do_create_account(make_random_form())
         if course_key is not None:
             CourseEnrollment.enroll(user, course_key)
+        print('Created user {}'.format(user.username))
 
 
 class Command(BaseCommand):
@@ -45,16 +47,15 @@ Examples:
   create_random_users.py 100 HarvardX/CS50x/2012
 """
 
+    def add_arguments(self, parser):
+        parser.add_argument('num_users',
+                            help='Number of users to create',
+                            type=int)
+        parser.add_argument('course_key',
+                            help='Add newly created users to this course',
+                            nargs='?')
+
     def handle(self, *args, **options):
-        if len(args) < 1 or len(args) > 2:
-            print Command.help
-            return
-
-        num = int(args[0])
-
-        if len(args) == 2:
-            course_key = CourseKey.from_string(args[1])
-        else:
-            course_key = None
-
+        num = options['num_users']
+        course_key = CourseKey.from_string(options['course_key']) if options['course_key'] else None
         create(num, course_key)

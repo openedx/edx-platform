@@ -5,47 +5,54 @@ Most of the functionality is covered in test_views.py.
 """
 
 import re
-import ddt
-from dateutil.parser import parse as parse_datetime
 
-from mock import Mock, patch
-from django.test import TestCase
-from nose.plugins.attrib import attr
-from nose.tools import raises
-import unittest
-from student.tests.factories import UserFactory
+import pytest
+from dateutil.parser import parse as parse_datetime
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
+from django.test import TestCase
 from django.test.client import RequestFactory
-from openedx.core.djangoapps.user_api.accounts import (
-    USERNAME_MAX_LENGTH,
-    PRIVATE_VISIBILITY
-)
+from mock import Mock, patch
+from six import iteritems
+
+import ddt
+from nose.plugins.attrib import attr
+from nose.tools import raises
+from openedx.core.djangoapps.user_api.accounts import PRIVATE_VISIBILITY, USERNAME_MAX_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import (
-    get_account_settings,
-    update_account_settings,
-    create_account,
     activate_account,
-    request_password_change
-)
-from openedx.core.djangoapps.user_api.errors import (
-    UserNotFound, UserNotAuthorized,
-    AccountUpdateError, AccountValidationError, AccountUserAlreadyExists,
-    AccountUsernameInvalid, AccountEmailInvalid, AccountPasswordInvalid,
-    AccountRequestError
+    create_account,
+    get_account_settings,
+    request_password_change,
+    update_account_settings
 )
 from openedx.core.djangoapps.user_api.accounts.tests.testutils import (
-    INVALID_EMAILS, INVALID_PASSWORDS, INVALID_USERNAMES, VALID_USERNAMES_UNICODE
+    INVALID_EMAILS,
+    INVALID_PASSWORDS,
+    INVALID_USERNAMES,
+    VALID_USERNAMES_UNICODE
+)
+from openedx.core.djangoapps.user_api.errors import (
+    AccountEmailInvalid,
+    AccountPasswordInvalid,
+    AccountRequestError,
+    AccountUpdateError,
+    AccountUserAlreadyExists,
+    AccountUsernameInvalid,
+    AccountValidationError,
+    UserNotAuthorized,
+    UserNotFound
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import PendingEmailChange
+from student.tests.factories import UserFactory
 from student.tests.tests import UserSettingsEventTestMixin
 
 
 def mock_render_to_string(template_name, context):
     """Return a string that encodes template_name and context"""
-    return str((template_name, sorted(context.iteritems())))
+    return str((template_name, sorted(iteritems(context))))
 
 
 @attr(shard=2)
@@ -312,6 +319,32 @@ class AccountSettingsOnCreationTest(TestCase):
 
 
 @attr(shard=2)
+@pytest.mark.django_db
+def test_create_account_duplicate_email(django_db_use_migrations):
+    """
+    Test case for duplicate email constraint
+    Email uniqueness constraints were introduced in a database migration,
+    which we disable in the unit tests to improve the speed of the test suite
+
+    This test only runs if migrations have been run.
+
+    django_db_use_migrations is a pytest_django fixture which tells us whether
+    migrations are being used.
+    """
+    password = 'legit'
+    email = 'zappadappadoo@example.com'
+
+    if django_db_use_migrations:
+        create_account('zappadappadoo', password, email)
+
+        with pytest.raises(
+                AccountUserAlreadyExists,
+                message='Migrations are being used, but creating an account with duplicate email succeeded!'
+        ):
+            create_account('different_user', password, email)
+
+
+@attr(shard=2)
 @ddt.ddt
 class AccountCreationActivationAndPasswordChangeTest(TestCase):
     """
@@ -345,14 +378,6 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         with self.assertRaises(AccountUserAlreadyExists):
             create_account(self.USERNAME, self.PASSWORD, 'different+email@example.com')
-
-    # Email uniqueness constraints were introduced in a database migration,
-    # which we disable in the unit tests to improve the speed of the test suite.
-    @unittest.skipUnless(settings.SOUTH_TESTS_MIGRATE, "South migrations required")
-    def test_create_account_duplicate_email(self):
-        create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        with self.assertRaises(AccountUserAlreadyExists):
-            create_account('different_user', self.PASSWORD, self.EMAIL)
 
     def test_username_too_long(self):
         long_username = 'e' * (USERNAME_MAX_LENGTH + 1)

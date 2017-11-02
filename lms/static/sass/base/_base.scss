@@ -130,9 +130,13 @@ a:visited:not(.btn) {
 }
 
 .content-wrapper {
-  width: flex-grid(12);
-  margin: 0 auto;
-  background: $body-bg;
+  max-width: map-get($container-max-widths, xl);
+  margin-top: $baseline;
+  padding: 0 0 $baseline/2;
+
+  @include media-breakpoint-up(md) {
+    padding: 0 $baseline $baseline/2;
+  }
 
   @media print {
     padding-bottom: 0;

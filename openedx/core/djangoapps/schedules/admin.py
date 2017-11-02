@@ -4,12 +4,17 @@ from django.utils.translation import ugettext_lazy as _
 from . import models
 
 
+class ScheduleExperienceAdminInline(admin.StackedInline):
+    model = models.ScheduleExperience
+
+
 @admin.register(models.Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
     list_display = ('username', 'course_id', 'active', 'start', 'upgrade_deadline')
     raw_id_fields = ('enrollment',)
     readonly_fields = ('modified',)
     search_fields = ('enrollment__user__username', 'enrollment__course_id',)
+    inlines = (ScheduleExperienceAdminInline,)
 
     def username(self, obj):
         return obj.enrollment.user.username

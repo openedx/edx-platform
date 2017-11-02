@@ -532,7 +532,7 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
             describe('Section Highlights', function() {
                 var createCourse, createCourseWithHighlights, createCourseWithHighlightsDisabled, mockHighlightValues,
                     highlightsLink, highlightInputs, openHighlights, saveHighlights, setHighlights,
-                    expectHighlightLinkTextToBe, expectHighlightsToBe, expectServerHandshakeWithHighlights,
+                    expectHighlightLinkNumberToBe, expectHighlightsToBe, expectServerHandshakeWithHighlights,
                     expectHighlightsToUpdate,
                     maxNumHighlights = 5;
 
@@ -591,8 +591,10 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     }
                 };
 
-                expectHighlightLinkTextToBe = function(expectedValue) {
-                    expect(highlightsLink()).toContainText(expectedValue);
+                expectHighlightLinkNumberToBe = function(expectedNumber) {
+                    var link = highlightsLink();
+                    expect(link).toContainText('Section Highlights');
+                    expect(link.find('.number-highlights')).toHaveHtml(expectedNumber);
                 };
 
                 expectHighlightsToBe = function(expectedHighlights) {
@@ -645,13 +647,13 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
 
                 it('displays link when no highlights exist', function() {
                     createCourseWithHighlights([]);
-                    expectHighlightLinkTextToBe('Enter Section Highlights');
+                    expectHighlightLinkNumberToBe(0);
                 });
 
                 it('displays link when highlights exist', function() {
                     var highlights = mockHighlightValues(2);
                     createCourseWithHighlights(highlights);
-                    expectHighlightLinkTextToBe('Section Highlights: 2 entered');
+                    expectHighlightLinkNumberToBe(2);
                 });
 
                 it('can view when no highlights exist', function() {

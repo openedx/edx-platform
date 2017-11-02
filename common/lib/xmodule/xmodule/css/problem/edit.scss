@@ -51,7 +51,7 @@
   background-color: $white;
   overflow: hidden;
 
-  @include transition(width .3s linear 0s);
+  @include transition(width 0.3s linear 0s);
 
   &.shown {
     width: 20%;
@@ -108,7 +108,7 @@
 
 .problem-editor {
   // adding padding to simple editor only - adjacent selector is needed since there are no toggles for CodeMirror
-  .markdown-box+.CodeMirror {
+  .markdown-box + .CodeMirror {
     padding: 10px;
   }
 }

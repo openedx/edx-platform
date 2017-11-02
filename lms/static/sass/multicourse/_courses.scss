@@ -23,14 +23,15 @@ $facet-background-color: #007db8;
 
 // +Layout - Courses Container
 // ====================
-.find-courses, .university-profile {
+.find-courses,
+.university-profile {
   .discovery-button:not(:disabled) {
     @extend %t-action2;
 
     @include text-align(left);
 
     outline: 0 none;
-    box-shadow:none;
+    box-shadow: none;
     border: 0;
     background: none;
     padding: 0 ($baseline*0.6);
@@ -39,7 +40,7 @@ $facet-background-color: #007db8;
     text-transform: none;
 
     //STATE: hover
-    &::hover {
+    &:hover {
       background: none;
     }
   }
@@ -131,7 +132,8 @@ $facet-background-color: #007db8;
 
 // +Hero - Home Header
 // ====================
-.find-courses, .university-profile {
+.find-courses,
+.university-profile {
   header.search {
     background: $gray-l5;
     background-size: cover;
@@ -162,7 +164,8 @@ $facet-background-color: #007db8;
         z-index: 2;
       }
 
-      &.main-search, &.university-search {
+      &.main-search,
+      &.university-search {
         text-align: center;
 
         .heading-group {
@@ -180,7 +183,7 @@ $facet-background-color: #007db8;
           vertical-align: middle;
 
           &::after {
-            @include right(0px);
+            @include right(0);
 
             content: "";
             display: block;
@@ -203,7 +206,8 @@ $facet-background-color: #007db8;
           text-transform: none;
         }
 
-        h1, h2 {
+        h1,
+        h2 {
           display: inline-block;
           letter-spacing: 1px;
           margin-bottom: 0;
@@ -247,7 +251,6 @@ $facet-background-color: #007db8;
       @include media($bp-large) {
         @include span-columns(8);
       }
-
     }
 
     .wrapper-search-input {
@@ -318,7 +321,8 @@ $facet-background-color: #007db8;
     text-shadow: none;
 
     //STATE: hover, focus
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       background: $m-blue-d5;
     }
   }
@@ -463,7 +467,8 @@ $facet-background-color: #007db8;
       content: "";
     }
 
-    .header-search-facets, .header-facet {
+    .header-search-facets,
+    .header-facet {
       @extend %t-title6;
       @extend %t-strong;
 
@@ -579,7 +584,8 @@ $facet-background-color: #007db8;
 
 // +All Other Styles
 // ====================
-.find-courses, .university-profile {
+.find-courses,
+.university-profile {
   background: $gray-l5;
   padding-bottom: ($baseline*3);
 
@@ -591,6 +597,5 @@ $facet-background-color: #007db8;
     border-top: 1px solid $border-color-2;
     margin-top: $baseline;
     padding-top: ($baseline*3);
-
   }
 }

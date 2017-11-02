@@ -12,7 +12,8 @@ $seq-nav-height: 44px;
 
   display: block;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background: none;
   }
 }
@@ -32,14 +33,15 @@ $seq-nav-height: 44px;
 
       display: block;
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         background: none;
       }
     }
   }
 }
 
-%ui-clear-button  {
+%ui-clear-button {
   background-color: transparent;
   background-image: none;
   background-position: center 14px;
@@ -60,16 +62,13 @@ $seq-nav-height: 44px;
 .sequence-nav {
   @extend .topbar;
 
-  margin: 0 0 $baseline 0;
+  margin: 0 auto $baseline;
   position: relative;
   border-bottom: none;
   z-index: 0;
   height: $seq-nav-height;
   display: flex;
-
-  .sequence-nav-button {
-    max-width: 200px;
-  }
+  justify-content: center;
 
   @media print {
     display: none;
@@ -81,6 +80,11 @@ $seq-nav-height: 44px;
     position: relative;
     height: 100%;
     flex-grow: 1;
+
+    @include media-breakpoint-down(md) {
+      white-space: nowrap;
+      overflow-x: scroll;
+    }
   }
 
   ol {
@@ -88,7 +92,7 @@ $seq-nav-height: 44px;
 
     li {
       box-sizing: border-box;
-      min-width: 20px;
+      min-width: 40px;
       flex-grow: 1;
       border-color: $seq-nav-border-color;
       border-width: 1px;
@@ -127,28 +131,28 @@ $seq-nav-height: 44px;
 
         //video
         &.seq_video {
-          .icon:before {
+          .icon::before {
             content: "\f008"; // .fa-film
           }
         }
 
         //other
         &.seq_other {
-          .icon:before {
+          .icon::before {
             content: "\f02d"; // .fa-book
           }
         }
 
         //vertical
         &.seq_vertical {
-          .icon:before {
+          .icon::before {
             content: "\f00b";  // .fa-tasks
           }
         }
 
         //problems
         &.seq_problem {
-          .icon:before {
+          .icon::before {
             content: "\f044";  // .fa-pencil-square-o
           }
         }
@@ -207,38 +211,60 @@ $seq-nav-height: 44px;
 
   display: block;
   top: 0;
+  min-width: 40px;
+  max-width: 40px;
   height: 100%;
   text-shadow: none; // overrides default button text-shadow
   background: none;  // overrides default button gradient
-  background-color: white;
+  background-color: theme-color("inverse");
   border-color: $seq-nav-border-color;
   box-shadow: none;
-  min-width: 120px;
   font-size: inherit;
   font-weight: normal;
-  padding: 0 $baseline;
-  text-overflow: ellipsis;
+  padding: 0;
   white-space: nowrap;
-  overflow: hidden;
+  overflow-x: scroll;
 
-  span:not(:last-child) {
-    @include padding-right($baseline / 2);
+  @include media-breakpoint-up(md) {
+    min-width: 120px;
+    max-width: 200px;
+    text-overflow: ellipsis;
+
+    span:not(:last-child) {
+      @include padding-right($baseline / 2);
+    }
+  }
+
+  .sequence-nav-button-label {
+    display: none;
+
+    @include media-breakpoint-up(md) {
+      display: inline;
+    }
   }
 
   &.button-previous {
-    @include left(0);
-    @include border-top-left-radius(3px);
-    @include border-top-right-radius(0);
-    @include border-bottom-right-radius(0);
-    @include border-bottom-left-radius(3px);
+    order: -999;
+
+    @include media-breakpoint-up(md) {
+      @include left(0);
+      @include border-top-left-radius(3px);
+      @include border-top-right-radius(0);
+      @include border-bottom-right-radius(0);
+      @include border-bottom-left-radius(3px);
+    }
   }
 
   &.button-next {
-    @include right(0);
-    @include border-top-left-radius(0);
-    @include border-top-right-radius(3px);
-    @include border-bottom-right-radius(3px);
-    @include border-bottom-left-radius(0);
+    order: 999;
+
+    @include media-breakpoint-up(md) {
+      @include right(0);
+      @include border-top-left-radius(0);
+      @include border-top-right-radius(3px);
+      @include border-bottom-right-radius(3px);
+      @include border-bottom-left-radius(0);
+    }
   }
 
   &.disabled {
@@ -250,7 +276,7 @@ $seq-nav-height: 44px;
   display: none;
 }
 
-nav.sequence-bottom {
+.sequence-bottom {
   position: relative;
   height: 45px;
   margin: lh(2) auto;
@@ -259,6 +285,9 @@ nav.sequence-bottom {
 
   .sequence-nav-button {
     position: relative;
+    min-width: 120px;
+    max-width: 200px;
+    text-overflow: ellipsis;
 
     &:last-of-type {
       @include border-left(none);

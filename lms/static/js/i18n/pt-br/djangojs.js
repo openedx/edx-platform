@@ -192,7 +192,6 @@
     "Author": "Autor", 
     "Automatic": "Autom\u00e1tico", 
     "Average": "M\u00e9dio", 
-    "Back to Dashboard": "Voltar para o Painel", 
     "Back to sign in": "Voltar para entrar", 
     "Back to {platform} FAQs": "Voltar para {platform} FAQs", 
     "Background color": "Cor do plano de fundo", 

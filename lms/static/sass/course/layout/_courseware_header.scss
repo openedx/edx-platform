@@ -5,12 +5,18 @@
   @extend %ui-print-excluded;
 
   border-bottom: none;
-  margin: 0 auto 0;
+  margin: 0 auto;
   padding: 0;
   width: 100%;
 
   .course-material {
     @extend %inner-wrapper;
+
+    @include media-breakpoint-down(md) {
+      overflow-x: scroll;
+      overflow-y: hidden;
+      white-space: nowrap;
+    }
   }
 
   .course-tabs {
@@ -19,7 +25,7 @@
 
     padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
 
-    li {
+    .tab {
       display: inline-block;
       list-style: none;
 
@@ -42,7 +48,7 @@
         @extend %t-title7;
         @extend %t-regular;
 
-        color: $gray-d1;
+        color: theme-color("dark");
         display: block;
         text-align: center;
         text-decoration: none;
@@ -51,8 +57,8 @@
         &:hover,
         &:focus,
         &.active {
-          color: $uxpl-blue-hover-active;
-          border-bottom-color: $uxpl-blue-hover-active;
+          color: theme-color("primary");
+          border-bottom-color: theme-color("primary");
           background-color: transparent;
         }
       }
@@ -92,8 +98,6 @@
     display: none;
 
     &#login {
-      display: block;
-
       @include background-image(linear-gradient(-90deg, lighten($link-color, 8%), lighten($link-color, 5%) 50%, $link-color 50%, darken($link-color, 10%) 100%));
 
       border: 1px solid transparent;
@@ -103,12 +107,11 @@
       @include box-sizing(border-box);
 
       box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-      color: $white;
+      color: theme-color("inverse");
       display: inline-block;
       font-family: $font-family-sans-serif;
-      font-size: 14px;
+      font-size: $font-size-sm;
       font-weight: bold;
-      display: inline-block;
       letter-spacing: 0;
       line-height: 1em;
       margin: 4px;
@@ -118,7 +121,9 @@
       text-shadow: 0 -1px rgba(0, 0, 0, 0.6);
       vertical-align: middle;
 
-      &:hover, &:active, &:focus {
+      &:hover,
+      &:active,
+      &:focus {
         @include background-image(linear-gradient(-90deg, $primary, $primary 50%, $primary 50%, $primary 100%));
       }
     }
@@ -156,7 +161,6 @@
       font: inherit;
       font-weight: bold;
     }
-
   }
 
   a#signup {

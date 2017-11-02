@@ -310,14 +310,16 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
             sys_msg = err.response.json() if err.response else "Not available"
             log_msg_template = (
                 'Unable to retrieve user details with username {username} from SAPSuccessFactors for company ' +
-                'ID {company} with url "{url}".  Error message: {err_msg}.  System message: {sys_msg}.'
+                'ID {company} with url "{url}".  Error message: {err_msg}.  System message: {sys_msg}.  ' +
+                'Headers: {headers}'
             )
             log_msg = log_msg_template.format(
                 username=username,
                 company=self.odata_company_id,
                 url=odata_api_url,
                 err_msg=err.message,
-                sys_msg=sys_msg
+                sys_msg=sys_msg,
+                headers=err.response.headers
             )
             log.warning(log_msg, exc_info=True)
             return details

@@ -86,6 +86,45 @@ engine = Engine(dirs=settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
 source, template_path = Loader(engine).load_template_source(path)
 %>${source | n, decode.utf8}</%def>
 
+<%def name="studiofrontend(page, lang='en')">
+    <%doc>
+        Loads a studio-frontend page, with the necessary context. Context is expected
+        as a dictionary in the body of this tag.
+
+        Dev note: we could also add the locale-injection script in this block
+            -use a better default than the hardcoded 'en'. There should be a setting or something?
+            -lookup (webpack exported) locale-injection script using lang as key
+            -include it as the first script in this block
+    </%doc>
+    <%
+        from django.template import Template, Context
+        from webpack_loader.exceptions import WebpackLoaderBadStatsError
+        import json
+
+        def _convert_dict_to_json(input_dict):
+            output_json = "{"
+            for key in input_dict:
+                output_json = "{}{}:\"{}\",".format(output_json, key, input_dict[key])
+            output_json += "}"
+            return output_json
+
+        body = capture(caller.body)
+        body_dict = json.loads(body)
+        body_dict['lang'] = lang
+        return Template("""
+            <script type="text/javascript" id='courseContext'>
+                var courseContext = {% autoescape off %}{{ body }}{% endautoescape %};
+            </script>
+            <div id="root"></div>
+            {% load render_bundle from webpack_loader %}
+            {% render_bundle page %}
+        """).render(Context({
+            'body': _convert_dict_to_json(body_dict),
+            'page': page
+        }))
+    %>
+</%def>
+
 <%def name="webpack(entry)">
     <%doc>
         Loads Javascript onto your page from a Webpack-generated bundle.

@@ -92,7 +92,7 @@ class Command(BaseCommand):
         if theme_dirs:
             available_themes = {}
             for theme_dir in theme_dirs:
-                available_themes.update({t.theme_dir_name: t for t in get_themes(theme_dir)})
+                available_themes.update({t.theme_dir_name: t for t in get_themes([theme_dir])})
         else:
             theme_dirs = get_theme_base_dirs()
             available_themes = {t.theme_dir_name: t for t in get_themes()}

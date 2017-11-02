@@ -32,6 +32,7 @@ class PytestSuite(TestSuite):
             self.django_toxenv = 'py27-django111'
         else:
             self.django_toxenv = 'py27-django18'
+        self.disable_capture = kwargs.get('disable_capture', None)
         self.report_dir = Env.REPORT_DIR / self.root
 
         # If set, put reports for run in "unique" directories.
@@ -144,6 +145,9 @@ class SystemTestSuite(PytestSuite):
         elif self.verbosity > 1:
             cmd.append("--verbose")
 
+        if self.disable_capture:
+            cmd.append("-s")
+
         if self.processes == -1:
             cmd.append('-n auto')
             cmd.append('--dist=loadscope')
@@ -230,6 +234,8 @@ class LibTestSuite(PytestSuite):
             cmd.append("--quiet")
         elif self.verbosity > 1:
             cmd.append("--verbose")
+        if self.disable_capture:
+            cmd.append("-s")
         cmd.append(self.test_id)
 
         return self._under_coverage_cmd(cmd)

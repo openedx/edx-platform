@@ -75,7 +75,8 @@
             display: inline-block;
             color: $black;
 
-            &:hover, &:focus {
+            &:hover,
+            &:focus {
               color: $blue;
             }
 

@@ -741,16 +741,22 @@ class TestMakoTemplateLinter(TestLinter):
                 ${x | h}
             </%static:require_module>
             ${x | h}
+            <%static:studiofrontend page="${x}" lang="en">
+                ${x | h}
+            </%static:studiofrontend>
+            ${x | h}
         """)
 
         linter._check_mako_file_is_safe(mako_template, results)
 
-        self.assertEqual(len(results.violations), 5)
+        self.assertEqual(len(results.violations), 7)
         self.assertEqual(results.violations[0].rule, Rules.mako_unwanted_html_filter)
         self.assertEqual(results.violations[1].rule, Rules.mako_invalid_js_filter)
         self.assertEqual(results.violations[2].rule, Rules.mako_unwanted_html_filter)
         self.assertEqual(results.violations[3].rule, Rules.mako_invalid_js_filter)
         self.assertEqual(results.violations[4].rule, Rules.mako_unwanted_html_filter)
+        self.assertEqual(results.violations[5].rule, Rules.mako_invalid_js_filter)
+        self.assertEqual(results.violations[6].rule, Rules.mako_unwanted_html_filter)
 
     def test_check_mako_expressions_javascript_strings(self):
         """

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-10-27 10:15+0000\n"
-"PO-Revision-Date: 2017-10-27 10:15:37.846287\n"
+"POT-Creation-Date: 2017-11-02 09:35+0000\n"
+"PO-Revision-Date: 2017-11-02 09:35:50.719930\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4452,21 +4452,36 @@ msgstr ""
 msgid "Powered by Open edX"
 msgstr ""
 
+#: lms/djangoapps/branding/api.py lms/templates/static_templates/blog.html
+msgid "Blog"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
+msgid "Contact Us"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Help Center"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+#: lms/templates/static_templates/media-kit.html
+msgid "Media Kit"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py lms/templates/static_templates/donate.html
+msgid "Donate"
+msgstr ""
+
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid "{platform_name} for Business"
 msgstr ""
 
-#: lms/djangoapps/branding/api.py lms/templates/static_templates/blog.html
-msgid "Blog"
-msgstr ""
-
 #: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
 msgid "News"
-msgstr ""
-
-#: lms/djangoapps/branding/api.py
-msgid "Help Center"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
@@ -4480,10 +4495,6 @@ msgstr ""
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Careers"
-msgstr ""
-
-#: lms/djangoapps/branding/api.py lms/templates/static_templates/donate.html
-msgid "Donate"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -4512,11 +4523,6 @@ msgstr ""
 msgid "Sitemap"
 msgstr ""
 
-#: lms/djangoapps/branding/api.py
-#: lms/templates/static_templates/media-kit.html
-msgid "Media Kit"
-msgstr ""
-
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
@@ -4526,6 +4532,14 @@ msgstr ""
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Terms of Service"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Affiliates"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Open edX"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -9492,7 +9506,7 @@ msgstr ""
 #, python-format
 msgid ""
 "Welcome to week %(week_num)s of our %(course_name)s course! Here is what you"
-" can look forward to learning this week: %(week_summary)s"
+" can look forward to learning this week:"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/subject.txt
@@ -11094,12 +11108,6 @@ msgstr ""
 msgid "Send an email to {email}"
 msgstr ""
 
-#: cms/templates/widgets/sock.html
-#: themes/edx.org/cms/templates/widgets/sock.html
-#: themes/stanford-style/lms/templates/static_templates/about.html
-msgid "Contact Us"
-msgstr ""
-
 #: cms/templates/widgets/tabs-aggregator.html
 #: lms/templates/courseware/static_tab.html
 #: lms/templates/courseware/tab-view-v2.html
@@ -12148,11 +12156,11 @@ msgid "Previous"
 msgstr ""
 
 #: lms/templates/seq_module.html
-msgid "Sequence"
+msgid "Next"
 msgstr ""
 
 #: lms/templates/seq_module.html
-msgid "Next"
+msgid "Sequence"
 msgstr ""
 
 #: lms/templates/signup_modal.html
@@ -14496,6 +14504,14 @@ msgid "Related Programs"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You can no longer access this course because payment has not yet been "
+"received. You can {contact_link_start}contact the account "
+"holder{contact_link_end} to request payment, or you can "
+"{unenroll_link_start}unenroll{unenroll_link_end} from this course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
 msgstr ""
 
@@ -14571,14 +14587,6 @@ msgid ""
 "{cert_name_long}{link_end}."
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You can no longer access this course because payment has not yet been "
-"received. You can {contact_link_start}contact the account "
-"holder{contact_link_end} to request payment, or you can "
-"{unenroll_link_start}unenroll{unenroll_link_end} from this course"
-msgstr ""
-
 #. Translators: provider_name is the name of a credit provider or university
 #. (e.g. State University)
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -14643,6 +14651,20 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "An error occurred with this transaction. For help, contact {support_email}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_show_consent.html
+msgid "Consent to share your data"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_show_consent.html
+msgid ""
+"To access this course, you must first consent to share your learning "
+"achievements with {enterprise_customer_name}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_show_consent.html
+msgid "View Consent"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -18430,12 +18452,22 @@ msgid "Page Footer"
 msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
-#: themes/edx.org/lms/templates/certificates/_about-edx.html
-msgid "About edX"
+msgid "edX Home Page"
 msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
-msgid "edX Home Page"
+msgid "© 2012–{year} edX Inc. "
+msgstr ""
+
+#: themes/edx.org/lms/templates/footer.html
+msgid ""
+"EdX, Open edX, and MicroMasters are trademarks of edX Inc., registered in "
+"the U.S. and other countries."
+msgstr ""
+
+#: themes/edx.org/lms/templates/footer.html
+#: themes/edx.org/lms/templates/certificates/_about-edx.html
+msgid "About edX"
 msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html

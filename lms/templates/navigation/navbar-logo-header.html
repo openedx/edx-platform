@@ -24,7 +24,9 @@ from branding import api as branding_api
   % if enable_enterprise_sidebar:
     <span class="enterprise-tagline">
       <% tagline = configuration_helpers.get_value('ENTERPRISE_TAGLINE', settings.ENTERPRISE_TAGLINE) %>
-      ${tagline}
+      % if tagline:
+        ${tagline}
+      % endif
     </span>
   % endif
   % if course:

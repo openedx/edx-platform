@@ -15,6 +15,7 @@ import json
 
 from .common import *
 
+from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.logsettings import get_logger_config
 import os
 
@@ -201,10 +202,6 @@ for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
 COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 
 ASSET_IGNORE_REGEX = ENV_TOKENS.get('ASSET_IGNORE_REGEX', ASSET_IGNORE_REGEX)
-
-# following setting is for backward compatibility
-if ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', None):
-    COMPREHENSIVE_THEME_DIR = ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR')
 
 COMPREHENSIVE_THEME_DIRS = ENV_TOKENS.get('COMPREHENSIVE_THEME_DIRS', COMPREHENSIVE_THEME_DIRS) or []
 
@@ -534,3 +531,7 @@ PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
 
 # Allow extra middleware classes to be added to the app through configuration.
 MIDDLEWARE_CLASSES.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
+
+########################## Derive Any Derived Settings  #######################
+
+derive_settings(__name__)

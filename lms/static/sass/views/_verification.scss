@@ -652,7 +652,8 @@
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
@@ -874,7 +875,7 @@
 
           @include float(left);
 
-          width: flex-grid(4,12);
+          width: flex-grid(4, 12);
 
           @include text-align(right);
 
@@ -1163,7 +1164,8 @@
               }
             }
 
-            .contribution-option-other1 label, .contribution-option-other2 label {
+            .contribution-option-other1 label,
+            .contribution-option-other2 label {
               @extend %text-sr;
             }
           }
@@ -1196,7 +1198,8 @@
       }
 
       // previously defined in HTML
-      video, canvas {
+      video,
+      canvas {
         position: relative;
         display: block;
 
@@ -1302,7 +1305,9 @@
         margin-right: ($baseline/4);
       }
 
-      .deco-denomination, .label-value, .denomination-name {
+      .deco-denomination,
+      .label-value,
+      .denomination-name {
         display: inline-block;
         vertical-align: middle;
       }
@@ -1443,7 +1448,8 @@
         margin-bottom: 0;
       }
 
-      .wrapper-copy, .list-actions {
+      .wrapper-copy,
+      .list-actions {
         display: inline-block;
         vertical-align: middle;
       }
@@ -1784,7 +1790,7 @@
         .placeholder-art {
           position: relative;
           display: inline-block;
-          margin: $baseline 0 ($baseline/2) 0;
+          margin: $baseline 0 ($baseline/2);
           padding: $baseline;
           background: $verified-color-lvl3;
           border-radius: ($baseline*10);
@@ -1844,7 +1850,8 @@
           padding: ($baseline/2) $baseline;
         }
 
-        .copy-super, .copy-sub {
+        .copy-super,
+        .copy-sub {
           display: block;
         }
 
@@ -1905,11 +1912,6 @@
     }
   }
 
-  // VIEW: take and review photos
-  &.step-photos {
-
-  }
-
   // VIEW: take cam photo
   &.step-photos-cam {
 
@@ -1967,7 +1969,8 @@
           border-color: $verified-color-lvl3;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-l3;
         }
       }
@@ -2014,7 +2017,8 @@
 
         color: $m-blue-d3;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           color: $m-blue-d1;
           border: none;
         }
@@ -2043,7 +2047,7 @@
           margin-top: ($baseline/2);
         }
 
-        .action-verify label  {
+        .action-verify label {
           @extend %t-copy-sub1;
         }
       }
@@ -2328,7 +2332,8 @@
         border-color: $m-blue-d1;
       }
 
-      .step-number, .step-name {
+      .step-number,
+      .step-name {
         color: $m-gray-d3;
       }
     }
@@ -2383,14 +2388,15 @@
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
     }
 
     .progress-sts-value {
-      width: 0% !important;
+      width: 0 !important;
     }
   }
 
@@ -2423,7 +2429,8 @@
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
@@ -2448,7 +2455,8 @@
           border-color: $verified-color-lvl3;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-l3;
         }
       }
@@ -2462,7 +2470,8 @@
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }

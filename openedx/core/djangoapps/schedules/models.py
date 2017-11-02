@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.sites.models import Site
+from model_utils import Choices
 from model_utils.models import TimeStampedModel
 
 from config_models.models import ConfigurationModel
@@ -23,6 +24,12 @@ class Schedule(TimeStampedModel):
         help_text=_('Deadline by which the learner must upgrade to a verified seat')
     )
 
+    def get_experience_type(self):
+        try:
+            return self.experience.experience_type
+        except ScheduleExperience.DoesNotExist:
+            return ScheduleExperience.EXPERIENCES.default
+
     class Meta(object):
         verbose_name = _('Schedule')
         verbose_name_plural = _('Schedules')
@@ -39,3 +46,13 @@ class ScheduleConfig(ConfigurationModel):
     deliver_upgrade_reminder = models.BooleanField(default=False)
     enqueue_course_update = models.BooleanField(default=False)
     deliver_course_update = models.BooleanField(default=False)
+
+
+class ScheduleExperience(models.Model):
+    EXPERIENCES = Choices(
+        (0, 'default', 'Recurring Nudge and Upgrade Reminder'),
+        (1, 'course_updates', 'Course Updates')
+    )
+
+    schedule = models.OneToOneField(Schedule, related_name='experience')
+    experience_type = models.PositiveSmallIntegerField(choices=EXPERIENCES, default=EXPERIENCES.default)

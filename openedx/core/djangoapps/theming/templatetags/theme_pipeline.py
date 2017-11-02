@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 from pipeline.templatetags.pipeline import StylesheetNode, JavascriptNode
 from pipeline.utils import guess_type
 
-from openedx.core.djangoapps.theming.helpers import get_static_file_url
+from openedx.core.djangoapps.theming.helpers_static import get_static_file_url
 
 register = template.Library()  # pylint: disable=invalid-name
 

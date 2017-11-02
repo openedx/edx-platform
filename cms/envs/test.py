@@ -24,6 +24,7 @@ from path import Path as path
 from warnings import filterwarnings, simplefilter
 from uuid import uuid4
 from util.db import NoOpMigrationModules
+from openedx.core.lib.derived import derive_settings
 
 # import settings from LMS for consistent behavior with CMS
 # pylint: disable=unused-import
@@ -75,9 +76,6 @@ COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 # For testing "push to lms"
 FEATURES['ENABLE_EXPORT_GIT'] = True
 GIT_REPO_EXPORT_DIR = TEST_ROOT / "export_course_repos"
-
-# Makes the tests run much faster...
-SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing
 STATICFILES_DIRS = [
@@ -360,3 +358,7 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
     ),
     DIRECTORY_PREFIX='video-transcripts/',
 )
+
+########################## Derive Any Derived Settings  #######################
+
+derive_settings(__name__)

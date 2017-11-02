@@ -50,7 +50,7 @@ import lms.envs.common
 from lms.envs.common import (
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, PLATFORM_DESCRIPTION, BUGS_EMAIL, DOC_STORE_CONFIG, DATA_DIR,
     ALL_LANGUAGES, WIKI_ENABLED, update_module_store_settings, ASSET_IGNORE_REGEX,
-    PARENTAL_CONSENT_AGE_LIMIT, COMPREHENSIVE_THEME_DIRS, REGISTRATION_EMAIL_PATTERNS_ALLOWED,
+    PARENTAL_CONSENT_AGE_LIMIT, REGISTRATION_EMAIL_PATTERNS_ALLOWED,
     # The following PROFILE_IMAGE_* settings are included as they are
     # indirectly accessed through the email opt-in API, which is
     # technically accessible through the CMS via legacy URLs.
@@ -81,6 +81,8 @@ from lms.envs.common import (
 
     # Enable or disable theming
     ENABLE_COMPREHENSIVE_THEMING,
+    COMPREHENSIVE_THEME_LOCALE_PATHS,
+    COMPREHENSIVE_THEME_DIRS,
 
     # constants for redirects app
     REDIRECT_CACHE_TIMEOUT,
@@ -113,6 +115,10 @@ from lms.envs.common import (
     # Video Image settings
     VIDEO_IMAGE_SETTINGS,
     VIDEO_TRANSCRIPTS_SETTINGS,
+
+    # Methods to derive settings
+    _make_main_mako_templates,
+    _make_locale_paths,
 )
 from path import Path as path
 from warnings import simplefilter
@@ -121,7 +127,13 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
 import dealer.git
 from xmodule.modulestore.edit_info import EditInfoMixin
+from openedx.core.djangoapps.theming.helpers_dirs import (
+    get_themes_unchecked,
+    get_theme_base_dirs_from_settings
+)
 from openedx.core.lib.license import LicenseMixin
+from openedx.core.lib.derived import derived, derived_dict_entry
+from openedx.core.release import doc_version
 
 ############################ FEATURE CONFIGURATION #############################
 
@@ -300,7 +312,7 @@ GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
 import tempfile
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_cms')
 MAKO_TEMPLATES = {}
-MAKO_TEMPLATES['main'] = [
+MAIN_MAKO_TEMPLATES_BASE = [
     PROJECT_ROOT / 'templates',
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
@@ -310,9 +322,10 @@ MAKO_TEMPLATES['main'] = [
     OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
     CMS_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
 ]
+MAKO_TEMPLATES['lms.main'] = lms.envs.common.MAIN_MAKO_TEMPLATES_BASE
 
-for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
-    MAKO_TEMPLATES['lms.' + namespace] = template_dirs
+MAKO_TEMPLATES['main'] = _make_main_mako_templates
+derived_dict_entry('MAKO_TEMPLATES', 'main')
 
 # Django templating
 TEMPLATES = [
@@ -321,7 +334,7 @@ TEMPLATES = [
         # Don't look for template source files inside installed applications.
         'APP_DIRS': False,
         # Instead, look for template source files in these dirs.
-        'DIRS': MAKO_TEMPLATES['main'],
+        'DIRS': MAIN_MAKO_TEMPLATES_BASE,
         # Options specific to this backend.
         'OPTIONS': {
             'loaders': (
@@ -601,8 +614,9 @@ USE_L10N = True
 
 STATICI18N_ROOT = PROJECT_ROOT / "static"
 
-# Localization strings (e.g. django.po) are under this directory
-LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
+# Localization strings (e.g. django.po) are under these directories
+LOCALE_PATHS = _make_locale_paths
+derived('LOCALE_PATHS')
 
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
@@ -959,7 +973,7 @@ INSTALLED_APPS = [
     'webpack_loader',
 
     # Theming
-    'openedx.core.djangoapps.theming',
+    'openedx.core.djangoapps.theming.apps.ThemingConfig',
 
     # Site configuration for theming and behavioral modification
     'openedx.core.djangoapps.site_configuration',
@@ -974,7 +988,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
 
     # for managing course modes
-    'course_modes',
+    'course_modes.apps.CourseModesConfig',
 
     # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
     'openedx.core.djangoapps.verified_track_content',
@@ -1015,7 +1029,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.coursegraph.apps.CoursegraphConfig',
 
     # Credit courses
-    'openedx.core.djangoapps.credit',
+    'openedx.core.djangoapps.credit.apps.CreditConfig',
 
     'xblock_django',
 
@@ -1036,7 +1050,10 @@ INSTALLED_APPS = [
     # These are apps that aren't strictly needed by Studio, but are imported by
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
+    'courseware',
+    'survey',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
+    'lms.djangoapps.completion.apps.CompletionAppConfig',
 
     # Microsite configuration application
     'microsite_configuration',
@@ -1369,9 +1386,9 @@ AFFILIATE_COOKIE_NAME = 'affiliate_id'
 ############## Settings for Studio Context Sensitive Help ##############
 
 HELP_TOKENS_INI_FILE = REPO_ROOT / "cms" / "envs" / "help_tokens.ini"
-
-# Theme directory locale paths
-COMPREHENSIVE_THEME_LOCALE_PATHS = []
+HELP_TOKENS_LANGUAGE_CODE = lambda settings: settings.LANGUAGE_CODE
+HELP_TOKENS_VERSION = lambda settings: doc_version()
+derived('HELP_TOKENS_LANGUAGE_CODE', 'HELP_TOKENS_VERSION')
 
 # This is required for the migrations in oauth_dispatch.models
 # otherwise it fails saying this attribute is not present in Settings

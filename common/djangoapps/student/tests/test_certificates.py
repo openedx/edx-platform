@@ -111,6 +111,8 @@ class CertificateDashboardMessageDisplayTest(CertificateDisplayTestBase):
     Tests the certificates messages for a course in the dashboard.
     """
 
+    ENABLED_SIGNALS = ['course_published']
+
     @classmethod
     def setUpClass(cls):
         super(CertificateDashboardMessageDisplayTest, cls).setUpClass()

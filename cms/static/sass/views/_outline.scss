@@ -48,7 +48,8 @@
     }
 
     // STATE: hover/focus
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       .incontext-editor-open-action {
         opacity: 1;
       }
@@ -638,17 +639,38 @@
   .highlights-button {
     cursor: pointer;
     color: theme-color("primary");
+
+    // remove button styling
+    border: none;
+    background: none;
+    padding: 0;
+    font-weight: 600;
   }
 
-  .highlight-input-text {
-    width: 100%;
-    margin-bottom: 5px;
-    margin-top: 5px;
+  .number-highlights {
+    background: theme-color("primary");
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    color: $white;
+    display: inline-block;
+    font-weight: bold;
+    line-height: 18px;
+    margin-right: 2px;
+    text-align: center;
+    width: 18px;
   }
 
-  .highlights-description {
-    font-size: 80%;
-    font-weight: bolder;
+  .highlights-section-modal {
+    .highlight-input-text {
+      width: 100%;
+      margin-bottom: ($baseline/4);
+      margin-top: ($baseline/4);
+    }
+
+    .highlight-input-label {
+      font-weight: 600;
+    }
   }
 
   // outline: edit item settings
@@ -740,10 +762,6 @@
   .bulkpublish-section-modal,
   .bulkpublish-subsection-modal,
   .bulkpublish-unit-modal {
-    .modal-introduction {
-      color: $gray-d2;
-    }
-
     .modal-section .outline-bulkpublish {
       max-height: ($baseline*20);
       overflow-y: auto;
