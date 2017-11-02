@@ -47,9 +47,10 @@ def sync_user_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=u
             data_to_sync = {
                 "city_of_residence": instance.city_of_residence,
                 "country_of_residence": instance.country_of_residence,
+                # "birthday": instance.dob,
                 "country_of_employment": instance.country_of_employment,
                 "city_of_employment": instance.city_of_employment,
-                "birthday": instance.dob,
+                "birthday": "01/01/%s" % instance.year_of_birth,
                 "language": instance.language,
             }
         elif sender == OrganizationSurvey:

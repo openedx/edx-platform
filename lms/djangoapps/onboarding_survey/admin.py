@@ -18,6 +18,8 @@ EnglishProficiency,
 UserInfoSurvey,
 Organization,
 ExtendedProfile,
+FunctionArea,
+OrganizationDetailSurvey
 )
 
 
@@ -43,3 +45,5 @@ admin.site.register(EnglishProficiency)
 admin.site.register(UserInfoSurvey)
 admin.site.register(Organization)
 admin.site.register(ExtendedProfile)
+admin.site.register(FunctionArea)
+admin.site.register(OrganizationDetailSurvey)

@@ -1606,9 +1606,8 @@ def _do_create_account(form, custom_form=None):
         with transaction.atomic():
             user.save()
             if custom_form:
-                custom_model = custom_form.save(commit=False)
-                custom_model.user = user
-                custom_model.save()
+                custom_model = custom_form.save(user=user, commit=True)
+
     except IntegrityError:
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=user.username)) > 0:

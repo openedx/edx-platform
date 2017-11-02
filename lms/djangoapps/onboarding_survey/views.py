@@ -9,26 +9,37 @@ from path import Path as path
 
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
+from django.db import transaction
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 from django.http import HttpResponse
+
+from lms.djangoapps.onboarding_survey.helpers import is_first_signup_in_org
 from lms.djangoapps.onboarding_survey.models import (
     UserInfoSurvey,
     InterestsSurvey,
     OrganizationSurvey,
-    Organization)
+    Organization,
+    OrganizationDetailSurvey,
+    Currency)
 from lms.djangoapps.onboarding_survey.signals import save_interests
-from lms.djangoapps.onboarding_survey.history import update_history
 from onboarding_survey import forms
 
 log = logging.getLogger("edx.onboarding_survey")
 
 
 def update_user_history(user):
-    if user.extended_profile.is_survey_completed:
-        update_history(user)
+    pass
+    # if user.extended_profile.is_survey_completed:
+    #     update_history(user)
+
+
+def set_survey_complete(extended_profile):
+        extended_profile.is_survey_completed = True
+        extended_profile.save()
+        update_user_history(extended_profile.user)
 
 
 def get_un_submitted_surveys(user):
@@ -51,22 +62,41 @@ def get_un_submitted_surveys(user):
     except Exception:
         un_submitted_surveys['organization'] = True
 
-    if un_submitted_surveys.get('user_info') and un_submitted_surveys.get('interests') and un_submitted_surveys.get('organization'):
+    try:
+        user.org_detail_survey
+    except Exception:
+        un_submitted_surveys['org_detail_survey'] = True
+
+    # if user.extended_profile.is_poc:
+    #     try:
+    #         user.organization_survey
+    #     except Exception:
+    #         un_submitted_surveys['organization'] = True
+
+    if un_submitted_surveys.get('user_info') and un_submitted_surveys.get('interests') and\
+            un_submitted_surveys.get('organization') and un_submitted_surveys.get('org_detail_survey'):
         un_submitted_surveys['user_info'] = False
 
-    elif un_submitted_surveys.get('interests') and un_submitted_surveys.get('organization'):
+    elif un_submitted_surveys.get('interests') and un_submitted_surveys.get('organization')\
+            and un_submitted_surveys.get('org_detail_survey'):
         un_submitted_surveys['user_info'] = False
         un_submitted_surveys['interests'] = False
 
+    elif un_submitted_surveys.get('organization') and un_submitted_surveys.get('org_detail_survey'):
+        un_submitted_surveys['user_info'] = False
+        un_submitted_surveys['interests'] = False
+        un_submitted_surveys['organization'] = False
     else:
         un_submitted_surveys['user_info'] = False
         un_submitted_surveys['interests'] = False
         un_submitted_surveys['organization'] = False
+        un_submitted_surveys['org_detail_survey'] = False
 
     return un_submitted_surveys
 
 
 @login_required
+@transaction.atomic
 def user_info(request):
     """
     The view to handle user info survey from the user.
@@ -76,49 +106,54 @@ def user_info(request):
     is then saved. After saving the form, user is redirected to the
     next survey namely, interests survey.
     """
+
     are_forms_complete = request.user.extended_profile.is_survey_completed
     if request.method == 'POST':
+        existing_survey = None
         try:
-            form = forms.UserInfoModelForm(request.POST, instance=request.user.user_info_survey)
-            if form.is_valid():
-                form.save()
-                update_user_history(request.user)
-                if not are_forms_complete:
-                    return redirect(reverse('interests'))
-                return redirect(reverse('user_info'))
-
+            existing_survey = request.user.user_info_survey
         except UserInfoSurvey.DoesNotExist:
+            pass
+
+        if existing_survey:
+            form = forms.UserInfoModelForm(request.POST, instance=existing_survey)
+        else:
             form = forms.UserInfoModelForm(request.POST)
-            if form.is_valid():
-                user_info_survey = form.save()
+
+        if form.is_valid():
+            user_info_survey = form.save()
+
+            if not existing_survey:
                 user_info_survey.user = request.user
                 user_info_survey.save()
-                update_user_history(request.user)
-                if not are_forms_complete:
-                    return redirect(reverse('interests'))
-                return redirect(reverse('user_info'))
+
+            update_user_history(request.user)
+            if not are_forms_complete:
+                return redirect(reverse('interests'))
+            return redirect(reverse('user_info'))
 
     else:
         user_info_instance = UserInfoSurvey.objects.filter(user=request.user).first()
         if user_info_instance:
-            if user_info_instance.dob:
-                form = forms.UserInfoModelForm(
-                    instance=user_info_instance, initial={'dob': user_info_instance.dob.strftime("%m/%d/%Y")}
-                )
-            else:
-                form = forms.UserInfoModelForm(
-                    instance=user_info_instance
-                )
+            form = forms.UserInfoModelForm(
+                instance=user_info_instance
+            )
         else:
             form = forms.UserInfoModelForm()
 
-    context = {'form': form, 'are_forms_complete': are_forms_complete}
+    context = {
+        'form': form, 'are_forms_complete': are_forms_complete, 'first_name': request.user.extended_profile.first_name
+    }
     user = request.user
+    extended_profile = user.extended_profile
     context.update(get_un_submitted_surveys(user))
+    context['is_poc'] = extended_profile.is_poc
+    context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
     return render(request, 'onboarding_survey/tell_us_more_survey.html', context)
 
 
 @login_required
+@transaction.atomic
 def interests(request):
     """
     The view to handle interests survey from the user.
@@ -129,31 +164,37 @@ def interests(request):
     namely, organization survey.
     """
     are_forms_complete = request.user.extended_profile.is_survey_completed
+    extended_profile = request.user.extended_profile
     if request.method == 'POST':
+        existing_survey = None
         try:
-            form = forms.InterestModelForm(request.POST, instance=request.user.interest_survey)
-            if form.is_valid():
-                interest_survey = form.save()
-                save_interests.send(sender=InterestsSurvey, instance=interest_survey)
-
-                update_user_history(request.user)
-                if not are_forms_complete:
-                    return redirect(reverse('organization'))
-
-                return redirect(reverse('interests'))
-
+            existing_survey = request.user.interest_survey
         except InterestsSurvey.DoesNotExist:
+            pass
+
+        if existing_survey:
+            form = forms.InterestModelForm(request.POST, instance=existing_survey)
+        else:
             form = forms.InterestModelForm(request.POST)
-            if form.is_valid():
-                interest_survey = form.save()
+
+        if form.is_valid():
+            interest_survey = form.save()
+
+            if not existing_survey:
                 interest_survey.user = request.user
                 interest_survey.save()
-                save_interests.send(sender=InterestsSurvey, instance=interest_survey)
 
-                update_user_history(request.user)
-                if not are_forms_complete:
-                    return redirect(reverse('organization'))
-                return redirect(reverse('interests'))
+            save_interests.send(sender=InterestsSurvey, instance=interest_survey)
+            update_user_history(request.user)
+            if extended_profile.is_poc or is_first_signup_in_org(
+                    request.user.extended_profile.organization):
+                return redirect(reverse('organization'))
+
+            if not are_forms_complete:
+                set_survey_complete(extended_profile)
+                return redirect(reverse('dashboard'))
+
+            return redirect(reverse('interests'))
 
     else:
         user_interest_survey_instance = InterestsSurvey.objects.filter(user=request.user).first()
@@ -165,7 +206,10 @@ def interests(request):
     context = {'form': form, 'are_forms_complete': are_forms_complete}
 
     user = request.user
+    extended_profile = user.extended_profile
     context.update(get_un_submitted_surveys(user))
+    context['is_poc'] = extended_profile.is_poc
+    context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
     return render(request, 'onboarding_survey/interests_survey.html', context)
 
 
@@ -173,14 +217,16 @@ def mark_partner_network(organization_survey):
     """
     Marks partner as affiliated if not already.
     """
-    partner_network = organization_survey.partner_network
-    if partner_network:
-        if not partner_network.is_partner_affiliated:
-            partner_network.is_partner_affiliated = True
-            partner_network.save()
+    partner_network_manager = organization_survey.partner_network
+    if partner_network_manager.exists():
+        for partner_network in partner_network_manager.all():
+            if not partner_network.is_partner_affiliated:
+                partner_network.is_partner_affiliated = True
+                partner_network.save()
 
 
 @login_required
+@transaction.atomic
 def organization(request):
     """
     The view to handle organization survey from the user.
@@ -190,40 +236,34 @@ def organization(request):
     saved. After saving the form, user is redirected to dashboard.
     """
 
-    def set_survey_complete(extended_profile):
-        extended_profile.is_survey_completed = True
-        extended_profile.save()
-        update_user_history(request.user)
-
     are_forms_complete = request.user.extended_profile.is_survey_completed
     if request.method == 'POST':
+        existing_survey = None
 
         try:
-            form = forms.OrganizationInfoModelForm(request.POST, instance=request.user.organization_survey)
-            if form.is_valid():
-                organization_survey = form.save()
-                update_user_history(request.user)
-                mark_partner_network(organization_survey)
-
-                if not are_forms_complete:
-                    set_survey_complete(request.user.extended_profile)
-                    return redirect(reverse('dashboard'))
-                return redirect(reverse('organization'))
-
+            existing_survey = request.user.organization_survey
         except OrganizationSurvey.DoesNotExist:
+            pass
+
+        if existing_survey:
+            form = forms.OrganizationInfoModelForm(request.POST, instance=request.user.organization_survey)
+        else:
             form = forms.OrganizationInfoModelForm(request.POST)
-            if form.is_valid():
-                organization_survey = form.save()
-                update_user_history(request.user)
+
+        if form.is_valid():
+            organization_survey = form.save()
+            update_user_history(request.user)
+
+            if not existing_survey:
                 organization_survey.user = request.user
                 organization_survey.save()
-                mark_partner_network(organization_survey)
 
-                if not are_forms_complete:
-                    set_survey_complete(request.user.extended_profile)
-                    return redirect(reverse('dashboard'))
+            mark_partner_network(organization_survey)
 
-                return redirect(reverse('organization'))
+            if not are_forms_complete:
+                return redirect(reverse('org_detail_survey'))
+
+            return redirect(reverse('organization'))
 
     else:
         org_survey_instance = OrganizationSurvey.objects.filter(user=request.user).first()
@@ -235,7 +275,11 @@ def organization(request):
     context = {'form': form, 'are_forms_complete': are_forms_complete}
 
     user = request.user
+    extended_profile = user.extended_profile
     context.update(get_un_submitted_surveys(user))
+
+    context['is_poc'] = extended_profile.is_poc
+    context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
 
     return render(request, 'onboarding_survey/organization_survey.html', context)
 
@@ -262,6 +306,54 @@ def get_country_names(request):
     mime_type = 'application/json'
 
     return HttpResponse(data, mime_type)
+
+
+@login_required
+@transaction.atomic
+def org_detail_survey(request):
+
+    are_forms_complete = request.user.extended_profile.is_survey_completed
+
+    if request.method == 'POST':
+        existing_survey = None
+
+        try:
+            existing_survey = request.user.org_detail_survey
+        except OrganizationDetailSurvey.DoesNotExist:
+            pass
+
+        if existing_survey:
+            form = forms.OrganizationDetailModelForm(request.POST, instance=request.user.org_detail_survey)
+        else:
+            form = forms.OrganizationDetailModelForm(request.POST)
+
+        if form.is_valid():
+            org_detail = form.save()
+
+            if not existing_survey:
+                org_detail.user = request.user
+                org_detail.save()
+
+            if not are_forms_complete:
+                set_survey_complete(request.user.extended_profile)
+                return redirect(reverse('dashboard'))
+
+            return redirect(reverse('org_detail_survey'))
+
+    else:
+        org_detail_instance = OrganizationDetailSurvey.objects.filter(user=request.user).first()
+        if org_detail_instance:
+            form = forms.OrganizationDetailModelForm(instance=org_detail_instance)
+        else:
+            form = forms.OrganizationDetailModelForm()
+
+    context = {'form': form, 'are_forms_complete': are_forms_complete}
+    user = request.user
+    extended_profile = user.extended_profile
+    context.update(get_un_submitted_surveys(user))
+    context['is_poc'] = extended_profile.is_poc
+    context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
+    return render(request, 'onboarding_survey/organization_detail_survey.html', context)
 
 
 @csrf_exempt
@@ -327,9 +419,9 @@ def get_user_organizations(request):
     final_result = {}
     if request.is_ajax():
         query = request.GET.get('term', '')
-        all_organizations = Organization.objects.filter(name__startswith=query)
+        all_organizations = Organization.objects.filter(name__istartswith=query)
         for organization in all_organizations:
-            final_result[organization.name] = organization.is_poc_exist
+            final_result[organization.name] = True if organization.admin else False
 
         if request.user.is_authenticated():
             user_extended_profile = request.user.extended_profile
@@ -339,3 +431,16 @@ def get_user_organizations(request):
             }
 
     return JsonResponse(final_result)
+
+
+@csrf_exempt
+def get_currencies(request):
+    currencies = []
+
+    if request.is_ajax():
+        term = request.GET.get('term', '')
+        currencies = Currency.objects.filter(alphabetic_code__istartswith=term).values_list('alphabetic_code',
+                                                                                            flat=True).distinct()
+
+    data = json.dumps(list(currencies))
+    return HttpResponse(data, 'application/json')

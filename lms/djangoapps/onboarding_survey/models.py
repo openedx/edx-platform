@@ -2,8 +2,11 @@
 Models to support the on-boarding surveys
 """
 import logging
+from datetime import datetime
+import re
 
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator, URLValidator
 from django.db import models
 
 log = logging.getLogger("edx.onboarding_survey")
@@ -16,7 +19,9 @@ class Organization(models.Model):
 
     name = models.CharField(max_length=255, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
-    is_poc_exist = models.BooleanField(default=False)
+    admin = models.ForeignKey(
+        User, related_name='organization', blank=True, null=True, on_delete=models.SET_NULL
+    )
 
     def __str__(self):
         return self.name
@@ -34,10 +39,10 @@ class ExtendedProfile(models.Model):
         Organization, related_name='extended_profiles', blank=True, null=True, on_delete=models.SET_NULL
     )
     is_poc = models.BooleanField(choices=POC_CHOICES, default=False)
-    is_currently_employed = models.BooleanField(default=False)
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='extended_profile')
     org_admin_email = models.EmailField(blank=True, null=True)
     is_survey_completed = models.BooleanField(default=False)
+    backup_user_data = models.TextField()
 
 
 class RoleInsideOrg(models.Model):
@@ -112,20 +117,28 @@ class PartnerNetwork(models.Model):
         return self.name
 
 
+class SchemaOrNoSchemaURLValidator(URLValidator):
+    regex = re.compile(
+        r'((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]'
+        r'+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-]*)'
+        r'?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)',
+        re.IGNORECASE
+    )
+
+
 class OrganizationSurvey(models.Model):
     """
     The model to save the organization survey as provided by the user.
     """
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='organization_survey', null=True,
                                 blank=True)
-    role_in_org = models.ForeignKey(
-        RoleInsideOrg, on_delete=models.CASCADE, related_name='org_survey', blank=True, null=True
-    )
-    start_month_year = models.CharField(max_length=100, blank=True)
 
-    country = models.CharField(max_length=256)
-    city = models.CharField(max_length=265, blank=True)
-    url = models.URLField(max_length=256, blank=True)
+    country = models.CharField(max_length=255)
+    city = models.CharField(max_length=255, blank=True)
+    ORG_URL_EXISTENCE_CHOICES = ((1, 'Yes'), (0, 'No'))
+
+    is_org_url_exist = models.BooleanField(choices=ORG_URL_EXISTENCE_CHOICES, default=True)
+    url = models.URLField(max_length=255, blank=True, validators=[SchemaOrNoSchemaURLValidator])
 
     sector = models.ForeignKey(OrgSector, on_delete=models.CASCADE, related_name='org_survey')
     level_of_operation = models.ForeignKey(OperationLevel, on_delete=models.CASCADE, related_name='org_survey')
@@ -133,17 +146,43 @@ class OrganizationSurvey(models.Model):
 
     founding_year = models.PositiveSmallIntegerField(blank=True, null=True)
     total_employees = models.ForeignKey(
-        TotalEmployee, on_delete=models.CASCADE, related_name='org_survey', blank=True, null=True
-    )
-    total_volunteers = models.ForeignKey(
-        TotalVolunteer, on_delete=models.CASCADE, related_name='org_survey', blank=True, null=True
+        TotalEmployee, on_delete=models.CASCADE, related_name='org_survey', null=True
     )
 
-    total_clients = models.PositiveIntegerField(blank=True, null=True)
-    total_revenue = models.CharField(max_length=255, blank=True)
-    partner_network = models.ForeignKey(
-        PartnerNetwork, on_delete=models.CASCADE, related_name='org_survey', blank=True, null=True
+    partner_network = models.ManyToManyField(
+        PartnerNetwork
     )
+    alternate_admin_email = models.EmailField(blank=True, null=True)
+
+
+class Currency(models.Model):
+    name = models.CharField(max_length=255)
+    alphabetic_code = models.CharField(max_length=255)
+
+
+class OrganizationDetailSurvey(models.Model):
+    user = models.OneToOneField(User, unique=True, db_index=True, related_name='org_detail_survey', null=True,
+                                blank=True)
+
+    CAN_PROVIDE_INFO_CHOICES = ((1, 'Yes'), (0, 'No'))
+    INFO_ACCURACY_CHOICES = (
+        (1, "Actual - My answers come directly from my organization's official documentation"),
+        (0, "Estimated - My answers are my best guesses based on my knowledge of the organization")
+    )
+    can_provide_info = models.BooleanField(choices=CAN_PROVIDE_INFO_CHOICES, default=True)
+    info_accuracy = models.NullBooleanField(choices=INFO_ACCURACY_CHOICES, blank=True, null=True)
+
+    currency = models.ForeignKey(
+        Currency, on_delete=models.SET_NULL, blank=True, null=True, related_name='org_detail_survey'
+    )
+
+    last_fiscal_year_end_date = models.DateField(blank=True, null=True)
+
+    total_clients = models.PositiveIntegerField(blank=True, null=True)
+    total_employees = models.PositiveIntegerField(blank=True, null=True)
+    total_revenue = models.BigIntegerField(blank=True, null=True)
+    total_expenses = models.BigIntegerField(blank=True, null=True)
+    total_program_expenses = models.BigIntegerField(blank=True, null=True)
 
 
 class OrganizationalCapacityArea(models.Model):
@@ -183,9 +222,8 @@ class InterestsSurvey(models.Model):
     The model to store the interests survey as provided by the user.
     """
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='interest_survey', null=True, blank=True)
-    capacity_areas = models.ManyToManyField(OrganizationalCapacityArea)
-    interested_communities = models.ManyToManyField(CommunityTypeInterest)
-    reason_of_selected_interest = models.CharField(max_length=255, blank=True)
+    capacity_areas = models.ManyToManyField(OrganizationalCapacityArea, blank=True)
+    interested_communities = models.ManyToManyField(CommunityTypeInterest, blank=True)
     personal_goal = models.ManyToManyField(PersonalGoal, blank=True)
 
 
@@ -209,31 +247,55 @@ class EnglishProficiency(models.Model):
         return self.label
 
 
+class FunctionArea(models.Model):
+    label = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.label
+
+
 class UserInfoSurvey(models.Model):
     """
     The survey to store the basic information about the user.
     """
+
+    year_of_birth = models.PositiveIntegerField(
+        validators=[
+            MinValueValidator(1900),
+            MaxValueValidator(datetime.now().year)]
+    )
+
     user = models.OneToOneField(
         User, unique=True, db_index=True, related_name='user_info_survey', null=True, blank=True
     )
-    dob = models.DateField(blank=True, null=True)
 
     level_of_education = models.ForeignKey(
-        EducationLevel, on_delete=models.CASCADE, related_name='user_info_survey', blank=True, null=True
+        EducationLevel, on_delete=models.CASCADE, related_name='user_info_survey', null=True
     )
 
-    language = models.CharField(max_length=256)
+    language = models.CharField(max_length=255)
 
     english_proficiency = models.ForeignKey(EnglishProficiency, on_delete=models.CASCADE,
                                             related_name='user_info_survey')
 
-    country_of_residence = models.CharField(max_length=256)
-    city_of_residence = models.CharField(max_length=256, blank=True)
+    country_of_residence = models.CharField(max_length=255)
+    city_of_residence = models.CharField(max_length=255, blank=True)
 
     is_emp_location_different = models.BooleanField(default=False)
 
-    country_of_employment = models.CharField(max_length=256, blank=True)
-    city_of_employment = models.CharField(max_length=256, blank=True)
+    country_of_employment = models.CharField(max_length=255, blank=True)
+    city_of_employment = models.CharField(max_length=255, blank=True)
+
+    role_in_org = models.ForeignKey(
+        RoleInsideOrg, on_delete=models.CASCADE, related_name='user_info_survey', null=True
+    )
+    start_month_year = models.CharField(max_length=100)
+
+    weekly_work_hours = models.PositiveIntegerField(
+        validators=[MaxValueValidator(168)]
+    )
+
+    function_area = models.ManyToManyField(FunctionArea, blank=True, null=True)
 
 
 class History(models.Model):
