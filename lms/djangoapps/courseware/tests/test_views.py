@@ -807,7 +807,12 @@ class ViewsTestCase(ModuleStoreTestCase):
         CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, course_id=course)
 
         # Enroll user in the course
-        enrollment = CourseEnrollmentFactory(course_id=course, user=self.user, mode=CourseMode.AUDIT)
+        # Don't use the CourseEnrollmentFactory since it ensures a CourseOverview is available
+        enrollment = CourseEnrollment.objects.create(
+            course_id=course,
+            user=self.user,
+            mode=CourseMode.AUDIT,
+        )
 
         self.assertEqual(enrollment.course_overview, None)
 

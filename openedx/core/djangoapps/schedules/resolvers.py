@@ -18,7 +18,7 @@ from courseware.date_summary import verified_upgrade_deadline_link, verified_upg
 from openedx.core.djangoapps.monitoring_utils import function_trace, set_custom_metric
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
-from openedx.core.djangoapps.schedules.models import Schedule
+from openedx.core.djangoapps.schedules.models import Schedule, ScheduleExperience
 from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
 from openedx.core.djangoapps.schedules.template_context import (
     absolute_url,
@@ -64,6 +64,9 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
                                relative to. For example, if this resolver finds schedules that started 7 days ago
                                this variable should be set to "start".
         num_bins -- the int number of bins to split the users into
+        experience_filter -- a queryset filter used to select only the users who should be getting this message as part
+                             of their experience. This defaults to users without a specified experience type and those
+                             in the "recurring nudges and upgrade reminder" experience.
     """
     async_send_task = attr.ib()
     site = attr.ib()
@@ -74,6 +77,8 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
 
     schedule_date_field = None
     num_bins = DEFAULT_NUM_BINS
+    experience_filter = (Q(experience__experience_type=ScheduleExperience.EXPERIENCES.default)
+                         | Q(experience__isnull=True))
 
     def __attrs_post_init__(self):
         # TODO: in the next refactor of this task, pass in current_datetime instead of reproducing it here
@@ -122,11 +127,10 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         schedules = Schedule.objects.select_related(
             'enrollment__user__profile',
             'enrollment__course',
-        ).prefetch_related(
-            'enrollment__course__modes'
         ).filter(
             Q(enrollment__course__end__isnull=True) | Q(
                 enrollment__course__end__gte=self.current_datetime),
+            self.experience_filter,
             enrollment__user__in=users,
             enrollment__is_active=True,
             **schedule_day_equals_target_day_filter
@@ -142,6 +146,8 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         with function_trace('schedule_query_set_evaluation'):
             # This will run the query and cache all of the results in memory.
             num_schedules = len(schedules)
+
+        LOG.debug('Number of schedules = %d', num_schedules)
 
         # This should give us a sense of the volume of data being processed by each task.
         set_custom_metric('num_schedules', num_schedules)
@@ -231,6 +237,14 @@ class RecurringNudgeResolver(BinnedSchedulesBaseResolver):
     log_prefix = 'Recurring Nudge'
     schedule_date_field = 'start'
     num_bins = RECURRING_NUDGE_NUM_BINS
+
+    @property
+    def experience_filter(self):
+        if self.day_offset == -3:
+            experiences = [ScheduleExperience.EXPERIENCES.default, ScheduleExperience.EXPERIENCES.course_updates]
+            return Q(experience__experience_type__in=experiences) | Q(experience__isnull=True)
+        else:
+            return Q(experience__experience_type=ScheduleExperience.EXPERIENCES.default) | Q(experience__isnull=True)
 
     def get_template_context(self, user, user_schedules):
         first_schedule = user_schedules[0]
@@ -333,6 +347,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
     log_prefix = 'Course Update'
     schedule_date_field = 'start'
     num_bins = COURSE_UPDATE_NUM_BINS
+    experience_filter = Q(experience__experience_type=ScheduleExperience.EXPERIENCES.course_updates)
 
     def schedules_for_bin(self):
         week_num = abs(self.day_offset) / 7

@@ -1,14 +1,18 @@
 from unittest import skipUnless
 
+import ddt
 from django.conf import settings
 
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_recurring_nudge as nudge
-from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base import ScheduleSendEmailTestBase
+from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base import ScheduleSendEmailTestBase, \
+    ExperienceTest
 from openedx.core.djangoapps.schedules.management.commands.tests.upsell_base import ScheduleUpsellTestMixin
+from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
+@ddt.ddt
 @skip_unless_lms
 @skipUnless(
     'openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
@@ -27,3 +31,14 @@ class TestSendRecurringNudge(ScheduleUpsellTestMixin, ScheduleSendEmailTestBase)
     expected_offsets = (-3, -10)
 
     consolidates_emails_for_learner = True
+
+    @ddt.data(
+        ExperienceTest(experience=ScheduleExperience.EXPERIENCES.default, offset=-3, email_sent=True),
+        ExperienceTest(experience=ScheduleExperience.EXPERIENCES.default, offset=-10, email_sent=True),
+        ExperienceTest(experience=ScheduleExperience.EXPERIENCES.course_updates, offset=-3, email_sent=True),
+        ExperienceTest(experience=ScheduleExperience.EXPERIENCES.course_updates, offset=-10, email_sent=False),
+        ExperienceTest(experience=None, offset=-3, email_sent=True),
+        ExperienceTest(experience=None, offset=-10, email_sent=True),
+    )
+    def test_nudge_experience(self, test_config):
+        self._check_if_email_sent_for_experience(test_config)
