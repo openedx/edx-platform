@@ -208,33 +208,33 @@ class DashboardPage(PageObject):
         """
         Click username dropdown.
         """
-        self.q(css='.user-dropdown').first.click()
+        self.q(css='.toggle-user-dropdown').first.click()
 
     @property
     def username_dropdown_link_text(self):
         """
         Return list username dropdown links.
         """
-        return self.q(css='.user-dropdown-menu a').text
+        return self.q(css='.dropdown-user-menu a').text
 
     @property
     def tabs_link_text(self):
         """
         Return the text of all the tabs on the dashboard.
         """
-        return self.q(css='.tab-nav-item a').text
+        return self.q(css='.nav-tab a').text
 
     def click_my_profile_link(self):
         """
         Click on `Profile` link.
         """
-        self.q(css='.tab-nav-item a').nth(1).click()
+        self.q(css='.nav-tab a').nth(1).click()
 
     def click_account_settings_link(self):
         """
         Click on `Account` link.
         """
-        self.q(css='.user-dropdown-menu a').nth(1).click()
+        self.q(css='.dropdown-user-menu a').nth(1).click()
 
     @property
     def language_selector(self):

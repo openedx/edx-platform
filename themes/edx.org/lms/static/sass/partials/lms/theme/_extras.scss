@@ -7,3 +7,17 @@
 // rules into modular pieces.
 
 @import 'certificates';
+
+
+// Ensure the header matches the edx.org marketing site header
+.header-logo a {
+  @include media-breakpoint-down(md) {
+    margin-left: calc(50% - 30px) !important;
+
+    .logo{
+        margin-left: 0 !important;
+        width: $header-logo-width;
+        height: auto !important;
+    }
+  }
+}

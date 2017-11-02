@@ -1,6 +1,6 @@
 ## mako
 
-<%page expression_filter="h"/>
+<%page expression_filter="h" args="online_help_token"/>
 
 <%namespace name='static' file='../static_content.html'/>
 <%namespace file='../main.html' import="login_query"/>
@@ -17,56 +17,54 @@ from django.utils.translation import ugettext as _
 %>
 
 <div class="nav-links">
-  <%block name="navigation_global_links_authenticated">
-    <div class="main">
-      % if not course or disable_courseware_header:
-        % if not nav_hidden:
-          <div class="mobile-nav-item hidden-mobile nav-item">
-            <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
-          </div>
-          <div class="mobile-nav-item hidden-mobile nav-item">
-            <a href="${marketing_link('COURSES')}">${_("Find Courses")}</a>
-          </div>
-          <div class="mobile-nav-item hidden-mobile nav-item">
-            <a href="${marketing_link('SCHOOLS')}">${_("Schools & Partners")}</a>
-          </div>
-        % endif
-        % if show_dashboard_tabs:
-          <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-            <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
-              ${_("Courses")}
-            </a>
-          </div>
-          % if show_program_listing:
-            <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-              <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
-                ${_("Programs")}
-              </a>
-            </div>
-          % endif
-          <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-            <a class="${'active ' if '/u/' in request.path  else ''}tab-nav-link" href="${reverse('learner_profile', args=[self.real_user.username])}">
-              ${_("Profile")}
-            </a>
-          </div>
-        % endif
-      % endif
-
-    </div>
-    <div class="secondary">
-      % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
+  <div class="main">
+    % if not course or disable_courseware_header:
+      % if not nav_hidden:
         <div class="mobile-nav-item hidden-mobile nav-item">
-          <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
-            <span class="icon fa fa-shopping-cart" aria-hidden="true"></span> ${_("Shopping Cart")}
+          <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
+        </div>
+        <div class="mobile-nav-item hidden-mobile nav-item">
+          <a href="${marketing_link('COURSES')}">${_("Find Courses")}</a>
+        </div>
+        <div class="mobile-nav-item hidden-mobile nav-item">
+          <a href="${marketing_link('SCHOOLS')}">${_("Schools & Partners")}</a>
+        </div>
+      % endif
+      % if show_dashboard_tabs:
+        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+          <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
+            ${_("Courses")}
+          </a>
+        </div>
+        % if show_program_listing:
+          <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+            <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
+              ${_("Programs")}
+            </a>
+          </div>
+        % endif
+        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+          <a class="${'active ' if '/u/' in request.path  else ''}tab-nav-link" href="${reverse('learner_profile', args=[self.real_user.username])}">
+            ${_("Profile")}
           </a>
         </div>
       % endif
+    % endif
+
+  </div>
+  <div class="secondary">
+    % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
       <div class="mobile-nav-item hidden-mobile nav-item">
-        <a href="${get_online_help_info(online_help_token)['doc_url']}" target="_blank">${_("Help")}</a>
+        <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
+          <span class="icon fa fa-shopping-cart" aria-hidden="true"></span> ${_("Shopping Cart")}
+        </a>
       </div>
-      <%include file="user_dropdown.html"/>
+    % endif
+    <div class="mobile-nav-item hidden-mobile nav-item">
+      <a href="${get_online_help_info(online_help_token)['doc_url']}" target="_blank">${_("Help")}</a>
     </div>
-  </%block>
+    <%include file="user_dropdown.html"/>
+  </div>
 </div>
 
 
