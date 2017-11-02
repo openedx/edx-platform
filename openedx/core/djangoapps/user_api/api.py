@@ -144,6 +144,7 @@ class RegistrationFormFactory(object):
         "year_of_birth",
         "level_of_education",
         "company",
+        "job_title",
         "title",
         "mailing_address",
         "goals",
@@ -649,6 +650,23 @@ class RegistrationFormFactory(object):
         form_desc.add_field(
             "title",
             label=title_label,
+            required=required
+        )
+
+    def _add_job_title_field(self, form_desc, required=False):
+        """Add a Job Title field to a form description.
+        Arguments:
+            form_desc: A form description
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the Job Title
+        job_title_label = _(u"Job Title")
+
+        form_desc.add_field(
+            "job_title",
+            label=job_title_label,
             required=required
         )
 

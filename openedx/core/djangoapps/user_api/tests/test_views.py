@@ -1731,6 +1731,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "level_of_education",
             "company",
             "title",
+            "job_title",
             "mailing_address",
             "goals",
             "honor_code",
