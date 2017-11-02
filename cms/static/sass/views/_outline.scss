@@ -639,6 +639,12 @@
   .highlights-button {
     cursor: pointer;
     color: theme-color("primary");
+
+    // remove button styling
+    border: none;
+    background: none;
+    padding: 0;
+    font-weight: 600;
   }
 
   .number-highlights {

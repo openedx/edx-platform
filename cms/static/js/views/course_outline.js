@@ -220,9 +220,11 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                     event.preventDefault();
                     this.publishXBlock();
                 }.bind(this));
-                element.find('.highlights-button').click(function(event) {
-                    event.preventDefault();
-                    this.highlightsXBlock();
+                element.find('.highlights-button').on('click keydown', function(event) {
+                    if (event.type === 'click' || event.which === 13 || event.which === 32) {
+                        event.preventDefault();
+                        this.highlightsXBlock();
+                    }
                 }.bind(this));
             },
 
