@@ -77,9 +77,6 @@ COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 FEATURES['ENABLE_EXPORT_GIT'] = True
 GIT_REPO_EXPORT_DIR = TEST_ROOT / "export_course_repos"
 
-# Makes the tests run much faster...
-SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
-
 # TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",

@@ -89,9 +89,6 @@ WIKI_ENABLED = True
 # Enable a parental consent age limit for testing
 PARENTAL_CONSENT_AGE_LIMIT = 13
 
-# Makes the tests run much faster...
-SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
-
 _SYSTEM = 'lms'
 
 _REPORT_DIR = REPO_ROOT / 'reports' / _SYSTEM
