@@ -276,15 +276,16 @@ mark {
   overflow: hidden;
   background: $white;
   border-bottom: 1px solid $border-color-4;
-  padding: ($baseline*0.75) ($baseline/2);
+  padding: ($baseline*0.75) 0;
 
   &:focus,
   &:active {
-    @include left(50%);
+    @include left(45%);
     @include margin-left(-1 * $baseline * 1.5);
+
     position: absolute;
     top: $baseline/4;
-    width: auto;
+    width: 10%;
     height: auto;
     background-color: black;
     margin: 0;
@@ -292,5 +293,14 @@ mark {
     color: white !important;
     text-decoration: none !important;
     outline: none;
+    text-align: center;
+
+
+    // Responsive styling for mobile
+    @include media-breakpoint-down(md) {
+      @include left(40%);
+
+      width: 20%;
+    }
   }
 }
