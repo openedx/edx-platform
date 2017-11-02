@@ -21,8 +21,9 @@ module.exports = {
         Import: './cms/static/js/features/import/factories/import.js',
         StudioIndex: './cms/static/js/features_jsx/studio/index.jsx',
 
-        // LMS: single support form
+        // LMS
         SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',
+        AlertStatusBar: './lms/static/js/accessible_components/StatusBarAlert.jsx',
 
         // Features
         CourseGoals: './openedx/features/course_experience/static/course_experience/js/CourseGoals.js',
