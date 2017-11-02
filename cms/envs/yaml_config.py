@@ -259,7 +259,7 @@ BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
 
 ######################## CUSTOM COURSES for EDX CONNECTOR ######################
 if FEATURES.get('CUSTOM_COURSES_EDX'):
-    INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon')
+    INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
 
 ########################## Extra middleware classes  #######################
 
