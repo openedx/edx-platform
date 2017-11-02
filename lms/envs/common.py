@@ -2199,9 +2199,6 @@ INSTALLED_APPS = [
     # Country embargo support
     'openedx.core.djangoapps.embargo',
 
-    # Monitoring functionality
-    'openedx.core.djangoapps.monitoring',
-
     # Course action state
     'course_action_state',
 

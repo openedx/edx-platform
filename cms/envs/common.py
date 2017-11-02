@@ -1006,9 +1006,6 @@ INSTALLED_APPS = [
     # Signals
     'openedx.core.djangoapps.signals.apps.SignalConfig',
 
-    # Monitoring signals
-    'openedx.core.djangoapps.monitoring',
-
     # Course action state
     'course_action_state',
 
