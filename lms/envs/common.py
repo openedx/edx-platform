@@ -558,6 +558,8 @@ def _make_main_mako_templates(settings):
         for theme in get_themes_unchecked(themes_dirs, PROJECT_ROOT):
             if theme.themes_base_dir not in settings.MAIN_MAKO_TEMPLATES_BASE:
                 settings.MAIN_MAKO_TEMPLATES_BASE.insert(0, theme.themes_base_dir)
+    if settings.FEATURES.get('USE_MICROSITES', False) and getattr(settings, "MICROSITE_CONFIGURATION", False):
+        settings.MAIN_MAKO_TEMPLATES_BASE.insert(0, settings.MICROSITE_ROOT_DIR)
     return settings.MAIN_MAKO_TEMPLATES_BASE
 MAKO_TEMPLATES['main'] = _make_main_mako_templates
 derived_dict_entry('MAKO_TEMPLATES', 'main')
@@ -621,6 +623,18 @@ TEMPLATES = [
     }
 ]
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
+DEFAULT_TEMPLATE_ENGINE_DIRS = DEFAULT_TEMPLATE_ENGINE['DIRS'][:]
+
+
+def _add_microsite_dirs_to_default_template_engine(settings):
+    """
+    Derives the final DEFAULT_TEMPLATE_ENGINE['DIRS'] setting from other settings.
+    """
+    if settings.FEATURES.get('USE_MICROSITES', False) and getattr(settings, "MICROSITE_CONFIGURATION", False):
+        DEFAULT_TEMPLATE_ENGINE_DIRS.append(settings.MICROSITE_ROOT_DIR)
+    return DEFAULT_TEMPLATE_ENGINE_DIRS
+DEFAULT_TEMPLATE_ENGINE['DIRS'] = _add_microsite_dirs_to_default_template_engine
+derived_dict_entry('DEFAULT_TEMPLATE_ENGINE', 'DIRS')
 
 ###############################################################################################
 
@@ -2177,7 +2191,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.dark_lang',
 
     # Microsite configuration
-    'microsite_configuration',
+    'microsite_configuration.apps.MicrositeConfigurationConfig',
 
     # RSS Proxy
     'rss_proxy',
