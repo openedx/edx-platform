@@ -966,7 +966,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.datadog',
 
     # For asset pipelining
-    'edxmako',
+    'edxmako.apps.EdxMakoConfig',
     'pipeline',
     'static_replace',
     'require',

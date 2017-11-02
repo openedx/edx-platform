@@ -2040,7 +2040,7 @@ INSTALLED_APPS = [
     'status',
 
     # For asset pipelining
-    'edxmako',
+    'edxmako.apps.EdxMakoConfig',
     'pipeline',
     'static_replace',
     'webpack_loader',
