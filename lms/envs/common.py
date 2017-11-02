@@ -2159,7 +2159,7 @@ INSTALLED_APPS = [
     'notifier_api',
 
     # Different Course Modes
-    'course_modes',
+    'course_modes.apps.CourseModesConfig',
 
     # Enrollment API
     'enrollment',
