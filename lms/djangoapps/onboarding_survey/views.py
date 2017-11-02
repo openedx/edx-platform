@@ -348,7 +348,7 @@ def org_detail_survey(request):
             form = forms.OrganizationDetailModelForm(instance=org_detail_instance, initial={
                 'can_provide_info': '1' if org_detail_instance.can_provide_info else '0',
                 'info_accuracy': '1' if org_detail_instance.info_accuracy else '0',
-                'currency_input': org_detail_instance.currency.alphabetic_code
+                'currency_input': org_detail_instance.currency.alphabetic_code if org_detail_instance.currency else ""
             })
         else:
             form = forms.OrganizationDetailModelForm()

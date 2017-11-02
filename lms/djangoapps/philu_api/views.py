@@ -60,7 +60,12 @@ class UpdateCommunityProfile(APIView):
             country_of_employment = data.get('country_of_employment', user_info_survey.country_of_employment)
 
             language = data.get('language', user_info_survey.language)
-            birthday = data.get('birthday', user_info_survey.dob)
+
+            birthday = data.get('birthday')
+            if birthday:
+                birthday_year = birthday.split("/")[2]
+            else:
+                birthday_year = user_info_survey.year_of_birth
 
             extended_profile.first_name = first_name
             extended_profile.last_name = last_name
@@ -72,7 +77,7 @@ class UpdateCommunityProfile(APIView):
             user_info_survey.language = language
 
             if birthday:
-                user_info_survey.dob = datetime.strptime(birthday, '%m/%d/%Y')
+                user_info_survey.year_of_birth = birthday_year
 
             extended_profile.save()
             user_info_survey.save()
