@@ -108,4 +108,5 @@ git+https://github.com/mitodl/edx-sga.git@d019b8a050c056db535e3ff13c93096145a932
 git+https://github.com/open-craft/xblock-poll@7ba819b968fe8faddb78bb22e1fe7637005eb414#egg=xblock-poll==1.2.7
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.18#egg=xblock-drag-and-drop-v2==2.0.18
 # TODO: Deploy xblock-review to PyPI and pin it before going to master. Talk to Feanil if any questions
--e git+https://github.com/Dillon-Dumesnil/xblock-review@master#egg=xblock-review
+# For the purpose of being able to build during this PR time, I'm setting the branch to PR. Will switch to PyPI later
+-e git+https://github.com/Dillon-Dumesnil/xblock-review@PR#egg=xblock-review
