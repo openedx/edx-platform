@@ -3,12 +3,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function LoggedOutUser({ loginUrl }) {
+function LoggedOutUser({ platformName, loginUrl }) {
   return (
     <div>
       <div className="row">
         <div className="col-sm-12">
-          <p>{gettext('Sign in to edX so we can help you better.')}</p>
+          <p>{gettext(`Sign in to ${platformName} so we can help you better.`)}</p>
         </div>
       </div>
 
@@ -42,6 +42,7 @@ function LoggedOutUser({ loginUrl }) {
 }
 
 LoggedOutUser.propTypes = {
+  platformName: PropTypes.string.isRequired,
   loginUrl: PropTypes.string.isRequired,
 };
 
