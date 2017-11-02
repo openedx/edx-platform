@@ -8,7 +8,7 @@ class ForumUser(User):
 
     def create(self, username, **kwargs):
         kwargs.update({'username': username})
-        return self.client.post('/api/v2//users/create', **kwargs['kwargs'])
+        return self.client.post('/api/v2/users/create', **kwargs['kwargs'])
 
     def activate(self, username, **kwargs):
         payload = {'username': username}
