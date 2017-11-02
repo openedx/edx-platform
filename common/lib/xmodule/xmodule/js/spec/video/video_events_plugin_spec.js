@@ -23,7 +23,8 @@
             state.el.trigger('ready');
             expect(Logger.log).toHaveBeenCalledWith('load_video', {
                 id: 'id',
-                code: this.code
+                code: this.code,
+                duration: this.duration
             });
         });
 
@@ -33,7 +34,8 @@
             expect(Logger.log).toHaveBeenCalledWith('play_video', {
                 id: 'id',
                 code: this.code,
-                currentTime: 10
+                currentTime: 10,
+                duration: this.duration
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeFalsy();
         });
@@ -49,7 +51,8 @@
             expect(Logger.log).toHaveBeenCalledWith('pause_video', {
                 id: 'id',
                 code: this.code,
-                currentTime: 10
+                currentTime: 10,
+                duration: this.duration
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
@@ -61,7 +64,8 @@
                 code: this.code,
                 current_time: 10,
                 old_speed: '1.0',
-                new_speed: '2.0'
+                new_speed: '2.0',
+                duration: this.duration
             });
         });
 
@@ -72,7 +76,8 @@
                 code: this.code,
                 old_time: 0,
                 new_time: 1,
-                type: 'any'
+                type: 'any',
+                duration: this.duration
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
@@ -88,7 +93,8 @@
             expect(Logger.log).toHaveBeenCalledWith('stop_video', {
                 id: 'id',
                 code: this.code,
-                currentTime: 10
+                currentTime: 10,
+                duration: this.duration
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
 
@@ -97,7 +103,8 @@
             expect(Logger.log).toHaveBeenCalledWith('stop_video', {
                 id: 'id',
                 code: this.code,
-                currentTime: 10
+                currentTime: 10,
+                duration: this.duration
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
@@ -107,7 +114,8 @@
             expect(Logger.log).toHaveBeenCalledWith('skip_video', {
                 id: 'id',
                 code: this.code,
-                currentTime: 10
+                currentTime: 10,
+                duration: this.duration
             });
         });
 
@@ -116,7 +124,8 @@
             expect(Logger.log).toHaveBeenCalledWith('do_not_show_again_video', {
                 id: 'id',
                 code: this.code,
-                currentTime: 10
+                currentTime: 10,
+                duration: this.duration
             });
         });
 
@@ -124,7 +133,8 @@
             state.el.trigger('language_menu:show');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.language_menu.shown', {
                 id: 'id',
-                code: this.code
+                code: this.code,
+                duration: this.duration
             });
         });
 
@@ -133,7 +143,8 @@
             expect(Logger.log).toHaveBeenCalledWith('edx.video.language_menu.hidden', {
                 id: 'id',
                 code: this.code,
-                language: 'en'
+                language: 'en',
+                duration: this.duration
             });
         });
 
@@ -142,7 +153,8 @@
             expect(Logger.log).toHaveBeenCalledWith('show_transcript', {
                 id: 'id',
                 code: this.code,
-                current_time: 10
+                current_time: 10,
+                duration: this.duration
             });
         });
 
@@ -151,7 +163,8 @@
             expect(Logger.log).toHaveBeenCalledWith('hide_transcript', {
                 id: 'id',
                 code: this.code,
-                current_time: 10
+                current_time: 10,
+                duration: this.duration
             });
         });
 
@@ -160,7 +173,8 @@
             expect(Logger.log).toHaveBeenCalledWith('edx.video.closed_captions.shown', {
                 id: 'id',
                 code: this.code,
-                current_time: 10
+                current_time: 10,
+                duration: this.duration
             });
         });
 
@@ -169,7 +183,8 @@
             expect(Logger.log).toHaveBeenCalledWith('edx.video.closed_captions.hidden', {
                 id: 'id',
                 code: this.code,
-                current_time: 10
+                current_time: 10,
+                duration: this.duration
             });
         });
 
@@ -208,6 +223,7 @@
         describe('html5 encoding only', function() {
             beforeEach(function(done) {
                 this.code = 'html5';
+                this.duration = 111;
                 state = jasmine.initializePlayer('video_html5.html');
                 done();
             });
@@ -217,6 +233,7 @@
         describe('hls encoding', function() {
             beforeEach(function(done) {
                 this.code = 'hls';
+                this.duration = 111;
                 state = jasmine.initializeHLSPlayer();
                 done();
             });

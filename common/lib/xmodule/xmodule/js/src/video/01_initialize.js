@@ -569,6 +569,7 @@ function(VideoPlayer, i18n, moment, _) {
             this.config.speed || this.config.generalSpeed
         );
         this.htmlPlayerLoaded = false;
+        this.duration = this.metadata.duration;
 
         _setConfigurations(this);
 

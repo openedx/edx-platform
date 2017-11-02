@@ -143,7 +143,8 @@
                 var logInfo = _.extend({
                     id: this.state.id,
                     // eslint-disable-next-line no-nested-ternary
-                    code: this.state.isYoutubeType() ? this.state.youtubeId() : this.state.canPlayHLS ? 'hls' : 'html5'
+                    code: this.state.isYoutubeType() ? this.state.youtubeId() : this.state.canPlayHLS ? 'hls' : 'html5',
+                    duration: this.state.duration
                 }, data, this.options.data);
                 Logger.log(eventName, logInfo);
             }

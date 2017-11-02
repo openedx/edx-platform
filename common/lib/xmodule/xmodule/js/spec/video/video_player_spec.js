@@ -1011,6 +1011,21 @@ function(VideoPlayer, HLS) {
             });
         });
 
+        describe('Video duration', function() {
+            beforeEach(function() {
+                state = jasmine.initializePlayer();
+                spyOn(state.videoPlayer, 'duration').and.returnValue(61);
+            });
+
+            it('overrides the duration if not set', function(done) {
+                jasmine.waitUntil(function() {
+                    return state.duration !== undefined;
+                }).then(function() {
+                    expect(state.duration).toEqual(61);
+                }).always(done);
+            });
+        });
+
         describe('Overlay Play Button', function() {
             var playButtonOverlaySelector = '.video-wrapper .btn-play.fa.fa-youtube-play.fa-2x';
             beforeEach(function() {
