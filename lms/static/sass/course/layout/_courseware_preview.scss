@@ -174,7 +174,7 @@
     .exam-timer-clock {
       display: inline-block;
       padding: 0 0 0 ($baseline/3);
-      background-color: $gray-l3;
+      background-color: theme-color("light");
       border-radius: 3px;
 
       #toggle_timer {
