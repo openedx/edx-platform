@@ -2,15 +2,15 @@
 This file contains celery tasks for sending email
 """
 import logging
+
+from boto.exception import NoAuthHandlerFound
+from celery.exceptions import MaxRetriesExceededError
+from celery.task import task  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.core import mail
-
-from celery.task import task  # pylint: disable=no-name-in-module, import-error
-from celery.exceptions import MaxRetriesExceededError
-from boto.exception import NoAuthHandlerFound
-
-from student.models import CourseEnrollment
 from edx_notifications.lib.publisher import bulk_publish_notification_to_users
+from mobileapps.models import MobileApp
+from student.models import CourseEnrollment
 
 log = logging.getLogger('edx.celery.task')
 
@@ -69,10 +69,14 @@ def publish_course_notifications_task(course_id, notification_msg, exclude_user_
         bulk_publish_notification_to_users(user_ids, notification_msg, exclude_user_ids=exclude_user_ids)
         # if we have a course announcement notification publish it to urban airship too
         if notification_msg.msg_type.name == 'open-edx.studio.announcements.new-announcement':
-            bulk_publish_notification_to_users(
-                user_ids, notification_msg, exclude_user_ids=exclude_user_ids, preferred_channel='urban-airship'
-            )
-
+            # fetch all active mobile apps to send notifications to all apps
+            mobile_apps = MobileApp.objects.filter(is_active=True)
+            for mobile_app in mobile_apps:
+                api_credentials = {
+                    "api_credentials": mobile_app.get_api_keys()
+                }
+                bulk_publish_notification_to_users(user_ids, notification_msg, exclude_user_ids=exclude_user_ids,
+                                                   preferred_channel='urban-airship', channel_context=api_credentials)
     except Exception, ex:
         # Notifications are never critical, so we don't want to disrupt any
         # other logic processing. So log and continue.
