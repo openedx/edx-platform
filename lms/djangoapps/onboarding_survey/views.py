@@ -268,7 +268,9 @@ def organization(request):
     else:
         org_survey_instance = OrganizationSurvey.objects.filter(user=request.user).first()
         if org_survey_instance:
-            form = forms.OrganizationInfoModelForm(instance=org_survey_instance)
+            form = forms.OrganizationInfoModelForm(instance=org_survey_instance, initial={
+                'is_org_url_exist': '1' if org_survey_instance.is_org_url_exist else '0'
+            })
         else:
             form = forms.OrganizationInfoModelForm()
 
@@ -343,7 +345,11 @@ def org_detail_survey(request):
     else:
         org_detail_instance = OrganizationDetailSurvey.objects.filter(user=request.user).first()
         if org_detail_instance:
-            form = forms.OrganizationDetailModelForm(instance=org_detail_instance)
+            form = forms.OrganizationDetailModelForm(instance=org_detail_instance, initial={
+                'can_provide_info': '1' if org_detail_instance.can_provide_info else '0',
+                'info_accuracy': '1' if org_detail_instance.info_accuracy else '0',
+                'currency_input': org_detail_instance.currency.alphabetic_code
+            })
         else:
             form = forms.OrganizationDetailModelForm()
 

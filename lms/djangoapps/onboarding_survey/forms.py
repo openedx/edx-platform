@@ -76,7 +76,7 @@ class UserInfoModelForm(forms.ModelForm):
         widgets = {
             'year_of_birth': forms.TextInput(attrs={'placeholder': 'Year of Birth*'}),
             'country_of_employment': forms.TextInput(attrs={'placeholder': 'Country of Employment'}),
-            'city_of_employment': forms.TextInput(attrs={'placeholder': 'City of Employment'}),
+            'city_of_employment': forms.TextInput(attrs={'placeholder': 'City of Employment*'}),
             'country_of_residence': forms.TextInput(attrs={'placeholder': 'Country of Residence*'}),
             'city_of_residence': forms.TextInput(attrs={'placeholder': 'City of Residence'}),
             'language': forms.TextInput(attrs={'placeholder': 'Native Language*'}),
@@ -489,7 +489,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         can_provide_info = int(self.data['can_provide_info'])
         info_accuracy = self.cleaned_data['info_accuracy']
 
-        if can_provide_info and not info_accuracy:
+        if can_provide_info and info_accuracy not in [True, False]:
             raise forms.ValidationError("Please select an option for Estimated or Actual Information")
 
         return info_accuracy
