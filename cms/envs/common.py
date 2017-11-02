@@ -939,7 +939,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.service_status',
 
     # Bookmarks
-    'openedx.core.djangoapps.bookmarks',
+    'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',
 
     # Video module configs (This will be moved to Video once it becomes an XBlock)
     'openedx.core.djangoapps.video_config',

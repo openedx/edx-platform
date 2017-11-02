@@ -2076,7 +2076,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.video_config',
 
     # Bookmarks
-    'openedx.core.djangoapps.bookmarks',
+    'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',
 
     # Our courseware
     'courseware',
