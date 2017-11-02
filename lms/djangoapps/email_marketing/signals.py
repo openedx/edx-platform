@@ -7,16 +7,19 @@ import logging
 import crum
 from django.conf import settings
 from django.dispatch import receiver
-from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError
 from celery.exceptions import TimeoutError
 
+from course_modes.models import CourseMode
 from email_marketing.models import EmailMarketingConfiguration
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from lms.djangoapps.email_marketing.tasks import update_user, update_user_email, get_email_cookies_via_sailthru
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from student.cookies import CREATE_LOGON_COOKIE
+from student.signals import ENROLL_STATUS_CHANGE
 from student.views import REGISTER_USER
 from util.model_utils import USER_FIELD_CHANGED
+from .tasks import update_course_enrollment
 
 log = logging.getLogger(__name__)
 
@@ -24,6 +27,28 @@ log = logging.getLogger(__name__)
 CHANGED_FIELDNAMES = ['username', 'is_active', 'name', 'gender', 'education',
                       'age', 'level_of_education', 'year_of_birth',
                       'country', LANGUAGE_KEY]
+
+WAFFLE_NAMESPACE = 'sailthru'
+WAFFLE_SWITCHES = WaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
+
+SAILTHRU_AUDIT_PURCHASE_ENABLED = 'audit_purchase_enabled'
+
+
+@receiver(ENROLL_STATUS_CHANGE)
+def update_sailthru(sender, event, user, mode, course_id, **kwargs):
+    """
+    Receives signal and calls a celery task to update the
+    enrollment track
+    Arguments:
+        user: current user
+        course_id: course key of a course
+    Returns:
+        None
+    """
+    if WAFFLE_SWITCHES.is_enabled(SAILTHRU_AUDIT_PURCHASE_ENABLED) and mode in CourseMode.AUDIT_MODES:
+        course_key = str(course_id)
+        email = str(user.email)
+        update_course_enrollment.delay(email, course_key, mode)
 
 
 @receiver(CREATE_LOGON_COOKIE)
