@@ -82,30 +82,31 @@ class RedirectMiddleware(object):
                     return None
                 return redirect(self.interests_survey_url)
 
-            if not self.is_org_survey_complete(user):
-                if is_first_signup_in_org(extended_profile.organization) or extended_profile.is_poc:
-                    if self.organization_survey_url == request.get_full_path()\
-                            or self.interests_survey_url == request.get_full_path()\
-                            or self.user_info_survey_url == request.get_full_path():
-                        return None
+            if is_first_signup_in_org(extended_profile.organization) or extended_profile.is_poc:
+                if not self.is_org_survey_complete(user):
+                    if is_first_signup_in_org(extended_profile.organization) or extended_profile.is_poc:
+                        if self.organization_survey_url == request.get_full_path()\
+                                or self.interests_survey_url == request.get_full_path()\
+                                or self.user_info_survey_url == request.get_full_path():
+                            return None
 
-                    return redirect(self.organization_survey_url)
-                else:
-                    if request.get_full_path() == self.user_info_survey_url:
-                        return None
-                    return redirect(self.dashboard_url)
+                        return redirect(self.organization_survey_url)
+                    else:
+                        if request.get_full_path() == self.user_info_survey_url:
+                            return None
+                        return redirect(self.dashboard_url)
 
-            if not self.is_org_detail_survey_complete(user):
-                if is_first_signup_in_org(extended_profile.organization) or extended_profile.is_poc:
-                    if self.org_detail_survey_url == request.get_full_path()\
-                            or self.organization_survey_url == request.get_full_path()\
-                            or self.interests_survey_url == request.get_full_path()\
-                            or self.user_info_survey_url == request.get_full_path():
-                        return None
-                    return redirect(self.org_detail_survey_url)
-                else:
-                    if request.get_full_path() == self.user_info_survey_url:
-                        return None
-                    return redirect(self.dashboard_url)
+                if not self.is_org_detail_survey_complete(user):
+                    if is_first_signup_in_org(extended_profile.organization) or extended_profile.is_poc:
+                        if self.org_detail_survey_url == request.get_full_path()\
+                                or self.organization_survey_url == request.get_full_path()\
+                                or self.interests_survey_url == request.get_full_path()\
+                                or self.user_info_survey_url == request.get_full_path():
+                            return None
+                        return redirect(self.org_detail_survey_url)
+                    else:
+                        if request.get_full_path() == self.user_info_survey_url:
+                            return None
+                        return redirect(self.dashboard_url)
 
             return None

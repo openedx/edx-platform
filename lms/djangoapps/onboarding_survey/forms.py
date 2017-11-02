@@ -101,13 +101,13 @@ class UserInfoModelForm(forms.ModelForm):
                 'required': required_error.format('Country of residence'),
             },
             'start_month_year': {
-                'required': required_error.format('Country of Start month year'),
+                'required': required_error.format('Start month year'),
             },
             'weekly_work_hours': {
-                'required': required_error.format('Country of Weekly work hours'),
+                'required': required_error.format('Weekly work hours'),
             },
             'role_in_org': {
-                'required': required_error.format('Country of Role in organization'),
+                'required': required_error.format(' Role in organization'),
             },
             'level_of_education': {
                 'required': required_error.format('Level of Education'),
