@@ -11,8 +11,12 @@ from wiki.editors.markitup import MarkItUpAdminWidget
 class CodeMirrorWidget(forms.Widget):
     def __init__(self, attrs=None):
         # The 'rows' and 'cols' attributes are required for HTML correctness.
-        default_attrs = {'class': 'markItUp',
-                         'rows': '10', 'cols': '40', }
+        default_attrs = {
+            'class': 'markItUp',
+            'rows': '10',
+            'cols': '40',
+            'aria-describedby': 'hint_id_content'
+        }
         if attrs:
             default_attrs.update(attrs)
         super(CodeMirrorWidget, self).__init__(default_attrs)
