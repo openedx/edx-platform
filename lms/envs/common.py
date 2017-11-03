@@ -2161,7 +2161,7 @@ INSTALLED_APPS = [
     'splash',
 
     # Monitoring
-    'openedx.core.djangoapps.datadog',
+    'openedx.core.djangoapps.datadog.apps.DatadogConfig',
 
     # User API
     'rest_framework',
@@ -2201,9 +2201,6 @@ INSTALLED_APPS = [
 
     # Country embargo support
     'openedx.core.djangoapps.embargo',
-
-    # Monitoring functionality
-    'openedx.core.djangoapps.monitoring',
 
     # Course action state
     'course_action_state',

@@ -966,7 +966,7 @@ INSTALLED_APPS = [
     'eventtracking.django.apps.EventTrackingConfig',
 
     # Monitoring
-    'openedx.core.djangoapps.datadog',
+    'openedx.core.djangoapps.datadog.apps.DatadogConfig',
 
     # For asset pipelining
     'edxmako.apps.EdxMakoConfig',
@@ -1008,9 +1008,6 @@ INSTALLED_APPS = [
 
     # Signals
     'openedx.core.djangoapps.signals.apps.SignalConfig',
-
-    # Monitoring signals
-    'openedx.core.djangoapps.monitoring',
 
     # Course action state
     'course_action_state',
