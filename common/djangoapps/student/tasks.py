@@ -69,10 +69,15 @@ def publish_course_notifications_task(course_id, notification_msg, exclude_user_
         bulk_publish_notification_to_users(user_ids, notification_msg, exclude_user_ids=exclude_user_ids)
         # if we have a course announcement notification publish it to urban airship too
         if notification_msg.msg_type.name == 'open-edx.studio.announcements.new-announcement':
-            bulk_publish_notification_to_users(
-                user_ids, notification_msg, exclude_user_ids=exclude_user_ids, preferred_channel='urban-airship'
-            )
-
+            # fetch all active mobile apps to send notifications to all apps
+            mobile_apps = MobileApp.objects.filter(is_active=True)
+            for mobile_app in mobile_apps:
+                channel_context = {
+                    "api_credentials": mobile_app.get_api_keys()
+                }
+                preferred_channel = mobile_app.get_notification_provider_name()
+                bulk_publish_notification_to_users(user_ids, notification_msg, exclude_user_ids=exclude_user_ids,
+                                                   preferred_channel=preferred_channel, channel_context=channel_context)
     except Exception, ex:
         # Notifications are never critical, so we don't want to disrupt any
         # other logic processing. So log and continue.
