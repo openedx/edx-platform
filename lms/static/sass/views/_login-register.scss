@@ -37,14 +37,13 @@
   font-size: 14px;
   text-align: left;
   display: inline-block;
-  vertical-align: middle;
   line-height: normal;
-  margin-left: -30px;
+  padding: 15px 0 0 10px;
 }
 
-@media (max-width: $bp-screen-sm) {
+@include media-breakpoint-down(md) {
   .enterprise-tagline {
-    width: 200px
+    display: none;
   }
 }
 
