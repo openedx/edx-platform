@@ -112,7 +112,7 @@ class ItemTest(CourseTestCase):
             data['display_name'] = display_name
         if boilerplate is not None:
             data['boilerplate'] = boilerplate
-        return self.client.ajax_post(reverse('contentstore.views.xblock_handler'), json.dumps(data))
+        return self.client.ajax_post(reverse('xblock_handler'), json.dumps(data))
 
     def _create_vertical(self, parent_usage_key=None):
         """
@@ -653,7 +653,7 @@ class DuplicateHelper(object):
         if display_name is not None:
             data['display_name'] = display_name
 
-        resp = self.client.ajax_post(reverse('contentstore.views.xblock_handler'), json.dumps(data))
+        resp = self.client.ajax_post(reverse('xblock_handler'), json.dumps(data))
         return self.response_usage_key(resp)
 
 
@@ -864,7 +864,7 @@ class TestMoveItem(ItemTest):
             data['target_index'] = target_index
 
         return self.client.patch(
-            reverse('contentstore.views.xblock_handler'),
+            reverse('xblock_handler'),
             json.dumps(data),
             content_type='application/json'
         )
@@ -1147,7 +1147,7 @@ class TestMoveItem(ItemTest):
         data = {'move_source_locator': unicode(self.html_usage_key)}
         with self.assertRaises(InvalidKeyError):
             self.client.patch(
-                reverse('contentstore.views.xblock_handler'),
+                reverse('xblock_handler'),
                 json.dumps(data),
                 content_type='application/json'
             )
@@ -1157,7 +1157,7 @@ class TestMoveItem(ItemTest):
         Test patch request without providing a move source locator.
         """
         response = self.client.patch(
-            reverse('contentstore.views.xblock_handler')
+            reverse('xblock_handler')
         )
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
@@ -1308,7 +1308,7 @@ class TestMoveItem(ItemTest):
         }
         with self.assertRaises(ItemNotFoundError):
             self.client.patch(
-                reverse('contentstore.views.xblock_handler'),
+                reverse('xblock_handler'),
                 json.dumps(data),
                 content_type='application/json'
             )
