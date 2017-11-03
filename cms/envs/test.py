@@ -351,6 +351,7 @@ if FEATURES.get('EDX_SOLUTIONS_API'):
         'progress',
         'edx_solutions_projects',
         'edx_solutions_organizations',
+        'mobileapps',
     )
 FEATURES['DISABLE_SOLUTIONS_APPS_SIGNALS'] = True
 

@@ -1987,7 +1987,6 @@ YOUTUBE_API_KEY = None
 ################################### APPS ######################################
 INSTALLED_APPS = (
     # Standard ones that are always installed...
-    'mobileapps',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.humanize',
@@ -3195,6 +3194,7 @@ NOTIFICATION_CHANNEL_PROVIDERS = {
     },
     'urban-airship': {
         'class': 'edx_notifications.channels.urban_airship.UrbanAirshipNotificationChannelProvider',
+        'options': {}
     },
     'null': {
         'class': 'edx_notifications.channels.null.NullNotificationChannel',
