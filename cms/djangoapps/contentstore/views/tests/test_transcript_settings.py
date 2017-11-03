@@ -69,7 +69,7 @@ class TranscriptCredentialsTest(CourseTestCase):
             },
             ({'error_type': TranscriptionProviderErrorType.INVALID_CREDENTIALS}, False),
             400,
-            '{\n  "error": "Transcript credentials are not valid."\n}'
+            '{\n  "error": "The information you entered is incorrect."\n}'
         ),
         (
             {

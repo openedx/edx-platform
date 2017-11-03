@@ -103,7 +103,7 @@ def transcript_credentials_handler(request, course_key_string):
             # edx-video-pipeline doesn't support i18n translations yet.
             error_type = error_response.get('error_type')
             if error_type == TranscriptionProviderErrorType.INVALID_CREDENTIALS:
-                error_message = _('Transcript credentials are not valid.')
+                error_message = _('The information you entered is incorrect.')
 
             response = JsonResponse({'error': error_message}, status=400)
 
