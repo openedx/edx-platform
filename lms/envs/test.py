@@ -582,6 +582,7 @@ INSTALLED_APPS += (
     'completion_api',
     'edx_solutions_projects',
     'edx_solutions_organizations',
+    'mobileapps',
 )
 
 

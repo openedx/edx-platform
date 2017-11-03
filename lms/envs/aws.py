@@ -831,6 +831,7 @@ if FEATURES.get('EDX_SOLUTIONS_API'):
         'completion_api',
         'edx_solutions_projects',
         'edx_solutions_organizations',
+        'mobileapps',
     )
 
 ##### Custom Courses for EdX #####
