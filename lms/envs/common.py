@@ -3089,10 +3089,6 @@ NOTIFICATION_CHANNEL_PROVIDERS = {
     },
     'urban-airship': {
         'class': 'edx_notifications.channels.urban_airship.UrbanAirshipNotificationChannelProvider',
-        'options': {
-            'application_id': 'test_api_key',
-            'rest_api_key': 'test_api_key',
-        }
     },
     'null': {
         'class': 'edx_notifications.channels.null.NullNotificationChannel',
