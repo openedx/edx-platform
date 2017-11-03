@@ -21,7 +21,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
-            'click .action-save': 'save'
+            'click .action-save': 'save',
+            keydown: 'keyHandler'
         }),
 
         options: $.extend({}, BaseModal.prototype.options, {
@@ -102,6 +103,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             });
 
             return $.extend.apply(this, [true, {}].concat(requestData));
+        },
+
+        keyHandler: function(event) {
+            if (event.which === 27) {  // escape key
+                this.hide();
+            }
         }
     });
 
