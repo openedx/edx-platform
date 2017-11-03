@@ -925,6 +925,9 @@ INSTALLED_APPS = [
     'djcelery',
     'method_override',
 
+    # Common Initialization
+    'openedx.core.djangoapps.common_initialization.apps.CommonInitializationConfig',
+
     # Common views
     'openedx.core.djangoapps.common_views',
 
