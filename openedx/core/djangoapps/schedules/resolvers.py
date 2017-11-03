@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.urlresolvers import reverse
-from django.db.models import F, Q
+from django.db.models import ExpressionWrapper, F, Func, IntegerField, Q
 from django.utils.formats import dateformat, get_format
 
 
@@ -98,7 +98,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
                 self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)
 
     def get_schedules_with_target_date_by_bin_and_orgs(
-        self, order_by='enrollment__user__id'
+        self, order_by='enrollment__user__id', bin_by='user'
     ):
         """
         Returns Schedules with the target_date, related to Users whose id matches the bin_num, and filtered by org_list.
@@ -111,14 +111,18 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
             'courseenrollment__schedule__{}__gte'.format(self.schedule_date_field): target_day,
             'courseenrollment__schedule__{}__lt'.format(self.schedule_date_field): target_day + datetime.timedelta(days=1),
         }
+
         users = User.objects.filter(
             courseenrollment__is_active=True,
             **schedule_day_equals_target_day_filter
-        ).annotate(
-            id_mod=F('id') % self.num_bins
-        ).filter(
-            id_mod=self.bin_num
         )
+
+        if bin_by == 'user':
+            users = users.annotate(
+                id_mod=F('id') % self.num_bins
+            ).filter(
+                id_mod=self.bin_num
+            )
 
         schedule_day_equals_target_day_filter = {
             '{}__gte'.format(self.schedule_date_field): target_day,
@@ -134,7 +138,18 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
             enrollment__user__in=users,
             enrollment__is_active=True,
             **schedule_day_equals_target_day_filter
-        ).order_by(order_by)
+        )
+
+        if bin_by == 'course':
+            schedules = schedules.annotate(
+                hashed_course_id=ExpressionWrapper(
+                    Func(F('enrollment__course_id'), function='CRC32') % self.num_bins,
+                    output_field=IntegerField())
+            ).filter(
+                hashed_course_id=self.bin_num
+            )
+
+        schedules = schedules.order_by(order_by)
 
         schedules = self.filter_by_org(schedules)
 
@@ -353,6 +368,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
         week_num = abs(self.day_offset) / 7
         schedules = self.get_schedules_with_target_date_by_bin_and_orgs(
             order_by='enrollment__course',
+            bin_by='course',
         )
 
         template_context = get_base_template_context(self.site)

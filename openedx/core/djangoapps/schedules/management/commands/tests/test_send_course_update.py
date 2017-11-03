@@ -35,6 +35,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestBase):
     experience_type = ScheduleExperience.EXPERIENCES.course_updates
 
     queries_deadline_for_each_course = True
+    bin_by = 'course'
 
     def setUp(self):
         super(TestSendCourseUpdate, self).setUp()

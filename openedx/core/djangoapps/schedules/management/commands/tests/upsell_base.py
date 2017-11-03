@@ -42,7 +42,7 @@ class ScheduleUpsellTestMixin(object):
             mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args[1])
             self.task.apply(kwargs=dict(
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
-                bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
+                bin_num=self._calculate_bin(schedule.enrollment.user, unicode(schedule.enrollment.course.id)),
             ))
         self.assertEqual(len(sent_messages), 1)
 
