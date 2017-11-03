@@ -16,7 +16,7 @@ from edx_ace.recipient import Recipient
 
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
 from openedx.core.djangoapps.monitoring_utils import function_trace, set_custom_metric
-from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
+from openedx.core.djangoapps.schedules.content_highlights import get_week_highlights
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleExperience
 from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
@@ -25,9 +25,6 @@ from openedx.core.djangoapps.schedules.template_context import (
     get_base_template_context
 )
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-
-from request_cache.middleware import request_cached
-from xmodule.modulestore.django import modulestore
 
 
 LOG = logging.getLogger(__name__)
@@ -358,14 +355,14 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
         template_context = get_base_template_context(self.site)
         for schedule in schedules:
             enrollment = schedule.enrollment
+            user = enrollment.user
+
             try:
-                week_highlights = get_week_highlights(enrollment.course_id, week_num)
+                week_highlights = get_week_highlights(user, enrollment.course_id, week_num)
             except CourseUpdateDoesNotExist:
                 continue
 
-            user = enrollment.user
             course_id_str = str(enrollment.course_id)
-
             template_context.update({
                 'course_name': schedule.enrollment.course.display_name,
                 'course_url': absolute_url(
@@ -380,12 +377,3 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             template_context.update(_get_upsell_information_for_schedule(user, schedule))
 
             yield (user, schedule.enrollment.course.language, template_context)
-
-
-@request_cached
-def get_week_highlights(course_id, week_num):
-    if COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course_id):
-        course = modulestore().get_course(course_id)
-        return course.highlights_for_week(week_num)
-    else:
-        raise CourseUpdateDoesNotExist()

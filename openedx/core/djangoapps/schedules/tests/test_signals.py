@@ -6,7 +6,6 @@ from pytz import utc
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.schedules.signals import CREATE_SCHEDULE_WAFFLE_FLAG
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -88,10 +87,10 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
             enrollment.schedule
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
-    @patch('openedx.core.djangoapps.schedules.signals.get_week_highlights')
-    def test_create_schedule_course_updates_experience(self, mock_get_week_highlights, mock_get_current_site):
+    @patch('openedx.core.djangoapps.schedules.signals.course_has_highlights')
+    def test_create_schedule_course_updates_experience(self, mock_course_has_highlights, mock_get_current_site):
         site = SiteFactory.create()
-        mock_get_week_highlights.return_value = True
+        mock_course_has_highlights.return_value = True
         mock_get_current_site.return_value = site
         self.assert_schedule_created(experience_type=ScheduleExperience.EXPERIENCES.course_updates)
 
