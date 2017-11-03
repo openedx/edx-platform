@@ -49,7 +49,7 @@ class TestUpgradeReminder(ScheduleSendEmailTestBase):
 
         self.task.apply(kwargs=dict(
             site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
-            bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
+            bin_num=self._calculate_bin(schedule.enrollment.user, unicode(schedule.enrollment.course.id)),
         ))
 
         self.assertEqual(mock_ace.send.called, not is_verified)
@@ -73,7 +73,7 @@ class TestUpgradeReminder(ScheduleSendEmailTestBase):
 
             self.task.apply(kwargs=dict(
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
-                bin_num=self._calculate_bin_for_user(user),
+                bin_num=self._calculate_bin(user, 'edX/toy/Course0'),
             ))
 
             messages = [Message.from_string(m) for m in sent_messages]
@@ -92,7 +92,7 @@ class TestUpgradeReminder(ScheduleSendEmailTestBase):
 
         self.task.apply(kwargs=dict(
             site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
-            bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
+            bin_num=self._calculate_bin(schedule.enrollment.user, unicode(schedule.enrollment.course.id)),
         ))
         self.assertEqual(mock_ace.send.called, False)
 

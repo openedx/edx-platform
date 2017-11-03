@@ -1,8 +1,10 @@
-from collections import namedtuple, defaultdict
-from copy import deepcopy
 import datetime
-import ddt
 import logging
+from collections import defaultdict, namedtuple
+from copy import deepcopy
+from zlib import crc32
+
+import ddt
 
 import attr
 from django.conf import settings
@@ -69,6 +71,7 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
 
     queries_deadline_for_each_course = False
     consolidates_emails_for_learner = False
+    bin_by = 'user'
 
     def setUp(self):
         super(ScheduleSendEmailTestBase, self).setUp()
@@ -82,8 +85,11 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
 
         self._courses_with_verified_modes = set()
 
-    def _calculate_bin_for_user(self, user):
-        return user.id % self.task.num_bins
+    def _calculate_bin(self, user, course_key_str):
+        if self.bin_by == 'user':
+            return user.id % self.task.num_bins
+        elif self.bin_by == 'course':
+            return crc32(course_key_str) % self.task.num_bins
 
     def _get_dates(self, offset=None):
         current_day = _get_datetime_beginning_of_day(datetime.datetime.now(pytz.UTC))
@@ -159,7 +165,8 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
                 self._schedule_factory() for _ in range(schedule_count)
             ]
 
-            bins_in_use = frozenset((self._calculate_bin_for_user(s.enrollment.user)) for s in schedules)
+            bins_in_use = frozenset((self._calculate_bin(s.enrollment.user, unicode(s.enrollment.course.id)))
+                                    for s in schedules)
             is_first_match = True
             target_day_str = serialize(target_day)
 
@@ -331,10 +338,10 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
             with patch.object(self.task, 'async_send_task') as mock_schedule_send:
                 self.task.apply(kwargs=dict(
                     site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
-                    bin_num=self._calculate_bin_for_user(user),
+                    bin_num=self._calculate_bin(user, 'edX/toy/course0'),
                 ))
 
-        expected_call_count = 1 if self.consolidates_emails_for_learner else num_courses
+        expected_call_count = 1 if self.consolidates_emails_for_learner or self.bin_by == 'course' else num_courses
         self.assertEqual(mock_schedule_send.apply_async.call_count, expected_call_count)
         self.assertFalse(mock_ace.send.called)
 
@@ -379,9 +386,10 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
                 with self.assertNumQueries(num_expected_queries, table_blacklist=WAFFLE_TABLES):
                     self.task.apply(kwargs=dict(
                         site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
-                        bin_num=self._calculate_bin_for_user(user),
+                        bin_num=self._calculate_bin(user, 'edX/toy/course0'),
                     ))
-            num_expected_messages = 1 if self.consolidates_emails_for_learner else message_count
+            num_expected_messages = (1 if self.consolidates_emails_for_learner or self.bin_by == 'course' else
+                                     message_count)
             self.assertEqual(len(sent_messages), num_expected_messages)
 
             with self.assertNumQueries(2):
@@ -409,7 +417,7 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
         with patch.object(tasks, 'ace') as mock_ace:
             self.task.apply(kwargs=dict(
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
-                bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
+                bin_num=self._calculate_bin(schedule.enrollment.user, unicode(schedule.enrollment.course.id)),
             ))
 
             self.assertEqual(mock_ace.send.called, test_config.email_sent)
