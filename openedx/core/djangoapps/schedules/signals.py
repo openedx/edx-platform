@@ -1,6 +1,8 @@
 import datetime
 import logging
+import random
 
+import analytics
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -55,16 +57,25 @@ def create_schedule(sender, **kwargs):
 
     upgrade_deadline = _calculate_upgrade_deadline(enrollment.course_id, content_availability_date)
 
+    if course_has_highlights(enrollment.course_id):
+        experience_type = ScheduleExperience.EXPERIENCES.course_updates
+    else:
+        experience_type = ScheduleExperience.EXPERIENCES.default
+
+    if _should_randomly_suppress_schedule_creation(
+        schedule_config,
+        enrollment,
+        upgrade_deadline,
+        experience_type,
+        content_availability_date,
+    ):
+        return
+
     schedule = Schedule.objects.create(
         enrollment=enrollment,
         start=content_availability_date,
         upgrade_deadline=upgrade_deadline
     )
-
-    if course_has_highlights(enrollment.course_id):
-        experience_type = ScheduleExperience.EXPERIENCES.course_updates
-    else:
-        experience_type = ScheduleExperience.EXPERIENCES.default
 
     ScheduleExperience(schedule=schedule, experience_type=experience_type).save()
 
@@ -138,3 +149,36 @@ def _get_upgrade_deadline_delta_setting(course_id):
         delta = None
 
     return delta
+
+
+def _should_randomly_suppress_schedule_creation(
+    schedule_config,
+    enrollment,
+    upgrade_deadline,
+    experience_type,
+    content_availability_date,
+):
+    # The hold back ratio is always between 0 and 1. A value of 0 indicates that schedules should be created for all
+    # schedules. A value of 1 indicates that no schedules should be created for any enrollments. A value of 0.2 would
+    # mean that 20% of enrollments should *not* be given schedules.
+
+    # This allows us to measure the impact of the dynamic schedule experience by comparing this "control" group that
+    # does not receive any of benefits of the feature against the group that does.
+    if random.random() < schedule_config.hold_back_ratio:
+        log.debug('Schedules: Enrollment held back from dynamic schedule experiences.')
+        upgrade_deadline_str = None
+        if upgrade_deadline:
+            upgrade_deadline_str = upgrade_deadline.isoformat()
+        analytics.track(
+            'edx.bi.schedule.suppressed',
+            {
+                'user_id': enrollment.user.id,
+                'course_id': unicode(enrollment.course_id),
+                'experience_type': experience_type,
+                'upgrade_deadline': upgrade_deadline_str,
+                'content_availability_date': content_availability_date.isoformat(),
+            }
+        )
+        return True
+
+    return False
