@@ -65,7 +65,7 @@
   }
 
   .form-actions {
-    @include media-breakpoint-down(xs) {
+    @include media-breakpoint-down(sm) {
       margin-top: $baseline/2;
     }
   }
@@ -90,6 +90,14 @@
       }
     }
   }
+
+  @include media-breakpoint-down(sm) {
+    padding: $baseline;
+
+    .page-header-search {
+      width: 100%;
+    }
+  }
 }
 
 .page-content-container {
@@ -102,6 +110,7 @@
 .page-content {
   padding: $baseline*2;
 
+  // Adjust styles for desktop sized screens
   @include media-breakpoint-up(md) {
     display: flex;
 
@@ -114,5 +123,18 @@
       max-width: 350px;  // Note: setting width only is not obeyed
       margin-left: $baseline*2;
     }
+  }
+
+  // Override styles for tablet sized screens
+  @include media-breakpoint-only(md) {
+    .page-content-secondary {
+      min-width: 250px;
+      max-width: 250px;
+    }
+  }
+
+  // Adjust styles for phone sized screens
+  @include media-breakpoint-down(sm) {
+    padding: $baseline;
   }
 }

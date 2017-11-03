@@ -279,6 +279,13 @@
       margin-top: ($baseline / 5);
     }
   }
+
+  @include media-breakpoint-down(sm) {
+    @include padding-left(0);
+
+    border-top: 1px solid theme-color("light");
+    padding-top: $baseline;
+  }
 }
 
 // Course outline
@@ -480,6 +487,7 @@
       top: $baseline * (-1/2);
       right: $baseline / 2;
       cursor: pointer;
+      background-color: theme-color("primary");
     }
   }
 

@@ -120,7 +120,7 @@
   // +case - calculator spacing (needed for overriding calculator positioning)
   // --------------------
   &.has-utility-calculator {
-    @include right($baseline*2.50);
+    @include right($baseline*2.75);
   }
 }
 
