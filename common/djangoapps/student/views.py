@@ -1263,6 +1263,10 @@ def change_enrollment(request, check_access=True):
         )
         return HttpResponseBadRequest(_("Invalid course id"))
 
+    # Allow us to monitor performance of this transaction on a per-course basis since we often roll-out features
+    # on a per-course basis.
+    monitoring_utils.set_custom_metric('course_id', unicode(course_id))
+
     if action == "enroll":
         # Make sure the course exists
         # We don't do this check on unenroll, or a bad course id can't be unenrolled from
