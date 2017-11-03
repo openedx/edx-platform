@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from student.models import CourseEnrollment
 
-from commerce.models import CommerceConfiguration
+from .models import CommerceConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 

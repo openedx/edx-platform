@@ -2,8 +2,8 @@
 import ddt
 from django.test import TestCase
 
-from commerce.api.v1.models import Course
 from course_modes.models import CourseMode
+from ..models import Course
 
 
 @ddt.ddt

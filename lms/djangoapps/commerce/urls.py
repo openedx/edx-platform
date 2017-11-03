@@ -3,7 +3,7 @@ Defines the URL routes for this app.
 """
 from django.conf.urls import url
 
-from commerce import views
+from . import views
 
 urlpatterns = [
     url(r'^checkout/cancel/$', views.checkout_cancel, name='checkout_cancel'),

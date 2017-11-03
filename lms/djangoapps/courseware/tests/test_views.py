@@ -35,7 +35,7 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from certificates import api as certs_api
 from certificates.models import CertificateGenerationConfiguration, CertificateStatuses
 from certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
-from commerce.models import CommerceConfiguration
+from lms.djangoapps.commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.access_utils import check_course_open_for_learner

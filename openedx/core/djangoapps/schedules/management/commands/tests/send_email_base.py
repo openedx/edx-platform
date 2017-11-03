@@ -10,7 +10,7 @@ from freezegun import freeze_time
 from mock import Mock, patch
 import pytz
 
-from commerce.models import CommerceConfiguration
+from lms.djangoapps.commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration

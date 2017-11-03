@@ -27,9 +27,9 @@ from provider.oauth2.models import AccessToken as dop_access_token
 from provider.oauth2.models import RefreshToken as dop_refresh_token
 from testfixtures import LogCapture
 
-from commerce.models import CommerceConfiguration
-from commerce.tests import factories
-from commerce.tests.mocks import mock_get_orders
+from lms.djangoapps.commerce.models import CommerceConfiguration
+from lms.djangoapps.commerce.tests import factories
+from lms.djangoapps.commerce.tests.mocks import mock_get_orders
 from course_modes.models import CourseMode
 from http.cookies import SimpleCookie
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories

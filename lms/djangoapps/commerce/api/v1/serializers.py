@@ -7,8 +7,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 
-from commerce.api.v1.models import Course
 from course_modes.models import CourseMode
+from .models import Course
 from xmodule.modulestore.django import modulestore
 
 

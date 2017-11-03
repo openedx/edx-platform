@@ -9,7 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 
-from commerce.utils import EcommerceService
+from lms.djangoapps.commerce.utils import EcommerceService
 from course_modes.models import get_cosmetic_verified_display_price
 from courseware.access import has_access
 from courseware.courses import (

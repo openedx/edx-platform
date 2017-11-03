@@ -12,7 +12,7 @@ from mock import patch
 from nose.plugins.attrib import attr
 from pytz import utc
 
-from commerce.models import CommerceConfiguration
+from lms.djangoapps.commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.courses import get_course_date_blocks

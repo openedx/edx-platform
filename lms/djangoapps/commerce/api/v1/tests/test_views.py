@@ -14,9 +14,9 @@ from edx_rest_api_client import exceptions
 from nose.plugins.attrib import attr
 from rest_framework.utils.encoders import JSONEncoder
 
-from commerce.tests.mocks import mock_order_endpoint
-from commerce.tests.test_views import UserMixin
 from course_modes.models import CourseMode
+from ....tests.mocks import mock_order_endpoint
+from ....tests.test_views import UserMixin
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

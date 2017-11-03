@@ -30,7 +30,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from commerce.utils import EcommerceService, is_account_activation_requirement_disabled
+from lms.djangoapps.commerce.utils import EcommerceService, is_account_activation_requirement_disabled
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response, render_to_string
 from eventtracking import tracker

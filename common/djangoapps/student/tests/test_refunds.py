@@ -203,7 +203,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         raised while getting order detail for ecommerce.
         """
         # importing this after overriding value of ECOMMERCE_API_URL
-        from commerce.tests.mocks import mock_order_endpoint
+        from lms.djangoapps.commerce.tests.mocks import mock_order_endpoint
 
         self.client.login(username=self.user.username, password=self.USER_PASSWORD)
         with mock_order_endpoint(order_number=self.ORDER_NUMBER, exception=exception, reset_on_exit=False):

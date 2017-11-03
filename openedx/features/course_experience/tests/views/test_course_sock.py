@@ -4,7 +4,7 @@ Tests for course verification sock
 
 import ddt
 
-from commerce.models import CommerceConfiguration
+from lms.djangoapps.commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG

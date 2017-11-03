@@ -14,8 +14,8 @@ from pytz import UTC
 from waffle.models import Flag
 from waffle.testutils import override_flag
 
-from commerce.models import CommerceConfiguration
-from commerce.utils import EcommerceService
+from lms.djangoapps.commerce.models import CommerceConfiguration
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
 from course_modes.models import CourseMode
 from courseware.tests.factories import StaffFactory

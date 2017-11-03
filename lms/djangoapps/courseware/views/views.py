@@ -12,7 +12,7 @@ import shoppingcart
 import survey.views
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses
-from commerce.utils import EcommerceService
+from lms.djangoapps.commerce.utils import EcommerceService
 from course_modes.models import (CourseMode, get_course_prices)
 from courseware.access import has_access, has_ccx_coach_role
 from courseware.access_utils import check_course_open_for_learner

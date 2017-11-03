@@ -3,7 +3,7 @@ API v0 URLs.
 """
 from django.conf.urls import include, url
 
-from commerce.api.v0 import views
+from . import views
 
 BASKET_URLS = [
     url(r'^$', views.BasketsView.as_view(), name='create'),

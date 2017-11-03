@@ -4,7 +4,7 @@ Tests for management command for enabling commerce configuration.
 from django.core.management import call_command
 from django.test import TestCase
 
-from commerce.models import CommerceConfiguration
+from ....models import CommerceConfiguration
 
 
 class TestCommerceConfigurationCommand(TestCase):

@@ -95,7 +95,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         self.cert_status = cert_status
 
         with patch('student.views.cert_info', side_effect=self.mock_cert):
-            with patch('commerce.signals.handle_refund_order') as mock_refund_handler:
+            with patch('lms.djangoapps.commerce.signals.handle_refund_order') as mock_refund_handler:
                 REFUND_ORDER.connect(mock_refund_handler)
                 response = self.client.post(
                     reverse('change_enrollment'),
