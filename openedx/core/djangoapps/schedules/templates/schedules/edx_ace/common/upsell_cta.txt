@@ -1,5 +1,4 @@
 {% load i18n %}
-
 {% if show_upsell %}
 {% blocktrans trimmed %}
     Don't miss the opportunity to highlight your new knowledge and skills by earning a verified

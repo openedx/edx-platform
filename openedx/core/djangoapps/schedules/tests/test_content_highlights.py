@@ -39,12 +39,12 @@ class TestContentHighlights(ModuleStoreTestCase):
     def test_non_existent_course_raises_exception(self):
         nonexistent_course_key = self.course_key.replace(run='no_such_run')
         with self.assertRaises(CourseUpdateDoesNotExist):
-            get_week_highlights(self.user, nonexistent_course_key, 0)
+            get_week_highlights(self.user, nonexistent_course_key, week_num=1)
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_empty_course_raises_exception(self):
         with self.assertRaises(CourseUpdateDoesNotExist):
-            get_week_highlights(self.user, self.course_key, 0)
+            get_week_highlights(self.user, self.course_key, week_num=1)
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, False)
     def test_flag_disabled(self):
@@ -53,7 +53,7 @@ class TestContentHighlights(ModuleStoreTestCase):
 
         self.assertFalse(course_has_highlights(self.course_key))
         with self.assertRaises(CourseUpdateDoesNotExist):
-            get_week_highlights(self.user, self.course_key, week_num=0)
+            get_week_highlights(self.user, self.course_key, week_num=1)
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_flag_enabled(self):
@@ -62,7 +62,7 @@ class TestContentHighlights(ModuleStoreTestCase):
             self._create_chapter(highlights=highlights)
         self.assertTrue(course_has_highlights(self.course_key))
         self.assertEqual(
-            get_week_highlights(self.user, self.course_key, week_num=0),
+            get_week_highlights(self.user, self.course_key, week_num=1),
             highlights,
         )
 
@@ -77,7 +77,7 @@ class TestContentHighlights(ModuleStoreTestCase):
 
         self.assertFalse(course_has_highlights(self.course_key))
         with self.assertRaises(CourseUpdateDoesNotExist):
-            get_week_highlights(self.user, self.course_key, week_num=0)
+            get_week_highlights(self.user, self.course_key, week_num=1)
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_course_with_highlights(self):
@@ -89,15 +89,15 @@ class TestContentHighlights(ModuleStoreTestCase):
         self.assertTrue(course_has_highlights(self.course_key))
 
         self.assertEqual(
-            get_week_highlights(self.user, self.course_key, week_num=0),
+            get_week_highlights(self.user, self.course_key, week_num=1),
             [u'a', u'b', u'á'],
         )
         self.assertEqual(
-            get_week_highlights(self.user, self.course_key, week_num=1),
+            get_week_highlights(self.user, self.course_key, week_num=2),
             [u'skipped a week'],
         )
         with self.assertRaises(CourseUpdateDoesNotExist):
-            get_week_highlights(self.user, self.course_key, week_num=2)
+            get_week_highlights(self.user, self.course_key, week_num=3)
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_staff_only(self):
@@ -109,4 +109,4 @@ class TestContentHighlights(ModuleStoreTestCase):
 
         self.assertTrue(course_has_highlights(self.course_key))
         with self.assertRaises(CourseUpdateDoesNotExist):
-            get_week_highlights(self.user, self.course_key, week_num=0)
+            get_week_highlights(self.user, self.course_key, week_num=1)
