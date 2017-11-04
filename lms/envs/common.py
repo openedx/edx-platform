@@ -2903,6 +2903,7 @@ OPTIONAL_APPS = [
     ('enterprise', None),
     ('consent', None),
     ('integrated_channels.integrated_channel', None),
+    ('integrated_channels.degreed', None),
     ('integrated_channels.sap_success_factors', None),
 
     # Required by the Enterprise App
