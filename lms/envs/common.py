@@ -3086,6 +3086,10 @@ NOTIFICATION_CHANNEL_PROVIDERS = {
             }
         }
     },
+    'urban-airship': {
+        'class': 'edx_notifications.channels.urban_airship.UrbanAirshipNotificationChannelProvider',
+        'options': {}
+    },
     'null': {
         'class': 'edx_notifications.channels.null.NullNotificationChannel',
         'options': {}
