@@ -1,8 +1,6 @@
 from django.contrib import admin
 from oauth2_provider.admin import ApplicationAdmin
-from oauth2_provider.models import AccessToken, get_application_model, Grant, RefreshToken
-
-from .models import RestrictedApplication
+from oauth2_provider.models import AccessToken, Grant, RefreshToken, get_application_model
 
 
 def reregister(model_class):
@@ -43,6 +41,7 @@ class DOTRefreshTokenAdmin(admin.ModelAdmin):
 
 @reregister(get_application_model())
 class DOTApplicationAdmin(ApplicationAdmin):
+    list_filter = ('client_type', 'authorization_grant_type', 'skip_authorization', 'restricted',)
     search_fields = ('name', 'user__username', 'client_id')
 
 
@@ -53,8 +52,3 @@ class DOTGrantAdmin(admin.ModelAdmin):
     list_filter = ('application',)
     raw_id_fields = ('user',)
     search_fields = ('code', 'user__username')
-
-
-@admin.register(RestrictedApplication)
-class RestrictedApplicationAdmin(admin.ModelAdmin):
-    list_display = ('application',)

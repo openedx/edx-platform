@@ -11,6 +11,7 @@ from Crypto.PublicKey import RSA
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase, override_settings
+from django.utils import timezone
 from oauth2_provider import models as dot_models
 from provider import constants
 
@@ -101,8 +102,8 @@ class _DispatchingViewTestCase(TestCase):
             user=self.user,
             redirect_uri=DUMMY_REDIRECT_URL,
             client_id='dot-restricted-app-client-id',
+            restricted=True
         )
-        models.RestrictedApplication.objects.create(application=self.restricted_dot_app)
 
     def _post_request(self, user, client, token_type=None):
         """
@@ -170,7 +171,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
 
         # double check that the token stored in the DB is marked as expired
         access_token = dot_models.AccessToken.objects.get(token=data['access_token'])
-        self.assertTrue(models.RestrictedApplication.verify_access_token_as_expired(access_token))
+        assert access_token.expires < timezone.now()
 
     @ddt.data('dop_app', 'dot_app')
     def test_jwt_access_token(self, client_attr):

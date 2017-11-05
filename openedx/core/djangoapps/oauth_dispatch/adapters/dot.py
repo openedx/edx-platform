@@ -18,7 +18,8 @@ class DOTAdapter(object):
                                    user,
                                    redirect_uri,
                                    client_id=None,
-                                   authorization_grant_type=AbstractApplication.GRANT_AUTHORIZATION_CODE):
+                                   authorization_grant_type=AbstractApplication.GRANT_AUTHORIZATION_CODE,
+                                   restricted=False):
         """
         Create an oauth client application that is confidential.
         """
@@ -29,9 +30,10 @@ class DOTAdapter(object):
             client_type=AbstractApplication.CLIENT_CONFIDENTIAL,
             authorization_grant_type=authorization_grant_type,
             redirect_uris=redirect_uri,
+            restricted=restricted
         )
 
-    def create_public_client(self, name, user, redirect_uri, client_id=None):
+    def create_public_client(self, name, user, redirect_uri, client_id=None, restricted=False):
         """
         Create an oauth client application that is public.
         """
@@ -44,6 +46,7 @@ class DOTAdapter(object):
             client_type=Application.CLIENT_PUBLIC,
             authorization_grant_type=Application.GRANT_PASSWORD,
             redirect_uris=redirect_uri,
+            restricted=restricted
         )
 
     def get_client(self, **filters):

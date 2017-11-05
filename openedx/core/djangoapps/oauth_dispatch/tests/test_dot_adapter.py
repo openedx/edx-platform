@@ -14,7 +14,6 @@ from oauth2_provider import models
 from student.tests.factories import UserFactory
 from .constants import DUMMY_REDIRECT_URL, DUMMY_REDIRECT_URL2
 from ..adapters import DOTAdapter
-from ..models import RestrictedApplication
 
 Application = models.get_application_model()
 
@@ -48,16 +47,8 @@ class DOTAdapterTestCase(TestCase):
             user=self.user,
             redirect_uri=DUMMY_REDIRECT_URL2,
             client_id='restricted-client-id',
+            restricted=True
         )
-        self.restricted_app = RestrictedApplication.objects.create(application=self.restricted_client)
-
-    def test_restricted_app_unicode(self):
-        """
-        Make sure unicode representation of RestrictedApplication is correct
-        """
-        self.assertEqual(unicode(self.restricted_app), u"<RestrictedApplication '{name}'>".format(
-            name=self.restricted_client.name
-        ))
 
     @ddt.data(
         ('confidential', Application.CLIENT_CONFIDENTIAL),
@@ -115,4 +106,4 @@ class DOTAdapterTestCase(TestCase):
         )
 
         readback_token = self.adapter.get_access_token(token_string='expired-token-id')
-        self.assertTrue(RestrictedApplication.verify_access_token_as_expired(readback_token))
+        assert readback_token.expires < now()

@@ -12,8 +12,6 @@ from oauth2_provider.models import AccessToken
 from oauth2_provider.oauth2_validators import OAuth2Validator
 from pytz import utc
 
-from .models import RestrictedApplication
-
 
 @receiver(pre_save, sender=AccessToken)
 def on_access_token_presave(sender, instance, *args, **kwargs):  # pylint: disable=unused-argument
@@ -24,9 +22,8 @@ def on_access_token_presave(sender, instance, *args, **kwargs):  # pylint: disab
     We do this as a pre-save hook on the ORM
     """
 
-    is_application_restricted = RestrictedApplication.objects.filter(application=instance.application).exists()
-    if is_application_restricted:
-        RestrictedApplication.set_access_token_as_expired(instance)
+    if instance.application.restricted:
+        instance.expires = datetime(1970, 1, 1, tzinfo=utc)
 
 
 class EdxOAuth2Validator(OAuth2Validator):
@@ -83,12 +80,11 @@ class EdxOAuth2Validator(OAuth2Validator):
 
         super(EdxOAuth2Validator, self).save_bearer_token(token, request, *args, **kwargs)
 
-        is_application_restricted = RestrictedApplication.objects.filter(application=request.client).exists()
-        if is_application_restricted:
-            # Since RestrictedApplications will override the DOT defined expiry, so that access_tokens
+        if request.client.restricted:
+            # Since restricted applications will override the DOT defined expiry, so that access_tokens
             # are always expired, we need to re-read the token from the database and then calculate the
             # expires_in (in seconds) from what we stored in the database. This value should be a negative
-            #value, meaning that it is already expired
+            # value, meaning that it is already expired
 
             access_token = AccessToken.objects.get(token=token['access_token'])
             utc_now = datetime.utcnow().replace(tzinfo=utc)
