@@ -8,6 +8,7 @@ from openedx.core.lib.api.authentication import (
 from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
 from .serializers import SAMLConfigurationSerializer, SAMLProviderConfigSerializer
 
+
 class SAMLConfigurationViewSet(viewsets.ModelViewSet):
     queryset = SAMLConfiguration.objects.current_set()
     serializer_class = SAMLConfigurationSerializer
@@ -23,11 +24,13 @@ class SAMLConfigurationSiteDetail(generics.RetrieveAPIView):
         site_id = self.kwargs['site_id']
         return SAMLConfiguration.objects.current_set().filter(site__id=site_id)
 
+
 class SAMLProviderConfigViewSet(viewsets.ModelViewSet):
     queryset = SAMLProviderConfig.objects.current_set()
     serializer_class = SAMLProviderConfigSerializer
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
     permission_classes = (IsAuthenticated, AMCAdminPermission)
+
 
 class SAMLProviderSiteDetail(generics.ListAPIView):
     serializer_class = SAMLProviderConfigSerializer
