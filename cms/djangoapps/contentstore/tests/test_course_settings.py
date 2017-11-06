@@ -14,6 +14,7 @@ from pytz import UTC
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 
+from adaptive_learning.config.models import AdaptiveLearningEnabledFlag
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from milestones.models import MilestoneRelationshipType
 from models.settings.course_grading import CourseGradingModel, GRADING_POLICY_CHANGED_EVENT_TYPE, hash_grading_policy
@@ -941,6 +942,15 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertNotIn('allow_unsupported_xblocks', CourseMetadata.fetch(self.fullcourse))
         XBlockStudioConfigurationFlag(enabled=True).save()
         self.assertIn('allow_unsupported_xblocks', CourseMetadata.fetch(self.fullcourse))
+
+    def test_allow_adaptive_learning_configuration(self):
+        """
+        Test that `adaptive_learning_configuration` is only shown in Advanced Settings
+        if AdaptiveLearningEnabledFlag is enabled.
+        """
+        self.assertNotIn('adaptive_learning_configuration', CourseMetadata.fetch(self.fullcourse))
+        AdaptiveLearningEnabledFlag(enabled=True).save()
+        self.assertIn('adaptive_learning_configuration', CourseMetadata.fetch(self.fullcourse))
 
     def test_validate_from_json_correct_inputs(self):
         is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(

@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from xblock.fields import Scope
 
+from adaptive_learning.config.models import AdaptiveLearningEnabledFlag
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
 
@@ -107,6 +108,10 @@ class CourseMetadata(object):
         # display the "Allow Unsupported XBlocks" setting.
         if not XBlockStudioConfigurationFlag.is_enabled():
             filtered_list.append('allow_unsupported_xblocks')
+
+        # Do not show field for configuring Adaptive Learning if feature is disabled.
+        if not AdaptiveLearningEnabledFlag.is_enabled():
+            filtered_list.append('adaptive_learning_configuration')
 
         return filtered_list
 
