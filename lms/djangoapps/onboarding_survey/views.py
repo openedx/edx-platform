@@ -27,6 +27,7 @@ from lms.djangoapps.onboarding_survey.models import (
 from lms.djangoapps.onboarding_survey.signals import save_interests
 from onboarding_survey import forms
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.student_dashboard.views import get_recommended_xmodule_courses, get_recommended_communities
 
 
 log = logging.getLogger("edx.onboarding_survey")
@@ -452,16 +453,18 @@ def get_currencies(request):
     data = json.dumps(list(currencies))
     return HttpResponse(data, 'application/json')
 
+
 @login_required
 def recommendations(request):
     """
     Display recommended courses and communities based on the survey
 
     """
-    # Recommended Courses
+    recommended_courses = get_recommended_xmodule_courses(request.user)
+    recommended_communities = get_recommended_communities(request.user)
+    context = {
+        'recommended_courses': recommended_courses,
+        'recommended_communities': recommended_communities,
+    }
 
-
-    # Recommended Communities
-
-    # return render(request, 'onboarding_survey/recommendations.html', {})
-    return render_to_response('onboarding_survey/recommendations.html', {})
+    return render_to_response('onboarding_survey/recommendations.html', context)
