@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from oauth2_provider import models as dot_models
+from oauth2_provider.models import get_application_model, AccessToken
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -59,14 +59,14 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
 
         # create a configuration for django-oauth-toolkit (DOT)
         dot_app_user = UserFactory.create(password=USER_PASSWORD)
-        dot_app = dot_models.Application.objects.create(
+        dot_app = get_application_model().objects.create(
             name='test app',
             user=dot_app_user,
             client_type='confidential',
             authorization_grant_type='authorization-code',
             redirect_uris='http://localhost:8079/complete/edxorg/'
         )
-        self.dot_access_token = dot_models.AccessToken.objects.create(
+        self.dot_access_token = AccessToken.objects.create(
             user=self.student,
             application=dot_app,
             expires=datetime.utcnow() + timedelta(weeks=1),
