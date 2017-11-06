@@ -12,12 +12,9 @@
   .course-tabs {
     padding: 0;
     font-size: $font-size-sm;
-
-    @include media-breakpoint-down(md) {
-      overflow-x: scroll;
-      overflow-y: hidden;
-      white-space: nowrap;
-    }
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
 
     .navbar-nav {
       display: flex;
