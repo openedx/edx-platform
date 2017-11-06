@@ -144,13 +144,13 @@ class ProblemHintTest(ProblemsTest, EventsTestMixin):
         self.assertEqual([None, None], problem_page.get_hint_button_disabled_attr())
 
         # The hint button rotates through multiple hints
-        problem_page.click_hint()
+        problem_page.click_hint(hint_index=0)
         self.assertTrue(problem_page.is_hint_notification_visible())
         self.assertEqual(problem_page.hint_text, first_hint)
         # Now there are two "hint" buttons, as there is also one in the hint notification.
         self.assertEqual([None, None], problem_page.get_hint_button_disabled_attr())
 
-        problem_page.click_hint()
+        problem_page.click_hint(hint_index=1)
         self.assertEqual(problem_page.hint_text, second_hint)
         # Now both "hint" buttons should be disabled, as there are no more hints.
         self.assertEqual(['true', 'true'], problem_page.get_hint_button_disabled_attr())
@@ -573,7 +573,7 @@ class ProblemWithMathjax(ProblemsTest):
         problem_page.verify_mathjax_rendered_in_problem()
 
         # The hint button rotates through multiple hints
-        problem_page.click_hint()
+        problem_page.click_hint(hint_index=0)
         self.assertEqual(
             ["<strong>Hint (1 of 2): </strong>mathjax should work1"],
             problem_page.extract_hint_text_from_html
@@ -581,7 +581,7 @@ class ProblemWithMathjax(ProblemsTest):
         problem_page.verify_mathjax_rendered_in_hint()
 
         # Rotate the hint and check the problem hint
-        problem_page.click_hint()
+        problem_page.click_hint(hint_index=1)
 
         self.assertEqual(
             [
