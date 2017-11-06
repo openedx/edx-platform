@@ -1383,7 +1383,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self._assert_404(reverse('shoppingcart.views.use_code', args=[]), use_post=True)
         self._assert_404(reverse('shoppingcart.views.update_user_cart', args=[]))
         self._assert_404(reverse('shoppingcart.views.reset_code_redemption', args=[]), use_post=True)
-        self._assert_404(reverse('shoppingcart.views.billing_details', args=[]))
+        self._assert_404(reverse('billing_details', args=[]))
 
     def test_upgrade_postpay_callback_emits_ga_event(self):
         # Enroll as honor in the course with the current user.
@@ -1693,7 +1693,7 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         self.testing_course.enrollment_end = self.nextday
         self.testing_course = self.update_course(self.testing_course, self.user.id)
 
-        resp = self.client.post(reverse('shoppingcart.views.billing_details'))
+        resp = self.client.post(reverse('billing_details'))
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(json.loads(resp.content)['is_course_enrollment_closed'])
 
