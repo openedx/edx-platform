@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from courseware.courses import get_courses
 from custom_settings.models import CustomSettings
 from lms.djangoapps.onboarding_survey.models import InterestsSurvey
+from common.lib.nodebb_client.client import NodeBBClient
 
 
 def get_recommended_courses(user):
@@ -37,3 +38,10 @@ def get_enrolled_past_courses(course_enrollments):
             enrolled.append(course)
 
     return enrolled, past
+
+
+def get_recommended_communities(user):
+    status, categories = NodeBBClient().users.recommended_communities(user)
+    if status in [400, 499]:
+        return []
+    return categories.get('recommended')

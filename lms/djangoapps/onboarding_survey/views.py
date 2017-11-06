@@ -26,6 +26,8 @@ from lms.djangoapps.onboarding_survey.models import (
     Currency)
 from lms.djangoapps.onboarding_survey.signals import save_interests
 from onboarding_survey import forms
+from edxmako.shortcuts import render_to_response
+
 
 log = logging.getLogger("edx.onboarding_survey")
 
@@ -230,59 +232,57 @@ def mark_partner_network(organization_survey):
 def organization(request):
     """
     The view to handle organization survey from the user.
-
     If its a GET request then an empty form for survey is returned
     otherwise, a form is populated form the POST request and then is
     saved. After saving the form, user is redirected to dashboard.
     """
 
+    def set_survey_complete(extended_profile):
+        extended_profile.is_survey_completed = True
+        extended_profile.save()
+        update_user_history(request.user)
+
     are_forms_complete = request.user.extended_profile.is_survey_completed
     if request.method == 'POST':
-        existing_survey = None
 
         try:
-            existing_survey = request.user.organization_survey
-        except OrganizationSurvey.DoesNotExist:
-            pass
-
-        if existing_survey:
             form = forms.OrganizationInfoModelForm(request.POST, instance=request.user.organization_survey)
-        else:
+            if form.is_valid():
+                organization_survey = form.save()
+                update_user_history(request.user)
+                mark_partner_network(organization_survey)
+
+                if not are_forms_complete:
+                    set_survey_complete(request.user.extended_profile)
+                    return redirect(reverse('dashboard'))
+                return redirect(reverse('organization'))
+
+        except OrganizationSurvey.DoesNotExist:
             form = forms.OrganizationInfoModelForm(request.POST)
-
-        if form.is_valid():
-            organization_survey = form.save()
-            update_user_history(request.user)
-
-            if not existing_survey:
+            if form.is_valid():
+                organization_survey = form.save()
+                update_user_history(request.user)
                 organization_survey.user = request.user
                 organization_survey.save()
+                mark_partner_network(organization_survey)
 
-            mark_partner_network(organization_survey)
+                if not are_forms_complete:
+                    set_survey_complete(request.user.extended_profile)
+                    return redirect(reverse('dashboard'))
 
-            if not are_forms_complete:
-                return redirect(reverse('org_detail_survey'))
-
-            return redirect(reverse('organization'))
+                return redirect(reverse('organization'))
 
     else:
         org_survey_instance = OrganizationSurvey.objects.filter(user=request.user).first()
         if org_survey_instance:
-            form = forms.OrganizationInfoModelForm(instance=org_survey_instance, initial={
-                'is_org_url_exist': '1' if org_survey_instance.is_org_url_exist else '0'
-            })
+            form = forms.OrganizationInfoModelForm(instance=org_survey_instance)
         else:
             form = forms.OrganizationInfoModelForm()
 
     context = {'form': form, 'are_forms_complete': are_forms_complete}
 
     user = request.user
-    extended_profile = user.extended_profile
     context.update(get_un_submitted_surveys(user))
-
-    context['is_poc'] = extended_profile.is_poc
-    context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
-    context['organization'] = extended_profile.organization.name
 
     return render(request, 'onboarding_survey/organization_survey.html', context)
 
@@ -451,3 +451,17 @@ def get_currencies(request):
 
     data = json.dumps(list(currencies))
     return HttpResponse(data, 'application/json')
+
+@login_required
+def recommendations(request):
+    """
+    Display recommended courses and communities based on the survey
+
+    """
+    # Recommended Courses
+
+
+    # Recommended Communities
+
+    # return render(request, 'onboarding_survey/recommendations.html', {})
+    return render_to_response('onboarding_survey/recommendations.html', {})

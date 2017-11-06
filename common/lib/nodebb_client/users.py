@@ -17,3 +17,6 @@ class ForumUser(User):
     def update_profile(self, username, **kwargs):
         kwargs['kwargs']['username'] = username
         return self.client.post('/api/v2/users/update', **kwargs['kwargs'])
+
+    def recommended_communities(self, user, **kwargs):
+        return self.client.get('/api/user/{}/mycommunities'.format(user.username))
