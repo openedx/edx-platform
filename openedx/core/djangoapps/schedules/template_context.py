@@ -31,6 +31,14 @@ def encode_url(url):
 
 
 def absolute_url(site, relative_path):
+    """
+    Add site.domain to the beginning of the given relative path.
+
+    If the given URL is already absolute (has a netloc part), then it is just returned.
+    """
+    if bool(urlparse(relative_path).netloc):
+        # Given URL is already absolute
+        return relative_path
     root = site.domain.rstrip('/')
     relative_path = relative_path.lstrip('/')
     return encode_url(u'https://{root}/{path}'.format(root=root, path=relative_path))
