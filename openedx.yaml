@@ -3,5 +3,6 @@
 
 nick: edx
 oeps: {}
+owner: edx/learner
 openedx-release: {ref: release, requirements: requirements/edx/github.txt}
 track-pulls: true
