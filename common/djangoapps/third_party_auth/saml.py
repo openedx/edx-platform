@@ -308,6 +308,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         except requests.RequestException as err:
             # If there was an HTTP level error, log the error and return the details from the SAML assertion.
             sys_msg = err.response.json() if err.response else "Not available"
+            headers = err.response.headers if err.response else "Not available"
             log_msg_template = (
                 'Unable to retrieve user details with username {username} from SAPSuccessFactors for company ' +
                 'ID {company} with url "{url}".  Error message: {err_msg}.  System message: {sys_msg}.  ' +
@@ -319,7 +320,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
                 url=odata_api_url,
                 err_msg=err.message,
                 sys_msg=sys_msg,
-                headers=err.response.headers
+                headers=headers
             )
             log.warning(log_msg, exc_info=True)
             return details
