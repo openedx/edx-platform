@@ -5,7 +5,7 @@ from courseware.courses import get_course
 
 
 class Command(BaseCommand):
-    help = "Write a discussion link for a given course on standard output."
+    help = 'Write a discussion link for a given course on standard output.'
 
     def add_arguments(self, parser):
         parser.add_argument('course_id',
@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
         course = get_course(course_key)
         if not course:
-            raise CommandError("Invalid course id: {}".format(course_id))
+            raise CommandError('Invalid course id: {}'.format(course_id))
 
         if course.discussion_link:
             self.stdout.write(course.discussion_link)

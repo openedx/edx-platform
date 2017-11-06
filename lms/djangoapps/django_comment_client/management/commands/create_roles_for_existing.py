@@ -16,7 +16,7 @@ class Command(BaseCommand):
     help = 'Seed default permisssions and roles.'
 
     def handle(self, *args, **options):
-        print("Updated roles for ", end=' ')
+        print('Updated roles for ', end=' ')
         for i, enrollment in enumerate(CourseEnrollment.objects.filter(is_active=1), start=1):
             assign_default_role_on_enrollment(None, enrollment)
             if i % 1000 == 0:
