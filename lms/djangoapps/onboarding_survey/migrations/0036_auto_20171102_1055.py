@@ -10,8 +10,8 @@ edu_levels = ["Doctoral or professional degree", "Master's degree", "Bachelor's 
 en_profs = ["No proficiency", "Beginning", "Intermediate", "Advanced", "Native speaker",
             "I'd rather not say"]
 
-roles_in_org = ["Volunteer", "Internship", "Entry level", "Associate", "Mid-Senior level", "Manager",
-                "Director", "Executive"]
+roles_in_org = ["Volunteer", "Internship", "Entry level", "Manager",
+                "Director", "Executive", "I’d rather not say"]
 
 func_areas = ["Strategy and planning", "Leadership and governance", "Program design and development",
               "Measurement, evaluation, and learning", "Stakeholder engagement and partnerships",
@@ -41,6 +41,17 @@ focus_areas = ["Animals", "Arts, Culture, Humanities","Community Development", "
 total_employees = ["1 (only yourself)", "2-5", "6-10", "11-20", "21-50", "51-100", "101-200", "201-501",
                    "501-1,000", "1,000+", "Not applicable"]
 
+partner_network = ["+Acumen", "FHI 360 / FHI Foundation", "Global Giving", "Mercy Corps"]
+
+
+def populate_partner_network(apps, model, updated_list):
+    _model = apps.get_model("onboarding_survey", model)
+    _model.objects.all().delete()
+
+    for name in updated_list:
+        obj = _model(name=name.encode('utf8'))
+        obj.save()
+
 
 def populate_model(apps, model, updated_list):
     _model = apps.get_model("onboarding_survey", model)
@@ -50,12 +61,14 @@ def populate_model(apps, model, updated_list):
         obj = _model(label=label.encode('utf8'))
         obj.save()
 
+
 def update_org_survey(apps):
     org_survey_model = apps.get_model("onboarding_survey", "OrganizationSurvey")
     sector_model = apps.get_model("onboarding_survey", "OrgSector")
     operation_level_model = apps.get_model("onboarding_survey", "OperationLevel")
     focus_area_model = apps.get_model("onboarding_survey", "FocusArea")
     total_employee_model = apps.get_model("onboarding_survey", "TotalEmployee")
+    partner_network_model = apps.get_model("onboarding_survey", "PartnerNetwork")
 
     org_surveys = org_survey_model.objects.all()
 
@@ -69,6 +82,7 @@ def update_org_survey(apps):
         org_survey.level_of_operation = operation_level
         org_survey.focus_area = focus_area
         org_survey.total_employees = total_employee
+        org_survey.partner_network.add(partner_network_model.objects.first())
         org_survey.save()
 
 
@@ -89,6 +103,7 @@ def update_interest_survey(apps):
         interest_survey.interested_communities.add(community_interest)
         interest_survey.personal_goal.add(personal_goal)
         interest_survey.save()
+
 
 def update_userinfo_survey(apps):
     userinfo_survey_model = apps.get_model("onboarding_survey", "UserInfoSurvey")
@@ -111,6 +126,7 @@ def update_userinfo_survey(apps):
         user_info_survey.function_area.add(func_area)
         user_info_survey.save()
 
+
 class Migration(migrations.Migration):
 
     def populate_required_tables(apps, schema_editor):
@@ -123,6 +139,8 @@ class Migration(migrations.Migration):
 
         for i in range(0,len(model_list)):
             populate_model(apps, model_list[i], list_of_updated_lists[i])
+
+        populate_partner_network(apps, "PartnerNetwork", partner_network)
 
         update_org_survey(apps)
         update_interest_survey(apps)
