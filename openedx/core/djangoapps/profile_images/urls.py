@@ -7,12 +7,11 @@ NOTE: These views are deprecated.  These routes are superseded by
 """
 
 from django.conf import settings
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from .views import ProfileImageRemoveView, ProfileImageUploadView
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         r'^v1/' + settings.USERNAME_PATTERN + '/upload$',
         ProfileImageUploadView.as_view(),
@@ -23,4 +22,4 @@ urlpatterns = patterns(
         ProfileImageRemoveView.as_view(),
         name="profile_image_remove"
     ),
-)
+]
