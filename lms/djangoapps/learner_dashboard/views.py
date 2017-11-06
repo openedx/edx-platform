@@ -7,6 +7,7 @@ from django.views.decorators.http import require_GET
 from edxmako.shortcuts import render_to_response
 from commerce.utils import EcommerceService
 
+from lms.djangoapps.learner_dashboard.programs import ProgramsFragmentView
 from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import (
@@ -23,19 +24,14 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 def program_listing(request):
     """View a list of programs in which the user is engaged."""
     programs_config = ProgramsApiConfig.current()
-    if not programs_config.enabled:
-        raise Http404
-
-    meter = ProgramProgressMeter(request.site, request.user)
+    programs_fragment = ProgramsFragmentView().render_to_fragment(request, programs_config=programs_config)
 
     context = {
         'disable_courseware_js': True,
-        'marketing_url': get_program_marketing_url(programs_config),
+        'programs_fragment': programs_fragment,
         'nav_hidden': True,
-        'programs': meter.engaged_programs,
-        'progress': meter.progress(),
-        'show_program_listing': programs_config.enabled,
         'show_dashboard_tabs': True,
+        'show_program_listing': programs_config.enabled,
         'uses_pattern_library': True,
     }
 
