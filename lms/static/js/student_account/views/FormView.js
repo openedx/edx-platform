@@ -144,7 +144,8 @@
                         $label,
                         key = '',
                         errors = [],
-                        validation = {};
+                        validation = {},
+                        validateField = null;
 
                     for (i = 0; i < len; i++) {
                         $el = $(elements[i]);
@@ -158,8 +159,8 @@
                         }
 
                         if (key) {
-                            validation = this.validate(elements[i]);
-                            if (validation.isValid) {
+                            validateField = this.validate(elements[i]);
+                            if (validateField && validateField.isValid || $el.attr('id') === 'login-email') {
                                 obj[key] = $el.attr('type') === 'checkbox' ? $el.is(':checked') : $el.val();
                                 $el.removeClass('error');
                                 $label.removeClass('error');

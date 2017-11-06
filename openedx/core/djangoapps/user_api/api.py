@@ -79,11 +79,11 @@ def get_login_session_form():
 
     # Translators: This label appears above a field on the login form
     # meant to hold the user's email address.
-    email_label = _(u"Email")
+    email_label = "%s %s %s" % (_(u"Username"), _(u"or"), _(u"email"))
 
     # Translators: This example email address is used as a placeholder in
     # a field on the login form meant to hold the user's email address.
-    email_placeholder = _(u"username@domain.com")
+    email_placeholder = "%s %s %s" % (_(u"username"), _(u"or"), _(u"username@domain.com"))
 
     # Translators: These instructions appear on the login form, immediately
     # below a field meant to hold the user's email address.

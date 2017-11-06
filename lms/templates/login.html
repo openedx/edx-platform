@@ -178,8 +178,8 @@ from third_party_auth import provider, pipeline
 
         <ol class="list-input">
           <li class="field required text" id="field-email">
-            <label for="email">${_('E-mail')}</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="${_('example: username@domain.com')}" required aria-required="true" aria-described-by="email-tip" />
+            <label for="email">${_('E-mail')} or ${_('username')}</label>
+            <input class="" id="email" type="email" name="email" value="" placeholder="${_('example: username@domain.com')} or ${_('username')}" required aria-required="true" aria-described-by="email-tip" />
             <span class="tip tip-input" id="email-tip">${_("This is the e-mail address you used to register with {platform}").format(platform=platform_name)}</span>
           </li>
           <li class="field required password" id="field-password">

@@ -1447,10 +1447,15 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-                AUDIT_LOG.warning(u"Login failed - Unknown user email")
-            else:
-                AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
+            try:
+                # try using the email as username
+                username = email
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+                    AUDIT_LOG.warning(u"Login failed - Unknown user email or username")
+                else:
+                    AUDIT_LOG.warning(u"Login failed - Unknown user email or username: {0}".format(email))
 
     # check if the user has a linked shibboleth account, if so, redirect the user to shib-login
     # This behavior is pretty much like what gmail does for shibboleth.  Try entering some @stanford.edu
