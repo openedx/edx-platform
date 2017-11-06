@@ -215,6 +215,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     });
 
     HighlightsXBlockModal = CourseOutlineXBlockModal.extend({
+
+        events: _.extend({}, CourseOutlineXBlockModal.prototype.events, {
+            'click .action-save': 'callAnalytics',
+            'click .action-cancel': 'callAnalytics'
+        }),
+
         initialize: function() {
             CourseOutlineXBlockModal.prototype.initialize.call(this);
             if (this.options.xblockType) {
@@ -236,6 +242,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                   'this section (250 character limit).'
                 )
             );
+        },
+
+        callAnalytics: function(event) {
+            event.preventDefault();
+            window.analytics.track('edx.bi.highlights.' + event.target.innerText.toLowerCase());
+            this.save(event);
         },
 
         addActionButtons: function() {
