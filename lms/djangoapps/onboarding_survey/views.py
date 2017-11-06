@@ -238,40 +238,34 @@ def organization(request):
     saved. After saving the form, user is redirected to dashboard.
     """
 
-    def set_survey_complete(extended_profile):
-        extended_profile.is_survey_completed = True
-        extended_profile.save()
-        update_user_history(request.user)
-
     are_forms_complete = request.user.extended_profile.is_survey_completed
     if request.method == 'POST':
+        existing_survey = None
 
         try:
-            form = forms.OrganizationInfoModelForm(request.POST, instance=request.user.organization_survey)
-            if form.is_valid():
-                organization_survey = form.save()
-                update_user_history(request.user)
-                mark_partner_network(organization_survey)
-
-                if not are_forms_complete:
-                    set_survey_complete(request.user.extended_profile)
-                    return redirect(reverse('dashboard'))
-                return redirect(reverse('organization'))
-
+            existing_survey = request.user.organization_survey
         except OrganizationSurvey.DoesNotExist:
+            pass
+
+        if existing_survey:
+            form = forms.OrganizationInfoModelForm(request.POST, instance=request.user.organization_survey)
+        else:
             form = forms.OrganizationInfoModelForm(request.POST)
-            if form.is_valid():
-                organization_survey = form.save()
-                update_user_history(request.user)
+
+        if form.is_valid():
+            organization_survey = form.save()
+            update_user_history(request.user)
+
+            if not existing_survey:
                 organization_survey.user = request.user
                 organization_survey.save()
-                mark_partner_network(organization_survey)
 
-                if not are_forms_complete:
-                    set_survey_complete(request.user.extended_profile)
-                    return redirect(reverse('dashboard'))
+            mark_partner_network(organization_survey)
 
-                return redirect(reverse('organization'))
+            if not are_forms_complete:
+                return redirect(reverse('org_detail_survey'))
+
+            return redirect(reverse('organization'))
 
     else:
         org_survey_instance = OrganizationSurvey.objects.filter(user=request.user).first()
@@ -283,7 +277,11 @@ def organization(request):
     context = {'form': form, 'are_forms_complete': are_forms_complete}
 
     user = request.user
+    extended_profile = user.extended_profile
     context.update(get_un_submitted_surveys(user))
+
+    context['is_poc'] = extended_profile.is_poc
+    context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
 
     return render(request, 'onboarding_survey/organization_survey.html', context)
 
