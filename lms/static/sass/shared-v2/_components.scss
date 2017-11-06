@@ -149,7 +149,7 @@
 
   margin: 0 auto;
   padding: ($baseline*0.75) ($baseline*2);
-  background-color: $lms-preview-menu-color;
+  background-color: theme-color("primary");
 
   @media print {
     display: none;
@@ -176,6 +176,7 @@
         display: inline-block;
         margin-bottom: 0;
         vertical-align: middle;
+        color: theme-color("inverse");
       }
 
       .action-preview-select {

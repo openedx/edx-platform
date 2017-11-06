@@ -24,7 +24,7 @@
   transform: rotate(-90deg);
   transform-origin: top left;
   position: fixed;
-  top: 250px;
+  bottom: $baseline;
   left: 0;
 
   a:link,

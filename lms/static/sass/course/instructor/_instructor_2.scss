@@ -284,7 +284,6 @@
   .instructor-nav {
     @extend %ui-no-list;
 
-    border-top: 1px solid $gray-l3;
     border-bottom: 1px solid $gray-l3;
 
     .nav-item {
@@ -301,11 +300,11 @@
 
         &:hover,
         &:focus {
-          background: $gray-l5 !important;
+          border-bottom: 3px solid theme-color("primary");
         }
 
         &.active-section {
-          background: $gray-l5;
+          border-bottom: 3px solid theme-color("primary");
           color: $black;
         }
       }

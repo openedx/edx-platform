@@ -1,12 +1,15 @@
 .program-list-wrapper {
-  padding: $baseline;
+
+  @include media-breakpoint-up(sm) {
+    padding: $baseline;
+  }
 }
 
 .program-cards-container {
   @include grid-container();
   @include span(12);
 
-  @media (min-width: $bp-screen-md) {
+  @include media-breakpoint-up(sm) {
     @include span(9);
   }
 }
@@ -17,7 +20,7 @@
 
   margin-bottom: $baseline;
 
-  @media (min-width: $bp-screen-md) {
+  @include media-breakpoint-up(sm) {
     @include span(3);
   }
 

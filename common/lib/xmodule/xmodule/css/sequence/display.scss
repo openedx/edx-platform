@@ -4,7 +4,7 @@ $seq-nav-link-color: $link-color !default;
 $seq-nav-icon-color: rgb(10, 10, 10) !default;
 $seq-nav-icon-color-muted: rgb(90, 90, 90) !default;
 $seq-nav-tooltip-color: rgb(51, 51, 51) !default;
-$seq-nav-height: 44px;
+$seq-nav-height: 50px;
 
 // repeated extends - needed since LMS styling was referenced
 .block-link {
@@ -162,7 +162,7 @@ $seq-nav-height: 44px;
 
           @extend %ui-depth2;
 
-          margin-top: ($baseline/5);
+          margin-top: 12px;
           background: $seq-nav-tooltip-color;
           color: $white;
           font-family: $font-family-sans-serif;
@@ -223,7 +223,7 @@ $seq-nav-height: 44px;
   font-weight: normal;
   padding: 0;
   white-space: nowrap;
-  overflow-x: scroll;
+  overflow-x: hidden;
 
   @include media-breakpoint-up(md) {
     min-width: 120px;
