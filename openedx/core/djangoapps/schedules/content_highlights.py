@@ -27,6 +27,9 @@ def course_has_highlights(course_key):
 def get_week_highlights(user, course_key, week_num):
     """
     Get highlights (list of unicode strings) for a given week.
+    week_num starts at 1.
+    Raises CourseUpdateDoesNotExist if highlights do not exist for
+    the requested week_num.
     """
     if not COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course_key):
         raise CourseUpdateDoesNotExist(
@@ -75,12 +78,12 @@ def _get_sections_with_highlights(course_module):
 def _get_highlights_for_week(sections, week_num, course_key):
     # assume each provided section maps to a single week
     num_sections = len(sections)
-    if not (0 <= week_num < num_sections):
+    if not (1 <= week_num <= num_sections):
         raise CourseUpdateDoesNotExist(
             "Requested week {} but {} has only {} sections.".format(
-                week_num + 1, course_key, num_sections
+                week_num, course_key, num_sections
             )
         )
 
-    section = sections[week_num]
+    section = sections[week_num - 1]
     return section.highlights
