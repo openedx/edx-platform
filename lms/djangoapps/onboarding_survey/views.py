@@ -282,7 +282,7 @@ def organization(request):
 
     context['is_poc'] = extended_profile.is_poc
     context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
-    context['organization'] = extended_profile.organization.name
+    context['organization_name'] = extended_profile.organization.name
 
     return render(request, 'onboarding_survey/organization_survey.html', context)
 
@@ -360,6 +360,7 @@ def org_detail_survey(request):
     context.update(get_un_submitted_surveys(user))
     context['is_poc'] = extended_profile.is_poc
     context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
+    context['organization_name'] = extended_profile.organization.name
     return render(request, 'onboarding_survey/organization_detail_survey.html', context)
 
 
@@ -448,6 +449,5 @@ def get_currencies(request):
         term = request.GET.get('term', '')
         currencies = Currency.objects.filter(alphabetic_code__istartswith=term).values_list('alphabetic_code',
                                                                                             flat=True).distinct()
-
     data = json.dumps(list(currencies))
     return HttpResponse(data, 'application/json')

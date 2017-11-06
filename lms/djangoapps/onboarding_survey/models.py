@@ -261,8 +261,13 @@ class UserInfoSurvey(models.Model):
 
     year_of_birth = models.PositiveIntegerField(
         validators=[
-            MinValueValidator(1900),
-            MaxValueValidator(datetime.now().year)]
+            MinValueValidator(1900, message='Ensure year of birth is greater than or equal to 1900'),
+            MaxValueValidator(
+                datetime.now().year, message='Ensure year of birth is less than or equal to {}'.format(
+                    datetime.now().year
+                )
+            )
+        ]
     )
 
     user = models.OneToOneField(
