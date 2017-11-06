@@ -2218,7 +2218,7 @@ INSTALLED_APPS = [
     # Surveys
     'survey',
 
-    'lms.djangoapps.lms_xblock',
+    'lms.djangoapps.lms_xblock.apps.LMSXBlockConfig',
 
     # Course data caching
     'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig',
