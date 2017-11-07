@@ -13,14 +13,12 @@ import re
 from unittest import skipUnless
 
 import crum
-from django import db
 from django.conf import settings
 from django.contrib import sites
 from django.core.cache import caches
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
-from nose.plugins import Plugin
 from request_cache.middleware import RequestCache
 
 
@@ -220,23 +218,6 @@ class FilteredQueryCountMixin(object):
 
         with context:
             func(*args, **kwargs)
-
-
-class NoseDatabaseIsolation(Plugin):
-    """
-    nosetest plugin that resets django databases before any tests begin.
-
-    Used to make sure that tests running in multi processes aren't sharing
-    a database connection.
-    """
-    name = "database-isolation"
-
-    def begin(self):
-        """
-        Before any tests start, reset all django database connections.
-        """
-        for db_ in db.connections.all():
-            db_.close()
 
 
 def get_mock_request(user=None):
