@@ -2,20 +2,20 @@
 Views for on-boarding app.
 """
 import json
-import os
 import logging
 
+import os
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from django.db import transaction
+from django.http import HttpResponse
+from django.http import JsonResponse
+from django.shortcuts import redirect
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 from path import Path as path
 
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
-from django.db import transaction
-from django.core.urlresolvers import reverse
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render
-from django.http import HttpResponse
-
+from edxmako.shortcuts import render_to_response
 from lms.djangoapps.onboarding_survey.helpers import is_first_signup_in_org
 from lms.djangoapps.onboarding_survey.models import (
     UserInfoSurvey,
@@ -25,10 +25,8 @@ from lms.djangoapps.onboarding_survey.models import (
     OrganizationDetailSurvey,
     Currency)
 from lms.djangoapps.onboarding_survey.signals import save_interests
-from onboarding_survey import forms
-from edxmako.shortcuts import render_to_response
 from lms.djangoapps.student_dashboard.views import get_recommended_xmodule_courses, get_recommended_communities
-
+from onboarding_survey import forms
 
 log = logging.getLogger("edx.onboarding_survey")
 

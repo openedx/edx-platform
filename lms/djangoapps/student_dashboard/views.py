@@ -4,10 +4,10 @@ Student Custom Dashboard View
 
 from django.core.exceptions import ObjectDoesNotExist
 
+from common.lib.nodebb_client.client import NodeBBClient
 from courseware.courses import get_courses
 from custom_settings.models import CustomSettings
 from lms.djangoapps.onboarding_survey.models import InterestsSurvey
-from common.lib.nodebb_client.client import NodeBBClient
 from xmodule.modulestore.django import modulestore
 
 
@@ -19,7 +19,7 @@ def get_recommended_courses(user):
         for course in all_courses:
             try:
                 tags = CustomSettings.objects.filter(id=course.id).first().tags
-                tags = tags.split(',')
+                tags = tags.split('|')
                 if set(user_interests) & set(tags):
                     recommended_courses.append(course)
             except AttributeError:
@@ -49,7 +49,7 @@ def get_recommended_xmodule_courses(user):
         for course in all_courses:
             try:
                 tags = CustomSettings.objects.filter(id=course.id).first().tags
-                tags = tags.split(',')
+                tags = tags.split('|')
                 matched_interests = set(user_interests) & set(tags)
                 if matched_interests:
                     detailed_course = modulestore().get_course(course.id)
