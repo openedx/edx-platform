@@ -30,7 +30,7 @@ def start_servers(options):
     """
     Start the servers we will run tests on, returns PIDs for servers.
     """
-    coveragerc = options.get('coveragerc', Env.BOK_CHOY_COVERAGERC)
+    coveragerc = options.get('coveragerc', None)
 
     def start_server(cmd, logfile, cwd=None):
         """
@@ -41,13 +41,14 @@ def start_servers(options):
 
     for service, info in Env.BOK_CHOY_SERVERS.iteritems():
         address = "0.0.0.0:{}".format(info['port'])
-        cmd = (
-            "DEFAULT_STORE={default_store} "
-            "coverage run --rcfile={coveragerc} -m "
+        cmd = ("DEFAULT_STORE={default_store} ").format(default_store=options.default_store)
+        if coveragerc:
+            cmd += ("coverage run --rcfile={coveragerc} -m ").format(coveragerc=coveragerc)
+        else:
+            cmd += "python -m "
+        cmd += (
             "manage {service} --settings {settings} runserver "
             "{address} --traceback --noreload".format(
-                default_store=options.default_store,
-                coveragerc=coveragerc,
                 service=service,
                 settings=Env.SETTINGS,
                 address=address,
