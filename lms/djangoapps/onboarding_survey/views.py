@@ -26,14 +26,14 @@ from lms.djangoapps.onboarding_survey.models import (
     Currency)
 from lms.djangoapps.onboarding_survey.signals import save_interests
 from onboarding_survey import forms
+from lms.djangoapps.onboarding_survey.history import update_history
 
 log = logging.getLogger("edx.onboarding_survey")
 
 
 def update_user_history(user):
-    pass
-    # if user.extended_profile.is_survey_completed:
-    #     update_history(user)
+    if user.extended_profile.is_survey_completed:
+        update_history(user)
 
 
 def set_survey_complete(extended_profile):
@@ -66,12 +66,6 @@ def get_un_submitted_surveys(user):
         user.org_detail_survey
     except Exception:
         un_submitted_surveys['org_detail_survey'] = True
-
-    # if user.extended_profile.is_poc:
-    #     try:
-    #         user.organization_survey
-    #     except Exception:
-    #         un_submitted_surveys['organization'] = True
 
     if un_submitted_surveys.get('user_info') and un_submitted_surveys.get('interests') and\
             un_submitted_surveys.get('organization') and un_submitted_surveys.get('org_detail_survey'):
@@ -252,13 +246,14 @@ def organization(request):
 
         if form.is_valid():
             organization_survey = form.save()
-            update_user_history(request.user)
 
             if not existing_survey:
                 organization_survey.user = request.user
                 organization_survey.save()
 
             mark_partner_network(organization_survey)
+
+            update_user_history(request.user)
 
             if not are_forms_complete:
                 return redirect(reverse('org_detail_survey'))
@@ -337,6 +332,7 @@ def org_detail_survey(request):
                 org_detail.user = request.user
                 org_detail.save()
 
+            update_user_history(request.user)
             if not are_forms_complete:
                 set_survey_complete(request.user.extended_profile)
                 return redirect(reverse('dashboard'))

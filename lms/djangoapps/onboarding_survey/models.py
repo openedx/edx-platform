@@ -395,14 +395,14 @@ class History(models.Model):
     # OrganizationSurvey
     org_country = models.CharField(max_length=255)
     org_city = models.CharField(max_length=255, blank=True)
-    org_is_url_exist = models.BooleanField(default=True)
+    org_is_url_exist = models.NullBooleanField(blank=True, null=True)
     org_url = models.URLField(max_length=255, blank=True)
     org_founding_year = models.PositiveSmallIntegerField(blank=True, null=True)
     org_alternate_admin_email = models.EmailField(blank=True, null=True)
 
     # OrganizationDetail
     info_accuracy = models.NullBooleanField(blank=True, null=True)
-    can_provide_info = models.BooleanField(default=True)
+    can_provide_info = models.NullBooleanField(blank=True, null=True)
     last_fiscal_year_end_date = models.DateField(blank=True, null=True)
     total_clients = models.PositiveIntegerField(blank=True, null=True)
     total_employees = models.PositiveIntegerField(blank=True, null=True)
@@ -418,7 +418,6 @@ class History(models.Model):
         Organization, related_name='user_history', blank=True, null=True, on_delete=models.SET_NULL
     )
     is_poc = models.BooleanField(choices=POC_CHOICES, default=False)
-    is_currently_employed = models.BooleanField(default=False)
     org_admin_email = models.EmailField(blank=True, null=True)
 
     start_date = models.DateTimeField(auto_now_add=True)

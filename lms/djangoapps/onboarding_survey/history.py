@@ -4,8 +4,11 @@ Module to populate history table for the user.
 from django.utils import timezone
 
 from lms.djangoapps.onboarding_survey.models import (
-    History
+    History,
+    OrganizationDetailSurvey,
+    OrganizationSurvey
 )
+from lms.djangoapps.onboarding_survey.helpers import is_first_signup_in_org
 
 
 def add_fields(fields, add_from, add_to, fields_mapping=None):
@@ -40,7 +43,7 @@ def add_user_info_survey(history, user):
     # The fields to be added in the history table from user info survey
     fields = [
         'year_of_birth', 'language', 'country_of_residence', 'city_of_residence', 'is_emp_location_different',
-        'country_of_employment', 'city_of_employment', 'start_month_year', 'weekly_work_hours' 'level_of_education',
+        'country_of_employment', 'city_of_employment', 'start_month_year', 'weekly_work_hours', 'level_of_education',
         'english_proficiency', 'role_in_org'
     ]
 
@@ -73,7 +76,6 @@ def add_interests_survey(history, user):
         user(User): Django user model instance
     """
     interests_survey = user.interest_survey
-    history.reason_of_selected_interest = interests_survey.reason_of_selected_interest
 
     # We have decided to store every option of ManyToMany field as a separate column.
     many_to_many_fields_mapping = {
@@ -89,11 +91,10 @@ def add_interests_survey(history, user):
         'Marketing, communications, and PR': 'org_eff_marketing_and_PR',
         'Systems, tools, and processes': 'org_eff_system_and_process',
         # Personal Goal
-        'Gain new skills': 'goal_gain_new_skill',
-        'Build relationship with other nonprofit practitioners': 'goal_relation_with_other',
-        'Develop my leadership abilities': 'goal_develop_leadership',
-        'Improve my job prospects': 'goal_improve_job_prospect',
-        'Contribute to my organization\'s capacity': 'goal_contribute_to_org',
+        'Develop new skills': 'goal_gain_new_skill',
+        'Build relationships with other nonprofit leaders': 'goal_relation_with_other',
+        'Get a new job': 'goal_improve_job_prospect',
+        'Help improve my organization': 'goal_contribute_to_org',
         # CommunityTypeInterest
         'Learners working for similar organizations': 'coi_similar_org',
         'Learners interested in the same areas of organizational effectiveness': 'coi_similar_org_capacity',
@@ -119,44 +120,52 @@ def add_organization_survey(history, user):
         history(History): History table model
         user(User): Django user model instance
     """
+    extended_profile = user.extended_profile
+    if extended_profile.is_poc or is_first_signup_in_org(extended_profile.organization):
+        # Partner Network
+        many_to_many_fields_mapping = {
+            'Mercy Corps': 'partner_network_mercy_corps',
+            'Global Giving': 'partner_network_global_giving',
+            'FHI 360 / FHI Foundation': 'partner_network_fhi_360',
+            '+Acumen': 'partner_network_acumen',
+        }
+        # Some of the fields in history table have different corresponding names in organization survey.
+        history_and_org_survey_field_mappings = {
+            'org_sector': 'sector',
+            'org_level_of_operation': 'level_of_operation',
+            'org_focus_area': 'focus_area',
+            'org_total_employees': 'total_employees',
+            'org_country': 'country',
+            'org_city': 'city',
+            'org_is_url_exist': 'is_org_url_exist',
+            'org_url': 'url',
+            'org_founding_year': 'founding_year',
+            'org_alternate_admin_email': 'alternate_admin_email'
+        }
 
-    # Partner Network
-    many_to_many_fields_mapping = {
-        'Mercy Corps': 'partner_network_mercy_corps',
-        'Global Giving': 'partner_network_global_giving',
-        'FHI 360 / FHI Foundation': 'partner_network_fhi_360',
-        '+Acumen': 'partner_network_acumen',
-    }
-    # Some of the fields in history table have different corresponding names in organization survey.
-    history_and_org_survey_field_mappings = {
-        'org_sector': 'sector',
-        'org_level_of_operation': 'level_of_operation',
-        'org_focus_area': 'focus_area',
-        'org_total_employees': 'total_employees',
-        'org_country': 'country',
-        'org_city': 'city',
-        'org_is_url_exist': 'is_org_url_exist',
-        'org_url': 'url',
-        'org_founding_year': 'founding_year',
-        'org_alternate_admin_email': 'alternate_admin_email'
-    }
+        try:
+            organization_survey = user.organization_survey
+            add_fields([], organization_survey, history, history_and_org_survey_field_mappings)
 
-    organization_survey = user.organization_survey
-    add_fields(None, organization_survey, history, history_and_org_survey_field_mappings)
-
-    for partner_network in organization_survey.partner_network.all():
-        setattr(history, many_to_many_fields_mapping[partner_network.name], True)
+            for partner_network in organization_survey.partner_network.all():
+                setattr(history, many_to_many_fields_mapping[partner_network.name], True)
+        except OrganizationSurvey.DoesNotExist:
+            pass
 
 
 def add_organization_detail_survey(history, user):
 
-    fields = [
-        'info_accuracy', 'can_provide_info', 'last_fiscal_year_end_date', 'currency',
-        'total_clients', 'total_employees', 'total_revenue', 'total_expenses', 'total_program_expenses'
-    ]
-    org_detail_survey = user.org_detail_survey
-
-    add_fields(fields, org_detail_survey, history)
+    extended_profile = user.extended_profile
+    if extended_profile.is_poc or is_first_signup_in_org(extended_profile.organization):
+        fields = [
+            'info_accuracy', 'can_provide_info', 'last_fiscal_year_end_date', 'currency',
+            'total_clients', 'total_employees', 'total_revenue', 'total_expenses', 'total_program_expenses'
+        ]
+        try:
+            org_detail_survey = user.org_detail_survey
+            add_fields(fields, org_detail_survey, history)
+        except OrganizationDetailSurvey.DoesNotExist:
+            pass
 
 
 def add_extended_registration(history, user):
@@ -169,7 +178,7 @@ def add_extended_registration(history, user):
     """
 
     # The fields to be added in the history table from extended profile
-    fields = ['first_name', 'last_name', 'organization', 'is_poc', 'is_currently_employed', 'org_admin_email']
+    fields = ['first_name', 'last_name', 'organization', 'is_poc', 'org_admin_email']
 
     extended_profile = user.extended_profile
     add_fields(fields, extended_profile, history)
