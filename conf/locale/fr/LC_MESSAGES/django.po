@@ -83,6 +83,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Aurelien Croq <aurelien.croq@themoocagency.com>, 2017
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013

@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-02 09:29+0000\n"
-"PO-Revision-Date: 2017-11-02 09:35:50.998146\n"
+"POT-Creation-Date: 2017-11-07 20:58+0000\n"
+"PO-Revision-Date: 2017-11-07 21:04:39.781402\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -35,6 +35,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 "Language: en\n"
+
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: common/static/bundles/Import.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
+
+#: cms/static/cms/js/main.js common/static/bundles/Import.js
+msgid "Studio's having trouble saving your work"
+msgstr ""
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -106,6 +117,62 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cancel"
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error during the upload process."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while unpacking the file."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while verifying the file you submitted."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "Choose new file"
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid ""
+"File format not supported. Please upload a file with a {ext} extension."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while importing the new library to our database."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while importing the new course to our database."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "Your import has failed."
+msgstr ""
+
+#: cms/static/js/features/import/views/import.js
+#: common/static/bundles/Import.js
+msgid "Your import is in progress; navigating away will abort it."
+msgstr ""
+
+#: cms/static/js/features/import/views/import.js
+#: common/static/bundles/Import.js
+msgid "Error importing course"
+msgstr ""
+
+#: cms/static/js/features/import/views/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error with the upload"
 msgstr ""
 
 #. Translators: This is the status of an active video upload
@@ -1886,6 +1953,162 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
+msgstr ""
+
+#: common/static/bundles/CourseGoals.js
+msgid "Thank you for setting your course goal to "
+msgstr ""
+
+#: common/static/bundles/CourseGoals.js
+msgid ""
+"There was an error in setting your goal, please reload the page and try "
+"again."
+msgstr ""
+
+#: common/static/bundles/CourseHome.js
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "You have successfully updated your goal."
+msgstr ""
+
+#: common/static/bundles/CourseHome.js
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "There was an error updating your goal."
+msgstr ""
+
+#: common/static/bundles/CourseHome.js
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "Show more"
+msgstr ""
+
+#: common/static/bundles/CourseHome.js
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "Show less"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Please fix the following errors:"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Files that you upload must be smaller than 5MB in size."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid ""
+"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or "
+".png format."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Something went wrong. Please try again later."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Add Attachment"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "(Optional)"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Remove file"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "What can we help you with, "
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Course Name"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Sign in to edX so we can help you better."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/login.underscore
+msgid "Sign in"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Your Email Address"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Enter a valid email address."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Enter a subject for your support request."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Enter some details for your support request."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Contact Us"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Your question might have already been answered."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Search the edX Help Center"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Details"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "The more you tell us, the more quickly and helpfully we can respond!"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-response.underscore
+#: common/static/common/templates/discussion/thread.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Cancel upload"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.js
+msgid "Organization:"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.js
+msgid "Course Number:"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.js
+msgid "Course Run:"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.js
+msgid "(Read-only)"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.js
+msgid "Re-run Course"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.js
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
 msgstr ""
 
 #: common/static/common/js/components/utils/view_utils.js
@@ -3997,10 +4220,6 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr ""
-
-#: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
 msgstr ""
 
@@ -4688,22 +4907,6 @@ msgstr ""
 msgid "Bookmark this page"
 msgstr ""
 
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "You have successfully updated your goal."
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "There was an error updating your goal."
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "Show more"
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "Show less"
-msgstr ""
-
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -4790,16 +4993,6 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
-msgstr ""
-
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
-
-#: cms/static/cms/js/main.js
-msgid "Studio's having trouble saving your work"
 msgstr ""
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
@@ -4942,51 +5135,6 @@ msgstr ""
 #: cms/static/js/factories/textbooks.js
 #: cms/static/js/views/pages/group_configurations.js
 msgid "You have unsaved changes. Do you really want to leave this page?"
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error during the upload process."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while unpacking the file."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while verifying the file you submitted."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "Choose new file"
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid ""
-"File format not supported. Please upload a file with a {ext} extension."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while importing the new library to our database."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while importing the new course to our database."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "Your import has failed."
-msgstr ""
-
-#: cms/static/js/features/import/views/import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
-
-#: cms/static/js/features/import/views/import.js
-msgid "Error importing course"
-msgstr ""
-
-#: cms/static/js/features/import/views/import.js
-msgid "There was an error with the upload"
 msgstr ""
 
 #: cms/static/js/maintenance/force_publish_course.js
@@ -5556,10 +5704,8 @@ msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid ""
-"The highlights you provide here are messaged (i.e., emailed) to learners. "
-"Each {item}'s highlights are emailed at the time that we expect the learner "
-"to start working on that {item}. At this time, we assume that each {item} "
-"will take 1 week to complete."
+"Enter 3-5 highlights to include in the email message that learners receive "
+"for this section (250 character limit)."
 msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -6314,13 +6460,6 @@ msgstr ""
 msgid "post anonymously to classmates"
 msgstr ""
 
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr ""
-
 #: common/static/common/templates/discussion/post-user-display.underscore
 msgid "(Community TA)"
 msgstr ""
@@ -6957,6 +7096,10 @@ msgstr ""
 msgid "End My Exam"
 msgstr ""
 
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
+msgstr ""
+
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
 msgstr ""
@@ -7559,11 +7702,6 @@ msgstr ""
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Forgot password?"
-msgstr ""
-
-#: lms/templates/student_account/hinted_login.underscore
-#: lms/templates/student_account/login.underscore
-msgid "Sign in"
 msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
@@ -9045,9 +9183,7 @@ msgid "delete group"
 msgstr ""
 
 #: cms/templates/js/highlights-editor.underscore
-msgid ""
-"Please enter 3-5 highlights to be sent as separate bullet points in the "
-"message."
+msgid "Highlight {highlight_index}"
 msgstr ""
 
 #: cms/templates/js/highlights-editor.underscore
@@ -9332,10 +9468,6 @@ msgstr ""
 msgid ""
 "If the subsection does not have a due date, learners always see their scores"
 " when they submit answers to assessments."
-msgstr ""
-
-#: cms/templates/js/show-textbook.underscore
-msgid "View Live"
 msgstr ""
 
 #: cms/templates/js/signatory-details.underscore

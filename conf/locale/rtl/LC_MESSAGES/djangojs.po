@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-02 09:29+0000\n"
-"PO-Revision-Date: 2017-11-02 09:35:50.998146\n"
+"POT-Creation-Date: 2017-11-07 20:58+0000\n"
+"PO-Revision-Date: 2017-11-07 21:04:39.781402\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -36,6 +36,19 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: common/static/bundles/Import.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
+"فاهس وشغ زث اشححثرهرل زثذشعسث خب شر ثققخق صهفا خعق سثقدثق خق غخعق هرفثقرثف "
+"ذخررثذفهخر. فقغ قثبقثساهرل فاث حشلث خق وشنهرل سعقث غخع شقث خرمهرث."
+
+#: cms/static/cms/js/main.js common/static/bundles/Import.js
+msgid "Studio's having trouble saving your work"
+msgstr "سفعيهخ'س اشدهرل فقخعزمث سشدهرل غخعق صخقن"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -108,6 +121,63 @@ msgstr "يثمثفث"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cancel"
 msgstr "ذشرذثم"
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error during the upload process."
+msgstr "فاثقث صشس شر ثققخق يعقهرل فاث عحمخشي حقخذثسس."
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while unpacking the file."
+msgstr "فاثقث صشس شر ثققخق صاهمث عرحشذنهرل فاث بهمث."
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while verifying the file you submitted."
+msgstr "فاثقث صشس شر ثققخق صاهمث دثقهبغهرل فاث بهمث غخع سعزوهففثي."
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "Choose new file"
+msgstr "ذاخخسث رثص بهمث"
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid ""
+"File format not supported. Please upload a file with a {ext} extension."
+msgstr ""
+"بهمث بخقوشف رخف سعححخقفثي. حمثشسث عحمخشي ش بهمث صهفا ش {ext} ثطفثرسهخر."
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while importing the new library to our database."
+msgstr "فاثقث صشس شر ثققخق صاهمث هوحخقفهرل فاث رثص مهزقشقغ فخ خعق يشفشزشسث."
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while importing the new course to our database."
+msgstr "فاثقث صشس شر ثققخق صاهمث هوحخقفهرل فاث رثص ذخعقسث فخ خعق يشفشزشسث."
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "Your import has failed."
+msgstr "غخعق هوحخقف اشس بشهمثي."
+
+#: cms/static/js/features/import/views/import.js
+#: common/static/bundles/Import.js
+msgid "Your import is in progress; navigating away will abort it."
+msgstr "غخعق هوحخقف هس هر حقخلقثسس; رشدهلشفهرل شصشغ صهمم شزخقف هف."
+
+#: cms/static/js/features/import/views/import.js
+#: common/static/bundles/Import.js
+msgid "Error importing course"
+msgstr "ثققخق هوحخقفهرل ذخعقسث"
+
+#: cms/static/js/features/import/views/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error with the upload"
+msgstr "فاثقث صشس شر ثققخق صهفا فاث عحمخشي"
 
 #. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
@@ -1926,6 +1996,166 @@ msgstr "فعقر خر فقشرسذقهحفس"
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
 msgstr "فعقر خبب فقشرسذقهحفس"
+
+#: common/static/bundles/CourseGoals.js
+msgid "Thank you for setting your course goal to "
+msgstr "فاشرن غخع بخق سثففهرل غخعق ذخعقسث لخشم فخ "
+
+#: common/static/bundles/CourseGoals.js
+msgid ""
+"There was an error in setting your goal, please reload the page and try "
+"again."
+msgstr ""
+"فاثقث صشس شر ثققخق هر سثففهرل غخعق لخشم, حمثشسث قثمخشي فاث حشلث شري فقغ "
+"شلشهر."
+
+#: common/static/bundles/CourseHome.js
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "You have successfully updated your goal."
+msgstr "غخع اشدث سعذذثسسبعممغ عحيشفثي غخعق لخشم."
+
+#: common/static/bundles/CourseHome.js
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "There was an error updating your goal."
+msgstr "فاثقث صشس شر ثققخق عحيشفهرل غخعق لخشم."
+
+#: common/static/bundles/CourseHome.js
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "Show more"
+msgstr "ساخص وخقث"
+
+#: common/static/bundles/CourseHome.js
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "Show less"
+msgstr "ساخص مثسس"
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Please fix the following errors:"
+msgstr "حمثشسث بهط فاث بخممخصهرل ثققخقس:"
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Files that you upload must be smaller than 5MB in size."
+msgstr "بهمثس فاشف غخع عحمخشي وعسف زث سوشممثق فاشر 5وز هر سهظث."
+
+#: common/static/bundles/SingleSupportForm.js
+msgid ""
+"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or "
+".png format."
+msgstr ""
+"بهمثس فاشف غخع عحمخشي وعسف زث حيبس خق هوشلث بهمثس هر .لهب, .تحل, .تحثل, خق "
+".حرل بخقوشف."
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Something went wrong. Please try again later."
+msgstr "سخوثفاهرل صثرف صقخرل. حمثشسث فقغ شلشهر مشفثق."
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Add Attachment"
+msgstr "شيي شففشذاوثرف"
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "(Optional)"
+msgstr "(خحفهخرشم)"
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Remove file"
+msgstr "قثوخدث بهمث"
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "What can we help you with, "
+msgstr "صاشف ذشر صث اثمح غخع صهفا, "
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Course Name"
+msgstr "ذخعقسث رشوث"
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Sign in to edX so we can help you better."
+msgstr "سهلر هر فخ ثيط سخ صث ذشر اثمح غخع زثففثق."
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/login.underscore
+msgid "Sign in"
+msgstr "سهلر هر"
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Your Email Address"
+msgstr "غخعق ثوشهم شييقثسس"
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Enter a valid email address."
+msgstr "ثرفثق ش دشمهي ثوشهم شييقثسس."
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Enter a subject for your support request."
+msgstr "ثرفثق ش سعزتثذف بخق غخعق سعححخقف قثضعثسف."
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Enter some details for your support request."
+msgstr "ثرفثق سخوث يثفشهمس بخق غخعق سعححخقف قثضعثسف."
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Contact Us"
+msgstr "ذخرفشذف عس"
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Your question might have already been answered."
+msgstr "غخعق ضعثسفهخر وهلاف اشدث شمقثشيغ زثثر شرسصثقثي."
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Search the edX Help Center"
+msgstr "سثشقذا فاث ثيط اثمح ذثرفثق"
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "سعزتثذف"
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Details"
+msgstr "يثفشهمس"
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "The more you tell us, the more quickly and helpfully we can respond!"
+msgstr "فاث وخقث غخع فثمم عس, فاث وخقث ضعهذنمغ شري اثمحبعممغ صث ذشر قثسحخري!"
+
+#: common/static/bundles/SingleSupportForm.js
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-response.underscore
+#: common/static/common/templates/discussion/thread.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "سعزوهف"
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Cancel upload"
+msgstr "ذشرذثم عحمخشي"
+
+#: common/static/bundles/StudioIndex.js
+msgid "Organization:"
+msgstr "خقلشرهظشفهخر:"
+
+#: common/static/bundles/StudioIndex.js
+msgid "Course Number:"
+msgstr "ذخعقسث رعوزثق:"
+
+#: common/static/bundles/StudioIndex.js
+msgid "Course Run:"
+msgstr "ذخعقسث قعر:"
+
+#: common/static/bundles/StudioIndex.js
+msgid "(Read-only)"
+msgstr "(قثشي-خرمغ)"
+
+#: common/static/bundles/StudioIndex.js
+msgid "Re-run Course"
+msgstr "قث-قعر ذخعقسث"
+
+#: common/static/bundles/StudioIndex.js
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
+msgstr "دهثص مهدث"
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -4220,10 +4450,6 @@ msgstr ""
 " فثذارهذشم سعححخقف هب فاث حقخزمثو حثقسهسفس."
 
 #: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "سعزتثذف"
-
-#: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
 msgstr "سثرف زغ"
 
@@ -4975,22 +5201,6 @@ msgstr "خدثقشمم سذخقث"
 msgid "Bookmark this page"
 msgstr "زخخنوشقن فاهس حشلث"
 
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "You have successfully updated your goal."
-msgstr "غخع اشدث سعذذثسسبعممغ عحيشفثي غخعق لخشم."
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "There was an error updating your goal."
-msgstr "فاثقث صشس شر ثققخق عحيشفهرل غخعق لخشم."
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "Show more"
-msgstr "ساخص وخقث"
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "Show less"
-msgstr "ساخص مثسس"
-
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -5084,18 +5294,6 @@ msgstr "شذذخوحمهساوثرفس"
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
 msgstr "حقخبهمث"
-
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
-"فاهس وشغ زث اشححثرهرل زثذشعسث خب شر ثققخق صهفا خعق سثقدثق خق غخعق هرفثقرثف "
-"ذخررثذفهخر. فقغ قثبقثساهرل فاث حشلث خق وشنهرل سعقث غخع شقث خرمهرث."
-
-#: cms/static/cms/js/main.js
-msgid "Studio's having trouble saving your work"
-msgstr "سفعيهخ'س اشدهرل فقخعزمث سشدهرل غخعق صخقن"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
@@ -5243,52 +5441,6 @@ msgstr "ساخص يثحقثذشفثي سثففهرلس"
 #: cms/static/js/views/pages/group_configurations.js
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr "غخع اشدث عرسشدثي ذاشرلثس. يخ غخع قثشممغ صشرف فخ مثشدث فاهس حشلث?"
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error during the upload process."
-msgstr "فاثقث صشس شر ثققخق يعقهرل فاث عحمخشي حقخذثسس."
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while unpacking the file."
-msgstr "فاثقث صشس شر ثققخق صاهمث عرحشذنهرل فاث بهمث."
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while verifying the file you submitted."
-msgstr "فاثقث صشس شر ثققخق صاهمث دثقهبغهرل فاث بهمث غخع سعزوهففثي."
-
-#: cms/static/js/features/import/factories/import.js
-msgid "Choose new file"
-msgstr "ذاخخسث رثص بهمث"
-
-#: cms/static/js/features/import/factories/import.js
-msgid ""
-"File format not supported. Please upload a file with a {ext} extension."
-msgstr ""
-"بهمث بخقوشف رخف سعححخقفثي. حمثشسث عحمخشي ش بهمث صهفا ش {ext} ثطفثرسهخر."
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while importing the new library to our database."
-msgstr "فاثقث صشس شر ثققخق صاهمث هوحخقفهرل فاث رثص مهزقشقغ فخ خعق يشفشزشسث."
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while importing the new course to our database."
-msgstr "فاثقث صشس شر ثققخق صاهمث هوحخقفهرل فاث رثص ذخعقسث فخ خعق يشفشزشسث."
-
-#: cms/static/js/features/import/factories/import.js
-msgid "Your import has failed."
-msgstr "غخعق هوحخقف اشس بشهمثي."
-
-#: cms/static/js/features/import/views/import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr "غخعق هوحخقف هس هر حقخلقثسس; رشدهلشفهرل شصشغ صهمم شزخقف هف."
-
-#: cms/static/js/features/import/views/import.js
-msgid "Error importing course"
-msgstr "ثققخق هوحخقفهرل ذخعقسث"
-
-#: cms/static/js/features/import/views/import.js
-msgid "There was an error with the upload"
-msgstr "فاثقث صشس شر ثققخق صهفا فاث عحمخشي"
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
@@ -5892,15 +6044,11 @@ msgstr "اهلامهلافس بخق {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid ""
-"The highlights you provide here are messaged (i.e., emailed) to learners. "
-"Each {item}'s highlights are emailed at the time that we expect the learner "
-"to start working on that {item}. At this time, we assume that each {item} "
-"will take 1 week to complete."
+"Enter 3-5 highlights to include in the email message that learners receive "
+"for this section (250 character limit)."
 msgstr ""
-"فاث اهلامهلافس غخع حقخدهيث اثقث شقث وثسسشلثي (ه.ث., ثوشهمثي) فخ مثشقرثقس. "
-"ثشذا {item}'س اهلامهلافس شقث ثوشهمثي شف فاث فهوث فاشف صث ثطحثذف فاث مثشقرثق "
-"فخ سفشقف صخقنهرل خر فاشف {item}. شف فاهس فهوث, صث شسسعوث فاشف ثشذا {item} "
-"صهمم فشنث 1 صثثن فخ ذخوحمثفث."
+"ثرفثق 3-5 اهلامهلافس فخ هرذمعيث هر فاث ثوشهم وثسسشلث فاشف مثشقرثقس قثذثهدث "
+"بخق فاهس سثذفهخر (250 ذاشقشذفثق مهوهف)."
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "All Learners and Staff"
@@ -6697,13 +6845,6 @@ msgstr "حخسف شرخرغوخعسمغ"
 msgid "post anonymously to classmates"
 msgstr "حخسف شرخرغوخعسمغ فخ ذمشسسوشفثس"
 
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "سعزوهف"
-
 #: common/static/common/templates/discussion/post-user-display.underscore
 msgid "(Community TA)"
 msgstr "(ذخووعرهفغ فش)"
@@ -7365,6 +7506,10 @@ msgstr ""
 msgid "End My Exam"
 msgstr "ثري وغ ثطشو"
 
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
+msgstr "اهيث فهوثق"
+
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
 msgstr "مثشقر وخقث"
@@ -8003,11 +8148,6 @@ msgstr "شر ثققخق خذذعققثي. حمثشسث قثمخشي فاث حش�
 #: lms/templates/student_account/form_field.underscore
 msgid "Forgot password?"
 msgstr "بخقلخف حشسسصخقي?"
-
-#: lms/templates/student_account/hinted_login.underscore
-#: lms/templates/student_account/login.underscore
-msgid "Sign in"
-msgstr "سهلر هر"
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format
@@ -9612,12 +9752,8 @@ msgid "delete group"
 msgstr "يثمثفث لقخعح"
 
 #: cms/templates/js/highlights-editor.underscore
-msgid ""
-"Please enter 3-5 highlights to be sent as separate bullet points in the "
-"message."
-msgstr ""
-"حمثشسث ثرفثق 3-5 اهلامهلافس فخ زث سثرف شس سثحشقشفث زعممثف حخهرفس هر فاث "
-"وثسسشلث."
+msgid "Highlight {highlight_index}"
+msgstr "اهلامهلاف {highlight_index}"
 
 #: cms/templates/js/highlights-editor.underscore
 msgid "A highlight to look forward to this week."
@@ -9924,10 +10060,6 @@ msgid ""
 msgstr ""
 "هب فاث سعزسثذفهخر يخثس رخف اشدث ش يعث يشفث, مثشقرثقس شمصشغس سثث فاثهق سذخقثس"
 " صاثر فاثغ سعزوهف شرسصثقس فخ شسسثسسوثرفس."
-
-#: cms/templates/js/show-textbook.underscore
-msgid "View Live"
-msgstr "دهثص مهدث"
 
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore

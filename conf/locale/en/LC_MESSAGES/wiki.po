@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-02 11:05+0000\n"
-"PO-Revision-Date: 2017-11-02 11:05:33.956778\n"
+"POT-Creation-Date: 2017-11-07 21:04+0000\n"
+"PO-Revision-Date: 2017-11-07 21:04:39.355952\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -17,354 +17,354 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Language: en\n"
 
-#: wiki/admin.py:72 wiki/models/article.py:26
+#: wiki/admin.py wiki/models/article.py
 msgid "created"
 msgstr ""
 
-#: wiki/apps.py:9
+#: wiki/apps.py
 msgid "Wiki notifications"
 msgstr ""
 
-#: wiki/apps.py:15
+#: wiki/apps.py
 msgid "Wiki images"
 msgstr ""
 
-#: wiki/apps.py:21
+#: wiki/apps.py
 msgid "Wiki attachments"
 msgstr ""
 
-#: wiki/forms.py:31
+#: wiki/forms.py
 msgid "Only localhost... muahahaha"
 msgstr ""
 
-#: wiki/forms.py:37 wiki/forms.py:45 wiki/forms.py:206
+#: wiki/forms.py wiki/forms.py wiki/forms.py
 msgid "Title"
 msgstr ""
 
-#: wiki/forms.py:37
+#: wiki/forms.py
 msgid "Initial title of the article. May be overridden with revision titles."
 msgstr ""
 
-#: wiki/forms.py:38
+#: wiki/forms.py
 msgid "Type in some contents"
 msgstr ""
 
-#: wiki/forms.py:39
+#: wiki/forms.py
 msgid ""
 "This is just the initial contents of your article. After creating it, you "
 "can use more complex features like adding plugins, meta data, related "
 "articles etc..."
 msgstr ""
 
-#: wiki/forms.py:46 wiki/forms.py:209
+#: wiki/forms.py wiki/forms.py
 msgid "Contents"
 msgstr ""
 
-#: wiki/forms.py:49 wiki/forms.py:212
+#: wiki/forms.py wiki/forms.py
 msgid "Summary"
 msgstr ""
 
-#: wiki/forms.py:49
+#: wiki/forms.py
 msgid ""
 "Give a short reason for your edit, which will be stated in the revision log."
 msgstr ""
 
-#: wiki/forms.py:98
+#: wiki/forms.py
 msgid ""
 "While you were editing, someone else changed the revision. Your contents "
 "have been automatically merged with the new contents. Please review the text"
 " below."
 msgstr ""
 
-#: wiki/forms.py:100
+#: wiki/forms.py
 msgid "No changes made. Nothing to save."
 msgstr ""
 
-#: wiki/forms.py:162
+#: wiki/forms.py
 msgid "Select an option"
 msgstr ""
 
-#: wiki/forms.py:207
+#: wiki/forms.py
 msgid "Slug"
 msgstr ""
 
-#: wiki/forms.py:207
+#: wiki/forms.py
 msgid ""
 "This will be the address where your article can be found. Use only "
 "alphanumeric characters and - or _. Note that you cannot change the slug "
 "after creating the article."
 msgstr ""
 
-#: wiki/forms.py:212
+#: wiki/forms.py
 msgid "Write a brief message for the article's history log."
 msgstr ""
 
-#: wiki/forms.py:222
+#: wiki/forms.py
 msgid "A slug may not begin with an underscore."
 msgstr ""
 
-#: wiki/forms.py:231
+#: wiki/forms.py
 #, python-format
 msgid "A deleted article with slug \"%s\" already exists."
 msgstr ""
 
-#: wiki/forms.py:233
+#: wiki/forms.py
 #, python-format
 msgid "A slug named \"%s\" already exists."
 msgstr ""
 
-#: wiki/forms.py:246
+#: wiki/forms.py
 msgid "Yes, I am sure"
 msgstr ""
 
-#: wiki/forms.py:248
+#: wiki/forms.py
 msgid "Purge"
 msgstr ""
 
-#: wiki/forms.py:249
+#: wiki/forms.py
 msgid ""
 "Purge the article: Completely remove it (and all its contents) with no undo."
 " Purging is a good idea if you want to free the slug such that users can "
 "create new articles in its place."
 msgstr ""
 
-#: wiki/forms.py:256 wiki/plugins/attachments/forms.py:24
-#: wiki/plugins/images/forms.py:64
+#: wiki/forms.py wiki/plugins/attachments/forms.py
+#: wiki/plugins/images/forms.py
 msgid "You are not sure enough!"
 msgstr ""
 
-#: wiki/forms.py:258
+#: wiki/forms.py
 msgid "While you tried to delete this article, it was modified. TAKE CARE!"
 msgstr ""
 
-#: wiki/forms.py:264
+#: wiki/forms.py
 msgid "Lock article"
 msgstr ""
 
-#: wiki/forms.py:264
+#: wiki/forms.py
 msgid "Deny all users access to edit this article."
 msgstr ""
 
-#: wiki/forms.py:267
+#: wiki/forms.py
 msgid "Permissions"
 msgstr ""
 
-#: wiki/forms.py:271
+#: wiki/forms.py
 msgid "Owner"
 msgstr ""
 
-#: wiki/forms.py:272
+#: wiki/forms.py
 msgid "Enter the username of the owner."
 msgstr ""
 
-#: wiki/forms.py:273
+#: wiki/forms.py
 msgid "(none)"
 msgstr ""
 
-#: wiki/forms.py:278
+#: wiki/forms.py
 msgid "Inherit permissions"
 msgstr ""
 
-#: wiki/forms.py:278
+#: wiki/forms.py
 msgid ""
 "Check here to apply the above permissions recursively to articles under this"
 " one."
 msgstr ""
 
-#: wiki/forms.py:283
+#: wiki/forms.py
 msgid "Permission settings for the article were updated."
 msgstr ""
 
-#: wiki/forms.py:285
+#: wiki/forms.py
 msgid "Your permission settings were unchanged, so nothing saved."
 msgstr ""
 
-#: wiki/forms.py:324
+#: wiki/forms.py
 msgid "No user with that username"
 msgstr ""
 
-#: wiki/forms.py:346
+#: wiki/forms.py
 msgid "Article locked for editing"
 msgstr ""
 
-#: wiki/forms.py:353
+#: wiki/forms.py
 msgid "Article unlocked for editing"
 msgstr ""
 
-#: wiki/forms.py:366
+#: wiki/forms.py
 msgid "Filter"
 msgstr ""
 
-#: wiki/core/plugins/base.py:44
+#: wiki/core/plugins/base.py
 msgid "Settings for plugin"
 msgstr ""
 
-#: wiki/models/article.py:21 wiki/models/pluginbase.py:158
-#: wiki/plugins/attachments/models.py:19
+#: wiki/models/article.py wiki/models/pluginbase.py
+#: wiki/plugins/attachments/models.py
 msgid "current revision"
 msgstr ""
 
-#: wiki/models/article.py:23
+#: wiki/models/article.py
 msgid ""
 "The revision being displayed for this article. If you need to do a roll-"
 "back, simply change the value of this field."
 msgstr ""
 
-#: wiki/models/article.py:27
+#: wiki/models/article.py
 msgid "modified"
 msgstr ""
 
-#: wiki/models/article.py:28
+#: wiki/models/article.py
 msgid "Article properties last modified"
 msgstr ""
 
-#: wiki/models/article.py:30
+#: wiki/models/article.py
 msgid "owner"
 msgstr ""
 
-#: wiki/models/article.py:32
+#: wiki/models/article.py
 msgid ""
 "The owner of the article, usually the creator. The owner always has both "
 "read and write access."
 msgstr ""
 
-#: wiki/models/article.py:34
+#: wiki/models/article.py
 msgid "group"
 msgstr ""
 
-#: wiki/models/article.py:36
+#: wiki/models/article.py
 msgid ""
 "Like in a UNIX file system, permissions can be given to a user according to "
 "group membership. Groups are handled through the Django auth system."
 msgstr ""
 
-#: wiki/models/article.py:38
+#: wiki/models/article.py
 msgid "group read access"
 msgstr ""
 
-#: wiki/models/article.py:39
+#: wiki/models/article.py
 msgid "group write access"
 msgstr ""
 
-#: wiki/models/article.py:40
+#: wiki/models/article.py
 msgid "others read access"
 msgstr ""
 
-#: wiki/models/article.py:41
+#: wiki/models/article.py
 msgid "others write access"
 msgstr ""
 
-#: wiki/models/article.py:169
+#: wiki/models/article.py
 #, python-format
 msgid "Article without content (%(id)d)"
 msgstr ""
 
-#: wiki/models/article.py:197
+#: wiki/models/article.py
 msgid "content type"
 msgstr ""
 
-#: wiki/models/article.py:199
+#: wiki/models/article.py
 msgid "object ID"
 msgstr ""
 
-#: wiki/models/article.py:205
+#: wiki/models/article.py
 msgid "Article for object"
 msgstr ""
 
-#: wiki/models/article.py:206
+#: wiki/models/article.py
 msgid "Articles for object"
 msgstr ""
 
-#: wiki/models/article.py:214
+#: wiki/models/article.py
 msgid "revision number"
 msgstr ""
 
-#: wiki/models/article.py:220
+#: wiki/models/article.py
 msgid "IP address"
 msgstr ""
 
-#: wiki/models/article.py:225
+#: wiki/models/article.py
 msgid "user"
 msgstr ""
 
-#: wiki/models/article.py:236
+#: wiki/models/article.py
 msgid "deleted"
 msgstr ""
 
-#: wiki/models/article.py:237
+#: wiki/models/article.py
 msgid "locked"
 msgstr ""
 
-#: wiki/models/article.py:255 wiki/models/pluginbase.py:38
+#: wiki/models/article.py wiki/models/pluginbase.py
 msgid "article"
 msgstr ""
 
-#: wiki/models/article.py:258
+#: wiki/models/article.py
 msgid "article contents"
 msgstr ""
 
-#: wiki/models/article.py:262
+#: wiki/models/article.py
 msgid "article title"
 msgstr ""
 
-#: wiki/models/article.py:263
+#: wiki/models/article.py
 msgid ""
 "Each revision contains a title field that must be filled out, even if the "
 "title has not changed"
 msgstr ""
 
-#: wiki/models/pluginbase.py:74
+#: wiki/models/pluginbase.py
 msgid "original article"
 msgstr ""
 
-#: wiki/models/pluginbase.py:75
+#: wiki/models/pluginbase.py
 msgid "Permissions are inherited from this article"
 msgstr ""
 
-#: wiki/models/pluginbase.py:133
+#: wiki/models/pluginbase.py
 msgid "A plugin was changed"
 msgstr ""
 
-#: wiki/models/pluginbase.py:160
+#: wiki/models/pluginbase.py
 msgid ""
 "The revision being displayed for this plugin.If you need to do a roll-back, "
 "simply change the value of this field."
 msgstr ""
 
-#: wiki/models/urlpath.py:41
+#: wiki/models/urlpath.py
 msgid "Cache lookup value for articles"
 msgstr ""
 
-#: wiki/models/urlpath.py:47
+#: wiki/models/urlpath.py
 msgid "slug"
 msgstr ""
 
-#: wiki/models/urlpath.py:137
+#: wiki/models/urlpath.py
 msgid "(root)"
 msgstr ""
 
-#: wiki/models/urlpath.py:147
+#: wiki/models/urlpath.py
 msgid "URL path"
 msgstr ""
 
-#: wiki/models/urlpath.py:148
+#: wiki/models/urlpath.py
 msgid "URL paths"
 msgstr ""
 
-#: wiki/models/urlpath.py:153
+#: wiki/models/urlpath.py
 msgid "Sorry but you cannot have a root article with a slug."
 msgstr ""
 
-#: wiki/models/urlpath.py:155
+#: wiki/models/urlpath.py
 msgid "A non-root note must always have a slug."
 msgstr ""
 
-#: wiki/models/urlpath.py:158
+#: wiki/models/urlpath.py
 #, python-format
 msgid "There is already a root node on %s"
 msgstr ""
 
-#: wiki/models/urlpath.py:262
+#: wiki/models/urlpath.py
 msgid ""
 "Articles who lost their parents\n"
 "===============================\n"
@@ -372,311 +372,311 @@ msgid ""
 "The children of this article have had their parents deleted. You should probably find a new home for them."
 msgstr ""
 
-#: wiki/models/urlpath.py:265
+#: wiki/models/urlpath.py
 msgid "Lost and found"
 msgstr ""
 
-#: wiki/plugins/attachments/forms.py:9
+#: wiki/plugins/attachments/forms.py
 msgid "Description"
 msgstr ""
 
-#: wiki/plugins/attachments/forms.py:10
+#: wiki/plugins/attachments/forms.py
 msgid "A short summary of what the file contains"
 msgstr ""
 
-#: wiki/plugins/attachments/forms.py:19
+#: wiki/plugins/attachments/forms.py
 msgid "Yes I am sure..."
 msgstr ""
 
-#: wiki/plugins/attachments/markdown_extensions.py:33
+#: wiki/plugins/attachments/markdown_extensions.py
 msgid "Click to download file"
 msgstr ""
 
-#: wiki/plugins/attachments/models.py:21
+#: wiki/plugins/attachments/models.py
 msgid ""
 "The revision of this attachment currently in use (on all articles using the "
 "attachment)"
 msgstr ""
 
-#: wiki/plugins/attachments/models.py:24
+#: wiki/plugins/attachments/models.py
 msgid "original filename"
 msgstr ""
 
-#: wiki/plugins/attachments/models.py:36
+#: wiki/plugins/attachments/models.py
 msgid "attachment"
 msgstr ""
 
-#: wiki/plugins/attachments/models.py:37
+#: wiki/plugins/attachments/models.py
 msgid "attachments"
 msgstr ""
 
-#: wiki/plugins/attachments/models.py:79
+#: wiki/plugins/attachments/models.py
 msgid "file"
 msgstr ""
 
-#: wiki/plugins/attachments/models.py:85
+#: wiki/plugins/attachments/models.py
 msgid "attachment revision"
 msgstr ""
 
-#: wiki/plugins/attachments/models.py:86
+#: wiki/plugins/attachments/models.py
 msgid "attachment revisions"
 msgstr ""
 
-#: wiki/plugins/attachments/views.py:49
+#: wiki/plugins/attachments/views.py
 #, python-format
 msgid "%s was successfully added."
 msgstr ""
 
-#: wiki/plugins/attachments/views.py:51 wiki/plugins/attachments/views.py:116
+#: wiki/plugins/attachments/views.py wiki/plugins/attachments/views.py
 #, python-format
 msgid "Your file could not be saved: %s"
 msgstr ""
 
-#: wiki/plugins/attachments/views.py:53 wiki/plugins/attachments/views.py:120
+#: wiki/plugins/attachments/views.py wiki/plugins/attachments/views.py
 msgid ""
 "Your file could not be saved, probably because of a permission error on the "
 "web server."
 msgstr ""
 
-#: wiki/plugins/attachments/views.py:114
+#: wiki/plugins/attachments/views.py
 #, python-format
 msgid "%s uploaded and replaces old attachment."
 msgstr ""
 
-#: wiki/plugins/attachments/views.py:128
+#: wiki/plugins/attachments/views.py
 msgid ""
 "Your new file will automatically be renamed to match the file already "
 "present. Files with different extensions are not allowed."
 msgstr ""
 
-#: wiki/plugins/attachments/views.py:182
+#: wiki/plugins/attachments/views.py
 #, python-format
 msgid "Current revision changed for %s."
 msgstr ""
 
-#: wiki/plugins/attachments/views.py:203
+#: wiki/plugins/attachments/views.py
 #, python-format
 msgid "Added a reference to \"%(att)s\" from \"%(art)s\"."
 msgstr ""
 
-#: wiki/plugins/attachments/views.py:233
+#: wiki/plugins/attachments/views.py
 #, python-format
 msgid "The file %s was deleted."
 msgstr ""
 
-#: wiki/plugins/attachments/views.py:236
+#: wiki/plugins/attachments/views.py
 #, python-format
 msgid "This article is no longer related to the file %s."
 msgstr ""
 
-#: wiki/plugins/attachments/wiki_plugin.py:30
+#: wiki/plugins/attachments/wiki_plugin.py
 msgid "Attachments"
 msgstr ""
 
-#: wiki/plugins/attachments/wiki_plugin.py:36
+#: wiki/plugins/attachments/wiki_plugin.py
 #, python-format
 msgid "A file was changed: %s"
 msgstr ""
 
-#: wiki/plugins/attachments/wiki_plugin.py:36
+#: wiki/plugins/attachments/wiki_plugin.py
 #, python-format
 msgid "A file was deleted: %s"
 msgstr ""
 
-#: wiki/plugins/help/wiki_plugin.py:12
+#: wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr ""
 
-#: wiki/plugins/images/forms.py:16
+#: wiki/plugins/images/forms.py
 #, python-format
 msgid ""
 "New image %s was successfully uploaded. You can use it by selecting it from "
 "the list of available images."
 msgstr ""
 
-#: wiki/plugins/images/forms.py:59
+#: wiki/plugins/images/forms.py
 msgid "Are you sure?"
 msgstr ""
 
-#: wiki/plugins/images/models.py:40
+#: wiki/plugins/images/models.py
 msgid "image"
 msgstr ""
 
-#: wiki/plugins/images/models.py:41
+#: wiki/plugins/images/models.py
 msgid "images"
 msgstr ""
 
-#: wiki/plugins/images/models.py:45
+#: wiki/plugins/images/models.py
 #, python-format
 msgid "Image: %s"
 msgstr ""
 
-#: wiki/plugins/images/models.py:45
+#: wiki/plugins/images/models.py
 msgid "Current revision not set!!"
 msgstr ""
 
-#: wiki/plugins/images/models.py:92
+#: wiki/plugins/images/models.py
 msgid "image revision"
 msgstr ""
 
-#: wiki/plugins/images/models.py:93
+#: wiki/plugins/images/models.py
 msgid "image revisions"
 msgstr ""
 
-#: wiki/plugins/images/models.py:98
+#: wiki/plugins/images/models.py
 #, python-format
 msgid "Image Revsion: %d"
 msgstr ""
 
-#: wiki/plugins/images/views.py:64
+#: wiki/plugins/images/views.py
 #, python-format
 msgid "%s has been restored"
 msgstr ""
 
-#: wiki/plugins/images/views.py:66
+#: wiki/plugins/images/views.py
 #, python-format
 msgid "%s has been marked as deleted"
 msgstr ""
 
-#: wiki/plugins/images/views.py:120
+#: wiki/plugins/images/views.py
 #, python-format
 msgid "%(file)s has been changed to revision #%(revision)d"
 msgstr ""
 
-#: wiki/plugins/images/views.py:158
+#: wiki/plugins/images/views.py
 #, python-format
 msgid "%(file)s has been saved."
 msgstr ""
 
-#: wiki/plugins/images/wiki_plugin.py:15
+#: wiki/plugins/images/wiki_plugin.py
 msgid "Images"
 msgstr ""
 
-#: wiki/plugins/images/wiki_plugin.py:26
+#: wiki/plugins/images/wiki_plugin.py
 #, python-format
 msgid "An image was added: %s"
 msgstr ""
 
-#: wiki/plugins/links/wiki_plugin.py:20
+#: wiki/plugins/links/wiki_plugin.py
 msgid "Links"
 msgstr ""
 
-#: wiki/plugins/notifications/forms.py:13
+#: wiki/plugins/notifications/forms.py
 msgid "Notifications"
 msgstr ""
 
-#: wiki/plugins/notifications/forms.py:17
+#: wiki/plugins/notifications/forms.py
 msgid "When this article is edited"
 msgstr ""
 
-#: wiki/plugins/notifications/forms.py:18
+#: wiki/plugins/notifications/forms.py
 msgid "Also receive emails about article edits"
 msgstr ""
 
-#: wiki/plugins/notifications/forms.py:41
+#: wiki/plugins/notifications/forms.py
 msgid "Your notification settings were updated."
 msgstr ""
 
-#: wiki/plugins/notifications/forms.py:43
+#: wiki/plugins/notifications/forms.py
 msgid "Your notification settings were unchanged, so nothing saved."
 msgstr ""
 
-#: wiki/plugins/notifications/models.py:17
+#: wiki/plugins/notifications/models.py
 #, python-format
 msgid "%(user)s subscribing to %(article)s (%(type)s)"
 msgstr ""
 
-#: wiki/plugins/notifications/models.py:38
+#: wiki/plugins/notifications/models.py
 #, python-format
 msgid "Article deleted: %s"
 msgstr ""
 
-#: wiki/plugins/notifications/models.py:41
+#: wiki/plugins/notifications/models.py
 #, python-format
 msgid "Article modified: %s"
 msgstr ""
 
-#: wiki/plugins/notifications/models.py:44
+#: wiki/plugins/notifications/models.py
 #, python-format
 msgid "New article created: %s"
 msgstr ""
 
-#: wiki/views/accounts.py:25
+#: wiki/views/accounts.py
 msgid "You are now sign up... and now you can sign in!"
 msgstr ""
 
-#: wiki/views/accounts.py:32
+#: wiki/views/accounts.py
 msgid "You are no longer logged in. Bye bye!"
 msgstr ""
 
-#: wiki/views/accounts.py:57
+#: wiki/views/accounts.py
 msgid "You are now logged in! Have fun!"
 msgstr ""
 
-#: wiki/views/article.py:87
+#: wiki/views/article.py
 #, python-format
 msgid "New article '%s' created."
 msgstr ""
 
-#: wiki/views/article.py:92
+#: wiki/views/article.py
 #, python-format
 msgid "There was an error creating this article: %s"
 msgstr ""
 
-#: wiki/views/article.py:94
+#: wiki/views/article.py
 msgid "There was an error creating this article."
 msgstr ""
 
-#: wiki/views/article.py:175
+#: wiki/views/article.py
 msgid ""
 "This article cannot be deleted because it has children or is a root article."
 msgstr ""
 
-#: wiki/views/article.py:186
+#: wiki/views/article.py
 msgid ""
 "This article together with all its contents are now completely gone! Thanks!"
 msgstr ""
 
-#: wiki/views/article.py:193
+#: wiki/views/article.py
 #, python-format
 msgid ""
 "The article \"%s\" is now marked as deleted! Thanks for keeping the site "
 "free from unwanted material!"
 msgstr ""
 
-#: wiki/views/article.py:276
+#: wiki/views/article.py
 msgid "Your changes were saved."
 msgstr ""
 
-#: wiki/views/article.py:299
+#: wiki/views/article.py
 msgid "A new revision of the article was successfully added."
 msgstr ""
 
-#: wiki/views/article.py:356
+#: wiki/views/article.py
 msgid "Restoring article"
 msgstr ""
 
-#: wiki/views/article.py:358
+#: wiki/views/article.py
 #, python-format
 msgid "The article \"%s\" and its children are now restored."
 msgstr ""
 
-#: wiki/views/article.py:542
+#: wiki/views/article.py
 #, python-format
 msgid ""
 "The article %(title)s is now set to display revision #%(revision_number)d"
 msgstr ""
 
-#: wiki/views/article.py:607
+#: wiki/views/article.py
 msgid "New title"
 msgstr ""
 
-#: wiki/views/article.py:631
+#: wiki/views/article.py
 #, python-format
 msgid "Merge between Revision #%(r1)d and Revision #%(r2)d"
 msgstr ""
 
-#: wiki/views/article.py:635
+#: wiki/views/article.py
 #, python-format
 msgid ""
 "A new revision was created: Merge between Revision #%(r1)d and Revision "
