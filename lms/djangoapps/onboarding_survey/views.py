@@ -195,7 +195,7 @@ def interests(request):
 
             if not are_forms_complete:
                 set_survey_complete(extended_profile)
-                return redirect(reverse('dashboard'))
+                return redirect(reverse('recommendations'))
 
             return redirect(reverse('interests'))
 
@@ -236,7 +236,7 @@ def organization(request):
 
     If its a GET request then an empty form for survey is returned
     otherwise, a form is populated form the POST request and then is
-    saved. After saving the form, user is redirected to dashboard.
+    saved. After saving the form, user is redirected to recommendations page.
     """
 
     are_forms_complete = request.user.extended_profile.is_survey_completed
@@ -342,7 +342,7 @@ def org_detail_survey(request):
 
             if not are_forms_complete:
                 set_survey_complete(request.user.extended_profile)
-                return redirect(reverse('dashboard'))
+                return redirect(reverse('recommendations'))
 
             return redirect(reverse('org_detail_survey'))
 

@@ -64,5 +64,5 @@ def get_recommended_xmodule_courses(user):
 
 
 def get_recommended_communities(user):
-    status, categories = NodeBBClient().categories.featured()
+    status, categories = NodeBBClient().categories.recommended(user)
     return categories if status == 200 else []
