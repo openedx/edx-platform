@@ -3,26 +3,16 @@
  */
 define([
     'jquery', 'backbone', 'underscore', 'gettext', 'moment',
-    'common/js/components/utils/view_utils',
     'edx-ui-toolkit/js/utils/html-utils',
     'edx-ui-toolkit/js/utils/string-utils',
-    'text!templates/course-video-settings.underscore',
-    'text!templates/course-video-transcript-preferences.underscore',
-    'text!templates/course-video-transcript-provider-empty.underscore',
-    'text!templates/course-video-transcript-provider-selected.underscore',
-    'text!templates/transcript-organization-credentials.underscore',
-    'text!templates/course-video-settings-update-settings-footer.underscore',
-    'text!templates/course-video-settings-update-org-credentials-footer.underscore'
+    'text!templates/course-video-settings.underscore'
 ],
-function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, TranscriptSettingsTemplate,
-         TranscriptPreferencesTemplate, TranscriptProviderEmptyStateTemplate, TranscriptProviderSelectedStateTemplate,
-         OrganizationCredentialsTemplate, UpdateSettingsFooterTemplate, OrganizationCredentialsFooterTemplate) {
+function($, Backbone, _, gettext, moment, HtmlUtils, StringUtils, TranscriptSettingsTemplate) {
     'use strict';
 
     var CourseVideoSettingsView,
         CIELO24 = 'Cielo24',
-        THREE_PLAY_MEDIA = '3PlayMedia',
-        INTERNAL_SERVER_ERROR_MESSAGE = gettext('An error has occurred. Wait a few minutes, and then try again.');
+        THREE_PLAY_MEDIA = '3PlayMedia';
 
     CourseVideoSettingsView = Backbone.View.extend({
         el: 'div.video-transcript-settings-wrapper',
@@ -34,27 +24,16 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             'change #video-source-language': 'videoSourceLanguageSelected',
             'click .action-add-language': 'languageSelected',
             'click .action-remove-language': 'languageRemoved',
-            'click .action-change-provider': 'renderOrganizationCredentials',
-            'click .action-update-org-credentials': 'updateOrganizationCredentials',
             'click .action-update-course-video-settings': 'updateCourseVideoSettings',
-            'click .action-cancel-course-video-settings': 'discardChanges',
             'click .action-close-course-video-settings': 'closeCourseVideoSettings'
         },
 
         initialize: function(options) {
             var videoTranscriptSettings = options.videoTranscriptSettings;
             this.activeTranscriptionPlan = options.activeTranscriptPreferences;
-            this.transcriptOrganizationCredentials = _.extend({}, options.transcriptOrganizationCredentials);
             this.availableTranscriptionPlans = videoTranscriptSettings.transcription_plans;
             this.transcriptHandlerUrl = videoTranscriptSettings.transcript_preferences_handler_url;
-            this.transcriptCredentialsHandlerUrl = videoTranscriptSettings.transcript_credentials_handler_url;
             this.template = HtmlUtils.template(TranscriptSettingsTemplate);
-            this.transcriptPreferencesTemplate = HtmlUtils.template(TranscriptPreferencesTemplate);
-            this.organizationCredentialsTemplate = HtmlUtils.template(OrganizationCredentialsTemplate);
-            this.organizationCredentialsFooterTemplate = HtmlUtils.template(OrganizationCredentialsFooterTemplate);
-            this.updateSettingsFooterTemplate = HtmlUtils.template(UpdateSettingsFooterTemplate);
-            this.transcriptProviderEmptyStateTemplate = HtmlUtils.template(TranscriptProviderEmptyStateTemplate);
-            this.transcriptProviderSelectedStateTemplate = HtmlUtils.template(TranscriptProviderSelectedStateTemplate);
             this.setActiveTranscriptPlanData();
             this.selectedLanguages = [];
         },
@@ -70,7 +49,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
 
             // Click anywhere outside the course video settings pane would close the pane.
             $(document).click(function(event) {
-                // If the target of the click isn't the container nor a descendant of the contain
+                // if the target of the click isn't the container nor a descendant of the contain
                 if (!self.$el.is(event.target) && self.$el.has(event.target).length === 0) {
                     self.closeCourseVideoSettings();
                 }
@@ -181,35 +160,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         providerSelected: function(event) {
             this.resetPlanData();
             this.selectedProvider = event.target.value;
-            // Re-render view
-            this.reRenderView();
-        },
-
-        reRenderView: function() {
-            var $courseVideoSettingsContentEl = this.$el.find('.course-video-settings-content'),
-                dateModified = this.activeTranscriptionPlan ?
-                    moment.utc(this.activeTranscriptionPlan.modified).format('ll') : '';
-
-            if (!this.selectedProvider) {
-                // Hide organization credentials and transcript preferences views
-                $courseVideoSettingsContentEl.hide();
-
-                // Render footer
-                HtmlUtils.setHtml(
-                    this.$el.find('.course-video-settings-footer'),
-                    this.updateSettingsFooterTemplate({
-                        dateModified: dateModified
-                    })
-                );
-                return;
-            }
-            $courseVideoSettingsContentEl.show();
-            // If org provider specific credentials are present
-            if (this.transcriptOrganizationCredentials[this.selectedProvider]) {
-                this.renderTranscriptPreferences();
-            } else {
-                this.renderOrganizationCredentials();
-            }
+            this.renderPreferences();
         },
 
         languageSelected: function(event) {
@@ -236,56 +187,43 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             $(event.target.parentElement).parent().remove();
 
             // Remove language from selected languages.
-            this.selectedLanguages = this.activeLanguages = _.without(this.selectedLanguages, selectedLanguage);
+            this.selectedLanguages = _.without(this.selectedLanguages, selectedLanguage);
 
             // Populate menu again to reflect latest changes.
             this.populateLanguageMenu();
         },
 
-        renderProviders: function(state) {
-            var $transcriptProviderWrapperEl = this.$el.find('.transcript-provider-wrapper');
-            if (!state) {
-                state = this.selectedProvider ? 'selected' : 'empty';   // eslint-disable-line no-param-reassign
-            }
+        renderProviders: function() {
+            var self = this,
+                providerPlan = self.availableTranscriptionPlans,
+                $providerEl = self.$el.find('.transcript-provider-group');
 
-            // If no transcription plans are sentm return.
-            if (!this.availableTranscriptionPlans) {
-                return;
-            }
-            if (state === 'empty') {
+            if (providerPlan) {
                 HtmlUtils.setHtml(
-                    $transcriptProviderWrapperEl,
-                    this.transcriptProviderEmptyStateTemplate({
-                        providers: [
+                    $providerEl,
+                    HtmlUtils.interpolateHtml(
+                        HtmlUtils.HTML('<input type="radio" id="transcript-provider-none" name="transcript-provider" value="" {checked}/><label for="transcript-provider-none">{text}</label>'),    // eslint-disable-line max-len
+                        {
+                            text: gettext('N/A'),
+                            checked: self.selectedProvider === '' ? 'checked' : ''
+                        }
+                    )
+                );
+
+                _.each(providerPlan, function(providerObject, key) {
+                    var checked = self.selectedProvider === key ? 'checked' : '';
+                    HtmlUtils.append(
+                        $providerEl,
+                        HtmlUtils.interpolateHtml(
+                            HtmlUtils.HTML('<input type="radio" id="transcript-provider-{value}" name="transcript-provider" value="{value}" {checked}/><label for="transcript-provider-{value}">{text}'),   // eslint-disable-line max-len
                             {
-                                key: 'none',
-                                value: '',
-                                name: gettext('None'),
-                                checked: this.selectedProvider === '' ? 'checked' : ''
-                            },
-                            {
-                                key: CIELO24,
-                                value: CIELO24,
-                                name: this.availableTranscriptionPlans[CIELO24].display_name,
-                                checked: this.selectedProvider === CIELO24 ? 'checked' : ''
-                            },
-                            {
-                                key: THREE_PLAY_MEDIA,
-                                value: THREE_PLAY_MEDIA,
-                                name: this.availableTranscriptionPlans[THREE_PLAY_MEDIA].display_name,
-                                checked: this.selectedProvider === THREE_PLAY_MEDIA ? 'checked' : ''
+                                text: providerObject.display_name,
+                                value: key,
+                                checked: checked
                             }
-                        ]
-                    })
-                );
-            } else {
-                HtmlUtils.setHtml(
-                    $transcriptProviderWrapperEl,
-                    this.transcriptProviderSelectedStateTemplate({
-                        selectedProvider: this.availableTranscriptionPlans[this.selectedProvider].display_name
-                    })
-                );
-                this.renderTranscriptPreferences();
+                        )
+                    );
+                });
             }
         },
 
@@ -346,10 +284,6 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
 
         renderTargetLanguages: function() {
             var self = this,
-            // Merge active and selected languages, this handles the case when active languages are present and
-            // user also has selected some languages but not saved, user changes organization credentials,
-            // both active and selected languages should be rendered.
-                selectedLanguages = _.union(self.activeLanguages, self.selectedLanguages),
                 $languagesPreferenceContainer = self.$el.find('.transcript-languages-wrapper'),
                 $languagesContainer = self.$el.find('.languages-container');
 
@@ -358,9 +292,9 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
 
             $languagesContainer.empty();
 
-            // Show language container if source language is selected.
+            // Show language container if source language is selected .
             if (self.selectedVideoSourceLanguage) {
-                _.each(selectedLanguages, function(language) {
+                _.each(self.activeLanguages, function(language) {
                     // Only add if not in the list already.
                     if (_.indexOf(self.selectedLanguages, language) === -1) {
                         self.selectedLanguages.push(language);
@@ -452,6 +386,14 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             }
         },
 
+        renderPreferences: function() {
+            this.renderProviders();
+            this.renderTurnaround();
+            this.renderFidelity();
+            this.renderSourceLanguages();
+            this.renderTargetLanguages();
+        },
+
         addLanguage: function(language) {
             var $languagesContainer = this.$el.find('.languages-container');
             HtmlUtils.append(
@@ -477,9 +419,8 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             );
         },
 
-        updateSuccessResponseStatus: function(data, successMessage) {
+        updateSuccessResponseStatus: function(data) {
             var dateModified = data ? moment.utc(data.modified).format('ll') : '';
-            successMessage = successMessage ? successMessage : gettext('Settings updated'); // eslint-disable-line no-param-reassign, no-unneeded-ternary, max-len
 
             // Update last modified date
             if (dateModified) {
@@ -495,10 +436,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                 );
             }
 
-            // Now re-render providers state.
-            this.renderProviders();
-
-            this.renderResponseStatus(successMessage, 'success');
+            this.renderResponseStatus(gettext('Settings updated'), 'success');
             // Sync ActiveUploadListView with latest active plan.
             this.activeTranscriptionPlan = data;
             Backbone.trigger('coursevideosettings:syncActiveTranscriptPreferences', this.activeTranscriptionPlan);
@@ -510,8 +448,9 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             // show some error to user
             try {
                 errorMessage = $.parseJSON(data).error;
-            } catch (e) {}   // eslint-disable-line no-empty
-            this.renderResponseStatus(errorMessage || INTERNAL_SERVER_ERROR_MESSAGE, 'error');
+            } catch (e) {}  // eslint-disable-line no-empty
+            errorMessage = errorMessage || gettext('Error saving data');
+            this.renderResponseStatus(errorMessage, 'error');
         },
 
         renderResponseStatus: function(responseText, type) {
@@ -609,46 +548,6 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             return isValid;
         },
 
-        validateOrganizationCredentials: function() {
-            var $OrganizationApiSecretWrapperEl,
-                $OrganizationUsernameWrapperEl,
-                isValid = true,
-                $OrganizationApiKeyWrapperEl = this.$el.find('.' + this.selectedProvider + '-api-key-wrapper');
-
-
-            // Explicit None selected case.
-            if (this.selectedProvider === '') {
-                return false;
-            }
-
-            if ($OrganizationApiKeyWrapperEl.find('input').val() === '') {
-                isValid = false;
-                this.addErrorState($OrganizationApiKeyWrapperEl);
-            } else {
-                this.clearPreferenceErrorState($OrganizationApiKeyWrapperEl);
-            }
-
-            if (this.selectedProvider === THREE_PLAY_MEDIA) {
-                $OrganizationApiSecretWrapperEl = this.$el.find('.' + this.selectedProvider + '-api-secret-wrapper');
-                if ($OrganizationApiSecretWrapperEl.find('input').val() === '') {
-                    isValid = false;
-                    this.addErrorState($OrganizationApiSecretWrapperEl);
-                } else {
-                    this.clearPreferenceErrorState($OrganizationApiSecretWrapperEl);
-                }
-            } else {
-                $OrganizationUsernameWrapperEl = this.$el.find('.' + this.selectedProvider + '-username-wrapper');
-                if ($OrganizationUsernameWrapperEl.find('input').val() === '') {
-                    isValid = false;
-                    this.addErrorState($OrganizationUsernameWrapperEl);
-                } else {
-                    this.clearPreferenceErrorState($OrganizationUsernameWrapperEl);
-                }
-            }
-
-            return isValid;
-        },
-
         saveTranscriptPreferences: function() {
             var self = this,
                 responseTranscriptPreferences;
@@ -668,66 +567,21 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                     responseTranscriptPreferences = data ? data.transcript_preferences : null;
                     self.updateSuccessResponseStatus(responseTranscriptPreferences);
                 }).fail(function(jqXHR) {
-                    self.updateFailResponseStatus(jqXHR.responseText);
+                    if (jqXHR.responseText) {
+                        self.updateFailResponseStatus(jqXHR.responseText);
+                    }
                 });
             } else {
                 $.ajax({
                     type: 'DELETE',
                     url: self.transcriptHandlerUrl
                 }).done(function() {
-                    responseTranscriptPreferences = null;
-                    self.updateSuccessResponseStatus(
-                        responseTranscriptPreferences,
-                        gettext('Automatic transcripts are disabled.')
-                    );
+                    self.updateSuccessResponseStatus(null);
                 }).fail(function(jqXHR) {
-                    self.updateFailResponseStatus(jqXHR.responseText);
+                    if (jqXHR.responseText) {
+                        self.updateFailResponseStatus(jqXHR.responseText);
+                    }
                 });
-            }
-        },
-
-        saveOrganizationCredentials: function() {
-            var self = this,
-                username,
-                apiSecret,
-                apiKey = this.$el.find('.' + this.selectedProvider + '-api-key').val();
-
-            // First clear response status if present already
-            this.clearResponseStatus();
-
-            if (this.selectedProvider === THREE_PLAY_MEDIA) {
-                apiSecret = this.$el.find('.' + this.selectedProvider + '-api-secret').val();
-            } else {
-                username = this.$el.find('.' + this.selectedProvider + '-username').val();
-            }
-
-            $.postJSON(self.transcriptCredentialsHandlerUrl, {
-                provider: self.selectedProvider,
-                api_key: apiKey,
-                api_secret_key: apiSecret,
-                username: username,
-                global: false   // Do not trigger global AJAX error handler
-            }, function() {
-                self.$el.find('.organization-credentials-wrapper').hide();
-
-                // Update org credentials for selected provider
-                self.transcriptOrganizationCredentials[self.selectedProvider] = true;
-
-                self.updateSuccessResponseStatus(
-                    self.activeTranscriptionPlan,
-                    gettext('{selectedProvider} credentials saved').replace(
-                        '{selectedProvider}',
-                        self.availableTranscriptionPlans[self.selectedProvider].display_name
-                    )
-                );
-            }).fail(function(jqXHR) {
-                self.updateFailResponseStatus(jqXHR.responseText);
-            });
-        },
-
-        updateOrganizationCredentials: function() {
-            if (this.validateOrganizationCredentials()) {
-                this.saveOrganizationCredentials();
             }
         },
 
@@ -740,81 +594,17 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             }
         },
 
-        discardChanges: function() {
-            this.setActiveTranscriptPlanData();
-            // Re-render views
-            this.renderProviders();
-            this.reRenderView();
-        },
-
-        renderOrganizationCredentials: function() {
-            var $courseVideoSettingsContentEl = this.$el.find('.course-video-settings-content');
-
-            // Render empty state providers view.
-            this.renderProviders('empty');
-
-            HtmlUtils.setHtml(
-                $courseVideoSettingsContentEl,
-                this.organizationCredentialsTemplate({
-                    selectedProvider: {
-                        key: this.selectedProvider,
-                        name: this.availableTranscriptionPlans[this.selectedProvider].display_name
-                    },
-                    organizationCredentialsExists: this.transcriptOrganizationCredentials[this.selectedProvider],
-                    CIELO24: CIELO24,
-                    THREE_PLAY_MEDIA: THREE_PLAY_MEDIA
-                })
-            );
-            // Render footer
-            HtmlUtils.setHtml(
-                this.$el.find('.course-video-settings-footer'),
-                this.organizationCredentialsFooterTemplate({})
-            );
-        },
-
-        renderTranscriptPreferences: function() {
-            var $courseVideoSettingsContentEl = this.$el.find('.course-video-settings-content'),
-                dateModified = this.activeTranscriptionPlan ?
-                    moment.utc(this.activeTranscriptionPlan.modified).format('ll') : '';
-
-            HtmlUtils.setHtml(
-                $courseVideoSettingsContentEl,
-                this.transcriptPreferencesTemplate({
-                    selectedProvider: this.selectedProvider,
-                    THREE_PLAY_MEDIA: THREE_PLAY_MEDIA
-                })
-            );
-
-            // Render transcript preferences.
-            this.renderTurnaround();
-            this.renderFidelity();
-            this.renderSourceLanguages();
-            this.renderTargetLanguages();
-
-            // Render footer
-            HtmlUtils.setHtml(
-                this.$el.find('.course-video-settings-footer'),
-                this.updateSettingsFooterTemplate({
-                    dateModified: dateModified
-                })
-            );
-        },
-
         render: function() {
             var dateModified = this.activeTranscriptionPlan ?
                 moment.utc(this.activeTranscriptionPlan.modified).format('ll') : '';
-
-            HtmlUtils.setHtml(this.$el, this.template({}));
-
-            // Render footer
             HtmlUtils.setHtml(
-                this.$el.find('.course-video-settings-footer'),
-                this.updateSettingsFooterTemplate({
+                this.$el,
+                this.template({
                     dateModified: dateModified
                 })
             );
 
-            this.renderProviders();
+            this.renderPreferences();
 
             this.registerCloseClickHandler();
             this.setFixedCourseVideoSettingsPane();
@@ -850,7 +640,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         closeCourseVideoSettings: function() {
-            // TODO: Slide out when closing settings pane. See EDUCATOR-1477
+            // TODO: Slide out when closing settings pane. We may need to hide the view instead of destroying it.
 
             // Trigger destroy transcript event.
             Backbone.trigger('coursevideosettings:destroyCourseVideoSettingsView');
