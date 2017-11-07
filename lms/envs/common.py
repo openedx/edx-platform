@@ -2078,9 +2078,6 @@ INSTALLED_APPS = [
     # Video module configs (This will be moved to Video once it becomes an XBlock)
     'openedx.core.djangoapps.video_config',
 
-    # edX Video Pipeline integration
-    'openedx.core.djangoapps.video_pipeline',
-
     # Bookmarks
     'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',
 

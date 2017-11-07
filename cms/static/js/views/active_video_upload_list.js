@@ -42,7 +42,6 @@ define([
                 this.concurrentUploadLimit = options.concurrentUploadLimit || 0;
                 this.postUrl = options.postUrl;
                 this.activeTranscriptPreferences = options.activeTranscriptPreferences;
-                this.transcriptOrganizationCredentials = options.transcriptOrganizationCredentials;
                 this.videoTranscriptSettings = options.videoTranscriptSettings;
                 this.isVideoTranscriptEnabled = options.isVideoTranscriptEnabled;
                 this.videoSupportedFileFormats = options.videoSupportedFileFormats;
@@ -86,7 +85,6 @@ define([
                 if (this.isVideoTranscriptEnabled) {
                     this.courseVideoSettingsView = new CourseVideoSettingsView({
                         activeTranscriptPreferences: this.activeTranscriptPreferences,
-                        transcriptOrganizationCredentials: this.transcriptOrganizationCredentials,
                         videoTranscriptSettings: this.videoTranscriptSettings
                     });
                     this.courseVideoSettingsView.render();
