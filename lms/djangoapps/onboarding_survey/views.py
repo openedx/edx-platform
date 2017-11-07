@@ -270,7 +270,9 @@ def organization(request):
     else:
         org_survey_instance = OrganizationSurvey.objects.filter(user=request.user).first()
         if org_survey_instance:
-            form = forms.OrganizationInfoModelForm(instance=org_survey_instance)
+            form = forms.OrganizationInfoModelForm(instance=org_survey_instance, initial={
+                'is_org_url_exist': '1' if org_survey_instance.is_org_url_exist else '0'
+            })
         else:
             form = forms.OrganizationInfoModelForm()
 
@@ -282,6 +284,7 @@ def organization(request):
 
     context['is_poc'] = extended_profile.is_poc
     context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
+    context['organization'] = extended_profile.organization.name
 
     return render(request, 'onboarding_survey/organization_survey.html', context)
 
