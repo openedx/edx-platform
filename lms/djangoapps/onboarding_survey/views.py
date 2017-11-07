@@ -233,6 +233,7 @@ def mark_partner_network(organization_survey):
 def organization(request):
     """
     The view to handle organization survey from the user.
+
     If its a GET request then an empty form for survey is returned
     otherwise, a form is populated form the POST request and then is
     saved. After saving the form, user is redirected to dashboard.
