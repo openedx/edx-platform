@@ -31,14 +31,13 @@ class UserInfoModelForm(forms.ModelForm):
         self.fields['english_proficiency'].empty_label = None
         self.fields['role_in_org'].empty_label = None
 
-    def clean_country_of_residence(self):
-
+    def clean_country_of_employment(self):
         if self.cleaned_data['is_emp_location_different'] and self.cleaned_data.get('country_of_residence', None):
             if self.cleaned_data['country_of_employment'] == self.cleaned_data['country_of_residence']:
                 raise forms.ValidationError(empty_field_error.format(
-                    "Please provide Country of Employment which is difference from Country of Residence")
+                    "Country of Employment which is difference from Country of Residence")
                 )
-        return self.cleaned_data['country_of_residence']
+        return self.cleaned_data['country_of_employment']
 
     class Meta:
         """
