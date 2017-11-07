@@ -2,6 +2,7 @@
 Module to populate history table for the user.
 """
 from django.utils import timezone
+import logging
 
 from lms.djangoapps.onboarding_survey.models import (
     History,
@@ -9,6 +10,8 @@ from lms.djangoapps.onboarding_survey.models import (
     OrganizationSurvey
 )
 from lms.djangoapps.onboarding_survey.helpers import is_first_signup_in_org
+
+LOGGER = logging.getLogger(__name__)
 
 
 def add_fields(fields, add_from, add_to, fields_mapping=None):
@@ -150,7 +153,7 @@ def add_organization_survey(history, user):
             for partner_network in organization_survey.partner_network.all():
                 setattr(history, many_to_many_fields_mapping[partner_network.name], True)
         except OrganizationSurvey.DoesNotExist:
-            pass
+            LOGGER.info("Organization survey doesn't exist.")
 
 
 def add_organization_detail_survey(history, user):
@@ -165,7 +168,7 @@ def add_organization_detail_survey(history, user):
             org_detail_survey = user.org_detail_survey
             add_fields(fields, org_detail_survey, history)
         except OrganizationDetailSurvey.DoesNotExist:
-            pass
+            LOGGER.info("Organization detail survey doesn't exist.")
 
 
 def add_extended_registration(history, user):
