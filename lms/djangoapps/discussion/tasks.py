@@ -17,6 +17,7 @@ from edx_ace.recipient import Recipient
 from edx_ace.utils.date import deserialize
 from edxmako.shortcuts import marketing_link
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.site_configuration.helpers import get_value
 from lms.lib.comment_client.user import User as CommentClientUser
 from lms.lib.comment_client.utils import merge_dict
 
@@ -50,11 +51,15 @@ def send_ace_message(thread_id, thread_author_id, comment_author_id, course_id):
 
 
 def _build_email_context(comment_author, thread_id):
+    # these will be passed in via context
+    course_key = None
+    thread_author = None
     return merge_dict(
         _get_base_template_context(Site.objects.get_current()),
         {
             'comment_author': comment_author,
-            'thread_id': thread_id
+            'thread_id': thread_id,
+            'ga_pixel_url': _generate_ga_pixel_url(course_key=course_key, user_id=thread_author.id),
         }
     )
 
@@ -106,25 +111,21 @@ def _encode_urls_in_dict(mapping):
     return urls
 
 
-def _generate_ga_pixel_url(course_key):
+def _generate_ga_pixel_url(course_key, user_id):
     # used for analytics
     query_params = {
         'v': '1',
         't': 'event',
         'ec': 'email',
         'ea': 'open',
-        'tid': None,
-        'cid': None,
-        'uid': None,
+        'tid': get_value("GOOGLE_ANALYTICS_TRACKING_ID", settings.GOOGLE_ANALYTICS_TRACKING_ID),
+        'uid': user_id,
         'utm_source': 'discussion_notification_email',
-        # 'utm_name': 'discussions_notifications_emails',
         'utm_medium': 'email',
-        # 'utm_term': None,
-        # 'utm_content': None,
         'cm': 'email',
         'cn': 'discussions_notifications_emails',
         'dp': '/email/ace/discussions/responsenotification/{0}/'.format(course_key),
-        'dt': None,
+        'dt': 'To Be Filled In',
     }
 
     url = u"{url}?{params}".format(
