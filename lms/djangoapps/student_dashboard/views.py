@@ -20,6 +20,7 @@ def get_recommended_courses(user):
             try:
                 tags = CustomSettings.objects.filter(id=course.id).first().tags
                 tags = tags.split('|')
+                tags = [tag.strip() for tag in tags]
                 if set(user_interests) & set(tags):
                     recommended_courses.append(course)
             except AttributeError:
@@ -50,11 +51,12 @@ def get_recommended_xmodule_courses(user):
             try:
                 tags = CustomSettings.objects.filter(id=course.id).first().tags
                 tags = tags.split('|')
+                tags = [tag.strip() for tag in tags]
                 matched_interests = set(user_interests) & set(tags)
                 if matched_interests:
                     detailed_course = modulestore().get_course(course.id)
                     detailed_course.short_description = course.short_description
-                    detailed_course.interests = ', '.join(list(matched_interests))
+                    detailed_course.interests = '/ '.join(list(matched_interests))
                     recommended_courses.append(detailed_course)
             except AttributeError:
                 pass
