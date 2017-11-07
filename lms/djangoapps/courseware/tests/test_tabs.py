@@ -61,9 +61,7 @@ class TabTestCase(SharedModuleStoreTestCase):
         """
         Creates a mock user with the specified properties.
         """
-        user = UserFactory()
-        user.name = 'mock_user'
-        user.is_staff = is_staff
+        user = UserFactory(is_staff=is_staff)
         user.is_enrolled = is_enrolled
         user.is_authenticated = lambda: is_authenticated
         return user

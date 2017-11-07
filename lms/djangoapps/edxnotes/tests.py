@@ -10,6 +10,7 @@ from unittest import skipUnless
 import ddt
 import jwt
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
@@ -72,10 +73,10 @@ class TestProblem(object):
 
     The purpose of this class is to imitate any problem.
     """
-    def __init__(self, course):
+    def __init__(self, course, user=None):
         self.system = MagicMock(is_author_mode=False)
         self.scope_ids = MagicMock(usage_id="test_usage_id")
-        self.user = UserFactory.create(username="Joe", email="joe@example.com", password="edx")
+        self.user = user or UserFactory()
         self.runtime = MagicMock(course_id=course.id, get_real_user=lambda anon_id: self.user)
         self.descriptor = MagicMock()
         self.descriptor.runtime.modulestore.get_course.return_value = course
@@ -100,9 +101,9 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         ClientFactory(name="edx-notes")
         # Using old mongo because of locator comparison issues (see longer
         # note below in EdxNotesHelpersTest setUp.
-        self.course = CourseFactory.create(edxnotes=True, default_store=ModuleStoreEnum.Type.mongo)
-        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
-        self.client.login(username=self.user.username, password="edx")
+        self.course = CourseFactory(edxnotes=True, default_store=ModuleStoreEnum.Type.mongo)
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)
         self.problem = TestProblem(self.course)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_EDXNOTES': True})
@@ -169,6 +170,13 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         self.course.advanced_modules = ["videoannotation", "imageannotation", "textannotation"]
         enable_edxnotes_for_the_course(self.course, self.user.id)
         self.assertEqual("original_get_html", self.problem.get_html())
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
+    def test_anonymous_user(self):
+        user = AnonymousUser()
+        problem = TestProblem(self.course, user)
+        enable_edxnotes_for_the_course(self.course, None)
+        assert problem.get_html() == "original_get_html"
 
 
 @attr(shard=3)
