@@ -47,7 +47,7 @@ def add_user_info_survey(history, user):
         'english_proficiency', 'role_in_org'
     ]
 
-    many_many_fields_mapping = {
+    many_to_many_fields_mapping = {
         'Strategy and planning': 'user_fn_strategy_and_planning',
         'Leadership and governance': 'user_fn_leadership_and_gov',
         'Program design and development': 'user_fn_program_design_and_dev',
@@ -64,7 +64,7 @@ def add_user_info_survey(history, user):
     add_fields(fields, user_info_survey, history)
 
     for function_area in user_info_survey.function_area.all():
-        setattr(history, many_many_fields_mapping[function_area.label], True)
+        setattr(history, many_to_many_fields_mapping[function_area.label], True)
 
 
 def add_interests_survey(history, user):
