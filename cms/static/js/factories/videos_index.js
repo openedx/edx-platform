@@ -15,6 +15,7 @@ define([
         videoSupportedFileFormats,
         videoUploadMaxFileSizeInGB,
         activeTranscriptPreferences,
+        transcriptOrganizationCredentials,
         videoTranscriptSettings,
         isVideoTranscriptEnabled,
         videoImageSettings
@@ -27,6 +28,7 @@ define([
                 videoUploadMaxFileSizeInGB: videoUploadMaxFileSizeInGB,
                 videoImageSettings: videoImageSettings,
                 activeTranscriptPreferences: activeTranscriptPreferences,
+                transcriptOrganizationCredentials: transcriptOrganizationCredentials,
                 videoTranscriptSettings: videoTranscriptSettings,
                 isVideoTranscriptEnabled: isVideoTranscriptEnabled,
                 onFileUploadDone: function(activeVideos) {
