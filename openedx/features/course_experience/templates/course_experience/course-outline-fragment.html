@@ -24,7 +24,7 @@ from openedx.core.djangolib.markup import HTML, Text
                     tabindex="0"
                 >
                     <div class="section-name">
-                        <h3>${ section['display_name'] }</h3>
+                        <h3 class="section-title">${ section['display_name'] }</h3>
                     </div>
                     <ol class="outline-item focusable" role="group" tabindex="0">
                         % for subsection in section.get('children', []):
