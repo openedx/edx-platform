@@ -17,6 +17,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from config_models.models import ConfigurationModel
 from lms.djangoapps import django_comment_client
+from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from static_replace.models import AssetBaseUrlConfig
 from xmodule import course_metadata_utils, block_metadata_utils
@@ -194,7 +195,8 @@ class CourseOverview(TimeStampedModel):
         course_overview.course_video_url = CourseDetails.fetch_video_url(course.id)
         course_overview.self_paced = course.self_paced
 
-        course_overview.language = course.language
+        if not CatalogIntegration.is_enabled():
+            course_overview.language = course.language
 
         return course_overview
 
