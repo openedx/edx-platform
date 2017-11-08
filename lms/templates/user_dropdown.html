@@ -73,7 +73,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
                     <span class="sr">${_("More options")}</span>
                     <span class="fa fa-sort-desc" aria-hidden="true"></span>
                 </button>
-                <ul class="user-dropdown-menu" aria-label="More Options" role="menu">
+                <ul class="user-dropdown-menu" aria-label=${_("More Options")} role="menu">
                     ${navigation_dropdown_menu_links()}
                     <li class="item"><a href="${reverse('logout')}" role="menuitem" class="user-dropdown-menuitem">${_("Sign Out")}</a></li>
                 </ul>

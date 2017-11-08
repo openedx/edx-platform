@@ -6,6 +6,7 @@ from pytz import utc
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration
+from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.schedules.signals import CREATE_SCHEDULE_WAFFLE_FLAG
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
@@ -19,19 +20,27 @@ from ..models import Schedule
 from ..tests.factories import ScheduleConfigFactory
 
 
+@ddt.ddt
 @patch('openedx.core.djangoapps.schedules.signals.get_current_site')
 @skip_unless_lms
 class CreateScheduleTests(SharedModuleStoreTestCase):
 
-    def assert_schedule_created(self):
+    def assert_schedule_created(self, experience_type=ScheduleExperience.EXPERIENCES.default):
         course = _create_course_run(self_paced=True)
-        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
+        enrollment = CourseEnrollmentFactory(
+            course_id=course.id,
+            mode=CourseMode.AUDIT,
+        )
         self.assertIsNotNone(enrollment.schedule)
         self.assertIsNone(enrollment.schedule.upgrade_deadline)
+        self.assertEquals(enrollment.schedule.experience.experience_type, experience_type)
 
     def assert_schedule_not_created(self):
         course = _create_course_run(self_paced=True)
-        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
+        enrollment = CourseEnrollmentFactory(
+            course_id=course.id,
+            mode=CourseMode.AUDIT,
+        )
         with self.assertRaises(Schedule.DoesNotExist):
             enrollment.schedule
 
@@ -78,6 +87,41 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         with self.assertRaises(Schedule.DoesNotExist):
             enrollment.schedule
 
+    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
+    @patch('openedx.core.djangoapps.schedules.signals.course_has_highlights')
+    def test_create_schedule_course_updates_experience(self, mock_course_has_highlights, mock_get_current_site):
+        site = SiteFactory.create()
+        mock_course_has_highlights.return_value = True
+        mock_get_current_site.return_value = site
+        self.assert_schedule_created(experience_type=ScheduleExperience.EXPERIENCES.course_updates)
+
+    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
+    @patch('analytics.track')
+    @patch('random.random')
+    @ddt.data(
+        (0, True),
+        (0.1, True),
+        (0.3, False),
+    )
+    @ddt.unpack
+    def test_create_schedule_hold_backs(
+        self,
+        hold_back_ratio,
+        expect_schedule_created,
+        mock_random,
+        mock_track,
+        mock_get_current_site
+    ):
+        mock_random.return_value = 0.2
+        schedule_config = ScheduleConfigFactory.create(enabled=True, hold_back_ratio=hold_back_ratio)
+        mock_get_current_site.return_value = schedule_config.site
+        if expect_schedule_created:
+            self.assert_schedule_created()
+            self.assertFalse(mock_track.called)
+        else:
+            self.assert_schedule_not_created()
+            mock_track.assert_called_once()
+
 
 @ddt.ddt
 @skip_unless_lms
@@ -104,7 +148,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
 
         course = _create_course_run(self_paced=True, start_day_offset=5)  # course starts in future
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-        self.assert_schedule_dates(enrollment.schedule, enrollment.course_overview.start)
+        self.assert_schedule_dates(enrollment.schedule, enrollment.course.start)
 
         course.start = course.start + datetime.timedelta(days=3)  # new course start changes to another future date
         self.store.update_item(course, ModuleStoreEnum.UserID.test)
@@ -128,7 +172,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
 
         course = _create_course_run(self_paced=True, start_day_offset=5)  # course starts in future
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-        previous_start = enrollment.course_overview.start
+        previous_start = enrollment.course.start
         self.assert_schedule_dates(enrollment.schedule, previous_start)
 
         course.start = course.start + datetime.timedelta(days=-10)  # new course start changes to a past date

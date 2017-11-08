@@ -385,7 +385,7 @@ class CreditRequirement(TimeStampedModel):
             name(str): Name of credit course requirement
 
         Returns:
-            CreditRequirement object if exists
+            CreditRequirement object if exists, None otherwise.
 
         """
         try:

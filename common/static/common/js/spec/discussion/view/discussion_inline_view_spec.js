@@ -43,10 +43,21 @@
         };
 
         showDiscussion = function(test, testView) {
+            var courseSettings = DiscussionSpecHelper.createTestCourseSettings({
+                groups: [
+                    {
+                        id: 1,
+                        name: 'Cohort1'
+                    }, {
+                        id: 2,
+                        name: 'Cohort2'
+                    }
+                ]
+            });
             setNextAjaxResult(test, {
                 user_info: DiscussionSpecHelper.getTestUserInfo(),
                 roles: DiscussionSpecHelper.getTestRoleInfo(),
-                course_settings: DiscussionSpecHelper.createTestCourseSettings().attributes,
+                course_settings: courseSettings.attributes,
                 discussion_data: DiscussionViewSpecHelper.makeThreadWithProps({
                     commentable_id: 'test-topic',
                     title: TEST_THREAD_TITLE

@@ -12,3 +12,11 @@ clean:
 	-git clean -fdX
 	tar xf $(PRIVATE_FILES)
 	rm $(PRIVATE_FILES)
+
+extract_translations:
+	# Extract localizable strings from sources
+	paver i18n_extract
+
+push_translations:
+	# Push source strings to Transifex for translation
+	paver i18n_transifex_push

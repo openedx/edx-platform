@@ -5,12 +5,11 @@ import json
 import logging
 import urllib
 from collections import OrderedDict, namedtuple
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import analytics
 import shoppingcart
 import survey.views
-import waffle
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses
 from commerce.utils import EcommerceService
@@ -69,7 +68,6 @@ from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
-from openedx.core.djangoapps.certificates import api as auto_certs_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
@@ -487,7 +485,6 @@ class CourseTabView(EdxFragmentView):
         """
         Register messages to be shown to the user if they have limited access.
         """
-        is_enrolled = CourseEnrollment.is_enrolled(request.user, course_key)
         if request.user.is_anonymous():
             PageLevelMessages.register_warning_message(
                 request,
@@ -502,23 +499,24 @@ class CourseTabView(EdxFragmentView):
                     ),
                 )
             )
-        elif not is_enrolled:
-            # Only show enroll button if course is open for enrollment.
-            if course_open_for_self_enrollment(course_key):
-                enroll_message = _('You must be enrolled in the course to see course content. \
-                        {enroll_link_start}Enroll now{enroll_link_end}.')
-                PageLevelMessages.register_warning_message(
-                    request,
-                    Text(enroll_message).format(
-                        enroll_link_start=HTML('<button class="enroll-btn btn-link">'),
-                        enroll_link_end=HTML('</button>')
+        else:
+            if not CourseEnrollment.is_enrolled(request.user, course_key):
+                # Only show enroll button if course is open for enrollment.
+                if course_open_for_self_enrollment(course_key):
+                    enroll_message = _('You must be enrolled in the course to see course content. \
+                            {enroll_link_start}Enroll now{enroll_link_end}.')
+                    PageLevelMessages.register_warning_message(
+                        request,
+                        Text(enroll_message).format(
+                            enroll_link_start=HTML('<button class="enroll-btn btn-link">'),
+                            enroll_link_end=HTML('</button>')
+                        )
                     )
-                )
-            else:
-                PageLevelMessages.register_warning_message(
-                    request,
-                    Text(_('You must be enrolled in the course to see course content.'))
-                )
+                else:
+                    PageLevelMessages.register_warning_message(
+                        request,
+                        Text(_('You must be enrolled in the course to see course content.'))
+                    )
 
     @staticmethod
     def handle_exceptions(request, course, exception):
@@ -554,11 +552,11 @@ class CourseTabView(EdxFragmentView):
             log.exception("Error while rendering courseware-error page")
             raise
 
-    def uses_bootstrap(self, request, course):
+    def uses_bootstrap(self, request, course, tab):
         """
         Returns true if this view uses Bootstrap.
         """
-        return False
+        return tab.uses_bootstrap
 
     def create_page_context(self, request, course=None, tab=None, **kwargs):
         """
@@ -566,7 +564,7 @@ class CourseTabView(EdxFragmentView):
         """
         staff_access = has_access(request.user, 'staff', course)
         supports_preview_menu = tab.get('supports_preview_menu', False)
-        uses_bootstrap = self.uses_bootstrap(request, course)
+        uses_bootstrap = self.uses_bootstrap(request, course, tab=tab)
         if supports_preview_menu:
             masquerade, masquerade_user = setup_masquerade(request, course.id, staff_access, reset_masquerade_data=True)
             request.user = masquerade_user
@@ -610,8 +608,9 @@ class CourseTabView(EdxFragmentView):
         """
         if not page_context:
             page_context = self.create_page_context(request, course=course, tab=tab, **kwargs)
+        tab = page_context['tab']
         page_context['fragment'] = fragment
-        if self.uses_bootstrap(request, course):
+        if self.uses_bootstrap(request, course, tab=tab):
             return render_to_response('courseware/tab-view.html', page_context)
         else:
             return render_to_response('courseware/tab-view-v2.html', page_context)
@@ -1342,9 +1341,18 @@ def generate_user_cert(request, course_id):
         return HttpResponseBadRequest(_("Course is not valid"))
 
     if not is_course_passed(student, course):
+        log.info(u"User %s has not passed the course: %s", student.username, course_id)
         return HttpResponseBadRequest(_("Your certificate will be available when you pass the course."))
 
     certificate_status = certs_api.certificate_downloadable_status(student, course.id)
+
+    log.info(
+        u"User %s has requested for certificate in %s, current status: is_downloadable: %s, is_generating: %s",
+        student.username,
+        course_id,
+        certificate_status["is_downloadable"],
+        certificate_status["is_generating"],
+    )
 
     if certificate_status["is_downloadable"]:
         return HttpResponseBadRequest(_("Certificate has already been created."))
@@ -1566,7 +1574,7 @@ def financial_assistance_form(request):
             'email': user.email,
             'username': user.username,
             'name': user.profile.name,
-            'country': str(user.profile.country.name),
+            'country': unicode(user.profile.country.name),
         },
         'submit_url': reverse('submit_financial_assistance_request'),
         'fields': [

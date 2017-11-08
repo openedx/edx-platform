@@ -169,9 +169,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-09-14 12:33+0000\n"
-"PO-Revision-Date: 2017-09-23 19:57+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"POT-Creation-Date: 2017-10-30 10:12+0000\n"
+"PO-Revision-Date: 2017-10-27 10:31+0000\n"
+"Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -179,17 +179,6 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: common/static/bundles/Import.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
-
-#: cms/static/cms/js/main.js common/static/bundles/Import.js
-msgid "Studio's having trouble saving your work"
-msgstr ""
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -263,62 +252,6 @@ msgstr "Supprimer"
 msgid "Cancel"
 msgstr "Annuler"
 
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error during the upload process."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while unpacking the file."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while verifying the file you submitted."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "Choose new file"
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid ""
-"File format not supported. Please upload a file with a {ext} extension."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while importing the new library to our database."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while importing the new course to our database."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "Your import has failed."
-msgstr ""
-
-#: cms/static/js/features/import/views/import.js
-#: common/static/bundles/Import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
-
-#: cms/static/js/features/import/views/import.js
-#: common/static/bundles/Import.js
-msgid "Error importing course"
-msgstr ""
-
-#: cms/static/js/features/import/views/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error with the upload"
-msgstr ""
-
 #. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
 #: cms/static/js/views/video_thumbnail.js lms/static/js/views/image_field.js
@@ -332,6 +265,7 @@ msgstr "Chargement en cours"
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/student_account/tos_modal.js
+#: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/alert-popup.underscore
 #: common/static/common/templates/discussion/forum-action-close.underscore
@@ -368,6 +302,16 @@ msgstr "Choisir le fichier"
 msgid "OK"
 msgstr "OK"
 
+#: cms/static/js/views/course_video_settings.js
+#: cms/static/js/views/metadata.js
+#: cms/static/js/views/previous_video_upload.js
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+#: lms/static/js/views/image_field.js
+#: cms/templates/js/video/metadata-translations-item.underscore
+#: lms/djangoapps/teams/static/teams/templates/edit-team-member.underscore
+msgid "Remove"
+msgstr "Supprimer"
+
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/manage_users_and_roles.js
@@ -380,15 +324,6 @@ msgstr "Ok"
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: cms/static/js/views/metadata.js
-#: cms/static/js/views/previous_video_upload.js
-#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
-#: lms/static/js/views/image_field.js
-#: cms/templates/js/video/metadata-translations-item.underscore
-#: lms/djangoapps/teams/static/teams/templates/edit-team-member.underscore
-msgid "Remove"
-msgstr "Supprimer"
-
 #: cms/static/js/views/metadata.js lms/static/js/views/file_uploader.js
 msgid "Upload File"
 msgstr "Charger un fichier"
@@ -397,6 +332,7 @@ msgstr "Charger un fichier"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/base_modal.js
+#: cms/static/js/views/modals/course_outline_modals.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
@@ -2130,30 +2066,6 @@ msgstr "Activer la transcription"
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
 msgstr "Désactiver la transcription"
-
-#: common/static/bundles/StudioIndex.js
-msgid "Organization:"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.js
-msgid "Course Number:"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.js
-msgid "Course Run:"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.js
-msgid "(Read-only)"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.js
-msgid "Re-run Course"
-msgstr ""
-
-#: cms/templates/js/show-textbook.underscore
-msgid "View Live"
-msgstr "Aperçu réel"
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -5155,6 +5067,14 @@ msgid "Bookmark this page"
 msgstr ""
 
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "You have successfully updated your goal."
+msgstr ""
+
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "There was an error updating your goal."
+msgstr ""
+
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "Show more"
 msgstr ""
 
@@ -5248,6 +5168,16 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
+msgstr ""
+
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
+
+#: cms/static/cms/js/main.js
+msgid "Studio's having trouble saving your work"
 msgstr ""
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
@@ -5401,6 +5331,51 @@ msgstr ""
 "Il reste des modifications non sauvegardées. Voulez-vous vraiment quitter "
 "cette page ?"
 
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error during the upload process."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while unpacking the file."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while verifying the file you submitted."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+msgid "Choose new file"
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+msgid ""
+"File format not supported. Please upload a file with a {ext} extension."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while importing the new library to our database."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while importing the new course to our database."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+msgid "Your import has failed."
+msgstr ""
+
+#: cms/static/js/features/import/views/import.js
+msgid "Your import is in progress; navigating away will abort it."
+msgstr ""
+
+#: cms/static/js/features/import/views/import.js
+msgid "Error importing course"
+msgstr ""
+
+#: cms/static/js/features/import/views/import.js
+msgid "There was an error with the upload"
+msgstr ""
+
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
 msgstr "Erreur interne du serveur."
@@ -5508,6 +5483,10 @@ msgstr "Le code peut uniquement contenir des lettres, nombres, signes _ ou -"
 #: cms/static/js/models/settings/course_details.js
 msgid "Please enter an integer between %(min)s and %(max)s."
 msgstr "Veuillez saisir un nombre entier compris entre %(min)s et %(max)s."
+
+#: cms/static/js/models/settings/course_grader.js
+msgid "The assignment type must have a name."
+msgstr ""
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "There's already another assignment type with this name."
@@ -5698,6 +5677,44 @@ msgstr "Créer une relance"
 #: cms/static/js/views/course_rerun.js
 msgid "Processing Re-run Request"
 msgstr "Traitement de la demande de relance"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+#: lms/templates/ccx/schedule.underscore
+msgid "N/A"
+msgstr "N/A"
+
+#: cms/static/js/views/course_video_settings.js
+msgid "Select turnaround"
+msgstr ""
+
+#: cms/static/js/views/course_video_settings.js
+msgid "Select fidelity"
+msgstr ""
+
+#: cms/static/js/views/course_video_settings.js
+msgid "Select language"
+msgstr ""
+
+#: cms/static/js/views/course_video_settings.js
+msgid "Press Remove to remove language"
+msgstr ""
+
+#: cms/static/js/views/course_video_settings.js
+#: cms/templates/js/course-video-settings.underscore
+msgid "Last updated"
+msgstr ""
+
+#: cms/static/js/views/course_video_settings.js
+msgid "Settings updated"
+msgstr ""
+
+#: cms/static/js/views/course_video_settings.js
+msgid "Error saving data"
+msgstr ""
+
+#: cms/static/js/views/course_video_settings.js
+msgid "Required"
+msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%= name %>”"
@@ -5958,6 +5975,18 @@ msgstr "Publier toutes les modifications non publiées pour cet {item} ?"
 #: cms/templates/js/publish-xblock.underscore
 msgid "Publish"
 msgstr "Publier"
+
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Highlights for {display_name}"
+msgstr ""
+
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid ""
+"The highlights you provide here are messaged (i.e., emailed) to learners. "
+"Each {item}'s highlights are emailed at the time that we expect the learner "
+"to start working on that {item}. At this time, we assume that each {item} "
+"will take 1 week to complete."
+msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "All Learners and Staff"
@@ -6689,6 +6718,15 @@ msgstr "Charger plus"
 msgid "Error posting your message."
 msgstr ""
 
+#: common/static/common/templates/discussion/new-post-visibility.underscore
+#, python-format
+msgid "This post will be visible only to %(group_name)s."
+msgstr ""
+
+#: common/static/common/templates/discussion/new-post-visibility.underscore
+msgid "This post will be visible to everyone."
+msgstr ""
+
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Add a Post"
 msgstr "Ajouter un  message"
@@ -7112,11 +7150,6 @@ msgstr "Raison"
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Last modified by"
 msgstr "Dernière modification par"
-
-#: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: lms/templates/ccx/schedule.underscore
-msgid "N/A"
-msgstr "N/A"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Change Enrollment"
@@ -7829,6 +7862,14 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 msgid "Certificate Purchased"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "Final Grade"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "for {courseName}"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
@@ -8698,10 +8739,6 @@ msgstr[1] ""
 msgid "Sorry, no results were found."
 msgstr "Désolé, aucun résultat trouvé."
 
-#: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
-msgid "Back to Dashboard"
-msgstr "Retour au tableau de bord"
-
 #: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
 #, python-format
 msgid "Share your \"%(display_name)s\" award"
@@ -9242,6 +9279,18 @@ msgid "Scheduled:"
 msgstr "Programmé :"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Highlights:"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Section Highlights: {number_of_highlights} entered"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Enter Section Highlights"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Graded as:"
 msgstr "Noté comme :"
 
@@ -9274,6 +9323,53 @@ msgstr ""
 
 #: cms/templates/js/course-settings-learning-fields.underscore
 msgid "Add a learning outcome here"
+msgstr ""
+
+#: cms/templates/js/course-video-settings.underscore
+msgid "Press close to hide course video settings"
+msgstr ""
+
+#: cms/templates/js/course-video-settings.underscore
+msgid "Course Video Settings"
+msgstr ""
+
+#: cms/templates/js/course-video-settings.underscore
+msgid "Transcript Provider"
+msgstr ""
+
+#: cms/templates/js/course-video-settings.underscore
+msgid "Transcript Turnaround"
+msgstr ""
+
+#: cms/templates/js/course-video-settings.underscore
+msgid "Transcript Fidelity"
+msgstr ""
+
+#: cms/templates/js/course-video-settings.underscore
+msgid "Video Source Language"
+msgstr ""
+
+#: cms/templates/js/course-video-settings.underscore
+msgid "Transcript Languages"
+msgstr ""
+
+#: cms/templates/js/course-video-settings.underscore
+#: cms/templates/js/metadata-dict-entry.underscore
+#: cms/templates/js/metadata-list-entry.underscore
+#: cms/templates/js/video/metadata-translations-entry.underscore
+msgid "Add"
+msgstr "Ajouter"
+
+#: cms/templates/js/course-video-settings.underscore
+msgid "Press Add to language"
+msgstr ""
+
+#: cms/templates/js/course-video-settings.underscore
+msgid "Update Settings"
+msgstr ""
+
+#: cms/templates/js/course-video-settings.underscore
+msgid "Press update settings to update course video settings"
 msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
@@ -9511,6 +9607,20 @@ msgstr ""
 msgid "delete group"
 msgstr ""
 
+#: cms/templates/js/highlights-editor.underscore
+msgid "Section Highlights"
+msgstr ""
+
+#: cms/templates/js/highlights-editor.underscore
+msgid ""
+"Please enter 3-5 highlights to be sent as separate bullet points in the "
+"message."
+msgstr ""
+
+#: cms/templates/js/highlights-editor.underscore
+msgid "A highlight to look forward to this week."
+msgstr ""
+
 #: cms/templates/js/license-selector.underscore
 msgid "License Type"
 msgstr "Type de licence"
@@ -9554,12 +9664,6 @@ msgstr ""
 #, python-format
 msgid "New %(item_type)s"
 msgstr "Nouveau %(item_type)s"
-
-#: cms/templates/js/metadata-dict-entry.underscore
-#: cms/templates/js/metadata-list-entry.underscore
-#: cms/templates/js/video/metadata-translations-entry.underscore
-msgid "Add"
-msgstr "Ajouter"
 
 #: cms/templates/js/metadata-dict-entry.underscore
 #: cms/templates/js/metadata-file-uploader-entry.underscore
@@ -9796,6 +9900,10 @@ msgid ""
 "If the subsection does not have a due date, learners always see their scores"
 " when they submit answers to assessments."
 msgstr ""
+
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
+msgstr "Aperçu réel"
 
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore

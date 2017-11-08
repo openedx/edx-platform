@@ -6,7 +6,7 @@
 %pattern-library-btn {
   @include transition(
     color 0.125s ease-in-out 0s,
-        border-color 0.125s ease-in-out 0s,
+    border-color 0.125s ease-in-out 0s,
         background 0.125s ease-in-out 0s,
         box-shadow 0.125s ease-in-out 0s
    );
@@ -19,7 +19,7 @@
   box-shadow: none;
   height: 40px;
   text-shadow: none;
-  font-family: $f-sans-serif; // without this, it would fallback to lms button tag style
+  font-family: $font-family-sans-serif; // without this, it would fallback to lms button tag style
   font-size: 14px;
   font-weight: 600;
   word-wrap: break-word;

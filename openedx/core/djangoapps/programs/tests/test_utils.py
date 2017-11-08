@@ -18,6 +18,7 @@ from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.catalog.tests.factories import (
     generate_course_run_key,
     ProgramFactory,
@@ -138,7 +139,7 @@ class TestProgramProgressMeter(TestCase):
         self.assertEqual(meter.engaged_programs, [program])
         self._assert_progress(
             meter,
-            ProgressFactory(uuid=program['uuid'], in_progress=1)
+            ProgressFactory(uuid=program['uuid'], in_progress=1, grades={course_run_key: 0.0})
         )
         self.assertEqual(meter.completed_programs, [])
 
@@ -169,7 +170,8 @@ class TestProgramProgressMeter(TestCase):
                 uuid=program['uuid'],
                 completed=[],
                 in_progress=[program['courses'][0]],
-                not_started=[]
+                not_started=[],
+                grades={course_run_key: 0.0},
             )
         ]
 
@@ -205,7 +207,8 @@ class TestProgramProgressMeter(TestCase):
                 uuid=program['uuid'],
                 completed=[],
                 in_progress=[program['courses'][0]],
-                not_started=[]
+                not_started=[],
+                grades={course_run_key: 0.0},
             )
         ]
 
@@ -246,7 +249,8 @@ class TestProgramProgressMeter(TestCase):
                 uuid=program['uuid'],
                 completed=0,
                 in_progress=1 if offset in [None, 1] else 0,
-                not_started=1 if offset in [-1] else 0
+                not_started=1 if offset in [-1] else 0,
+                grades={course_run_key: 0.0},
             )
         ]
 
@@ -285,9 +289,14 @@ class TestProgramProgressMeter(TestCase):
         self._attach_detail_url(data)
         programs = data[:2]
         self.assertEqual(meter.engaged_programs, programs)
+
+        grades = {
+            newer_course_run_key: 0.0,
+            older_course_run_key: 0.0,
+        }
         self._assert_progress(
             meter,
-            *(ProgressFactory(uuid=program['uuid'], in_progress=1) for program in programs)
+            *(ProgressFactory(uuid=program['uuid'], in_progress=1, grades=grades) for program in programs)
         )
         self.assertEqual(meter.completed_programs, [])
 
@@ -330,9 +339,15 @@ class TestProgramProgressMeter(TestCase):
         self._attach_detail_url(data)
         programs = data[:3]
         self.assertEqual(meter.engaged_programs, programs)
+
+        grades = {
+            solo_course_run_key: 0.0,
+            shared_course_run_key: 0.0,
+        }
+
         self._assert_progress(
             meter,
-            *(ProgressFactory(uuid=program['uuid'], in_progress=1) for program in programs)
+            *(ProgressFactory(uuid=program['uuid'], in_progress=1, grades=grades) for program in programs)
         )
         self.assertEqual(meter.completed_programs, [])
 
@@ -366,7 +381,7 @@ class TestProgramProgressMeter(TestCase):
         program, program_uuid = data[0], data[0]['uuid']
         self._assert_progress(
             meter,
-            ProgressFactory(uuid=program_uuid, in_progress=1, not_started=1)
+            ProgressFactory(uuid=program_uuid, in_progress=1, not_started=1, grades={first_course_run_key: 0.0})
         )
         self.assertEqual(meter.completed_programs, [])
 
@@ -375,7 +390,14 @@ class TestProgramProgressMeter(TestCase):
         meter = ProgramProgressMeter(self.site, self.user)
         self._assert_progress(
             meter,
-            ProgressFactory(uuid=program_uuid, in_progress=2)
+            ProgressFactory(
+                uuid=program_uuid,
+                in_progress=2,
+                grades={
+                    first_course_run_key: 0.0,
+                    second_course_run_key: 0.0,
+                },
+            )
         )
         self.assertEqual(meter.completed_programs, [])
 
@@ -386,7 +408,15 @@ class TestProgramProgressMeter(TestCase):
         meter = ProgramProgressMeter(self.site, self.user)
         self._assert_progress(
             meter,
-            ProgressFactory(uuid=program_uuid, completed=1, in_progress=1)
+            ProgressFactory(
+                uuid=program_uuid,
+                completed=1,
+                in_progress=1,
+                grades={
+                    first_course_run_key: 0.0,
+                    second_course_run_key: 0.0,
+                }
+            )
         )
         self.assertEqual(meter.completed_programs, [])
 
@@ -398,7 +428,15 @@ class TestProgramProgressMeter(TestCase):
         meter = ProgramProgressMeter(self.site, self.user)
         self._assert_progress(
             meter,
-            ProgressFactory(uuid=program_uuid, completed=1, in_progress=1)
+            ProgressFactory(
+                uuid=program_uuid,
+                completed=1,
+                in_progress=1,
+                grades={
+                    first_course_run_key: 0.0,
+                    second_course_run_key: 0.0,
+                }
+            )
         )
         self.assertEqual(meter.completed_programs, [])
 
@@ -410,7 +448,14 @@ class TestProgramProgressMeter(TestCase):
         meter = ProgramProgressMeter(self.site, self.user)
         self._assert_progress(
             meter,
-            ProgressFactory(uuid=program_uuid, completed=2)
+            ProgressFactory(
+                uuid=program_uuid,
+                completed=2,
+                grades={
+                    first_course_run_key: 0.0,
+                    second_course_run_key: 0.0,
+                }
+            )
         )
         self.assertEqual(meter.completed_programs, [program_uuid])
 
@@ -443,7 +488,7 @@ class TestProgramProgressMeter(TestCase):
         program, program_uuid = data[0], data[0]['uuid']
         self._assert_progress(
             meter,
-            ProgressFactory(uuid=program_uuid, completed=1)
+            ProgressFactory(uuid=program_uuid, completed=1, grades={course_run_key: 0.0})
         )
         self.assertEqual(meter.completed_programs, [program_uuid])
 
@@ -548,6 +593,38 @@ class TestProgramProgressMeter(TestCase):
         meter = ProgramProgressMeter(self.site, self.user)
         mock_completed_course_runs.return_value = [{'course_run_id': course_run_key, 'type': 'verified'}]
         self.assertEqual(meter._is_course_complete(course), True)
+
+    def test_course_grade_results(self, mock_get_programs):
+        grade_percent = .8
+        with mock_passing_grade(percent=grade_percent):
+            course_run_key = generate_course_run_key()
+            data = [
+                ProgramFactory(
+                    courses=[
+                        CourseFactory(course_runs=[
+                            CourseRunFactory(key=course_run_key),
+                        ]),
+                    ]
+                )
+            ]
+            mock_get_programs.return_value = data
+
+            self._create_enrollments(course_run_key)
+
+            meter = ProgramProgressMeter(self.site, self.user)
+
+            program = data[0]
+            expected = [
+                ProgressFactory(
+                    uuid=program['uuid'],
+                    completed=[],
+                    in_progress=[program['courses'][0]],
+                    not_started=[],
+                    grades={course_run_key: grade_percent},
+                )
+            ]
+
+            self.assertEqual(meter.progress(count_only=False), expected)
 
 
 def _create_course(self, course_price, course_run_count=1):

@@ -1,8 +1,9 @@
-.editor{
+.editor {
   @include clearfix();
 
   .CodeMirror {
     @include box-sizing(border-box);
+
     width: 100%;
     position: relative;
     height: 379px;

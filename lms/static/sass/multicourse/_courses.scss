@@ -23,14 +23,15 @@ $facet-background-color: #007db8;
 
 // +Layout - Courses Container
 // ====================
-.find-courses, .university-profile {
+.find-courses,
+.university-profile {
   .discovery-button:not(:disabled) {
     @extend %t-action2;
 
     @include text-align(left);
 
     outline: 0 none;
-    box-shadow:none;
+    box-shadow: none;
     border: 0;
     background: none;
     padding: 0 ($baseline*0.6);
@@ -39,7 +40,7 @@ $facet-background-color: #007db8;
     text-transform: none;
 
     //STATE: hover
-    &::hover {
+    &:hover {
       background: none;
     }
   }
@@ -131,14 +132,15 @@ $facet-background-color: #007db8;
 
 // +Hero - Home Header
 // ====================
-.find-courses, .university-profile {
+.find-courses,
+.university-profile {
   header.search {
     background: $gray-l5;
     background-size: cover;
     background-image: $homepage-bg-image;
     background-position: center top !important;
     border-bottom: 1px solid $border-color-3;
-    box-shadow: inset 0 -1px 8px 0 rgba(0,0,0, 0.2), inset 0 1px 12px 0 rgba(0,0,0, 0.3);
+    box-shadow: inset 0 -1px 8px 0 rgba(0, 0, 0, 0.2), inset 0 1px 12px 0 rgba(0, 0, 0, 0.3);
     height: 430px;
     margin-top: $header_image_margin;
     width: 100%;
@@ -146,7 +148,7 @@ $facet-background-color: #007db8;
     .inner-wrapper {
       height: 120px;
       margin: 0 auto;
-      max-width: 1200px;
+      max-width: map-get($container-max-widths, xl);
       padding-top: ($baseline*10);
       position: relative;
       text-align: center;
@@ -156,13 +158,14 @@ $facet-background-color: #007db8;
         background: $white;
         background: $course-header-bg;
         border: 1px solid $border-color-3;
-        box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
+        box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
         padding: $baseline ($baseline*1.5);
         position: relative;
         z-index: 2;
       }
 
-      &.main-search, &.university-search {
+      &.main-search,
+      &.university-search {
         text-align: center;
 
         .heading-group {
@@ -180,7 +183,7 @@ $facet-background-color: #007db8;
           vertical-align: middle;
 
           &::after {
-            @include right(0px);
+            @include right(0);
 
             content: "";
             display: block;
@@ -195,19 +198,20 @@ $facet-background-color: #007db8;
         }
 
         h1 {
-          color: $base-font-color;
-          font-family: $sans-serif;
+          color: $body-color;
+          font-family: $font-family-sans-serif;
           font-style: italic;
           font-weight: 700;
           letter-spacing: 0;
           text-transform: none;
         }
 
-        h1, h2 {
+        h1,
+        h2 {
           display: inline-block;
           letter-spacing: 1px;
           margin-bottom: 0;
-          text-shadow: 0 1px rgba(255,255,255, 0.8);
+          text-shadow: 0 1px rgba(255, 255, 255, 0.8);
           vertical-align: middle;
         }
       }
@@ -247,7 +251,6 @@ $facet-background-color: #007db8;
       @include media($bp-large) {
         @include span-columns(8);
       }
-
     }
 
     .wrapper-search-input {
@@ -318,7 +321,8 @@ $facet-background-color: #007db8;
     text-shadow: none;
 
     //STATE: hover, focus
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       background: $m-blue-d5;
     }
   }
@@ -397,7 +401,6 @@ $facet-background-color: #007db8;
       width: auto;
       color: $blue-d1; // WCAG 2.0 AA requirements
       text-align: center;
-      text-transform: uppercase;
 
       &:hover,
       &:focus {
@@ -464,7 +467,8 @@ $facet-background-color: #007db8;
       content: "";
     }
 
-    .header-search-facets, .header-facet {
+    .header-search-facets,
+    .header-facet {
       @extend %t-title6;
       @extend %t-strong;
 
@@ -525,7 +529,8 @@ $facet-background-color: #007db8;
       }
 
       //STATE: hover, focus
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         background: $facet-background-color;
         color: $white;
         text-decoration: none;
@@ -543,7 +548,7 @@ $facet-background-color: #007db8;
         color: $facet-text-color;
 
         .count {
-          color: $gray;
+          color: theme-color("dark");
 
           .count-number {
             display: none;
@@ -572,7 +577,6 @@ $facet-background-color: #007db8;
 
         padding: ($baseline/4) ($baseline/2);
         color: $facet-background-color;
-        text-transform: uppercase;
       }
     }
   }
@@ -580,7 +584,8 @@ $facet-background-color: #007db8;
 
 // +All Other Styles
 // ====================
-.find-courses, .university-profile {
+.find-courses,
+.university-profile {
   background: $gray-l5;
   padding-bottom: ($baseline*3);
 
@@ -592,6 +597,5 @@ $facet-background-color: #007db8;
     border-top: 1px solid $border-color-2;
     margin-top: $baseline;
     padding-top: ($baseline*3);
-
   }
 }

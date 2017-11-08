@@ -15,6 +15,7 @@ import json
 
 from .common import *
 
+from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.logsettings import get_logger_config
 import os
 
@@ -202,10 +203,6 @@ COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 
 ASSET_IGNORE_REGEX = ENV_TOKENS.get('ASSET_IGNORE_REGEX', ASSET_IGNORE_REGEX)
 
-# following setting is for backward compatibility
-if ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', None):
-    COMPREHENSIVE_THEME_DIR = ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR')
-
 COMPREHENSIVE_THEME_DIRS = ENV_TOKENS.get('COMPREHENSIVE_THEME_DIRS', COMPREHENSIVE_THEME_DIRS) or []
 
 # COMPREHENSIVE_THEME_LOCALE_PATHS contain the paths to themes locale directories e.g.
@@ -236,7 +233,7 @@ for feature, value in ENV_FEATURES.items():
 
 # Additional installed apps
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
-    INSTALLED_APPS += (app,)
+    INSTALLED_APPS.append(app)
 
 WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 
@@ -259,11 +256,13 @@ if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
 CAS_EXTRA_LOGIN_PARAMS = ENV_TOKENS.get("CAS_EXTRA_LOGIN_PARAMS", None)
 if FEATURES.get('AUTH_USE_CAS'):
     CAS_SERVER_URL = ENV_TOKENS.get("CAS_SERVER_URL", None)
-    AUTHENTICATION_BACKENDS = (
+    AUTHENTICATION_BACKENDS = [
         'django.contrib.auth.backends.ModelBackend',
         'django_cas.backends.CASBackend',
-    )
-    INSTALLED_APPS += ('django_cas',)
+    ]
+
+    INSTALLED_APPS.append('django_cas')
+
     MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
     CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
     if CAS_ATTRIBUTE_CALLBACK:
@@ -453,6 +452,10 @@ VIDEO_UPLOAD_PIPELINE = ENV_TOKENS.get('VIDEO_UPLOAD_PIPELINE', VIDEO_UPLOAD_PIP
 
 VIDEO_IMAGE_SETTINGS = ENV_TOKENS.get('VIDEO_IMAGE_SETTINGS', VIDEO_IMAGE_SETTINGS)
 
+################ VIDEO TRANSCRIPTS STORAGE ###############
+
+VIDEO_TRANSCRIPTS_SETTINGS = ENV_TOKENS.get('VIDEO_TRANSCRIPTS_SETTINGS', VIDEO_TRANSCRIPTS_SETTINGS)
+
 ################ PUSH NOTIFICATIONS ###############
 
 PARSE_KEYS = AUTH_TOKENS.get("PARSE_KEYS", {})
@@ -500,7 +503,7 @@ JWT_AUTH.update(ENV_TOKENS.get('JWT_AUTH', {}))
 
 ######################## CUSTOM COURSES for EDX CONNECTOR ######################
 if FEATURES.get('CUSTOM_COURSES_EDX'):
-    INSTALLED_APPS += ('openedx.core.djangoapps.ccxcon',)
+    INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
 
 # Partner support link for CMS footer
 PARTNER_SUPPORT_EMAIL = ENV_TOKENS.get('PARTNER_SUPPORT_EMAIL', PARTNER_SUPPORT_EMAIL)
@@ -528,3 +531,7 @@ PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
 
 # Allow extra middleware classes to be added to the app through configuration.
 MIDDLEWARE_CLASSES.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
+
+########################## Derive Any Derived Settings  #######################
+
+derive_settings(__name__)

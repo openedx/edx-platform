@@ -52,7 +52,8 @@ def encode_url(url):
 
 
 def absolute_url(site, relative_path):
-    """Add site.domain to the beginning of the given relative path.
+    """
+    Add site.domain to the beginning of the given relative path.
 
     If the given URL is already absolute (has a netloc part), then it is just returned.
     """

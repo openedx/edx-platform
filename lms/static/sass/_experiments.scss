@@ -131,7 +131,7 @@
   border-radius: 2px;
   box-shadow: rgb(0, 77, 0) 0 2px 1px 0;
   cursor: pointer;
-  font-family: "Open Sans";
+  font-family: $font-family-sans-serif;
   height: auto;
   margin-right: 4px;
   margin-top: 0;
@@ -141,7 +141,8 @@
   font-size: 14px !important;
   font-weight: 500 !important;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background-color: #009b00 !important;
     border-color: #009b00;
     box-shadow: #004d00 0 2px 1px 0;

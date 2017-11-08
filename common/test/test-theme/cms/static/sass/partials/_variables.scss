@@ -37,17 +37,17 @@ $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
 
 // +Colors - Utility
 // ====================
-$transparent: rgba(0,0,0,0); // used when color value is needed for UI width/transitions but element is transparent
+$transparent: rgba(0, 0, 0, 0); // used when color value is needed for UI width/transitions but element is transparent
 
 // +Colors - Primary
 // ====================
-$black: rgb(0,0,0);
+$black: rgb(0, 0, 0);
 $black-t0: rgba($black, 0.125);
 $black-t1: rgba($black, 0.25);
 $black-t2: rgba($black, 0.5);
 $black-t3: rgba($black, 0.75);
 
-$white: rgb(255,255,255);
+$white: rgb(255, 255, 255);
 $white-t0: rgba($white, 0.125);
 $white-t1: rgba($white, 0.25);
 $white-t2: rgba($white, 0.5);
@@ -87,7 +87,6 @@ $blue-t1: rgba($blue, 0.25);
 $blue-t2: rgba($blue, 0.50);
 $blue-t3: rgba($blue, 0.75);
 
-$uxpl-blue-base: rgb(0, 117, 180); // wcag2a compliant
 $uxpl-blue-hover-active: rgb(6, 86, 131); // wcag2a compliant
 
 $uxpl-green-base: rgb(0, 129, 0); // wcag2a compliant
@@ -233,7 +232,6 @@ $ui-update-color: $blue-l4;
 // +Deprecated
 // ====================
 // do not use, future clean up will use updated styles
-$baseFontColor: $gray-d2;
 $lighter-base-font-color: rgb(100,100,100);
 $offBlack: #3c3c3c;
 $green: #108614;
@@ -258,9 +256,8 @@ $error-red: rgb(253, 87, 87);
 $sidebar-color: rgb(246, 246, 246);
 
 // type
-$sans-serif: $f-sans-serif;
 $body-line-height: golden-ratio(.875em, 1);
 
 // carried over from LMS for xmodules
-$action-primary-active-bg: #1AA1DE; // $m-blue
+$action-primary-active-bg: #1aa1de; // $m-blue
 $very-light-text: $white;

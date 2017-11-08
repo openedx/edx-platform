@@ -19,6 +19,11 @@ html.video-fullscreen {
   @extend %ui-print-excluded;
 
   margin: ($baseline/2) ($baseline/4) 0 0;
+  display: none;
+
+  @include media-breakpoint-up(md) {
+    display: block;
+  }
 
   &.studio-view {
     margin: 0;
@@ -35,7 +40,6 @@ html.video-fullscreen {
     padding: ($baseline/4) ($baseline/2);
     border-radius: ($baseline/4);
     background-color: $light-gray1;
-    text-transform: uppercase;
     color: $staff-color;
 
     &:hover {
@@ -66,7 +70,7 @@ html.video-fullscreen {
     display: block;
     width: auto;
     padding: ($baseline/4) 0;
-    color: $base-font-color;
+    color: $body-color;
 
     span {
       color: inherit;
@@ -74,12 +78,12 @@ html.video-fullscreen {
 
     a:link,
     a:visited {
-      color: $base-font-color;
+      color: $body-color;
     }
 
     a:active,
     a:hover {
-      color: $uxpl-blue-base;
+      color: theme-color("primary");
     }
 
     .license-label,
@@ -101,7 +105,6 @@ html.video-fullscreen {
   }
 }
 
-// TO-DO should this be content wrapper?
 .course-wrapper {
   position: relative;
 
@@ -131,6 +134,12 @@ html.video-fullscreen {
       overflow-wrap: break-word;
       word-wrap: break-word;
       word-break: break-word;
+    }
+
+    // Make text-focused blocks have a maximum width for readability.
+    .xmodule_HtmlModule,
+    .xmodule_CapaModule {
+      max-width: $text-width-readability-max;
     }
 
     h1 {
@@ -178,7 +187,7 @@ html.video-fullscreen {
 
       button.gated-sequence {
         background: $transparent;
-        color: $uxpl-blue-base;
+        color: theme-color("primary");
         border: none;
         box-shadow: none;
 
@@ -200,13 +209,13 @@ html.video-fullscreen {
       }
 
       .gated-sequence {
-        color: $uxpl-blue-base;
+        color: theme-color("primary");
         font-weight: 600;
         padding: ($baseline / 1.5) ($baseline / 4);
 
         a.start-timed-exam {
           cursor: pointer;
-          color: $uxpl-blue-base;
+          color: theme-color("primary");
           font-weight: 600;
           position: relative;
           top: ($baseline/10);
@@ -324,7 +333,7 @@ html.video-fullscreen {
 
           &.action-primary {
             .icon {
-              color: $uxpl-blue-base;
+              color: theme-color("primary");
             }
           }
         }
@@ -614,11 +623,11 @@ html.video-fullscreen {
 
     div.staff_actions {
       p.error {
-        color: $error-color
+        color: theme-color("danger");
       }
 
       p.success {
-        color: $success-color;
+        color: theme-color("success");
       }
     }
 

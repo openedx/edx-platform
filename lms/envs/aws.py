@@ -25,6 +25,7 @@ import warnings
 import dateutil
 
 from .common import *
+from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.logsettings import get_logger_config
 import os
 
@@ -339,7 +340,7 @@ USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
 
 # Additional installed apps
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
-    INSTALLED_APPS += (app,)
+    INSTALLED_APPS.append(app)
 
 WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
@@ -399,11 +400,13 @@ SSL_AUTH_DN_FORMAT_STRING = ENV_TOKENS.get(
 CAS_EXTRA_LOGIN_PARAMS = ENV_TOKENS.get("CAS_EXTRA_LOGIN_PARAMS", None)
 if FEATURES.get('AUTH_USE_CAS'):
     CAS_SERVER_URL = ENV_TOKENS.get("CAS_SERVER_URL", None)
-    AUTHENTICATION_BACKENDS = (
+    AUTHENTICATION_BACKENDS = [
         'django.contrib.auth.backends.ModelBackend',
         'django_cas.backends.CASBackend',
-    )
-    INSTALLED_APPS += ('django_cas',)
+    ]
+
+    INSTALLED_APPS.append('django_cas')
+
     MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
     CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
     if CAS_ATTRIBUTE_CALLBACK:
@@ -675,16 +678,17 @@ X_FRAME_OPTIONS = ENV_TOKENS.get('X_FRAME_OPTIONS', X_FRAME_OPTIONS)
 
 ##### Third-party auth options ################################################
 if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
-    AUTHENTICATION_BACKENDS = (
-        ENV_TOKENS.get('THIRD_PARTY_AUTH_BACKENDS', [
-            'social_core.backends.google.GoogleOAuth2',
-            'social_core.backends.linkedin.LinkedinOAuth2',
-            'social_core.backends.facebook.FacebookOAuth2',
-            'social_core.backends.azuread.AzureADOAuth2',
-            'third_party_auth.saml.SAMLAuthBackend',
-            'third_party_auth.lti.LTIAuthBackend',
-        ]) + list(AUTHENTICATION_BACKENDS)
-    )
+    tmp_backends = ENV_TOKENS.get('THIRD_PARTY_AUTH_BACKENDS', [
+        'social_core.backends.google.GoogleOAuth2',
+        'social_core.backends.linkedin.LinkedinOAuth2',
+        'social_core.backends.facebook.FacebookOAuth2',
+        'social_core.backends.azuread.AzureADOAuth2',
+        'third_party_auth.saml.SAMLAuthBackend',
+        'third_party_auth.lti.LTIAuthBackend',
+    ])
+
+    AUTHENTICATION_BACKENDS = list(tmp_backends) + list(AUTHENTICATION_BACKENDS)
+    del tmp_backends
 
     # The reduced session expiry time during the third party login pipeline. (Value in seconds)
     SOCIAL_AUTH_PIPELINE_TIMEOUT = ENV_TOKENS.get('SOCIAL_AUTH_PIPELINE_TIMEOUT', 600)
@@ -795,6 +799,9 @@ XBLOCK_SETTINGS.setdefault("VideoModule", {})['YOUTUBE_API_KEY'] = AUTH_TOKENS.g
 ##### VIDEO IMAGE STORAGE #####
 VIDEO_IMAGE_SETTINGS = ENV_TOKENS.get('VIDEO_IMAGE_SETTINGS', VIDEO_IMAGE_SETTINGS)
 
+##### VIDEO TRANSCRIPTS STORAGE #####
+VIDEO_TRANSCRIPTS_SETTINGS = ENV_TOKENS.get('VIDEO_TRANSCRIPTS_SETTINGS', VIDEO_TRANSCRIPTS_SETTINGS)
+
 ##### CDN EXPERIMENT/MONITORING FLAGS #####
 CDN_VIDEO_URLS = ENV_TOKENS.get('CDN_VIDEO_URLS', CDN_VIDEO_URLS)
 ONLOAD_BEACON_SAMPLE_RATE = ENV_TOKENS.get('ONLOAD_BEACON_SAMPLE_RATE', ONLOAD_BEACON_SAMPLE_RATE)
@@ -816,7 +823,7 @@ ECOMMERCE_SERVICE_WORKER_USERNAME = ENV_TOKENS.get(
 
 ##### Custom Courses for EdX #####
 if FEATURES.get('CUSTOM_COURSES_EDX'):
-    INSTALLED_APPS += ('lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon')
+    INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
         'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',
     )
@@ -862,8 +869,8 @@ CREDIT_PROVIDER_SECRET_KEYS = AUTH_TOKENS.get("CREDIT_PROVIDER_SECRET_KEYS", {})
 
 ##################### LTI Provider #####################
 if FEATURES.get('ENABLE_LTI_PROVIDER'):
-    INSTALLED_APPS += ('lti_provider',)
-    AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend', )
+    INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
+    AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
 
 LTI_USER_EMAIL_DOMAIN = ENV_TOKENS.get('LTI_USER_EMAIL_DOMAIN', 'lti.example.com')
 
@@ -915,7 +922,7 @@ CREDENTIALS_GENERATION_ROUTING_KEY = ENV_TOKENS.get('CREDENTIALS_GENERATION_ROUT
 
 # The extended StudentModule history table
 if FEATURES.get('ENABLE_CSMH_EXTENDED'):
-    INSTALLED_APPS += ('coursewarehistoryextended',)
+    INSTALLED_APPS.append('coursewarehistoryextended')
 
 API_ACCESS_MANAGER_EMAIL = ENV_TOKENS.get('API_ACCESS_MANAGER_EMAIL')
 API_ACCESS_FROM_EMAIL = ENV_TOKENS.get('API_ACCESS_FROM_EMAIL')
@@ -966,6 +973,13 @@ ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ENV_TOKENS.get(
 ENTERPRISE_SUPPORT_URL = ENV_TOKENS.get(
     'ENTERPRISE_SUPPORT_URL',
     ENTERPRISE_SUPPORT_URL
+)
+
+# A shared secret to be used for encrypting passwords passed from the enterprise api
+# to the enteprise reporting script.
+ENTERPRISE_REPORTING_SECRET = AUTH_TOKENS.get(
+    'ENTERPRISE_REPORTING_SECRET',
+    ENTERPRISE_REPORTING_SECRET
 )
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
@@ -1055,3 +1069,7 @@ ACE_ROUTING_KEY = ENV_TOKENS.get('ACE_ROUTING_KEY', ACE_ROUTING_KEY)
 
 # Allow extra middleware classes to be added to the app through configuration.
 MIDDLEWARE_CLASSES.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
+
+########################## Derive Any Derived Settings  #######################
+
+derive_settings(__name__)

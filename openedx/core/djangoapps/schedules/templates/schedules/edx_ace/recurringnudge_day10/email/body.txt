@@ -12,3 +12,4 @@
     {% endblocktrans %}
     {% trans "Keep learning" %} <{{course_url}}>
 {% endif %}
+{% include "schedules/edx_ace/common/upsell_cta.txt"%}

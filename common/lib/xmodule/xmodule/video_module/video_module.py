@@ -24,7 +24,7 @@ from pkg_resources import resource_string
 from django.conf import settings
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
-from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
+from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, VideoTranscriptEnabledFlag
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 from openedx.core.lib.license import LicenseMixin
 from xblock.core import XBlock
@@ -41,7 +41,13 @@ from xmodule.x_module import XModule, module_attr
 from xmodule.xml_module import deserialize_field, is_pointer_tag, name_to_pathname
 
 from .bumper_utils import bumperize
-from .transcripts_utils import Transcript, VideoTranscriptsMixin, get_html5_ids
+from .transcripts_utils import (
+    get_html5_ids,
+    get_video_ids_info,
+    is_val_transcript_feature_enabled_for_course,
+    Transcript,
+    VideoTranscriptsMixin,
+)
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
 from .video_xfields import VideoFields
@@ -181,13 +187,13 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
 
         transcript_language = self.get_default_transcript_language(transcripts)
-
         native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
         languages = {
             lang: native_languages.get(lang, display)
             for lang, display in settings.ALL_LANGUAGES
             if lang in other_lang
         }
+
         if not other_lang or (other_lang and sub):
             languages['en'] = 'English'
 
@@ -205,6 +211,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         download_video_link = None
         branding_info = None
         youtube_streams = ""
+        video_duration = None
 
         # Determine if there is an alternative source for this video
         # based on user locale.  This exists to support cases where
@@ -247,7 +254,11 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 if val_video_urls["youtube"]:
                     youtube_streams = "1.00:{}".format(val_video_urls["youtube"])
 
-            except edxval_api.ValInternalError:
+                # get video duration
+                video_data = edxval_api.get_video_info(self.edx_video_id.strip())
+                video_duration = video_data.get('duration')
+
+            except (edxval_api.ValInternalError, edxval_api.ValVideoNotFoundError):
                 # VAL raises this exception if it can't find data for the edx video ID. This can happen if the
                 # course data is ported to a machine that does not have the VAL data. So for now, pass on this
                 # exception and fallback to whatever we find in the VideoDescriptor.
@@ -277,7 +288,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             if download_video_link and download_video_link.endswith('.m3u8'):
                 download_video_link = None
 
-        track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(self.get_transcripts_info())
+        feature_enabled = is_val_transcript_feature_enabled_for_course(self.course_id)
+        transcripts = self.get_transcripts_info(include_val_transcripts=feature_enabled)
+        track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(transcripts=transcripts)
 
         # CDN_VIDEO_URLS is only to be used here and will be deleted
         # TODO(ali@edx.org): Delete this after the CDN experiment has completed.
@@ -318,6 +331,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'sub': self.sub,
             'sources': sources,
             'poster': poster,
+            'duration': video_duration,
             # This won't work when we move to data that
             # isn't on the filesystem
             'captionDataDir': getattr(self, 'data_dir', None),
@@ -595,6 +609,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             ScopeIds(None, block_type, definition_id, usage_id),
             field_data,
         )
+
+        # update val with info extracted from `xml_object`
+        video.import_video_info_into_val(xml_object, getattr(id_generator, 'target_course_id', None))
+
         return video
 
     def definition_to_xml(self, resource_fs):
@@ -658,14 +676,19 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 ele.set('src', self.transcripts[transcript_language])
                 xml.append(ele)
 
-        if self.edx_video_id and edxval_api:
-            try:
-                xml.append(edxval_api.export_to_xml(
-                    self.edx_video_id,
-                    unicode(self.runtime.course_id.for_branch(None)))
-                )
-            except edxval_api.ValVideoNotFoundError:
-                pass
+        if edxval_api:
+            external, video_ids = get_video_ids_info(self.edx_video_id, self.youtube_id_1_0, self.html5_sources)
+            if video_ids:
+                try:
+                    xml.append(
+                        edxval_api.export_to_xml(
+                            video_ids,
+                            unicode(self.runtime.course_id.for_branch(None)),
+                            external=external
+                        )
+                    )
+                except edxval_api.ValVideoNotFoundError:
+                    pass
 
         # handle license specifically
         self.add_license_to_xml(xml)
@@ -864,23 +887,32 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         if 'download_track' not in field_data and track is not None:
             field_data['download_track'] = True
 
-        video_asset_elem = xml.find('video_asset')
-        if (
-                edxval_api and
-                video_asset_elem is not None and
-                'edx_video_id' in field_data
-        ):
-            # Allow ValCannotCreateError to escape
-            edxval_api.import_from_xml(
-                video_asset_elem,
-                field_data['edx_video_id'],
-                course_id=course_id
-            )
-
         # load license if it exists
         field_data = LicenseMixin.parse_license_from_xml(field_data, xml)
 
         return field_data
+
+    def import_video_info_into_val(self, xml, course_id):
+        """
+        Import parsed video info from `xml` into edxval.
+
+        Arguments:
+            xml (lxml object): xml representation of video to be imported
+            course_id (str): course id
+        """
+        if self.edx_video_id is not None:
+            edx_video_id = self.edx_video_id.strip()
+
+        video_asset_elem = xml.find('video_asset')
+        if edxval_api and video_asset_elem is not None:
+            # Always pass the edx_video_id, Whether the video is internal or external
+            # In case of external, we only need to import transcripts and for that
+            # purpose video id is already present in the xml
+            edxval_api.import_from_xml(
+                video_asset_elem,
+                edx_video_id,
+                course_id=course_id
+            )
 
     def index_dictionary(self):
         xblock_body = super(VideoDescriptor, self).index_dictionary()
@@ -990,10 +1022,12 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     "file_size": 0,  # File size is not relevant for external link
                 }
 
-        transcripts_info = self.get_transcripts_info()
+        feature_enabled = is_val_transcript_feature_enabled_for_course(self.runtime.course_id.for_branch(None))
+        transcripts_info = self.get_transcripts_info(include_val_transcripts=feature_enabled)
+        available_translations = self.available_translations(transcripts_info, include_val_transcripts=feature_enabled)
         transcripts = {
             lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)
-            for lang in self.available_translations(transcripts_info)
+            for lang in available_translations
         }
 
         return {

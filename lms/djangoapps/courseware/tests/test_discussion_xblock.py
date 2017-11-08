@@ -57,7 +57,7 @@ class TestDiscussionXBlock(XModuleRenderingTestBase):
         self.block.xmodule_runtime = mock.Mock()
 
         if self.PATCH_DJANGO_USER:
-            self.django_user_canary = object()
+            self.django_user_canary = UserFactory()
             self.django_user_mock = self.add_patcher(
                 mock.patch.object(DiscussionXBlock, "django_user", new_callable=mock.PropertyMock)
             )
@@ -259,7 +259,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
         Set up a user, course, and discussion XBlock for use by tests.
         """
         super(TestXBlockInCourse, cls).setUpClass()
-        cls.user = UserFactory.create()
+        cls.user = UserFactory()
         cls.course = ToyCourseFactory.create()
         cls.course_key = cls.course.id
         cls.course_usage_key = cls.store.make_course_usage_key(cls.course_key)
@@ -380,8 +380,8 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
         """
         Tests that the permissions queries are cached when rendering numerous discussion XBlocks.
         """
-        user = UserFactory.create()
-        course = ToyCourseFactory.create()
+        user = UserFactory()
+        course = ToyCourseFactory()
         course_key = course.id
         course_usage_key = self.store.make_course_usage_key(course_key)
         discussions = []

@@ -303,11 +303,11 @@
   }
 }
 
-@-webkit-keyframes fade-in-animation{ @include fade-in-keyframes; }
+@-webkit-keyframes fade-in-animation { @include fade-in-keyframes; }
 
-@-moz-keyframes fade-in-animation{ @include fade-in-keyframes; }
+@-moz-keyframes fade-in-animation { @include fade-in-keyframes; }
 
-@keyframes fade-in-animation{ @include fade-in-keyframes; }
+@keyframes fade-in-animation { @include fade-in-keyframes; }
 
 
 // +utility animations

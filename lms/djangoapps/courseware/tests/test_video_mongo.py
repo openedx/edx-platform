@@ -9,7 +9,15 @@ import ddt
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
-from edxval.api import ValCannotCreateError, ValVideoNotFoundError, create_profile, create_video, get_video_info
+from edxval.api import (
+    ValCannotCreateError,
+    ValVideoNotFoundError,
+    create_or_update_video_transcript,
+    create_profile,
+    create_video,
+    get_video_info,
+    get_video_transcript
+)
 from lxml import etree
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
@@ -61,6 +69,7 @@ class TestVideoYouTube(TestVideo):
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
                 'sub': 'a_sub_file.srt.sjson',
                 'sources': sources,
+                'duration': None,
                 'poster': None,
                 'captionDataDir': None,
                 'showCaptions': 'true',
@@ -141,6 +150,7 @@ class TestVideoNonYouTube(TestVideo):
                 'streams': '1.00:3_yD_cEKoCk',
                 'sub': 'a_sub_file.srt.sjson',
                 'sources': sources,
+                'duration': None,
                 'poster': None,
                 'captionDataDir': None,
                 'showCaptions': 'true',
@@ -198,6 +208,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'streams': '1.00:3_yD_cEKoCk',
             'sub': 'a_sub_file.srt.sjson',
             'sources': '[]',
+            'duration': 111.0,
             'poster': None,
             'captionDataDir': None,
             'showCaptions': 'true',
@@ -298,6 +309,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         for data in cases:
             metadata = self.default_metadata_dict
             metadata['sources'] = sources
+            metadata['duration'] = None
             DATA = SOURCE_XML.format(
                 download_track=data['download_track'],
                 track=data['track'],
@@ -416,6 +428,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             ],
             'poster': 'null',
         }
+        initial_context['metadata']['duration'] = None
 
         for data in cases:
             DATA = SOURCE_XML.format(
@@ -666,7 +679,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         result = create_video(
             dict(
                 client_video_id='A Client Video id',
-                duration=111,
+                duration=111.0,
                 edx_video_id=edx_video_id,
                 status='test',
                 encoded_videos=encoded_videos,
@@ -827,6 +840,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             ],
             'poster': 'null',
         }
+        initial_context['metadata']['duration'] = None
 
         for data in cases:
             DATA = SOURCE_XML.format(
@@ -1307,6 +1321,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         self.transcript_url = "transcript_url"
         self.video = instantiate_descriptor(data=sample_xml)
         self.video.runtime.handler_url = Mock(return_value=self.transcript_url)
+        self.video.runtime.course_id = MagicMock()
 
     def setup_val_video(self, associate_course_in_val=False):
         """
@@ -1405,6 +1420,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         self.transcript_url = "transcript_url"
         self.video = instantiate_descriptor(data=sample_xml)
         self.video.runtime.handler_url = Mock(return_value=self.transcript_url)
+        self.video.runtime.course_id = MagicMock()
         result = self.get_result()
         self.verify_result_with_youtube_url(result)
 
@@ -1442,6 +1458,43 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         result = self.get_result(allow_cache_miss)
         self.verify_result_with_fallback_and_youtube(result)
 
+    @ddt.data(
+        ({}, '', [], ['en']),
+        ({}, '', ['de'], ['de']),
+        ({}, '', ['en', 'de'], ['en', 'de']),
+        ({}, 'en-subs', ['de'], ['en', 'de']),
+        ({'uk': 1}, 'en-subs', ['de'], ['en', 'uk', 'de']),
+        ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
+    )
+    @ddt.unpack
+    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
+    def test_student_view_with_val_transcripts_enabled(self, transcripts, english_sub, val_transcripts,
+                                                       expected_transcripts, mock_get_transcript_languages):
+        """
+        Test `student_view_data` with edx-val transcripts enabled.
+        """
+        mock_get_transcript_languages.return_value = val_transcripts
+        self.video.transcripts = transcripts
+        self.video.sub = english_sub
+        student_view_response = self.get_result()
+        self.assertItemsEqual(student_view_response['transcripts'].keys(), expected_transcripts)
+
+    @patch(
+        'xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled',
+        Mock(return_value=False),
+    )
+    @patch(
+        'xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages',
+        Mock(return_value=['ro', 'es']),
+    )
+    def test_student_view_with_val_transcripts_disabled(self):
+        """
+        Test `student_view_data` with edx-val transcripts disabled.
+        """
+        student_view_response = self.get_result()
+        self.assertDictEqual(student_view_response['transcripts'], {self.TEST_LANGUAGE: self.transcript_url})
+
 
 @attr(shard=1)
 class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
@@ -1452,6 +1505,15 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         super(VideoDescriptorTest, self).setUp()
         self.descriptor.runtime.handler_url = MagicMock()
         self.descriptor.runtime.course_id = MagicMock()
+
+    def get_video_transcript_data(self, video_id):
+        return dict(
+            video_id=video_id,
+            language_code='ar',
+            url='/media/ext101.srt',
+            provider='Cielo24',
+            file_format='srt',
+        )
 
     def test_get_context(self):
         """"
@@ -1480,13 +1542,13 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
             self.descriptor.editable_metadata_fields['edx_video_id']
         )
 
-    def test_export_val_data(self):
+    def test_export_val_data_with_internal(self):
         self.descriptor.edx_video_id = 'test_edx_video_id'
         create_profile('mobile')
         create_video({
             'edx_video_id': self.descriptor.edx_video_id,
             'client_video_id': 'test_client_video_id',
-            'duration': 111,
+            'duration': 111.0,
             'status': 'dummy',
             'encoded_videos': [{
                 'profile': 'mobile',
@@ -1495,15 +1557,52 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
                 'bitrate': 333,
             }],
         })
+        create_or_update_video_transcript(
+            video_id=self.descriptor.edx_video_id,
+            language_code='ar',
+            file_name='ext101.srt',
+            file_format='srt',
+            provider='Cielo24',
+        )
 
         actual = self.descriptor.definition_to_xml(resource_fs=None)
         expected_str = """
             <video download_video="false" url_name="SampleProblem">
                 <video_asset client_video_id="test_client_video_id" duration="111.0" image="">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
+                    <transcripts>
+                        <transcript file_format="srt" file_name="ext101.srt" language_code="ar" provider="Cielo24" video_id="{video_id}"/>
+                    </transcripts>
                 </video_asset>
             </video>
+        """.format(video_id=self.descriptor.edx_video_id)
+        parser = etree.XMLParser(remove_blank_text=True)
+        expected = etree.XML(expected_str, parser=parser)
+        self.assertXmlEqual(expected, actual)
+
+    def test_export_val_data_with_external(self):
         """
+        Tests exported val data for external video.
+        """
+        external_video_id = '3_yD_cEKoCk'
+        create_or_update_video_transcript(
+            video_id=external_video_id,
+            language_code='ar',
+            file_name='ext101.srt',
+            file_format='srt',
+            provider='Cielo24',
+        )
+
+        actual = self.descriptor.definition_to_xml(resource_fs=None)
+        expected_str = """
+            <video url_name="SampleProblem" download_video="false">
+                <video_asset>
+                    <transcripts>
+                        <transcript file_format="srt" file_name="ext101.srt" language_code="ar" provider="Cielo24" video_id="{video_id}"/>
+                    </transcripts>
+                </video_asset>
+            </video>
+        """.format(video_id=external_video_id)
         parser = etree.XMLParser(remove_blank_text=True)
         expected = etree.XML(expected_str, parser=parser)
         self.assertXmlEqual(expected, actual)
@@ -1516,7 +1615,21 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         expected = etree.XML(expected_str, parser=parser)
         self.assertXmlEqual(expected, actual)
 
-    def test_import_val_data(self):
+    @patch('xmodule.video_module.transcripts_utils.get_video_ids_info')
+    def test_export_no_video_ids(self, mock_get_video_ids_info):
+        """
+        Tests export when there are no video ids
+        """
+        mock_get_video_ids_info.return_value = True, []
+
+        actual = self.descriptor.definition_to_xml(resource_fs=None)
+        expected_str = '<video url_name="SampleProblem" download_video="false"><video_asset/></video>'
+
+        parser = etree.XMLParser(remove_blank_text=True)
+        expected = etree.XML(expected_str, parser=parser)
+        self.assertXmlEqual(expected, actual)
+
+    def test_import_val_data_internal(self):
         create_profile('mobile')
         module_system = DummySystem(load_error_modules=True)
 
@@ -1524,22 +1637,57 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
             <video edx_video_id="test_edx_video_id">
                 <video_asset client_video_id="test_client_video_id" duration="111.0">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
+                    <transcripts>
+                        <transcript file_format="srt" file_name="ext101.srt" language_code="ar" provider="Cielo24"  video_id="test_edx_video_id"/>
+                    </transcripts>
                 </video_asset>
             </video>
         """
         id_generator = Mock()
         id_generator.target_course_id = "test_course_id"
-        video = VideoDescriptor.from_xml(xml_data, module_system, id_generator)
+        video = self.descriptor.from_xml(xml_data, module_system, id_generator)
         self.assertEqual(video.edx_video_id, 'test_edx_video_id')
         video_data = get_video_info(video.edx_video_id)
         self.assertEqual(video_data['client_video_id'], 'test_client_video_id')
-        self.assertEqual(video_data['duration'], 111)
+        self.assertEqual(video_data['duration'], 111.0)
         self.assertEqual(video_data['status'], 'imported')
         self.assertEqual(video_data['courses'], [{id_generator.target_course_id: None}])
         self.assertEqual(video_data['encoded_videos'][0]['profile'], 'mobile')
         self.assertEqual(video_data['encoded_videos'][0]['url'], 'http://example.com/video')
         self.assertEqual(video_data['encoded_videos'][0]['file_size'], 222)
         self.assertEqual(video_data['encoded_videos'][0]['bitrate'], 333)
+        # verify transcript data
+        self.assertDictEqual(
+            get_video_transcript(video.edx_video_id, 'ar'),
+            self.get_video_transcript_data('test_edx_video_id')
+        )
+
+    def test_import_val_data_external(self):
+        """
+        Tests video import with external video.
+        """
+        external_video_id = 'external_video_id'
+        module_system = DummySystem(load_error_modules=True)
+
+        xml_data = """
+            <video>
+                <video_asset>
+                    <transcripts>
+                        <transcript file_format="srt" file_name="ext101.srt" language_code="ar" provider="Cielo24" video_id="{video_id}"/>
+                    </transcripts>
+                </video_asset>
+            </video>
+        """.format(video_id=external_video_id)
+
+        id_generator = Mock()
+        id_generator.target_course_id = "test_course_id"
+        self.descriptor.from_xml(xml_data, module_system, id_generator)
+
+        # verify transcript data
+        self.assertDictEqual(
+            get_video_transcript(external_video_id, 'ar'),
+            self.get_video_transcript_data(external_video_id)
+        )
 
     def test_import_val_data_invalid(self):
         create_profile('mobile')
@@ -1646,6 +1794,7 @@ class TestVideoWithBumper(TestVideo):
                 'sub': 'a_sub_file.srt.sjson',
                 'sources': sources,
                 'poster': None,
+                'duration': None,
                 'captionDataDir': None,
                 'showCaptions': 'true',
                 'generalSpeed': 1.0,

@@ -1,8 +1,12 @@
 {% load i18n %}
 
-<!-- This is preview text that is visible in the inbox view of many email clients but not visible in the actual
-email itself. -->
-<div style="
+{% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+
+{# This is preview text that is visible in the inbox view of many email clients but not visible in the actual #}
+{# email itself. #}
+
+<div lang="{{ LANGUAGE_CODE|default:"en" }}" style="
     display:none;
     font-size:1px;
     line-height:1px;
@@ -19,8 +23,7 @@ email itself. -->
 {# Sailthru when the email is sent. Other email providers would need to replace this variable in the HTML as well. #}
 <img src="{beacon_src}" alt="" role="presentation" aria-hidden="true" />
 
-{% get_current_language as LANGUAGE_CODE %}
-<div bgcolor="#f5f5f5" lang="{{ LANGUAGE_CODE|default:"en" }}" style="
+<div bgcolor="#f5f5f5" lang="{{ LANGUAGE_CODE|default:"en" }}" dir="{{ LANGUAGE_BIDI|yesno:"rtl,ltr" }}" style="
     margin: 0;
     padding: 0;
     min-width: 100%;
@@ -56,9 +59,9 @@ email itself. -->
                         <td width="70">
                             <a href="{{ homepage_url }}"><img
                                 src="{{ edx_logo }}" width="70" height="30"
-                                alt="{% blocktrans %}{{ platform_name }} Home Page{% endblocktrans %}"/></a>
+                                alt="{% blocktrans %}Go to {{ platform_name }} Home Page{% endblocktrans %}"/></a>
                         </td>
-                        <td align="right" style="text-align: right;">
+                        <td align="right" style="text-align: {{ LANGUAGE_BIDI|yesno:"left,right" }};">
                             <a class="login" href="{{ dashboard_url }}" style="color: #005686;">{%  trans "Sign In" %}</a>
                         </td>
                     </tr>
@@ -83,7 +86,7 @@ email itself. -->
                     <tr>
                         <td style="padding-bottom: 20px;">
                             <!-- SOCIAL -->
-                            <table role="presentation" align="left" border="0" border="0" cellpadding="0" cellspacing="0" width="210">
+                            <table role="presentation" align="{{ LANGUAGE_BIDI|yesno:"right,left" }}" border="0" border="0" cellpadding="0" cellspacing="0" width="210">
                                 <tr>
                                     {% if social_media_urls.linkedin %}
                                         <td height="32" width="42">
@@ -136,7 +139,7 @@ email itself. -->
                                 <a href="{{ mobile_store_urls.apple }}" style="text-decoration: none">
                                     <img src="{{ mobile_store_icons.apple }}"
                                          alt="{% trans "Download the iOS app on the Apple Store" %}"
-                                         width="136" height="50" style="margin-right: 10px"/>
+                                         width="136" height="50" style="margin-{{ LANGUAGE_BIDI|yesno:"left,right" }}: 10px"/>
                                 </a>
                             {% endif %}
                             {% if mobile_store_urls.google %}

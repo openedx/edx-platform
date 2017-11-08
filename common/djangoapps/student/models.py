@@ -13,6 +13,7 @@ file and check it in at the same time as your model changes. To do that,
 import hashlib
 import json
 import logging
+import six
 import uuid
 from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, timedelta
@@ -50,7 +51,11 @@ import request_cache
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, REFUND_ORDER, ENROLLMENT_TRACK_UPDATED
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
-from courseware.models import DynamicUpgradeDeadlineConfiguration, CourseDynamicUpgradeDeadlineConfiguration
+from courseware.models import (
+    CourseDynamicUpgradeDeadlineConfiguration,
+    DynamicUpgradeDeadlineConfiguration,
+    OrgDynamicUpgradeDeadlineConfiguration
+)
 from enrollment.api import _default_course_mode
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -1529,7 +1534,7 @@ class CourseEnrollment(models.Model):
 
         if not status_hash:
             enrollments = cls.enrollments_for_user(user).values_list('course_id', 'mode')
-            enrollments = [(e[0].lower(), e[1].lower()) for e in enrollments]
+            enrollments = [(six.text_type(e[0]).lower(), e[1].lower()) for e in enrollments]
             enrollments = sorted(enrollments, key=lambda e: e[0])
             hash_elements = [user.username]
             hash_elements += ['{course_id}={mode}'.format(course_id=e[0], mode=e[1]) for e in enrollments]
@@ -1681,9 +1686,13 @@ class CourseEnrollment(models.Model):
         """
         if not self._course_overview:
             try:
-                self._course_overview = CourseOverview.get_from_id(self.course_id)
-            except (CourseOverview.DoesNotExist, IOError):
-                self._course_overview = None
+                self._course_overview = self.course
+            except CourseOverview.DoesNotExist:
+                log.info('Course Overviews: unable to find course overview for enrollment, loading from modulestore.')
+                try:
+                    self._course_overview = CourseOverview.get_from_id(self.course_id)
+                except (CourseOverview.DoesNotExist, IOError):
+                    self._course_overview = None
         return self._course_overview
 
     @cached_property
@@ -1709,26 +1718,45 @@ class CourseEnrollment(models.Model):
             return None
 
         if self.dynamic_upgrade_deadline is not None:
+            # When course modes expire they aren't found any more and None would be returned.
+            # Replicate that behavior here by returning None if the personalized deadline is in the past.
+            if datetime.now(UTC) >= self.dynamic_upgrade_deadline:
+                log.debug('Schedules: Returning None since dynamic upgrade deadline has already passed.')
+                return None
+
+            if self.verified_mode is None:
+                log.debug('Schedules: Returning None for dynamic upgrade deadline since the course does not have a '
+                          'verified mode.')
+                return None
+
             return self.dynamic_upgrade_deadline
 
         return self.course_upgrade_deadline
 
     @cached_property
     def dynamic_upgrade_deadline(self):
+        """
+        Returns the learner's personalized upgrade deadline if one exists, otherwise it returns None.
 
-        try:
-            course_overview = self.course
-        except CourseOverview.DoesNotExist:
-            course_overview = self.course_overview
+        Note that this will return a value even if the deadline is in the past. This property can be used
+        to modify behavior for users with personalized deadlines by checking if it's None or not.
 
-        if not course_overview.self_paced:
+        Returns:
+            datetime|None
+        """
+        if not self.course_overview.self_paced:
             return None
 
         if not DynamicUpgradeDeadlineConfiguration.is_enabled():
             return None
 
         course_config = CourseDynamicUpgradeDeadlineConfiguration.current(self.course_id)
-        if course_config.enabled and course_config.opt_out:
+        if course_config.opted_out():
+            # Course-level config should be checked first since it overrides the org-level config
+            return None
+
+        org_config = OrgDynamicUpgradeDeadlineConfiguration.current(self.course_id.org)
+        if org_config.opted_out() and not course_config.opted_in():
             return None
 
         try:
@@ -1746,13 +1774,19 @@ class CourseEnrollment(models.Model):
             log.debug('Schedules: No schedule exists for CourseEnrollment %d.', self.id)
             return None
 
-        if upgrade_deadline is None or datetime.now(UTC) >= upgrade_deadline:
-            return None
-
         return upgrade_deadline
 
     @cached_property
     def course_upgrade_deadline(self):
+        """
+        Returns the expiration datetime for the verified course mode.
+
+        If the mode is already expired, return None. Also return None if the course does not have a verified
+        course mode.
+
+        Returns:
+            datetime|None
+        """
         try:
             if self.verified_mode:
                 log.debug('Schedules: Defaulting to verified mode expiration date-time for %s.', self.course_id)

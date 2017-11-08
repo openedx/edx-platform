@@ -451,7 +451,15 @@ class MongoConnection(object):
                 }
             return self.course_index.find_one(query)
 
-    def find_matching_course_indexes(self, branch=None, search_targets=None, org_target=None, course_context=None):
+    def find_matching_course_indexes(
+            self,
+            branch=None,
+            search_targets=None,
+            org_target=None,
+            course_context=None,
+            course_keys=None
+
+    ):
         """
         Find the course_index matching particular conditions.
 
@@ -464,17 +472,40 @@ class MongoConnection(object):
         """
         with TIMER.timer("find_matching_course_indexes", course_context):
             query = {}
-            if branch is not None:
-                query['versions.{}'.format(branch)] = {'$exists': True}
+            if course_keys:
+                courses_queries = self._generate_query_from_course_keys(branch, course_keys)
+                query['$or'] = courses_queries
+            else:
+                if branch is not None:
+                    query['versions.{}'.format(branch)] = {'$exists': True}
 
-            if search_targets:
-                for key, value in search_targets.iteritems():
-                    query['search_targets.{}'.format(key)] = value
+                if search_targets:
+                    for key, value in search_targets.iteritems():
+                        query['search_targets.{}'.format(key)] = value
 
-            if org_target:
-                query['org'] = org_target
+                if org_target:
+                    query['org'] = org_target
 
             return self.course_index.find(query)
+
+    def _generate_query_from_course_keys(self, branch, course_keys):
+        """
+        Generate query for courses using course keys
+        """
+        courses_queries = []
+        query = {}
+        if branch:
+            query = {'versions.{}'.format(branch): {'$exists': True}}
+
+        for course_key in course_keys:
+            course_query = {
+                key_attr: getattr(course_key, key_attr)
+                for key_attr in ('org', 'course', 'run')
+            }
+            course_query.update(query)
+            courses_queries.append(course_query)
+
+        return courses_queries
 
     def insert_course_index(self, course_index, course_context=None):
         """

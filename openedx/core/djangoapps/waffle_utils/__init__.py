@@ -45,12 +45,16 @@ To test WaffleSwitchNamespace, use the provided context managers.  For example:
         ...
 
 """
+import crum
 import logging
 from abc import ABCMeta
 from contextlib import contextmanager
+
+import six
 from opaque_keys.edx.keys import CourseKey
-from request_cache import get_cache as get_request_cache, get_request
 from waffle import flag_is_active, switch_is_active
+
+from request_cache import get_cache as get_request_cache
 
 log = logging.getLogger(__name__)
 
@@ -165,6 +169,31 @@ class WaffleSwitchNamespace(WaffleNamespace):
         return self._get_request_cache().setdefault('switches', {})
 
 
+class WaffleSwitch(object):
+    """
+    Represents a single waffle switch, using a cached namespace.
+    """
+    def __init__(self, waffle_namespace, switch_name):
+        """
+        Arguments:
+            waffle_namespace (WaffleSwitchNamespace | String): Namespace for this switch.
+            switch_name (String): The name of the switch (without namespacing).
+        """
+        if isinstance(waffle_namespace, six.string_types):
+            waffle_namespace = WaffleSwitchNamespace(name=waffle_namespace)
+
+        self.waffle_namespace = waffle_namespace
+        self.switch_name = switch_name
+
+    def is_enabled(self):
+        return self.waffle_namespace.is_enabled(self.switch_name)
+
+    @contextmanager
+    def override(self, active=True):
+        with self.waffle_namespace.override(self.switch_name, active):
+            yield
+
+
 class WaffleFlagNamespace(WaffleNamespace):
     """
     Provides a single namespace for a set of waffle flags.
@@ -227,7 +256,17 @@ class WaffleFlagNamespace(WaffleNamespace):
                         value = flag_undefined_default
 
                 if value is None:
-                    value = flag_is_active(get_request(), namespaced_flag_name)
+                    request = crum.get_current_request()
+                    if request:
+                        value = flag_is_active(request, namespaced_flag_name)
+                    else:
+                        log.warn(u"%sFlag '%s' accessed without a request", self.log_prefix, namespaced_flag_name)
+                        # Return the default value if not in a request context.
+                        # Note: this skips the cache as the value might be different
+                        # in a normal request context. This case seems to occur when
+                        # a page redirects to a 404. In this case, we'll just return
+                        # the default value.
+                        return bool(flag_undefined_default)
 
                 self._cached_flags[namespaced_flag_name] = value
         return value

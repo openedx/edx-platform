@@ -6,6 +6,7 @@
 <script language="javascript">
   $(document).ready(function() {
     $("#id_revision").val('{{ article.current_revision.id }}');
+    $("#div_id_title > .controls").attr('tabindex', -1).focus();
   });
 </script>
 </div>

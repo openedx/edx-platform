@@ -51,6 +51,7 @@ from social_django import utils as social_utils
 import dogstats_wrapper as dog_stats_api
 import openedx.core.djangoapps.external_auth.views
 import third_party_auth
+from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 import track.views
 from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-error
 from certificates.api import get_certificate_url, has_html_certificates_enabled  # pylint: disable=import-error
@@ -86,7 +87,11 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import course_home_url_name
-from openedx.features.enterprise_support.api import get_dashboard_consent_notification
+from openedx.features.enterprise_support.api import (
+    consent_needed_for_course,
+    enterprise_customer_for_request,
+    get_dashboard_consent_notification
+)
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
 from student.cookies import delete_logged_in_cookies, set_logged_in_cookies, set_user_info_cookie
@@ -196,6 +201,11 @@ def index(request, extra_context=None, user=AnonymousUser()):
     # 1) Change False to True
     context['show_homepage_promo_video'] = configuration_helpers.get_value('show_homepage_promo_video', False)
 
+    # Maximum number of courses to display on the homepage.
+    context['homepage_course_max'] = configuration_helpers.get_value(
+        'HOMEPAGE_COURSE_MAX', settings.HOMEPAGE_COURSE_MAX
+    )
+
     # 2) Add your video's YouTube ID (11 chars, eg "123456789xX"), or specify via site configuration
     # Note: This value should be moved into a configuration setting and plumbed-through to the
     # context via the site configuration workflow, versus living here
@@ -234,11 +244,9 @@ def cert_info(user, course_overview, course_mode):
 
     Returns:
         dict: A dictionary with keys:
-            'status': one of 'generating', 'downloadable', 'notpassing', 'processing', 'restricted'
-            'show_download_url': bool
-            'certificate_message_viewable': bool -- if certificates are viewable
+            'status': one of 'generating', 'downloadable', 'notpassing', 'processing', 'restricted', 'unavailable', or
+                'certificate_earned_but_not_available'
             'download_url': url, only present if show_download_url is True
-            'show_disabled_download_button': bool -- true if state is 'generating'
             'show_survey_button': bool
             'survey_url': url, only if show_survey_button is True
             'grade': if status is not 'processing'
@@ -359,13 +367,11 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         CertificateStatuses.unverified: 'unverified',
     }
 
+    certificate_earned_but_not_available_status = 'certificate_earned_but_not_available'
     default_status = 'processing'
 
     default_info = {
         'status': default_status,
-        'certificate_message_viewable': False,
-        'show_disabled_download_button': False,
-        'show_download_url': False,
         'show_survey_button': False,
         'can_unenroll': True,
     }
@@ -373,25 +379,30 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
     if cert_status is None:
         return default_info
 
-    is_hidden_status = cert_status['status'] in ('unavailable', 'processing', 'generating', 'notpassing', 'auditing')
-
-    if course_overview.certificates_display_behavior == 'early_no_info' and is_hidden_status:
-        return {}
-
     status = template_state.get(cert_status['status'], default_status)
+    is_hidden_status = status in ('unavailable', 'processing', 'generating', 'notpassing', 'auditing')
+
+    if (
+        not certificates_viewable_for_course(course_overview) and
+        (status in CertificateStatuses.PASSED_STATUSES) and
+        course_overview.certificate_available_date
+    ):
+        status = certificate_earned_but_not_available_status
+
+    if (
+        course_overview.certificates_display_behavior == 'early_no_info' and
+        is_hidden_status
+    ):
+        return default_info
 
     status_dict = {
         'status': status,
-        'certificate_message_viewable': certificates_viewable_for_course(course_overview),
-        'show_download_url': status == 'downloadable',
-        'show_disabled_download_button': status == 'generating',
         'mode': cert_status.get('mode', None),
         'linked_in_url': None,
         'can_unenroll': status not in DISABLE_UNENROLL_CERT_STATES,
     }
 
-    if (status in ('generating', 'downloadable', 'notpassing', 'restricted', 'auditing', 'unverified') and
-            course_overview.end_of_course_survey_url is not None):
+    if not status == default_status and course_overview.end_of_course_survey_url is not None:
         status_dict.update({
             'show_survey_button': True,
             'survey_url': process_survey_link(course_overview.end_of_course_survey_url, user)})
@@ -408,7 +419,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                 })
             else:
                 # don't show download certificate button if we don't have an active certificate for course
-                status_dict['show_download_url'] = False
+                status_dict['status'] = 'unavailable'
         elif 'download_url' not in cert_status:
             log.warning(
                 u"User %s has a downloadable cert for %s, but no download url",
@@ -727,6 +738,16 @@ def dashboard(request):
 
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
 
+    enterprise_customer = enterprise_customer_for_request(request)
+    consent_required_courses = set()
+    enterprise_customer_name = None
+    if enterprise_customer:
+        consent_required_courses = {
+            enrollment.course_id for enrollment in course_enrollments
+            if consent_needed_for_course(request, request.user, str(enrollment.course_id), True)
+        }
+        enterprise_customer_name = enterprise_customer['name']
+
     # Account activation message
     account_activation_messages = [
         message for message in messages.get_messages(request) if 'account-activation' in message.tags
@@ -845,6 +866,8 @@ def dashboard(request):
 
     context = {
         'enterprise_message': enterprise_message,
+        'consent_required_courses': consent_required_courses,
+        'enterprise_customer_name': enterprise_customer_name,
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
         'account_activation_messages': account_activation_messages,
@@ -1244,6 +1267,10 @@ def change_enrollment(request, check_access=True):
             request.POST.get("course_id"),
         )
         return HttpResponseBadRequest(_("Invalid course id"))
+
+    # Allow us to monitor performance of this transaction on a per-course basis since we often roll-out features
+    # on a per-course basis.
+    monitoring_utils.set_custom_metric('course_id', unicode(course_id))
 
     if action == "enroll":
         # Make sure the course exists
@@ -2037,32 +2064,16 @@ def create_account_with_params(request, params):
 
     create_comments_service_user(user)
 
-    # Don't send email if we are:
-    #
-    # 1. Doing load testing.
-    # 2. Random user generation for other forms of testing.
-    # 3. External auth bypassing activation.
-    # 4. Have the platform configured to not require e-mail activation.
-    # 5. Registering a new user using a trusted third party provider (with skip_email_verification=True)
-    #
-    # Note that this feature is only tested as a flag set one way or
-    # the other for *new* systems. we need to be careful about
-    # changing settings on a running system to make sure no users are
-    # left in an inconsistent state (or doing a migration if they are).
-    send_email = (
-        not settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) and
-        not settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') and
-        not (do_external_auth and settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH')) and
-        not (
-            third_party_provider and third_party_provider.skip_email_verification and
-            user.email == running_pipeline['kwargs'].get('details', {}).get('email')
-        )
+    # Check if we system is configured to skip activation email for the current user.
+    skip_email = skip_activation_email(
+        user, do_external_auth, running_pipeline, third_party_provider,
     )
-    if send_email:
-        compose_and_send_activation_email(user, profile, registration)
-    else:
+
+    if skip_email:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
+    else:
+        compose_and_send_activation_email(user, profile, registration)
 
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
@@ -2096,6 +2107,54 @@ def create_account_with_params(request, params):
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(new_user.username, new_user.email))
 
     return new_user
+
+
+def skip_activation_email(user, do_external_auth, running_pipeline, third_party_provider):
+    """
+    Return `True` if activation email should be skipped.
+
+    Skip email if we are:
+        1. Doing load testing.
+        2. Random user generation for other forms of testing.
+        3. External auth bypassing activation.
+        4. Have the platform configured to not require e-mail activation.
+        5. Registering a new user using a trusted third party provider (with skip_email_verification=True)
+
+    Note that this feature is only tested as a flag set one way or
+    the other for *new* systems. we need to be careful about
+    changing settings on a running system to make sure no users are
+    left in an inconsistent state (or doing a migration if they are).
+
+    Arguments:
+        user (User): Django User object for the current user.
+        do_external_auth (bool): True if external authentication is in progress.
+        running_pipeline (dict): Dictionary containing user and pipeline data for third party authentication.
+        third_party_provider (ProviderConfig): An instance of third party provider configuration.
+
+    Returns:
+        (bool): `True` if account activation email should be skipped, `False` if account activation email should be
+            sent.
+    """
+    sso_pipeline_email = running_pipeline and running_pipeline['kwargs'].get('details', {}).get('email')
+
+    # Email is valid if the SAML assertion email matches the user account email or
+    # no email was provided in the SAML assertion. Some IdP's use a callback
+    # to retrieve additional user account information (including email) after the
+    # initial account creation.
+    valid_email = (
+        sso_pipeline_email == user.email or (
+            sso_pipeline_email is None and
+            third_party_provider and
+            getattr(third_party_provider, "identity_provider_type", None) == SAP_SUCCESSFACTORS_SAML_KEY
+        )
+    )
+
+    return (
+        settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) or
+        settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') or
+        (settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH') and do_external_auth) or
+        (third_party_provider and third_party_provider.skip_email_verification and valid_email)
+    )
 
 
 def _enroll_user_in_pending_courses(student):
@@ -2169,7 +2228,7 @@ def record_registration_attributions(request, user):
 def create_account(request, post_override=None):
     """
     JSON call to create new edX account.
-    Used by form in signup_modal.html, which is included into navigation.html
+    Used by form in signup_modal.html, which is included into header.html
     """
     # Check if ALLOW_PUBLIC_ACCOUNT_CREATION flag turned off to restrict user account creation
     if not configuration_helpers.get_value(

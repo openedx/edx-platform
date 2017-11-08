@@ -27,9 +27,11 @@
 
       text-transform: lowercase;
 
-      &:hover, &:active, &:focus {
-        border-color: rgb(200,200,200);
-        color: $base-font-color;
+      &:hover,
+      &:active,
+      &:focus {
+        border-color: rgb(200, 200, 200);
+        color: $body-color;
         text-decoration: none;
       }
     }
@@ -41,7 +43,7 @@
     }
 
     .our-mission {
-      border-bottom: 1px solid rgb(220,220,220);
+      border-bottom: 1px solid rgb(220, 220, 220);
 
       @include clearfix();
 
@@ -49,7 +51,7 @@
       padding-bottom: 40px;
 
       .logo {
-        @include border-right(1px solid rgb(200,200,200));
+        @include border-right(1px solid rgb(200, 200, 200));
         @include box-sizing(border-box);
         @include float(left);
 
@@ -83,7 +85,7 @@
     }
 
     .message {
-      border-bottom: 1px solid rgb(220,220,220);
+      border-bottom: 1px solid rgb(220, 220, 220);
 
       @include clearfix();
 
@@ -100,21 +102,21 @@
       }
 
       h2 {
-        border-bottom: 1px solid rgb(200,200,200);
+        border-bottom: 1px solid rgb(200, 200, 200);
         padding-bottom: 15px;
       }
 
       .photo {
         @include box-sizing(border-box);
 
-        background: rgb(255,255,255);
-        border: 1px solid rgb(210,210,210);
+        background: rgb(255, 255, 255);
+        border: 1px solid rgb(210, 210, 210);
         margin-top: 37px;
         padding: 1px;
         width: flex-grid(3);
 
         img {
-          background: rgb(245,245,245);
+          background: rgb(245, 245, 245);
           display: block;
           width: 100%;
         }
@@ -167,7 +169,7 @@
     @include clearfix();
 
     nav.categories {
-      border: 1px solid rgb(220,220,220);
+      border: 1px solid rgb(220, 220, 220);
 
       @include box-sizing(border-box);
       @include float(left);
@@ -185,8 +187,9 @@
 
         text-align: left;
 
-        &:hover, &:focus {
-          background: rgb(245,245,245);
+        &:hover,
+        &:focus {
+          background: rgb(245, 245, 245);
           text-decoration: none;
         }
       }
@@ -205,7 +208,7 @@
         }
 
         > h2 {
-          border-bottom: 1px solid rgb(220,220,220);
+          border-bottom: 1px solid rgb(220, 220, 220);
           margin-bottom: ($baseline*2);
           padding-bottom: $baseline;
         }
@@ -215,7 +218,7 @@
         margin-bottom: ($baseline*2);
 
         h3 {
-          font-family: $sans-serif;
+          font-family: $font-family-sans-serif;
           font-weight: 700;
           margin-bottom: ($baseline*0.75);
         }
@@ -225,7 +228,7 @@
 
   .press {
     .press-story {
-      border-bottom: 1px solid rgb(220,220,220);
+      border-bottom: 1px solid rgb(220, 220, 220);
 
       @include clearfix();
 
@@ -239,8 +242,8 @@
       }
 
       .article-cover {
-        background: rgb(255,255,255);
-        border: 1px solid rgb(120,120,120);
+        background: rgb(255, 255, 255);
+        border: 1px solid rgb(120, 120, 120);
 
         @include box-sizing(border-box);
         @include float(left);
@@ -268,7 +271,7 @@
           margin-bottom: ($baseline/2);
 
           h3 {
-            font-family: $sans-serif;
+            font-family: $font-family-sans-serif;
             font-weight: 700;
             margin-bottom: ($baseline/4);
           }
@@ -291,8 +294,8 @@
     .photo {
       @include box-sizing(border-box);
 
-      background: rgb(255,255,255);
-      border: 1px solid rgb(210,210,210);
+      background: rgb(255, 255, 255);
+      border: 1px solid rgb(210, 210, 210);
       padding: 1px;
 
       @include float(left);

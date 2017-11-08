@@ -348,7 +348,7 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
 
 @attr(shard=1)
-@override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False), ENABLE_ENTERPRISE_INTEGRATION=False)
+@override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False))
 class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Tests for the info page of self-paced courses.
@@ -379,7 +379,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         self.assertEqual(resp.status_code, 200)
 
     def test_num_queries_instructor_paced(self):
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 26, 3)
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 27, 3)
 
     def test_num_queries_self_paced(self):
-        self.fetch_course_info_with_queries(self.self_paced_course, 26, 3)
+        self.fetch_course_info_with_queries(self.self_paced_course, 27, 3)

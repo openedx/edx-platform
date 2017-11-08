@@ -3,6 +3,7 @@ Views for the course_mode module
 """
 
 import decimal
+import json
 import urllib
 
 import waffle
@@ -190,8 +191,11 @@ class ChooseModeView(View):
         context['currency_data'] = []
         if waffle.switch_is_active('local_currency'):
             if 'edx-price-l10n' not in request.COOKIES:
-                context['currency_data'] = get_currency_data()
-
+                currency_data = get_currency_data()
+                try:
+                    context['currency_data'] = json.dumps(currency_data)
+                except TypeError:
+                    pass
         return render_to_response("course_modes/choose.html", context)
 
     @method_decorator(tpa_hint_ends_existing_session)

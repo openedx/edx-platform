@@ -14,7 +14,7 @@ from django.core.cache import cache
 from django.template.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from edx_proctoring.services import ProctoringService
 from opaque_keys import InvalidKeyError
@@ -39,6 +39,8 @@ from courseware.masquerade import (
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
+from lms.djangoapps.completion.models import BlockCompletion
+from lms.djangoapps.completion import waffle as completion_waffle
 from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
@@ -384,12 +386,23 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
     )
 
 
-def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=too-many-statements
-                               # Arguments preceding this comment have user binding, those following don't
-                               descriptor, course_id, track_function, xqueue_callback_url_prefix,
-                               request_token, position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                               static_asset_path='', user_location=None, disable_staff_debug_info=False,
-                               course=None):
+def get_module_system_for_user(
+        user,
+        student_data,  # TODO  # pylint: disable=too-many-statements
+        # Arguments preceding this comment have user binding, those following don't
+        descriptor,
+        course_id,
+        track_function,
+        xqueue_callback_url_prefix,
+        request_token,
+        position=None,
+        wrap_xmodule_display=True,
+        grade_bucket_type=None,
+        static_asset_path='',
+        user_location=None,
+        disable_staff_debug_info=False,
+        course=None
+):
     """
     Helper function that returns a module system and student_data bound to a user and a descriptor.
 
@@ -461,18 +474,29 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             course=course
         )
 
+    def get_event_handler(event_type):
+        """
+        Return an appropriate function to handle the event.
+
+        Returns None if no special processing is required.
+        """
+        handlers = {
+            'grade': handle_grade_event,
+        }
+        if completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            handlers.update({
+                'completion': handle_completion_event,
+                'progress': handle_deprecated_progress_event,
+            })
+        return handlers.get(event_type)
+
     def publish(block, event_type, event):
-        """A function that allows XModules to publish events."""
-        if event_type == 'grade' and not is_masquerading_as_specific_student(user, course_id):
-            SCORE_PUBLISHED.send(
-                sender=None,
-                block=block,
-                user=user,
-                raw_earned=event['value'],
-                raw_possible=event['max_value'],
-                only_if_higher=event.get('only_if_higher'),
-                score_deleted=event.get('score_deleted'),
-            )
+        """
+        A function that allows XModules to publish events.
+        """
+        handle_event = get_event_handler(event_type)
+        if handle_event and not is_masquerading_as_specific_student(user, course_id):
+            handle_event(block, event)
         else:
             context = contexts.course_context_from_course_id(course_id)
             if block.runtime.user_id:
@@ -485,6 +509,57 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
                         context['asides'][aside.scope_ids.block_type] = aside_event_info
             with tracker.get_tracker().context(event_type, context):
                 track_function(event_type, event)
+
+    def handle_completion_event(block, event):
+        """
+        Submit a completion object for the block.
+        """
+        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            raise Http404
+        else:
+            BlockCompletion.objects.submit_completion(
+                user=user,
+                course_key=course_id,
+                block_key=block.scope_ids.usage_id,
+                completion=event['completion'],
+            )
+
+    def handle_grade_event(block, event):
+        """
+        Submit a grade for the block.
+        """
+        SCORE_PUBLISHED.send(
+            sender=None,
+            block=block,
+            user=user,
+            raw_earned=event['value'],
+            raw_possible=event['max_value'],
+            only_if_higher=event.get('only_if_higher'),
+            score_deleted=event.get('score_deleted'),
+        )
+
+    def handle_deprecated_progress_event(block, event):
+        """
+        DEPRECATED: Submit a completion for the block represented by the
+        progress event.
+
+        This exists to support the legacy progress extension used by
+        edx-solutions.  New XBlocks should not emit these events, but instead
+        emit completion events directly.
+        """
+        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            raise Http404
+        else:
+            requested_user_id = event.get('user_id', user.id)
+            if requested_user_id != user.id:
+                log.warning("{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
+                return
+            BlockCompletion.objects.submit_completion(
+                user=user,
+                course_key=course_id,
+                block_key=block.scope_ids.usage_id,
+                completion=1.0,
+            )
 
     def rebind_noauth_module_to_user(module, real_user):
         """
@@ -850,29 +925,32 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     Generic view for extensions. This is where AJAX calls go.
 
     Arguments:
+        request (Request): Django request.
+        course_id (str): Course containing the block
+        usage_id (str)
+        handler (str)
+        suffix (str)
 
-      - request -- the django request.
-      - location -- the module location. Used to look up the XModule instance
-      - course_id -- defines the course context for this request.
-
-    Return 403 error if the user is not logged in. Raises Http404 if
-    the location and course_id do not identify a valid module, the module is
-    not accessible by the user, or the module raises NotFoundError. If the
-    module raises any other error, it will escape this function.
+    Raises:
+        Http404: If the course is not found in the modulestore.
     """
-    if not request.user.is_authenticated():
-        return HttpResponse('Unauthenticated', status=403)
+    # NOTE (CCB): Allow anonymous GET calls (e.g. for transcripts). Modifying this view is simpler than updating
+    # the XBlocks to use `handle_xblock_callback_noauth`...which is practically identical to this view.
+    if request.method != 'GET' and not request.user.is_authenticated():
+        return HttpResponseForbidden()
+
+    request.user.known = request.user.is_authenticated()
 
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
-        raise Http404("Invalid location")
+        raise Http404('{} is not a valid course key'.format(course_id))
 
     with modulestore().bulk_operations(course_key):
         try:
             course = modulestore().get_course(course_key)
         except ItemNotFoundError:
-            raise Http404("invalid location")
+            raise Http404('{} does not exist in the modulestore'.format(course_id))
 
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 

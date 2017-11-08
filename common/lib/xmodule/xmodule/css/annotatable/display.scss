@@ -12,26 +12,28 @@ $annotatable--body-font-size: em(14);
 }
 
 .annotatable-header {
-  margin-bottom: .5em;
+  margin-bottom: 0.5em;
 }
 
 .annotatable-section {
   position: relative;
-  padding: .5em 1em;
+  padding: 0.5em 1em;
   border: 1px solid $annotatable--border-color;
   border-radius: 0.5em;
   margin-bottom: 0.5em;
 
-  &.shaded { background-color: #EDEDED; }
+  &.shaded { background-color: #ededed; }
 
   .annotatable-section-title {
     font-weight: bold;
     a { font-weight: normal; }
   }
+
   .annotatable-section-body {
     border-top: 1px solid $annotatable--border-color;
     margin-top: 0.5em;
     padding-top: 0.5em;
+
     @include clearfix();
   }
 
@@ -40,6 +42,7 @@ $annotatable--body-font-size: em(14);
     margin-left: 4em;
     b { font-weight: bold; }
     i { font-style: italic; }
+
     code {
       display: inline;
       white-space: pre;
@@ -52,27 +55,29 @@ $annotatable--body-font-size: em(14);
   position: absolute;
   right: 0;
   margin: 2px 1em 2px 0;
-  &.expanded:after { content: " \2191" }
-  &.collapsed:after { content: " \2193" }
+  &.expanded::after { content: " \2191"; }
+  &.collapsed::after { content: " \2193"; }
 }
 
 .annotatable-span {
   @extend %ui-fake-link;
+
   display: inline;
 
   $highlight_index: 0;
+
   @each $highlight in (
-    (yellow rgba(255,255,10,0.3) rgba(255,255,10,0.9)),
+    (yellow rgba(255, 255,10, 0.3) rgba(255, 255,10, 0.9)),
     (red rgba(178,19,16,0.3) rgba(178,19,16,0.9)),
-    (orange rgba(255,165,0,0.3) rgba(255,165,0,0.9)),
+    (orange rgba(255,165,0, 0.3) rgba(255,165,0, 0.9)),
     (green rgba(25,255,132,0.3) rgba(25,255,132,0.9)),
     (blue rgba(35,163,255,0.3) rgba(35,163,255,0.9)),
     (purple rgba(115,9,178,0.3) rgba(115,9,178,0.9))) {
 
     $highlight_index: $highlight_index + 1;
-    $marker: nth($highlight,1);
-    $color: nth($highlight,2);
-    $selected_color: nth($highlight,3);
+    $marker: nth($highlight, 1);
+    $color: nth($highlight, 2);
+    $selected_color: nth($highlight, 3);
 
     @if $highlight_index == 1 {
       &.highlight {
@@ -80,6 +85,7 @@ $annotatable--body-font-size: em(14);
         &.selected { background-color: $selected_color; }
       }
     }
+
     &.highlight-#{$marker} {
       background-color: $color;
       &.selected { background-color: $selected_color; }
@@ -89,6 +95,7 @@ $annotatable--body-font-size: em(14);
   &.hide {
     cursor: none;
     background-color: inherit;
+
     .annotatable-icon {
       display: none;
     }
@@ -103,7 +110,7 @@ $annotatable--body-font-size: em(14);
   font-size: $annotatable--body-font-size;
   border: 1px solid #333;
   border-radius: 1em;
-  background-color: rgba(0,0,0,0.85);
+  background-color: rgba(0, 0, 0, 0.85);
   color: $white;
   -webkit-font-smoothing: antialiased;
 
@@ -113,20 +120,24 @@ $annotatable--body-font-size: em(14);
     background-color: transparent;
     padding: ($baseline/4) ($baseline/2);
     border: none;
+
     .ui-tooltip-title {
       padding: ($baseline/4) 0;
       border-bottom: 2px solid #333;
       font-weight: bold;
     }
+
     .ui-tooltip-icon {
       right: 10px;
       background: #333;
     }
+
     .ui-state-hover {
       color: inherit;
       border: 1px solid $gray-l3;
     }
   }
+
   .ui-tooltip-content {
     color: inherit;
     font-size: em(14);
@@ -136,16 +147,19 @@ $annotatable--body-font-size: em(14);
     background-color: transparent;
     border-color: transparent;
   }
+
   p {
-      color: inherit;
-      line-height: normal;
+    color: inherit;
+    line-height: normal;
   }
 }
 
 .ui-tooltip.qtip.ui-tooltip-annotatable {
   max-width: 375px;
+
   .ui-tooltip-content {
     padding: 0 ($baseline/2);
+
     .annotatable-comment {
       display: block;
       margin: 0 0 ($baseline/2) 0;
@@ -153,6 +167,7 @@ $annotatable--body-font-size: em(14);
       overflow: auto;
       line-height: normal;
     }
+
     .annotatable-reply {
       display: block;
       border-top: 2px solid #333;
@@ -161,7 +176,8 @@ $annotatable--body-font-size: em(14);
       text-align: center;
     }
   }
-  &:after {
+
+  &::after {
     content: '';
     display: inline-block;
     position: absolute;

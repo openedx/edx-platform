@@ -1,6 +1,8 @@
 """
 UserPartitionScheme for enrollment tracks.
 """
+import logging
+
 from course_modes.models import CourseMode
 from courseware.masquerade import (
     get_course_masquerade,
@@ -12,6 +14,9 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
 from student.models import CourseEnrollment
 from xmodule.partitions.partitions import Group, UserPartition
+
+LOGGER = logging.getLogger(__name__)
+
 
 # These IDs must be less than 100 so that they do not overlap with Groups in
 # CohortUserPartition or RandomUserPartitionScheme
@@ -89,7 +94,10 @@ class EnrollmentTrackPartitionScheme(object):
                 modes=CourseMode.modes_for_course(course_key, include_expired=True, only_selectable=False),
             )
             if course_mode and CourseMode.is_credit_mode(course_mode):
-                course_mode = CourseMode.verified_mode_for_course(course_key)
+                # We want the verified track even if the upgrade deadline has passed, since we
+                # are determining what content to show the user, not whether the user can enroll
+                # in the verified track.
+                course_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
             if not course_mode:
                 course_mode = CourseMode.DEFAULT_MODE
             return Group(ENROLLMENT_GROUP_IDS[course_mode.slug], unicode(course_mode.name))

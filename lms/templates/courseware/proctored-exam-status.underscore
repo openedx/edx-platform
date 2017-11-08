@@ -19,9 +19,14 @@
             <% } %>
         </span>
         <span class="sr timer-announce" aria-live="assertive"></span>
-        <span id="time_remaining_id">
-            <b>
-            </b>
+        <span class="exam-timer-clock">
+            <span id="time_remaining_id">
+                <b>
+                </b>
+            </span>
+            <button role="button" id="toggle_timer" aria-label="<%- gettext("Hide Timer") %>" aria-pressed="false">
+                <i class="fa fa-eye-slash" aria-hidden="true"></i>
+            </button>
         </span>
     </div>
 </div>

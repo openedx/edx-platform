@@ -2,16 +2,11 @@
 // LMS main styles for Bootstrap
 // -----------------------------
 
-// Bootstrap theme
-@import 'bootstrap/theme';
-@import 'bootstrap/scss/bootstrap';
+// Set the relative path to the static root
+$static-path: '../..';
 
-// Legacy support
-@import 'legacy';
-
-// Base
-@import 'base';
-@import 'variables';
+// Base build
+@import 'build';
 
 // Elements
 @import 'header';
@@ -20,6 +15,8 @@
 @import 'layouts';
 @import 'components';
 @import 'course/layout/courseware_preview';
+@import 'shared/modal';
+@import 'shared/help-tab';
 
 // Features
 @import 'features/bookmarks';
@@ -30,3 +27,9 @@
 
 // Individual Pages
 @import "views/program-marketing-page";
+
+// Responsive Design
+@import '../header';
+
+// Extra theme-specific rules
+@import 'lms/theme/extras';

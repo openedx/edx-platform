@@ -20,7 +20,6 @@ ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
 COMMENTS_SERVICE_URL = 'http://edx.devstack.forum:4567'
 
 ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_ROOT_URL)
-ENABLE_ENTERPRISE_INTEGRATION = False
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
@@ -39,15 +38,17 @@ FEATURES.update({
     'ENABLE_COURSE_DISCOVERY': False,
     'ENABLE_DASHBOARD_SEARCH': False,
     'ENABLE_DISCUSSION_SERVICE': True,
-    'SHOW_HEADER_LANGUAGE_SELECTOR': True
+    'SHOW_HEADER_LANGUAGE_SELECTOR': True,
+    'ENABLE_ENTERPRISE_INTEGRATION': False,
 })
 
 ENABLE_MKTG_SITE = os.environ.get('ENABLE_MARKETING_SITE', False)
 MARKETING_SITE_ROOT = os.environ.get('MARKETING_SITE_ROOT', 'http://localhost:8080')
 
 MKTG_URLS = {
-    'ABOUT': '/about-us',
+    'ABOUT': '/about',
     'ACCESSIBILITY': '/accessibility',
+    'AFFILIATES': '/affiliates',
     'BLOG': '/blog',
     'CAREERS': '/careers',
     'CONTACT': '/contact',

@@ -8,7 +8,7 @@ $forum-color-background-light: palette(grayscale, x-back) !default;
 
 // contextual color variables
 $forum-color-background: $lms-container-background-color !default;
-$forum-color-active-thread: $lms-active-color !default;
+$forum-color-active-thread: theme-color("primary") !default;
 $forum-color-hover: palette(primary, dark) !default;
 $forum-color-active-text: $lms-container-background-color !default;
 $forum-color-pinned: palette(secondary, dark) !default;
@@ -47,7 +47,3 @@ $forum-small-font-size: font-size(x-small);
 
 // borders
 $forum-border-radius: $component-border-radius;
-
-// btn colors
-$uxpl-primary-blue: palette(primary, base) !default;
-$btn-default-background-color: $lms-container-background-color;

@@ -20,7 +20,7 @@ from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsec
 from lms.djangoapps.grades.services import GradesService
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lms.djangoapps.grades.tasks import (
-    RECALCULATE_GRADE_DELAY,
+    RECALCULATE_GRADE_DELAY_SECONDS,
     _course_task_args,
     compute_grades_for_course_v2,
     recalculate_subsection_grade_v3
@@ -142,7 +142,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             return_value=None
         ) as mock_task_apply:
             PROBLEM_WEIGHTED_SCORE_CHANGED.send(sender=None, **send_args)
-            mock_task_apply.assert_called_once_with(countdown=RECALCULATE_GRADE_DELAY, kwargs=local_task_args)
+            mock_task_apply.assert_called_once_with(countdown=RECALCULATE_GRADE_DELAY_SECONDS, kwargs=local_task_args)
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
     def test_triggers_subsection_score_signal(self, mock_subsection_signal):

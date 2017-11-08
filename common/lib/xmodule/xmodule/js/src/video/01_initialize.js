@@ -286,7 +286,7 @@ function(VideoPlayer, i18n, moment, _) {
      */
     function extractHLSVideoSources(state) {
         return _.filter(state.config.sources, function(source) {
-            return /\.m3u8$/.test(source);
+            return /\.m3u8(\?.*)?$/.test(source);
         });
     }
 
@@ -569,6 +569,7 @@ function(VideoPlayer, i18n, moment, _) {
             this.config.speed || this.config.generalSpeed
         );
         this.htmlPlayerLoaded = false;
+        this.duration = this.metadata.duration;
 
         _setConfigurations(this);
 

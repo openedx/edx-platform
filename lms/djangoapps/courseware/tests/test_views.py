@@ -11,10 +11,23 @@ from urllib import quote, urlencode
 from uuid import uuid4
 
 import ddt
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponseBadRequest
+from django.test import TestCase
+from django.test.client import Client, RequestFactory
+from django.test.utils import override_settings
 from freezegun import freeze_time
+from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, PropertyMock, create_autospec, patch
 from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import Location
 from pytz import UTC
+from xblock.core import XBlock
+from xblock.fields import Scope, String
+from xblock.fragment import Fragment
 
 import courseware.views.views as views
 import shoppingcart
@@ -32,19 +45,9 @@ from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
-from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
-from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseBadRequest
-from django.test import TestCase
-from django.test.client import Client, RequestFactory
-from django.test.utils import override_settings
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
-from milestones.tests.utils import MilestonesTestCaseMixin
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import Location
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -52,19 +55,17 @@ from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.tests.test_date_utils import fake_pgettext, fake_ugettext
 from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
-from xblock.core import XBlock
-from xblock.fields import Scope, String
-from xblock.fragment import Fragment
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -213,8 +214,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 145),
-        (ModuleStoreEnum.Type.split, 4, 145),
+        (ModuleStoreEnum.Type.mongo, 10, 143),
+        (ModuleStoreEnum.Type.split, 4, 143),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -227,9 +228,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
                 for _ in range(self.NUM_PROBLEMS):
                     ItemFactory.create(category='problem', parent_location=vertical.location)
 
-        password = 'test'
-        self.user = UserFactory(password=password)
-        self.client.login(username=self.user.username, password=password)
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
         CourseEnrollment.enroll(self.user, course.id)
 
         with self.assertNumQueries(expected_mysql_query_count, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
@@ -302,8 +302,8 @@ class ViewsTestCase(ModuleStoreTestCase):
             )
 
         self.course_key = self.course.id
-        self.password = '123456'
-        self.user = UserFactory(username='dummy', password=self.password, email='test@mit.edu')
+        # Set profile country to Åland Islands to check Unicode characters does not raise error
+        self.user = UserFactory(username='dummy', profile__country='AX')
         self.date = datetime(2013, 1, 22, tzinfo=UTC)
         self.enrollment = CourseEnrollment.enroll(self.user, self.course_key)
         self.enrollment.created = self.date
@@ -314,7 +314,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.org = u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ"
         self.org_html = "<p>'+Stark/Industries+'</p>"
 
-        self.assertTrue(self.client.login(username=self.user.username, password=self.password))
+        self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
 
         # refresh the course from the modulestore so that it has children
         self.course = modulestore().get_course(self.course.id)
@@ -390,7 +390,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         Create global staff user and log them in
         """
         self.global_staff = GlobalStaffFactory.create()  # pylint: disable=attribute-defined-outside-init
-        self.assertTrue(self.client.login(username=self.global_staff.username, password='test'))
+        self.assertTrue(self.client.login(username=self.global_staff.username, password=TEST_PASSWORD))
 
     def _create_url_for_enroll_staff(self):
         """
@@ -457,7 +457,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertNotIn(in_cart_span, response.content)
 
         # authenticated user with nothing in cart
-        self.assertTrue(self.client.login(username=self.user.username, password=self.password))
+        self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
         response = self.client.get(reverse('about_course', args=[unicode(course.id)]))
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(in_cart_span, response.content)
@@ -486,7 +486,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         if is_anonymous:
             self.client.logout()
         else:
-            self.assertTrue(self.client.login(username=self.user.username, password=self.password))
+            self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
 
         # Construct the link according the following scenarios and verify its presence in the response:
         #      (1) shopping cart is enabled and the user is not logged in
@@ -563,7 +563,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.section.location.name,
             'f'
         ])
-        self.assertTrue(self.client.login(username=self.user.username, password=self.password))
+        self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
         response = self.client.get(request_url)
         self.assertEqual(response.status_code, 404)
 
@@ -576,7 +576,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.section.location.name,
             '1'
         ]
-        self.assertTrue(self.client.login(username=self.user.username, password=self.password))
+        self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
         for idx, val in enumerate(url_parts):
             url_parts_copy = url_parts[:]
             url_parts_copy[idx] = val + u'χ'
@@ -808,7 +808,12 @@ class ViewsTestCase(ModuleStoreTestCase):
         CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, course_id=course)
 
         # Enroll user in the course
-        enrollment = CourseEnrollmentFactory(course_id=course, user=self.user, mode=CourseMode.AUDIT)
+        # Don't use the CourseEnrollmentFactory since it ensures a CourseOverview is available
+        enrollment = CourseEnrollment.objects.create(
+            course_id=course,
+            user=self.user,
+            mode=CourseMode.AUDIT,
+        )
 
         self.assertEqual(enrollment.course_overview, None)
 
@@ -1202,7 +1207,6 @@ class StartDateTests(ModuleStoreTestCase):
 
 # pylint: disable=protected-access, no-member
 @attr(shard=1)
-@override_settings(ENABLE_ENTERPRISE_INTEGRATION=False)
 class ProgressPageBaseTests(ModuleStoreTestCase):
     """
     Base class for progress page tests.
@@ -1457,13 +1461,13 @@ class ProgressPageTests(ProgressPageBaseTests):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(34 if self_paced else 33, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
+        with self.assertNumQueries(35 if self_paced else 34, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
             self._get_progress_page()
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 40, 26),
-        (True, 33, 22)
+        (False, 41, 27),
+        (True, 34, 23)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -2029,7 +2033,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
     def setUp(self):
         super(GenerateUserCertTests, self).setUp()
 
-        self.student = UserFactory(username='dummy', password='123456', email='test@mit.edu')
+        self.student = UserFactory()
         self.course = CourseFactory.create(
             org='edx',
             number='verified',
@@ -2039,7 +2043,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             self_paced=True
         )
         self.enrollment = CourseEnrollment.enroll(self.student, self.course.id, mode='honor')
-        self.assertTrue(self.client.login(username=self.student, password='123456'))
+        self.assertTrue(self.client.login(username=self.student, password=TEST_PASSWORD))
         self.url = reverse('generate_user_cert', kwargs={'course_id': unicode(self.course.id)})
 
     def test_user_with_out_passing_grades(self):
@@ -2190,6 +2194,7 @@ class TestIndexView(ModuleStoreTestCase):
     """
     Tests of the courseware.views.index view.
     """
+    SEO_WAFFLE_FLAG = CourseWaffleFlag(WaffleFlagNamespace(name='seo'), 'enable_anonymous_courseware_access')
 
     @XBlock.register_temp_plugin(ViewCheckerBlock, 'view_checker')
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -2258,6 +2263,28 @@ class TestIndexView(ModuleStoreTestCase):
             ) + '?activate_block_id=test_block_id'
         )
         self.assertIn("Activate Block ID: test_block_id", response.content)
+
+    def test_anonymous_access(self):
+        course = CourseFactory()
+        with self.store.bulk_operations(course.id):
+            chapter = ItemFactory(parent=course, category='chapter')
+            section = ItemFactory(parent=chapter, category='sequential')
+
+        url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': str(course.id),
+                'chapter': chapter.url_name,
+                'section': section.url_name,
+            }
+        )
+        response = self.client.get(url, follow=False)
+        assert response.status_code == 302
+
+        waffle_flag = CourseWaffleFlag(WaffleFlagNamespace(name='seo'), 'enable_anonymous_courseware_access')
+        with override_waffle_flag(waffle_flag, active=True):
+            response = self.client.get(url, follow=False)
+            assert response.status_code == 200
 
 
 @ddt.ddt
@@ -2443,14 +2470,13 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
     @classmethod
     def setUpTestData(cls):
         """Set up and enroll our fake user in the course."""
-        cls.password = 'test'
-        cls.user = UserFactory(password=cls.password)
+        cls.user = UserFactory()
         CourseEnrollment.enroll(cls.user, cls.course.id)
 
     def setUp(self):
         """Do the client login."""
         super(TestIndexViewCrawlerStudentStateWrites, self).setUp()
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
     def test_write_by_default(self):
         """By default, always write student state, regardless of user agent."""

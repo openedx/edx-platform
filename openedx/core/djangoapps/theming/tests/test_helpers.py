@@ -22,12 +22,13 @@ class TestHelpers(TestCase):
         Tests template paths are returned from enabled theme.
         """
         expected_themes = [
-            Theme('edge.edx.org', 'edge.edx.org', get_theme_base_dir('edge.edx.org')),
-            Theme('edx.org', 'edx.org', get_theme_base_dir('edx.org')),
-            Theme('open-edx', 'open-edx', get_theme_base_dir('open-edx')),
-            Theme('red-theme', 'red-theme', get_theme_base_dir('red-theme')),
-            Theme('stanford-style', 'stanford-style', get_theme_base_dir('stanford-style')),
-            Theme('test-theme', 'test-theme', get_theme_base_dir('test-theme')),
+            Theme('dark-theme', 'dark-theme', get_theme_base_dir('dark-theme'), settings.PROJECT_ROOT),
+            Theme('edge.edx.org', 'edge.edx.org', get_theme_base_dir('edge.edx.org'), settings.PROJECT_ROOT),
+            Theme('edx.org', 'edx.org', get_theme_base_dir('edx.org'), settings.PROJECT_ROOT),
+            Theme('open-edx', 'open-edx', get_theme_base_dir('open-edx'), settings.PROJECT_ROOT),
+            Theme('red-theme', 'red-theme', get_theme_base_dir('red-theme'), settings.PROJECT_ROOT),
+            Theme('stanford-style', 'stanford-style', get_theme_base_dir('stanford-style'), settings.PROJECT_ROOT),
+            Theme('test-theme', 'test-theme', get_theme_base_dir('test-theme'), settings.PROJECT_ROOT),
         ]
         actual_themes = get_themes()
         self.assertItemsEqual(expected_themes, actual_themes)
@@ -38,7 +39,7 @@ class TestHelpers(TestCase):
         Tests template paths are returned from enabled theme.
         """
         expected_themes = [
-            Theme('test-theme', 'test-theme', get_theme_base_dir('test-theme')),
+            Theme('test-theme', 'test-theme', get_theme_base_dir('test-theme'), settings.PROJECT_ROOT),
         ]
         actual_themes = get_themes()
         self.assertItemsEqual(expected_themes, actual_themes)

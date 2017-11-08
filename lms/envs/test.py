@@ -25,6 +25,7 @@ from uuid import uuid4
 from warnings import filterwarnings, simplefilter
 
 from util.db import NoOpMigrationModules
+from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.tempdir import mkdtemp_clean
 
 # This patch disables the commit_on_success decorator during tests
@@ -88,33 +89,12 @@ WIKI_ENABLED = True
 # Enable a parental consent age limit for testing
 PARENTAL_CONSENT_AGE_LIMIT = 13
 
-# Makes the tests run much faster...
-SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
-
-# Nose Test Runner
-TEST_RUNNER = 'openedx.core.djangolib.nose.NoseTestSuiteRunner'
-
-_SYSTEM = 'lms'
-
-_REPORT_DIR = REPO_ROOT / 'reports' / _SYSTEM
-_REPORT_DIR.makedirs_p()
-_NOSEID_DIR = REPO_ROOT / '.testids' / _SYSTEM
-_NOSEID_DIR.makedirs_p()
-
-NOSE_ARGS = [
-    '--id-file', _NOSEID_DIR / 'noseids',
-]
-
-NOSE_PLUGINS = [
-    'openedx.core.djangolib.testing.utils.NoseDatabaseIsolation'
-]
-
 # Local Directories
 TEST_ROOT = path("test_root")
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
-INSTALLED_APPS = tuple(app for app in INSTALLED_APPS if app != 'webpack_loader')
-INSTALLED_APPS += ('openedx.tests.util.webpack_loader',)
+INSTALLED_APPS = [app for app in INSTALLED_APPS if app != 'webpack_loader']
+INSTALLED_APPS.append('openedx.tests.util.webpack_loader')
 WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
 
 STATUS_MESSAGE_PATH = TEST_ROOT / "status_message.json"
@@ -208,7 +188,7 @@ if os.environ.get('DISABLE_MIGRATIONS'):
 
 # Make sure we test with the extended history table
 FEATURES['ENABLE_CSMH_EXTENDED'] = True
-INSTALLED_APPS += ('coursewarehistoryextended',)
+INSTALLED_APPS.append('coursewarehistoryextended')
 
 CACHES = {
     # This is the cache used for most things.
@@ -263,7 +243,7 @@ PASSWORD_COMPLEXITY = {}
 ######### Third-party auth ##########
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
 
-AUTHENTICATION_BACKENDS = (
+AUTHENTICATION_BACKENDS = [
     'social_core.backends.google.GoogleOAuth2',
     'social_core.backends.linkedin.LinkedinOAuth2',
     'social_core.backends.facebook.FacebookOAuth2',
@@ -272,7 +252,7 @@ AUTHENTICATION_BACKENDS = (
     'third_party_auth.dummy.DummyBackend',
     'third_party_auth.saml.SAMLAuthBackend',
     'third_party_auth.lti.LTIAuthBackend',
-) + AUTHENTICATION_BACKENDS
+] + AUTHENTICATION_BACKENDS
 
 THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
     'custom1': {
@@ -390,10 +370,10 @@ for static_dir in STATICFILES_DIRS:
 STATICFILES_DIRS = _NEW_STATICFILES_DIRS
 
 FILE_UPLOAD_TEMP_DIR = TEST_ROOT / "uploads"
-FILE_UPLOAD_HANDLERS = (
+FILE_UPLOAD_HANDLERS = [
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
-)
+]
 
 ########################### Server Ports ###################################
 
@@ -415,15 +395,10 @@ HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {
 
 ################### Make tests faster
 
-#http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
-PASSWORD_HASHERS = (
-    # 'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-    # 'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-    # 'django.contrib.auth.hashers.BCryptPasswordHasher',
+PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.SHA1PasswordHasher',
     'django.contrib.auth.hashers.MD5PasswordHasher',
-    # 'django.contrib.auth.hashers.CryptPasswordHasher',
-)
+]
 
 ### This enables the Metrics tab for the Instructor dashboard ###########
 FEATURES['CLASS_DASHBOARD'] = True
@@ -514,7 +489,7 @@ MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
 TEST_THEME = COMMON_ROOT / "test" / "test-theme"
 
 # add extra template directory for test-only templates
-MAKO_TEMPLATES['main'].extend([
+MAIN_MAKO_TEMPLATES_BASE.extend([
     COMMON_ROOT / 'test' / 'templates',
     COMMON_ROOT / 'test' / 'test_sites',
     REPO_ROOT / 'openedx' / 'core' / 'djangolib' / 'tests' / 'templates',
@@ -562,7 +537,7 @@ FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.8"
 
 ######### custom courses #########
-INSTALLED_APPS += ('lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon')
+INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
 FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # Set dummy values for profile image settings.
@@ -581,8 +556,8 @@ PROFILE_IMAGE_MIN_BYTES = 100
 
 # Enable the LTI provider feature for testing
 FEATURES['ENABLE_LTI_PROVIDER'] = True
-INSTALLED_APPS += ('lti_provider',)
-AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend',)
+INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
+AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
 
 # ORGANIZATIONS
 FEATURES['ORGANIZATIONS_APP'] = True
@@ -606,7 +581,6 @@ COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
 
 LMS_ROOT_URL = "http://localhost:8000"
 
-ENABLE_ENTERPRISE_INTEGRATION = False
 ECOMMERCE_API_URL = 'https://ecommerce.example.com/api/v2/'
 ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = 'http://enterprise.example.com/consent/api/v1/'
@@ -614,3 +588,7 @@ ENTERPRISE_CONSENT_API_URL = 'http://enterprise.example.com/consent/api/v1/'
 ACTIVATION_EMAIL_FROM_ADDRESS = 'test_activate@edx.org'
 
 TEMPLATES[0]['OPTIONS']['debug'] = True
+
+########################## Derive Any Derived Settings  #######################
+
+derive_settings(__name__)

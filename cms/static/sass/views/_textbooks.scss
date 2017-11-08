@@ -49,10 +49,10 @@
           @extend %ui-fake-link;
 
           &:hover {
-            color: $uxpl-blue-base;
+            color: theme-color("primary");
 
             .ui-toggle-expansion {
-              color: $uxpl-blue-base;
+              color: theme-color("primary");
             }
           }
         }
@@ -229,10 +229,9 @@
               margin: 0 0 ($baseline/4) 0;
 
               &.is-focused {
-                color: $uxpl-blue-base;
+                color: theme-color("primary");
               }
             }
-
 
             &.add-textbook-name label {
               @extend %t-title5;

@@ -24,10 +24,15 @@ from courseware.date_summary import (
     VerifiedUpgradeDeadlineDate,
     CertificateAvailableDate
 )
-from courseware.models import DynamicUpgradeDeadlineConfiguration, CourseDynamicUpgradeDeadlineConfiguration
+from courseware.models import (
+    CourseDynamicUpgradeDeadlineConfiguration,
+    DynamicUpgradeDeadlineConfiguration,
+    OrgDynamicUpgradeDeadlineConfiguration
+)
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules.signals import CREATE_SCHEDULE_WAFFLE_FLAG
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -562,6 +567,7 @@ class TestDateAlerts(SharedModuleStoreTestCase):
                 self.assertEqual(len(messages), 0)
 
 
+@ddt.ddt
 @attr(shard=1)
 class TestScheduleOverrides(SharedModuleStoreTestCase):
 
@@ -585,19 +591,42 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         self.assertEqual(block.date, expected)
+        self._check_text(block)
+
+    def _check_text(self, upgrade_date_summary):
+        self.assertEqual(upgrade_date_summary.title, 'Upgrade to Verified Certificate')
+        self.assertEqual(
+            upgrade_date_summary.description,
+            'Don\'t miss the opportunity to highlight your new knowledge and skills by earning a verified'
+            ' certificate.'
+        )
+        self.assertEqual(upgrade_date_summary.relative_datestring, 'by {date}')
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_date_with_self_paced_with_enrollment_after_course_start(self):
         """ Enrolling after a course begins should result in the upgrade deadline being set relative to the
-        enrollment date. """
+        enrollment date.
+
+        Additionally, OrgDynamicUpgradeDeadlineConfiguration should override the number of days until the deadline,
+        and CourseDynamicUpgradeDeadlineConfiguration should override the org-level override.
+        """
         global_config = DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
-        course = create_self_paced_course_run(days_till_start=-1)
+        course = create_self_paced_course_run(days_till_start=-1, org_id='TestOrg')
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         expected = enrollment.created + timedelta(days=global_config.deadline_days)
         self.assertEqual(block.date, expected)
 
-        # Courses should be able to override the deadline
+        # Orgs should be able to override the deadline
+        org_config = OrgDynamicUpgradeDeadlineConfiguration.objects.create(
+            enabled=True, org_id=course.org, deadline_days=4
+        )
+        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
+        block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
+        expected = enrollment.created + timedelta(days=org_config.deadline_days)
+        self.assertEqual(block.date, expected)
+
+        # Courses should be able to override the deadline (and the org-level override)
         course_config = CourseDynamicUpgradeDeadlineConfiguration.objects.create(
             enabled=True, course_id=course.id, deadline_days=3
         )
@@ -639,6 +668,68 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
 
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         self.assertEqual(block.date, expected)
+
+    @ddt.data(
+        # (enroll before configs, org enabled, org opt-out, course enabled, course opt-out, expected dynamic deadline)
+        (False, False, False, False, False, True),
+        (False, False, False, False, True, True),
+        (False, False, False, True, False, True),
+        (False, False, False, True, True, False),
+        (False, False, True, False, False, True),
+        (False, False, True, False, True, True),
+        (False, False, True, True, False, True),
+        (False, False, True, True, True, False),
+        (False, True, False, False, False, True),
+        (False, True, False, False, True, True),
+        (False, True, False, True, False, True),
+        (False, True, False, True, True, False),  # course-level overrides org-level
+        (False, True, True, False, False, False),
+        (False, True, True, False, True, False),
+        (False, True, True, True, False, True),  # course-level overrides org-level
+        (False, True, True, True, True, False),
+
+        (True, False, False, False, False, True),
+        (True, False, False, False, True, True),
+        (True, False, False, True, False, True),
+        (True, False, False, True, True, False),
+        (True, False, True, False, False, True),
+        (True, False, True, False, True, True),
+        (True, False, True, True, False, True),
+        (True, False, True, True, True, False),
+        (True, True, False, False, False, True),
+        (True, True, False, False, True, True),
+        (True, True, False, True, False, True),
+        (True, True, False, True, True, False),  # course-level overrides org-level
+        (True, True, True, False, False, False),
+        (True, True, True, False, True, False),
+        (True, True, True, True, False, True),  # course-level overrides org-level
+        (True, True, True, True, True, False),
+    )
+    @ddt.unpack
+    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
+    def test_date_with_org_and_course_config_overrides(self, enroll_first, org_config_enabled, org_config_opt_out,
+                                                       course_config_enabled, course_config_opt_out,
+                                                       expected_dynamic_deadline):
+        """ Runs through every combination of org-level plus course-level DynamicUpgradeDeadlineConfiguration enabled
+        and opt-out states to verify that course-level overrides the org-level config. """
+        course = create_self_paced_course_run(days_till_start=-1, org_id='TestOrg')
+        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
+        if enroll_first:
+            enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT, course__self_paced=True)
+        OrgDynamicUpgradeDeadlineConfiguration.objects.create(
+            enabled=org_config_enabled, opt_out=org_config_opt_out, org_id=course.id.org
+        )
+        CourseDynamicUpgradeDeadlineConfiguration.objects.create(
+            enabled=course_config_enabled, opt_out=course_config_opt_out, course_id=course.id
+        )
+        if not enroll_first:
+            enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT, course__self_paced=True)
+
+        # The enrollment has a schedule, and the upgrade_deadline is set when expected_dynamic_deadline is True
+        if not enroll_first:
+            self.assertEqual(enrollment.schedule.upgrade_deadline is not None, expected_dynamic_deadline)
+        # The CourseEnrollment.upgrade_deadline property method is checking the configs
+        self.assertEqual(enrollment.dynamic_upgrade_deadline is not None, expected_dynamic_deadline)
 
 
 def create_user(verification_status=None):
@@ -695,7 +786,7 @@ def create_course_run(
     return course
 
 
-def create_self_paced_course_run(days_till_start=1):
+def create_self_paced_course_run(days_till_start=1, org_id=None):
     """ Create a new course run and course modes.
 
     All date-related arguments are relative to the current date-time (now) unless otherwise specified.
@@ -704,9 +795,11 @@ def create_self_paced_course_run(days_till_start=1):
 
     Arguments:
         days_till_start (int): Number of days until the course starts.
+        org_id (string): String org id to assign the course to (default: None; use CourseFactory default)
     """
     now = datetime.now(utc)
-    course = CourseFactory.create(start=now + timedelta(days=days_till_start), self_paced=True)
+    course = CourseFactory.create(start=now + timedelta(days=days_till_start), self_paced=True,
+                                  org=org_id if org_id else 'TestedX')
 
     CourseModeFactory(
         course_id=course.id,

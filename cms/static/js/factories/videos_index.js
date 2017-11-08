@@ -10,19 +10,25 @@ define([
         encodingsDownloadUrl,
         defaultVideoImageURL,
         concurrentUploadLimit,
-        uploadButton,
+        courseVideoSettingsButton,
         previousUploads,
         videoSupportedFileFormats,
         videoUploadMaxFileSizeInGB,
+        activeTranscriptPreferences,
+        videoTranscriptSettings,
+        isVideoTranscriptEnabled,
         videoImageSettings
     ) {
         var activeView = new ActiveVideoUploadListView({
                 postUrl: videoHandlerUrl,
                 concurrentUploadLimit: concurrentUploadLimit,
-                uploadButton: uploadButton,
+                courseVideoSettingsButton: courseVideoSettingsButton,
                 videoSupportedFileFormats: videoSupportedFileFormats,
                 videoUploadMaxFileSizeInGB: videoUploadMaxFileSizeInGB,
                 videoImageSettings: videoImageSettings,
+                activeTranscriptPreferences: activeTranscriptPreferences,
+                videoTranscriptSettings: videoTranscriptSettings,
+                isVideoTranscriptEnabled: isVideoTranscriptEnabled,
                 onFileUploadDone: function(activeVideos) {
                     $.ajax({
                         url: videoHandlerUrl,

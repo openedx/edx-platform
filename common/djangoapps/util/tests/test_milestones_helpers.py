@@ -3,15 +3,17 @@ Tests for the milestones helpers library, which is the integration point for the
 """
 
 import ddt
+import pytest
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from milestones import api as milestones_api
 from milestones.exceptions import InvalidCourseKeyException, InvalidUserException
+from milestones.models import MilestoneRelationshipType
 from mock import patch
 
-from milestones import api as milestones_api
-from milestones.models import MilestoneRelationshipType
+from util import milestones_helpers
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from util import milestones_helpers
 
 
 @patch.dict(settings.FEATURES, {'MILESTONES_APP': False})
@@ -134,3 +136,20 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
             milestones_helpers.any_unfulfilled_milestones(None, self.user['id'])
         with self.assertRaises(InvalidUserException):
             milestones_helpers.any_unfulfilled_milestones(self.course.id, None)
+
+    @patch.dict(settings.FEATURES, {'MILESTONES_APP': True})
+    def test_get_required_content_with_anonymous_user(self):
+        course = CourseFactory()
+
+        required_content = milestones_helpers.get_required_content(course.id, AnonymousUser())
+        assert required_content == []
+
+        # NOTE (CCB): The initial version of anonymous courseware access is very simple. We avoid accidentally
+        # exposing locked content by simply avoiding anonymous access altogether for courses runs with milestones.
+        milestone = milestones_api.add_milestone({
+            'name': 'test',
+            'namespace': 'test',
+        })
+        milestones_helpers.add_course_milestone(str(course.id), 'requires', milestone)
+        with pytest.raises(InvalidUserException):
+            milestones_helpers.get_required_content(course.id, AnonymousUser())

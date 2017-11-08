@@ -1,9 +1,9 @@
 $a11y--gray: rgb(127, 127, 127);
 $a11y--blue: rgb(0, 159, 230);
-$a11y--gray-d1: shade($gray,20%);
-$a11y--gray-l2: tint($gray,40%);
-$a11y--gray-l3: tint($gray,60%);
-$a11y--blue-s1: saturate($blue,15%);
+$a11y--gray-d1: shade($gray, 20%);
+$a11y--gray-l2: tint($gray, 40%);
+$a11y--gray-l3: tint($gray, 60%);
+$a11y--blue-s1: saturate($blue, 15%);
 
 %use-font-awesome {
   font-family: FontAwesome;
@@ -23,6 +23,7 @@ $a11y--blue-s1: saturate($blue,15%);
 
   .a11y-menu-list {
     @extend %ui-depth3;
+
     top: 100%;
     margin: 0;
     padding: 0;
@@ -34,6 +35,7 @@ $a11y--blue-s1: saturate($blue,15%);
 
     li {
       @extend %ui-fake-link;
+
       margin: 0;
       padding: 0;
       border-bottom: 1px solid #eee;
@@ -48,12 +50,13 @@ $a11y--blue-s1: saturate($blue,15%);
         font-size: 14px;
         line-height: 23px;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           color: $a11y--gray-d1;
         }
       }
 
-      &.active{
+      &.active {
         a {
           color: $a11y--blue;
         }
@@ -82,16 +85,16 @@ $a11y--blue-s1: saturate($blue,15%);
         background-color: $action-primary-active-bg;
         color: $very-light-text;
 
-        &:after {
+        &::after {
           color: $very-light-text;
         }
       }
-
     }
 
     > a {
       @include transition(all $tmg-f2 ease-in-out 0s);
       @include font-size(12);
+
       display: block;
       border-radius: 0 3px 3px 0;
       background-color: $very-light-text;
@@ -103,8 +106,9 @@ $a11y--blue-s1: saturate($blue,15%);
       overflow: hidden;
       text-overflow: ellipsis;
 
-      &:after {
+      &::after {
         @extend %use-font-awesome;
+
         content: "\f0d7";
         position: absolute;
         right: ($baseline*0.5);
@@ -133,8 +137,10 @@ $a11y--blue-s1: saturate($blue,15%);
 }
 
 
-.contextmenu, .submenu {
+.contextmenu,
+.submenu {
   @extend %ui-depth5;
+
   border: 1px solid #333;
   background: $white;
   color: #333;
@@ -149,17 +155,18 @@ $a11y--blue-s1: saturate($blue,15%);
   white-space: nowrap;
 
   &.is-opened {
-     display: block;
+    display: block;
   }
 
-  .menu-item, .submenu-item {
+  .menu-item,
+  .submenu-item {
     border-top: 1px solid $gray-l3;
     padding: ($baseline/4) ($baseline/2);
     outline: none;
 
     & > span {
-        color: #333;
-      }
+      color: #333;
+    }
 
     &:first-child {
       border-top: none;
@@ -179,7 +186,7 @@ $a11y--blue-s1: saturate($blue,15%);
     position: relative;
     padding: ($baseline/4) $baseline ($baseline/4) ($baseline/2);
 
-    &:after {
+    &::after {
       content: '\25B6';
       position: absolute;
       right: 5px;
@@ -217,6 +224,7 @@ $a11y--blue-s1: saturate($blue,15%);
 
 .overlay {
   @extend %ui-depth4;
+
   position: fixed;
   top: 0;
   left: 0;

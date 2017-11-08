@@ -29,7 +29,7 @@
     width: 70px;
     height: 70px;
     border-radius: $baseline*7/4;
-    border: 1px solid $lms-border-color;
+    border: 1px solid $border-color;
 
     @media (max-width: $grid-breakpoints-md) {
       display: none;
@@ -41,7 +41,7 @@
 
     flex-grow: 1;
     position: relative;
-    border: 1px solid $lms-border-color;
+    border: 1px solid $border-color;
     padding: $baseline;
     border-radius: $baseline/4;
 
@@ -75,13 +75,13 @@
 
     &::before {
       @include margin-left($baseline*-1);
-      @include border-right-color($lms-border-color);
+      @include border-right-color($border-color);
 
       border-width: $baseline/2;
     }
 
     .message-header {
-      @include margin-right($baseline*2);
+      @include margin-right($baseline*4);
 
       font-weight: $font-semibold;
       margin-bottom: $baseline/2;
@@ -112,17 +112,34 @@
     .goal-options-container {
       margin-top: $baseline;
       text-align: center;
+      display: flex;
+      flex-direction: row;
 
       .goal-option {
         text-decoration: none;
-        font-size: font-size(x-small);
+        font-size: $font-size-base;
         padding: $baseline/2;
+        margin: $baseline/4 $baseline/4 0;
+        flex-grow: 1;
+
+        &:not(.dismissible):first-of-type {
+          color: theme-color("purchase");
+          border-color: theme-color("purchase");
+
+          &:hover {
+            color: theme-color("inverse");
+            background-color: theme-color("purchase");
+          }
+        }
 
         &.dismissible {
           @include right($baseline/4);
 
           position: absolute;
           top: $baseline/2;
+          margin: 0;
+          width: auto;
+          flex-grow: 1;
           font-size: font-size(small);
           color: theme-color("primary");
           cursor: pointer;
@@ -130,6 +147,15 @@
           &:hover {
             color: $black-t2;
           }
+        }
+      }
+
+      @media (max-width: $grid-breakpoints-md) {
+        flex-direction: column;
+
+        .goal-option {
+          margin-top: $baseline/4;
+          width: 100%;
         }
       }
     }
@@ -145,7 +171,7 @@
 // Welcome message / Latest Update message
 .welcome-message,
 .update-message {
-  border: solid 1px $lms-border-color;
+  border: solid 1px $border-color;
 
   @include border-left(solid 4px $black);
 
@@ -186,13 +212,13 @@
   .section-goals {
     @include float(left);
 
-    border: 1px solid $lms-border-color;
-    padding: $baseline*0.75 $baseline*0.75 $baseline*0.25;
+    border: 1px solid $border-color;
+    padding: $baseline*0.75 $baseline*0.75 $baseline*0.5;
     border-radius: 5px;
     position: relative;
     width: 100%;
     cursor: pointer;
-    margin-bottom: $baseline/2;
+    margin-bottom: $baseline;
 
     &.hidden {
       display: none;
@@ -213,14 +239,14 @@
       background-color: transparent;
 
       &:hover {
-        color: $lms-border-color;
+        color: $border-color;
       }
     }
 
     .current-goal-container {
       .title {
+        @include margin($baseline/5, $baseline*0.4, 0, 0);
         @include float(left);
-        @include margin-right($baseline/4);
       }
 
       .title-label {
@@ -252,6 +278,13 @@
     .section-tools .course-tool:not(:first-child) {
       margin-top: ($baseline / 5);
     }
+  }
+
+  @include media-breakpoint-down(sm) {
+    @include padding-left(0);
+
+    border-top: 1px solid theme-color("light");
+    padding-top: $baseline;
   }
 }
 
@@ -291,13 +324,14 @@
 
       ol.outline-item {
         padding-bottom: $baseline;
-        border-bottom: 1px solid $lms-border-color;
+        border-bottom: 1px solid $border-color;
         margin: 0 0 ($baseline / 2) 0;
 
         .subsection {
           list-style-type: none;
           border: 1px solid transparent;
           border-radius: 3px;
+          margin-bottom: $baseline/4;
 
           a.outline-item {
             display: flex;
@@ -332,7 +366,7 @@
           }
 
           &.current {
-            border: 1px solid $lms-active-color;
+            border: 1px solid theme-color("primary");
             border-radius: $btn-border-radius;
 
             .resume-right {
@@ -341,7 +375,11 @@
           }
 
           &:hover {
-            border: 1px solid $lms-active-color;
+            border: 1px solid theme-color("primary");
+          }
+
+          &:last-child {
+            margin-bottom: 0;
           }
         }
 
@@ -412,10 +450,12 @@
 // Course Updates Page
 .course-updates {
   .all-updates {
+    flex-grow: 1;
+
     .updates-article {
       margin: ($baseline*6/5) 0;
       padding-bottom: ($baseline*6/5);
-      border-bottom: 1px solid $lms-border-color;
+      border-bottom: 1px solid $border-color;
 
       .date {
         font-size: font-size(small);
@@ -447,6 +487,7 @@
       top: $baseline * (-1/2);
       right: $baseline / 2;
       cursor: pointer;
+      background-color: theme-color("primary");
     }
   }
 

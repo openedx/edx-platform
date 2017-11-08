@@ -33,7 +33,8 @@ from contentstore.views.item import (
     _get_source_index,
     _xblock_type_and_display_name,
     add_container_page_publishing_info,
-    create_xblock_info
+    create_xblock_info,
+    highlights_setting,
 )
 from lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
@@ -111,7 +112,7 @@ class ItemTest(CourseTestCase):
             data['display_name'] = display_name
         if boilerplate is not None:
             data['boilerplate'] = boilerplate
-        return self.client.ajax_post(reverse('contentstore.views.xblock_handler'), json.dumps(data))
+        return self.client.ajax_post(reverse('xblock_handler'), json.dumps(data))
 
     def _create_vertical(self, parent_usage_key=None):
         """
@@ -652,7 +653,7 @@ class DuplicateHelper(object):
         if display_name is not None:
             data['display_name'] = display_name
 
-        resp = self.client.ajax_post(reverse('contentstore.views.xblock_handler'), json.dumps(data))
+        resp = self.client.ajax_post(reverse('xblock_handler'), json.dumps(data))
         return self.response_usage_key(resp)
 
 
@@ -863,7 +864,7 @@ class TestMoveItem(ItemTest):
             data['target_index'] = target_index
 
         return self.client.patch(
-            reverse('contentstore.views.xblock_handler'),
+            reverse('xblock_handler'),
             json.dumps(data),
             content_type='application/json'
         )
@@ -1146,7 +1147,7 @@ class TestMoveItem(ItemTest):
         data = {'move_source_locator': unicode(self.html_usage_key)}
         with self.assertRaises(InvalidKeyError):
             self.client.patch(
-                reverse('contentstore.views.xblock_handler'),
+                reverse('xblock_handler'),
                 json.dumps(data),
                 content_type='application/json'
             )
@@ -1156,7 +1157,7 @@ class TestMoveItem(ItemTest):
         Test patch request without providing a move source locator.
         """
         response = self.client.patch(
-            reverse('contentstore.views.xblock_handler')
+            reverse('xblock_handler')
         )
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
@@ -1307,7 +1308,7 @@ class TestMoveItem(ItemTest):
         }
         with self.assertRaises(ItemNotFoundError):
             self.client.patch(
-                reverse('contentstore.views.xblock_handler'),
+                reverse('xblock_handler'),
                 json.dumps(data),
                 content_type='application/json'
             )
@@ -2389,7 +2390,8 @@ class TestXBlockInfo(ItemTest):
         super(TestXBlockInfo, self).setUp()
         user_id = self.user.id
         self.chapter = ItemFactory.create(
-            parent_location=self.course.location, category='chapter', display_name="Week 1", user_id=user_id
+            parent_location=self.course.location, category='chapter', display_name="Week 1", user_id=user_id,
+            highlights=['highlight'],
         )
         self.sequential = ItemFactory.create(
             parent_location=self.chapter.location, category='sequential', display_name="Lesson 1", user_id=user_id
@@ -2570,6 +2572,12 @@ class TestXBlockInfo(ItemTest):
 
             self.assertEqual(xblock_info['start'], DEFAULT_START_DATE.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
+    def test_highlights_enabled(self):
+        chapter = modulestore().get_item(self.chapter.location)
+        with highlights_setting().override():
+            xblock_info = create_xblock_info(chapter)
+            self.assertTrue(xblock_info['highlights_enabled'])
+
     def validate_course_xblock_info(self, xblock_info, has_child_info=True, course_outline=False):
         """
         Validate that the xblock info is correct for the test course.
@@ -2596,6 +2604,8 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['graded'], False)
         self.assertEqual(xblock_info['due'], None)
         self.assertEqual(xblock_info['format'], None)
+        self.assertEqual(xblock_info['highlights'], self.chapter.highlights)
+        self.assertFalse(xblock_info['highlights_enabled'])
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info)

@@ -54,7 +54,9 @@ def assign_role(course_id, user, rolename):
     """
     Assign forum role `rolename` to user
     """
-    role, __ = Role.objects.get_or_create(course_id=course_id, name=rolename)
+    role, created = Role.objects.get_or_create(course_id=course_id, name=rolename)
+    if created:
+        logging.info("EDUCATOR-1635: Created role {} for course {}".format(role, course_id))
     user.roles.add(role)
 
 
@@ -133,6 +135,9 @@ def permission_blacked_out(course, role_names, permission_name):
 
 def all_permissions_for_user_in_course(user, course_id):  # pylint: disable=invalid-name
     """Returns all the permissions the user has in the given course."""
+    if not user.is_authenticated():
+        return {}
+
     course = modulestore().get_course(course_id)
     if course is None:
         raise ItemNotFoundError(course_id)

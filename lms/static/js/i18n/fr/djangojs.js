@@ -217,7 +217,6 @@
     "Author": "Auteur", 
     "Automatic": "Automatique", 
     "Average": "Moyen", 
-    "Back to Dashboard": "Retour au tableau de bord", 
     "Back to sign in": "Retour \u00e0 la connexion", 
     "Background color": "Couleur du fond", 
     "Basic": "Basique", 

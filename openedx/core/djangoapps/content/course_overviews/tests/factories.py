@@ -14,7 +14,6 @@ class CourseOverviewFactory(DjangoModelFactory):
 
     version = CourseOverview.VERSION
     pre_requisite_courses = []
-    start = factory.Faker('past_datetime')
     org = 'edX'
 
     @factory.lazy_attribute

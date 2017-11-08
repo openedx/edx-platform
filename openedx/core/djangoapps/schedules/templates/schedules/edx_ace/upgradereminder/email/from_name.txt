@@ -1,1 +1,5 @@
-{{ course_name }}
+{% if course_ids|length > 1 %}
+{{ platform_name }}
+{% else %}
+{{ first_course_name }}
+{% endif %}

@@ -244,7 +244,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         expected_count = 1 if (is_enrolled or is_unenrolled_staff) else 0
         self.assertContains(response, TEST_CHAPTER_NAME, count=expected_count)
         self.assertContains(response, 'Start Course', count=expected_count)
-        self.assertContains(response, 'Learn About Verified Certificate', count=expected_count)
+        self.assertContains(response, 'Learn About Verified Certificate', count=(1 if is_enrolled else 0))
         self.assertContains(response, TEST_WELCOME_MESSAGE, count=expected_count)
 
         # Verify that the expected message is shown to the user
@@ -285,7 +285,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         expected_count = 1 if (is_enrolled or is_unenrolled_staff) else 0
         self.assertContains(response, TEST_CHAPTER_NAME, count=expected_count)
         self.assertContains(response, 'Start Course', count=expected_count)
-        self.assertContains(response, 'Learn About Verified Certificate', count=expected_count)
+        self.assertContains(response, 'Learn About Verified Certificate', count=(1 if is_enrolled else 0))
 
         # Verify that the expected message is shown to the user
         self.assertContains(response, '<div class="user-messages">', count=1 if expected_message else 0)
@@ -517,7 +517,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertIn('vc-message', response.content)
         url = EcommerceService().get_checkout_page_url(self.verified_mode.sku)
-        self.assertIn('<a class="btn-upgrade"', response.content)
+        self.assertIn('<a class="btn btn-upgrade"', response.content)
         self.assertIn(url, response.content)
         self.assertIn('Upgrade (${price})</a>'.format(price=self.verified_mode.min_price), response.content)
 

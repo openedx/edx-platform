@@ -13,16 +13,11 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="header_extras">
-% if waffle_flag_enabled:
-    <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/studio-frontend.min.css')}" />
-    <script type="text/javascript" src="${static.url('common/js/vendor/assets.min.js')}" defer></script>
-% else:
     % for template_name in ["asset"]:
     <script type="text/template" id="${template_name}-tpl">
         <%static:include path="js/${template_name}.underscore" />
     </script>
     % endfor
-% endif
 </%block>
 
 % if not waffle_flag_enabled:
@@ -61,7 +56,17 @@
     <div class="content">
         <div class="content-primary">
             % if waffle_flag_enabled:
-                <div id="root"></div>
+                <%static:studiofrontend page="AssetsPage" lang="fr">
+                    {
+                        "id": "${context_course.id | n, js_escaped_string}",
+                        "name": "${context_course.display_name_with_default | n, js_escaped_string}",
+                        "url_name": "${context_course.location.name | n, js_escaped_string}",
+                        "org": "${context_course.location.org | n, js_escaped_string}",
+                        "num": "${context_course.location.course | n, js_escaped_string}",
+                        "display_course_number": "${context_course.display_coursenumber | n, js_escaped_string}",
+                        "revision": "${context_course.location.revision | n, js_escaped_string}"
+                    }
+                </%static:studiofrontend>
             % else:
                 <div class="wrapper-assets"></div>
             % endif

@@ -1,9 +1,9 @@
 .wrapper-preview-menu {
   @include clearfix();
 
-  margin: 0 auto 0;
+  margin: 0 auto;
   padding: ($baseline*0.75);
-  background-color: $lms-preview-menu-color;
+  background-color: theme-color("primary");
   box-sizing: border-box;
 
   @media print {
@@ -31,6 +31,7 @@
         display: inline-block;
         margin-bottom: 0;
         vertical-align: middle;
+        color: theme-color("inverse");
       }
 
       .action-preview-select {
@@ -122,6 +123,26 @@
             color: theme-color("brand");
           }
         }
+        .exam-timer-clock {
+          background-color: transparent;
+          border: 1px solid $white;
+          #toggle_timer, b {
+            color: $white;
+          }
+          #toggle_timer {
+            border-top: none;
+            border-right: none;
+            border-bottom: none;
+            border-top-right-radius: 2px;
+            border-bottom-right-radius: 2px;
+
+            &:hover {
+              border-top: none;
+              border-right: none;
+              border-bottom: none;
+            }
+          }
+        }
       }
     }
 
@@ -149,6 +170,28 @@
       &:hover,
       &:focus {
         border: 0;
+      }
+    }
+    .exam-timer-clock {
+      display: inline-block;
+      padding: 0 0 0 ($baseline/3);
+      background-color: theme-color("light");
+      border-radius: 3px;
+
+      #toggle_timer {
+        @extend .exam-button-turn-in-exam;
+
+        padding: ($baseline/5) ($baseline/3);
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
+        margin-right: 0;
+      }
+      b {
+        padding-right: ($baseline/5);
+
+        &.timer-hidden {
+          visibility: hidden;
+        }
       }
     }
   }

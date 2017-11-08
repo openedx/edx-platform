@@ -39,9 +39,14 @@ from warnings import simplefilter
 from django.utils.translation import ugettext_lazy as _
 
 from .discussionsettings import *
+from openedx.core.djangoapps.theming.helpers_dirs import (
+    get_themes_unchecked,
+    get_theme_base_dirs_from_settings
+)
+from openedx.core.lib.derived import derived, derived_dict_entry
+from openedx.core.release import doc_version
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from xmodule.modulestore.edit_info import EditInfoMixin
-from openedx.core.lib.license import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
@@ -231,8 +236,8 @@ FEATURES = {
     # Turn on/off Microsites feature
     'USE_MICROSITES': False,
 
-    # Turn on third-party auth. Disabled for now because full implementations are not yet available. Remember to syncdb
-    # if you enable this; we don't create tables by default.
+    # Turn on third-party auth. Disabled for now because full implementations are not yet available. Remember to run
+    # migrations if you enable this; we don't create tables by default.
     'ENABLE_THIRD_PARTY_AUTH': False,
 
     # Toggle to enable alternate urls for marketing links
@@ -406,6 +411,12 @@ FEATURES = {
 
     # Whether course goals is enabled.
     'ENABLE_COURSE_GOALS': True,
+
+    # Set to enable Enterprise integration
+    'ENABLE_ENTERPRISE_INTEGRATION': False,
+
+    # Whether HTML XBlocks/XModules return HTML content with the Course Blocks API student_view_data
+    'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -507,6 +518,7 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 
 OAUTH2_PROVIDER = {
     'OAUTH2_VALIDATOR_CLASS': 'openedx.core.djangoapps.oauth_dispatch.dot_overrides.EdxOAuth2Validator',
+    'REFRESH_TOKEN_EXPIRE_SECONDS': 20160,
     'SCOPES': {
         'read': 'Read scope',
         'write': 'Write scope',
@@ -526,7 +538,7 @@ OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 import tempfile
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_lms')
 MAKO_TEMPLATES = {}
-MAKO_TEMPLATES['main'] = [
+MAIN_MAKO_TEMPLATES_BASE = [
     PROJECT_ROOT / 'templates',
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
@@ -535,6 +547,22 @@ MAKO_TEMPLATES['main'] = [
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
     OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
 ]
+
+
+def _make_main_mako_templates(settings):
+    """
+    Derives the final MAKO_TEMPLATES['main'] setting from other settings.
+    """
+    if settings.ENABLE_COMPREHENSIVE_THEMING:
+        themes_dirs = get_theme_base_dirs_from_settings(settings.COMPREHENSIVE_THEME_DIRS)
+        for theme in get_themes_unchecked(themes_dirs, PROJECT_ROOT):
+            if theme.themes_base_dir not in settings.MAIN_MAKO_TEMPLATES_BASE:
+                settings.MAIN_MAKO_TEMPLATES_BASE.insert(0, theme.themes_base_dir)
+    if settings.FEATURES.get('USE_MICROSITES', False) and getattr(settings, "MICROSITE_CONFIGURATION", False):
+        settings.MAIN_MAKO_TEMPLATES_BASE.insert(0, settings.MICROSITE_ROOT_DIR)
+    return settings.MAIN_MAKO_TEMPLATES_BASE
+MAKO_TEMPLATES['main'] = _make_main_mako_templates
+derived_dict_entry('MAKO_TEMPLATES', 'main')
 
 # Django templating
 TEMPLATES = [
@@ -595,13 +623,23 @@ TEMPLATES = [
     }
 ]
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
+DEFAULT_TEMPLATE_ENGINE_DIRS = DEFAULT_TEMPLATE_ENGINE['DIRS'][:]
+
+
+def _add_microsite_dirs_to_default_template_engine(settings):
+    """
+    Derives the final DEFAULT_TEMPLATE_ENGINE['DIRS'] setting from other settings.
+    """
+    if settings.FEATURES.get('USE_MICROSITES', False) and getattr(settings, "MICROSITE_CONFIGURATION", False):
+        DEFAULT_TEMPLATE_ENGINE_DIRS.append(settings.MICROSITE_ROOT_DIR)
+    return DEFAULT_TEMPLATE_ENGINE_DIRS
+DEFAULT_TEMPLATE_ENGINE['DIRS'] = _add_microsite_dirs_to_default_template_engine
+derived_dict_entry('DEFAULT_TEMPLATE_ENGINE', 'DIRS')
 
 ###############################################################################################
 
 # use the ratelimit backend to prevent brute force attacks
-AUTHENTICATION_BACKENDS = (
-    'ratelimitbackend.backends.RateLimitModelBackend',
-)
+AUTHENTICATION_BACKENDS = ['ratelimitbackend.backends.RateLimitModelBackend']
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
@@ -918,7 +956,7 @@ LANGUAGES_BIDI = ("he", "ar", "fa", "ur", "fa-ir", "rtl")
 LANGUAGE_COOKIE = "openedx-language-preference"
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
-LANGUAGES = (
+LANGUAGES = [
     ('en', u'English'),
     ('rtl', u'Right-to-Left Test Language'),
     ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
@@ -1000,7 +1038,7 @@ LANGUAGES = (
     ('zh-cn', u'中文 (简体)'),  # Chinese (China)
     ('zh-hk', u'中文 (香港)'),  # Chinese (Hong Kong)
     ('zh-tw', u'中文 (台灣)'),  # Chinese (Taiwan)
-)
+]
 
 LANGUAGE_DICT = dict(LANGUAGES)
 
@@ -1013,8 +1051,18 @@ USE_L10N = True
 STATICI18N_ROOT = PROJECT_ROOT / "static"
 STATICI18N_OUTPUT_DIR = "js/i18n"
 
-# Localization strings (e.g. django.po) are under this directory
-LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
+
+# Localization strings (e.g. django.po) are under these directories
+def _make_locale_paths(settings):
+    locale_paths = [settings.REPO_ROOT + '/conf/locale']  # edx-platform/conf/locale/
+    if settings.ENABLE_COMPREHENSIVE_THEMING:
+        # Add locale paths to settings for comprehensive theming.
+        for locale_path in settings.COMPREHENSIVE_THEME_LOCALE_PATHS:
+            locale_paths += (path(locale_path), )
+    return locale_paths
+LOCALE_PATHS = _make_locale_paths
+derived('LOCALE_PATHS')
+
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
@@ -1799,6 +1847,7 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
     }
 }
+WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
 
 ########################## DJANGO DEBUG TOOLBAR ###############################
 
@@ -1985,8 +2034,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'djcelery',
 
+    # Common Initialization
+    'openedx.core.djangoapps.common_initialization.apps.CommonInitializationConfig',
+
+    # LMS-specific Initialization
+    'lms_initialization.apps.LMSInitializationConfig',
+
     # Common views
     'openedx.core.djangoapps.common_views',
+
+    # History tables
+    'simple_history',
 
     # Database-backed configuration
     'config_models',
@@ -1999,7 +2057,7 @@ INSTALLED_APPS = [
     'status',
 
     # For asset pipelining
-    'edxmako',
+    'edxmako.apps.EdxMakoConfig',
     'pipeline',
     'static_replace',
     'webpack_loader',
@@ -2012,7 +2070,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.contentserver',
 
     # Theming
-    'openedx.core.djangoapps.theming',
+    'openedx.core.djangoapps.theming.apps.ThemingConfig',
 
     # Site configuration for theming and behavioral modification
     'openedx.core.djangoapps.site_configuration',
@@ -2021,7 +2079,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.video_config',
 
     # Bookmarks
-    'openedx.core.djangoapps.bookmarks',
+    'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',
 
     # Our courseware
     'courseware',
@@ -2034,7 +2092,7 @@ INSTALLED_APPS = [
     'util',
     'certificates.apps.CertificatesConfig',
     'dashboard',
-    'lms.djangoapps.instructor',
+    'lms.djangoapps.instructor.apps.InstructorConfig',
     'lms.djangoapps.instructor_task',
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
@@ -2086,15 +2144,14 @@ INSTALLED_APPS = [
 
     # For testing
     'django.contrib.admin',  # only used in DEBUG mode
-    'django_nose',
     'debug',
-    'django_extensions',
+    'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Discussion forums
     'django_comment_client',
     'django_comment_common',
     'discussion_api',
-    'lms.djangoapps.discussion',
+    'lms.djangoapps.discussion.apps.DiscussionConfig',
 
     # Notes
     'notes',
@@ -2104,7 +2161,7 @@ INSTALLED_APPS = [
     'splash',
 
     # Monitoring
-    'openedx.core.djangoapps.datadog',
+    'openedx.core.djangoapps.datadog.apps.DatadogConfig',
 
     # User API
     'rest_framework',
@@ -2119,31 +2176,31 @@ INSTALLED_APPS = [
     'notifier_api',
 
     # Different Course Modes
-    'course_modes',
+    'course_modes.apps.CourseModesConfig',
 
     # Enrollment API
     'enrollment',
+
+    # Entitlement API
+    'entitlements',
 
     # Bulk Enrollment API
     'bulk_enroll',
 
     # Student Identity Verification
-    'lms.djangoapps.verify_student',
+    'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
 
     # Dark-launching languages
     'openedx.core.djangoapps.dark_lang',
 
     # Microsite configuration
-    'microsite_configuration',
+    'microsite_configuration.apps.MicrositeConfigurationConfig',
 
     # RSS Proxy
     'rss_proxy',
 
     # Country embargo support
     'openedx.core.djangoapps.embargo',
-
-    # Monitoring functionality
-    'openedx.core.djangoapps.monitoring',
 
     # Course action state
     'course_action_state',
@@ -2161,10 +2218,10 @@ INSTALLED_APPS = [
     # Surveys
     'survey',
 
-    'lms.djangoapps.lms_xblock',
+    'lms.djangoapps.lms_xblock.apps.LMSXBlockConfig',
 
     # Course data caching
-    'openedx.core.djangoapps.content.course_overviews',
+    'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig',
     'openedx.core.djangoapps.content.course_structures.apps.CourseStructuresConfig',
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
     'lms.djangoapps.course_blocks',
@@ -2186,7 +2243,7 @@ INSTALLED_APPS = [
     'commerce',
 
     # Credit courses
-    'openedx.core.djangoapps.credit',
+    'openedx.core.djangoapps.credit.apps.CreditConfig',
 
     # Course teams
     'lms.djangoapps.teams',
@@ -2232,7 +2289,7 @@ INSTALLED_APPS = [
     'django_sites_extensions',
 
     # Email marketing integration
-    'email_marketing',
+    'email_marketing.apps.EmailMarketingConfig',
 
     # additional release utilities to ease automation
     'release_util',
@@ -2252,6 +2309,9 @@ INSTALLED_APPS = [
 
     # Course Goals
     'lms.djangoapps.course_goals',
+
+    # Completion
+    'lms.djangoapps.completion.apps.CompletionAppConfig',
 
     # Features
     'openedx.features.course_bookmarks',
@@ -2326,12 +2386,14 @@ SOCIAL_SHARING_SETTINGS = {
     # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in cms/envs/common.py
     'CUSTOM_COURSE_URLS': False,
     'DASHBOARD_FACEBOOK': False,
+    'FACEBOOK_BRAND': None,
     'CERTIFICATE_FACEBOOK': False,
     'CERTIFICATE_FACEBOOK_TEXT': None,
     'CERTIFICATE_TWITTER': False,
     'CERTIFICATE_TWITTER_TEXT': None,
     'DASHBOARD_TWITTER': False,
-    'DASHBOARD_TWITTER_TEXT': None
+    'DASHBOARD_TWITTER_TEXT': None,
+    'TWITTER_BRAND': None
 }
 
 ################# Social Media Footer Links #######################
@@ -2380,7 +2442,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # Translators: This is the website name of www.twitter.com.  Please
         # translate this the way that Twitter advertises in your language.
         "title": _("Twitter"),
-        "icon": "fa-twitter",
+        "icon": "fa-twitter-square",
         "action": _("Follow {platform_name} on Twitter")
     },
     "linkedin": {
@@ -2413,7 +2475,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # Translators: This is the website name of www.reddit.com.  Please
         # translate this the way that Reddit advertises in your language.
         "title": _("Reddit"),
-        "icon": "fa-reddit",
+        "icon": "fa-reddit-square",
         "action": _("Subscribe to the {platform_name} subreddit"),
     },
     "vk": {
@@ -2432,7 +2494,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # Translators: This is the website name of www.youtube.com.  Please
         # translate this the way that YouTube advertises in your language.
         "title": _("Youtube"),
-        "icon": "fa-youtube",
+        "icon": "fa-youtube-square",
         "action": _("Subscribe to the {platform_name} YouTube channel")
     }
 }
@@ -2456,7 +2518,7 @@ DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH = "verify_student_disable_account_
 ### This enables the Metrics tab for the Instructor dashboard ###########
 FEATURES['CLASS_DASHBOARD'] = False
 if FEATURES.get('CLASS_DASHBOARD'):
-    INSTALLED_APPS += ('class_dashboard',)
+    INSTALLED_APPS.append('class_dashboard')
 
 ################ Enable credit eligibility feature ####################
 ENABLE_CREDIT_ELIGIBILITY = True
@@ -2466,11 +2528,13 @@ FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
 
 if FEATURES.get('AUTH_USE_CAS'):
     CAS_SERVER_URL = 'https://provide_your_cas_url_here'
-    AUTHENTICATION_BACKENDS = (
+    AUTHENTICATION_BACKENDS = [
         'django.contrib.auth.backends.ModelBackend',
         'django_cas.backends.CASBackend',
-    )
-    INSTALLED_APPS += ('django_cas',)
+    ]
+
+    INSTALLED_APPS.append('django_cas')
+
     MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
 
 ############# Cross-domain requests #################
@@ -2605,12 +2669,26 @@ VIDEO_IMAGE_SETTINGS = dict(
     DIRECTORY_PREFIX='video-images/',
 )
 
+########################## VIDEO TRANSCRIPTS STORAGE ############################
+
+VIDEO_TRANSCRIPTS_SETTINGS = dict(
+    VIDEO_TRANSCRIPTS_MAX_BYTES=3 * 1024 * 1024,    # 3 MB
+    # Backend storage
+    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
+    # STORAGE_KWARGS=dict(bucket='video-transcripts-bucket'),
+    STORAGE_KWARGS=dict(
+        location=MEDIA_ROOT,
+        base_url=MEDIA_URL,
+    ),
+    DIRECTORY_PREFIX='video-transcripts/',
+)
+
 
 # Source:
 # http://loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt according to http://en.wikipedia.org/wiki/ISO_639-1
 # Note that this is used as the set of choices to the `code` field of the
 # `LanguageProficiency` model.
-ALL_LANGUAGES = (
+ALL_LANGUAGES = [
     [u"aa", u"Afar"],
     [u"ab", u"Abkhazian"],
     [u"af", u"Afrikaans"],
@@ -2797,27 +2875,27 @@ ALL_LANGUAGES = (
     [u"yo", u"Yoruba"],
     [u"za", u"Zhuang"],
     [u"zu", u"Zulu"]
-)
+]
 
 
 ### Apps only installed in some instances
 # The order of INSTALLED_APPS matters, so this tuple is the app name and the item in INSTALLED_APPS
 # that this app should be inserted *before*. A None here means it should be appended to the list.
-OPTIONAL_APPS = (
+OPTIONAL_APPS = [
     ('mentoring', None),
-    ('problem_builder', 'openedx.core.djangoapps.content.course_overviews'),
+    ('problem_builder', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('edx_sga', None),
 
     # edx-ora2
-    ('submissions', 'openedx.core.djangoapps.content.course_overviews'),
-    ('openassessment', 'openedx.core.djangoapps.content.course_overviews'),
-    ('openassessment.assessment', 'openedx.core.djangoapps.content.course_overviews'),
-    ('openassessment.fileupload', 'openedx.core.djangoapps.content.course_overviews'),
-    ('openassessment.workflow', 'openedx.core.djangoapps.content.course_overviews'),
-    ('openassessment.xblock', 'openedx.core.djangoapps.content.course_overviews'),
+    ('submissions', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    ('openassessment', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    ('openassessment.assessment', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    ('openassessment.fileupload', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    ('openassessment.workflow', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    ('openassessment.xblock', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
 
     # edxval
-    ('edxval', 'openedx.core.djangoapps.content.course_overviews'),
+    ('edxval', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
 
     # edX Proctoring
     ('edx_proctoring', None),
@@ -2833,7 +2911,7 @@ OPTIONAL_APPS = (
 
     # Required by the Enterprise App
     ('django_object_actions', None),  # https://github.com/crccheck/django-object-actions
-)
+]
 
 for app_name, insert_before in OPTIONAL_APPS:
     # First attempt to only find the module rather than actually importing it,
@@ -2850,7 +2928,7 @@ for app_name, insert_before in OPTIONAL_APPS:
     try:
         INSTALLED_APPS.insert(INSTALLED_APPS.index(insert_before), app_name)
     except (IndexError, ValueError):
-        INSTALLED_APPS += (app_name,)
+        INSTALLED_APPS.append(app_name)
 
 ### ADVANCED_SECURITY_CONFIG
 # Empty by default
@@ -3235,21 +3313,28 @@ REDIRECT_CACHE_KEY_PREFIX = 'redirects'
 ############## Settings for LMS Context Sensitive Help ##############
 
 HELP_TOKENS_INI_FILE = REPO_ROOT / "lms" / "envs" / "help_tokens.ini"
+HELP_TOKENS_LANGUAGE_CODE = lambda settings: settings.LANGUAGE_CODE
+HELP_TOKENS_VERSION = lambda settings: doc_version()
 HELP_TOKENS_BOOKS = {
     'learner': 'http://edx.readthedocs.io/projects/open-edx-learner-guide',
     'course_author': 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course',
 }
+derived('HELP_TOKENS_LANGUAGE_CODE', 'HELP_TOKENS_VERSION')
 
 ############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
 # The Open edX Enterprise service is currently hosted via the LMS container/process.
 # However, for all intents and purposes this service is treated as a standalone IDA.
 # These configuration settings are specific to the Enterprise service and you should
 # not find references to them within the edx-platform project.
+#
+# Only used if FEATURES['ENABLE_ENTERPRISE_INTEGRATION'] == True.
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + LMS_ENROLLMENT_API_PATH
 ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENTERPRISE_ENROLLMENT_API_URL
 ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ['audit', 'honor']
 ENTERPRISE_SUPPORT_URL = ''
+# The default value of this needs to be a 16 character string
+ENTERPRISE_REPORTING_SECRET = '0000000000000000'
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class
@@ -3305,7 +3390,7 @@ COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
 
 ############## Settings for ACE ####################################
 ACE_ENABLED_CHANNELS = [
-    'sailthru_email'
+    'file_email'
 ]
 ACE_ENABLED_POLICIES = [
     'bulk_email_optout'

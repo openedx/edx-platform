@@ -48,6 +48,9 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
+# Load development webpack donfiguration
+WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
+
 ############################ PYFS XBLOCKS SERVICE #############################
 # Set configuration for Django pyfilesystem
 
@@ -63,7 +66,9 @@ DJFS = {
 CELERY_ALWAYS_EAGER = True
 
 ################################ DEBUG TOOLBAR ################################
-INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
+
+INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
+
 MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 INTERNAL_IPS = ('127.0.0.1',)
 

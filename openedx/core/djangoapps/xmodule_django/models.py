@@ -7,7 +7,7 @@ import warnings
 from django.core.exceptions import ValidationError
 from django.db import models
 from opaque_keys.edx.keys import BlockTypeKey, CourseKey, UsageKey
-
+from openedx.core.djangoapps.util.model_utils import CreatorMixin
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -68,7 +68,7 @@ def _strip_value(value, lookup='exact'):
     return stripped_value
 
 
-class OpaqueKeyField(models.CharField):
+class OpaqueKeyField(CreatorMixin, models.CharField):
     """
     A django field for storing OpaqueKeys.
 
@@ -80,8 +80,6 @@ class OpaqueKeyField(models.CharField):
     to parse the key string, and will return an instance of KEY_CLASS.
     """
     description = "An OpaqueKey object, saved to the DB in the form of a string."
-
-    __metaclass__ = models.SubfieldBase
 
     Empty = object()
     KEY_CLASS = None

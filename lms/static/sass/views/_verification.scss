@@ -58,7 +58,7 @@
   }
 
   // reset: typography
-  font-family: $sans-serif;
+  font-family: $font-family-sans-serif;
 
   // reset: typography - heading
   h1,
@@ -80,7 +80,7 @@
   input,
   select,
   textarea {
-    font-family: $f-sans-serif;
+    font-family: $font-family-sans-serif;
     color: $m-gray-d1;
   }
 
@@ -121,7 +121,7 @@
   label {
     @extend %t-weight4;
 
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     font-style: normal;
     color: $m-gray-d4;
   }
@@ -182,7 +182,7 @@
 
   // elements: layout
   .content-wrapper {
-    background: $m-gray-l4;
+    background: $body-bg;
     padding-bottom: 0;
   }
 
@@ -516,7 +516,7 @@
 
       .wrapper-sts {
         display: inline-block;
-        width: flex-grid(9,12);
+        width: flex-grid(9, 12);
         margin-bottom: ($baseline/4);
       }
 
@@ -568,7 +568,7 @@
   }
 
   .progress {
-    width: flex-grid(12,12);
+    width: flex-grid(12, 12);
     margin: 0 auto;
     border-bottom: ($baseline/4) solid $m-gray-l4;
 
@@ -590,7 +590,9 @@
       padding: $baseline $baseline ($baseline*1.5) $baseline;
       text-align: center;
 
-      .wrapper-step-number, .step-number, .step-name {
+      .wrapper-step-number,
+      .step-number,
+      .step-name {
         display: block;
       }
 
@@ -650,7 +652,8 @@
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
@@ -807,7 +810,7 @@
             .icon {
               @extend %t-icon4;
 
-              padding: ($baseline*.25) ($baseline*.5);
+              padding: ($baseline*0.25) ($baseline*0.5);
               display: block;
             }
           }
@@ -872,7 +875,7 @@
 
           @include float(left);
 
-          width: flex-grid(4,12);
+          width: flex-grid(4, 12);
 
           @include text-align(right);
 
@@ -1161,7 +1164,8 @@
               }
             }
 
-            .contribution-option-other1 label, .contribution-option-other2 label {
+            .contribution-option-other1 label,
+            .contribution-option-other2 label {
               @extend %text-sr;
             }
           }
@@ -1194,7 +1198,8 @@
       }
 
       // previously defined in HTML
-      video, canvas {
+      video,
+      canvas {
         position: relative;
         display: block;
 
@@ -1220,12 +1225,13 @@
   .deco-divider {
     position: relative;
     display: block;
-    margin: $baseline 0 ($baseline*2) 0;
+    margin: $baseline 0 ($baseline*2);
     border-top: ($baseline/5) solid $m-gray-l4;
 
     .copy {
       @extend %t-copy-lead1;
       @extend %t-weight4;
+
       @include left(calc(50% - 46px));
 
       position: absolute;
@@ -1299,7 +1305,9 @@
         margin-right: ($baseline/4);
       }
 
-      .deco-denomination, .label-value, .denomination-name {
+      .deco-denomination,
+      .label-value,
+      .denomination-name {
         display: inline-block;
         vertical-align: middle;
       }
@@ -1405,7 +1413,7 @@
   &.step-select-track {
     .container {
       min-width: 0;
-      max-width: 1200px;
+      max-width: map-get($container-max-widths, xl);
     }
 
     .sts-track {
@@ -1423,7 +1431,8 @@
       }
     }
 
-    .register-choice, .help-register {
+    .register-choice,
+    .help-register {
       @include float(left);
     }
 
@@ -1439,7 +1448,8 @@
         margin-bottom: 0;
       }
 
-      .wrapper-copy, .list-actions {
+      .wrapper-copy,
+      .list-actions {
         display: inline-block;
         vertical-align: middle;
       }
@@ -1645,7 +1655,8 @@
           }
         }
 
-        .contribution-option-other1 label, .contribution-option-other2 label {
+        .contribution-option-other1 label,
+        .contribution-option-other2 label {
           @extend %text-sr;
         }
       }
@@ -1779,7 +1790,7 @@
         .placeholder-art {
           position: relative;
           display: inline-block;
-          margin: $baseline 0 ($baseline/2) 0;
+          margin: $baseline 0 ($baseline/2);
           padding: $baseline;
           background: $verified-color-lvl3;
           border-radius: ($baseline*10);
@@ -1790,7 +1801,8 @@
             color: $white;
           }
 
-          .fa-stack-1x, .fa-stack-2x {
+          .fa-stack-1x,
+          .fa-stack-2x {
             position: relative;
           }
 
@@ -1838,7 +1850,8 @@
           padding: ($baseline/2) $baseline;
         }
 
-        .copy-super, .copy-sub {
+        .copy-super,
+        .copy-sub {
           display: block;
         }
 
@@ -1899,11 +1912,6 @@
     }
   }
 
-  // VIEW: take and review photos
-  &.step-photos {
-
-  }
-
   // VIEW: take cam photo
   &.step-photos-cam {
 
@@ -1961,7 +1969,8 @@
           border-color: $verified-color-lvl3;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-l3;
         }
       }
@@ -2008,7 +2017,8 @@
 
         color: $m-blue-d3;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           color: $m-blue-d1;
           border: none;
         }
@@ -2037,7 +2047,7 @@
           margin-top: ($baseline/2);
         }
 
-        .action-verify label  {
+        .action-verify label {
           @extend %t-copy-sub1;
         }
       }
@@ -2062,17 +2072,15 @@
           @extend %t-copy-sub1;
         }
       }
-
-      .step-proceed {
-
-      }
     }
 
     // progress nav
     .progress .progress-step {
 
       // STATE: is completed
-      &#progress-step0, &#progress-step1, &#progress-step2 {
+      &#progress-step0,
+      &#progress-step1,
+      &#progress-step2 {
         border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
         .wrapper-step-number {
@@ -2143,7 +2151,8 @@
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
@@ -2197,23 +2206,6 @@
         .action-dashboard {
           @extend %btn-primary-blue;
         }
-      }
-    }
-
-    // information - verification
-    .verification-info {
-
-    }
-
-    // information - payment
-    .payment-info {
-
-    }
-
-    // UI: table/report
-    .wrapper-report {
-      .report {
-
       }
     }
 
@@ -2325,7 +2317,8 @@
         border-color: $verified-color-lvl3;
       }
 
-      .step-number, .step-name {
+      .step-number,
+      .step-name {
         color: $m-gray-l3;
       }
     }
@@ -2339,7 +2332,8 @@
         border-color: $m-blue-d1;
       }
 
-      .step-number, .step-name {
+      .step-number,
+      .step-name {
         color: $m-gray-d3;
       }
     }
@@ -2394,14 +2388,15 @@
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
     }
 
     .progress-sts-value {
-      width: 0% !important;
+      width: 0 !important;
     }
   }
 
@@ -2419,7 +2414,8 @@
           border-color: $verified-color-lvl3;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-l3;
         }
       }
@@ -2433,7 +2429,8 @@
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
@@ -2458,7 +2455,8 @@
           border-color: $verified-color-lvl3;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-l3;
         }
       }
@@ -2472,7 +2470,8 @@
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }

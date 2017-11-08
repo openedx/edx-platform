@@ -83,7 +83,7 @@
 # Dmitriy <polevaiabrest@gmail.com>, 2014
 # Evgeniya <eugenia000@gmail.com>, 2013
 # Evgeniya <eugenia000@gmail.com>, 2013
-# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2016
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2017
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # Michael Savin <m.savin.ru@gmail.com>, 2015-2016
 # Nikolay K Medvedev <elsin16@gmail.com>, 2014
@@ -141,6 +141,7 @@
 # Ned Batchelder <ned@edx.org>, 2015
 # Ничик Дмитрий Валерьевич <dmi.nichik@gmail.com>, 2013
 # Nikolay K Medvedev <elsin16@gmail.com>, 2014-2015
+# Olga Filipova <olga.filipova@feedzai.com>, 2017
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # Pavel Zamyshliaev, 2014
 # Katerina <rosemaily@gmail.com>, 2014
@@ -234,7 +235,7 @@
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # Katerina <rosemaily@gmail.com>, 2014
-# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2016
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2017
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # MIchael Kuznetsov <michael.kuznetsov@gmail.com>, 2017
 # Michael Savin <m.savin.ru@gmail.com>, 2015-2016
@@ -247,9 +248,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-09-14 12:34+0000\n"
-"PO-Revision-Date: 2017-09-23 19:33+0000\n"
-"Last-Translator: MIchael Kuznetsov <michael.kuznetsov@gmail.com>\n"
+"POT-Creation-Date: 2017-10-30 10:18+0000\n"
+"PO-Revision-Date: 2017-10-02 16:09+0000\n"
+"Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -265,6 +266,7 @@ msgstr ""
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+#: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "Обсуждение"
 
@@ -2517,28 +2519,28 @@ msgstr ""
 #, python-brace-format
 msgid "Incorrect ({progress} point)"
 msgid_plural "Incorrect ({progress} points)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Неверно ({progress} балл)"
+msgstr[1] "Неверно ({progress} балла)"
+msgstr[2] "Неверно ({progress} баллов)"
+msgstr[3] "Неверно ({progress} баллов)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
 msgid "Correct ({progress} point)"
 msgid_plural "Correct ({progress} points)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Верно ({progress} балл)"
+msgstr[1] "Верно ({progress} балла)"
+msgstr[2] "Верно ({progress} баллов)"
+msgstr[3] "Верно ({progress} баллов)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
 msgid "Partially correct ({progress} point)"
 msgid_plural "Partially correct ({progress} points)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Частично верно ({progress} балл)"
+msgstr[1] "Частично верно ({progress} балла)"
+msgstr[2] "Частично верно ({progress} баллов)"
+msgstr[3] "Частично верно ({progress} баллов)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Partially Correct"
@@ -3663,6 +3665,11 @@ msgstr ""
 msgid "General"
 msgstr "Общее"
 
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Text"
 msgstr "Текст"
@@ -4540,6 +4547,11 @@ msgstr ""
 "Этот подраздел доступен слушателям, выполнившим предварительные условия его "
 "изучения."
 
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"A list summarizing what students should look forward to in this section."
+msgstr ""
+
 #: common/lib/xmodule/xmodule/split_test_module.py
 #, python-brace-format
 msgid "Group ID {group_id}"
@@ -4651,6 +4663,7 @@ msgstr "Главная страница"
 #: openedx/features/course_experience/__init__.py
 #: cms/templates/widgets/header.html lms/templates/help_modal.html
 #: lms/templates/courseware/courseware.html
+#: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Course"
 msgstr "Курс"
 
@@ -5211,6 +5224,7 @@ msgstr ""
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
 #. http://openedx.org for more information.
 #: lms/djangoapps/branding/api.py cms/templates/widgets/footer.html
+#: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Powered by Open edX"
 msgstr "На основе Open edX"
@@ -5259,6 +5273,7 @@ msgstr "Условия предоставления услуг и Кодекс �
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
+#: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -5907,6 +5922,27 @@ msgstr ""
 "Если курс не появится на вашей панели управления, напишите "
 "{payment_support_link}."
 
+#: lms/djangoapps/completion/models.py
+#, python-brace-format
+msgid "{value} must be between 0.0 and 1.0"
+msgstr ""
+
+#: lms/djangoapps/course_goals/models.py
+msgid "Earn a certificate"
+msgstr ""
+
+#: lms/djangoapps/course_goals/models.py
+msgid "Complete the course"
+msgstr ""
+
+#: lms/djangoapps/course_goals/models.py
+msgid "Explore the course"
+msgstr ""
+
+#: lms/djangoapps/course_goals/models.py
+msgid "Not sure yet"
+msgstr ""
+
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 msgid "Wiki"
@@ -5952,6 +5988,10 @@ msgstr "У вас нет доступа к этому курсу"
 msgid "You do not have access to this course on a mobile device"
 msgstr "Этот курс недоступен вам из мобильного приложения"
 
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Upgrade to Verified"
+msgstr "Повысить до уровня «Подтверждённый сертификат»"
+
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
 #. 'absolute'. For example, 'absolute' might be "Jan 01, 2020",
@@ -5970,6 +6010,20 @@ msgstr "в {relative} - {absolute}"
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Course Starts"
 msgstr "Курс начнётся"
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Don't forget to add a calendar reminder!"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "Course starts in {time_remaining_string} on {course_start_date}."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "Course starts in {time_remaining_string} at {course_start_time}."
+msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Course End"
@@ -5995,6 +6049,16 @@ msgstr ""
 "фактически курс завершён."
 
 #: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "This course is ending in {time_remaining_string} on {course_end_date}."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "This course is ending in {time_remaining_string} at {course_end_time}."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
 msgid "Certificate Available"
 msgstr ""
 
@@ -6003,8 +6067,35 @@ msgid "Day certificates will become available for passing verified learners."
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid ""
+"If you have earned a certificate, you will be able to access it "
+"{time_remaining_string} from now. You will also be able to view your "
+"certificates on your {learner_profile_link}."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Learner Profile"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "We are working on generating course certificates."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Upgrade to Verified Certificate"
+msgstr "Повысить до уровня «Подтверждённый сертификат»"
+
+#: lms/djangoapps/courseware/date_summary.py
 msgid "Verification Upgrade Deadline"
 msgstr "Срок окончания приёма заявок на подтверждение данных"
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid ""
+"Don't miss the opportunity to highlight your new knowledge and skills by "
+"earning a verified certificate."
+msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
@@ -6014,9 +6105,40 @@ msgstr ""
 "Вы всё ещё можете получить подтверждённый сертификат! Продолжайте, чтобы "
 "показать знания и навыки, полученные в этом курсе."
 
+#. Translators: This describes the time by which the user
+#. should upgrade to the verified track. 'date' will be
+#. their personalized verified upgrade deadline formatted
+#. according to their locale.
 #: lms/djangoapps/courseware/date_summary.py
-msgid "Upgrade to Verified Certificate"
-msgstr "Повысить до уровня «Подтверждённый сертификат»"
+#, python-brace-format
+msgid "by {date}"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid ""
+"Don't forget, you have {time_remaining_string} left to upgrade to a Verified"
+" Certificate."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "Don't forget to upgrade to a verified certificate by {localized_date}."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid ""
+"In order to qualify for a certificate, you must meet all course grading "
+"requirements, upgrade before the course deadline, and successfully verify "
+"your identity on {platform_name} if you have not done so "
+"already.{button_panel}"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
+msgid "Upgrade ({upgrade_price})"
+msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Learn More"
@@ -6073,9 +6195,11 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/courseware/models.py
-msgid ""
-"This does not do anything and is no longer used. Setting enabled=False has "
-"the same effect."
+msgid "Disable the dynamic upgrade deadline for this course run."
+msgstr ""
+
+#: lms/djangoapps/courseware/models.py
+msgid "Disable the dynamic upgrade deadline for this organization."
 msgstr ""
 
 #: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
@@ -6084,6 +6208,7 @@ msgstr "Программа обучения"
 
 #: lms/djangoapps/courseware/tabs.py
 #: lms/templates/peer_grading/peer_grading.html
+#: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Progress"
 msgstr "Прогресс"
 
@@ -6094,6 +6219,57 @@ msgstr "Прогресс"
 #: cms/templates/widgets/header.html
 msgid "Textbooks"
 msgstr "Учебники"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your enrollment: Audit track"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You are enrolled in the audit track for this course. The audit track does "
+"not include a certificate."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "We're working on it..."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"We're creating your certificate. You can keep working in your courses and a "
+"link to it will appear here and on your Dashboard when it is ready."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate has been invalidated"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Please contact your course team if you have any questions."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Congratulations, you qualified for a certificate!"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "You've earned a certificate for this course."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Certificate unavailable"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate is available"
+msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
@@ -6113,62 +6289,12 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "You must be enrolled in the course to see course content."
-"                         {enroll_link_start}Enroll now{enroll_link_end}."
+"                             {enroll_link_start}Enroll now{enroll_link_end}."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
+#: openedx/features/course_experience/views/course_home_messages.py
 msgid "You must be enrolled in the course to see course content."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Your enrollment: Audit track"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"You are enrolled in the audit track for this course. The audit track does "
-"not include a certificate."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Your certificate has been invalidated"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Please contact your course team if you have any questions."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "We're working on it..."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"We're creating your certificate. You can keep working in your courses and a "
-"link to it will appear here and on your Dashboard when it is ready."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Your certificate is available"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "You've earned a certificate for this course."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Certificate unavailable"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
-msgid ""
-"You have not received a certificate because you do not have a current "
-"{platform_name} verified identity."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Congratulations, you qualified for a certificate!"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
@@ -7405,7 +7531,7 @@ msgstr[3] "{num_emails} отправлено"
 #, python-brace-format
 msgid "{num_emails} failed"
 msgid_plural "{num_emails} failed"
-msgstr[0] "{num_emails} ошибки"
+msgstr[0] "{num_emails} ошибка"
 msgstr[1] "{num_emails} ошибки"
 msgstr[2] "{num_emails} ошибки"
 msgstr[3] "{num_emails} ошибки"
@@ -9349,6 +9475,10 @@ msgid "Your Platform Name Here"
 msgstr ""
 
 #: lms/envs/common.py
+msgid "Your Platform Description Here"
+msgstr ""
+
+#: lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr "Бесплатный курс"
@@ -9919,6 +10049,7 @@ msgstr ""
 #: lms/templates/courseware/courses.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/ux/reference/bootstrap/course-skeleton.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 #: themes/edx.org/lms/templates/dashboard.html
@@ -9993,6 +10124,10 @@ msgstr "Эта версия была удалена."
 #: lms/templates/wiki/preview_inline.html
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr "Если восстановить эту версию, статья будет помечена как удалённая."
+
+#: lms/urls.py
+msgid "LMS Administration"
+msgstr ""
 
 #: openedx/core/djangoapps/api_admin/admin.py
 #, python-brace-format
@@ -10504,12 +10639,8 @@ msgid "Schedule"
 msgstr "Расписание"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-msgid "View on Web"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
 #, python-format
-msgid "%(platform_name)s Home Page"
+msgid "Go to %(platform_name)s Home Page"
 msgstr ""
 
 #: cms/templates/login.html cms/templates/widgets/header.html
@@ -10551,11 +10682,69 @@ msgid "Download the Android app on the Google Play Store"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+msgid "View on Web"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
 msgid "Unsubscribe from this list"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
 msgid "Our mailing address is"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_head.html
+msgid "edX Email"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.html
+#, python-format
+msgid ""
+"Don't miss the opportunity to highlight your new knowledge and skills by "
+"earning a verified certificate. Upgrade by "
+"%(user_schedule_upgrade_deadline_time)s."
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.html
+msgid "Upgrade Now"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.txt
+#, python-format
+msgid ""
+"Don't miss the opportunity to highlight your new knowledge and skills by "
+"earning a verified certificate. Upgrade by "
+"%(user_schedule_upgrade_deadline_time)s. Upgrade Now! <%(upsell_link)s>"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+#, python-format
+msgid "Welcome to week %(week_num)s of our %(course_name)s course!"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+#, python-format
+msgid "Welcome to week %(week_num)s of <strong>%(course_name)s</strong>!"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+msgid "Here is what you can look forward to learning this week:"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+msgid "Resume your course now"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt
+#, python-format
+msgid ""
+"Welcome to week %(week_num)s of our %(course_name)s course! Here is what you"
+" can look forward to learning this week: %(week_summary)s"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/subject.txt
+#, python-format
+msgid "%(course_name)s - Welcome to Week %(week_num)s "
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
@@ -10649,12 +10838,81 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/subject.txt
 #, python-format
-msgid "Keep learning on %(platform_name)s!"
+msgid "Keep learning on %(platform_name)s"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/subject.txt
 #, python-format
-msgid "Keep learning in %(course_name)s !"
+msgid "Keep learning in %(course_name)s"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.txt
+#, python-format
+msgid ""
+"We hope you are enjoying learning with us so far on %(platform_name)s! A "
+"verified certificate allows you to highlight your new knowledge and skills. "
+"An %(platform_name)s certificate is official and easily shareable. Upgrade "
+"by %(user_schedule_upgrade_deadline_time)s."
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.txt
+#, python-format
+msgid ""
+"We hope you are enjoying learning with us so far in %(first_course_name)s! A"
+" verified certificate allows you to highlight your new knowledge and skills."
+" An %(platform_name)s certificate is official and easily shareable. Upgrade "
+"by %(user_schedule_upgrade_deadline_time)s."
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+msgid "Upgrade now"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+#, python-format
+msgid ""
+"We hope you are enjoying learning with us so far on "
+"<strong>%(platform_name)s</strong>! A verified certificate allows you to "
+"highlight your new knowledge and skills. An %(platform_name)s certificate is"
+" official and easily shareable."
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+#, python-format
+msgid ""
+"We hope you are enjoying learning with us so far in "
+"<strong>%(first_course_name)s</strong>! A verified certificate allows you to"
+" highlight your new knowledge and skills. An %(platform_name)s certificate "
+"is official and easily shareable."
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+#, python-format
+msgid "Upgrade by <strong>%(user_schedule_upgrade_deadline_time)s</strong>."
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+msgid "You are eligible to upgrade in these courses:"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+msgid "Example of a verified certificate"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.txt
+msgid "Upgrade now at"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/subject.txt
+#, python-format
+msgid "Upgrade to earn a verified certificate on %(platform_name)s"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/subject.txt
+#, python-format
+msgid "Upgrade to earn a verified certificate in %(first_course_name)s"
 msgstr ""
 
 #: openedx/core/djangoapps/self_paced/models.py
@@ -10717,9 +10975,6 @@ msgstr ""
 "Кажется {username} уже используется. Попробуйте ещё раз с другим именем "
 "пользователя."
 
-#. Translators: This message is shown to users who enter a
-#. username/email/password
-#. with an inappropriate length (too short or too long).
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
 msgid "Username must be between {min} and {max} characters long."
@@ -11044,6 +11299,18 @@ msgstr "Нет данных для обновления пользователь
 msgid "{header_open}{title}{header_close}{body}"
 msgstr ""
 
+#: openedx/core/djangoapps/util/user_messages.py
+#, python-brace-format
+msgid "{header_open}{title}{header_close}"
+msgstr ""
+
+#: openedx/core/djangoapps/util/user_messages.py
+#: cms/templates/course_outline.html cms/templates/index.html
+#: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
+#: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
+msgid "Dismiss"
+msgstr ""
+
 #: openedx/core/djangoapps/verified_track_content/models.py
 msgid "The course key for the course we would like to be auto-cohorted."
 msgstr ""
@@ -11131,23 +11398,47 @@ msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
-msgid " {sign_in_link} or {register_link} and then enroll in this course."
+msgid "{sign_in_link} or {register_link} and then enroll in this course."
 msgstr ""
 
+#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header.html
+#: themes/edx.org/lms/templates/legacy_header.html
+#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "Вход"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid ""
-"{open_enroll_link} Enroll now{close_enroll_link} to access the full course."
+"{open_enroll_link}Enroll now{close_enroll_link} to access the full course."
 msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
-msgid "Don't forget to add a calendar reminder!"
+#, python-brace-format
+msgid "Welcome to {course_display_name}"
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid ""
+"To start, set a course goal by selecting the option below that best "
+"describes your learning plan. {goal_options_container}"
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid "Set goal to: {choice}"
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid "{choice}"
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid "Set goal to: {goal_text}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -11160,6 +11451,14 @@ msgstr ""
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
 msgid "Enrollment in {course_name} was not complete."
+msgstr ""
+
+#: openedx/features/learner_profile/views/learner_profile.py
+#, python-brace-format
+msgid ""
+"Welcome to the new learner profile page. Your full profile now displays more"
+" information to other learners. You can instead choose to display a limited "
+"profile. {learn_more_link_start}Learn more{learn_more_link_end}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/course_group_config.py
@@ -11322,6 +11621,12 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
 msgstr "Загрузка завершена"
+
+#: cms/djangoapps/contentstore/views/assets.py
+#, python-brace-format
+msgid ""
+"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
@@ -11666,6 +11971,17 @@ msgstr "Импортировано"
 msgid "Unknown"
 msgstr "Неизвестно"
 
+#. Translators: This is the status for a video that is having its
+#. transcription in progress on servers
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Transcription in Progress"
+msgstr ""
+
+#. Translators: This is the status for a video whose transcription is complete
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Transcript Ready"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "The image must have name, content type, and size information."
 msgstr ""
@@ -11826,6 +12142,10 @@ msgstr ""
 msgid "Dictionary with the available tags"
 msgstr "Словарь тегов"
 
+#: cms/urls.py
+msgid "Studio Administration"
+msgstr ""
+
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
 msgid "Page Not Found"
@@ -11872,12 +12192,6 @@ msgstr "Номер курса"
 msgid "Course Outline"
 msgstr ""
 
-#: cms/templates/course_outline.html cms/templates/index.html
-#: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
-#: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
-msgid "Dismiss"
-msgstr ""
-
 #: cms/templates/course_outline.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Start Date:"
@@ -11900,11 +12214,13 @@ msgstr "Номер курса:"
 #: cms/templates/index.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header.html
+#: themes/edx.org/lms/templates/legacy_header.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Courses"
 msgstr "Курсы"
 
@@ -12001,21 +12317,26 @@ msgstr "Сбросить"
 msgid "Legal"
 msgstr "Юридическая информация"
 
-#: cms/templates/widgets/header.html lms/templates/navigation/navigation.html
+#: cms/templates/widgets/header.html lms/templates/header/header.html
+#: lms/templates/navigation/navigation.html
 #: lms/templates/widgets/footer-language-selector.html
 msgid "Choose Language"
 msgstr "Выберите язык"
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
-#: themes/edx.org/lms/templates/header.html
+#: lms/templates/header/user_dropdown.html
+#: themes/edx.org/lms/templates/legacy_header.html
 msgid "Account"
 msgstr "Учётная запись"
 
 #: cms/templates/widgets/header.html
+#: lms/templates/header/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/static_templates/help.html
-#: themes/edx.org/lms/templates/header.html wiki/plugins/help/wiki_plugin.py
+#: themes/edx.org/lms/templates/legacy_header.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+#: wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "Помощь"
 
@@ -12075,6 +12396,13 @@ msgstr "Отправить сообщение на адрес {email}"
 msgid "Contact Us"
 msgstr "Свяжитесь с нами"
 
+#: cms/templates/widgets/tabs-aggregator.html
+#: lms/templates/courseware/static_tab.html
+#: lms/templates/courseware/tab-view-v2.html
+#: lms/templates/courseware/tab-view.html
+msgid "name"
+msgstr ""
+
 #: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Usermenu"
 msgstr "Меню пользователя"
@@ -12084,6 +12412,7 @@ msgid "Usermenu dropdown"
 msgstr "Выпадающий список меню пользователя"
 
 #: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
+#: lms/templates/header/user_dropdown.html
 msgid "Sign Out"
 msgstr "Выйти"
 
@@ -12128,12 +12457,12 @@ msgid "Add a Post"
 msgstr "Добавить тему"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
-msgid "Discussion thread list"
-msgstr "Список тем обсуждения"
-
-#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "New topic form"
 msgstr "Форма для новой темы"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
+msgid "Discussion thread list"
+msgstr "Список тем обсуждения"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion - {course_number}"
@@ -12213,6 +12542,7 @@ msgid "View all Courses"
 msgstr "Посмотреть все курсы"
 
 #: lms/templates/dashboard.html lms/templates/user_dropdown.html
+#: lms/templates/header/user_dropdown.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "Панель управления"
@@ -12222,9 +12552,9 @@ msgid "You are not enrolled in any courses yet."
 msgstr "Вы ещё не зарегистрированы ни на один курс."
 
 #: lms/templates/dashboard.html
+#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore courses"
 msgstr "Просмотреть курсы"
@@ -13059,9 +13389,10 @@ msgid "I agree to the {link_start}Honor Code{link_end}"
 msgstr "Я согласен с {link_start}Кодексом чести{link_end}"
 
 #: lms/templates/register-form.html
+#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header.html
+#: themes/edx.org/lms/templates/legacy_header.html
+#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
 msgstr "Регистрация"
@@ -13368,12 +13699,10 @@ msgid "Page"
 msgstr "Страница"
 
 #: lms/templates/staticbook.html
-#: lms/templates/courseware/program_marketing.html
 msgid "Previous page"
 msgstr "Предыдущая страница"
 
 #: lms/templates/staticbook.html
-#: lms/templates/courseware/program_marketing.html
 msgid "Next page"
 msgstr "Следующая страница"
 
@@ -13551,13 +13880,9 @@ msgstr ""
 "отказались от подписки случайно, {undo_link_start}вы можете подписаться "
 "снова{link_end}."
 
-#: lms/templates/user_dropdown.html
+#: lms/templates/user_dropdown.html lms/templates/header/user_dropdown.html
 msgid "Dashboard for:"
 msgstr "Панель управления для:"
-
-#: lms/templates/user_dropdown.html
-msgid "Profile"
-msgstr "Профиль"
 
 #: lms/templates/user_dropdown.html
 msgid "More options"
@@ -14776,6 +15101,7 @@ msgid "Download student grades"
 msgstr "Скачать оценки"
 
 #: lms/templates/certificates/_accomplishment-banner.html
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr "Напечатайте сертификат или поделитесь им:"
 
@@ -14789,6 +15115,7 @@ msgstr "Опубликовать в Facebook"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
 msgid "Share on Twitter"
 msgstr "Опубликовать в Twitter"
 
@@ -14797,6 +15124,7 @@ msgid "Tweet this Accomplishment. Pop up window."
 msgstr "Поделитесь достижением в Twitter. Всплывающее окно."
 
 #: lms/templates/certificates/_accomplishment-banner.html
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
 msgid "Add to LinkedIn Profile"
 msgstr "Добавить в профиль LinkedIn"
 
@@ -14819,6 +15147,12 @@ msgstr "Запись сделана"
 #: lms/templates/certificates/_accomplishment-rendering.html
 msgid "Supported by the following organizations"
 msgstr "При поддержке следующих организаций"
+
+#: lms/templates/certificates/_edx-accomplishment-print-help.html
+msgid ""
+"For tips and tricks on printing your certificate, view the {link_start}Web "
+"Certificates help documentation{link_end}."
+msgstr ""
 
 #: lms/templates/certificates/invalid.html
 msgid "Cannot Find Certificate"
@@ -15186,6 +15520,17 @@ msgid "Email someone to say you've enrolled in this course"
 msgstr "Сообщить по электронной почте, что вы записались на курс. "
 
 #: lms/templates/courseware/course_navigation.html
+msgid "current location"
+msgstr ""
+
+#. Translators: 'needs attention' is an alternative string for the
+#. notification image that indicates the tab "needs attention".
+#: lms/templates/courseware/course_navigation.html
+#: lms/templates/courseware/tabs.html
+msgid "needs attention"
+msgstr "обратите внимание"
+
+#: lms/templates/courseware/course_navigation.html
 msgid "Course Material"
 msgstr "Материалы курса"
 
@@ -15321,19 +15666,37 @@ msgid "Start Learning"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "View Program Trailer"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
 msgid "Play"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "Number of Courses"
+msgid "YouTube Video"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "{number_of_courses} courses in program"
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "View Courses"
+msgstr "Посмотреть курс"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Meet the Instructors"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Frequenty Asked Questions"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Job Outlook"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Real Career Impact"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "What You'll Learn"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
@@ -15352,6 +15715,14 @@ msgstr ""
 msgid ""
 "{min_hours_effort_per_week}-{max_hours_effort_per_week} hours per week, per "
 "course"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Number of Courses"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "{number_of_courses} courses in program"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
@@ -15383,60 +15754,15 @@ msgid "${full_program_price} for entire program"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "Overview"
+msgid "Courses in the {}"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "Job Outlook"
+msgid "Starts on {}"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "What You'll Learn"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "{position} at {organization}"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-#: lms/templates/static_templates/faq.html
-#: themes/red-theme/lms/templates/footer.html
-msgid "FAQ"
-msgstr "Вопросы и ответы"
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Endorser Image"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Meet the Instructors"
-msgstr ""
-
-#. Translators: Pagination range contains ordinal numbers of the first and the
-#. last instructor
-#. whose information is shown on the current page.
-#: lms/templates/courseware/program_marketing.html
-msgid "{pagination_range} of {number_of_instructors}"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Courses in the {program_type}"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Starts {course_start_datetime}"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Instructor - Paced"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Self - Paced"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "YouTube Video"
+msgid "Frequently Asked Questions"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -15568,12 +15894,6 @@ msgstr "Нет баллов за выполненные в этом раздел
 msgid "{course.display_number_with_default} Course Info"
 msgstr "{course.display_number_with_default} О курсе"
 
-#. Translators: 'needs attention' is an alternative string for the
-#. notification image that indicates the tab "needs attention".
-#: lms/templates/courseware/tabs.html
-msgid "needs attention"
-msgstr "обратите внимание"
-
 #: lms/templates/courseware/welcome-back.html
 msgid ""
 "You were most recently in {section_link}.  If you're done with that, choose "
@@ -15656,12 +15976,8 @@ msgstr ""
 "здесь{link_end}."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid ""
-"Final course details are being wrapped up at this time. Your final standing "
-"will be available shortly."
+msgid "Your certificate will be available on or before {date}"
 msgstr ""
-"Сейчас идёт заключительный этап работы над курсом. Ваша финальная оценка "
-"скоро будет доступна."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
@@ -15814,7 +16130,7 @@ msgid "View Archived Course"
 msgstr "Посмотреть курс из архива"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "I'm taking {course_name} online with edX.org. Check it out!"
+msgid "I'm taking {course_name} online with {facebook_brand}. Check it out!"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -15822,11 +16138,12 @@ msgid "Share {course_name} on Facebook"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
 msgid "Share on Facebook"
 msgstr "Поделиться на Facebook"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "I'm taking {course_name} online with @edxonline. Check it out!"
+msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -15935,10 +16252,6 @@ msgstr ""
 "Это официальный сертификат. О нём легко рассказать. Стремление получить "
 "такой сертификат мотивирует закончить курс.  {line_break}{link_start}Узнать "
 "больше о подтверждённом {cert_name_long}{link_end}."
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Upgrade to Verified"
-msgstr "Повысить до уровня «Подтверждённый сертификат»"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -17150,6 +17463,76 @@ msgstr "Назад к разделу «Вопросы и ответы»"
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Apply for Financial Assistance"
 msgstr "Подать заявление на финансовую помощь"
+
+#: lms/templates/header/brand.html
+#: lms/templates/header/navbar-logo-header.html
+#: lms/templates/navigation/navbar-logo-header.html
+#: lms/templates/navigation/bootstrap/navbar-logo-header.html
+msgid "{platform_name} Home Page"
+msgstr "{platform_name} Главная страница"
+
+#: lms/templates/header/header.html lms/templates/navigation/navigation.html
+msgid "Global"
+msgstr "Глобально"
+
+#: lms/templates/header/header.html lms/templates/navigation/navigation.html
+#: themes/edx.org/lms/templates/legacy_header.html
+msgid ""
+"{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
+"strongly recommend using {chrome_link} or {ff_link}."
+msgstr ""
+"{begin_strong}Предупреждение:{end_strong} ваш браузер поддерживается не "
+"полностью. Настоятельно рекомендуем использовать {chrome_link} или "
+"{ff_link}."
+
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/learner_dashboard/programs.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/legacy_header.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Programs"
+msgstr "Программы"
+
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/legacy_header.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Profile"
+msgstr "Профиль"
+
+#: lms/templates/header/navbar-authenticated.html
+msgid "Discover New"
+msgstr ""
+
+#. Translators: This is short for "System administration".
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+msgid "Sysadmin"
+msgstr "Сисадмин"
+
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/shoppingcart/shopping_cart.html
+#: themes/edx.org/lms/templates/legacy_header.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Shopping Cart"
+msgstr "Корзина"
+
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/legacy_header.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "How it Works"
+msgstr "Как это работает"
+
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+msgid "Schools"
+msgstr "Организации"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -18854,13 +19237,6 @@ msgstr "Мои курсы"
 msgid "Program Details"
 msgstr "Информация о программе"
 
-#: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header.html
-msgid "Programs"
-msgstr "Программы"
-
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "Настройка языковых предпочтений"
@@ -18881,53 +19257,9 @@ msgstr ""
 "Не нашли язык, который предпочитаете? {link_start}Станьте переводчиком-"
 "волонтёром!{link_end}"
 
-#. Translators: This is short for "System administration".
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-msgid "Sysadmin"
-msgstr "Сисадмин"
-
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/header.html
-msgid "Shopping Cart"
-msgstr "Корзина"
-
-#: lms/templates/navigation/navbar-logo-header.html
-#: lms/templates/navigation/bootstrap/navbar-logo-header.html
-#: themes/edx.org/lms/templates/header.html
-msgid "{platform_name} Home Page"
-msgstr "{platform_name} Главная страница"
-
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header.html
-msgid "How it Works"
-msgstr "Как это работает"
-
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-not-authenticated.html
-msgid "Schools"
-msgstr "Организации"
-
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Explore Courses"
 msgstr "Просмотреть курсы"
-
-#: lms/templates/navigation/navigation.html
-msgid "Global"
-msgstr "Глобально"
-
-#: lms/templates/navigation/navigation.html
-#: themes/edx.org/lms/templates/header.html
-msgid ""
-"{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
-"strongly recommend using {chrome_link} or {ff_link}."
-msgstr ""
-"{begin_strong}Предупреждение:{end_strong} ваш браузер поддерживается не "
-"полностью. Настоятельно рекомендуем использовать {chrome_link} или "
-"{ff_link}."
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""
@@ -19285,11 +19617,6 @@ msgstr "Обработка платежей происходит на отдел
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Your Shopping cart is currently empty."
 msgstr "Ваша корзина пуста."
-
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "View Courses"
-msgstr "Посмотреть курс"
 
 #: lms/templates/shoppingcart/cybersource_form.html
 #: lms/templates/shoppingcart/shopping_cart_flow.html
@@ -19709,6 +20036,11 @@ msgid ""
 " export controls,we cannot allow you to access this course at this time."
 msgstr ""
 
+#: lms/templates/static_templates/faq.html
+#: themes/red-theme/lms/templates/footer.html
+msgid "FAQ"
+msgstr "Вопросы и ответы"
+
 #: lms/templates/static_templates/jobs.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Jobs"
@@ -19768,6 +20100,10 @@ msgstr "Поддержка слушателей"
 #: lms/templates/support/certificates.html
 msgid "Student Support: Certificates"
 msgstr "Поддержка слушателей: сертификаты"
+
+#: lms/templates/support/contact_us.html
+msgid "Contact US"
+msgstr ""
 
 #: lms/templates/support/enrollment.html
 msgid "Student Support: Enrollment"
@@ -19863,6 +20199,21 @@ msgstr "Куда обратиться, если у меня есть вопро�
 msgid ""
 "If you have any questions about this course or this form, you can contact "
 "{link_start}{mail_to_link}{link_end}."
+msgstr ""
+
+#: lms/templates/ux/reference/bootstrap/course-skeleton.html
+msgid "Skeleton Page"
+msgstr ""
+
+#: lms/templates/ux/reference/bootstrap/course-skeleton.html
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: openedx/features/course_search/templates/course_search/course-search-fragment.html
+msgid "Search the course"
+msgstr ""
+
+#: lms/templates/ux/reference/bootstrap/course-skeleton.html
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Start Course"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_help.html
@@ -20049,15 +20400,6 @@ msgid "Today is {date}"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-#: openedx/features/course_search/templates/course_search/course-search-fragment.html
-msgid "Search the course"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Start Course"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Show/Hide"
 msgstr ""
 
@@ -20091,25 +20433,20 @@ msgstr ""
 msgid "Upgrade ({price})"
 msgstr ""
 
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Goal: "
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Edit your course goal:"
+msgstr ""
+
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "This is your last visited course section."
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "This course has not started yet."
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "We're still working on course content."
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid ""
-"This course has not started yet, and will launch on {launch_date_html}."
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
@@ -20172,10 +20509,6 @@ msgid "Explore New Courses"
 msgstr "Посмотреть новые курсы"
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Learner Profile"
-msgstr ""
-
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "My Profile"
 msgstr ""
 
@@ -20211,6 +20544,7 @@ msgid "Page Footer"
 msgstr "Нижний колонтитул страницы"
 
 #: themes/edx.org/lms/templates/footer.html
+#: themes/edx.org/lms/templates/certificates/_about-edx.html
 msgid "About edX"
 msgstr "Об edX"
 
@@ -20225,17 +20559,81 @@ msgid ""
 "of edX Inc."
 msgstr ""
 
-#: themes/edx.org/lms/templates/header.html
+#: themes/edx.org/lms/templates/legacy_header.html
 msgid "Main"
 msgstr ""
 
-#: themes/edx.org/lms/templates/header.html
+#: themes/edx.org/lms/templates/legacy_header.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Find Courses"
 msgstr "Найти курсы"
 
-#: themes/edx.org/lms/templates/header.html
+#: themes/edx.org/lms/templates/legacy_header.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Schools & Partners"
 msgstr "Учебные заведения и партнёры"
+
+#: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
+msgid "About edX Verified Certificates"
+msgstr ""
+
+#: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
+msgid ""
+"An edX Verified Certificate signifies that the learner has agreed to abide "
+"by the edX honor code and completed all of the required tasks of this course"
+" under its guidelines, as well as having their photo ID checked to verify "
+"their identity."
+msgstr ""
+
+#: themes/edx.org/lms/templates/certificates/_about-edx.html
+msgid ""
+"{link_start}edX{link_end} offers interactive online classes and MOOCs from "
+"the world's best universities, including MIT, Harvard, Berkeley, University "
+"of Texas, and many others. edX is a non-profit online initiative created by "
+"founding partners Harvard and MIT."
+msgstr ""
+
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+msgid "Congratulations, {user_name}!"
+msgstr ""
+
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+msgid ""
+"You worked hard to earn your certificate from "
+"{accomplishment_copy_course_org} {dash} share it with colleagues, friends, "
+"and family to get the word out about what you mastered in "
+"{accomplishment_course_title}."
+msgstr ""
+
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+msgid "Share this certificate on Facebook (opens a new tab/window)"
+msgstr ""
+
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+msgid "Tweet this certificate (opens a new tab/window)"
+msgstr ""
+
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+msgid "Add this certificate to your LinkedIn profile (opens a new tab/window)"
+msgstr ""
+
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+msgid "Print"
+msgstr ""
+
+#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+msgid "Print this certificate"
+msgstr ""
+
+#: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
+msgid "edX Inc."
+msgstr ""
+
+#: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
+msgid ""
+"All rights reserved except where noted. edX, Open edX and the edX and Open "
+"edX logos are registered trademarks or trademarks of edX Inc."
+msgstr ""
 
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
@@ -20454,7 +20852,7 @@ msgstr ""
 msgid "Files & Uploads"
 msgstr "Файлы и загрузки"
 
-#: cms/templates/asset_index.html cms/templates/videos_index.html
+#: cms/templates/asset_index.html
 msgid "Upload New File"
 msgstr "Загрузить новый файл"
 
@@ -23654,6 +24052,10 @@ msgstr "Узнать больше об учебниках"
 msgid "Video Uploads"
 msgstr "Загруженные видео"
 
+#: cms/templates/videos_index.html
+msgid "Course Video Settings"
+msgstr ""
+
 #: cms/templates/visibility_editor.html
 msgid "Access is not restricted"
 msgstr ""
@@ -23982,10 +24384,6 @@ msgstr "Открыть портал Open edX"
 msgid "Open edX Portal"
 msgstr "Портал Open edX"
 
-#: cms/templates/widgets/tabs-aggregator.html
-msgid "name"
-msgstr "название"
-
 #: cms/templates/widgets/user_dropdown.html
 msgid "Currently signed in as:"
 msgstr "Вы зашли как:"
@@ -23993,6 +24391,18 @@ msgstr "Вы зашли как:"
 #: cms/templates/widgets/user_dropdown.html
 msgid "Maintenance"
 msgstr "Техническое обслуживание"
+
+#: wiki/apps.py
+msgid "Wiki notifications"
+msgstr ""
+
+#: wiki/apps.py
+msgid "Wiki images"
+msgstr ""
+
+#: wiki/apps.py
+msgid "Wiki attachments"
+msgstr ""
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"

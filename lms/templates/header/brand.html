@@ -7,6 +7,7 @@
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # App that handles subdomain specific branding
 from branding import api as branding_api
@@ -14,7 +15,7 @@ from branding import api as branding_api
 
 <h1 class="hd logo-header navbar-brand">
   <div class="logo">
-    <a class="navbar-brand" href="${reverse('dashboard')}" itemprop="url">
+    <a class="navbar-brand" href="${branding_api.get_home_url()}" itemprop="url">
       <img class="logo-image" src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}" itemprop="logo" />
     </a>
   </div>
@@ -26,3 +27,11 @@ from branding import api as branding_api
     </div>
   % endif
 </h1>
+% if enable_enterprise_sidebar:
+  <div class="enterprise-tagline">
+    <% tagline = configuration_helpers.get_value('ENTERPRISE_TAGLINE', settings.ENTERPRISE_TAGLINE) %>
+    % if tagline:
+      ${tagline}
+    % endif
+  </div>
+% endif

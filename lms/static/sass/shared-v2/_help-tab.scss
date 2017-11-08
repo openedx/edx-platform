@@ -1,16 +1,33 @@
+#help-modal {
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+
+  @media (max-width: $grid-breakpoints-md) {
+    width: 90% !important;
+    margin-left: -47% !important;
+  }
+
+  @media (min-width: $grid-breakpoints-md) {
+    width: 700px !important;
+    margin-left: -350px !important;
+  }
+
+}
+
 .help-tab {
   @include transform(rotate(-90deg));
   @include transform-origin(0 0);
 
   z-index: z-index(front);
-  top: 250px;
+  bottom: $baseline;
   left: 0;
   position: fixed;
 
   a:link,
   a:visited {
     cursor: pointer;
-    border: 1px solid $lms-border-color;
+    border: 1px solid $border-color;
     border-top-style: none;
     border-radius: 0 0 ($baseline/2) ($baseline/2);
     background: transparentize($white, 0.25);
@@ -29,7 +46,9 @@
 }
 
 .help-buttons {
-  padding: ($baseline/2) ($baseline*2.5);
+  .btn {
+    flex-grow: 1;
+  }
 
   a:link,
   a:visited {
@@ -39,7 +58,7 @@
     background: $white;
     text-decoration: none;
     display: block;
-    border: 1px solid $lms-border-color;
+    border: 1px solid $border-color;
 
     &#feedback_link_problem {
       border-bottom-style: none;

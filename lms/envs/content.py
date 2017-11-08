@@ -15,7 +15,8 @@ TEMPLATE_DEBUG = True
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ################################ DEBUG TOOLBAR #################################
-INSTALLED_APPS += ('debug_toolbar',)
+INSTALLED_APPS.append('debug_toolbar')
+
 MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 
 DEBUG_TOOLBAR_PANELS = (

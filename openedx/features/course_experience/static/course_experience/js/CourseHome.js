@@ -60,12 +60,14 @@ export class CourseHome {  // eslint-disable-line import/prefer-default-export
     });
 
     // Send an ajax request to update the course goal
-    $goalSelect.on('change', (event) => {
+    $goalSelect.on('blur change', (event) => {
+      $currentGoalText.show();
+      $goalUpdateTitle.show();
+      $goalUpdateLabel.hide();
+      $goalSelect.hide();
+      // No need to update in the case of a blur event
+      if (event.type === 'blur') return;
       const newGoalKey = $(event.target).val();
-      $goalSelect.toggle();
-      $currentGoalText.toggle();
-      $goalUpdateTitle.toggle();
-      $goalUpdateLabel.toggle();
       $responseIndicator.removeClass().addClass('response-icon fa fa-spinner fa-spin');
       $.ajax({
         method: 'POST',

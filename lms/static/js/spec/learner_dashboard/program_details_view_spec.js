@@ -462,7 +462,10 @@ define([
                                 }
                             ]
                         }
-                    ]
+                    ],
+                    grades: {
+                        'course-v1:Testx+DOGx002+1T2016': 0.9
+                    }
                 },
                 urls: {
                     program_listing_url: '/dashboard/programs/',

@@ -312,7 +312,7 @@ class FieldData(object):
         if self._is_own_field(field_name):
             return super(FieldData, self).__delattr__(field_name)
         else:
-            delattr(self.fields, field_name)
+            del self.fields[field_name]
 
     def _is_own_field(self, field_name):
         """

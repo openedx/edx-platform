@@ -109,12 +109,6 @@ from openedx.core.djangolib.markup import HTML
             %endif
           </div>
 
-          %if analytics_dashboard_message:
-            <div class="wrapper-msg urgency-low is-shown">
-                <p>${analytics_dashboard_message}</p>
-            </div>
-          %endif
-
         ## links which are tied to idash-sections below.
         ## the links are activated and handled in instructor_dashboard.coffee
         ## when the javascript loads, it clicks on the first section
@@ -123,7 +117,9 @@ from openedx.core.djangolib.markup import HTML
             <% is_hidden = section_data.get('is_hidden', False) %>
             ## This is necessary so we don't scrape 'section_display_name' as a string.
             <% dname = section_data['section_display_name'] %>
-            <li class="nav-item"><button type="button" class="btn-link ${ section_data['section_key'] }${' hidden' if is_hidden else ''}" data-section="${ section_data['section_key'] }">${_(dname)}</button></li>
+            % if not is_hidden:
+              <li class="nav-item"><button type="button" class="btn-link ${ section_data['section_key'] }${' hidden' if is_hidden else ''}" data-section="${ section_data['section_key'] }">${_(dname)}</button></li>
+            % endif
           % endfor
         </ul>
 

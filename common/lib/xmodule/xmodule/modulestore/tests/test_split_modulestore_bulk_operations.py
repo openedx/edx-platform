@@ -302,7 +302,13 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         org_targets = None
         self.conn.find_matching_course_indexes.return_value = [Mock(name='result')]
         result = self.bulk.find_matching_course_indexes(branch, search_targets)
-        self.assertConnCalls(call.find_matching_course_indexes(branch, search_targets, org_targets))
+        self.assertConnCalls(call.find_matching_course_indexes(
+            branch,
+            search_targets,
+            org_targets,
+            course_keys=None
+        )
+        )
         self.assertEqual(result, self.conn.find_matching_course_indexes.return_value)
         self.assertCacheNotCleared()
 

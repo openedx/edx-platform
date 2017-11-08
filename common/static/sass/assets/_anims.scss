@@ -98,11 +98,13 @@
 @include keyframes(bounceIn) {
   0% {
     opacity: 0.0;
+
     @include transform(scale(0.3));
   }
 
   50% {
     opacity: 1.0;
+
     @include transform(scale(1.05));
   }
 
@@ -119,11 +121,13 @@
 
   50% {
     opacity: 1.0;
+
     @include transform(scale(1.05));
   }
 
   100% {
     opacity: 0.0;
+
     @include transform(scale(0.3));
   }
 }
@@ -144,11 +148,11 @@
 
 // flash - double
 @include keyframes(flashDouble) {
-0%, 50%, 100% {
-  opacity: 1.0;
-}
+  0%, 50%, 100% {
+    opacity: 1.0;
+  }
 
-25%, 75% {
+  25%, 75% {
     opacity: 0.0;
   }
 }
