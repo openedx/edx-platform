@@ -29,6 +29,15 @@ class CatalogIntegration(ConfigurationModel):
         )
     )
 
+    long_term_cache_ttl = models.PositiveIntegerField(
+        verbose_name=_('Long Term Cache Time To Live'),
+        default=86400,
+        help_text=_(
+            'Specified in seconds (defaults to 86400s, 24hr). In some cases the cache does needs to be refreshed '
+            'less frequently. Enable long term caching of API responses by setting this to a value greater than 0.'
+        )
+    )
+
     service_username = models.CharField(
         max_length=100,
         default='lms_catalog_service_user',
