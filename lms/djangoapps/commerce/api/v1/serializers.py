@@ -8,8 +8,9 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 
 from course_modes.models import CourseMode
-from .models import Course
 from xmodule.modulestore.django import modulestore
+
+from .models import Course
 
 
 class CourseModeSerializer(serializers.ModelSerializer):

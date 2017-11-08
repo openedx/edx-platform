@@ -1,32 +1,31 @@
-from collections import namedtuple, defaultdict
-from copy import deepcopy
 import datetime
-import ddt
 import logging
+from collections import defaultdict, namedtuple
+from copy import deepcopy
 
 import attr
+import ddt
+import pytz
 from django.conf import settings
+from edx_ace.channel import ChannelType
+from edx_ace.test_utils import StubPolicy, patch_channels, patch_policies
+from edx_ace.utils.date import serialize
 from freezegun import freeze_time
 from mock import Mock, patch
-import pytz
+from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration
-from edx_ace.channel import ChannelType
-from edx_ace.utils.date import serialize
-from edx_ace.test_utils import StubPolicy, patch_channels, patch_policies
-from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
+from lms.djangoapps.commerce.models import CommerceConfiguration
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.resolvers import _get_datetime_beginning_of_day
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory, ScheduleFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from openedx.core.djangolib.testing.utils import FilteredQueryCountMixin, CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, FilteredQueryCountMixin
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-
 
 SITE_QUERY = 1  # django_site
 SITE_CONFIG_QUERY = 1  # site_configuration_siteconfiguration

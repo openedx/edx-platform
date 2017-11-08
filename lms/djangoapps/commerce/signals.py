@@ -14,12 +14,13 @@ from django.contrib.auth.models import AnonymousUser
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 
-from .models import CommerceConfiguration
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from request_cache.middleware import RequestCache
 from student.signals import REFUND_ORDER
+
+from .models import CommerceConfiguration
 
 log = logging.getLogger(__name__)
 

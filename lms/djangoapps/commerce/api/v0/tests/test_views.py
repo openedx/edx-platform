@@ -17,18 +17,18 @@ from nose.plugins.attrib import attr
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from enrollment.api import get_enrollment
-from ..views import SAILTHRU_CAMPAIGN_COOKIE
-from ....constants import Messages
-from ....tests.mocks import mock_basket_order
-from ....tests.test_views import UserMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
-from course_modes.tests.factories import CourseModeFactory
 from student.tests.tests import EnrollmentEventTestMixin
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from ....constants import Messages
+from ....tests.mocks import mock_basket_order
+from ....tests.test_views import UserMixin
+from ..views import SAILTHRU_CAMPAIGN_COOKIE
 
 UTM_COOKIE_NAME = 'edx.test.utm'
 UTM_COOKIE_CONTENTS = {

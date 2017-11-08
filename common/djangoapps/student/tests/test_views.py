@@ -14,17 +14,17 @@ from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase
 from edx_oauth2_provider.constants import AUTHORIZED_CLIENTS_SESSION_KEY
 from edx_oauth2_provider.tests.factories import ClientFactory, TrustedClientFactory
-from mock import patch
-from pyquery import PyQuery as pq
-from opaque_keys import InvalidKeyError
-
 from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import patch
+from opaque_keys import InvalidKeyError
+from pyquery import PyQuery as pq
+
 from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from student.models import CourseEnrollment, UserProfile
 from student.signals import REFUND_ORDER
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.milestones_helpers import set_prerequisite_courses, remove_prerequisite_course, get_course_milestones
+from util.milestones_helpers import get_course_milestones, remove_prerequisite_course, set_prerequisite_courses
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
