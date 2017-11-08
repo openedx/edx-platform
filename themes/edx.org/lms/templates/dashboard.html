@@ -9,9 +9,14 @@ import third_party_auth
 from third_party_auth import pipeline
 from django.core.urlresolvers import reverse
 import json
+from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.djangoapps.theming import helpers as theming_helpers
+
+from entitlements.models import CourseEntitlement
+from student.models import CourseEnrollment
 %>
 
 <%
@@ -108,28 +113,58 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
     <header class="wrapper-header-courses">
       <h2 class="header-courses">${_("My Courses")}</h2>
     </header>
+    % if len(course_entitlements + course_enrollments) > 0:
+        <ul class="listing-courses">
+        <% share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}) %>
+        % for dashboard_index, enrollment in enumerate(course_entitlements + course_enrollments):
+          <%
+            # Check if the course run is an entitlement and if it has an associated session
+            entitlement = enrollment if isinstance(enrollment, CourseEntitlement) else None
+            entitlement_session = entitlement.enrollment_course_run if entitlement else None
 
+            is_fulfilled_entitlement = True if entitlement and entitlement_session else False
+            is_unfulfilled_entitlement = True if entitlement and not entitlement_session else False
 
-    % if len(course_enrollments) > 0:
-      <ul class="listing-courses">
-      <% share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}) %>
-      % for dashboard_index, enrollment in enumerate(course_enrollments):
-        <% show_courseware_link = (enrollment.course_id in show_courseware_links_for) %>
-        <% cert_status = cert_statuses.get(enrollment.course_id) %>
-        <% can_unenroll = (not cert_status) or cert_status.get('can_unenroll') %>
-        <% credit_status = credit_statuses.get(enrollment.course_id) %>
-        <% show_email_settings = (enrollment.course_id in show_email_settings_for) %>
-        <% course_mode_info = all_course_modes.get(enrollment.course_id) %>
-        <% is_paid_course = (enrollment.course_id in enrolled_courses_either_paid) %>
-        <% is_course_blocked = (enrollment.course_id in block_courses) %>
-        <% course_verification_status = verification_status_by_course.get(enrollment.course_id, {}) %>
-        <% course_requirements = courses_requirements_not_met.get(enrollment.course_id) %>
-        <% related_programs = inverted_programs.get(unicode(enrollment.course_id)) %>
-        <% show_consent_link = (enrollment.course_id in consent_required_courses) %>
-        <%include file = 'dashboard/_dashboard_course_listing.html' args='course_overview=enrollment.course_overview, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name' />
-      % endfor
+            entitlement_available_sessions = []
+            if entitlement:
+              # Grab the available, enrollable sessions for a given entitlement and scrape them for relevant attributes
+              entitlement_available_sessions = [{
+                'session_id': course['key'],
+                'enrollment_end': course['enrollment_end'],
+                'pacing_type': course['pacing_type'],
+                'session_start_advertised': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).advertised_start,
+                'session_start': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).start,
+                'session_end': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).end,
+                } for course in course_entitlement_available_sessions[str(entitlement.uuid)]]
+              if is_fulfilled_entitlement:
+                # If the user has a fulfilled entitlement, pass through the entitlements CourseEnrollment object
+                enrollment = entitlement_session
+              else:
+                # If the user has an unfulfilled entitlement, pass through a bare CourseEnrollment object built off of the next available session
+                upcoming_sessions = course_entitlement_available_sessions[str(entitlement.uuid)]
+                next_session = upcoming_sessions[0] if upcoming_sessions else None
+                if not next_session:
+                    continue
+                enrollment = CourseEnrollment(user=user, course_id=next_session['key'], mode=next_session['type'])
 
-      </ul>
+            session_id = enrollment.course_id
+            show_courseware_link = (session_id in show_courseware_links_for)
+            cert_status = cert_statuses.get(session_id)
+            can_unenroll = (not cert_status) or cert_status.get('can_unenroll') if not unfulfilled_entitlement else False
+            credit_status = credit_statuses.get(session_id)
+            show_email_settings = (session_id in show_email_settings_for)
+            course_mode_info = all_course_modes.get(session_id)
+            is_paid_course = True if entitlement else (session_id in enrolled_courses_either_paid)
+            is_course_blocked = (session_id in block_courses)
+            course_verification_status = verification_status_by_course.get(session_id, {})
+            course_requirements = courses_requirements_not_met.get(session_id)
+            related_programs = inverted_programs.get(unicode(session_id))
+            show_consent_link = (session_id in consent_required_courses)
+            course_overview = enrollment.course_overview
+          %>
+          <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, show_courseware_link=show_courseware_link, cert_status=cert_status, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name' />
+        % endfor
+        </ul>
     % else:
       <section class="empty-dashboard-message">
         <p>${_("You are not enrolled in any courses yet.")}</p>

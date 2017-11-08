@@ -10,10 +10,10 @@ var edx = edx || {};
     edx.dashboard.dropdown.toggleCourseActionsDropdownMenu = function(event) {
         // define variables for code legibility
         var dashboardIndex = $(event.currentTarget).data().dashboardIndex,
-            dropdown = $('#actions-dropdown-' + dashboardIndex),
+            $dropdown = $('#actions-dropdown-' + dashboardIndex),
             dropdownButton = $('#actions-dropdown-link-' + dashboardIndex),
             ariaExpandedState = (dropdownButton.attr('aria-expanded') === 'true'),
-            menuItems = dropdown.find('a');
+            menuItems = $dropdown.find('a');
 
         var catchKeyPress = function(object, event) {
             // get currently focused item
@@ -57,12 +57,12 @@ var edx = edx || {};
         };
 
         // Toggle the visibility control for the selected element and set the focus
-        dropdown.toggleClass('is-visible');
-        if (dropdown.hasClass('is-visible')) {
-            dropdown.attr('tabindex', -1);
-            dropdown.focus();
+        $dropdown.toggleClass('is-visible');
+        if ($dropdown.hasClass('is-visible')) {
+            $dropdown.attr('tabindex', -1);
+            $dropdown.focus();
         } else {
-            dropdown.removeAttr('tabindex');
+            $dropdown.removeAttr('tabindex');
             dropdownButton.focus();
         }
 
@@ -71,8 +71,8 @@ var edx = edx || {};
 
         // catch keypresses when inside dropdownMenu (we want to catch spacebar;
         // escape; up arrow or shift+tab; and down arrow or tab)
-        dropdown.on('keydown', function(event) {
-            catchKeyPress($(this), event);
+        $dropdown.on('keydown', function(e) {
+            catchKeyPress($(this), e);
         });
     };
 
