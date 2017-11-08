@@ -38,4 +38,4 @@ class SAMLProviderSiteDetail(generics.ListAPIView):
 
     def get_queryset(self):
         site_id = self.kwargs['site_id']
-        return SAMLProviderConfig.objects.current_set().filter(site__id=site_id)
+        return SAMLProviderConfig.objects.current_set().filter(site__id=site_id).order_by('-enabled')
