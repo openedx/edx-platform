@@ -3071,11 +3071,6 @@ NOTIFICATION_STORE_PROVIDER = {
     }
 }
 
-MIGRATION_MODULES = {
-    'djcelery': 'ignore',
-    'edx_notifications': 'edx_notifications.stores.sql.migrations',
-}
-
 MAX_NOTIFICATION_LIST_SIZE = 100
 
 # Google Place API key
