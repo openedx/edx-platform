@@ -2,7 +2,7 @@
   "name": "edx",
   "version": "0.1.0",
   "dependencies": {
-    "@edx/edx-bootstrap": "^0.4.1",
+    "@edx/edx-bootstrap": "^0.4.2",
     "@edx/paragon": "^0.2.0",
     "@edx/studio-frontend": "^0.3.0",
     "babel-core": "^6.23.0",
