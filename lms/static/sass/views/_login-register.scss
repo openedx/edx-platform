@@ -399,7 +399,7 @@
       }
 
       &.success {
-        border-color: $success-color-hover;
+        border-color: theme-color("success");
       }
     }
 
@@ -410,7 +410,7 @@
       }
 
       &.success {
-        outline-color: $success-color-hover;
+        outline-color: theme-color("success");
       }
     }
 
@@ -438,7 +438,7 @@
       }
 
       &.success {
-        color: $success-color-hover;
+        color: theme-color("success");
       }
     }
 
