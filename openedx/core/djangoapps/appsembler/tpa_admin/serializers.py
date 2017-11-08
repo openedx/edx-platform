@@ -38,7 +38,5 @@ class SAMLProviderConfigSerializer(serializers.ModelSerializer):
 
     def get_metadata_ready(self, obj):
         """ Do we have cached metadata for this SAML provider? """
-        if not obj.is_active:
-            return None  # N/A
         data = SAMLProviderData.current(obj.entity_id)
         return bool(data and data.is_valid())
