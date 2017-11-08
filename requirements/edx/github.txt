@@ -98,3 +98,7 @@ git+https://github.com/edx/edx-proctoring.git@0.17.0#egg=edx-proctoring==0.17.0
 -e git+https://github.com/philanthropy-u/AudioXBlock.git#egg=audio-xblock==1.0.2
 -e git+https://github.com/adlnet-archive/Table-XBlock.git#egg=table-xblock==1.0
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.15#egg=xblock-drag-and-drop-v2==2.0.15
+
+# edx-notifications
+-e git+https://github.com/edx/edx-notifications.git@1d02faf585ca248d1167485043794c68e6b8948c#egg=edx-notifications
+

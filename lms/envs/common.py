@@ -1939,6 +1939,10 @@ INSTALLED_APPS = (
     'pipeline',
     'static_replace',
 
+    # Edx-Notifications
+    'edx_notifications',
+    'edx_notifications.server.web',
+
     # For content serving
     'openedx.core.djangoapps.contentserver',
 
@@ -3057,6 +3061,22 @@ ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
 # Notification email settings
 NOTIFICATION_FROM_EMAIL = 'no-reply@philanthropyu.org'
 NOTIFICATION_EMAIL_SUBJECT = 'Philanthropy-U-Team Course Notification'
+
+
+############## Settings for edX Notifications App ######################
+
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+MIGRATION_MODULES = {
+    'djcelery': 'ignore',
+    'edx_notifications': 'edx_notifications.stores.sql.migrations',
+}
+
+MAX_NOTIFICATION_LIST_SIZE = 100
 
 # Google Place API key
 GOOGLE_PLACE_API_KEY = 'AIzaSyDhkKEySp0g2Ip8bovRHCI5KE257DSAJkA'
