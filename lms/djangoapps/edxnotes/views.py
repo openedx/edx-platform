@@ -45,7 +45,7 @@ def edxnotes(request, course_id):
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, "load", course_key)
 
-    if not is_feature_enabled(course):
+    if not is_feature_enabled(course, request.user):
         raise Http404
 
     notes_info = get_notes(request, course)
@@ -149,7 +149,7 @@ def notes(request, course_id):
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
 
-    if not is_feature_enabled(course):
+    if not is_feature_enabled(course, request.user):
         raise Http404
 
     page = request.GET.get('page') or DEFAULT_PAGE
@@ -191,7 +191,7 @@ def edxnotes_visibility(request, course_id):
         request.user, request, course, field_data_cache, course_key, course=course
     )
 
-    if not is_feature_enabled(course):
+    if not is_feature_enabled(course, request.user):
         raise Http404
 
     try:
