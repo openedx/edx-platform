@@ -635,6 +635,7 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     saveHighlights();
 
                     expectServerHandshakeWithHighlights(updatedHighlights);
+                    expectHighlightLinkNumberToBe(updatedHighlights.length);
 
                     openHighlights();
                     expectHighlightsToBe(updatedHighlights);

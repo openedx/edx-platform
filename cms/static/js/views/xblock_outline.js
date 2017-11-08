@@ -224,7 +224,11 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
             },
 
             onSync: function(event) {
-                if (ViewUtils.hasChangedAttributes(this.model, ['visibility_state', 'child_info', 'display_name'])) {
+                var hasChangedAttributes = ViewUtils.hasChangedAttributes(
+                    this.model,
+                    ['visibility_state', 'child_info', 'display_name', 'highlights']
+                );
+                if (hasChangedAttributes) {
                     this.onXBlockChange();
                 }
             },
