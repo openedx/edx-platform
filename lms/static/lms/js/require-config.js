@@ -100,6 +100,8 @@
             'string_utils': 'js/src/string_utils',
             'utility': 'js/src/utility',
             'draggabilly': 'js/vendor/draggabilly',
+            'popper': 'common/js/vendor/popper',
+            'bootstrap': 'common/js/vendor/bootstrap',
 
             // Files needed by OVA
             'annotator': 'js/vendor/ova/annotator-full',
@@ -205,6 +207,13 @@
             },
             'grouping-annotator': {
                 deps: ['annotator']
+            },
+            'popper': {
+                exports: 'Popper'
+            },
+            'bootstrap': {
+                deps: ['jquery', 'popper'],
+                exports: 'bootstrap'
             },
             'ova': {
                 exports: 'ova',
