@@ -2251,7 +2251,7 @@ INSTALLED_APPS = [
     'xblock_django',
 
     # programs support
-    'openedx.core.djangoapps.programs',
+    'openedx.core.djangoapps.programs.apps.ProgramsConfig',
 
     # Catalog integration
     'openedx.core.djangoapps.catalog',

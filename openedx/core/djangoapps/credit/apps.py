@@ -14,6 +14,7 @@ class CreditConfig(AppConfig):
     name = u'openedx.core.djangoapps.credit'
 
     def ready(self):
+        from . import signals
         if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
             from .services import CreditService
             set_runtime_service('credit', CreditService())
