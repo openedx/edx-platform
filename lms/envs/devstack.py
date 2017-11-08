@@ -20,7 +20,8 @@ CELERY_ALWAYS_EAGER = True
 HTTPS = 'off'
 
 LMS_ROOT_URL = 'http://localhost:8000'
-ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
+LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
+ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 
 ################################ LOGGERS ######################################
 
