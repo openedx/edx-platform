@@ -1,17 +1,21 @@
+from __future__ import print_function
+
 import os
 import sys
 import traceback
 
 import lxml.etree
+
 from django.core.management.base import BaseCommand
 from fs.osfs import OSFS
 from path import Path as path
-
 from xmodule.modulestore.xml import XMLModuleStore
 
 
 def traverse_tree(course):
-    """Load every descriptor in course.  Return bool success value."""
+    """
+    Load every descriptor in course.  Return bool success value.
+    """
     queue = [course]
     while len(queue) > 0:
         node = queue.pop()
@@ -21,13 +25,13 @@ def traverse_tree(course):
 
 
 def export(course, export_dir):
-    """Export the specified course to course_dir.  Creates dir if it doesn't exist.
-    Overwrites files, does not clean out dir beforehand.
+    """
+    Export the specified course to course_dir.  Creates dir if it doesn't
+    exist.  Overwrites files, does not clean out dir beforehand.
     """
     fs = OSFS(export_dir, create=True)
     if not fs.isdirempty('.'):
-        print ('WARNING: Directory {dir} not-empty.'
-               '  May clobber/confuse things'.format(dir=export_dir))
+        print('WARNING: Directory {dir} not-empty.  May clobber/confuse things'.format(dir=export_dir))
 
     try:
         course.runtime.export_fs = fs
@@ -38,7 +42,7 @@ def export(course, export_dir):
 
         return True
     except:
-        print 'Export failed!'
+        print('Export failed!')
         traceback.print_exc()
 
     return False
@@ -47,7 +51,7 @@ def export(course, export_dir):
 def import_with_checks(course_dir):
     all_ok = True
 
-    print "Attempting to load '{0}'".format(course_dir)
+    print('Attempting to load "{}"'.format(course_dir))
 
     course_dir = path(course_dir)
     data_dir = course_dir.dirname()
@@ -69,88 +73,85 @@ def import_with_checks(course_dir):
 
     n = len(courses)
     if n != 1:
-        print 'ERROR: Expect exactly 1 course.  Loaded {n}: {lst}'.format(
-            n=n, lst=courses)
+        print('ERROR: Expect exactly 1 course.  Loaded {n}: {lst}'.format(n=n, lst=courses))
         return (False, None)
 
     course = courses[0]
     errors = modulestore.get_course_errors(course.id)
     if len(errors) != 0:
         all_ok = False
-        print '\n'
-        print "=" * 40
-        print 'ERRORs during import:'
-        print '\n'.join(map(str_of_err, errors))
-        print "=" * 40
-        print '\n'
+        print(
+            '\n' +
+            '========================================' +
+            'ERRORs during import:' +
+            '\n'.join(map(str_of_err, errors)) +
+            '========================================' +
+            '\n'
+        )
 
     # print course
     validators = (
         traverse_tree,
     )
 
-    print "=" * 40
-    print "Running validators..."
+    print('========================================')
+    print('Running validators...')
 
     for validate in validators:
-        print 'Running {0}'.format(validate.__name__)
+        print('Running {}'.format(validate.__name__))
         all_ok = validate(course) and all_ok
 
     if all_ok:
-        print 'Course passes all checks!'
+        print('Course passes all checks!')
     else:
-        print "Course fails some checks.  See above for errors."
+        print('Course fails some checks.  See above for errors.')
     return all_ok, course
 
 
 def check_roundtrip(course_dir):
-    """Check that import->export leaves the course the same"""
+    """
+    Check that import->export leaves the course the same
+    """
 
-    print "====== Roundtrip import ======="
+    print('====== Roundtrip import =======')
     (ok, course) = import_with_checks(course_dir)
     if not ok:
-        raise Exception("Roundtrip import failed!")
+        raise Exception('Roundtrip import failed!')
 
-    print "====== Roundtrip export ======="
-    export_dir = course_dir + ".rt"
+    print('====== Roundtrip export =======')
+    export_dir = course_dir + '.rt'
     export(course, export_dir)
 
     # dircmp doesn't do recursive diffs.
     # diff = dircmp(course_dir, export_dir, ignore=[], hide=[])
-    print "======== Roundtrip diff: ========="
+    print('======== Roundtrip diff: =========')
     sys.stdout.flush()  # needed to make diff appear in the right place
-    os.system("diff -r {0} {1}".format(course_dir, export_dir))
-    print "======== ideally there is no diff above this ======="
-
-
-def clean_xml(course_dir, export_dir, force):
-    (ok, course) = import_with_checks(course_dir)
-    if ok or force:
-        if not ok:
-            print "WARNING: Exporting despite errors"
-        export(course, export_dir)
-        check_roundtrip(export_dir)
-    else:
-        print "Did NOT export"
+    os.system('diff -r {} {}'.format(course_dir, export_dir))
+    print('======== ideally there is no diff above this =======')
 
 
 class Command(BaseCommand):
-    help = """Imports specified course.xml, validate it, then exports in
-    a canonical format.
+    help = 'Imports specified course, validates it, then exports it in a canonical format.'
 
-Usage: clean_xml PATH-TO-COURSE-DIR PATH-TO-OUTPUT-DIR [force]
-
-If 'force' is specified as the last argument, exports even if there
-were import errors.
-"""
+    def add_arguments(self, parser):
+        parser.add_argument('course_dir',
+                            help='path to the input course directory')
+        parser.add_argument('output_dir',
+                            help='path to the output course directory')
+        parser.add_argument('--force',
+                            action='store_true',
+                            help='export course even if there were import errors')
 
     def handle(self, *args, **options):
-        n = len(args)
-        if n < 2 or n > 3:
-            print Command.help
-            return
+        course_dir = options['course_dir']
+        output_dir = options['output_dir']
+        force = options['force']
 
-        force = False
-        if n == 3 and args[2] == 'force':
-            force = True
-        clean_xml(args[0], args[1], force)
+        (ok, course) = import_with_checks(course_dir)
+        if ok or force:
+            if not ok:
+                print('WARNING: Exporting despite errors')
+            export(course, output_dir)
+            check_roundtrip(output_dir)
+        else:
+            print('Did NOT export')
