@@ -15,6 +15,7 @@ from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.conf import settings
 
 from lms.djangoapps.onboarding_survey.helpers import is_first_signup_in_org
 from lms.djangoapps.onboarding_survey.models import (
@@ -149,6 +150,7 @@ def user_info(request):
     context.update(get_un_submitted_surveys(user))
     context['is_poc'] = extended_profile.is_poc
     context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
+    context['google_place_api_key'] = settings.GOOGLE_PLACE_API_KEY
     return render(request, 'onboarding_survey/tell_us_more_survey.html', context)
 
 
