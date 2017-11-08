@@ -30,10 +30,10 @@ def edxnotes(cls):
         # - the feature flag or `edxnotes` setting of the course is set to False
         # - the user is not authenticated
         user = self.runtime.get_real_user(self.runtime.anonymous_student_id)
-        if is_studio or not is_feature_enabled(course) or not user.is_authenticated():
+
+        if is_studio or not is_feature_enabled(course, user):
             return original_get_html(self, *args, **kwargs)
         else:
-
             return render_to_string("edxnotes_wrapper.html", {
                 "content": original_get_html(self, *args, **kwargs),
                 "uid": generate_uid(),

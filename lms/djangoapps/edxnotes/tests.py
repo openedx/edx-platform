@@ -9,6 +9,7 @@ from unittest import skipUnless
 
 import ddt
 import jwt
+import pytest
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ImproperlyConfigured
@@ -76,8 +77,8 @@ class TestProblem(object):
     def __init__(self, course, user=None):
         self.system = MagicMock(is_author_mode=False)
         self.scope_ids = MagicMock(usage_id="test_usage_id")
-        self.user = user or UserFactory()
-        self.runtime = MagicMock(course_id=course.id, get_real_user=lambda anon_id: self.user)
+        user = user or UserFactory()
+        self.runtime = MagicMock(course_id=course.id, get_real_user=lambda __: user)
         self.descriptor = MagicMock()
         self.descriptor.runtime.modulestore.get_course.return_value = course
 
@@ -104,7 +105,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         self.course = CourseFactory(edxnotes=True, default_store=ModuleStoreEnum.Type.mongo)
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)
-        self.problem = TestProblem(self.course)
+        self.problem = TestProblem(self.course, self.user)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_EDXNOTES': True})
     @patch("edxnotes.helpers.get_public_endpoint", autospec=True)
@@ -116,18 +117,23 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         Tests if get_html is wrapped when feature flag is on and edxnotes are
         enabled for the course.
         """
+        course = CourseFactory(edxnotes=True)
+        enrollment = CourseEnrollmentFactory(course_id=course.id)
+        user = enrollment.user
+        problem = TestProblem(course, user)
+
         mock_generate_uid.return_value = "uid"
         mock_get_id_token.return_value = "token"
         mock_get_token_url.return_value = "/tokenUrl"
         mock_get_endpoint.return_value = "/endpoint"
-        enable_edxnotes_for_the_course(self.course, self.user.id)
+        enable_edxnotes_for_the_course(course, user.id)
         expected_context = {
             "content": "original_get_html",
             "uid": "uid",
             "edxnotes_visibility": "true",
             "params": {
-                "usageId": u"test_usage_id",
-                "courseId": unicode(self.course.id).encode("utf-8"),
+                "usageId": "test_usage_id",
+                "courseId": course.id,
                 "token": "token",
                 "tokenUrl": "/tokenUrl",
                 "endpoint": "/endpoint",
@@ -136,7 +142,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
             },
         }
         self.assertEqual(
-            self.problem.get_html(),
+            problem.get_html(),
             render_to_string("edxnotes_wrapper.html", expected_context),
         )
 
@@ -225,8 +231,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             self.child_vertical = self.store.get_item(self.child_vertical.location)
             self.child_html_module = self.store.get_item(self.child_html_module.location)
 
-            self.user = UserFactory.create(username="Joe", email="joe@example.com", password="edx")
-            self.client.login(username=self.user.username, password="edx")
+            self.user = UserFactory()
+            self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)
 
         self.request = RequestFactory().request()
         self.request.user = self.user
@@ -246,29 +252,17 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Tests that edxnotes are disabled when Harvard Annotation Tool is enabled.
         """
-        self.course.advanced_modules = ["foo", "imageannotation", "boo"]
-        self.assertFalse(helpers.is_feature_enabled(self.course))
+        self.course.advanced_modules = ['imageannotation', 'textannotation', 'videoannotation']
+        assert not helpers.is_feature_enabled(self.course, self.user)
 
-        self.course.advanced_modules = ["foo", "boo", "videoannotation"]
-        self.assertFalse(helpers.is_feature_enabled(self.course))
-
-        self.course.advanced_modules = ["textannotation", "foo", "boo"]
-        self.assertFalse(helpers.is_feature_enabled(self.course))
-
-        self.course.advanced_modules = ["textannotation", "videoannotation", "imageannotation"]
-        self.assertFalse(helpers.is_feature_enabled(self.course))
-
-    @ddt.unpack
-    @ddt.data(
-        {'_edxnotes': True},
-        {'_edxnotes': False}
-    )
-    def test_is_feature_enabled(self, _edxnotes):
+    @ddt.data(True, False)
+    def test_is_feature_enabled(self, enabled):
         """
         Tests that is_feature_enabled shows correct behavior.
         """
-        self.course.edxnotes = _edxnotes
-        self.assertEqual(helpers.is_feature_enabled(self.course), _edxnotes)
+        course = CourseFactory(edxnotes=enabled)
+        enrollment = CourseEnrollmentFactory(course_id=course.id)
+        assert helpers.is_feature_enabled(course, enrollment.user) == enabled
 
     @ddt.data(
         helpers.get_public_endpoint,
@@ -947,10 +941,10 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
     def setUp(self):
         ClientFactory(name="edx-notes")
         super(EdxNotesViewsTest, self).setUp()
-        self.course = CourseFactory.create(edxnotes=True)
-        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
-        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
-        self.client.login(username=self.user.username, password="edx")
+        self.course = CourseFactory(edxnotes=True)
+        self.user = UserFactory()
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+        self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)
         self.notes_page_url = reverse("edxnotes", args=[unicode(self.course.id)])
         self.notes_url = reverse("notes", args=[unicode(self.course.id)])
         self.get_token_url = reverse("get_token", args=[unicode(self.course.id)])
@@ -1144,38 +1138,27 @@ class EdxNotesPluginTest(ModuleStoreTestCase):
     def setUp(self):
         super(EdxNotesPluginTest, self).setUp()
         self.course = CourseFactory.create(edxnotes=True)
-        self.user = UserFactory.create(username="ma", email="ma@ma.info", password="edx")
+        self.user = UserFactory()
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
 
-    def test_edxnotes_tab_with_unauthorized_user(self):
-        """
-        Verify EdxNotesTab visibility when user is unauthroized.
-        """
-        user = UserFactory.create(username="ma1", email="ma1@ma1.info", password="edx")
-        self.assertFalse(EdxNotesTab.is_enabled(self.course, user=user))
+    def test_edxnotes_tab_with_unenrolled_user(self):
+        user = UserFactory()
+        assert not EdxNotesTab.is_enabled(self.course, user=user)
 
-    @ddt.unpack
-    @ddt.data(
-        {'enable_edxnotes': False},
-        {'enable_edxnotes': True}
-    )
-    def test_edxnotes_tab_with_feature_flag(self, enable_edxnotes):
+    @ddt.data(True, False)
+    def test_edxnotes_tab_with_feature_flag(self, enabled):
         """
         Verify EdxNotesTab visibility when ENABLE_EDXNOTES feature flag is enabled/disabled.
         """
-        FEATURES['ENABLE_EDXNOTES'] = enable_edxnotes
+        FEATURES['ENABLE_EDXNOTES'] = enabled
         with override_settings(FEATURES=FEATURES):
-            self.assertEqual(EdxNotesTab.is_enabled(self.course), enable_edxnotes)
+            assert EdxNotesTab.is_enabled(self.course, self.user) == enabled
 
-    @ddt.unpack
-    @ddt.data(
-        {'harvard_notes_enabled': False},
-        {'harvard_notes_enabled': True}
-    )
+    @ddt.data(True, False)
     def test_edxnotes_tab_with_harvard_notes(self, harvard_notes_enabled):
         """
         Verify EdxNotesTab visibility when harvard notes feature is enabled/disabled.
         """
         with patch("edxnotes.plugins.is_harvard_notes_enabled") as mock_harvard_notes_enabled:
             mock_harvard_notes_enabled.return_value = harvard_notes_enabled
-            self.assertEqual(EdxNotesTab.is_enabled(self.course), not harvard_notes_enabled)
+            assert EdxNotesTab.is_enabled(self.course, self.user) == (not harvard_notes_enabled)

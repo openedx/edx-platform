@@ -7,7 +7,6 @@ from django.http import Http404
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
-from waffle.testutils import override_flag
 
 from courseware.courses import get_course_by_id
 from courseware.tabs import (
@@ -651,11 +650,10 @@ class CourseTabListTestCase(TabListTestCase):
         self.course.tabs = self.all_valid_tab_list
 
         # enumerate the tabs with no user
-        for i, tab in enumerate(xmodule_tabs.CourseTabList.iterate_displayable(
-                self.course,
-                inline_collections=False
-        )):
-            self.assertEquals(tab.type, self.course.tabs[i].type)
+        expected = [tab.type for tab in
+                    xmodule_tabs.CourseTabList.iterate_displayable(self.course, inline_collections=False)]
+        actual = [tab.type for tab in self.course.tabs if tab.is_enabled(self.course, user=None)]
+        assert actual == expected
 
         # enumerate the tabs with a staff user
         user = UserFactory(is_staff=True)

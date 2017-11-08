@@ -19,9 +19,8 @@ class EnrolledTab(CourseTab):
     """
     @classmethod
     def is_enabled(cls, course, user=None):
-        if user is None:
-            return True
-        return bool(CourseEnrollment.is_enrolled(user, course.id) or has_access(user, 'staff', course, course.id))
+        return user and user.is_authenticated() and \
+            bool(CourseEnrollment.is_enrolled(user, course.id) or has_access(user, 'staff', course, course.id))
 
 
 class CoursewareTab(EnrolledTab):

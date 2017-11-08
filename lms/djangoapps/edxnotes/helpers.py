@@ -423,8 +423,8 @@ def generate_uid():
     return uuid4().int  # pylint: disable=no-member
 
 
-def is_feature_enabled(course):
+def is_feature_enabled(course, user):
     """
     Returns True if Student Notes feature is enabled for the course, False otherwise.
     """
-    return EdxNotesTab.is_enabled(course)
+    return EdxNotesTab.is_enabled(course, user)

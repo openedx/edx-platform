@@ -22,7 +22,6 @@ class EdxNotesTab(EnrolledTab):
 
         Args:
             course (CourseDescriptor): the course using the feature
-            settings (dict): a dict of configuration settings
             user (User): the user interacting with the course
         """
         if not super(EdxNotesTab, cls).is_enabled(course, user=user):
