@@ -8,7 +8,7 @@ import ddt
 import mock
 import pytz
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.test import TestCase
 from django.test.utils import override_settings
 from edx_rest_api_client import exceptions
@@ -285,7 +285,7 @@ class BasketOrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """
     view_name = 'commerce_api:v0:baskets:retrieve_order'
     MOCK_ORDER = {'number': 1}
-    path = reverse(view_name, kwargs={'basket_id': 1})
+    path = reverse_lazy(view_name, kwargs={'basket_id': 1})
 
     def setUp(self):
         super(BasketOrderViewTests, self).setUp()

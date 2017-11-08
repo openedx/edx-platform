@@ -18,7 +18,6 @@ from courseware.views import views as courseware_views
 from courseware.views.index import CoursewareIndex
 from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from debug import views as debug_views
-from django_cas import views as django_cas_views
 from django_comment_common.models import ForumsConfig
 from django_openid_auth import views as django_openid_auth_views
 from lms.djangoapps.discussion import views as discussion_views
@@ -40,6 +39,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
+from openedx.core.djangoapps.common_views.xblock import xblock_resource
 from openedx.features.enterprise_support.api import enterprise_enabled
 from ratelimitbackend import admin
 from static_template_view import views as static_template_view_views
@@ -290,7 +290,7 @@ urlpatterns += [
     # xblock Resource URL
     url(
         r'xblock/resource/(?P<block_type>[^/]+)/(?P<uri>.*)$',
-        'openedx.core.djangoapps.common_views.xblock.xblock_resource',
+        xblock_resource,
         name='xblock_resource_url',
     ),
 
@@ -825,6 +825,8 @@ if settings.FEATURES.get('AUTH_USE_SHIB'):
     ]
 
 if settings.FEATURES.get('AUTH_USE_CAS'):
+    from django_cas import views as django_cas_views
+
     urlpatterns += [
         url(r'^cas-auth/login/$', external_auth_views.cas_login, name='cas-login'),
         url(r'^cas-auth/logout/$', django_cas_views.logout, {'next_page': '/'}, name='cas-logout'),
