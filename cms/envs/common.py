@@ -378,9 +378,10 @@ AUTHENTICATION_BACKENDS = [
 
 LMS_BASE = None
 LMS_ROOT_URL = "http://localhost:8000"
+LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
-ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
-ENTERPRISE_CONSENT_API_URL = LMS_ROOT_URL + '/consent/api/v1/'
+ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
+ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
 
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.
