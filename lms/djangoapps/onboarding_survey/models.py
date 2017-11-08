@@ -261,8 +261,13 @@ class UserInfoSurvey(models.Model):
 
     year_of_birth = models.PositiveIntegerField(
         validators=[
-            MinValueValidator(1900),
-            MaxValueValidator(datetime.now().year)]
+            MinValueValidator(1900, message='Ensure year of birth is greater than or equal to 1900'),
+            MaxValueValidator(
+                datetime.now().year, message='Ensure year of birth is less than or equal to {}'.format(
+                    datetime.now().year
+                )
+            )
+        ]
     )
 
     user = models.OneToOneField(
@@ -304,6 +309,7 @@ class History(models.Model):
     coi_similar_org = models.BooleanField(blank=True, default=False)
     coi_similar_org_capacity = models.BooleanField(blank=True, default=False)
     coi_same_region = models.BooleanField(blank=True, default=False)
+    coi_diff_from_me = models.BooleanField(blank=True, default=False)
     # EducationLevel
     level_of_education = models.ForeignKey(
         EducationLevel, on_delete=models.SET_NULL, related_name='user_history', blank=True, null=True
@@ -324,53 +330,86 @@ class History(models.Model):
     org_sector = models.ForeignKey(
         OrgSector, on_delete=models.SET_NULL, related_name='user_history', blank=True, null=True
     )
-    # OrgCapacityArea
-    org_capacity_logistics = models.BooleanField(blank=True, default=False)
-    org_capacity_administration = models.BooleanField(blank=True, default=False)
-    org_capacity_finance = models.BooleanField(blank=True, default=False)
-    org_capacity_external_relation = models.BooleanField(blank=True, default=False)
-    org_capacity_program = models.BooleanField(blank=True, default=False)
-    org_capacity_leadership = models.BooleanField(blank=True, default=False)
-    # PartnerNetwork
-    partner_network = models.ForeignKey(
-        PartnerNetwork, on_delete=models.SET_NULL, related_name='user_history', blank=True, null=True
+
+    currency = models.ForeignKey(
+        Currency, on_delete=models.SET_NULL, blank=True, null=True, related_name='user_history'
     )
+
+    # UserFunctionOrDepartment
+    user_fn_strategy_and_planning = models.BooleanField(blank=True, default=False)
+    user_fn_leadership_and_gov = models.BooleanField(blank=True, default=False)
+    user_fn_program_design_and_dev = models.BooleanField(blank=True, default=False)
+    user_fn_measurement_and_learning = models.BooleanField(blank=True, default=False)
+    user_fn_engagement_and_partnership = models.BooleanField(blank=True, default=False)
+    user_fn_human_resource = models.BooleanField(blank=True, default=False)
+    user_fn_financial_management = models.BooleanField(blank=True, default=False)
+    user_fn_fundraising_and_mobilization = models.BooleanField(blank=True, default=False)
+    user_fn_marketing_and_PR = models.BooleanField(blank=True, default=False)
+    user_fn_system_and_process = models.BooleanField(blank=True, default=False)
+
+    # OrgEffectiveness
+    org_eff_strategy_and_planning = models.BooleanField(blank=True, default=False)
+    org_eff_leadership_and_gov = models.BooleanField(blank=True, default=False)
+    org_eff_program_design_and_dev = models.BooleanField(blank=True, default=False)
+    org_eff_measurement_and_learning = models.BooleanField(blank=True, default=False)
+    org_eff_engagement_and_partnership = models.BooleanField(blank=True, default=False)
+    org_eff_human_resource = models.BooleanField(blank=True, default=False)
+    org_eff_financial_management = models.BooleanField(blank=True, default=False)
+    org_eff_fundraising_and_mobilization = models.BooleanField(blank=True, default=False)
+    org_eff_marketing_and_PR = models.BooleanField(blank=True, default=False)
+    org_eff_system_and_process = models.BooleanField(blank=True, default=False)
+
+    # PartnerNetwork
+    partner_network_mercy_corps = models.BooleanField(blank=True, default=False)
+    partner_network_global_giving = models.BooleanField(blank=True, default=False)
+    partner_network_fhi_360 = models.BooleanField(blank=True, default=False)
+    partner_network_acumen = models.BooleanField(blank=True, default=False)
+
     # PersonalGoal
     goal_gain_new_skill = models.BooleanField(blank=True, default=False)
     goal_relation_with_other = models.BooleanField(blank=True, default=False)
-    goal_develop_leadership = models.BooleanField(blank=True, default=False)
     goal_improve_job_prospect = models.BooleanField(blank=True, default=False)
     goal_contribute_to_org = models.BooleanField(blank=True, default=False)
+
     # RoleInsideOrg
     role_in_org = models.ForeignKey(
         RoleInsideOrg, on_delete=models.SET_NULL, related_name='user_history', blank=True, null=True
     )
+
     # TotalEmployees
     org_total_employees = models.ForeignKey(
         TotalEmployee, on_delete=models.SET_NULL, related_name='user_history', blank=True, null=True
     )
-    # TotalVolunteers
-    org_total_volunteers = models.ForeignKey(
-        TotalVolunteer, on_delete=models.SET_NULL, related_name='user_history', blank=True, null=True
-    )
+
     # UserInfoSurvey
-    dob = models.DateField(blank=True, null=True)
     language = models.CharField(max_length=255)
     country_of_residence = models.CharField(max_length=255)
     city_of_residence = models.CharField(max_length=255, blank=True)
     is_emp_location_different = models.BooleanField(default=False)
     country_of_employment = models.CharField(max_length=255, blank=True)
     city_of_employment = models.CharField(max_length=255, blank=True)
-    # InterestSurvey
-    reason_of_selected_interest = models.CharField(max_length=255, blank=True)
+    year_of_birth = models.PositiveIntegerField(blank=True)
+    start_month_year = models.CharField(max_length=100, blank=True, null=True)
+    weekly_work_hours = models.PositiveIntegerField(blank=True)
+
     # OrganizationSurvey
-    org_start_month_year = models.CharField(max_length=100, blank=True)
     org_country = models.CharField(max_length=255)
     org_city = models.CharField(max_length=255, blank=True)
+    org_is_url_exist = models.NullBooleanField(blank=True, null=True)
     org_url = models.URLField(max_length=255, blank=True)
     org_founding_year = models.PositiveSmallIntegerField(blank=True, null=True)
-    org_total_clients = models.PositiveIntegerField(blank=True, null=True)
-    org_total_revenue = models.CharField(max_length=255, blank=True)
+    org_alternate_admin_email = models.EmailField(blank=True, null=True)
+
+    # OrganizationDetail
+    info_accuracy = models.NullBooleanField(blank=True, null=True)
+    can_provide_info = models.NullBooleanField(blank=True, null=True)
+    last_fiscal_year_end_date = models.DateField(blank=True, null=True)
+    total_clients = models.PositiveIntegerField(blank=True, null=True)
+    total_employees = models.PositiveIntegerField(blank=True, null=True)
+    total_revenue = models.BigIntegerField(blank=True, null=True)
+    total_expenses = models.BigIntegerField(blank=True, null=True)
+    total_program_expenses = models.BigIntegerField(blank=True, null=True)
+
     # Registration
     POC_CHOICES = ((0, 'No'), (1, 'Yes'))
     first_name = models.CharField(max_length=255)
@@ -379,7 +418,6 @@ class History(models.Model):
         Organization, related_name='user_history', blank=True, null=True, on_delete=models.SET_NULL
     )
     is_poc = models.BooleanField(choices=POC_CHOICES, default=False)
-    is_currently_employed = models.BooleanField(default=False)
     org_admin_email = models.EmailField(blank=True, null=True)
 
     start_date = models.DateTimeField(auto_now_add=True)

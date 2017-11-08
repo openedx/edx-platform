@@ -14,6 +14,10 @@ from lms.djangoapps.onboarding_survey.models import (
     Currency)
 
 
+no_option_select_error = 'Please select an option for {}'
+empty_field_error = 'Please enter your {}'
+
+
 class UserInfoModelForm(forms.ModelForm):
     """
     Model from to be used in the first step of survey.
@@ -27,31 +31,13 @@ class UserInfoModelForm(forms.ModelForm):
         self.fields['english_proficiency'].empty_label = None
         self.fields['role_in_org'].empty_label = None
 
-    def clean(self):
-        """
-        Clean the form data.
-        """
-        cleaned_data = super(UserInfoModelForm, self).clean()
-
-        # if user check that his/her country/city of employment if different
-        # from that of the residence, and user then enters the same country/city
-        # then a validation error should be raised.
-        if cleaned_data['is_emp_location_different'] and cleaned_data.get('country_of_residence', None):
-
-            if cleaned_data['country_of_employment'] == cleaned_data['country_of_residence']:
-                raise forms.ValidationError(
-                    "Please provide Country of Employment which is difference from Country of Residence"
+    def clean_country_of_employment(self):
+        if self.cleaned_data['is_emp_location_different'] and self.cleaned_data.get('country_of_residence', None):
+            if self.cleaned_data['country_of_employment'] == self.cleaned_data['country_of_residence']:
+                raise forms.ValidationError(empty_field_error.format(
+                    "Country of Employment which is difference from Country of Residence")
                 )
-
-            if not cleaned_data['country_of_employment']:
-                raise forms.ValidationError(
-                    "Please provide Country of Employment which is difference from Country of Residence"
-                )
-
-            if not cleaned_data['city_of_employment']:
-                raise forms.ValidationError(
-                    "Please provide City of Employment which is difference from City of Residence"
-                )
+        return self.cleaned_data['country_of_employment']
 
     class Meta:
         """
@@ -71,12 +57,12 @@ class UserInfoModelForm(forms.ModelForm):
             'level_of_education': 'Level of Education*',
             'english_proficiency': 'English language proficiency*',
             'role_in_org': 'Role in Organization*',
-            'function_area': 'Department or function (Check all that apply.)'
+            'function_area': 'Department or Function (Check all that apply.)'
         }
         widgets = {
             'year_of_birth': forms.TextInput(attrs={'placeholder': 'Year of Birth*'}),
             'country_of_employment': forms.TextInput(attrs={'placeholder': 'Country of Employment'}),
-            'city_of_employment': forms.TextInput(attrs={'placeholder': 'City of Employment*'}),
+            'city_of_employment': forms.TextInput(attrs={'placeholder': 'City of Employment'}),
             'country_of_residence': forms.TextInput(attrs={'placeholder': 'Country of Residence*'}),
             'city_of_residence': forms.TextInput(attrs={'placeholder': 'City of Residence'}),
             'language': forms.TextInput(attrs={'placeholder': 'Native Language*'}),
@@ -85,35 +71,33 @@ class UserInfoModelForm(forms.ModelForm):
             'role_in_org': forms.RadioSelect,
             'start_month_year': forms.TextInput(attrs={'placeholder': 'Start Month and Year*'}),
             'function_area': forms.CheckboxSelectMultiple(),
-            'weekly_work_hours': forms.NumberInput(attrs={'placeholder': 'Typical number of hours worked per week*'}),
+            'weekly_work_hours': forms.NumberInput(attrs={'placeholder': 'Typical Number of Hours Worked Per Week*'}),
         }
-
-        required_error = 'Please select an option for {}'
 
         error_messages = {
             'year_of_birth': {
-                'required': required_error.format('Year of birth'),
+                'required': empty_field_error.format('Year of birth'),
             },
             'language': {
-                'required': required_error.format('Language'),
+                'required': empty_field_error.format('Language'),
             },
             'country_of_residence': {
-                'required': required_error.format('Country of residence'),
+                'required': empty_field_error.format('Country of residence'),
             },
             'start_month_year': {
-                'required': required_error.format('Start month year'),
+                'required': empty_field_error.format('Start month year'),
             },
             'weekly_work_hours': {
-                'required': required_error.format('Weekly work hours'),
+                'required': empty_field_error.format('Weekly work hours'),
             },
             'role_in_org': {
-                'required': required_error.format(' Role in organization'),
+                'required': no_option_select_error.format(' Role in the organization'),
             },
             'level_of_education': {
-                'required': required_error.format('Level of Education'),
+                'required': no_option_select_error.format('Level of Education'),
             },
             'english_proficiency': {
-                'required': required_error.format('English Language Proficiency'),
+                'required': no_option_select_error.format('English Language Proficiency'),
             }
         }
 
@@ -172,11 +156,12 @@ class InterestModelForm(forms.ModelForm):
         }
 
         labels = {
-            'capacity_areas': 'Which of these organizational capacity areas are'
-                              ' you most interested to learn more about',
-            'interested_communities': 'Which of these community types are interesting to you? (Check all that apply)',
-            'personal_goal': 'Which is your most important personal goal in'
-                             ' using the Philanthropy University platform? (Check all that apply.)'
+            'capacity_areas': 'Which of these areas of organizational effectiveness are you most interested'
+                              ' to learn more about? (Check all that apply.)',
+            'interested_communities': 'What types of other Philanthropy University'
+                                      ' learners are interesting to you? (Check all that apply.)',
+            'personal_goal': 'What is your most important personal goal in joining'
+                             ' Philanthropy University? (Check all that apply.)'
         }
 
         required_error = 'Please select an option for {}'
@@ -208,7 +193,7 @@ class OrganizationInfoModelForm(forms.ModelForm):
         self.fields['sector'].empty_label = None
         self.fields['level_of_operation'].empty_label = None
         self.fields['focus_area'].empty_label = None
-        self.fields['total_employees'].empty_label = "Total Employees"
+        self.fields['total_employees'].empty_label = "Total Employees*"
         self.fields['partner_network'].empty_label = None
         self.fields['is_org_url_exist'].required = True
 
@@ -223,7 +208,7 @@ class OrganizationInfoModelForm(forms.ModelForm):
         widgets = {
             'country': forms.TextInput(attrs={'placeholder': 'Country of Organization Headquarters*'}),
             'city': forms.TextInput(attrs={'placeholder': 'City of Organization Headquarters'}),
-            'url': forms.TextInput(attrs={'placeholder': 'Organization Website(if applicable)'}),
+            'url': forms.TextInput(attrs={'placeholder': 'Website address*'}),
             'is_org_url_exist': forms.RadioSelect(choices=((1, 'Yes'), (0, 'No'))),
             'founding_year': forms.NumberInput(attrs={'placeholder': 'Founding Year'}),
             'sector': forms.RadioSelect,
@@ -236,13 +221,14 @@ class OrganizationInfoModelForm(forms.ModelForm):
         labels = {
             'alternate_admin_email': 'Please provide the email address for an alternative'
                                      ' Admin contact at your organization if we are unable to reach you.',
-            'is_org_url_exist': 'Is org url exist*',
+            'is_org_url_exist': 'Does your organization have a website?*',
             'sector': 'Sector*',
             'level_of_operation': 'Level of Operation*',
             'total_employees': 'Total Employees*',
             'focus_area': 'Focus Area*',
             'country': 'Country*',
-            'partner_network': 'Partner Network*',
+            'partner_network': "Are you currently working with any of Philanthropy University's"
+                               " partners? (Check all that apply.)*"
         }
 
         initial = {
@@ -265,7 +251,7 @@ class OrganizationInfoModelForm(forms.ModelForm):
                 'required': required_error.format('Focus Area'),
             },
             'country': {
-                'required': required_error.format('Country'),
+                'required': empty_field_error.format('Country of Organization Headquarters'),
             },
             'partner_network': {
                 'required': required_error.format('Partner Network'),
@@ -281,7 +267,7 @@ class OrganizationInfoModelForm(forms.ModelForm):
         organization_website = self.cleaned_data['url']
 
         if is_org_url_exist and not organization_website:
-            raise forms.ValidationError("Please enter value for Organization url")
+            raise forms.ValidationError(empty_field_error.format('Organization Website'))
 
         return organization_website
 
@@ -464,11 +450,11 @@ class OrganizationDetailModelForm(forms.ModelForm):
         widgets = {
             'can_provide_info': forms.RadioSelect,
             'info_accuracy': RadioSelectNotNull,
-            'last_fiscal_year_end_date': forms.TextInput(attrs={'placeholder': 'End date of last fiscal year*'}),
+            'last_fiscal_year_end_date': forms.TextInput(attrs={'placeholder': 'End Date of Last Fiscal Year*'}),
             'total_clients': forms.NumberInput(
                 attrs={'placeholder': 'Total Annual Clients or Direct Beneficiaries for Last Fiscal Year*'}
             ),
-            'total_employees': forms.NumberInput(attrs={'placeholder': 'Total employees at end of last fiscal year*'}),
+            'total_employees': forms.NumberInput(attrs={'placeholder': 'Total Employees at End of Last Fiscal Year*'}),
 
             'total_revenue': forms.NumberInput(
                 attrs={'placeholder': 'Total Annual Revenue for Last Fiscal Year (local currency)*'}
@@ -486,6 +472,11 @@ class OrganizationDetailModelForm(forms.ModelForm):
             'info_accuracy': 'Is the information you will provide on this page estimated or actual?'
         }
 
+        help_texts = {
+            'last_fiscal_year_end_date': "If the data you are providing below is for the last 12 months,"
+                                         " please enter today's date."
+        }
+
     def clean_info_accuracy(self):
         can_provide_info = int(self.data['can_provide_info'])
         info_accuracy = self.cleaned_data['info_accuracy']
@@ -500,7 +491,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         last_fiscal_year_end_date = self.cleaned_data['last_fiscal_year_end_date']
 
         if can_provide_info and not last_fiscal_year_end_date:
-            raise forms.ValidationError("Please enter your End date for last fiscal year")
+            raise forms.ValidationError(empty_field_error.format("End date for Last Fiscal Year"))
 
         return last_fiscal_year_end_date
 
@@ -509,7 +500,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         total_clients = self.cleaned_data['total_clients']
 
         if can_provide_info and not total_clients:
-            raise forms.ValidationError("Please enter your Total client")
+            raise forms.ValidationError(empty_field_error.format("Total Client"))
 
         return total_clients
 
@@ -518,7 +509,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         total_employees = self.cleaned_data['total_employees']
 
         if can_provide_info and not total_employees:
-            raise forms.ValidationError("Please enter your Total employees")
+            raise forms.ValidationError(empty_field_error.format("Total Employees"))
 
         return total_employees
 
@@ -527,7 +518,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         total_revenue = self.cleaned_data['total_revenue']
 
         if can_provide_info and not total_revenue:
-            raise forms.ValidationError("Please enter your Total revenue")
+            raise forms.ValidationError(empty_field_error.format("Total Revenue"))
 
         return total_revenue
 
@@ -536,7 +527,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         total_expenses = self.cleaned_data['total_expenses']
 
         if can_provide_info and not total_expenses:
-            raise forms.ValidationError("Please enter your Total expenses")
+            raise forms.ValidationError(empty_field_error.format("Total Expenses"))
 
         return total_expenses
 
@@ -545,7 +536,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         total_program_expenses = self.cleaned_data['total_program_expenses']
 
         if can_provide_info and not total_program_expenses:
-            raise forms.ValidationError("Please enter your Total program expense")
+            raise forms.ValidationError(empty_field_error.format("Total Program Expense"))
 
         return total_program_expenses
 

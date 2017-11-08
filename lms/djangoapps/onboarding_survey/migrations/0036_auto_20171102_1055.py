@@ -11,7 +11,7 @@ en_profs = ["No proficiency", "Beginning", "Intermediate", "Advanced", "Native s
             "I'd rather not say"]
 
 roles_in_org = ["Volunteer", "Internship", "Entry level", "Manager",
-                "Director", "Executive", "I’d rather not say"]
+                "Director", "Executive", "I'd rather not say"]
 
 func_areas = ["Strategy and planning", "Leadership and governance", "Program design and development",
               "Measurement, evaluation, and learning", "Stakeholder engagement and partnerships",
