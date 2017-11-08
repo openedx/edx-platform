@@ -76,7 +76,7 @@ def _get_course_language(course_id):
 
 
 def _build_message_context(context):
-    message_context = get_base_template_context(Site.objects.get_current())
+    message_context = get_base_template_context(Site.objects.get(id=context['site_id']))
     message_context.update(context)
     message_context['post_link'] = _get_thread_url(context)
     return message_context

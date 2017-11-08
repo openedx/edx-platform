@@ -15,9 +15,10 @@ import mock
 from django_comment_common.models import ForumsConfig
 from django_comment_common.signals import comment_created
 from edx_ace.recipient import Recipient
-from lms.djangoapps.discussion.config.waffle import waffle, FORUM_RESPONSE_NOTIFICATIONS
+from lms.djangoapps.discussion.config.waffle import waffle, FORUM_RESPONSE_NOTIFICATIONS, SEND_NOTIFICATIONS_FOR_COURSE
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules.template_context import get_base_template_context
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -89,6 +90,7 @@ class TaskTestCase(ModuleStoreTestCase):
         config.save()
 
     @ddt.data(True, False)
+    @override_waffle_flag(SEND_NOTIFICATIONS_FOR_COURSE, True)
     def test_send_discussion_email_notification(self, user_subscribed):
         with mock_the_things() as mocked_items:
             mock_request, mock_ace_send, mock_permalink = mocked_items
@@ -105,7 +107,7 @@ class TaskTestCase(ModuleStoreTestCase):
             one_hour_ago = now - timedelta(hours=1)
             thread = mock.Mock(
                 id=self.discussion_id,
-                course_id=self.course.id,
+                course_id=unicode(self.course.id),
                 created_at=one_hour_ago,
                 title='thread-title',
                 user_id=self.thread_author.id,
@@ -121,12 +123,14 @@ class TaskTestCase(ModuleStoreTestCase):
                 username=self.comment_author.username
             )
             user = mock.Mock()
+            site = Site.objects.get_current()
 
             with waffle().override(FORUM_RESPONSE_NOTIFICATIONS):
-                comment_created.send(sender=None, user=user, post=comment)
+                with mock.patch('lms.djangoapps.discussion.signals.handlers.get_current_site', return_value=site):
+                    comment_created.send(sender=None, user=user, post=comment)
 
             if user_subscribed:
-                expected_message_context = get_base_template_context(Site.objects.get_current())
+                expected_message_context = get_base_template_context(site)
                 expected_message_context.update({
                     'comment_author_id': self.comment_author.id,
                     'comment_body': 'comment-body',
@@ -141,6 +145,7 @@ class TaskTestCase(ModuleStoreTestCase):
                     'thread_username': self.thread_author.username,
                     'thread_commentable_id': 'thread-commentable-id',
                     'post_link': urljoin(settings.LMS_ROOT_URL, mock_permalink.return_value),
+                    'site_id': site.id
                 })
                 expected_recipient = Recipient(self.thread_author.username, self.thread_author.email)
                 actual_message = mock_ace_send.call_args_list[0][0][0]
