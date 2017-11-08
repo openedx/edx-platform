@@ -4,10 +4,13 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Adolfo Michel <Michel.14.993@gmail.com>, 2017
 # arrow1234 <aleoncavallo@gmail.com>, 2014
 # Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
+# Anthony Mangano <amangano@edx.org>, 2017
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Antonio Pardo <apardo@alabs.org>, 2013
+# Bill DeRusha <bill@edx.org>, 2017
 # Carlos Arias Fernandez <cararias@gmail.com>, 2016
 # Cristian Salamea <ovnicraft@gmail.com>, 2014-2015
 # David Salazar <imdjsg@gmail.com>, 2014
@@ -88,6 +91,7 @@
 # 
 # Translators:
 # Addi Hazel Mendoza Sánchez <addictivoh@gmail.com>, 2014
+# Adolfo Michel <Michel.14.993@gmail.com>, 2017
 # Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
 # andreslucena <inactive+andreslucena@transifex.com>, 2013
 # andreslucena <inactive+andreslucena@transifex.com>, 2013
@@ -1451,7 +1455,7 @@ msgstr "Abr"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "May"
-msgstr "Mayo"
+msgstr "mayo"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jun 10, 2014". It is used for the %b
@@ -1515,7 +1519,7 @@ msgstr "Dic"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "January"
-msgstr "Enero"
+msgstr "enero"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "February 10, 2014". It is used for the %B directive in
@@ -1523,7 +1527,7 @@ msgstr "Enero"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "February"
-msgstr "Febrero"
+msgstr "febrero"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "March 10, 2014". It is used for the %B directive in
@@ -1531,7 +1535,7 @@ msgstr "Febrero"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "March"
-msgstr "Marzo"
+msgstr "marzo"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "April 10, 2014". It is used for the %B directive in
@@ -1539,7 +1543,7 @@ msgstr "Marzo"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "May 10, 2014". It is used for the %B directive in
@@ -1547,7 +1551,7 @@ msgstr "Abril"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "May"
-msgstr "Mayo"
+msgstr "mayo"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "June 10, 2014". It is used for the %B directive in
@@ -1555,7 +1559,7 @@ msgstr "Mayo"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "June"
-msgstr "Junio"
+msgstr "junio"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "July 10, 2014". It is used for the %B directive in
@@ -1563,7 +1567,7 @@ msgstr "Junio"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "July"
-msgstr "Julio"
+msgstr "julio"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "August 10, 2014". It is used for the %B directive in
@@ -1571,7 +1575,7 @@ msgstr "Julio"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "September 10, 2014". It is used for the %B directive in
@@ -1579,7 +1583,7 @@ msgstr "Agosto"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "September"
-msgstr "Septiembre"
+msgstr "septiembre"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "October 10, 2014". It is used for the %B directive in
@@ -1587,7 +1591,7 @@ msgstr "Septiembre"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "October"
-msgstr "Octubre"
+msgstr "octubre"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "November 10, 2014". It is used for the %B directive in
@@ -1595,7 +1599,7 @@ msgstr "Octubre"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "November"
-msgstr "Noviembre"
+msgstr "noviembre"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "December 10, 2014". It is used for the %B directive in
@@ -1603,7 +1607,7 @@ msgstr "Noviembre"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "December"
-msgstr "Diciembre"
+msgstr "diciembre"
 
 #: common/djangoapps/util/file.py
 #, python-brace-format
@@ -5631,7 +5635,7 @@ msgstr ""
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
 msgid "{month} {day}, {year}"
-msgstr "{day} de {month}, {year}"
+msgstr "{day} de {month} de {year}"
 
 #. Translators:  This text represents the verification of the certificate
 #: lms/djangoapps/certificates/views/webview.py
@@ -21115,7 +21119,7 @@ msgstr "Escuelas y socios"
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid "About edX Verified Certificates"
-msgstr ""
+msgstr "Acerca de los Certificados Verificados de edX"
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid ""
@@ -21124,6 +21128,10 @@ msgid ""
 " under its guidelines, as well as having their photo ID checked to verify "
 "their identity."
 msgstr ""
+"Un Certificado Verificado de EdX significa que el alumno ha aceptado cumplir"
+" con el código de honor de edX y ha completado todas las tareas requeridas "
+"de este curso según sus pautas, además de que se ha verificado su identidad "
+"con foto para verificar su identidad."
 
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
 msgid ""
@@ -21135,7 +21143,7 @@ msgstr ""
 
 #: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
 msgid "Congratulations, {user_name}!"
-msgstr ""
+msgstr "Felicitaciones, {user_name}!"
 
 #: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
 msgid ""
@@ -21144,6 +21152,10 @@ msgid ""
 "and family to get the word out about what you mastered in "
 "{accomplishment_course_title}."
 msgstr ""
+"Trabajaste duro para ganar tu certificado de "
+"{accomplishment_copy_course_org} {dash} compártelo con tus colegas, amigos y"
+" familiares y hazle saber al mundo lo que aprendiste en "
+"{accomplishment_course_title}."
 
 #: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
 msgid "Share this certificate on Facebook (opens a new tab/window)"
