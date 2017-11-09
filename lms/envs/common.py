@@ -2243,7 +2243,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'openedx.core.djangoapps.cors_csrf',
 
-    'commerce',
+    'lms.djangoapps.commerce.apps.CommerceConfig',
 
     # Credit courses
     'openedx.core.djangoapps.credit.apps.CreditConfig',

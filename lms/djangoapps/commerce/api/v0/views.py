@@ -9,8 +9,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT
 from rest_framework.views import APIView
 
-from commerce.constants import Messages
-from commerce.http import DetailResponse
 from course_modes.models import CourseMode
 from courseware import courses
 from enrollment.api import add_enrollment
@@ -21,6 +19,9 @@ from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse
+
+from ...constants import Messages
+from ...http import DetailResponse
 
 log = logging.getLogger(__name__)
 SAILTHRU_CAMPAIGN_COOKIE = 'sailthru_bid'

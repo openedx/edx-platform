@@ -5,10 +5,11 @@ from urlparse import urljoin
 import waffle
 from django.conf import settings
 from django.core.urlresolvers import reverse
+
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import CourseEnrollment
 
-from commerce.models import CommerceConfiguration
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from .models import CommerceConfiguration
 
 
 def is_account_activation_requirement_disabled():

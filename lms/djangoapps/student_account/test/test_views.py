@@ -20,6 +20,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from edx_rest_api_client import exceptions
+from http.cookies import SimpleCookie
 from nose.plugins.attrib import attr
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
@@ -27,11 +28,10 @@ from provider.oauth2.models import AccessToken as dop_access_token
 from provider.oauth2.models import RefreshToken as dop_refresh_token
 from testfixtures import LogCapture
 
-from commerce.models import CommerceConfiguration
-from commerce.tests import factories
-from commerce.tests.mocks import mock_get_orders
 from course_modes.models import CourseMode
-from http.cookies import SimpleCookie
+from lms.djangoapps.commerce.models import CommerceConfiguration
+from lms.djangoapps.commerce.tests import factories
+from lms.djangoapps.commerce.tests.mocks import mock_get_orders
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin

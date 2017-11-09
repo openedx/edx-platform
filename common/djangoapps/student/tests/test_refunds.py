@@ -18,11 +18,11 @@ from edx_rest_api_client.exceptions import SlumberBaseException
 from mock import patch
 from slumber.exceptions import HttpClientError, HttpServerError
 
+from certificates.models import CertificateStatuses, GeneratedCertificate  # pylint: disable=import-error
+from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
 from course_modes.tests.factories import CourseModeFactory
-from certificates.models import CertificateStatuses, GeneratedCertificate  # pylint: disable=import-error
-from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
 from student.models import CourseEnrollment, CourseEnrollmentAttribute
 from student.tests.factories import UserFactory
@@ -203,7 +203,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         raised while getting order detail for ecommerce.
         """
         # importing this after overriding value of ECOMMERCE_API_URL
-        from commerce.tests.mocks import mock_order_endpoint
+        from lms.djangoapps.commerce.tests.mocks import mock_order_endpoint
 
         self.client.login(username=self.user.username, password=self.USER_PASSWORD)
         with mock_order_endpoint(order_number=self.ORDER_NUMBER, exception=exception, reset_on_exit=False):
