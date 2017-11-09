@@ -210,6 +210,38 @@ def get_course_runs():
     return course_runs
 
 
+def get_course_runs_for_course(course_uuid):
+    catalog_integration = CatalogIntegration.current()
+
+    if catalog_integration.is_enabled():
+        try:
+            user = catalog_integration.get_service_user()
+        except ObjectDoesNotExist:
+            logger.error(
+                'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
+                catalog_integration.service_username,
+            )
+            return []
+
+        api = create_catalog_api_client(user)
+        cache_key = '{base}.course.{uuid}.course_runs'.format(
+            base=catalog_integration.CACHE_KEY,
+            uuid=course_uuid
+        )
+        data = get_edx_api_data(
+            catalog_integration,
+            'courses',
+            resource_id=course_uuid,
+            api=api,
+            cache_key=cache_key if catalog_integration.is_cache_enabled else None,
+            long_term_cache=True
+        )
+
+        return data.get('course_runs', [])
+    else:
+        return []
+
+
 def get_course_run_details(course_run_key, fields):
     """
     Retrieve information about the course run with the given id
