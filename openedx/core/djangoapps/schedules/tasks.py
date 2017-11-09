@@ -2,7 +2,9 @@ import datetime
 import logging
 
 from celery.task import task, Task
+from crum import CurrentRequestUserMiddleware
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 
@@ -17,7 +19,8 @@ from openedx.core.djangoapps.monitoring_utils import set_custom_metric
 from openedx.core.djangoapps.schedules import message_types
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 from openedx.core.djangoapps.schedules import resolvers
-
+from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
+from openedx.core.lib.celery.task_utils import emulate_http_request
 
 LOG = logging.getLogger(__name__)
 
@@ -177,15 +180,22 @@ class ScheduleCourseUpdate(ScheduleMessageBaseTask):
 
 
 def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):
-    if _is_delivery_enabled(site_id, delivery_config_var, log_prefix):
-        msg = Message.from_string(msg_str)
-        _annonate_send_task_for_monitoring(msg)
-        LOG.debug('%s: Sending message = %s', log_prefix, msg_str)
-        ace.send(msg)
-
-
-def _is_delivery_enabled(site_id, delivery_config_var, log_prefix):
     site = Site.objects.get(pk=site_id)
+    if _is_delivery_enabled(site, delivery_config_var, log_prefix):
+        msg = Message.from_string(msg_str)
+
+        user = User.objects.get(username=msg.recipient.username)
+        middleware_classes = [
+            CurrentRequestUserMiddleware,
+            CurrentSiteThemeMiddleware,
+        ]
+        with emulate_http_request(site=site, user=user, middleware_classes=middleware_classes):
+            _annonate_send_task_for_monitoring(msg)
+            LOG.debug('%s: Sending message = %s', log_prefix, msg_str)
+            ace.send(msg)
+
+
+def _is_delivery_enabled(site, delivery_config_var, log_prefix):
     if getattr(ScheduleConfig.current(site), delivery_config_var, False):
         return True
     else:
