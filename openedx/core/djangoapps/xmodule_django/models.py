@@ -36,13 +36,14 @@ class NoneToEmptyQuerySet(models.query.QuerySet):
     """
     def _filter_or_exclude(self, *args, **kwargs):
         # pylint: disable=protected-access
-        for name in self.model._meta.get_all_field_names():
-            field_object, _model, direct, _m2m = self.model._meta.get_field_by_name(name)
+        for field_object in self.model._meta.get_fields():
+            direct = not field_object.auto_created or field_object.concrete
             if direct and hasattr(field_object, 'Empty'):
                 for suffix in ('', '_exact'):
-                    key = '{}{}'.format(name, suffix)
+                    key = '{}{}'.format(field_object.name, suffix)
                     if key in kwargs and kwargs[key] is None:
                         kwargs[key] = field_object.Empty
+
         return super(NoneToEmptyQuerySet, self)._filter_or_exclude(*args, **kwargs)
 
 
