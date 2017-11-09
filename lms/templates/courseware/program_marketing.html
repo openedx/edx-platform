@@ -341,7 +341,7 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
             ${faq['question']}
           </div>
           <div class="answer">
-            ${faq['answer']}
+            ${HTML(faq['answer'])}
           </div>
         </div>
       % endfor
