@@ -1,6 +1,30 @@
-# Schedules
+# Dynamic Pacing Schedules
 
-High-level description of what the app is.
+The Schedules app allows course teams to automatically email learners taking
+self-paced courses. The emails are designed to keep learners engaged with a
+course's content. The app sends them at important milestones in a learner's
+progression. The app sends three message types "out of the box":
+
+ - Recurring Nudges 
+ - Upgrade Reminders 
+ - Weekly Course Highlight Messages
+
+Recurring Nudges encourage learners to engage with self-paced courses at regular
+intervals.  The app sends learners nudges three days, 10 days, and 19 days after
+they enroll in a self-paced course.
+
+Upgrade Reminders signal learners to upgrade to a self-paced course's "Verified"
+track. They are sent 19 days from a learner's enrollment date, or two days from
+the course's end date.
+
+Weekly Course Highlight Messages tell learners what to look forward to in a
+coming week of a course. The app generates messages with instructor-supplied
+"section highlights" in the body of the message.
+
+The app measures a learner's progress in a "Schedule" Django object. A Schedule
+stores the day a learner enrolls in a course and the learner's "upgrade
+deadline" (the date before which they can purchase a verified certificate). The
+app coordinates its messaging to learners through their Schedules. 
 
 ## Definitions
 
