@@ -292,6 +292,7 @@
     width: 100%;
     margin: ($baseline/2) 0 0 0;
 
+
     &.select-year_of_birth {
       @include margin-left(15px);
     }
@@ -313,6 +314,25 @@
       font-family: $font-family-sans-serif;
       font-style: normal;
       font-weight: 500;
+
+      &.focus-in {
+        position: relative;
+        padding-top: 0;
+        padding-left: 0;
+        opacity: 1;
+      }
+
+      &.focus-out {
+        position: absolute;
+        padding-top: 5px;
+        padding-left: 9px;
+        opacity: 0.75;
+        z-index: 1;
+      }
+
+      a {
+        z-index: 1;
+      }
     }
 
     #login-remember {

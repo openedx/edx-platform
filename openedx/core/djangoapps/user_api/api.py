@@ -9,6 +9,7 @@ from django_countries import countries
 import accounts
 import third_party_auth
 from edxmako.shortcuts import marketing_link
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
@@ -277,10 +278,6 @@ class RegistrationFormFactory(object):
         # meant to hold the user's email address.
         email_label = _(u"Email")
 
-        # Translators: This example email address is used as a placeholder in
-        # a field on the registration form meant to hold the user's email address.
-        email_placeholder = _(u"username@domain.com")
-
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's email address.
         email_instructions = _(u"This is what you will use to login.")
@@ -289,7 +286,6 @@ class RegistrationFormFactory(object):
             "email",
             field_type="email",
             label=email_label,
-            placeholder=email_placeholder,
             instructions=email_instructions,
             restrictions={
                 "min_length": accounts.EMAIL_MIN_LENGTH,
@@ -308,6 +304,7 @@ class RegistrationFormFactory(object):
         # Translators: This label appears above a field on the registration form
         # meant to confirm the user's email address.
         email_label = _(u"Confirm Email")
+
         error_msg = accounts.REQUIRED_FIELD_CONFIRM_EMAIL_MSG
 
         form_desc.add_field(
@@ -330,10 +327,6 @@ class RegistrationFormFactory(object):
         # meant to hold the user's full name.
         name_label = _(u"Full Name")
 
-        # Translators: This example name is used as a placeholder in
-        # a field on the registration form meant to hold the user's name.
-        name_placeholder = _(u"Jane Q. Learner")
-
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
         name_instructions = _(u"This name will be used on any certificates that you earn.")
@@ -341,7 +334,6 @@ class RegistrationFormFactory(object):
         form_desc.add_field(
             "name",
             label=name_label,
-            placeholder=name_placeholder,
             instructions=name_instructions,
             restrictions={
                 "max_length": accounts.NAME_MAX_LENGTH,
@@ -366,16 +358,10 @@ class RegistrationFormFactory(object):
             u"The name that will identify you in your courses. "
             u"It cannot be changed later."
         )
-
-        # Translators: This example username is used as a placeholder in
-        # a field on the registration form meant to hold the user's username.
-        username_placeholder = _(u"Jane_Q_Learner")
-
         form_desc.add_field(
             "username",
             label=username_label,
             instructions=username_instructions,
-            placeholder=username_placeholder,
             restrictions={
                 "min_length": accounts.USERNAME_MIN_LENGTH,
                 "max_length": accounts.USERNAME_MAX_LENGTH,
@@ -711,16 +697,17 @@ class RegistrationFormFactory(object):
         # form used to select the country in which the user lives.
         country_label = _(u"Country or Region of Residence")
 
+        error_msg = accounts.REQUIRED_FIELD_COUNTRY_MSG
+
+        # If we set a country code, make sure it's uppercase for the sake of the form.
+        # pylint: disable=protected-access
+        default_country = form_desc._field_overrides.get('country', {}).get('defaultValue')
+
         country_instructions = _(
             # Translators: These instructions appear on the registration form, immediately
             # below a field meant to hold the user's country.
             u"The country or region where you live."
         )
-
-        error_msg = accounts.REQUIRED_FIELD_COUNTRY_MSG
-
-        # If we set a country code, make sure it's uppercase for the sake of the form.
-        default_country = form_desc._field_overrides.get('country', {}).get('defaultValue')
         if default_country:
             form_desc.override_field_properties(
                 'country',
@@ -751,7 +738,6 @@ class RegistrationFormFactory(object):
         if self._is_field_visible("terms_of_service"):
             terms_label = _(u"Honor Code")
             terms_link = marketing_link("HONOR")
-            terms_text = _(u"Review the Honor Code")
 
         # Combine terms of service and honor code checkboxes
         else:
@@ -759,13 +745,16 @@ class RegistrationFormFactory(object):
             # in order to register a new account.
             terms_label = _(u"Terms of Service and Honor Code")
             terms_link = marketing_link("HONOR")
-            terms_text = _(u"Review the Terms of Service and Honor Code")
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
-        label = _(u"I agree to the {platform_name} {terms_of_service}").format(
+        label = Text(_(
+            u"I agree to the {platform_name} {terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+        )).format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
-            terms_of_service=terms_label
+            terms_of_service=terms_label,
+            terms_of_service_link_start=HTML("<a href='{terms_link}' target='_blank'>").format(terms_link=terms_link),
+            terms_of_service_link_end=HTML("</a>"),
         )
 
         # Translators: "Terms of Service" is a legal document users must agree to
@@ -784,8 +773,6 @@ class RegistrationFormFactory(object):
             error_messages={
                 "required": error_msg
             },
-            supplementalLink=terms_link,
-            supplementalText=terms_text
         )
 
     def _add_terms_of_service_field(self, form_desc, required=True):

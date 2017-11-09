@@ -5,12 +5,14 @@
         'underscore',
         'gettext',
         'edx-ui-toolkit/js/utils/string-utils',
+        'edx-ui-toolkit/js/utils/html-utils',
         'js/student_account/views/FormView',
         'text!templates/student_account/form_status.underscore'
     ],
         function(
             $, _, gettext,
             StringUtils,
+            HtmlUtils,
             FormView,
             formStatusTpl
         ) {
@@ -65,6 +67,59 @@
                     this.listenTo(this.model, 'validation', this.renderLiveValidations);
                 },
 
+
+                renderFields: function(fields, className) {
+                    var html = [],
+                        i,
+                        fieldTpl = this.fieldTpl;
+
+                    html.push(HtmlUtils.joinHtml(
+                        HtmlUtils.HTML('<div class="'),
+                        className,
+                        HtmlUtils.HTML('">')
+                    ));
+                    for (i = 0; i < fields.length; i++) {
+                        html.push(HtmlUtils.template(fieldTpl)($.extend(fields[i], {
+                            form: this.formType,
+                            requiredStr: this.requiredStr,
+                            optionalStr: this.optionalStr,
+                            supplementalText: fields[i].supplementalText || '',
+                            supplementalLink: fields[i].supplementalLink || ''
+                        })));
+                    }
+                    html.push('</div>');
+                    return html;
+                },
+
+                buildForm: function(data) {
+                    var html = [],
+                        i,
+                        len = data.length,
+                        requiredFields = [],
+                        optionalFields = [];
+
+                    this.fields = data;
+
+                    for (i = 0; i < len; i++) {
+                        if (data[i].errorMessages) {
+                            // eslint-disable-next-line no-param-reassign
+                            data[i].errorMessages = this.escapeStrings(data[i].errorMessages);
+                        }
+
+                        if (data[i].required) {
+                            requiredFields.push(data[i]);
+                        } else {
+                            optionalFields.push(data[i]);
+                        }
+                    }
+
+                    html = this.renderFields(requiredFields, 'required-fields');
+
+                    html.push.apply(html, this.renderFields(optionalFields, 'optional-fields'));
+
+                    this.render(html.join(''));
+                },
+
                 render: function(html) {
                     var fields = html || '',
                         formErrorsTitle = gettext('An error occurred.');
@@ -100,6 +155,101 @@
                     }
 
                     return this;
+                },
+
+                postRender: function() {
+                    var inputs = [
+                            this.$('#register-name'),
+                            this.$('#register-email'),
+                            this.$('#register-username'),
+                            this.$('#register-password'),
+                            this.$('#register-country')
+                        ],
+                        inputTipSelectors = ['tip error', 'tip tip-input'],
+                        inputTipSelectorsHidden = ['tip error hidden', 'tip tip-input hidden'],
+                        onInputFocus = function() {
+                            // Apply on focus styles to input
+                            $(this).prev('label').addClass('focus-in')
+                                .removeClass('focus-out');
+
+                            // Show each input tip
+                            $(this).siblings().each(function() {
+                                if (inputTipSelectorsHidden.includes($(this).attr('class'))) {
+                                    $(this).removeClass('hidden');
+                                }
+                            });
+                        },
+                        onInputFocusOut = function() {
+                            // If input has no text apply focus out styles
+                            if ($(this).val().length === 0) {
+                                $(this).prev('label').addClass('focus-out')
+                                    .removeClass('focus-in');
+                            }
+
+                            // Hide each input tip
+                            $(this).siblings().each(function() {
+                                if (inputTipSelectors.includes($(this).attr('class'))) {
+                                    $(this).addClass('hidden');
+                                }
+                            });
+                        },
+                        handleInputBehavior = function(input) {
+                            // Initially put label in input
+                            if (input.val().length === 0) {
+                                input.prev('label').addClass('focus-out')
+                                    .removeClass('focus-in');
+                            }
+
+                            // Initially hide each input tip
+                            input.siblings().each(function() {
+                                if (inputTipSelectors.includes($(this).attr('class'))) {
+                                    $(this).addClass('hidden');
+                                }
+                            });
+
+                            input.focusin(onInputFocus);
+                            input.focusout(onInputFocusOut);
+                        },
+                        handleAutocomplete = function() {
+                            inputs.forEach(function(input) {
+                                if (input.val().length === 0 && !input.is(':-webkit-autofill')) {
+                                    input.prev('label').addClass('focus-out')
+                                        .removeClass('focus-in');
+                                } else {
+                                    input.prev('label').addClass('focus-in')
+                                        .removeClass('focus-out');
+                                }
+                            });
+                        };
+
+                    FormView.prototype.postRender.call(this);
+                    $('.optional-fields').addClass('hidden');
+                    $('#toggle_optional_fields').change(function() {
+                        window.analytics.track('edx.bi.user.register.optional_fields_selected');
+                        $('.optional-fields').toggleClass('hidden');
+                    });
+
+                    // We are swapping the order of these elements here because the honor code agreement
+                    // is a required checkbox field and the optional fields toggle is a cosmetic
+                    // improvement so that we don't have to show all the optional fields.
+                    // xss-lint: disable=javascript-jquery-insert-into-target
+                    $('.checkbox-optional_fields_toggle').insertBefore('.optional-fields');
+                    // xss-lint: disable=javascript-jquery-insert-into-target
+                    $('.checkbox-honor_code').insertAfter('.optional-fields');
+
+                    // Clicking on links inside a label should open that link.
+                    $('label a').click(function(ev) {
+                        ev.stopPropagation();
+                        ev.preventDefault();
+                        window.open($(this).attr('href'), $(this).attr('target'));
+                    });
+                    $('#register-country option:first').html('');
+                    inputs.forEach(function(input) {
+                        if (input.length > 0) {
+                            handleInputBehavior(input);
+                        }
+                    });
+                    setTimeout(handleAutocomplete, 1000);
                 },
 
                 hideRequiredMessageExceptOnError: function($el) {
