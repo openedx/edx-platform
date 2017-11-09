@@ -2,3 +2,75 @@
 %ui-btn-pill {
   border-radius: ($baseline/5);
 }
+
+.announcements-editor {
+  padding: 40px;
+  width: 60%;
+
+  .announcement-content {
+    margin-bottom: 20px;
+
+    textarea {
+      width: 100%;
+      min-height: 300px;
+      max-height: 300px;
+      overflow: auto;
+    }
+  }
+
+  .announcement-active {
+    label {
+      margin-bottom: 15px;
+    }
+  }
+
+  .save-announcement {
+    margin-bottom: 15px;
+  }
+}
+
+.announcements-list {
+  display: table;
+  border-spacing: 2em;
+
+  .announcement-label {
+    display: table-cell;
+    text-align: center;
+  }
+
+  .announcement-item {
+    display: table-row;
+
+    .announcement-content {
+      display: table-cell;
+      background-color: $color-draft;
+      align-content: center;
+      text-align: center;
+      padding: 22px 33px;
+      max-width: 300px;
+    }
+
+    .announcement-active {
+      display: table-cell;
+      padding: 22px 2px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    a {
+      display: table-cell;
+      vertical-align: middle;
+    }
+  }
+
+  a {
+    color: inherit;
+    text-decoration: inherit;
+  }
+
+  a:disabled,
+  a[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
