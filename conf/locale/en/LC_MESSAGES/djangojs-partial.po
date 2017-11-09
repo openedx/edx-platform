@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-02 11:03+0000\n"
-"PO-Revision-Date: 2017-11-02 11:05:34.008128\n"
+"POT-Creation-Date: 2017-11-09 11:12+0000\n"
+"PO-Revision-Date: 2017-11-09 11:14:36.686876\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -50,8 +50,8 @@ msgstr ""
 #: cms/static/js/views/export.js:360
 #: cms/static/js/views/manage_users_and_roles.js:32
 #: cms/static/js/views/modals/base_modal.js:134
-#: cms/static/js/views/modals/course_outline_modals.js:206
-#: cms/static/js/views/modals/course_outline_modals.js:238
+#: cms/static/js/views/modals/course_outline_modals.js:213
+#: cms/static/js/views/modals/course_outline_modals.js:255
 #: cms/static/js/views/show_textbook.js:52 cms/static/js/views/tabs.js:187
 #: cms/static/js/views/validation.js:127
 #: common/lib/xmodule/xmodule/js/src/html/edit.js:204
@@ -123,14 +123,14 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/base_modal.js:45
-#: cms/static/js/views/modals/course_outline_modals.js:237
+#: cms/static/js/views/modals/course_outline_modals.js:254
 #: common/lib/xmodule/xmodule/js/src/html/edit.js:924
 msgid "Save"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/js/views/modals/course_outline_modals.js:940
+#: cms/static/js/views/modals/course_outline_modals.js:957
 #: common/lib/xmodule/xmodule/js/src/html/edit.js:114
 msgid "Advanced"
 msgstr ""

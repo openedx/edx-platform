@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-02 10:59+0000\n"
-"PO-Revision-Date: 2017-11-02 11:05:33.871318\n"
+"POT-Creation-Date: 2017-11-09 11:08+0000\n"
+"PO-Revision-Date: 2017-11-09 11:14:36.532420\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/component.py:240
 #: lms/djangoapps/courseware/tabs.py:249
 #: lms/djangoapps/discussion/plugins.py:21
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py:172
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py:192
 msgid "Discussion"
 msgstr ""
 
@@ -31,7 +31,7 @@ msgid "Problem"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py:357
-#: common/lib/xmodule/xmodule/video_module/video_module.py:412
+#: common/lib/xmodule/xmodule/video_module/video_module.py:418
 msgid "Advanced"
 msgstr ""
 
@@ -82,18 +82,18 @@ msgstr ""
 msgid "Pending"
 msgstr ""
 
-#: common/djangoapps/course_modes/admin.py:42
+#: common/djangoapps/course_modes/admin.py:36
 #: common/djangoapps/course_modes/models.py:66
 #: common/lib/xmodule/xmodule/library_content_module.py:81
 msgid "Mode"
 msgstr ""
 
-#: common/djangoapps/course_modes/admin.py:50
-#: lms/djangoapps/courseware/date_summary.py:597
+#: common/djangoapps/course_modes/admin.py:44
+#: lms/djangoapps/courseware/date_summary.py:600
 msgid "Verification Deadline"
 msgstr ""
 
-#: common/djangoapps/course_modes/admin.py:53
+#: common/djangoapps/course_modes/admin.py:47
 msgid ""
 "OPTIONAL: After this date/time, users will no longer be able to submit "
 "photos for verification.  This appies ONLY to modes that require "
@@ -342,7 +342,7 @@ msgid "Username and password fields cannot match"
 msgstr ""
 
 #: common/djangoapps/student/forms.py:270
-#: common/djangoapps/student/views.py:2592
+#: common/djangoapps/student/views.py:2601
 msgid "Password: "
 msgstr ""
 
@@ -512,155 +512,155 @@ msgstr ""
 msgid "Other education"
 msgstr ""
 
-#: common/djangoapps/student/models.py:2229
+#: common/djangoapps/student/models.py:2235
 #, python-brace-format
 msgid "{platform_name} Honor Code Certificate for {course_name}"
 msgstr ""
 
-#: common/djangoapps/student/models.py:2230
+#: common/djangoapps/student/models.py:2236
 #, python-brace-format
 msgid "{platform_name} Verified Certificate for {course_name}"
 msgstr ""
 
-#: common/djangoapps/student/models.py:2231
-#: common/djangoapps/student/models.py:2233
+#: common/djangoapps/student/models.py:2237
+#: common/djangoapps/student/models.py:2239
 #, python-brace-format
 msgid "{platform_name} Professional Certificate for {course_name}"
 msgstr ""
 
-#: common/djangoapps/student/models.py:2239
+#: common/djangoapps/student/models.py:2245
 msgid ""
 "The company identifier for the LinkedIn Add-to-Profile button e.g "
 "0_0dPSPyS070e0HsE9HNz_13_d11_"
 msgstr ""
 
-#: common/djangoapps/student/models.py:2252
+#: common/djangoapps/student/models.py:2258
 msgid ""
 "Short identifier for the LinkedIn partner used in the tracking code.  "
 "(Example: 'edx')  If no value is provided, tracking codes will not be sent "
 "to LinkedIn."
 msgstr ""
 
-#: common/djangoapps/student/models.py:2301
+#: common/djangoapps/student/models.py:2307
 #, python-brace-format
 msgid "{platform_name} Certificate for {course_name}"
 msgstr ""
 
-#: common/djangoapps/student/models.py:2399
-#: common/djangoapps/student/models.py:2428
+#: common/djangoapps/student/models.py:2405
+#: common/djangoapps/student/models.py:2434
 msgid "The ISO 639-1 language code for this language."
 msgstr ""
 
-#: common/djangoapps/student/models.py:2454
+#: common/djangoapps/student/models.py:2460
 msgid "Namespace of enrollment attribute"
 msgstr ""
 
-#: common/djangoapps/student/models.py:2458
+#: common/djangoapps/student/models.py:2464
 msgid "Name of the enrollment attribute"
 msgstr ""
 
-#: common/djangoapps/student/models.py:2462
+#: common/djangoapps/student/models.py:2468
 msgid "Value of the enrollment attribute"
 msgstr ""
 
-#: common/djangoapps/student/models.py:2533
+#: common/djangoapps/student/models.py:2539
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
 msgstr ""
 
-#: common/djangoapps/student/models.py:2555
+#: common/djangoapps/student/models.py:2561
 msgid "Name of the UTM cookie"
 msgstr ""
 
-#: common/djangoapps/student/models.py:2560
+#: common/djangoapps/student/models.py:2566
 msgid "Name of the affiliate cookie"
 msgstr ""
 
-#: common/djangoapps/student/models.py:2581
+#: common/djangoapps/student/models.py:2587
 msgid "Name of this user attribute."
 msgstr ""
 
-#: common/djangoapps/student/models.py:2582
+#: common/djangoapps/student/models.py:2588
 msgid "Value of this user attribute."
 msgstr ""
 
-#: common/djangoapps/student/views.py:849
+#: common/djangoapps/student/views.py:854
 #, python-brace-format
 msgid "The course you are looking for does not start until {date}."
 msgstr ""
 
-#: common/djangoapps/student/views.py:853
+#: common/djangoapps/student/views.py:858
 #, python-brace-format
 msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr ""
 
-#: common/djangoapps/student/views.py:947
+#: common/djangoapps/student/views.py:952
 msgid "Photos are mismatched"
 msgstr ""
 
-#: common/djangoapps/student/views.py:948
+#: common/djangoapps/student/views.py:953
 msgid "Name missing from ID photo"
 msgstr ""
 
-#: common/djangoapps/student/views.py:949
+#: common/djangoapps/student/views.py:954
 msgid "ID photo not provided"
 msgstr ""
 
-#: common/djangoapps/student/views.py:950
+#: common/djangoapps/student/views.py:955
 msgid "ID is invalid"
 msgstr ""
 
-#: common/djangoapps/student/views.py:951
+#: common/djangoapps/student/views.py:956
 msgid "Learner photo is blurry"
 msgstr ""
 
-#: common/djangoapps/student/views.py:952
+#: common/djangoapps/student/views.py:957
 msgid "Name on ID does not match name on account"
 msgstr ""
 
-#: common/djangoapps/student/views.py:953
+#: common/djangoapps/student/views.py:958
 msgid "Learner photo not provided"
 msgstr ""
 
-#: common/djangoapps/student/views.py:954
+#: common/djangoapps/student/views.py:959
 msgid "ID photo is blurry"
 msgstr ""
 
-#: common/djangoapps/student/views.py:988
+#: common/djangoapps/student/views.py:993
 msgid " and "
 msgstr ""
 
-#: common/djangoapps/student/views.py:1253
+#: common/djangoapps/student/views.py:1258
 msgid "Course id not specified"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1264
+#: common/djangoapps/student/views.py:1269
 #: lms/djangoapps/support/views/refund.py:61
 msgid "Invalid course id"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1275
+#: common/djangoapps/student/views.py:1284
 msgid "Course id is invalid"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1308
+#: common/djangoapps/student/views.py:1317
 msgid "Could not enroll"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1324
+#: common/djangoapps/student/views.py:1333
 msgid "You are not enrolled in this course"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1328
+#: common/djangoapps/student/views.py:1337
 msgid "Your certificate prevents you from unenrolling from this course"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1334
+#: common/djangoapps/student/views.py:1343
 msgid "Enrollment action is invalid"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1356
+#: common/djangoapps/student/views.py:1365
 #, python-brace-format
 msgid ""
 "In order to sign in, you need to activate your account.<br /><br />We just "
@@ -669,14 +669,14 @@ msgid ""
 "{platform} Support</a>."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1408
+#: common/djangoapps/student/views.py:1417
 #, python-brace-format
 msgid ""
 "You've successfully logged into your {provider_name} account, but this "
 "account isn't linked with an {platform_name} account yet."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1416
+#: common/djangoapps/student/views.py:1425
 #, python-brace-format
 msgid ""
 "Use your {platform_name} username and password to log into {platform_name} "
@@ -684,97 +684,97 @@ msgid ""
 "your dashboard."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1424
+#: common/djangoapps/student/views.py:1433
 #, python-brace-format
 msgid ""
 "If you don't have an {platform_name} account yet, click "
 "<strong>Register</strong> at the top of the page."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1438
+#: common/djangoapps/student/views.py:1447
 msgid "There was an error receiving your login information. Please email us."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1470
+#: common/djangoapps/student/views.py:1479
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1481
+#: common/djangoapps/student/views.py:1490
 msgid ""
 "Your password has expired due to password policy on this account. You must "
 "reset your password before you can log in again. Please click the \"Forgot "
 "Password\" link on this page to reset your password before logging in again."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1498
+#: common/djangoapps/student/views.py:1507
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1516
+#: common/djangoapps/student/views.py:1525
 msgid "Email or password is incorrect."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1672
+#: common/djangoapps/student/views.py:1681
 msgid "Please enter a username"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1677
+#: common/djangoapps/student/views.py:1686
 msgid "Please choose an option"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1684
+#: common/djangoapps/student/views.py:1693
 msgid "User with username {} does not exist"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1692
+#: common/djangoapps/student/views.py:1701
 msgid "Successfully disabled {}'s account"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1696
+#: common/djangoapps/student/views.py:1705
 msgid "Successfully reenabled {}'s account"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1699
+#: common/djangoapps/student/views.py:1708
 msgid "Unexpected account status"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1794
+#: common/djangoapps/student/views.py:1803
 #, python-brace-format
 msgid "An account with the Public Username '{username}' already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1799
+#: common/djangoapps/student/views.py:1808
 #, python-brace-format
 msgid "An account with the Email '{email}' already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1901
+#: common/djangoapps/student/views.py:1910
 #, python-brace-format
 msgid "Registration using {provider} has timed out."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1970
+#: common/djangoapps/student/views.py:1979
 msgid "An access_token is required when passing value ({}) for provider."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1981
+#: common/djangoapps/student/views.py:1990
 msgid "The provided access_token is already associated with another user."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1983
+#: common/djangoapps/student/views.py:1992
 msgid "The provided access_token is not valid."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2229
-#: common/djangoapps/student/views.py:2355
+#: common/djangoapps/student/views.py:2238
+#: common/djangoapps/student/views.py:2364
 #: openedx/core/djangoapps/user_api/accounts/api.py:286
 #: openedx/core/djangoapps/user_api/views.py:166
 msgid "Account creation not allowed."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2438
+#: common/djangoapps/student/views.py:2447
 #, python-brace-format
 msgid ""
 "{html_start}Your account could not be activated{html_end}Something went "
@@ -782,12 +782,12 @@ msgid ""
 "issue."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2451
+#: common/djangoapps/student/views.py:2460
 #, python-brace-format
 msgid "{html_start}Success{html_end} You have activated your account."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2456
+#: common/djangoapps/student/views.py:2465
 #, python-brace-format
 msgid ""
 "{html_start}Success! You have activated your account.{html_end}You will now "
@@ -795,12 +795,12 @@ msgid ""
 "enrolled in. Sign In to continue."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2473
+#: common/djangoapps/student/views.py:2482
 #, python-brace-format
 msgid "{html_start}This account has already been activated.{html_end}"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2619
+#: common/djangoapps/student/views.py:2628
 #, python-brace-format
 msgid ""
 "You are re-using a password that you have used recently. You must have {num}"
@@ -811,7 +811,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/djangoapps/student/views.py:2630
+#: common/djangoapps/student/views.py:2639
 #, python-brace-format
 msgid ""
 "You are resetting passwords too frequently. Due to security policies, {num} "
@@ -822,36 +822,36 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/djangoapps/student/views.py:2677
+#: common/djangoapps/student/views.py:2686
 msgid "Password reset unsuccessful"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2703
+#: common/djangoapps/student/views.py:2712
 msgid "Error in resetting your password. Please try again."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2733
+#: common/djangoapps/student/views.py:2742
 msgid "No inactive user with this e-mail exists"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2746
-#: common/djangoapps/student/views.py:2766
+#: common/djangoapps/student/views.py:2755
+#: common/djangoapps/student/views.py:2775
 msgid "Unable to send reactivation email"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2780
+#: common/djangoapps/student/views.py:2789
 msgid "Valid e-mail address required."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2783
+#: common/djangoapps/student/views.py:2792
 msgid "Old email is the same as the new email."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2786
+#: common/djangoapps/student/views.py:2795
 msgid "An account with this e-mail already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2829
+#: common/djangoapps/student/views.py:2838
 msgid "Unable to send email activation link. Please try again later."
 msgstr ""
 
@@ -1410,12 +1410,12 @@ msgid "Cannot rescore problems with possible file submissions"
 msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py:521
-#: common/lib/xmodule/xmodule/capa_base.py:800
+#: common/lib/xmodule/xmodule/capa_base.py:803
 msgid "Incorrect"
 msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py:526
-#: common/lib/xmodule/xmodule/capa_base.py:809
+#: common/lib/xmodule/xmodule/capa_base.py:812
 msgid "Correct"
 msgstr ""
 
@@ -2088,106 +2088,105 @@ msgstr ""
 #. the placeholders.
 #: common/lib/xmodule/xmodule/capa_base.py:644
 #, python-brace-format
-msgid ""
-"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
+msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
 msgstr ""
 
 #. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
 #. This text is shown in bold before the accompanying hint text.
-#: common/lib/xmodule/xmodule/capa_base.py:648
+#: common/lib/xmodule/xmodule/capa_base.py:650
 #, python-brace-format
 msgid "Hint ({hint_num} of {hints_count}): "
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:718
+#: common/lib/xmodule/xmodule/capa_base.py:721
 #, python-brace-format
 msgid ""
 "Your answers were previously saved. Click '{button_name}' to grade them."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:795
+#: common/lib/xmodule/xmodule/capa_base.py:798
 #, python-brace-format
 msgid "Incorrect ({progress} point)"
 msgid_plural "Incorrect ({progress} points)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:804
+#: common/lib/xmodule/xmodule/capa_base.py:807
 #, python-brace-format
 msgid "Correct ({progress} point)"
 msgid_plural "Correct ({progress} points)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:813
+#: common/lib/xmodule/xmodule/capa_base.py:816
 #, python-brace-format
 msgid "Partially correct ({progress} point)"
 msgid_plural "Partially correct ({progress} points)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:818
+#: common/lib/xmodule/xmodule/capa_base.py:821
 msgid "Partially Correct"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:820
+#: common/lib/xmodule/xmodule/capa_base.py:823
 msgid "Answer submitted."
 msgstr ""
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
-#: common/lib/xmodule/xmodule/capa_base.py:1180
-#: common/lib/xmodule/xmodule/capa_base.py:1489
+#: common/lib/xmodule/xmodule/capa_base.py:1183
+#: common/lib/xmodule/xmodule/capa_base.py:1492
 msgid "Problem is closed."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:1188
+#: common/lib/xmodule/xmodule/capa_base.py:1191
 msgid "Problem must be reset before it can be submitted again."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:1197
+#: common/lib/xmodule/xmodule/capa_base.py:1200
 #, python-brace-format
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:1206
+#: common/lib/xmodule/xmodule/capa_base.py:1209
 #, python-brace-format
 msgid ""
 "You must wait at least {wait_secs} between submissions. {remaining_secs} "
 "remaining."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:1369
+#: common/lib/xmodule/xmodule/capa_base.py:1372
 #, python-brace-format
 msgid "{num_hour} hour"
 msgid_plural "{num_hour} hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:1374
+#: common/lib/xmodule/xmodule/capa_base.py:1377
 #, python-brace-format
 msgid "{num_minute} minute"
 msgid_plural "{num_minute} minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:1380
+#: common/lib/xmodule/xmodule/capa_base.py:1383
 #, python-brace-format
 msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:1500
+#: common/lib/xmodule/xmodule/capa_base.py:1503
 msgid "Problem needs to be reset prior to save."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:1510
+#: common/lib/xmodule/xmodule/capa_base.py:1513
 msgid "Your answers have been saved."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:1513
+#: common/lib/xmodule/xmodule/capa_base.py:1516
 #, python-brace-format
 msgid ""
 "Your answers have been saved but not graded. Click '{button_name}' to grade "
@@ -2196,21 +2195,21 @@ msgstr ""
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
-#: common/lib/xmodule/xmodule/capa_base.py:1545
+#: common/lib/xmodule/xmodule/capa_base.py:1548
 msgid "You cannot select Reset for a problem that is closed."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:1554
+#: common/lib/xmodule/xmodule/capa_base.py:1557
 msgid "You must submit an answer before you can select Reset."
 msgstr ""
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
-#: common/lib/xmodule/xmodule/capa_base.py:1609
+#: common/lib/xmodule/xmodule/capa_base.py:1612
 msgid "Problem's definition does not support rescoring."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py:1615
+#: common/lib/xmodule/xmodule/capa_base.py:1618
 msgid "Problem must be answered before it can be graded again."
 msgstr ""
 
@@ -3815,7 +3814,7 @@ msgid ""
 "requirements."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/seq_module.py:591
+#: common/lib/xmodule/xmodule/seq_module.py:621
 msgid ""
 "A list summarizing what students should look forward to in this section."
 msgstr ""
@@ -3975,11 +3974,11 @@ msgstr ""
 msgid "Invalid encoding type, transcripts should be UTF-8 encoded."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/video_module/video_module.py:407
+#: common/lib/xmodule/xmodule/video_module/video_module.py:413
 msgid "Basic"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/video_module/video_module.py:479
+#: common/lib/xmodule/xmodule/video_module/video_module.py:485
 #, python-brace-format
 msgid "There is no transcript file associated with the {lang} language."
 msgid_plural ""
@@ -3987,13 +3986,13 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/lib/xmodule/xmodule/video_module/video_module.py:734
+#: common/lib/xmodule/xmodule/video_module/video_module.py:740
 msgid ""
 "The URL for your video. This can be a YouTube URL or a link to an .mp4, "
 ".ogg, or .webm video file hosted elsewhere on the Internet."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/video_module/video_module.py:735
+#: common/lib/xmodule/xmodule/video_module/video_module.py:741
 msgid "Default Video URL"
 msgstr ""
 
@@ -4427,7 +4426,7 @@ msgstr ""
 #. Translators: A 'Privacy Policy' is a legal document/statement describing a
 #. website's use of personal information
 #: lms/djangoapps/branding/api.py:220 lms/djangoapps/branding/api.py:274
-#: lms/djangoapps/certificates/views/webview.py:175
+#: lms/djangoapps/certificates/views/webview.py:180
 msgid "Privacy Policy"
 msgstr ""
 
@@ -4656,7 +4655,7 @@ msgid "An unexpected error occurred while regenerating certificates."
 msgstr ""
 
 #. Translators:  This text describes the 'Honor' course certificate type.
-#: lms/djangoapps/certificates/views/webview.py:63
+#: lms/djangoapps/certificates/views/webview.py:68
 #, python-brace-format
 msgid ""
 "An {cert_type} certificate signifies that a learner has agreed to abide by "
@@ -4668,7 +4667,7 @@ msgstr ""
 #. type, which is a higher level of
 #. verification offered by edX.  This type of verification is useful for
 #. professional education/certifications
-#: lms/djangoapps/certificates/views/webview.py:71
+#: lms/djangoapps/certificates/views/webview.py:76
 #, python-brace-format
 msgid ""
 "A {cert_type} certificate signifies that a learner has agreed to abide by "
@@ -4682,20 +4681,20 @@ msgstr ""
 #. An XSeries is a collection of
 #. courses related to each other in a meaningful way, such as a specific topic
 #. or theme, or even an organization
-#: lms/djangoapps/certificates/views/webview.py:81
+#: lms/djangoapps/certificates/views/webview.py:86
 #, python-brace-format
 msgid ""
 "An {cert_type} certificate demonstrates a high level of achievement in a "
 "program of study, and includes verification of the student's identity."
 msgstr ""
 
-#: lms/djangoapps/certificates/views/webview.py:105
+#: lms/djangoapps/certificates/views/webview.py:110
 #, python-brace-format
 msgid "{month} {day}, {year}"
 msgstr ""
 
 #. Translators:  This text represents the verification of the certificate
-#: lms/djangoapps/certificates/views/webview.py:112
+#: lms/djangoapps/certificates/views/webview.py:117
 #, python-brace-format
 msgid ""
 "This is a valid {platform_name} certificate for {user_name}, who "
@@ -4704,7 +4703,7 @@ msgstr ""
 
 #. Translators:  This text is bound to the HTML 'title' element of the page
 #. and appears in the browser title bar
-#: lms/djangoapps/certificates/views/webview.py:121
+#: lms/djangoapps/certificates/views/webview.py:126
 #, python-brace-format
 msgid "{partner_short_name} {course_number} Certificate | {platform_name}"
 msgstr ""
@@ -4713,7 +4712,7 @@ msgstr ""
 #. (displayed in a large font) on the certificate
 #. screen.  The text describes the accomplishment represented by the
 #. certificate information displayed to the user
-#: lms/djangoapps/certificates/views/webview.py:129
+#: lms/djangoapps/certificates/views/webview.py:134
 #, python-brace-format
 msgid ""
 "successfully completed, received a passing grade, and was awarded this "
@@ -4722,7 +4721,7 @@ msgstr ""
 
 #. Translators: This text describes the purpose (and therefore, value) of a
 #. course certificate
-#: lms/djangoapps/certificates/views/webview.py:140
+#: lms/djangoapps/certificates/views/webview.py:145
 #, python-brace-format
 msgid ""
 "{platform_name} acknowledges achievements through certificates, which are "
@@ -4731,8 +4730,8 @@ msgstr ""
 
 #. Translators:  'All rights reserved' is a legal term used in copyrighting to
 #. protect published content
-#: lms/djangoapps/certificates/views/webview.py:160
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:170
+#: lms/djangoapps/certificates/views/webview.py:165
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:173
 msgid "All rights reserved"
 msgstr ""
 
@@ -4740,54 +4739,54 @@ msgstr ""
 #. and appears
 #. in the browser title bar when a requested certificate is not found or
 #. recognized
-#: lms/djangoapps/certificates/views/webview.py:169
+#: lms/djangoapps/certificates/views/webview.py:174
 msgid "Invalid Certificate"
 msgstr ""
 
 #. Translators: The &amp; characters represent an ampersand character and can
 #. be ignored
-#: lms/djangoapps/certificates/views/webview.py:172
+#: lms/djangoapps/certificates/views/webview.py:177
 msgid "Terms of Service &amp; Honor Code"
 msgstr ""
 
 #. Translators: This line appears as a byline to a header image and describes
 #. the purpose of the page
-#: lms/djangoapps/certificates/views/webview.py:178
+#: lms/djangoapps/certificates/views/webview.py:183
 msgid "Certificate Validation"
 msgstr ""
 
 #. Translators: Accomplishments describe the awards/certifications obtained by
 #. students on this platform
-#: lms/djangoapps/certificates/views/webview.py:181
+#: lms/djangoapps/certificates/views/webview.py:186
 #, python-brace-format
 msgid "About {platform_name} Accomplishments"
 msgstr ""
 
 #. Translators:  This line appears on the page just before the generation date
 #. for the certificate
-#: lms/djangoapps/certificates/views/webview.py:186
+#: lms/djangoapps/certificates/views/webview.py:191
 msgid "Issued On:"
 msgstr ""
 
 #. Translators:  The Certificate ID Number is an alphanumeric value unique to
 #. each individual certificate
-#: lms/djangoapps/certificates/views/webview.py:189
+#: lms/djangoapps/certificates/views/webview.py:194
 msgid "Certificate ID Number"
 msgstr ""
 
-#: lms/djangoapps/certificates/views/webview.py:191
+#: lms/djangoapps/certificates/views/webview.py:196
 #, python-brace-format
 msgid "About {platform_name} Certificates"
 msgstr ""
 
-#: lms/djangoapps/certificates/views/webview.py:195
+#: lms/djangoapps/certificates/views/webview.py:200
 #, python-brace-format
 msgid "How {platform_name} Validates Student Certificates"
 msgstr ""
 
 #. Translators:  This text describes the validation mechanism for a
 #. certificate file (known as GPG security)
-#: lms/djangoapps/certificates/views/webview.py:200
+#: lms/djangoapps/certificates/views/webview.py:205
 #, python-brace-format
 msgid ""
 "Certificates issued by {platform_name} are signed by a gpg key so that they "
@@ -4796,51 +4795,51 @@ msgid ""
 "\"detached signature\"&quot;\"."
 msgstr ""
 
-#: lms/djangoapps/certificates/views/webview.py:206
+#: lms/djangoapps/certificates/views/webview.py:211
 msgid "Validate this certificate for yourself"
 msgstr ""
 
 #. Translators:  This text describes (at a high level) the mission and charter
 #. the edX platform and organization
-#: lms/djangoapps/certificates/views/webview.py:209
+#: lms/djangoapps/certificates/views/webview.py:214
 #, python-brace-format
 msgid "{platform_name} offers interactive online classes and MOOCs."
 msgstr ""
 
-#: lms/djangoapps/certificates/views/webview.py:212
+#: lms/djangoapps/certificates/views/webview.py:217
 #, python-brace-format
 msgid "About {platform_name}"
 msgstr ""
 
-#: lms/djangoapps/certificates/views/webview.py:214
+#: lms/djangoapps/certificates/views/webview.py:219
 #, python-brace-format
 msgid "Learn more about {platform_name}"
 msgstr ""
 
-#: lms/djangoapps/certificates/views/webview.py:216
+#: lms/djangoapps/certificates/views/webview.py:221
 #, python-brace-format
 msgid "Learn with {platform_name}"
 msgstr ""
 
-#: lms/djangoapps/certificates/views/webview.py:218
+#: lms/djangoapps/certificates/views/webview.py:223
 #, python-brace-format
 msgid "Work at {platform_name}"
 msgstr ""
 
-#: lms/djangoapps/certificates/views/webview.py:220
+#: lms/djangoapps/certificates/views/webview.py:225
 #, python-brace-format
 msgid "Contact {platform_name}"
 msgstr ""
 
 #. Translators:  This text appears near the top of the certficate and
 #. describes the guarantee provided by edX
-#: lms/djangoapps/certificates/views/webview.py:223
+#: lms/djangoapps/certificates/views/webview.py:228
 #, python-brace-format
 msgid "{platform_name} acknowledges the following student accomplishment"
 msgstr ""
 
 #. Translators:  This text represents the description of course
-#: lms/djangoapps/certificates/views/webview.py:240
+#: lms/djangoapps/certificates/views/webview.py:245
 #, python-brace-format
 msgid ""
 "a course of study offered by {partner_short_name}, an online learning "
@@ -4848,37 +4847,37 @@ msgid ""
 msgstr ""
 
 #. Translators:  This text represents the description of course
-#: lms/djangoapps/certificates/views/webview.py:248
+#: lms/djangoapps/certificates/views/webview.py:253
 #, python-brace-format
 msgid "a course of study offered by {partner_short_name}."
 msgstr ""
 
-#: lms/djangoapps/certificates/views/webview.py:286
+#: lms/djangoapps/certificates/views/webview.py:268
 #, python-brace-format
 msgid "I completed the {course_title} course on {platform_name}."
 msgstr ""
 
-#: lms/djangoapps/certificates/views/webview.py:294
+#: lms/djangoapps/certificates/views/webview.py:276
 #, python-brace-format
 msgid ""
 "I completed a course at {platform_name}. Take a look at my certificate."
 msgstr ""
 
-#: lms/djangoapps/certificates/views/webview.py:334
+#: lms/djangoapps/certificates/views/webview.py:316
 #, python-brace-format
 msgid "More Information About {user_name}'s Certificate:"
 msgstr ""
 
 #. Translators: This line is displayed to a user who has completed a course
 #. and achieved a certification
-#: lms/djangoapps/certificates/views/webview.py:338
+#: lms/djangoapps/certificates/views/webview.py:320
 #, python-brace-format
 msgid "{fullname}, you earned a certificate!"
 msgstr ""
 
 #. Translators: This line congratulates the user and instructs them to share
 #. their accomplishment on social networks
-#: lms/djangoapps/certificates/views/webview.py:343
+#: lms/djangoapps/certificates/views/webview.py:325
 msgid ""
 "Congratulations! This page summarizes what you accomplished. Show it off to "
 "family, friends, and colleagues in your social and professional networks."
@@ -4886,7 +4885,7 @@ msgstr ""
 
 #. Translators: This line leads the reader to understand more about the
 #. certificate that a student has been awarded
-#: lms/djangoapps/certificates/views/webview.py:348
+#: lms/djangoapps/certificates/views/webview.py:330
 #, python-brace-format
 msgid "More about {fullname}'s accomplishment"
 msgstr ""
@@ -4896,7 +4895,7 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py:1242
 #: lms/djangoapps/instructor/views/tools.py:188
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py:99
-#: openedx/core/djangoapps/schedules/admin.py:17
+#: openedx/core/djangoapps/schedules/admin.py:23
 msgid "Username"
 msgstr ""
 
@@ -5185,22 +5184,22 @@ msgstr ""
 msgid "We are working on generating course certificates."
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py:448
-#: lms/djangoapps/courseware/date_summary.py:483
+#: lms/djangoapps/courseware/date_summary.py:451
+#: lms/djangoapps/courseware/date_summary.py:486
 msgid "Upgrade to Verified Certificate"
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py:485
+#: lms/djangoapps/courseware/date_summary.py:488
 msgid "Verification Upgrade Deadline"
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py:497
+#: lms/djangoapps/courseware/date_summary.py:500
 msgid ""
 "Don't miss the opportunity to highlight your new knowledge and skills by "
 "earning a verified certificate."
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py:500
+#: lms/djangoapps/courseware/date_summary.py:503
 msgid ""
 "You are still eligible to upgrade to a Verified Certificate! Pursue it to "
 "highlight the knowledge and skills you gain in this course."
@@ -5210,24 +5209,24 @@ msgstr ""
 #. should upgrade to the verified track. 'date' will be
 #. their personalized verified upgrade deadline formatted
 #. according to their locale.
-#: lms/djangoapps/courseware/date_summary.py:516
+#: lms/djangoapps/courseware/date_summary.py:519
 #, python-brace-format
 msgid "by {date}"
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py:528
+#: lms/djangoapps/courseware/date_summary.py:531
 #, python-brace-format
 msgid ""
 "Don't forget, you have {time_remaining_string} left to upgrade to a Verified"
 " Certificate."
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py:532
+#: lms/djangoapps/courseware/date_summary.py:535
 #, python-brace-format
 msgid "Don't forget to upgrade to a verified certificate by {localized_date}."
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py:537
+#: lms/djangoapps/courseware/date_summary.py:540
 #, python-brace-format
 msgid ""
 "In order to qualify for a certificate, you must meet all course grading "
@@ -5236,34 +5235,34 @@ msgid ""
 "already.{button_panel}"
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py:550
+#: lms/djangoapps/courseware/date_summary.py:553
 #, python-brace-format
 msgid "Upgrade ({upgrade_price})"
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py:585
+#: lms/djangoapps/courseware/date_summary.py:588
 msgid "Learn More"
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py:586
+#: lms/djangoapps/courseware/date_summary.py:589
 msgid "Retry Verification"
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py:588
+#: lms/djangoapps/courseware/date_summary.py:591
 msgid "Verify My Identity"
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py:596
+#: lms/djangoapps/courseware/date_summary.py:599
 msgid "Missed Verification Deadline"
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py:603
+#: lms/djangoapps/courseware/date_summary.py:606
 msgid ""
 "Unfortunately you missed this course's deadline for a successful "
 "verification."
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py:607
+#: lms/djangoapps/courseware/date_summary.py:610
 msgid ""
 "You must successfully complete verification before this date to qualify for "
 "a Verified Certificate."
@@ -5309,6 +5308,26 @@ msgstr ""
 #. course' textbooks
 #: lms/djangoapps/courseware/tabs.py:117
 msgid "Textbooks"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/index.py:168
+#, python-brace-format
+msgid ""
+"You are not signed in. To see additional course content, {sign_in_link} or "
+"{register_link}, and enroll in this course."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/index.py:171
+#: lms/djangoapps/courseware/views/views.py:493
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py:181
+msgid "sign in"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/index.py:175
+#: lms/djangoapps/courseware/views/views.py:497
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py:185
+#: openedx/features/course_experience/views/course_home_messages.py:114
+msgid "register"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py:119
@@ -5366,15 +5385,6 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py:491
 #, python-brace-format
 msgid "To see course content, {sign_in_link} or {register_link}."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py:493
-msgid "sign in"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py:497
-#: openedx/features/course_experience/views/course_home_messages.py:114
-msgid "register"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py:506
@@ -5715,6 +5725,31 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py:565
 msgid "full_name"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.html:5
+#, python-format
+msgid "Hi %(thread_username)s"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.html:14
+#, python-format
+msgid ""
+"<h1> Hi %(thread_username)s, </h1> <p> %(comment_username)s made the "
+"following reply to %(thread_title)s at %(comment_created_at)s. </p> <p> "
+"%(comment_body)s </p> <p> <a href=\"%(post_link)s\"> View the "
+"discussion.</a> </p>"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.txt:3
+msgid "This is the reply to your thread:"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/subject.txt:3
+#, python-format
+msgid ""
+"\n"
+"Someone replied to your thread on %(platform_name)s\n"
 msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py:252
@@ -8014,7 +8049,7 @@ msgid "Email Address"
 msgstr ""
 
 #: lms/djangoapps/support/views/refund.py:36
-#: openedx/core/djangoapps/schedules/admin.py:22
+#: openedx/core/djangoapps/schedules/admin.py:28
 msgid "Course ID"
 msgstr ""
 
@@ -8211,114 +8246,114 @@ msgstr ""
 msgid "Your Platform Description Here"
 msgstr ""
 
-#: lms/envs/common.py:669
+#: lms/envs/common.py:683
 msgid "Audit"
 msgstr ""
 
 #. Translators: This is the website name of www.facebook.com.  Please
 #. translate this the way that Facebook advertises in your language.
-#: lms/envs/common.py:2423
+#: lms/envs/common.py:2437
 msgid "Facebook"
 msgstr ""
 
-#: lms/envs/common.py:2425
+#: lms/envs/common.py:2439
 #, python-brace-format
 msgid "Like {platform_name} on Facebook"
 msgstr ""
 
 #. Translators: This is the website name of www.twitter.com.  Please
 #. translate this the way that Twitter advertises in your language.
-#: lms/envs/common.py:2430
+#: lms/envs/common.py:2444
 msgid "Twitter"
 msgstr ""
 
-#: lms/envs/common.py:2432
+#: lms/envs/common.py:2446
 #, python-brace-format
 msgid "Follow {platform_name} on Twitter"
 msgstr ""
 
 #. Translators: This is the website name of www.linkedin.com.  Please
 #. translate this the way that LinkedIn advertises in your language.
-#: lms/envs/common.py:2437
+#: lms/envs/common.py:2451
 msgid "LinkedIn"
 msgstr ""
 
-#: lms/envs/common.py:2439
+#: lms/envs/common.py:2453
 #, python-brace-format
 msgid "Follow {platform_name} on LinkedIn"
 msgstr ""
 
 #. Translators: This is the website name of plus.google.com.  Please
 #. translate this the way that Google+ advertises in your language.
-#: lms/envs/common.py:2444
+#: lms/envs/common.py:2458
 msgid "Google+"
 msgstr ""
 
-#: lms/envs/common.py:2446
+#: lms/envs/common.py:2460
 #, python-brace-format
 msgid "Follow {platform_name} on Google+"
 msgstr ""
 
 #. Translators: This is the website name of www.tumblr.com.  Please
 #. translate this the way that Tumblr advertises in your language.
-#: lms/envs/common.py:2451
+#: lms/envs/common.py:2465
 msgid "Tumblr"
 msgstr ""
 
 #. Translators: This is the website name of www.meetup.com.  Please
 #. translate this the way that MeetUp advertises in your language.
-#: lms/envs/common.py:2457
+#: lms/envs/common.py:2471
 msgid "Meetup"
 msgstr ""
 
 #. Translators: This is the website name of www.reddit.com.  Please
 #. translate this the way that Reddit advertises in your language.
-#: lms/envs/common.py:2463
+#: lms/envs/common.py:2477
 msgid "Reddit"
 msgstr ""
 
-#: lms/envs/common.py:2465
+#: lms/envs/common.py:2479
 #, python-brace-format
 msgid "Subscribe to the {platform_name} subreddit"
 msgstr ""
 
 #. Translators: This is the website name of https://vk.com.  Please
 #. translate this the way that VK advertises in your language.
-#: lms/envs/common.py:2470
+#: lms/envs/common.py:2484
 msgid "VK"
 msgstr ""
 
 #. Translators: This is the website name of http://www.weibo.com.  Please
 #. translate this the way that Weibo advertises in your language.
-#: lms/envs/common.py:2476
+#: lms/envs/common.py:2490
 msgid "Weibo"
 msgstr ""
 
 #. Translators: This is the website name of www.youtube.com.  Please
 #. translate this the way that YouTube advertises in your language.
-#: lms/envs/common.py:2482
+#: lms/envs/common.py:2496
 msgid "Youtube"
 msgstr ""
 
-#: lms/envs/common.py:2484
+#: lms/envs/common.py:2498
 #, python-brace-format
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr ""
 
-#: lms/envs/common.py:2929
+#: lms/envs/common.py:2943
 msgid "Your Platform Insights"
 msgstr ""
 
-#: lms/envs/common.py:2940
+#: lms/envs/common.py:2954
 msgid "Kosovo"
 msgstr ""
 
-#: lms/envs/common.py:3341
+#: lms/envs/common.py:3355
 #, python-brace-format
 msgid "Welcome to {platform_name}."
 msgstr ""
 
-#: lms/envs/common.py:3343
+#: lms/envs/common.py:3357
 #, python-brace-format
 msgid ""
 "{start_bold}{enterprise_name}{end_bold} has partnered with "
@@ -8347,7 +8382,7 @@ msgid ""
 "        "
 msgstr ""
 
-#: lms/templates/main_django.html:30
+#: lms/templates/main_django.html:32
 msgid "Skip to main content"
 msgstr ""
 
@@ -8791,7 +8826,7 @@ msgstr ""
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr ""
 
-#: lms/urls.py:27
+#: lms/urls.py:54
 msgid "LMS Administration"
 msgstr ""
 
@@ -9239,77 +9274,77 @@ msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\").
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/apps.py:7
-#: openedx/core/djangoapps/schedules/models.py:28
+#: openedx/core/djangoapps/schedules/models.py:35
 msgid "Schedules"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/models.py:13
+#: openedx/core/djangoapps/schedules/models.py:14
 msgid "Indicates if this schedule is actively used"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/models.py:17
+#: openedx/core/djangoapps/schedules/models.py:18
 msgid "Date this schedule went into effect"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/models.py:23
+#: openedx/core/djangoapps/schedules/models.py:24
 msgid "Deadline by which the learner must upgrade to a verified seat"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/models.py:27
+#: openedx/core/djangoapps/schedules/models.py:34
 msgid "Schedule"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:59
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:62
 #, python-format
 msgid "Go to %(platform_name)s Home Page"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:62
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:65
 msgid "Sign In"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:92
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:95
 #, python-format
 msgid "%(platform_name)s on LinkedIn"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:100
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:103
 #, python-format
 msgid "%(platform_name)s on Twitter"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:108
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:111
 #, python-format
 msgid "%(platform_name)s on Facebook"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:116
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:119
 #, python-format
 msgid "%(platform_name)s on Google Plus"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:124
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:127
 #, python-format
 msgid "%(platform_name)s on Reddit"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:138
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:141
 msgid "Download the iOS app on the Apple Store"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:145
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:148
 msgid "Download the Android app on the Google Play Store"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:157
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:160
 msgid "View on Web"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:162
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:165
 msgid "Unsubscribe from this list"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:172
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html:175
 msgid "Our mailing address is"
 msgstr ""
 
@@ -9329,7 +9364,7 @@ msgstr ""
 msgid "Upgrade Now"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.txt:4
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.txt:3
 #, python-format
 msgid ""
 "Don't miss the opportunity to highlight your new knowledge and skills by "
@@ -9339,32 +9374,38 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html:6
 #, python-format
-msgid "Welcome to week %(week_num)s of our %(course_name)s course!"
+msgid "Welcome to week %(week_num)s of %(course_name)s!"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html:16
 #, python-format
-msgid "Welcome to week %(week_num)s of <strong>%(course_name)s</strong>!"
+msgid ""
+"We hope you're enjoying <strong>%(course_name)s</strong>! We want to let you"
+" know what you can look forward to in week %(week_num)s:"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html:21
-msgid "Here is what you can look forward to learning this week:"
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html:27
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt:12
+msgid ""
+"With self-paced courses, you learn on your own schedule. We encourage you to"
+" spend time with the course each week. Your focused attention will pay off "
+"in the end!"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html:31
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html:34
 msgid "Resume your course now"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt:3
 #, python-format
 msgid ""
-"Welcome to week %(week_num)s of our %(course_name)s course! Here is what you"
-" can look forward to learning this week:"
+"We hope you're enjoying %(course_name)s! We want to let you know what you "
+"can look forward to in week %(week_num)s:"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/subject.txt:3
 #, python-format
-msgid "%(course_name)s - Welcome to Week %(week_num)s "
+msgid "Welcome to week %(week_num)s "
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html:6
@@ -9979,6 +10020,13 @@ msgstr ""
 msgid ""
 "A subcategory name for the discussion. This name appears in the left pane of"
 " the discussion forum for the course."
+msgstr ""
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py:178
+#, python-brace-format
+msgid ""
+"You are not signed in. To view the discussion content, {sign_in_link} or "
+"{register_link}, and enroll in this course."
 msgstr ""
 
 #: openedx/features/course_bookmarks/plugins.py:37

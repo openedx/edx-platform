@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-02 10:59+0000\n"
-"PO-Revision-Date: 2017-11-02 11:05:33.968401\n"
+"POT-Creation-Date: 2017-11-09 11:08+0000\n"
+"PO-Revision-Date: 2017-11-09 11:14:36.639160\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -208,29 +208,29 @@ msgstr ""
 msgid "Course has been successfully reindexed."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/course.py:646
+#: cms/djangoapps/contentstore/views/course.py:623
 msgid "Unscheduled"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/course.py:808
+#: cms/djangoapps/contentstore/views/course.py:785
 msgid ""
 "Special characters not allowed in organization, course number, and course "
 "run."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/course.py:844
+#: cms/djangoapps/contentstore/views/course.py:821
 msgid ""
 "There is already a course defined with the same organization and course "
 "number. Please change either organization or course number to be unique."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/course.py:849
-#: cms/djangoapps/contentstore/views/course.py:852
+#: cms/djangoapps/contentstore/views/course.py:826
+#: cms/djangoapps/contentstore/views/course.py:829
 msgid ""
 "Please change either the organization or course number so that it is unique."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/course.py:857
+#: cms/djangoapps/contentstore/views/course.py:834
 #, python-brace-format
 msgid ""
 "Unable to create course '{name}'.\n"
@@ -238,30 +238,30 @@ msgid ""
 "{err}"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/course.py:870
+#: cms/djangoapps/contentstore/views/course.py:847
 msgid ""
 "You must link this course to an organization in order to continue. "
 "Organization you selected does not exist in the system, you will need to add"
 " it to the system"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/course.py:1141
+#: cms/djangoapps/contentstore/views/course.py:1118
 msgid "Invalid prerequisite course key"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/course.py:1329
+#: cms/djangoapps/contentstore/views/course.py:1306
 msgid "An error occurred while trying to save your tabs"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/course.py:1330
+#: cms/djangoapps/contentstore/views/course.py:1307
 msgid "Tabs Exception"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/course.py:1554
+#: cms/djangoapps/contentstore/views/course.py:1531
 msgid "This group configuration is in use and cannot be deleted."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/course.py:1568
+#: cms/djangoapps/contentstore/views/course.py:1545
 msgid "This content group is in use and cannot be deleted."
 msgstr ""
 
@@ -659,6 +659,6 @@ msgstr ""
 msgid "Dictionary with the available tags"
 msgstr ""
 
-#: cms/urls.py:12
+#: cms/urls.py:17
 msgid "Studio Administration"
 msgstr ""
