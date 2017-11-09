@@ -66,6 +66,12 @@ urlpatterns = [
     # Event tracking endpoints
     url(r'', include('track.urls')),
 
+    # Content endpoints
+    url(
+        r'api/block_structure/v1/',
+        include('openedx.core.djangoapps.content.block_structure.urls')
+    ),
+
     # Performance endpoints
     url(r'', include('openedx.core.djangoapps.performance.urls')),
 

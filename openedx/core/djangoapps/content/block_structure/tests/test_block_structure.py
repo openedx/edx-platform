@@ -1,7 +1,12 @@
+#-*- coding: utf-8 -*-
 """
 Tests for block_structure.py
 """
 # pylint: disable=protected-access
+import json
+import requests
+from datetime import datetime, timedelta
+
 from collections import namedtuple
 from copy import deepcopy
 import ddt
@@ -9,11 +14,71 @@ import itertools
 from nose.plugins.attrib import attr
 from unittest import TestCase
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.graph_traversals import traverse_post_order
 
 from ..block_structure import BlockStructure, BlockStructureModulestoreData
 from ..exceptions import TransformerException
 from .helpers import MockXBlock, MockTransformer, ChildrenMapTestMixin
+from ..views import ClearCoursesCacheView
+
+from student.tests.factories import UserFactory
+from provider.oauth2.models import Client, Grant
+from oauth2_provider import models as dot_models
+from provider.constants import CONFIDENTIAL
+from rest_framework import status
+from rest_framework.test import \
+    APIRequestFactory, APITestCase, force_authenticate
+
+from django.core.urlresolvers import reverse
+
+
+@skip_unless_lms
+@attr(shard=2)
+@ddt.ddt
+class TestBlockStuctureAPI(APITestCase):
+    """
+    Tests for BlockStructure
+    """
+
+    USERNAME = "dondraper"
+    EMAIL = "dondraper@madmen.com"
+    PASSWORD = "adamwhitman"
+
+    def setUp(self):
+        """
+        Start the stub server.
+        """
+        super(TestBlockStuctureAPI, self).setUp()
+
+        self.view = ClearCoursesCacheView.as_view()
+        self.request_factory = APIRequestFactory()
+        self.staff = UserFactory.create(
+            username=self.USERNAME,
+            email=self.EMAIL,
+            password=self.PASSWORD,
+            is_staff=True,
+        )
+
+        self.url = reverse('clear-courses-cache')
+
+    @ddt.data(
+        ({'courses_id': ['course-v1:edX+DemoX+Demo_Course']}, status.HTTP_200_OK),
+        ({'courses_id': []}, status.HTTP_400_BAD_REQUEST),
+        ({}, status.HTTP_400_BAD_REQUEST),
+    )
+    @ddt.unpack
+    def test_courses_clear_cache(self, data, expected_status):
+        request =\
+            self.request_factory.post(
+                self.url,
+                data=json.dumps(data),
+                content_type='application/json'
+            )
+
+        force_authenticate(request, user=self.staff)
+        response = self.view(request)
+        self.assertEqual(response.status_code, expected_status)
 
 
 @attr(shard=2)
