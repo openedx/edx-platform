@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-02 09:35+0000\n"
-"PO-Revision-Date: 2017-11-02 09:35:50.719930\n"
+"POT-Creation-Date: 2017-11-09 10:51+0000\n"
+"PO-Revision-Date: 2017-11-09 10:51:48.171308\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2599,11 +2599,10 @@ msgstr ""
 #. the placeholders.
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
-msgid ""
-"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
+msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
 msgstr ""
-"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li> "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+"{previous_hints}{list_start_tag}{strong_text}{hint_text}</li> Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт α#"
 
 #. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
@@ -6989,6 +6988,28 @@ msgstr "Prögréss Ⱡ'σяєм ιρѕυм ∂#"
 msgid "Textbooks"
 msgstr "Téxtßööks Ⱡ'σяєм ιρѕυм ∂σł#"
 
+#: lms/djangoapps/courseware/views/index.py
+#, python-brace-format
+msgid ""
+"You are not signed in. To see additional course content, {sign_in_link} or "
+"{register_link}, and enroll in this course."
+msgstr ""
+"Ýöü äré nöt sïgnéd ïn. Tö séé äddïtïönäl çöürsé çöntént, {sign_in_link} ör "
+"{register_link}, änd énröll ïn thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/djangoapps/courseware/views/index.py
+#: lms/djangoapps/courseware/views/views.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "sign in"
+msgstr "sïgn ïn Ⱡ'σяєм ιρѕυм #"
+
+#: lms/djangoapps/courseware/views/index.py
+#: lms/djangoapps/courseware/views/views.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/features/course_experience/views/course_home_messages.py
+msgid "register"
+msgstr "régïstér Ⱡ'σяєм ιρѕυм ∂#"
+
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your enrollment: Audit track"
 msgstr "Ýöür énröllmént: Àüdït träçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
@@ -7066,15 +7087,6 @@ msgid "To see course content, {sign_in_link} or {register_link}."
 msgstr ""
 "Tö séé çöürsé çöntént, {sign_in_link} ör {register_link}. Ⱡ'σяєм ιρѕυм ∂σłσя"
 " ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "sign in"
-msgstr "sïgn ïn Ⱡ'σяєм ιρѕυм #"
-
-#: lms/djangoapps/courseware/views/views.py
-#: openedx/features/course_experience/views/course_home_messages.py
-msgid "register"
-msgstr "régïstér Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
@@ -7484,6 +7496,39 @@ msgstr "rölé Ⱡ'σяєм ι#"
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "full_name"
 msgstr "füll_nämé Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.html
+#, python-format
+msgid "Hi %(thread_username)s"
+msgstr "Hï %(thread_username)s Ⱡ'σяєм ιρѕυ#"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.html
+#, python-format
+msgid ""
+"<h1> Hi %(thread_username)s, </h1> <p> %(comment_username)s made the "
+"following reply to %(thread_title)s at %(comment_created_at)s. </p> <p> "
+"%(comment_body)s </p> <p> <a href=\"%(post_link)s\"> View the "
+"discussion.</a> </p>"
+msgstr ""
+"<h1> Hï %(thread_username)s, </h1> <p> %(comment_username)s mädé thé "
+"föllöwïng réplý tö %(thread_title)s ät %(comment_created_at)s. </p> <p> "
+"%(comment_body)s </p> <p> <a href=\"%(post_link)s\"> Vïéw thé "
+"dïsçüssïön.</a> </p> Ⱡ'σяєм ιρѕυ#"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.txt
+msgid "This is the reply to your thread:"
+msgstr ""
+"Thïs ïs thé réplý tö ýöür thréäd: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/subject.txt
+#, python-format
+msgid ""
+"\n"
+"Someone replied to your thread on %(platform_name)s\n"
+msgstr ""
+"\n"
+"Söméöné réplïéd tö ýöür thréäd ön %(platform_name)s\n"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#\n"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -12141,23 +12186,36 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 #, python-format
-msgid "Welcome to week %(week_num)s of our %(course_name)s course!"
+msgid "Welcome to week %(week_num)s of %(course_name)s!"
 msgstr ""
-"Wélçömé tö wéék %(week_num)s öf öür %(course_name)s çöürsé! Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+"Wélçömé tö wéék %(week_num)s öf %(course_name)s! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 #, python-format
-msgid "Welcome to week %(week_num)s of <strong>%(course_name)s</strong>!"
+msgid ""
+"We hope you're enjoying <strong>%(course_name)s</strong>! We want to let you"
+" know what you can look forward to in week %(week_num)s:"
 msgstr ""
-"Wélçömé tö wéék %(week_num)s öf <strong>%(course_name)s</strong>! Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+"Wé höpé ýöü'ré énjöýïng <strong>%(course_name)s</strong>! Wé wänt tö lét ýöü"
+" knöw whät ýöü çän löök förwärd tö ïn wéék %(week_num)s: Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
-msgid "Here is what you can look forward to learning this week:"
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt
+msgid ""
+"With self-paced courses, you learn on your own schedule. We encourage you to"
+" spend time with the course each week. Your focused attention will pay off "
+"in the end!"
 msgstr ""
-"Héré ïs whät ýöü çän löök förwärd tö léärnïng thïs wéék: Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Wïth sélf-päçéd çöürsés, ýöü léärn ön ýöür öwn sçhédülé. Wé énçöürägé ýöü tö"
+" spénd tïmé wïth thé çöürsé éäçh wéék. Ýöür föçüséd ätténtïön wïll päý öff "
+"ïn thé énd! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
+"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
+"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
+"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
+"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕ#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 msgid "Resume your course now"
@@ -12166,18 +12224,16 @@ msgstr "Résümé ýöür çöürsé nöw Ⱡ'σяєм ιρѕυм ∂σłσя ѕ
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt
 #, python-format
 msgid ""
-"Welcome to week %(week_num)s of our %(course_name)s course! Here is what you"
-" can look forward to learning this week:"
+"We hope you're enjoying %(course_name)s! We want to let you know what you "
+"can look forward to in week %(week_num)s:"
 msgstr ""
-"Wélçömé tö wéék %(week_num)s öf öür %(course_name)s çöürsé! Héré ïs whät ýöü"
-" çän löök förwärd tö léärnïng thïs wéék: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+"Wé höpé ýöü'ré énjöýïng %(course_name)s! Wé wänt tö lét ýöü knöw whät ýöü "
+"çän löök förwärd tö ïn wéék %(week_num)s: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/subject.txt
 #, python-format
-msgid "%(course_name)s - Welcome to Week %(week_num)s "
-msgstr ""
-"%(course_name)s - Wélçömé tö Wéék %(week_num)s  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕ#"
+msgid "Welcome to week %(week_num)s "
+msgstr "Wélçömé tö wéék %(week_num)s  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #, python-format
@@ -12985,6 +13041,15 @@ msgstr ""
 "À süßçätégörý nämé för thé dïsçüssïön. Thïs nämé äppéärs ïn thé léft päné öf"
 " thé dïsçüssïön förüm för thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#, python-brace-format
+msgid ""
+"You are not signed in. To view the discussion content, {sign_in_link} or "
+"{register_link}, and enroll in this course."
+msgstr ""
+"Ýöü äré nöt sïgnéd ïn. Tö vïéw thé dïsçüssïön çöntént, {sign_in_link} ör "
+"{register_link}, änd énröll ïn thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
 #: openedx/features/course_bookmarks/plugins.py
 #: openedx/features/course_bookmarks/views/course_bookmarks.py
 #: lms/templates/courseware/courseware.html
@@ -13013,7 +13078,6 @@ msgstr ""
 #: openedx/features/course_experience/views/course_home_messages.py
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
@@ -13953,7 +14017,6 @@ msgstr "Çöürsé Nümßér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Courses"
 msgstr "Çöürsés Ⱡ'σяєм ιρѕυм #"
@@ -14063,7 +14126,6 @@ msgstr "Çhöösé Längüägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
 #: lms/templates/header/user_dropdown.html
-#: themes/edx.org/lms/templates/legacy_header.html
 msgid "Account"
 msgstr "Àççöünt Ⱡ'σяєм ιρѕυм #"
 
@@ -14072,7 +14134,6 @@ msgstr "Àççöünt Ⱡ'σяєм ιρѕυм #"
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/static_templates/help.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 #: wiki/plugins/help/wiki_plugin.py
 msgid "Help"
@@ -15263,7 +15324,6 @@ msgstr ""
 #: lms/templates/register-form.html
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
@@ -15803,6 +15863,11 @@ msgstr "Däshßöärd för: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #: lms/templates/user_dropdown.html
 msgid "More options"
 msgstr "Möré öptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/user_dropdown.html lms/templates/header/header.html
+#: lms/templates/header/user_dropdown.html
+msgid "More Options"
+msgstr "Möré Öptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -19984,12 +20049,11 @@ msgstr "Àpplý för Fïnänçïäl Àssïstänçé Ⱡ'σяєм ιρѕυм ∂�
 msgid "{platform_name} Home Page"
 msgstr "{platform_name} Hömé Pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
-#: lms/templates/header/header.html lms/templates/navigation/navigation.html
-msgid "Global"
-msgstr "Glößäl Ⱡ'σяєм ιρѕυ#"
+#: lms/templates/header/header.html lms/templates/header/user_dropdown.html
+msgid "Options Menu"
+msgstr "Öptïöns Ménü Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/header/header.html lms/templates/navigation/navigation.html
-#: themes/edx.org/lms/templates/legacy_header.html
 msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
@@ -20002,7 +20066,6 @@ msgstr ""
 #: lms/templates/learner_dashboard/programs.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Programs"
 msgstr "Prögräms Ⱡ'σяєм ιρѕυм ∂#"
@@ -20010,7 +20073,6 @@ msgstr "Prögräms Ⱡ'σяєм ιρѕυм ∂#"
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Profile"
 msgstr "Pröfïlé Ⱡ'σяєм ιρѕυм #"
@@ -20030,14 +20092,16 @@ msgstr "Sýsädmïn Ⱡ'σяєм ιρѕυм ∂#"
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Shopping Cart"
 msgstr "Shöppïng Çärt Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/header/navbar-not-authenticated.html
+msgid "Supplemental Links"
+msgstr "Süppléméntäl Lïnks Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "How it Works"
 msgstr "Höw ït Wörks Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -22091,6 +22155,10 @@ msgstr ""
 msgid "Explore Courses"
 msgstr "Éxplöré Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
+#: lms/templates/navigation/navigation.html
+msgid "Global"
+msgstr "Glößäl Ⱡ'σяєм ιρѕυ#"
+
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""
 "\n"
@@ -23026,8 +23094,8 @@ msgid "Student Support: Certificates"
 msgstr "Stüdént Süppört: Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/support/contact_us.html
-msgid "Contact US"
-msgstr "Çöntäçt ÛS Ⱡ'σяєм ιρѕυм ∂σłσ#"
+msgid "{platform_name} Support: Contact Us"
+msgstr "{platform_name} Süppört: Çöntäçt Ûs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/support/enrollment.html
 msgid "Student Support: Enrollment"
@@ -23570,20 +23638,6 @@ msgstr ""
 "νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт#"
 
-#: themes/edx.org/lms/templates/legacy_header.html
-msgid "Main"
-msgstr "Mäïn Ⱡ'σяєм ι#"
-
-#: themes/edx.org/lms/templates/legacy_header.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Find Courses"
-msgstr "Fïnd Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: themes/edx.org/lms/templates/legacy_header.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Schools & Partners"
-msgstr "Sçhööls & Pärtnérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid "About edX Verified Certificates"
 msgstr "Àßöüt édX Vérïfïéd Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
@@ -23693,6 +23747,14 @@ msgid ""
 msgstr ""
 "{b_start}Süppört öür Mïssïön: {b_end} ÉdX, ä nön-pröfït, rélïés ön vérïfïéd "
 "çértïfïçätés tö hélp fünd fréé édüçätïön för évérýöné glößällý Ⱡ'σя#"
+
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Find Courses"
+msgstr "Fïnd Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Schools & Partners"
+msgstr "Sçhööls & Pärtnérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
