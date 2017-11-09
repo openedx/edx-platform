@@ -7,6 +7,8 @@ from cStringIO import StringIO
 from datetime import datetime, timedelta
 import dateutil.parser
 
+from django.conf import settings
+
 import requests
 from lazy import lazy
 from lxml import etree
@@ -31,6 +33,8 @@ _ = lambda text: text
 CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
 CATALOG_VISIBILITY_ABOUT = "about"
 CATALOG_VISIBILITY_NONE = "none"
+
+ENABLE_HTML_DISPLAY_NAME = settings.FEATURES.get('ENABLE_HTML_DISPLAY_NAME', False)
 
 
 class StringOrDate(Date):
@@ -864,6 +868,15 @@ class CourseFields(object):
             "more of the base requirements, such as testing, accessibility, internationalization, and documentation."
         ),
         scope=Scope.settings, default=False
+    )
+    enable_html_display_name = Boolean(
+        display_name=_("Show display name on all HTML components"),
+        help=_(
+            "By default the HTML components will not show the display name to "
+            "be backwards compatible."
+        ),
+        scope=Scope.settings,
+        default=ENABLE_HTML_DISPLAY_NAME
     )
 
 

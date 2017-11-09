@@ -17,19 +17,33 @@ from xblock.fragment import Fragment
 
 import dogstats_wrapper as dog_stats_api
 from xmodule.contentstore.content import StaticContent
+from xmodule.course_module import CourseDescriptor
 from xmodule.editing_module import EditingDescriptor
 from xmodule.edxnotes_utils import edxnotes
 from xmodule.html_checker import check_html
+from xmodule.modulestore.django import modulestore
 from xmodule.stringify import stringify_children
 from xmodule.util.misc import escape_html_characters
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
+
+from openedx.core.djangoapps.content.course_overviews.models import\
+    CourseOverview
 
 log = logging.getLogger("edx.courseware")
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
+
+
+def get_course_descriptor(course_id):
+    store = modulestore()
+    with store.bulk_operations(course_id):
+        course_descriptor = store.get_course(course_id)
+        if isinstance(course_descriptor, CourseDescriptor):
+            return course_descriptor
+    return None
 
 
 class HtmlBlock(object):
@@ -45,6 +59,12 @@ class HtmlBlock(object):
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
         default=_("Text")
+    )
+    show_display_name = Boolean(
+        display_name=_("Show Display Name"),
+        help=_("Show display name on html"),
+        default=False,
+        scope=Scope.settings
     )
     data = String(help=_("Html contents to display for this module"), default=u"", scope=Scope.content)
     source_code = String(
@@ -97,9 +117,26 @@ class HtmlBlock(object):
         # When we switch this to an XBlock, we can merge this with student_view,
         # but for now the XModule mixin requires that this method be defined.
         # pylint: disable=no-member
-        if self.data is not None and getattr(self.system, 'anonymous_student_id', None) is not None:
-            return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
-        return self.data
+
+        # Get the course descriptor to get enable_html_display_name value and
+        # decide to override or not
+        course_id = self.scope_ids.usage_id.course_key
+        override_show_display_name = False
+        course_descriptor = get_course_descriptor(course_id)
+        if course_descriptor and course_descriptor.enable_html_display_name:
+            override_show_display_name = True
+
+        data = self.data
+        display_name = self.display_name
+        if data is not None:
+            if override_show_display_name or self.show_display_name:
+                data = "<h3> %s </h3> %s" % (display_name, data)
+
+            if getattr(self.system, 'anonymous_student_id', None) is not None:
+                anonymous_student_id = self.system.anonymous_student_id
+                return data.replace("%%USER_ID%%", anonymous_student_id)
+
+        return data
 
 
 class HtmlModuleMixin(HtmlBlock, XModule):
@@ -195,6 +232,17 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
             'enable_latex_compiler': self.use_latex_compiler,
             'editor': self.editor
         })
+
+        # Get the course descriptor to get enable_html_display_name value and
+        # decide to override or not
+        course_id = self.scope_ids.usage_id.course_key
+        course_descriptor = get_course_descriptor(course_id)
+        if course_descriptor and course_descriptor.enable_html_display_name:
+            editable_metadata_fields = _context["editable_metadata_fields"]
+            show_display_name = editable_metadata_fields["show_display_name"]
+            show_display_name["explicitly_set"] = True
+            show_display_name["value"] = True
+
         return _context
 
     # NOTE: html descriptors are special.  We do not want to parse and

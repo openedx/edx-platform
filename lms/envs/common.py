@@ -2527,6 +2527,10 @@ if FEATURES.get('CLASS_DASHBOARD'):
 ENABLE_CREDIT_ELIGIBILITY = True
 FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
 
+################ Enable display name in HTML components ####################
+ENABLE_HTML_DISPLAY_NAME = False
+FEATURES['ENABLE_HTML_DISPLAY_NAME'] = ENABLE_HTML_DISPLAY_NAME
+
 ######################## CAS authentication ###########################
 
 if FEATURES.get('AUTH_USE_CAS'):
