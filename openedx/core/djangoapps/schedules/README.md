@@ -21,18 +21,26 @@ Weekly Course Highlight Messages tell learners what to look forward to in a
 coming week of a course. The app generates messages with instructor-supplied
 "section highlights" in the body of the message.
 
-The app measures a learner's progress in a "Schedule" Django object. A Schedule
-stores the day a learner enrolls in a course and the learner's "upgrade
-deadline" (the date before which they can purchase a verified certificate). The
-app coordinates its messaging to learners through their Schedules. 
+The app measures a learner's progress with a "Schedule" Django object. The app
+assigns Schedules to learners and coordinates its messaging with their
+Schedules. 
 
-## Definitions
+## Glossary
 
-* Schedule
+* Schedule 
+Stores the day a learner enrolls in a course and the
+learner's "upgrade deadline" 
+
 * Schedule Experience
-* Upgrade Deadline
-    - May either mean the soft upgrade deadline on the Schedule model or the
-      hard experation date for upgrading on the course.
+
+* Upgrade Deadline 
+
+The date before which a learner can purchase a verified certificate. A Schedule
+imposes a "soft" upgrade deadline 21 days from when a learner enrolled in a
+course. A self-paced course imposes a "hard" upgrade deadline that is the
+course-wide expiration date for upgrading on the course. A learner's Schedule
+will use whichever date is earlier.
+
 * Recurring Nudge
 * Upgrade Reminder
 * Course Update
