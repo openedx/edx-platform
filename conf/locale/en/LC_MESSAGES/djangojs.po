@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-02 09:29+0000\n"
-"PO-Revision-Date: 2017-11-02 09:35:50.998146\n"
+"POT-Creation-Date: 2017-11-09 10:45+0000\n"
+"PO-Revision-Date: 2017-11-09 10:51:48.453681\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5556,10 +5556,8 @@ msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid ""
-"The highlights you provide here are messaged (i.e., emailed) to learners. "
-"Each {item}'s highlights are emailed at the time that we expect the learner "
-"to start working on that {item}. At this time, we assume that each {item} "
-"will take 1 week to complete."
+"Enter 3-5 highlights to include in the email message that learners receive "
+"for this section (250 character limit)."
 msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -6955,6 +6953,10 @@ msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
 msgstr ""
 
 #: lms/templates/discovery/course_card.underscore
@@ -9045,9 +9047,7 @@ msgid "delete group"
 msgstr ""
 
 #: cms/templates/js/highlights-editor.underscore
-msgid ""
-"Please enter 3-5 highlights to be sent as separate bullet points in the "
-"message."
+msgid "Highlight {highlight_index}"
 msgstr ""
 
 #: cms/templates/js/highlights-editor.underscore

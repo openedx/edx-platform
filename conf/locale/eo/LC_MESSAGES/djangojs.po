@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-02 09:29+0000\n"
-"PO-Revision-Date: 2017-11-02 09:35:50.998146\n"
+"POT-Creation-Date: 2017-11-09 10:45+0000\n"
+"PO-Revision-Date: 2017-11-09 10:51:48.453681\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -6669,19 +6669,11 @@ msgstr "Hïghlïghts för {display_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ�
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid ""
-"The highlights you provide here are messaged (i.e., emailed) to learners. "
-"Each {item}'s highlights are emailed at the time that we expect the learner "
-"to start working on that {item}. At this time, we assume that each {item} "
-"will take 1 week to complete."
+"Enter 3-5 highlights to include in the email message that learners receive "
+"for this section (250 character limit)."
 msgstr ""
-"Thé hïghlïghts ýöü prövïdé héré äré méssägéd (ï.é., émäïléd) tö léärnérs. "
-"Éäçh {item}'s hïghlïghts äré émäïléd ät thé tïmé thät wé éxpéçt thé léärnér "
-"tö stärt wörkïng ön thät {item}. Àt thïs tïmé, wé ässümé thät éäçh {item} "
-"wïll täké 1 wéék tö çömplété. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє#"
+"Éntér 3-5 hïghlïghts tö ïnçlüdé ïn thé émäïl méssägé thät léärnérs réçéïvé "
+"för thïs séçtïön (250 çhäräçtér lïmït). Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "All Learners and Staff"
@@ -8251,6 +8243,10 @@ msgstr ""
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
 msgstr "Énd Mý Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
+msgstr "Hïdé Tïmér Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -10771,12 +10767,8 @@ msgid "delete group"
 msgstr "délété gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/js/highlights-editor.underscore
-msgid ""
-"Please enter 3-5 highlights to be sent as separate bullet points in the "
-"message."
-msgstr ""
-"Pléäsé éntér 3-5 hïghlïghts tö ßé sént äs sépäräté ßüllét pöïnts ïn thé "
-"méssägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+msgid "Highlight {highlight_index}"
+msgstr "Hïghlïght {highlight_index} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: cms/templates/js/highlights-editor.underscore
 msgid "A highlight to look forward to this week."
