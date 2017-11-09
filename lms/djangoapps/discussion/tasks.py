@@ -101,10 +101,9 @@ def _get_course_language(course_id):
 
 
 def _build_message_context(context):
-    message_context = get_base_template_context(Site.objects.get(id=context['site_id']))
+    message_context = get_base_template_context(context['site'])
     message_context.update(_deserialize_context_dates(context))
     message_context['post_link'] = _get_thread_url(context)
-    message_context['ga_tracking_pixel_url'] = _generate_ga_pixel_url(context)
     return message_context
 
 
@@ -122,25 +121,3 @@ def _get_thread_url(context):
         'id': context['thread_id'],
     }
     return urljoin(context['site'].domain, permalink(thread_content))
-
-
-def _generate_ga_pixel_url(context):
-    # used for analytics
-    query_params = {
-        'v': '1',  # version, required for GA
-        't': 'event',  #
-        'ec': 'email',  # event category
-        'ea': 'edx.bi.email.opened',  # event action: in this case, the user opened the email
-        'tid': get_value("GOOGLE_ANALYTICS_TRACKING_ID", getattr(settings, "GOOGLE_ANALYTICS_TRACKING_ID", None)),  # tracking ID to associate this link with our GA instance
-        'uid': context['thread_author_id'],
-        'cs': 'sailthru',  # Campaign source - what sent the email
-        'cm': 'email',  # Campaign medium - how the content is being delivered
-        'cn': 'triggered_discussionnotification',  # Campaign name - human-readable name for this particular class of message
-        'dp': '/email/ace/discussions/responsenotification/{0}/'.format(context['course_id']),  # document path, used for drilling down into specific events
-        'dt': 'Reply to {0} at {1}'.format(context['thread_title'], context['comment_created_at']),  # document title, should match the title of the email
-    }
-
-    return u"{url}?{params}".format(
-        url="https://www.google-analytics.com/collect",
-        params=urlencode(query_params)
-    )

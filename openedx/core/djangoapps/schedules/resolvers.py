@@ -20,10 +20,7 @@ from openedx.core.djangoapps.schedules.content_highlights import get_week_highli
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleExperience
 from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
-from openedx.core.djangoapps.schedules.template_context import (
-    absolute_url,
-    get_base_template_context
-)
+from openedx.core.djangoapps.schedules.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 
@@ -247,9 +244,7 @@ class RecurringNudgeResolver(BinnedSchedulesBaseResolver):
         first_schedule = user_schedules[0]
         context = {
             'course_name': first_schedule.enrollment.course.display_name,
-            'course_url': absolute_url(
-                self.site, reverse('course_root', args=[str(first_schedule.enrollment.course_id)])
-            ),
+            'course_url': reverse('course_root', args=[str(first_schedule.enrollment.course_id)]),
         }
 
         # Information for including upsell messaging in template.
@@ -289,7 +284,7 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
             course_id_str = str(schedule.enrollment.course_id)
             course_id_strs.append(course_id_str)
             course_links.append({
-                'url': absolute_url(self.site, reverse('course_root', args=[course_id_str])),
+                'url': reverse('course_root', args=[course_id_str]),
                 'name': schedule.enrollment.course.display_name
             })
 
@@ -300,7 +295,7 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
         context = {
             'course_links': course_links,
             'first_course_name': first_schedule.enrollment.course.display_name,
-            'cert_image': absolute_url(self.site, static('course_experience/images/verified-cert.png')),
+            'cert_image': static('course_experience/images/verified-cert.png'),
             'course_ids': course_id_strs,
         }
         context.update(first_valid_upsell_context)
@@ -365,9 +360,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             course_id_str = str(enrollment.course_id)
             template_context.update({
                 'course_name': schedule.enrollment.course.display_name,
-                'course_url': absolute_url(
-                    self.site, reverse('course_root', args=[course_id_str])
-                ),
+                'course_url': reverse('course_root', args=[course_id_str]),
                 'week_num': week_num,
                 'week_highlights': week_highlights,
 

@@ -400,7 +400,9 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
             self.assertEqual(len(sent_messages), num_expected_messages)
 
             with self.assertNumQueries(NUM_QUERIES_PER_MESSAGE_DELIVERY):
-                self.deliver_task(*sent_messages[0])
+                with patch('analytics.track') as mock_analytics_track:
+                    self.deliver_task(*sent_messages[0])
+                    self.assertEqual(mock_analytics_track.call_count, 1)
 
             self.assertEqual(mock_channel.deliver.call_count, 1)
             for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
