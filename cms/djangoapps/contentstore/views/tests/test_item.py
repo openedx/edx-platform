@@ -2574,7 +2574,7 @@ class TestXBlockInfo(ItemTest):
 
     def test_highlights_enabled(self):
         chapter = modulestore().get_item(self.chapter.location)
-        with highlights_setting().override():
+        with highlights_setting.override():
             xblock_info = create_xblock_info(chapter)
             self.assertTrue(xblock_info['highlights_enabled'])
 
