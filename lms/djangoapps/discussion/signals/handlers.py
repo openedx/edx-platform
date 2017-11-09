@@ -3,6 +3,7 @@ Signal handlers related to discussions.
 """
 import logging
 
+from django.contrib.sites.models import Site
 from django.dispatch import receiver
 
 from django_comment_common import signals
@@ -28,6 +29,7 @@ def send_message(comment):
         'comment_author_id': comment.user_id,
         'comment_username': comment.username,
         'comment_created_at': comment.created_at,
+        'site_id': Site.objects.get_current().id,
         'thread_id': thread.id,
         'thread_title': thread.title,
         'thread_username': thread.username,
