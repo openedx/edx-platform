@@ -236,12 +236,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         getIntroductionMessage: function() {
-            return StringUtils.interpolate(
-                gettext(
-                  'Enter 3-5 highlights to include in the email message that learners receive for ' +
-                  'this section (250 character limit).'
-                )
-            );
+            return '';
         },
 
         callAnalytics: function(event) {
@@ -930,7 +925,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 {},
                 AbstractEditor.prototype.getContext.call(this),
                 {
-                    highlights: this.model.get('highlights') || []
+                    highlights: this.model.get('highlights'),
+                    highlights_preview_only: this.model.get('highlights_preview_only'),
+                    highlights_doc_url: this.model.get('highlights_doc_url')
                 }
             );
         }
