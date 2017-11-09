@@ -7,6 +7,7 @@
 
 ## Pages currently use v1 styling by default. Once the Pattern Library
 ## rollout has been completed, this default can be switched to v2.
+<%page expression_filter="h"/>
 <%! main_css = "style-main-v1" %>
 
 
@@ -175,6 +176,7 @@ from pipeline_mako import render_require_js_path_overrides
 % if not disable_window_wrap:
   <div class="window-wrap" dir="${static.dir_rtl()}">
 % endif
+    <%block name="skip_links"/>
     <a class="nav-skip sr-only sr-only-focusable" href="#main">${_("Skip to main content")}</a>
 
     % if not disable_header:

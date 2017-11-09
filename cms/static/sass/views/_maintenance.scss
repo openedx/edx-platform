@@ -83,4 +83,22 @@
       font-size: 15px;
     }
   }
+
+  .announcement-container {
+    width: 100%;
+    text-align: center;
+
+    .announcement-item {
+      display: inline-block;
+      max-width: 300px;
+      min-width: 300px;
+      margin: 15px;
+
+      .announcement-content {
+        background-color: $body-bg;
+        text-align: center;
+        padding: 22px 33px;
+      }
+    }
+  }
 }
