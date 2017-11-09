@@ -34,7 +34,10 @@ from openedx.core.djangoapps.user_api.api import (
     get_login_session_form,
     get_password_reset_form
 )
-from openedx.core.djangoapps.user_api.errors import UserNotFound
+from openedx.core.djangoapps.user_api.errors import (
+    UserNotFound,
+    UserAPIInternalError
+)
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
@@ -213,6 +216,10 @@ def password_change_request_handler(request):
             AUDIT_LOG.info("Invalid password reset attempt")
             # Increment the rate limit counter
             limiter.tick_bad_request_counter(request)
+        except UserAPIInternalError as err:
+            log.exception('Error occured during password change for user {email}: {error}'
+                          .format(email=email, error=err))
+            return HttpResponse(_("Some error occured during password change. Please try again"), status=500)
 
         return HttpResponse(status=200)
     else:
