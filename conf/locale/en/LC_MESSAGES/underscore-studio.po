@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-02 10:59+0000\n"
-"PO-Revision-Date: 2017-11-02 11:05:34.237548\n"
+"POT-Creation-Date: 2017-11-09 11:08+0000\n"
+"PO-Revision-Date: 2017-11-09 11:14:36.925402\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -869,13 +869,12 @@ msgstr ""
 msgid "delete group"
 msgstr ""
 
-#: cms/templates/js/highlights-editor.underscore:6
-msgid ""
-"Please enter 3-5 highlights to be sent as separate bullet points in the "
-"message."
+#: cms/templates/js/highlights-editor.underscore:11
+#: cms/templates/js/highlights-editor.underscore:24
+msgid "Highlight {highlight_index}"
 msgstr ""
 
-#: cms/templates/js/highlights-editor.underscore:22
+#: cms/templates/js/highlights-editor.underscore:30
 msgid "A highlight to look forward to this week."
 msgstr ""
 

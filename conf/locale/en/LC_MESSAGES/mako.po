@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-02 10:59+0000\n"
-"PO-Revision-Date: 2017-11-02 11:05:34.133492\n"
+"POT-Creation-Date: 2017-11-09 11:08+0000\n"
+"PO-Revision-Date: 2017-11-09 11:14:36.815384\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -92,7 +92,7 @@ msgstr ""
 msgid "Dismiss"
 msgstr ""
 
-#: cms/templates/course_outline.html:124 lms/templates/seq_module.html:62
+#: cms/templates/course_outline.html:124 lms/templates/seq_module.html:63
 #: lms/templates/ccx/schedule.html:86
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html:43
 msgid "Section"
@@ -106,7 +106,7 @@ msgstr ""
 #: cms/templates/group_configurations.html:89
 #: cms/templates/group_configurations.html:99
 #: cms/templates/group_configurations.html:108
-#: lms/templates/courseware/program_marketing.html:268
+#: lms/templates/courseware/program_marketing.html:287
 msgid "Learn More"
 msgstr ""
 
@@ -139,14 +139,12 @@ msgstr ""
 #: cms/templates/index.html:316 lms/templates/sysadmin_dashboard.html:59
 #: lms/templates/sysadmin_dashboard_gitlogs.html:116
 #: lms/templates/courseware/courses.html:31
-#: lms/templates/header/navbar-authenticated.html:24
+#: lms/templates/header/navbar-authenticated.html:23
 #: lms/templates/header/navbar-not-authenticated.html:29
 #: lms/templates/navigation/navbar-authenticated.html:22
 #: lms/templates/navigation/navbar-not-authenticated.html:20
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html:39
-#: themes/edx.org/lms/templates/legacy_header.html:82
-#: themes/edx.org/lms/templates/legacy_header.html:176
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html:37
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html:36
 msgid "Courses"
 msgstr ""
 
@@ -257,7 +255,7 @@ msgid "Course End Date"
 msgstr ""
 
 #: cms/templates/settings.html:504
-#: lms/templates/courseware/program_marketing.html:295
+#: lms/templates/courseware/program_marketing.html:316
 msgid "Instructors"
 msgstr ""
 
@@ -331,8 +329,8 @@ msgstr ""
 #: cms/templates/widgets/header.html:46 cms/templates/widgets/header.html:50
 #: cms/templates/widgets/header.html:81 cms/templates/widgets/header.html:149
 #: lms/templates/help_modal.html:173
-#: lms/templates/courseware/courseware.html:145
-#: lms/templates/courseware/courseware.html:159
+#: lms/templates/courseware/courseware.html:155
+#: lms/templates/courseware/courseware.html:169
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html:21
 msgid "Course"
 msgstr ""
@@ -343,7 +341,7 @@ msgstr ""
 msgid "Updates"
 msgstr ""
 
-#: cms/templates/widgets/header.html:198 lms/templates/header/header.html:99
+#: cms/templates/widgets/header.html:198 lms/templates/header/header.html:92
 #: lms/templates/navigation/navigation.html:94
 #: lms/templates/widgets/footer-language-selector.html:23
 msgid "Choose Language"
@@ -352,21 +350,17 @@ msgstr ""
 #: cms/templates/widgets/header.html:214 cms/templates/widgets/header.html:227
 #: lms/templates/user_dropdown.html:29 lms/templates/user_dropdown.html:37
 #: lms/templates/user_dropdown.html:55
-#: lms/templates/header/user_dropdown.html:37
-#: themes/edx.org/lms/templates/legacy_header.html:123
-#: themes/edx.org/lms/templates/legacy_header.html:218
+#: lms/templates/header/user_dropdown.html:36
 msgid "Account"
 msgstr ""
 
 #: cms/templates/widgets/header.html:218 cms/templates/widgets/header.html:231
-#: lms/templates/header/navbar-authenticated.html:61
+#: lms/templates/header/navbar-authenticated.html:60
 #: lms/templates/navigation/navbar-authenticated.html:55
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html:78
 #: lms/templates/static_templates/help.html:5
 #: lms/templates/static_templates/help.html:9
-#: themes/edx.org/lms/templates/legacy_header.html:116
-#: themes/edx.org/lms/templates/legacy_header.html:206
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html:65
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html:64
 msgid "Help"
 msgstr ""
 
@@ -449,7 +443,7 @@ msgstr ""
 #: cms/templates/widgets/user_dropdown.html:55
 #: lms/templates/user_dropdown.html:30 lms/templates/user_dropdown.html:38
 #: lms/templates/user_dropdown.html:57 lms/templates/user_dropdown.html:78
-#: lms/templates/header/user_dropdown.html:38
+#: lms/templates/header/user_dropdown.html:37
 msgid "Sign Out"
 msgstr ""
 
@@ -563,7 +557,7 @@ msgstr ""
 msgid "Hide Annotations"
 msgstr ""
 
-#: lms/templates/bookmark_button.html:13 lms/templates/seq_module.html:42
+#: lms/templates/bookmark_button.html:13 lms/templates/seq_module.html:43
 msgid "Bookmarked"
 msgstr ""
 
@@ -594,7 +588,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html:22 lms/templates/user_dropdown.html:28
 #: lms/templates/user_dropdown.html:36 lms/templates/user_dropdown.html:54
-#: lms/templates/header/user_dropdown.html:36
+#: lms/templates/header/user_dropdown.html:35
 #: themes/edx.org/lms/templates/dashboard.html:23
 msgid "Dashboard"
 msgstr ""
@@ -625,7 +619,7 @@ msgstr ""
 #: lms/templates/dashboard.html:180 lms/templates/index.html:33
 #: lms/templates/api_admin/catalogs/search.html:23
 #: lms/templates/courseware/courses.html:42
-#: lms/templates/courseware/courseware.html:133
+#: lms/templates/courseware/courseware.html:143
 #: lms/templates/edxnotes/edxnotes.html:39
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html:47
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html:41
@@ -636,7 +630,7 @@ msgid "Search"
 msgstr ""
 
 #: lms/templates/dashboard.html:183
-#: lms/templates/courseware/courseware.html:134
+#: lms/templates/courseware/courseware.html:144
 #: themes/edx.org/lms/templates/dashboard.html:179
 msgid "Clear search"
 msgstr ""
@@ -1533,10 +1527,6 @@ msgstr ""
 #: lms/templates/header/navbar-not-authenticated.html:57
 #: lms/templates/navigation/navbar-not-authenticated.html:38
 #: lms/templates/navigation/navbar-not-authenticated.html:42
-#: themes/edx.org/lms/templates/legacy_header.html:129
-#: themes/edx.org/lms/templates/legacy_header.html:133
-#: themes/edx.org/lms/templates/legacy_header.html:223
-#: themes/edx.org/lms/templates/legacy_header.html:227
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html:25
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html:33
 #: themes/stanford-style/lms/templates/register-form.html:264
@@ -1654,11 +1644,11 @@ msgid ""
 "{dashboard_link_start}return to your dashboard{link_end}."
 msgstr ""
 
-#: lms/templates/seq_module.html:18 lms/templates/seq_module.html:65
+#: lms/templates/seq_module.html:18 lms/templates/seq_module.html:66
 msgid "Previous"
 msgstr ""
 
-#: lms/templates/seq_module.html:21 lms/templates/seq_module.html:68
+#: lms/templates/seq_module.html:21 lms/templates/seq_module.html:69
 msgid "Next"
 msgstr ""
 
@@ -2038,6 +2028,11 @@ msgstr ""
 
 #: lms/templates/user_dropdown.html:73
 msgid "More options"
+msgstr ""
+
+#: lms/templates/user_dropdown.html:76 lms/templates/header/header.html:63
+#: lms/templates/header/user_dropdown.html:34
+msgid "More Options"
 msgstr ""
 
 #: lms/templates/using.html:4
@@ -3542,7 +3537,7 @@ msgid "{course_number} Courseware"
 msgstr ""
 
 #: lms/templates/courseware/courseware-chromeless.html:80
-#: lms/templates/courseware/courseware.html:244
+#: lms/templates/courseware/courseware.html:254
 msgid "Course Utilities"
 msgstr ""
 
@@ -3550,28 +3545,28 @@ msgstr ""
 msgid "Courseware"
 msgstr ""
 
-#: lms/templates/courseware/courseware.html:123
+#: lms/templates/courseware/courseware.html:133
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html:43
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html:50
 msgid "Bookmarks"
 msgstr ""
 
-#: lms/templates/courseware/courseware.html:130
+#: lms/templates/courseware/courseware.html:140
 msgid "Course Search"
 msgstr ""
 
-#: lms/templates/courseware/courseware.html:149
+#: lms/templates/courseware/courseware.html:159
 msgid "No content has been added to this course"
 msgstr ""
 
-#: lms/templates/courseware/courseware.html:193
+#: lms/templates/courseware/courseware.html:203
 #, python-format
 msgid ""
 "To access course materials, you must score {required_score}% or higher on "
 "this                     exam. Your current score is {current_score}%."
 msgstr ""
 
-#: lms/templates/courseware/courseware.html:211
+#: lms/templates/courseware/courseware.html:221
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr ""
 
@@ -3659,111 +3654,111 @@ msgstr ""
 msgid "Updates to Discussion Posts You Follow"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:78
+#: lms/templates/courseware/program_marketing.html:88
 msgid "Purchase the Program"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:82
+#: lms/templates/courseware/program_marketing.html:92
 msgid "Start Learning"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:90
+#: lms/templates/courseware/program_marketing.html:100
 msgid "Play"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:93
+#: lms/templates/courseware/program_marketing.html:103
 msgid "YouTube Video"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:104
+#: lms/templates/courseware/program_marketing.html:115
 #: lms/templates/shoppingcart/billing_details.html:59
 #: lms/templates/shoppingcart/shopping_cart.html:205
 msgid "View Courses"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:107
+#: lms/templates/courseware/program_marketing.html:120
 msgid "Meet the Instructors"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:110
+#: lms/templates/courseware/program_marketing.html:125
 msgid "Frequenty Asked Questions"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:126
+#: lms/templates/courseware/program_marketing.html:142
 msgid "Job Outlook"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:138
+#: lms/templates/courseware/program_marketing.html:154
 msgid "Real Career Impact"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:155
+#: lms/templates/courseware/program_marketing.html:173
 msgid "What You'll Learn"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:171
+#: lms/templates/courseware/program_marketing.html:189
 msgid "Average Length"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:174
+#: lms/templates/courseware/program_marketing.html:192
 msgid "{weeks_to_complete} weeks per course"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:182
+#: lms/templates/courseware/program_marketing.html:200
 msgid "Effort"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:185
+#: lms/templates/courseware/program_marketing.html:203
 msgid ""
 "{min_hours_effort_per_week}-{max_hours_effort_per_week} hours per week, per "
 "course"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:194
+#: lms/templates/courseware/program_marketing.html:212
 msgid "Number of Courses"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:197
+#: lms/templates/courseware/program_marketing.html:215
 msgid "{number_of_courses} courses in program"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:205
+#: lms/templates/courseware/program_marketing.html:223
 msgid "Price (USD)"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:210
+#: lms/templates/courseware/program_marketing.html:228
 msgid "Original Price"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:211
+#: lms/templates/courseware/program_marketing.html:229
 msgid "${oldPrice}"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:215
+#: lms/templates/courseware/program_marketing.html:233
 msgid "Discounted Price"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:216
+#: lms/templates/courseware/program_marketing.html:234
 msgid "${newPrice}{htmlEnd} for entire program"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:221
+#: lms/templates/courseware/program_marketing.html:239
 msgid "You save ${discount_value} {currency}"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:229
+#: lms/templates/courseware/program_marketing.html:247
 msgid "${full_program_price} for entire program"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:245
+#: lms/templates/courseware/program_marketing.html:264
 msgid "Courses in the {}"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:273
+#: lms/templates/courseware/program_marketing.html:292
 msgid "Starts on {}"
 msgstr ""
 
-#: lms/templates/courseware/program_marketing.html:314
+#: lms/templates/courseware/program_marketing.html:336
 msgid "Frequently Asked Questions"
 msgstr ""
 
@@ -4440,11 +4435,11 @@ msgstr ""
 msgid "Results:"
 msgstr ""
 
-#: lms/templates/discussion/_discussion_inline.html:18
+#: lms/templates/discussion/_discussion_inline.html:27
 msgid "Topic:"
 msgstr ""
 
-#: lms/templates/discussion/_discussion_inline.html:25
+#: lms/templates/discussion/_discussion_inline.html:36
 msgid "Show Discussion"
 msgstr ""
 
@@ -5288,64 +5283,59 @@ msgstr ""
 msgid "{platform_name} Home Page"
 msgstr ""
 
-#: lms/templates/header/header.html:80
-#: lms/templates/navigation/navigation.html:75
-msgid "Global"
+#: lms/templates/header/header.html:51
+#: lms/templates/header/user_dropdown.html:31
+msgid "Options Menu"
 msgstr ""
 
-#: lms/templates/header/header.html:120
+#: lms/templates/header/header.html:68
 #: lms/templates/navigation/navigation.html:115
-#: themes/edx.org/lms/templates/legacy_header.html:248
 msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
 msgstr ""
 
-#: lms/templates/header/navbar-authenticated.html:30
-#: lms/templates/learner_dashboard/programs.html:25
+#: lms/templates/header/navbar-authenticated.html:29
+#: lms/templates/learner_dashboard/programs.html:12
 #: lms/templates/navigation/navbar-authenticated.html:28
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html:45
-#: themes/edx.org/lms/templates/legacy_header.html:88
-#: themes/edx.org/lms/templates/legacy_header.html:182
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html:43
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html:42
 msgid "Programs"
 msgstr ""
 
-#: lms/templates/header/navbar-authenticated.html:36
+#: lms/templates/header/navbar-authenticated.html:35
 #: lms/templates/navigation/navbar-authenticated.html:38
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html:55
-#: themes/edx.org/lms/templates/legacy_header.html:98
-#: themes/edx.org/lms/templates/legacy_header.html:192
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html:49
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html:48
 msgid "Profile"
 msgstr ""
 
-#: lms/templates/header/navbar-authenticated.html:42
+#: lms/templates/header/navbar-authenticated.html:41
 msgid "Discover New"
 msgstr ""
 
 #. Translators: This is short for "System administration".
-#: lms/templates/header/navbar-authenticated.html:48
+#: lms/templates/header/navbar-authenticated.html:47
 #: lms/templates/navigation/navbar-authenticated.html:45
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html:63
 msgid "Sysadmin"
 msgstr ""
 
-#: lms/templates/header/navbar-authenticated.html:56
+#: lms/templates/header/navbar-authenticated.html:55
 #: lms/templates/navigation/navbar-authenticated.html:61
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html:71
 #: lms/templates/shoppingcart/shopping_cart.html:46
-#: themes/edx.org/lms/templates/legacy_header.html:109
-#: themes/edx.org/lms/templates/legacy_header.html:212
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html:60
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html:59
 msgid "Shopping Cart"
+msgstr ""
+
+#: lms/templates/header/navbar-not-authenticated.html:21
+msgid "Supplemental Links"
 msgstr ""
 
 #: lms/templates/header/navbar-not-authenticated.html:25
 #: lms/templates/navigation/navbar-not-authenticated.html:16
-#: themes/edx.org/lms/templates/legacy_header.html:70
-#: themes/edx.org/lms/templates/legacy_header.html:163
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html:25
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html:24
 msgid "How it Works"
 msgstr ""
 
@@ -5358,10 +5348,7 @@ msgstr ""
 #: lms/templates/header/navbar-not-authenticated.html:61
 #: lms/templates/navigation/navbar-not-authenticated.html:54
 #: lms/templates/navigation/navbar-not-authenticated.html:56
-#: themes/edx.org/lms/templates/legacy_header.html:140
-#: themes/edx.org/lms/templates/legacy_header.html:142
-#: themes/edx.org/lms/templates/legacy_header.html:234
-#: themes/edx.org/lms/templates/legacy_header.html:236
+#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html:19
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html:28
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html:37
 msgid "Sign in"
@@ -7046,6 +7033,10 @@ msgstr ""
 msgid "Explore Courses"
 msgstr ""
 
+#: lms/templates/navigation/navigation.html:75
+msgid "Global"
+msgstr ""
+
 #: lms/templates/peer_grading/peer_grading.html:3
 msgid ""
 "\n"
@@ -7897,8 +7888,8 @@ msgstr ""
 msgid "Student Support: Certificates"
 msgstr ""
 
-#: lms/templates/support/contact_us.html:14
-msgid "Contact US"
+#: lms/templates/support/contact_us.html:16
+msgid "{platform_name} Support: Contact Us"
 msgstr ""
 
 #: lms/templates/support/enrollment.html:26
@@ -8378,23 +8369,6 @@ msgid ""
 "of edX Inc."
 msgstr ""
 
-#: themes/edx.org/lms/templates/legacy_header.html:56
-#: themes/edx.org/lms/templates/legacy_header.html:158
-msgid "Main"
-msgstr ""
-
-#: themes/edx.org/lms/templates/legacy_header.html:73
-#: themes/edx.org/lms/templates/legacy_header.html:166
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html:28
-msgid "Find Courses"
-msgstr ""
-
-#: themes/edx.org/lms/templates/legacy_header.html:76
-#: themes/edx.org/lms/templates/legacy_header.html:169
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html:31
-msgid "Schools & Partners"
-msgstr ""
-
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html:7
 msgid "About edX Verified Certificates"
 msgstr ""
@@ -8465,6 +8439,14 @@ msgstr ""
 msgid ""
 "{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
 "certificates to help fund free education for everyone globally"
+msgstr ""
+
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html:27
+msgid "Find Courses"
+msgstr ""
+
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html:30
+msgid "Schools & Partners"
 msgstr ""
 
 #: themes/red-theme/lms/templates/footer.html:35

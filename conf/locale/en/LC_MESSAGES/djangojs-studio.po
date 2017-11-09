@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-02 11:03+0000\n"
-"PO-Revision-Date: 2017-11-02 11:05:34.052417\n"
+"POT-Creation-Date: 2017-11-09 11:12+0000\n"
+"PO-Revision-Date: 2017-11-09 11:14:36.732966\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -752,43 +752,41 @@ msgstr ""
 msgid "Are you sure you want to restrict {email} access to “{container}”?"
 msgstr ""
 
-#: cms/static/js/views/modals/course_outline_modals.js:112
+#: cms/static/js/views/modals/course_outline_modals.js:119
 msgid "{display_name} Settings"
 msgstr ""
 
-#: cms/static/js/views/modals/course_outline_modals.js:192
+#: cms/static/js/views/modals/course_outline_modals.js:199
 msgid "Publish {display_name}"
 msgstr ""
 
-#: cms/static/js/views/modals/course_outline_modals.js:199
+#: cms/static/js/views/modals/course_outline_modals.js:206
 msgid "Publish all unpublished changes for this {item}?"
 msgstr ""
 
-#: cms/static/js/views/modals/course_outline_modals.js:205
+#: cms/static/js/views/modals/course_outline_modals.js:212
 msgid "Publish"
 msgstr ""
 
-#: cms/static/js/views/modals/course_outline_modals.js:220
+#: cms/static/js/views/modals/course_outline_modals.js:233
 msgid "Highlights for {display_name}"
 msgstr ""
 
-#: cms/static/js/views/modals/course_outline_modals.js:228
+#: cms/static/js/views/modals/course_outline_modals.js:241
 msgid ""
-"The highlights you provide here are messaged (i.e., emailed) to learners. "
-"Each {item}'s highlights are emailed at the time that we expect the learner "
-"to start working on that {item}. At this time, we assume that each {item} "
-"will take 1 week to complete."
+"Enter 3-5 highlights to include in the email message that learners receive "
+"for this section (250 character limit)."
 msgstr ""
 
-#: cms/static/js/views/modals/course_outline_modals.js:683
+#: cms/static/js/views/modals/course_outline_modals.js:700
 msgid "All Learners and Staff"
 msgstr ""
 
-#: cms/static/js/views/modals/course_outline_modals.js:949
+#: cms/static/js/views/modals/course_outline_modals.js:966
 msgid "Basic"
 msgstr ""
 
-#: cms/static/js/views/modals/course_outline_modals.js:954
+#: cms/static/js/views/modals/course_outline_modals.js:971
 msgid "Visibility"
 msgstr ""
 
