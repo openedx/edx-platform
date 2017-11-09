@@ -313,12 +313,20 @@ $seq-nav-height: 50px;
   &:hover,
   &:active,
   &.active {
-    border-bottom: 3px solid $seq-nav-link-color;
-    // keeps icon/text centered on hover, necessary due to border-box setting
     padding-top: 2px;
+    background-color: theme-color("primary");
 
     .icon {
-      color: $seq-nav-icon-color;
+      color: theme-color("inverse");
+    }
+
+    @include media-breakpoint-up(sm) {
+      border-bottom: 3px solid $seq-nav-link-color;
+      background-color: theme-color("inverse");
+
+      .icon {
+        color: $seq-nav-icon-color;
+      }
     }
   }
 }

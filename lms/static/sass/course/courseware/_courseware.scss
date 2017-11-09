@@ -41,6 +41,7 @@ html.video-fullscreen {
     border-radius: ($baseline/4);
     background-color: $light-gray1;
     color: $staff-color;
+    text-transform: uppercase; 
 
     &:hover {
       background-color: $staff-color;
@@ -134,12 +135,11 @@ html.video-fullscreen {
       overflow-wrap: break-word;
       word-wrap: break-word;
       word-break: break-word;
-    }
+      margin: 0 auto;
 
-    // Make text-focused blocks have a maximum width for readability.
-    .xmodule_HtmlModule,
-    .xmodule_CapaModule {
-      max-width: $text-width-readability-max;
+      &.xblock-student_view-vertical {
+        max-width: $text-width-readability-max;
+      }
     }
 
     h1 {
