@@ -13,6 +13,7 @@ from common.djangoapps.edx_notifications.data import (
 )
 
 from edx_notifications import startup
+from edx_notifications.philu_notification_types import NOTIFICATION_TYPES
 
 
 @receiver(startup.perform_type_registrations)
@@ -21,12 +22,14 @@ def perform_type_registrations_handler(sender, **kwargs):  # pylint: disable=unu
     Register test notification types
     """
 
-    register_notification_type(
-        NotificationType(
-            name='philu.nodebb.user_mentioned_you_in',
-            renderer='edx_notifications.renderers.basic.JsonRenderer',
+    for notification_type in NOTIFICATION_TYPES:
+
+        register_notification_type(
+            NotificationType(
+                name='philu.nodebb.%s' % notification_type,
+                renderer='edx_notifications.renderers.basic.JsonRenderer',
+            )
         )
-    )
 
 
 def start_up():
