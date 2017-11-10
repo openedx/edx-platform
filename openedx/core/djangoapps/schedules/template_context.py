@@ -14,10 +14,24 @@ def get_base_template_context(site):
         'homepage_url': encode_url(marketing_link('ROOT')),
         'dashboard_url': absolute_url(site, reverse('dashboard')),
         'template_revision': settings.EDX_PLATFORM_REVISION,
-        'platform_name': settings.PLATFORM_NAME,
-        'contact_mailing_address': settings.CONTACT_MAILING_ADDRESS,
-        'social_media_urls': encode_urls_in_dict(getattr(settings, 'SOCIAL_MEDIA_FOOTER_URLS', {})),
-        'mobile_store_urls': encode_urls_in_dict(getattr(settings, 'MOBILE_STORE_URLS', {})),
+        'platform_name': site.configuration.get_value('platform_name', settings.PLATFORM_NAME),
+        'contact_mailing_address': site.configuration.get_value(
+            'contact_mailing_address',
+            settings.CONTACT_MAILING_ADDRESS
+        ),
+        'social_media_urls': encode_urls_in_dict(
+            site.configuration.get_value(
+                'SOCIAL_MEDIA_FOOTER_URLS',
+                getattr(settings, 'SOCIAL_MEDIA_FOOTER_URLS', {})
+            )
+        ),
+        'mobile_store_urls': encode_urls_in_dict(
+            site.configuration.get_value(
+                'MOBILE_STORE_URLS',
+                getattr(settings, 'MOBILE_STORE_URLS', {})
+            )
+
+        ),
     }
 
 
