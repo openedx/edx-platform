@@ -137,7 +137,7 @@ class NotificationCount(AuthenticatedAPIView):
         )
 
 
-class NotificationsList(APIView):
+class NotificationsList(AuthenticatedAPIView):
     """
     GET returns list of notifications
     """
