@@ -166,23 +166,19 @@ class NotificationsList(APIView):
         """
         HTTP GET Handler
         """
-        notification_data = request.POST
+        notification_data = request.data
         user_ids = []
 
         for user in notification_data.get('user', []):
             try:
-                user = User.objects.get(username=user['username'])
+                user = User.objects.get(username=user['user_name'])
                 user_ids.append(user.id)
             except User.DoesNotExist:
                 return JsonResponse({'message': "User does not exist for provided username"},
                                     status=status.HTTP_400_BAD_REQUEST)
 
-        type_name = notification_data['notification_type']
-        msg_type = get_notification_type(type_name)
+        type_name = notification_data['type']
 
-        channel_name = request.POST['notification_channel']
-        if not channel_name:
-            channel_name = None
         msg_type = get_notification_type(type_name)
 
         msg = NotificationMessage(
@@ -190,13 +186,14 @@ class NotificationsList(APIView):
             namespace=NAMESPACE,
             payload=self.generate_payload(notification_data),
         )
-        bulk_publish_notification_to_users(user_ids, msg, preferred_channel=channel_name)
+        bulk_publish_notification_to_users(user_ids, msg)
 
         return Response([], status.HTTP_200_OK)
 
     def generate_payload(self, notification_data):
         payload = dict(notification_data)
         payload.pop('user', None)
+        return payload
 
 
 def _find_notification_by_id(user_id, msg_id):
