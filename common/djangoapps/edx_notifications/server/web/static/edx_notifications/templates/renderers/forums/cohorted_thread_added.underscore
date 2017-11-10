@@ -1,0 +1,8 @@
+<div class='xns-title'><%=thread_title %></div>
+<div class='xns-date'>
+    <%= __display_created %>
+</div>
+
+<div class='xns-excerpt'>
+    <span class='xns-username'><%= action_username %></span> posted: <%= excerpt %>
+</div>

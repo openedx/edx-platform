@@ -1,0 +1,71 @@
+<script src="{{ STATIC_URL }}edx_notifications/js/models/counter_icon_model.js"></script>
+<script src="{{ STATIC_URL }}edx_notifications/js/models/user_notification_model.js"></script>
+<script src="{{ STATIC_URL }}edx_notifications/js/collections/notification_collection.js"></script>
+
+<script src="{{ STATIC_URL }}edx_notifications/js/views/counter_icon_view.js"></script>
+<script src="{{ STATIC_URL }}edx_notifications/js/views/notification_pane_view.js"></script>
+
+{% include 'django/notifications_widget_preferences_header.html' %}
+
+<script type="text/template" id="xns-counter-template">
+    <% if (typeof count !== 'undefined' && count > 0) { %>
+    <%= count %>
+    <% } %>
+</script>
+
+<script type="text/template" id="xns-pane-template">
+    <div class="xns-container">
+        <div class="xns-content xns-pane-<%= selected_pane %>">
+            <div class="xns-list-header">
+                <h2>Notifications</h2>
+                <div class="xns-actions">
+                    <ul class="xns-tab-list">
+                        <li class="xns-unread-action active"><a  href="#">View unread</a></li>
+                        <li class="xns-all-action"><a href="#">View all</a></li>
+                        <li class="xns-mark-read-action"><a href="#">Mark as read</a></li>
+                        <% if (typeof this.global_variables.hide_link_is_visible != 'undefined' &&
+                        this.global_variables.hide_link_is_visible != 'False') { %>
+                            <li class="xns-hide-pane"><a href="#">Hide</a></li>
+                        <% } %>
+                        <% if (typeof this.global_variables.notification_preference_tab_is_visible != 'undefined' &&
+                        this.global_variables.notification_preference_tab_is_visible == 'True') { %>
+                            <li class="xns-notification-preferences"><a href="#">Settings</a></li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+            <div class="xns-list-body">
+                <ul class="xns-items">
+                    <% if (typeof grouped_user_notifications == 'undefined' || grouped_user_notifications.length == 0) { %>
+                        <li class='xns-empty-list'>
+                            <p class="xns-no-notifications-msg xns-item">You have no unread notifications.</p>
+                        </li>
+                    <% } else { %>
+                        <% _.each(grouped_user_notifications, function(grouped_user_notification){ %>
+                            <h3 class="xns-group"><%= grouped_user_notification.group_title %></h3>
+                            <% _.each(grouped_user_notification.messages, function(message){ %>
+                                <li class="xns-item" id="<%= message.msg.id %>">
+                                    <% if (selected_pane == 'unread' && always_show_dates_on_unread) { %>
+                                        <div class="xns-item-date">
+                                            <% if (Date.equals(new Date(message.msg.created).clearTime(), Date.today())) { %>
+                                                Today at <%= new Date(message.msg.created).toString("h:mmtt") %>
+                                            <%} else {%>
+                                                <%= new Date(message.msg.created).toString("MMMM dd, yyyy") %> at <%= new Date(message.msg.created).toString("h:mmtt") %>
+                                            <% } %>
+                                        </div>
+                                    <% } %>
+                                    <div class="xns-item-body">
+                                        <span data-msg-id="<%= message.msg.id %>" data-click-link="<%=message.msg.payload['_click_link']%>" class='xns-<%= message.group_name %>'><%= message.html %></span>
+                                    </div>
+                                    <% if (selected_pane == 'unread') { %>
+                                          <div data-msg-id="<%= message.msg.id %>" class="xns-close-item"><span class='xns-close-item-x'>x</span></div>
+                                    <% } %>
+                                </li>
+                            <% }); %>
+                        <% }); %>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+    </div>
+</script>

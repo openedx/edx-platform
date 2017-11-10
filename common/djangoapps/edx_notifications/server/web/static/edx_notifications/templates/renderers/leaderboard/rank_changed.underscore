@@ -1,0 +1,1 @@
+You are now <span class='xns-rank'>#<%= rank %></span> for <span class='xns-title'><%= leaderboard_name %></span> in the cohort!

@@ -1,0 +1,4 @@
+<div class='xns-date'>
+    <%= __display_created %>
+</div>
+Your post <span class='xns-title'><%=thread_title%></span> was upvoted <%=num_upvotes%> times

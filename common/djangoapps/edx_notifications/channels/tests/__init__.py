@@ -1,0 +1,3 @@
+"""
+All tests regarding channels
+"""

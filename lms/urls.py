@@ -19,6 +19,7 @@ from django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from util.enterprise_helpers import enterprise_enabled
 
+
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     admin.autodiscover()
@@ -31,6 +32,7 @@ urlpatterns = (
     url(r'', include('homepage.urls', namespace='homepage')),
 
     url(r'^onboarding_survey/', include('lms.djangoapps.onboarding_survey.urls')),
+    url(r'^notifications/', include('common.djangoapps.edx_notifications.server.urls')),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
 
     url(r'', include('student.urls')),

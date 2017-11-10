@@ -1,0 +1,6 @@
+<div class='xns-title'>
+    <%= subject %>
+</div>
+<div class='xns-body'>
+    <%= body %>
+</div>

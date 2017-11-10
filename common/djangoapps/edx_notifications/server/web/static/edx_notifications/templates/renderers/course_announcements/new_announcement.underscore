@@ -1,0 +1,11 @@
+<div class='xns-title'>
+    <%= title %>
+</div>
+
+<div class='xns-date'>
+    <%= __display_created %>
+</div>
+<div class='xns-excerpt'>
+    <%= excerpt %>
+</div>
+

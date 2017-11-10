@@ -1,0 +1,93 @@
+
+
+.xns-pane {
+    background-color: #ffffff;
+    box-shadow: -3px 3px 4px 0 rgba(51, 51, 51, 0.2);
+    border-radius: 0 0 4px 4px;
+    border-style: solid;
+    border-width: 1px;
+    right: 0px;
+    position: absolute;
+    top: 48px;
+    width: 340px;
+    display: none;
+}
+
+.xns-container {
+    border-top: 0px;
+    border-radius: 0 0 3px 3px;
+    padding: 0px 0px 20px 10px;
+    position: relative;
+    width: 600px;
+}
+
+.xns-item {
+    position: relative;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    border-bottom: 1px solid #F5F5F5;
+    cursor: pointer;
+}
+
+h3.xns-group {
+    text-transform: uppercase;
+    padding-bottom: 0px;
+    font-size: .85714rem;
+    font-weight: 700;
+    color: #333333;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #E0E0E0;
+}
+
+.xns-item-body {
+    color: #333333;
+    font-size: .85714rem;
+    line-height: 18px;
+}
+
+.xns-item-body a {
+    color: #333333;
+    text-decoration: none;
+    cursor: default;
+}
+
+.xns-date {
+    color: #868685;
+    font-size: .85714rem;
+    font-style: italic;
+}
+
+.xns-title {
+    color: #3384CA;
+    font-weight: 700;
+}
+
+.xns-alert {
+    color: #E37222;
+    font-height: 10pt;
+    font-weight: 700;
+}
+
+.xns-username {
+    font-weight: 700;
+}
+
+.xns-rank {
+    font-weight: 700;
+}
+
+.xns-branded-logo {
+	display:inline-block;
+}
+
+.xns-list-footer {
+	background: #e0e0e0;
+	padding: 10px;
+    margin-top: 50px;
+}
+
+.xns-namespace-display-name {
+    font-weight: 600;
+}
+

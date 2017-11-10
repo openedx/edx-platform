@@ -1,0 +1,22 @@
+{% for grouped_user_notification in grouped_user_notifications %}
+
+    <table style='width:600px;'>
+        <tr><td style='font-family: Open Sans, Helvetica, sans-serif;'>
+        <h3 class="xns-group">{{ grouped_user_notification.group_title }}</h3>
+        </td></tr>
+        {% for message in grouped_user_notification.messages %}
+            <tr><td style='font-family: Open Sans, Helvetica, sans-serif; padding-bottom: 5px; border-bottom: 1px solid #F5F5F5;'>
+            <div class="xns-item-body">
+            {% if message.click_link %}
+            <a href='{{message.click_link}}'>
+            {% endif %}
+                <span class='xns-{{ message.group_name }}'>{% autoescape off %}{{ message.html }}{% endautoescape %}</span>
+            {% if message.click_link %}
+            </a>
+            {% endif %}
+            </div>
+            </td></tr>
+        {% endfor %}
+    </table>
+{% endfor %}
+
