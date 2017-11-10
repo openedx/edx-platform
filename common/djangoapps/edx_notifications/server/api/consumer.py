@@ -177,8 +177,7 @@ class NotificationsList(AuthenticatedAPIView):
                 return JsonResponse({'message': "User does not exist for provided username"},
                                     status=status.HTTP_400_BAD_REQUEST)
 
-        type_name = notification_data['type']
-
+        type_name = self.get_notification_type(notification_data['type'])
         msg_type = get_notification_type(type_name)
 
         msg = NotificationMessage(
@@ -194,6 +193,10 @@ class NotificationsList(AuthenticatedAPIView):
         payload = dict(notification_data)
         payload.pop('user', None)
         return payload
+
+    def get_notification_type(self, notification_type):
+        # TODO: handle nodebb and edx notification types
+        return 'philu.nodebb.%s' % notification_type
 
 
 def _find_notification_by_id(user_id, msg_id):
