@@ -3063,3 +3063,6 @@ LMS_BASE_URL = 'https://philanthropyu.org'
 # Notification email settings
 NOTIFICATION_FROM_EMAIL = 'no-reply@philanthropyu.org'
 NOTIFICATION_EMAIL_SUBJECT = 'Philanthropy-U-Team Course Notification'
+
+# Admin activation email
+ADMIN_ACTIVATION_EMAIL = 'test@test.com'

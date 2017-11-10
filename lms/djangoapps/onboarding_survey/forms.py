@@ -1,9 +1,14 @@
 """
 Model form for the surveys.
 """
+import uuid
+
+
 from itertools import chain
 from django import forms
 from django.utils.encoding import force_unicode
+from django.core import mail
+from django.conf import settings
 from lms.djangoapps.onboarding_survey.models import (
     OrganizationSurvey,
     InterestsSurvey,
@@ -12,6 +17,9 @@ from lms.djangoapps.onboarding_survey.models import (
     Organization,
     OrganizationDetailSurvey,
     Currency)
+from django.contrib.auth.models import User
+
+from edxmako.shortcuts import render_to_response, render_to_string
 
 
 no_option_select_error = 'Please select an option for {}'
@@ -395,6 +403,34 @@ class RegModelForm(forms.ModelForm):
                 prev_org.save()
 
         extended_profile.organization = organization_to_assign
+
+        is_extended_profile = None
+        try:
+            is_extended_profile = user.extended_profile
+        except:
+            pass
+
+        if not is_extended_profile and extended_profile.org_admin_email:
+            admin_user = None
+
+            try:
+                admin_user = User.objects.get(email=extended_profile.org_admin_email)
+            except:
+                pass
+
+            if admin_user:
+                admin_user.extended_profile.admin_activation_key = uuid.uuid4().hex
+                admin_user.extended_profile.save()
+
+            message_context = {"key": admin_user.extended_profile.admin_activation_key }
+            message_body = render_to_string('emails/admin_activation.txt', message_context)
+
+            with mail.get_connection() as connection:
+                mail.EmailMessage(
+                    "TEST", message_body, settings.ADMIN_ACTIVATION_EMAIL, [extended_profile.org_admin_email],
+                    connection=connection,
+                ).send()
+
         if user:
             extended_profile.user = user
 
