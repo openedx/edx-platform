@@ -1,0 +1,31 @@
+<script src="{{ STATIC_URL }}edx_notifications/js/models/notification_preferences_model.js"></script>
+<script src="{{ STATIC_URL }}edx_notifications/js/collections/notification_preferences_collection.js"></script>
+<script src="{{ STATIC_URL }}edx_notifications/js/views/notification_preferences_view.js"></script>
+
+<script type="text/template" id="xns-notification-preferences-template">
+    <div class='xns-preference-pane'>
+        <div class='xns-preference-pane-header'>
+            <span>Notification preferences</span>
+        </div>
+        <% _.each(notification_preferences, function(notification_preference){ %>
+            <% if ('user_value' in notification_preference) { %>
+                <% if  (notification_preference.user_value == 'true') { %>
+                    <% var checked = 'checked' %>
+                <% } %>
+            <% } else { %>
+                <% if (notification_preference.default_value == 'true') { %>
+                    <% var class_name = 'xns-default-preference' %>
+                    <% var checked = 'checked' %>
+                <% } %>
+            <% } %>
+            <div class="xns-notification-preferences-list">
+                <input type="checkbox" class="xns-preference <%= class_name %>"
+                       data-preference-name="<%= notification_preference.name %>" <%= checked %> >
+                <%= notification_preference.display_name %>
+                <span class="xns-tooltip" data-tooltip="<%= notification_preference.display_description %>">
+                    <img class="xns-tooltip-icon" src="/static/edx_notifications/img/tooltip-icon.png">
+                </span>
+            </div>
+        <% }); %>
+    </div>
+</script>

@@ -1,0 +1,12 @@
+{% comment %}
+
+This is a "drop-in" Django template widget to instantiate the edx-notifications front end application
+which is a Backbone application that is defined in edx_notifications/server/web/static/js
+
+This HTML snippet assumes that jQuery, Backbone, DateJS, and Underscore have been included in the
+page that is using this widget
+
+{% endcomment %}
+
+{% include 'django/notifications_widget_header.html' %}
+{% include 'django/notifications_widget_body.html' %}

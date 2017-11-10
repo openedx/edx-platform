@@ -1,0 +1,37 @@
+<script type="text/javascript">
+    Backbone.$.ajaxSetup({ cache: false });
+    var notification_counter_icon = new CounterIconView({
+        el: $(".xns-icon"),
+        count_el: $(".xns-counter"),
+        pane_el: $(".xns-pane"),
+        endpoints: {
+            unread_notification_count: "{% autoescape off %}{{ endpoints.unread_notification_count }}{% endautoescape %}",
+            mark_all_user_notifications_read: "{% autoescape off %}{{ endpoints.mark_all_user_notifications_read }}{% endautoescape %}",
+            user_notifications_all: "{% autoescape off %}{{ endpoints.user_notifications_all }}{% endautoescape %}",
+            user_notifications_unread_only: "{% autoescape off %}{{ endpoints.user_notifications_unread_only }}{% endautoescape %}",
+            renderer_templates_urls: "{% autoescape off %}{{ endpoints.renderer_templates_urls }}{% endautoescape %}",
+            user_notification_mark_read: "{% autoescape off %}{{ endpoints.user_notification_mark_read }}{% endautoescape %}",
+            notification_preferences_all: "{% autoescape off %}{{ endpoints.notification_preferences_all }}{% endautoescape %}",
+            user_notification_preferences: "{% autoescape off %}{{ endpoints.user_notification_preferences }}{% endautoescape %}",
+            user_notification_preferences_detail: "{% autoescape off %}{{ endpoints.user_notification_preferences_detail }}{% endautoescape %}"
+        },
+        global_variables: {
+            app_name: "{{ global_variables.app_name }}",
+            hide_link_is_visible: "{{ global_variables.hide_link_is_visible}}",
+            always_show_dates_on_unread: false,
+            notification_preference_tab_is_visible: "{{ global_variables.notification_preference_tab_is_visible }}"
+        },
+        refresh_watcher: {
+            name: "{{refresh_watcher.name}}",
+            args: {
+            {% if refresh_watcher.name == 'short-poll' %}
+                poll_period_secs: {{ refresh_watcher.args.poll_period_secs }}
+            {% endif %}
+            }
+        },
+        view_audios: {
+            notification_alert: {% if view_audios.notification_alert %}"{% autoescape off %}{{ view_audios.notification_alert }}{% endautoescape %}"{% else %}null{% endif %}
+        },
+        namespace: {% if namespace %}"{{namespace}}"{% else %}null{% endif %}
+    });
+</script>

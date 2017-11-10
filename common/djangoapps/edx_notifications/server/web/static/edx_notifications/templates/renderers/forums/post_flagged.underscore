@@ -1,0 +1,4 @@
+<div class='xns-date'>
+    <%= __display_created %>
+</div>
+<span class='xns-username'><%= action_username %></span> has flagged a post entitled <span class='xns-title'><%=title %></span>

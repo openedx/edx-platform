@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<div class="xns-container">
+    <div class="xns-content">
+        <div class="xns-list-header">
+            <div class="xns-logos">
+                <div class="xns-branded-logo"> <img src="cid:{{branded_logo}}"></div>
+            </div>
+            <h2>Triggered Notification</h2>
+            <div class="xns-user-name"><span>Hi {{ user_first_name }} {{ user_last_name }},</span></div>
+        </div>
+        <div class="xns-list-body">
+            <ul class="xns-items">
+                <h3 class="xns-group">{{ group_title }}</h3>
+                <li class="xns-item">
+                    <div class="xns-item-body">
+                        <span class='xns-{{ group_name }}'>
+                            <a href="{{ click_link }}">
+                                {% autoescape off %}{{ notification_html }}{% endautoescape %}
+                            </a>
+                        </span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+</html>

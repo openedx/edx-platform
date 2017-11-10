@@ -111,6 +111,9 @@ if __name__ == "__main__":
     startup = importlib.import_module(edx_args.startup)
     startup.run()
 
+    from edx_notifications.load_notification_startup import start_up as notification_startup
+    notification_startup()
+
     from django.core.management import execute_from_command_line
 
     execute_from_command_line([sys.argv[0]] + django_args)

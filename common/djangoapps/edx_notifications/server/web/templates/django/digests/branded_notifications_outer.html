@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body style="width=600px; font-family: Open Sans, Helvetica, sans-serif;">
+
+    <p style='font-family: Open Sans, Helvetica, sans-serif;'>
+        <img src="cid:{{branded_logo}}">
+    </p>
+    <p class="xns-user-name" style='font-family: Open Sans, Helvetica, sans-serif;'>Hi {{ user_first_name }} {{ user_last_name }},</p>
+    <p class="xns-user-notifications-count" style='font-family: Open Sans, Helvetica, sans-serif;'>You have {{ count }} unread notifications in <span class="xns-namespace-display-name">{{ namespace }}</span>.</p>
+
+    {% autoescape off %} {{ rendered_notifications }} {% endautoescape %}
+
+    <div class="xns-list-footer" style='font-family: Open Sans, Helvetica, sans-serif;'>
+        <span class="xns-digest-footer-text">If you would like to stop receiving these updates, you
+        can turn off all Notification Digests from your profile.</span>
+    </div>
+</body>
+</html>

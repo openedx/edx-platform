@@ -1,0 +1,18 @@
+<script type="text/javascript">
+    Backbone.$.ajaxSetup({ cache: false });
+
+    var notification_preferences_tab = new NotificationPreferencesView({
+        el: $('.xns-preference-pane-container'),
+        endpoints: {
+            notification_preferences_all: "{% autoescape off %}{{ endpoints.notification_preferences_all }}{% endautoescape %}",
+            user_notification_preferences: "{% autoescape off %}{{ endpoints.user_notification_preferences }}{% endautoescape %}",
+            user_notification_preferences_detail: "{% autoescape off %}{{ endpoints.user_notification_preferences_detail }}{% endautoescape %}"
+        },
+        global_variables: {
+            app_name: "{{ global_variables.app_name }}",
+            hide_link_is_visible: "{{ global_variables.hide_link_is_visible}}",
+            always_show_dates_on_unread: false,
+            notification_preference_tab_is_visible: "{{ global_variables.notification_preference_tab_is_visible }}"
+        },
+    });
+</script>
