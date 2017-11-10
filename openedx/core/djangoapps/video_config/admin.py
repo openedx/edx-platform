@@ -7,10 +7,11 @@ from django.contrib import admin
 
 from openedx.core.djangoapps.video_config.forms import (
     CourseHLSPlaybackFlagAdminForm,
+    CourseVideoTranscriptFlagAdminForm,
 )
 from openedx.core.djangoapps.video_config.models import (
     CourseHLSPlaybackEnabledFlag, HLSPlaybackEnabledFlag,
-    CourseVideoTranscriptEnabledFlag, VideoTranscriptEnabledFlag
+    CourseVideoTranscriptEnabledFlag, VideoTranscriptEnabledFlag,
 )
 
 
@@ -45,9 +46,10 @@ class CourseVideoTranscriptEnabledFlagAdmin(CourseSpecificEnabledFlagBaseAdmin):
     Admin of Video Transcript feature on course-by-course basis.
     Allows searching by course id.
     """
-    form = CourseHLSPlaybackFlagAdminForm
+    form = CourseVideoTranscriptFlagAdminForm
 
 admin.site.register(HLSPlaybackEnabledFlag, ConfigurationModelAdmin)
 admin.site.register(CourseHLSPlaybackEnabledFlag, CourseHLSPlaybackEnabledFlagAdmin)
+
 admin.site.register(VideoTranscriptEnabledFlag, ConfigurationModelAdmin)
-admin.site.register(CourseVideoTranscriptEnabledFlag, CourseHLSPlaybackEnabledFlagAdmin)
+admin.site.register(CourseVideoTranscriptEnabledFlag, CourseVideoTranscriptEnabledFlagAdmin)
