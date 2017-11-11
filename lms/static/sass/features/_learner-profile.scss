@@ -267,7 +267,7 @@
       width: 100%;
       margin: 0 auto;
       border-bottom: 1px solid $gray-l3;
-      background-color: $gray-l4;
+      color: theme-color("primary");
       padding: ($baseline*0.75) 5%;
 
       .u-field-account_privacy {
@@ -284,11 +284,15 @@
         }
       }
 
+      .u-field-select-account_privacy:disabled {
+        color: theme-color("gray-dark");
+      }
+
       .u-field-title {
         @extend %t-strong;
 
         width: auto;
-        color: $body-color;
+        color: theme-color("inverse");
         cursor: text;
         text-shadow: none; // override bad lms styles on labels
       }
@@ -304,7 +308,8 @@
 
         width: 100%;
         padding: 0;
-        color: $body-color;
+        margin-top: ($baseline/2);
+        color: theme-color("inverse");
 
         .u-field-message-notification {
           color: $gray-d2;

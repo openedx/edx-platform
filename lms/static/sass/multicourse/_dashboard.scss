@@ -1017,6 +1017,7 @@
 
       .related-programs-preface {
         @include float(left);
+        @include margin-right($baseline/4);
       }
 
       .related-program-list {
