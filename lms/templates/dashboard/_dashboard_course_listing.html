@@ -270,9 +270,9 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
       % if related_programs:
       <div class="message message-related-programs is-shown">
         <span class="related-programs-preface" tabindex="0">${_('Related Programs')}:</span>
-        <ul>
+        <ul class="related-program-list">
           % for program in related_programs:
-          <li>
+          <li class="related-program-listitem">
             <span class="category-icon ${program['type'].lower()}-icon" aria-hidden="true"></span>
             <span><a href="${program['detail_url']}">${u'{title} {type}'.format(title=program['title'], type=program['type'])}</a></span>
           </li>
@@ -364,7 +364,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
             <div class="wrapper-extended">
               <p class="message-copy" align="justify">
                 <b class="message-copy-bold">
-                  ${_("Pursue a {cert_name_long} to highlight the knowledge and skills you gain in this course.").format(cert_name_long=cert_name_long)}
+                  ${_("Pursue a {cert_name_long} in this course.").format(cert_name_long=cert_name_long)}
                 </b><br>
                   ${Text(_("It's official. It's easily shareable. "
                       "It's a proven motivator to complete the course. {line_break}"

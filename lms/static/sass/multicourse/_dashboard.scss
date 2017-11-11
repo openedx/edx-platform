@@ -12,7 +12,7 @@
 
   // Contains main course card listings
   .main-container {
-    @include padding($baseline*2, $baseline, $baseline, $baseline*2);
+    padding: $baseline;
 
     flex-grow: 8;
     order: 1;
@@ -90,7 +90,7 @@
 
               width: 100%;
               position: relative;
-              bottom: 15px;
+              bottom: 20px;
               display: inline-block;
               text-align: center;
 
@@ -154,6 +154,7 @@
 
               display: block;
               padding: 0;
+              margin-top: $baseline;
 
               [class*="info-"] {
                 color: $gray-d1;
@@ -397,7 +398,6 @@
           // changes to cover
           .wrapper-course-image .cover {
             border-color: $professional-color-lvl3;
-            padding: ($baseline/10);
           }
 
           // course enrollment status message
@@ -419,7 +419,6 @@
           // changes to cover
           .wrapper-course-image .cover {
             border-color: $verified-color-lvl1;
-            padding: ($baseline/10);
           }
 
           // course enrollment status message
@@ -451,7 +450,6 @@
           // changes to cover
           .wrapper-course-image .cover {
             border-color: $honorcode-color-lvl2;
-            padding: ($baseline/10);
           }
 
           // status message
@@ -466,7 +464,6 @@
           // changes to cover
           .wrapper-course-image .cover {
             border-color: $audit-color-lvl2;
-            padding: ($baseline/10);
           }
 
           // status message
@@ -485,7 +482,7 @@
 
   // Secondary functionality
   .side-container {
-    @include padding($baseline*2, $baseline*2, $baseline, $baseline);
+    padding: $baseline;
 
     max-width: $baseline*20;
     min-width: $baseline*20;
@@ -1015,22 +1012,20 @@
 
     &.message-related-programs {
       background: none;
-      padding: $baseline/2;
+      padding: $baseline/2 $baseline;
       margin-bottom: 0;
 
       .related-programs-preface {
         @include float(left);
-
-        font-weight: bold;
       }
 
-      ul {
+      .related-program-list {
         display: inline;
         padding: 0;
         margin: 0;
       }
 
-      li {
+      .related-program-listitem {
         @include float(left);
 
         display: inline;
@@ -1131,7 +1126,7 @@
 // status - verification
 .status-verification {
   list-style: none;
-  padding: $baseline/2;
+  padding: $baseline;
 
   .status-title {
     margin: 0 0 ($baseline/4) 0;
