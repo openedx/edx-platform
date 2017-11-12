@@ -222,11 +222,15 @@
 
   display: block; // override the table-cell display set in .content
   width: 100%;
-  padding: 40px;
+  padding: 0;
 
   .wrap-instructor-info {
-    display: inline;
-    top: 0;
+    @include float(right);
+    @include box-sizing(border-box);
+
+    display: inline-block;
+    width: flex-grid(6,12);
+    padding: $baseline;
   }
 
   .request-response-error {
@@ -261,10 +265,12 @@
 
   .instructor-dashboard-title {
     @extend .top-header;
+    @include box-sizing(border-box);
 
     display: inline-block;
+    width: flex-grid(6,12);
     margin-bottom: ($baseline*0.75);
-    padding-bottom: 0;
+    padding: $baseline;
     border-bottom: 0;
   }
 
@@ -285,6 +291,9 @@
     @extend %ui-no-list;
 
     border-bottom: 1px solid $gray-l3;
+    padding: 0 ($baseline*1.5); 
+    overflow-x: scroll;
+    white-space: nowrap;
 
     .nav-item {
       @extend %t-copy-base;
@@ -301,6 +310,7 @@
         &:hover,
         &:focus {
           border-bottom: 3px solid theme-color("primary");
+          text-transform: none !important; // removes link hover styling on tab
         }
 
         &.active-section {
@@ -315,6 +325,7 @@
 // elements - general
 // --------------------
 .idash-section {
+  padding: $baseline;
 
   // messages
   .message {
