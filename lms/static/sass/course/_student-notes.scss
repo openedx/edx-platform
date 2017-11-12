@@ -48,6 +48,10 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
       @extend .content; // needed extend carried over from course handouts UI, but should be cleaned up
 
+      @include media-breakpoint-down(md) {
+        padding: ($baseline/2);
+      } 
+
       width: 100%;
     }
   }
@@ -62,7 +66,12 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
     .wrapper-title {
       @include float(left);
 
-      width: flex-grid(7, 12);
+      width: flex-grid(12, 12);
+
+      @include media-breakpoint-up(md) {
+        width: flex-grid(7, 12);
+        padding-bottom: $baseline;
+      }
 
       .page-title {
         @extend %t-title4;
@@ -76,7 +85,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
           display: block;
           margin-top: ($baseline/4);
-          color: $lightest-base-font-color;
+          color: theme-color("gray-dark");
           letter-spacing: 0;
         }
       }
@@ -85,7 +94,11 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
     .wrapper-notes-search {
       @include float(right);
 
-      width: flex-grid(5, 12);
+      width: flex-grid(12, 12);
+
+      @include media-breakpoint-up(sm) {
+        width: flex-grid(5, 12);
+      }
 
       @include text-align(right);
     }
@@ -162,6 +175,10 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
         border: 1px solid $gray-l5;
         border-radius: ($baseline/10);
 
+        @include media-breakpoint-down(md) {
+          width: flex-grid(12, 12);
+        }
+
         // note - highlighted content
         .note-excerpt {
           @include transition(background-color $tmg-avg ease-in-out 0);
@@ -212,7 +229,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
               letter-spacing: ($baseline/20);
               margin: 0 0 ($baseline/4) 0;
-              color: $gray-l2;
+              color: theme-color("gray-dark");
             }
 
             .note-comment-p,
@@ -252,9 +269,27 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
         width: flex-grid(3, 12);
         vertical-align: top;
 
+        @include media-breakpoint-down(md) {
+          width: flex-grid(12, 12);
+          padding: $baseline 0;
+          border-bottom: 3px solid theme-color("gray-dark");
+        }
+
         .wrapper-reference-content {
           padding: 0 $baseline;
-          color: $gray-l2;
+          color: theme-color("gray-dark");
+
+          .wrapper-reference-item {
+            display: inline-block;
+
+            @include media-breakpoint-down(md) {
+              width: flex-grid(4, 12);
+            }
+
+            @include media-breakpoint-down(sm) {
+              width: flex-grid(12, 12);
+            }
+          }
 
           .reference-title {
             @extend %t-title8;
@@ -310,10 +345,6 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
           border-color: $gray-l4;
         }
 
-        .note-excerpt {
-          background: $student-notes-highlight-color-focus;
-        }
-
         .note-comment {
           color: $gray-d2;
 
@@ -356,7 +387,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
       @include clearfix();
 
       position: relative;
-      top: ($baseline/5);
+      top: 6px;
 
       .tabs-label,
       .tabs {
@@ -372,8 +403,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
         @include padding-right($baseline);
 
-        color: $lightest-base-font-color;
-        font-weight: $font-semibold !important; // needed for poor base LMS styling scope
+        color: theme-color("gray-dark");
       }
 
       .tabs {
@@ -382,7 +412,6 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
         @extend %ui-no-list;
 
         position: relative;
-        bottom: -($baseline/4);
       }
 
       .tab {
@@ -447,8 +476,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
   // +case - no notes made
   // --------------------
   .placeholder {
-    background: $gray-l5;
-    border-top: ($baseline/4) solid $active-color;
+    border-top: 1px solid theme-color("gray-dark");
     padding: ($baseline*1.5);
 
     a {

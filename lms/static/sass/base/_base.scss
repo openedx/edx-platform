@@ -150,7 +150,7 @@ a:visited:not(.btn) {
   @include media-breakpoint-up(md) {
     margin: 0 auto;
     padding: ($baseline*2) 0;
-    max-width: grid-width(12);
+    max-width: 1920px;
     min-width: 760px;
     width: flex-grid(12);
   }

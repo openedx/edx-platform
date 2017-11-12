@@ -23,7 +23,7 @@
     @include border-top-radius(4px);
     @include clearfix();
 
-    padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
+    padding: 0;
 
     .tab {
       display: inline-block;
