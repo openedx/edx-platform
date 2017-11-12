@@ -146,12 +146,17 @@
   }
 
   .main-article {
+    @include box-sizing(border-box);
+
     float: left;
-    width: flex-grid(9);
-    padding: 40px 0 40px 40px;
+    width: flex-grid(9,12);
+    padding: ($baseline*2) 0 ($baseline*2) ($baseline*2);
     color: $body-color;
 
-    @include box-sizing(border-box);
+    @include media-breakpoint-down(md) {
+      width: flex-grid(12,12);
+      padding: $baseline;
+    }
   }
 
   &.view .main-article {
@@ -235,11 +240,18 @@
   -----------------*/
 
   .article-functions {
-    float: left;
-    width: flex-grid(3);
-    padding: 40px 40px;
-
     @include box-sizing(border-box);
+
+    float: left;
+    width: flex-grid(3,12);
+    padding: ($baseline*2);
+
+    @include media-breakpoint-down(md) {
+      border-top: 3px solid theme-color("gray-dark");
+      width: flex-grid(12,12);
+      padding: $baseline;
+      margin-top: $baseline;
+    }
 
     .timestamp {
       margin-top: ($baseline*0.75);
