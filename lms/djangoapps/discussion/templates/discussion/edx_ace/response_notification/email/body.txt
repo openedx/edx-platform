@@ -3,3 +3,27 @@
 {% blocktrans trimmed %}
     This is the reply to your thread:
 {% endblocktrans %}
+
+{% load i18n %}
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+{% block preview_text %}
+    ${_("Hi {username}").format(username=thread_username)}
+{% endblock %}
+
+{% block content %}
+${_("Hi {username},").format(username=thread_username)}
+${_("{username} made the following reply to {thread_title} at {date}").format(
+    username=comment_username,
+    thread_title=thread_title,
+    date=comment_created_at
+)}
+{{ comment_body }}
+<a href="{{ post_link }}"> ${_("View the discussion.")} </a>
+{% endblock %}
+
+{% block google_analytics_pixel %}
+<img src="{{ ga_tracking_pixel_url }}" alt="" role="presentation" aria-hidden="true" />
+{% endblock %}

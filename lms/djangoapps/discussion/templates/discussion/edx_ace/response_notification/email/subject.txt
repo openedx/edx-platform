@@ -1,5 +1,6 @@
 {% load i18n %}
+<%!
+from django.utils.translation import ugettext as _
+%>
 
-{% blocktrans %}
-Someone replied to your thread on {{ platform_name }}
-{% endblocktrans %}
+${_("Someone replied to your thread on {platform_name}").format(platform_name=platform_name)}
