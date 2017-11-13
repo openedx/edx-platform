@@ -25,6 +25,7 @@ from openedx.core.djangoapps.coursegraph.tasks import (
     serialize_course,
     coerce_types,
     should_dump_course,
+    strip_branch_and_version,
 )
 from openedx.core.djangoapps.content.course_structures.signals import (
     listen_for_course_publish
@@ -261,6 +262,25 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         self.assertEqual(len(nodes), 9)
         # the course has 7 "PARENT_OF" relationships and 3 "PRECEDES"
         self.assertEqual(len(relationships), 10)
+
+    def test_strip_version_and_branch(self):
+        """
+        Tests that the _strip_version_and_branch function strips the version
+        and branch from a location
+        """
+        location = self.course.id.make_usage_key(
+            'test_block_type', 'test_block_id'
+        ).for_branch(
+            'test_branch'
+        ).for_version('test_version')
+
+        self.assertIsNotNone(location.branch)
+        self.assertIsNotNone(location.version)
+
+        stripped_location = strip_branch_and_version(location)
+
+        self.assertIsNone(stripped_location.branch)
+        self.assertIsNone(stripped_location.version)
 
     @staticmethod
     def _extract_relationship_pairs(relationships, relationship_type):
@@ -503,7 +523,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         mock_get_command_last_run.return_value = last_command_run
         mock_get_course_last_published.return_value = last_course_published
-        mock_course_key = mock.Mock
+        mock_course_key = mock.Mock()
         mock_graph = mock.Mock()
         self.assertEqual(
             should_dump_course(mock_course_key, mock_graph),

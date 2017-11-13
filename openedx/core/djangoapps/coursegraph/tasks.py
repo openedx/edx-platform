@@ -144,6 +144,16 @@ def get_course_last_published(course_key):
     return course_last_published_date
 
 
+def strip_branch_and_version(location):
+    """
+    Removes the branch and version information from a location.
+    Args:
+        location: an xblock's location.
+    Returns: that xblock's location without branch and version information.
+    """
+    return location.for_branch(None)
+
+
 def serialize_course(course_id):
     """
     Serializes a course into py2neo Nodes and Relationships
@@ -170,15 +180,15 @@ def serialize_course(course_id):
             fields[field_name] = coerce_types(value)
 
         node = Node(block_type, 'item', **fields)
-        location_to_node[item.location.version_agnostic()] = node
+        location_to_node[strip_branch_and_version(item.location)] = node
 
     # create relationships
     relationships = []
     for item in items:
         previous_child_node = None
         for index, child in enumerate(item.get_children()):
-            parent_node = location_to_node.get(item.location.version_agnostic())
-            child_node = location_to_node.get(child.location.version_agnostic())
+            parent_node = location_to_node.get(strip_branch_and_version(item.location))
+            child_node = location_to_node.get(strip_branch_and_version(child.location))
 
             if parent_node is not None and child_node is not None:
                 child_node["index"] = index
