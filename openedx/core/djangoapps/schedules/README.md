@@ -58,31 +58,96 @@ will use whichever date is earlier.
 * Task
 
 
-## User-flow
+## Running the Management Commands
 
-When a user enrolls in a self-paced course and the necessary flags and
-configurations are enabled, a Schedule and ScheduleExperience is created for
-them. The Schedule has an upgrade deadline set for some number of days from the
-enrollment date.
+To initiate the celery tasks that query for users and then send emails, run one
+of the management commands in the Schedules app. There is one command per
+message type: `send_recurring_nudge`, `send_upgrade_reminder`, and
+`send_course_update`.
 
-## Getting Started
+The command requires you to specify for which Site to send emails. E.g.:
+
+```
+./manage.py lms send_recurring_nudge example.com
+```
+
+Make sure to specify the settings for the environment you are running the
+management command in. For example, in docker devstack this would be:
+
+```
+./manage.py lms --settings devstack_docker send_recurring_nudge example.com
+```
+
+You have the option to override the current date in order to run the command as
+if it were run on that day.
+
+```
+./manage.py lms --settings devstack_docker send_recurring_nudge example.com --date 2017-11-13
+```
+
+If you have Sailthru configured in the current environment, you also have the
+option to override the recipient email addresses so that all of the emails are
+sent to the address that you specify instead of to the users emails.
+
+```
+./manage.py lms --settings devstack_docker send_recurring_nudge example.com --override-recipient-email developer@example.com
+```
+
+These management commands are intended to be ran on a daily basis, so it is
+recommended to execute them in a Cron job or Jenkins job scheduled to run
+automatically every day.
+
+
+## Configuring A.C.E.
 
 These instructions assume you have already setup an Open edX instance or have a
 Running devstack. See the [Open edX Developer's
 Guide](http://edx.readthedocs.io/projects/edx-developer-guide/en/latest/) for
-information on how to set those up.
+information on how to set them up.
 
-### Setting up edX Automated Communication Engine (A.C.E.)
+The Schedule app relies on ACE. ACE can be configured to send emails to a file
+or send emails through Sailthru which actually delivers emails to users.
 
-The Schedule app relies on ACE, which requires a
-[Sailthru](http://www.sailthru.com/) back-end for sending emails. See the
-[edx-ace
+### File Back-end
+
+Edit the `lms/envs/common.py` or `lms/envs/private.py`and add/change the
+following:
+
+```python
+ACE_CHANNEL_SAILTHRU_DEBUG = True
+```
+
+By default your devstack should be configured to use the `file_email` ACE
+channel which saves the HTML emails to
+`/path/to/your/devstack/src/ace_messages/*.html` on your host (or
+`/edx/src/ace_messages/` in your devstack docker container). Open the files in
+your browser to view the emails.
+
+### Sailthru Back-end
+
+To configure ACE to actually send emails to users' email addresses, add a
+[Sailthru](http://www.sailthru.com/) back-end configuration. See the [edx-ace
 documentation](https://edx-ace.readthedocs.io/en/latest/getting_started.html#sailthruemailchannel-settings)
-for instructions on setting up a Sailthru channel in ACE.
+for instructions on setting up a Sailthru API key and secret.
 
-### Django Settings
+Additionally, make sure these are set in either the `lms/envs/common.py` or
+`lms/envs/private.py`:
 
-Edit the `lms.env.json` and add/change the following:
+```python
+ACE_CHANNEL_SAILTHRU_DEBUG = False
+ACE_ENABLED_CHANNEL = ['sailthru_email']
+ACE_ENABLED_POLICIES = ['bulk_email_optout']
+ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = '<insert_sailthru_template_name_here>'
+```
+
+
+## Django Settings
+
+Regardless of which ACE back-end you use, make sure to set the following Django
+settings so that all of the features of the emails are enabled.
+
+Edit the `lms/envs/common.py` or `lms/envs/private.py` and add/change the
+following:
 
 ```python
 FEATURES = {
@@ -106,16 +171,14 @@ MOBILE_STORE_URLS = {
     'apple': '<insert_app_store_url_here>',
 }
 CONTACT_MAILING_ADDRESS = '<insert_physical_address_here>'
-ACE_ENABLED_CHANNEL = ['sailthru_email']
-ACE_ENABLED_POLICIES = ['bulk_email_optout']
-ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = '<insert_sailthru_template_name_here>'
 ```
 
-### Configuring Schedule Creation
+
+## Configuring Schedule Creation
 
 Make sure a Site has been created at `<lms_url>/admin/sites/site`.
 
-#### ScheduleConfig
+### ScheduleConfig
 
 In the Django admin panel at `<lms_url>/admin/schedules/scheduleconfig/` create
 a ScheduleConfig and link it to the Site. Make sure to enable all of the
@@ -126,14 +189,14 @@ settings:
 * `hold_back_ratio`: ratio of all new Course Enrollments that should NOT have a
   Schedule created.
 
-#### Roll-out Waffle Flag
+### Roll-out Waffle Flag
 
 There is one roll-out related course waffle flag that we plan to delete called
 `schedules.create_schedules_for_course`, which, if the
 `ScheduleConfig.create_schedules` is disabled, will enable schedule creation on
 a per-course basis.
 
-#### Self-paced Configuration
+### Self-paced Configuration
 
 Schedules will only be created for a course if it is self-paced. A course can be
 configured to be self-paced by going to
@@ -142,14 +205,15 @@ self paced config. Then, go to Studio settings for the course and change the
 Course Pacing value to "Self-Paced". Note that the Course Start Date has to be
 set to sometime in the future in order to change the Course Pacing.
 
-### Configuring Upgrade Deadline on Schedule
+
+## Configuring Upgrade Deadline on Schedule
 
 The upgrade reminder message type depends on there being a date in the
 `upgrade_deadline` field of the Schedule model. Up-sell messaging will also be
 added to the recurring nudge and course updates message types when an upgrade
 deadline date is present.
 
-#### DynamicUpgradeDeadlineConfiguration models
+### DynamicUpgradeDeadlineConfiguration models
 
 In order to enable filling in the `upgrade_deadline` field of new Schedule
 models created, you must create and enable one of the following:
@@ -168,16 +232,17 @@ DynamicUpgradeDeadlineConfiguration.
 The "deadline days" field specifies how many days from the day of the learner's
 enrollment will be their soft upgrade deadline on the Schedule model.
 
-#### Verified Course Mode
+### Verified Course Mode
 
 The `upgrade_deadline` will only be filled for a course if it has a verified
 course mode. To add a verified course mode to a course, go to
 `<lms_url>/admin/course_modes/coursemode/` and add a course mode linked with
 the course with the "Mode" equal to "verified".
 
-### Configuring Email Sending
 
-#### ScheduleConfig
+## Configuring Email Sending
+
+### ScheduleConfig
 
 The ScheduleConfig model at `<lms_url>/admin/schedules/scheduleconfig/` also has
 fields which configure enqueueing and delivering emails per message type:
@@ -185,13 +250,14 @@ fields which configure enqueueing and delivering emails per message type:
 * `enqueue_*`: allows sending email tasks of this message type to celery.
 * `deliver_*`: allows delivering emails through ACE for this message type.
 
-#### Roll-out Waffle Flag
+### Roll-out Waffle Flag
 
 Another roll-out related course waffle flag that we plan to delete called
 `schedules.send_updates_for_course` will enable sending specifically the course
 updates email per-course.
 
-### Configuring Highlights UI in Studio
+
+## Configuring Highlights UI in Studio
 
 The button and modal on the course outline page that allows course authors to
 enter section highlights can be toggled globally by going to
@@ -200,45 +266,36 @@ enter section highlights can be toggled globally by going to
 
 This is a roll-out related waffle switch that we will eventually delete.
 
-### Configuring a Learner's Schedule
+
+## Configuring a Learner's Schedule
 
 Emails will only be sent to learners who have Schedule `start_date`s or
 `upgrade_deadline`s and ScheduleExperience that match the criteria for the
 message type.
 
-#### Recurring Nudge
+### Recurring Nudge
 
 * Learners must have the ScheduleExperience type of "Recurring Nudge and Upgrade
 Reminder".
 * Their Schedule `start_date` must be 3 or 10 days before the current date.
 
-#### Upgrade Reminder
+### Upgrade Reminder
 
 * Learners must have the ScheduleExperience type of "Recurring Nudge and Upgrade
 Reminder".
 * Their Schedule `upgrade_deadline` must be 2 days after the current date.
 
-#### Course Update
+### Course Update
 
 * Learners must have the ScheduleExperience type of "Course Updates".
 * Their Schedule `start_date` must be 7, 14, or any increment of 7 days up to 77
   days before the current date.
 
-## Testing Changes
 
-### Running in Devstack
+## Litmus
 
-Ensure that you have correctly configured your LMS to send emails and that you
-have at least one user that matches the criteria of the message type you are
-testing.
-
-By default your devstack should be configured to use the `file_email` ACE
-channel which saves the HTML emails to
-`/path/to/your/devstack/src/ace_messages/*.html` on your host (or
-`/edx/src/ace_messages/` in your devstack docker container). Open the files in
-your browser to view the emails.
-
-### Litmus
-
-Refer to the confluence page on [How to test emails in a variety of
-clients](https://openedx.atlassian.net/wiki/spaces/RET/pages/216563991/How+to+test+emails+in+a+variety+of+clients).
+Make sure that ACE is configured to use Sailthru, and then refer to the
+confluence page on [How to test emails in a variety of
+clients](https://openedx.atlassian.net/wiki/spaces/RET/pages/216563991/How+to+test+emails+in+a+variety+of+clients)
+which will explain how to send emails to Litmus using the
+`--override-recipient-email` option to the management commands.
