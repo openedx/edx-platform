@@ -1,3 +1,0 @@
-"""
-All notification channel implementations
-"""
