@@ -3057,3 +3057,6 @@ ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
 # Notification email settings
 NOTIFICATION_FROM_EMAIL = 'no-reply@philanthropyu.org'
 NOTIFICATION_EMAIL_SUBJECT = 'Philanthropy-U-Team Course Notification'
+
+# Google Place API key
+GOOGLE_PLACE_API_KEY = 'AIzaSyDhkKEySp0g2Ip8bovRHCI5KE257DSAJkA'
