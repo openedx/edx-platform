@@ -558,8 +558,6 @@ def course_listing(request):
         u'optimization_enabled': optimization_enabled
     })
 
-    return response
-
 
 def _get_rerun_link_for_item(course_key):
     """ Returns the rerun link for the given course key. """
