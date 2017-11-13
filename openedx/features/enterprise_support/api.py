@@ -125,6 +125,7 @@ class EnterpriseApiClient(object):
         Initialize an authenticated Enterprise service API client by using the
         provided user.
         """
+        self.user = user
         jwt = JwtBuilder(user).build_token([])
         self.client = EdxRestApiClient(
             configuration_helpers.get_value('ENTERPRISE_API_URL', settings.ENTERPRISE_API_URL),
@@ -247,10 +248,11 @@ class EnterpriseApiClient(object):
             querystring = {'username': user.username}
             response = endpoint().get(**querystring)
         except (HttpClientError, HttpServerError):
-            message = ("An error occurred while getting EnterpriseLearner data for user {username}".format(
-                username=user.username
-            ))
-            LOGGER.exception(message)
+            LOGGER.exception(
+                'Failed to get enterprise-learner for user [%s] with client user [%s]',
+                user.username,
+                self.user.username
+            )
             return None
 
         return response
