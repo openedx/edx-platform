@@ -146,3 +146,6 @@ MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+# NodeBB settings
+NODEBB_ENDPOINT = ENV_TOKENS.get('NODEBB_ENDPOINT', None)
