@@ -1,33 +1,37 @@
 {% load i18n %}
 {% load static %}
 
+<%!
+from django.utils.translation import ugettext as _
+%>
+
 {% block preview_text %}
-    {% blocktrans trimmed %}
-        Hi {{ thread_username }}
-    {% endblocktrans %}
+    ${_("Hi {username}").format(username=thread_username)}
 {% endblock %}
 
 {% block content %}
 <table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
     <tr>
         <td>
-            {% blocktrans trimmed %}
-                <h1>
-                    Hi {{ thread_username }},
-                </h1>
+            <h1>
+                ${_("Hi {username},").format(username=thread_username)}
+            </h1>
 
-                <p>
-                    {{ comment_username }} made the following reply to {{ thread_title }} at {{ comment_created_at }}.
-                </p>
+            <p>
+                ${_("{username} made the following reply to {thread_title} at {date}").format(
+                    username=comment_username,
+                    thread_title=thread_title,
+                    date=comment_created_at
+                )}
+            </p>
 
-                <p>
-                    {{ comment_body }}
-                </p>
+            <p>
+                ${_("{comment_body}").format(comment_body=comment_body)}
+            </p>
 
-                <p>
-                    <a href="{{ post_link }}"> View the discussion.</a>
-                </p>
-            {% endblocktrans %}
+            <p>
+                <a href="{{ post_link }}"> ${_("View the discussion.")} </a>
+            </p>
 
             <p>
                 {# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
