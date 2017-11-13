@@ -6,7 +6,6 @@ import uuid
 from itertools import chain
 from django import forms
 from django.utils.encoding import force_unicode
-from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from django.conf import settings
 from lms.djangoapps.onboarding_survey.models import (
@@ -427,7 +426,7 @@ class RegModelForm(forms.ModelForm):
                 )
 
                 send_admin_activation_email("Admin Activation.", message_body, from_address, extended_profile.org_admin_email)
-            except ObjectDoesNotExist:
+            except User.DoesNotExist:
                 pass
             except Exception:
                 pass
