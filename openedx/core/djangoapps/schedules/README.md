@@ -1,35 +1,44 @@
 # Dynamic Pacing Schedules
 
-The Schedules app allows course teams to automatically email learners taking
+The Schedules app allows course teams to automatically email learners in
 self-paced courses. The emails are designed to keep learners engaged with a
-course's content. The app sends them at important milestones in a learner's
-progression. The app sends three message types "out of the box":
+course's content. Learners receive these messages at important milestones
+throughout a course.
+
+With Schedules, the author of a self-paced course opts learners into one of
+two "Schedule Experiences". Learners either receive Weekly Course Highlight
+Messages, or a combination of Recurring Nudges and Upgrade Reminders.
+
+The app can send all three message types "out of the box":
 
  - Recurring Nudges 
  - Upgrade Reminders 
  - Weekly Course Highlight Messages
 
 Recurring Nudges encourage learners to engage with self-paced courses at regular
-intervals.  The app sends learners nudges three days, 10 days, and 19 days after
-they enroll in a self-paced course.
+intervals.  The app sends nudges three days and ten days after a learner
+enrolls in a course.
 
-Upgrade Reminders signal learners to upgrade to a self-paced course's "Verified"
-track. They are sent 19 days from a learner's enrollment date, or two days from
-the course's end date.
+Upgrade Reminders ask learners to purchase their course's "Verified"
+certificate. The reminders are sent two days from their course's upgrade
+deadline, or two days from the course's end date. Whichever date occurs sooner.
 
-Weekly Course Highlight Messages tell learners what to look forward to in a
-coming week of a course. The app generates messages with instructor-supplied
-"section highlights" in the body of the message.
+Weekly Course Highlight Messages tell learners what to look forward to in the
+coming week of a course. Course authors provide "section highlights" when
+authoring a course in Studio. The app generates emails with these section
+highlights listed in the body of the message.
 
-The app measures a learner's progress with a "Schedule" Django object. The app
-assigns Schedules to learners and coordinates its messaging with their
-Schedules. 
+The app introduces the Schedule object to the edX codebase. Learners receive
+Schedules when they enroll in self-paced courses.  With Schedules, the app
+determines when to send particular messages. It assumes a steady rate of
+progress through course materials. It determines the cadence of its messaging
+through a course's "Schedule Experience".
+
 
 ## Glossary
 
-* Schedule 
-Stores the day a learner enrolls in a course and the
-learner's "upgrade deadline" 
+* Schedule  Stores the day a learner enrolls in a course and the learner's
+"upgrade deadline".
 
 * Schedule Experience
 
