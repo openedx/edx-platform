@@ -1,3 +1,0 @@
-"""
-Subdirectory containing tests
-"""
