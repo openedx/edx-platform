@@ -108,13 +108,13 @@ if it were run on that day.
 
 If you have Sailthru configured in the current environment, you also have the
 option to override the recipient email addresses so that all of the emails are
-sent to the address that you specify instead of to the users emails.
+sent to the address that you specify instead of to the users' emails.
 
 ```
 ./manage.py lms --settings devstack_docker send_recurring_nudge example.com --override-recipient-email developer@example.com
 ```
 
-These management commands are intended to be ran on a daily basis, so it is
+These management commands are intended to be run on a daily basis, so it is
 recommended to execute them in a Cron job or Jenkins job scheduled to run
 automatically every day.
 
