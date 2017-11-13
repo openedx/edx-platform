@@ -219,8 +219,17 @@ Reminder".
 
 ### Running in Devstack
 
-The management command?
+Ensure that you have correctly configured your LMS to send emails and that you
+have at least one user that matches the criteria of the message type you are
+testing.
 
-Outputting to File backend.
+By default your devstack should be configured to use the `file_email` ACE
+channel which saves the HTML emails to
+`/path/to/your/devstack/src/ace_messages/*.html` on your host (or
+`/edx/src/ace_messages/` in your devstack docker container). Open the files in
+your browser to view the emails.
 
 ### Litmus
+
+Refer to the confluence page on [How to test emails in a variety of
+clients](https://openedx.atlassian.net/wiki/spaces/RET/pages/216563991/How+to+test+emails+in+a+variety+of+clients).
