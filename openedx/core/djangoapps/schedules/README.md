@@ -37,25 +37,46 @@ through a course's "Schedule Experience".
 
 ## Glossary
 
-* Schedule  Stores the day a learner enrolls in a course and the learner's
-"upgrade deadline".
+* **Schedule**: Stores the day a learner enrolls in a course and the learner's
+  "upgrade deadline".
 
-* Schedule Experience
+* **Schedule Experience**: Defines which set of emails that a learner will
+  receive so that they have a consistent email experience throughout their time
+  in the course even if a course author makes changes to the course after they
+  enroll. Right now, the possible Schedule Experiences are:
+    * "Recurring Nudge and Upgrade Reminder"
+    * "Course Updates"
 
-* Upgrade Deadline 
+* **Upgrade Deadline**: The date before which a learner can purchase a verified
+  certificate. A Schedule imposes a "soft" upgrade deadline 21 days from when a
+  learner enrolled in a course. A self-paced course imposes a "hard" upgrade
+  deadline that is the course-wide expiration date for upgrading on the course.
+  A learner's Schedule will use whichever date is earlier.
 
-The date before which a learner can purchase a verified certificate. A Schedule
-imposes a "soft" upgrade deadline 21 days from when a learner enrolled in a
-course. A self-paced course imposes a "hard" upgrade deadline that is the
-course-wide expiration date for upgrading on the course. A learner's Schedule
-will use whichever date is earlier.
+* **Course Update**: In the code, we refer to Weekly Course Highlight messages
+  as Course Updates. In hindsight, this is confusing since we also use the term
+  Course Updates to refer to bulk-emails manually sent out by course
+  instructors. We haven't had the chance to rename these variables in the code
+  yet.
 
-* Recurring Nudge
-* Upgrade Reminder
-* Course Update
-* Highlights
-* Resolver
-* Task
+* **Highlights**: A list of topics that learners should expect to learn in a
+  section of a course. These are defined by course authors in the Studio UI.
+
+* **Resolver**: Python class that defines which learners to filter to for the
+  message type and then creates and sends an email to each of those learners.
+
+* **MessageType**: Python class that defines a particular kind of email message
+  and the Django template it uses. [MessageType is an ACE
+  concept](https://edx-ace.readthedocs.io/en/latest/modules.html#edx_ace.message.MessageType).
+
+* **Task**: A [Celery](http://docs.celeryproject.org/en/latest/index.html)
+  asynchronous class/function that is run in a separate process from the main
+  Django LMS process. We have to serialize all data we send to a task to a
+  string. In the Schedules app, a task is created for every bin of learners.
+
+* **Bin**: In the Schedules app, we divide the learners that we want to send
+  emails to into N "bins" (default is 24). This is so that each Celery task only
+  has to process approximately 1,000 emails each.
 
 
 ## Running the Management Commands
@@ -294,8 +315,12 @@ Reminder".
 
 ## Litmus
 
-Make sure that ACE is configured to use Sailthru, and then refer to the
-confluence page on [How to test emails in a variety of
+When designing email templates, it is important to test the rendered emails in a
+variety of email clients to ensure there are no bugs in any of them. EdX uses a
+tool called [Litmus](http://litmus.com/) that automates this process.
+
+To begin using Litmus, make sure that ACE is configured to use Sailthru, and
+then refer to the confluence page on [How to test emails in a variety of
 clients](https://openedx.atlassian.net/wiki/spaces/RET/pages/216563991/How+to+test+emails+in+a+variety+of+clients)
 which will explain how to send emails to Litmus using the
 `--override-recipient-email` option to the management commands.
