@@ -9,3 +9,7 @@ class ForumCategory(Category):
 
     def featured(self, **kwargs):
         return self.client.get('/api/v2/category/featured', **kwargs)
+
+    def recommended(self, username, **kwargs):
+        payload = {'username': username}
+        return self.client.post('/api/v2/category/recommended', **payload)

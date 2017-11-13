@@ -2,21 +2,21 @@
 Views for on-boarding app.
 """
 import json
-import os
 import logging
 
-from path import Path as path
-
-from django.http import JsonResponse
+import os
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
-from django.db import transaction
 from django.core.urlresolvers import reverse
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render
+from django.db import transaction
 from django.http import HttpResponse
 from django.conf import settings
+from django.http import JsonResponse
+from django.shortcuts import redirect
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+from path import Path as path
 
+from edxmako.shortcuts import render_to_response
 from lms.djangoapps.onboarding_survey.helpers import is_first_signup_in_org
 from lms.djangoapps.onboarding_survey.models import (
     UserInfoSurvey,
@@ -26,15 +26,16 @@ from lms.djangoapps.onboarding_survey.models import (
     OrganizationDetailSurvey,
     Currency)
 from lms.djangoapps.onboarding_survey.signals import save_interests
+from lms.djangoapps.student_dashboard.views import get_recommended_xmodule_courses, get_recommended_communities
 from onboarding_survey import forms
+from lms.djangoapps.onboarding_survey.history import update_history
 
 log = logging.getLogger("edx.onboarding_survey")
 
 
 def update_user_history(user):
-    pass
-    # if user.extended_profile.is_survey_completed:
-    #     update_history(user)
+    if user.extended_profile.is_survey_completed:
+        update_history(user)
 
 
 def set_survey_complete(extended_profile):
@@ -67,12 +68,6 @@ def get_un_submitted_surveys(user):
         user.org_detail_survey
     except Exception:
         un_submitted_surveys['org_detail_survey'] = True
-
-    # if user.extended_profile.is_poc:
-    #     try:
-    #         user.organization_survey
-    #     except Exception:
-    #         un_submitted_surveys['organization'] = True
 
     if un_submitted_surveys.get('user_info') and un_submitted_surveys.get('interests') and\
             un_submitted_surveys.get('organization') and un_submitted_surveys.get('org_detail_survey'):
@@ -194,7 +189,7 @@ def interests(request):
 
             if not are_forms_complete:
                 set_survey_complete(extended_profile)
-                return redirect(reverse('dashboard'))
+                return redirect(reverse('recommendations'))
 
             return redirect(reverse('interests'))
 
@@ -235,7 +230,7 @@ def organization(request):
 
     If its a GET request then an empty form for survey is returned
     otherwise, a form is populated form the POST request and then is
-    saved. After saving the form, user is redirected to dashboard.
+    saved. After saving the form, user is redirected to recommendations page.
     """
 
     are_forms_complete = request.user.extended_profile.is_survey_completed
@@ -254,13 +249,14 @@ def organization(request):
 
         if form.is_valid():
             organization_survey = form.save()
-            update_user_history(request.user)
 
             if not existing_survey:
                 organization_survey.user = request.user
                 organization_survey.save()
 
             mark_partner_network(organization_survey)
+
+            update_user_history(request.user)
 
             if not are_forms_complete:
                 return redirect(reverse('org_detail_survey'))
@@ -284,7 +280,7 @@ def organization(request):
 
     context['is_poc'] = extended_profile.is_poc
     context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
-    context['organization'] = extended_profile.organization.name
+    context['organization_name'] = extended_profile.organization.name
 
     return render(request, 'onboarding_survey/organization_survey.html', context)
 
@@ -339,9 +335,10 @@ def org_detail_survey(request):
                 org_detail.user = request.user
                 org_detail.save()
 
+            update_user_history(request.user)
             if not are_forms_complete:
                 set_survey_complete(request.user.extended_profile)
-                return redirect(reverse('dashboard'))
+                return redirect(reverse('recommendations'))
 
             return redirect(reverse('org_detail_survey'))
 
@@ -362,6 +359,7 @@ def org_detail_survey(request):
     context.update(get_un_submitted_surveys(user))
     context['is_poc'] = extended_profile.is_poc
     context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
+    context['organization_name'] = extended_profile.organization.name
     return render(request, 'onboarding_survey/organization_detail_survey.html', context)
 
 
@@ -450,6 +448,21 @@ def get_currencies(request):
         term = request.GET.get('term', '')
         currencies = Currency.objects.filter(alphabetic_code__istartswith=term).values_list('alphabetic_code',
                                                                                             flat=True).distinct()
-
     data = json.dumps(list(currencies))
     return HttpResponse(data, 'application/json')
+
+
+@login_required
+def recommendations(request):
+    """
+    Display recommended courses and communities based on the survey
+
+    """
+    recommended_courses = get_recommended_xmodule_courses(request.user)
+    recommended_communities = get_recommended_communities(request.user)
+    context = {
+        'recommended_courses': recommended_courses,
+        'recommended_communities': recommended_communities,
+    }
+
+    return render_to_response('onboarding_survey/recommendations.html', context)
