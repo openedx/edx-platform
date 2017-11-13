@@ -5,7 +5,7 @@ from smtplib import SMTPException
 
 def send_admin_activation_email(subject, message, from_address, dest_addr):
     """
-    Sending an activation email to the users.
+    Sends an admin activation email.
     """
     max_retries = settings.RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS
 

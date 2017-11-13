@@ -409,7 +409,7 @@ class RegModelForm(forms.ModelForm):
         is_extended_profile = None
         try:
             is_extended_profile = user.extended_profile
-        except ObjectDoesNotExist:
+        except ExtendedProfile.DoesNotExist:
             pass
 
         if not is_extended_profile and extended_profile.org_admin_email:
