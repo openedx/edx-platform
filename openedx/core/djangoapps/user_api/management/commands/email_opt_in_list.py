@@ -19,22 +19,23 @@ When reports are generated, we need to handle:
 The command will always use the read replica database if one is configured.
 
 """
-import os.path
-import csv
-import time
-import datetime
-import contextlib
-import logging
-import optparse
+from __future__ import unicode_literals
 
-from django.core.management.base import BaseCommand, CommandError
+import contextlib
+import csv
+import datetime
+import logging
+import os.path
+import time
+
 from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
 from django.utils import timezone
-
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore
+from six import text_type
 
+from xmodule.modulestore.django import modulestore
 
 DEFAULT_CHUNK_SIZE = 10
 
@@ -46,20 +47,28 @@ def chunks(sequence, chunk_size):
 
 
 class Command(BaseCommand):
-    """Generate a list of email opt-in values for user enrollments. """
-
-    args = "<OUTPUT_FILENAME> <ORG_ALIASES> --courses=COURSE_ID_LIST --email-optin-chunk-size=CHUNK_SIZE"
+    """
+    Generate a list of email opt-in values for user enrollments.
+    """
     help = "Generate a list of email opt-in values for user enrollments."
-    option_list = BaseCommand.option_list + (
-        optparse.make_option('--courses ', action='store'),
-        optparse.make_option(
-            '--email-optin-chunk-size',
-            action='store',
-            type='int',
-            default=DEFAULT_CHUNK_SIZE,
-            dest='email_optin_chunk_size',
-            help='The number of courses to get opt-in information for in a single query.')
-    )
+
+    def add_arguments(self, parser):
+        parser.add_argument('file_path',
+                            metavar='OUTPUT_FILENAME',
+                            help='Path where to output the email opt-in list.')
+        parser.add_argument('org_list',
+                            nargs='+',
+                            metavar='ORG_ALIASES',
+                            help='List of orgs for which to retrieve email opt-in info.')
+        parser.add_argument('--courses',
+                            metavar='COURSE_ID_LIST',
+                            help='List of course IDs for which to retrieve email opt-in info.')
+        parser.add_argument('--email-optin-chunk-size',
+                            type=int,
+                            default=DEFAULT_CHUNK_SIZE,
+                            dest='email_optin_chunk_size',
+                            metavar='CHUNK_SIZE',
+                            help='Number of courses for which to get opt-in information in a single query.')
 
     # Fields output in the CSV
     OUTPUT_FIELD_NAMES = [
@@ -77,10 +86,11 @@ class Command(BaseCommand):
     QUERY_INTERVAL = 1000
 
     # Default datetime if the user has not set a preference
-    DEFAULT_DATETIME_STR = datetime.datetime(year=2014, month=12, day=1).isoformat(' ')
+    DEFAULT_DATETIME_STR = datetime.datetime(year=2014, month=12, day=1).isoformat(str(' '))
 
     def handle(self, *args, **options):
-        """Execute the command.
+        """
+        Execute the command.
 
         Arguments:
             file_path (str): Path to the output file.
@@ -92,9 +102,12 @@ class Command(BaseCommand):
 
         Raises:
             CommandError
-
         """
-        file_path, org_list = self._parse_args(args)
+        file_path = options['file_path']
+        org_list = options['org_list']
+
+        if os.path.exists(file_path):
+            raise CommandError("File already exists at '{path}'".format(path=file_path))
 
         # Retrieve all the courses for the org.
         # If we were given a specific list of courses to include,
@@ -116,15 +129,15 @@ class Command(BaseCommand):
         # If no courses are found, abort
         if not courses:
             raise CommandError(
-                u"No courses found for orgs: {orgs}".format(
+                "No courses found for orgs: {orgs}".format(
                     orgs=", ".join(org_list)
                 )
             )
 
         # Let the user know what's about to happen
         LOGGER.info(
-            u"Retrieving data for courses: {courses}".format(
-                courses=", ".join([unicode(course) for course in courses])
+            "Retrieving data for courses: {courses}".format(
+                courses=", ".join([text_type(course) for course in courses])
             )
         )
 
@@ -137,44 +150,17 @@ class Command(BaseCommand):
                     self._write_email_opt_in_prefs(file_handle, org_list, course_group)
 
         # Remind the user where the output file is
-        LOGGER.info(u"Output file: {file_path}".format(file_path=file_path))
-
-    def _parse_args(self, args):
-        """Check and parse arguments.
-
-        Validates that the right number of args were provided
-        and that the output file doesn't already exist.
-
-        Arguments:
-            args (list): List of arguments given at the command line.
-
-        Returns:
-            Tuple of (file_path, org_list)
-
-        Raises:
-            CommandError
-
-        """
-        if len(args) < 2:
-            raise CommandError(u"Usage: {args}".format(args=self.args))
-
-        file_path = args[0]
-        org_list = args[1:]
-
-        if os.path.exists(file_path):
-            raise CommandError("File already exists at '{path}'".format(path=file_path))
-
-        return file_path, org_list
+        LOGGER.info("Output file: {file_path}".format(file_path=file_path))
 
     def _get_courses_for_org(self, org_aliases):
-        """Retrieve all course keys for a particular org.
+        """
+        Retrieve all course keys for a particular org.
 
         Arguments:
             org_aliases (list): List of aliases for the org.
 
         Returns:
             List of `CourseKey`s
-
         """
         all_courses = modulestore().get_courses()
         orgs_lowercase = [org.lower() for org in org_aliases]
@@ -186,14 +172,17 @@ class Command(BaseCommand):
 
     @contextlib.contextmanager
     def _log_execution_time(self):
-        """Context manager for measuring execution time. """
+        """
+        Context manager for measuring execution time.
+        """
         start_time = time.time()
         yield
         execution_time = time.time() - start_time
-        LOGGER.info(u"Execution time: {time} seconds".format(time=execution_time))
+        LOGGER.info("Execution time: {time} seconds".format(time=execution_time))
 
     def _write_email_opt_in_prefs(self, file_handle, org_aliases, courses):
-        """Write email opt-in preferences to the output file.
+        """
+        Write email opt-in preferences to the output file.
 
         This will generate a CSV with one row for each enrollment.
         This means that the user's "opt in" preference will be specified
@@ -209,14 +198,13 @@ class Command(BaseCommand):
 
         Returns:
             None
-
         """
         writer = csv.DictWriter(file_handle, fieldnames=self.OUTPUT_FIELD_NAMES)
         writer.writeheader()
 
         cursor = self._db_cursor()
         query = (
-            u"""
+            """
             SELECT
                 user.`id` AS `user_id`,
                 user.`username` AS username,
@@ -281,17 +269,17 @@ class Command(BaseCommand):
             row_count += 1
 
         # Log the number of rows we processed
-        LOGGER.info(u"Retrieved {num_rows} records.".format(num_rows=row_count))
+        LOGGER.info("Retrieved {num_rows} records.".format(num_rows=row_count))
 
     def _iterate_results(self, cursor):
-        """Iterate through the results of a database query, fetching in chunks.
+        """
+        Iterate through the results of a database query, fetching in chunks.
 
         Arguments:
             cursor: The database cursor
 
         Yields:
             tuple of row values from the query
-
         """
         while True:
             rows = cursor.fetchmany(self.QUERY_INTERVAL)
@@ -301,11 +289,15 @@ class Command(BaseCommand):
                 yield row
 
     def _sql_list(self, values):
-        """Serialize a list of values for including in a SQL "IN" statement. """
-        return u",".join([u'"{}"'.format(val) for val in values])
+        """
+        Serialize a list of values for including in a SQL "IN" statement.
+        """
+        return ",".join(['"{}"'.format(val) for val in values])
 
     def _db_cursor(self):
-        """Return a database cursor to the read replica if one is available. """
+        """
+        Return a database cursor to the read replica if one is available.
+        """
         # Use the read replica if one has been configured
         db_alias = (
             'read_replica'
