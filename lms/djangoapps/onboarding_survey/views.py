@@ -13,6 +13,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ObjectDoesNotExist
 from path import Path as path
 
 from edxmako.shortcuts import render_to_response
@@ -475,7 +476,7 @@ def admin_activation(request, activation_key):
     user = None
     try:
         user = ExtendedProfile.objects.get(admin_activation_key=activation_key)
-    except:
+    except ObjectDoesNotExist:
         pass
     # activation_status can have values 1,2,3,4.
     # 1 means 'activated',
@@ -484,10 +485,10 @@ def admin_activation(request, activation_key):
     # 4 means 'to be activated'
     context = {}
     activation_status = 3
-    if user and user.is_admin_activated:
-        activation_status = 2
-    elif user:
-        if request.method == 'GET':
+    if user:
+        if user.is_admin_activated:
+            activation_status = 2
+        elif request.method == 'GET':
             context['key'] = user.admin_activation_key
             activation_status = 4
         elif request.method == 'POST':
