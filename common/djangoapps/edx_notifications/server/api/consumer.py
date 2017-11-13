@@ -139,7 +139,7 @@ class NotificationCount(AuthenticatedAPIView):
 
 class NotificationsList(AuthenticatedAPIView):
     """
-    GET returns list of notifications
+    GET/Create list of notifications
     """
 
     def get(self, request):
@@ -164,19 +164,12 @@ class NotificationsList(AuthenticatedAPIView):
 
     def post(self, request):
         """
-        HTTP GET Handler
+        HTTP POST Handler
         """
-        notification_data = request.data
-        user_ids = []
+        notification_data = request.data['notification']
+        usernames = request.data['usernames']
 
-        for user in notification_data.get('user', []):
-            try:
-                user = User.objects.get(username=user['user_name'])
-                user_ids.append(user.id)
-            except User.DoesNotExist:
-                return JsonResponse({'message': "User does not exist for provided username"},
-                                    status=status.HTTP_400_BAD_REQUEST)
-
+        user_ids = User.objects.filter(username__in=usernames).values_list('id', flat=True)
         type_name = self.get_notification_type(notification_data['type'])
         msg_type = get_notification_type(type_name)
 
