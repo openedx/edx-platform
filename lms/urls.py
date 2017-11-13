@@ -30,9 +30,10 @@ urlpatterns = (
 
     # URL for home page
     url(r'', include('homepage.urls', namespace='homepage')),
+    url(r'', include('philu_notifications.urls', namespace='notifications')),
 
     url(r'^onboarding_survey/', include('lms.djangoapps.onboarding_survey.urls')),
-    url(r'^notifications/', include('common.djangoapps.edx_notifications.server.urls')),
+    url(r'', include('common.djangoapps.edx_notifications.server.urls')),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
 
     url(r'', include('student.urls')),
