@@ -33,7 +33,7 @@ urlpatterns = (
     url(r'', include('philu_notifications.urls', namespace='notifications')),
 
     url(r'^onboarding_survey/', include('lms.djangoapps.onboarding_survey.urls')),
-    url(r'', include('common.djangoapps.edx_notifications.server.urls')),
+    url(r'', include('edx_notifications.server.urls')),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
 
     url(r'', include('student.urls')),
