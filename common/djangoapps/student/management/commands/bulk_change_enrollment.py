@@ -6,9 +6,9 @@ from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from course_modes.models import CourseMode
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
@@ -16,7 +16,9 @@ logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 class Command(BaseCommand):
-    """Management command to change many user enrollments at once."""
+    """
+    Management command to change many user enrollments at once.
+    """
 
     help = """
     Change the enrollment status for all users enrolled in a
