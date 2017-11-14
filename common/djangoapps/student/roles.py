@@ -44,7 +44,7 @@ class BulkRoleCache(object):
         roles_by_user = defaultdict(set)
         get_cache(cls.CACHE_NAMESPACE)[cls.CACHE_KEY] = roles_by_user
 
-        for role in CourseAccessRole.objects.filter(user__in=users).select_related('user__id'):
+        for role in CourseAccessRole.objects.filter(user__in=users).select_related('user'):
             roles_by_user[role.user.id].add(role)
 
         users_without_roles = filter(lambda u: u.id not in roles_by_user, users)

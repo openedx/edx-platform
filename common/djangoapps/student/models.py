@@ -1871,7 +1871,7 @@ class CourseEnrollment(models.Model):
         # remove previously cached entries to keep memory usage low.
         request_cache.clear_cache(cls.MODE_CACHE_NAMESPACE)
 
-        records = cls.objects.filter(user__in=users, course_id=course_key).select_related('user__id')
+        records = cls.objects.filter(user__in=users, course_id=course_key).select_related('user')
         cache = cls._get_mode_active_request_cache()
         for record in records:
             enrollment_state = CourseEnrollmentState(record.mode, record.is_active)

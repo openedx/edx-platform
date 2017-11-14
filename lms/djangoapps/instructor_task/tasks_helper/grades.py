@@ -170,7 +170,7 @@ class _EnrollmentBulkContext(object):
         CourseEnrollment.bulk_fetch_enrollment_states(users, context.course_id)
         self.verified_users = [
             verified.user.id for verified in
-            SoftwareSecurePhotoVerification.verified_query().filter(user__in=users).select_related('user__id')
+            SoftwareSecurePhotoVerification.verified_query().filter(user__in=users).select_related('user')
         ]
 
 
@@ -295,7 +295,7 @@ class CourseGradeReport(object):
             return izip_longest(*args, fillvalue=fillvalue)
 
         users = CourseEnrollment.objects.users_enrolled_in(context.course_id, include_inactive=True)
-        users = users.select_related('profile__allow_certificate')
+        users = users.select_related('profile')
         return grouper(users)
 
     def _user_grades(self, course_grade, context):
