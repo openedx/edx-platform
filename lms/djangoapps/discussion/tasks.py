@@ -7,6 +7,7 @@ from urllib import urlencode
 from urlparse import urljoin
 
 from celery import task
+from crum import CurrentRequestUserMiddleware
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -23,6 +24,8 @@ import lms.lib.comment_client as cc
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.template_context import get_base_template_context
+from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
+from openedx.core.lib.celery.task_utils import emulate_http_request
 
 
 log = logging.getLogger(__name__)
@@ -44,12 +47,17 @@ def send_ace_message(context):
     context['site'] = Site.objects.get(id=context['site_id'])
     if _should_send_message(context):
         thread_author = User.objects.get(id=context['thread_author_id'])
-        message_context = _build_message_context(context)
-        message = ResponseNotification().personalize(
-            Recipient(thread_author.username, thread_author.email),
-            _get_course_language(context['course_id']),
-            message_context
-        )
+        middleware_classes = [
+            CurrentRequestUserMiddleware,
+            CurrentSiteThemeMiddleware,
+        ]
+        with emulate_http_request(site=context['site'], user=thread_author, middleware_classes=middleware_classes):
+            message_context = _build_message_context(context)
+            message = ResponseNotification().personalize(
+                Recipient(thread_author.username, thread_author.email),
+                _get_course_language(context['course_id']),
+                message_context
+            )
         log.info('Sending forum comment email notification with context %s', message_context)
         ace.send(message)
 
