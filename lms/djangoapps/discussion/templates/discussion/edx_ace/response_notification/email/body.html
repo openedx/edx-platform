@@ -2,32 +2,29 @@
 {% load static %}
 
 {% block preview_text %}
-    {% blocktrans trimmed %}
-        Hi {{ thread_username }}
-    {% endblocktrans %}
+    Hi {{ thread_username }}
 {% endblock %}
 
 {% block content %}
 <table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
     <tr>
         <td>
-            {% blocktrans trimmed %}
-                <h1>
-                    Hi {{ thread_username }},
-                </h1>
+            <h1>
+                Hi {{ thread_username }},
+            </h1>
 
-                <p>
-                    {{ comment_username }} made the following reply to {{ thread_title }} at {{ comment_created_at }}.
-                </p>
-
-                <p>
-                    {{ comment_body }}
-                </p>
-
-                <p>
-                    <a href="{{ post_link }}"> View the discussion.</a>
-                </p>
+            <p>
+            {% blocktrans %}
+              {{ comment_username }} made the following reply to {{ thread_title }} at {{ comment_created_at }}
+              <p>
+                {{ comment_body }}
+              </p>
             {% endblocktrans %}
+            </p>
+
+            <p>
+                <a href="{{ post_link }}"> {% trans "View the discussion." %} </a>
+            </p>
 
             <p>
                 {# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}

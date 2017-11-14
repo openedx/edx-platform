@@ -3,3 +3,22 @@
 {% blocktrans trimmed %}
     This is the reply to your thread:
 {% endblocktrans %}
+
+{% load i18n %}
+
+{% block preview_text %}
+    Hi {{ thread_username }}
+{% endblock %}
+
+{% block content %}
+    {% blocktrans %}
+    Hi {{ thread_username }},
+    {{ comment_username }} made the following reply to {{ thread_title }} at {{ comment_created_at }}:
+      {{ comment_body }}
+    {% endblocktrans %}
+<a href="{{ post_link }}"> {% trans "View the discussion." %} </a>
+{% endblock %}
+
+{% block google_analytics_pixel %}
+<img src="{{ ga_tracking_pixel_url }}" alt="" role="presentation" aria-hidden="true" />
+{% endblock %}
