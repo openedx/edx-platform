@@ -3,145 +3,148 @@ Dynamic Pacing Schedules
 
 The Schedules app allows course teams to automatically email learners in
 self-paced courses. The emails are designed to keep learners engaged
-with a course's content. Learners receive these messages at important
-milestones throughout a course.
+with a course. Learners receive these messages at important milestones
+in their learning.
 
-With Schedules, the author of a self-paced course opts learners into one
-of two "Schedule Experiences". Learners either receive Weekly Course
-Highlight Messages, or a combination of Recurring Nudges and Upgrade
-Reminders.
+The author of a self-paced course opts learners into one of two
+“Schedule Experiences”. Learners either receive Weekly Course Highlight
+Messages, or a combination of Recurring Nudges and Upgrade Reminders.
 
-The app can send all three message types "out of the box":
+The app can send all three message types “out of the box”
 
 -  Recurring Nudges
 -  Upgrade Reminders
 -  Weekly Course Highlight Messages
 
-Recurring Nudges encourage learners to engage with self-paced courses at
+Recurring Nudges encourage learners to return to self-paced courses at
 regular intervals. The app sends nudges three days and ten days after a
 learner enrolls in a course.
 
-Upgrade Reminders ask learners to purchase their course's "Verified"
-certificate. The reminders are sent two days from their course's upgrade
-deadline, or two days from the course's end date. Whichever date occurs
-sooner.
+Upgrade Reminders ask learners to purchase their course’s Verified
+certificate. The reminders are sent two days from their course’s upgrade
+deadline, or two days from the course’s end date (whichever date occurs
+sooner).
 
-Weekly Course Highlight Messages tell learners what to look forward to
-in the coming week of a course. Course authors provide "section
-highlights" when authoring a course in Studio. The app generates emails
-with these section highlights listed in the body of the message.
+Weekly Course Highlight Messages tell learners what to look forward to in the
+coming week of a course. Course authors provide “section highlights” when
+authoring a course in Studio. The app sends a weekly email with these
+highlights listed in the message.
 
-The app introduces the Schedule object to the edX codebase. Learners
-receive Schedules when they enroll in self-paced courses. With
-Schedules, the app determines when to send particular messages. It
-assumes a steady rate of progress through course materials. It
-determines the cadence of its messaging through a course's "Schedule
-Experience".
+The app introduces a Schedule object to the edX codebase. Learners receive
+Schedules when they enroll in self-paced courses. The app uses Schedules to
+determine which learners to message.
 
 Glossary
 --------
 
--  **Schedule**: Stores the day a learner enrolls in a course and the
-   learner's "upgrade deadline".
+-  **Schedule**: Stores the day a learner enrolls in a course and the learner’s
+“upgrade deadline”. Used by the app at runtime to determine which learners to
+message.
 
--  **Schedule Experience**: Defines which set of emails that a learner
-   will receive so that they have a consistent email experience
-   throughout their time in the course even if a course author makes
-   changes to the course after they enroll. Right now, the possible
-   Schedule Experiences are:
+-  **Schedule Experience**: Defines the set of emails that a learner
+   receives. The two Schedule Experiences are:
 
-   -  "Recurring Nudge and Upgrade Reminder"
-   -  "Course Updates"
+   -  “Recurring Nudge and Upgrade Reminder”
+   -  “Course Updates”
 
 -  **Upgrade Deadline**: The date before which a learner can purchase a
-   verified certificate. A Schedule imposes a "soft" upgrade deadline 21
-   days from when a learner enrolled in a course. A self-paced course
-   imposes a "hard" upgrade deadline that is the course-wide expiration
-   date for upgrading on the course. A learner's Schedule will use
-   whichever date is earlier.
+   verified certificate. By default, a Schedule imposes a “soft” upgrade
+   deadline 21 days from when a learner enrolled in a course. A course
+   also imposes a “hard” upgrade deadline. A Schedule uses whichever
+   date is earlier.
 
--  **Course Update**: In the code, we refer to Weekly Course Highlight
-   messages as Course Updates. In hindsight, this is confusing since we
-   also use the term Course Updates to refer to bulk-emails manually
-   sent out by course instructors. We haven't had the chance to rename
-   these variables in the code yet.
+-  **Course Update**: We refer to “Weekly Course Highlight Messages” as “Course
+   Updates” in the code. In contexts outside of this app, Course Updates refer to
+   bulk-emails sent by course instructors. We plan on removing this term from the
+   code to avoid confusion.
 
--  **Highlights**: A list of topics that learners should expect to learn
-   in a section of a course. These are defined by course authors in the
-   Studio UI.
+-  **Section**: From our
+   `documentation <http://edx.readthedocs.io/projects/edx-%20partner-course-staff/en/latest/developing_course/course_sections.html#what-is-a-section>`__,
+   “A section is the topmost category in your course. A section can
+   represent a time period in your course, a chapter, or another
+   organizing principle. A section contains one or more subsections.”
+   For the purposes of Weekly Section Highlights Messages, we assume
+   that a section contains a week’s worth of learning material.
 
--  **Resolver**: Python class that defines which learners to filter to
-   for the message type and then creates and sends an email to each of
-   those learners.
+-  **Weekly Section Highlights**: A list of topics that learners will
+   encounter in a section of a course. Course authors enter section
+   highlights in the Studio UI.
 
--  **MessageType**: Python class that defines a particular kind of email
-   message and the Django template it uses. `MessageType is an ACE
+-  **Resolver**: A Python class that identifies which learners to
+   message and sends them emails. We create a Resolver subclass to
+   manage each message type. An “UpgradeReminderResolver” sends Upgrade
+   Reminder messages, a “RecurringNudgeResolver” sends Recurring Nudge
+   messages, and a “CourseUpdateResolver” sends Weekly Section Highlight
+   Messages.
+
+-  **MessageType**: A Python class that represents a kind of email
+   message. It specifies the Django template the app uses the render the
+   email. `MessageType is an ACE
    concept <https://edx-ace.readthedocs.io/en/latest/modules.html#edx_ace.message.MessageType>`__.
 
 -  **Task**: A
    `Celery <http://docs.celeryproject.org/en/latest/index.html>`__
    asynchronous class/function that is run in a separate process from
-   the main Django LMS process. We have to serialize all data we send to
-   a task to a string. In the Schedules app, a task is created for every
-   bin of learners.
+   the main Django LMS process. In the app, a task is created to email
+   groups of learners. We bin learners to distribute the amount of work
+   each task performs. We email each bin's worth of learners in a task.
 
--  **Bin**: In the Schedules app, we divide the learners that we want to
-   send emails to into N "bins" (default is 24). This is so that each
-   Celery task only has to process approximately 1,000 emails each.
+-  **Bin**: In the Schedules app, we divide the learners we are emailing
+   into N “bins” (by default, N is 24). We do this to evenly distribute
+   the number of emails each task must send.
+
+-  **Email Backend**
 
 Running the Management Commands
 -------------------------------
 
-To initiate the celery tasks that query for users and then send emails,
-run one of the management commands in the Schedules app. There is one
-command per message type: ``send_recurring_nudge``,
-``send_upgrade_reminder``, and ``send_course_update``.
+There are three management commands in the Schedules app. Each command sends a
+message type: ``send_recurring_nudge``; ``send_upgrade_reminder``; and
+``send_course_update``.
 
-The command requires you to specify for which Site to send emails. E.g.:
+You must specify the Site for which you are sending emails in the command:
 
 ::
 
     ./manage.py lms send_recurring_nudge example.com
 
-Make sure to specify the settings for the environment you are running
-the management command in. For example, in docker devstack this would
-be:
+Make sure to specify your development environment with the “settings”
+flag. For example, if you are running a command in docker devstack, you
+can use:
 
 ::
 
     ./manage.py lms --settings devstack_docker send_recurring_nudge example.com
 
-You have the option to override the current date in order to run the
-command as if it were run on that day.
+You can override the “current date” when running a command. The app will run,
+using the date you specify as its "today":
 
 ::
 
     ./manage.py lms --settings devstack_docker send_recurring_nudge example.com --date 2017-11-13
 
-If you have Sailthru configured in the current environment, you also
-have the option to override the recipient email addresses so that all of
-the emails are sent to the address that you specify instead of to the
-users' emails.
+If the app is paired with Sailthru, you can override which email addresses the
+app sends to. The app will send all emails to the address you specify:
 
 ::
 
     ./manage.py lms --settings devstack_docker send_recurring_nudge example.com --override-recipient-email developer@example.com
 
-These management commands are intended to be run on a daily basis, so it
-is recommended to execute them in a Cron job or Jenkins job scheduled to
-run automatically every day.
+These management commands are meant to be run daily. We schedule them to
+run automatically in a Jenkins job. You can use a similar automation
+tool, like “cron”, to schedule a daily run of the app.
 
 Configuring A.C.E.
 ------------------
 
 These instructions assume you have already setup an Open edX instance or
-have a Running devstack. See the `Open edX Developer's
+are running devstack. See the `Open edX Developer’s
 Guide <http://edx.readthedocs.io/projects/edx-developer-guide/en/latest/>`__
-for information on how to set them up.
+for information on setting them up.
 
-The Schedule app relies on ACE. ACE can be configured to send emails to
-a file or send emails through Sailthru which actually delivers emails to
-users.
+The Schedule app relies on ACE. When live, ACE sends emails to users
+through Sailthru. You can instead configure ACE to write emails
+to the local filesystem, which can be useful for debugging.
 
 File Back-end
 ~~~~~~~~~~~~~
@@ -153,23 +156,23 @@ add/change the following:
 
     ACE_CHANNEL_SAILTHRU_DEBUG = True
 
-By default your devstack should be configured to use the ``file_email``
-ACE channel which saves the HTML emails to
-``/path/to/your/devstack/src/ace_messages/*.html`` on your host (or
-``/edx/src/ace_messages/`` in your devstack docker container). Open the
-files in your browser to view the emails.
+By default, your devstack should be configured to use the ``file_email``
+ACE channel. This ACE channel saves the emails to
+``/path/to/your/devstack/src/ace_messages/*.html`` on your host machine
+(the host path corresponds to ``/edx/src/ace_messages/`` in your devstack docker
+container). To view the emails, open the saved files in your browser.
 
 Sailthru Back-end
 ~~~~~~~~~~~~~~~~~
 
-To configure ACE to actually send emails to users' email addresses, add
-a `Sailthru <http://www.sailthru.com/>`__ back-end configuration. See
-the `edx-ace
+To configure ACE to send emails to users’ email addresses, add a
+`Sailthru <http://www.sailthru.com/>`__ back-end configuration. See the
+`edx-ace
 documentation <https://edx-ace.readthedocs.io/en/latest/getting_started.html#sailthruemailchannel-settings>`__
 for instructions on setting up a Sailthru API key and secret.
 
-Additionally, make sure these are set in either the
-``lms/envs/common.py`` or ``lms/envs/private.py``:
+Make sure to add the following settings in either ``lms/envs/common.py``
+or ``lms/envs/private.py``:
 
 .. code:: python
 
@@ -181,8 +184,8 @@ Additionally, make sure these are set in either the
 Django Settings
 ---------------
 
-Regardless of which ACE back-end you use, make sure to set the following
-Django settings so that all of the features of the emails are enabled.
+These settings populate links in the emails to external
+social media, marketing websites, app stores, etc.
 
 Edit the ``lms/envs/common.py`` or ``lms/envs/private.py`` and
 add/change the following:
@@ -246,7 +249,7 @@ Schedules will only be created for a course if it is self-paced. A
 course can be configured to be self-paced by going to
 ``<studio_url>/admin/self_paced/selfpacedconfiguration/`` and adding an
 enabled self paced config. Then, go to Studio settings for the course
-and change the Course Pacing value to "Self-Paced". Note that the Course
+and change the Course Pacing value to “Self-Paced”. Note that the Course
 Start Date has to be set to sometime in the future in order to change
 the Course Pacing.
 
@@ -276,8 +279,8 @@ The CourseDynamicUpgradeDeadlineConfiguration takes precedence over the
 OrgDynamicUpgradeDeadlineConfiguration which takes precedence over the
 global DynamicUpgradeDeadlineConfiguration.
 
-The "deadline days" field specifies how many days from the day of the
-learner's enrollment will be their soft upgrade deadline on the Schedule
+The “deadline days” field specifies how many days from the day of the
+learner’s enrollment will be their soft upgrade deadline on the Schedule
 model.
 
 Verified Course Mode
@@ -291,6 +294,8 @@ linked with the course with the "Mode" equal to "verified".
 Configuring Email Sending
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. scheduleconfig-1:
+
 ScheduleConfig
 ^^^^^^^^^^^^^^
 
@@ -302,6 +307,8 @@ configure enqueueing and delivering emails per message type:
    celery.
 -  ``deliver_*``: allows delivering emails through ACE for this message
    type.
+
+.. roll-out-waffle-flag-1:
 
 Roll-out Waffle Flag
 ^^^^^^^^^^^^^^^^^^^^
@@ -320,7 +327,7 @@ authors to enter section highlights can be toggled globally by going to
 
 This is a roll-out related waffle switch that we will eventually delete.
 
-Configuring a Learner's Schedule
+Configuring a Learner’s Schedule
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Emails will only be sent to learners who have Schedule ``start_date``\ s
@@ -338,15 +345,15 @@ Recurring Nudge
 Upgrade Reminder
 ^^^^^^^^^^^^^^^^
 
--  Learners must have the ScheduleExperience type of "Recurring Nudge
-   and Upgrade Reminder".
+-  Learners must have the ScheduleExperience type of “Recurring Nudge
+   and Upgrade Reminder”.
 -  Their Schedule ``upgrade_deadline`` must be 2 days after the current
    date.
 
 Course Update
 ^^^^^^^^^^^^^
 
--  Learners must have the ScheduleExperience type of "Course Updates".
+-  Learners must have the ScheduleExperience type of “Course Updates”.
 -  Their Schedule ``start_date`` must be 7, 14, or any increment of 7
    days up to 77 days before the current date.
 
