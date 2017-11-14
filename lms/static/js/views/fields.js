@@ -483,7 +483,6 @@
                 if (this.modelValueIsSet() === false) {
                     value = this.options.placeholderValue || '';
                 }
-                this.$('.u-field-value').attr('aria-label', this.options.title);
                 this.$('.u-field-value-readonly').text(value);
 
                 if (this.mode === 'display') {
