@@ -52,7 +52,8 @@
                 fieldTemplate: field_dropdown_account_template,
                 saveSucceeded: function() {
                     var data = {
-                        language: this.modelValue()
+                        language: this.modelValue(),
+                        next: window.location.href
                     };
 
                     var view = this;
