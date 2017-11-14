@@ -20,7 +20,7 @@ from lms.djangoapps.onboarding_survey.models import (
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
-from .email_utils import send_admin_activation_email
+from lms.djangoapps.onboarding_survey.email_utils import send_admin_activation_email
 
 
 no_option_select_error = 'Please select an option for {}'
@@ -520,7 +520,14 @@ class OrganizationDetailModelForm(forms.ModelForm):
             },
         }
 
+    def clean_info_accuracy(self):
+        can_provide_info = int(self.data['can_provide_info']) if self.data.get('can_provide_info') else False
+        info_accuracy = self.cleaned_data['info_accuracy']
 
+        if can_provide_info and info_accuracy not in [True, False]:
+            raise forms.ValidationError("Please select an option for Estimated or Actual Information")
+
+        return info_accuracy
 
     def clean_last_fiscal_year_end_date(self):
         can_provide_info = int(self.data.get('can_provide_info')) if self.data.get('can_provide_info') else False
