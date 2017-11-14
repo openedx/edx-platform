@@ -33,6 +33,9 @@ from openedx.core.djangolib.js_utils import js_escaped_string
             'loginQuery': "/login${login_query() | n, js_escaped_string}",
             'dashboardUrl': "${reverse('dashboard') | n, js_escaped_string}",
             'homepageUrl': "${marketing_link('ROOT') | n, js_escaped_string}",
+            'zendeskApiHost': "${zendeskApiHost | n, js_escaped_string}",
+            'accessToken': "${access_token | n, js_escaped_string}",
+            'customFields': "${custom_fields | n, js_escaped_string}",
         }
 
         % if user.is_authenticated():
