@@ -16,10 +16,10 @@ from provider import constants
 
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
+
 from . import mixins
+from .. import adapters, models
 from .constants import DUMMY_REDIRECT_URL
-from .. import adapters
-from .. import models
 
 # NOTE (CCB): We use this feature flag in a roundabout way to determine if the oauth_dispatch app is installed
 # in the current service--LMS or Studio. Normally we would check if settings.ROOT_URLCONF == 'lms.urls'; however,
