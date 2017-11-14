@@ -328,10 +328,15 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
         "errorMessage": None,
         "registerFormSubmitButtonText": _("Create Account"),
     }
+    running_pipeline = pipeline.get(request)
 
     if third_party_auth.is_enabled():
         enterprise_customer = enterprise_customer_for_request(request)
-        if not enterprise_customer:
+
+        if enterprise_customer and not tpa_hint:
+            tpa_hint = enterprise_customer.get('identity_provider')
+
+        if running_pipeline is None and tpa_hint:
             for enabled in third_party_auth.provider.Registry.displayed_for_login(tpa_hint=tpa_hint):
                 info = {
                     "id": enabled.provider_id,
@@ -350,9 +355,7 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
                     ),
                 }
                 context["providers" if not enabled.secondary else "secondaryProviders"].append(info)
-
-        running_pipeline = pipeline.get(request)
-        if running_pipeline is not None:
+        elif running_pipeline is not None:
             current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
 
             if current_provider is not None:
