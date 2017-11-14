@@ -22,6 +22,7 @@ class TestAPIUtils(VideoPipelineIntegrationMixin, TestCase):
     def setUp(self):
         self.pipeline_integration = self.create_video_pipeline_integration()
         self.user = UserFactory(username=self.pipeline_integration.service_username)
+        self.oauth_client = self.create_video_pipeline_oauth_client(user=self.user)
 
     def test_update_transcription_service_credentials_with_integration_disabled(self):
         """
@@ -37,6 +38,15 @@ class TestAPIUtils(VideoPipelineIntegrationMixin, TestCase):
         Test updating the credentials when expected service user is not registered.
         """
         self.pipeline_integration.service_username = 'non_existent_user'
+        self.pipeline_integration.save()
+        __, is_updated = update_3rd_party_transcription_service_credentials()
+        self.assertFalse(is_updated)
+
+    def test_update_transcription_service_credentials_with_unknown_oauth_client(self):
+        """
+        Test updating the credentials when expected oauth cleint is not present.
+        """
+        self.pipeline_integration.client_name = 'non_existent_client'
         self.pipeline_integration.save()
         __, is_updated = update_3rd_party_transcription_service_credentials()
         self.assertFalse(is_updated)
