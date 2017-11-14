@@ -2,6 +2,7 @@
 Model form for the surveys.
 """
 import uuid
+import base64
 
 from itertools import chain
 from django import forms
@@ -16,12 +17,10 @@ from lms.djangoapps.onboarding_survey.models import (
     Organization,
     OrganizationDetailSurvey,
     Currency)
+from lms.djangoapps.onboarding_survey.email_utils import send_admin_activation_email
 
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
-from lms.djangoapps.onboarding_survey.email_utils import send_admin_activation_email
-
 
 no_option_select_error = 'Please select an option for {}'
 empty_field_error = 'Please enter your {}'
@@ -416,12 +415,14 @@ class RegModelForm(forms.ModelForm):
                 admin_user = User.objects.get(email=extended_profile.org_admin_email)
                 admin_user.extended_profile.admin_activation_key = uuid.uuid4().hex
                 admin_user.extended_profile.save()
-                org_id = extended_profile.organization.id
+                org_id = extended_profile.organization_id
                 org_name = extended_profile.organization.name
+
+                encoded_org_id = base64.b64encode(str(org_id))
 
                 message_context = {
                     "key": admin_user.extended_profile.admin_activation_key,
-                    "org_id": org_id,
+                    "org_id": encoded_org_id,
                     "org_name": org_name,
                     "referring_user": user.username,
 

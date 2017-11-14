@@ -3,8 +3,10 @@ Views for on-boarding app.
 """
 import json
 import logging
+import base64
 
 import os
+
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db import transaction
@@ -474,9 +476,9 @@ def admin_activation(request, org_id, activation_key):
     When clicked on link sent in email to make user admin.
 
     """
-    extended_user = None
+    extended_profile = None
     try:
-        extended_user = ExtendedProfile.objects.get(admin_activation_key=activation_key)
+        extended_profile = ExtendedProfile.objects.get(admin_activation_key=activation_key)
     except ExtendedProfile.DoesNotExist:
         pass
     # activation_status can have values 1,2,3,4.
@@ -486,20 +488,21 @@ def admin_activation(request, org_id, activation_key):
     # 4 means 'to be activated'
     context = {}
     activation_status = 3
-    if extended_user:
-        if extended_user.is_admin_activated:
+    if extended_profile:
+        if extended_profile.is_admin_activated:
             activation_status = 2
         elif request.method == 'GET':
-            context['key'] = extended_user.admin_activation_key
+            context['key'] = extended_profile.admin_activation_key
             activation_status = 4
         elif request.method == 'POST':
             try:
-                organization = Organization.objects.get(pk=org_id)
-                extended_user.is_admin_activated = True
-                extended_user.is_poc = True
-                extended_user.organization = organization
-                organization.admin = extended_user.user
-                extended_user.save()
+                decoded_org_id = base64.b64decode(org_id)
+                organization = Organization.objects.get(pk=decoded_org_id)
+                extended_profile.is_admin_activated = True
+                extended_profile.is_poc = True
+                extended_profile.organization = organization
+                organization.admin = extended_profile.user
+                extended_profile.save()
                 activation_status = 1
                 organization.save()
             except Organization.DoesNotExist:
