@@ -469,14 +469,14 @@ def recommendations(request):
     return render_to_response('onboarding_survey/recommendations.html', context)
 
 @csrf_exempt
-def admin_activation(request, activation_key):
+def admin_activation(request, org_id, activation_key):
     """
     When clicked on link sent in email to make user admin.
 
     """
-    user = None
+    extended_user = None
     try:
-        user = ExtendedProfile.objects.get(admin_activation_key=activation_key)
+        extended_user = ExtendedProfile.objects.get(admin_activation_key=activation_key)
     except ExtendedProfile.DoesNotExist:
         pass
     # activation_status can have values 1,2,3,4.
@@ -486,16 +486,26 @@ def admin_activation(request, activation_key):
     # 4 means 'to be activated'
     context = {}
     activation_status = 3
-    if user:
-        if user.is_admin_activated:
+    if extended_user:
+        if extended_user.is_admin_activated:
             activation_status = 2
         elif request.method == 'GET':
-            context['key'] = user.admin_activation_key
+            context['key'] = extended_user.admin_activation_key
             activation_status = 4
         elif request.method == 'POST':
-            user.is_admin_activated = True
-            user.save()
-            activation_status = 1
+            try:
+                organization = Organization.objects.get(pk=org_id)
+                extended_user.is_admin_activated = True
+                extended_user.is_poc = True
+                extended_user.organization = organization
+                organization.admin = extended_user.user
+                extended_user.save()
+                activation_status = 1
+                organization.save()
+            except Organization.DoesNotExist:
+                activation_status = 3
+            except Exception:
+                activation_status = 3
 
     context['activation_status'] = activation_status
     return render_to_response('onboarding_survey/admin_activation.html', context)

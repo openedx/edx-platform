@@ -416,8 +416,16 @@ class RegModelForm(forms.ModelForm):
                 admin_user = User.objects.get(email=extended_profile.org_admin_email)
                 admin_user.extended_profile.admin_activation_key = uuid.uuid4().hex
                 admin_user.extended_profile.save()
+                org_id = extended_profile.organization.id
+                org_name = extended_profile.organization.name
 
-                message_context = {"key": admin_user.extended_profile.admin_activation_key}
+                message_context = {
+                    "key": admin_user.extended_profile.admin_activation_key,
+                    "org_id": org_id,
+                    "org_name": org_name,
+                    "referring_user": user.username,
+
+                }
                 message_body = render_to_string('emails/admin_activation.txt', message_context)
 
                 from_address = configuration_helpers.get_value(
