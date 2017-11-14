@@ -483,6 +483,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
             'total_employees', 'currency_input', 'total_revenue', 'total_expenses', 'total_program_expenses'
         ]
 
+
         widgets = {
             'can_provide_info': forms.RadioSelect,
             'info_accuracy': RadioSelectNotNull,
@@ -513,17 +514,16 @@ class OrganizationDetailModelForm(forms.ModelForm):
                                          " please enter today's date."
         }
 
-    def clean_info_accuracy(self):
-        can_provide_info = int(self.data['can_provide_info'])
-        info_accuracy = self.cleaned_data['info_accuracy']
+        error_messages = {
+            'can_provide_info': {
+                'required': "Please select an option for providing information.",
+            },
+        }
 
-        if can_provide_info and info_accuracy not in [True, False]:
-            raise forms.ValidationError("Please select an option for Estimated or Actual Information")
 
-        return info_accuracy
 
     def clean_last_fiscal_year_end_date(self):
-        can_provide_info = int(self.data['can_provide_info'])
+        can_provide_info = int(self.data.get('can_provide_info')) if self.data.get('can_provide_info') else False
         last_fiscal_year_end_date = self.cleaned_data['last_fiscal_year_end_date']
 
         if can_provide_info and not last_fiscal_year_end_date:
@@ -532,7 +532,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         return last_fiscal_year_end_date
 
     def clean_total_clients(self):
-        can_provide_info = int(self.data['can_provide_info'])
+        can_provide_info = int(self.data.get('can_provide_info')) if self.data.get('can_provide_info') else False
         total_clients = self.cleaned_data['total_clients']
 
         if can_provide_info and not total_clients:
@@ -541,7 +541,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         return total_clients
 
     def clean_total_employees(self):
-        can_provide_info = int(self.data['can_provide_info'])
+        can_provide_info = int(self.data.get('can_provide_info')) if self.data.get('can_provide_info') else False
         total_employees = self.cleaned_data['total_employees']
 
         if can_provide_info and not total_employees:
@@ -550,7 +550,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         return total_employees
 
     def clean_total_revenue(self):
-        can_provide_info = int(self.data['can_provide_info'])
+        can_provide_info = int(self.data.get('can_provide_info')) if self.data.get('can_provide_info') else False
         total_revenue = self.cleaned_data['total_revenue']
 
         if can_provide_info and not total_revenue:
@@ -559,7 +559,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         return total_revenue
 
     def clean_total_expenses(self):
-        can_provide_info = int(self.data['can_provide_info'])
+        can_provide_info = int(self.data.get('can_provide_info')) if self.data.get('can_provide_info') else False
         total_expenses = self.cleaned_data['total_expenses']
 
         if can_provide_info and not total_expenses:
@@ -568,13 +568,14 @@ class OrganizationDetailModelForm(forms.ModelForm):
         return total_expenses
 
     def clean_total_program_expenses(self):
-        can_provide_info = int(self.data['can_provide_info'])
+        can_provide_info = int(self.data.get('can_provide_info')) if self.data.get('can_provide_info') else False
         total_program_expenses = self.cleaned_data['total_program_expenses']
 
         if can_provide_info and not total_program_expenses:
             raise forms.ValidationError(empty_field_error.format("Total Program Expense"))
 
         return total_program_expenses
+
 
     def save(self, user=None, commit=True):
         org_detail = super(OrganizationDetailModelForm, self).save(commit=False)
