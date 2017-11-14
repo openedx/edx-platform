@@ -484,7 +484,7 @@ def _accessible_libraries_iter(user, org=None):
     if org is not None:
         libraries = [] if org == '' else modulestore().get_libraries(org=org)
     else:
-        libraries = modulestore().get_libraries()
+        libraries = modulestore().get_library_summaries()
     # No need to worry about ErrorDescriptors - split's get_libraries() never returns them.
     return (lib for lib in libraries if has_studio_read_access(user, lib.location.library_key))
 
@@ -493,7 +493,7 @@ def _accessible_libraries_iter(user, org=None):
 @ensure_csrf_cookie
 def course_listing(request):
     """
-    List all courses available to the logged in user
+    List all courses and libraries available to the logged in user
     """
 
     optimization_enabled = GlobalStaff().has_user(request.user) and \
@@ -502,7 +502,10 @@ def course_listing(request):
     org = request.GET.get('org', '') if optimization_enabled else None
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     user = request.user
+    # remove this temporary log after getting results
+    start_time = time.time()
     libraries = _accessible_libraries_iter(request.user, org) if LIBRARIES_ENABLED else []
+    log.info("_accessible_libraries_iter completed in [%f]", (time.time() - start_time))
 
     def format_in_process_course_view(uca):
         """
@@ -529,6 +532,7 @@ def course_listing(request):
         """
         Return a dict of the data which the view requires for each library
         """
+
         return {
             u'display_name': library.display_name,
             u'library_key': unicode(library.location.library_key),

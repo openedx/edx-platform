@@ -322,6 +322,23 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return courses.values()
 
     @strip_key
+    def get_library_summaries(self, **kwargs):
+        """
+        Returns a list of LibrarySummary objects.
+        Information contains `location`, `display_name`, `locator` of the libraries in this modulestore.
+        """
+        library_summaries = {}
+        for store in self.modulestores:
+            if not hasattr(store, 'get_libraries'):
+                continue
+            # fetch library summaries and filter out any duplicated entry across/within stores
+            for library_summary in store.get_library_summaries(**kwargs):
+                library_id = self._clean_locator_for_mapping(library_summary.location)
+                if library_id not in library_summaries:
+                    library_summaries[library_id] = library_summary
+        return library_summaries.values()
+
+    @strip_key
     def get_libraries(self, **kwargs):
         """
         Returns a list containing the top level XBlock of the libraries (LibraryRoot) in this modulestore.
