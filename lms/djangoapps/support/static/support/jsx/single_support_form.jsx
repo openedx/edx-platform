@@ -42,6 +42,7 @@ class RenderForm extends React.Component {
           body: $('#message').val(),
           uploads: $.map($('.uploaded-files button'), n => n.id),
         },
+        tags: this.props.context.zendeskTags,
       };
 
     let course;
