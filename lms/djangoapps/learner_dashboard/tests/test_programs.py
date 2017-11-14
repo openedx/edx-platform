@@ -10,7 +10,7 @@ from uuid import uuid4
 import mock
 from bs4 import BeautifulSoup
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.test import override_settings
 
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
@@ -31,7 +31,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Unit tests for the program listing page."""
     maxDiff = None
     password = 'test'
-    url = reverse('program_listing_view')
+    url = reverse_lazy('program_listing_view')
 
     @classmethod
     def setUpClass(cls):
@@ -176,7 +176,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
     """Unit tests for the program details page."""
     program_uuid = str(uuid4())
     password = 'test'
-    url = reverse('program_details_view', kwargs={'program_uuid': program_uuid})
+    url = reverse_lazy('program_details_view', kwargs={'program_uuid': program_uuid})
 
     @classmethod
     def setUpClass(cls):

@@ -13,7 +13,6 @@ from opaque_keys.edx.keys import CourseKey
 from py2neo import Graph, Node, Relationship, authenticate, NodeSelector
 from py2neo.compat import integer, string, unicode as neo4j_unicode
 from request_cache.middleware import RequestCache
-from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 
 
 log = logging.getLogger(__name__)
@@ -37,6 +36,8 @@ def serialize_item(item):
         block_type: the name of the XBlock's type (i.e. 'course'
         or 'problem')
     """
+    from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
+
     # convert all fields to a dict and filter out parent and children field
     fields = dict(
         (field, field_value.read_from(item))

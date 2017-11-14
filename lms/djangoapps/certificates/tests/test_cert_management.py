@@ -1,15 +1,16 @@
 """Tests for the resubmit_error_certificates management command. """
 import ddt
+from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
 from mock import patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
+from six import text_type
 
 from badges.events.course_complete import get_completion_badge
 from badges.models import BadgeAssertion
 from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
-from certificates.management.commands import regenerate_user, resubmit_error_certificates, ungenerated_certs
 from certificates.models import CertificateStatuses, GeneratedCertificate
 from course_modes.models import CourseMode
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
@@ -23,7 +24,7 @@ class CertificateManagementTest(ModuleStoreTestCase):
     Base test class for Certificate Management command tests.
     """
     # Override with the command module you wish to test.
-    command = resubmit_error_certificates
+    command = 'resubmit_error_certificates'
 
     def setUp(self):
         super(CertificateManagementTest, self).setUp()
@@ -53,11 +54,6 @@ class CertificateManagementTest(ModuleStoreTestCase):
             status=status
         )
 
-    def _run_command(self, *args, **kwargs):
-        """Run the management command to generate a fake cert. """
-        command = self.command.Command()
-        return command.handle(*args, **kwargs)
-
     def _assert_cert_status(self, course_key, user, expected_status):
         """Check the status of a certificate. """
         cert = GeneratedCertificate.eligible_certificates.get(user=user, course_id=course_key)
@@ -77,7 +73,7 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
 
         # Re-submit all certificates with status 'error'
         with check_mongo_calls(1):
-            self._run_command()
+            call_command(self.command)
 
         # Expect that the certificate was re-submitted
         self._assert_cert_status(self.courses[0].id, self.user, CertificateStatuses.notpassing)
@@ -89,9 +85,9 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
             self._create_cert(self.courses[idx].id, self.user, CertificateStatuses.error)
 
         # Re-submit certificates for two of the courses
-        self._run_command(course_key_list=[
-            unicode(self.courses[0].id),
-            unicode(self.courses[1].id)
+        call_command(self.command, course_key_list=[
+            text_type(self.courses[0].id),
+            text_type(self.courses[1].id)
         ])
 
         # Expect that the first two courses have been re-submitted,
@@ -115,7 +111,7 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
         self._create_cert(self.courses[1].id, self.user, other_status)
 
         # Re-submit certificates for all courses
-        self._run_command()
+        call_command(self.command)
 
         # Only the certificate with status "error" should have been re-submitted
         self._assert_cert_status(self.courses[0].id, self.user, CertificateStatuses.notpassing)
@@ -123,7 +119,7 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
 
     def test_resubmit_error_certificate_none_found(self):
         self._create_cert(self.courses[0].id, self.user, CertificateStatuses.downloadable)
-        self._run_command()
+        call_command(self.command)
         self._assert_cert_status(self.courses[0].id, self.user, CertificateStatuses.downloadable)
 
     def test_course_caching(self):
@@ -135,17 +131,17 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
         # Verify that we make only one Mongo query
         # because the course is cached.
         with check_mongo_calls(1):
-            self._run_command()
+            call_command(self.command)
 
     def test_invalid_course_key(self):
         invalid_key = u"invalid/"
         with self.assertRaisesRegexp(CommandError, invalid_key):
-            self._run_command(course_key_list=[invalid_key])
+            call_command(self.command, course_key_list=[invalid_key])
 
     def test_course_does_not_exist(self):
         phantom_course = CourseLocator(org='phantom', course='phantom', run='phantom')
         self._create_cert(phantom_course, self.user, 'error')
-        self._run_command()
+        call_command(self.command)
 
         # Expect that the certificate was NOT resubmitted
         # since the course doesn't actually exist.
@@ -158,7 +154,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
     """
     Tests for regenerating certificates.
     """
-    command = regenerate_user
+    command = 'regenerate_user'
 
     def setUp(self):
         """
@@ -185,10 +181,10 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         self.assertTrue(BadgeAssertion.objects.filter(user=self.user, badge_class=badge_class))
         self.course.issue_badges = issue_badges
         self.store.update_item(self.course, None)
-        self._run_command(
-            username=self.user.email, course=unicode(key), noop=False, insecure=False, template_file=None,
-            grade_value=None
-        )
+
+        args = '-u {} -c {}'.format(self.user.email, text_type(key))
+        call_command(self.command, *args.split(' '))
+
         xqueue.return_value.regen_cert.assert_called_with(
             self.user,
             key,
@@ -211,10 +207,10 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         """
         key = self.course.location.course_key
         self._create_cert(key, self.user, CertificateStatuses.downloadable)
-        self._run_command(
-            username=self.user.email, course=unicode(key), noop=False, insecure=True, template_file=None,
-            grade_value=None
-        )
+
+        args = '-u {} -c {} --insecure'.format(self.user.email, text_type(key))
+        call_command(self.command, *args.split(' '))
+
         certificate = GeneratedCertificate.eligible_certificates.get(
             user=self.user,
             course_id=key
@@ -228,7 +224,7 @@ class UngenerateCertificatesTest(CertificateManagementTest):
     """
     Tests for generating certificates.
     """
-    command = ungenerated_certs
+    command = 'ungenerated_certs'
 
     def setUp(self):
         """
@@ -248,10 +244,11 @@ class UngenerateCertificatesTest(CertificateManagementTest):
         mock_send_to_queue.return_value = (0, "Successfully queued")
         key = self.course.location.course_key
         self._create_cert(key, self.user, CertificateStatuses.unavailable)
+
         with mock_passing_grade():
-            self._run_command(
-                course=unicode(key), noop=False, insecure=True, force=False
-            )
+            args = '-c {} --insecure'.format(text_type(key))
+            call_command(self.command, *args.split(' '))
+
         self.assertTrue(mock_send_to_queue.called)
         certificate = GeneratedCertificate.eligible_certificates.get(
             user=self.user,
