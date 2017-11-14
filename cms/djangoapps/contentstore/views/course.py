@@ -567,6 +567,9 @@ def _deprecated_blocks_info(course_module, deprecated_block_types):
         'advance_settings_url': reverse_course_url('advanced_settings_handler', course_module.id)
     }
 
+    if not deprecated_block_types:
+        return data
+
     try:
         structure_data = api.course_structure(course_module.id, block_types=deprecated_block_types)
     except errors.CourseStructureNotAvailableError:
