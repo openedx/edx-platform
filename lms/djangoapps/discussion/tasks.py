@@ -36,9 +36,7 @@ ROUTING_KEY = getattr(settings, 'ACE_ROUTING_KEY', None)
 
 
 class ResponseNotification(MessageType):
-    def __init__(self, *args, **kwargs):
-        super(ResponseNotification, self).__init__(*args, **kwargs)
-        self.name = 'response_notification'
+    pass
 
 
 @task(base=LoggedTask, routing_key=ROUTING_KEY)
@@ -58,8 +56,8 @@ def send_ace_message(context):
                 _get_course_language(context['course_id']),
                 message_context
             )
-        log.info('Sending forum comment email notification with context %s', message_context)
-        ace.send(message)
+            log.info('Sending forum comment email notification with context %s', message_context)
+            ace.send(message)
 
 
 def _should_send_message(context):
