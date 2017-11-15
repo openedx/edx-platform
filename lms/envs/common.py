@@ -643,6 +643,11 @@ AUTHENTICATION_BACKENDS = ['ratelimitbackend.backends.RateLimitModelBackend']
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
+# Set request limits for maximum size of a request body and maximum number of GET/POST parameters. (>=Django 1.10)
+# Limits are currently disabled - but can be used for finer-grained denial-of-service protection.
+DATA_UPLOAD_MAX_MEMORY_SIZE = None
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
+
 # Configuration option for when we want to grab server error pages
 STATIC_GRAB = False
 DEV_CONTENT = True
