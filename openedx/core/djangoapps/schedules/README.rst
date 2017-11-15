@@ -21,8 +21,8 @@ regular intervals. The app sends nudges three days and ten days after a
 learner enrolls in a course.
 
 Upgrade Reminders ask learners to purchase their course’s Verified
-certificate. The reminders are sent two days from their course’s upgrade
-deadline, or two days from the course’s end date (whichever date occurs
+certificate. The reminders are sent two days before their course’s upgrade
+deadline, or two days before the course’s end date (whichever date occurs
 sooner).
 
 Weekly Course Highlight Messages tell learners what to look forward to in the
@@ -34,12 +34,17 @@ The app introduces a Schedule object to the edX codebase. Learners receive
 Schedules when they enroll in self-paced courses. The app uses Schedules to
 determine which learners to message.
 
+In the future, the Schedules app may be extended or changed to support more
+complicated communication patterns. For example, something that takes into
+account the user's progress through the course.
+
 Glossary
 --------
 
--  **Schedule**: Stores the day a learner enrolls in a course and the learner’s
-“upgrade deadline”. Used by the app at runtime to determine which learners to
-message.
+-  **Schedule**: Stores the day a learner enrolls in a course and the
+   learner's "upgrade deadline". This information allows us to personalize
+   learners' experiences in self-paced courses so that events happen relative to
+   the learner's schedule, not the course's schedule.
 
 -  **Schedule Experience**: Defines the set of emails that a learner
    receives. The two Schedule Experiences are:
@@ -47,16 +52,18 @@ message.
    -  “Recurring Nudge and Upgrade Reminder”
    -  “Course Updates”
 
--  **Upgrade Deadline**: The date before which a learner can purchase a
-   verified certificate. By default, a Schedule imposes a “soft” upgrade
-   deadline 21 days from when a learner enrolled in a course. A course
-   also imposes a “hard” upgrade deadline. A Schedule uses whichever
-   date is earlier.
+-  **Upgrade Deadline**: The date before which a learner is encouraged to
+   purchase a verified certificate. By default, a Schedule imposes a "soft"
+   upgrade deadline (meaning, a suggested, but not final, date) 21 days from
+   when a learner enrolled in a course. A self-paced course imposes a "hard"
+   upgrade deadline that is the course-wide expiration date for upgrading on the
+   course. A Schedule uses whichever date is earlier.
 
--  **Course Update**: We refer to “Weekly Course Highlight Messages” as “Course
-   Updates” in the code. In contexts outside of this app, Course Updates refer to
-   bulk-emails sent by course instructors. We plan on removing this term from the
-   code to avoid confusion.
+-  **Course Update**: We refer to "Weekly Course Highlight Messages" as "Course
+   Updates" in the code. In contexts outside of this app, Course Updates refer
+   to bulk-emails manually sent out by course instructors and for the blocks of
+   text that course instructors can add to the top of the course outline. We
+   plan on removing this term from this app's code to avoid confusion.
 
 -  **Section**: From our
    `documentation <http://edx.readthedocs.io/projects/edx-%20partner-course-staff/en/latest/developing_course/course_sections.html#what-is-a-section>`__,
@@ -93,7 +100,9 @@ message.
    into N “bins” (by default, N is 24). We do this to evenly distribute
    the number of emails each task must send.
 
--  **Email Backend**
+-  **Email Backend**: An external service that ACE will use to deliver emails.
+	 Right now, ACE only supports `Sailthru <http://www.sailthru.com/>` as an
+   email backend.
 
 Running the Management Commands
 -------------------------------
@@ -365,9 +374,30 @@ emails in a variety of email clients to ensure there are no bugs in any
 of them. EdX uses a tool called `Litmus <http://litmus.com/>`__ that
 automates this process.
 
-To begin using Litmus, make sure that ACE is configured to use Sailthru,
-and then refer to the confluence page on `How to test emails in a
-variety of
-clients <https://openedx.atlassian.net/wiki/spaces/RET/pages/216563991/How+to+test+emails+in+a+variety+of+clients>`__
-which will explain how to send emails to Litmus using the
-``--override-recipient-email`` option to the management commands.
+To begin using Litmus, follow these steps:
+
+1. Make sure that ACE is configured to use Sailthru (see instructions above).
+2. Go to the `Litmus checklist page <https://litmus.com/checklist>`__ and start
+   a new checklist.
+3. The checklist will provide you with an email address to send the test email
+   to. Take note of it.
+4. Send an email, using management command with the `--override-recipient-email`
+   option so that it is sent to the Litmus email you got in step 3.
+
+::
+
+    ./manage.py lms --settings devstack_docker send_recurring_nudge example.com --override-recipient-email PUT-LITMUS-ADDRESS-HERE
+
+Using the Browser Extenstion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Configure your devstack to use the "file_email" channel for ACE (see
+   instructions above).
+2. Install the Litmus `chrome browser extension
+   <https://chrome.google.com/webstore/detail/litmus/makmhllelncgkglnpaipelogkekggpio>`__.
+3. Send an email by running the management command. This should save the email
+   to a file.
+4. Open the saved file in chrome on your host. It should be in
+   `/path/to/your/devstack/src/ace_messages/*.html`.
+5. Open the Litmus extension.
+6. When you regenerate emails, you can easily refresh the previews in Litmus.
