@@ -111,7 +111,7 @@ if __name__ == "__main__":
     startup = importlib.import_module(edx_args.startup)
     startup.run()
 
-    if django_args[0] == 'runserver':
+    if 'runserver' in django_args:
         from edx_notifications.load_notification_startup import start_up as notification_startup
         notification_startup()
 
