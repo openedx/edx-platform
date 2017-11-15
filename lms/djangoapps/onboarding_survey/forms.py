@@ -3,6 +3,8 @@ Model form for the surveys.
 """
 import uuid
 import base64
+import json
+import os
 
 from itertools import chain
 from django import forms
@@ -46,6 +48,32 @@ class UserInfoModelForm(forms.ModelForm):
                     "Country of Employment which is difference from Country of Residence")
                 )
         return self.cleaned_data['country_of_employment']
+
+    def clean_country_of_residence(self):
+        curr_dir = os.path.dirname(__file__)
+        all_countries_json_file = open(os.path.join(curr_dir, 'data/world_countries.json'))
+        all_countries = json.load(all_countries_json_file)
+
+        country_of_residence = self.cleaned_data['country_of_residence']
+
+        for country in all_countries:
+            if country == country_of_residence:
+                return self.cleaned_data['country_of_residence']
+
+        raise forms.ValidationError('Please select country of residence from the auto-fill drop down.')
+
+    def clean_language(self):
+        curr_dir = os.path.dirname(__file__)
+        all_languages_json_file = open(os.path.join(curr_dir, 'data/world_languages.json'))
+        all_languages = json.load(all_languages_json_file)
+
+        submitted_language = self.cleaned_data['language']
+
+        for language in all_languages:
+            if language == submitted_language:
+                return self.cleaned_data['language']
+
+        raise forms.ValidationError('Please select language from the auto-fill drop down.')
 
     class Meta:
         """
@@ -269,6 +297,19 @@ class OrganizationInfoModelForm(forms.ModelForm):
             },
 
         }
+
+    def clean_country(self):
+        curr_dir = os.path.dirname(__file__)
+        all_countries_json_file = open(os.path.join(curr_dir, 'data/world_countries.json'))
+        all_countries = json.load(all_countries_json_file)
+
+        country = self.cleaned_data['country']
+
+        for _country in all_countries:
+            if _country == country:
+                return self.cleaned_data['country']
+
+        raise forms.ValidationError('Please select country of Organization Headquarters from the auto-fill drop down.')
 
     def clean_url(self):
         is_org_url_exist = int(self.data.get('is_org_url_exist')) if self.data.get('is_org_url_exist') else None
@@ -528,6 +569,16 @@ class OrganizationDetailModelForm(forms.ModelForm):
                 'required': "Please select an option for providing information.",
             },
         }
+
+    def clean_currency_input(self):
+        all_currency_codes = Currency.objects.values_list('alphabetic_code', flat=True)
+        currency_input = self.cleaned_data['currency_input']
+
+        for currency in all_currency_codes:
+            if currency == currency_input:
+                return self.cleaned_data['currency_input']
+
+        raise forms.ValidationError('Please select currency code from the auto-fill drop down.')
 
     def clean_info_accuracy(self):
         can_provide_info = int(self.data['can_provide_info']) if self.data.get('can_provide_info') else False
