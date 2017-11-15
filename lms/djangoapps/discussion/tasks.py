@@ -100,15 +100,17 @@ def _get_course_language(course_id):
 
 def _build_message_context(context):
     message_context = get_base_template_context(context['site'])
-    message_context.update(_deserialize_context_dates(context))
-    message_context['post_link'] = _get_thread_url(context)
+    message_context.update(context)
+    thread_author = User.objects.get(id=context['thread_author_id'])
+    comment_author = User.objects.get(id=context['comment_author_id'])
+    message_context.update({
+        'thread_username': thread_author.username,
+        'comment_username': comment_author.username,
+        'post_link': _get_thread_url(context),
+        'comment_created_at': date.deserialize(context['comment_created_at']),
+        'thread_created_at': date.deserialize(context['thread_created_at'])
+    })
     return message_context
-
-
-def _deserialize_context_dates(context):
-    context['comment_created_at'] = date.deserialize(context['comment_created_at'])
-    context['thread_created_at'] = date.deserialize(context['thread_created_at'])
-    return context
 
 
 def _get_thread_url(context):
