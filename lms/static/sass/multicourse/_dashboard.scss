@@ -734,7 +734,7 @@
 
         @include clearfix();
 
-        position: inherit;
+        position: relative;
 
         @include left($baseline/2);
         @include padding(($baseline * 0.4), 0, ($baseline * 0.4), ($baseline * 0.75));
@@ -783,15 +783,6 @@
           @extend %t-action4;
 
           opacity: 0.875;
-        }
-      }
-
-      .action-view-consent {
-        @extend %btn-pl-white-base;
-        @include float(right);
-              
-        &.archived {
-          @extend %btn-pl-default-base;
         }
       }
     }
