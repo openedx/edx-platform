@@ -1,6 +1,7 @@
 {% extends 'schedules/edx_ace/common/base_body.html' %}
 {% load i18n %}
 {% load static %}
+{% load ace %}
 
 {% block preview_text %}
     {% if course_ids|length > 1 %}
@@ -56,7 +57,7 @@
                 <ul style="margin-bottom: 30px;">
                 {% for course_link in course_links %}
                     <li>
-                        <a href="{{ course_link.url }}">{{ course_link.name }}</a>
+                        <a href="{% with_link_tracking course_link.url %}">{{ course_link.name }}</a>
                     </li>
                 {% endfor %}
                 </ul>
@@ -82,9 +83,9 @@
                 {# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
                 <a
                     {% if course_ids|length == 1 %}
-                      href="{{ upsell_link }}"
+                      href="{% with_link_tracking upsell_link %}"
                     {% else %}
-                      href="{{ dashboard_url }}"
+                      href="{% with_link_tracking dashboard_url %}"
                     {% endif %}
                     style="
                         color: #ffffff;

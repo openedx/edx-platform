@@ -1,12 +1,17 @@
 {% load i18n %}
+{% load ace %}
 
 <p>
     {# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
     <a
-    {% if course_ids|length > 1 %}
-        href="{{ dashboard_url }}"
+    {% if course_cta_url %}
+        href="{% with_link_tracking course_cta_url %}"
     {% else %}
-        href="{{ course_url }}"
+        {%if course_ids|length > 1 %}
+            href="{% with_link_tracking dashboard_url %}"
+        {% else %}
+            href="{% with_link_tracking course_url %}"
+        {% endif %}
     {% endif %}
     style="
         color: #ffffff;

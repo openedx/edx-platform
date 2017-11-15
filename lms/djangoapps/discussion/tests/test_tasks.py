@@ -1,16 +1,15 @@
 """
 Tests the execution of forum notification tasks.
 """
-from contextlib import contextmanager
 from datetime import datetime, timedelta
 import json
 import math
-from urlparse import urljoin
 
 import ddt
-from django.conf import settings
 from django.contrib.sites.models import Site
 import mock
+
+import lms.lib.comment_client as cc
 
 from django_comment_common.models import ForumsConfig
 from django_comment_common.signals import comment_created
@@ -18,8 +17,7 @@ from edx_ace.recipient import Recipient
 from edx_ace.utils import date
 from lms.djangoapps.discussion.config.waffle import waffle, FORUM_RESPONSE_NOTIFICATIONS, SEND_NOTIFICATIONS_FOR_COURSE
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
-from lms.djangoapps.discussion.tasks import _should_send_message, _generate_ga_pixel_url
-import lms.lib.comment_client as cc
+from lms.djangoapps.discussion.tasks import _should_send_message
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
@@ -204,11 +202,10 @@ class TaskTestCase(ModuleStoreTestCase):
                 'thread_title': 'thread-title',
                 'thread_username': self.thread_author.username,
                 'thread_commentable_id': self.thread['commentable_id'],
-                'post_link': urljoin(site.domain, self.mock_permalink.return_value),
+                'post_link': self.mock_permalink.return_value,
                 'site': site,
                 'site_id': site.id
             })
-            expected_message_context['ga_tracking_pixel_url'] = _generate_ga_pixel_url(expected_message_context)
             expected_recipient = Recipient(self.thread_author.username, self.thread_author.email)
             actual_message = self.mock_ace_send.call_args_list[0][0][0]
             self.assertEqual(expected_message_context, actual_message.context)
