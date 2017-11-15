@@ -88,6 +88,21 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         results = response.data.get('results', [])
         assert results == CourseEntitlementSerializer(entitlements, many=True).data
 
+    def test_get_user_entitlements(self):
+        user2 = UserFactory()
+        CourseEntitlementFactory.create()
+        entitlement_user2 = CourseEntitlementFactory.create(user=user2)
+        url = reverse('entitlements_api:v1:entitlements-list')
+        url += '?user={username}'.format(username=user2.username)
+        response = self.client.get(
+            url,
+            content_type='application/json',
+        )
+        assert response.status_code == 200
+
+        results = response.data.get('results', [])
+        assert results == CourseEntitlementSerializer([entitlement_user2], many=True).data
+
     def test_get_entitlement_by_uuid(self):
         entitlement = CourseEntitlementFactory()
         CourseEntitlementFactory.create_batch(2)
