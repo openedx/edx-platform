@@ -369,27 +369,27 @@ Course Update
 Litmus
 ------
 
-When designing email templates, it is important to test the rendered
-emails in a variety of email clients to ensure there are no bugs in any
-of them. EdX uses a tool called `Litmus <http://litmus.com/>`__ that
-automates this process.
+When designing email templates, it is important to test the rendered emails in a
+variety of email clients to ensure that they render correctly. EdX uses a tool
+called `Litmus <http://litmus.com/>`__ for this process.
 
 To begin using Litmus, follow these steps:
 
 1. Make sure that ACE is configured to use Sailthru (see instructions above).
 2. Go to the `Litmus checklist page <https://litmus.com/checklist>`__ and start
    a new checklist.
-3. The checklist will provide you with an email address to send the test email
-   to. Take note of it.
-4. Send an email, using management command with the `--override-recipient-email`
-   option so that it is sent to the Litmus email you got in step 3.
+3. The checklist will provide you with an email address to which you will send 
+   a test email.
+4. Send an email. Use one of the management commands with the 
+   `--override-recipient-email` flag. Use the Litmus email you got in step 3 
+   as the flag value.
 
 ::
 
     ./manage.py lms --settings devstack_docker send_recurring_nudge example.com --override-recipient-email PUT-LITMUS-ADDRESS-HERE
 
-Using the Browser Extenstion
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using the Litmus Browser Extenstion to test emails saved as local files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Configure your devstack to use the "file_email" channel for ACE (see
    instructions above).
