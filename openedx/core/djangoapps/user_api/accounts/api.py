@@ -375,7 +375,6 @@ def request_password_change(email, is_secure):
 
     Args:
         email (str): An email address
-        orig_host (str): An originating host, extracted from a request with get_host
         is_secure (bool): Whether the request was made with HTTPS
 
     Returns:

@@ -10,5 +10,14 @@ urlpatterns = [
 
 if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
     urlpatterns += [
-        url(r'^password$', views.password_change_request_handler, name='password_change_request'),
+        url(
+            r'^password$',
+            views.password_change_request_handler,
+            name='password_change_request'
+        ),
+        url(
+            r'^recover-password$',
+            views.RecoverPasswordView.as_view(),
+            name="recover_password_api"
+        ),
     ]

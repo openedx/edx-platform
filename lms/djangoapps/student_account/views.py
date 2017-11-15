@@ -8,6 +8,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
@@ -34,10 +35,12 @@ from openedx.core.djangoapps.user_api.api import (
     get_login_session_form,
     get_password_reset_form
 )
+
 from openedx.core.djangoapps.user_api.errors import (
     UserNotFound,
     UserAPIInternalError
 )
+
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
@@ -49,6 +52,11 @@ from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.date_utils import strftime_localized
+
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework import views
+from rest_framework.decorators import api_view
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
@@ -173,6 +181,7 @@ def login_and_registration_form(request, initial_mode="login"):
 
 
 @require_http_methods(['POST'])
+@api_view(['POST'])
 def password_change_request_handler(request):
     """Handle password change requests originating from the account page.
 
@@ -198,32 +207,26 @@ def password_change_request_handler(request):
 
     """
 
-    limiter = BadRequestRateLimiter()
-    if limiter.is_rate_limit_exceeded(request):
-        AUDIT_LOG.warning("Password reset rate limit exceeded")
-        return HttpResponseForbidden()
-
     user = request.user
     # Prefer logged-in user's email
-    email = user.email if user.is_authenticated() else request.POST.get('email')
+    email =\
+        user.email if user.is_authenticated() else request.POST.get('email')
 
     if email:
-        try:
-            request_password_change(email, request.is_secure())
-            user = user if user.is_authenticated() else User.objects.get(email=email)
-            destroy_oauth_tokens(user)
-        except UserNotFound:
-            AUDIT_LOG.info("Invalid password reset attempt")
-            # Increment the rate limit counter
-            limiter.tick_bad_request_counter(request)
-        except UserAPIInternalError as err:
-            log.exception('Error occured during password change for user {email}: {error}'
-                          .format(email=email, error=err))
-            return HttpResponse(_("Some error occured during password change. Please try again"), status=500)
+        status_response = change_password(request, email)
+        if status_response == 500:
+            return\
+                HttpResponse(
+                    _("Some error occured during password change. Please try "
+                        "again"),
+                    status=status_response
+                )
+        elif status_response == 403:
+            return HttpResponseForbidden()
 
-        return HttpResponse(status=200)
-    else:
-        return HttpResponseBadRequest(_("No email address provided."))
+        return HttpResponse(status=status_response)
+
+    return HttpResponseBadRequest(_("No email address provided."))
 
 
 def update_context_for_enterprise(request, context):
@@ -595,3 +598,65 @@ def account_settings_context(request):
         } for state in auth_states if state.provider.display_for_login or state.has_account]
 
     return context
+
+
+class RecoverPasswordView(views.APIView):
+    """
+    Resets a password of a user by proving the email address
+
+    Example Requests:
+        POST /account/recover-password
+        {"email": "staff@example.com"}
+
+    Response Values:
+        HttpResponse: 200 if the password was reset correctly
+        HttpResponse: 400 if email wasn't provided
+        HttpResponse: 403 if the client has been rate limited
+        HttpResponse: 405 if using an unsupported HTTP method
+    """
+
+    http_method_names = ["post"]
+
+    def post(self, request, format=None):
+        email = request.data.get('email')
+        if email:
+            return Response(status=change_password(request, email))
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+def change_password(request, email):
+    """
+    Changes user's password by providing email.
+
+    Args:
+        request (HTTPRequest): The request to change user's email
+        email (String): The user email
+
+    Returns:
+        status code of Response
+        Options:
+            - 200
+            - 403
+            - 500
+    """
+    limiter = BadRequestRateLimiter()
+    if limiter.is_rate_limit_exceeded(request):
+        AUDIT_LOG.warning("Password reset rate limit exceeded")
+        return status.HTTP_403_FORBIDDEN
+
+    try:
+        user = User.objects.get(email=email)
+        request_password_change(email, request.is_secure())
+        destroy_oauth_tokens(user)
+    except User.DoesNotExist:
+        AUDIT_LOG.info("Invalid password reset attempt")
+        # Increment the rate limit counter
+        limiter.tick_bad_request_counter(request)
+    except UserAPIInternalError as err:
+        log.exception(
+            'Error occured during password change for user {email}: {error}'
+            .format(email=email, error=err)
+        )
+        return status.HTTP_500_INTERNAL_SERVER_ERROR
+    return status.HTTP_200_OK
