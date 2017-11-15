@@ -57,6 +57,7 @@ from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-er
 from certificates.api import get_certificate_url, has_html_certificates_enabled  # pylint: disable=import-error
 from certificates.models import (  # pylint: disable=import-error
     CertificateStatuses,
+    GeneratedCertificate,
     certificate_status_for_student
 )
 from course_modes.models import CourseMode
@@ -64,6 +65,7 @@ from courseware.access import has_access
 from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date  # pylint: disable=import-error
 from django_comment_common.models import assign_role
 from edxmako.shortcuts import render_to_response, render_to_string
+from entitlements.models import CourseEntitlement
 from eventtracking import tracker
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
@@ -71,7 +73,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps import monitoring_utils
-from openedx.core.djangoapps.catalog.utils import get_programs_with_type
+from openedx.core.djangoapps.catalog.utils import get_programs_with_type, get_course_runs_for_course
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -677,15 +679,22 @@ def dashboard(request):
         'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
     ) or settings.SUPPORT_SITE_LINK
 
-    # get the org whitelist or the org blacklist for the current site
+    # Get the org whitelist or the org blacklist for the current site
     site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site(user)
     course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist))
+
+    # Get the entitlements for the user and a mapping to all available sessions for that entitlement
+    course_entitlements = list(CourseEntitlement.objects.filter(user=user).select_related('enrollment_course_run'))
+    course_entitlement_available_sessions = {
+        str(entitlement.uuid): get_course_runs_for_course(str(entitlement.course_uuid))
+        for entitlement in course_entitlements
+    }
 
     # Record how many courses there are so that we can get a better
     # understanding of usage patterns on prod.
     monitoring_utils.accumulate('num_courses', len(course_enrollments))
 
-    # sort the enrollment pairs by the enrollment date
+    # Sort the enrollment pairs by the enrollment date
     course_enrollments.sort(key=lambda x: x.created, reverse=True)
 
     # Retrieve the course modes for each course
@@ -854,6 +863,10 @@ def dashboard(request):
     valid_verification_statuses = ['approved', 'must_reverify', 'pending', 'expired']
     display_sidebar_on_dashboard = len(order_history_list) or verification_status in valid_verification_statuses
 
+    # Filter out any course enrollment course cards that are associated with fulfilled entitlements
+    for entitlement in [e for e in course_entitlements if e.enrollment_course_run is not None]:
+        course_enrollments = [enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id]  # pylint: disable=line-too-long
+
     context = {
         'enterprise_message': enterprise_message,
         'consent_required_courses': consent_required_courses,
@@ -862,6 +875,8 @@ def dashboard(request):
         'redirect_message': redirect_message,
         'account_activation_messages': account_activation_messages,
         'course_enrollments': course_enrollments,
+        'course_entitlements': course_entitlements,
+        'course_entitlement_available_sessions': course_entitlement_available_sessions,
         'course_optouts': course_optouts,
         'banner_account_activation_message': banner_account_activation_message,
         'sidebar_account_activation_message': sidebar_account_activation_message,

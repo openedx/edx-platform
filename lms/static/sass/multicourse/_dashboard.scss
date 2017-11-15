@@ -163,11 +163,31 @@
                 display: inline-block;
               }
 
-              .info-date-block {
-                @extend %t-title7;
-
-                color: $gray; // WCAG 2.0 AA compliant
+              .info-date-block-container {
                 display: block;
+
+                .info-date-block{
+                  @extend %t-title7;
+
+                  color: $gray; // WCAG 2.0 AA compliant
+
+                  .fa-close {
+                    color: theme-color("error");
+                  }
+
+                  .fa-check {
+                    color: theme-color("success");
+                  }
+                }
+
+                .change-session {
+                  @extend %t-title7;
+                  @include margin(0, 0, 0, $baseline/4);
+
+                  padding: 0;
+                  border: none;
+                  letter-spacing: normal;
+                }
               }
             }
 
@@ -633,18 +653,20 @@
     .message-copy .copy {
       @extend %t-copy-sub1;
 
-      margin: 2px 0 0 0;
+      margin: 2px 0 0;
     }
 
     // CASE: expandable
     &.is-expandable {
       .wrapper-tip {
-        .message-title, .message-copy {
+        .message-title,
+        .message-copy {
           margin-bottom: 0;
           display: inline-block;
         }
 
-        .message-title .value, .message-copy {
+        .message-title .value,
+        .message-copy {
           @include transition(color $tmg-f2 ease-in-out 0s);
         }
 
@@ -652,7 +674,9 @@
         &:hover {
           cursor: pointer;
 
-          .message-title .value, .message-copy, .ui-toggle-expansion {
+          .message-title .value,
+          .message-copy,
+          .ui-toggle-expansion {
             color: $link-color;
           }
         }
@@ -789,7 +813,7 @@
       .action-view-consent {
         @extend %btn-pl-white-base;
         @include float(right);
-              
+
         &.archived {
           @extend %btn-pl-default-base;
         }
@@ -1071,6 +1095,89 @@
       @include padding($baseline/2, $baseline, $baseline/2, $baseline/2);
     }
   }
+
+  // Course Entitlement Session Selection
+  .course-entitlement-selection-container {
+    background-color: theme-color("inverse");
+
+    .action-header {
+      padding-bottom: $baseline/4;
+      font-weight: $font-weight-bold;
+      color: theme-color("dark");
+    }
+
+    .action-controls {
+      display: flex;
+
+      .session-select {
+        background-color: theme-color("inverse");
+        height: $baseline*1.5;
+        flex-grow: 5;
+        margin-bottom: $baseline*0.4;
+      }
+
+      .enroll-btn-initial {
+        @include margin-left($baseline);
+
+        height: $baseline*1.5;
+        flex-grow: 1;
+        letter-spacing: 0;
+        background: theme-color("inverse");
+        border-color: theme-color("primary");
+        color: theme-color("primary");
+        text-shadow: none;
+        font-size: $font-size-base;
+        padding: 0;
+        box-shadow: none;
+        border-radius: $border-radius-sm;
+        transition: all 0.4s ease-out;
+
+        &:hover {
+          background: theme-color("primary");
+          border-color: theme-color("primary");
+          color: theme-color("inverse");
+        }
+      }
+
+      @include media-breakpoint-down(xs) {
+        flex-direction: column;
+
+        .enroll-btn-initial {
+          margin: $baseline/4 0 $baseline/4;
+        }
+      }
+    }
+
+    .popover {
+      .popover-title {
+        margin-bottom: $baseline/2;
+      }
+
+      .action-items {
+        display: flex;
+        justify-content: space-between;
+        margin-top: $baseline/2;
+
+        .final-confirmation-btn {
+          box-shadow: none;
+          border: 1px solid theme-color("dark");
+          background: none;
+          color: theme-color("dark");
+          text-shadow: none;
+          letter-spacing: 0;
+          flex-grow: 1;
+          margin: 0 $baseline/4;
+          padding: $baseline/10 $baseline;
+          font-size: $font-size-base;
+
+          &:hover {
+            background: theme-color("primary");
+            color: theme-color("inverse");
+          }
+        }
+      }
+    }
+  }
 }
 
 // CASE: empty dashboard
@@ -1323,11 +1430,11 @@ p.course-block {
   padding: 6px 32px 7px;
   text-align: center;
   margin-top: 16px;
-  opacity:0.5;
-  background:#808080;
-  border:0;
+  opacity: 0.5;
+  background: #808080;
+  border: 0;
   color: theme-color("inverse");
-  box-shadow:none;
+  box-shadow: none;
 
   &.archived {
     @include button(simple, $button-archive-color);
@@ -1557,5 +1664,4 @@ a.fade-cover {
     color: theme-color("inverse");
     text-decoration: none;
   }
-
 }
