@@ -652,10 +652,6 @@ EDX_ROOT_URL = ''
 LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/login'
 LOGIN_URL = EDX_ROOT_URL + '/login'
 
-COURSE_NAME = "6.002_Spring_2012"
-COURSE_NUMBER = "6.002x"
-COURSE_TITLE = "Circuits and Electronics"
-
 ### Dark code. Should be enabled in local settings for devel.
 
 ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.edXhome)
@@ -663,16 +659,6 @@ ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see l
 WIKI_ENABLED = False
 
 ###
-
-COURSE_DEFAULT = '6.002x_Fall_2012'
-COURSE_SETTINGS = {
-    '6.002x_Fall_2012': {
-        'number': '6.002x',
-        'title': 'Circuits and Electronics',
-        'xmlpath': '6002x/',
-        'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
-    }
-}
 
 COURSE_MODE_DEFAULTS = {
     'bulk_sku': None,
