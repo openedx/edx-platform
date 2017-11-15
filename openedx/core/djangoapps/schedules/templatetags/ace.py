@@ -20,7 +20,8 @@ def with_link_tracking(context, url):
     All URLs will be augmented to include UTM parameters so that clicks can be tracked.
 
     Args:
-        context (dict): The template context. Must include a "request" and "message".
+        context (dict): The template context. Must include a "message". A request must be provided in this template
+            context or be retrievable using crum.
         url (str): The url to rewrite.
 
     Returns:
@@ -75,7 +76,8 @@ def google_analytics_tracking_pixel(context):
     This tracking pixel will allow email open events to be tracked.
 
     Args:
-        context (dict): The template context. Must include a "request" and "message".
+        context (dict): The template context. Must include a "message". A request must be provided in this template
+            context or be retrievable using crum.
 
     Returns:
         str: A string containing an HTML image tag that implements the GA measurement protocol or an empty string if
