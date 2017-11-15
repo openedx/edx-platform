@@ -72,9 +72,9 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
     @override_settings(GOOGLE_ANALYTICS_TRACKING_ID='UA-123456-1')
     def test_default_parameters(self):
         pixel = GoogleAnalyticsTrackingPixel()
-        self.assertIsNotNone(pixel.image_url)
+        self.assertIsNotNone(pixel.generate_image_url())
         self.assert_url_components_equal(
-            pixel.image_url,
+            pixel.generate_image_url(),
             scheme='https',
             netloc='www.google-analytics.com',
             path='/collect',
@@ -100,9 +100,9 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
             document_path='test_dp',
             client_id='123456.123456',
         )
-        self.assertIsNotNone(pixel.image_url)
+        self.assertIsNotNone(pixel.generate_image_url())
         self.assert_url_components_equal(
-            pixel.image_url,
+            pixel.generate_image_url(),
             scheme='https',
             netloc='www.google-analytics.com',
             path='/collect',
@@ -112,7 +112,7 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
 
     def test_missing_settings(self):
         pixel = GoogleAnalyticsTrackingPixel()
-        self.assertIsNone(pixel.image_url)
+        self.assertIsNone(pixel.generate_image_url())
 
     @override_settings(GOOGLE_ANALYTICS_TRACKING_ID='UA-123456-1')
     def test_site_config_override(self):
@@ -122,7 +122,7 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
             )
         )
         pixel = GoogleAnalyticsTrackingPixel(site=site_config.site)
-        self.assert_query_string_parameters_equal(pixel.image_url, tid='UA-654321-1')
+        self.assert_query_string_parameters_equal(pixel.generate_image_url(), tid='UA-654321-1')
 
     @override_settings(
         GOOGLE_ANALYTICS_TRACKING_ID='UA-123456-1',
@@ -130,9 +130,9 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
     )
     def test_custom_dimension(self):
         pixel = GoogleAnalyticsTrackingPixel(user_id=10, campaign_source=None, campaign_medium=None)
-        self.assertIsNotNone(pixel.image_url)
+        self.assertIsNotNone(pixel.generate_image_url())
         self.assert_url_components_equal(
-            pixel.image_url,
+            pixel.generate_image_url(),
             query='v=1&t=event&ec=email&ea=edx.bi.email.opened&cid={cid}&tid=UA-123456-1&cd40=10&uid=10'.format(
                 cid=GoogleAnalyticsTrackingPixel.ANONYMOUS_USER_CLIENT_ID,
             )
@@ -144,9 +144,9 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
     )
     def test_custom_dimension_without_user_id(self):
         pixel = GoogleAnalyticsTrackingPixel(campaign_source=None, campaign_medium=None)
-        self.assertIsNotNone(pixel.image_url)
+        self.assertIsNotNone(pixel.generate_image_url())
         self.assert_url_components_equal(
-            pixel.image_url,
+            pixel.generate_image_url(),
             query='v=1&t=event&ec=email&ea=edx.bi.email.opened&cid={cid}&tid=UA-123456-1'.format(
                 cid=GoogleAnalyticsTrackingPixel.ANONYMOUS_USER_CLIENT_ID,
             )
@@ -156,11 +156,11 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
     def test_course_id(self):
         course_id = 'foo/bar/baz'
         pixel = GoogleAnalyticsTrackingPixel(course_id=course_id)
-        self.assertIsNotNone(pixel.image_url)
-        self.assert_query_string_parameters_equal(pixel.image_url, el=course_id)
+        self.assertIsNotNone(pixel.generate_image_url())
+        self.assert_query_string_parameters_equal(pixel.generate_image_url(), el=course_id)
 
     @override_settings(GOOGLE_ANALYTICS_TRACKING_ID='UA-123456-1')
     def test_course_id_with_event_label(self):
         pixel = GoogleAnalyticsTrackingPixel(course_id='foo/bar/baz', event_label='test_label')
-        self.assertIsNotNone(pixel.image_url)
-        self.assert_query_string_parameters_equal(pixel.image_url, el='test_label')
+        self.assertIsNotNone(pixel.generate_image_url())
+        self.assert_query_string_parameters_equal(pixel.generate_image_url(), el='test_label')

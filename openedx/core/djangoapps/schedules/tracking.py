@@ -73,8 +73,7 @@ class GoogleAnalyticsTrackingPixel(object):
     user_id = attr.ib(default=None, metadata={'param_name': 'uid'})
     client_id = attr.ib(default=ANONYMOUS_USER_CLIENT_ID, metadata={'param_name': 'cid'})
 
-    @property
-    def image_url(self):
+    def generate_image_url(self):
         """
         A URL to a clear image that can be embedded in HTML documents to track email open events.
 

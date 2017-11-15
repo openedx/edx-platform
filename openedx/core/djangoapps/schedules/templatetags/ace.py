@@ -112,7 +112,7 @@ def _get_google_analytics_tracking_url(context):
     if course_ids is not None and len(course_ids) > 0:
         pixel.course_id = course_ids[0]
 
-    return pixel.image_url
+    return pixel.generate_image_url()
 
 
 def modify_url_to_track_clicks(url, campaign=None):
