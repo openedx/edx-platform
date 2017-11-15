@@ -100,5 +100,5 @@ git+https://github.com/edx/edx-proctoring.git@0.17.0#egg=edx-proctoring==0.17.0
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.15#egg=xblock-drag-and-drop-v2==2.0.15
 
 # edx-notifications
--e git+https://github.com/philanthropy-u/edx-notifications.git@379000753667410971cc26462d51798852de92a3#egg=edx-notifications
+-e git+https://github.com/philanthropy-u/edx-notifications.git@7c6693976d9838315d9d709f708f3b40aee90d99#egg=edx-notifications
 
