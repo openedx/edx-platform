@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from .models import CourseEntitlement
+from .models import CourseEntitlement, CourseEntitlementPolicy
 
 
 @admin.register(CourseEntitlement)
-class EntitlementAdmin(admin.ModelAdmin):
+class CourseEntitlementAdmin(admin.ModelAdmin):
     list_display = ('user',
                     'uuid',
                     'course_uuid',
@@ -14,3 +14,14 @@ class EntitlementAdmin(admin.ModelAdmin):
                     'mode',
                     'enrollment_course_run',
                     'order_number')
+
+
+@admin.register(CourseEntitlementPolicy)
+class CourseEntitlementPolicyAdmin(admin.ModelAdmin):
+    """
+    Registration of CourseEntitlementPolicy for Django Admin
+    """
+    list_display = ('expiration_period',
+                    'refund_period',
+                    'regain_period',
+                    'site')
