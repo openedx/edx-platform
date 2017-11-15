@@ -14,7 +14,7 @@ from pytz import UTC
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 
-from adaptive_learning.config.models import AdaptiveLearningEnabledFlag
+from adaptive_learning.config.models import AdaptiveLearningEnabledFlag, CourseAdaptiveLearningFlag
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from milestones.models import MilestoneRelationshipType
 from models.settings.course_grading import CourseGradingModel, GRADING_POLICY_CHANGED_EVENT_TYPE, hash_grading_policy
@@ -946,11 +946,15 @@ class CourseMetadataEditingTest(CourseTestCase):
     def test_allow_adaptive_learning_configuration(self):
         """
         Test that `adaptive_learning_configuration` is only shown in Advanced Settings
-        if AdaptiveLearningEnabledFlag is enabled.
+        if both AdaptiveLearningEnabledFlag and CourseAdaptiveLearningFlag are enabled.
         """
         self.assertNotIn('adaptive_learning_configuration', CourseMetadata.fetch(self.fullcourse))
         AdaptiveLearningEnabledFlag(enabled=True).save()
+        self.assertNotIn('adaptive_learning_configuration', CourseMetadata.fetch(self.fullcourse))
+        CourseAdaptiveLearningFlag.create(course_id=self.fullcourse.id, enabled=True)
         self.assertIn('adaptive_learning_configuration', CourseMetadata.fetch(self.fullcourse))
+        AdaptiveLearningEnabledFlag.objects.all().update(enabled=False)
+        self.assertNotIn('adaptive_learning_configuration', CourseMetadata.fetch(self.fullcourse))
 
     def test_validate_from_json_correct_inputs(self):
         is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(

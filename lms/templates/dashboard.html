@@ -17,7 +17,7 @@ from adaptive_learning.config.models import AdaptiveLearningEnabledFlag
 <%
   cert_name_short = settings.CERT_NAME_SHORT
   cert_name_long = settings.CERT_NAME_LONG
-  adaptive_learning_enabled = AdaptiveLearningEnabledFlag.current().enabled
+  adaptive_learning_enabled = AdaptiveLearningEnabledFlag.current().feature_enabled()
 %>
 
 
