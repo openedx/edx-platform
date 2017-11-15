@@ -138,6 +138,18 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
             self._change_password()
             self.assertRaises(UserAPIInternalError)
 
+    @ddt.data(
+        ({'email': 'walter@graymattertech.com'}, 200),
+        ({'email': ''}, 400),
+        ({}, 400),
+    )
+    @ddt.unpack
+    @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+    def test_password_recover_api(self, password_recover_info, expected_status):
+        self.client.logout()
+        response = self._recover_password_through_api(**password_recover_info)
+        self.assertEqual(response.status_code, expected_status)
+
     @ddt.data(True, False)
     def test_password_change_logged_out(self, send_email):
         # Log the user out
@@ -230,6 +242,15 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
             data['email'] = email
 
         return self.client.post(path=reverse('password_change_request'), data=data)
+
+    def _recover_password_through_api(self, email=None):
+        """Request to change the user's password. """
+        data = {}
+
+        if email:
+            data['email'] = email
+
+        return self.client.post(path=reverse('recover_password_api'), data=data)
 
     def _create_dop_tokens(self, user=None):
         """Create dop access token for given user if user provided else for default user."""
