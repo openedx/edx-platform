@@ -1,28 +1,18 @@
 from logging import getLogger
 
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save, pre_save, m2m_changed
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.onboarding_survey.models import ExtendedProfile, UserInfoSurvey, InterestsSurvey, OrganizationSurvey
+from lms.djangoapps.onboarding_survey.signals import save_interests
 from nodebb.models import DiscussionCommunity
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange
 from xmodule.modulestore.django import modulestore
-from custom_settings.models import CustomSettings
-from lms.djangoapps.onboarding_survey.signals import save_interests
 
 log = getLogger(__name__)
-
-
-@receiver(post_save, sender=CourseOverview, dispatch_uid="nodebb.signals.handlers.set_is_featured_false")
-def set_is_featured_false(sender, instance, created, **kwargs):
-    if created:
-        course_key = instance.id
-        CustomSettings.objects.get_or_create(id=course_key)
-
-        log.info("Course {} is set as not featured".format(course_key))
 
 
 @receiver(post_save, sender=UserInfoSurvey)
