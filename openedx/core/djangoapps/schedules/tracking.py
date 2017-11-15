@@ -3,8 +3,7 @@ from urlparse import parse_qs
 import attr
 from django.utils.http import urlencode
 
-from openedx.core.djangoapps.schedules.utils import get_config_value_from_site_or_settings
-
+from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
 
 DEFAULT_CAMPAIGN_SOURCE = 'ace'
 DEFAULT_CAMPAIGN_MEDIUM = 'email'

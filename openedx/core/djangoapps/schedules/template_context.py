@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from edxmako.shortcuts import marketing_link
-from openedx.core.djangoapps.schedules.utils import get_config_value_from_site_or_settings
+from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
 
 
 def get_base_template_context(site):
