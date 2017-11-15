@@ -3026,6 +3026,78 @@ SEARCH_FILTER_GENERATOR = "lms.lib.courseware_search.lms_filter_generator.LmsSea
 # Override to skip enrollment start date filtering in course search
 SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = False
 
+# Elasticsearch uses index settings to specify available analyzers.
+# We are adding the lowercase analyzer and tweaking the ngram analyzers here,
+# so we need to use these settings rather than the index defaults.
+# We are making these changes to enable autocomplete for the typeahead endpoint.
+# In addition we are specifying the number of shards and replicas that indices
+# will be created with as recommended here:
+# https://aws.amazon.com/blogs/database/get-started-with-amazon-elasticsearch-service-how-many-shards-do-i-need/
+ELASTICSEARCH_INDEX_SETTINGS = {
+    'settings': {
+        'index': {
+            'number_of_shards': 1,
+            'number_of_replicas': 1
+        },
+        'analysis': {
+            'tokenizer': {
+                'haystack_edgengram_tokenizer': {
+                    'type': 'edgeNGram',
+                    'side': 'front',
+                    'min_gram': 2,
+                    'max_gram': 15
+                },
+                'haystack_ngram_tokenizer': {
+                    'type': 'nGram',
+                    'min_gram': 2,
+                    'max_gram': 15
+                }
+            },
+            'analyzer': {
+                'lowercase': {
+                    'type': 'custom',
+                    'tokenizer': 'keyword',
+                    'filter': [
+                        'lowercase',
+                        'synonym',
+                    ]
+                },
+                'snowball_with_synonyms': {
+                    'type': 'custom',
+                    'filter': [
+                        'standard',
+                        'lowercase',
+                        'snowball',
+                        'synonym'
+                    ],
+                    'tokenizer': 'standard'
+                },
+                'ngram_analyzer': {
+                    'type':'custom',
+                    'filter': [
+                        'lowercase',
+                        'haystack_ngram',
+                        'synonym',
+                    ],
+                    'tokenizer': 'keyword'
+                }
+            },
+            'filter': {
+                'haystack_ngram': {
+                    'type': 'nGram',
+                    'min_gram': 2,
+                    'max_gram': 22
+                },
+                'synonym' : {
+                  'type': 'synonym',
+                  'ignore_case': 'true',
+                  'synonyms': []
+                }
+            }
+        }
+    }
+}
+
 ### PERFORMANCE EXPERIMENT SETTINGS ###
 # CDN experiment/monitoring flags
 CDN_VIDEO_URLS = {}
