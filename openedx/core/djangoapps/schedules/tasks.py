@@ -207,12 +207,10 @@ def _track_message_sent(site, user, msg):
         'send_uuid': msg.send_uuid,
     }
     course_ids = msg.context.get('course_ids', [])
+    properties['num_courses'] = len(course_ids)
     if len(course_ids) > 0:
         properties['course_ids'] = course_ids[:10]
         properties['primary_course_id'] = course_ids[0]
-
-    if len(course_ids) > 1:
-        properties['num_courses'] = len(course_ids)
 
     analytics.track(
         user_id=user.id,
