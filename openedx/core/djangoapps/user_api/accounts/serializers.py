@@ -1,6 +1,7 @@
 """
 Django REST Framework serializers for the User API Accounts sub-application
 """
+import json
 import logging
 
 from rest_framework import serializers
@@ -10,6 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
 from lms.djangoapps.badges.utils import badges_enabled
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
@@ -112,6 +114,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             "accomplishments_shared": accomplishments_shared,
             "account_privacy": self.configuration.get('default_visibility'),
             "social_links": None,
+            "extended_profile_fields": None,
         }
 
         if user_profile:
@@ -138,6 +141,7 @@ class UserReadOnlySerializer(serializers.Serializer):
                     "social_links": SocialLinkSerializer(
                         user_profile.social_links.all(), many=True
                     ).data,
+                    "extended_profile": get_extended_profile(user_profile),
                 }
             )
 
@@ -325,6 +329,26 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         instance.save()
 
         return instance
+
+
+def get_extended_profile(user_profile):
+    """Returns the extended user profile fields stored in user_profile.meta"""
+
+    # pick the keys from the site configuration
+    extended_profile_field_names = configuration_helpers.get_value('extended_profile_fields', [])
+
+    try:
+        extended_profile_fields_data = json.loads(user_profile.meta)
+    except ValueError:
+        extended_profile_fields_data = {}
+
+    extended_profile = []
+    for field_name in extended_profile_field_names:
+        extended_profile.append({
+            "field_name": field_name,
+            "field_value": extended_profile_fields_data.get(field_name, "")
+        })
+    return extended_profile
 
 
 def get_profile_visibility(user_profile, user, configuration=None):

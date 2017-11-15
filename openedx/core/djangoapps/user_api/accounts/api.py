@@ -229,6 +229,17 @@ def update_account_settings(requesting_user, update, username=None):
             existing_user_profile.set_meta(meta)
             existing_user_profile.save()
 
+        # updating extended user profile info
+        if 'extended_profile' in update:
+            meta = existing_user_profile.get_meta()
+            new_extended_profile = update['extended_profile']
+            for field in new_extended_profile:
+                field_name = field['field_name']
+                new_value = field['field_value']
+                meta[field_name] = new_value
+            existing_user_profile.set_meta(meta)
+            existing_user_profile.save()
+
     except PreferenceValidationError as err:
         raise AccountValidationError(err.preference_errors)
     except AccountValidationError as err:
