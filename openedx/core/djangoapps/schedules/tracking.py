@@ -87,10 +87,7 @@ class GoogleAnalyticsTrackingPixel(object):
                 parameter_name = attribute.metadata['param_name']
                 parameters[parameter_name] = str(value)
 
-        tracking_id = get_config_value_from_site_or_settings("GOOGLE_ANALYTICS_ACCOUNT", site=self.site)
-        if tracking_id is None:
-            tracking_id = get_config_value_from_site_or_settings("GOOGLE_ANALYTICS_TRACKING_ID", site=self.site)
-
+        tracking_id = self._get_tracking_id()
         if tracking_id is None:
             return None
 
@@ -106,3 +103,9 @@ class GoogleAnalyticsTrackingPixel(object):
             parameters[param_name] = unicode(self.course_id)
 
         return u"https://www.google-analytics.com/collect?{params}".format(params=urlencode(parameters))
+
+    def _get_tracking_id(self):
+        tracking_id = get_config_value_from_site_or_settings("GOOGLE_ANALYTICS_ACCOUNT", site=self.site)
+        if tracking_id is None:
+            tracking_id = get_config_value_from_site_or_settings("GOOGLE_ANALYTICS_TRACKING_ID", site=self.site)
+        return tracking_id
