@@ -84,7 +84,7 @@ case "$TEST_SUITE" in
         echo "Finding pep8 violations and storing report..."
         paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
         echo "Finding pylint violations and storing in report..."
-        paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { echo 'Too many pylint violations. You can view them in pylint.log'; EXIT=1; }
+        paver run_pylint -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD > pylint.log || { echo 'Too many pylint violations. You can view them in pylint.log'; EXIT=1; }
 
         mkdir -p reports
 
