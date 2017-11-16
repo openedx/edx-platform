@@ -102,12 +102,12 @@
             font-weight: $font-weight-normal;
             display: inline-block;
             margin-bottom: -1*$baseline/2;
-            border-bottom: 4px solid transparent;
+            border-bottom: 4px hidden theme-color("dark");
             cursor: pointer;
 
             &.active,
             &:hover {
-              border-bottom-color: theme-color("dark");
+              border-bottom-style: solid;
             }
 
             &:hover {
