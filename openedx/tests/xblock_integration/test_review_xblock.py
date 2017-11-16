@@ -26,6 +26,8 @@ class TestReviewXBlock(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         {'email': 'learner@test.com', 'password': 'foo'},
     ]
     XBLOCK_NAMES = ['review']
+    URL_BEGINNING = settings.LMS_ROOT_URL + \
+        '/xblock/block-v1:DillonX/DAD101x_review/3T2017+type@'
 
     @classmethod
     def setUpClass(cls):
@@ -255,7 +257,7 @@ class TestReviewFunctions(TestReviewXBlock):
                 'section': self.section1_actual.location.name,
             }
         ))
-        if num_desired > 5:
+        if num_desired > 6:
             self.client.get(reverse(
                 'courseware_section',
                 kwargs={
@@ -369,8 +371,6 @@ class TestReviewFunctions(TestReviewXBlock):
         expected_correctness_text = 'correct'
         expected_problems = ['Review Problem 1', 'Review Problem 2', 'Review Problem 3',
                              'Review Problem 4', 'Review Problem 5', 'Review Problem 6']
-        expected_url_beginning = settings.LMS_ROOT_URL + \
-            '/xblock/block-v1:DillonX/DAD101x_review/3T2017+type@problem+block@'
 
         self.assertIn(expected_header_text, response.content)
         self.assertEqual(response.content.count(expected_correctness_text), num_desired)
@@ -381,7 +381,7 @@ class TestReviewFunctions(TestReviewXBlock):
             if problem in response.content:
                 count += 1
         self.assertEqual(count, num_desired)
-        self.assertEqual(response.content.count(expected_url_beginning), num_desired)
+        self.assertEqual(response.content.count(self.URL_BEGINNING), num_desired)
 
     @ddt.data(2, 6)
     def test_review_problem_urls(self, num_desired):
@@ -422,14 +422,13 @@ class TestReviewFunctions(TestReviewXBlock):
         crum.set_current_user(user)
         result_urls = get_review_ids.get_problems(num_desired, self.course_actual.id)
 
-        url_beginning = settings.LMS_ROOT_URL + '/xblock/block-v1:DillonX/DAD101x_review/3T2017+type@problem+block@'
         expected_urls = [
-            (url_beginning + 'Problem_1', True, 0),
-            (url_beginning + 'Problem_2', True, 0),
-            (url_beginning + 'Problem_3', True, 0),
-            (url_beginning + 'Problem_4', True, 0),
-            (url_beginning + 'Problem_5', True, 0),
-            (url_beginning + 'Problem_6', True, 0)
+            (self.URL_BEGINNING + 'problem+block@Problem_1', True, 0),
+            (self.URL_BEGINNING + 'problem+block@Problem_2', True, 0),
+            (self.URL_BEGINNING + 'problem+block@Problem_3', True, 0),
+            (self.URL_BEGINNING + 'problem+block@Problem_4', True, 0),
+            (self.URL_BEGINNING + 'problem+block@Problem_5', True, 0),
+            (self.URL_BEGINNING + 'problem+block@Problem_6', True, 0)
         ]
 
         # Since the problems are randomly selected, we have to check
@@ -474,16 +473,15 @@ class TestReviewFunctions(TestReviewXBlock):
         crum.set_current_user(user)
         result_urls = get_review_ids.get_problems(num_desired, self.course_actual.id)
 
-        url_beginning = settings.LMS_ROOT_URL + '/xblock/block-v1:DillonX/DAD101x_review/3T2017+type@problem+block@'
         expected_urls = [
-            (url_beginning + 'Problem_1', True, 0),
-            (url_beginning + 'Problem_2', True, 0),
-            (url_beginning + 'Problem_3', True, 0),
-            (url_beginning + 'Problem_4', True, 0),
+            (self.URL_BEGINNING + 'problem+block@Problem_1', True, 0),
+            (self.URL_BEGINNING + 'problem+block@Problem_2', True, 0),
+            (self.URL_BEGINNING + 'problem+block@Problem_3', True, 0),
+            (self.URL_BEGINNING + 'problem+block@Problem_4', True, 0),
             # This is the unique problem when num_desired == 5
-            (url_beginning + 'Problem_6', True, 0)
+            (self.URL_BEGINNING + 'problem+block@Problem_6', True, 0)
         ]
-        expected_not_loaded_problem = (url_beginning + 'Problem_5', True, 0)
+        expected_not_loaded_problem = (self.URL_BEGINNING + 'problem+block@Problem_5', True, 0)
 
         # Since the problems are randomly selected, we have to check
         # the correct number of urls are returned.
@@ -523,7 +521,6 @@ class TestReviewFunctions(TestReviewXBlock):
         crum.set_current_user(user)
         result_url = get_review_ids.get_vertical(self.course_actual.id)
 
-        expected_url = settings.LMS_ROOT_URL + \
-            '/xblock/block-v1:DillonX/DAD101x_review/3T2017+type@vertical+block@New_Unit_1'
+        expected_url = self.URL_BEGINNING + 'vertical+block@New_Unit_1'
 
         self.assertEqual(result_url, expected_url)
