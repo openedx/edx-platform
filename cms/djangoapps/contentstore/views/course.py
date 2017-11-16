@@ -502,10 +502,7 @@ def course_listing(request):
     org = request.GET.get('org', '') if optimization_enabled else None
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     user = request.user
-    # remove this temporary log after getting results
-    start_time = time.time()
     libraries = _accessible_libraries_iter(request.user, org) if LIBRARIES_ENABLED else []
-    log.info("_accessible_libraries_iter completed in [%f]", (time.time() - start_time))
 
     def format_in_process_course_view(uca):
         """
