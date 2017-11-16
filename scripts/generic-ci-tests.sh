@@ -84,18 +84,18 @@ case "$TEST_SUITE" in
         echo "Finding pep8 violations and storing report..."
         paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
         echo "Finding pylint violations and storing in report..."
-        paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { cat pylint.log; EXIT=1; }
+        paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { echo 'Too many pylint violations. You can view them in pylint.log'; EXIT=1; }
 
         mkdir -p reports
 
         echo "Finding ESLint violations and storing report..."
-        paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
+        paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { echo 'Too many eslint violations. You can view them in eslint.log'; EXIT=1; }
         echo "Finding Stylelint violations and storing report..."
-        paver run_stylelint -l $STYLELINT_THRESHOLD > stylelint.log || { cat stylelint.log; EXIT=1; }
+        paver run_stylelint -l $STYLELINT_THRESHOLD > stylelint.log || { echo 'Too many stylelint violations. You can view them in stylelint.log'; EXIT=1; }
         echo "Running code complexity report (python)."
         paver run_complexity || echo "Unable to calculate code complexity. Ignoring error."
         echo "Running xss linter report."
-        paver run_xsslint -t $XSSLINT_THRESHOLDS > xsslint.log || { cat xsslint.log; EXIT=1; }
+        paver run_xsslint -t $XSSLINT_THRESHOLDS > xsslint.log || { echo 'Too many xsslint violations. You can view them in xsslint.log'; EXIT=1; }
         echo "Running xss commit linter report."
         paver run_xsscommitlint > xsscommitlint.log || { cat xsscommitlint.log; EXIT=1; }
         # Run quality task. Pass in the 'fail-under' percentage to diff-quality
