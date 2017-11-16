@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import json
 import math
 
+from crum import CurrentRequestUserMiddleware
 import ddt
 from django.contrib.sites.models import Site
 import mock
@@ -14,6 +15,7 @@ import lms.lib.comment_client as cc
 from django_comment_common.models import ForumsConfig
 from django_comment_common.signals import comment_created
 from edx_ace.recipient import Recipient
+from edx_ace.renderers import EmailRenderer
 from edx_ace.utils import date
 from lms.djangoapps.discussion.config.waffle import waffle, FORUM_RESPONSE_NOTIFICATIONS, SEND_NOTIFICATIONS_FOR_COURSE
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
@@ -21,9 +23,12 @@ from lms.djangoapps.discussion.tasks import _should_send_message
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
+from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.core.lib.celery.task_utils import emulate_http_request
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+
 
 NOW = datetime.utcnow()
 ONE_HOUR_AGO = NOW - timedelta(hours=1)
@@ -211,8 +216,25 @@ class TaskTestCase(ModuleStoreTestCase):
             self.assertEqual(expected_message_context, actual_message.context)
             self.assertEqual(expected_recipient, actual_message.recipient)
             self.assertEqual(self.course.language, actual_message.language)
+            self._assert_rendered_email(actual_message)
         else:
             self.assertFalse(self.mock_ace_send.called)
+
+    def _assert_rendered_email(self, message):
+        # check that we can actually render the message
+        middleware_classes = [
+            CurrentRequestUserMiddleware,
+            CurrentSiteThemeMiddleware,
+        ]
+        with emulate_http_request(
+            site=message.context['site'], user=self.thread_author, middleware_classes=middleware_classes
+        ):
+            rendered_email = EmailRenderer().render(message)
+            self.assertTrue(self.comment['body'] in rendered_email.body_html)
+            self.assertTrue(self.comment_author.username in rendered_email.body_html)
+            self.assertTrue(self.thread_author.username in rendered_email.body_html)
+            self.assertTrue(self.mock_permalink in rendered_email.body_html)
+            self.assertTrue(message.context['site'].domain in rendered_email.body_html)
 
     @override_waffle_flag(SEND_NOTIFICATIONS_FOR_COURSE, True)
     def run_should_not_send_email_test(self, comment_dict):
