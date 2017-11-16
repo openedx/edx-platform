@@ -2,7 +2,7 @@
 Course API Views
 """
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from openedx.core.lib.api.paginators import NamespacedPageNumberPagination
@@ -10,6 +10,7 @@ from openedx.core.lib.api.view_utils import view_auth_classes, DeveloperErrorVie
 from .api import course_detail, list_courses
 from .forms import CourseDetailGetForm, CourseListGetForm
 from .serializers import CourseSerializer, CourseDetailSerializer
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 @view_auth_classes(is_authenticated=False)
@@ -196,9 +197,12 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         """
         Return a list of courses visible to the user.
         """
+        restrict_course_api = configuration_helpers.get_value('RESTRICT_COURSES_API')
         form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
         if not form.is_valid():
             raise ValidationError(form.errors)
+        elif restrict_course_api and not self.request.user.is_staff:
+            raise PermissionDenied()
 
         return list_courses(
             self.request,
