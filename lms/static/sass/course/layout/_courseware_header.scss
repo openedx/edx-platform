@@ -52,13 +52,13 @@
         display: block;
         text-align: center;
         text-decoration: none;
-        border-bottom: 4px solid transparent;
+        border-bottom: 4px hidden theme-color("primary");
 
         &:hover,
         &:focus,
         &.active {
           color: theme-color("primary");
-          border-bottom-color: theme-color("primary");
+          border-bottom-style: solid;
           background-color: transparent;
         }
       }
