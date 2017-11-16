@@ -470,6 +470,37 @@ OAUTH2_PROVIDER = {
 # otherwise it fails saying this attribute is not present in Settings
 OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 
+
+############## Settings for edX Notifications App ######################
+
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+MAX_NOTIFICATION_LIST_SIZE = 100
+
+# list all known channel providers
+NOTIFICATION_CHANNEL_PROVIDERS = {
+    'durable': {
+        'class': 'edx_notifications.channels.durable.BaseDurableNotificationChannel',
+        'options': {}
+    },
+    'null': {
+        'class': 'edx_notifications.channels.null.NullNotificationChannel',
+        'options': {}
+    }
+}
+
+# list all of the mappings of notification types to channel
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
+    '*': 'durable',  # default global mapping
+}
+
+
+
+
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
 # TODO: Move the Mako templating into a different engine in TEMPLATES below.
@@ -1939,6 +1970,10 @@ INSTALLED_APPS = (
     'pipeline',
     'static_replace',
 
+    # Edx-Notifications
+    'edx_notifications',
+    'edx_notifications.server.api',
+
     # For content serving
     'openedx.core.djangoapps.contentserver',
 
@@ -3054,12 +3089,13 @@ DOC_LINK_BASE_URL = None
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
 
-# NodeBB settings
-NODEBB_ENDPOINT = 'http://community.philanthropyu.org'
-
 # Project features
-LMS_BASE_URL = 'https://philanthropyu.org'
+LMS_BASE_URL = ''
 
 # Notification email settings
 NOTIFICATION_FROM_EMAIL = 'no-reply@philanthropyu.org'
 NOTIFICATION_EMAIL_SUBJECT = 'Philanthropy-U-Team Course Notification'
+
+
+# Google Place API key
+GOOGLE_PLACE_API_KEY = 'AIzaSyDhkKEySp0g2Ip8bovRHCI5KE257DSAJkA'

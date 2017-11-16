@@ -43,6 +43,8 @@ class ExtendedProfile(models.Model):
     org_admin_email = models.EmailField(blank=True, null=True)
     is_survey_completed = models.BooleanField(default=False)
     backup_user_data = models.TextField()
+    admin_activation_key = models.CharField(('admin activation key'), max_length=32, default=None, null=True, blank=True)
+    is_admin_activated = models.BooleanField(default=False)
 
 
 class RoleInsideOrg(models.Model):

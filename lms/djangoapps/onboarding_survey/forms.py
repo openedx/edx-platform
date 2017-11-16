@@ -1,9 +1,14 @@
 """
 Model form for the surveys.
 """
+import uuid
+import base64
+
 from itertools import chain
 from django import forms
 from django.utils.encoding import force_unicode
+from django.contrib.auth.models import User
+from django.conf import settings
 from lms.djangoapps.onboarding_survey.models import (
     OrganizationSurvey,
     InterestsSurvey,
@@ -12,7 +17,10 @@ from lms.djangoapps.onboarding_survey.models import (
     Organization,
     OrganizationDetailSurvey,
     Currency)
+from lms.djangoapps.onboarding_survey.email_utils import send_admin_activation_email
 
+from edxmako.shortcuts import render_to_response, render_to_string
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 no_option_select_error = 'Please select an option for {}'
 empty_field_error = 'Please enter your {}'
@@ -395,6 +403,43 @@ class RegModelForm(forms.ModelForm):
                 prev_org.save()
 
         extended_profile.organization = organization_to_assign
+
+        is_extended_profile = None
+        try:
+            is_extended_profile = user.extended_profile
+        except ExtendedProfile.DoesNotExist:
+            pass
+
+        if not is_extended_profile and extended_profile.org_admin_email:
+            try:
+                admin_user = User.objects.get(email=extended_profile.org_admin_email)
+                admin_user.extended_profile.admin_activation_key = uuid.uuid4().hex
+                admin_user.extended_profile.save()
+                org_id = extended_profile.organization_id
+                org_name = extended_profile.organization.name
+
+                encoded_org_id = base64.b64encode(str(org_id))
+
+                message_context = {
+                    "key": admin_user.extended_profile.admin_activation_key,
+                    "org_id": encoded_org_id,
+                    "org_name": org_name,
+                    "referring_user": user.username,
+
+                }
+                message_body = render_to_string('emails/admin_activation.txt', message_context)
+
+                from_address = configuration_helpers.get_value(
+                    'email_from_address',
+                    settings.DEFAULT_FROM_EMAIL
+                )
+
+                send_admin_activation_email("Admin Activation.", message_body, from_address, extended_profile.org_admin_email)
+            except User.DoesNotExist:
+                pass
+            except Exception:
+                pass
+
         if user:
             extended_profile.user = user
 
@@ -447,6 +492,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
             'total_employees', 'currency_input', 'total_revenue', 'total_expenses', 'total_program_expenses'
         ]
 
+
         widgets = {
             'can_provide_info': forms.RadioSelect,
             'info_accuracy': RadioSelectNotNull,
@@ -477,8 +523,14 @@ class OrganizationDetailModelForm(forms.ModelForm):
                                          " please enter today's date."
         }
 
+        error_messages = {
+            'can_provide_info': {
+                'required': "Please select an option for providing information.",
+            },
+        }
+
     def clean_info_accuracy(self):
-        can_provide_info = int(self.data['can_provide_info'])
+        can_provide_info = int(self.data['can_provide_info']) if self.data.get('can_provide_info') else False
         info_accuracy = self.cleaned_data['info_accuracy']
 
         if can_provide_info and info_accuracy not in [True, False]:
@@ -487,7 +539,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         return info_accuracy
 
     def clean_last_fiscal_year_end_date(self):
-        can_provide_info = int(self.data['can_provide_info'])
+        can_provide_info = int(self.data.get('can_provide_info')) if self.data.get('can_provide_info') else False
         last_fiscal_year_end_date = self.cleaned_data['last_fiscal_year_end_date']
 
         if can_provide_info and not last_fiscal_year_end_date:
@@ -496,7 +548,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         return last_fiscal_year_end_date
 
     def clean_total_clients(self):
-        can_provide_info = int(self.data['can_provide_info'])
+        can_provide_info = int(self.data.get('can_provide_info')) if self.data.get('can_provide_info') else False
         total_clients = self.cleaned_data['total_clients']
 
         if can_provide_info and not total_clients:
@@ -505,7 +557,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         return total_clients
 
     def clean_total_employees(self):
-        can_provide_info = int(self.data['can_provide_info'])
+        can_provide_info = int(self.data.get('can_provide_info')) if self.data.get('can_provide_info') else False
         total_employees = self.cleaned_data['total_employees']
 
         if can_provide_info and not total_employees:
@@ -514,7 +566,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         return total_employees
 
     def clean_total_revenue(self):
-        can_provide_info = int(self.data['can_provide_info'])
+        can_provide_info = int(self.data.get('can_provide_info')) if self.data.get('can_provide_info') else False
         total_revenue = self.cleaned_data['total_revenue']
 
         if can_provide_info and not total_revenue:
@@ -523,7 +575,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
         return total_revenue
 
     def clean_total_expenses(self):
-        can_provide_info = int(self.data['can_provide_info'])
+        can_provide_info = int(self.data.get('can_provide_info')) if self.data.get('can_provide_info') else False
         total_expenses = self.cleaned_data['total_expenses']
 
         if can_provide_info and not total_expenses:
@@ -532,13 +584,14 @@ class OrganizationDetailModelForm(forms.ModelForm):
         return total_expenses
 
     def clean_total_program_expenses(self):
-        can_provide_info = int(self.data['can_provide_info'])
+        can_provide_info = int(self.data.get('can_provide_info')) if self.data.get('can_provide_info') else False
         total_program_expenses = self.cleaned_data['total_program_expenses']
 
         if can_provide_info and not total_program_expenses:
             raise forms.ValidationError(empty_field_error.format("Total Program Expense"))
 
         return total_program_expenses
+
 
     def save(self, user=None, commit=True):
         org_detail = super(OrganizationDetailModelForm, self).save(commit=False)
