@@ -6,6 +6,7 @@ import warnings
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.lookups import IsNull
 from opaque_keys.edx.keys import BlockTypeKey, CourseKey, UsageKey
 from openedx.core.djangoapps.util.model_utils import CreatorMixin
 from xmodule.modulestore.django import modulestore
@@ -116,16 +117,6 @@ class OpaqueKeyField(CreatorMixin, models.CharField):
         else:
             return value
 
-    def get_prep_lookup(self, lookup, value):
-        if lookup == 'isnull':
-            raise TypeError('Use {0}.Empty rather than None to query for a missing {0}'.format(self.__class__.__name__))
-
-        return super(OpaqueKeyField, self).get_prep_lookup(
-            lookup,
-            # strip key before comparing
-            _strip_value(value, lookup)
-        )
-
     def get_prep_value(self, value):
         if value is self.Empty or value is None:
             return ''  # CharFields should use '' as their empty value, rather than None
@@ -157,6 +148,19 @@ class OpaqueKeyField(CreatorMixin, models.CharField):
             return
 
         return super(OpaqueKeyField, self).run_validators(value)
+
+
+class OpaqueKeyFieldEmptyLookupIsNull(IsNull):
+    """
+    This overrides the default __isnull model filter to help enforce the special way
+    we handle null / empty values in OpaqueKeyFields.
+    """
+    def get_prep_lookup(self):
+        raise TypeError("Use this field's .Empty member rather than None or __isnull "
+                        "to query for missing objects of this type.")
+
+
+OpaqueKeyField.register_lookup(OpaqueKeyFieldEmptyLookupIsNull)
 
 
 class CourseKeyField(OpaqueKeyField):
