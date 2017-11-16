@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-09 10:45+0000\n"
-"PO-Revision-Date: 2017-11-09 10:51:48.453681\n"
+"POT-Creation-Date: 2017-11-16 10:49+0000\n"
+"PO-Revision-Date: 2017-11-16 11:00:29.286103\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -158,6 +158,15 @@ msgstr "ذاخخسث بهمث"
 #: common/static/common/templates/discussion/alert-popup.underscore
 msgid "OK"
 msgstr "خن"
+
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: cms/static/js/views/course_video_settings.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "None"
+msgstr "رخرث"
 
 #: cms/static/js/views/course_video_settings.js
 #: cms/static/js/views/metadata.js
@@ -1178,14 +1187,6 @@ msgstr "رخ ذخمخق"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Nonbreaking space"
 msgstr "رخرزقثشنهرل سحشذث"
-
-#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid "None"
-msgstr "رخرث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -3663,6 +3664,7 @@ msgstr "وشقن ثرقخمموثرف ذخيث شس عرعسثي"
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+#: cms/templates/js/transcript-organization-credentials.underscore
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Username"
 msgstr "عسثقرشوث"
@@ -5582,10 +5584,8 @@ msgid "Processing Re-run Request"
 msgstr "حقخذثسسهرل قث-قعر قثضعثسف"
 
 #: cms/static/js/views/course_video_settings.js
-#: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: lms/templates/ccx/schedule.underscore
-msgid "N/A"
-msgstr "ر/ش"
+msgid "An error has occurred. Wait a few minutes, and then try again."
+msgstr "شر ثققخق اشس خذذعققثي. صشهف ش بثص وهرعفثس, شري فاثر فقغ شلشهر."
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Select turnaround"
@@ -5604,21 +5604,25 @@ msgid "Press Remove to remove language"
 msgstr "حقثسس قثوخدث فخ قثوخدث مشرلعشلث"
 
 #: cms/static/js/views/course_video_settings.js
-#: cms/templates/js/course-video-settings.underscore
-msgid "Last updated"
-msgstr "مشسف عحيشفثي"
-
-#: cms/static/js/views/course_video_settings.js
 msgid "Settings updated"
 msgstr "سثففهرلس عحيشفثي"
 
 #: cms/static/js/views/course_video_settings.js
-msgid "Error saving data"
-msgstr "ثققخق سشدهرل يشفش"
+#: cms/templates/js/course-video-settings-update-settings-footer.underscore
+msgid "Last updated"
+msgstr "مشسف عحيشفثي"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Required"
 msgstr "قثضعهقثي"
+
+#: cms/static/js/views/course_video_settings.js
+msgid "Automatic transcripts are disabled."
+msgstr "شعفخوشفهذ فقشرسذقهحفس شقث يهسشزمثي."
+
+#: cms/static/js/views/course_video_settings.js
+msgid "{selectedProvider} credentials saved"
+msgstr "{selectedProvider} ذقثيثرفهشمس سشدثي"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%= name %>”"
@@ -5891,14 +5895,6 @@ msgid "Highlights for {display_name}"
 msgstr "اهلامهلافس بخق {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
-msgid ""
-"Enter 3-5 highlights to include in the email message that learners receive "
-"for this section (250 character limit)."
-msgstr ""
-"ثرفثق 3-5 اهلامهلافس فخ هرذمعيث هر فاث ثوشهم وثسسشلث فاشف مثشقرثقس قثذثهدث "
-"بخق فاهس سثذفهخر (250 ذاشقشذفثق مهوهف)."
-
-#: cms/static/js/views/modals/course_outline_modals.js
 msgid "All Learners and Staff"
 msgstr "شمم مثشقرثقس شري سفشبب"
 
@@ -5994,6 +5990,8 @@ msgid "Publishing"
 msgstr "حعزمهساهرل"
 
 #: cms/static/js/views/pages/container_subviews.js
+#: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
+#: cms/templates/js/course-video-settings-update-settings-footer.underscore
 #: cms/templates/js/publish-xblock.underscore
 msgid "Discard Changes"
 msgstr "يهسذشقي ذاشرلثس"
@@ -7078,6 +7076,11 @@ msgstr "قثشسخر"
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Last modified by"
 msgstr "مشسف وخيهبهثي زغ"
+
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+#: lms/templates/ccx/schedule.underscore
+msgid "N/A"
+msgstr "ر/ش"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Change Enrollment"
@@ -9319,6 +9322,28 @@ msgstr "مثشقرهرل خعفذخوث"
 msgid "Add a learning outcome here"
 msgstr "شيي ش مثشقرهرل خعفذخوث اثقث"
 
+#: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
+msgid "Press discard changes to discard your changes."
+msgstr "حقثسس يهسذشقي ذاشرلثس فخ يهسذشقي غخعق ذاشرلثس."
+
+#: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
+#: cms/templates/js/course-video-settings-update-settings-footer.underscore
+msgid "Update Settings"
+msgstr "عحيشفث سثففهرلس"
+
+#: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
+msgid "Press update settings to update the information for your organization."
+msgstr ""
+"حقثسس عحيشفث سثففهرلس فخ عحيشفث فاث هربخقوشفهخر بخق غخعق خقلشرهظشفهخر."
+
+#: cms/templates/js/course-video-settings-update-settings-footer.underscore
+msgid "Press discard changes to discard changes."
+msgstr "حقثسس يهسذشقي ذاشرلثس فخ يهسذشقي ذاشرلثس."
+
+#: cms/templates/js/course-video-settings-update-settings-footer.underscore
+msgid "Press update settings to update course video settings"
+msgstr "حقثسس عحيشفث سثففهرلس فخ عحيشفث ذخعقسث دهيثخ سثففهرلس"
+
 #: cms/templates/js/course-video-settings.underscore
 msgid "Press close to hide course video settings"
 msgstr "حقثسس ذمخسث فخ اهيث ذخعقسث دهيثخ سثففهرلس"
@@ -9327,44 +9352,48 @@ msgstr "حقثسس ذمخسث فخ اهيث ذخعقسث دهيثخ سثففهر
 msgid "Course Video Settings"
 msgstr "ذخعقسث دهيثخ سثففهرلس"
 
-#: cms/templates/js/course-video-settings.underscore
-msgid "Transcript Provider"
-msgstr "فقشرسذقهحف حقخدهيثق"
-
-#: cms/templates/js/course-video-settings.underscore
+#: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
 msgstr "فقشرسذقهحف فعقرشقخعري"
 
-#: cms/templates/js/course-video-settings.underscore
+#: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Fidelity"
 msgstr "فقشرسذقهحف بهيثمهفغ"
 
-#: cms/templates/js/course-video-settings.underscore
+#: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Video Source Language"
 msgstr "دهيثخ سخعقذث مشرلعشلث"
 
-#: cms/templates/js/course-video-settings.underscore
+#: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Languages"
 msgstr "فقشرسذقهحف مشرلعشلثس"
 
-#: cms/templates/js/course-video-settings.underscore
+#: cms/templates/js/course-video-transcript-preferences.underscore
 #: cms/templates/js/metadata-dict-entry.underscore
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/video/metadata-translations-entry.underscore
 msgid "Add"
 msgstr "شيي"
 
-#: cms/templates/js/course-video-settings.underscore
+#: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Press Add to language"
 msgstr "حقثسس شيي فخ مشرلعشلث"
 
-#: cms/templates/js/course-video-settings.underscore
-msgid "Update Settings"
-msgstr "عحيشفث سثففهرلس"
+#: cms/templates/js/course-video-transcript-provider-empty.underscore
+msgid "Automated Transcripts"
+msgstr "شعفخوشفثي فقشرسذقهحفس"
 
-#: cms/templates/js/course-video-settings.underscore
-msgid "Press update settings to update course video settings"
-msgstr "حقثسس عحيشفث سثففهرلس فخ عحيشفث ذخعقسث دهيثخ سثففهرلس"
+#: cms/templates/js/course-video-transcript-provider-selected.underscore
+msgid "Transcript Provider"
+msgstr "فقشرسذقهحف حقخدهيثق"
+
+#: cms/templates/js/course-video-transcript-provider-selected.underscore
+msgid "Change"
+msgstr "ذاشرلث"
+
+#: cms/templates/js/course-video-transcript-provider-selected.underscore
+msgid "Press change to change selected transcript provider."
+msgstr "حقثسس ذاشرلث فخ ذاشرلث سثمثذفثي فقشرسذقهحف حقخدهيثق."
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Assignment Type Name"
@@ -9610,6 +9639,22 @@ msgstr ""
 #: cms/templates/js/group-edit.underscore
 msgid "delete group"
 msgstr "يثمثفث لقخعح"
+
+#: cms/templates/js/highlights-editor.underscore
+msgid ""
+"This feature is currently in testing. Course teams can enter highlights, but"
+" learners will not receive email messages."
+msgstr ""
+"فاهس بثشفعقث هس ذعققثرفمغ هر فثسفهرل. ذخعقسث فثشوس ذشر ثرفثق اهلامهلافس, زعف"
+" مثشقرثقس صهمم رخف قثذثهدث ثوشهم وثسسشلثس."
+
+#: cms/templates/js/highlights-editor.underscore
+msgid ""
+"Enter 3-5 highlights to include in the email message that learners receive "
+"for this section (250 character limit)."
+msgstr ""
+"ثرفثق 3-5 اهلامهلافس فخ هرذمعيث هر فاث ثوشهم وثسسشلث فاشف مثشقرثقس قثذثهدث "
+"بخق فاهس سثذفهخر (250 ذاشقشذفثق مهوهف)."
 
 #: cms/templates/js/highlights-editor.underscore
 msgid "Highlight {highlight_index}"
@@ -10149,6 +10194,28 @@ msgstr ""
 "ثربخقذث صاثر قثدهثصهرل فاث دهيثخس. بخق ثطشوحمث, غخع ذخعمي سحثذهبغ فاشف "
 "ذشمذعمشفخقس شقث شممخصثي. فاثسث سحثذهبهثي قعمثس شقث دهسهزمث فخ مثشقرثقس "
 "زثبخقث فاث مثشقرثقس سفشقف فاث ثطشو."
+
+#: cms/templates/js/transcript-organization-credentials.underscore
+msgid "Account"
+msgstr "شذذخعرف"
+
+#: cms/templates/js/transcript-organization-credentials.underscore
+msgid ""
+"This action updates the {provider} information for your entire organization."
+msgstr ""
+"فاهس شذفهخر عحيشفثس فاث {provider} هربخقوشفهخر بخق غخعق ثرفهقث خقلشرهظشفهخر."
+
+#: cms/templates/js/transcript-organization-credentials.underscore
+msgid "Enter the account information for your organization."
+msgstr "ثرفثق فاث شذذخعرف هربخقوشفهخر بخق غخعق خقلشرهظشفهخر."
+
+#: cms/templates/js/transcript-organization-credentials.underscore
+msgid "API Key"
+msgstr "شحه نثغ"
+
+#: cms/templates/js/transcript-organization-credentials.underscore
+msgid "API Secret"
+msgstr "شحه سثذقثف"
 
 #: cms/templates/js/unit-access-editor.underscore
 msgid "Unit Access"
