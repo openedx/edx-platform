@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-09 10:51+0000\n"
-"PO-Revision-Date: 2017-11-09 10:51:48.171308\n"
+"POT-Creation-Date: 2017-11-16 11:00+0000\n"
+"PO-Revision-Date: 2017-11-16 11:00:28.867741\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -87,6 +87,11 @@ msgstr "Süßséçtïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr "Ûnït Ⱡ'σяєм ι#"
+
+#: cms/djangoapps/contentstore/views/helpers.py
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Empty"
+msgstr "Émptý Ⱡ'σяєм ιρѕ#"
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
@@ -6267,6 +6272,7 @@ msgstr ""
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr "Àll rïghts résérvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
@@ -7497,30 +7503,34 @@ msgstr "rölé Ⱡ'σяєм ι#"
 msgid "full_name"
 msgstr "füll_nämé Ⱡ'σяєм ιρѕυм ∂σł#"
 
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.html
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #, python-format
-msgid "Hi %(thread_username)s"
-msgstr "Hï %(thread_username)s Ⱡ'σяєм ιρѕυ#"
+msgid "%(comment_username)s replied to your thread."
+msgstr ""
+"%(comment_username)s réplïéd tö ýöür thréäd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє#"
 
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.html
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #, python-format
 msgid ""
-"<h1> Hi %(thread_username)s, </h1> <p> %(comment_username)s made the "
-"following reply to %(thread_title)s at %(comment_created_at)s. </p> <p> "
-"%(comment_body)s </p> <p> <a href=\"%(post_link)s\"> View the "
-"discussion.</a> </p>"
+"<p> Hi %(thread_username)s, </p> <p> %(comment_username)s made the following"
+" reply to %(thread_title)s at %(comment_created_at)s. </p> <p> "
+"%(comment_body)s </p>"
 msgstr ""
-"<h1> Hï %(thread_username)s, </h1> <p> %(comment_username)s mädé thé "
-"föllöwïng réplý tö %(thread_title)s ät %(comment_created_at)s. </p> <p> "
-"%(comment_body)s </p> <p> <a href=\"%(post_link)s\"> Vïéw thé "
-"dïsçüssïön.</a> </p> Ⱡ'σяєм ιρѕυ#"
+"<p> Hï %(thread_username)s, </p> <p> %(comment_username)s mädé thé föllöwïng"
+" réplý tö %(thread_title)s ät %(comment_created_at)s. </p> <p> "
+"%(comment_body)s </p> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.txt
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
+msgid "View the discussion"
+msgstr "Vïéw thé dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 msgid "This is the reply to your thread:"
 msgstr ""
 "Thïs ïs thé réplý tö ýöür thréäd: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/subject.txt
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/subject.txt
 #, python-format
 msgid ""
 "\n"
@@ -10461,6 +10471,12 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/student_account/views.py
+msgid "Some error occured during password change. Please try again"
+msgstr ""
+"Sömé érrör öççüréd dürïng pässwörd çhängé. Pléäsé trý ägäïn Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/student_account/views.py
 msgid "No email address provided."
 msgstr "Nö émäïl äddréss prövïdéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
@@ -11597,6 +11613,7 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєтυя #"
 
 #: openedx/core/djangoapps/catalog/models.py
+#: openedx/core/djangoapps/video_pipeline/models.py
 msgid "Internal API URL"
 msgstr "Ìntérnäl ÀPÌ ÛRL Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
@@ -11613,6 +11630,25 @@ msgid ""
 msgstr ""
 "Spéçïfïéd ïn séçönds. Énäßlé çäçhïng öf ÀPÌ réspönsés ßý séttïng thïs tö ä "
 "välüé gréätér thän 0. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid "Long Term Cache Time To Live"
+msgstr "Löng Térm Çäçhé Tïmé Tö Lïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Specified in seconds (defaults to 86400s, 24hr). In some cases the cache "
+"does needs to be refreshed less frequently. Enable long term caching of API "
+"responses by setting this to a value greater than 0."
+msgstr ""
+"Spéçïfïéd ïn séçönds (défäülts tö 86400s, 24hr). Ìn sömé çäsés thé çäçhé "
+"döés nééds tö ßé réfréshéd léss fréqüéntlý. Énäßlé löng térm çäçhïng öf ÀPÌ "
+"réspönsés ßý séttïng thïs tö ä välüé gréätér thän 0. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
+"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
+"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
+"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
+"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢α#"
 
 #: openedx/core/djangoapps/catalog/models.py
 msgid ""
@@ -12089,62 +12125,74 @@ msgid "Schedule"
 msgstr "Sçhédülé Ⱡ'σяєм ιρѕυм ∂#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "Go to %(platform_name)s Home Page"
 msgstr "Gö tö %(platform_name)s Hömé Pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #: cms/templates/login.html cms/templates/widgets/header.html
 #: themes/red-theme/cms/templates/login.html
 msgid "Sign In"
 msgstr "Sïgn Ìn Ⱡ'σяєм ιρѕυм #"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on LinkedIn"
 msgstr "%(platform_name)s ön LïnkédÌn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Twitter"
 msgstr "%(platform_name)s ön Twïttér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Facebook"
 msgstr "%(platform_name)s ön Fäçéßöök Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Google Plus"
 msgstr "%(platform_name)s ön Gööglé Plüs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Reddit"
 msgstr "%(platform_name)s ön Réddït Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Download the iOS app on the Apple Store"
 msgstr ""
 "Döwnlöäd thé ïÖS äpp ön thé Àpplé Störé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Download the Android app on the Google Play Store"
 msgstr ""
 "Döwnlöäd thé Àndröïd äpp ön thé Gööglé Pläý Störé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "View on Web"
 msgstr "Vïéw ön Wéß Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Unsubscribe from this list"
 msgstr "Ûnsüßsçrïßé fröm thïs lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "Öür mäïlïng äddréss ïs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
@@ -12153,6 +12201,7 @@ msgid "edX Email"
 msgstr "édX Émäïl Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.txt
 #, python-format
 msgid ""
 "Don't miss the opportunity to highlight your new knowledge and skills by "
@@ -12164,25 +12213,9 @@ msgstr ""
 "%(user_schedule_upgrade_deadline_time)s. Ⱡ'σяєм ιρѕυ#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.txt
 msgid "Upgrade Now"
 msgstr "Ûpgrädé Nöw Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.txt
-#, python-format
-msgid ""
-"Don't miss the opportunity to highlight your new knowledge and skills by "
-"earning a verified certificate. Upgrade by "
-"%(user_schedule_upgrade_deadline_time)s. Upgrade Now! <%(upsell_link)s>"
-msgstr ""
-"Dön't mïss thé öppörtünïtý tö hïghlïght ýöür néw knöwlédgé änd skïlls ßý "
-"éärnïng ä vérïfïéd çértïfïçäté. Ûpgrädé ßý "
-"%(user_schedule_upgrade_deadline_time)s. Ûpgrädé Nöw! <%(upsell_link)s> "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσ#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 #, python-format
@@ -12329,6 +12362,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
@@ -12345,6 +12379,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
@@ -12386,6 +12421,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 msgid "Start learning now"
 msgstr "Stärt léärnïng nöw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
@@ -12974,6 +13010,23 @@ msgstr ""
 "Thé çöürsé kéý för thé çöürsé wé wöüld lïké tö ßé äütö-çöhörtéd. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "Oauth client name of video pipeline service."
+msgstr ""
+"Öäüth çlïént nämé öf vïdéö pïpélïné sérvïçé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "edx-video-pipeline API URL."
+msgstr "édx-vïdéö-pïpélïné ÀPÌ ÛRL. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid ""
+"Username created for Video Pipeline Integration, e.g. veda_service_user."
+msgstr ""
+"Ûsérnämé çréätéd för Vïdéö Pïpélïné Ìntégrätïön, é.g. védä_sérvïçé_üsér. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force On"
 msgstr "Förçé Ön Ⱡ'σяєм ιρѕυм ∂#"
@@ -13481,10 +13534,6 @@ msgstr ""
 msgid "Vertical"
 msgstr "Vértïçäl Ⱡ'σяєм ιρѕυм ∂#"
 
-#: cms/djangoapps/contentstore/views/helpers.py
-msgid "Empty"
-msgstr "Émptý Ⱡ'σяєм ιρѕ#"
-
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
 msgstr ""
@@ -13623,6 +13672,12 @@ msgstr ""
 msgid "Access restricted to: {list_of_groups}"
 msgstr ""
 "Àççéss réstrïçtéd tö: {list_of_groups} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+msgid "The information you entered is incorrect."
+msgstr ""
+"Thé ïnförmätïön ýöü éntéréd ïs ïnçörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
