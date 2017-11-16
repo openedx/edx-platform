@@ -18,6 +18,7 @@ from rest_framework.views import APIView
 from course_modes.models import CourseMode
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError
+from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -36,6 +37,7 @@ from openedx.features.enterprise_support.api import (
     enterprise_enabled
 )
 from student.auth import user_has_role
+from student.models import CourseEnrollment
 from student.models import User
 from student.roles import CourseStaffRole, GlobalStaff
 from util.disable_rate_limit import can_disable_rate_limit
@@ -528,25 +530,11 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         # Get the User, Course ID, and Mode from the request.
 
         username = request.data.get('user', request.user.username)
+        # Note that course_id is actually the Course Run Key
         course_id = request.data.get('course_details', {}).get('course_id')
-
-        if not course_id:
-            return Response(
-                status=status.HTTP_400_BAD_REQUEST,
-                data={"message": u"Course ID must be specified to create a new enrollment."}
-            )
-
-        try:
-            course_id = CourseKey.from_string(course_id)
-        except InvalidKeyError:
-            return Response(
-                status=status.HTTP_400_BAD_REQUEST,
-                data={
-                    "message": u"No course '{course_id}' found for enrollment".format(course_id=course_id)
-                }
-            )
-
+        course_uuid = request.data.get('course_details', {}).get('course_uuid')
         mode = request.data.get('mode')
+        is_active = request.data.get('is_active')
 
         has_api_key_permissions = self.has_api_key_permissions(request)
 
@@ -579,13 +567,46 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 }
             )
 
+        course_entitlement = None
+        if course_uuid:
+            course_entitlement = CourseEntitlement.get_active_user_course_entitlements(user, course_uuid)
+
+        if course_entitlement and course_entitlement.enrollment_course_run is not None and is_active:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    "message": u"Entitlement for {course_uuid} already has an enrollment applied".format(
+                        course_uuid=course_uuid
+                    )
+                }
+            )
+
+        if not course_id:
+            if course_entitlement and course_entitlement.enrollment_course_run is not None:
+                course_id = course_entitlement.enrollment_course_run.course_id
+            else:
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data={"message": u"Course ID must be specified to create a new enrollment."}
+                )
+
+        else:
+            try:
+                course_id = CourseKey.from_string(course_id)
+            except InvalidKeyError:
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data={
+                        "message": u"No course '{course_id}' found for enrollment".format(course_id=course_id)
+                    }
+                )
+
         embargo_response = embargo_api.get_embargo_response(request, course_id, user)
 
         if embargo_response:
             return embargo_response
 
         try:
-            is_active = request.data.get('is_active')
             # Check if the requested activation status is None or a Boolean
             if is_active is not None and not isinstance(is_active, bool):
                 return Response(
@@ -612,60 +633,87 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 }
                 consent_client.provide_consent(**kwargs)
 
-            enrollment_attributes = request.data.get('enrollment_attributes')
-            enrollment = api.get_enrollment(username, unicode(course_id))
-            mode_changed = enrollment and mode is not None and enrollment['mode'] != mode
-            active_changed = enrollment and is_active is not None and enrollment['is_active'] != is_active
-            missing_attrs = []
-            if enrollment_attributes:
-                actual_attrs = [
-                    u"{namespace}:{name}".format(**attr)
-                    for attr in enrollment_attributes
-                ]
-                missing_attrs = set(REQUIRED_ATTRIBUTES.get(mode, [])) - set(actual_attrs)
-            if has_api_key_permissions and (mode_changed or active_changed):
-                if mode_changed and active_changed and not is_active:
-                    # if the requester wanted to deactivate but specified the wrong mode, fail
-                    # the request (on the assumption that the requester had outdated information
-                    # about the currently active enrollment).
-                    msg = u"Enrollment mode mismatch: active mode={}, requested mode={}. Won't deactivate.".format(
-                        enrollment["mode"], mode
-                    )
-                    log.warning(msg)
-                    return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": msg})
-
-                if len(missing_attrs) > 0:
-                    msg = u"Missing enrollment attributes: requested mode={} required attributes={}".format(
-                        mode, REQUIRED_ATTRIBUTES.get(mode)
-                    )
-                    log.warning(msg)
-                    return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": msg})
-
+            # Add Enrollment for the Entitlement user with the correct Mode
+            # This should only occur if the User has a Course Entitlement in place.
+            # As a reault the api_key_permissions do not apply the User may enroll themselves based on the entitlement.
+            if course_entitlement and is_active:
+                mode = course_entitlement.mode
+                response = api.add_enrollment(
+                    username,
+                    unicode(course_id),
+                    mode=mode,
+                    is_active=True,
+                )
+                CourseEntitlement.set_enrollment(
+                    entitlement=course_entitlement,
+                    enrollment=CourseEnrollment.get_enrollment(user, course_id)
+                )
+                log.info('Enrolling [%s] entitlement for run [%s] of Course [%s].', username, course_id, course_uuid)
+            elif course_entitlement and not is_active:
+                # Unenroll the course as part of the entitlement
                 response = api.update_enrollment(
                     username,
                     unicode(course_id),
                     mode=mode,
                     is_active=is_active,
-                    enrollment_attributes=enrollment_attributes,
-                    # If we are updating enrollment by authorized api caller, we should allow expired modes
-                    include_expired=has_api_key_permissions
                 )
+                CourseEntitlement.set_enrollment(course_entitlement, None)
+                log.info('Unenrolling [%s] entitlement for run [%s] of Course [%s].', username, course_id, course_uuid)
             else:
-                # Will reactivate inactive enrollments.
-                response = api.add_enrollment(
-                    username,
-                    unicode(course_id),
-                    mode=mode,
-                    is_active=is_active,
-                    enrollment_attributes=enrollment_attributes
-                )
+                enrollment_attributes = request.data.get('enrollment_attributes')
+                enrollment = api.get_enrollment(username, unicode(course_id))
+                mode_changed = enrollment and mode is not None and enrollment['mode'] != mode
+                active_changed = enrollment and is_active is not None and enrollment['is_active'] != is_active
+                missing_attrs = []
+                if enrollment_attributes:
+                    actual_attrs = [
+                        u"{namespace}:{name}".format(**attr)
+                        for attr in enrollment_attributes
+                    ]
+                    missing_attrs = set(REQUIRED_ATTRIBUTES.get(mode, [])) - set(actual_attrs)
+                if has_api_key_permissions and (mode_changed or active_changed):
+                    if mode_changed and active_changed and not is_active:
+                        # if the requester wanted to deactivate but specified the wrong mode, fail
+                        # the request (on the assumption that the requester had outdated information
+                        # about the currently active enrollment).
+                        msg = u"Enrollment mode mismatch: active mode={}, requested mode={}. Won't deactivate.".format(
+                            enrollment["mode"], mode
+                        )
+                        log.warning(msg)
+                        return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": msg})
 
-            email_opt_in = request.data.get('email_opt_in', None)
-            if email_opt_in is not None:
-                org = course_id.org
-                update_email_opt_in(request.user, org, email_opt_in)
+                    if len(missing_attrs) > 0:
+                        msg = u"Missing enrollment attributes: requested mode={} required attributes={}".format(
+                            mode, REQUIRED_ATTRIBUTES.get(mode)
+                        )
+                        log.warning(msg)
+                        return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": msg})
 
-            log.info('The user [%s] has already been enrolled in course run [%s].', username, course_id)
+                    response = api.update_enrollment(
+                        username,
+                        unicode(course_id),
+                        mode=mode,
+                        is_active=is_active,
+                        enrollment_attributes=enrollment_attributes,
+                        # If we are updating enrollment by authorized api caller, we should allow expired modes
+                        include_expired=has_api_key_permissions
+                    )
+                else:
+                    # Will reactivate inactive enrollments.
+                    response = api.add_enrollment(
+                        username,
+                        unicode(course_id),
+                        mode=mode,
+                        is_active=is_active,
+                        enrollment_attributes=enrollment_attributes
+                    )
+
+                email_opt_in = request.data.get('email_opt_in', None)
+                if email_opt_in is not None:
+                    org = course_id.org
+                    update_email_opt_in(request.user, org, email_opt_in)
+
+                log.info('The user [%s] has already been enrolled in course run [%s].', username, course_id)
             return Response(response)
         except CourseModeNotFoundError as error:
             return Response(

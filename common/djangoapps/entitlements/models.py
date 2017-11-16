@@ -214,6 +214,22 @@ class CourseEntitlement(TimeStampedModel):
         return self.policy.is_entitlement_redeemable(self)
 
     @classmethod
+    def get_active_user_course_entitlements(cls, user, course_uuid):
+        """
+        Returns all the available sessions for a given course.
+        """
+
+        try:
+            entitlement = cls.objects.get(
+                user=user,
+                course_uuid=course_uuid,
+                expired_at=None,
+            )
+            return entitlement
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
     def set_enrollment(cls, entitlement, enrollment):
         """
         Fulfills an entitlement by specifying a session.
