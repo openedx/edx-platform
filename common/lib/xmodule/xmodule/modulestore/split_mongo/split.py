@@ -70,6 +70,7 @@ from bson.objectid import ObjectId
 from xblock.core import XBlock
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.course_module import CourseSummary
+from xmodule.library_content_module import LibrarySummary
 from xmodule.errortracker import null_error_tracker
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import (
@@ -582,16 +583,15 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
         return course_indexes
 
-    def find_course_blocks_by_id(self, ids):
+    def find_courselike_blocks_by_id(self, ids, block_type):
         """
-        Find all structures that specified in `ids`. Filter the course blocks to only return whose
-        `block_type` is `course`
-
+        Find all structures that specified in `ids`. Return blocks matching with block_type.
         Arguments:
             ids (list): A list of structure ids
+            block_type: type of block to return
         """
         ids = set(ids)
-        return self.db_connection.find_course_blocks_by_id(list(ids))
+        return self.db_connection.find_courselike_blocks_by_id(list(ids), block_type)
 
     def find_structures_by_id(self, ids):
         """
@@ -690,6 +690,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
     # It won't recompute the value on operations such as update_course_index (e.g., to revert to a prev
     # version) but those functions will have an optional arg for setting these.
     SEARCH_TARGET_DICT = ['wiki_slug']
+
+    DEFAULT_ROOT_LIBRARY_BLOCK_TYPE = 'library'
+    DEFAULT_ROOT_COURSE_BLOCK_TYPE = 'course'
 
     def __init__(self, contentstore, doc_store_config, fs_root, render_template,
                  default_class=None,
@@ -913,16 +916,19 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # add it in the envelope for the structure.
         return CourseEnvelope(course_key.replace(version_guid=version_guid), entry)
 
-    def _get_course_blocks_for_branch(self, branch, **kwargs):
+    def _get_courselike_blocks_for_branch(self, branch, **kwargs):
         """
-        Internal generator for fetching lists of courses without loading them.
+        Internal generator for fetching lists of courselike without loading them.
         """
         version_guids, id_version_map = self.collect_ids_from_matching_indexes(branch, **kwargs)
 
         if not version_guids:
             return
 
-        for entry in self.find_course_blocks_by_id(version_guids):
+        block_type = SplitMongoModuleStore.DEFAULT_ROOT_LIBRARY_BLOCK_TYPE \
+            if branch == 'library' else SplitMongoModuleStore.DEFAULT_ROOT_COURSE_BLOCK_TYPE
+
+        for entry in self.find_courselike_blocks_by_id(version_guids, block_type):
             for course_index in id_version_map[entry['_id']]:
                 yield entry, course_index
 
@@ -1039,7 +1045,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             }
 
         courses_summaries = []
-        for entry, structure_info in self._get_course_blocks_for_branch(branch, **kwargs):
+        for entry, structure_info in self._get_courselike_blocks_for_branch(branch, **kwargs):
             course_locator = self._create_course_locator(structure_info, branch=None)
             course_block = [
                 block_data
@@ -1058,6 +1064,42 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 CourseSummary(course_locator, **course_summary)
             )
         return courses_summaries
+
+    @autoretry_read()
+    def get_library_summaries(self, **kwargs):
+        """
+        Returns a list of `LibrarySummary` objects.
+        kwargs can be valid db fields to match against active_versions
+        collection e.g org='example_org'.
+        """
+        branch = 'library'
+        libraries_summaries = []
+        for entry, structure_info in self._get_courselike_blocks_for_branch(branch, **kwargs):
+            library_locator = self._create_library_locator(structure_info, branch=None)
+            library_block = [
+                block_data
+                for block_key, block_data in entry['blocks'].items()
+                if block_key.type == "library"
+            ]
+            if not library_block:
+                raise ItemNotFoundError
+
+            if len(library_block) > 1:
+                raise MultipleLibraryBlocksFound(
+                    "Expected 1 library block, but found {0}".format(len(library_block))
+                )
+
+            library_block_fields = library_block[0].fields
+            display_name = ''
+
+            if 'display_name' in library_block_fields:
+                display_name = library_block_fields['display_name']
+
+            libraries_summaries.append(
+                LibrarySummary(library_locator, display_name)
+            )
+
+        return libraries_summaries
 
     def get_libraries(self, branch="library", **kwargs):
         """

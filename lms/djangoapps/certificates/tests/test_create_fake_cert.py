@@ -1,10 +1,12 @@
 """Tests for the create_fake_certs management command. """
+
+from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
+from six import text_type
 
-from certificates.management.commands import create_fake_cert
 from certificates.models import GeneratedCertificate
 from student.tests.factories import UserFactory
 
@@ -24,7 +26,7 @@ class CreateFakeCertTest(TestCase):
         # No existing cert, so create it
         self._run_command(
             self.USERNAME,
-            unicode(self.COURSE_KEY),
+            text_type(self.COURSE_KEY),
             cert_mode='verified',
             grade='0.89'
         )
@@ -38,17 +40,16 @@ class CreateFakeCertTest(TestCase):
         # Cert already exists; modify it
         self._run_command(
             self.USERNAME,
-            unicode(self.COURSE_KEY),
+            text_type(self.COURSE_KEY),
             cert_mode='honor'
         )
         cert = GeneratedCertificate.eligible_certificates.get(user=self.user, course_id=self.COURSE_KEY)
         self.assertEqual(cert.mode, 'honor')
 
     def test_too_few_args(self):
-        with self.assertRaisesRegexp(CommandError, 'Usage'):
+        with self.assertRaisesRegexp(CommandError, 'Error: too few arguments'):
             self._run_command(self.USERNAME)
 
     def _run_command(self, *args, **kwargs):
         """Run the management command to generate a fake cert. """
-        command = create_fake_cert.Command()
-        return command.handle(*args, **kwargs)
+        return call_command('create_fake_cert', *args, **kwargs)

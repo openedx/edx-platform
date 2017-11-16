@@ -9,7 +9,9 @@ from nose.plugins.attrib import attr
 
 import ddt
 from django.contrib.auth.models import User
+from django.core.management import call_command
 from django.core.management.base import CommandError
+from six import text_type
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -214,7 +216,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         output = self._run_command(self.TEST_ORG, chunk_size=2)
         course_ids = [row['course_id'].strip().decode('utf-8') for row in output]
         for course in self.courses:
-            assert unicode(course.id) in course_ids
+            assert text_type(course.id) in course_ids
 
     # Choose numbers before and after the query interval boundary
     @ddt.data(2, 3, 4, 5, 6, 7, 8, 9)
@@ -261,10 +263,10 @@ class EmailOptInListTest(ModuleStoreTestCase):
     def test_not_enough_args(self, num_args):
         args = ["dummy"] * num_args
         expected_msg_regex = (
-            "^Usage: <OUTPUT_FILENAME> <ORG_ALIASES> --courses=COURSE_ID_LIST --email-optin-chunk-size=CHUNK_SIZE$"
+            "^Error: too few arguments$"
         )
         with self.assertRaisesRegexp(CommandError, expected_msg_regex):
-            email_opt_in_list.Command().handle(*args)
+            call_command('email_opt_in_list', *args)
 
     def test_file_already_exists(self):
         temp_file = tempfile.NamedTemporaryFile(delete=True)
@@ -273,7 +275,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
             temp_file.close()
 
         with self.assertRaisesRegexp(CommandError, "^File already exists"):
-            email_opt_in_list.Command().handle(temp_file.name, self.TEST_ORG)
+            call_command('email_opt_in_list', temp_file.name, self.TEST_ORG)
 
     def test_no_user_profile(self):
         """
@@ -376,7 +378,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         output_path = os.path.join(temp_dir_path, self.OUTPUT_FILE_NAME)
         org_list = [org] + other_names
         if only_courses is not None:
-            only_courses = ",".join(unicode(course_id) for course_id in only_courses)
+            only_courses = ",".join(text_type(course_id) for course_id in only_courses)
 
         command = email_opt_in_list.Command()
 
@@ -388,7 +390,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         kwargs = {'courses': only_courses}
         if chunk_size:
             kwargs['email_optin_chunk_size'] = chunk_size
-        command.handle(output_path, *org_list, **kwargs)
+        call_command('email_opt_in_list', output_path, *org_list, **kwargs)
 
         # Retrieve the output from the file
         try:
@@ -442,8 +444,8 @@ class EmailOptInListTest(ModuleStoreTestCase):
                     if hasattr(user, 'profile')
                     else ''
                 ),
-                "course_id": unicode(course_id).encode('utf-8'),
-                "is_opted_in_for_email": unicode(opt_in_pref),
+                "course_id": text_type(course_id).encode('utf-8'),
+                "is_opted_in_for_email": text_type(opt_in_pref),
                 "preference_set_datetime": (
                     self._latest_pref_set_datetime(self.user)
                     if kwargs.get("expect_pref_datetime", True)

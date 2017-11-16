@@ -25,6 +25,8 @@ from openedx.features.enterprise_support.api import (
     enterprise_customer_for_request,
     get_dashboard_consent_notification,
     get_enterprise_consent_url,
+    insert_enterprise_pipeline_elements,
+    enterprise_enabled,
 )
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from openedx.features.enterprise_support.utils import get_cache_key
@@ -428,3 +430,25 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
                 self.assertIn(substr, notification_string)
         else:
             self.assertEqual(notification_string, '')
+
+    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=False))
+    def test_utils_with_enterprise_disabled(self):
+        """
+        Test that disabling the enterprise integration flag causes
+        the utilities to return the expected default values.
+        """
+        self.assertFalse(enterprise_enabled())
+        self.assertEqual(insert_enterprise_pipeline_elements(None), None)
+
+    def test_utils_with_enterprise_enabled(self):
+        """
+        Test that enabling enterprise integration (which is currently on by default) causes the
+        the utilities to return the expected values.
+        """
+        self.assertTrue(enterprise_enabled())
+        pipeline = ['abc', 'social_core.pipeline.social_auth.load_extra_data', 'def']
+        insert_enterprise_pipeline_elements(pipeline)
+        self.assertEqual(pipeline, ['abc',
+                                    'enterprise.tpa_pipeline.handle_enterprise_logistration',
+                                    'social_core.pipeline.social_auth.load_extra_data',
+                                    'def'])

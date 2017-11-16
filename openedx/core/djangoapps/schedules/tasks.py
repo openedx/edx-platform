@@ -1,6 +1,7 @@
 import datetime
 import logging
 
+import analytics
 from celery.task import task, Task
 from crum import CurrentRequestUserMiddleware
 from django.conf import settings
@@ -180,7 +181,7 @@ class ScheduleCourseUpdate(ScheduleMessageBaseTask):
 
 
 def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):
-    site = Site.objects.get(pk=site_id)
+    site = Site.objects.select_related('configuration').get(pk=site_id)
     if _is_delivery_enabled(site, delivery_config_var, log_prefix):
         msg = Message.from_string(msg_str)
 
@@ -193,6 +194,29 @@ def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):
             _annonate_send_task_for_monitoring(msg)
             LOG.debug('%s: Sending message = %s', log_prefix, msg_str)
             ace.send(msg)
+            _track_message_sent(site, user, msg)
+
+
+def _track_message_sent(site, user, msg):
+    properties = {
+        'site': site.domain,
+        'app_label': msg.app_label,
+        'name': msg.name,
+        'language': msg.language,
+        'uuid': unicode(msg.uuid),
+        'send_uuid': unicode(msg.send_uuid),
+    }
+    course_ids = msg.context.get('course_ids', [])
+    properties['num_courses'] = len(course_ids)
+    if len(course_ids) > 0:
+        properties['course_ids'] = course_ids[:10]
+        properties['primary_course_id'] = course_ids[0]
+
+    analytics.track(
+        user_id=user.id,
+        event='edx.bi.email.sent',
+        properties=properties
+    )
 
 
 def _is_delivery_enabled(site, delivery_config_var, log_prefix):

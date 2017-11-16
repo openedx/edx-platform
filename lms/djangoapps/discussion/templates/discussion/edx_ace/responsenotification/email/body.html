@@ -1,0 +1,35 @@
+{% extends 'schedules/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block preview_text %}
+    {% blocktrans trimmed %}
+        {{ comment_username }} replied to your thread.
+    {% endblocktrans %}
+{% endblock %}
+
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            {% blocktrans trimmed %}
+                <p>
+                    Hi {{ thread_username }},
+                </p>
+
+                <p>
+                    {{ comment_username }} made the following reply to {{ thread_title }} at {{ comment_created_at }}.
+                </p>
+
+                <p>
+                    {{ comment_body }}
+                </p>
+            {% endblocktrans %}
+
+            {% trans "View the discussion" as course_cta_text %}
+            {% include "schedules/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=post_link%}
+        </td>
+    </tr>
+</table>
+{% endblock %}

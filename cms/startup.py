@@ -19,6 +19,9 @@ def run():
     NOTE: DO **NOT** add additional code to this method or this file! The Platform Team
           is moving all startup code to more standard locations using Django best practices.
     """
-    django_db_models_options.patch()
+    # TODO: Remove Django 1.11 upgrade shim
+    # SHIM: We should be able to get rid of this monkey patch post-upgrade
+    if django.VERSION[0] == 1 and django.VERSION[1] < 10:
+        django_db_models_options.patch()
 
     django.setup()

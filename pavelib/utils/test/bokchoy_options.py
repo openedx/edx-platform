@@ -26,7 +26,6 @@ BOKCHOY_EVAL_ATTR = make_option(
 BOKCHOY_FASTTEST = make_option('--fasttest', action='store_true', help='Skip some setup')
 BOKCHOY_COVERAGERC = make_option(
     '--coveragerc',
-    default=Env.BOK_CHOY_COVERAGERC,
     help='coveragerc file to use during this test'
 )
 

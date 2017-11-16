@@ -11,6 +11,14 @@ class VideoPipelineIntegration(ConfigurationModel):
     """
     Manages configuration for connecting to the edx-video-pipeline service and using its API.
     """
+    client_name = models.CharField(
+        max_length=100,
+        default='VEDA-Prod',
+        null=False,
+        blank=False,
+        help_text=_('Oauth client name of video pipeline service.')
+    )
+
     api_url = models.URLField(
         verbose_name=_('Internal API URL'),
         help_text=_('edx-video-pipeline API URL.')
@@ -18,10 +26,10 @@ class VideoPipelineIntegration(ConfigurationModel):
 
     service_username = models.CharField(
         max_length=100,
-        default='video_pipeline_service_user',
+        default='veda_service_user',
         null=False,
         blank=False,
-        help_text=_('Username created for Video Pipeline Integration, e.g. video_pipeline_service_user.')
+        help_text=_('Username created for Video Pipeline Integration, e.g. veda_service_user.')
     )
 
     def get_service_user(self):

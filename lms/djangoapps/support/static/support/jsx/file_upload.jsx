@@ -23,12 +23,11 @@ class FileUpload extends React.Component {
     e.preventDefault();
     const fileToken = e.target.id,
       $this = this,
-      url = `https://arbisoft.zendesk.com/api/v2/uploads/${fileToken}.json`,
-      accessToken = 'd6ed06821334b6584dd9607d04007c281007324ed07e087879c9c44835c684da',
+      url = `${this.props.zendeskApiHost}/api/v2/uploads/${fileToken}.json`,
       request = new XMLHttpRequest();
 
     request.open('DELETE', url, true);
-    request.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+    request.setRequestHeader('Authorization', `Bearer ${this.props.accessToken}`);
     request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
 
     request.send();
@@ -43,13 +42,12 @@ class FileUpload extends React.Component {
   }
 
   uploadFile(e) {
-    const url = 'https://arbisoft.zendesk.com/api/v2/uploads.json?filename=',
+    const url = `${this.props.zendeskApiHost}/api/v2/uploads.json?filename=`,
       fileReader = new FileReader(),
       request = new XMLHttpRequest(),
       errorList = [],
       $this = this,
       file = e.target.files[0],
-      accessToken = 'd6ed06821334b6584dd9607d04007c281007324ed07e087879c9c44835c684da',
       maxFileSize = 5000000, // 5mb is max limit
       allowedFileTypes = ['gif', 'png', 'jpg', 'jpeg', 'pdf'];
 
@@ -68,7 +66,7 @@ class FileUpload extends React.Component {
     }
 
     request.open('POST', (url + file.name), true);
-    request.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+    request.setRequestHeader('Authorization', `Bearer ${this.props.accessToken}`);
     request.setRequestHeader('Content-Type', 'application/binary');
 
     fileReader.readAsArrayBuffer(file);
@@ -166,5 +164,7 @@ class FileUpload extends React.Component {
 
 FileUpload.propTypes = {
   setErrorState: PropTypes.func.isRequired,
+  zendeskApiHost: PropTypes.string.isRequired,
+  accessToken: PropTypes.string.isRequired,
 };
 export default FileUpload;

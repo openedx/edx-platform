@@ -236,7 +236,4 @@ class MigrationTests(TestCase):
         out = StringIO()
         call_command('makemigrations', dry_run=True, verbosity=3, stdout=out)
         output = out.getvalue()
-        # Temporary for `edx-val` version bumps with migrations.
-        # Please delete when `edx-val==0.15`.
-        if 'Remove field' not in output and 'Delete model' not in output:
-            self.assertIn('No changes detected', output)
+        self.assertIn('No changes detected', output)

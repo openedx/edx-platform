@@ -66,7 +66,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
     <div class="wrapper-course-image" aria-hidden="true">
       % if show_courseware_link:
         % if not is_course_blocked:
-            <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover">
+            <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover" tabindex="-1">
               <img src="${course_overview.image_urls['small']}" class="course-image" alt="${_('{course_number} {course_name} Home Page').format(course_number=course_overview.number, course_name=course_overview.display_name_with_default)}" />
             </a>
         % else:

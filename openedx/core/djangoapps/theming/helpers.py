@@ -10,6 +10,7 @@ from path import Path
 
 from microsite_configuration import microsite
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers_dirs import (
     get_theme_base_dirs_from_settings,
     get_themes_unchecked,
@@ -336,3 +337,37 @@ def is_comprehensive_theming_enabled():
         return False
 
     return settings.ENABLE_COMPREHENSIVE_THEMING
+
+
+def get_config_value_from_site_or_settings(name, site=None, site_config_name=None):
+    """
+    Given a configuration setting name, try to get it from the site configuration and then fall back on the settings.
+
+    If site_config_name is not specified then "name" is used as the key for both collections.
+
+    Args:
+        name (str): The name of the setting to get the value of.
+        site: The site that we are trying to fetch the value for.
+        site_config_name: The name of the setting within the site configuration.
+
+    Returns:
+        The value stored in the configuration.
+    """
+    if site_config_name is None:
+        site_config_name = name
+
+    if site is None:
+        site = get_current_site()
+
+    site_configuration = None
+    if site is not None:
+        try:
+            site_configuration = getattr(site, "configuration", None)
+        except SiteConfiguration.DoesNotExist:
+            pass
+
+    value_from_settings = getattr(settings, name, None)
+    if site_configuration is not None:
+        return site_configuration.get_value(site_config_name, default=value_from_settings)
+    else:
+        return value_from_settings

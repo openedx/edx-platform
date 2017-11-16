@@ -484,7 +484,7 @@ def _accessible_libraries_iter(user, org=None):
     if org is not None:
         libraries = [] if org == '' else modulestore().get_libraries(org=org)
     else:
-        libraries = modulestore().get_libraries()
+        libraries = modulestore().get_library_summaries()
     # No need to worry about ErrorDescriptors - split's get_libraries() never returns them.
     return (lib for lib in libraries if has_studio_read_access(user, lib.location.library_key))
 
@@ -493,7 +493,7 @@ def _accessible_libraries_iter(user, org=None):
 @ensure_csrf_cookie
 def course_listing(request):
     """
-    List all courses available to the logged in user
+    List all courses and libraries available to the logged in user
     """
 
     optimization_enabled = GlobalStaff().has_user(request.user) and \
@@ -529,6 +529,7 @@ def course_listing(request):
         """
         Return a dict of the data which the view requires for each library
         """
+
         return {
             u'display_name': library.display_name,
             u'library_key': unicode(library.location.library_key),
@@ -557,8 +558,6 @@ def course_listing(request):
         u'allow_course_reruns': settings.FEATURES.get(u'ALLOW_COURSE_RERUNS', True),
         u'optimization_enabled': optimization_enabled
     })
-
-    return response
 
 
 def _get_rerun_link_for_item(course_key):
