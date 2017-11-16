@@ -18,7 +18,6 @@ from edx_ace.utils import date
 from edx_ace.message import MessageType
 from edx_ace.recipient import Recipient
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.site_configuration.helpers import get_value
 from lms.djangoapps.django_comment_client.utils import permalink
 import lms.lib.comment_client as cc
 
