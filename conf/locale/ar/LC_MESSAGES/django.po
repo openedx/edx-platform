@@ -174,7 +174,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-10-30 10:18+0000\n"
+"POT-Creation-Date: 2017-11-14 09:37+0000\n"
 "PO-Revision-Date: 2017-10-19 08:33+0000\n"
 "Last-Translator: Sahbi BG <sahbi.g@gmail.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -2425,10 +2425,8 @@ msgstr "إذا استمرّ ظهور هذا الخطأ، يُرجى الاتصا
 #. the placeholders.
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
-msgid ""
-"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
+msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
 msgstr ""
-"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
 
 #. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
@@ -5149,22 +5147,37 @@ msgstr ""
 msgid "Powered by Open edX"
 msgstr "تُديره Open edX"
 
+#: lms/djangoapps/branding/api.py lms/templates/static_templates/blog.html
+msgid "Blog"
+msgstr "المدوّنة"
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
+msgid "Contact Us"
+msgstr "اتصل بنا"
+
+#: lms/djangoapps/branding/api.py
+msgid "Help Center"
+msgstr "مركز المساعدة"
+
+#: lms/djangoapps/branding/api.py
+#: lms/templates/static_templates/media-kit.html
+msgid "Media Kit"
+msgstr "الأدوات الخاصة بالوسائط المتعدّدة"
+
+#: lms/djangoapps/branding/api.py lms/templates/static_templates/donate.html
+msgid "Donate"
+msgstr "تبرَّع"
+
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid "{platform_name} for Business"
 msgstr "{platform_name} للأعمال التجارية"
 
-#: lms/djangoapps/branding/api.py lms/templates/static_templates/blog.html
-msgid "Blog"
-msgstr "المدوّنة"
-
 #: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
 msgid "News"
 msgstr "الأخبار"
-
-#: lms/djangoapps/branding/api.py
-msgid "Help Center"
-msgstr "مركز المساعدة"
 
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
 #: themes/red-theme/lms/templates/footer.html
@@ -5178,10 +5191,6 @@ msgstr "معلومات الاتّصال"
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Careers"
 msgstr "الوظائف"
-
-#: lms/djangoapps/branding/api.py lms/templates/static_templates/donate.html
-msgid "Donate"
-msgstr "تبرَّع"
 
 #: lms/djangoapps/branding/api.py
 msgid "Terms of Service & Honor Code"
@@ -5208,11 +5217,6 @@ msgstr "سياسة إمكانية الوصول "
 msgid "Sitemap"
 msgstr "خريطة الموقع"
 
-#: lms/djangoapps/branding/api.py
-#: lms/templates/static_templates/media-kit.html
-msgid "Media Kit"
-msgstr "الأدوات الخاصة بالوسائط المتعدّدة"
-
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
@@ -5223,6 +5227,14 @@ msgstr "الأدوات الخاصة بالوسائط المتعدّدة"
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Terms of Service"
 msgstr "شروط الخدمة"
+
+#: lms/djangoapps/branding/api.py
+msgid "Affiliates"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Open edX"
+msgstr ""
 
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
@@ -5525,6 +5537,7 @@ msgstr ""
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr "جميع الحقوق محفوظة"
 
@@ -6140,6 +6153,26 @@ msgstr "العلامات"
 msgid "Textbooks"
 msgstr "الكتب"
 
+#: lms/djangoapps/courseware/views/index.py
+#, python-brace-format
+msgid ""
+"You are not signed in. To see additional course content, {sign_in_link} or "
+"{register_link}, and enroll in this course."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/index.py
+#: lms/djangoapps/courseware/views/views.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "sign in"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/index.py
+#: lms/djangoapps/courseware/views/views.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/features/course_experience/views/course_home_messages.py
+msgid "register"
+msgstr ""
+
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your enrollment: Audit track"
 msgstr "تسجيلك: مسار التدقيق"
@@ -6197,15 +6230,6 @@ msgstr "شهادتك جاهزة"
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid "To see course content, {sign_in_link} or {register_link}."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "sign in"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-#: openedx/features/course_experience/views/course_home_messages.py
-msgid "register"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
@@ -6565,6 +6589,31 @@ msgstr "الدور"
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "full_name"
 msgstr "الاسم الكامل"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.html
+#, python-format
+msgid "Hi %(thread_username)s"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.html
+#, python-format
+msgid ""
+"<h1> Hi %(thread_username)s, </h1> <p> %(comment_username)s made the "
+"following reply to %(thread_title)s at %(comment_created_at)s. </p> <p> "
+"%(comment_body)s </p> <p> <a href=\"%(post_link)s\"> View the "
+"discussion.</a> </p>"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.txt
+msgid "This is the reply to your thread:"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/subject.txt
+#, python-format
+msgid ""
+"\n"
+"Someone replied to your thread on %(platform_name)s\n"
+msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -9119,6 +9168,10 @@ msgid "You do not have permission to view this page."
 msgstr "ليست لديك صلاحية الاطّلاع على محتوى هذه الصفحة."
 
 #: lms/djangoapps/student_account/views.py
+msgid "Some error occured during password change. Please try again"
+msgstr ""
+
+#: lms/djangoapps/student_account/views.py
 msgid "No email address provided."
 msgstr "لم يُحدَّد عنوان بريد إلكتروني."
 
@@ -10134,6 +10187,7 @@ msgid "Bookmark with usage_id: {usage_id} does not exist."
 msgstr "ضع علامة باستخدام ’usage_id‘: {usage_id}  غير موجود."
 
 #: openedx/core/djangoapps/catalog/models.py
+#: openedx/core/djangoapps/video_pipeline/models.py
 msgid "Internal API URL"
 msgstr "رابط لواجهة برمجة التطبيقات الداخلية"
 
@@ -10148,6 +10202,17 @@ msgid ""
 msgstr ""
 "حدد مدة الذاكرة المؤقتة بالثواني لتفعل تخزين النتائج مؤقتاً عند إدخالك قيمةً"
 " أكبر من 0."
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid "Long Term Cache Time To Live"
+msgstr ""
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Specified in seconds (defaults to 86400s, 24hr). In some cases the cache "
+"does needs to be refreshed less frequently. Enable long term caching of API "
+"responses by setting this to a value greater than 0."
+msgstr ""
 
 #: openedx/core/djangoapps/catalog/models.py
 msgid ""
@@ -10529,6 +10594,7 @@ msgid "Schedule"
 msgstr "وضع الجدول"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "Go to %(platform_name)s Home Page"
 msgstr ""
@@ -10539,47 +10605,57 @@ msgid "Sign In"
 msgstr "تسجيل الدخول"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on LinkedIn"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Twitter"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Facebook"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Google Plus"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Reddit"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Download the iOS app on the Apple Store"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Download the Android app on the Google Play Store"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "View on Web"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Unsubscribe from this list"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr ""
 
@@ -10609,16 +10685,22 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 #, python-format
-msgid "Welcome to week %(week_num)s of our %(course_name)s course!"
+msgid "Welcome to week %(week_num)s of %(course_name)s!"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 #, python-format
-msgid "Welcome to week %(week_num)s of <strong>%(course_name)s</strong>!"
+msgid ""
+"We hope you're enjoying <strong>%(course_name)s</strong>! We want to let you"
+" know what you can look forward to in week %(week_num)s:"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
-msgid "Here is what you can look forward to learning this week:"
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt
+msgid ""
+"With self-paced courses, you learn on your own schedule. We encourage you to"
+" spend time with the course each week. Your focused attention will pay off "
+"in the end!"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
@@ -10628,13 +10710,13 @@ msgstr ""
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt
 #, python-format
 msgid ""
-"Welcome to week %(week_num)s of our %(course_name)s course! Here is what you"
-" can look forward to learning this week: %(week_summary)s"
+"We hope you're enjoying %(course_name)s! We want to let you know what you "
+"can look forward to in week %(week_num)s:"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/subject.txt
 #, python-format
-msgid "%(course_name)s - Welcome to Week %(week_num)s "
+msgid "Welcome to week %(week_num)s "
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
@@ -10688,6 +10770,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
@@ -10696,6 +10779,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
@@ -10723,6 +10807,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 msgid "Start learning now"
 msgstr ""
 
@@ -11203,6 +11288,16 @@ msgstr ""
 msgid "The course key for the course we would like to be auto-cohorted."
 msgstr "مفتاح الدورة للدورة التدريبية التي تود جعلها تشعبية بشكل تلقائي. "
 
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "edx-video-pipeline API URL."
+msgstr ""
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid ""
+"Username created for Video Pipeline Integration, e.g. "
+"video_pipeline_service_user."
+msgstr ""
+
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force On"
 msgstr ""
@@ -11266,6 +11361,13 @@ msgstr ""
 "اسم الفئة الفرعية في النقاشات. يظهر هذا الاسم في الجانب الأيسر من منتدى "
 "النقاشات الخاص بالمساق."
 
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#, python-brace-format
+msgid ""
+"You are not signed in. To view the discussion content, {sign_in_link} or "
+"{register_link}, and enroll in this course."
+msgstr ""
+
 #: lms/templates/courseware/courseware.html
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
 msgid "Bookmarks"
@@ -11289,7 +11391,6 @@ msgstr ""
 
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "تسجيل الدخول"
@@ -11742,6 +11843,10 @@ msgstr ""
 msgid "Access restricted to: {list_of_groups}"
 msgstr ""
 
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+msgid "The information you entered is incorrect."
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
 msgstr "بيانات الفيديو الوارد فارغة."
@@ -12095,7 +12200,6 @@ msgstr "رقم المساق: "
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Courses"
 msgstr "المساقات"
@@ -12201,7 +12305,6 @@ msgstr "اختر لغة"
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
 #: lms/templates/header/user_dropdown.html
-#: themes/edx.org/lms/templates/legacy_header.html
 msgid "Account"
 msgstr "الحساب"
 
@@ -12210,7 +12313,6 @@ msgstr "الحساب"
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/static_templates/help.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 #: wiki/plugins/help/wiki_plugin.py
 msgid "Help"
@@ -12265,12 +12367,6 @@ msgstr "سجّل في StudioX"
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Send an email to {email}"
 msgstr "أرسل رسالةً إلكترونية إلى {email}"
-
-#: cms/templates/widgets/sock.html
-#: themes/edx.org/cms/templates/widgets/sock.html
-#: themes/stanford-style/lms/templates/static_templates/about.html
-msgid "Contact Us"
-msgstr "اتصل بنا"
 
 #: cms/templates/widgets/tabs-aggregator.html
 #: lms/templates/courseware/static_tab.html
@@ -13270,7 +13366,6 @@ msgstr "أوافق على {link_start}ميثاق الشرف{link_end} "
 #: lms/templates/register-form.html
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
@@ -13407,12 +13502,12 @@ msgid "Previous"
 msgstr "السابق"
 
 #: lms/templates/seq_module.html
-msgid "Sequence"
-msgstr ""
-
-#: lms/templates/seq_module.html
 msgid "Next"
 msgstr "التالي"
+
+#: lms/templates/seq_module.html
+msgid "Sequence"
+msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -13763,6 +13858,11 @@ msgstr "لوحة المعلومات لـ:"
 
 #: lms/templates/user_dropdown.html
 msgid "More options"
+msgstr ""
+
+#: lms/templates/user_dropdown.html lms/templates/header/header.html
+#: lms/templates/header/user_dropdown.html
+msgid "More Options"
 msgstr ""
 
 #: lms/templates/using.html
@@ -16102,6 +16202,18 @@ msgid "Related Programs"
 msgstr "البرامج ذات الصلة"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You can no longer access this course because payment has not yet been "
+"received. You can {contact_link_start}contact the account "
+"holder{contact_link_end} to request payment, or you can "
+"{unenroll_link_start}unenroll{unenroll_link_end} from this course"
+msgstr ""
+"عذرًا، لم يعد بإمكانك الدخول إلى هذا المساق لأنّه لم يجرِ تلقّي الدفعة بعد. "
+"يمكنك {contact_link_start}الاتصال بصاحب الحساب{contact_link_end} لطلب "
+"الدفعة، أو يمكنك {unenroll_link_start}إلغاء التسجيل{unenroll_link_end} في "
+"هذا المساق."
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
 msgstr "لم يكتمل التحقّق بعد."
 
@@ -16192,18 +16304,6 @@ msgstr ""
 "إنه رسمي. إنه سهل المشاركة. إنه حافز مجرّب لاستكمال هذه الدورة التدريبية. "
 "{line_break}{link_start}اعرف المزيد عن المثبتين {cert_name_long}{link_end}."
 
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You can no longer access this course because payment has not yet been "
-"received. You can {contact_link_start}contact the account "
-"holder{contact_link_end} to request payment, or you can "
-"{unenroll_link_start}unenroll{unenroll_link_end} from this course"
-msgstr ""
-"عذرًا، لم يعد بإمكانك الدخول إلى هذا المساق لأنّه لم يجرِ تلقّي الدفعة بعد. "
-"يمكنك {contact_link_start}الاتصال بصاحب الحساب{contact_link_end} لطلب "
-"الدفعة، أو يمكنك {unenroll_link_start}إلغاء التسجيل{unenroll_link_end} في "
-"هذا المساق."
-
 #. Translators: provider_name is the name of a credit provider or university
 #. (e.g. State University)
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -16281,6 +16381,20 @@ msgid ""
 msgstr ""
 "وقع خطأ أثناء إكمال هذه العملية. للحصول على المساعدة يرجى الاتصال مع "
 "{support_email}."
+
+#: lms/templates/dashboard/_dashboard_show_consent.html
+msgid "Consent to share your data"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_show_consent.html
+msgid ""
+"To access this course, you must first consent to share your learning "
+"achievements with {enterprise_customer_name}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_show_consent.html
+msgid "View Consent"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Approved"
@@ -17386,12 +17500,11 @@ msgstr "تقدّم بطلب للحصول على دعم مالي"
 msgid "{platform_name} Home Page"
 msgstr "الصفحة الرئيسية لمنصّة {platform_name}"
 
-#: lms/templates/header/header.html lms/templates/navigation/navigation.html
-msgid "Global"
-msgstr "عالمي"
+#: lms/templates/header/header.html lms/templates/header/user_dropdown.html
+msgid "Options Menu"
+msgstr ""
 
 #: lms/templates/header/header.html lms/templates/navigation/navigation.html
-#: themes/edx.org/lms/templates/legacy_header.html
 msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
@@ -17403,7 +17516,6 @@ msgstr ""
 #: lms/templates/learner_dashboard/programs.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Programs"
 msgstr "البرامج"
@@ -17411,7 +17523,6 @@ msgstr "البرامج"
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Profile"
 msgstr "الملف الشخصي"
@@ -17431,14 +17542,16 @@ msgstr "المشرف على النظام"
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Shopping Cart"
 msgstr "سلّة التسوّق"
 
 #: lms/templates/header/navbar-not-authenticated.html
+msgid "Supplemental Links"
+msgstr ""
+
+#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "How it Works"
 msgstr "كيفية العمل"
@@ -19152,6 +19265,10 @@ msgstr ""
 msgid "Explore Courses"
 msgstr "استكشاف الدورات التدريبية"
 
+#: lms/templates/navigation/navigation.html
+msgid "Global"
+msgstr "عالمي"
+
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""
 "\n"
@@ -19984,7 +20101,7 @@ msgid "Student Support: Certificates"
 msgstr "دعم الطلاب: الشهادات"
 
 #: lms/templates/support/contact_us.html
-msgid "Contact US"
+msgid "{platform_name} Support: Contact Us"
 msgstr ""
 
 #: lms/templates/support/enrollment.html
@@ -20426,13 +20543,23 @@ msgid "Page Footer"
 msgstr "ذيل الصفحة"
 
 #: themes/edx.org/lms/templates/footer.html
+msgid "edX Home Page"
+msgstr ""
+
+#: themes/edx.org/lms/templates/footer.html
+msgid "© 2012–{year} edX Inc. "
+msgstr ""
+
+#: themes/edx.org/lms/templates/footer.html
+msgid ""
+"EdX, Open edX, and MicroMasters are trademarks of edX Inc., registered in "
+"the U.S. and other countries."
+msgstr ""
+
+#: themes/edx.org/lms/templates/footer.html
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
 msgid "About edX"
 msgstr "لمحة عن edX"
-
-#: themes/edx.org/lms/templates/footer.html
-msgid "edX Home Page"
-msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
@@ -20440,20 +20567,6 @@ msgid ""
 "edX and the edX and Open edX logos are registered trademarks or trademarks "
 "of edX Inc."
 msgstr ""
-
-#: themes/edx.org/lms/templates/legacy_header.html
-msgid "Main"
-msgstr ""
-
-#: themes/edx.org/lms/templates/legacy_header.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Find Courses"
-msgstr "إيجاد المساقات"
-
-#: themes/edx.org/lms/templates/legacy_header.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Schools & Partners"
-msgstr "المدارس والشركاء"
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid "About edX Verified Certificates"
@@ -20524,6 +20637,14 @@ msgid ""
 msgstr ""
 "{b_start} ادعم مهمتنا: {b_end} EdX مشروع غير ربحي، يعتمد على مجموعة من "
 "الشهادات الموثّقة بهدف دعم تمويل التعليم المجاني للجميع، حول العالم."
+
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Find Courses"
+msgstr "إيجاد المساقات"
+
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Schools & Partners"
+msgstr "المدارس والشركاء"
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
