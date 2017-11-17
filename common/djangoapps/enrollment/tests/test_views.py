@@ -24,9 +24,11 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from entitlements.tests.factories import CourseEntitlementFactory
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError
 from enrollment.views import EnrollmentUserThrottle
+from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
@@ -35,7 +37,7 @@ from openedx.core.lib.django_test_client_utils import get_absolute_url
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
-from student.tests.factories import AdminFactory, UserFactory
+from student.tests.factories import AdminFactory, UserFactory, TEST_PASSWORD
 from util.models import RateLimitConfiguration
 from util.testing import UrlResetMixin
 
@@ -47,6 +49,7 @@ class EnrollmentTestMixin(object):
     def assert_enrollment_status(
             self,
             course_id=None,
+            course_uuid=None,
             username=None,
             expected_status=status.HTTP_200_OK,
             email_opt_in=None,
@@ -76,6 +79,9 @@ class EnrollmentTestMixin(object):
             'user': username,
             'enrollment_attributes': enrollment_attributes
         }
+
+        if course_uuid:
+            data['course_details']['course_uuid'] = course_uuid
 
         if is_active is not None:
             data['is_active'] = is_active
@@ -131,6 +137,78 @@ class EnrollmentTestMixin(object):
         actual_mode, actual_activation = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
         self.assertEqual(actual_activation, expected_activation)
         self.assertEqual(actual_mode, expected_mode)
+
+
+# @override_settings(EDX_API_KEY="i am a key")
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class EntitlementEnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
+
+    def setUp(self):
+        super(EntitlementEnrollmentTest, self).setUp()
+        self.course = CourseFactory()
+        self.user = UserFactory()
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.VERIFIED,
+            mode_display_name=CourseMode.VERIFIED,
+        )
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
+    def test_enroll_entitlement(self):
+        entitlement = CourseEntitlementFactory.create(user=self.user, mode='verified')
+
+        resp = self.assert_enrollment_status(
+            course_id=unicode(self.course.id),
+            course_uuid=str(entitlement.course_uuid),
+            is_active=True,
+            mode=None,
+            max_mongo_calls=4
+        )
+        data = json.loads(resp.content)
+        self.assertEqual(self.course.display_name_with_default, data['course_details']['course_name'])
+
+        # Verify that the enrollment was created correctly
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertTrue(is_active)
+        self.assertEqual(course_mode, entitlement.mode)
+
+        entitlement.refresh_from_db()
+        # Verify the Entitlement settings are correct
+        self.assertIsNotNone(entitlement.enrollment_course_run)
+        self.assertEqual(entitlement.enrollment_course_run.course_id, self.course.id)
+
+    def test_unenroll_entitlement(self):
+        entitlement = CourseEntitlementFactory.create(user=self.user, mode='verified')
+
+        # Enroll user
+        self.assert_enrollment_status(
+            course_id=unicode(self.course.id),
+            course_uuid=str(entitlement.course_uuid),
+            is_active=True,
+            mode=None,
+            max_mongo_calls=4
+        )
+
+        # Unenroll the user
+        resp = self.assert_enrollment_status(
+            course_id=unicode(self.course.id),
+            course_uuid=str(entitlement.course_uuid),
+            is_active=False,
+            mode=None,
+            max_mongo_calls=4
+        )
+        data = json.loads(resp.content)
+        self.assertEqual(self.course.display_name_with_default, data['course_details']['course_name'])
+
+        # Verify that the enrollment was created correctly
+        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertFalse(is_active)
+        self.assertEqual(course_mode, entitlement.mode)
+
+        entitlement.refresh_from_db()
+        self.assertIsNone(entitlement.enrollment_course_run)
 
 
 @attr(shard=3)
