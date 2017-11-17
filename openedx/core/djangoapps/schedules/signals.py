@@ -89,19 +89,17 @@ def update_schedules_on_course_start_changed(sender, updated_course_overview, pr
     Updates all course schedules if course hasn't started yet and
     the updated start date is still in the future.
     """
-    current_time = timezone.now()
-    if previous_start_date > current_time and updated_course_overview.start > current_time:
-        upgrade_deadline = _calculate_upgrade_deadline(
-            updated_course_overview.id,
-            content_availability_date=updated_course_overview.start,
-        )
-        update_course_schedules.apply_async(
-            kwargs=dict(
-                course_id=unicode(updated_course_overview.id),
-                new_start_date_str=date.serialize(updated_course_overview.start),
-                new_upgrade_deadline_str=date.serialize(upgrade_deadline),
-            ),
-        )
+    upgrade_deadline = _calculate_upgrade_deadline(
+        updated_course_overview.id,
+        content_availability_date=updated_course_overview.start,
+    )
+    update_course_schedules.apply_async(
+        kwargs=dict(
+            course_id=unicode(updated_course_overview.id),
+            new_start_date_str=date.serialize(updated_course_overview.start),
+            new_upgrade_deadline_str=date.serialize(upgrade_deadline),
+        ),
+    )
 
 
 def _calculate_upgrade_deadline(course_id, content_availability_date):
