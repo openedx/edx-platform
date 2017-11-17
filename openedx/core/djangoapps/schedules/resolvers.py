@@ -123,10 +123,12 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
             'enrollment__course',
         ).filter(
             Q(enrollment__course__end__isnull=True) | Q(
-                enrollment__course__end__gte=self.current_datetime),
+                enrollment__course__end__gte=self.current_datetime
+            ),
             self.experience_filter,
             enrollment__user__in=users,
             enrollment__is_active=True,
+            active=True,
             **schedule_day_equals_target_day_filter
         ).order_by(order_by)
 
