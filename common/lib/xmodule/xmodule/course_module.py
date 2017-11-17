@@ -869,6 +869,14 @@ class CourseFields(object):
         ),
         scope=Scope.settings, default=False
     )
+    highlights_enabled_for_messaging = Boolean(
+        display_name=_("Highlights Enabled for Messaging"),
+        help=_(
+            "Enter true or false. If true, any highlights associated with content in the course will be messaged "
+            "to learners at their scheduled time."
+        ),
+        scope=Scope.settings, default=False
+    )
 
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
