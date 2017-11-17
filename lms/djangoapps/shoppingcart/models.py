@@ -1309,21 +1309,6 @@ class RegistrationCodeRedemption(models.Model):
         return code_redemption
 
 
-class SoftDeleteCouponManager(models.Manager):
-    """ Use this manager to get objects that have a is_active=True """
-    def get_active_coupons_queryset(self):
-        """
-        filter the is_active = True Coupons only
-        """
-        return super(SoftDeleteCouponManager, self).get_queryset().filter(is_active=True)
-
-    def get_queryset(self):
-        """
-        get all the coupon objects
-        """
-        return super(SoftDeleteCouponManager, self).get_queryset()
-
-
 class Coupon(models.Model):
     """
     This table contains coupon codes
@@ -1343,8 +1328,6 @@ class Coupon(models.Model):
 
     def __unicode__(self):
         return "[Coupon] code: {} course: {}".format(self.code, self.course_id)
-
-    objects = SoftDeleteCouponManager()
 
     @property
     def display_expiry_date(self):
