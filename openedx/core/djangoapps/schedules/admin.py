@@ -11,11 +11,45 @@ class ScheduleExperienceAdminInline(admin.StackedInline):
 
 @admin.register(models.Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
-    list_display = ('username', 'course_id', 'active', 'start', 'upgrade_deadline')
+    list_display = ('username', 'course_id', 'active', 'start', 'upgrade_deadline', 'experience_display')
+    list_filter = ('experience__experience_type', 'active')
     raw_id_fields = ('enrollment',)
     readonly_fields = ('modified',)
     search_fields = ('enrollment__user__username', 'enrollment__course__id',)
     inlines = (ScheduleExperienceAdminInline,)
+    actions = ['deactivate_schedules', 'activate_schedules', 'set_experience_to_default', 'set_experience_to_course_updates']
+
+    def deactivate_schedules(self, request, queryset):
+        rows_updated = queryset.update(active=False)
+        self.message_user(request, "{} schedule(s) were deactivated".format(rows_updated))
+    deactivate_schedules.short_description = "Deactivate selected schedules"
+
+    def activate_schedules(self, request, queryset):
+        rows_updated = queryset.update(active=True)
+        self.message_user(request, "{} schedule(s) were activated".format(rows_updated))
+    activate_schedules.short_description = "Activate selected schedules"
+
+    def set_experience_to_default(self, request, queryset):
+        rows_updated = models.ScheduleExperience.objects.filter(
+            schedule__in=list(queryset)
+        ).update(
+            experience_type=models.ScheduleExperience.EXPERIENCES.default
+        )
+        self.message_user(request, "{} schedule(s) were changed to use the default experience".format(rows_updated))
+    set_experience_to_default.short_description = "Convert the selected schedules to the default experience"
+
+    def set_experience_to_course_updates(self, request, queryset):
+        rows_updated = models.ScheduleExperience.objects.filter(
+            schedule__in=list(queryset)
+        ).update(
+            experience_type=models.ScheduleExperience.EXPERIENCES.course_updates
+        )
+        self.message_user(request, "{} schedule(s) were changed to use the course update experience".format(rows_updated))
+    set_experience_to_course_updates.short_description = "Convert the selected schedules to the course updates experience"
+
+    def experience_display(self, obj):
+        return obj.experience.get_experience_type_display()
+    experience_display.short_descriptions = _('Experience')
 
     def username(self, obj):
         return obj.enrollment.user.username
