@@ -3,7 +3,6 @@ Defines asynchronous celery task for sending email notification (through edx-ace
 pertaining to new discussion forum comments.
 """
 import logging
-from urllib import urlencode
 from urlparse import urljoin
 
 from celery import task
@@ -41,8 +40,9 @@ class ResponseNotification(MessageType):
 @task(base=LoggedTask, routing_key=ROUTING_KEY)
 def send_ace_message(context):
     context['course_id'] = CourseKey.from_string(context['course_id'])
-    context['site'] = Site.objects.get(id=context['site_id'])
+
     if _should_send_message(context):
+        context['site'] = Site.objects.get(id=context['site_id'])
         thread_author = User.objects.get(id=context['thread_author_id'])
         middleware_classes = [
             CurrentRequestUserMiddleware,
