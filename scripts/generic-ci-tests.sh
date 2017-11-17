@@ -170,37 +170,7 @@ case "$TEST_SUITE" in
         ;;
 
     "bok-choy")
-
-        PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS"
-
-        case "$SHARD" in
-
-            "all")
-                paver test_bokchoy $PAVER_ARGS
-                ;;
-
-            [1-9]|10)
-                paver test_bokchoy --eval-attr="shard==$SHARD" $PAVER_ARGS
-                ;;
-
-            11|"noshard")
-                paver test_bokchoy --eval-attr='not shard and not a11y' $PAVER_ARGS
-                ;;
-
-            # Default case because if we later define another bok-choy shard on Jenkins
-            # (e.g. Shard 10) in the multi-config project and expand this file
-            # with an additional case condition, old branches without that commit
-            # would not execute any tests on the worker assigned to that shard
-            # and thus their build would fail.
-            # This way they will just report 1 test executed and passed.
-            *)
-                # Need to create an empty test result so the post-build
-                # action doesn't fail the build.
-                # May be unnecessary if we changed the "Skip if there are no test files"
-                # option to True in the jenkins job definitions.
-                mkdir -p reports/bok_choy
-                emptyxunit "bok_choy/xunit"
-                ;;
-        esac
+        mkdir -p reports/bok_choy
+        emptyxunit "bok_choy/xunit"
         ;;
 esac
