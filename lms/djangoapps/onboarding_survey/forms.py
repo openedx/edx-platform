@@ -27,6 +27,12 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 no_option_select_error = 'Please select an option for {}'
 empty_field_error = 'Please enter your {}'
 
+def get_data_from_json_file(file_name):
+    curr_dir = os.path.dirname(__file__)
+    file_path = 'data/'+file_name
+    json_file = open(os.path.join(curr_dir, file_path))
+    data = json.load(json_file)
+    return data
 
 class UserInfoModelForm(forms.ModelForm):
     """
@@ -50,30 +56,26 @@ class UserInfoModelForm(forms.ModelForm):
         return self.cleaned_data['country_of_employment']
 
     def clean_country_of_residence(self):
-        curr_dir = os.path.dirname(__file__)
-        all_countries_json_file = open(os.path.join(curr_dir, 'data/world_countries.json'))
-        all_countries = json.load(all_countries_json_file)
 
+        all_countries = get_data_from_json_file('world_countries.json')
         country_of_residence = self.cleaned_data['country_of_residence']
 
         for country in all_countries:
             if country == country_of_residence:
                 return self.cleaned_data['country_of_residence']
 
-        raise forms.ValidationError('Please select country of residence from the auto-fill drop down.')
+        raise forms.ValidationError('Please select country of residence.')
 
     def clean_language(self):
-        curr_dir = os.path.dirname(__file__)
-        all_languages_json_file = open(os.path.join(curr_dir, 'data/world_languages.json'))
-        all_languages = json.load(all_languages_json_file)
 
+        all_languages = get_data_from_json_file('world_languages.json')
         submitted_language = self.cleaned_data['language']
 
         for language in all_languages:
             if language == submitted_language:
                 return self.cleaned_data['language']
 
-        raise forms.ValidationError('Please select language from the auto-fill drop down.')
+        raise forms.ValidationError('Please select language.')
 
     class Meta:
         """
@@ -299,17 +301,15 @@ class OrganizationInfoModelForm(forms.ModelForm):
         }
 
     def clean_country(self):
-        curr_dir = os.path.dirname(__file__)
-        all_countries_json_file = open(os.path.join(curr_dir, 'data/world_countries.json'))
-        all_countries = json.load(all_countries_json_file)
 
+        all_countries = get_data_from_json_file('world_countries.json')
         country = self.cleaned_data['country']
 
         for _country in all_countries:
             if _country == country:
                 return self.cleaned_data['country']
 
-        raise forms.ValidationError('Please select country of Organization Headquarters from the auto-fill drop down.')
+        raise forms.ValidationError('Please select country of Organization Headquarters.')
 
     def clean_url(self):
         is_org_url_exist = int(self.data.get('is_org_url_exist')) if self.data.get('is_org_url_exist') else None
@@ -578,7 +578,7 @@ class OrganizationDetailModelForm(forms.ModelForm):
             if currency == currency_input:
                 return self.cleaned_data['currency_input']
 
-        raise forms.ValidationError('Please select currency code from the auto-fill drop down.')
+        raise forms.ValidationError('Please select currency code.')
 
     def clean_info_accuracy(self):
         can_provide_info = int(self.data['can_provide_info']) if self.data.get('can_provide_info') else False
