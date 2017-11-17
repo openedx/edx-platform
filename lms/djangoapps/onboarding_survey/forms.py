@@ -27,12 +27,29 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 no_option_select_error = 'Please select an option for {}'
 empty_field_error = 'Please enter your {}'
 
-def get_data_from_json_file(file_name):
+def get_onboarding_autosuggesion_data(file_name):
+    """
+
+    Receives a json file name and return data related to autocomplete fields in
+    onboarding survey.
+    """
+
     curr_dir = os.path.dirname(__file__)
-    file_path = 'data/'+file_name
+    file_path = "{}/{}".format('data', file_name)
     json_file = open(os.path.join(curr_dir, file_path))
     data = json.load(json_file)
     return data
+
+def is_selected_from_autocomplete(autocomplete_data, submitted_input):
+    """
+
+    Checks whether submitted input lies in autocomplete data or not.
+    """
+
+    for value in autocomplete_data:
+        if value == submitted_input:
+            return True
+    return False
 
 class UserInfoModelForm(forms.ModelForm):
     """
@@ -57,23 +74,21 @@ class UserInfoModelForm(forms.ModelForm):
 
     def clean_country_of_residence(self):
 
-        all_countries = get_data_from_json_file('world_countries.json')
+        all_countries = get_onboarding_autosuggesion_data('world_countries.json')
         country_of_residence = self.cleaned_data['country_of_residence']
 
-        for country in all_countries:
-            if country == country_of_residence:
-                return self.cleaned_data['country_of_residence']
+        if is_selected_from_autocomplete(all_countries, country_of_residence):
+            return country_of_residence
 
         raise forms.ValidationError('Please select country of residence.')
 
     def clean_language(self):
 
-        all_languages = get_data_from_json_file('world_languages.json')
+        all_languages = get_onboarding_autosuggesion_data('world_languages.json')
         submitted_language = self.cleaned_data['language']
 
-        for language in all_languages:
-            if language == submitted_language:
-                return self.cleaned_data['language']
+        if is_selected_from_autocomplete(all_languages, submitted_language):
+            return submitted_language
 
         raise forms.ValidationError('Please select language.')
 
@@ -302,12 +317,11 @@ class OrganizationInfoModelForm(forms.ModelForm):
 
     def clean_country(self):
 
-        all_countries = get_data_from_json_file('world_countries.json')
+        all_countries = get_onboarding_autosuggesion_data('world_countries.json')
         country = self.cleaned_data['country']
 
-        for _country in all_countries:
-            if _country == country:
-                return self.cleaned_data['country']
+        if is_selected_from_autocomplete(all_countries, country):
+            return country
 
         raise forms.ValidationError('Please select country of Organization Headquarters.')
 
