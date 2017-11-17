@@ -1,13 +1,13 @@
 {% load i18n %}
 {% if course_ids|length > 1 %}
     {% blocktrans trimmed %}
-        Many edX learners are completing more problems every week, and
+        Many {{ platform_name }} learners are completing more problems every week, and
         participating in the discussion forums. What do you want to do to keep learning?
     {% endblocktrans %}
     {% trans "Keep learning" %} <{{dashboard_url}}>
 {% else %}
     {% blocktrans trimmed %}
-        Many edX learners in {{course_name}} are completing more problems every week, and
+        Many {{ platform_name }} learners in {{course_name}} are completing more problems every week, and
         participating in the discussion forums. What do you want to do to keep learning?
     {% endblocktrans %}
     {% trans "Keep learning" %} <{{course_url}}>

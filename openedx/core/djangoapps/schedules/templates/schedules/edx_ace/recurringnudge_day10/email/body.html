@@ -24,12 +24,12 @@
             <p>
                 {% if course_ids|length > 1 %}
                     {% blocktrans trimmed %}
-                        Many edX learners are completing more problems every week, and
+                        Many {{ platform_name }} learners are completing more problems every week, and
                         participating in the discussion forums. What do you want to do to keep learning?
                     {% endblocktrans %}
                 {% else %}
                     {% blocktrans trimmed %}
-                        Many edX learners in <strong>{{course_name}}</strong> are completing more problems every week, and
+                        Many {{ platform_name }} learners in <strong>{{course_name}}</strong> are completing more problems every week, and
                         participating in the discussion forums. What do you want to do to keep learning?
                     {% endblocktrans %}
                 {% endif %}
