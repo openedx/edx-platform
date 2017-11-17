@@ -649,7 +649,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     enrollment=CourseEnrollment.get_enrollment(user, course_id)
                 )
                 log.info('Enrolling [%s] entitlement for run [%s] of Course [%s].', username, course_id, course_uuid)
-            elif course_entitlement and not is_active:
+            elif course_entitlement and is_active is not None and not is_active:
                 # Unenroll the course as part of the entitlement
                 response = api.update_enrollment(
                     username,
