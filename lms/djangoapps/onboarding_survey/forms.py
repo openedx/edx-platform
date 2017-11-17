@@ -29,7 +29,6 @@ empty_field_error = 'Please enter your {}'
 
 def get_onboarding_autosuggesion_data(file_name):
     """
-
     Receives a json file name and return data related to autocomplete fields in
     onboarding survey.
     """
@@ -42,7 +41,6 @@ def get_onboarding_autosuggesion_data(file_name):
 
 def is_selected_from_autocomplete(autocomplete_data, submitted_input):
     """
-
     Checks whether submitted input lies in autocomplete data or not.
     """
 
@@ -588,9 +586,8 @@ class OrganizationDetailModelForm(forms.ModelForm):
         all_currency_codes = Currency.objects.values_list('alphabetic_code', flat=True)
         currency_input = self.cleaned_data['currency_input']
 
-        for currency in all_currency_codes:
-            if currency == currency_input:
-                return self.cleaned_data['currency_input']
+        if is_selected_from_autocomplete(all_currency_codes, currency_input):
+            return currency_input
 
         raise forms.ValidationError('Please select currency code.')
 
