@@ -14,7 +14,7 @@ class ScheduleAdmin(admin.ModelAdmin):
     list_display = ('username', 'course_id', 'active', 'start', 'upgrade_deadline')
     raw_id_fields = ('enrollment',)
     readonly_fields = ('modified',)
-    search_fields = ('enrollment__user__username', 'enrollment__course_id',)
+    search_fields = ('enrollment__user__username', 'enrollment__course__id',)
     inlines = (ScheduleExperienceAdminInline,)
 
     def username(self, obj):
