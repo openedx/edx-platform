@@ -267,7 +267,7 @@
       width: 100%;
       margin: 0 auto;
       border-bottom: 1px solid $gray-l3;
-      color: theme-color("primary");
+      background-color: theme-color("primary");
       padding: ($baseline*0.75) 5%;
 
       .u-field-account_privacy {
