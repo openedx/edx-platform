@@ -39,14 +39,15 @@ ORG_DEADLINE_QUERY = 1  # courseware_orgdynamicupgradedeadlineconfiguration
 COURSE_DEADLINE_QUERY = 1  # courseware_coursedynamicupgradedeadlineconfiguration
 COMMERCE_CONFIG_QUERY = 1  # commerce_commerceconfiguration
 
-USER_QUERY = 1
+USER_QUERY = 1  # auth_user
 THEME_PREVIEW_QUERY = 1
-THEME_QUERY = 1
-SCHEDULE_CONFIG_QUERY = 1
+THEME_QUERY = 1  # theming_sitetheme
+SCHEDULE_CONFIG_QUERY = 1  # schedules_scheduleconfig
 
 NUM_QUERIES_SITE_SCHEDULES = (
     SITE_QUERY +
     SITE_CONFIG_QUERY +
+    THEME_QUERY +
     SCHEDULES_QUERY
 )
 
