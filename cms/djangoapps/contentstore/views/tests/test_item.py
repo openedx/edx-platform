@@ -2573,7 +2573,9 @@ class TestXBlockInfo(ItemTest):
             self.assertEqual(xblock_info['start'], DEFAULT_START_DATE.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
     def test_highlights_enabled(self):
-        chapter = modulestore().get_item(self.chapter.location)
+        self.course.highlights_enabled_for_messaging = True
+        self.store.update_item(self.course, None)
+        chapter = self.store.get_item(self.chapter.location)
         with highlights_setting.override():
             xblock_info = create_xblock_info(chapter)
             self.assertTrue(xblock_info['highlights_enabled'])
@@ -2606,6 +2608,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['format'], None)
         self.assertEqual(xblock_info['highlights'], self.chapter.highlights)
         self.assertFalse(xblock_info['highlights_enabled'])
+        self.assertFalse(xblock_info['highlights_enabled_for_messaging'])
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info)
