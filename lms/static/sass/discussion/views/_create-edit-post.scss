@@ -47,7 +47,6 @@
       }
 
       .field-label-text {
-        margin: $baseline 0 0 0;
         display: block;
       }
 
@@ -67,7 +66,7 @@
       line-height: 1.5;
 
       &#field_help_post_type {
-        @include margin($baseline / 2, 0, $baseline * 0.75, 0);
+        @include margin($baseline / 4, 0, $baseline * 0.75, 0);
       }
 
       &#new-post-editor-description {
