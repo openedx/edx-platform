@@ -8,11 +8,11 @@ import pytz
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import force_text
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from opaque_keys.edx.keys import CourseKey
@@ -103,7 +103,8 @@ class CourseMode(models.Model):
     # DEPRECATED: the suggested prices for this mode
     # We used to allow users to choose from a set of prices, but we now allow only
     # a single price.  This field has been deprecated by `min_price`
-    suggested_prices = models.CommaSeparatedIntegerField(max_length=255, blank=True, default='')
+    suggested_prices = models.CharField(max_length=255, blank=True, default='',
+                                        validators=[validate_comma_separated_integer_list])
 
     # optional description override
     # WARNING: will not be localized
