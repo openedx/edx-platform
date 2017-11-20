@@ -416,6 +416,13 @@ def _get_source_address(course_id, course_title, course_language, truncate=True)
     if len(escaped_encoded_from_addr) >= 320 and truncate:
         from_addr = format_address(course_name)
 
+    # EDUCATOR-1773: Courses with unicode in the title are not handled by django-ses logging
+    # remove this block once https://github.com/django-ses/django-ses/issues/137 is resolved and released
+    try:
+        dummy_var = "not a unicode string {}".format(from_addr)
+    except UnicodeEncodeError:
+        from_addr = format_address(course_name)
+
     return from_addr
 
 
