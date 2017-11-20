@@ -1,3 +1,7 @@
+"""
+Contains methods for accessing weekly course highlights. Weekly highlights is a
+schedule experience built on the Schedules app.
+"""
 import logging
 
 from courseware.module_render import get_module_for_descriptor
@@ -24,26 +28,28 @@ def course_has_highlights(course_key):
         return False
 
     else:
-        course_has_highlights = any(
+        highlights_are_available = any(
             section.highlights
             for section in course.get_children()
             if not section.hide_from_toc
         )
 
-        if not course_has_highlights:
+        if not highlights_are_available:
             log.error(
                 "Course team enabled highlights and provided no highlights."
             )
 
-        return course_has_highlights
+        return highlights_are_available
 
 
 def get_week_highlights(user, course_key, week_num):
     """
     Get highlights (list of unicode strings) for a given week.
     week_num starts at 1.
-    Raises CourseUpdateDoesNotExist if highlights do not exist for
-    the requested week_num.
+
+    Raises:
+        CourseUpdateDoesNotExist: if highlights do not exist for
+            the requested week_num.
     """
     course_descriptor = _get_course_with_highlights(course_key)
     course_module = _get_course_module(course_descriptor, user)
@@ -57,6 +63,7 @@ def get_week_highlights(user, course_key, week_num):
 
 
 def _get_course_with_highlights(course_key):
+    # pylint: disable=missing-docstring
     if not COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course_key):
         raise CourseUpdateDoesNotExist(
             "%s Course Update Messages waffle flag is disabled.",

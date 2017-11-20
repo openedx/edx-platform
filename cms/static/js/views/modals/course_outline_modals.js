@@ -17,7 +17,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
         StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
-        AccessEditor, ShowCorrectnessEditor, HighlightsEditor;
+        AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
@@ -242,12 +242,54 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         callAnalytics: function(event) {
             event.preventDefault();
             window.analytics.track('edx.bi.highlights.' + event.target.innerText.toLowerCase());
-            this.save(event);
+            if (event.target.className.indexOf('save') !== -1) {
+                this.save(event);
+            } else {
+                this.hide();
+            }
         },
 
         addActionButtons: function() {
             this.addActionButton('save', gettext('Save'), true);
             this.addActionButton('cancel', gettext('Cancel'));
+        }
+    });
+
+    HighlightsEnableXBlockModal = CourseOutlineXBlockModal.extend({
+
+        events: _.extend({}, CourseOutlineXBlockModal.prototype.events, {
+            'click .action-save': 'callAnalytics',
+            'click .action-cancel': 'callAnalytics'
+        }),
+
+        initialize: function() {
+            CourseOutlineXBlockModal.prototype.initialize.call(this);
+            if (this.options.xblockType) {
+                this.options.modalName = 'highlights-enable-' + this.options.xblockType;
+            }
+        },
+
+        getTitle: function() {
+            return gettext('Enable Weekly Course Highlight Messages');
+        },
+
+        getIntroductionMessage: function() {
+            return '';
+        },
+
+        callAnalytics: function(event) {
+            event.preventDefault();
+            window.analytics.track('edx.bi.highlights_enable.' + event.target.innerText.toLowerCase());
+            if (event.target.className.indexOf('save') !== -1) {
+                this.save(event);
+            } else {
+                this.hide();
+            }
+        },
+
+        addActionButtons: function() {
+            this.addActionButton('save', gettext('Enable'), true);
+            this.addActionButton('cancel', gettext('Not yet'));
         }
     });
 
@@ -933,6 +975,42 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         }
     });
 
+    HighlightsEnableEditor = AbstractEditor.extend({
+        templateName: 'highlights-enable-editor',
+        className: 'edit-enable-highlights',
+
+        currentValue: function() {
+            return true;
+        },
+
+        hasChanges: function() {
+            return this.model.get('highlights_enabled_for_messaging') !== this.currentValue();
+        },
+
+        getRequestData: function() {
+            if (this.hasChanges()) {
+                return {
+                    publish: 'republish',
+                    metadata: {
+                        highlights_enabled_for_messaging: this.currentValue()
+                    }
+                };
+            } else {
+                return {};
+            }
+        },
+        getContext: function() {
+            return $.extend(
+                {},
+                AbstractEditor.prototype.getContext.call(this),
+                {
+                    highlights_enabled: this.model.get('highlights_enabled_for_messaging'),
+                    highlights_doc_url: this.model.get('highlights_doc_url')
+                }
+            );
+        }
+    });
+
     return {
         getModal: function(type, xblockInfo, options) {
             if (type === 'edit') {
@@ -941,6 +1019,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 return this.getPublishModal(xblockInfo, options);
             } else if (type === 'highlights') {
                 return this.getHighlightsModal(xblockInfo, options);
+            } else if (type === 'highlights_enable') {
+                return this.getHighlightsEnableModal(xblockInfo, options);
             } else {
                 return null;
             }
@@ -1016,6 +1096,13 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         getHighlightsModal: function(xblockInfo, options) {
             return new HighlightsXBlockModal($.extend({
                 editors: [HighlightsEditor],
+                model: xblockInfo
+            }, options));
+        },
+
+        getHighlightsEnableModal: function(xblockInfo, options) {
+            return new HighlightsEnableXBlockModal($.extend({
+                editors: [HighlightsEnableEditor],
                 model: xblockInfo
             }, options));
         }
