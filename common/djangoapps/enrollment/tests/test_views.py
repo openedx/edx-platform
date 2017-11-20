@@ -5,6 +5,7 @@ import datetime
 import itertools
 import json
 import unittest
+import uuid
 
 import ddt
 import httpretty
@@ -209,6 +210,21 @@ class EntitlementEnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITes
 
         entitlement.refresh_from_db()
         self.assertIsNone(entitlement.enrollment_course_run)
+
+    def test_enroll_no_entitlement(self):
+        resp = self.assert_enrollment_status(
+            course_id=unicode(self.course.id),
+            course_uuid=str(uuid.uuid4()),
+            is_active=True,
+            mode=None,
+            max_mongo_calls=4,
+            expected_status=status.HTTP_400_BAD_REQUEST
+        )
+        data = json.loads(resp.content)
+        self.assertEqual(self.course.display_name_with_default, data['course_details']['course_name'])
+
+        # Verify that the enrollment was created correctly
+        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
 
 
 @attr(shard=3)

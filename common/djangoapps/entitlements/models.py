@@ -223,7 +223,6 @@ class CourseEntitlement(TimeStampedModel):
             entitlement = cls.objects.get(
                 user=user,
                 course_uuid=course_uuid,
-                expired_at=None,
             )
             return entitlement
         except cls.DoesNotExist:
