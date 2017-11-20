@@ -103,15 +103,20 @@ class ScheduleMessageBaseTask(Task):
     ):
         msg_type = self.make_message_type(day_offset)
         site = Site.objects.select_related('configuration').get(id=site_id)
-        _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
-        return self.resolver(
-            self.async_send_task,
-            site,
-            deserialize(target_day_str),
-            day_offset,
-            bin_num,
-            override_recipient_email=override_recipient_email,
-        ).send(msg_type)
+        middleware_classes = [
+            CurrentRequestUserMiddleware,
+            CurrentSiteThemeMiddleware,
+        ]
+        with emulate_http_request(site=site, middleware_classes=middleware_classes):
+            _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
+            return self.resolver(
+                self.async_send_task,
+                site,
+                deserialize(target_day_str),
+                day_offset,
+                bin_num,
+                override_recipient_email=override_recipient_email,
+            ).send(msg_type)
 
     def make_message_type(self, day_offset):
         raise NotImplementedError
