@@ -284,6 +284,7 @@ def organization(request):
     context['is_poc'] = extended_profile.is_poc
     context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
     context['organization_name'] = extended_profile.organization.name
+    context['google_place_api_key'] = settings.GOOGLE_PLACE_API_KEY
 
     return render(request, 'onboarding_survey/organization_survey.html', context)
 

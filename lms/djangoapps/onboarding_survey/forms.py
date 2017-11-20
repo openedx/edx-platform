@@ -3,6 +3,8 @@ Model form for the surveys.
 """
 import uuid
 import base64
+import json
+import os
 
 from itertools import chain
 from django import forms
@@ -25,6 +27,27 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 no_option_select_error = 'Please select an option for {}'
 empty_field_error = 'Please enter your {}'
 
+def get_onboarding_autosuggesion_data(file_name):
+    """
+    Receives a json file name and return data related to autocomplete fields in
+    onboarding survey.
+    """
+
+    curr_dir = os.path.dirname(__file__)
+    file_path = "{}/{}".format('data', file_name)
+    json_file = open(os.path.join(curr_dir, file_path))
+    data = json.load(json_file)
+    return data
+
+def is_selected_from_autocomplete(autocomplete_data, submitted_input):
+    """
+    Checks whether submitted input lies in autocomplete data or not.
+    """
+
+    for value in autocomplete_data:
+        if value == submitted_input:
+            return True
+    return False
 
 class UserInfoModelForm(forms.ModelForm):
     """
@@ -46,6 +69,26 @@ class UserInfoModelForm(forms.ModelForm):
                     "Country of Employment which is difference from Country of Residence")
                 )
         return self.cleaned_data['country_of_employment']
+
+    def clean_country_of_residence(self):
+
+        all_countries = get_onboarding_autosuggesion_data('world_countries.json')
+        country_of_residence = self.cleaned_data['country_of_residence']
+
+        if is_selected_from_autocomplete(all_countries, country_of_residence):
+            return country_of_residence
+
+        raise forms.ValidationError('Please select country of residence.')
+
+    def clean_language(self):
+
+        all_languages = get_onboarding_autosuggesion_data('world_languages.json')
+        submitted_language = self.cleaned_data['language']
+
+        if is_selected_from_autocomplete(all_languages, submitted_language):
+            return submitted_language
+
+        raise forms.ValidationError('Please select language.')
 
     class Meta:
         """
@@ -270,6 +313,16 @@ class OrganizationInfoModelForm(forms.ModelForm):
 
         }
 
+    def clean_country(self):
+
+        all_countries = get_onboarding_autosuggesion_data('world_countries.json')
+        country = self.cleaned_data['country']
+
+        if is_selected_from_autocomplete(all_countries, country):
+            return country
+
+        raise forms.ValidationError('Please select country of Organization Headquarters.')
+
     def clean_url(self):
         is_org_url_exist = int(self.data.get('is_org_url_exist')) if self.data.get('is_org_url_exist') else None
         organization_website = self.cleaned_data['url']
@@ -405,10 +458,12 @@ class RegModelForm(forms.ModelForm):
         extended_profile.organization = organization_to_assign
 
         is_extended_profile = None
-        try:
-            is_extended_profile = user.extended_profile
-        except ExtendedProfile.DoesNotExist:
-            pass
+
+        if user:
+            try:
+                is_extended_profile = user.extended_profile
+            except ExtendedProfile.DoesNotExist:
+                pass
 
         if not is_extended_profile and extended_profile.org_admin_email:
             try:
@@ -528,6 +583,15 @@ class OrganizationDetailModelForm(forms.ModelForm):
                 'required': "Please select an option for providing information.",
             },
         }
+
+    def clean_currency_input(self):
+        all_currency_codes = Currency.objects.values_list('alphabetic_code', flat=True)
+        currency_input = self.cleaned_data['currency_input']
+
+        if is_selected_from_autocomplete(all_currency_codes, currency_input):
+            return currency_input
+
+        raise forms.ValidationError('Please select currency code.')
 
     def clean_info_accuracy(self):
         can_provide_info = int(self.data['can_provide_info']) if self.data.get('can_provide_info') else False
