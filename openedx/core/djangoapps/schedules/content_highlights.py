@@ -1,3 +1,5 @@
+import logging
+
 from courseware.module_render import get_module_for_descriptor
 from courseware.model_data import FieldDataCache
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
@@ -6,6 +8,7 @@ from request_cache import get_request_or_stub
 
 from xmodule.modulestore.django import modulestore
 
+log = logging.getLogger(__name__)
 
 def course_has_highlights(course_key):
     """
@@ -13,15 +16,20 @@ def course_has_highlights(course_key):
     This ignores access checks, since highlights may be lurking in currently
     inaccessible content.
     """
-    if not COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course_key):
+    try:
+        course = _get_course_with_highlights(course_key)
+
+    except CourseUpdateDoesNotExist:
         return False
 
-    course = modulestore().get_course(course_key, depth=1)
-    return any(
-        section.highlights
-        for section in course.get_children()
-        if not section.hide_from_toc
-    )
+    else:
+        course_has_highlights = any(
+            section.highlights
+            for section in course.get_children()
+            if not section.hide_from_toc
+        )
+        _log_when_highlights_modal_is_left_empty(course, course_has_highlights)
+        return course_has_highlights 
 
 
 def get_week_highlights(user, course_key, week_num):
@@ -33,15 +41,36 @@ def get_week_highlights(user, course_key, week_num):
     """
     if not COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course_key):
         raise CourseUpdateDoesNotExist(
-            "%s does not have Course Updates enabled.",
+            "%s does not have Course Updates waffle flag enabled.",
             course_key
         )
 
-    course_descriptor = _get_course_descriptor(course_key)
+    course_descriptor = _get_course_with_highlights(course_key)
     course_module = _get_course_module(course_descriptor, user)
     sections_with_highlights = _get_sections_with_highlights(course_module)
     highlights = _get_highlights_for_week(sections_with_highlights, week_num, course_key)
     return highlights
+
+
+def _get_course_with_highlights(course_key):
+    if not COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course_key):
+        raise CourseUpdateDoesNotExist(
+            "%s does not have Course Updates waffle flag enabled.",
+            course_key
+        )
+    course_descriptor = _get_course_descriptor(course_key)
+    if not course_descriptor.highlights_enabled_for_messaging:
+        raise CourseUpdateDoesNotExist(
+            "%s does not have highlights_enabled_for_messaging.",
+            course_key
+        )
+
+    return course_descriptor
+
+
+def _log_when_highlights_modal_is_left_empty(course, course_has_highlights):
+    if course.highlights_enabled_for_messaging and not course_has_highlights:
+        log.error("Course team enabled highlights and provided no highlights.")
 
 
 def _get_course_descriptor(course_key):
