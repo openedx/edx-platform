@@ -458,10 +458,12 @@ class RegModelForm(forms.ModelForm):
         extended_profile.organization = organization_to_assign
 
         is_extended_profile = None
-        try:
-            is_extended_profile = user.extended_profile
-        except ExtendedProfile.DoesNotExist:
-            pass
+
+        if user:
+            try:
+                is_extended_profile = user.extended_profile
+            except ExtendedProfile.DoesNotExist:
+                pass
 
         if not is_extended_profile and extended_profile.org_admin_email:
             try:
