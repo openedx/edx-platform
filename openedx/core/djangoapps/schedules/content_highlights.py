@@ -10,6 +10,7 @@ from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
+
 def course_has_highlights(course_key):
     """
     Does the course have any highlights for any section/week in it?
@@ -28,8 +29,13 @@ def course_has_highlights(course_key):
             for section in course.get_children()
             if not section.hide_from_toc
         )
-        _log_when_highlights_modal_is_left_empty(course, course_has_highlights)
-        return course_has_highlights 
+
+        if not course_has_highlights:
+            log.error(
+                "Course team enabled highlights and provided no highlights."
+            )
+
+        return course_has_highlights
 
 
 def get_week_highlights(user, course_key, week_num):
@@ -39,38 +45,32 @@ def get_week_highlights(user, course_key, week_num):
     Raises CourseUpdateDoesNotExist if highlights do not exist for
     the requested week_num.
     """
-    if not COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course_key):
-        raise CourseUpdateDoesNotExist(
-            "%s does not have Course Updates waffle flag enabled.",
-            course_key
-        )
-
     course_descriptor = _get_course_with_highlights(course_key)
     course_module = _get_course_module(course_descriptor, user)
     sections_with_highlights = _get_sections_with_highlights(course_module)
-    highlights = _get_highlights_for_week(sections_with_highlights, week_num, course_key)
+    highlights = _get_highlights_for_week(
+        sections_with_highlights,
+        week_num,
+        course_key,
+    )
     return highlights
 
 
 def _get_course_with_highlights(course_key):
     if not COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course_key):
         raise CourseUpdateDoesNotExist(
-            "%s does not have Course Updates waffle flag enabled.",
-            course_key
+            "%s Course Update Messages waffle flag is disabled.",
+            course_key,
         )
+
     course_descriptor = _get_course_descriptor(course_key)
     if not course_descriptor.highlights_enabled_for_messaging:
         raise CourseUpdateDoesNotExist(
-            "%s does not have highlights_enabled_for_messaging.",
-            course_key
+            "%s Course Update Messages are disabled.",
+            course_key,
         )
 
     return course_descriptor
-
-
-def _log_when_highlights_modal_is_left_empty(course, course_has_highlights):
-    if course.highlights_enabled_for_messaging and not course_has_highlights:
-        log.error("Course team enabled highlights and provided no highlights.")
 
 
 def _get_course_descriptor(course_key):
