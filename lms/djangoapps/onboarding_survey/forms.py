@@ -583,13 +583,15 @@ class OrganizationDetailModelForm(forms.ModelForm):
         }
 
     def clean_currency_input(self):
+        can_provide_info = int(self.data['can_provide_info']) if self.data.get('can_provide_info') else False
         all_currency_codes = Currency.objects.values_list('alphabetic_code', flat=True)
         currency_input = self.cleaned_data['currency_input']
 
-        if is_selected_from_autocomplete(all_currency_codes, currency_input):
-            return currency_input
+        if can_provide_info and not is_selected_from_autocomplete(all_currency_codes, currency_input):
+            raise forms.ValidationError('Please select currency code.')
 
-        raise forms.ValidationError('Please select currency code.')
+        return currency_input
+
 
     def clean_info_accuracy(self):
         can_provide_info = int(self.data['can_provide_info']) if self.data.get('can_provide_info') else False
