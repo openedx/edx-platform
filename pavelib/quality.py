@@ -6,7 +6,6 @@ Check code quality using pep8, pylint, and diff_quality.
 import json
 import os
 import re
-from string import join
 
 from paver.easy import BuildFailure, call_task, cmdopts, needs, sh, task
 
@@ -15,13 +14,7 @@ from openedx.core.djangolib.markup import HTML
 from .utils.envs import Env
 from .utils.timer import timed
 
-ALL_SYSTEMS = [
-    'cms',
-    'common',
-    'lms',
-    'openedx',
-    'pavelib',
-]
+ALL_SYSTEMS = 'lms,cms,common,openedx,pavelib'
 
 
 def top_python_dirs(dirname):
@@ -55,7 +48,7 @@ def find_fixme(options):
     Run pylint on system code, only looking for fixme items.
     """
     num_fixme = 0
-    systems = getattr(options, 'system', '').split(',') or ALL_SYSTEMS
+    systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
 
     for system in systems:
         # Directory to put the pylint report in.
@@ -92,7 +85,7 @@ def find_fixme(options):
 @cmdopts([
     ("system=", "s", "System to act on"),
     ("errors", "e", "Check for errors only"),
-    ("limit=", "l", "limit for number of acceptable violations"),
+    ("limit=", "l", "Limits for number of acceptable violations - either <upper> or <lower>:<upper>"),
 ])
 @timed
 def run_pylint(options):
@@ -100,14 +93,12 @@ def run_pylint(options):
     Run pylint on system code. When violations limit is passed in,
     fail the task if too many violations are found.
     """
-    num_violations = 0
-    violations_limit = int(getattr(options, 'limit', -1))
-    errors = getattr(options, 'errors', False)
-    systems = getattr(options, 'system', '').split(',') or ALL_SYSTEMS
+    lower_violations_limit, upper_violations_limit, errors, systems = _parse_pylint_options(options)
 
     # Make sure the metrics subdirectory exists
     Env.METRICS_DIR.makedirs_p()
 
+    num_violations = 0
     for system in systems:
         # Directory to put the pylint report in.
         # This makes the folder if it doesn't already exist.
@@ -147,10 +138,45 @@ def run_pylint(options):
     with open(Env.METRICS_DIR / "pylint", "w") as f:
         f.write(violations_count_str)
 
-    # Fail number of violations is greater than the limit
-    if num_violations > violations_limit > -1:
-        raise BuildFailure("Failed. Too many pylint violations. "
-                           "The limit is {violations_limit}.".format(violations_limit=violations_limit))
+    # Fail when number of violations is less than the lower limit,
+    # which likely means that pylint did not run successfully.
+    # If pylint *did* run successfully, then great! Modify the lower limit.
+    if num_violations < lower_violations_limit > -1:
+        raise BuildFailure(
+            "Failed. Too few pylint violations. "
+            "Expected to see at least {lower_limit} pylint violations. "
+            "Either pylint is not running correctly -or- "
+            "the limits should be lowered and/or the lower limit should be removed.".format(
+                lower_limit=lower_violations_limit
+            )
+        )
+
+    # Fail when number of violations is greater than the upper limit.
+    if num_violations > upper_violations_limit > -1:
+        raise BuildFailure(
+            "Failed. Too many pylint violations. "
+            "The limit is {upper_limit}.".format(upper_limit=upper_violations_limit)
+        )
+
+
+def _parse_pylint_options(options):
+    """
+    Parse the options passed to run_pylint.
+    """
+    lower_violations_limit = upper_violations_limit = -1
+    violations_limit = getattr(options, 'limit', '').split(':')
+    if violations_limit[0]:
+        # Limit was specified.
+        if len(violations_limit) == 1:
+            # Only upper limit was specified.
+            upper_violations_limit = int(violations_limit[0])
+        else:
+            # Upper and lower limits were both specified.
+            lower_violations_limit = int(violations_limit[0])
+            upper_violations_limit = int(violations_limit[1])
+    errors = getattr(options, 'errors', False)
+    systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
+    return lower_violations_limit, upper_violations_limit, errors, systems
 
 
 def _count_pylint_violations(report_file):
@@ -244,7 +270,7 @@ def run_complexity():
     Uses radon to examine cyclomatic complexity.
     For additional details on radon, see http://radon.readthedocs.org/
     """
-    system_string = join(ALL_SYSTEMS, '/ ') + '/'
+    system_string = '/ '.join(ALL_SYSTEMS.split(',')) + '/'
     complexity_report_dir = (Env.REPORT_DIR / "complexity")
     complexity_report = complexity_report_dir / "python_complexity.log"
 
