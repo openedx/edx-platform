@@ -13,7 +13,6 @@ from openedx.core.lib.logsettings import get_logger_config
 from lms.envs.dev import (WIKI_ENABLED)
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 HTTPS = 'off'
 
 LOGGING = get_logger_config(ENV_ROOT / "log",
