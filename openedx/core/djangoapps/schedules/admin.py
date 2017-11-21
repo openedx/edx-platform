@@ -2,6 +2,8 @@ import functools
 
 from django.contrib import admin
 from django import forms
+from django.db.models import F
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from . import models
@@ -41,10 +43,26 @@ for (db_name, human_name) in models.ScheduleExperience.EXPERIENCES:
     experience_actions.append(partial)
 
 
+class KnownErrorCases(admin.SimpleListFilter):
+    title = _('KnownErrorCases')
+
+    parameter_name = 'error'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('schedule_start', _('Schedule start < course start')),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'schedule_start':
+            return queryset.filter(start__lt=F('enrollment__course__start'))
+
+
 @admin.register(models.Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
     list_display = ('username', 'course_id', 'active', 'start', 'upgrade_deadline', 'experience_display')
-    list_filter = ('experience__experience_type', 'active')
+    list_display_links = ('start', 'upgrade_deadline', 'experience_display')
+    list_filter = ('experience__experience_type', 'active', KnownErrorCases)
     raw_id_fields = ('enrollment',)
     readonly_fields = ('modified',)
     search_fields = ('enrollment__user__username', 'enrollment__course__id',)
@@ -66,13 +84,23 @@ class ScheduleAdmin(admin.ModelAdmin):
     experience_display.short_descriptions = _('Experience')
 
     def username(self, obj):
-        return obj.enrollment.user.username
+        return '<a href="{}">{}</a>'.format(
+            reverse("admin:auth_user_change", args=(obj.enrollment.user.id,)),
+            obj.enrollment.user.username
+        )
 
+    username.allow_tags = True
     username.short_description = _('Username')
 
     def course_id(self, obj):
-        return obj.enrollment.course_id
+        return '<a href="{}">{}</a>'.format(
+            reverse("admin:course_overviews_courseoverview_change", args=(
+                obj.enrollment.course_id,
+            )),
+            obj.enrollment.course_id
+        )
 
+    course_id.allow_tags = True
     course_id.short_description = _('Course ID')
 
     def get_queryset(self, request):
