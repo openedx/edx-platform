@@ -2200,6 +2200,10 @@ INSTALLED_APPS = (
 
     'lms.djangoapps.onboarding_survey',
 
+
+    # OEF survey
+    'lms.djangoapps.oef',
+
     # Dynamic FAQ page
     'lms.djangoapps.faq',
 
