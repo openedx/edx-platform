@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
 """Tests for certificates views. """
 
+import datetime
 import json
 from collections import OrderedDict
 from urllib import urlencode
 from uuid import uuid4
 
-import ddt
-import datetime
+import pytest
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
-
-from util.date_utils import strftime_localized
 from mock import patch
-from nose.plugins.attrib import attr
 
+import ddt
 from certificates.api import get_certificate_url
 from certificates.models import (
     CertificateGenerationCourseSetting,
@@ -40,6 +38,7 @@ from lms.djangoapps.badges.tests.factories import (
     CourseCompleteImageConfigurationFactory
 )
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from nose.plugins.attrib import attr
 from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.lib.tests.assertions.events import assert_event_matches
@@ -47,6 +46,7 @@ from student.roles import CourseStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from track.tests import EventTrackingTestCase
 from util import organizations_helpers as organizations_api
+from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -243,6 +243,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
 
 @attr(shard=1)
 @ddt.ddt
+@pytest.mark.django111_expected_failure
 class CertificatesViewsTests(CommonCertificatesTestCase):
     """
     Tests for the certificates web/html views

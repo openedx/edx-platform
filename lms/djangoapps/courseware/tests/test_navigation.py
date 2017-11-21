@@ -3,13 +3,15 @@ This test file will run through some LMS test scenarios regarding access and nav
 """
 import time
 
-from courseware.tests.factories import GlobalStaffFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
+import pytest
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from mock import patch
 from nose.plugins.attrib import attr
+
+from courseware.tests.factories import GlobalStaffFactory
+from courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG
 from student.tests.factories import UserFactory
@@ -19,6 +21,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @attr(shard=1)
+@pytest.mark.django111_expected_failure
 class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that navigation state is saved properly.
