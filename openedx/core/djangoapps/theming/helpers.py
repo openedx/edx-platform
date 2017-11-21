@@ -1,22 +1,23 @@
 """
 Helpers for accessing comprehensive theming related variables.
+
+This file is imported at startup. Imports of models or things which import models will break startup on Django 1.9+. If
+you need models here, please import them inside the function which uses them.
 """
 import os
 import re
 from logging import getLogger
 
 from django.conf import settings
-from path import Path
 
 from microsite_configuration import microsite
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers_dirs import (
-    get_theme_base_dirs_from_settings,
-    get_themes_unchecked,
-    get_theme_dirs,
+    Theme,
     get_project_root_name_from_settings,
-    Theme
+    get_theme_base_dirs_from_settings,
+    get_theme_dirs,
+    get_themes_unchecked
 )
 from request_cache.middleware import RequestCache
 
@@ -353,6 +354,8 @@ def get_config_value_from_site_or_settings(name, site=None, site_config_name=Non
     Returns:
         The value stored in the configuration.
     """
+    from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+
     if site_config_name is None:
         site_config_name = name
 
