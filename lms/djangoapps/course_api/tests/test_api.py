@@ -158,7 +158,7 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
 
     def setUp(self):
         super(TestGetCourseListMultipleCourses, self).setUp()
-        self.course = self.create_course()
+        self.course = self.create_course(mobile_available=False)
         self.staff_user = self.create_user("staff", is_staff=True)
         self.honor_user = self.create_user("honor", is_staff=False)
 
@@ -191,7 +191,7 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
 
     def test_filter(self):
         # Create a second course to be filtered out of queries.
-        alternate_course = self.create_course(course='mobile', mobile_available=True)
+        alternate_course = self.create_course(course='mobile')
 
         test_cases = [
             (None, [alternate_course, self.course]),

@@ -3,7 +3,6 @@ Defines asynchronous celery task for sending email notification (through edx-ace
 pertaining to new discussion forum comments.
 """
 import logging
-from urllib import urlencode
 from urlparse import urljoin
 
 from celery import task
@@ -18,7 +17,6 @@ from edx_ace.utils import date
 from edx_ace.message import MessageType
 from edx_ace.recipient import Recipient
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.site_configuration.helpers import get_value
 from lms.djangoapps.django_comment_client.utils import permalink
 import lms.lib.comment_client as cc
 
@@ -42,8 +40,9 @@ class ResponseNotification(MessageType):
 @task(base=LoggedTask, routing_key=ROUTING_KEY)
 def send_ace_message(context):
     context['course_id'] = CourseKey.from_string(context['course_id'])
-    context['site'] = Site.objects.get(id=context['site_id'])
+
     if _should_send_message(context):
+        context['site'] = Site.objects.get(id=context['site_id'])
         thread_author = User.objects.get(id=context['thread_author_id'])
         middleware_classes = [
             CurrentRequestUserMiddleware,
@@ -100,15 +99,17 @@ def _get_course_language(course_id):
 
 def _build_message_context(context):
     message_context = get_base_template_context(context['site'])
-    message_context.update(_deserialize_context_dates(context))
-    message_context['post_link'] = _get_thread_url(context)
+    message_context.update(context)
+    thread_author = User.objects.get(id=context['thread_author_id'])
+    comment_author = User.objects.get(id=context['comment_author_id'])
+    message_context.update({
+        'thread_username': thread_author.username,
+        'comment_username': comment_author.username,
+        'post_link': _get_thread_url(context),
+        'comment_created_at': date.deserialize(context['comment_created_at']),
+        'thread_created_at': date.deserialize(context['thread_created_at'])
+    })
     return message_context
-
-
-def _deserialize_context_dates(context):
-    context['comment_created_at'] = date.deserialize(context['comment_created_at'])
-    context['thread_created_at'] = date.deserialize(context['thread_created_at'])
-    return context
 
 
 def _get_thread_url(context):

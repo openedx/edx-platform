@@ -572,7 +572,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         messages = FallbackStorage(request)
         request._messages = messages        # pylint: disable=protected-access
         coupon_admin = SoftDeleteCouponAdmin(Coupon, AdminSite())
-        test_query_set = coupon_admin.queryset(request)
+        test_query_set = coupon_admin.get_queryset(request)
         test_actions = coupon_admin.get_actions(request)
         self.assertIn('really_delete_selected', test_actions['really_delete_selected'])
         self.assertEqual(get_coupon.is_active, True)
@@ -585,7 +585,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         coupon = Coupon(code='TestCode123', description='testing123', course_id=self.course_key,
                         percentage_discount=22, created_by=self.user, is_active=True)
         coupon.save()
-        test_query_set = coupon_admin.queryset(request)
+        test_query_set = coupon_admin.get_queryset(request)
         coupon_admin.really_delete_selected(request, test_query_set)
         for coupon in test_query_set:
             self.assertEqual(coupon.is_active, False)

@@ -34,7 +34,10 @@ CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
 CATALOG_VISIBILITY_ABOUT = "about"
 CATALOG_VISIBILITY_NONE = "none"
 
-ENABLE_HTML_DISPLAY_NAME = settings.FEATURES.get('ENABLE_HTML_DISPLAY_NAME', False)
+ENABLE_HTML_DISPLAY_NAME =\
+    settings.FEATURES.get('ENABLE_HTML_DISPLAY_NAME', False)
+    
+DEFAULT_MOBILE_AVAILABLE = getattr(settings, 'DEFAULT_MOBILE_AVAILABLE', False)
 
 
 class StringOrDate(Date):
@@ -341,7 +344,7 @@ class CourseFields(object):
     mobile_available = Boolean(
         display_name=_("Mobile Course Available"),
         help=_("Enter true or false. If true, the course will be available to mobile devices."),
-        default=False,
+        default=DEFAULT_MOBILE_AVAILABLE,
         scope=Scope.settings
     )
     video_upload_pipeline = Dict(
@@ -869,6 +872,7 @@ class CourseFields(object):
         ),
         scope=Scope.settings, default=False
     )
+<<<<<<< HEAD
     enable_html_display_name = Boolean(
         display_name=_("Show display name on all HTML components"),
         help=_(
@@ -877,6 +881,15 @@ class CourseFields(object):
         ),
         scope=Scope.settings,
         default=ENABLE_HTML_DISPLAY_NAME
+=======
+    highlights_enabled_for_messaging = Boolean(
+        display_name=_("Highlights Enabled for Messaging"),
+        help=_(
+            "Enter true or false. If true, any highlights associated with content in the course will be messaged "
+            "to learners at their scheduled time."
+        ),
+        scope=Scope.settings, default=False
+>>>>>>> upstream/master
     )
 
 

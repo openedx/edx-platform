@@ -150,8 +150,9 @@ class CoursesTest(ModuleStoreTestCase):
         Verify that filtering performs as expected.
         """
         user = UserFactory.create()
-        non_mobile_course = CourseFactory.create(emit_signals=True)
-        mobile_course = CourseFactory.create(mobile_available=True, emit_signals=True)
+        mobile_course = CourseFactory.create(emit_signals=True)
+        non_mobile_course =\
+            CourseFactory.create(mobile_available=False, emit_signals=True)
 
         test_cases = (
             (None, {non_mobile_course.id, mobile_course.id}),

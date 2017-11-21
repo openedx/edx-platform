@@ -54,11 +54,9 @@ def send_message(comment, site):
         'comment_id': comment.id,
         'comment_body': comment.body,
         'comment_author_id': comment.user_id,
-        'comment_username': comment.username,
         'comment_created_at': comment.created_at,  # comment_client models dates are already serialized
         'thread_id': thread.id,
         'thread_title': thread.title,
-        'thread_username': thread.username,
         'thread_author_id': thread.user_id,
         'thread_created_at': thread.created_at,  # comment_client models dates are already serialized
         'thread_commentable_id': thread.commentable_id,

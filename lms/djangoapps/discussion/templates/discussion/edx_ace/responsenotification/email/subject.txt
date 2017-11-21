@@ -1,5 +1,5 @@
 {% load i18n %}
 
-{% blocktrans %}
-Someone replied to your thread on {{ platform_name }}
+{% blocktrans trimmed %}
+    Response to your {{ thread_title }} post
 {% endblocktrans %}

@@ -142,8 +142,13 @@ define(['backbone',
                     requests,
                     'POST',
                     '/i18n/setlang/',
-                    'language=' + data[fieldData.valueAttribute]
+                    $.param({
+                        language: data[fieldData.valueAttribute],
+                        next: window.location.href
+                    })
                 );
+                // Django will actually respond with a 302 redirect, but that would cause a page load during these
+                // unittests.  204 should work fine for testing.
                 AjaxHelpers.respondWithNoContent(requests);
                 FieldViewsSpecHelpers.expectMessageContains(view, 'Your changes have been saved.');
 
@@ -157,7 +162,10 @@ define(['backbone',
                     requests,
                     'POST',
                     '/i18n/setlang/',
-                    'language=' + data[fieldData.valueAttribute]
+                    $.param({
+                        language: data[fieldData.valueAttribute],
+                        next: window.location.href
+                    })
                 );
                 AjaxHelpers.respondWithError(requests, 500);
                 FieldViewsSpecHelpers.expectMessageContains(

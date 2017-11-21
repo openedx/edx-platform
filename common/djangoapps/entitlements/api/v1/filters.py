@@ -34,8 +34,8 @@ class UUIDListFilter(CharListFilter):
 class CourseEntitlementFilter(filters.FilterSet):
 
     uuid = UUIDListFilter()
-    course_uuid = UUIDListFilter()
+    user = filters.CharFilter(name='user__username')
 
     class Meta:
         model = CourseEntitlement
-        fields = ('uuid',)
+        fields = ('uuid', 'user')
