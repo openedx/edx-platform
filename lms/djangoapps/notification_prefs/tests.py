@@ -103,11 +103,9 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
         self.assertRaises(PermissionDenied, ajax_enable, request)
         self.assertNotPrefExists(self.user)
 
-    @patch("Crypto.Random.new")
-    def test_ajax_enable_success(self, mock_random_new):
-        mock_stream = Mock()
-        mock_stream.read.return_value = self.INITIALIZATION_VECTOR
-        mock_random_new.return_value = mock_stream
+    @patch("os.urandom")
+    def test_ajax_enable_success(self, mock_urandom):
+        mock_urandom.return_value = self.INITIALIZATION_VECTOR
 
         def test_user(user):
             request = self.request_factory.post("dummy")
