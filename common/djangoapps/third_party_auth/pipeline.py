@@ -66,10 +66,12 @@ import string
 import urllib
 from collections import OrderedDict
 from logging import getLogger
+from smtplib import SMTPException
 
 import analytics
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.mail.message import EmailMessage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
@@ -79,7 +81,9 @@ from social_core.pipeline import partial
 from social_core.pipeline.social_auth import associate_by_email
 
 import student
+from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 from . import provider
 
@@ -562,7 +566,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
                 (current_provider.skip_email_verification or current_provider.send_to_registration_first))
 
     if not user:
-        if auth_entry in [AUTH_ENTRY_LOGIN_API, AUTH_ENTRY_REGISTER_API]:
+        if is_api(auth_entry):
             return HttpResponseBadRequest()
         elif auth_entry == AUTH_ENTRY_LOGIN:
             # User has authenticated with the third party provider but we don't know which edX
@@ -709,3 +713,79 @@ def associate_by_email_if_login_api(auth_entry, backend, details, user, current_
             # email address and the legitimate user would now login to the illegitimate
             # account.
             return association_response
+
+
+def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **kwargs):
+    """
+    Update normally protected user details using data from provider.
+
+    This step in the pipeline is akin to `social_core.pipeline.user.user_details`, which updates
+    the user details but has an unconfigurable protection over updating the username & email, and
+    is unable to update information such as the user's full name which isn't on the user model, but
+    rather on the user profile model.
+
+    Additionally, because the email field is normally used to log in, if the email is changed by this
+    forced synchronization, we send an email to both the old and new emails, letting the user know.
+
+    This step is controlled by the `sync_learner_profile_data` flag on the provider's configuration.
+    """
+    current_provider = provider.Registry.get_from_pipeline({'backend': strategy.request.backend.name, 'kwargs': kwargs})
+    if user and current_provider.sync_learner_profile_data:
+        # Keep track of which incoming values get applied.
+        changed = {}
+
+        # Map each incoming field from the provider to the name on the user model (by default, they always match).
+        field_mapping = {field: (user, field) for field in details.keys() if hasattr(user, field)}
+
+        # This is a special case where the field mapping should go to the user profile object and not the user object,
+        # in some cases with differing field names (i.e. 'fullname' vs. 'name').
+        field_mapping.update({
+            'fullname': (user.profile, 'name'),
+            'country': (user.profile, 'country'),
+        })
+
+        # Track any fields that would raise an integrity error if there was a conflict.
+        integrity_conflict_fields = {'email': user.email, 'username': user.username}
+
+        for provider_field, (model, field) in field_mapping.items():
+            provider_value = details.get(provider_field)
+            current_value = getattr(model, field)
+            if provider_value is not None and current_value != provider_value:
+                if field in integrity_conflict_fields and User.objects.filter(**{field: provider_value}).exists():
+                    logger.warning('User with ID [%s] tried to synchronize profile data through [%s] '
+                                   'but there was a conflict with an existing [%s]: [%s].',
+                                   user.id, current_provider.name, field, provider_value)
+                    continue
+                changed[provider_field] = current_value
+                setattr(model, field, provider_value)
+
+        if changed:
+            logger.info(
+                "User [%s] performed SSO through [%s] who synchronizes profile data, and the "
+                "following fields were changed: %s", user.username, current_provider.name, changed.keys(),
+            )
+
+            # Save changes to user and user.profile models.
+            strategy.storage.user.changed(user)
+            user.profile.save()
+
+            # Send an email to the old and new email to alert the user that their login email changed.
+            if changed.get('email'):
+                old_email = changed['email']
+                new_email = user.email
+                email_context = {'old_email': old_email, 'new_email': new_email}
+                # Subjects shouldn't have new lines.
+                subject = ''.join(render_to_string(
+                    'emails/sync_learner_profile_data_email_change_subject.txt',
+                    email_context
+                ).splitlines())
+                body = render_to_string('emails/sync_learner_profile_data_email_change_body.txt', email_context)
+                from_email = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+
+                email = EmailMessage(subject=subject, body=body, from_email=from_email, to=[old_email, new_email])
+                email.content_subtype = "html"
+                try:
+                    email.send()
+                except SMTPException:
+                    logger.exception('Error sending IdP learner data sync-initiated email change '
+                                     'notification email for user [%s].', user.username)
