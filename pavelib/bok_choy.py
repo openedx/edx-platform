@@ -51,6 +51,7 @@ def test_bokchoy(options, passthrough_options):
     # firefox as the default here.
     using_firefox = (os.environ.get('SELENIUM_BROWSER', 'firefox') == 'firefox')
     validate_firefox = getattr(options, 'validate_firefox_version', using_firefox)
+    options.test_bokchoy.coveragerc = options.get('coveragerc', None)
 
     if validate_firefox:
         check_firefox_version()
@@ -81,8 +82,8 @@ def test_a11y(options, passthrough_options):
     # Modify the options object directly, so that any subsequently called tasks
     # that share with this task get the modified options
     options.test_a11y.report_dir = Env.BOK_CHOY_A11Y_REPORT_DIR
-    options.test_a11y.coveragerc = Env.BOK_CHOY_A11Y_COVERAGERC
     options.test_a11y.extra_args = options.get('extra_args', '') + ' -a "a11y" '
+    options.test_a11y.coveragerc = options.get('coveragerc', None)
     run_bokchoy(options.test_a11y, passthrough_options)
 
 
@@ -120,7 +121,7 @@ def pa11ycrawler(options, passthrough_options):
     # Modify the options object directly, so that any subsequently called tasks
     # that share with this task get the modified options
     options.pa11ycrawler.report_dir = Env.PA11YCRAWLER_REPORT_DIR
-    options.pa11ycrawler.coveragerc = Env.PA11YCRAWLER_COVERAGERC
+    options.pa11ycrawler.coveragerc = options.get('coveragerc', None)
     options.pa11ycrawler.should_fetch_course = getattr(
         options,
         'should_fetch_course',

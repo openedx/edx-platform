@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-09 10:45+0000\n"
-"PO-Revision-Date: 2017-11-09 10:51:48.556016\n"
+"POT-Creation-Date: 2017-11-16 10:49+0000\n"
+"PO-Revision-Date: 2017-11-16 11:00:29.485177\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -173,6 +173,11 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Action"
+msgstr ""
+
+#: cms/templates/js/transcript-organization-credentials.underscore
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Username"
 msgstr ""
 
 #: cms/templates/js/video/metadata-translations-item.underscore
@@ -1146,10 +1151,6 @@ msgstr ""
 msgid ""
 "The following information is already a part of your {platform} profile. "
 "We\\'ve included it here for your application."
-msgstr ""
-
-#: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "Username"
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore

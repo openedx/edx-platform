@@ -6,7 +6,6 @@ from __future__ import absolute_import
 from django.apps import AppConfig
 
 import xmodule.x_module
-from .runtime import handler_url, local_resource_url
 
 
 class LMSXBlockConfig(AppConfig):
@@ -17,6 +16,8 @@ class LMSXBlockConfig(AppConfig):
     verbose_name = u'LMS XBlock'
 
     def ready(self):
+        from .runtime import handler_url, local_resource_url
+
         # In order to allow modules to use a handler url, we need to
         # monkey-patch the x_module library.
         # TODO: Remove this code when Runtimes are no longer created by modulestores

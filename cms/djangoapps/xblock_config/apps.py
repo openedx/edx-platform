@@ -7,7 +7,6 @@ from django.apps import AppConfig
 
 import cms.lib.xblock.runtime
 import xmodule.x_module
-from openedx.core.lib.xblock_utils import xblock_local_resource_url
 
 
 class XBlockConfig(AppConfig):
@@ -18,6 +17,8 @@ class XBlockConfig(AppConfig):
     verbose_name = u'XBlock Configuration'
 
     def ready(self):
+        from openedx.core.lib.xblock_utils import xblock_local_resource_url
+
         # In order to allow descriptors to use a handler url, we need to
         # monkey-patch the x_module library.
         # TODO: Remove this code when Runtimes are no longer created by modulestores

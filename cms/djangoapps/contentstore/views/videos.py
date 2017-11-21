@@ -526,7 +526,7 @@ def _get_videos(course):
     """
     Retrieves the list of videos from VAL corresponding to this course.
     """
-    videos = list(get_videos_for_course(course.id, VideoSortField.created, SortDirection.desc))
+    videos = list(get_videos_for_course(unicode(course.id), VideoSortField.created, SortDirection.desc))
 
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:

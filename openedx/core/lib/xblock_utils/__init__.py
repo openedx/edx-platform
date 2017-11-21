@@ -464,7 +464,7 @@ def xblock_local_resource_url(block, uri):
     xblock_class = getattr(block.__class__, 'unmixed_class', block.__class__)
     if settings.PIPELINE_ENABLED or not settings.REQUIRE_DEBUG:
         return staticfiles_storage.url('xblock/resources/{package_name}/{path}'.format(
-            package_name=xblock_class.__module__,
+            package_name=xblock_resource_pkg(xblock_class),
             path=uri
         ))
     else:
@@ -472,3 +472,30 @@ def xblock_local_resource_url(block, uri):
             'block_type': block.scope_ids.block_type,
             'uri': uri,
         })
+
+
+def xblock_resource_pkg(block):
+    """
+    Return the module name needed to find an XBlock's shared static assets.
+
+    This method will return the full module name that is one level higher than
+    the one the block is in. For instance, problem_builder.answer.AnswerBlock
+    has a __module__ value of 'problem_builder.answer'. This method will return
+    'problem_builder' instead. However, for edx-ora2's
+    openassessment.xblock.openassessmentblock.OpenAssessmentBlock, the value
+    returned is 'openassessment.xblock'.
+
+    XModules are special cased because they're local to this repo and they
+    actually don't share their resource files when compiled out as part of the
+    XBlock asset pipeline. This only covers XBlocks and XModules using the
+    XBlock-style of asset specification. If they use the XModule bundling part
+    of the asset pipeline (xmodule_assets), their assets are compiled through an
+    entirely separate mechanism and put into lms-modules.js/css.
+    """
+    # XModules are a special case because they map to different dirs for
+    # sub-modules.
+    module_name = block.__module__
+    if module_name.startswith('xmodule.'):
+        return module_name
+
+    return module_name.rsplit('.', 1)[0]

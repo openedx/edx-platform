@@ -36,7 +36,7 @@ ${static.get_page_title_breadcrumbs(course_name())}
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
 ## Utility: Notes
-% if is_edxnotes_enabled(course):
+% if is_edxnotes_enabled(course, request.user):
 <%static:css group='style-student-notes'/>
 % endif
 
@@ -76,10 +76,10 @@ ${HTML(fragment.foot_html())}
       </main>
   </section>
 </div>
-% if course.show_calculator or is_edxnotes_enabled(course):
+% if course.show_calculator or is_edxnotes_enabled(course, request.user):
     <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
       ## Utility: Notes
-      % if is_edxnotes_enabled(course):
+      % if is_edxnotes_enabled(course, request.user):
         <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
       % endif
 

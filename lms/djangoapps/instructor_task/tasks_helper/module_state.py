@@ -174,7 +174,7 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
         if not hasattr(instance, 'rescore'):
             # This should not happen, since it should be already checked in the
             # caller, but check here to be sure.
-            msg = "Specified problem does not support rescoring."
+            msg = "Specified module {0} of type {1} does not support rescoring.".format(usage_key, instance.__class__)
             raise UpdateProblemModuleStateError(msg)
 
         # We check here to see if the problem has any submissions. If it does not, we don't want to rescore it

@@ -1,5 +1,0 @@
-{% load i18n %}
-
-{% blocktrans %}
-Someone replied to your thread on {{ platform_name }}
-{% endblocktrans %}

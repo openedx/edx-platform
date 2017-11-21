@@ -1930,7 +1930,7 @@ class RerunCourseTest(ContentStoreTestCase):
         source_course = CourseFactory.create()
         destination_course_key = self.post_rerun_request(source_course.id)
         self.verify_rerun_course(source_course.id, destination_course_key, self.destination_course_data['display_name'])
-        videos = list(get_videos_for_course(destination_course_key))
+        videos = list(get_videos_for_course(unicode(destination_course_key)))
         self.assertEqual(0, len(videos))
         self.assertInCourseListing(destination_course_key)
 
@@ -1949,8 +1949,8 @@ class RerunCourseTest(ContentStoreTestCase):
         self.verify_rerun_course(source_course.id, destination_course_key, self.destination_course_data['display_name'])
 
         # Verify that the VAL copies videos to the rerun
-        source_videos = list(get_videos_for_course(source_course.id))
-        target_videos = list(get_videos_for_course(destination_course_key))
+        source_videos = list(get_videos_for_course(unicode(source_course.id)))
+        target_videos = list(get_videos_for_course(unicode(destination_course_key)))
         self.assertEqual(1, len(source_videos))
         self.assertEqual(source_videos, target_videos)
 

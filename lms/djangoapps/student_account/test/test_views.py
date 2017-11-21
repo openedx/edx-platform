@@ -44,6 +44,7 @@ from student_account.views import account_settings_context, get_user_orders
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from openedx.core.djangoapps.user_api.errors import UserAPIInternalError
 
 LOGGER_NAME = 'audit'
 User = get_user_model()  # pylint:disable=invalid-name
@@ -130,6 +131,12 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         # Verify that the new password continues to be valid
         result = self.client.login(username=self.USERNAME, password=self.NEW_PASSWORD)
         self.assertTrue(result)
+
+    def test_password_change_failure(self):
+        with mock.patch('openedx.core.djangoapps.user_api.accounts.api.request_password_change',
+                        side_effect=UserAPIInternalError):
+            self._change_password()
+            self.assertRaises(UserAPIInternalError)
 
     @ddt.data(True, False)
     def test_password_change_logged_out(self, send_email):

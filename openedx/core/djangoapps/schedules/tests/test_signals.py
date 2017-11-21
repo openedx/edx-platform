@@ -143,7 +143,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
             _strip_secs(expected_start) + datetime.timedelta(days=self.VERIFICATION_DEADLINE_DAYS),
         )
 
-    def test_updated_since_course_not_started(self, mock_get_current_site):
+    def test_updated_when_course_not_started(self, mock_get_current_site):
         mock_get_current_site.return_value = self.site
 
         course = _create_course_run(self_paced=True, start_day_offset=5)  # course starts in future
@@ -155,7 +155,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
         enrollment = CourseEnrollment.objects.get(id=enrollment.id)
         self.assert_schedule_dates(enrollment.schedule, course.start)  # start set to new course start
 
-    def test_not_updated_since_course_already_started(self, mock_get_current_site):
+    def test_updated_when_course_already_started(self, mock_get_current_site):
         mock_get_current_site.return_value = self.site
 
         course = _create_course_run(self_paced=True, start_day_offset=-5)  # course starts in past
@@ -165,9 +165,9 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
         course.start = course.start + datetime.timedelta(days=3)  # new course start changes to another future date
         self.store.update_item(course, ModuleStoreEnum.UserID.test)
         enrollment = CourseEnrollment.objects.get(id=enrollment.id)
-        self.assert_schedule_dates(enrollment.schedule, enrollment.created)  # start remains unchanged
+        self.assert_schedule_dates(enrollment.schedule, course.start)  # start set to new course start
 
-    def test_not_updated_since_new_start_in_past(self, mock_get_current_site):
+    def test_updated_when_new_start_in_past(self, mock_get_current_site):
         mock_get_current_site.return_value = self.site
 
         course = _create_course_run(self_paced=True, start_day_offset=5)  # course starts in future
@@ -178,7 +178,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
         course.start = course.start + datetime.timedelta(days=-10)  # new course start changes to a past date
         self.store.update_item(course, ModuleStoreEnum.UserID.test)
         enrollment = CourseEnrollment.objects.get(id=enrollment.id)
-        self.assert_schedule_dates(enrollment.schedule, previous_start)  # start remains unchanged
+        self.assert_schedule_dates(enrollment.schedule, course.start)  # start set to new course start
 
 
 def _create_course_run(self_paced=True, start_day_offset=-1):

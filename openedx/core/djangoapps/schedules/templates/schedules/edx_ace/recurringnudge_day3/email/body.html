@@ -4,12 +4,12 @@
 {% block preview_text %}
     {% if course_ids|length > 1 %}
         {% blocktrans trimmed %}
-            Remember when you enrolled in {{ course_name }}, and other courses on edX.org? We do, and we’re glad
+            Remember when you enrolled in {{ course_name }}, and other courses on {{ platform_name }}? We do, and we’re glad
             to have you! Come see what everyone is learning.
         {% endblocktrans %}
     {% else %}
         {% blocktrans trimmed %}
-            Remember when you enrolled in {{ course_name }} on edX.org? We do, and we’re glad
+            Remember when you enrolled in {{ course_name }} on {{ platform_name }}? We do, and we’re glad
             to have you! Come see what everyone is learning.
         {% endblocktrans %}
     {% endif %}
@@ -24,12 +24,12 @@
             <p>
                 {% if course_ids|length > 1 %}
                     {% blocktrans trimmed %}
-                        Remember when you enrolled in <strong>{{ course_name }}</strong>, and other courses on edX.org? We do, and we’re glad
+                        Remember when you enrolled in <strong>{{ course_name }}</strong>, and other courses on {{ platform_name }}? We do, and we’re glad
                         to have you! Come see what everyone is learning.
                     {% endblocktrans %}
                 {% else %}
                     {% blocktrans trimmed %}
-                        Remember when you enrolled in <strong>{{ course_name }}</strong> on edX.org? We do, and we’re glad
+                        Remember when you enrolled in <strong>{{ course_name }}</strong> on {{ platform_name }}? We do, and we’re glad
                         to have you! Come see what everyone is learning.
                     {% endblocktrans %}
                 {% endif %}

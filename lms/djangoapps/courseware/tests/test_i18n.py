@@ -7,7 +7,7 @@ import re
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.test import TestCase
 from django.test.client import Client
 from django.utils import translation
@@ -23,9 +23,9 @@ class BaseI18nTestCase(TestCase):
     Base utilities for i18n test classes to derive from
     """
     preview_language_url = '/update_lang/'
-    url = reverse('dashboard')
     site_lang = settings.LANGUAGE_CODE
     pwd = 'test_password'
+    url = reverse_lazy('dashboard')
 
     def setUp(self):
         super(BaseI18nTestCase, self).setUp()
@@ -171,7 +171,9 @@ class I18nLangPrefTests(BaseI18nTestCase):
         self.user_login()
 
     def set_lang_preference(self, language):
-        """Sets the user's language preference, allowing the LangPref middleware to operate to set the preference cookie."""
+        """
+        Sets the user's language preference, allowing the LangPref middleware to operate to set the preference cookie.
+        """
         response = self.client.patch(
             reverse('preferences_api', args=[self.user.username]),
             json.dumps({LANGUAGE_KEY: language}),

@@ -51,7 +51,7 @@ from openedx.features.course_experience import course_home_page_title, COURSE_OU
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
 ## Utility: Notes
-% if is_edxnotes_enabled(course):
+% if is_edxnotes_enabled(course, request.user):
 <%static:css group='style-student-notes'/>
 % endif
 
@@ -250,10 +250,10 @@ ${HTML(fragment.foot_html())}
     </div>
   % endif
 </div>
-% if course.show_calculator or is_edxnotes_enabled(course):
+% if course.show_calculator or is_edxnotes_enabled(course, request.user):
     <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
       ## Utility: Notes
-      % if is_edxnotes_enabled(course):
+      % if is_edxnotes_enabled(course, request.user):
         <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
       % endif
 

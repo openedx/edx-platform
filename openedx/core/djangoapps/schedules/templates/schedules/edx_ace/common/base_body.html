@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load ace %}
 
 {% get_current_language as LANGUAGE_CODE %}
 {% get_current_language_bidi as LANGUAGE_BIDI %}
@@ -22,6 +23,8 @@
 {# Note {beacon_src} is not a template variable that is evaluated by the Django template engine. It is evaluated by #}
 {# Sailthru when the email is sent. Other email providers would need to replace this variable in the HTML as well. #}
 <img src="{beacon_src}" alt="" role="presentation" aria-hidden="true" />
+
+{% google_analytics_tracking_pixel %}
 
 <div bgcolor="#f5f5f5" lang="{{ LANGUAGE_CODE|default:"en" }}" dir="{{ LANGUAGE_BIDI|yesno:"rtl,ltr" }}" style="
     margin: 0;
@@ -57,12 +60,12 @@
                 <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
                     <tr>
                         <td width="70">
-                            <a href="{{ homepage_url }}"><img
+                            <a href="{% with_link_tracking homepage_url %}"><img
                                     src="https://media.sailthru.com/595/1k1/8/o/599f355101b3f.png" width="70"
                                     height="30" alt="{% blocktrans %}Go to {{ platform_name }} Home Page{% endblocktrans %}"/></a>
                         </td>
                         <td align="right" style="text-align: {{ LANGUAGE_BIDI|yesno:"left,right" }};">
-                            <a class="login" href="{{ dashboard_url }}" style="color: #005686;">{%  trans "Sign In" %}</a>
+                            <a class="login" href="{% with_link_tracking dashboard_url %}" style="color: #005686;">{%  trans "Sign In" %}</a>
                         </td>
                     </tr>
                 </table>
@@ -90,7 +93,7 @@
                                 <tr>
                                     {% if social_media_urls.linkedin %}
                                         <td height="32" width="42">
-                                            <a href="{{ social_media_urls.linkedin }}">
+                                            <a href="{{ social_media_urls.linkedin|safe }}">
                                                 <img src="https://media.sailthru.com/595/1k1/8/o/599f354ec70cb.png"
                                                      width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on LinkedIn{% endblocktrans %}"/>
                                             </a>
@@ -98,7 +101,7 @@
                                     {% endif %}
                                     {% if social_media_urls.twitter %}
                                         <td height="32" width="42">
-                                            <a href="{{ social_media_urls.twitter }}">
+                                            <a href="{{ social_media_urls.twitter|safe }}">
                                                 <img src="https://media.sailthru.com/595/1k1/8/o/599f354d9c26e.png"
                                                      width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Twitter{% endblocktrans %}"/>
                                             </a>
@@ -106,7 +109,7 @@
                                     {% endif %}
                                     {% if social_media_urls.facebook %}
                                         <td height="32" width="42">
-                                            <a href="{{ social_media_urls.facebook }}">
+                                            <a href="{{ social_media_urls.facebook|safe }}">
                                                 <img src="https://media.sailthru.com/595/1k1/8/o/599f355052c8e.png"
                                                      width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Facebook{% endblocktrans %}"/>
                                             </a>
@@ -114,7 +117,7 @@
                                     {% endif %}
                                     {% if social_media_urls.google_plus %}
                                         <td height="32" width="42">
-                                            <a href="{{ social_media_urls.google_plus }}">
+                                            <a href="{{ social_media_urls.google_plus|safe }}">
                                                 <img src="https://media.sailthru.com/595/1k1/8/o/599f354fc554a.png"
                                                      width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Google Plus{% endblocktrans %}"/>
                                             </a>
@@ -122,7 +125,7 @@
                                     {% endif %}
                                     {% if social_media_urls.reddit %}
                                         <td height="32" width="42">
-                                            <a href="{{ social_media_urls.reddit }}">
+                                            <a href="{{ social_media_urls.reddit|safe }}">
                                                 <img src="https://media.sailthru.com/595/1k1/8/o/599f354e326b9.png"
                                                      width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Reddit{% endblocktrans %}"/>
                                             </a>
@@ -136,14 +139,14 @@
                         <!-- APP BUTTONS -->
                         <td style="padding-bottom: 20px;">
                             {% if mobile_store_urls.apple %}
-                                <a href="{{ mobile_store_urls.apple }}" style="text-decoration: none">
+                                <a href="{{ mobile_store_urls.apple|safe }}" style="text-decoration: none">
                                     <img src="https://media.sailthru.com/595/1k1/6/2/5931cfbba391b.png"
                                          alt="{% trans "Download the iOS app on the Apple Store" %}"
                                          width="136" height="50" style="margin-{{ LANGUAGE_BIDI|yesno:"left,right" }}: 10px"/>
                                 </a>
                             {% endif %}
                             {% if mobile_store_urls.google %}
-                                <a href="{{ mobile_store_urls.google }}" style="text-decoration: none">
+                                <a href="{{ mobile_store_urls.google|safe }}" style="text-decoration: none">
                                     <img src="https://media.sailthru.com/595/1k1/6/2/5931cf879a033.png"
                                          alt="{% trans "Download the Android app on the Google Play Store" %}"
                                          width="136" height="50"/>

@@ -247,8 +247,14 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
             return missing
 
     def log_bizx_api_exception(self, transaction_data, err):
-        sys_msg = err.response.json() if err.response else 'Not available'
-        headers = err.response.headers if err.response else 'Not available'
+        try:
+            sys_msg = err.response.content
+        except AttributeError:
+            sys_msg = 'Not available'
+        try:
+            headers = err.response.headers
+        except AttributeError:
+            headers = 'Not available'
         token_data = transaction_data.get('token_data')
         token_data = token_data if token_data else 'Not available'
         log_msg_template = (

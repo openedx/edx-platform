@@ -7,7 +7,7 @@ import ddt
 import pytz
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.test import TestCase
 from django.test.utils import override_settings
 from edx_rest_api_client import exceptions
@@ -83,7 +83,7 @@ class CourseApiViewTestMixin(object):
 
 class CourseListViewTests(CourseApiViewTestMixin, ModuleStoreTestCase):
     """ Tests for CourseListView. """
-    path = reverse('commerce_api:v1:courses:list')
+    path = reverse_lazy('commerce_api:v1:courses:list')
 
     def test_authentication_required(self):
         """ Verify only authenticated users can access the view. """
@@ -400,7 +400,7 @@ class OrderViewTests(UserMixin, TestCase):
     view_name = 'commerce_api:v1:orders:detail'
     ORDER_NUMBER = 'EDX-100001'
     MOCK_ORDER = {'number': ORDER_NUMBER}
-    path = reverse(view_name, kwargs={'number': ORDER_NUMBER})
+    path = reverse_lazy(view_name, kwargs={'number': ORDER_NUMBER})
 
     def setUp(self):
         super(OrderViewTests, self).setUp()

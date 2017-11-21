@@ -478,8 +478,9 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase):
         )
 
     def test_get_all_courses_by_mobile_available(self):
-        non_mobile_course = CourseFactory.create(emit_signals=True)
-        mobile_course = CourseFactory.create(mobile_available=True, emit_signals=True)
+        mobile_course = CourseFactory.create(emit_signals=True)
+        non_mobile_course =\
+            CourseFactory.create(mobile_available=False, emit_signals=True)
 
         test_cases = (
             (None, {non_mobile_course.id, mobile_course.id}),
@@ -495,7 +496,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase):
                     CourseOverview.get_all_courses(filter_=filter_)
                 },
                 expected_courses,
-                "testing CourseOverview.get_all_courses with filter_={}".format(filter_),
+                "testing CourseOverview.get_all_courses with filter_={}"
+                .format(filter_),
             )
 
     def test_get_from_ids_if_exists(self):

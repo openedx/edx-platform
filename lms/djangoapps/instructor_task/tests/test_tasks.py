@@ -394,7 +394,10 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         entry = InstructorTask.objects.get(id=task_entry.id)
         output = json.loads(entry.task_output)
         self.assertEquals(output['exception'], "UpdateProblemModuleStateError")
-        self.assertEquals(output['message'], "Specified problem does not support rescoring.")
+        self.assertEquals(output['message'], "Specified module {0} of type {1} does not support rescoring.".format(
+            self.location,
+            mock_instance.__class__,
+        ))
         self.assertGreater(len(output['traceback']), 0)
 
     def test_rescoring_unaccessable(self):

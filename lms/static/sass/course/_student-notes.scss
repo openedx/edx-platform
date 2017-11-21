@@ -76,7 +76,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
           display: block;
           margin-top: ($baseline/4);
-          color: $gray-l1;
+          color: $lightest-base-font-color;
           letter-spacing: 0;
         }
       }
@@ -372,7 +372,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
         @include padding-right($baseline);
 
-        color: $gray-l2;
+        color: $lightest-base-font-color;
         font-weight: $font-semibold !important; // needed for poor base LMS styling scope
       }
 
@@ -450,6 +450,10 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
     background: $gray-l5;
     border-top: ($baseline/4) solid $active-color;
     padding: ($baseline*1.5);
+
+    a {
+      color: $blue-d1;
+    }
   }
 
   .placeholder-title {

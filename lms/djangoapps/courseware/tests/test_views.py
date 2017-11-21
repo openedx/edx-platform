@@ -13,7 +13,7 @@ from uuid import uuid4
 import ddt
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
@@ -983,7 +983,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 class TestProgramMarketingView(SharedModuleStoreTestCase):
     """Unit tests for the program marketing page."""
     program_uuid = str(uuid4())
-    url = reverse('program_marketing_view', kwargs={'program_uuid': program_uuid})
+    url = reverse_lazy('program_marketing_view', kwargs={'program_uuid': program_uuid})
 
     @classmethod
     def setUpClass(cls):

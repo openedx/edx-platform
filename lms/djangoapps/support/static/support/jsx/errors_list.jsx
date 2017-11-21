@@ -6,7 +6,9 @@ import PropTypes from 'prop-types';
 
 class ShowErrors extends React.Component {
   render() {
-    window.scrollTo(0, 0);
+    if (this.props.errorList.length > 0) {
+      window.scrollTo(0, 0);
+    }
     return this.props.errorList.length > 0 &&
       <div className="col-sm-12">
         <div className="alert alert-danger" role="alert">

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-09 10:46+0000\n"
-"PO-Revision-Date: 2017-11-09 10:51:48.183839\n"
+"POT-Creation-Date: 2017-11-16 10:50+0000\n"
+"PO-Revision-Date: 2017-11-16 11:00:28.886511\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -279,10 +279,6 @@ msgstr ""
 msgid "Vertical"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/helpers.py
-msgid "Empty"
-msgstr ""
-
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
 msgstr ""
@@ -386,6 +382,10 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/preview.py
 #, python-brace-format
 msgid "Access restricted to: {list_of_groups}"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+msgid "The information you entered is incorrect."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py

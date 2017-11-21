@@ -23,7 +23,8 @@ class DummyConfig(ConfigurationModel):
     """
     Dummy Configuration
     """
-    pass
+    class Meta:
+        app_label = 'xmoduletestservices'
 
 
 class DummyUnexpected(object):

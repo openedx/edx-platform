@@ -271,6 +271,8 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
       <% 
         course_run = course['course_runs'][0] 
         course_img = course_run.get('image')
+        course_about_url = reverse('about_course', args=[course_run['key']])
+        course_purchase_url = course_run['upgrade_url'] if course_run['upgrade_url'] else course_about_url
       %>
       <div class="row course">
         <div class="col-3 col-lg-2 course-image">
@@ -280,11 +282,11 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
         </div>
         <div class="col-9 col-lg-6">
           <div>
-            <a href="${course_run['course_url']}">${course_run['title']}</a>
+            <a href="${course_about_url}">${course_run['title']}</a>
           </div>
           <div>${course_run['short_description']}</div>
           <div>
-            <a href="${course_run['course_url']}">${_('Learn More')}</a>
+            <a href="${course_about_url}">${_('Learn More')}</a>
           </div>
         </div>
         <div class="col-12 col-lg-4 course-enroll">
@@ -296,7 +298,7 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
           % if program.get('is_learner_eligible_for_one_click_purchase') != True:
             % if course_run['is_enrollment_open'] and course_run['can_enroll'] and not course_run['is_course_ended']:
               <div>
-                <a class="btn btn-primary btn-block btn-success" href="${course_run['course_url']}about">Enroll Now</a>
+                <a class="btn btn-primary btn-block btn-success" href="${course_purchase_url}">Enroll Now</a>
               </div>
             % else:
               <div>

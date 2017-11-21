@@ -17,7 +17,6 @@ The resulting JSON object has one entry for each module in the course:
 """
 
 import json
-from optparse import make_option
 from textwrap import dedent
 
 from django.core.management.base import BaseCommand, CommandError

@@ -1,5 +1,0 @@
-{% load i18n %}
-
-{% blocktrans trimmed %}
-    This is the reply to your thread:
-{% endblocktrans %}
