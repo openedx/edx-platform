@@ -3,14 +3,9 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.conf import settings
 from django.core.cache import cache
-from django.core.exceptions import ImproperlyConfigured
-from edx_rest_api_client.client import EdxRestApiClient
-from provider.oauth2.models import Client
 
 from openedx.core.lib.cache_utils import zpickle, zunpickle
-from openedx.core.lib.token_utils import JwtBuilder
 
 log = logging.getLogger(__name__)
 

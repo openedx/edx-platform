@@ -8,13 +8,12 @@ import unittest
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from opaque_keys.edx.keys import CourseKey
 
 # This import is for an lms djangoapp.
 # Its testcases are only run under lms.
 from bulk_email.models import BulkEmailFlag, CourseAuthorization  # pylint: disable=import-error
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 

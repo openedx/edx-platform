@@ -9,7 +9,6 @@ from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponse, HttpResponseRedirect, SimpleCookie
 from django.test import TestCase
-from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
 from nose.plugins.attrib import attr

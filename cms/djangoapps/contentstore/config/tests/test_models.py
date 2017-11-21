@@ -5,9 +5,7 @@ persistent grading feature.
 import itertools
 
 import ddt
-from django.conf import settings
 from django.test import TestCase
-from mock import patch
 from opaque_keys.edx.locator import CourseLocator
 
 from contentstore.config.models import NewAssetsPageFlag

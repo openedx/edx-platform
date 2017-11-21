@@ -1,7 +1,7 @@
 """
 Serializer for user API
 """
-from opaque_keys.edx.keys import CourseKey
+
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 

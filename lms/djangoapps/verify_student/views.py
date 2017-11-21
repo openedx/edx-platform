@@ -9,7 +9,6 @@ import logging
 import urllib
 
 import analytics
-import waffle
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
