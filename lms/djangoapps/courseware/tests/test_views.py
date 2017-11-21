@@ -210,6 +210,7 @@ class TestJumpTo(ModuleStoreTestCase):
 
 @attr(shard=2)
 @ddt.ddt
+@pytest.mark.django111_expected_failure
 class IndexQueryTestCase(ModuleStoreTestCase):
     """
     Tests for query count.
@@ -252,6 +253,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
 
 @attr(shard=2)
 @ddt.ddt
+@pytest.mark.django111_expected_failure
 class ViewsTestCase(ModuleStoreTestCase):
     """
     Tests for views.py methods.
