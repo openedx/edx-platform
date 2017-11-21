@@ -20,6 +20,7 @@ from courseware.tests.factories import StaffFactory, StudentModuleFactory, UserF
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
+from pyquery import PyQuery as pq
 from shoppingcart.models import CourseRegCodeItem, Order, PaidCourseRegistration
 from student.models import CourseEnrollment
 from student.roles import CourseFinanceAdminRole
@@ -66,6 +67,12 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             mode_display_name=CourseMode.DEFAULT_MODE.name,
             min_price=40
         )
+        self.course_info = CourseFactory.create(
+            org="ACME",
+            number="001",
+            run="2017",
+            name="How to defeat the Road Runner"
+        )
         self.course_mode.save()
         # Create instructor account
         self.instructor = AdminFactory.create()
@@ -106,6 +113,44 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         student = UserFactory.create()
         self.assertFalse(has_instructor_tab(student, self.course))
+
+    @ddt.data(
+        ("How to defeat the Road Runner", "2017", "001", "ACME"),
+    )
+    @ddt.unpack
+    def test_instructor_course_info(self, display_name, run, number, org):
+        """
+        Verify that it shows the correct course information
+        """
+        url = reverse(
+            'instructor_dashboard',
+            kwargs={
+                'course_id': unicode(self.course_info.id)
+            }
+        )
+
+        response = self.client.get(url)
+        content = pq(response.content)
+
+        self.assertEqual(
+            display_name,
+            content('#field-course-display-name b').contents()[0].strip()
+        )
+
+        self.assertEqual(
+            run,
+            content('#field-course-name b').contents()[0].strip()
+        )
+
+        self.assertEqual(
+            number,
+            content('#field-course-number b').contents()[0].strip()
+        )
+
+        self.assertEqual(
+            org,
+            content('#field-course-organization b').contents()[0].strip()
+        )
 
     def test_student_admin_staff_instructor(self):
         """
