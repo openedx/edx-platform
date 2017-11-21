@@ -1,13 +1,15 @@
 <%page expression_filter="h"/>
 <%!
 import logging
+import json
 from django.contrib.staticfiles.storage import staticfiles_storage
 from pipeline_mako import compressed_css, compressed_js
 from django.utils.translation import get_language_bidi
 from mako.exceptions import TemplateLookupException
 from edxmako.shortcuts import marketing_link
 
-from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
+from openedx.core.djangolib.markup import HTML
 from openedx.core.djangoapps.site_configuration.helpers import (
   page_title_breadcrumbs,
   get_value,
@@ -18,6 +20,7 @@ from openedx.core.djangoapps.theming.helpers import (
   is_request_in_themed_site,
 )
 from certificates.api import get_asset_url_by_slug
+from webpack_loader.templatetags.webpack_loader import render_bundle
 logger = logging.getLogger(__name__)
 %>
 
@@ -97,25 +100,15 @@ source, template_path = Loader(engine).load_template_source(path)
             -include it as the first script in this block
     </%doc>
     <%
-        from django.template import Template, Context
-        from webpack_loader.exceptions import WebpackLoaderBadStatsError
-        import json
-
         body = capture(caller.body)
         body_dict = json.loads(body)
         body_dict['lang'] = lang
-        return Template("""
-            <script type="text/javascript" id='studioContext'>
-                var studioContext = {% autoescape off %}{{ body }}{% endautoescape %};
-            </script>
-            <div id="root"></div>
-            {% load render_bundle from webpack_loader %}
-            {% render_bundle page %}
-        """).render(Context({
-            'body': json.dumps(body_dict),
-            'page': page
-        }))
     %>
+    <script type="text/javascript" id='courseContext'>
+      var studioContext = ${ body | n, decode.utf8};
+    </script>
+    <div id="root"></div>
+    ${HTML(render_bundle(page))}
 </%def>
 
 <%def name="webpack(entry)">
@@ -124,21 +117,41 @@ source, template_path = Loader(engine).load_template_source(path)
         Uses the Django template engine because our webpack loader only provides template tags for Jinja and Django.
     </%doc>
     <%
-        from django.template import Template, Context
-        from webpack_loader.exceptions import WebpackLoaderBadStatsError
-        return Template("""
-            {% load render_bundle from webpack_loader %}
-            {% render_bundle entry %}
-            {% if body %}
-              <script type="text/javascript">
-                  {% autoescape off %}{{ body }}{% endautoescape %}
-              </script>
-            {% endif %}
-        """).render(Context({
-            'entry': entry,
-            'body': capture(caller.body)
-        }))
+        body = capture(caller.body)
     %>
+    ${HTML(render_bundle(entry))}
+    % if body:
+      <script type="text/javascript">
+        ${body | n, decode.utf8}
+      </script>
+    % endif
+</%def>
+
+<%def name="renderReact(component, id, props={})">
+    <%doc>
+        Wrapper function to load a React component via webpack() and render
+        it onto the page, passing an optional context object via props.
+        component: (string) The component to render, as specified by the name
+        of its Webpack entry point.
+        id: (string) A unique id to apply to the component's container div.
+        props: (dict, optional) An object containing data to pass into the
+        component as props.
+    </%doc>
+
+    ${HTML(render_bundle(component))}
+    ${HTML(render_bundle('ReactRenderer'))}
+
+    <div id="${id}"></div>
+    <script type="text/javascript">
+      var c;
+      try { c = ${component | n, decode.utf8}; } catch (e) { c = null; }
+      new ReactRenderer({
+        component: c,
+        selector: '#${id | n, decode.utf8}',
+        componentName: '${component | n, js_escaped_string}',
+        props: ${props | n, dump_js_escaped_json}
+      });
+    </script>
 </%def>
 
 <%def name="require_module(module_name, class_name)">
