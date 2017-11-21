@@ -54,5 +54,8 @@ module.exports = Merge.smart(commonConfig, {
                 ]
             }
         ]
+    },
+    watchOptions: {
+        ignored: [/node_modules/, /\.git/]
     }
 });
