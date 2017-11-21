@@ -251,22 +251,14 @@ class ThemePipelineMixin(PipelineMixin):
 
         for theme in themes:
             css_packages = self.get_themed_packages(theme.theme_dir_name, settings.PIPELINE_CSS)
-            js_packages = self.get_themed_packages(theme.theme_dir_name, settings.PIPELINE_JS)
 
             from pipeline.packager import Packager
-            packager = Packager(storage=self, css_packages=css_packages, js_packages=js_packages)
+            packager = Packager(storage=self, css_packages=css_packages)
             for package_name in packager.packages['css']:
                 package = packager.package_for('css', package_name)
                 output_file = package.output_filename
                 if self.packing:
                     packager.pack_stylesheets(package)
-                paths[output_file] = (self, output_file)
-                yield output_file, output_file, True
-            for package_name in packager.packages['js']:
-                package = packager.package_for('js', package_name)
-                output_file = package.output_filename
-                if self.packing:
-                    packager.pack_javascripts(package)
                 paths[output_file] = (self, output_file)
                 yield output_file, output_file, True
 

@@ -10,16 +10,18 @@
     height: 100%;
     padding-left: $baseline;
     padding-right: $baseline;
+    margin-left: auto;
   }
 
   .login-register.border-left {
     border-left: 1px solid #d9d9d9;
     padding-left: ($baseline*1.5);
     padding-right: $baseline;
+    margin-left: 0;
   }
 }
 
-@media (max-width: 767px) {
+@include media-breakpoint-down(md) {
   .enterprise-content {
     margin: auto auto;
     display: block;
@@ -397,7 +399,7 @@
       }
 
       &.success {
-        border-color: $success-color-hover;
+        border-color: theme-color("success");
       }
     }
 
@@ -408,7 +410,7 @@
       }
 
       &.success {
-        outline-color: $success-color-hover;
+        outline-color: theme-color("success");
       }
     }
 
@@ -436,7 +438,7 @@
       }
 
       &.success {
-        color: $success-color-hover;
+        color: theme-color("success");
       }
     }
 

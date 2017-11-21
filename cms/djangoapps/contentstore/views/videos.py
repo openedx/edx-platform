@@ -1,11 +1,10 @@
 """
 Views related to the video upload feature
 """
-from contextlib import closing
-
 import csv
 import json
 import logging
+from contextlib import closing
 from datetime import datetime, timedelta
 from uuid import uuid4
 
@@ -18,33 +17,38 @@ from django.core.files.images import get_image_dimensions
 from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
-from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from edxval.api import (
     SortDirection,
     VideoSortField,
-    create_video,
-    get_videos_for_course,
-    remove_video_for_course,
-    update_video_status,
-    update_video_image,
-    get_3rd_party_transcription_plans,
-    get_transcript_preferences,
     create_or_update_transcript_preferences,
+    create_video,
+    get_3rd_party_transcription_plans,
+    get_transcript_credentials_state_for_org,
+    get_transcript_preferences,
+    get_videos_for_course,
     remove_transcript_preferences,
+    remove_video_for_course,
+    update_video_image,
+    update_video_status
 )
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 
 from contentstore.models import VideoUploadConfig
 from contentstore.utils import reverse_course_url
 from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from util.json_request import JsonResponse, expect_json
 
 from .course import get_course_and_check_access
 
-
-__all__ = ['videos_handler', 'video_encodings_download', 'video_images_handler', 'transcript_preferences_handler']
+__all__ = [
+    'videos_handler',
+    'video_encodings_download',
+    'video_images_handler',
+    'transcript_preferences_handler',
+]
 
 LOGGER = logging.getLogger(__name__)
 
@@ -522,7 +526,7 @@ def _get_videos(course):
     """
     Retrieves the list of videos from VAL corresponding to this course.
     """
-    videos = list(get_videos_for_course(course.id, VideoSortField.created, SortDirection.desc))
+    videos = list(get_videos_for_course(unicode(course.id), VideoSortField.created, SortDirection.desc))
 
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:
@@ -589,7 +593,8 @@ def videos_index_html(course):
         },
         'is_video_transcript_enabled': is_video_transcript_enabled,
         'video_transcript_settings': None,
-        'active_transcript_preferences': None
+        'active_transcript_preferences': None,
+        'transcript_credentials': None
     }
 
     if is_video_transcript_enabled:
@@ -598,9 +603,15 @@ def videos_index_html(course):
                 'transcript_preferences_handler',
                 unicode(course.id)
             ),
+            'transcript_credentials_handler_url': reverse_course_url(
+                'transcript_credentials_handler',
+                unicode(course.id)
+            ),
             'transcription_plans': get_3rd_party_transcription_plans(),
         }
         context['active_transcript_preferences'] = get_transcript_preferences(unicode(course.id))
+        # Cached state for transcript providers' credentials (org-specific)
+        context['transcript_credentials'] = get_transcript_credentials_state_for_org(course.id.org)
 
     return render_to_response('videos_index.html', context)
 

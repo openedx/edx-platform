@@ -1,0 +1,31 @@
+{% extends 'schedules/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <p>
+                {% blocktrans trimmed %}
+                    {{ comment_username }} replied to your <b>{{ thread_title }}</b> post
+                {% endblocktrans %}
+            </p>
+
+            <div style="border: 1px solid white;
+                        padding: 15px 15px 15px 20px;
+                        box-shadow: 0 0px 2px rgba(0, 0, 0, 0.55);
+                        margin: 30px 70px 40px 0px;">
+                {{ comment_body }}
+            </div>
+
+            {% trans "View discussion" as course_cta_text %}
+            {% include "schedules/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=post_link%}
+
+            {% block google_analytics_pixel %}
+                <img src="{{ ga_tracking_pixel_url }}" alt="" role="presentation" aria-hidden="true" style="display: block;"/>
+            {% endblock %}
+        </td>
+    </tr>
+</table>
+{% endblock %}

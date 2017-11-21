@@ -9,10 +9,11 @@ from django.test.utils import override_settings
 from mock import patch
 from waffle.testutils import override_switch
 
-from commerce.models import CommerceConfiguration
-from commerce.utils import EcommerceService
 from openedx.core.lib.log_utils import audit_log
 from student.tests.factories import UserFactory
+
+from ..models import CommerceConfiguration
+from ..utils import EcommerceService
 
 
 def update_commerce_config(enabled=False, checkout_page='/test_basket/'):

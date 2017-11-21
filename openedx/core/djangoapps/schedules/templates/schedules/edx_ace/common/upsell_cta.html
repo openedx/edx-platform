@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load ace %}
 
 {% if show_upsell %}
     <p>
@@ -8,7 +9,7 @@
         {% endblocktrans %}
     </p>
     <p>
-        <a href="{{ upsell_link }}"
+        <a href="{% with_link_tracking upsell_link %}"
            style="
             color: #1e8142;
             text-decoration: none;

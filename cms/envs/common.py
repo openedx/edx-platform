@@ -109,6 +109,8 @@ from lms.envs.common import (
     PASSWORD_RESET_SUPPORT_LINK,
     ACTIVATION_EMAIL_SUPPORT_LINK,
 
+    DEFAULT_MOBILE_AVAILABLE,
+
     CONTACT_EMAIL,
 
     DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH,
@@ -947,6 +949,9 @@ INSTALLED_APPS = [
     # Video module configs (This will be moved to Video once it becomes an XBlock)
     'openedx.core.djangoapps.video_config',
 
+    # edX Video Pipeline integration
+    'openedx.core.djangoapps.video_pipeline',
+
     # For CMS
     'contentstore.apps.ContentstoreConfig',
 
@@ -955,7 +960,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.external_auth',
     'student',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
-    'xblock_config',
+    'xblock_config.apps.XBlockConfig',
 
     # Maintenance tools
     'maintenance',
@@ -1237,6 +1242,11 @@ ADVANCED_SECURITY_CONFIG = {}
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
+
+# Set request limits for maximum size of a request body and maximum number of GET/POST parameters. (>=Django 1.10)
+# Limits are currently disabled - but can be used for finer-grained denial-of-service protection.
+DATA_UPLOAD_MAX_MEMORY_SIZE = None
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
 ### Size of chunks into which asset uploads will be divided
 UPLOAD_CHUNK_SIZE_IN_MB = 10

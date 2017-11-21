@@ -572,7 +572,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         messages = FallbackStorage(request)
         request._messages = messages        # pylint: disable=protected-access
         coupon_admin = SoftDeleteCouponAdmin(Coupon, AdminSite())
-        test_query_set = coupon_admin.queryset(request)
+        test_query_set = coupon_admin.get_queryset(request)
         test_actions = coupon_admin.get_actions(request)
         self.assertIn('really_delete_selected', test_actions['really_delete_selected'])
         self.assertEqual(get_coupon.is_active, True)
@@ -585,7 +585,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         coupon = Coupon(code='TestCode123', description='testing123', course_id=self.course_key,
                         percentage_discount=22, created_by=self.user, is_active=True)
         coupon.save()
-        test_query_set = coupon_admin.queryset(request)
+        test_query_set = coupon_admin.get_queryset(request)
         coupon_admin.really_delete_selected(request, test_query_set)
         for coupon in test_query_set:
             self.assertEqual(coupon.is_active, False)
@@ -1383,7 +1383,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self._assert_404(reverse('shoppingcart.views.use_code', args=[]), use_post=True)
         self._assert_404(reverse('shoppingcart.views.update_user_cart', args=[]))
         self._assert_404(reverse('shoppingcart.views.reset_code_redemption', args=[]), use_post=True)
-        self._assert_404(reverse('shoppingcart.views.billing_details', args=[]))
+        self._assert_404(reverse('billing_details', args=[]))
 
     def test_upgrade_postpay_callback_emits_ga_event(self):
         # Enroll as honor in the course with the current user.
@@ -1693,7 +1693,7 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         self.testing_course.enrollment_end = self.nextday
         self.testing_course = self.update_course(self.testing_course, self.user.id)
 
-        resp = self.client.post(reverse('shoppingcart.views.billing_details'))
+        resp = self.client.post(reverse('billing_details'))
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(json.loads(resp.content)['is_course_enrollment_closed'])
 

@@ -4,6 +4,7 @@ Views to render a learner's achievements.
 
 from django.template.loader import render_to_string
 from lms.djangoapps.certificates import api as certificate_api
+from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from web_fragments.fragment import Fragment
@@ -41,7 +42,8 @@ class LearnerAchievementsFragmentView(EdxFragmentView):
                 try:
                     course_overview = CourseOverview.get_from_id(course_key)
                     course_certificate['course'] = course_overview
-                    passing_certificates.append(course_certificate)
+                    if certificates_viewable_for_course(course_overview):
+                        passing_certificates.append(course_certificate)
                 except CourseOverview.DoesNotExist:
                     # This is unlikely to fail as the course should exist.
                     # Ideally the cert should have all the information that

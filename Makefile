@@ -15,8 +15,8 @@ clean:
 
 extract_translations:
 	# Extract localizable strings from sources
-	paver i18n_extract
+	i18n_tool extract -vv
 
 push_translations:
 	# Push source strings to Transifex for translation
-	paver i18n_transifex_push
+	i18n_tool transifex push

@@ -41,6 +41,7 @@ from lms.djangoapps.badges.tests.factories import (
 )
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.certificates.config import waffle
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from student.roles import CourseStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -935,7 +936,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
     def test_request_certificate_without_passing(self):
         self.cert.status = CertificateStatuses.unavailable
         self.cert.save()
-        request_certificate_url = reverse('certificates.views.request_certificate')
+        request_certificate_url = reverse('request_certificate')
         response = self.client.post(request_certificate_url, {'course_id': unicode(self.course.id)})
         self.assertEqual(response.status_code, 200)
         response_json = json.loads(response.content)
@@ -946,7 +947,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
     def test_request_certificate_after_passing(self):
         self.cert.status = CertificateStatuses.unavailable
         self.cert.save()
-        request_certificate_url = reverse('certificates.views.request_certificate')
+        request_certificate_url = reverse('request_certificate')
         with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
             mock_queue.return_value = (0, "Successfully queued")
             with mock_passing_grade():
@@ -1079,6 +1080,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         Tests custom template search and rendering.
         This test should check template matching when org={org}, course={course}, mode={mode}.
         """
+        DarkLangConfig(released_languages='es-419, fr', changed_by=self.user, enabled=True).save()
+
         right_language = 'es'
         wrong_language = 'fr'
         mock_get_org_id.return_value = 1
@@ -1137,6 +1140,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         match org and mode.
         This test should check template matching when org={org}, course=Null, mode={mode}.
         """
+        DarkLangConfig(released_languages='es-419, fr', changed_by=self.user, enabled=True).save()
+
         right_language = 'es'
         wrong_language = 'fr'
         mock_get_org_id.return_value = 1
@@ -1193,6 +1198,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         Tests custom template search when we have a single template for a organization.
         This test should check template matching when org={org}, course=Null, mode=null.
         """
+        DarkLangConfig(released_languages='es-419, fr', changed_by=self.user, enabled=True).save()
+
         right_language = 'es'
         wrong_language = 'fr'
         mock_get_org_id.return_value = 1
@@ -1248,6 +1255,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         Tests custom template search if we have a single template for a course mode.
         This test should check template matching when org=null, course=Null, mode={mode}.
         """
+        DarkLangConfig(released_languages='es-419, fr', changed_by=self.user, enabled=True).save()
+
         right_language = 'es'
         wrong_language = 'fr'
         mock_get_org_id.return_value = 1
@@ -1303,6 +1312,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         Tests custom template search if we have a single template for a course mode.
         This test should check template matching when org=null, course=Null, mode={mode}.
         """
+        DarkLangConfig(released_languages='es-419, fr', changed_by=self.user, enabled=True).save()
+
         right_language = 'es'
         wrong_language = 'fr'
         mock_get_org_id.return_value = 1

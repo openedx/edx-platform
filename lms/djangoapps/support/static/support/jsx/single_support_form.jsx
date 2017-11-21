@@ -12,11 +12,6 @@ import LoggedInUser from './logged_in_user';
 import LoggedOutUser from './logged_out_user';
 import Success from './success';
 
-// TODO
-// edx zendesk APIs
-// access token
-// custom fields ids
-// https://openedx.atlassian.net/browse/LEARNER-2736
 
 class RenderForm extends React.Component {
   constructor(props) {
@@ -24,7 +19,7 @@ class RenderForm extends React.Component {
     this.state = {
       currentRequest: null,
       errorList: [],
-      success: true,
+      success: false,
     };
     this.submitForm = this.submitForm.bind(this);
     this.setErrorState = this.setErrorState.bind(this);
@@ -37,17 +32,17 @@ class RenderForm extends React.Component {
   }
 
   submitForm() {
-    const url = 'https://example.zendesk.com/api/v2/tickets.json',
+    const url = `${this.props.context.zendeskApiHost}/api/v2/tickets.json`,
       $userInfo = $('.user-info'),
       request = new XMLHttpRequest(),
       $course = $('#course'),
-      accessToken = 'abc000',
       data = {
         subject: $('#subject').val(),
         comment: {
           body: $('#message').val(),
           uploads: $.map($('.uploaded-files button'), n => n.id),
         },
+        tags: this.props.context.zendeskTags,
       };
 
     let course;
@@ -64,13 +59,13 @@ class RenderForm extends React.Component {
     }
 
     data.custom_fields = [{
-      id: '114099484092',
+      id: this.props.context.customFields.course,
       value: course,
     }];
 
     if (this.validateData(data)) {
       request.open('POST', url, true);
-      request.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+      request.setRequestHeader('Authorization', `Bearer ${this.props.context.accessToken}`);
       request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
 
       request.send(JSON.stringify({
@@ -197,7 +192,11 @@ class RenderForm extends React.Component {
           </div>
         </div>
 
-        <FileUpload setErrorState={this.setErrorState} />
+        <FileUpload
+          setErrorState={this.setErrorState}
+          zendeskApiHost={this.props.context.zendeskApiHost}
+          accessToken={this.props.context.accessToken}
+        />
 
         <div className="row">
           <div className="col-sm-12">

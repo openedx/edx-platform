@@ -35,3 +35,4 @@ class ScheduleConfigFactory(factory.DjangoModelFactory):
     deliver_upgrade_reminder = True
     enqueue_course_update = True
     deliver_course_update = True
+    hold_back_ratio = 0

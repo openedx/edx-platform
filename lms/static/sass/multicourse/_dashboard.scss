@@ -150,12 +150,10 @@
             }
 
             .course-info {
-              display: block;
-
               @include float(left);
 
+              display: block;
               padding: 0;
-              margin-top: $baseline;
 
               [class*="info-"] {
                 color: $gray-d1;
@@ -183,6 +181,21 @@
             // Responsive behavior
             @include media-breakpoint-down(sm) {
               width: 100%;
+              display: flex;
+              flex-direction: column;
+
+              .course-info,
+              .wrapper-course-actions {
+                flex-grow: 1;
+
+                .action {
+                  @include margin-right(0);
+                }
+
+                .wrapper-action-more {
+                  padding-top: 3px;
+                }
+              }
             }
           }
 
@@ -786,6 +799,7 @@
     // TYPE: status
     &.message-status {
       border-color: $gray-l4;
+      margin-bottom: 0;
 
       .wrapper-message-primary {
         @include clearfix();
@@ -1001,9 +1015,8 @@
 
     &.message-related-programs {
       background: none;
-      margin-top: ($baseline/4);
-      margin-bottom: $baseline/2;
-      padding: 0;
+      padding: $baseline/2;
+      margin-bottom: 0;
 
       .related-programs-preface {
         @include float(left);

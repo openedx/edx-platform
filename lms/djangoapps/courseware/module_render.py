@@ -14,7 +14,7 @@ from django.core.cache import cache
 from django.template.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from edx_proctoring.services import ProctoringService
 from opaque_keys import InvalidKeyError
@@ -925,29 +925,32 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     Generic view for extensions. This is where AJAX calls go.
 
     Arguments:
+        request (Request): Django request.
+        course_id (str): Course containing the block
+        usage_id (str)
+        handler (str)
+        suffix (str)
 
-      - request -- the django request.
-      - location -- the module location. Used to look up the XModule instance
-      - course_id -- defines the course context for this request.
-
-    Return 403 error if the user is not logged in. Raises Http404 if
-    the location and course_id do not identify a valid module, the module is
-    not accessible by the user, or the module raises NotFoundError. If the
-    module raises any other error, it will escape this function.
+    Raises:
+        Http404: If the course is not found in the modulestore.
     """
-    if not request.user.is_authenticated():
-        return HttpResponse('Unauthenticated', status=403)
+    # NOTE (CCB): Allow anonymous GET calls (e.g. for transcripts). Modifying this view is simpler than updating
+    # the XBlocks to use `handle_xblock_callback_noauth`...which is practically identical to this view.
+    if request.method != 'GET' and not request.user.is_authenticated():
+        return HttpResponseForbidden()
+
+    request.user.known = request.user.is_authenticated()
 
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
-        raise Http404("Invalid location")
+        raise Http404('{} is not a valid course key'.format(course_id))
 
     with modulestore().bulk_operations(course_key):
         try:
             course = modulestore().get_course(course_key)
         except ItemNotFoundError:
-            raise Http404("invalid location")
+            raise Http404('{} does not exist in the modulestore'.format(course_id))
 
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 

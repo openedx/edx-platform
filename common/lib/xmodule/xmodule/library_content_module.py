@@ -640,3 +640,39 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
             if field.is_set_on(self):
                 xml_object.set(field_name, unicode(field.read_from(self)))
         return xml_object
+
+
+class LibrarySummary(object):
+    """
+    A library summary object which contains the fields required for library listing on studio.
+    """
+
+    def __init__(self, library_locator, display_name):
+        """
+        Initialize LibrarySummary
+
+        Arguments:
+        library_locator (LibraryLocator):  LibraryLocator object of the library.
+
+        display_name (unicode): display name of the library.
+        """
+        self.display_name = display_name if display_name else _(u"Empty")
+
+        self.id = library_locator  # pylint: disable=invalid-name
+        self.location = library_locator.make_usage_key('library', 'library')
+
+    @property
+    def display_org_with_default(self):
+        """
+        Org display names are not implemented. This just provides API compatibility with CourseDescriptor.
+        Always returns the raw 'org' field from the key.
+        """
+        return self.location.library_key.org
+
+    @property
+    def display_number_with_default(self):
+        """
+        Display numbers are not implemented. This just provides API compatibility with CourseDescriptor.
+        Always returns the raw 'library' field from the key.
+        """
+        return self.location.library_key.library

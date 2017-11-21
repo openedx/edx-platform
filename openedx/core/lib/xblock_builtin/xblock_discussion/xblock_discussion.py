@@ -3,21 +3,21 @@
 Discussion XBlock
 """
 import logging
+import urllib
 
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.urlresolvers import reverse
 from django.utils.translation import get_language_bidi
-
-from xblockutils.resources import ResourceLoader
-from xblockutils.studio_editable import StudioEditableXBlockMixin
-from xmodule.raw_module import RawDescriptor
-
 from xblock.core import XBlock
 from xblock.fields import Scope, String, UNIQUE_ID
 from xblock.fragment import Fragment
-from xmodule.xml_module import XmlParserMixin
+from xblockutils.resources import ResourceLoader
+from xblockutils.studio_editable import StudioEditableXBlockMixin
 
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
-
+from xmodule.raw_module import RawDescriptor
+from xmodule.xml_module import XmlParserMixin
 
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
@@ -167,9 +167,29 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
 
         self.add_resource_urls(fragment)
 
+        login_msg = ''
+
+        if not self.django_user.is_authenticated():
+            qs = urllib.urlencode({
+                'course_id': self.course_key,
+                'enrollment_action': 'enroll',
+                'email_opt_in': False,
+            })
+            login_msg = Text(_("You are not signed in. To view the discussion content, {sign_in_link} or "
+                               "{register_link}, and enroll in this course.")).format(
+                sign_in_link=HTML('<a href="{url}">{sign_in_label}</a>').format(
+                    sign_in_label=_('sign in'),
+                    url='{}?{}'.format(reverse('signin_user'), qs),
+                ),
+                register_link=HTML('<a href="/{url}">{register_label}</a>').format(
+                    register_label=_('register'),
+                    url='{}?{}'.format(reverse('register_user'), qs),
+                ),
+            )
+
         context = {
             'discussion_id': self.discussion_id,
-            'display_name': self.display_name if (self.display_name) else _("Discussion"),
+            'display_name': self.display_name if self.display_name else _("Discussion"),
             'user': self.django_user,
             'course_id': self.course_key,
             'discussion_category': self.discussion_category,
@@ -177,6 +197,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
             'can_create_thread': self.has_permission("create_thread"),
             'can_create_comment': self.has_permission("create_comment"),
             'can_create_subcomment': self.has_permission("create_sub_comment"),
+            'login_msg': login_msg,
         }
 
         fragment.add_content(self.runtime.render_template('discussion/_discussion_inline.html', context))

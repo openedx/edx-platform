@@ -290,7 +290,6 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.post(dispatch_url, {'position': 2})
         self.assertEquals(403, response.status_code)
-        self.assertEquals('Unauthenticated', response.content)
 
     def test_missing_position_handler(self):
         """

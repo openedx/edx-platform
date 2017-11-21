@@ -59,7 +59,7 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
             description=self.DESCRIPTION,
             template=self.TEMPLATE,
         )
-        self.url = reverse('certificates.views.update_example_certificate')
+        self.url = reverse('update_example_certificate')
 
         # Since rate limit counts are cached, we need to clear
         # this before each test.

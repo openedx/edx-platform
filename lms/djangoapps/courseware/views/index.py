@@ -8,12 +8,14 @@ import logging
 import urllib
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.template.context_processors import csrf
+from django.contrib.auth.views import redirect_to_login
 from django.core.urlresolvers import reverse
 from django.http import Http404
+from django.template.context_processors import csrf
 from django.utils.decorators import method_decorator
+from django.utils.functional import cached_property
+from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
@@ -29,19 +31,20 @@ from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
+from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace, WaffleFlagNamespace, CourseWaffleFlag
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, default_course_url_name
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.models import CourseRegistrationCode
 from student.views import is_course_blocked
-from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
-
+from .views import CourseTabView
 from ..access import has_access
-from ..access_utils import in_preview_mode, check_course_open_for_learner
+from ..access_utils import check_course_open_for_learner
 from ..courses import get_course_with_access, get_current_child, get_studio_url
 from ..entrance_exams import (
     course_has_entrance_exam,
@@ -52,9 +55,6 @@ from ..entrance_exams import (
 from ..masquerade import setup_masquerade
 from ..model_data import FieldDataCache
 from ..module_render import get_module_for_descriptor, toc_for_course
-from .views import (
-    CourseTabView,
-)
 
 log = logging.getLogger("edx.courseware.views.index")
 
@@ -66,7 +66,12 @@ class CoursewareIndex(View):
     """
     View class for the Courseware page.
     """
-    @method_decorator(login_required)
+
+    @cached_property
+    def enable_anonymous_courseware_access(self):
+        waffle_flag = CourseWaffleFlag(WaffleFlagNamespace(name='seo'), 'enable_anonymous_courseware_access')
+        return waffle_flag.is_enabled(self.course_key)
+
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     @method_decorator(ensure_valid_course_key)
@@ -91,7 +96,10 @@ class CoursewareIndex(View):
             position (unicode): position in module, eg of <sequential> module
         """
         self.course_key = CourseKey.from_string(course_id)
-        self.request = request
+
+        if not (request.user.is_authenticated() or self.enable_anonymous_courseware_access):
+            return redirect_to_login(request.get_full_path())
+
         self.original_chapter_url_name = chapter
         self.original_section_url_name = section
         self.chapter_url_name = chapter
@@ -108,11 +116,11 @@ class CoursewareIndex(View):
                 self.course = get_course_with_access(
                     request.user, 'load', self.course_key,
                     depth=CONTENT_DEPTH,
-                    check_if_enrolled=True,
+                    check_if_enrolled=not self.enable_anonymous_courseware_access,
                 )
                 self.is_staff = has_access(request.user, 'staff', self.course)
                 self._setup_masquerade_for_effective_user()
-                return self._get(request)
+                return self.render(request)
         except Exception as exception:  # pylint: disable=broad-except
             return CourseTabView.handle_exceptions(request, self.course, exception)
 
@@ -131,7 +139,7 @@ class CoursewareIndex(View):
         # Set the user in the request to the effective user.
         self.request.user = self.effective_user
 
-    def _get(self, request):
+    def render(self, request):
         """
         Render the index page.
         """
@@ -147,6 +155,28 @@ class CoursewareIndex(View):
                 self._redirect_if_not_requested_section()
                 self._save_positions()
                 self._prefetch_and_bind_section()
+
+        if not request.user.is_authenticated():
+            qs = urllib.urlencode({
+                'course_id': self.course_key,
+                'enrollment_action': 'enroll',
+                'email_opt_in': False,
+            })
+
+            PageLevelMessages.register_warning_message(
+                request,
+                Text(_("You are not signed in. To see additional course content, {sign_in_link} or "
+                       "{register_link}, and enroll in this course.")).format(
+                    sign_in_link=HTML('<a href="{url}">{sign_in_label}</a>').format(
+                        sign_in_label=_('sign in'),
+                        url='{}?{}'.format(reverse('signin_user'), qs),
+                    ),
+                    register_link=HTML('<a href="/{url}">{register_label}</a>').format(
+                        register_label=_('register'),
+                        url='{}?{}'.format(reverse('register_user'), qs),
+                    ),
+                )
+            )
 
         return render_to_response('courseware/courseware.html', self._create_courseware_context(request))
 
@@ -186,15 +216,20 @@ class CoursewareIndex(View):
         """
         Redirect to dashboard if the course is blocked due to non-payment.
         """
-        self.real_user = User.objects.prefetch_related("groups").get(id=self.real_user.id)
-        redeemed_registration_codes = CourseRegistrationCode.objects.filter(
-            course_id=self.course_key,
-            registrationcoderedemption__redeemed_by=self.real_user
-        )
+        redeemed_registration_codes = []
+
+        if self.request.user.is_authenticated():
+            self.real_user = User.objects.prefetch_related("groups").get(id=self.real_user.id)
+            redeemed_registration_codes = CourseRegistrationCode.objects.filter(
+                course_id=self.course_key,
+                registrationcoderedemption__redeemed_by=self.real_user
+            )
+
         if is_course_blocked(self.request, redeemed_registration_codes, self.course_key):
             # registration codes may be generated via Bulk Purchase Scenario
             # we have to check only for the invoice generated registration codes
             # that their invoice is valid or not
+            # TODO Update message to account for the fact that the user is not authenticated.
             log.warning(
                 u'User %s cannot access the course %s because payment has not yet been received',
                 self.real_user,
@@ -218,9 +253,11 @@ class CoursewareIndex(View):
         """
         Returns the preferred language for the actual user making the request.
         """
-        language_preference = get_user_preference(self.real_user, LANGUAGE_KEY)
-        if not language_preference:
-            language_preference = settings.LANGUAGE_CODE
+        language_preference = settings.LANGUAGE_CODE
+
+        if self.request.user.is_authenticated():
+            language_preference = get_user_preference(self.real_user, LANGUAGE_KEY)
+
         return language_preference
 
     def _is_masquerading_as_student(self):
@@ -445,10 +482,15 @@ class CoursewareIndex(View):
                 requested_child=requested_child,
             )
 
+        # NOTE (CCB): Pull the position from the URL for un-authenticated users. Otherwise, pull the saved
+        # state from the data store.
+        position = None if self.request.user.is_authenticated() else self.position
         section_context = {
             'activate_block_id': self.request.GET.get('activate_block_id'),
             'requested_child': self.request.GET.get("child"),
             'progress_url': reverse('progress', kwargs={'course_id': unicode(self.course_key)}),
+            'user_authenticated': self.request.user.is_authenticated(),
+            'position': position,
         }
         if previous_of_active_section:
             section_context['prev_url'] = _compute_section_url(previous_of_active_section, 'last')

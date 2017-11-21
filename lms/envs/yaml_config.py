@@ -319,7 +319,7 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
 
 ##################### LTI Provider #####################
 if FEATURES.get('ENABLE_LTI_PROVIDER'):
-    INSTALLED_APPS.append('lti_provider')
+    INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
     AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
 
 ################################ Settings for Credentials Service ################################

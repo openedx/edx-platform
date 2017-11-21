@@ -4,26 +4,26 @@ This must be run only after seed_permissions_roles.py!
 Creates default roles for all users in the provided course. Just runs through
 Enrollments.
 """
-from django.core.management.base import BaseCommand, CommandError
+from __future__ import print_function
 
+from django.core.management.base import BaseCommand
 from django_comment_common.models import assign_default_role_on_enrollment
 from student.models import CourseEnrollment
 
 
 class Command(BaseCommand):
-    args = 'course_id'
-    help = 'Add roles for all users in a course'
+    help = 'Add roles for all users in a course.'
+
+    def add_arguments(self, parser):
+        parser.add_argument('course_id',
+                            help='the edx course_id')
 
     def handle(self, *args, **options):
-        if len(args) == 0:
-            raise CommandError("Please provide a course id")
-        if len(args) > 1:
-            raise CommandError("Too many arguments")
-        course_id = args[0]
+        course_id = options['course_id']
 
-        print "Updated roles for ",
+        print('Updated roles for ', end=' ')
         for i, enrollment in enumerate(CourseEnrollment.objects.filter(course_id=course_id, is_active=1), start=1):
             assign_default_role_on_enrollment(None, enrollment)
             if i % 1000 == 0:
-                print "{0}...".format(i),
-        print
+                print('{0}...'.format(i), end=' ')
+        print()

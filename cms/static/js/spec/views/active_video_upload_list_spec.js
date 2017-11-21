@@ -43,7 +43,7 @@ define(
                 activeTranscriptPreferences: {},
                 videoTranscriptSettings: {
                     transcript_preferences_handler_url: '',
-                    transcription_plans: {}
+                    transcription_plans: null
                 },
                 isVideoTranscriptEnabled: isVideoTranscriptEnabled
             });

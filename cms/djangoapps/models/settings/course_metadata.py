@@ -28,6 +28,7 @@ class CourseMetadata(object):
         'end',
         'enrollment_start',
         'enrollment_end',
+        'certificate_available_date',
         'tabs',
         'graceperiod',
         'show_timezone',
@@ -59,6 +60,7 @@ class CourseMetadata(object):
         'show_correctness',
         'chrome',
         'default_tab',
+        'highlights_enabled_for_messaging',
     ]
 
     @classmethod
@@ -107,13 +109,6 @@ class CourseMetadata(object):
         # display the "Allow Unsupported XBlocks" setting.
         if not XBlockStudioConfigurationFlag.is_enabled():
             filtered_list.append('allow_unsupported_xblocks')
-
-        # TODO: https://openedx.atlassian.net/browse/EDUCATOR-736
-        # Before we roll out the auto-certs feature, move this to a good, shared
-        # place such that we're not repeating code found in LMS.
-        switches = WaffleSwitchNamespace(name=u'certificates', log_prefix=u'Certificates: ')
-        if not switches.is_enabled(u'instructor_paced_only'):
-            filtered_list.append('certificate_available_date')
 
         return filtered_list
 

@@ -5,7 +5,6 @@ from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
 
 import contentstore.views
-import django_cas.views
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
 import openedx.core.djangoapps.external_auth.views
@@ -141,6 +140,8 @@ urlpatterns = [
         contentstore.views.video_images_handler, name='video_images_handler'),
     url(r'^transcript_preferences/{}$'.format(settings.COURSE_KEY_PATTERN),
         contentstore.views.transcript_preferences_handler, name='transcript_preferences_handler'),
+    url(r'^transcript_credentials/{}$'.format(settings.COURSE_KEY_PATTERN),
+        contentstore.views.transcript_credentials_handler, name='transcript_credentials_handler'),
     url(r'^video_encodings_download/{}$'.format(settings.COURSE_KEY_PATTERN),
         contentstore.views.video_encodings_download, name='video_encodings_download'),
     url(r'^group_configurations/{}$'.format(settings.COURSE_KEY_PATTERN),
@@ -178,6 +179,8 @@ if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns.append(url(r'^status/', include('openedx.core.djangoapps.service_status.urls')))
 
 if settings.FEATURES.get('AUTH_USE_CAS'):
+    import django_cas.views
+
     urlpatterns += [
         url(r'^cas-auth/login/$', openedx.core.djangoapps.external_auth.views.cas_login, name="cas-login"),
         url(r'^cas-auth/logout/$', django_cas.views.logout, {'next_page': '/'}, name="cas-logout"),

@@ -25,15 +25,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import View
 from edx_rest_api_client.exceptions import SlumberBaseException
+from eventtracking import tracker
 from ipware.ip import get_ip
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from commerce.utils import EcommerceService, is_account_activation_requirement_disabled
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response, render_to_string
-from eventtracking import tracker
+from lms.djangoapps.commerce.utils import EcommerceService, is_account_activation_requirement_disabled
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.ssencrypt import has_valid_signature

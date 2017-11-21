@@ -641,12 +641,15 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             # Translators: {previous_hints} is the HTML of hints that have already been generated, {hint_number_prefix}
             # is a header for this hint, and {hint_text} is the text of the hint itself.
             # This string is being passed to translation only for possible reordering of the placeholders.
-            total_text = HTML(_('{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>')).format(
+            total_text = HTML(_('{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>')).format(
                 previous_hints=HTML(total_text),
-                # Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three hints.
-                # This text is shown in bold before the accompanying hint text.
-                hint_number_prefix=Text(_("Hint ({hint_num} of {hints_count}): ")).format(
-                    hint_num=counter + 1, hints_count=len(demand_hints)
+                list_start_tag=HTML('<li class="hint-index-{counter}" tabindex="-1">').format(counter=counter),
+                strong_text=HTML('<strong>{hint_number_prefix}</strong>').format(
+                    # Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three hints.
+                    # This text is shown in bold before the accompanying hint text.
+                    hint_number_prefix=Text(_("Hint ({hint_num} of {hints_count}): ")).format(
+                        hint_num=counter + 1, hints_count=len(demand_hints)
+                    )
                 ),
                 # Course-authored HTML demand hints are supported.
                 hint_text=HTML(get_inner_html_from_xpath(demand_hints[counter]))

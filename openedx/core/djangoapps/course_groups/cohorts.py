@@ -182,7 +182,7 @@ def bulk_cache_cohorts(course_key, users):
         cohorts_by_user = {
             membership.user: membership
             for membership in
-            CohortMembership.objects.filter(user__in=users, course_id=course_key).select_related('user__id')
+            CohortMembership.objects.filter(user__in=users, course_id=course_key).select_related('user')
         }
         for user, membership in cohorts_by_user.iteritems():
             cache[_cohort_cache_key(user.id, course_key)] = membership.course_user_group

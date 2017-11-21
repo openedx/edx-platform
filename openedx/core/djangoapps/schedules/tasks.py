@@ -1,8 +1,11 @@
 import datetime
 import logging
 
+import analytics
 from celery.task import task, Task
+from crum import CurrentRequestUserMiddleware
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 
@@ -17,7 +20,8 @@ from openedx.core.djangoapps.monitoring_utils import set_custom_metric
 from openedx.core.djangoapps.schedules import message_types
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 from openedx.core.djangoapps.schedules import resolvers
-
+from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
+from openedx.core.lib.celery.task_utils import emulate_http_request
 
 LOG = logging.getLogger(__name__)
 
@@ -99,15 +103,20 @@ class ScheduleMessageBaseTask(Task):
     ):
         msg_type = self.make_message_type(day_offset)
         site = Site.objects.select_related('configuration').get(id=site_id)
-        _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
-        return self.resolver(
-            self.async_send_task,
-            site,
-            deserialize(target_day_str),
-            day_offset,
-            bin_num,
-            override_recipient_email=override_recipient_email,
-        ).send(msg_type)
+        middleware_classes = [
+            CurrentRequestUserMiddleware,
+            CurrentSiteThemeMiddleware,
+        ]
+        with emulate_http_request(site=site, middleware_classes=middleware_classes):
+            _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
+            return self.resolver(
+                self.async_send_task,
+                site,
+                deserialize(target_day_str),
+                day_offset,
+                bin_num,
+                override_recipient_email=override_recipient_email,
+            ).send(msg_type)
 
     def make_message_type(self, day_offset):
         raise NotImplementedError
@@ -177,15 +186,45 @@ class ScheduleCourseUpdate(ScheduleMessageBaseTask):
 
 
 def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):
-    if _is_delivery_enabled(site_id, delivery_config_var, log_prefix):
+    site = Site.objects.select_related('configuration').get(pk=site_id)
+    if _is_delivery_enabled(site, delivery_config_var, log_prefix):
         msg = Message.from_string(msg_str)
-        _annonate_send_task_for_monitoring(msg)
-        LOG.debug('%s: Sending message = %s', log_prefix, msg_str)
-        ace.send(msg)
+
+        user = User.objects.get(username=msg.recipient.username)
+        middleware_classes = [
+            CurrentRequestUserMiddleware,
+            CurrentSiteThemeMiddleware,
+        ]
+        with emulate_http_request(site=site, user=user, middleware_classes=middleware_classes):
+            _annonate_send_task_for_monitoring(msg)
+            LOG.debug('%s: Sending message = %s', log_prefix, msg_str)
+            ace.send(msg)
+            _track_message_sent(site, user, msg)
 
 
-def _is_delivery_enabled(site_id, delivery_config_var, log_prefix):
-    site = Site.objects.get(pk=site_id)
+def _track_message_sent(site, user, msg):
+    properties = {
+        'site': site.domain,
+        'app_label': msg.app_label,
+        'name': msg.name,
+        'language': msg.language,
+        'uuid': unicode(msg.uuid),
+        'send_uuid': unicode(msg.send_uuid),
+    }
+    course_ids = msg.context.get('course_ids', [])
+    properties['num_courses'] = len(course_ids)
+    if len(course_ids) > 0:
+        properties['course_ids'] = course_ids[:10]
+        properties['primary_course_id'] = course_ids[0]
+
+    analytics.track(
+        user_id=user.id,
+        event='edx.bi.email.sent',
+        properties=properties
+    )
+
+
+def _is_delivery_enabled(site, delivery_config_var, log_prefix):
     if getattr(ScheduleConfig.current(site), delivery_config_var, False):
         return True
     else:

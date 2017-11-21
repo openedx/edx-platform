@@ -83,26 +83,13 @@ FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 
 FEATURES['ENABLE_BULK_ENROLLMENT_VIEW'] = True
 
+DEFAULT_MOBILE_AVAILABLE = True
+
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 
 # Enable a parental consent age limit for testing
 PARENTAL_CONSENT_AGE_LIMIT = 13
-
-_SYSTEM = 'lms'
-
-_REPORT_DIR = REPO_ROOT / 'reports' / _SYSTEM
-_REPORT_DIR.makedirs_p()
-_NOSEID_DIR = REPO_ROOT / '.testids' / _SYSTEM
-_NOSEID_DIR.makedirs_p()
-
-NOSE_ARGS = [
-    '--id-file', _NOSEID_DIR / 'noseids',
-]
-
-NOSE_PLUGINS = [
-    'openedx.core.djangolib.testing.utils.NoseDatabaseIsolation'
-]
 
 # Local Directories
 TEST_ROOT = path("test_root")
@@ -571,7 +558,7 @@ PROFILE_IMAGE_MIN_BYTES = 100
 
 # Enable the LTI provider feature for testing
 FEATURES['ENABLE_LTI_PROVIDER'] = True
-INSTALLED_APPS.append('lti_provider')
+INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
 AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
 
 # ORGANIZATIONS

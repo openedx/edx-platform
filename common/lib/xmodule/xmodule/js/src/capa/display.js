@@ -486,8 +486,8 @@
             this.focus_on_notification('submit');
         };
 
-        Problem.prototype.focus_on_hint_notification = function() {
-            this.focus_on_notification('hint');
+        Problem.prototype.focus_on_hint_notification = function(hintIndex) {
+            this.$('.notification-hint .notification-message > ol > li.hint-index-' + hintIndex).focus();
         };
 
         Problem.prototype.focus_on_save_notification = function() {
@@ -1312,7 +1312,7 @@
                         that.hintButton.attr({disabled: 'disabled'});
                     }
                     that.el.find('.notification-hint').show();
-                    that.focus_on_hint_notification();
+                    that.focus_on_hint_notification(nextIndex);
                 } else {
                     that.gentle_alert(response.msg);
                 }

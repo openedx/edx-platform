@@ -82,7 +82,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-10-30 10:18+0000\n"
+"POT-Creation-Date: 2017-11-14 09:37+0000\n"
 "PO-Revision-Date: 2017-09-28 17:01+0000\n"
 "Last-Translator: Zimeng Chen <schen@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -2289,10 +2289,8 @@ msgstr "אם שגיאה זו ממשיכה, אנא צור קשר עם צוות ה
 #. the placeholders.
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
-msgid ""
-"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
+msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
 msgstr ""
-"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
 
 #. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
@@ -4891,22 +4889,37 @@ msgstr ""
 msgid "Powered by Open edX"
 msgstr "מופעל על ידי Open edX"
 
+#: lms/djangoapps/branding/api.py lms/templates/static_templates/blog.html
+msgid "Blog"
+msgstr "בלוג"
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
+msgid "Contact Us"
+msgstr "צור קשר"
+
+#: lms/djangoapps/branding/api.py
+msgid "Help Center"
+msgstr "מרכז עזרה"
+
+#: lms/djangoapps/branding/api.py
+#: lms/templates/static_templates/media-kit.html
+msgid "Media Kit"
+msgstr "ערכת מדיה"
+
+#: lms/djangoapps/branding/api.py lms/templates/static_templates/donate.html
+msgid "Donate"
+msgstr "תרום"
+
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid "{platform_name} for Business"
 msgstr "{platform_name} לעסקים"
 
-#: lms/djangoapps/branding/api.py lms/templates/static_templates/blog.html
-msgid "Blog"
-msgstr "בלוג"
-
 #: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
 msgid "News"
 msgstr "חדשות"
-
-#: lms/djangoapps/branding/api.py
-msgid "Help Center"
-msgstr "מרכז עזרה"
 
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
 #: themes/red-theme/lms/templates/footer.html
@@ -4920,10 +4933,6 @@ msgstr "צור קשר"
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Careers"
 msgstr "קריירות"
-
-#: lms/djangoapps/branding/api.py lms/templates/static_templates/donate.html
-msgid "Donate"
-msgstr "תרום"
 
 #: lms/djangoapps/branding/api.py
 msgid "Terms of Service & Honor Code"
@@ -4950,11 +4959,6 @@ msgstr "מדיניות נגישות"
 msgid "Sitemap"
 msgstr "מפת אתר"
 
-#: lms/djangoapps/branding/api.py
-#: lms/templates/static_templates/media-kit.html
-msgid "Media Kit"
-msgstr "ערכת מדיה"
-
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
@@ -4965,6 +4969,14 @@ msgstr "ערכת מדיה"
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Terms of Service"
 msgstr "תנאי השימוש"
+
+#: lms/djangoapps/branding/api.py
+msgid "Affiliates"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Open edX"
+msgstr ""
 
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
@@ -5262,6 +5274,7 @@ msgstr ""
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr "כל הזכויות שמורות"
 
@@ -5862,6 +5875,26 @@ msgstr "התקדמות"
 msgid "Textbooks"
 msgstr "ספרי לימוד"
 
+#: lms/djangoapps/courseware/views/index.py
+#, python-brace-format
+msgid ""
+"You are not signed in. To see additional course content, {sign_in_link} or "
+"{register_link}, and enroll in this course."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/index.py
+#: lms/djangoapps/courseware/views/views.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "sign in"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/index.py
+#: lms/djangoapps/courseware/views/views.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/features/course_experience/views/course_home_messages.py
+msgid "register"
+msgstr ""
+
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your enrollment: Audit track"
 msgstr "הרשמתך: מסלול שומע חופשי"
@@ -5918,15 +5951,6 @@ msgstr "התעודה שלך זמינה"
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid "To see course content, {sign_in_link} or {register_link}."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "sign in"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-#: openedx/features/course_experience/views/course_home_messages.py
-msgid "register"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
@@ -6280,6 +6304,31 @@ msgstr "תפקיד"
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "full_name"
 msgstr "full_name"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.html
+#, python-format
+msgid "Hi %(thread_username)s"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.html
+#, python-format
+msgid ""
+"<h1> Hi %(thread_username)s, </h1> <p> %(comment_username)s made the "
+"following reply to %(thread_title)s at %(comment_created_at)s. </p> <p> "
+"%(comment_body)s </p> <p> <a href=\"%(post_link)s\"> View the "
+"discussion.</a> </p>"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.txt
+msgid "This is the reply to your thread:"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/subject.txt
+#, python-format
+msgid ""
+"\n"
+"Someone replied to your thread on %(platform_name)s\n"
+msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -8767,6 +8816,10 @@ msgid "You do not have permission to view this page."
 msgstr "אין לך הרשאה לצפות בעמוד זה."
 
 #: lms/djangoapps/student_account/views.py
+msgid "Some error occured during password change. Please try again"
+msgstr ""
+
+#: lms/djangoapps/student_account/views.py
 msgid "No email address provided."
 msgstr "לא סופקה כתובת דואר אלקטרוני."
 
@@ -9777,6 +9830,7 @@ msgid "Bookmark with usage_id: {usage_id} does not exist."
 msgstr "סימון בסימניה עם usage_id: {usage_id} לא קיים."
 
 #: openedx/core/djangoapps/catalog/models.py
+#: openedx/core/djangoapps/video_pipeline/models.py
 msgid "Internal API URL"
 msgstr "כתובת URL ל-API פנימי"
 
@@ -9790,6 +9844,17 @@ msgid ""
 "value greater than 0."
 msgstr ""
 "מצוין בשניות. אפשר אחסון במטמון של תגובות API על ידי הגדרתו לערך גדול מ-0."
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid "Long Term Cache Time To Live"
+msgstr ""
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Specified in seconds (defaults to 86400s, 24hr). In some cases the cache "
+"does needs to be refreshed less frequently. Enable long term caching of API "
+"responses by setting this to a value greater than 0."
+msgstr ""
 
 #: openedx/core/djangoapps/catalog/models.py
 msgid ""
@@ -10161,6 +10226,7 @@ msgid "Schedule"
 msgstr "קבע תאריך"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "Go to %(platform_name)s Home Page"
 msgstr ""
@@ -10171,47 +10237,57 @@ msgid "Sign In"
 msgstr "כניסה"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on LinkedIn"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Twitter"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Facebook"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Google Plus"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Reddit"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Download the iOS app on the Apple Store"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Download the Android app on the Google Play Store"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "View on Web"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Unsubscribe from this list"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr ""
 
@@ -10241,16 +10317,22 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 #, python-format
-msgid "Welcome to week %(week_num)s of our %(course_name)s course!"
+msgid "Welcome to week %(week_num)s of %(course_name)s!"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 #, python-format
-msgid "Welcome to week %(week_num)s of <strong>%(course_name)s</strong>!"
+msgid ""
+"We hope you're enjoying <strong>%(course_name)s</strong>! We want to let you"
+" know what you can look forward to in week %(week_num)s:"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
-msgid "Here is what you can look forward to learning this week:"
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt
+msgid ""
+"With self-paced courses, you learn on your own schedule. We encourage you to"
+" spend time with the course each week. Your focused attention will pay off "
+"in the end!"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
@@ -10260,13 +10342,13 @@ msgstr ""
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt
 #, python-format
 msgid ""
-"Welcome to week %(week_num)s of our %(course_name)s course! Here is what you"
-" can look forward to learning this week: %(week_summary)s"
+"We hope you're enjoying %(course_name)s! We want to let you know what you "
+"can look forward to in week %(week_num)s:"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/subject.txt
 #, python-format
-msgid "%(course_name)s - Welcome to Week %(week_num)s "
+msgid "Welcome to week %(week_num)s "
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
@@ -10320,6 +10402,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
@@ -10328,6 +10411,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
@@ -10355,6 +10439,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 msgid "Start learning now"
 msgstr ""
 
@@ -10838,6 +10923,16 @@ msgstr ""
 msgid "The course key for the course we would like to be auto-cohorted."
 msgstr "מפתח הקורס עבור הקורס שברצוננו להפוך לקבוצת לימוד אוטומטית."
 
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "edx-video-pipeline API URL."
+msgstr ""
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid ""
+"Username created for Video Pipeline Integration, e.g. "
+"video_pipeline_service_user."
+msgstr ""
+
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force On"
 msgstr "אלץ דלוק"
@@ -10901,6 +10996,13 @@ msgstr ""
 "שם תת קטגוריה עבור הדיון. השם הזה מופיע בחלונית השמאלית של פורום הדיונים של "
 "הקורס. "
 
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#, python-brace-format
+msgid ""
+"You are not signed in. To view the discussion content, {sign_in_link} or "
+"{register_link}, and enroll in this course."
+msgstr ""
+
 #: lms/templates/courseware/courseware.html
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
 msgid "Bookmarks"
@@ -10924,7 +11026,6 @@ msgstr ""
 
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "כניסה"
@@ -11375,6 +11476,10 @@ msgstr ""
 msgid "Access restricted to: {list_of_groups}"
 msgstr ""
 
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+msgid "The information you entered is incorrect."
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
 msgstr "נתוני סרטון וידאו נכנס ריקים."
@@ -11727,7 +11832,6 @@ msgstr "מספר הקורס"
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Courses"
 msgstr "קורסים"
@@ -11833,7 +11937,6 @@ msgstr "שפת הקורס"
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
 #: lms/templates/header/user_dropdown.html
-#: themes/edx.org/lms/templates/legacy_header.html
 msgid "Account"
 msgstr "חשבון"
 
@@ -11842,7 +11945,6 @@ msgstr "חשבון"
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/static_templates/help.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 #: wiki/plugins/help/wiki_plugin.py
 msgid "Help"
@@ -11897,12 +11999,6 @@ msgstr "הירשם ל-StudioX"
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Send an email to {email}"
 msgstr "שלח הודעת דואר אלקטרוני ל-{email}"
-
-#: cms/templates/widgets/sock.html
-#: themes/edx.org/cms/templates/widgets/sock.html
-#: themes/stanford-style/lms/templates/static_templates/about.html
-msgid "Contact Us"
-msgstr "צור קשר"
 
 #: cms/templates/widgets/tabs-aggregator.html
 #: lms/templates/courseware/static_tab.html
@@ -12873,7 +12969,6 @@ msgstr "אני מסכים {link_start}לקוד האתי{link_end}"
 #: lms/templates/register-form.html
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
@@ -13007,12 +13102,12 @@ msgid "Previous"
 msgstr "הקודם"
 
 #: lms/templates/seq_module.html
-msgid "Sequence"
-msgstr "רצף"
-
-#: lms/templates/seq_module.html
 msgid "Next"
 msgstr "הבא"
+
+#: lms/templates/seq_module.html
+msgid "Sequence"
+msgstr "רצף"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -13361,6 +13456,11 @@ msgstr "לוח בקרה של:"
 #: lms/templates/user_dropdown.html
 msgid "More options"
 msgstr "אפשרויות נוספות"
+
+#: lms/templates/user_dropdown.html lms/templates/header/header.html
+#: lms/templates/header/user_dropdown.html
+msgid "More Options"
+msgstr ""
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -15637,6 +15737,18 @@ msgid "Related Programs"
 msgstr "תכניות קשורות"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You can no longer access this course because payment has not yet been "
+"received. You can {contact_link_start}contact the account "
+"holder{contact_link_end} to request payment, or you can "
+"{unenroll_link_start}unenroll{unenroll_link_end} from this course"
+msgstr ""
+"אינך יכול יותר לגשת לקורס זה היות ולא התקבל תשלום. יש "
+"באפשרותך{contact_link_start}ליצור קשר עם בעל החשבון{contact_link_end} על מנת"
+" לבקש את התשלום או באפשרותך{unenroll_link_start}לבטל את "
+"ההרשמה{unenroll_link_end} בקורס זה."
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
 msgstr "אימות טרם הושלם"
 
@@ -15722,18 +15834,6 @@ msgstr ""
 "{line_break}{link_start}לקבלת מידע נוסף על {cert_name_long}{link_end} "
 "המאומת."
 
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You can no longer access this course because payment has not yet been "
-"received. You can {contact_link_start}contact the account "
-"holder{contact_link_end} to request payment, or you can "
-"{unenroll_link_start}unenroll{unenroll_link_end} from this course"
-msgstr ""
-"אינך יכול יותר לגשת לקורס זה היות ולא התקבל תשלום. יש "
-"באפשרותך{contact_link_start}ליצור קשר עם בעל החשבון{contact_link_end} על מנת"
-" לבקש את התשלום או באפשרותך{unenroll_link_start}לבטל את "
-"ההרשמה{unenroll_link_end} בקורס זה."
-
 #. Translators: provider_name is the name of a credit provider or university
 #. (e.g. State University)
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -15810,6 +15910,20 @@ msgstr ""
 msgid ""
 "An error occurred with this transaction. For help, contact {support_email}."
 msgstr "אירעה שגיאה בעסקה זו. לקבלת עזרה, צור קשר עם {support_email}."
+
+#: lms/templates/dashboard/_dashboard_show_consent.html
+msgid "Consent to share your data"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_show_consent.html
+msgid ""
+"To access this course, you must first consent to share your learning "
+"achievements with {enterprise_customer_name}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_show_consent.html
+msgid "View Consent"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Approved"
@@ -16875,12 +16989,11 @@ msgstr "הגש בקשה לעזרה כספית"
 msgid "{platform_name} Home Page"
 msgstr "{platform_name} עמוד הבית"
 
-#: lms/templates/header/header.html lms/templates/navigation/navigation.html
-msgid "Global"
-msgstr "גלובלי"
+#: lms/templates/header/header.html lms/templates/header/user_dropdown.html
+msgid "Options Menu"
+msgstr ""
 
 #: lms/templates/header/header.html lms/templates/navigation/navigation.html
-#: themes/edx.org/lms/templates/legacy_header.html
 msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
@@ -16892,7 +17005,6 @@ msgstr ""
 #: lms/templates/learner_dashboard/programs.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Programs"
 msgstr "תכניות"
@@ -16900,7 +17012,6 @@ msgstr "תכניות"
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Profile"
 msgstr "פרופיל"
@@ -16920,14 +17031,16 @@ msgstr "מנהל מערכת"
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Shopping Cart"
 msgstr "עגלת קניות"
 
 #: lms/templates/header/navbar-not-authenticated.html
+msgid "Supplemental Links"
+msgstr ""
+
+#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "How it Works"
 msgstr "כיצד זה עובד"
@@ -18612,6 +18725,10 @@ msgstr ""
 msgid "Explore Courses"
 msgstr "גלה קורסים"
 
+#: lms/templates/navigation/navigation.html
+msgid "Global"
+msgstr "גלובלי"
+
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""
 "\n"
@@ -19416,7 +19533,7 @@ msgid "Student Support: Certificates"
 msgstr "תמיכת סטודנט: תעודות"
 
 #: lms/templates/support/contact_us.html
-msgid "Contact US"
+msgid "{platform_name} Support: Contact Us"
 msgstr ""
 
 #: lms/templates/support/enrollment.html
@@ -19857,13 +19974,23 @@ msgid "Page Footer"
 msgstr "כותרת תחתונה של העמוד"
 
 #: themes/edx.org/lms/templates/footer.html
+msgid "edX Home Page"
+msgstr ""
+
+#: themes/edx.org/lms/templates/footer.html
+msgid "© 2012–{year} edX Inc. "
+msgstr ""
+
+#: themes/edx.org/lms/templates/footer.html
+msgid ""
+"EdX, Open edX, and MicroMasters are trademarks of edX Inc., registered in "
+"the U.S. and other countries."
+msgstr ""
+
+#: themes/edx.org/lms/templates/footer.html
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
 msgid "About edX"
 msgstr "אודות edX"
-
-#: themes/edx.org/lms/templates/footer.html
-msgid "edX Home Page"
-msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
@@ -19871,20 +19998,6 @@ msgid ""
 "edX and the edX and Open edX logos are registered trademarks or trademarks "
 "of edX Inc."
 msgstr ""
-
-#: themes/edx.org/lms/templates/legacy_header.html
-msgid "Main"
-msgstr ""
-
-#: themes/edx.org/lms/templates/legacy_header.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Find Courses"
-msgstr "חפש קורסים"
-
-#: themes/edx.org/lms/templates/legacy_header.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Schools & Partners"
-msgstr "מוסדות ושותפים"
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid "About edX Verified Certificates"
@@ -19955,6 +20068,14 @@ msgid ""
 msgstr ""
 "{b_start}תמוך במשימתנו: {b_end} EdX, מלכ\"ר, נסמכת על תעודות מאומתות על מנת "
 "לסייע במימון חינוך חינם לכל אדם בעולם"
+
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Find Courses"
+msgstr "חפש קורסים"
+
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Schools & Partners"
+msgstr "מוסדות ושותפים"
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.

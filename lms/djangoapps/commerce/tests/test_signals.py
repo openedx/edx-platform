@@ -18,13 +18,14 @@ from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from requests import Timeout
 
-from commerce.models import CommerceConfiguration
-from commerce.signals import create_zendesk_ticket, generate_refund_notification_body, send_refund_notification
-from commerce.tests import JSON
-from commerce.tests.mocks import mock_create_refund, mock_process_refund
 from course_modes.models import CourseMode
 from student.signals import REFUND_ORDER
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+
+from . import JSON
+from ..models import CommerceConfiguration
+from ..signals import create_zendesk_ticket, generate_refund_notification_body, send_refund_notification
+from .mocks import mock_create_refund, mock_process_refund
 
 ZENDESK_URL = 'http://zendesk.example.com/'
 ZENDESK_USER = 'test@example.com'
@@ -76,11 +77,11 @@ class TestRefundSignal(TestCase):
         Ensure that the receiver quietly bypasses attempts to initiate
         refunds when there is no external service configured.
         """
-        with mock.patch('commerce.signals.refund_seat') as mock_refund_seat:
+        with mock.patch('lms.djangoapps.commerce.signals.refund_seat') as mock_refund_seat:
             self.send_signal()
             self.assertFalse(mock_refund_seat.called)
 
-    @mock.patch('commerce.signals.refund_seat')
+    @mock.patch('lms.djangoapps.commerce.signals.refund_seat')
     def test_receiver(self, mock_refund_seat):
         """
         Ensure that the REFUND_ORDER signal triggers correct calls to
@@ -100,8 +101,8 @@ class TestRefundSignal(TestCase):
         self.send_signal()
         self.assertFalse(mock_refund_seat.called)
 
-    @mock.patch('commerce.signals.refund_seat')
-    @mock.patch('commerce.signals.get_request_user', return_value=None)
+    @mock.patch('lms.djangoapps.commerce.signals.refund_seat')
+    @mock.patch('lms.djangoapps.commerce.signals.get_request_user', return_value=None)
     def test_requester(self, mock_get_request_user, mock_refund_seat):
         """
         Ensure the right requester is specified when initiating refunds.
@@ -131,7 +132,7 @@ class TestRefundSignal(TestCase):
         self.send_signal()
         self.assertFalse(mock_refund_seat.called)
 
-    @mock.patch('commerce.signals.log.exception')
+    @mock.patch('lms.djangoapps.commerce.signals.log.exception')
     def test_error_logging(self, mock_log_exception):
         """
         Ensure that unexpected Exceptions are logged as errors (but do not
@@ -141,7 +142,7 @@ class TestRefundSignal(TestCase):
             self.send_signal()
             self.assertTrue(mock_log_exception.called)
 
-    @mock.patch('commerce.signals.send_refund_notification')
+    @mock.patch('lms.djangoapps.commerce.signals.send_refund_notification')
     def test_notification_when_approval_fails(self, mock_send_notification):
         """
         Ensure the notification function is triggered when refunds are initiated, and cannot be automatically approved.
@@ -156,7 +157,7 @@ class TestRefundSignal(TestCase):
                     self.assertTrue(mock_send_notification.called)
                     mock_send_notification.assert_called_with(self.course_enrollment, [failed_refund_id])
 
-    @mock.patch('commerce.signals.send_refund_notification')
+    @mock.patch('lms.djangoapps.commerce.signals.send_refund_notification')
     def test_notification_if_automatic_approval_disabled(self, mock_send_notification):
         """
         Ensure the notification is always sent if the automatic approval functionality is disabled.
@@ -170,7 +171,7 @@ class TestRefundSignal(TestCase):
             self.assertTrue(mock_send_notification.called)
             mock_send_notification.assert_called_with(self.course_enrollment, [refund_id])
 
-    @mock.patch('commerce.signals.send_refund_notification')
+    @mock.patch('lms.djangoapps.commerce.signals.send_refund_notification')
     def test_no_notification_after_approval(self, mock_send_notification):
         """
         Ensure the notification function is triggered when refunds are initiated, and cannot be automatically approved.
@@ -185,7 +186,7 @@ class TestRefundSignal(TestCase):
                 last_request = httpretty.last_request()
                 self.assertDictEqual(json.loads(last_request.body), {'action': 'approve_payment_only'})
 
-    @mock.patch('commerce.signals.send_refund_notification')
+    @mock.patch('lms.djangoapps.commerce.signals.send_refund_notification')
     def test_notification_no_refund(self, mock_send_notification):
         """
         Ensure the notification function is NOT triggered when no refunds are
@@ -195,7 +196,7 @@ class TestRefundSignal(TestCase):
             self.send_signal()
             self.assertFalse(mock_send_notification.called)
 
-    @mock.patch('commerce.signals.send_refund_notification')
+    @mock.patch('lms.djangoapps.commerce.signals.send_refund_notification')
     @ddt.data(
         CourseMode.HONOR,
         CourseMode.PROFESSIONAL,
@@ -216,8 +217,8 @@ class TestRefundSignal(TestCase):
             self.send_signal()
             self.assertFalse(mock_send_notification.called)
 
-    @mock.patch('commerce.signals.send_refund_notification', side_effect=Exception("Splat!"))
-    @mock.patch('commerce.signals.log.warning')
+    @mock.patch('lms.djangoapps.commerce.signals.send_refund_notification', side_effect=Exception("Splat!"))
+    @mock.patch('lms.djangoapps.commerce.signals.log.warning')
     def test_notification_error(self, mock_log_warning, mock_send_notification):
         """
         Ensure an error occuring during notification does not break program

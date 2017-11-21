@@ -110,6 +110,8 @@
   .window-wrap,
   .content-wrapper {
     background-color: $body-bg;
+    padding: 0;
+    margin-top: 0;
   }
 
   .page-banner {
@@ -119,6 +121,7 @@
     .user-messages {
       max-width: map-get($container-max-widths, xl);
       margin: auto;
+      padding: $baseline/2;
     }
   }
 
@@ -265,7 +268,7 @@
       margin: 0 auto;
       border-bottom: 1px solid $gray-l3;
       background-color: $gray-l4;
-      padding: ($baseline*0.75) 0;
+      padding: ($baseline*0.75) 5%;
 
       .u-field-account_privacy {
         @extend .container;
@@ -273,6 +276,7 @@
         border: none;
         box-shadow: none;
         padding: 0;
+        margin: 0;
 
         @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
           max-width: calc(100% - 40px);
@@ -311,11 +315,11 @@
 
   .wrapper-profile-sections {
     @extend .container;
-
-    @include padding($baseline*1.5, 0, $baseline*1.5, 0);
+    @include padding($baseline*1.5, 5%, $baseline*1.5, 5%);
 
     display: flex;
     min-width: 0;
+    max-width: 100%;
 
     @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
       @include margin-left(0);
@@ -327,11 +331,7 @@
   .profile-header {
     max-width: map-get($container-max-widths, xl);
     margin: auto;
-    padding: $baseline 0 0;
-
-    @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
-      @include padding(0, $baseline*2, $baseline, $baseline*0.75);
-    }
+    padding: $baseline 5% 0;
 
     .header {
       @extend %t-title4;
@@ -347,8 +347,7 @@
 
   .wrapper-profile-section-container-one {
     @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
-      width: 90%;
-      padding: 0 5%;
+      width: 100%;
     }
 
     .wrapper-profile-section-one {
@@ -481,7 +480,7 @@
     @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
       width: 90%;
       margin-top: $baseline;
-      padding: 0 5%;
+      padding: 0;
     }
 
     .u-field-textarea {

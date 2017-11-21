@@ -504,7 +504,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
 
         odata_company_id = 'NCC1701D'
         odata_api_root_url = 'http://api.successfactors.com/odata/v2/'
-        mocked_odata_ai_url = self._mock_odata_api_for_error(odata_api_root_url, self.USER_USERNAME)
+        mocked_odata_api_url = self._mock_odata_api_for_error(odata_api_root_url, self.USER_USERNAME)
         self._configure_testshib_provider(
             identity_provider_type='sap_success_factors',
             metadata_source=TESTSHIB_METADATA_URL,
@@ -520,7 +520,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
             super(SuccessFactorsIntegrationTest, self).test_register()
             logging_messages = str([log_msg.getMessage() for log_msg in log_capture.records]).replace('\\', '')
             self.assertIn(odata_company_id, logging_messages)
-            self.assertIn(mocked_odata_ai_url, logging_messages)
+            self.assertIn(mocked_odata_api_url, logging_messages)
             self.assertIn(self.USER_USERNAME, logging_messages)
             self.assertIn("SAPSuccessFactors", logging_messages)
             self.assertIn("Error message", logging_messages)

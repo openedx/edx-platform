@@ -199,6 +199,7 @@
 
     .btn-link {
       color: palette(grayscale, base);
+      border-color: transparent;
     }
   }
 }
@@ -275,9 +276,22 @@
       }
     }
 
-    .section-tools .course-tool:not(:first-child) {
-      margin-top: ($baseline / 5);
+    .section-tools .course-tool {
+      .course-tool-link:visited {
+        color: theme-color("primary");
+      }
+
+      &:not(:first-child) {
+        margin-top: ($baseline / 5);
+      }
     }
+  }
+
+  @include media-breakpoint-down(sm) {
+    @include padding-left(0);
+
+    border-top: 1px solid theme-color("light");
+    padding-top: $baseline;
   }
 }
 
@@ -321,6 +335,8 @@
         margin: 0 0 ($baseline / 2) 0;
 
         .subsection {
+          @include margin-left(10px);
+
           list-style-type: none;
           border: 1px solid transparent;
           border-radius: 3px;
@@ -480,6 +496,7 @@
       top: $baseline * (-1/2);
       right: $baseline / 2;
       cursor: pointer;
+      background-color: theme-color("primary");
     }
   }
 

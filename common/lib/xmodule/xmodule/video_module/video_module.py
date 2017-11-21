@@ -216,7 +216,8 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         # Determine if there is an alternative source for this video
         # based on user locale.  This exists to support cases where
         # we leverage a geography specific CDN, like China.
-        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
+        default_cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get('default')
+        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location, default_cdn_url)
 
         # If we have an edx_video_id, we prefer its values over what we store
         # internally for download links (source, html5_sources) and the youtube

@@ -2,11 +2,11 @@
 URL mappings for the Survey feature
 """
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-urlpatterns = patterns(
-    'survey.views',
+from survey import views
 
-    url(r'^(?P<survey_name>[0-9A-Za-z]+)/$', 'view_survey', name='view_survey'),
-    url(r'^(?P<survey_name>[0-9A-Za-z]+)/answers/$', 'submit_answers', name='submit_answers'),
-)
+urlpatterns = [
+    url(r'^(?P<survey_name>[0-9A-Za-z]+)/$', views.view_survey, name='view_survey'),
+    url(r'^(?P<survey_name>[0-9A-Za-z]+)/answers/$', views.submit_answers, name='submit_answers'),
+]

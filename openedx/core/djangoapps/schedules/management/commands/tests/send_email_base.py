@@ -1,32 +1,32 @@
-from collections import namedtuple, defaultdict
-from copy import deepcopy
 import datetime
-import ddt
 import logging
+from collections import defaultdict, namedtuple
+from copy import deepcopy
 
 import attr
+import ddt
+import pytz
 from django.conf import settings
+from edx_ace.channel import ChannelType
+from edx_ace.test_utils import StubPolicy, patch_channels, patch_policies
+from edx_ace.utils.date import serialize
 from freezegun import freeze_time
 from mock import Mock, patch
-import pytz
+from opaque_keys.edx.keys import CourseKey
 
-from commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration
-from edx_ace.channel import ChannelType
-from edx_ace.utils.date import serialize
-from edx_ace.test_utils import StubPolicy, patch_channels, patch_policies
-from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
+from lms.djangoapps.commerce.models import CommerceConfiguration
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.resolvers import _get_datetime_beginning_of_day
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory, ScheduleFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from openedx.core.djangolib.testing.utils import FilteredQueryCountMixin, CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, FilteredQueryCountMixin
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-
 
 SITE_QUERY = 1  # django_site
 SITE_CONFIG_QUERY = 1  # site_configuration_siteconfiguration
@@ -39,9 +39,15 @@ ORG_DEADLINE_QUERY = 1  # courseware_orgdynamicupgradedeadlineconfiguration
 COURSE_DEADLINE_QUERY = 1  # courseware_coursedynamicupgradedeadlineconfiguration
 COMMERCE_CONFIG_QUERY = 1  # commerce_commerceconfiguration
 
+USER_QUERY = 1  # auth_user
+THEME_PREVIEW_QUERY = 1
+THEME_QUERY = 1  # theming_sitetheme
+SCHEDULE_CONFIG_QUERY = 1  # schedules_scheduleconfig
+
 NUM_QUERIES_SITE_SCHEDULES = (
     SITE_QUERY +
     SITE_CONFIG_QUERY +
+    THEME_QUERY +
     SCHEDULES_QUERY
 )
 
@@ -51,6 +57,14 @@ NUM_QUERIES_FIRST_MATCH = (
     + ORG_DEADLINE_QUERY
     + COURSE_DEADLINE_QUERY
     + COMMERCE_CONFIG_QUERY
+)
+
+NUM_QUERIES_PER_MESSAGE_DELIVERY = (
+    SITE_QUERY +
+    SCHEDULE_CONFIG_QUERY +
+    USER_QUERY +
+    THEME_PREVIEW_QUERY +
+    THEME_QUERY
 )
 
 LOG = logging.getLogger(__name__)
@@ -220,10 +234,12 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
     @patch.object(tasks, 'ace')
     @patch.object(tasks, 'Message')
     def test_deliver_config(self, is_enabled, mock_message, mock_ace):
+        user = UserFactory.create()
         schedule_config_kwargs = {
             'site': self.site_config.site,
             self.deliver_config: is_enabled,
         }
+        mock_message.from_string.return_value.recipient.username = user.username
         ScheduleConfigFactory.create(**schedule_config_kwargs)
 
         mock_msg = Mock()
@@ -384,8 +400,10 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
             num_expected_messages = 1 if self.consolidates_emails_for_learner else message_count
             self.assertEqual(len(sent_messages), num_expected_messages)
 
-            with self.assertNumQueries(2):
-                self.deliver_task(*sent_messages[0])
+            with self.assertNumQueries(NUM_QUERIES_PER_MESSAGE_DELIVERY):
+                with patch('analytics.track') as mock_analytics_track:
+                    self.deliver_task(*sent_messages[0])
+                    self.assertEqual(mock_analytics_track.call_count, 1)
 
             self.assertEqual(mock_channel.deliver.call_count, 1)
             for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
@@ -393,6 +411,8 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
                     self.assertNotIn("TEMPLATE WARNING", template)
                     self.assertNotIn("{{", template)
                     self.assertNotIn("}}", template)
+
+            return mock_channel.deliver.mock_calls
 
     def _check_if_email_sent_for_experience(self, test_config):
         current_day, offset, target_day, _ = self._get_dates(offset=test_config.offset)
@@ -413,3 +433,10 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
             ))
 
             self.assertEqual(mock_ace.send.called, test_config.email_sent)
+
+    @with_comprehensive_theme('red-theme')
+    def test_templates_with_theme(self):
+        calls_to_deliver = self._assert_template_for_offset(self.expected_offsets[0], 1)
+
+        _name, (_msg, email), _kwargs = calls_to_deliver[0]
+        self.assertIn('TEST RED THEME MARKER', email.body_html)

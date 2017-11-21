@@ -163,8 +163,10 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * This xBlock's Highlights to message to learners.
              */
-            highlights: null,
-            highlights_enabled: null
+            highlights: [],
+            highlights_enabled: false,
+            highlights_preview_only: true,
+            highlights_doc_url: ''
         },
 
         initialize: function() {

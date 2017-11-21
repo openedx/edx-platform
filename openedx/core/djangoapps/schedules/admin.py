@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from . import models
@@ -32,6 +33,15 @@ class ScheduleAdmin(admin.ModelAdmin):
         return qs
 
 
+class ScheduleConfigAdminForm(forms.ModelForm):
+
+    def clean_hold_back_ratio(self):
+        hold_back_ratio = self.cleaned_data["hold_back_ratio"]
+        if hold_back_ratio < 0 or hold_back_ratio > 1:
+            raise forms.ValidationError("Invalid hold back ratio, the value must be between 0 and 1.")
+        return hold_back_ratio
+
+
 @admin.register(models.ScheduleConfig)
 class ScheduleConfigAdmin(admin.ModelAdmin):
     search_fields = ('site',)
@@ -40,4 +50,6 @@ class ScheduleConfigAdmin(admin.ModelAdmin):
         'enqueue_recurring_nudge', 'deliver_recurring_nudge',
         'enqueue_upgrade_reminder', 'deliver_upgrade_reminder',
         'enqueue_course_update', 'deliver_course_update',
+        'hold_back_ratio',
     )
+    form = ScheduleConfigAdminForm

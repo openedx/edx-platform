@@ -14,11 +14,11 @@ from pytz import UTC
 from waffle.models import Flag
 from waffle.testutils import override_flag
 
-from commerce.models import CommerceConfiguration
-from commerce.utils import EcommerceService
-from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
 from course_modes.models import CourseMode
 from courseware.tests.factories import StaffFactory
+from lms.djangoapps.commerce.models import CommerceConfiguration
+from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.features.course_experience import (
     SHOW_REVIEWS_TOOL_FLAG,
@@ -26,14 +26,15 @@ from openedx.features.course_experience import (
     UNIFIED_COURSE_TAB_FLAG
 )
 from student.models import CourseEnrollment
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.date_utils import strftime_localized
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+
+from ... import COURSE_PRE_START_ACCESS_FLAG, ENABLE_COURSE_GOALS
 from .helpers import add_course_mode
 from .test_course_updates import create_course_update, remove_course_updates
-from ... import COURSE_PRE_START_ACCESS_FLAG, ENABLE_COURSE_GOALS
 
 TEST_PASSWORD = 'test'
 TEST_CHAPTER_NAME = 'Test Chapter'

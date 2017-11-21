@@ -46,6 +46,7 @@ class ScheduleConfig(ConfigurationModel):
     deliver_upgrade_reminder = models.BooleanField(default=False)
     enqueue_course_update = models.BooleanField(default=False)
     deliver_course_update = models.BooleanField(default=False)
+    hold_back_ratio = models.FloatField(default=0)
 
 
 class ScheduleExperience(models.Model):

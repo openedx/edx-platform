@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-02 09:35+0000\n"
-"PO-Revision-Date: 2017-11-02 09:35:50.719930\n"
+"POT-Creation-Date: 2017-11-16 11:00+0000\n"
+"PO-Revision-Date: 2017-11-16 11:00:28.867741\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -87,6 +87,11 @@ msgstr "سعزسثذفهخر"
 #: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr "عرهف"
+
+#: cms/djangoapps/contentstore/views/helpers.py
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Empty"
+msgstr "ثوحفغ"
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
@@ -2279,10 +2284,8 @@ msgstr "هب فاهس ثققخق حثقسهسفس, حمثشسث ذخرفشذف �
 #. the placeholders.
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
-msgid ""
-"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
-msgstr ""
-"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
+msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
+msgstr "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
 
 #. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
@@ -5371,6 +5374,7 @@ msgstr ""
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr "شمم قهلافس قثسثقدثي"
 
@@ -6006,6 +6010,28 @@ msgstr "حقخلقثسس"
 msgid "Textbooks"
 msgstr "فثطفزخخنس"
 
+#: lms/djangoapps/courseware/views/index.py
+#, python-brace-format
+msgid ""
+"You are not signed in. To see additional course content, {sign_in_link} or "
+"{register_link}, and enroll in this course."
+msgstr ""
+"غخع شقث رخف سهلرثي هر. فخ سثث شييهفهخرشم ذخعقسث ذخرفثرف, {sign_in_link} خق "
+"{register_link}, شري ثرقخمم هر فاهس ذخعقسث."
+
+#: lms/djangoapps/courseware/views/index.py
+#: lms/djangoapps/courseware/views/views.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "sign in"
+msgstr "سهلر هر"
+
+#: lms/djangoapps/courseware/views/index.py
+#: lms/djangoapps/courseware/views/views.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/features/course_experience/views/course_home_messages.py
+msgid "register"
+msgstr "قثلهسفثق"
+
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your enrollment: Audit track"
 msgstr "غخعق ثرقخمموثرف: شعيهف فقشذن"
@@ -6067,15 +6093,6 @@ msgstr "غخعق ذثقفهبهذشفث هس شدشهمشزمث"
 #, python-brace-format
 msgid "To see course content, {sign_in_link} or {register_link}."
 msgstr "فخ سثث ذخعقسث ذخرفثرف, {sign_in_link} خق {register_link}."
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "sign in"
-msgstr "سهلر هر"
-
-#: lms/djangoapps/courseware/views/views.py
-#: openedx/features/course_experience/views/course_home_messages.py
-msgid "register"
-msgstr "قثلهسفثق"
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
@@ -6433,6 +6450,39 @@ msgstr "قخمث"
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "full_name"
 msgstr "بعمم_رشوث"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
+#, python-format
+msgid "%(comment_username)s replied to your thread."
+msgstr "%(comment_username)s قثحمهثي فخ غخعق فاقثشي."
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
+#, python-format
+msgid ""
+"<p> Hi %(thread_username)s, </p> <p> %(comment_username)s made the following"
+" reply to %(thread_title)s at %(comment_created_at)s. </p> <p> "
+"%(comment_body)s </p>"
+msgstr ""
+"<p> اه %(thread_username)s, </p> <p> %(comment_username)s وشيث فاث بخممخصهرل"
+" قثحمغ فخ %(thread_title)s شف %(comment_created_at)s. </p> <p> "
+"%(comment_body)s </p>"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
+msgid "View the discussion"
+msgstr "دهثص فاث يهسذعسسهخر"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
+msgid "This is the reply to your thread:"
+msgstr "فاهس هس فاث قثحمغ فخ غخعق فاقثشي:"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/subject.txt
+#, python-format
+msgid ""
+"\n"
+"Someone replied to your thread on %(platform_name)s\n"
+msgstr ""
+"\n"
+"سخوثخرث قثحمهثي فخ غخعق فاقثشي خر %(platform_name)s\n"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -9017,6 +9067,10 @@ msgid "You do not have permission to view this page."
 msgstr "غخع يخ رخف اشدث حثقوهسسهخر فخ دهثص فاهس حشلث."
 
 #: lms/djangoapps/student_account/views.py
+msgid "Some error occured during password change. Please try again"
+msgstr "سخوث ثققخق خذذعقثي يعقهرل حشسسصخقي ذاشرلث. حمثشسث فقغ شلشهر"
+
+#: lms/djangoapps/student_account/views.py
 msgid "No email address provided."
 msgstr "رخ ثوشهم شييقثسس حقخدهيثي."
 
@@ -10041,6 +10095,7 @@ msgid "Bookmark with usage_id: {usage_id} does not exist."
 msgstr "زخخنوشقن صهفا عسشلث_هي: {usage_id} يخثس رخف ثطهسف."
 
 #: openedx/core/djangoapps/catalog/models.py
+#: openedx/core/djangoapps/video_pipeline/models.py
 msgid "Internal API URL"
 msgstr "هرفثقرشم شحه عقم"
 
@@ -10055,6 +10110,20 @@ msgid ""
 msgstr ""
 "سحثذهبهثي هر سثذخريس. ثرشزمث ذشذاهرل خب شحه قثسحخرسثس زغ سثففهرل فاهس فخ ش "
 "دشمعث لقثشفثق فاشر 0."
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid "Long Term Cache Time To Live"
+msgstr "مخرل فثقو ذشذاث فهوث فخ مهدث"
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Specified in seconds (defaults to 86400s, 24hr). In some cases the cache "
+"does needs to be refreshed less frequently. Enable long term caching of API "
+"responses by setting this to a value greater than 0."
+msgstr ""
+"سحثذهبهثي هر سثذخريس (يثبشعمفس فخ 86400س, 24اق). هر سخوث ذشسثس فاث ذشذاث "
+"يخثس رثثيس فخ زث قثبقثساثي مثسس بقثضعثرفمغ. ثرشزمث مخرل فثقو ذشذاهرل خب شحه "
+"قثسحخرسثس زغ سثففهرل فاهس فخ ش دشمعث لقثشفثق فاشر 0."
 
 #: openedx/core/djangoapps/catalog/models.py
 msgid ""
@@ -10440,58 +10509,70 @@ msgid "Schedule"
 msgstr "سذاثيعمث"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "Go to %(platform_name)s Home Page"
 msgstr "لخ فخ %(platform_name)s اخوث حشلث"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #: cms/templates/login.html cms/templates/widgets/header.html
 #: themes/red-theme/cms/templates/login.html
 msgid "Sign In"
 msgstr "سهلر هر"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on LinkedIn"
 msgstr "%(platform_name)s خر مهرنثيهر"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Twitter"
 msgstr "%(platform_name)s خر فصهففثق"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Facebook"
 msgstr "%(platform_name)s خر بشذثزخخن"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Google Plus"
 msgstr "%(platform_name)s خر لخخلمث حمعس"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Reddit"
 msgstr "%(platform_name)s خر قثييهف"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Download the iOS app on the Apple Store"
 msgstr "يخصرمخشي فاث هخس شحح خر فاث شححمث سفخقث"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Download the Android app on the Google Play Store"
 msgstr "يخصرمخشي فاث شريقخهي شحح خر فاث لخخلمث حمشغ سفخقث"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "View on Web"
 msgstr "دهثص خر صثز"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Unsubscribe from this list"
 msgstr "عرسعزسذقهزث بقخو فاهس مهسف"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "خعق وشهمهرل شييقثسس هس"
 
@@ -10500,6 +10581,7 @@ msgid "edX Email"
 msgstr "ثيط ثوشهم"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.txt
 #, python-format
 msgid ""
 "Don't miss the opportunity to highlight your new knowledge and skills by "
@@ -10511,33 +10593,34 @@ msgstr ""
 "%(user_schedule_upgrade_deadline_time)s."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.txt
 msgid "Upgrade Now"
 msgstr "عحلقشيث رخص"
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.txt
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+#, python-format
+msgid "Welcome to week %(week_num)s of %(course_name)s!"
+msgstr "صثمذخوث فخ صثثن %(week_num)s خب %(course_name)s!"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 #, python-format
 msgid ""
-"Don't miss the opportunity to highlight your new knowledge and skills by "
-"earning a verified certificate. Upgrade by "
-"%(user_schedule_upgrade_deadline_time)s. Upgrade Now! <%(upsell_link)s>"
+"We hope you're enjoying <strong>%(course_name)s</strong>! We want to let you"
+" know what you can look forward to in week %(week_num)s:"
 msgstr ""
-"يخر'ف وهسس فاث خححخقفعرهفغ فخ اهلامهلاف غخعق رثص نرخصمثيلث شري سنهممس زغ "
-"ثشقرهرل ش دثقهبهثي ذثقفهبهذشفث. عحلقشيث زغ "
-"%(user_schedule_upgrade_deadline_time)s. عحلقشيث رخص! <%(upsell_link)s>"
+"صث اخحث غخع'قث ثرتخغهرل <strong>%(course_name)s</strong>! صث صشرف فخ مثف غخع"
+" نرخص صاشف غخع ذشر مخخن بخقصشقي فخ هر صثثن %(week_num)s:"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
-#, python-format
-msgid "Welcome to week %(week_num)s of our %(course_name)s course!"
-msgstr "صثمذخوث فخ صثثن %(week_num)s خب خعق %(course_name)s ذخعقسث!"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
-#, python-format
-msgid "Welcome to week %(week_num)s of <strong>%(course_name)s</strong>!"
-msgstr "صثمذخوث فخ صثثن %(week_num)s خب <strong>%(course_name)s</strong>!"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
-msgid "Here is what you can look forward to learning this week:"
-msgstr "اثقث هس صاشف غخع ذشر مخخن بخقصشقي فخ مثشقرهرل فاهس صثثن:"
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt
+msgid ""
+"With self-paced courses, you learn on your own schedule. We encourage you to"
+" spend time with the course each week. Your focused attention will pay off "
+"in the end!"
+msgstr ""
+"صهفا سثمب-حشذثي ذخعقسثس, غخع مثشقر خر غخعق خصر سذاثيعمث. صث ثرذخعقشلث غخع فخ"
+" سحثري فهوث صهفا فاث ذخعقسث ثشذا صثثن. غخعق بخذعسثي شففثرفهخر صهمم حشغ خبب "
+"هر فاث ثري!"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 msgid "Resume your course now"
@@ -10546,16 +10629,16 @@ msgstr "قثسعوث غخعق ذخعقسث رخص"
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt
 #, python-format
 msgid ""
-"Welcome to week %(week_num)s of our %(course_name)s course! Here is what you"
-" can look forward to learning this week:"
+"We hope you're enjoying %(course_name)s! We want to let you know what you "
+"can look forward to in week %(week_num)s:"
 msgstr ""
-"صثمذخوث فخ صثثن %(week_num)s خب خعق %(course_name)s ذخعقسث! اثقث هس صاشف غخع"
-" ذشر مخخن بخقصشقي فخ مثشقرهرل فاهس صثثن:"
+"صث اخحث غخع'قث ثرتخغهرل %(course_name)s! صث صشرف فخ مثف غخع نرخص صاشف غخع "
+"ذشر مخخن بخقصشقي فخ هر صثثن %(week_num)s:"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/subject.txt
 #, python-format
-msgid "%(course_name)s - Welcome to Week %(week_num)s "
-msgstr "%(course_name)s - صثمذخوث فخ صثثن %(week_num)s "
+msgid "Welcome to week %(week_num)s "
+msgstr "صثمذخوث فخ صثثن %(week_num)s "
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #, python-format
@@ -10622,6 +10705,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
@@ -10632,6 +10716,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
@@ -10666,6 +10751,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 msgid "Start learning now"
 msgstr "سفشقف مثشقرهرل رخص"
 
@@ -11171,6 +11257,20 @@ msgstr "يهسوهسس"
 msgid "The course key for the course we would like to be auto-cohorted."
 msgstr "فاث ذخعقسث نثغ بخق فاث ذخعقسث صث صخعمي مهنث فخ زث شعفخ-ذخاخقفثي."
 
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "Oauth client name of video pipeline service."
+msgstr "خشعفا ذمهثرف رشوث خب دهيثخ حهحثمهرث سثقدهذث."
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "edx-video-pipeline API URL."
+msgstr "ثيط-دهيثخ-حهحثمهرث شحه عقم."
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid ""
+"Username created for Video Pipeline Integration, e.g. veda_service_user."
+msgstr ""
+"عسثقرشوث ذقثشفثي بخق دهيثخ حهحثمهرث هرفثلقشفهخر, ث.ل. دثيش_سثقدهذث_عسثق."
+
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force On"
 msgstr "بخقذث خر"
@@ -11235,6 +11335,15 @@ msgstr ""
 "ش سعزذشفثلخقغ رشوث بخق فاث يهسذعسسهخر. فاهس رشوث شححثشقس هر فاث مثبف حشرث خب"
 " فاث يهسذعسسهخر بخقعو بخق فاث ذخعقسث."
 
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#, python-brace-format
+msgid ""
+"You are not signed in. To view the discussion content, {sign_in_link} or "
+"{register_link}, and enroll in this course."
+msgstr ""
+"غخع شقث رخف سهلرثي هر. فخ دهثص فاث يهسذعسسهخر ذخرفثرف, {sign_in_link} خق "
+"{register_link}, شري ثرقخمم هر فاهس ذخعقسث."
+
 #: openedx/features/course_bookmarks/plugins.py
 #: openedx/features/course_bookmarks/views/course_bookmarks.py
 #: lms/templates/courseware/courseware.html
@@ -11261,7 +11370,6 @@ msgstr "{sign_in_link} خق {register_link} شري فاثر ثرقخمم هر ف
 #: openedx/features/course_experience/views/course_home_messages.py
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "سهلر هر"
@@ -11614,10 +11722,6 @@ msgstr "ذخعقسث سعذذثسسبعممغ ثطحخقفثي فخ لهف قث�
 msgid "Vertical"
 msgstr "دثقفهذشم"
 
-#: cms/djangoapps/contentstore/views/helpers.py
-msgid "Empty"
-msgstr "ثوحفغ"
-
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
 msgstr "بهمث عحمخشي ذخققعحفثي. حمثشسث فقغ شلشهر"
@@ -11730,6 +11834,10 @@ msgstr ""
 #, python-brace-format
 msgid "Access restricted to: {list_of_groups}"
 msgstr "شذذثسس قثسفقهذفثي فخ: {list_of_groups}"
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+msgid "The information you entered is incorrect."
+msgstr "فاث هربخقوشفهخر غخع ثرفثقثي هس هرذخققثذف."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -12096,7 +12204,6 @@ msgstr "ذخعقسث رعوزثق:"
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Courses"
 msgstr "ذخعقسثس"
@@ -12202,7 +12309,6 @@ msgstr "ذاخخسث مشرلعشلث"
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
 #: lms/templates/header/user_dropdown.html
-#: themes/edx.org/lms/templates/legacy_header.html
 msgid "Account"
 msgstr "شذذخعرف"
 
@@ -12211,7 +12317,6 @@ msgstr "شذذخعرف"
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/static_templates/help.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 #: wiki/plugins/help/wiki_plugin.py
 msgid "Help"
@@ -13251,7 +13356,6 @@ msgstr "ه شلقثث فخ فاث {link_start}اخرخق ذخيث{link_end}"
 #: lms/templates/register-form.html
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
@@ -13741,6 +13845,11 @@ msgstr "يشسازخشقي بخق:"
 
 #: lms/templates/user_dropdown.html
 msgid "More options"
+msgstr "وخقث خحفهخرس"
+
+#: lms/templates/user_dropdown.html lms/templates/header/header.html
+#: lms/templates/header/user_dropdown.html
+msgid "More Options"
 msgstr "وخقث خحفهخرس"
 
 #: lms/templates/using.html
@@ -17427,12 +17536,11 @@ msgstr "شححمغ بخق بهرشرذهشم شسسهسفشرذث"
 msgid "{platform_name} Home Page"
 msgstr "{platform_name} اخوث حشلث"
 
-#: lms/templates/header/header.html lms/templates/navigation/navigation.html
-msgid "Global"
-msgstr "لمخزشم"
+#: lms/templates/header/header.html lms/templates/header/user_dropdown.html
+msgid "Options Menu"
+msgstr "خحفهخرس وثرع"
 
 #: lms/templates/header/header.html lms/templates/navigation/navigation.html
-#: themes/edx.org/lms/templates/legacy_header.html
 msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
@@ -17444,7 +17552,6 @@ msgstr ""
 #: lms/templates/learner_dashboard/programs.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Programs"
 msgstr "حقخلقشوس"
@@ -17452,7 +17559,6 @@ msgstr "حقخلقشوس"
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Profile"
 msgstr "حقخبهمث"
@@ -17472,14 +17578,16 @@ msgstr "سغسشيوهر"
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Shopping Cart"
 msgstr "ساخححهرل ذشقف"
 
 #: lms/templates/header/navbar-not-authenticated.html
+msgid "Supplemental Links"
+msgstr "سعححمثوثرفشم مهرنس"
+
+#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/legacy_header.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "How it Works"
 msgstr "اخص هف صخقنس"
@@ -19233,6 +19341,10 @@ msgstr ""
 msgid "Explore Courses"
 msgstr "ثطحمخقث ذخعقسثس"
 
+#: lms/templates/navigation/navigation.html
+msgid "Global"
+msgstr "لمخزشم"
+
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""
 "\n"
@@ -20067,8 +20179,8 @@ msgid "Student Support: Certificates"
 msgstr "سفعيثرف سعححخقف: ذثقفهبهذشفثس"
 
 #: lms/templates/support/contact_us.html
-msgid "Contact US"
-msgstr "ذخرفشذف عس"
+msgid "{platform_name} Support: Contact Us"
+msgstr "{platform_name} سعححخقف: ذخرفشذف عس"
 
 #: lms/templates/support/enrollment.html
 msgid "Student Support: Enrollment"
@@ -20551,20 +20663,6 @@ msgstr ""
 "ثيط شري فاث ثيط شري خحثر ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خق فقشيثوشقنس "
 "خب ثيط هرذ."
 
-#: themes/edx.org/lms/templates/legacy_header.html
-msgid "Main"
-msgstr "وشهر"
-
-#: themes/edx.org/lms/templates/legacy_header.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Find Courses"
-msgstr "بهري ذخعقسثس"
-
-#: themes/edx.org/lms/templates/legacy_header.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Schools & Partners"
-msgstr "سذاخخمس & حشقفرثقس"
-
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid "About edX Verified Certificates"
 msgstr "شزخعف ثيط دثقهبهثي ذثقفهبهذشفثس"
@@ -20649,6 +20747,14 @@ msgid ""
 msgstr ""
 "{b_start}سعححخقف خعق وهسسهخر: {b_end} ثيط, ش رخر-حقخبهف, قثمهثس خر دثقهبهثي "
 "ذثقفهبهذشفثس فخ اثمح بعري بقثث ثيعذشفهخر بخق ثدثقغخرث لمخزشممغ"
+
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Find Courses"
+msgstr "بهري ذخعقسثس"
+
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Schools & Partners"
+msgstr "سذاخخمس & حشقفرثقس"
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.

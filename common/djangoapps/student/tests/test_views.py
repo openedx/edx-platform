@@ -14,17 +14,17 @@ from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase
 from edx_oauth2_provider.constants import AUTHORIZED_CLIENTS_SESSION_KEY
 from edx_oauth2_provider.tests.factories import ClientFactory, TrustedClientFactory
-from mock import patch
-from pyquery import PyQuery as pq
-from opaque_keys import InvalidKeyError
-
 from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import patch
+from opaque_keys import InvalidKeyError
+from pyquery import PyQuery as pq
+
 from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from student.models import CourseEnrollment, UserProfile
 from student.signals import REFUND_ORDER
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.milestones_helpers import set_prerequisite_courses, remove_prerequisite_course, get_course_milestones
+from util.milestones_helpers import get_course_milestones, remove_prerequisite_course, set_prerequisite_courses
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -95,7 +95,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         self.cert_status = cert_status
 
         with patch('student.views.cert_info', side_effect=self.mock_cert):
-            with patch('commerce.signals.handle_refund_order') as mock_refund_handler:
+            with patch('lms.djangoapps.commerce.signals.handle_refund_order') as mock_refund_handler:
                 REFUND_ORDER.connect(mock_refund_handler)
                 response = self.client.post(
                     reverse('change_enrollment'),
@@ -336,43 +336,3 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         remove_prerequisite_course(self.course.id, get_course_milestones(self.course.id)[0])
         response = self.client.get(reverse('dashboard'))
         self.assertNotIn('<div class="prerequisites">', response.content)
-
-    @mock.patch('student.views.consent_needed_for_course')
-    @mock.patch('student.views.enterprise_customer_for_request')
-    @ddt.data(
-        (True, True, True),
-        (True, True, False),
-        (True, False, False),
-        (False, True, False),
-        (False, False, False),
-    )
-    @ddt.unpack
-    def test_enterprise_view_consent_for_course(
-            self,
-            enterprise_enabled,
-            consent_needed,
-            future_course,
-            mock_enterprise_customer,
-            mock_consent_necessary
-    ):
-        """
-        Verify that the 'View Consent' icon show up if data sharing consent turned on
-        for enterprise customer
-        """
-        if future_course:
-            self.course = CourseFactory.create(start=self.TOMORROW, emit_signals=True)
-        else:
-            self.course = CourseFactory.create(emit_signals=True)
-        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
-
-        if enterprise_enabled:
-            mock_enterprise_customer.return_value = {'name': 'TestEnterprise', 'uuid': 'abc123xxx'}
-        else:
-            mock_enterprise_customer.return_value = None
-
-        mock_consent_necessary.return_value = consent_needed
-
-        # Assert 'View Consent' button shows up appropriately
-        response = self.client.get(reverse('dashboard'))
-        self.assertEquals('View Consent' in response.content, enterprise_enabled and consent_needed)
-        self.assertEquals('TestEnterprise' in response.content, enterprise_enabled and consent_needed)

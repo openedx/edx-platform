@@ -4,19 +4,18 @@
     margin-top: $baseline;
   }
 
-  .logo {
-    height: 100px;
-  }
-
   .main-banner {
     color: $white;
     margin-bottom: 1px;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
+    background-size:cover !important;
+    background-repeat:no-repeat !important;
 
     .authoring-org-logo {
       background-color: $white;
+      height: 100px;
+    }
+    .logo-space{
+      height: 50px;
     }
 
     .btn {
@@ -81,7 +80,7 @@
   .thick_rule {
     height: 4px;
     border: 0;
-    background-color: theme-color('secondary');
+    background-color: theme-color('primary');
   }
 
   .program-info {

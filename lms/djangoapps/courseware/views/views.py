@@ -8,12 +8,38 @@ from collections import OrderedDict, namedtuple
 from datetime import datetime
 
 import analytics
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import AnonymousUser, User
+from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
+from django.db import transaction
+from django.db.models import Q
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, QueryDict
+from django.shortcuts import redirect
+from django.template.context_processors import csrf
+from django.utils.decorators import method_decorator
+from django.utils.http import urlquote_plus
+from django.utils.text import slugify
+from django.utils.translation import ugettext as _
+from django.views.decorators.cache import cache_control
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
+from django.views.generic import View
+from eventtracking import tracker
+from ipware.ip import get_ip
+from markupsafe import escape
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from pytz import UTC
+from rest_framework import status
+from web_fragments.fragment import Fragment
+
 import shoppingcart
 import survey.views
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses
-from commerce.utils import EcommerceService
-from course_modes.models import (CourseMode, get_course_prices)
+from course_modes.models import CourseMode, get_course_prices
 from courseware.access import has_access, has_ccx_coach_role
 from courseware.access_utils import check_course_open_for_learner
 from courseware.courses import (
@@ -34,47 +60,24 @@ from courseware.model_data import FieldDataCache
 from courseware.models import BaseStudentModuleHistory, StudentModule
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
-from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import AnonymousUser, User
-from django.template.context_processors import csrf
-from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
-from django.db import transaction
-from django.db.models import Q
-from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, QueryDict
-from django.shortcuts import redirect
-from django.utils.decorators import method_decorator
-from django.utils.http import urlquote_plus
-from django.utils.text import slugify
-from pytz import UTC
-from django.utils.translation import ugettext as _
-from django.views.decorators.cache import cache_control
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_GET, require_http_methods, require_POST
-from django.views.generic import View
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from enrollment.api import add_enrollment
-from eventtracking import tracker
-from ipware.ip import get_ip
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from markupsafe import escape
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
+from openedx.core.djangoapps.certificates import api as auto_certs_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
     is_credit_course,
     is_user_eligible_for_credit
 )
-from openedx.core.djangoapps.certificates import api as auto_certs_api
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
@@ -87,14 +90,12 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_h
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from rest_framework import status
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import CourseEnrollment, UserTestGroup
 from util.cache import cache, cache_if_anonymous
 from util.db import outer_atomic
 from util.milestones_helpers import get_prerequisite_courses_display
 from util.views import _record_feedback_in_zendesk, ensure_valid_course_key, ensure_valid_usage_key
-from web_fragments.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList

@@ -503,7 +503,7 @@ def get_certificate_template(course_key, mode, language):
             mode=mode
         )
         template = get_language_specific_template_or_default(language, mode_templates)
-    return template.template if template else None
+    return template if template else None
 
 
 def get_language_specific_template_or_default(language, templates):
@@ -540,7 +540,12 @@ def _get_two_letter_language_code(language_code):
     Shortens language to only first two characters (e.g. es-419 becomes es)
     This is needed because Catalog returns locale language which is not always a 2 letter code.
     """
-    return language_code[:2] if language_code else None
+    if language_code is None:
+        return None
+    elif language_code == '':
+        return ''
+    else:
+        return language_code[:2]
 
 
 def emit_certificate_event(event_name, user, course_id, course=None, event_data=None):

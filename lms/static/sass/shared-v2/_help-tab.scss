@@ -20,7 +20,7 @@
   @include transform-origin(0 0);
 
   z-index: z-index(front);
-  top: 250px;
+  bottom: $baseline;
   left: 0;
   position: fixed;
 

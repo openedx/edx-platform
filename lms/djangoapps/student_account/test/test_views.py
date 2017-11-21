@@ -20,6 +20,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from edx_rest_api_client import exceptions
+from http.cookies import SimpleCookie
 from nose.plugins.attrib import attr
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
@@ -27,11 +28,10 @@ from provider.oauth2.models import AccessToken as dop_access_token
 from provider.oauth2.models import RefreshToken as dop_refresh_token
 from testfixtures import LogCapture
 
-from commerce.models import CommerceConfiguration
-from commerce.tests import factories
-from commerce.tests.mocks import mock_get_orders
 from course_modes.models import CourseMode
-from http.cookies import SimpleCookie
+from lms.djangoapps.commerce.models import CommerceConfiguration
+from lms.djangoapps.commerce.tests import factories
+from lms.djangoapps.commerce.tests.mocks import mock_get_orders
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
@@ -44,6 +44,7 @@ from student_account.views import account_settings_context, get_user_orders
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from openedx.core.djangoapps.user_api.errors import UserAPIInternalError
 
 LOGGER_NAME = 'audit'
 User = get_user_model()  # pylint:disable=invalid-name
@@ -130,6 +131,12 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         # Verify that the new password continues to be valid
         result = self.client.login(username=self.USERNAME, password=self.NEW_PASSWORD)
         self.assertTrue(result)
+
+    def test_password_change_failure(self):
+        with mock.patch('openedx.core.djangoapps.user_api.accounts.api.request_password_change',
+                        side_effect=UserAPIInternalError):
+            self._change_password()
+            self.assertRaises(UserAPIInternalError)
 
     @ddt.data(True, False)
     def test_password_change_logged_out(self, send_email):

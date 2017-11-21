@@ -19,9 +19,8 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <%
 faqs = program['faq']
-program_type = program['type']
+program_type = program['type'] if program['type'] else 'Program'
 title = program['title']
-status = program['status']
 courses = program['courses']
 subtitle = program['subtitle']
 overview = program['overview']
@@ -30,19 +29,24 @@ job_outlook_items = program['job_outlook_items']
 weeks_to_complete = program['weeks_to_complete']
 full_program_price_format = '{0:.0f}' if program['full_program_price'].is_integer() else '{0:.2f}'
 full_program_price = full_program_price_format.format(program['full_program_price'])
-corporate_endorsement = program['corporate_endorsements'][0] if program['corporate_endorsements'] else {}
-corporate_endorsement_name = corporate_endorsement.get('corporation_name')
-corporate_endorsement_image = corporate_endorsement.get('image',{}).get('src','')
-endorsement = corporate_endorsement['individual_endorsements'][0]
-endorsement_quote = endorsement.get('quote')
-endorser = endorsement.get('endorser')
-endorser_name = endorser.get('given_name') + ' ' + endorser.get('family_name')
-endorser_position = endorser.get('position') or {}
-endorser_title = endorser_position.get('title')
-endorser_org = endorser_position.get('organization_name') or corporate_endorsement_name
 expected_learning_items = program['expected_learning_items']
 min_hours_effort_per_week = program['min_hours_effort_per_week']
 max_hours_effort_per_week = program['max_hours_effort_per_week']
+
+## Start Endorsement
+corporate_endorsement = program['corporate_endorsements'][0] if program['corporate_endorsements'] else {}
+corporate_endorsement_name = corporate_endorsement.get('corporation_name')
+corporate_endorsement_image = corporate_endorsement['image']['src'] if corporate_endorsement.get('image') else ''
+endorsements = corporate_endorsement.get('individual_endorsements')
+endorsement = endorsements[0] if endorsements else {}
+endorsement_quote = endorsement.get('quote')
+endorser = endorsement.get('endorser', {})
+endorser_given_name = endorser.get('given_name') if endorser.get('given_name') else ''
+endorser_family_name = endorser.get('family_name') if endorser.get('family_name') else ''
+endorser_name = (endorser_given_name + ' ' + endorser_family_name).strip()
+endorser_position = endorser.get('position') if endorser.get('position') else {}
+endorser_title = endorser_position.get('title', '')
+endorser_org = endorser_position.get('organization_name') or corporate_endorsement_name
 %>
 
 <%block name="js_extra">
@@ -55,16 +59,22 @@ max_hours_effort_per_week = program['max_hours_effort_per_week']
     banner_image = program.get('banner_image', {}).get('large', {}).get('url', '')
     authoring_organizations = program['authoring_organizations']
     video_url = program['video'].get('src') if program['video'] else ''
+    faqs = program['faq']
+    courses = program['courses']
+    instructors = program['instructors']
   %>
   <div id="program-details-hero">
-    <div class="main-banner" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url(${banner_image}); background-size:100%;">
+    <div class="main-banner" 
+      style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url(${banner_image});">
       <div class="container" >
         <div class="row">
           <div class="col col-12 col-md-8">
             % if authoring_organizations and authoring_organizations[0]['logo_image_url']:
             <div>
-              <img class="authoring-org-logo logo" alt="${authoring_organizations[0]['name']}" src="${authoring_organizations[0]['logo_image_url']}"/>
+              <img class="authoring-org-logo" alt="${authoring_organizations[0]['name']}" src="${authoring_organizations[0]['logo_image_url']}"/>
             </div>
+            % else:
+            <div class="logo-space"></div>
             % endif
             <div>
               <h1 class="program_title">${program['title']}</h1>
@@ -100,15 +110,21 @@ max_hours_effort_per_week = program['max_hours_effort_per_week']
     <div class="row quick-nav">
       <div class="container">
         <ul class="nav nav-fill col-lg-12">
+          % if courses:
           <li class="nav-item">
             <a class="nav-link" href="#courses">${_('View Courses')}</a>
           </li>
+          % endif
+          % if instructors:
           <li class="nav-item">
             <a class="nav-link" href="#instructors">${_('Meet the Instructors')}</a>
           </li>
+          % endif
+          % if faqs:
           <li class="nav-item">
             <a class="nav-link" href="#faqs">${_('Frequenty Asked Questions')}</a>
           </li>
+          % endif
         </ul>
       </div>
     </div>
@@ -137,7 +153,9 @@ max_hours_effort_per_week = program['max_hours_effort_per_week']
         % if endorsement:
          <h3 class="section_title">${_('Real Career Impact')}</h3>
         <p>
-          <img class="logo" alt="${corporate_endorsement_name}" src="${corporate_endorsement_image}"/>
+          % if corporate_endorsement_image:
+            <img class="logo" alt="${corporate_endorsement_name}" src="${corporate_endorsement_image}"/>
+          % endif
           <blockquote class="blockquote">
             <p class="quote">"${endorsement_quote}"</p>
             <footer class="blockquote-footer">
@@ -237,6 +255,7 @@ max_hours_effort_per_week = program['max_hours_effort_per_week']
       </div>
     </div>
   </div>
+  % if courses:
   <hr class="thick_rule">
   <div id="courses">
     <div class="row">
@@ -252,6 +271,8 @@ max_hours_effort_per_week = program['max_hours_effort_per_week']
       <% 
         course_run = course['course_runs'][0] 
         course_img = course_run.get('image')
+        course_about_url = reverse('about_course', args=[course_run['key']])
+        course_purchase_url = course_run['upgrade_url'] if course_run['upgrade_url'] else course_about_url
       %>
       <div class="row course">
         <div class="col-3 col-lg-2 course-image">
@@ -261,11 +282,11 @@ max_hours_effort_per_week = program['max_hours_effort_per_week']
         </div>
         <div class="col-9 col-lg-6">
           <div>
-            <a href="${course_run['course_url']}">${course_run['title']}</a>
+            <a href="${course_about_url}">${course_run['title']}</a>
           </div>
           <div>${course_run['short_description']}</div>
           <div>
-            <a href="${course_run['course_url']}">${_('Learn More')}</a>
+            <a href="${course_about_url}">${_('Learn More')}</a>
           </div>
         </div>
         <div class="col-12 col-lg-4 course-enroll">
@@ -277,7 +298,7 @@ max_hours_effort_per_week = program['max_hours_effort_per_week']
           % if program.get('is_learner_eligible_for_one_click_purchase') != True:
             % if course_run['is_enrollment_open'] and course_run['can_enroll'] and not course_run['is_course_ended']:
               <div>
-                <a class="btn btn-primary btn-block btn-success" href="${course_run['course_url']}about">Enroll Now</a>
+                <a class="btn btn-primary btn-block btn-success" href="${course_purchase_url}">Enroll Now</a>
               </div>
             % else:
               <div>
@@ -289,26 +310,29 @@ max_hours_effort_per_week = program['max_hours_effort_per_week']
       </div>
     % endfor
   </div>
-  <hr class="thick_rule">
-  <div id="instructors" class="row">
-    <div class="col-12">
-      <h2>${_('Instructors')}</h2>
-    </div>
-    % for instructor in instructors:
-      <div class="col-6 col-sm-3 instructor">
-        <div>
-          <img alt="" src="${instructor['image']}"/>
-        </div>
-        <div class="instructor-name">${instructor['name']}</div>
-        % if instructor.get('position'):
-          <div class="instructor-position">${instructor['position'].get('position')}</div>
-          <div class="instructor-org">${instructor['position'].get('organization_name')}</div>
-        % endif
+  % endif
+  % if instructors:
+    <hr class="thick_rule">
+    <div id="instructors" class="row">
+      <div class="col-12">
+        <h2>${_('Instructors')}</h2>
       </div>
-    % endfor
-  </div>
-  <hr class="thick_rule">
+      % for instructor in instructors:
+        <div class="col-6 col-sm-3 instructor">
+          <div>
+            <img alt="" src="${instructor['image']}"/>
+          </div>
+          <div class="instructor-name">${instructor['name']}</div>
+          % if instructor.get('position'):
+            <div class="instructor-position">${instructor['position'].get('position')}</div>
+            <div class="instructor-org">${instructor['position'].get('organization_name')}</div>
+          % endif
+        </div>
+      % endfor
+    </div>
+  % endif
   % if faqs:
+  <hr class="thick_rule">
     <div id="faqs" class="row faqs">
       <div class="col-12">
         <h2>${_('Frequently Asked Questions')}</h2>
@@ -319,7 +343,7 @@ max_hours_effort_per_week = program['max_hours_effort_per_week']
             ${faq['question']}
           </div>
           <div class="answer">
-            ${faq['answer']}
+            ${HTML(faq['answer'])}
           </div>
         </div>
       % endfor

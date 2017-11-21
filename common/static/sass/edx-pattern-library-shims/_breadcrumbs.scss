@@ -12,11 +12,21 @@
 
     display: inline-block;
 
-    @include media-breakpoint-down(md) {
-      max-width: 60px;
+    @include media-breakpoint-down(lg) {
+      max-width: 240px;
+    }
+
+    @include media-breakpoint-down(sm) {
+      max-width: 140px;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
+    }
+
+    @include media-breakpoint-down(xs) {
+      &:not(:first-child) {
+        max-width: 60px;
+      }
     }
 
     &.nav-item-course {
@@ -36,7 +46,7 @@
   .fa-angle-right {
     @include margin-left($baseline/4);
 
-    @include media-breakpoint-down(md) {
+    @include media-breakpoint-down(sm) {
       position: relative;
       top: -5px;
     }

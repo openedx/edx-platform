@@ -83,6 +83,15 @@
         border: solid 1px $state-danger-border;
       }
 
+      .organization-credentials-content {
+        margin-top: ($baseline*1.6);
+        .org-credentials-wrapper input {
+          width: 65%;
+          margin-top: ($baseline*0.8);
+          display: inline-block;
+        }
+      }
+
       .transcript-preferance-wrapper {
         margin-top: ($baseline*1.6);
         .icon.fa-info-circle {
@@ -99,6 +108,7 @@
 
       .error-info {
         @include font-size(16);
+        @include margin-left($baseline/2);
       }
 
       .transcript-preferance-label {
@@ -108,10 +118,15 @@
         display: block;
       }
 
-      .transcript-provider-group, .transcript-turnaround, .transcript-fidelity, .video-source-language {
+      .transcript-provider-group, .transcript-turnaround, .transcript-fidelity, .video-source-language, .selected-transcript-provider {
         margin-top: ($baseline*0.8);
       }
 
+      .selected-transcript-provider {
+        .action-change-provider {
+          @include margin-left($baseline/2);
+        }
+      }
 
       .transcript-provider-group {
         input[type=radio]  {
@@ -126,6 +141,10 @@
 
       .transcript-turnaround-wrapper, .transcript-fidelity-wrapper, .video-source-language-wrapper, .transcript-languages-wrapper {
         display: none;
+      }
+
+      .transcript-languages-wrapper .transcript-preferance-label {
+        display: inline-block;
       }
 
       .transcript-languages-container .languages-container {
@@ -148,6 +167,9 @@
           .action-add-language {
             @include margin-left($baseline/4);
           }
+          .error-info {
+            display: inline-block;
+          }
         }
       }
       .transcript-language-menu, .video-source-language {
@@ -155,11 +177,28 @@
       }
     }
 
+    .transcription-account-details {
+      margin-top: ($baseline*0.8);
+      span {
+        @include font-size(15);
+      }
+    }
+
+    .transcription-account-details.warning {
+      background-color: $state-warning-bg;
+      padding: ($baseline/2);
+    }
+
+    .action-cancel-course-video-settings {
+      @include margin-right($baseline/2);
+    }
+
     .course-video-settings-footer {
       margin-top: ($baseline*1.6);
       .last-updated-text {
         @include font-size(12);
-        @include margin-left($baseline/4);
+        display: block;
+        margin-top: ($baseline/2);
       }
     }
 

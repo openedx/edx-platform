@@ -17,6 +17,7 @@ from django.utils import timezone
 from PIL import Image
 
 from lms.djangoapps.certificates.api import get_active_web_certificate
+from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.courses import course_image_url
 from static_replace.models import AssetBaseUrlConfig
@@ -40,7 +41,7 @@ from ..models import CourseOverview, CourseOverviewImageSet, CourseOverviewImage
 
 @attr(shard=3)
 @ddt.ddt
-class CourseOverviewTestCase(ModuleStoreTestCase):
+class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase):
     """
     Tests for CourseOverview model.
     """
@@ -270,6 +271,24 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         course = CourseFactory.create(default_store=modulestore_type, run="TestRun", **kwargs)
         self.check_course_overview_against_course(course)
 
+    @ddt.data(True, False)
+    def test_language_field(self, catalog_integration_enabled):
+        """
+        Test that the language field is not updated from the modulestore
+        when catalog integration is enabled. In that case, it gets updated
+        by the sync_course_runs management command, which synchronizes with
+        the Catalog service.
+        """
+        self.create_catalog_integration(enabled=catalog_integration_enabled)
+
+        course = CourseFactory.create(language='en')
+        course_overview = CourseOverview.get_from_id(course.id)
+
+        if catalog_integration_enabled:
+            self.assertNotEqual(course_overview.language, course.language)
+        else:
+            self.assertEqual(course_overview.language, course.language)
+
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
     def test_get_non_existent_course(self, modulestore_type):
         """
@@ -459,8 +478,9 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         )
 
     def test_get_all_courses_by_mobile_available(self):
-        non_mobile_course = CourseFactory.create(emit_signals=True)
-        mobile_course = CourseFactory.create(mobile_available=True, emit_signals=True)
+        mobile_course = CourseFactory.create(emit_signals=True)
+        non_mobile_course =\
+            CourseFactory.create(mobile_available=False, emit_signals=True)
 
         test_cases = (
             (None, {non_mobile_course.id, mobile_course.id}),
@@ -476,7 +496,8 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                     CourseOverview.get_all_courses(filter_=filter_)
                 },
                 expected_courses,
-                "testing CourseOverview.get_all_courses with filter_={}".format(filter_),
+                "testing CourseOverview.get_all_courses with filter_={}"
+                .format(filter_),
             )
 
     def test_get_from_ids_if_exists(self):

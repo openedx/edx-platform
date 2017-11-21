@@ -1,6 +1,7 @@
 """
 Sync course runs from catalog service.
 """
+from collections import namedtuple
 import logging
 
 from django.core.management.base import BaseCommand
@@ -15,33 +16,30 @@ log = logging.getLogger(__name__)
 class Command(BaseCommand):
     """
     Purpose is to sync course runs data from catalog service to make it accessible in edx-platform.
-    It just happens to only be syncing marketing URLs from catalog course runs for now.
     """
     help = 'Refresh marketing urls from catalog service.'
 
-    def update_course_overviews(self, course_runs):
-        """
-        Refresh marketing urls for the given catalog course runs.
+    CourseRunField = namedtuple('CourseRunField', 'catalog_name course_overview_name')
+    course_run_fields = (
+        CourseRunField(catalog_name='marketing_url', course_overview_name='marketing_url'),
+        CourseRunField(catalog_name='eligible_for_financial_aid', course_overview_name='eligible_for_financial_aid'),
+        CourseRunField(catalog_name='content_language', course_overview_name='language'),
+    )
 
-        Arguments:
-             course_runs: A list containing catalog course runs.
-        """
+    def handle(self, *args, **options):
+        log.info('[sync_course_runs] Fetching course runs from catalog service.')
+        course_runs = get_course_runs()
+
         # metrics for observability
-        # number of catalog course runs retrieved.
-        catalog_course_runs_retrieved = len(course_runs)
-        # number of catalog course runs found in course overview.
-        course_runs_found_in_cache = 0
-        # number of course overview records actually get updated.
-        course_metadata_updated = 0
+        num_runs_found_in_catalog = len(course_runs)
+        num_runs_found_in_course_overview = 0
+        num_course_overviews_updated = 0
 
         for course_run in course_runs:
-            is_course_metadata_updated = False
-            marketing_url = course_run['marketing_url']
-            eligible_for_financial_aid = course_run['eligible_for_financial_aid']
             course_key = CourseKey.from_string(course_run['key'])
             try:
                 course_overview = CourseOverview.objects.get(id=course_key)
-                course_runs_found_in_cache += 1
+                num_runs_found_in_course_overview += 1
             except CourseOverview.DoesNotExist:
                 log.info(
                     '[sync_course_runs] course overview record not found for course run: %s',
@@ -49,32 +47,25 @@ class Command(BaseCommand):
                 )
                 continue
 
-            # Check whether course overview's marketing url is outdated - this saves a db hit.
-            if course_overview.marketing_url != marketing_url:
-                course_overview.marketing_url = marketing_url
-                is_course_metadata_updated = True
-
-            # Check whether course overview's eligible for financial aid is outdated
-            if course_overview.eligible_for_financial_aid != eligible_for_financial_aid:
-                course_overview.eligible_for_financial_aid = eligible_for_financial_aid
-                is_course_metadata_updated = True
+            is_course_metadata_updated = False
+            for field in self.course_run_fields:
+                catalog_value = course_run.get(field.catalog_name)
+                if getattr(course_overview, field.course_overview_name) != catalog_value:
+                    setattr(course_overview, field.course_overview_name, catalog_value)
+                    is_course_metadata_updated = True
 
             if is_course_metadata_updated:
                 course_overview.save()
-                course_metadata_updated += 1
-
-        return catalog_course_runs_retrieved, course_runs_found_in_cache, course_metadata_updated
-
-    def handle(self, *args, **options):
-        log.info('[sync_course_runs] Fetching course runs from catalog service.')
-        course_runs = get_course_runs()
-        course_runs_retrieved, course_runs_found, course_metadata_updated = self.update_course_overviews(course_runs)
+                num_course_overviews_updated += 1
 
         log.info(
-            ('[sync_course_runs] course runs retrieved: %d, course runs found in course overview: %d,'
-             ' course runs not found in course overview: %d, course overviews metadata updated: %d,'),
-            course_runs_retrieved,
-            course_runs_found,
-            course_runs_retrieved - course_runs_found,
-            course_metadata_updated,
+            '[sync_course_runs] '
+            'course runs found in catalog: %d, '
+            'course runs found in course overview: %d, '
+            'course runs not found in course overview: %d, '
+            'course overviews updated: %d',
+            num_runs_found_in_catalog,
+            num_runs_found_in_course_overview,
+            num_runs_found_in_catalog - num_runs_found_in_course_overview,
+            num_course_overviews_updated,
         )

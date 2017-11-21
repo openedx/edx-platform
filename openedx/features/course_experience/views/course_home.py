@@ -2,30 +2,31 @@
 Views for the course home page.
 """
 
-from django.template.context_processors import csrf
 from django.core.urlresolvers import reverse
+from django.template.context_processors import csrf
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
+from opaque_keys.edx.keys import CourseKey
+from web_fragments.fragment import Fragment
 
-from commerce.utils import EcommerceService
 from course_modes.models import get_cosmetic_verified_display_price
 from courseware.access import has_access
-from courseware.courses import (
-    can_self_enroll_in_course,
-    get_course_info_section,
-    get_course_with_access,
+from courseware.courses import can_self_enroll_in_course, get_course_info_section, get_course_with_access
+from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.course_goals.api import (
+    get_course_goal,
+    get_course_goal_options,
+    get_goal_api_url,
+    has_course_goal_permission
 )
-from lms.djangoapps.course_goals.api import get_course_goal, has_course_goal_permission, get_course_goal_options, get_goal_api_url
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.courseware.views.views import CourseTabView
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
-from web_fragments.fragment import Fragment
 
 from .. import LATEST_UPDATE_FLAG, SHOW_UPGRADE_MSG_ON_COURSE_HOME, USE_BOOTSTRAP_FLAG
 from ..utils import get_course_outline_block_tree

@@ -5,7 +5,7 @@ Utility library for working with the edx-milestones app
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from milestones import api as milestones_api
-from milestones.exceptions import InvalidMilestoneRelationshipTypeException
+from milestones.exceptions import InvalidMilestoneRelationshipTypeException, InvalidUserException
 from milestones.models import MilestoneRelationshipType
 from milestones.services import MilestonesService
 from opaque_keys import InvalidKeyError
@@ -213,21 +213,32 @@ def get_required_content(course_key, user):
     """
     required_content = []
     if settings.FEATURES.get('MILESTONES_APP'):
-        # Get all of the outstanding milestones for this course, for this user
-        try:
-            milestone_paths = get_course_milestones_fulfillment_paths(
-                unicode(course_key),
-                serialize_user(user)
-            )
-        except InvalidMilestoneRelationshipTypeException:
-            return required_content
+        course_run_id = unicode(course_key)
 
-        # For each outstanding milestone, see if this content is one of its fulfillment paths
-        for path_key in milestone_paths:
-            milestone_path = milestone_paths[path_key]
-            if milestone_path.get('content') and len(milestone_path['content']):
-                for content in milestone_path['content']:
-                    required_content.append(content)
+        if user.is_authenticated():
+            # Get all of the outstanding milestones for this course, for this user
+            try:
+
+                milestone_paths = get_course_milestones_fulfillment_paths(
+                    course_run_id,
+                    serialize_user(user)
+                )
+            except InvalidMilestoneRelationshipTypeException:
+                return required_content
+
+            # For each outstanding milestone, see if this content is one of its fulfillment paths
+            for path_key in milestone_paths:
+                milestone_path = milestone_paths[path_key]
+                if milestone_path.get('content') and len(milestone_path['content']):
+                    for content in milestone_path['content']:
+                        required_content.append(content)
+        else:
+            if get_course_milestones(course_run_id):
+                # NOTE (CCB): The initial version of anonymous courseware access is very simple. We avoid accidentally
+                # exposing locked content by simply avoiding anonymous access altogether for courses runs with
+                # milestones.
+                raise InvalidUserException('Anonymous access is not allowed for course runs with milestones set.')
+
     return required_content
 
 

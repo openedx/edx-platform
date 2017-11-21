@@ -1,24 +1,23 @@
+from courseware.courses import get_course
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 
-from courseware.courses import get_course
-
 
 class Command(BaseCommand):
-    args = "<course_id>"
+    help = 'Write a discussion link for a given course on standard output.'
+
+    def add_arguments(self, parser):
+        parser.add_argument('course_id',
+                            help='course for which to write a discussion link')
 
     def handle(self, *args, **options):
-        if not args:
-            raise CommandError("Course id not specified")
-        if len(args) > 1:
-            raise CommandError("Only one course id may be specifiied")
-        course_id = args[0]
+        course_id = options['course_id']
 
         course_key = CourseKey.from_string(course_id)
 
         course = get_course(course_key)
         if not course:
-            raise CommandError("Invalid course id: {}".format(course_id))
+            raise CommandError('Invalid course id: {}'.format(course_id))
 
         if course.discussion_link:
             self.stdout.write(course.discussion_link)
