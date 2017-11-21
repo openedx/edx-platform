@@ -16,7 +16,7 @@ from paver import tasks
 from paver.easy import call_task, cmdopts, consume_args, needs, no_help, path, sh, task
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers.api import DEFAULT_OBSERVER_TIMEOUT
-from watchdog.observers.polling import PollingObserver
+from watchdog.observers import Observer
 
 from openedx.core.djangoapps.theming.paver_helpers import get_theme_paths
 
@@ -792,7 +792,7 @@ def execute_webpack_watch(settings=None):
     # from Watchdog like the other watchers do.
     run_background_process(
         'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack {options}'.format(
-            options='--watch --watch-poll=200 --config={config_path}'.format(
+            options='--watch --config={config_path}'.format(
                 config_path=Env.get_django_setting("WEBPACK_CONFIG_PATH", "lms", settings=settings)
             ),
             static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings),
@@ -852,7 +852,6 @@ def watch_assets(options):
     themes = get_parsed_option(options, 'themes')
     theme_dirs = get_parsed_option(options, 'theme_dirs', [])
 
-    # wait comes in as a list of strings, define the default value similarly for convenience.
     default_wait = [unicode(DEFAULT_OBSERVER_TIMEOUT)]
     wait = float(get_parsed_option(options, 'wait', default_wait)[0])
 
@@ -863,7 +862,7 @@ def watch_assets(options):
         theme_dirs = [path(_dir) for _dir in theme_dirs]
 
     sass_directories = get_watcher_dirs(theme_dirs, themes)
-    observer = PollingObserver(timeout=wait)
+    observer = Observer(timeout=wait)
 
     CoffeeScriptWatcher().register(observer)
     SassWatcher().register(observer, sass_directories)
