@@ -7,17 +7,14 @@ from path import Path as path
 from six import text_type
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.views.decorators.csrf import csrf_exempt
 
 from django.core.files import File
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from user_tasks.models import UserTaskArtifact, UserTaskStatus
+from user_tasks.models import UserTaskStatus
 
 from student.auth import has_course_author_access
 

@@ -30,7 +30,7 @@ from contracts import contract, new_contract
 from django.db import DatabaseError
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from opaque_keys.edx.block_types import BlockTypeKeyV1
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey
 from xblock.core import XBlockAside
 from xblock.exceptions import InvalidScopeError, KeyValueMultiSaveError
 from xblock.fields import Scope, UserScope

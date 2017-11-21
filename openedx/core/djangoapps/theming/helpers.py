@@ -6,7 +6,6 @@ import re
 from logging import getLogger
 
 from django.conf import settings
-from path import Path
 
 from microsite_configuration import microsite
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

@@ -3,7 +3,6 @@ Tests for branding page
 """
 import datetime
 
-import ddt
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
@@ -14,7 +13,6 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 from pytz import UTC
-from waffle.testutils import override_switch
 
 from branding.views import index
 from courseware.tests.helpers import LoginEnrollmentTestCase

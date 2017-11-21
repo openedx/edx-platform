@@ -5,7 +5,6 @@ Certificate HTML webview.
 import logging
 import urllib
 from datetime import datetime
-from dateutil import parser
 from uuid import uuid4
 
 import pytz

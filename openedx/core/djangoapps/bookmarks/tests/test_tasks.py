@@ -4,8 +4,6 @@ Tests for tasks.
 import ddt
 from nose.plugins.attrib import attr
 
-from django.conf import settings
-
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import check_mongo_calls, ItemFactory
 

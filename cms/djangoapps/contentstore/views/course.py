@@ -6,7 +6,6 @@ import json
 import logging
 import random
 import string  # pylint: disable=deprecated-module
-import time
 
 import django.utils
 import six

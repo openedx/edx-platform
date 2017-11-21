@@ -12,7 +12,7 @@ from bok_choy.promise import EmptyPromise
 from nose.plugins.attrib import attr
 from pytz import UTC, utc
 
-from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.instructor_dashboard import DataDownloadPage, InstructorDashboardPage
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage

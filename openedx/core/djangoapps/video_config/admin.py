@@ -6,7 +6,7 @@ from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModel
 from django.contrib import admin
 
 from openedx.core.djangoapps.video_config.forms import (
-    CourseHLSPlaybackFlagAdminForm, CourseVideoTranscriptFlagAdminForm
+    CourseHLSPlaybackFlagAdminForm,
 )
 from openedx.core.djangoapps.video_config.models import (
     CourseHLSPlaybackEnabledFlag, HLSPlaybackEnabledFlag,

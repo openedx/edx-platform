@@ -6,7 +6,6 @@ from django.utils.timezone import now
 from rest_framework import serializers
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from student.models import UserProfile
 
 from .models import UserPreference
 

@@ -32,7 +32,6 @@ from student.roles import (
 )
 from student.tests.factories import UserFactory
 from xmodule.course_module import CourseSummary
-from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls

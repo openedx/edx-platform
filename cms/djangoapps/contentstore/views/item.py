@@ -49,7 +49,7 @@ from edxmako.shortcuts import render_to_string
 from help_tokens.core import HelpUrlExpert
 from models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitch
+from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import request_token, wrap_xblock
 from static_replace import replace_static_urls

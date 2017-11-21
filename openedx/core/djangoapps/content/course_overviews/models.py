@@ -13,7 +13,6 @@ from django.template import defaultfilters
 
 from ccx_keys.locator import CCXLocator
 from model_utils.models import TimeStampedModel
-from opaque_keys.edx.keys import CourseKey
 
 from config_models.models import ConfigurationModel
 from lms.djangoapps import django_comment_client

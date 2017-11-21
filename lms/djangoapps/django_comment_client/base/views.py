@@ -28,7 +28,6 @@ from django_comment_client.utils import (
     get_annotated_content_info,
     get_cached_discussion_id_map,
     get_group_id_for_comments_service,
-    get_group_id_for_user,
     get_user_group_ids,
     is_comment_too_deep,
     prepare_content

@@ -5,7 +5,6 @@ End-to-end tests for the LMS Instructor Dashboard.
 
 import ddt
 from bok_choy.promise import EmptyPromise
-from unittest import skip
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture

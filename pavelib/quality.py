@@ -7,7 +7,7 @@ import json
 import os
 import re
 
-from paver.easy import BuildFailure, call_task, cmdopts, needs, sh, task
+from paver.easy import BuildFailure, cmdopts, needs, sh, task
 
 from openedx.core.djangolib.markup import HTML
 
