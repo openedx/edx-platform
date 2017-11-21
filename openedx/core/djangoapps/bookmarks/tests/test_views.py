@@ -1,22 +1,21 @@
 """
 Tests for bookmark views.
 """
-
-import ddt
 import json
-from nose.plugins.attrib import attr
 import urllib
 
+import ddt
+import pytest
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import patch
+from nose.plugins.attrib import attr
 from rest_framework.test import APIClient
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore import ModuleStoreEnum
-
-from .test_models import BookmarksTestsBase
 from .test_api import BookmarkApiEventTestMixin
+from .test_models import BookmarksTestsBase
 
 
 # pylint: disable=no-member
@@ -67,6 +66,7 @@ class BookmarksViewsTestsBase(BookmarksTestsBase, BookmarkApiEventTestMixin):
 @attr(shard=2)
 @ddt.ddt
 @skip_unless_lms
+@pytest.mark.django111_expected_failure
 class BookmarksListViewTests(BookmarksViewsTestsBase):
     """
     This contains the tests for GET & POST methods of bookmark.views.BookmarksListView class
@@ -372,6 +372,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
 @attr(shard=2)
 @ddt.ddt
 @skip_unless_lms
+@pytest.mark.django111_expected_failure
 class BookmarksDetailViewTests(BookmarksViewsTestsBase):
     """
     This contains the tests for GET & DELETE methods of bookmark.views.BookmarksDetailView class
