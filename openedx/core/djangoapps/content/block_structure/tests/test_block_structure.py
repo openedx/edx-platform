@@ -4,8 +4,6 @@ Tests for block_structure.py
 """
 # pylint: disable=protected-access
 import json
-import requests
-from datetime import datetime, timedelta
 
 from collections import namedtuple
 from copy import deepcopy
@@ -23,9 +21,6 @@ from .helpers import MockXBlock, MockTransformer, ChildrenMapTestMixin
 from ..views import ClearCoursesCacheView
 
 from student.tests.factories import UserFactory
-from provider.oauth2.models import Client, Grant
-from oauth2_provider import models as dot_models
-from provider.constants import CONFIDENTIAL
 from rest_framework import status
 from rest_framework.test import \
     APIRequestFactory, APITestCase, force_authenticate

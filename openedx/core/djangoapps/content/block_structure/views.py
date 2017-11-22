@@ -4,7 +4,6 @@
 Views for block structure api endpoints.
 """
 import logging
-import json
 
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from rest_framework.response import Response
@@ -22,7 +21,6 @@ LOGGER = logging.getLogger(__name__)
 
 
 class ClearCoursesCacheView(APIView):
-
     """
         **Use Cases**
             Given a list of courses id it will clear the courses cache
@@ -40,6 +38,8 @@ class ClearCoursesCacheView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
+    http_method_names = ["post"]
+    
     def post(self, request, format=None):
 
         courses_id = request.data.get('courses_id', None)
@@ -51,8 +51,8 @@ class ClearCoursesCacheView(APIView):
                     course_key = CourseKey.from_string(course_id)
                     clear_course_from_cache(course_key)
                     success_clear_courses_cache.append(course_id)
-                except InvalidKeyError as e:
-                    LOGGER.error(str(e))
+                except InvalidKeyError as error:
+                    LOGGER.error(str(error))
                     error_clear_courses_cache.append(course_id)
 
             return Response(
