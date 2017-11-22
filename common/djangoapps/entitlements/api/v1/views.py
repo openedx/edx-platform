@@ -85,7 +85,7 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
         CourseEntitlement.set_enrollment(entitlement, None)
 
     def create(self, request, uuid):
-        course_session_id = request.data.get('course_session_id', None)
+        course_session_id = request.data.get('course_run_id', None)
 
         if not course_session_id:
             return Response(
