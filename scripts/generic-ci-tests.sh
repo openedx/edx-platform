@@ -116,7 +116,7 @@ case "$TEST_SUITE" in
         run_paver_quality run_xsscommitlint || EXIT=1
         # Run quality task. Pass in the 'fail-under' percentage to diff-quality
         echo "Running diff quality."
-        run_paver_quality run_quality -p 100 || EXIT=1
+        run_paver_quality run_quality -p 100 -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD || EXIT=1
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.
