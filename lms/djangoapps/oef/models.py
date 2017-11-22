@@ -5,8 +5,8 @@ from student.models import User
 
 
 class OefSurvey(TimeStampedModel):
-    user = models.ForeignKey(User)
-    is_complete = models.BooleanField(default=False)
+    title = models.CharField(max_length=256)
+    is_enabled = models.BooleanField(default=False)
 
 
 class OptionPriority(TimeStampedModel):
@@ -14,16 +14,26 @@ class OptionPriority(TimeStampedModel):
     value = models.FloatField()
 
 
-class Topic(TimeStampedModel):
+class TopicQuestion(TimeStampedModel):
     survey = models.ForeignKey(OefSurvey)
-    is_enabled = models.BooleanField(default=True)
-    is_completed = models.BooleanField(default=False)
-    selected_option = models.ForeignKey(OptionPriority, null=True, blank=True)
     title = models.TextField()
     description = models.TextField()
 
 
 class Option(TimeStampedModel):
-    topic = models.ForeignKey(Topic)
+    topic = models.ForeignKey(TopicQuestion)
     priority = models.ForeignKey(OptionPriority)
     text = models.TextField()
+
+
+class UserOefSurvey(TimeStampedModel):
+    user = models.ForeignKey(User)
+    survey_date = models.DateField()
+    oef_survey = models.ForeignKey(OefSurvey)
+
+
+class UserAnswers(TimeStampedModel):
+    user = models.ForeignKey(User)
+    survey_id = models.ForeignKey(OefSurvey)
+    question = models.ForeignKey(TopicQuestion)
+    selected_option = models.ForeignKey(OptionPriority)
