@@ -123,6 +123,10 @@ def rsa_decrypt(data, rsa_priv_key_bytes):
     """
     When given some `data` and an RSA private key, decrypt the data
     """
+    if isinstance(data, text_type):
+        data = data.encode('utf-8')
+    if isinstance(rsa_priv_key_bytes, text_type):
+        rsa_priv_key_bytes = rsa_priv_key_bytes.encode('utf-8')
     if rsa_priv_key_bytes.startswith(b'-----'):
         key = serialization.load_pem_private_key(rsa_priv_key_bytes, password=None, backend=default_backend())
     else:
