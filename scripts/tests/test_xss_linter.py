@@ -1072,6 +1072,7 @@ class TestUnderscoreTemplateLinter(TestLinter):
 
     @data(
         {'template': '<%= HtmlUtils.ensureHtml(message) %>'},
+        {'template': '<%= edx.HtmlUtils.ensureHtml(message) %>'},
         {'template': '<%= _.escape(message) %>'},
     )
     def test_check_underscore_no_escape_allowed(self, data):
