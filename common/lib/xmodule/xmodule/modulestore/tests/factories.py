@@ -12,7 +12,7 @@ from collections import defaultdict
 from contextlib import contextmanager
 from uuid import uuid4
 
-from factory import Factory, Sequence, lazy_attribute_sequence, lazy_attribute, Faker
+from factory import Factory, Sequence, lazy_attribute_sequence, lazy_attribute
 from factory.errors import CyclicDefinitionError
 from mock import patch
 from nose.tools import assert_less_equal, assert_greater_equal
