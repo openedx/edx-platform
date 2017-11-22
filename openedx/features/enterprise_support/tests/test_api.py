@@ -1,7 +1,7 @@
 """
 Test the enterprise support APIs.
 """
-import json
+
 import unittest
 
 import ddt

@@ -5,7 +5,6 @@ from datetime import datetime
 
 from pytz import UTC
 
-from course_modes.models import CourseMode
 from openedx.core.djangoapps.certificates.config import waffle
 from student.models import CourseEnrollment
 

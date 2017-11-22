@@ -1,6 +1,6 @@
 import datetime
 import logging
-from collections import defaultdict, namedtuple
+from collections import namedtuple
 from copy import deepcopy
 
 import attr

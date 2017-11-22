@@ -5,7 +5,7 @@
 from courseware.tests.factories import GlobalStaffFactory
 from django.conf import settings
 from django.contrib.messages.middleware import MessageMiddleware
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.contrib.sites.models import Site
 from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
 from student.tests.factories import UserFactory

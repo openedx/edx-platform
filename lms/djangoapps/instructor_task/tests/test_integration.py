@@ -36,7 +36,6 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     TestReportMixin
 )
 from openedx.core.djangoapps.util.testing import TestConditionalContent
-from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import ItemFactory

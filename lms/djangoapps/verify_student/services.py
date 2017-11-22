@@ -4,12 +4,9 @@ Implementation of "reverification" service to communicate with Reverification XB
 
 import logging
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.db import IntegrityError
-from opaque_keys.edx.keys import CourseKey
 
-from student.models import CourseEnrollment, User
+from student.models import User
 
 from .models import SoftwareSecurePhotoVerification
 
