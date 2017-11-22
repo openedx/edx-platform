@@ -259,6 +259,20 @@
       display: none;
     }
 
+    input[readonly] {
+      font-family: OpenSans-Regular;
+      background-color: #e6e4e4;
+      color: #292b2c;
+      font-size: 22px;
+      border: none;
+      margin: 5px 0;
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+
     .auto-register-message {
       font-size: 1.1em;
       line-height: 1.3em;
@@ -446,7 +460,8 @@
       outline: solid 1px $gray-l3;
       cursor: pointer;
 
-      &:active, &:focus {
+      &:active,
+      &:focus {
         outline: auto;
       }
     }
@@ -462,7 +477,8 @@
       }
     }
 
-    .tip, .label-optional {
+    .tip,
+    .label-optional {
       @extend %t-copy-sub1;
 
       color: $uxpl-gray-base;

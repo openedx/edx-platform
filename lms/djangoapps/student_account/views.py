@@ -124,6 +124,22 @@ def login_and_registration_form(request, initial_mode="login"):
         } for message in messages.get_messages(request) if 'account-activation' in message.tags
     ]
 
+    account_creation_allowed = configuration_helpers.get_value(
+        'ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)
+    )
+
+    # add user details from running pipeline
+    pipeline_user_details = {}
+    running_pipeline = pipeline.get(request)
+    if running_pipeline:
+        pipeline_user_details = running_pipeline['kwargs']['details']
+        if 'email' in pipeline_user_details or 'username' in pipeline_user_details:
+            # pylint: disable=invalid-name
+            qs = {'email': pipeline_user_details['email']} if pipeline_user_details.get('email') else \
+                {'username': pipeline_user_details.get('username')}
+            if User.objects.filter(**qs).exists():
+                account_creation_allowed = False
+
     # Otherwise, render the combined login/registration page
     context = {
         'data': {
@@ -145,8 +161,8 @@ def login_and_registration_form(request, initial_mode="login"):
             'login_form_desc': json.loads(form_descriptions['login']),
             'registration_form_desc': json.loads(form_descriptions['registration']),
             'password_reset_form_desc': json.loads(form_descriptions['password_reset']),
-            'account_creation_allowed': configuration_helpers.get_value(
-                'ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True))
+            'account_creation_allowed': account_creation_allowed,
+            'pipeline_user_details': pipeline_user_details
         },
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
         'responsive': True,
@@ -236,6 +252,7 @@ def update_context_for_enterprise(request, context):
     context = context.copy()
 
     sidebar_context = enterprise_sidebar_context(request)
+    sync_learner_profile_data = context['data']['third_party_auth']['syncLearnerProfileData']
 
     if sidebar_context:
         context['data']['registration_form_desc']['fields'] = enterprise_fields_only(
@@ -246,6 +263,11 @@ def update_context_for_enterprise(request, context):
         context['data']['hide_auth_warnings'] = True
     else:
         context['enable_enterprise_sidebar'] = False
+
+    if sync_learner_profile_data:
+        context['data']['hide_auth_warnings'] = True
+        enterprise_customer = enterprise_customer_for_request(request)
+        context['data']['enterprise_name'] = enterprise_customer and enterprise_customer['name']
 
     return context
 
@@ -327,6 +349,7 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
         "finishAuthUrl": None,
         "errorMessage": None,
         "registerFormSubmitButtonText": _("Create Account"),
+        "syncLearnerProfileData": False,
     }
 
     if third_party_auth.is_enabled():
@@ -358,6 +381,8 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
             if current_provider is not None:
                 context["currentProvider"] = current_provider.name
                 context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.backend_name)
+                context["hideSignInLink"] = bool(current_provider.sync_learner_profile_data)
+                context["syncLearnerProfileData"] = current_provider.sync_learner_profile_data
 
                 if current_provider.skip_registration_form:
                     # For enterprise (and later for everyone), we need to get explicit consent to the

@@ -567,6 +567,14 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
                 (current_provider.skip_email_verification or current_provider.send_to_registration_first))
 
     if not user:
+        details = kwargs.get('details', {})
+        if 'email' in details or 'username' in details:
+            # pylint: disable=invalid-name
+            qs = {'email': details['email']} if details.get('email') else \
+                {'username': details.get('username')}
+            if User.objects.filter(**qs).exists():
+                return dispatch_to_login()
+
         if is_api(auth_entry):
             return HttpResponseBadRequest()
         elif auth_entry == AUTH_ENTRY_LOGIN:
