@@ -38,7 +38,7 @@ class ClearCoursesCacheView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    http_method_names = ["post"]
+    # Will clear the course cache
     def post(self, request, format=None):
 
         courses_id = request.data.get('courses_id', None)
