@@ -291,9 +291,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Comments and processing instructions should be skipped.
         xml_str = textwrap.dedent("""\
             <?xml version="1.0" encoding="utf-8"?>
-            <!DOCTYPE html [
-                <!ENTITY % wacky "lxml.etree is wacky!">
-            ]>
+            <!DOCTYPE html []>
             <problem>
             <!-- A commment. -->
             <?ignore this processing instruction. ?>
@@ -305,7 +303,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Render the HTML
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div/>")
+        self.assertRegexpMatches(the_html, r"<div>\s*</div>")
 
     def _create_test_file(self, path, content_str):
         test_fp = self.capa_system.filestore.open(path, "w")
