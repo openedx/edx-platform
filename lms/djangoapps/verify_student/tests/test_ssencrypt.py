@@ -1,6 +1,8 @@
-import base64
+"""
+Tests of the encryption and decryption utilities in the ssencrypt module.
+"""
 
-from nose.tools import assert_equals
+import base64
 
 from lms.djangoapps.verify_student.ssencrypt import (
     aes_decrypt,
@@ -11,32 +13,10 @@ from lms.djangoapps.verify_student.ssencrypt import (
     rsa_encrypt
 )
 
+AES_KEY_BYTES = b'32fe72aaf2abb44de9e161131b5435c8d37cbdb6f5df242ae860b283115f2dae'.decode('hex')
 
-def test_aes():
-    key_str = "32fe72aaf2abb44de9e161131b5435c8d37cbdb6f5df242ae860b283115f2dae"
-    key = key_str.decode("hex")
-
-    def assert_roundtrip(text):
-        assert_equals(text, aes_decrypt(aes_encrypt(text, key), key))
-        assert_equals(
-            text,
-            decode_and_decrypt(
-                encrypt_and_encode(text, key),
-                key
-            )
-        )
-
-    assert_roundtrip("Hello World!")
-    assert_roundtrip("1234567890123456")  # AES block size, padding corner case
-    # Longer string
-    assert_roundtrip("12345678901234561234567890123456123456789012345601")
-    assert_roundtrip("")
-    assert_roundtrip("\xe9\xe1a\x13\x1bT5\xc8")  # Random, non-ASCII text
-
-
-def test_rsa():
-    # Make up some garbage keys for testing purposes.
-    pub_key_str = """-----BEGIN PUBLIC KEY-----
+# Make up some garbage keys for testing purposes.
+PUB_KEY_BYTES = b"""-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1hLVjP0oV0Uy/+jQ+Upz
 c+eYc4Pyflb/WpfgYATggkoQdnsdplmvPtQr85+utgqKPxOh+PvYGW8QNUzjLIu4
 5/GlmvBa82i1jRMgEAxGI95bz7j9DtH+7mnj+06zR5xHwT49jK0zMs5MjMaz5WRq
@@ -45,7 +25,7 @@ h5svjspz1MIsOoShjbAdfG+4VX7sVwYlw2rnQeRsMH5/xpnNeqtScyOMoz0N9UDG
 dtRMNGa2MihAg7zh7/zckbUrtf+o5wQtlCJL1Kdj4EjshqYvCxzWnSM+MaYAjb3M
 EQIDAQAB
 -----END PUBLIC KEY-----"""
-    priv_key_str = """-----BEGIN RSA PRIVATE KEY-----
+PRIV_KEY_BYTES = b"""-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEA1hLVjP0oV0Uy/+jQ+Upzc+eYc4Pyflb/WpfgYATggkoQdnsd
 plmvPtQr85+utgqKPxOh+PvYGW8QNUzjLIu45/GlmvBa82i1jRMgEAxGI95bz7j9
 DtH+7mnj+06zR5xHwT49jK0zMs5MjMaz5WRqBUNkz7dxWzDrYJZQx230sPp6upy1
@@ -72,13 +52,46 @@ MlpJNBECgYAmIswPdldm+G8SJd5j9O2fcDVTURjKAoSXCv2j4gEZzzfudpLWNHYu
 l8N6+LEIVTMAytPk+/bImHvGHKZkCz5rEMSuYJWOmqKI92rUtI6fz5DUb3XSbrwT
 3W+sdGFUK3GH1NAX71VxbAlFVLUetcMwai1+wXmGkRw6A7YezVFnhw==
 -----END RSA PRIVATE KEY-----"""
-    aes_key_str = "32fe72aaf2abb44de9e161131b5435c8d37cbdb6f5df242ae860b283115f2dae"
 
-    aes_key = aes_key_str.decode('hex')
 
-    encrypted_aes_key = rsa_encrypt(aes_key, pub_key_str)
-    assert_equals(aes_key, rsa_decrypt(encrypted_aes_key, priv_key_str))
+def test_aes():
+    def assert_roundtrip(data):
+        """
+        Verify that the original data is retrieved after encrypting and
+        decrypting, and again when also using base64 encoding/decoding.
+        """
+        assert aes_decrypt(aes_encrypt(data, AES_KEY_BYTES), AES_KEY_BYTES) == data
+        assert decode_and_decrypt(encrypt_and_encode(data, AES_KEY_BYTES), AES_KEY_BYTES) == data
 
-    # Even though our AES key is only 32 bytes, RSA encryption will make it 256
+    assert_roundtrip(b"Hello World!")
+    assert_roundtrip(b"1234567890123456")  # AES block size, padding corner case
+    # Longer string
+    assert_roundtrip(b"12345678901234561234567890123456123456789012345601")
+    assert_roundtrip(b"")
+    assert_roundtrip(b"\xe9\xe1a\x13\x1bT5\xc8")  # Random, non-ASCII text
+
+
+def test_rsa():
+    _assert_rsa(AES_KEY_BYTES, PUB_KEY_BYTES, PRIV_KEY_BYTES)
+
+
+def test_rsa_unicode_data():
+    data = u'12345678901234567890123456789012'
+    _assert_rsa(data, PUB_KEY_BYTES, PRIV_KEY_BYTES)
+
+
+def test_rsa_unicode_keys():
+    _assert_rsa(AES_KEY_BYTES, PUB_KEY_BYTES.decode('utf-8'), PRIV_KEY_BYTES.decode('utf-8'))
+
+
+def _assert_rsa(data, public_key, private_key):
+    """
+    Assert that the original provided data is retrieved after RSA encryption
+    and decryption using the given keys.
+    """
+    encrypted_data = rsa_encrypt(data, public_key)
+    assert rsa_decrypt(encrypted_data, private_key) == data
+
+    # Even though our test data is only 32 bytes, RSA encryption will make it 256
     # bytes, and base64 encoding will blow that up to 344
-    assert_equals(len(base64.urlsafe_b64encode(encrypted_aes_key)), 344)
+    assert len(base64.urlsafe_b64encode(encrypted_data)) == 344
