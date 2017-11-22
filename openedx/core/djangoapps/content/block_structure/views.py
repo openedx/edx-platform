@@ -1,5 +1,3 @@
-#-*- coding: utf-8 -*-
-# pylint: disable=too-many-ancestors
 """
 Views for block structure api endpoints.
 """
@@ -38,7 +36,9 @@ class ClearCoursesCacheView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    # Will clear the course cache
+    """
+    Will clear the course cache
+    """
     def post(self, request, format=None):
 
         courses_id = request.data.get('courses_id', None)
