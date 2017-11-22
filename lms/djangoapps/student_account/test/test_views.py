@@ -640,6 +640,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             "finishAuthUrl": finish_auth_url,
             "errorMessage": None,
             "registerFormSubmitButtonText": "Create Account",
+            "syncLearnerProfileData": False,
         }
         if expected_ec is not None:
             # If we set an EnterpriseCustomer, third-party auth providers ought to be hidden.

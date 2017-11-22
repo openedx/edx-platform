@@ -894,8 +894,9 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         strategy.storage.user.create_user(username=self.get_username(), email='user@email.com', password='password')
         backend = strategy.request.backend
         backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        # If learner already has an account then make sure login page is served instead of registration.
         # pylint: disable=protected-access
-        self.assert_redirect_to_register_looks_correct(actions.do_complete(backend, social_views._do_login))
+        self.assert_redirect_to_login_looks_correct(actions.do_complete(backend, social_views._do_login))
         distinct_username = pipeline.get(request)['kwargs']['username']
         self.assertNotEqual(original_username, distinct_username)
 

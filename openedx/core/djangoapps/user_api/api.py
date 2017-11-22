@@ -843,8 +843,11 @@ class RegistrationFormFactory(object):
                     # When the TPA Provider is configured to skip the registration form and we are in an
                     # enterprise context, we need to hide all fields except for terms of service and
                     # ensure that the user explicitly checks that field.
-                    hide_registration_fields_except_tos = (current_provider.skip_registration_form and
-                                                           enterprise_customer_for_request(request))
+                    hide_registration_fields_except_tos = (
+                        (
+                            current_provider.skip_registration_form and enterprise_customer_for_request(request)
+                        ) or current_provider.sync_learner_profile_data
+                    )
 
                     for field_name in self.DEFAULT_FIELDS + self.EXTRA_FIELDS:
                         if field_name in field_overrides:
