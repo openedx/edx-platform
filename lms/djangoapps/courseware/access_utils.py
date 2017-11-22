@@ -15,7 +15,7 @@ from openedx.features.course_experience import COURSE_PRE_START_ACCESS_FLAG
 from student.roles import CourseBetaTesterRole
 from xmodule.util.django import get_current_request_hostname
 
-DEBUG_ACCESS = False
+DEBUG_ACCESS = True
 log = getLogger(__name__)
 
 ACCESS_GRANTED = AccessResponse(True)

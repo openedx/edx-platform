@@ -253,8 +253,11 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         display depending on whether staff is masquerading.
         """
         course = self._get_course()
-        if not self._can_user_view_content(course):
-            if course.self_paced:
+        content_gated = self._is_content_gated()
+        if not self._can_user_view_content(course) or content_gated:
+            if content_gated:
+                banner_text = _('This subsection is locked until prerequisite requirements met.')
+            elif course.self_paced:
                 banner_text = _("Because the course has ended, this assignment is hidden from the learner.")
             else:
                 banner_text = _("Because the due date has passed, this assignment is hidden from the learner.")
@@ -264,6 +267,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 {
                     'self_paced': course.self_paced,
                     'progress_url': context.get('progress_url'),
+                    'content_gated': content_gated
                 }
             )
 
@@ -274,14 +278,22 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         Checks whether the content is gated for learners. If so,
         returns a banner_text depending on whether user is staff.
         """
+        banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
+        if self._is_content_gated() and self.runtime.user_is_staff:
+            return banner_text
+
+    def _is_content_gated(self):
+        """
+        Checks whether the content is gated for learners.
+        """
         milestones_service = self.runtime.service(self, 'milestones')
         if milestones_service:
             content_milestones = milestones_service.get_course_content_milestones(
                 self.course_id, self.location, 'requires'
             )
-            banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
-            if content_milestones and self.runtime.user_is_staff:
-                return banner_text
+            return content_milestones
+
+        return False
 
     def _can_user_view_content(self, course):
         """
@@ -291,7 +303,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         hidden_date = course.end if course.self_paced else self.due
         return (
             self.runtime.user_is_staff or
-            self.verify_current_content_visibility(hidden_date, self.hide_after_due)
+            self.verify_current_content_visibility(hidden_date, self.hide_after_due) 
         )
 
     def is_user_authenticated(self, context):
