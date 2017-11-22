@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import FileUpload from './file_upload';
 import ShowErrors from './errors_list';
 import LoggedInUser from './logged_in_user';
 import LoggedOutUser from './logged_out_user';
@@ -47,19 +46,14 @@ class RenderForm extends React.Component {
 
     let course;
 
-    if ($userInfo.length) {
-      data.requester = $userInfo.data('email');
-      course = $course.find(':selected').text();
-      if (!course.length) {
-        course = $course.val();
-      }
-    } else {
-      data.requester = $('#email').val();
+    data.requester = $userInfo.data('email');
+    course = $course.find(':selected').val();
+    if (!course) {
       course = $course.val();
     }
 
     data.custom_fields = [{
-      id: this.props.context.customFields.course,
+      id: this.props.context.customFields.course_id,
       value: course,
     }];
 
@@ -128,11 +122,17 @@ class RenderForm extends React.Component {
   renderSupportForm() {
     let userElement;
     if (this.props.context.user) {
-      userElement = <LoggedInUser userInformation={this.props.context.user} />;
+      userElement = (<LoggedInUser
+        userInformation={this.props.context.user}
+        zendeskApiHost={this.props.context.zendeskApiHost}
+        accessToken={this.props.context.accessToken}
+        setErrorState={this.setErrorState}
+        submitForm={this.submitForm}
+      />);
     } else {
       userElement = (<LoggedOutUser
         platformName={this.props.context.platformName}
-        loginUrl={this.props.context.loginQuery}
+        loginQuery={this.props.context.loginQuery}
       />);
     }
 
@@ -151,7 +151,7 @@ class RenderForm extends React.Component {
 
         <div className="row">
           <div className="col-sm-12">
-            <p>{gettext('Your question might have already been answered.')}</p>
+            <p>{gettext('Find answers to the top questions asked by learners.')}</p>
           </div>
         </div>
 
@@ -165,47 +165,6 @@ class RenderForm extends React.Component {
         </div>
 
         {userElement}
-
-        <div className="row">
-          <div className="col-sm-12">
-            <div className="form-group">
-              <label htmlFor="subject">{gettext('Subject')}</label>
-              <input type="text" className="form-control" id="subject" />
-            </div>
-          </div>
-        </div>
-
-        <div className="row">
-          <div className="col-sm-12">
-            <div className="form-group">
-              <label htmlFor="message">{gettext('Details')}</label>
-              <p
-                className="message-desc"
-              >{gettext('The more you tell us, the more quickly and helpfully we can respond!')}</p>
-              <textarea
-                aria-describedby="message"
-                className="form-control"
-                rows="7"
-                id="message"
-              />
-            </div>
-          </div>
-        </div>
-
-        <FileUpload
-          setErrorState={this.setErrorState}
-          zendeskApiHost={this.props.context.zendeskApiHost}
-          accessToken={this.props.context.accessToken}
-        />
-
-        <div className="row">
-          <div className="col-sm-12">
-            <button
-              className="btn btn-primary btn-submit"
-              onClick={this.submitForm}
-            >{gettext('Submit')}</button>
-          </div>
-        </div>
       </div>
     );
   }

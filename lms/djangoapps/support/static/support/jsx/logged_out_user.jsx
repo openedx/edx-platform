@@ -3,7 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function LoggedOutUser({ platformName, loginUrl }) {
+function LoggedOutUser({ platformName, loginQuery }) {
   return (
     <div>
       <div className="row">
@@ -14,27 +14,13 @@ function LoggedOutUser({ platformName, loginUrl }) {
 
       <div className="row">
         <div className="col-sm-12">
-          <a href={loginUrl} className="btn btn-primary btn-signin">{gettext('Sign in')}</a>
+          <a href={`/login${loginQuery}`} className="btn btn-primary btn-signin">{gettext('Sign in')}</a>
         </div>
       </div>
 
       <div className="row">
         <div className="col-sm-12">
-          <div className="form-group">
-            <label htmlFor="email">{gettext('Your Email Address')}</label>
-            <input type="text" className="form-control" id="email" />
-          </div>
-        </div>
-      </div>
-
-      <div className="row">
-        <div className="col-sm-12">
-          <div className="form-group">
-            <label
-              htmlFor="course"
-            >{gettext('Course Name')}<span> {gettext('(Optional)')}</span></label>
-            <input type="text" className="form-control" id="course" />
-          </div>
+          <a className="create-account" href={`/register${loginQuery}`}>{gettext(`Create an ${platformName} account`)}</a>
         </div>
       </div>
     </div>
@@ -43,7 +29,7 @@ function LoggedOutUser({ platformName, loginUrl }) {
 
 LoggedOutUser.propTypes = {
   platformName: PropTypes.string.isRequired,
-  loginUrl: PropTypes.string.isRequired,
+  loginQuery: PropTypes.string.isRequired,
 };
 
 export default LoggedOutUser;
