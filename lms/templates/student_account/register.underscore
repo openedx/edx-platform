@@ -1,12 +1,16 @@
 <div class="js-form-feedback" aria-live="assertive" tabindex="-1">
 </div>
 
-<div class="toggle-form">
-    <span class="text"><%- edx.StringUtils.interpolate(gettext('Already have an {platformName} account?'), {platformName: context.platformName }) %></span>
-    <a href="#login" class="form-toggle" data-type="login"><%- gettext("Sign in.") %></a>
-</div>
+<% if (!context.syncLearnerProfileData) { %>
+	<div class="toggle-form">
+		<span class="text"><%- edx.StringUtils.interpolate(gettext('Already have an {platformName} account?'), {platformName: context.platformName }) %></span>
+		<a href="#login" class="form-toggle" data-type="login"><%- gettext("Sign in.") %></a>
+	</div>
+<% } %>
 
-<form id="register" class="register-form" autocomplete="off" tabindex="-1" method="POST">
+<h2><%- gettext('Create an Account')%></h2>
+
+<form id="register" class="register-form <% if (context.syncLearnerProfileData) { %> sync-profile-registration-form <% } %>" autocomplete="off" tabindex="-1" method="POST">
 
     <% if (!context.currentProvider) { %>
         <% if (context.providers.length > 0 || context.hasSecondaryProviders) { %>

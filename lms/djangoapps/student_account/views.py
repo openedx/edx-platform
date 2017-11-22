@@ -74,6 +74,24 @@ def login_and_registration_form(request, initial_mode="login"):
     if request.user.is_authenticated():
         return redirect(redirect_to)
 
+    running_pipeline = pipeline.get(request)
+    if running_pipeline and initial_mode == 'register':
+        current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
+        enterprise_customer = enterprise_customer_for_request(request)
+        if enterprise_customer and current_provider and current_provider.sync_learner_profile_data:
+            user_details = running_pipeline['kwargs']['details']
+
+            try:
+                # pylint: disable=invalid-name
+                qs = {'email': user_details['email']} if user_details.get('email') else \
+                    {'username': user_details.get('username')}
+                user = User.objects.get(**qs)
+            except User.DoesNotExist:
+                pass
+            else:
+                pipeline.sync_user_with_sso_provider_data(current_provider, user_details, user)
+                return redirect(reverse('signin_user'), next=redirect_to)
+
     # Retrieve the form descriptions from the user API
     form_descriptions = _get_form_descriptions(request)
 
@@ -236,6 +254,7 @@ def update_context_for_enterprise(request, context):
     context = context.copy()
 
     sidebar_context = enterprise_sidebar_context(request)
+    sync_learner_profile_data = context['data']['third_party_auth']['syncLearnerProfileData']
 
     if sidebar_context:
         context['data']['registration_form_desc']['fields'] = enterprise_fields_only(
@@ -246,6 +265,11 @@ def update_context_for_enterprise(request, context):
         context['data']['hide_auth_warnings'] = True
     else:
         context['enable_enterprise_sidebar'] = False
+
+    if sync_learner_profile_data:
+        context['data']['hide_auth_warnings'] = True
+        enterprise_customer = enterprise_customer_for_request(request)
+        context['data']['enterprise_name'] = enterprise_customer and enterprise_customer['name']
 
     return context
 
@@ -327,6 +351,7 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
         "finishAuthUrl": None,
         "errorMessage": None,
         "registerFormSubmitButtonText": _("Create Account"),
+        "syncLearnerProfileData": False,
     }
 
     if third_party_auth.is_enabled():
@@ -358,6 +383,7 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
             if current_provider is not None:
                 context["currentProvider"] = current_provider.name
                 context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.backend_name)
+                context["syncLearnerProfileData"] = current_provider.sync_learner_profile_data
 
                 if current_provider.skip_registration_form:
                     # For enterprise (and later for everyone), we need to get explicit consent to the

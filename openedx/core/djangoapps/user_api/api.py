@@ -15,6 +15,7 @@ from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from student.forms import get_registration_extension_form
 from student.models import UserProfile
+from student.views import REGISTRATION_DISPLAY_FIELD_NAMES_FOR_THIRD_PARTY_AUTH
 
 
 def get_password_reset_form():
@@ -836,33 +837,14 @@ class RegistrationFormFactory(object):
                 current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
 
                 if current_provider:
-                    # Override username / email / full name
-                    field_overrides = current_provider.get_register_form_data(
-                        running_pipeline.get('kwargs')
+                    self._override_registration_fields_using_identity_provider_configuration(
+                        request, current_provider, running_pipeline, form_desc
                     )
 
-                    # When the TPA Provider is configured to skip the registration form and we are in an
-                    # enterprise context, we need to hide all fields except for terms of service and
-                    # ensure that the user explicitly checks that field.
-                    hide_registration_fields_except_tos = (current_provider.skip_registration_form and
-                                                           enterprise_customer_for_request(request))
-
-                    for field_name in self.DEFAULT_FIELDS + self.EXTRA_FIELDS:
-                        if field_name in field_overrides:
-                            form_desc.override_field_properties(
-                                field_name, default=field_overrides[field_name]
-                            )
-
-                            if (field_name not in ['terms_of_service', 'honor_code']
-                                    and field_overrides[field_name]
-                                    and hide_registration_fields_except_tos):
-
-                                form_desc.override_field_properties(
-                                    field_name,
-                                    field_type="hidden",
-                                    label="",
-                                    instructions="",
-                                )
+                    # Apply third party overrides to registration form fields for sync_learner_profile_data.
+                    self._apply_sync_learner_profile_data_registration_fields(
+                        current_provider, running_pipeline, form_desc
+                    )
 
                     # Hide the password field
                     form_desc.override_field_properties(
@@ -881,4 +863,64 @@ class RegistrationFormFactory(object):
                         label="",
                         default=current_provider.name if current_provider.name else "Third Party",
                         required=False,
+                    )
+
+    # pylint: disable=invalid-name
+    def _override_registration_fields_using_identity_provider_configuration(
+            self, request, current_provider, running_pipeline, form_desc
+    ):
+        """
+        Apply form field overrides based on configuration of third party auth provider.
+        """
+        field_overrides = current_provider.get_register_form_data(
+            running_pipeline.get('kwargs')
+        )
+        # When the TPA Provider is configured to skip the registration form and we are in an
+        # enterprise context, we need to hide all fields except for terms of service and
+        # ensure that the user explicitly checks that field.
+        hide_registration_fields_except_tos = (
+            current_provider.skip_registration_form and enterprise_customer_for_request(request)
+        )
+
+        for field_name in self.DEFAULT_FIELDS + self.EXTRA_FIELDS:
+            if field_name in field_overrides:
+                form_desc.override_field_properties(
+                    field_name, default=field_overrides[field_name]
+                )
+
+                if field_name not in ['terms_of_service', 'honor_code'] and field_overrides[field_name] and \
+                        hide_registration_fields_except_tos:
+                    form_desc.override_field_properties(
+                        field_name,
+                        field_type="hidden",
+                        label="",
+                        instructions="",
+                    )
+
+    # pylint: disable=invalid-name
+    def _apply_sync_learner_profile_data_registration_fields(self, current_provider, running_pipeline, form_desc):
+        """
+        Apply login and registration field overrides depending upon third party auth's configurations.
+        """
+        field_overrides = current_provider.get_register_form_data(
+            running_pipeline.get('kwargs')
+        )
+        # Make input fields read-only for fields passed in via SSO callback data.
+        if current_provider.sync_learner_profile_data:
+            for field_name in self.DEFAULT_FIELDS + self.EXTRA_FIELDS:
+                if field_name in REGISTRATION_DISPLAY_FIELD_NAMES_FOR_THIRD_PARTY_AUTH:
+                    if field_name not in ['terms_of_service', 'honor_code'] and field_name in field_overrides and \
+                            field_overrides[field_name]:
+                        form_desc.override_field_properties(
+                            field_name,
+                            restrictions={"readonly": True},
+                            instructions=""
+                        )
+                else:
+                    form_desc.override_field_properties(
+                        field_name,
+                        field_type="hidden",
+                        required=False,
+                        label="",
+                        instructions="",
                     )

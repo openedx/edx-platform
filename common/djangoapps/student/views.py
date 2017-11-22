@@ -8,6 +8,7 @@ import logging
 import uuid
 import warnings
 from collections import defaultdict, namedtuple
+from copy import deepcopy
 from urlparse import parse_qs, urlsplit, urlunsplit
 
 import django
@@ -158,6 +159,10 @@ else:
 
 # Disable this warning because it doesn't make sense to completely refactor tests to appease Pylint
 # pylint: disable=logging-format-interpolation
+
+REGISTRATION_DISPLAY_FIELD_NAMES_FOR_THIRD_PARTY_AUTH = [
+    'terms_of_service', 'honor_code', 'email', 'name'
+]
 
 
 def csrf_token(context):
@@ -1894,6 +1899,7 @@ def create_account_with_params(request, params):
     # is sent in params.
     # `third_party_auth_credentials_in_api` essentially means 'request
     # is made from mobile application'
+    extra_fields = _apply_third_party_auth_overrides(request, extra_fields)
     third_party_auth_credentials_in_api = 'provider' in params
 
     is_third_party_auth_enabled = third_party_auth.is_enabled()
@@ -2108,6 +2114,28 @@ def create_account_with_params(request, params):
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(new_user.username, new_user.email))
 
     return new_user
+
+
+def _apply_third_party_auth_overrides(request, extra_fields):
+    """
+    Modify the required attribute of the provided extra_fields according to the learners third party auth provider.
+    """
+    updated_fields = deepcopy(extra_fields)
+
+    if third_party_auth.is_enabled():
+        running_pipeline = third_party_auth.pipeline.get(request)
+        if running_pipeline:
+            current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
+            # Make input fields read-only for fields passed in via SSO callback data.
+            if current_provider and current_provider.sync_learner_profile_data:
+
+                for field_name, field_value in extra_fields.items():
+                    if field_name not in REGISTRATION_DISPLAY_FIELD_NAMES_FOR_THIRD_PARTY_AUTH and \
+                            field_value == 'required':
+                        # Make hidden fields optional
+                        updated_fields[field_name] = 'optional'
+
+    return updated_fields
 
 
 def skip_activation_email(user, do_external_auth, running_pipeline, third_party_provider):

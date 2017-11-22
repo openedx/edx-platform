@@ -265,6 +265,118 @@
     }
   }
 
+
+  .sync-learner-account {
+    .welcome-message {
+      line-height: 30px;
+      font-size: 26px;
+      color: #fff;
+      font-family: Merriweather-Bold;
+      padding: 10px;
+      background-color: #ef7ab0;
+    }
+
+    .account-info-message {
+      font-size: 16px;
+      color: #636c72;
+      font-family: OpenSans-Regular;
+      padding: 10px 0;
+    }
+  }
+
+  .sync-profile-registration-form {
+    .register-button {
+      width: 100%;
+    }
+
+    div[class^="hidden-"] {
+      display: none;
+    }
+
+    .form-field label {
+      font-size: 16px;
+      color: #636c72;
+      font-family: OpenSans-Regular;
+    }
+
+    input[readonly] {
+      font-family: OpenSans-Regular;
+      background-color: #e6e4e4;
+      color: #292b2c;
+      font-size: 22px;
+      border: none;
+      margin: 5px 0;
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .checkbox-honor_code {
+      font-family: OpenSans-Regular;
+      margin: 30px 0;
+      color: #292b2c;
+      font-size: 16px;
+      padding: 4px;
+      background-color: #f2f8fd;
+
+      .supplemental-link {
+        margin-top: 20px;
+      }
+    }
+  }
+
+  .sync-learner-account-logo {
+    margin-left: 40%;
+  }
+
+  .sync-learner-account-login {
+    .welcome-message {
+      color: #636c72;
+      font-family: Merriweather-Bold;
+      font-size: 32px;
+      line-height: initial;
+    }
+
+    .account-info-message {
+      padding: 10px 0;
+      color: #4e4e4e;
+      font-family: OpenSans-Regular;
+      font-size: 16px;
+
+      div,
+      span {
+        padding: 10px 0;
+      }
+    }
+
+    .label {
+      padding: 5px 0;
+      color: #636c72;
+      font-family: OpenSans-SemiBold;
+      font-size: 16px;
+    }
+
+    .previously {
+      padding: 5px 0;
+      color: #636c72;
+      font-family: OpenSans-Regular;
+      font-size: 14px;
+    }
+
+    .field {
+      padding: 5px 0;
+      color: #292b2c;
+      font-family: OpenSans-Regular;
+      font-size: 22px;
+    }
+
+    .login-button {
+      width: 100%;
+      margin: 20px 0;
+    }
+  }
+
   %bold-label {
     @include font-size(16);
 
@@ -446,7 +558,8 @@
       outline: solid 1px $gray-l3;
       cursor: pointer;
 
-      &:active, &:focus {
+      &:active,
+      &:focus {
         outline: auto;
       }
     }
@@ -462,7 +575,8 @@
       }
     }
 
-    .tip, .label-optional {
+    .tip,
+    .label-optional {
       @extend %t-copy-sub1;
 
       color: $uxpl-gray-base;

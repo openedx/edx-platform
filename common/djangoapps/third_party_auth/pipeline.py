@@ -732,33 +732,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
     """
     current_provider = provider.Registry.get_from_pipeline({'backend': strategy.request.backend.name, 'kwargs': kwargs})
     if user and current_provider.sync_learner_profile_data:
-        # Keep track of which incoming values get applied.
-        changed = {}
-
-        # Map each incoming field from the provider to the name on the user model (by default, they always match).
-        field_mapping = {field: (user, field) for field in details.keys() if hasattr(user, field)}
-
-        # This is a special case where the field mapping should go to the user profile object and not the user object,
-        # in some cases with differing field names (i.e. 'fullname' vs. 'name').
-        field_mapping.update({
-            'fullname': (user.profile, 'name'),
-            'country': (user.profile, 'country'),
-        })
-
-        # Track any fields that would raise an integrity error if there was a conflict.
-        integrity_conflict_fields = {'email': user.email, 'username': user.username}
-
-        for provider_field, (model, field) in field_mapping.items():
-            provider_value = details.get(provider_field)
-            current_value = getattr(model, field)
-            if provider_value is not None and current_value != provider_value:
-                if field in integrity_conflict_fields and User.objects.filter(**{field: provider_value}).exists():
-                    logger.warning('User with ID [%s] tried to synchronize profile data through [%s] '
-                                   'but there was a conflict with an existing [%s]: [%s].',
-                                   user.id, current_provider.name, field, provider_value)
-                    continue
-                changed[provider_field] = current_value
-                setattr(model, field, provider_value)
+        changed = sync_user_with_sso_provider_data(current_provider, details, user)
 
         if changed:
             logger.info(
@@ -790,3 +764,35 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
                 except SMTPException:
                     logger.exception('Error sending IdP learner data sync-initiated email change '
                                      'notification email for user [%s].', user.username)
+
+
+def sync_user_with_sso_provider_data(current_provider, details, user):
+    """
+    Update user info based on the details dict provided in the argument.
+    """
+    # Keep track of which incoming values get applied.
+    changed = {}
+
+    # Map each incoming field from the provider to the name on the user model (by default, they always match).
+    field_mapping = {field: (user, field) for field in details.keys() if hasattr(user, field)}
+    # This is a special case where the field mapping should go to the user profile object and not the user object,
+    # in some cases with differing field names (i.e. 'fullname' vs. 'name').
+    field_mapping.update({
+        'fullname': (user.profile, 'name'),
+        'country': (user.profile, 'country'),
+    })
+    # Track any fields that would raise an integrity error if there was a conflict.
+    integrity_conflict_fields = {'email': user.email, 'username': user.username}
+    for provider_field, (model, field) in field_mapping.items():
+        provider_value = details.get(provider_field)
+        current_value = getattr(model, field)
+        if provider_value is not None and current_value != provider_value:
+            if field in integrity_conflict_fields and User.objects.filter(**{field: provider_value}).exists():
+                logger.warning('User with ID [%s] tried to synchronize profile data through [%s] '
+                               'but there was a conflict with an existing [%s]: [%s].',
+                               user.id, current_provider.name, field, provider_value)
+                continue
+            changed[provider_field] = current_value
+            setattr(model, field, provider_value)
+
+    return changed

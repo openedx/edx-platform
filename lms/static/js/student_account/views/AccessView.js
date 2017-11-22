@@ -71,6 +71,7 @@
                     };
 
                     this.platformName = options.platform_name;
+                    this.enterpriseName = options.enterprise_name;
                     this.supportURL = options.support_link;
                     this.passwordResetSupportUrl = options.password_reset_support_link;
                     this.createAccountOption = options.account_creation_allowed;
@@ -170,6 +171,7 @@
                             model: model,
                             thirdPartyAuth: this.thirdPartyAuth,
                             platformName: this.platformName,
+                            enterpriseName: this.enterpriseName,
                             hideAuthWarnings: this.hideAuthWarnings
                         });
 
