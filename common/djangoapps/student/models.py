@@ -1760,7 +1760,7 @@ class CourseEnrollment(models.Model):
             return None
 
         try:
-            if not self.schedule:
+            if not self.schedule or not self.schedule.active:
                 return None
 
             log.debug(

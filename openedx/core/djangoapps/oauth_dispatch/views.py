@@ -8,7 +8,7 @@ from __future__ import unicode_literals
 import hashlib
 import json
 
-from Crypto.PublicKey import RSA
+from Cryptodome.PublicKey import RSA
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import JsonResponse

@@ -16,7 +16,6 @@ from .common import *
 from openedx.core.lib.derived import derive_settings
 
 DEBUG = True
-TEMPLATE_DEBUG = True
 
 HTTPS = 'off'
 FEATURES['DISABLE_START_DATES'] = False

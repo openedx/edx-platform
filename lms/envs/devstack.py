@@ -268,6 +268,22 @@ JWT_AUTH.update({
     'JWT_AUDIENCE': 'lms-key',
 })
 
+
+############## Settings for ACE ####################################
+ACE_ENABLED_CHANNELS = [
+    'file_email'
+]
+ACE_ENABLED_POLICIES = [
+    'bulk_email_optout'
+]
+ACE_CHANNEL_SAILTHRU_DEBUG = True
+ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = 'Automated Communication Engine Email'
+ACE_CHANNEL_SAILTHRU_API_KEY = None
+ACE_CHANNEL_SAILTHRU_API_SECRET = None
+
+ACE_ROUTING_KEY = LOW_PRIORITY_QUEUE
+
+
 #####################################################################
 # See if the developer has any local overrides.
 if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):

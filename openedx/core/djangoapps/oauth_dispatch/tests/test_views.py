@@ -7,7 +7,7 @@ import unittest
 
 import ddt
 import httpretty
-from Crypto.PublicKey import RSA
+from Cryptodome.PublicKey import RSA
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase, override_settings
