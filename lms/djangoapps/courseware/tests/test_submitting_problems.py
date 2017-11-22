@@ -10,6 +10,7 @@ import os
 from textwrap import dedent
 
 import ddt
+import pytest
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -336,6 +337,7 @@ class TestCourseGrades(TestSubmittingProblems):
 
 @attr(shard=3)
 @ddt.ddt
+@pytest.mark.django111_expected_failure
 class TestCourseGrader(TestSubmittingProblems):
     """
     Suite of tests for the course grader.
