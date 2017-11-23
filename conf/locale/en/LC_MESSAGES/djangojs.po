@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-16 10:49+0000\n"
-"PO-Revision-Date: 2017-11-16 11:00:29.286103\n"
+"POT-Creation-Date: 2017-11-23 10:35+0000\n"
+"PO-Revision-Date: 2017-11-23 10:57:57.594095\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2746,7 +2746,8 @@ msgid "HTML preview of post"
 msgstr ""
 
 #: lms/static/coffee/src/customwmd.js
-msgid "Post body"
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "Your question or idea (required)"
 msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
@@ -6294,10 +6295,6 @@ msgstr ""
 #: common/static/common/templates/discussion/thread-edit.underscore
 msgid ""
 "Add a clear and descriptive title to encourage participation. (Required)"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "Your question or idea (required)"
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
