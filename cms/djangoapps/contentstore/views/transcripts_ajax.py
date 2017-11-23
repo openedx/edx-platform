@@ -14,6 +14,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.core.files.base import ContentFile
 from django.http import Http404, HttpResponse
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
@@ -40,6 +41,7 @@ from xmodule.video_module.transcripts_utils import (
     TranscriptsRequestValidationException,
     youtube_video_transcript_name,
 )
+from edxval import api as edxval_api
 
 __all__ = [
     'upload_transcripts',
@@ -119,16 +121,24 @@ def upload_transcripts(request):
     if video_list:
         sub_attr = source_subs_name
         try:
-            # Generate and save for 1.0 speed, will create subs_sub_attr.srt.sjson subtitles file in storage.
-            generate_subs_from_source({1: sub_attr}, source_subs_ext, source_subs_filedata, item)
+            # Generate sjson subtitles from srt substitles
+            sjson_subs = generate_subs_from_source({}, source_subs_ext, source_subs_filedata, item)
 
             for video_dict in video_list:
                 video_name = video_dict['video']
-                # We are creating transcripts for every video source, if in future some of video sources would be deleted.
-                # Updates item.sub with `video_name` on success.
-                copy_or_rename_transcript(video_name, sub_attr, item, user=request.user)
+                # We are creating transcripts for every video source in case a video source is deleted in future.
+                edxval_api.create_or_update_video_transcript(
+                    video_id=video_name,
+                    language_code='en',
+                    file_name='subs.sjson',  # S3 filename will be `uuid.sjson` like 5d30d3e44cebacf6163976388cae.sjson
+                    file_format='sjson',
+                    provider='Custom',
+                    file_data=ContentFile(json.dumps(sjson_subs)),
+                )
 
-            response['subs'] = item.sub
+            item.sub = video_name
+            item.save_with_metadata(request.user)
+            response['subs'] = video_name
             response['status'] = 'Success'
         except Exception as ex:
             return error_response(response, ex.message)

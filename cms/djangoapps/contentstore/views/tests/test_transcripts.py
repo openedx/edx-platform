@@ -21,6 +21,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.video_module import transcripts_utils
+from edxval import api as edxval_api
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -106,11 +107,11 @@ class TestUploadTranscripts(BaseTranscripts):
 
         self.good_srt_file = tempfile.NamedTemporaryFile(suffix='.srt')
         self.good_srt_file.write(textwrap.dedent("""
-            1
+            0
             00:00:10,500 --> 00:00:13,000
             Elephant's Dream
 
-            2
+            1
             00:00:15,000 --> 00:00:18,000
             At the left we can see...
         """))
@@ -133,6 +134,25 @@ class TestUploadTranscripts(BaseTranscripts):
         self.bad_name_srt_file.seek(0)
 
         self.ufeff_srt_file = tempfile.NamedTemporaryFile(suffix='.srt')
+
+    def assert_transcript_upload(self, filename, expected_transcript_content):
+        """
+        Verify that transcript is uploaded as expected
+        """
+        # verify that transcript should not be in contentstore
+        content_location = StaticContent.compute_location(self.course.id, 'subs_{0}.srt.sjson'.format(filename))
+        with self.assertRaises(NotFoundError) as item_not_found:
+            contentstore().find(content_location)
+
+        # verify uploaded transcript content
+        transcript_data = edxval_api.get_video_transcript_data([filename], 'en')
+        sjson_transcript = transcript_data['content']
+        uploaded_transcript_content = transcripts_utils.Transcript.convert(
+            sjson_transcript,
+            input_format='sjson',
+            output_format='srt'
+        )
+        self.assertIn(expected_transcript_content.strip(), uploaded_transcript_content.strip())
 
     def test_success_video_module_source_subs_uploading(self):
         self.item.data = textwrap.dedent("""
@@ -161,9 +181,9 @@ class TestUploadTranscripts(BaseTranscripts):
         item = modulestore().get_item(self.video_usage_key)
         self.assertEqual(item.sub, filename)
 
-        content_location = StaticContent.compute_location(
-            self.course.id, 'subs_{0}.srt.sjson'.format(filename))
-        self.assertTrue(contentstore().find(content_location))
+        # move the file pointer to start of the file
+        self.good_srt_file.seek(0)
+        self.assert_transcript_upload(filename, self.good_srt_file.read())
 
     def test_fail_data_without_id(self):
         link = reverse('upload_transcripts')
@@ -346,12 +366,7 @@ class TestUploadTranscripts(BaseTranscripts):
         })
         self.assertEqual(resp.status_code, 200)
 
-        content_location = StaticContent.compute_location(
-            self.course.id, 'subs_{0}.srt.sjson'.format(filename))
-        self.assertTrue(contentstore().find(content_location))
-
-        subs_text = json.loads(contentstore().find(content_location).data).get('text')
-        self.assertIn("Test ufeff characters", subs_text)
+        self.assert_transcript_upload(filename, 'Test ufeff characters')
 
     def tearDown(self):
         super(TestUploadTranscripts, self).tearDown()
