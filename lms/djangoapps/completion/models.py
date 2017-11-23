@@ -6,7 +6,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction, connection
 from django.utils.translation import ugettext as _
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey
@@ -34,7 +34,7 @@ class BlockCompletionManager(models.Manager):
     """
     Custom manager for BlockCompletion model.
 
-    Adds submit_completion method.
+    Adds submit_completion and submit_batch_completion methods.
     """
 
     def submit_completion(self, user, course_key, block_key, completion):
@@ -87,14 +87,14 @@ class BlockCompletionManager(models.Manager):
             )
 
         if waffle.waffle().is_enabled(waffle.ENABLE_COMPLETION_TRACKING):
-            obj, isnew = self.get_or_create(
+            obj, is_new = self.get_or_create(
                 user=user,
                 course_key=course_key,
                 block_type=block_type,
                 block_key=block_key,
                 defaults={'completion': completion},
             )
-            if not isnew and obj.completion != completion:
+            if not is_new and obj.completion != completion:
                 obj.completion = completion
                 obj.full_clean()
                 obj.save()
@@ -103,7 +103,44 @@ class BlockCompletionManager(models.Manager):
             raise RuntimeError(
                 "BlockCompletion.objects.submit_completion should not be called when the feature is disabled."
             )
-        return obj, isnew
+        return obj, is_new
+
+    @transaction.atomic()
+    def submit_batch_completion(self, user, course_key, blocks):
+        """
+        Performs a batch insertion of completion objects.
+
+        Parameters:
+            * user (django.contrib.auth.models.User): The user for whom the
+              completions are being submitted.
+            * course_key (opaque_keys.edx.keys.CourseKey): The course in
+              which the submitted blocks are found.
+            * blocks: A list of tuples of UsageKey to float completion values.
+              (float in range [0.0, 1.0]): The fractional completion
+              value of the block (0.0 = incomplete, 1.0 = complete).
+
+        Return Value:
+            Dict of (BlockCompletion, bool): A dictionary with a
+            BlockCompletion object key and a value of bool. The boolean value
+            indicates whether the object was newly created by this call.
+
+        Raises:
+
+            ValueError:
+                If the wrong type is passed for one of the parameters.
+
+            django.core.exceptions.ValidationError:
+                If a float is passed that is not between 0.0 and 1.0.
+
+            django.db.DatabaseError:
+                If there was a problem getting, creating, or updating the
+                BlockCompletion record in the database.
+        """
+        block_completions = {}
+        for block, completion in blocks:
+            (block_completion, is_new) = self.submit_completion(user, course_key, block, completion)
+            block_completions[block_completion] = is_new
+        return block_completions
 
 
 class BlockCompletion(TimeStampedModel, models.Model):

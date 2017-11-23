@@ -100,6 +100,9 @@ urlpatterns = [
     # Course API
     url(r'^api/courses/', include('course_api.urls')),
 
+    # Completion API
+    url(r'^api/completion/', include('completion.api.urls', namespace='completion_api')),
+
     # User API endpoints
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
