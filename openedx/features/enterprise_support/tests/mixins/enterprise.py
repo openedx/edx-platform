@@ -7,6 +7,8 @@ import mock
 import httpretty
 from django.conf import settings
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 
 
 class EnterpriseServiceMockMixin(object):
@@ -150,31 +152,47 @@ class EnterpriseTestConsentRequired(object):
     """
     Mixin to help test the data_sharing_consent_required decorator.
     """
-    def verify_consent_required(self, client, url, status_code=200):
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+    @mock.patch('openedx.features.enterprise_support.api.reverse')
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_enabled')
+    @mock.patch('openedx.features.enterprise_support.api.consent_needed_for_course')
+    def verify_consent_required(
+            self,
+            client,
+            url,
+            mock_consent_necessary,
+            mock_enterprise_enabled,
+            mock_reverse,
+            mock_enterprise_customer_uuid_for_request,
+            status_code=200,
+    ):
         """
         Verify that the given URL redirects to the consent page when consent is required,
         and doesn't redirect to the consent page when consent is not required.
-
-        Arguments:
-        * self: ignored
-        * client: the TestClient instance to be used
-        * url: URL to test
-        * status_code: expected status code of URL when no data sharing consent is required.
         """
-        with mock.patch('openedx.features.enterprise_support.api.enterprise_enabled', return_value=True):
-            with mock.patch('openedx.features.enterprise_support.api.consent_necessary_for_course') as mock_consent_necessary:  # pylint: disable=line-too-long
-                # Ensure that when consent is necessary, the user is redirected to the consent page.
-                mock_consent_necessary.return_value = True
-                response = client.get(url)
-                assert response.status_code == 302
-                assert 'grant_data_sharing_permissions' in response.url  # pylint: disable=no-member
 
-                # Ensure that when consent is not necessary, the user continues through to the requested page.
-                mock_consent_necessary.return_value = False
-                response = client.get(url)
-                assert response.status_code == status_code
+        def mock_consent_reverse(*args, **kwargs):
+            if args[0] == 'grant_data_sharing_permissions':
+                return '/enterprise/grant_data_sharing_permissions'
+            return reverse(*args, **kwargs)
 
-                # If we were expecting a redirect, ensure it's not to the data sharing permission page
-                if status_code == 302:
-                    assert 'grant_data_sharing_permissions' not in response.url  # pylint: disable=no-member
-                return response
+        mock_reverse.side_effect = mock_consent_reverse
+        mock_enterprise_enabled.return_value = True
+        mock_enterprise_customer_uuid_for_request.return_value = 'fake-uuid'
+        # Ensure that when consent is necessary, the user is redirected to the consent page.
+        mock_consent_necessary.return_value = True
+        response = client.get(url)
+        while(response.status_code == 302 and 'grant_data_sharing_permissions' not in response.url):
+            response = client.get(response.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('grant_data_sharing_permissions', response.url)  # pylint: disable=no-member
+
+        # Ensure that when consent is not necessary, the user continues through to the requested page.
+        mock_consent_necessary.return_value = False
+        response = client.get(url)
+        self.assertEqual(response.status_code, status_code)
+
+        # If we were expecting a redirect, ensure it's not to the data sharing permission page
+        if status_code == 302:
+            self.assertNotIn('grant_data_sharing_permissions', response.url)  # pylint: disable=no-member
+        return response
