@@ -6,7 +6,6 @@ import logging
 
 from django.conf import settings
 from django.test import TestCase
-from mock import patch
 
 from microsite_configuration import microsite
 from microsite_configuration.backends.base import BaseMicrositeBackend

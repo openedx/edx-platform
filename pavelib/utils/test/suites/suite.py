@@ -5,7 +5,6 @@ import sys
 import subprocess
 
 from paver import tasks
-from paver.easy import sh
 
 from pavelib.utils.process import kill_process
 

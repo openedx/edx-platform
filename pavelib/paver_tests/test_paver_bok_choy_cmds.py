@@ -9,9 +9,8 @@ from textwrap import dedent
 
 import ddt
 from mock import Mock, call, patch
-from paver.easy import BuildFailure, call_task, environment
+from paver.easy import call_task, environment
 
-from pavelib.utils.envs import Env
 from pavelib.utils.test.suites import BokChoyTestSuite, Pa11yCrawler
 from pavelib.utils.test.suites.bokchoy_suite import DEMO_COURSE_IMPORT_DIR, DEMO_COURSE_TAR_GZ
 

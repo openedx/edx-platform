@@ -5,7 +5,6 @@ Middleware for Language Preferences
 from django.conf import settings
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
-from lms.djangoapps.courseware.masquerade import MASQUERADE_SETTINGS_KEY
 
 from openedx.core.djangoapps.lang_pref import COOKIE_DURATION, LANGUAGE_HEADER, LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.errors import UserAPIInternalError, UserAPIRequestError

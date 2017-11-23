@@ -8,7 +8,6 @@ import hashlib
 import json
 
 import unittest
-from collections import OrderedDict
 from copy import deepcopy
 from mock import patch
 from nose.plugins.attrib import attr
@@ -30,7 +29,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 from openedx.core.lib.token_utils import JwtBuilder
 from student.models import UserProfile, LanguageProficiency, PendingEmailChange
 from student.tests.factories import (
-    AdminFactory, ContentTypeFactory, TEST_PASSWORD, PermissionFactory, SuperuserFactory, UserFactory
+    ContentTypeFactory, TEST_PASSWORD, PermissionFactory, SuperuserFactory, UserFactory
 )
 
 TEST_PROFILE_IMAGE_UPLOADED_AT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)

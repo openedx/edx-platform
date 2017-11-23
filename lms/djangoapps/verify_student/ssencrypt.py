@@ -23,6 +23,7 @@ import hmac
 import logging
 import os
 from hashlib import md5, sha256
+from six import text_type
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
@@ -105,6 +106,10 @@ def rsa_encrypt(data, rsa_pub_key_bytes):
     """
     `rsa_pub_key_bytes` is a byte sequence with the public key
     """
+    if isinstance(data, text_type):
+        data = data.encode('utf-8')
+    if isinstance(rsa_pub_key_bytes, text_type):
+        rsa_pub_key_bytes = rsa_pub_key_bytes.encode('utf-8')
     if rsa_pub_key_bytes.startswith(b'-----'):
         key = serialization.load_pem_public_key(rsa_pub_key_bytes, backend=default_backend())
     elif rsa_pub_key_bytes.startswith(b'ssh-rsa '):

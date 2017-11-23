@@ -58,7 +58,6 @@ import datetime
 import hashlib
 import logging
 import six
-import time
 
 from contracts import contract, new_contract
 from importlib import import_module

@@ -48,7 +48,7 @@ from slumber.exceptions import HttpClientError, HttpServerError
 import dogstats_wrapper as dog_stats_api
 import lms.lib.comment_client as cc
 import request_cache
-from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, REFUND_ORDER, ENROLLMENT_TRACK_UPDATED
+from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from courseware.models import (
@@ -1760,7 +1760,7 @@ class CourseEnrollment(models.Model):
             return None
 
         try:
-            if not self.schedule or not self.schedule.active:
+            if not self.schedule or not self.schedule.active:  # pylint: disable=no-member
                 return None
 
             log.debug(

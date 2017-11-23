@@ -1,7 +1,6 @@
 """Tests for embargo app views. """
 
 import ddt
-import json
 import mock
 import pygeoip
 
@@ -9,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from mock import patch
 
-from .factories import CountryFactory, CountryAccessRuleFactory, RestrictedCourseFactory
+from .factories import CountryAccessRuleFactory, RestrictedCourseFactory
 from .. import messages
 from lms.djangoapps.course_api.tests.mixins import CourseApiFactoryMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms

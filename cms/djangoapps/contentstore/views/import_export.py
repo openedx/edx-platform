@@ -27,13 +27,12 @@ from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from wsgiref.util import FileWrapper
 
 from contentstore.storage import course_import_export_storage
-from contentstore.tasks import CourseExportTask, CourseImportTask, create_export_tarball, export_olx, import_olx
+from contentstore.tasks import CourseExportTask, CourseImportTask, export_olx, import_olx
 from contentstore.utils import reverse_course_url, reverse_library_url
 from edxmako.shortcuts import render_to_response
 from student.auth import has_course_author_access
 from util.json_request import JsonResponse
 from util.views import ensure_valid_course_key
-from xmodule.exceptions import SerializationError
 from xmodule.modulestore.django import modulestore
 
 __all__ = [

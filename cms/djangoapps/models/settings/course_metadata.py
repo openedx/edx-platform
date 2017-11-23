@@ -5,8 +5,6 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from xblock.fields import Scope
 
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
-
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
 

@@ -5,6 +5,7 @@ from django import forms
 from django.db.models import F
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+from openedx.core.djangolib.markup import HTML
 
 from . import models
 
@@ -84,7 +85,7 @@ class ScheduleAdmin(admin.ModelAdmin):
     experience_display.short_descriptions = _('Experience')
 
     def username(self, obj):
-        return '<a href="{}">{}</a>'.format(
+        return HTML('<a href="{}">{}</a>').format(
             reverse("admin:auth_user_change", args=(obj.enrollment.user.id,)),
             obj.enrollment.user.username
         )
@@ -93,7 +94,7 @@ class ScheduleAdmin(admin.ModelAdmin):
     username.short_description = _('Username')
 
     def course_id(self, obj):
-        return '<a href="{}">{}</a>'.format(
+        return HTML('<a href="{}">{}</a>').format(
             reverse("admin:course_overviews_courseoverview_change", args=(
                 obj.enrollment.course_id,
             )),
