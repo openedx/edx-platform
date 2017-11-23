@@ -28,7 +28,7 @@
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
 # Heitor Althmann <heitoralthmann@gmail.com>, 2014
 # Heitor Althmann <heitoralthmann@gmail.com>, 2014
-# Hudson Martins dos Santos <p4p4l3gu4x@gmail.com>, 2015
+# Hudson Martins <p4p4l3gu4x@gmail.com>, 2015
 # javiercencig <javier@jecnet.com.br>, 2014
 # JhonatannSilva <jhonatannpereiradasilva@hotmail.com>, 2014
 # Joao Marcello Macedo Leme <joaoleme925@hotmail.com>, 2015
@@ -145,7 +145,7 @@
 # Guilherme Tadiello <guilhermetadiello@hotmail.com>, 2015
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
-# Hudson Martins dos Santos <p4p4l3gu4x@gmail.com>, 2015
+# Hudson Martins <p4p4l3gu4x@gmail.com>, 2015
 # javiercencig <javier@jecnet.com.br>, 2014
 # Joao Marcello Macedo Leme <joaoleme925@hotmail.com>, 2015
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
@@ -219,7 +219,7 @@
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
 # Hannah Ximenes <hannahmoreira@yahoo.com.br>, 2014
-# Hudson Martins dos Santos <p4p4l3gu4x@gmail.com>, 2015
+# Hudson Martins <p4p4l3gu4x@gmail.com>, 2015
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
 # Leonardo Lehnemann <lehneman@gmail.com>, 2014

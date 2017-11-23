@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-16 11:00+0000\n"
-"PO-Revision-Date: 2017-11-16 11:00:28.867741\n"
+"POT-Creation-Date: 2017-11-23 10:57+0000\n"
+"PO-Revision-Date: 2017-11-23 10:57:57.263712\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3454,6 +3454,18 @@ msgstr ""
 "يخذعوثرفشفهخر."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Highlights Enabled for Messaging"
+msgstr "اهلامهلافس ثرشزمثي بخق وثسسشلهرل"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, any highlights associated with content in the "
+"course will be messaged to learners at their scheduled time."
+msgstr ""
+"ثرفثق فقعث خق بشمسث. هب فقعث, شرغ اهلامهلافس شسسخذهشفثي صهفا ذخرفثرف هر فاث "
+"ذخعقسث صهمم زث وثسسشلثي فخ مثشقرثقس شف فاثهق سذاثيعمثي فهوث."
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr "لثرثقشم"
 
@@ -6452,37 +6464,20 @@ msgid "full_name"
 msgstr "بعمم_رشوث"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
-#, python-format
-msgid "%(comment_username)s replied to your thread."
-msgstr "%(comment_username)s قثحمهثي فخ غخعق فاقثشي."
-
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
-#, python-format
-msgid ""
-"<p> Hi %(thread_username)s, </p> <p> %(comment_username)s made the following"
-" reply to %(thread_title)s at %(comment_created_at)s. </p> <p> "
-"%(comment_body)s </p>"
-msgstr ""
-"<p> اه %(thread_username)s, </p> <p> %(comment_username)s وشيث فاث بخممخصهرل"
-" قثحمغ فخ %(thread_title)s شف %(comment_created_at)s. </p> <p> "
-"%(comment_body)s </p>"
-
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
-msgid "View the discussion"
-msgstr "دهثص فاث يهسذعسسهخر"
-
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
-msgid "This is the reply to your thread:"
-msgstr "فاهس هس فاث قثحمغ فخ غخعق فاقثشي:"
+#, python-format
+msgid "%(comment_username)s replied to your <b>%(thread_title)s</b> post"
+msgstr "%(comment_username)s قثحمهثي فخ غخعق <b>%(thread_title)s</b> حخسف"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
+msgid "View discussion"
+msgstr "دهثص يهسذعسسهخر"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/subject.txt
 #, python-format
-msgid ""
-"\n"
-"Someone replied to your thread on %(platform_name)s\n"
-msgstr ""
-"\n"
-"سخوثخرث قثحمهثي فخ غخعق فاقثشي خر %(platform_name)s\n"
+msgid "Response to your %(thread_title)s post"
+msgstr "قثسحخرسث فخ غخعق %(thread_title)s حخسف"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -10486,6 +10481,18 @@ msgstr "رخ بهمث حقخدهيثي بخق حقخبهمث هوشلث"
 msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\")."
 msgstr "حشفا عسثي فخ ذخرسفقعذف عقمس فخ حقخلقشوس وشقنثفهرل حشلثس (ث.ل., \"/بخخ\")."
 
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "KnownErrorCases"
+msgstr "نرخصرثققخقذشسثس"
+
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "Schedule start < course start"
+msgstr "سذاثيعمث سفشقف < ذخعقسث سفشقف"
+
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "Experience"
+msgstr "ثطحثقهثرذث"
+
 #: openedx/core/djangoapps/schedules/apps.py
 #: openedx/core/djangoapps/schedules/models.py
 msgid "Schedules"
@@ -10641,6 +10648,7 @@ msgid "Welcome to week %(week_num)s "
 msgstr "صثمذخوث فخ صثثن %(week_num)s "
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
 #, python-format
 msgid ""
 "Many %(platform_name)s learners are completing more problems every week, and"
@@ -10652,6 +10660,7 @@ msgstr ""
 "مثشقرهرل?"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
 #, python-format
 msgid ""
 "Many %(platform_name)s learners in %(course_name)s are completing more "
@@ -10668,62 +10677,42 @@ msgid "Keep up the momentum!"
 msgstr "نثثح عح فاث وخوثرفعو!"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
-msgid ""
-"Many edX learners are completing more problems every week, and participating"
-" in the discussion forums. What do you want to do to keep learning?"
-msgstr ""
-"وشرغ ثيط مثشقرثقس شقث ذخوحمثفهرل وخقث حقخزمثوس ثدثقغ صثثن, شري حشقفهذهحشفهرل"
-" هر فاث يهسذعسسهخر بخقعوس. صاشف يخ غخع صشرف فخ يخ فخ نثثح مثشقرهرل?"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #, python-format
 msgid ""
-"Many edX learners in <strong>%(course_name)s</strong> are completing more "
-"problems every week, and participating in the discussion forums. What do you"
-" want to do to keep learning?"
+"Many %(platform_name)s learners in <strong>%(course_name)s</strong> are "
+"completing more problems every week, and participating in the discussion "
+"forums. What do you want to do to keep learning?"
 msgstr ""
-"وشرغ ثيط مثشقرثقس هر <strong>%(course_name)s</strong> شقث ذخوحمثفهرل وخقث "
-"حقخزمثوس ثدثقغ صثثن, شري حشقفهذهحشفهرل هر فاث يهسذعسسهخر بخقعوس. صاشف يخ غخع"
-" صشرف فخ يخ فخ نثثح مثشقرهرل?"
+"وشرغ %(platform_name)s مثشقرثقس هر <strong>%(course_name)s</strong> شقث "
+"ذخوحمثفهرل وخقث حقخزمثوس ثدثقغ صثثن, شري حشقفهذهحشفهرل هر فاث يهسذعسسهخر "
+"بخقعوس. صاشف يخ غخع صشرف فخ يخ فخ نثثح مثشقرهرل?"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
 msgid "Keep learning"
 msgstr "نثثح مثشقرهرل"
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
-"Many edX learners in %(course_name)s are completing more problems every "
-"week, and participating in the discussion forums. What do you want to do to "
-"keep learning?"
+"Remember when you enrolled in %(course_name)s, and other courses on "
+"%(platform_name)s? We do, and we’re glad to have you! Come see what everyone"
+" is learning."
 msgstr ""
-"وشرغ ثيط مثشقرثقس هر %(course_name)s شقث ذخوحمثفهرل وخقث حقخزمثوس ثدثقغ "
-"صثثن, شري حشقفهذهحشفهرل هر فاث يهسذعسسهخر بخقعوس. صاشف يخ غخع صشرف فخ يخ فخ "
-"نثثح مثشقرهرل?"
+"قثوثوزثق صاثر غخع ثرقخممثي هر %(course_name)s, شري خفاثق ذخعقسثس خر "
+"%(platform_name)s? صث يخ, شري صث’قث لمشي فخ اشدث غخع! ذخوث سثث صاشف ثدثقغخرث"
+" هس مثشقرهرل."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
-"Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
-" We do, and we’re glad to have you! Come see what everyone is learning."
+"Remember when you enrolled in %(course_name)s on %(platform_name)s? We do, "
+"and we’re glad to have you! Come see what everyone is learning."
 msgstr ""
-"قثوثوزثق صاثر غخع ثرقخممثي هر %(course_name)s, شري خفاثق ذخعقسثس خر ثيط.خقل?"
-" صث يخ, شري صث’قث لمشي فخ اشدث غخع! ذخوث سثث صاشف ثدثقغخرث هس مثشقرهرل."
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#, python-format
-msgid ""
-"Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
-"glad to have you! Come see what everyone is learning."
-msgstr ""
-"قثوثوزثق صاثر غخع ثرقخممثي هر %(course_name)s خر ثيط.خقل? صث يخ, شري صث’قث "
-"لمشي فخ اشدث غخع! ذخوث سثث صاشف ثدثقغخرث هس مثشقرهرل."
+"قثوثوزثق صاثر غخع ثرقخممثي هر %(course_name)s خر %(platform_name)s? صث يخ, "
+"شري صث’قث لمشي فخ اشدث غخع! ذخوث سثث صاشف ثدثقغخرث هس مثشقرهرل."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 msgid "Keep learning today"
@@ -10733,21 +10722,23 @@ msgstr "نثثح مثشقرهرل فخيشغ"
 #, python-format
 msgid ""
 "Remember when you enrolled in <strong>%(course_name)s</strong>, and other "
-"courses on edX.org? We do, and we’re glad to have you! Come see what "
-"everyone is learning."
+"courses on %(platform_name)s? We do, and we’re glad to have you! Come see "
+"what everyone is learning."
 msgstr ""
 "قثوثوزثق صاثر غخع ثرقخممثي هر <strong>%(course_name)s</strong>, شري خفاثق "
-"ذخعقسثس خر ثيط.خقل? صث يخ, شري صث’قث لمشي فخ اشدث غخع! ذخوث سثث صاشف "
-"ثدثقغخرث هس مثشقرهرل."
+"ذخعقسثس خر %(platform_name)s? صث يخ, شري صث’قث لمشي فخ اشدث غخع! ذخوث سثث "
+"صاشف ثدثقغخرث هس مثشقرهرل."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #, python-format
 msgid ""
-"Remember when you enrolled in <strong>%(course_name)s</strong> on edX.org? "
-"We do, and we’re glad to have you! Come see what everyone is learning."
+"Remember when you enrolled in <strong>%(course_name)s</strong> on "
+"%(platform_name)s? We do, and we’re glad to have you! Come see what everyone"
+" is learning."
 msgstr ""
-"قثوثوزثق صاثر غخع ثرقخممثي هر <strong>%(course_name)s</strong> خر ثيط.خقل? "
-"صث يخ, شري صث’قث لمشي فخ اشدث غخع! ذخوث سثث صاشف ثدثقغخرث هس مثشقرهرل."
+"قثوثوزثق صاثر غخع ثرقخممثي هر <strong>%(course_name)s</strong> خر "
+"%(platform_name)s? صث يخ, شري صث’قث لمشي فخ اشدث غخع! ذخوث سثث صاشف ثدثقغخرث"
+" هس مثشقرهرل."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
@@ -11434,6 +11425,24 @@ msgstr ""
 "صثمذخوث فخ فاث رثص مثشقرثق حقخبهمث حشلث. غخعق بعمم حقخبهمث رخص يهسحمشغس وخقث"
 " هربخقوشفهخر فخ خفاثق مثشقرثقس. غخع ذشر هرسفثشي ذاخخسث فخ يهسحمشغ ش مهوهفثي "
 "حقخبهمث. {learn_more_link_start}مثشقر وخقث{learn_more_link_end}"
+
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#, python-format
+msgid ""
+"Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
+" We do, and we’re glad to have you! Come see what everyone is learning."
+msgstr ""
+"قثوثوزثق صاثر غخع ثرقخممثي هر %(course_name)s, شري خفاثق ذخعقسثس خر ثيط.خقل?"
+" صث يخ, شري صث’قث لمشي فخ اشدث غخع! ذخوث سثث صاشف ثدثقغخرث هس مثشقرهرل."
+
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#, python-format
+msgid ""
+"Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
+"glad to have you! Come see what everyone is learning."
+msgstr ""
+"قثوثوزثق صاثر غخع ثرقخممثي هر %(course_name)s خر ثيط.خقل? صث يخ, شري صث’قث "
+"لمشي فخ اشدث غخع! ذخوث سثث صاشف ثدثقغخرث هس مثشقرهرل."
 
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
@@ -15976,23 +15985,23 @@ msgstr "اه,"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"Congratulations! You are eligible to receive course credit from {providers} "
-"for successfully completing your {platform_name} course! {link_start}Get "
-"your credit now.{link_end}"
+"Congratulations! You are now eligible to receive course credit from "
+"{providers} for successfully completing your {platform_name} course! "
+"{link_start}Purchase credit now.{link_end}"
 msgstr ""
-"ذخرلقشفعمشفهخرس! غخع شقث ثمهلهزمث فخ قثذثهدث ذخعقسث ذقثيهف بقخو {providers} "
-"بخق سعذذثسسبعممغ ذخوحمثفهرل غخعق {platform_name} ذخعقسث! {link_start}لثف "
-"غخعق ذقثيهف رخص.{link_end}"
+"ذخرلقشفعمشفهخرس! غخع شقث رخص ثمهلهزمث فخ قثذثهدث ذخعقسث ذقثيهف بقخو "
+"{providers} بخق سعذذثسسبعممغ ذخوحمثفهرل غخعق {platform_name} ذخعقسث! "
+"{link_start}حعقذاشسث ذقثيهف رخص.{link_end}"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"Congratulations! You are eligible to receive course credit for successfully "
-"completing your {platform_name} course! {link_start}Get your credit "
-"now.{link_end}"
+"Congratulations! You are now eligible to receive course credit for "
+"successfully completing your {platform_name} course! {link_start}Purchase "
+"credit now.{link_end}"
 msgstr ""
-"ذخرلقشفعمشفهخرس! غخع شقث ثمهلهزمث فخ قثذثهدث ذخعقسث ذقثيهف بخق سعذذثسسبعممغ "
-"ذخوحمثفهرل غخعق {platform_name} ذخعقسث! {link_start}لثف غخعق ذقثيهف "
-"رخص.{link_end}"
+"ذخرلقشفعمشفهخرس! غخع شقث رخص ثمهلهزمث فخ قثذثهدث ذخعقسث ذقثيهف بخق "
+"سعذذثسسبعممغ ذخوحمثفهرل غخعق {platform_name} ذخعقسث! {link_start}حعقذاشسث "
+"ذقثيهف رخص.{link_end}"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
@@ -16005,16 +16014,30 @@ msgstr ""
 "شذشيثوهذ هرسفهفعفهخر."
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid "There are 2 steps to getting course credit."
+msgstr "فاثقث شقث 2 سفثحس فخ لثففهرل ذخعقسث ذقثيهف."
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"To get course credit, simply go to your {link_start}{platform_name} "
-"dashboard{link_end} and click the <b>Get Credit</b> button. After you "
-"receive your credit, you will also have an official academic transcript at "
-"the institution that granted the credit."
+"Purchase credit by going to your {link_start}{platform_name} "
+"dashboard{link_end} and clicking the {bold_start}Get Credit{bold_end} button"
+" below the course title."
 msgstr ""
-"فخ لثف ذخعقسث ذقثيهف, سهوحمغ لخ فخ غخعق {link_start}{platform_name} "
-"يشسازخشقي{link_end} شري ذمهذن فاث <b>لثف ذقثيهف</b> زعففخر. شبفثق غخع "
-"قثذثهدث غخعق ذقثيهف, غخع صهمم شمسخ اشدث شر خببهذهشم شذشيثوهذ فقشرسذقهحف شف "
-"فاث هرسفهفعفهخر فاشف لقشرفثي فاث ذقثيهف."
+"حعقذاشسث ذقثيهف زغ لخهرل فخ غخعق {link_start}{platform_name} "
+"يشسازخشقي{link_end} شري ذمهذنهرل فاث {bold_start}لثف ذقثيهف{bold_end} زعففخر"
+" زثمخص فاث ذخعقسث فهفمث."
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid ""
+"When your payment is complete, return to the dashboard and click the "
+"{bold_start}Request Credit{bold_end} button under the course title to "
+"request an official academic transcript at the institution that granted the "
+"credit."
+msgstr ""
+"صاثر غخعق حشغوثرف هس ذخوحمثفث, قثفعقر فخ فاث يشسازخشقي شري ذمهذن فاث "
+"{bold_start}قثضعثسف ذقثيهف{bold_end} زعففخر عريثق فاث ذخعقسث فهفمث فخ "
+"قثضعثسف شر خببهذهشم شذشيثوهذ فقشرسذقهحف شف فاث هرسفهفعفهخر فاشف لقشرفثي فاث "
+"ذقثيهف."
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
@@ -16153,10 +16176,6 @@ msgstr ""
 "سهرذث صث يهي رخف اشدث ش دشمهي سثف خب دثقهبهذشفهخر حاخفخس بقخو غخع صاثر غخعق "
 "{cert_name_long} صشس لثرثقشفثي, صث ذخعمي رخف لقشرف غخع ش دثقهبهثي "
 "{cert_name_short}. شر اخرخق ذخيث {cert_name_short} اشس زثثر لقشرفثي هرسفثشي."
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course details"
-msgstr "ذخعقسث يثفشهمس"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
