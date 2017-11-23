@@ -19,7 +19,7 @@ if (!Array.prototype.find) {
 
             // 3. If IsCallable(predicate) is false, throw a TypeError exception.
             if (typeof predicate !== 'function') {
-              throw new TypeError('predicate must be a function');
+                throw new TypeError('predicate must be a function');
             }
 
             // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
