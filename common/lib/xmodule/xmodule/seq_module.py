@@ -230,8 +230,6 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             banner_text, special_html = special_html_view
             if special_html and not masquerading_as_specific_student:
                 return Fragment(special_html)
-        else:
-            banner_text = self._gated_content_staff_banner()
         return self._student_view(context, banner_text)
 
     def _special_exam_student_view(self):
@@ -253,11 +251,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         display depending on whether staff is masquerading.
         """
         course = self._get_course()
-        content_gated = self._is_content_gated()
-        if not self._can_user_view_content(course) or content_gated:
-            if content_gated:
-                banner_text = _('This subsection is locked until prerequisite requirements met.')
-            elif course.self_paced:
+        if not self._can_user_view_content(course):
+            if course.self_paced:
                 banner_text = _("Because the course has ended, this assignment is hidden from the learner.")
             else:
                 banner_text = _("Because the due date has passed, this assignment is hidden from the learner.")
@@ -266,21 +261,11 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'hidden_content.html',
                 {
                     'self_paced': course.self_paced,
-                    'progress_url': context.get('progress_url'),
-                    'content_gated': content_gated
+                    'progress_url': context.get('progress_url')
                 }
             )
 
             return banner_text, hidden_content_html
-
-    def _gated_content_staff_banner(self):
-        """
-        Checks whether the content is gated for learners. If so,
-        returns a banner_text depending on whether user is staff.
-        """
-        banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
-        if self._is_content_gated() and self.runtime.user_is_staff:
-            return banner_text
 
     def _is_content_gated(self):
         """
@@ -294,6 +279,18 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             return content_milestones
 
         return False
+
+    def _is_prereq_met(self, milestone):
+        """
+        Evaluate if the user has completed the prerequiste
+        """
+        prereq_met = False
+        milestones_service = self.runtime.service(self, 'milestones')
+        if milestones_service:
+            # if it's complete then a user milestone record will exist
+            prereq_met = milestones_service.user_has_milestone({'id': self.runtime.user_id}, milestone)
+        
+        return prereq_met
 
     def _can_user_view_content(self, course):
         """
@@ -319,9 +316,21 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         display_items = self.get_display_items()
         self._update_position(context, len(display_items))
 
+        gate_content = False
+        milestones = self._is_content_gated()
+        if milestones:
+            if self.runtime.user_is_staff:
+                banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
+            elif not self._is_prereq_met(milestones[0]):
+                banner_text = _('This subsection is locked until prerequisite requirements are met.')
+                gate_content = True
+                # TODO - force a subsection grade recalcuation and then check again
+            else:
+                print('\nBF!! Hurray the prequesite has been met!!')
+      
         fragment = Fragment()
         params = {
-            'items': self._render_student_view_for_items(context, display_items, fragment),
+            'items': self._render_student_view_for_items(context, display_items, fragment) if not gate_content else [],
             'element_id': self.location.html_id(),
             'item_id': self.location.to_deprecated_string(),
             'position': self.position,
@@ -331,6 +340,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             'prev_url': context.get('prev_url'),
             'banner_text': banner_text,
             'disable_navigation': not self.is_user_authenticated(context),
+            'gate_content' : gate_content,
         }
         fragment.add_content(self.system.render_template("seq_module.html", params))
 
