@@ -8,29 +8,42 @@ class OefSurvey(TimeStampedModel):
     title = models.CharField(max_length=256)
     is_enabled = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.title
+
 
 class OptionPriority(TimeStampedModel):
     label = models.CharField(max_length=50)
     value = models.FloatField()
 
+    def __str__(self):
+        return self.label
+
 
 class TopicQuestion(TimeStampedModel):
-    survey = models.ForeignKey(OefSurvey)
+    survey = models.ForeignKey(OefSurvey, related_name='topics')
     title = models.TextField()
     description = models.TextField()
 
+    def __str__(self):
+        return self.title
+
 
 class Option(TimeStampedModel):
-    topic = models.ForeignKey(TopicQuestion)
+    topic = models.ForeignKey(TopicQuestion, related_name='options')
     priority = models.ForeignKey(OptionPriority)
     text = models.TextField()
 
+    def __str__(self):
+        return self.text[:20]
 
 class UserOefSurvey(TimeStampedModel):
     user = models.ForeignKey(User)
     survey_date = models.DateField()
     oef_survey = models.ForeignKey(OefSurvey)
 
+    def __str__(self):
+        return '-'.join([self.user.username, self.oef_survey.title])
 
 class UserAnswers(TimeStampedModel):
     user = models.ForeignKey(User)

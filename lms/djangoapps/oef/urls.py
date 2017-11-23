@@ -3,10 +3,11 @@ The urls for on-boarding app.
 """
 from django.conf.urls import patterns, url
 
-from onboarding_survey import views
+from oef import views
+
 
 
 urlpatterns = [
-    url(r"^recommendations/$", views.recommendations, name="recommendations"),
-
+    url(r"^$", views.fetch_survey, name="oef_survey"),
+    url(r"^topic/(?P<topic_id>[0-9]+)", views.get_survey_topic, name="oef_survey"),
 ]
