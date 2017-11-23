@@ -345,7 +345,8 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         CertificateStatuses.unverified: 'unverified',
     }
 
-    default_status = 'processing'
+    # open-ended courses should not display the 'processing' message
+    default_status = 'unavailable' if not course_overview.end else 'processing' 
 
     default_info = {
         'status': default_status,
