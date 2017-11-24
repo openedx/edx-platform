@@ -1,0 +1,10 @@
+<%! from django.utils.translation import ugettext as _ %>${_("Enrollment received for:")}
+
+% if user_full_name:
+${_("Learner: {username} ({full_name})").format(username=user.username, full_name=user_full_name)}
+% else:
+${_("Learner: {username}").format(username=user.username)}
+% endif
+${_("Course: {url}").format(url=course_url)}
+
+${_("More learner data in admin: {url}").format(url=user_admin_url)}

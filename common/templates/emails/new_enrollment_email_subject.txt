@@ -1,0 +1,2 @@
+<%! from django.utils.translation import ugettext as _ %>
+${_("New student enrollment")}
