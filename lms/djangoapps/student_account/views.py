@@ -613,7 +613,7 @@ class RecoverPasswordView(views.APIView):
         HttpResponse: 405 if using an unsupported HTTP method
     """
 
-    def post(self, request, format=None):
+    def post(self, request, *args, **kwargs):
         """
         Makes the request to change the password
         """
