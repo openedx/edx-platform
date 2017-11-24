@@ -218,7 +218,7 @@ def password_change_request_handler(request):
             return\
                 HttpResponse(
                     _("Some error occured during password change. Please try "
-                        "again"),
+                    "again"),
                     status=status_response
                 )
         elif status_response == 403:
@@ -618,6 +618,9 @@ class RecoverPasswordView(views.APIView):
     http_method_names = ["post"]
 
     def post(self, request, format=None):
+        """
+        Makes the request to change the password
+        """
         email = request.data.get('email')
         if email:
             return Response(status=change_password(request, email))
