@@ -251,7 +251,7 @@ class VideoStudentViewHandlers(object):
                 # Try to return static URL redirection as last resort
                 # if no translation is required
                 response = self.get_static_transcript(request, transcripts)
-                if response.status_code == 404 and feature_enabled:
+                if response.status_code == 404:
                     # Try to get transcript from edx-val as a last resort.
                     transcript = get_video_transcript_content(
                         language_code=self.transcript_language,

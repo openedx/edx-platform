@@ -141,7 +141,7 @@ class TestUploadTranscripts(BaseTranscripts):
         """
         # verify that transcript should not be in contentstore
         content_location = StaticContent.compute_location(self.course.id, 'subs_{0}.srt.sjson'.format(filename))
-        with self.assertRaises(NotFoundError) as item_not_found:
+        with self.assertRaises(NotFoundError):
             contentstore().find(content_location)
 
         # verify uploaded transcript content
