@@ -212,15 +212,13 @@ def password_change_request_handler(request):
     email =\
         user.email if user.is_authenticated() else request.POST.get('email')
 
+    error_message =\
+        _("Some error occured during password change. Please try again")
+
     if email:
         status_response = change_password(request, email)
         if status_response == 500:
-            return\
-                HttpResponse(
-                    _("Some error occured during password change. Please try "
-                    "again"),
-                    status=status_response
-                )
+            return HttpResponse(error_message, status=status_response)
         elif status_response == 403:
             return HttpResponseForbidden()
 
@@ -614,8 +612,6 @@ class RecoverPasswordView(views.APIView):
         HttpResponse: 403 if the client has been rate limited
         HttpResponse: 405 if using an unsupported HTTP method
     """
-
-    http_method_names = ["post"]
 
     def post(self, request, format=None):
         """
