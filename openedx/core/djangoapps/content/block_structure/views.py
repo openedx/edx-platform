@@ -1,17 +1,19 @@
+# -*- coding: utf-8 -*-
 """
 Views for block structure api endpoints.
 """
 import logging
 
-from edx_rest_framework_extensions.authentication import JwtAuthentication
-from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.permissions import IsAuthenticated
 from rest_framework_oauth.authentication import OAuth2Authentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+
 from openedx.core.djangoapps.content.block_structure.api import\
     clear_course_from_cache
 
@@ -31,16 +33,23 @@ class ClearCoursesCacheView(APIView):
                 error_clear_courses_cache: failed clear courses cache
             }
     """
-    authentication_classes =\
-        (OAuth2Authentication, JwtAuthentication, SessionAuthentication)
+    authentication_classes = (OAuth2Authentication, SessionAuthentication,)
 
     permission_classes = (IsAuthenticated,)
 
-    """
-    Will clear the course cache
-    """
-    def post(self, request, format=None):
-
+    def post(self, request, *args, **kwargs):
+        """
+            Clear cache of a list of courses
+            Payload: list of courses id
+            Response:
+                - 200: {
+                    success_clear_courses_cache: list of courses id
+                    error_clear_courses_cache: list of courses id
+                }
+                - 400: {
+                    error_message": "No courses id, at least provide one."
+                }
+        """
         courses_id = request.data.get('courses_id', None)
         success_clear_courses_cache = []
         error_clear_courses_cache = []
@@ -51,7 +60,7 @@ class ClearCoursesCacheView(APIView):
                     clear_course_from_cache(course_key)
                     success_clear_courses_cache.append(course_id)
                 except InvalidKeyError as error:
-                    LOGGER.error(str(error))
+                    LOGGER.error("Invalid course key: {}".format(courses_id))
                     error_clear_courses_cache.append(course_id)
 
             return Response(
