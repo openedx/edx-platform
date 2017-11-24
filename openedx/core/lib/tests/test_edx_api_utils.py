@@ -59,7 +59,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
             [httpretty.Response(body=json.dumps(data), content_type='application/json')]
         )
 
-        with mock.patch('openedx.core.lib.edx_api_utils.EdxRestApiClient.__init__') as mock_init:
+        with mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__') as mock_init:
             actual_collection = get_edx_api_data(catalog_integration, 'programs', api=api)
 
             # Verify that the helper function didn't initialize its own client.

@@ -2,8 +2,8 @@
 Run acceptance tests that use the bok-choy framework
 http://bok-choy.readthedocs.org/en/latest/
 """
+
 import os
-from optparse import make_option
 
 from paver.easy import cmdopts, needs, sh, task
 

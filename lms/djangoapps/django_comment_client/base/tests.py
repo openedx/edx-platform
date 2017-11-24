@@ -30,7 +30,6 @@ from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixi
 from django_comment_common.models import (
     assign_role,
     CourseDiscussionSettings,
-    FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_STUDENT,
     Role
 )

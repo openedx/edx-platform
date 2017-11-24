@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from textwrap import dedent
 
 import pytz
-from bok_choy.promise import EmptyPromise
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc
@@ -38,11 +37,9 @@ from common.test.acceptance.tests.helpers import (
     EventsTestMixin,
     UniqueCourseTest,
     element_has_text,
-    generate_course_key,
     get_selected_option_text,
     load_data_str,
     select_option_by_text,
-    select_option_by_value
 )
 
 

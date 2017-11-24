@@ -13,7 +13,7 @@ from django.template.loader import render_to_string
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 from edx_rest_api_client.client import EdxRestApiClient
-from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerError, SlumberBaseException
+from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerError
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.token_utils import JwtBuilder
@@ -22,7 +22,7 @@ from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
 
 try:
-    from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer
+    from enterprise.models import EnterpriseCustomer
 except ImportError:
     pass
 

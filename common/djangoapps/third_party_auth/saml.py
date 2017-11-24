@@ -286,22 +286,22 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         """
         session = requests.Session()
         transaction_data = {
-            'operation_name': 'generate_bizx_oauth_api_saml_assertion',
-            'endpoint_url': self.sapsf_idp_url,
             'token_url': self.sapsf_token_url,
-            'company_id': self.odata_company_id,
             'client_id': self.odata_client_id,
             'user_id': user_id,
             'private_key': self.sapsf_private_key,
         }
         try:
             assertion = session.post(
-                transaction_data['endpoint_url'],
+                self.sapsf_idp_url,
                 data=transaction_data,
                 timeout=self.timeout,
             )
             assertion.raise_for_status()
         except requests.RequestException as err:
+            transaction_data['operation_name'] = 'generate_bizx_oauth_api_saml_assertion'
+            transaction_data['endpoint_url'] = self.sapsf_idp_url
+            transaction_data['company_id'] = self.odata_company_id
             self.log_bizx_api_exception(transaction_data, err)
             return None
         return assertion.text
@@ -314,8 +314,6 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         """
         session = requests.Session()
         transaction_data = {
-            'operation_name': 'generate_bizx_oauth_api_access_token',
-            'endpoint_url': self.sapsf_token_url,
             'client_id': self.odata_client_id,
             'company_id': self.odata_company_id,
             'grant_type': 'urn:ietf:params:oauth:grant-type:saml2-bearer',
@@ -326,12 +324,15 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         try:
             transaction_data['assertion'] = assertion
             token_response = session.post(
-                transaction_data['endpoint_url'],
+                self.sapsf_token_url,
                 data=transaction_data,
                 timeout=self.timeout,
             )
             token_response.raise_for_status()
         except requests.RequestException as err:
+            transaction_data['operation_name'] = 'generate_bizx_oauth_api_access_token'
+            transaction_data['endpoint_url'] = self.sapsf_token_url
+            transaction_data['user_id'] = user_id
             self.log_bizx_api_exception(transaction_data, err)
             return None
         return token_response.json()
@@ -357,29 +358,32 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
             return basic_details
         user_id = basic_details['username']
         fields = ','.join(self.field_mappings)
-        transaction_data = {
-            'operation_name': 'get_user_details',
-            'user_id': user_id,
-            'company_id': self.odata_company_id,
-            'fields': fields,
-            'endpoint_url': '{root_url}User(userId=\'{user_id}\')?$select={fields}'.format(
-                root_url=self.odata_api_root_url,
-                user_id=user_id,
-                fields=fields,
-            ),
-        }
-        client = self.get_bizx_odata_api_client(user_id=transaction_data['user_id'])
+        endpoint_url = '{root_url}User(userId=\'{user_id}\')?$select={fields}'.format(
+            root_url=self.odata_api_root_url,
+            user_id=user_id,
+            fields=fields,
+        )
+        client = self.get_bizx_odata_api_client(user_id=user_id)
         if not client:
             return basic_details
+        transaction_data = {
+            'token_data': client.token_data
+        }
         try:
-            transaction_data['token_data'] = client.token_data
             response = client.get(
-                transaction_data['endpoint_url'],
+                endpoint_url,
                 timeout=self.timeout,
             )
             response.raise_for_status()
             response = response.json()
         except requests.RequestException as err:
+            transaction_data = {
+                'operation_name': 'get_user_details',
+                'endpoint_url': endpoint_url,
+                'user_id': user_id,
+                'company_id': self.odata_company_id,
+                'token_data': client.token_data,
+            }
             self.log_bizx_api_exception(transaction_data, err)
             return basic_details
         return self.get_registration_fields(response)

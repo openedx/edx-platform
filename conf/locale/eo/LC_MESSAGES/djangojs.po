@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-16 10:49+0000\n"
-"PO-Revision-Date: 2017-11-16 11:00:29.286103\n"
+"POT-Creation-Date: 2017-11-23 10:35+0000\n"
+"PO-Revision-Date: 2017-11-23 10:57:57.594095\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3022,8 +3022,10 @@ msgid "HTML preview of post"
 msgstr "HTML prévïéw öf pöst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/static/coffee/src/customwmd.js
-msgid "Post body"
-msgstr "Pöst ßödý Ⱡ'σяєм ιρѕυм ∂σł#"
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "Your question or idea (required)"
+msgstr ""
+"Ýöür qüéstïön ör ïdéä (réqüïréd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Hyperlink"
@@ -7521,11 +7523,6 @@ msgid ""
 msgstr ""
 "Àdd ä çléär änd désçrïptïvé tïtlé tö énçöürägé pärtïçïpätïön. (Réqüïréd) "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "Your question or idea (required)"
-msgstr ""
-"Ýöür qüéstïön ör ïdéä (réqüïréd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "follow this post"

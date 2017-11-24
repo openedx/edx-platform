@@ -13,13 +13,14 @@ LMS_BASE = 'edx.devstack.lms:18000'
 CMS_BASE = 'edx.devstack.studio:18010'
 SITE_NAME = LMS_BASE
 LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
+LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
 ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
 
 COMMENTS_SERVICE_URL = 'http://edx.devstack.forum:4567'
 
-ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_ROOT_URL)
+ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_INTERNAL_ROOT_URL)
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'

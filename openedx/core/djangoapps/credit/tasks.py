@@ -11,7 +11,6 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
 from openedx.core.djangoapps.credit.models import CreditCourse
-from openedx.core.djangoapps.credit.utils import get_course_blocks
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 

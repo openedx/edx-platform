@@ -57,7 +57,6 @@ from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-er
 from certificates.api import get_certificate_url, has_html_certificates_enabled  # pylint: disable=import-error
 from certificates.models import (  # pylint: disable=import-error
     CertificateStatuses,
-    GeneratedCertificate,
     certificate_status_for_student
 )
 from course_modes.models import CourseMode

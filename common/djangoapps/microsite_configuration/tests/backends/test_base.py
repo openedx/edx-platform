@@ -3,15 +3,9 @@ Test Microsite base backends.
 """
 import logging
 
-from mock import patch
-from django.conf import settings
 from django.test import TestCase
 
-from microsite_configuration import microsite
-from microsite_configuration.backends.base import (
-    AbstractBaseMicrositeBackend,
-    BaseMicrositeBackend
-)
+from microsite_configuration.backends.base import AbstractBaseMicrositeBackend
 
 log = logging.getLogger(__name__)
 
