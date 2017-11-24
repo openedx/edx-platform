@@ -1972,6 +1972,12 @@ BULK_EMAIL_LOG_SENT_EMAILS = False
 # parallel, and what the SES rate is.
 BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 
+############################# Enrollment E-mails ####################################
+
+# Used to send an e-mail when students enroll in courses. Write here the destination
+# e-mail address, or '' to keep it disabled.
+ENROLLMENT_NOTIFICATION_EMAIL = ''
+
 ############################# Email Opt In ####################################
 
 # Minimum age for organization-wide email opt in
@@ -2155,7 +2161,7 @@ INSTALLED_APPS = [
     'course_modes.apps.CourseModesConfig',
 
     # Enrollment API
-    'enrollment',
+    'enrollment.apps.EnrollmentConfig',
 
     # Entitlement API
     'entitlements.apps.EntitlementsConfig',
