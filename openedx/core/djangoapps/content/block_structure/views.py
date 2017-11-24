@@ -59,7 +59,7 @@ class ClearCoursesCacheView(APIView):
                     course_key = CourseKey.from_string(course_id)
                     clear_course_from_cache(course_key)
                     success_clear_courses_cache.append(course_id)
-                except InvalidKeyError as error:
+                except InvalidKeyError:
                     LOGGER.error("Invalid course key: {}".format(courses_id))
                     error_clear_courses_cache.append(course_id)
 
