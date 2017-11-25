@@ -37,16 +37,18 @@ class Option(TimeStampedModel):
     def __str__(self):
         return self.text[:20]
 
+
 class UserOefSurvey(TimeStampedModel):
     user = models.ForeignKey(User)
-    survey_date = models.DateField()
     oef_survey = models.ForeignKey(OefSurvey)
+    start_date = models.DateField()
+    completed_date = models.DateField(null=True, blank=True)
+    status = models.CharField(max_length=20)
 
     def __str__(self):
         return '-'.join([self.user.username, self.oef_survey.title])
 
 class UserAnswers(TimeStampedModel):
-    user = models.ForeignKey(User)
-    survey_id = models.ForeignKey(OefSurvey)
+    user_survey = models.ForeignKey(UserOefSurvey, related_name='answers')
     question = models.ForeignKey(TopicQuestion)
     selected_option = models.ForeignKey(OptionPriority)

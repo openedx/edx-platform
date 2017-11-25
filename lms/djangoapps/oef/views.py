@@ -9,8 +9,8 @@ from lms.djangoapps.oef.models import OefSurvey, TopicQuestion, UserOefSurvey, U
 
 def fetch_survey(request):
     survey = OefSurvey.objects.filter(is_enabled=True).latest('created')
-    topics = get_survey_topics(survey.id)
     uos = get_user_survey(request.user, survey)
+    topics = get_survey_topics(uos, survey.id)
 
     return render(request, 'oef/oef_survey.html', {"survey_id": survey.id, "topics": topics})
 
@@ -30,14 +30,19 @@ def get_user_survey(user, survey):
     return uos
 
 
-def get_survey_topics(survey_id):
+def is_answered(uos, question_id):
+    return UserAnswers.objects.filter(user_survey_id=uos.id).filter(question_id=question_id).exists()
+
+
+def get_survey_topics(uos, survey_id):
     topics = TopicQuestion.objects.filter(survey_id=survey_id)
     parsed_topics = []
     for index, topic in enumerate(topics):
         parsed_topics.append({
             'title': topic.title,
             'index': index + 1,
-            'id': topic.id
+            'id': topic.id,
+            'is_answered': is_answered(uos, topic.id)
         })
     return parsed_topics
 
@@ -50,15 +55,20 @@ def get_option_data(option):
     }
 
 
-def get_survey_topic(request, topic_id):
+def get_survey_topic(request, survey_id, topic_id):
     topic_question = TopicQuestion.objects.get(id=topic_id)
     options = topic_question.options.all()
     options = [get_option_data(option) for option in options]
+    uos = UserOefSurvey.objects.get(oef_survey_id=survey_id, user_id=request.user.id)
+    answer = get_answer(uos, topic_id)
+    answer = str(answer.selected_option.value) if answer else ''
+
     return JsonResponse({
         'title': topic_question.title,
         'description': topic_question.description,
         'id': topic_question.id,
-        'options': options
+        'options': options,
+        'answer': answer.replace('.0', '')
     }, status=status.HTTP_200_OK)
 
 
@@ -73,8 +83,6 @@ def create_answer(uos, data):
     answer = UserAnswers()
     answer.user_survey = uos
     answer.question_id = int(data['topic_id'])
-    answer.selected_option_id = int(data['answer'])
-    answer.save()
     return answer
 
 
@@ -84,6 +92,8 @@ def save_answer(request):
     question_id = int(data['topic_id'])
     uos = UserOefSurvey.objects.get(oef_survey_id=survey_id, user_id=request.user.id)
     answer = get_answer(uos, question_id) or create_answer(uos, data)
+    answer.selected_option_id = int(data['answer'])
+    answer.save()
     return JsonResponse({
         'status': 'success'
     }, status=status.HTTP_201_CREATED)
