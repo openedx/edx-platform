@@ -1,0 +1,11 @@
+<li class="notification-bell dropdown-toggle text-center hidden-xs" component="notifications" title=""  data-toggle="dropdown" id="notif_dropdown"
+       data-ajaxify="false" role="button" data-original-title="Notifications" aria-expanded="true">
+        <i  component="notifications/icon" class="fa fa-fw fa-bell-o" data-content="0"
+           class="notification-count"></i>
+        <span id="notification-count">
+                <% if (typeof count !== 'undefined' && count > 0) { %>
+                    <%= count %>
+                <% } %>
+        </span>
+</li>
+fdsfsdfsd
