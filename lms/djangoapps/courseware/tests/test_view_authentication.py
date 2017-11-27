@@ -1,6 +1,7 @@
 import datetime
 
 import pytz
+import pytest
 from django.core.urlresolvers import reverse
 from mock import patch
 from nose.plugins.attrib import attr
@@ -163,6 +164,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self.org_staff_user = OrgStaffFactory(course_key=self.course.id)
         self.org_instructor_user = OrgInstructorFactory(course_key=self.course.id)
 
+    @pytest.mark.django111_expected_failure
     def test_redirection_unenrolled(self):
         """
         Verify unenrolled student is redirected to the 'about' section of the chapter
@@ -179,6 +181,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
             )
         )
 
+    @pytest.mark.django111_expected_failure
     def test_redirection_enrolled(self):
         """
         Verify enrolled student is redirected to the 'Welcome' section of
@@ -302,6 +305,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
             self.assert_request_status_code(200, url)
 
     @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @pytest.mark.django111_expected_failure
     def test_dark_launch_enrolled_student(self):
         """
         Make sure that before course start, students can't access course
@@ -329,6 +333,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self._check_non_staff_dark(self.test_course)
 
     @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @pytest.mark.django111_expected_failure
     def test_dark_launch_instructor(self):
         """
         Make sure that before course start instructors can access the
@@ -352,6 +357,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self._check_non_staff_dark(self.test_course)
 
     @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @pytest.mark.django111_expected_failure
     def test_dark_launch_global_staff(self):
         """
         Make sure that before course start staff can access

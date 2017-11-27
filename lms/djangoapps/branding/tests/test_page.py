@@ -3,6 +3,7 @@ Tests for branding page
 """
 import datetime
 
+import pytest
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
@@ -156,6 +157,7 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, Mi
 
 
 @attr(shard=1)
+@pytest.mark.django111_expected_failure
 class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     """
     Test for Index page course cards sorting
@@ -291,6 +293,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
 
 
 @attr(shard=1)
+@pytest.mark.django111_expected_failure
 class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
     """
     Tests for Programs List in Marketing Pages.

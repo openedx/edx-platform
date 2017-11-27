@@ -1,6 +1,8 @@
 """
 Tests related to the Site Configuration feature
 """
+
+import pytest
 from bs4 import BeautifulSoup
 from contextlib import contextmanager
 from django.conf import settings
@@ -17,6 +19,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @attr(shard=1)
+@pytest.mark.django111_expected_failure
 class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     This is testing of the Site Configuration feature

@@ -3,6 +3,7 @@
 from datetime import datetime, timedelta
 
 import ddt
+import pytest
 import waffle
 from django.contrib.messages.middleware import MessageMiddleware
 from django.core.urlresolvers import reverse
@@ -45,6 +46,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 @attr(shard=1)
 @ddt.ddt
+@pytest.mark.django111_expected_failure
 class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""
 

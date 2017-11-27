@@ -5,13 +5,14 @@ import urllib
 from collections import OrderedDict
 
 import mock
-import oauthlib
+import pytest
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from nose.plugins.attrib import attr
 
+import oauthlib
 from courseware.tests.helpers import BaseTestXmodule
 from courseware.views.views import get_course_lti_endpoints
+from nose.plugins.attrib import attr
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -188,6 +189,7 @@ class TestLTIModuleListing(SharedModuleStoreTestCase):
             response = self.client.get(lti_rest_endpoints_url)
             self.assertEqual(404, response.status_code)
 
+    @pytest.mark.django111_expected_failure
     def test_lti_rest_listing(self):
         """tests that the draft lti module is part of the endpoint response"""
         request = mock.Mock()
