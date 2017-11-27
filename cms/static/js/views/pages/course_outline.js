@@ -1,10 +1,14 @@
 /**
  * This page is used to show the user an outline of the course.
  */
-define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'js/views/utils/xblock_utils',
-        'js/views/course_outline', 'common/js/components/utils/view_utils', 'common/js/components/views/feedback_alert',
-        'common/js/components/views/feedback_notification'],
-    function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils, AlertView, NoteView) {
+define([
+    'jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'js/views/utils/xblock_utils',
+    'js/views/course_outline', 'common/js/components/utils/view_utils', 'common/js/components/views/feedback_alert',
+    'common/js/components/views/feedback_notification', 'js/views/course_highlights_enable'],
+    function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils, AlertView, NoteView,
+             CourseHighlightsEnableView
+    ) {
+        'use strict';
         var expandedLocators, CourseOutlinePage;
 
         CourseOutlinePage = BasePage.extend({
@@ -63,6 +67,15 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'js/views
 
                 if (this.initialState && this.initialState.expanded_locators) {
                     this.expandedLocators.addAll(this.initialState.expanded_locators);
+                }
+
+                /* globals course */
+                if (this.model.get('highlights_enabled') && course.get('self_paced')) {
+                    this.highlightsEnableView = new CourseHighlightsEnableView({
+                        el: this.$('.status-highlights-enabled'),
+                        model: this.model
+                    });
+                    this.highlightsEnableView.render();
                 }
 
                 this.outlineView = new CourseOutlineView({
