@@ -646,7 +646,7 @@ class VideoTranscriptsMixin(object):
     This is necessary for both VideoModule and VideoDescriptor.
     """
 
-    def available_translations(self, transcripts, verify_assets=None, include_val_transcripts=None):
+    def available_translations(self, transcripts, verify_assets=None, include_val_transcripts=True):
         """
         Return a list of language codes for which we have transcripts.
 
@@ -770,13 +770,12 @@ class VideoTranscriptsMixin(object):
             transcript_language = u'en'
         return transcript_language
 
-    def get_transcripts_info(self, is_bumper=False, include_val_transcripts=False):
+    def get_transcripts_info(self, is_bumper=False):
         """
         Returns a transcript dictionary for the video.
 
         Arguments:
             is_bumper(bool): If True, the request is for the bumper transcripts
-            include_val_transcripts(bool): If True, include edx-val transcripts as well
         """
         if is_bumper:
             transcripts = copy.deepcopy(get_bumper_settings(self).get('transcripts', {}))
@@ -791,9 +790,10 @@ class VideoTranscriptsMixin(object):
             for language_code, transcript_file in transcripts.items() if transcript_file != ''
         }
 
-        # For phase 2, removing `include_val_transcripts` will make edx-val
-        # taking over the control for transcripts.
-        if include_val_transcripts:
+        # Do not include VAL transcripts into the transcripts metadata
+        # if the request is for bumper transcripts. Currently, we don't
+        # handle video pre-load/bumper transcripts in edx-val.
+        if not is_bumper:
             transcript_languages = get_available_transcript_languages(
                 edx_video_id=self.edx_video_id,
                 youtube_id_1_0=self.youtube_id_1_0,
@@ -804,6 +804,7 @@ class VideoTranscriptsMixin(object):
             # data is migrated to edx-val.
             for language_code in transcript_languages:
                 if language_code == 'en' and not sub:
+                    # TODO This is where we will be including val-identifier
                     sub = NON_EXISTENT_TRANSCRIPT
                 elif not transcripts.get(language_code):
                     transcripts[language_code] = NON_EXISTENT_TRANSCRIPT

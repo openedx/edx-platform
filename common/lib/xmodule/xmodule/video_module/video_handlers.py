@@ -22,7 +22,6 @@ from .transcripts_utils import (
     get_or_create_sjson,
     generate_sjson_for_all_speeds,
     get_video_transcript_content,
-    is_val_transcript_feature_enabled_for_course,
     save_to_store,
     subs_filename,
     Transcript,
@@ -226,8 +225,8 @@ class VideoStudentViewHandlers(object):
         """
         is_bumper = request.GET.get('is_bumper', False)
         # Currently, we don't handle video pre-load/bumper transcripts in edx-val.
-        feature_enabled = is_val_transcript_feature_enabled_for_course(self.course_id) and not is_bumper
-        transcripts = self.get_transcripts_info(is_bumper, include_val_transcripts=feature_enabled)
+        include_val_transcripts = not is_bumper
+        transcripts = self.get_transcripts_info(is_bumper)
         if dispatch.startswith('translation'):
             language = dispatch.replace('translation', '').strip('/')
 
@@ -242,101 +241,105 @@ class VideoStudentViewHandlers(object):
             if language != self.transcript_language:
                 self.transcript_language = language
 
-            try:
-                transcript = self.translation(request.GET.get('videoId', None), transcripts)
-            except (TypeError, TranscriptException, NotFoundError) as ex:
-                # Catching `TranscriptException` because its also getting raised at places
-                # when transcript is not found in contentstore.
-                log.debug(ex.message)
-                # Try to return static URL redirection as last resort
-                # if no translation is required
-                response = self.get_static_transcript(request, transcripts)
-                if response.status_code == 404 and feature_enabled:
-                    # Try to get transcript from edx-val as a last resort.
-                    transcript = get_video_transcript_content(
-                        language_code=self.transcript_language,
-                        edx_video_id=self.edx_video_id,
-                        youtube_id_1_0=self.youtube_id_1_0,
-                        html5_sources=self.html5_sources,
-                    )
-                    if transcript:
-                        response = Response(
-                            transcript['content'],
-                            headerlist=[('Content-Language', self.transcript_language)],
-                            charset='utf8',
-                        )
-                        response.content_type = Transcript.mime_types['sjson']
+            transcript = None
+            # This is to make sure that VAL transcript/translation is not retrieved on
+            # bumper transcript request as we don't keep bumper transcripts on VAL.
+            if include_val_transcripts:
+                # Getting transcript from edx-val
+                transcript = get_video_transcript_content(
+                    language_code=self.transcript_language,
+                    edx_video_id=self.edx_video_id,
+                    youtube_id_1_0=self.youtube_id_1_0,
+                    html5_sources=self.html5_sources,
+                )
 
-                return response
-            except (UnicodeDecodeError, TranscriptsGenerationException) as ex:
-                log.info(ex.message)
-                response = Response(status=404)
-            else:
-                response = Response(transcript, headerlist=[('Content-Language', language)])
+            if transcript:
+                response = Response(
+                    transcript['content'],
+                    headerlist=[('Content-Language', self.transcript_language)],
+                    charset='utf8',
+                )
                 response.content_type = Transcript.mime_types['sjson']
+            else:
+                # Use legacy contentstore as fallback for now. It will be removed once all the transcripts
+                # are migrated to S3. This will also be used in case of bumper videos.
+                try:
+                    transcript = self.translation(request.GET.get('videoId', None), transcripts)
+                except (TypeError, NotFoundError) as ex:
+                    log.debug(ex.message)
+                    # Try to return static URL redirection as last resort
+                    # if no translation is required
+                    response = self.get_static_transcript(request, transcripts)
+                except (TranscriptException, UnicodeDecodeError, TranscriptsGenerationException) as ex:
+                    log.info(ex.message)
+                    response = Response(status=404)
+                else:
+                    response = Response(transcript, headerlist=[('Content-Language', language)])
+                    response.content_type = Transcript.mime_types['sjson']
 
         elif dispatch == 'download':
+            # Make sure the language is set.
             lang = request.GET.get('lang', None)
-            try:
-                transcript_content, transcript_filename, transcript_mime_type = self.get_transcript(
-                    transcripts, transcript_format=self.transcript_download_format, lang=lang
+            if not lang:
+                lang = self.get_default_transcript_language(transcripts)
+
+            # Consider SRT format by default.
+            transcript_format = self.transcript_download_format if self.transcript_download_format else 'srt'
+            # Get transcripts from edx-val.
+            transcript = get_video_transcript_content(
+                language_code=lang,
+                edx_video_id=self.edx_video_id,
+                youtube_id_1_0=self.youtube_id_1_0,
+                html5_sources=self.html5_sources,
+            )
+            if transcript:
+                transcript_content = Transcript.convert(
+                    transcript['content'],
+                    input_format='sjson',
+                    output_format=transcript_format
                 )
-            except (ValueError, NotFoundError):
-                response = Response(status=404)
-                # Check for transcripts in edx-val as a last resort if corresponding feature is enabled.
-                if feature_enabled:
-                    # Make sure the language is set.
-                    if not lang:
-                        lang = self.get_default_transcript_language(transcripts)
+                # Construct the response
+                base_name, __ = os.path.splitext(os.path.basename(transcript['file_name']))
 
-                    transcript = get_video_transcript_content(
-                        language_code=lang,
-                        edx_video_id=self.edx_video_id,
-                        youtube_id_1_0=self.youtube_id_1_0,
-                        html5_sources=self.html5_sources,
-                    )
-                    if transcript:
-                        transcript_content = Transcript.convert(
-                            transcript['content'],
-                            input_format='sjson',
-                            output_format=self.transcript_download_format
-                        )
-                        # Construct the response
-                        base_name, __ = os.path.splitext(os.path.basename(transcript['file_name']))
-                        filename = '{base_name}.{ext}'.format(
-                            base_name=base_name.encode('utf8'),
-                            ext=self.transcript_download_format
-                        )
-                        response = Response(
-                            transcript_content,
-                            headerlist=[
-                                ('Content-Disposition', 'attachment; filename="{filename}"'.format(filename=filename)),
-                                ('Content-Language', lang),
-                            ],
-                            charset='utf8',
-                        )
-                        response.content_type = Transcript.mime_types[self.transcript_download_format]
-
-                return response
-            except (KeyError, UnicodeDecodeError):
-                return Response(status=404)
-            else:
+                filename = '{base_name}.{ext}'.format(
+                    base_name=base_name.encode('utf8'),
+                    ext=transcript_format
+                )
                 response = Response(
                     transcript_content,
                     headerlist=[
-                        ('Content-Disposition', 'attachment; filename="{}"'.format(transcript_filename.encode('utf8'))),
-                        ('Content-Language', self.transcript_language),
+                        ('Content-Disposition', 'attachment; filename="{filename}"'.format(filename=filename)),
+                        ('Content-Language', lang),
                     ],
-                    charset='utf8'
+                    charset='utf8',
                 )
-                response.content_type = transcript_mime_type
+                response.content_type = Transcript.mime_types[transcript_format]
+            else:
+                # Use legacy contentstore as fallback for now. It will be removed once all the transcripts
+                # are migrated to S3.
+                try:
+                    transcript_content, filename, transcript_mime_type = self.get_transcript(
+                        transcripts, transcript_format=transcript_format, lang=lang
+                    )
+                except (NotFoundError, ValueError, KeyError, UnicodeDecodeError):
+                    response = Response(status=404)
+                else:
+                    response = Response(
+                        transcript_content,
+                        headerlist=[
+                            ('Content-Disposition', 'attachment; filename="{}"'.format(filename.encode('utf8'))),
+                            ('Content-Language', self.transcript_language),
+                        ],
+                        charset='utf8'
+                    )
+                    response.content_type = transcript_mime_type
 
         elif dispatch.startswith('available_translations'):
 
             available_translations = self.available_translations(
                 transcripts,
                 verify_assets=True,
-                include_val_transcripts=feature_enabled,
+                include_val_transcripts=include_val_transcripts,
             )
             if available_translations:
                 response = Response(json.dumps(available_translations))

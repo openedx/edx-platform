@@ -887,10 +887,12 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
     )
     @ddt.unpack
-    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
-    def test_val_transcripts_with_feature_enabled(self, transcripts, english_sub, val_transcripts,
+    def test_val_transcript_languages(self, transcripts, english_sub, val_transcripts,
                                                   expected_transcripts, mock_get_transcript_languages):
+        """
+        Tests that serialized course outline includes the VAL transcripts/translations languages as well.
+        """
         self.login_and_enroll()
         video = ItemFactory.create(
             parent=self.nameless_unit,
@@ -939,10 +941,6 @@ class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileCou
         self.api_response(expected_response_code=200, lang='en')
 
     @patch(
-        'xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled',
-        Mock(return_value=True),
-    )
-    @patch(
         'xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages',
         Mock(return_value=['uk']),
     )
@@ -974,20 +972,3 @@ class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileCou
         self.assertEqual(response.content, expected_content)
         for attribute, value in expected_headers.iteritems():
             self.assertEqual(response.get(attribute), value)
-
-    @patch(
-        'xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled',
-        Mock(return_value=False),
-    )
-    @patch(
-        'xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages',
-        Mock(return_value=['uk']),
-    )
-    def test_val_transcript_feature_disabled(self):
-        """
-        Tests transcript retrieval view with val transcripts when
-        the corresponding feature is disabled.
-        """
-        self.login_and_enroll()
-        # request to retrieval endpoint will result in 404 as val transcripts are disabled.
-        self.api_response(expected_response_code=404, lang='uk')
