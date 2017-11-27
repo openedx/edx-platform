@@ -115,6 +115,7 @@ class TestJumpTo(ModuleStoreTestCase):
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
+    @pytest.mark.django111_expected_failure
     def test_jumpto_from_section(self):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
@@ -133,6 +134,7 @@ class TestJumpTo(ModuleStoreTestCase):
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
+    @pytest.mark.django111_expected_failure
     def test_jumpto_from_module(self):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
@@ -170,6 +172,7 @@ class TestJumpTo(ModuleStoreTestCase):
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
+    @pytest.mark.django111_expected_failure
     def test_jumpto_from_nested_module(self):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
@@ -1114,6 +1117,7 @@ class TestProgressDueDate(BaseDueDateTests):
 
 
 # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
+@pytest.mark.django111_expected_failure
 class TestAccordionDueDate(BaseDueDateTests):
     """
     Test that the accordion page displays due dates correctly
@@ -1186,6 +1190,7 @@ class StartDateTests(ModuleStoreTestCase):
     @patch('util.date_utils.ugettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "%Y-%b-%d",
     }))
+    @pytest.mark.django111_expected_failure
     def test_format_localized_in_studio_course(self):
         course = self.set_up_course()
         response = self.get_about_response(course.id)
@@ -2193,6 +2198,7 @@ class ViewCheckerBlock(XBlock):
 
 @attr(shard=1)
 @ddt.ddt
+@pytest.mark.django111_expected_failure
 class TestIndexView(ModuleStoreTestCase):
     """
     Tests of the courseware.views.index view.
@@ -2530,6 +2536,7 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
 
 
 @attr(shard=1)
+@pytest.mark.django111_expected_failure
 class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCase):
     """
     Ensure that the Enterprise Data Consent redirects are in place only when consent is required.

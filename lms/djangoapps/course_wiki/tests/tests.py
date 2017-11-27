@@ -1,3 +1,8 @@
+"""
+Tests for course wiki
+"""
+
+import pytest
 from django.core.urlresolvers import reverse
 from mock import patch
 from nose.plugins.attrib import attr
@@ -9,6 +14,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=1)
+@pytest.mark.django111_expected_failure
 class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for wiki course redirection.

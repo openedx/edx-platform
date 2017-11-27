@@ -10,6 +10,7 @@ import os
 from textwrap import dedent
 
 import ddt
+import pytest
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -779,6 +780,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         # re-fetch the course from the database so the object is up to date
         self.refresh_course()
 
+    @pytest.mark.django111_expected_failure
     def test_three_files(self):
         # Open the test files, and arrange to close them later.
         filenames = "prog1.py prog2.py prog3.py"
@@ -807,6 +809,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
 
 
 @attr(shard=1)
+@pytest.mark.django111_expected_failure
 class TestPythonGradedResponse(TestSubmittingProblems):
     """
     Check that we can submit a schematic and custom response, and it answers properly.
@@ -1174,6 +1177,7 @@ class TestConditionalContent(TestSubmittingProblems):
         # Submit answers for problem in Section 1, which is visible to all students.
         self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Incorrect'})
 
+    @pytest.mark.django111_expected_failure
     def test_split_different_problems_group_0(self):
         """
         Tests that users who see different problems in a split_test module instance are graded correctly.
@@ -1193,6 +1197,7 @@ class TestConditionalContent(TestSubmittingProblems):
         homework_2_score = (1.0 + 2.0) / 4
         self.check_grade_percent(round((homework_1_score + homework_2_score) / 2, 2))
 
+    @pytest.mark.django111_expected_failure
     def test_split_different_problems_group_1(self):
         """
         Tests that users who see different problems in a split_test module instance are graded correctly.
@@ -1229,6 +1234,7 @@ class TestConditionalContent(TestSubmittingProblems):
 
         self.submit_question_answer('H1P1', {'2_1': 'Correct'})
 
+    @pytest.mark.django111_expected_failure
     def test_split_one_group_no_problems_group_0(self):
         """
         Tests what happens when a given group has no problems in it (students receive 0 for that section).
@@ -1244,6 +1250,7 @@ class TestConditionalContent(TestSubmittingProblems):
         homework_2_score = 0.0
         self.check_grade_percent(round((homework_1_score + homework_2_score) / 2, 2))
 
+    @pytest.mark.django111_expected_failure
     def test_split_one_group_no_problems_group_1(self):
         """
         Verifies students in the group that DOES have a problem receive a score for their problem.

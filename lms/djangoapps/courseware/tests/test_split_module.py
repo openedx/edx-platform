@@ -1,6 +1,7 @@
 """
 Test for split test XModule
 """
+import pytest
 from django.core.urlresolvers import reverse
 from mock import MagicMock
 from nose.plugins.attrib import attr
@@ -142,6 +143,7 @@ class SplitTestBase(SharedModuleStoreTestCase):
             self.assertIn(visible, content)
 
 
+@pytest.mark.django111_expected_failure
 class TestSplitTestVert(SplitTestBase):
     """
     Tests a sequential whose top-level vertical is determined by a split test.
@@ -210,6 +212,7 @@ class TestSplitTestVert(SplitTestBase):
         ]
 
 
+@pytest.mark.django111_expected_failure
 class TestVertSplitTestVert(SplitTestBase):
     """
     Tests a sequential whose top-level vertical contains a split test determining content within that vertical.
