@@ -261,7 +261,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'hidden_content.html',
                 {
                     'self_paced': course.self_paced,
-                    'progress_url': context.get('progress_url')
+                    'progress_url': context.get('progress_url'),
                 }
             )
 
@@ -300,7 +300,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         hidden_date = course.end if course.self_paced else self.due
         return (
             self.runtime.user_is_staff or
-            self.verify_current_content_visibility(hidden_date, self.hide_after_due) 
+            self.verify_current_content_visibility(hidden_date, self.hide_after_due)
         )
 
     def is_user_authenticated(self, context):
