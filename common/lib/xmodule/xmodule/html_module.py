@@ -1,5 +1,6 @@
 import copy
 from datetime import datetime
+from django.conf import settings
 from fs.errors import ResourceNotFoundError
 import logging
 from lxml import etree
@@ -68,6 +69,8 @@ class HtmlBlock(object):
         scope=Scope.settings
     )
 
+    ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA = 'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA'
+
     @XBlock.supports("multi_device")
     def student_view(self, _context):
         """
@@ -77,14 +80,15 @@ class HtmlBlock(object):
 
     def student_view_data(self, context=None):  # pylint: disable=unused-argument
         """
-        Returns a JSON representation of the student_view of this XBlock,
-        retrievable from the Course Block API.
-        Since this data is not user-specific, fields like `html` may contain
-        placeholders like %%USER_ID%%.
+        Return a JSON representation of the student_view of this XBlock.
         """
-        return {
-            'html': self.data
-        }
+        if getattr(settings, 'FEATURES', {}).get(self.ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA, False):
+            return {'enabled': True, 'html': self.get_html()}
+        else:
+            return {
+                'enabled': False,
+                'message': 'To enable, set FEATURES["{}"]'.format(self.ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA)
+            }
 
     def get_html(self):
         """ Returns html required for rendering XModule. """
@@ -98,7 +102,7 @@ class HtmlBlock(object):
         # When we switch this to an XBlock, we can merge this with student_view,
         # but for now the XModule mixin requires that this method be defined.
         # pylint: disable=no-member
-        if self.system.anonymous_student_id:
+        if self.data is not None and getattr(self.system, 'anonymous_student_id', None) is not None:
             return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
         return self.data
 
