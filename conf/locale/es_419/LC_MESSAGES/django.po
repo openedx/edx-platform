@@ -466,7 +466,7 @@ msgstr ""
 #: common/djangoapps/course_modes/views.py
 #, python-brace-format
 msgid "Congratulations!  You are now enrolled in {course_name}"
-msgstr "Felicitaciones! Ya se encuentra inscrito en {course_name}"
+msgstr "Felicitaciones! Ya estás inscrito/a en {course_name}"
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment is closed"
@@ -11101,7 +11101,7 @@ msgid ""
 "problems every week, and participating in the discussion forums. What do you"
 " want to do to keep learning?"
 msgstr ""
-"Muchos estudiantes de %(platform_name)s en%(course_name)s completan más "
+"Muchos estudiantes de %(platform_name)s en %(course_name)s completan más "
 "problemas cada semana y participan en los foros. ¿Qué quieres hacer para "
 "continuar aprendiendo?"
 
@@ -11126,7 +11126,7 @@ msgid ""
 "problems every week, and participating in the discussion forums. What do you"
 " want to do to keep learning?"
 msgstr ""
-"Muchos estudiantes de edX en<strong>%(course_name)s</strong> completan más "
+"Muchos estudiantes de edX en <strong>%(course_name)s</strong> completan más "
 "problemas cada semana y participan en los foros. ¿Qué quieres hacer para "
 "continuar aprendiendo?"
 
@@ -11142,7 +11142,7 @@ msgid ""
 "week, and participating in the discussion forums. What do you want to do to "
 "keep learning?"
 msgstr ""
-"Muchos estudiantes de edX en%(course_name)s completan más problemas cada "
+"Muchos estudiantes de edX en %(course_name)s completan más problemas cada "
 "semana y participan en los foros. ¿Qué quieres hacer para continuar "
 "aprendiendo?"
 
@@ -11203,7 +11203,7 @@ msgstr "Empieza a aprender ahora"
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/subject.txt
 #, python-format
 msgid "Keep learning on %(platform_name)s"
-msgstr "Continúa aprendiendo en%(platform_name)s"
+msgstr "Continúa aprendiendo en %(platform_name)s"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/subject.txt
 #, python-format
@@ -11238,7 +11238,7 @@ msgstr ""
 "Certificado Verificado te permite resaltar tus nuevos conocimientos y "
 "habilidades. Los certificados de %(platform_name)s son oficiales y fáciles "
 "de compartir en las redes sociales. Cambia a la opción con certificado "
-"verificado antes del%(user_schedule_upgrade_deadline_time)s."
+"verificado antes del %(user_schedule_upgrade_deadline_time)s."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 msgid "Upgrade now"
@@ -11266,9 +11266,9 @@ msgid ""
 " highlight your new knowledge and skills. An %(platform_name)s certificate "
 "is official and easily shareable."
 msgstr ""
-"¡Esperamos que te esté gustando aprender con nosotros "
-"en<strong>%(first_course_name)s</strong>! El Certificado Verificado te "
-"permite resaltar tus nuevos conocimientos y habilidades. Los certificados "
+"¡Esperamos que te esté gustando aprender con nosotros en "
+"<strong>%(first_course_name)s</strong>! El Certificado Verificado te permite"
+" resaltar tus nuevos conocimientos y habilidades. Los certificados "
 "de%(platform_name)s son oficiales y son fáciles de compartir en las redes "
 "sociales."
 
@@ -11276,8 +11276,8 @@ msgstr ""
 #, python-format
 msgid "Upgrade by <strong>%(user_schedule_upgrade_deadline_time)s</strong>."
 msgstr ""
-"Cambia a la opción con certificado verificado antes "
-"del<strong>%(user_schedule_upgrade_deadline_time)s</strong>."
+"Cambia a la opción con certificado verificado antes del "
+"<strong>%(user_schedule_upgrade_deadline_time)s</strong>."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 msgid "You are eligible to upgrade in these courses:"
@@ -11900,8 +11900,8 @@ msgid ""
 msgstr ""
 "Bienvenido/a a la nueva página del perfil del estudiante. Tu perfil completo"
 " ahora muestra más información a otros estudiantes. También puedes elegir "
-"mostrar un perfil limitado. {learn_more_link_start}Learn "
-"more{learn_more_link_end}"
+"mostrar un perfil limitado. {learn_more_link_start}Aprender "
+"más{learn_more_link_end}"
 
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""

@@ -6,8 +6,6 @@ words, passing the `str` value of
 You want to pass in the result of calling .decode('hex') on that, so this instead:
 "'2\xfer\xaa\xf2\xab\xb4M\xe9\xe1a\x13\x1bT5\xc8\xd3|\xbd\xb6\xf5\xdf$*\xe8`\xb2\x83\x11_-\xae'"
 
-The RSA functions take any key format that RSA.importKey() accepts, so...
-
 An RSA public key can be in any of the following formats:
 * X.509 subjectPublicKeyInfo DER SEQUENCE (binary or PEM encoding)
 * PKCS#1 RSAPublicKey DER SEQUENCE (binary or PEM encoding)
@@ -16,27 +14,33 @@ An RSA public key can be in any of the following formats:
 An RSA private key can be in any of the following formats:
 * PKCS#1 RSAPrivateKey DER SEQUENCE (binary or PEM encoding)
 * PKCS#8 PrivateKeyInfo DER SEQUENCE (binary or PEM encoding)
-* OpenSSH (textual public key only)
-
-In case of PEM encoding, the private key can be encrypted with DES or 3TDES
-according to a certain pass phrase. Only OpenSSL-compatible pass phrases are
-supported.
 """
+from __future__ import division
+
 import base64
 import binascii
 import hmac
 import logging
+import os
 from hashlib import md5, sha256
+from six import text_type
 
-from Crypto import Random
-from Crypto.Cipher import AES, PKCS1_OAEP
-from Crypto.PublicKey import RSA
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric.padding import MGF1, OAEP
+from cryptography.hazmat.primitives.ciphers import Cipher
+from cryptography.hazmat.primitives.ciphers.algorithms import AES
+from cryptography.hazmat.primitives.ciphers.modes import CBC
+from cryptography.hazmat.primitives.hashes import SHA1
+from cryptography.hazmat.primitives.padding import PKCS7
 
 log = logging.getLogger(__name__)
 
+AES_BLOCK_SIZE_BYTES = int(AES.block_size / 8)
+
 
 def encrypt_and_encode(data, key):
-    """ Encrypts and endcodes `data` using `key' """
+    """ Encrypts and encodes `data` using `key' """
     return base64.urlsafe_b64encode(aes_encrypt(data, key))
 
 
@@ -51,7 +55,8 @@ def aes_encrypt(data, key):
     """
     cipher = aes_cipher_from_key(key)
     padded_data = pad(data)
-    return cipher.encrypt(padded_data)
+    encryptor = cipher.encryptor()
+    return encryptor.update(padded_data) + encryptor.finalize()
 
 
 def aes_decrypt(encrypted_data, key):
@@ -59,17 +64,18 @@ def aes_decrypt(encrypted_data, key):
     Decrypt `encrypted_data` using `key`
     """
     cipher = aes_cipher_from_key(key)
-    padded_data = cipher.decrypt(encrypted_data)
+    decryptor = cipher.decryptor()
+    padded_data = decryptor.update(encrypted_data) + decryptor.finalize()
     return unpad(padded_data)
 
 
 def aes_cipher_from_key(key):
     """
-    Given an AES key, return a Cipher object that has `encrypt()` and
-    `decrypt()` methods. It will create the cipher to use CBC mode, and create
+    Given an AES key, return a Cipher object that has `encryptor()` and
+    `decryptor()` methods. It will create the cipher to use CBC mode, and create
     the initialization vector as Software Secure expects it.
     """
-    return AES.new(key, AES.MODE_CBC, generate_aes_iv(key))
+    return Cipher(AES(key), CBC(generate_aes_iv(key)), backend=default_backend())
 
 
 def generate_aes_iv(key):
@@ -77,42 +83,55 @@ def generate_aes_iv(key):
     Return the initialization vector Software Secure expects for a given AES
     key (they hash it a couple of times and take a substring).
     """
-    return md5(key + md5(key).hexdigest()).hexdigest()[:AES.block_size]
+    return md5(key + md5(key).hexdigest()).hexdigest()[:AES_BLOCK_SIZE_BYTES]
 
 
 def random_aes_key():
-    return Random.new().read(32)
+    return os.urandom(32)
 
 
 def pad(data):
     """ Pad the given `data` such that it fits into the proper AES block size """
-    bytes_to_pad = AES.block_size - len(data) % AES.block_size
-    return data + (bytes_to_pad * chr(bytes_to_pad))
+    padder = PKCS7(AES.block_size).padder()
+    return padder.update(data) + padder.finalize()
 
 
 def unpad(padded_data):
     """  remove all padding from `padded_data` """
-    num_padded_bytes = ord(padded_data[-1])
-    return padded_data[:-num_padded_bytes]
+    unpadder = PKCS7(AES.block_size).unpadder()
+    return unpadder.update(padded_data) + unpadder.finalize()
 
 
-def rsa_encrypt(data, rsa_pub_key_str):
+def rsa_encrypt(data, rsa_pub_key_bytes):
     """
-    `rsa_pub_key` is a string with the public key
+    `rsa_pub_key_bytes` is a byte sequence with the public key
     """
-    key = RSA.importKey(rsa_pub_key_str)
-    cipher = PKCS1_OAEP.new(key)
-    encrypted_data = cipher.encrypt(data)
-    return encrypted_data
+    if isinstance(data, text_type):
+        data = data.encode('utf-8')
+    if isinstance(rsa_pub_key_bytes, text_type):
+        rsa_pub_key_bytes = rsa_pub_key_bytes.encode('utf-8')
+    if rsa_pub_key_bytes.startswith(b'-----'):
+        key = serialization.load_pem_public_key(rsa_pub_key_bytes, backend=default_backend())
+    elif rsa_pub_key_bytes.startswith(b'ssh-rsa '):
+        key = serialization.load_ssh_public_key(rsa_pub_key_bytes, backend=default_backend())
+    else:
+        key = serialization.load_der_public_key(rsa_pub_key_bytes, backend=default_backend())
+    return key.encrypt(data, OAEP(MGF1(SHA1()), SHA1(), label=None))
 
 
-def rsa_decrypt(data, rsa_priv_key_str):
+def rsa_decrypt(data, rsa_priv_key_bytes):
     """
     When given some `data` and an RSA private key, decrypt the data
     """
-    key = RSA.importKey(rsa_priv_key_str)
-    cipher = PKCS1_OAEP.new(key)
-    return cipher.decrypt(data)
+    if isinstance(data, text_type):
+        data = data.encode('utf-8')
+    if isinstance(rsa_priv_key_bytes, text_type):
+        rsa_priv_key_bytes = rsa_priv_key_bytes.encode('utf-8')
+    if rsa_priv_key_bytes.startswith(b'-----'):
+        key = serialization.load_pem_private_key(rsa_priv_key_bytes, password=None, backend=default_backend())
+    else:
+        key = serialization.load_der_private_key(rsa_priv_key_bytes, password=None, backend=default_backend())
+    return key.decrypt(data, OAEP(MGF1(SHA1()), SHA1(), label=None))
 
 
 def has_valid_signature(method, headers_dict, body_dict, access_key, secret_key):

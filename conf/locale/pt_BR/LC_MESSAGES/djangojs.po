@@ -29,7 +29,7 @@
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
 # Gislene Kucker Arantes <gislene.trad@gmail.com>, 2015
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
-# Hudson Martins dos Santos <p4p4l3gu4x@gmail.com>, 2015
+# Hudson Martins <p4p4l3gu4x@gmail.com>, 2015
 # Igor Brandorff <igor.souza@adaptivesoft.com.br>, 2017
 # javiercencig <javier@jecnet.com.br>, 2014
 # Jefferson Floyd Conz, 2014
@@ -148,7 +148,7 @@
 # G <glaucogm@ufpr.br>, 2014
 # Guilherme Henrique Spiller <inactive+guispiller@transifex.com>, 2015
 # Gustavo Bertoli, 2015
-# Hudson Martins dos Santos <p4p4l3gu4x@gmail.com>, 2015
+# Hudson Martins <p4p4l3gu4x@gmail.com>, 2015
 # Jaqueline Knebel Wildner <jaquelinewildner@gmail.com>, 2015
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
 # Luan Benavenuto dos Santos <luanbenavenuto@outlook.com>, 2015

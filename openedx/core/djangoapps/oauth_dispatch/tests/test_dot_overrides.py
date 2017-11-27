@@ -3,12 +3,18 @@ Test of custom django-oauth-toolkit behavior
 """
 
 # pylint: disable=protected-access
+import unittest
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase, RequestFactory
-from ..dot_overrides import EdxOAuth2Validator
+
+# oauth_dispatch is not in CMS' INSTALLED_APPS so these imports will error during test collection
+if settings.ROOT_URLCONF == 'lms.urls':
+    from ..dot_overrides import EdxOAuth2Validator
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class AuthenticateTestCase(TestCase):
     """
     Test that users can authenticate with either username or email
@@ -38,6 +44,7 @@ class AuthenticateTestCase(TestCase):
         )
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CustomValidationTestCase(TestCase):
     """
     Test custom user validation works.

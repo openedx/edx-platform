@@ -1,8 +1,6 @@
 from django.test import TestCase
 import mock
 
-from opaque_keys.edx.keys import CourseKey
-
 from django_comment_common import signals
 from lms.djangoapps.discussion.config.waffle import waffle, FORUM_RESPONSE_NOTIFICATIONS, SEND_NOTIFICATIONS_FOR_COURSE
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY

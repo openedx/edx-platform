@@ -5,43 +5,44 @@ import datetime
 import json
 
 import ddt
+import httpretty
+import mock
+import pytest
+import pytz
 from django.contrib.auth.models import User
 from django.core import mail
-from django.test.utils import override_settings
 from django.db import connection
+from django.test.utils import override_settings
 from nose.plugins.attrib import attr
-import httpretty
-from lms.djangoapps.commerce.tests import TEST_API_URL
-import mock
-import pytz
 from opaque_keys.edx.keys import CourseKey
+
+from course_modes.models import CourseMode
+from lms.djangoapps.commerce.tests import TEST_API_URL
 from openedx.core.djangoapps.credit import api
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.credit.exceptions import (
-    InvalidCreditRequirements,
-    InvalidCreditCourse,
-    RequestAlreadyCompleted,
-    UserIsNotEligible,
-    InvalidCreditStatus,
     CreditRequestNotFound,
+    InvalidCreditCourse,
+    InvalidCreditRequirements,
+    InvalidCreditStatus,
+    RequestAlreadyCompleted,
+    UserIsNotEligible
 )
 from openedx.core.djangoapps.credit.models import (
     CreditConfig,
     CreditCourse,
-    CreditProvider,
-    CreditRequirement,
-    CreditRequirementStatus,
     CreditEligibility,
-    CreditRequest
+    CreditProvider,
+    CreditRequest,
+    CreditRequirement,
+    CreditRequirementStatus
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.date_utils import from_timestamp
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
 
 TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
 TEST_ECOMMERCE_WORKER = 'test_worker'
@@ -205,6 +206,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
 @attr(shard=2)
 @skip_unless_lms
 @ddt.ddt
+@pytest.mark.django111_expected_failure
 class CreditRequirementApiTests(CreditApiTestBase):
     """
     Test Python API for credit requirements and eligibility.

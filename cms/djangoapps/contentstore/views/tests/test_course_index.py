@@ -17,7 +17,7 @@ from search.api import perform_search
 
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import add_instructor, reverse_course_url, reverse_library_url, reverse_usage_url
+from contentstore.utils import add_instructor, reverse_course_url, reverse_usage_url
 from contentstore.views.course import (
     _deprecated_blocks_info,
     course_outline_initial_state,

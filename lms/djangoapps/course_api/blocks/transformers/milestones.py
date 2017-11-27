@@ -10,7 +10,6 @@ from edx_proctoring.exceptions import ProctoredExamNotFoundException
 
 from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
-    FilteringTransformerMixin
 )
 from student.models import EntranceExamConfiguration
 from util import milestones_helpers

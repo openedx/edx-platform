@@ -20,7 +20,7 @@ from provider.oauth2.models import Client
 from provider.utils import long_token
 from social_core.backends.base import BaseAuth
 from social_core.backends.oauth import OAuthAuth
-from social_core.backends.saml import SAMLAuth, SAMLIdentityProvider
+from social_core.backends.saml import SAMLAuth
 from social_core.exceptions import SocialAuthBaseException
 from social_core.utils import module_member
 

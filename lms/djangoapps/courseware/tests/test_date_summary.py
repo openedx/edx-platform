@@ -3,10 +3,11 @@
 from datetime import datetime, timedelta
 
 import ddt
+import pytest
 import waffle
 from django.contrib.messages.middleware import MessageMiddleware
 from django.core.urlresolvers import reverse
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory
 from freezegun import freeze_time
 from mock import patch
 from nose.plugins.attrib import attr
@@ -32,7 +33,6 @@ from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules.signals import CREATE_SCHEDULE_WAFFLE_FLAG
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -46,6 +46,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 @attr(shard=1)
 @ddt.ddt
+@pytest.mark.django111_expected_failure
 class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""
 

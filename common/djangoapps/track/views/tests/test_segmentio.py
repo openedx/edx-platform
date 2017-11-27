@@ -15,7 +15,6 @@ from track.middleware import TrackMiddleware
 from track.views import segmentio
 from track.views.tests.base import (
     SegmentIOTrackingTestCaseBase,
-    SEGMENTIO_TEST_SECRET,
     SEGMENTIO_TEST_ENDPOINT,
     SEGMENTIO_TEST_USER_ID
 )

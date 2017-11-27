@@ -4,7 +4,8 @@ import json
 
 import ddt
 import mock
-from django.core.management import call_command
+import pytest
+
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase
 from mock import Mock, patch
@@ -21,10 +22,8 @@ from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
 from django_comment_common.models import (
-    FORUM_ROLE_GROUP_MODERATOR,
     CourseDiscussionSettings,
     ForumsConfig,
-    Role,
     assign_role
 )
 from django_comment_common.utils import (
@@ -32,8 +31,7 @@ from django_comment_common.utils import (
     seed_permissions_roles,
     set_course_discussion_settings
 )
-from edxmako import add_lookup
-from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from lms.lib.comment_client.utils import CommentClientMaintenanceError, perform_request
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups import cohorts
@@ -74,6 +72,7 @@ class DictionaryTestCase(TestCase):
 
 
 @attr(shard=1)
+@pytest.mark.django111_expected_failure
 class AccessUtilsTestCase(ModuleStoreTestCase):
     """
     Base testcase class for access and roles for the

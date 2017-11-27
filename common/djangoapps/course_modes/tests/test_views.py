@@ -10,7 +10,6 @@ import ddt
 import freezegun
 import httpretty
 import pytz
-import waffle
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import patch
@@ -24,7 +23,6 @@ from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util import organizations_helpers as organizations_api
 from util.testing import UrlResetMixin
 from util.tests.mixins.discovery import CourseCatalogServiceMockMixin
 from xmodule.modulestore.django import modulestore

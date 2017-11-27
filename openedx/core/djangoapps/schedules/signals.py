@@ -5,7 +5,6 @@ import random
 import analytics
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils import timezone
 
 from course_modes.models import CourseMode
 from courseware.models import (

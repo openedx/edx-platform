@@ -5,7 +5,6 @@ import unittest
 import mock
 import ddt
 from django import test
-from django.conf import settings
 from django.contrib.auth import models
 from social_django import models as social_models
 

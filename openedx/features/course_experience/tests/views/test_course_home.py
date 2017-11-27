@@ -26,7 +26,7 @@ from openedx.features.course_experience import (
     UNIFIED_COURSE_TAB_FLAG
 )
 from student.models import CourseEnrollment
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.tests.factories import UserFactory
 from util.date_utils import strftime_localized
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase

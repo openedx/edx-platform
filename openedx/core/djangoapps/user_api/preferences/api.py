@@ -15,14 +15,13 @@ from django.utils.translation import ugettext_noop
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from pytz import common_timezones, common_timezones_set, country_timezones
 from student.models import User, UserProfile
-from request_cache import get_request_or_stub
 from ..errors import (
     UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized,
     PreferenceValidationError, PreferenceUpdateError, CountryCodeError
 )
 from ..helpers import intercept_errors, serializer_is_dirty
 from ..models import UserOrgTag, UserPreference
-from ..serializers import UserSerializer, RawUserPreferenceSerializer
+from ..serializers import RawUserPreferenceSerializer
 
 log = logging.getLogger(__name__)
 
