@@ -3,12 +3,11 @@
 
     define([
         'jquery',
-        'underscore',
         'backbone',
         'gettext',
         'logger',
         'edx-ui-toolkit/js/utils/html-utils'
-    ], function($, _, Backbone, gettext, Logger, HtmlUtils) {
+    ], function($, Backbone, gettext, Logger, HtmlUtils) {
         return Backbone.View.extend({
 
             tagName: 'li',
@@ -27,7 +26,7 @@
             },
 
             render: function() {
-                var data = _.clone(this.model.attributes);
+                var data = Object.assign({}, this.model.attributes);
 
                 // Drop the preview text and result type if the search term is found
                 // in the title/location in the course hierarchy

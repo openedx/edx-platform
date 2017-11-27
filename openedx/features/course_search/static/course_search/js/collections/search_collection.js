@@ -2,10 +2,9 @@
     'use strict';
 
     define([
-        'underscore',
         'backbone',
         'course_search/js/models/search_result'
-    ], function(_, Backbone, SearchResult) {
+    ], function(Backbone, SearchResult) {
         return Backbone.Collection.extend({
 
             model: SearchResult,
@@ -84,7 +83,7 @@
                 this.totalCount = response.total;
                 this.accessDeniedCount += response.access_denied_count;
                 this.totalCount -= this.accessDeniedCount;
-                return _.map(response.results, function(result) {
+                return response.results.map(function(result) {
                     return result.data;
                 });
             },

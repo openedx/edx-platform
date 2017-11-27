@@ -4,7 +4,6 @@ define(
         'gettext',
         'backbone',
         'jquery',
-        'underscore',
         'edx-ui-toolkit/js/pagination/paging-collection',
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'common/js/spec_helpers/template_helpers',
@@ -19,7 +18,7 @@ define(
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner'
     ],
-    function(gettext, Backbone, $, _, PagingCollection, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers,
+    function(gettext, Backbone, $, PagingCollection, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers,
               FieldViews, UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
               BadgeListContainer, AccountSettingsFieldViews, MessageBannerView) {
         'use strict';

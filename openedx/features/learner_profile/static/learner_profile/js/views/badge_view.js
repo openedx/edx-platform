@@ -3,15 +3,16 @@
 
     define(
         [
-            'gettext', 'jquery', 'underscore', 'backbone', 'moment',
+            'gettext', 'jquery', 'backbone', 'moment',
+            'edx-ui-toolkit/js/utils/html-utils',
             'text!learner_profile/templates/badge.underscore',
             'learner_profile/js/views/share_modal_view'
         ],
-        function(gettext, $, _, Backbone, Moment, badgeTemplate, ShareModalView) {
+        function(gettext, $, Backbone, Moment, HtmlUtils, badgeTemplate, ShareModalView) {
             var BadgeView = Backbone.View.extend({
                 initialize: function(options) {
-                    this.options = _.extend({}, options);
-                    this.context = _.extend(this.options.model.toJSON(), {
+                    this.options = Object.assign({}, options);
+                    this.context = Object.assign(this.options.model.toJSON(), {
                         created: new Moment(this.options.model.toJSON().created),
                         ownProfile: options.ownProfile,
                         badgeMeta: options.badgeMeta
@@ -20,7 +21,7 @@
                 attributes: {
                     class: 'badge-display'
                 },
-                template: _.template(badgeTemplate),
+                template: HtmlUtils.template(badgeTemplate),
                 events: {
                     'click .share-button': 'createModal'
                 },
@@ -32,10 +33,10 @@
                     modal.$el.hide();
                     modal.render();
                     $('body').append(modal.$el);
-                    modal.$el.fadeIn('short', 'swing', _.bind(modal.ready, modal));
+                    modal.$el.fadeIn('short', 'swing', modal.ready.bind(modal));
                 },
                 render: function() {
-                    this.$el.html(this.template(this.context));
+                    HtmlUtils.setHtml(this.$el, this.template(this.context));
                     this.shareButton = this.$el.find('.share-button');
                     return this;
                 }

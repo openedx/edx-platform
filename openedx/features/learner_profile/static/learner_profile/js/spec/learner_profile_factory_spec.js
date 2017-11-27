@@ -1,6 +1,6 @@
 define(
     [
-        'backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'common/js/spec_helpers/template_helpers',
         'js/spec/student_account/helpers',
         'learner_profile/js/spec_helpers/helpers',
@@ -12,7 +12,7 @@ define(
         'learner_profile/js/learner_profile_factory',
         'js/views/message_banner'
     ],
-    function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews,
+    function(Backbone, $, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews,
              UserAccountModel, UserPreferencesModel, LearnerProfileView, LearnerProfileFields, LearnerProfilePage) {
         'use strict';
 

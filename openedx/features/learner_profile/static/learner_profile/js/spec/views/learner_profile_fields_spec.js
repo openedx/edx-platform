@@ -2,7 +2,6 @@ define(
     [
         'backbone',
         'jquery',
-        'underscore',
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'common/js/spec_helpers/template_helpers',
         'js/spec/student_account/helpers',
@@ -10,7 +9,7 @@ define(
         'learner_profile/js/views/learner_profile_fields',
         'js/views/message_banner'
     ],
-    function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, UserAccountModel, LearnerProfileFields,
+    function(Backbone, $, AjaxHelpers, TemplateHelpers, Helpers, UserAccountModel, LearnerProfileFields,
              MessageBannerView) {
         'use strict';
 
@@ -20,9 +19,9 @@ define(
             var MOCK_IMAGE_MIN_BYTES = 16;
 
             var createImageView = function(options) {
-                var yearOfBirth = _.isUndefined(options.yearOfBirth) ? MOCK_YEAR_OF_BIRTH : options.yearOfBirth;
-                var imageMaxBytes = _.isUndefined(options.imageMaxBytes) ? MOCK_IMAGE_MAX_BYTES : options.imageMaxBytes;
-                var imageMinBytes = _.isUndefined(options.imageMinBytes) ? MOCK_IMAGE_MIN_BYTES : options.imageMinBytes;
+                var yearOfBirth = options.yearOfBirth === undefined ? MOCK_YEAR_OF_BIRTH : options.yearOfBirth;
+                var imageMaxBytes = options.imageMaxBytes === undefined ? MOCK_IMAGE_MAX_BYTES : options.imageMaxBytes;
+                var imageMinBytes = options.imageMinBytes === undefined ? MOCK_IMAGE_MIN_BYTES : options.imageMinBytes;
                 var messageView;
 
                 var imageData = {
@@ -33,7 +32,7 @@ define(
                 var accountSettingsModel = new UserAccountModel();
                 accountSettingsModel.set({profile_image: imageData});
                 accountSettingsModel.set({year_of_birth: yearOfBirth});
-                accountSettingsModel.set({requires_parental_consent: !!_.isEmpty(yearOfBirth)});
+                accountSettingsModel.set({requires_parental_consent: yearOfBirth === ''});
 
                 accountSettingsModel.url = Helpers.USER_ACCOUNTS_API_URL;
 

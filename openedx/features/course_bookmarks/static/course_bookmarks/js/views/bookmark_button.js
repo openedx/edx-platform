@@ -1,8 +1,8 @@
 (function(define) {
     'use strict';
 
-    define(['gettext', 'jquery', 'underscore', 'backbone', 'js/views/message_banner'],
-        function(gettext, $, _, Backbone, MessageBannerView) {
+    define(['gettext', 'jquery', 'backbone', 'js/views/message_banner'],
+        function(gettext, $, Backbone, MessageBannerView) {
             return Backbone.View.extend({
                 errorMessage: gettext('An error has occurred. Please try again.'),
 
@@ -108,9 +108,9 @@
                     this.messageView.showMessage(errorMsg);
 
                     // Hide message automatically after some interval
-                    setTimeout(_.bind(function() {
+                    setTimeout(() => {
                         this.messageView.hideMessage();
-                    }, this), this.showBannerInterval);
+                    }, this.showBannerInterval);
                 }
             });
         });

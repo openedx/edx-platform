@@ -1,14 +1,13 @@
 define([
     'backbone',
     'jquery',
-    'underscore',
     'URI',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'edx-ui-toolkit/js/pagination/paging-collection',
     'learner_profile/js/spec_helpers/helpers',
     'learner_profile/js/views/badge_list_container'
 ],
-    function(Backbone, $, _, URI, AjaxHelpers, PagingCollection, LearnerProfileHelpers, BadgeListContainer) {
+    function(Backbone, $, URI, AjaxHelpers, PagingCollection, LearnerProfileHelpers, BadgeListContainer) {
         'use strict';
 
         describe('edx.user.BadgeListContainer', function() {
@@ -26,9 +25,9 @@ define([
                 var request;
                 var path;
                 badgeCollection.url = '/api/badges/v1/assertions/user/staff/';
-                _.each(_.range(badgeListObject.count), function(idx) {
+                for (var idx = 0; idx < badgeListObject.count; idx++) {
                     models.push(LearnerProfileHelpers.makeBadge(idx));
-                });
+                }
                 badgeListObject.results = models; // eslint-disable-line no-param-reassign
                 badgeCollection.setPage(pageNum);
                 request = AjaxHelpers.currentRequest(requests);

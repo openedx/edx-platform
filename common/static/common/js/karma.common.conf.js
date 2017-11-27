@@ -297,6 +297,7 @@ function getBaseConfig(config, useRequireJs) {
         frameworks: ['custom'],
 
         plugins: [
+            'karma-babel-preprocessor',
             'karma-jasmine',
             'karma-jasmine-html-reporter',
             'karma-requirejs',

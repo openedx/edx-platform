@@ -1,4 +1,4 @@
-define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'], function(_, URI, AjaxHelpers) {
+define(['URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'], function(URI, AjaxHelpers) {
     'use strict';
 
     var expectProfileElementContainsField = function(element, view) {
@@ -12,7 +12,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         }
 
         fieldTitle = titleElement.text().trim();
-        if (!_.isUndefined(view.options.title) && !_.isUndefined(fieldTitle)) {
+        if (view.options.title !== undefined && fieldTitle !== undefined) {
             expect(fieldTitle).toBe(view.options.title);
         }
 
@@ -56,7 +56,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         expectProfileElementContainsField(sectionOneFieldElements[1], learnerProfileView.options.usernameFieldView);
         expectProfileElementContainsField(sectionOneFieldElements[2], learnerProfileView.options.nameFieldView);
 
-        _.each(_.rest(sectionOneFieldElements, 3), function(sectionFieldElement, fieldIndex) {
+        sectionOneFieldElements.slice(3).each(function(fieldIndex, sectionFieldElement) {
             expectProfileElementContainsField(
                 sectionFieldElement,
                 learnerProfileView.options.sectionOneFieldViews[fieldIndex]
@@ -70,7 +70,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 
         expect($sectionTwoFieldElements.length).toBe(learnerProfileView.options.sectionTwoFieldViews.length);
 
-        _.each($sectionTwoFieldElements, function(sectionFieldElement, fieldIndex) {
+        $sectionTwoFieldElements.each(function(fieldIndex, sectionFieldElement) {
             expectProfileElementContainsField(
                 sectionFieldElement,
                 learnerProfileView.options.sectionTwoFieldViews[fieldIndex]
@@ -153,7 +153,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         expect(index).toBe('Showing ' + (pageData.start + 1) + '-' + (pageData.start + pageData.results.length) +
             ' out of ' + pageData.count + ' total');
         expect($badgeListContainer.find('.current-page').text()).toBe('' + pageData.current_page);
-        _.each(pageData.results, function(badge) {
+        pageData.results.forEach(function(badge) {
             expect($('.badge-display:contains(' + badge.badge_class.display_name + ')').length).toBe(1);
         });
     };
@@ -227,17 +227,17 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         };
     }
 
-    _.each(_.range(0, 10), function(i) {
+    for(var i = 0; i < 10; i++) {
         firstPageBadges.results.push(makeBadge(i));
-    });
+    }
 
-    _.each(_.range(10, 20), function(i) {
+    for(var i = 10; i < 20; i++) {
         secondPageBadges.results.push(makeBadge(i));
-    });
+    }
 
-    _.each(_.range(20, 30), function(i) {
+    for(var i = 20; i < 30; i++) {
         thirdPageBadges.results.push(makeBadge(i));
-    });
+    }
 
     return {
         expectLimitedProfileSectionsAndFieldsToBeRendered: expectLimitedProfileSectionsAndFieldsToBeRendered,

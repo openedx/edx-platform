@@ -1,11 +1,9 @@
-/* eslint-disable no-underscore-dangle */
 (function(define) {
     'use strict';
 
     define([
         'gettext',
         'jquery',
-        'underscore',
         'backbone',
         'edx-ui-toolkit/js/utils/string-utils',
         'edx-ui-toolkit/js/utils/html-utils',
@@ -13,7 +11,7 @@
         'js/views/image_field',
         'text!learner_profile/templates/social_icons.underscore',
         'backbone-super'
-    ], function(gettext, $, _, Backbone, StringUtils, HtmlUtils, FieldViews, ImageFieldView, socialIconsTemplate) {
+    ], function(gettext, $, Backbone, StringUtils, HtmlUtils, FieldViews, ImageFieldView, socialIconsTemplate) {
         var LearnerProfileFieldViews = {};
 
         LearnerProfileFieldViews.AccountPrivacyFieldView = FieldViews.DropdownFieldView.extend({
@@ -95,7 +93,7 @@
 
             showImageChangeFailedMessage: function(status, responseText) {
                 var errors;
-                if (_.contains([400, 404], status)) {
+                if ([400, 404].indexOf(status) >= 0) {
                     try {
                         errors = JSON.parse(responseText);
                         this.showErrorMessage(errors.user_message);
@@ -133,7 +131,7 @@
         LearnerProfileFieldViews.SocialLinkIconsView = Backbone.View.extend({
 
             initialize: function(options) {
-                this.options = _.extend({}, options);
+                this.options = Object.assign({}, options);
             },
 
             render: function() {

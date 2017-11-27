@@ -3,14 +3,13 @@
 
     define([
         'jquery',
-        'underscore',
         'backbone',
         'edx-ui-toolkit/js/utils/html-utils',
         'edx-ui-toolkit/js/utils/string-utils',
         'course_search/js/views/search_item_view',
         'text!course_search/templates/search_loading.underscore',
         'text!course_search/templates/search_error.underscore'
-    ], function($, _, Backbone, HtmlUtils, StringUtils, SearchItemView, searchLoadingTemplate, searchErrorTemplate) {
+    ], function($, Backbone, HtmlUtils, StringUtils, SearchItemView, searchLoadingTemplate, searchErrorTemplate) {
         return Backbone.View.extend({
 
             // these should be defined by subclasses

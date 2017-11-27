@@ -1,12 +1,12 @@
 define(
     [
-        'backbone', 'jquery', 'underscore', 'moment',
+        'backbone', 'jquery', 'moment',
         'js/spec/student_account/helpers',
         'learner_profile/js/spec_helpers/helpers',
         'learner_profile/js/views/share_modal_view',
         'jquery.simulate'
     ],
-    function(Backbone, $, _, Moment, Helpers, LearnerProfileHelpers, ShareModalView) {
+    function(Backbone, $, Moment, Helpers, LearnerProfileHelpers, ShareModalView) {
         'use strict';
 
         describe('edx.user.ShareModalView', function() {
@@ -16,7 +16,7 @@ define(
 
             var createModalView = function() {
                 var badge = LearnerProfileHelpers.makeBadge(1);
-                var context = _.extend(badge, {
+                var context = Object.assign(badge, {
                     created: new Moment(badge.created),
                     ownProfile: true,
                     badgeMeta: {}

@@ -1,9 +1,9 @@
 define([
-    'backbone', 'jquery', 'underscore',
+    'backbone', 'jquery',
     'learner_profile/js/spec_helpers/helpers',
     'learner_profile/js/views/badge_view'
 ],
-    function(Backbone, $, _, LearnerProfileHelpers, BadgeView) {
+    function(Backbone, $, LearnerProfileHelpers, BadgeView) {
         'use strict';
 
         describe('edx.user.BadgeView', function() {
@@ -83,7 +83,7 @@ define([
                 badgeDiv = view.$el.find('.badge-name');
                 expect(badgeDiv.length).toBeTruthy();
                 expect(badgeDiv.is(':visible')).toBe(true);
-                expect(_.count(badgeDiv.html(), badge.badge_class.display_name)).toBeTruthy();
+                expect(badgeDiv.html().indexOf(badge.badge_class.display_name)).toBeGreaterThan(-1);
             };
 
             it('test badge name is displayed for own profile', function() {

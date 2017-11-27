@@ -1,13 +1,13 @@
 /* eslint-disable vars-on-top */
 define(
     [
-        'backbone', 'jquery', 'underscore',
+        'backbone', 'jquery',
         'js/spec/student_account/helpers',
         'learner_profile/js/views/section_two_tab',
         'js/views/fields',
         'js/student_account/models/user_account_model'
     ],
-    function(Backbone, $, _, Helpers, SectionTwoTabView, FieldViews, UserAccountModel) {
+    function(Backbone, $, Helpers, SectionTwoTabView, FieldViews, UserAccountModel) {
         'use strict';
 
         describe('edx.user.SectionTwoTab', function() {
@@ -51,11 +51,11 @@ define(
 
             it('profile field parts are actually rendered for public profile', function() {
                 var view = createSectionTwoView(false, true);
-                _.each(view.options.viewList, function(fieldView) {
+                view.options.viewList.forEach(function(fieldView) {
                     spyOn(fieldView, 'render').and.callThrough();
                 });
                 view.render();
-                _.each(view.options.viewList, function(fieldView) {
+                view.options.viewList.forEach(function(fieldView) {
                     expect(fieldView.render).toHaveBeenCalled();
                 });
             });
@@ -67,7 +67,7 @@ define(
                 expect(bio.length).toBe(0);
                 var msg = view.$el.find('span.profile-private-message');
                 expect(msg.length).toBe(1);
-                expect(_.count(msg.html(), messageString)).toBeTruthy();
+                expect(msg.html().indexOf(messageString)).toBeGreaterThan(-1);
             };
 
             it('no profile when profile is private for other people', function() {
@@ -80,11 +80,11 @@ define(
 
             var testProfilePrivatePartsDoNotRender = function(ownProfile) {
                 var view = createSectionTwoView(ownProfile, false);
-                _.each(view.options.viewList, function(fieldView) {
+                view.options.viewList.forEach(function(fieldView) {
                     spyOn(fieldView, 'render');
                 });
                 view.render();
-                _.each(view.options.viewList, function(fieldView) {
+                view.options.viewList.forEach(function(fieldView) {
                     expect(fieldView.render).not.toHaveBeenCalled();
                 });
             };

@@ -1,8 +1,8 @@
 define([
-    'backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/template_helpers', 'course_bookmarks/js/views/bookmark_button'
 ],
-    function(Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
+    function(Backbone, $, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
         'use strict';
 
         describe('BookmarkButtonView', function() {
@@ -76,7 +76,7 @@ define([
                 var requests = AjaxHelpers.requests(this);
 
                 var bookmarkedData = [[addBookmarkedData, removeBookmarkData], [removeBookmarkData, addBookmarkedData]];
-                _.each(bookmarkedData, function(actionsData) {
+                bookmarkedData.forEach(function(actionsData) {
                     var firstActionData = actionsData[0];
                     var secondActionData = actionsData[1];
 

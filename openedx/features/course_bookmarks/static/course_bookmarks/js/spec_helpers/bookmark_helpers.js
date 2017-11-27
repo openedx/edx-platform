@@ -1,9 +1,8 @@
 define(
     [
-        'underscore',
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     ],
-    function(_, AjaxHelpers) {
+    function(AjaxHelpers) {
         'use strict';
 
         var TEST_COURSE_ID = 'course-v1:test-course';
@@ -43,7 +42,7 @@ define(
         };
 
         var breadcrumbTrail = function(path, unitDisplayName) {
-            return _.pluck(path, 'display_name').
+            return path.map(value => value['display_name']).
             concat([unitDisplayName]).
             join(' <span class="icon fa fa-caret-right" aria-hidden="true"></span><span class="sr">-</span> ');
         };

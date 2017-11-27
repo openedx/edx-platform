@@ -1,7 +1,6 @@
 define([
     'backbone',
     'jquery',
-    'underscore',
     'logger',
     'URI',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
@@ -11,7 +10,7 @@ define([
     'course_bookmarks/js/views/bookmarks_list',
     'course_bookmarks/js/collections/bookmarks'
 ],
-    function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBannerView,
+    function(Backbone, $, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBannerView,
              BookmarkHelpers, BookmarksListView, BookmarksCollection) {
         'use strict';
 
@@ -56,8 +55,8 @@ define([
 
             verifyRequestParams = function(requests, params) {
                 var urlParams = (new URI(requests[requests.length - 1].url)).query(true);
-                _.each(params, function(value, key) {
-                    expect(urlParams[key]).toBe(value);
+                Object.keys(params).forEach(function(key) {
+                    expect(urlParams[key]).toBe(params[key]);
                 });
             };
 

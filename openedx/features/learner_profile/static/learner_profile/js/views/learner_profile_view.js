@@ -3,17 +3,20 @@
 
     define(
         [
-            'gettext', 'jquery', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/html-utils',
+            'gettext', 'jquery', 'backbone', 'edx-ui-toolkit/js/utils/html-utils',
             'common/js/components/views/tabbed_view',
             'learner_profile/js/views/section_two_tab'
         ],
-        function(gettext, $, _, Backbone, HtmlUtils, TabbedView, SectionTwoTab) {
+        function(gettext, $, Backbone, HtmlUtils, TabbedView, SectionTwoTab) {
             var LearnerProfileView = Backbone.View.extend({
 
                 initialize: function(options) {
                     var Router;
-                    this.options = _.extend({}, options);
-                    _.bindAll(this, 'showFullProfile', 'render', 'renderFields', 'showLoadingError');
+                    this.options = Object.assign({}, options);
+                    this.showFullProfile = this.showFullProfile.bind(this);
+                    this.render = this.render.bind(this);
+                    this.renderFields = this.renderFields.bind(this);
+                    this.showLoadingError = this.showLoadingError.bind(this);
                     this.listenTo(this.options.preferencesModel, 'change:account_privacy', this.render);
                     Router = Backbone.Router.extend({
                         routes: {':about_me': 'loadTab', ':accomplishments': 'loadTab'}
@@ -91,7 +94,7 @@
                         this.$el.find('.account-settings-container').append(this.tabbedView.el);
 
                         if (this.firstRender) {
-                            this.router.on('route:loadTab', _.bind(this.setActiveTab, this));
+                            this.router.on('route:loadTab', this.setActiveTab.bind(this));
                             Backbone.history.start();
                             this.firstRender = false;
                             // Load from history.
@@ -138,7 +141,7 @@
                     this.$('.profile-image-field').append(imageView.render().el);
 
                     if (this.showFullProfile()) {
-                        _.each(this.options.sectionOneFieldViews, function(childFieldView) {
+                        this.options.sectionOneFieldViews.forEach(function(childFieldView) {
                             view.$('.profile-section-one-fields').append(childFieldView.render().el);
                         });
                     }

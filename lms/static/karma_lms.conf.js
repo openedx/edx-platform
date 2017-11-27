@@ -56,7 +56,12 @@ var options = {
         {pattern: 'lms/js/spec/main.js', included: true}
     ],
 
-    preprocessors: {}
+    preprocessors: {
+        'course_bookmarks/**/*.js': ['babel'],
+        'course_experience/**/*.js': ['babel'],
+        'course_search/**/*.js': ['babel'],
+        'learner_profile/**/*.js': ['babel'],
+    },
 };
 
 options.specFiles

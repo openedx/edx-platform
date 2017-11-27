@@ -4,13 +4,12 @@
     define([
         'gettext',
         'jquery',
-        'underscore',
         'edx-ui-toolkit/js/utils/html-utils',
         'common/js/components/views/list',
         'learner_profile/js/views/badge_view',
         'text!learner_profile/templates/badge_placeholder.underscore'
     ],
-        function(gettext, $, _, HtmlUtils, ListView, BadgeView, badgePlaceholder) {
+        function(gettext, $, HtmlUtils, ListView, BadgeView, badgePlaceholder) {
             var BadgeListView = ListView.extend({
                 tagName: 'div',
 

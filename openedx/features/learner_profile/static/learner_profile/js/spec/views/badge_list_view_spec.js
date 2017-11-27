@@ -1,12 +1,11 @@
 define([
     'backbone',
     'jquery',
-    'underscore',
     'edx-ui-toolkit/js/pagination/paging-collection',
     'learner_profile/js/spec_helpers/helpers',
     'learner_profile/js/views/badge_list_view'
 ],
-    function(Backbone, $, _, PagingCollection, LearnerProfileHelpers, BadgeListView) {
+    function(Backbone, $, PagingCollection, LearnerProfileHelpers, BadgeListView) {
         'use strict';
 
         describe('edx.user.BadgeListView', function() {
@@ -17,7 +16,7 @@ define([
                 var models = [];
                 var badgeList;
                 badgeCollection.url = '/api/badges/v1/assertions/user/staff/';
-                _.each(badges, function(element) {
+                badges.forEach(function(element) {
                     models.push(new Backbone.Model(element));
                 });
                 badgeCollection.models = models;
@@ -66,9 +65,9 @@ define([
                 var badges = [];
                 var placeholder;
                 var rows;
-                _.each(_.range(4), function(item) {
-                    badges.push(LearnerProfileHelpers.makeBadge(item));
-                });
+                for (var i = 0; i < 4; i++) {
+                    badges.push(LearnerProfileHelpers.makeBadge(i));
+                }
                 view = createView(badges, 1, 2, true);
                 view.render();
                 placeholder = view.$el.find('span.accomplishment-placeholder');

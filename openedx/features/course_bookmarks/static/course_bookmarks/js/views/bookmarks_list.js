@@ -2,11 +2,11 @@
     'use strict';
 
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'logger', 'moment', 'edx-ui-toolkit/js/utils/html-utils',
+        'gettext', 'jquery', 'backbone', 'logger', 'moment', 'edx-ui-toolkit/js/utils/html-utils',
         'common/js/components/views/paging_header', 'common/js/components/views/paging_footer',
         'text!course_bookmarks/templates/bookmarks-list.underscore'
     ],
-        function(gettext, $, _, Backbone, Logger, _moment, HtmlUtils,
+        function(gettext, $, Backbone, Logger, _moment, HtmlUtils,
                  PagingHeaderView, PagingFooterView, bookmarksListTemplate) {
             var moment = _moment || window.moment;
 
@@ -36,7 +36,8 @@
                     this.pagingHeaderView = new PagingHeaderView({collection: this.collection});
                     this.pagingFooterView = new PagingFooterView({collection: this.collection});
                     this.listenTo(this.collection, 'page_changed', this.render);
-                    _.bindAll(this, 'render', 'humanFriendlyDate');
+                    this.render = this.render.bind(this);
+                    this.humanFriendlyDate = this.humanFriendlyDate.bind(this);
                 },
 
                 render: function() {

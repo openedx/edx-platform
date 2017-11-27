@@ -4,7 +4,6 @@
     define([
         'gettext',
         'jquery',
-        'underscore',
         'backbone',
         'logger',
         'edx-ui-toolkit/js/utils/string-utils',
@@ -19,7 +18,7 @@
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner',
         'string_utils'
-    ], function(gettext, $, _, Backbone, Logger, StringUtils, PagingCollection, AccountSettingsModel,
+    ], function(gettext, $, Backbone, Logger, StringUtils, PagingCollection, AccountSettingsModel,
                 AccountPreferencesModel, FieldsView, LearnerProfileFieldsView, LearnerProfileView, BadgeModel,
                 BadgeListContainer, AccountSettingsFieldViews, MessageBannerView) {
         return function(options) {
@@ -31,7 +30,7 @@
             });
 
             var accountSettingsModel = new AccountSettingsModel(
-                _.extend(
+                Object.assign(
                     options.account_settings_data,
                     {default_public_account_fields: options.default_public_account_fields}
                 ),
