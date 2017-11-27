@@ -4,6 +4,7 @@ Tests for StudentViewTransformer.
 import ddt
 
 # pylint: disable=protected-access
+from django.test.utils import override_settings
 from openedx.core.lib.block_structure.factory import BlockStructureFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
@@ -22,6 +23,9 @@ class TestStudentViewTransformer(ModuleStoreTestCase):
         self.course_usage_key = self.store.make_course_usage_key(self.course_key)
         self.block_structure = BlockStructureFactory.create_from_modulestore(self.course_usage_key, self.store)
 
+    # pylint: disable=fixme
+    # FIXME: See openedx/core/lib/block_structure/block_structure.py FieldData.__delattr__
+    @override_settings(DEBUG=True)
     @ddt.data(
         'video', 'html', ['video', 'html'], [],
     )
