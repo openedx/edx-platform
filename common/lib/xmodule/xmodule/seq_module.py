@@ -322,12 +322,15 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             if self.runtime.user_is_staff:
                 banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
             elif not self._is_prereq_met(milestones[0]):
-                banner_text = _('This subsection is locked until prerequisite requirements are met.')
                 gate_content = True
-                # TODO - force a subsection grade recalcuation and then check again
+                required_grade = milestones[0]['requirements']['min_score']
+                # figure out correct way to formulate this url
+                preqreq_url = '../../../jump_to/' + milestones[0]['namespace'].replace('.gating', '')
+                # figure out how to get the display name of the gating section
+                preqreq_section_name = 'Test Section'
             else:
                 print('\nBF!! Hurray the prequesite has been met!!')
-      
+
         fragment = Fragment()
         params = {
             'items': self._render_student_view_for_items(context, display_items, fragment) if not gate_content else [],
@@ -340,7 +343,10 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             'prev_url': context.get('prev_url'),
             'banner_text': banner_text,
             'disable_navigation': not self.is_user_authenticated(context),
-            'gate_content' : gate_content,
+            'gate_content': gate_content,
+            'required_grade': required_grade if gate_content else None,
+            'prereq_url': preqreq_url if gate_content else None,
+            'prereq_section_name' : preqreq_section_name if gate_content else None
         }
         fragment.add_content(self.system.render_template("seq_module.html", params))
 
