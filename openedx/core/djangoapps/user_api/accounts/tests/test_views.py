@@ -3,36 +3,40 @@
 Test cases to cover Accounts-related behaviors of the User API application
 """
 import datetime
-import ddt
 import hashlib
 import json
-
 import unittest
 from copy import deepcopy
-from mock import patch
-from nose.plugins.attrib import attr
-from pytz import UTC
 
+import ddt
+import pytest
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
+from mock import patch
+from nose.plugins.attrib import attr
+from pytz import UTC
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APIClient, APITestCase
 
-from .. import PRIVATE_VISIBILITY, ALL_USERS_VISIBILITY
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.token_utils import JwtBuilder
-from student.models import UserProfile, LanguageProficiency, PendingEmailChange
+from student.models import LanguageProficiency, PendingEmailChange, UserProfile
 from student.tests.factories import (
-    ContentTypeFactory, TEST_PASSWORD, PermissionFactory, SuperuserFactory, UserFactory
+    TEST_PASSWORD,
+    ContentTypeFactory,
+    PermissionFactory,
+    SuperuserFactory,
+    UserFactory
 )
+from .. import ALL_USERS_VISIBILITY, PRIVATE_VISIBILITY
 
-TEST_PROFILE_IMAGE_UPLOADED_AT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
+TEST_PROFILE_IMAGE_UPLOADED_AT = datetime.datetime(2002, 1, 9, 15, 43, 1, tzinfo=UTC)
 
 
 # this is used in one test to check the behavior of profile image url
@@ -297,6 +301,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
     # This is needed when testing CMS as the patching is still executed even though the
     # suite is skipped.
     @patch.dict(getattr(settings, "ACCOUNT_VISIBILITY_CONFIGURATION", {}), {"default_visibility": "all_users"})
+    @pytest.mark.django111_expected_failure
     def test_get_account_different_user_visible(self):
         """
         Test that a client (logged in) can only get the shareable fields for a different user.
@@ -312,6 +317,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
     # This is needed when testing CMS as the patching is still executed even though the
     # suite is skipped.
     @patch.dict(getattr(settings, "ACCOUNT_VISIBILITY_CONFIGURATION", {}), {"default_visibility": "private"})
+    @pytest.mark.django111_expected_failure
     def test_get_account_different_user_private(self):
         """
         Test that a client (logged in) can only get the shareable fields for a different user.
@@ -333,6 +339,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         ("staff_client", "staff_user", ALL_USERS_VISIBILITY),
     )
     @ddt.unpack
+    @pytest.mark.django111_expected_failure
     def test_get_account_private_visibility(self, api_client, requesting_username, preference_visibility):
         """
         Test the return from GET based on user visibility setting.
@@ -611,6 +618,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         {'full': 50, 'medium': 30, 'small': 10},
         clear=True
     )
+    @pytest.mark.django111_expected_failure
     def test_patch_email(self):
         """
         Test that the user can request an email change through the accounts API.

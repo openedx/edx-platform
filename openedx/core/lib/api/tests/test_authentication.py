@@ -7,29 +7,30 @@ from __future__ import unicode_literals
 
 import itertools
 import json
+import unittest
 from collections import namedtuple
+from datetime import datetime, timedelta
 
 import ddt
-from datetime import datetime, timedelta
+import pytest
 from django.conf import settings
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.test import TestCase
 from django.utils.http import urlencode
 from nose.plugins.attrib import attr
 from oauth2_provider import models as dot_models
-from provider import constants, scope
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.test import APIRequestFactory, APIClient
+from rest_framework.test import APIClient, APIRequestFactory
 from rest_framework.views import APIView
 from rest_framework_oauth import permissions
 from rest_framework_oauth.compat import oauth2_provider, oauth2_provider_scope
-import unittest
 
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.lib.api import authentication
+from provider import constants, scope
 
 factory = APIRequestFactory()  # pylint: disable=invalid-name
 
@@ -74,6 +75,7 @@ urlpatterns = [
 @attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
+@pytest.mark.django111_expected_failure
 class OAuth2Tests(TestCase):
     """OAuth 2.0 authentication"""
     urls = 'openedx.core.lib.api.tests.test_authentication'

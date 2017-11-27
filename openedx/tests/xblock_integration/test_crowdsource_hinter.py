@@ -4,6 +4,7 @@ Test scenarios for the crowdsource hinter xblock.
 import json
 import unittest
 
+import pytest
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
@@ -135,6 +136,7 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @attr(shard=1)
+@pytest.mark.django111_expected_failure
 class TestHinterFunctions(TestCrowdsourceHinter):
     """
     Check that the essential functions of the hinter work as expected.

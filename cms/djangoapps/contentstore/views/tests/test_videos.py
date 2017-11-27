@@ -993,7 +993,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         (
             {
                 'provider': TranscriptProvider.THREE_PLAY_MEDIA,
-                'three_play_turnaround': 'default',
+                'three_play_turnaround': 'standard',
                 'video_source_language': 'zh',
             },
             True,
@@ -1003,7 +1003,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         (
             {
                 'provider': TranscriptProvider.THREE_PLAY_MEDIA,
-                'three_play_turnaround': 'default',
+                'three_play_turnaround': 'standard',
                 'video_source_language': 'es',
                 'preferred_languages': ['es', 'ur']
             },
@@ -1014,7 +1014,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         (
             {
                 'provider': TranscriptProvider.THREE_PLAY_MEDIA,
-                'three_play_turnaround': 'default',
+                'three_play_turnaround': 'standard',
                 'video_source_language': 'en',
                 'preferred_languages': ['es', 'ur']
             },
@@ -1038,7 +1038,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         (
             {
                 'provider': TranscriptProvider.THREE_PLAY_MEDIA,
-                'three_play_turnaround': 'default',
+                'three_play_turnaround': 'standard',
                 'preferred_languages': ['en'],
                 'video_source_language': 'en',
             },

@@ -11,6 +11,7 @@ import shutil
 import tempfile
 
 import ddt
+import pytest
 from boto.exception import BotoServerError
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -2860,6 +2861,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         decorated_func(request, self.course.id.to_deprecated_string())
         self.assertTrue(func.called)
 
+    @pytest.mark.django111_expected_failure
     def test_enrollment_report_features_csv(self):
         """
         test to generate enrollment report.
@@ -2900,6 +2902,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         response = self.client.post(url, {})
         self.assertIn('The detailed enrollment report is being created.', response.content)
 
+    @pytest.mark.django111_expected_failure
     def test_bulk_purchase_detailed_report(self):
         """
         test to generate detailed enrollment report.
@@ -2955,6 +2958,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         response = self.client.post(url, {})
         self.assertIn('The detailed enrollment report is being created.', response.content)
 
+    @pytest.mark.django111_expected_failure
     def test_create_registration_code_without_invoice_and_order(self):
         """
         test generate detailed enrollment report,
@@ -2977,6 +2981,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         response = self.client.post(url, {})
         self.assertIn('The detailed enrollment report is being created.', response.content)
 
+    @pytest.mark.django111_expected_failure
     def test_invoice_payment_is_still_pending_for_registration_codes(self):
         """
         test generate enrollment report
@@ -3630,6 +3635,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
 
 @attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@pytest.mark.django111_expected_failure
 class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Checks that only instructors have access to email endpoints, and that
@@ -4515,6 +4521,7 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
 
 @attr(shard=1)
 @override_settings(REGISTRATION_CODE_LENGTH=8)
+@pytest.mark.django111_expected_failure
 class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
     """
     Test data dumps for E-commerce Course Registration Codes.

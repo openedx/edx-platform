@@ -2,6 +2,7 @@
 Test cases for tabs.
 """
 
+import pytest
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -245,6 +246,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         cls.course.tabs.append(xmodule_tabs.CourseTab.load('static_tab', name='New Tab', url_slug='new_tab'))
         cls.course.save()
 
+    @pytest.mark.django111_expected_failure
     def test_logged_in(self):
         self.setup_user()
         url = reverse('static_tab', args=[self.course.id.to_deprecated_string(), 'new_tab'])
@@ -258,12 +260,14 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
 
+    @pytest.mark.django111_expected_failure
     def test_invalid_course_key(self):
         self.setup_user()
         request = get_mock_request(self.user)
         with self.assertRaises(Http404):
             StaticCourseTabView().get(request, course_id='edX/toy', tab_slug='new_tab')
 
+    @pytest.mark.django111_expected_failure
     def test_get_static_tab_fragment(self):
         self.setup_user()
         course = get_course_by_id(self.course.id)
@@ -319,6 +323,7 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.xml_url = "8e4cce2b4aaf4ba28b1220804619e41f"
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @pytest.mark.django111_expected_failure
     def test_logged_in_xml(self):
         self.setup_user()
         url = reverse('static_tab', args=[self.xml_course_key.to_deprecated_string(), self.xml_url])
@@ -336,6 +341,7 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
 @attr(shard=1)
 @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
+@pytest.mark.django111_expected_failure
 class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Validate tab behavior when dealing with Entrance Exams
@@ -443,6 +449,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
 
 
 @attr(shard=1)
+@pytest.mark.django111_expected_failure
 class TextBookCourseViewsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Validate tab behavior when dealing with textbooks.
@@ -690,6 +697,7 @@ class CourseTabListTestCase(TabListTestCase):
             # get tab by id
             self.assertEquals(xmodule_tabs.CourseTabList.get_tab_by_id(self.course.tabs, tab.tab_id), tab)
 
+    @pytest.mark.django111_expected_failure
     def test_course_tabs_staff_only(self):
         """
         Tests the static tabs that available only for instructor
@@ -721,6 +729,7 @@ class CourseTabListTestCase(TabListTestCase):
 
 
 @attr(shard=1)
+@pytest.mark.django111_expected_failure
 class ProgressTestCase(TabTestCase):
     """Test cases for Progress Tab."""
 
@@ -751,6 +760,7 @@ class ProgressTestCase(TabTestCase):
 
 
 @attr(shard=1)
+@pytest.mark.django111_expected_failure
 class StaticTabTestCase(TabTestCase):
     """Test cases for Static Tab."""
 
@@ -770,6 +780,7 @@ class StaticTabTestCase(TabTestCase):
 
 
 @attr(shard=1)
+@pytest.mark.django111_expected_failure
 class CourseInfoTabTestCase(TabTestCase):
     """Test cases for the course info tab."""
     def setUp(self):
@@ -798,6 +809,7 @@ class CourseInfoTabTestCase(TabTestCase):
 
 
 @attr(shard=1)
+@pytest.mark.django111_expected_failure
 class DiscussionLinkTestCase(TabTestCase):
     """Test cases for discussion link tab."""
 
