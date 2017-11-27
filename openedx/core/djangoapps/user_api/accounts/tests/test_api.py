@@ -6,6 +6,7 @@ Most of the functionality is covered in test_views.py.
 
 import re
 
+import ddt
 import pytest
 from dateutil.parser import parse as parse_datetime
 from django.conf import settings
@@ -14,11 +15,10 @@ from django.core import mail
 from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import Mock, patch
-from six import iteritems
-
-import ddt
 from nose.plugins.attrib import attr
 from nose.tools import raises
+from six import iteritems
+
 from openedx.core.djangoapps.user_api.accounts import PRIVATE_VISIBILITY, USERNAME_MAX_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import (
     activate_account,
@@ -409,6 +409,7 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         activate_account(u'invalid')
 
     @skip_unless_lms
+    @pytest.mark.django111_expected_failure
     def test_request_password_change(self):
         # Create and activate an account
         activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
@@ -427,6 +428,7 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         self.assertIsNot(result, None)
 
     @skip_unless_lms
+    @pytest.mark.django111_expected_failure
     def test_request_password_change_invalid_user(self):
         with self.assertRaises(UserNotFound):
             request_password_change(self.EMAIL, self.IS_SECURE)

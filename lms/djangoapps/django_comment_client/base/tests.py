@@ -6,6 +6,7 @@ import mock
 from contextlib import contextmanager
 
 import ddt
+import pytest
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
@@ -75,6 +76,7 @@ class MockRequestSetupMixin(object):
 
 @attr(shard=2)
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
+@pytest.mark.django111_expected_failure
 class CreateThreadGroupIdTestCase(
         MockRequestSetupMixin,
         CohortedTestCase,
@@ -495,6 +497,7 @@ class ViewsTestCase(
         with self.assert_discussion_signals('thread_created'):
             self.create_thread_helper(mock_request)
 
+    @pytest.mark.django111_expected_failure
     def test_create_thread_standalone(self, mock_request):
         team = CourseTeamFactory.create(
             name="A Team",
@@ -1408,6 +1411,7 @@ class CreateSubCommentUnicodeTestCase(
 @disable_signal(views, 'comment_created')
 @disable_signal(views, 'comment_voted')
 @disable_signal(views, 'comment_deleted')
+@pytest.mark.django111_expected_failure
 class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
     # Most of the test points use the same ddt data.
     # args: user, commentable_id, status_code
@@ -1874,6 +1878,7 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         {'comment_id': 'dummy_comment_id'}
     ))
     @ddt.unpack
+    @pytest.mark.django111_expected_failure
     def test_team_events(self, view_name, event_name, view_data, view_kwargs, mock_request, mock_emit):
         user = self.student
         team = CourseTeamFactory.create(discussion_topic_id=TEAM_COMMENTABLE_ID)

@@ -11,6 +11,7 @@ from urllib import quote, urlencode
 from uuid import uuid4
 
 import ddt
+import pytest
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse, reverse_lazy
@@ -206,6 +207,7 @@ class TestJumpTo(ModuleStoreTestCase):
 
 @attr(shard=2)
 @ddt.ddt
+@pytest.mark.django111_expected_failure
 class IndexQueryTestCase(ModuleStoreTestCase):
     """
     Tests for query count.
@@ -248,6 +250,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
 
 @attr(shard=2)
 @ddt.ddt
+@pytest.mark.django111_expected_failure
 class ViewsTestCase(ModuleStoreTestCase):
     """
     Tests for views.py methods.

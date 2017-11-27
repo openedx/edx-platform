@@ -6,11 +6,12 @@ import uuid
 
 import ddt
 import httpretty
+import mock
+import pytest
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
-import mock
 from nose.plugins.attrib import attr
 from pytz import utc
 
@@ -20,27 +21,26 @@ from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.catalog.tests.factories import (
-    generate_course_run_key,
-    ProgramFactory,
     CourseFactory,
     CourseRunFactory,
+    ProgramFactory,
     SeatFactory,
+    generate_course_run_key
 )
 from openedx.core.djangoapps.programs.tests.factories import ProgressFactory
 from openedx.core.djangoapps.programs.utils import (
     DEFAULT_ENROLLMENT_START_DATE,
-    ProgramProgressMeter,
     ProgramDataExtender,
     ProgramMarketingDataExtender,
-    get_certificates,
+    ProgramProgressMeter,
+    get_certificates
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import AnonymousUserFactory, UserFactory, CourseEnrollmentFactory
+from student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
 from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
-
 
 CERTIFICATES_API_MODULE = 'lms.djangoapps.certificates.api'
 ECOMMERCE_URL_ROOT = 'https://ecommerce.example.com'
@@ -51,6 +51,7 @@ UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 @attr(shard=2)
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_programs')
+@pytest.mark.django111_expected_failure
 class TestProgramProgressMeter(TestCase):
     """Tests of the program progress utility class."""
     def setUp(self):
