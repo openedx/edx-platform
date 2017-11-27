@@ -21,7 +21,7 @@
     {
         linkStart: edx.HtmlUtils.interpolateHtml(
             edx.HtmlUtils.HTML('<a href={highlightsDocUrl}">'),
-            {highlightsDocUrl: highlights_doc_url},
+            {highlightsDocUrl: highlights_doc_url}
         ),
         linkEnd: edx.HtmlUtils.HTML('</a>')
     }
