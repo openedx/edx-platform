@@ -1,12 +1,17 @@
 <ul aria-labelledby="notif_dropdown">
 
     <li class="notification-header action-btns"> Notifications
-        <a class="" href="/view_all_notifications">See all</a>
-        <a class="xns-all-action" href="#" onclick="markAllNotificationsRead(); return false;" class="mark-all-read">Mark all as read</a>
+        <div class="xns-actions">
+            <ul class="xns-tab-list">
+                <li class="xns-unread-action"><a href="#">View unread</a></li>
+                <li class="xns-all-action"><a href="#">View all</a></li>
+                <li class="xns-mark-read-action disabled"><a href="#">Mark as read</a></li>
+            </ul>
+        </div>
     </li>
 
     <% if(count === 0) { %>
-        <li class="no-notifs"><a href="#">No notifications</a></li>
+        <li class="no-notifs"><span>No notifications</span></li>
     <% } %>
     <li>
         <ul class="notification-menu" id="notification-dropdown">
