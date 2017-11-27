@@ -12,6 +12,7 @@ import httpretty
 import waffle
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 from mock import patch
 from nose.plugins.attrib import attr
 
@@ -152,12 +153,14 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         return reverse('course_modes_choose', args=[unicode(self.course.id)])
 
     @httpretty.activate
+    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     def test_no_enrollment(self):
         url = self._generate_enterprise_learner_context()
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
 
     @httpretty.activate
+    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_enterprise_learner_context(self):
         """
@@ -179,6 +182,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         )
 
     @httpretty.activate
+    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_enterprise_learner_context_with_multiple_organizations(self):
         """
@@ -202,6 +206,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # User visits the track selection page directly without ever enrolling
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
+        print(response)
         self.assertContains(
             response,
             'Welcome, {username}! You are about to enroll in {course_name}, from test organization 0 and '
@@ -212,6 +217,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         )
 
     @httpretty.activate
+    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_enterprise_learner_context_audit_disabled(self):
         """
@@ -225,6 +231,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.assertNotContains(response, 'Audit This Course')
 
     @httpretty.activate
+    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     def test_enterprise_learner_context_audit_enabled(self):
         """
         Track selection page should display Audit choice when specified for an Enterprise Customer
@@ -237,6 +244,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.assertContains(response, 'Audit This Course')
 
     @httpretty.activate
+    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     @patch('course_modes.views.get_enterprise_consent_url')
     @ddt.data(
         (True, True),

@@ -930,6 +930,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         self.assertTrue(is_active)
         self.assertEqual(course_mode, CourseMode.DEFAULT_MODE_SLUG)
 
+    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     def test_enterprise_course_enrollment_invalid_consent(self):
         """Verify that the enterprise_course_consent must be a boolean. """
         CourseModeFactory.create(
@@ -972,7 +973,8 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         )
 
     @httpretty.activate
-    @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker')
+    @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker',
+                       FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     def test_enterprise_course_enrollment_successful(self):
         """Verify that the enrollment completes when the EnterpriseCourseEnrollment creation succeeds. """
         UserFactory.create(

@@ -173,6 +173,7 @@ class TestEnterpriseApi(unittest.TestCase):
         mock_enterprise_enabled.assert_called_once()
         mock_consent_necessary.assert_called_once()
 
+    @override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_ENABLED)
     @mock.patch('openedx.features.enterprise_support.api.consent_needed_for_course')
     def test_get_enterprise_consent_url(self, needed_for_course_mock):
         """
@@ -197,6 +198,7 @@ class TestEnterpriseApi(unittest.TestCase):
         actual_url = get_enterprise_consent_url(request_mock, course_id, return_to=return_to)
         self.assertEqual(actual_url, expected_url)
 
+    @override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_ENABLED)
     @mock.patch('openedx.features.enterprise_support.api.consent_needed_for_course')
     def test_get_enterprise_consent_url_next_provided_not_course_specific(self, needed_for_course_mock):
         """
