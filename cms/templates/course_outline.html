@@ -153,7 +153,6 @@ from openedx.core.djangolib.markup import HTML, Text
             <div class="course-status">
                 <div class="status-release">
                     <h2 class="status-release-label">${_("Course Start Date")}</h2>
-                    <br>
                     <p class="status-release-value">${course_release_date}</p>
 
                     <ul class="status-actions">
@@ -168,7 +167,6 @@ from openedx.core.djangolib.markup import HTML, Text
                 % if SelfPacedConfiguration.current().enabled:
                     <div class="status-pacing">
                         <h2 class=status-pacing-label>${_("Course Pacing")}</h2>
-                        <br>
                         % if context_course.self_paced:
                             <p class="status-pacing-value">${_("Self-Paced")}</p>
                         % else:
