@@ -1054,8 +1054,8 @@ LANGUAGES = [
     ('vi', u'Tiếng Việt'),  # Vietnamese
     ('uz', u'Ўзбек'),  # Uzbek
     ('zh-cn', u'中文 (简体)'),  # Chinese (China)
-    ('zh-hk', u'中文 (香港)'),  # Chinese (Hong Kong)
-    ('zh-tw', u'中文 (台灣)'),  # Chinese (Taiwan)
+    ('zh-hans', u'中文 (简体)'),  # Chinese (China)
+    ('zh-hant', u'中文 (台灣)'),  # Chinese (Taiwan)
 ]
 
 LANGUAGE_DICT = dict(LANGUAGES)

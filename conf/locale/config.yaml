@@ -3,7 +3,7 @@
 # This will copy each source language to a new directory at the end of the i18n generate step
 # which allows us to migrate to a new locale code without re-creating the Transifex project.
 edx_lang_map:
-    zh_CN: zh_HANS
+    zh_CN: zh_Hans
 
 locales:
     - en  # English - Source Language
