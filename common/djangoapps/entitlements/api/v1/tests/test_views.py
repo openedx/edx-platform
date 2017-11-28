@@ -244,37 +244,37 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert course_entitlement.enrollment_course_run is not None
 
     def test_user_can_unenroll(self):
-            course_entitlement = CourseEntitlementFactory(
-                user=self.user
-            )
-            url = reverse(
-                self.ENTITLEMENTS_ENROLLMENT_NAMESPACE,
-                args=[str(course_entitlement.uuid)]
-            )
-            assert course_entitlement.enrollment_course_run is None
+        course_entitlement = CourseEntitlementFactory(
+            user=self.user
+        )
+        url = reverse(
+            self.ENTITLEMENTS_ENROLLMENT_NAMESPACE,
+            args=[str(course_entitlement.uuid)]
+        )
+        assert course_entitlement.enrollment_course_run is None
 
-            data = {
-                'course_run_id': str(self.course.id)
-            }
-            response = self.client.post(
-                url,
-                data=json.dumps(data),
-                content_type='application/json',
-            )
-            course_entitlement.refresh_from_db()
+        data = {
+            'course_run_id': str(self.course.id)
+        }
+        response = self.client.post(
+            url,
+            data=json.dumps(data),
+            content_type='application/json',
+        )
+        course_entitlement.refresh_from_db()
 
-            assert response.status_code == 201
-            assert CourseEnrollment.is_enrolled(self.user, self.course.id)
+        assert response.status_code == 201
+        assert CourseEnrollment.is_enrolled(self.user, self.course.id)
 
-            response = self.client.delete(
-                url,
-                content_type='application/json',
-            )
-            assert response.status_code == 204
+        response = self.client.delete(
+            url,
+            content_type='application/json',
+        )
+        assert response.status_code == 204
 
-            course_entitlement.refresh_from_db()
-            assert not CourseEnrollment.is_enrolled(self.user, self.course.id)
-            assert course_entitlement.enrollment_course_run is None
+        course_entitlement.refresh_from_db()
+        assert not CourseEnrollment.is_enrolled(self.user, self.course.id)
+        assert course_entitlement.enrollment_course_run is None
 
     def test_user_can_switch(self):
 
@@ -313,4 +313,3 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         course_entitlement.refresh_from_db()
         assert CourseEnrollment.is_enrolled(self.user, self.course2.id)
         assert course_entitlement.enrollment_course_run is not None
-

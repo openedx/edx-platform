@@ -18,6 +18,9 @@ from mock import patch
 from opaque_keys import InvalidKeyError
 from pyquery import PyQuery as pq
 
+from entitlements.tests.factories import CourseEntitlementFactory
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from student.models import CourseEnrollment, UserProfile
@@ -335,3 +338,57 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         remove_prerequisite_course(self.course.id, get_course_milestones(self.course.id)[0])
         response = self.client.get(reverse('dashboard'))
         self.assertNotIn('<div class="prerequisites">', response.content)
+
+    @patch('student.views.get_course_runs_for_course')
+    @patch.object(CourseOverview, 'get_from_id')
+    def test_unfulfilled_entitlement(self, mock_course_overview, mock_course_runs):
+        """
+        When a learner has an unfulfilled entitlement, their course dashboard should have:
+            - a hidden 'View Course' button
+            - the text 'In order to view the course you must select a session:'
+            - an unhidden course-entitlement-selection-container
+        """
+        CourseEntitlementFactory(user=self.user)
+        mock_course_overview.return_value = CourseOverviewFactory(start=self.TOMORROW)
+        mock_course_runs.return_value = [
+            {
+                'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
+                'enrollment_end': self.TOMORROW,
+                'pacing_type': 'instructor_paced',
+                'type': 'verified'
+            }
+        ]
+        response = self.client.get(self.path)
+        self.assertIn('class="enter-course hidden"', response.content)
+        self.assertIn('You must select a session to access the course.', response.content)
+        self.assertIn('<div class="course-entitlement-selection-container ">', response.content)
+
+    @patch('student.views.get_course_runs_for_course')
+    @patch.object(CourseOverview, 'get_from_id')
+    @patch('opaque_keys.edx.keys.CourseKey.from_string')
+    def test_fulfilled_entitlement(self, mock_course_key, mock_course_overview, mock_course_runs):
+        """
+        When a learner has a fulfilled entitlement, their course dashboard should have:
+            - exactly one course item, meaning it:
+                - has an entitlement card
+                - does NOT have a course card referencing the selected session
+            - an unhidden Change Session button
+        """
+        mocked_course_overview = CourseOverviewFactory(
+            start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
+        )
+        mock_course_overview.return_value = mocked_course_overview
+        mock_course_key.return_value = mocked_course_overview.id
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
+        mock_course_runs.return_value = [
+            {
+                'key': mocked_course_overview.id,
+                'enrollment_end': mocked_course_overview.enrollment_end,
+                'pacing_type': 'self_paced',
+                'type': 'verified'
+            }
+        ]
+        CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
+        response = self.client.get(self.path)
+        self.assertEqual(response.content.count('<li class="course-item">'), 1)
+        self.assertIn('<button class="change-session btn-link "', response.content)
