@@ -1,0 +1,7 @@
+
+<% if (count > 0) { %>
+    <span id="notification-count">
+        <%=count %>
+    </span>
+<% } %>
+
