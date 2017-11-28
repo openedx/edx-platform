@@ -1188,11 +1188,17 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             xblock_info.update({
                 'hide_after_due': xblock.hide_after_due,
             })
-        elif xblock.category == 'chapter':
+        elif xblock.category in ('chapter', 'course'):
+            if xblock.category == 'chapter':
+                xblock_info.update({
+                    'highlights': xblock.highlights,
+                })
+            elif xblock.category == 'course':
+                xblock_info.update({
+                    'highlights_enabled_for_messaging': course.highlights_enabled_for_messaging,
+                })
             xblock_info.update({
-                'highlights': xblock.highlights,
                 'highlights_enabled': highlights_setting.is_enabled(),
-                'highlights_enabled_for_messaging': course.highlights_enabled_for_messaging,
                 'highlights_preview_only': not COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course.id),
                 'highlights_doc_url': HelpUrlExpert.the_one().url_for_token('content_highlights'),
             })

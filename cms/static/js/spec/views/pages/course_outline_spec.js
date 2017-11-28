@@ -32,7 +32,9 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                         children: []
                     },
                     user_partitions: [],
-                    user_partition_info: {}
+                    user_partition_info: {},
+                    highlights_enabled: true,
+                    highlights_enabled_for_messaging: false
                 }, options, {child_info: {children: children}});
             };
 
@@ -262,7 +264,8 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     'due-date-editor', 'grading-editor', 'publish-editor',
                     'staff-lock-editor', 'unit-access-editor', 'content-visibility-editor',
                     'settings-modal-tabs', 'timed-examination-preference-editor', 'access-editor',
-                    'show-correctness-editor', 'highlights-editor'
+                    'show-correctness-editor', 'highlights-editor', 'highlights-enable-editor',
+                    'course-highlights-enable'
                 ]);
                 appendSetFixtures(mockOutlinePage);
                 mockCourseJSON = createMockCourseJSON({}, [
@@ -529,20 +532,17 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                 });
             });
 
-            describe('Section Highlights', function() {
-                var createCourse, createCourseWithHighlights, createCourseWithHighlightsDisabled, mockHighlightValues,
-                    highlightsLink, highlightInputs, openHighlights, saveHighlights, setHighlights,
-                    expectHighlightLinkNumberToBe, expectHighlightsToBe, expectServerHandshakeWithHighlights,
-                    expectHighlightsToUpdate,
-                    maxNumHighlights = 5;
+            describe('Content Highlights', function() {
+                var createCourse, createCourseWithHighlights, createCourseWithHighlightsDisabled,
+                    clickSaveOnModal, clickCancelOnModal;
 
                 beforeEach(function() {
                     setSelfPaced();
                 });
 
-                createCourse = function(sectionOptions) {
+                createCourse = function(sectionOptions, courseOptions) {
                     createCourseOutlinePage(this,
-                        createMockCourseJSON({}, [
+                        createMockCourseJSON(courseOptions, [
                             createMockSectionJSON(sectionOptions)
                         ])
                     );
@@ -553,142 +553,256 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                 };
 
                 createCourseWithHighlightsDisabled = function() {
-                    createCourse({highlights_enabled: false});
+                    var highlightsDisabled = {highlights_enabled: false};
+                    createCourse(highlightsDisabled, highlightsDisabled);
                 };
 
-                mockHighlightValues = function(numberOfHighlights) {
-                    var highlights = [],
-                        i;
-                    for (i = 0; i < numberOfHighlights; i++) {
-                        highlights.push('Highlight' + (i + 1));
-                    }
-                    return highlights;
-                };
-
-                highlightsLink = function() {
-                    return outlinePage.$('.section-status >> .highlights-button');
-                };
-
-                highlightInputs = function() {
-                    return $('.highlight-input-text');
-                };
-
-                openHighlights = function() {
-                    highlightsLink().click();
-                };
-
-                saveHighlights = function() {
+                clickSaveOnModal = function() {
                     $('.wrapper-modal-window .action-save').click();
                 };
 
-                setHighlights = function(highlights) {
-                    var i;
-                    for (i = 0; i < highlights.length; i++) {
-                        $(highlightInputs()[i]).val(highlights[i]);
-                    }
-                    for (i = highlights.length; i < maxNumHighlights; i++) {
-                        $(highlightInputs()[i]).val('');
-                    }
+                clickCancelOnModal = function() {
+                    $('.wrapper-modal-window .action-cancel').click();
                 };
 
-                expectHighlightLinkNumberToBe = function(expectedNumber) {
-                    var link = highlightsLink();
-                    expect(link).toContainText('Section Highlights');
-                    expect(link.find('.number-highlights')).toHaveHtml(expectedNumber);
-                };
+                describe('Course Highlights Setting', function() {
+                    var highlightsSetting, expectHighlightsEnabledToBe, expectServerHandshake, openHighlightsSettings;
 
-                expectHighlightsToBe = function(expectedHighlights) {
-                    var highlights = highlightInputs(),
-                        i;
+                    highlightsSetting = function() {
+                        return $('.course-highlights-setting');
+                    };
 
-                    expect(highlights).toHaveLength(maxNumHighlights);
-
-                    for (i = 0; i < expectedHighlights.length; i++) {
-                        expect(highlights[i]).toHaveValue(expectedHighlights[i]);
-                    }
-                    for (i = expectedHighlights.length; i < maxNumHighlights; i++) {
-                        expect(highlights[i]).toHaveValue('');
-                        expect(highlights[i]).toHaveAttr('placeholder', 'A highlight to look forward to this week.');
-                    }
-                };
-
-                expectServerHandshakeWithHighlights = function(highlights) {
-                    // POST to update section
-                    AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-section', {
-                        publish: 'republish',
-                        metadata: {
-                            highlights: highlights
+                    expectHighlightsEnabledToBe = function(expectedEnabled) {
+                        if (expectedEnabled) {
+                            expect('.status-highlights-enabled-value.button').not.toExist();
+                            expect('.status-highlights-enabled-value.text').toExist();
+                        } else {
+                            expect('.status-highlights-enabled-value.button').toExist();
+                            expect('.status-highlights-enabled-value.text').not.toExist();
                         }
+                    }
+
+                    expectServerHandshake = function() {
+                        // POST to update course
+                        AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-course', {
+                            publish: 'republish',
+                            metadata: {
+                                highlights_enabled_for_messaging: true
+                            }
+                        });
+                        AjaxHelpers.respondWithJson(requests, {});
+
+                        // GET updated course
+                        AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
+                        AjaxHelpers.respondWithJson(
+                            requests, createMockCourseJSON({highlights_enabled_for_messaging: true})
+                        );
+                    };
+
+                    openHighlightsSettings = function() {
+                        $('button.status-highlights-enabled-value').click();
+                    };
+
+                    it('does not display settings when disabled', function() {
+                        createCourseWithHighlightsDisabled();
+                        expect(highlightsSetting()).not.toExist();
                     });
-                    AjaxHelpers.respondWithJson(requests, {});
 
-                    // GET updated section
-                    AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section');
-                    AjaxHelpers.respondWithJson(requests, createMockSectionJSON({highlights: highlights}));
-                };
+                    it('displays settings when enabled', function() {
+                        createCourseWithHighlights([]);
+                        expect(highlightsSetting()).toExist();
+                    });
 
-                expectHighlightsToUpdate = function(originalHighlights, updatedHighlights) {
-                    createCourseWithHighlights(originalHighlights);
+                    it('displays settings as not enabled for messaging', function() {
+                        createCourse();
+                        expectHighlightsEnabledToBe(false);
+                    });
 
-                    openHighlights();
-                    setHighlights(updatedHighlights);
-                    saveHighlights();
+                    it('displays settings as enabled for messaging', function() {
+                        createCourse({}, {highlights_enabled_for_messaging: true});
+                        expectHighlightsEnabledToBe(true);
+                    });
 
-                    expectServerHandshakeWithHighlights(updatedHighlights);
-                    expectHighlightLinkNumberToBe(updatedHighlights.length);
+                    it('changes settings when enabled for messaging', function() {
+                        createCourse();
+                        openHighlightsSettings();
+                        clickSaveOnModal();
+                        expectServerHandshake();
+                        expectHighlightsEnabledToBe(true);
+                    });
 
-                    openHighlights();
-                    expectHighlightsToBe(updatedHighlights);
-                };
-
-                it('does not display a link when highlights is disabled', function() {
-                    createCourseWithHighlightsDisabled();
-                    expect(highlightsLink()).toHaveLength(0);
+                    it('does not change settings when enabling is cancelled', function() {
+                        createCourse();
+                        openHighlightsSettings();
+                        clickCancelOnModal();
+                        expectHighlightsEnabledToBe(false);
+                    });
                 });
 
-                it('displays link when no highlights exist', function() {
-                    createCourseWithHighlights([]);
-                    expectHighlightLinkNumberToBe(0);
-                });
 
-                it('displays link when highlights exist', function() {
-                    var highlights = mockHighlightValues(2);
-                    createCourseWithHighlights(highlights);
-                    expectHighlightLinkNumberToBe(2);
-                });
+                describe('Section Highlights', function() {
+                    var mockHighlightValues, highlightsLink, highlightInputs, openHighlights, saveHighlights,
+                        cancelHighlights, setHighlights, expectHighlightLinkNumberToBe, expectHighlightsToBe,
+                        expectServerHandshakeWithHighlights, expectHighlightsToUpdate,
+                        maxNumHighlights = 5;
 
-                it('can view when no highlights exist', function() {
-                    createCourseWithHighlights([]);
-                    openHighlights();
-                    expectHighlightsToBe([]);
-                });
+                    mockHighlightValues = function(numberOfHighlights) {
+                        var highlights = [],
+                            i;
+                        for (i = 0; i < numberOfHighlights; i++) {
+                            highlights.push('Highlight' + (i + 1));
+                        }
+                        return highlights;
+                    };
 
-                it('can view existing highlights', function() {
-                    var highlights = mockHighlightValues(2);
-                    createCourseWithHighlights(highlights);
-                    openHighlights();
-                    expectHighlightsToBe(highlights);
-                });
+                    highlightsLink = function() {
+                        return outlinePage.$('.section-status >> .highlights-button');
+                    };
 
-                it('can add highlights', function() {
-                    expectHighlightsToUpdate(
-                        mockHighlightValues(0),
-                        mockHighlightValues(1)
-                    );
-                });
+                    highlightInputs = function() {
+                        return $('.highlight-input-text');
+                    };
 
-                it('can remove highlights', function() {
-                    expectHighlightsToUpdate(
-                        mockHighlightValues(5),
-                        mockHighlightValues(3)
-                    );
-                });
+                    openHighlights = function() {
+                        highlightsLink().click();
+                    };
 
-                it('can edit highlights', function() {
-                    var originalHighlights = mockHighlightValues(3),
-                        editedHighlights = originalHighlights;
-                    editedHighlights[2] = 'A New Value';
-                    expectHighlightsToUpdate(originalHighlights, editedHighlights);
+                    saveHighlights = function() {
+                        clickSaveOnModal();
+                    };
+
+                    cancelHighlights = function() {
+                        clickCancelOnModal();
+                    };
+
+                    setHighlights = function(highlights) {
+                        var i;
+                        for (i = 0; i < highlights.length; i++) {
+                            $(highlightInputs()[i]).val(highlights[i]);
+                        }
+                        for (i = highlights.length; i < maxNumHighlights; i++) {
+                            $(highlightInputs()[i]).val('');
+                        }
+                    };
+
+                    expectHighlightLinkNumberToBe = function(expectedNumber) {
+                        var link = highlightsLink();
+                        expect(link).toContainText('Section Highlights');
+                        expect(link.find('.number-highlights')).toHaveHtml(expectedNumber);
+                    };
+
+                    expectHighlightsToBe = function(expectedHighlights) {
+                        var highlights = highlightInputs(),
+                            i;
+
+                        expect(highlights).toHaveLength(maxNumHighlights);
+
+                        for (i = 0; i < expectedHighlights.length; i++) {
+                            expect(highlights[i]).toHaveValue(expectedHighlights[i]);
+                        }
+                        for (i = expectedHighlights.length; i < maxNumHighlights; i++) {
+                            expect(highlights[i]).toHaveValue('');
+                            expect(highlights[i]).toHaveAttr(
+                                'placeholder',
+                                'A highlight to look forward to this week.'
+                            );
+                        }
+                    };
+
+                    expectServerHandshakeWithHighlights = function(highlights) {
+                        // POST to update section
+                        AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-section', {
+                            publish: 'republish',
+                            metadata: {
+                                highlights: highlights
+                            }
+                        });
+                        AjaxHelpers.respondWithJson(requests, {});
+
+                        // GET updated section
+                        AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section');
+                        AjaxHelpers.respondWithJson(requests, createMockSectionJSON({highlights: highlights}));
+                    };
+
+                    expectHighlightsToUpdate = function(originalHighlights, updatedHighlights) {
+                        createCourseWithHighlights(originalHighlights);
+
+                        openHighlights();
+                        setHighlights(updatedHighlights);
+                        saveHighlights();
+
+                        expectServerHandshakeWithHighlights(updatedHighlights);
+                        expectHighlightLinkNumberToBe(updatedHighlights.length);
+
+                        openHighlights();
+                        expectHighlightsToBe(updatedHighlights);
+                    };
+
+                    it('does not display link when disabled', function() {
+                        createCourseWithHighlightsDisabled();
+                        expect(highlightsLink()).not.toExist();
+                    });
+
+                    it('displays link when no highlights exist', function() {
+                        createCourseWithHighlights([]);
+                        expectHighlightLinkNumberToBe(0);
+                    });
+
+                    it('displays link when highlights exist', function() {
+                        var highlights = mockHighlightValues(2);
+                        createCourseWithHighlights(highlights);
+                        expectHighlightLinkNumberToBe(2);
+                    });
+
+                    it('can view when no highlights exist', function() {
+                        createCourseWithHighlights([]);
+                        openHighlights();
+                        expectHighlightsToBe([]);
+                    });
+
+                    it('can view existing highlights', function() {
+                        var highlights = mockHighlightValues(2);
+                        createCourseWithHighlights(highlights);
+                        openHighlights();
+                        expectHighlightsToBe(highlights);
+                    });
+
+                    it('does not save highlights when cancelled', function() {
+                        var originalHighlights = mockHighlightValues(2),
+                            editedHighlights = originalHighlights;
+                        editedHighlights[1] = 'A New Value';
+
+                        createCourseWithHighlights(originalHighlights);
+                        openHighlights();
+                        setHighlights(editedHighlights);
+
+                        cancelHighlights();
+                        AjaxHelpers.expectNoRequests(requests);
+
+                        openHighlights();
+                        expectHighlightsToBe(originalHighlights);
+                    });
+
+                    it('can add highlights', function() {
+                        expectHighlightsToUpdate(
+                            mockHighlightValues(0),
+                            mockHighlightValues(1)
+                        );
+                    });
+
+                    it('can remove highlights', function() {
+                        expectHighlightsToUpdate(
+                            mockHighlightValues(5),
+                            mockHighlightValues(3)
+                        );
+                    });
+
+                    it('can edit highlights', function() {
+                        var originalHighlights = mockHighlightValues(3),
+                            editedHighlights = originalHighlights;
+                        editedHighlights[2] = 'A New Value';
+                        expectHighlightsToUpdate(originalHighlights, editedHighlights);
+                    });
                 });
             });
 
