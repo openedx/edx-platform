@@ -313,6 +313,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             'items': contents,
             'xblock_context': context,
             'show_bookmark_button': False,
+            'watched_completable_blocks': set(),
         }))
         return fragment
 

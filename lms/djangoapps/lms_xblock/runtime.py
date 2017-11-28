@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from badges.service import BadgingService
 from badges.utils import badges_enabled
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
+from lms.djangoapps.completion.services import CompletionService
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import xblock_local_resource_url
@@ -133,15 +134,17 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     def __init__(self, **kwargs):
         request_cache_dict = RequestCache.get_request_cache().data
+        store = modulestore()
+
         services = kwargs.setdefault('services', {})
+        services['completion'] = CompletionService(user=kwargs.get('user'), course_key=kwargs.get('course_id'))
         services['fs'] = xblock.reference.plugins.FSService()
         services['i18n'] = ModuleI18nService
-        services['library_tools'] = LibraryToolsService(modulestore())
+        services['library_tools'] = LibraryToolsService(store)
         services['partitions'] = PartitionService(
             course_id=kwargs.get('course_id'),
             cache=request_cache_dict
         )
-        store = modulestore()
         services['settings'] = SettingsService()
         services['user_tags'] = UserTagsService(self)
         if badges_enabled():

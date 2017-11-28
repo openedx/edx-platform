@@ -16,28 +16,11 @@ from student.tests.factories import UserFactory
 
 from .. import handlers
 from ..models import BlockCompletion
-from .. import waffle
-
-
-class CompletionHandlerMixin(object):
-    """
-    Common functionality for completion handler tests.
-    """
-    def override_waffle_switch(self, override):
-        """
-        Override the setting of the ENABLE_COMPLETION_TRACKING waffle switch
-        for the course of the test.
-
-        Parameters:
-            override (bool): True if tracking should be enabled.
-        """
-        _waffle_overrider = waffle.waffle().override(waffle.ENABLE_COMPLETION_TRACKING, override)
-        _waffle_overrider.__enter__()
-        self.addCleanup(_waffle_overrider.__exit__, None, None, None)
+from ..test_utils import CompletionWaffleTestMixin
 
 
 @ddt.ddt
-class ScorableCompletionHandlerTestCase(CompletionHandlerMixin, TestCase):
+class ScorableCompletionHandlerTestCase(CompletionWaffleTestMixin, TestCase):
     """
     Test the signal handler
     """
@@ -89,7 +72,7 @@ class ScorableCompletionHandlerTestCase(CompletionHandlerMixin, TestCase):
         mock_handler.assert_called()
 
 
-class DisabledCompletionHandlerTestCase(CompletionHandlerMixin, TestCase):
+class DisabledCompletionHandlerTestCase(CompletionWaffleTestMixin, TestCase):
     """
     Test that disabling the ENABLE_COMPLETION_TRACKING waffle switch prevents
     the signal handler from submitting a completion.
